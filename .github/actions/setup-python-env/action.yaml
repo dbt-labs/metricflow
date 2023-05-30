@@ -32,11 +32,12 @@ runs:
         ~/.local/share/hatch
         ~/.cache/hatch
         ~/.cache/pre-commit
-      key: >
-        ${{ env.pythonLocation }}
-        --${{ hashFiles('pyproject.toml') }}
-        --${{ hashFiles('.pre-commit-config.yaml') }}
-        --${{ env.LINUX_RELEASE }}
+      # >- means combine all lines to a single line
+      key: >-
+        python_location="${{ env.pythonLocation }}"/
+        pyproject_hash="${{ hashFiles('pyproject.toml') }}"/
+        precommit_config_hash="${{ hashFiles('.pre-commit-config.yaml') }}"/
+        linux_release="${{ env.LINUX_RELEASE }}"}
 
   - name: Install Hatch
     shell: bash
