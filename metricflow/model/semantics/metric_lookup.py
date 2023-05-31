@@ -20,7 +20,7 @@ from metricflow.specs.specs import (
     MetricInputMeasureSpec,
     MetricSpec,
 )
-from metricflow.specs.where_filter_transform import ConvertToWhereSpec
+from metricflow.specs.where_filter_transform import WhereSpecFactory
 
 logger = logging.getLogger(__name__)
 
@@ -120,11 +120,9 @@ class MetricLookup(MetricAccessor):  # noqa: D
             )
             spec = MetricInputMeasureSpec(
                 measure_spec=measure_spec,
-                constraint=input_measure.filter.transform(
-                    ConvertToWhereSpec(
-                        column_association_resolver=column_association_resolver,
-                    )
-                )
+                constraint=WhereSpecFactory(
+                    column_association_resolver=column_association_resolver,
+                ).create_from_where_filter(input_measure.filter)
                 if input_measure.filter is not None
                 else None,
                 alias=input_measure.alias,
@@ -159,22 +157,18 @@ class MetricLookup(MetricAccessor):  # noqa: D
 
             # This is the constraint parameter added to the input metric in the derived metric definition
             combined_filter = (
-                input_metric.filter.transform(
-                    ConvertToWhereSpec(
-                        column_association_resolver=column_association_resolver,
-                    )
-                )
+                WhereSpecFactory(
+                    column_association_resolver=column_association_resolver,
+                ).create_from_where_filter(input_metric.filter)
                 if input_metric.filter is not None
                 else None
             )
 
             # This is the constraint parameter included in the original input metric definition
             if original_metric_obj.filter:
-                original_metric_filter = original_metric_obj.filter.transform(
-                    ConvertToWhereSpec(
-                        column_association_resolver=column_association_resolver,
-                    )
-                )
+                original_metric_filter = WhereSpecFactory(
+                    column_association_resolver=column_association_resolver,
+                ).create_from_where_filter(original_metric_obj.filter)
                 combined_filter = (
                     combined_filter.combine(original_metric_filter) if combined_filter else original_metric_filter
                 )

@@ -10,7 +10,7 @@ from dbt_semantic_interfaces.objects.elements.dimension import (
     DimensionType,
     DimensionTypeParams,
 )
-from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
+from dbt_semantic_interfaces.protocols.where_filter import WhereFilter
 from dbt_semantic_interfaces.objects.metadata import Metadata
 from dbt_semantic_interfaces.objects.metric import Metric as SemanticManifestMetric
 from dbt_semantic_interfaces.objects.metric import MetricInputMeasure, MetricType, MetricTypeParams

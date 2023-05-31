@@ -4,15 +4,15 @@ import logging
 from typing import Sequence
 
 import jinja2
-from dbt_semantic_interfaces.objects.filters.call_parameter_sets import (
+
+from dbt_semantic_interfaces.implementations.filters.call_parameter_sets import (
     DimensionCallParameterSet,
-    EntityCallParameterSet,
     TimeDimensionCallParameterSet,
+    EntityCallParameterSet,
 )
-from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter, WhereFilterTransform
+from dbt_semantic_interfaces.protocols.where_filter import WhereFilter
 from dbt_semantic_interfaces.references import DimensionReference, EntityReference, TimeDimensionReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
     DimensionSpec,
@@ -30,7 +30,7 @@ class RenderSqlTemplateException(Exception):  # noqa: D
     pass
 
 
-class ConvertToWhereSpec(WhereFilterTransform[WhereFilterSpec]):
+class WhereSpecFactory:
     """Renders the SQL template in the WhereFilter and converts it to a WhereFilterSpec."""
 
     def __init__(  # noqa: D
@@ -63,14 +63,14 @@ class ConvertToWhereSpec(WhereFilterTransform[WhereFilterSpec]):
             entity_links=parameter_set.entity_path,
         )
 
-    def transform(self, where_filter: WhereFilter) -> WhereFilterSpec:  # noqa: D
+    def create_from_where_filter(self, where_filter: WhereFilter) -> WhereFilterSpec:  # noqa: D
         dimension_specs = []
         time_dimension_specs = []
         entity_specs = []
 
         def _dimension_call(dimension_name: str, entity_path: Sequence[str] = ()) -> str:
             """Gets called by Jinja when rendering {{ dimension(...) }}."""
-            dimension_spec = ConvertToWhereSpec._convert_to_dimension_spec(
+            dimension_spec = WhereSpecFactory._convert_to_dimension_spec(
                 DimensionCallParameterSet(
                     dimension_reference=DimensionReference(element_name=dimension_name),
                     entity_path=tuple(EntityReference(element_name=arg) for arg in entity_path),
@@ -83,7 +83,7 @@ class ConvertToWhereSpec(WhereFilterTransform[WhereFilterSpec]):
             time_dimension_name: str, time_granularity_name: str, entity_path: Sequence[str] = ()
         ) -> str:
             """Gets called by Jinja when rendering {{ time_dimension(...) }}."""
-            time_dimension_spec = ConvertToWhereSpec._convert_to_time_dimension_spec(
+            time_dimension_spec = WhereSpecFactory._convert_to_time_dimension_spec(
                 TimeDimensionCallParameterSet(
                     time_dimension_reference=TimeDimensionReference(element_name=time_dimension_name),
                     time_granularity=TimeGranularity(time_granularity_name),
@@ -94,7 +94,7 @@ class ConvertToWhereSpec(WhereFilterTransform[WhereFilterSpec]):
             return self._column_association_resolver.resolve_spec(time_dimension_spec).column_name
 
         def _entity_call(entity_name: str, entity_path: Sequence[str] = ()) -> str:
-            entity_spec = ConvertToWhereSpec._convert_to_entity_spec(
+            entity_spec = WhereSpecFactory._convert_to_entity_spec(
                 EntityCallParameterSet(
                     entity_reference=EntityReference(element_name=entity_name),
                     entity_path=tuple(EntityReference(element_name=arg) for arg in entity_path),
