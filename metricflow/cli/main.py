@@ -17,12 +17,12 @@ import jinja2
 import pandas as pd
 from dbt_semantic_interfaces.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationResults
 from halo import Halo
 from packaging.version import parse
 from update_checker import UpdateChecker
 
 import metricflow.cli.custom_click_types as click_custom
+from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationResults
 from metricflow.cli import PACKAGE_NAME
 from metricflow.cli.cli_context import CLIContext
 from metricflow.cli.constants import DEFAULT_RESULT_DECIMAL_PLACES, MAX_LIST_OBJECT_ELEMENTS
@@ -657,14 +657,7 @@ def validate_configs(
     parsing_spinner = Halo(text="Building model from configs", spinner="dots")
     parsing_spinner.start()
 
-    if cfg.dbt_cloud_configs is not None:
-        from metricflow.model.parsing.dbt_cloud_to_model import model_build_result_for_dbt_cloud_job
-
-        parsing_result = model_build_result_for_dbt_cloud_job(
-            auth=cfg.dbt_cloud_configs.auth, job_id=cfg.dbt_cloud_configs.job_id
-        )
-    else:
-        parsing_result = model_build_result_from_config(handler=cfg.config, raise_issues_as_exceptions=False)
+    parsing_result = model_build_result_from_config(handler=cfg.config, raise_issues_as_exceptions=False)
 
     if not parsing_result.issues.has_blocking_issues:
         parsing_spinner.succeed(f"🎉 Successfully built model from configs ({parsing_result.issues.summary()})")

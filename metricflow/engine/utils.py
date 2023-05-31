@@ -5,8 +5,8 @@ from typing import Optional
 
 from dateutil.parser import parse
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.parsing.dir_to_model import ModelBuildResult, parse_directory_of_yaml_files_to_model
 
+from dbt_semantic_interfaces.parsing.dir_to_model import ModelBuildResult, parse_directory_of_yaml_files_to_model
 from metricflow.configuration.constants import CONFIG_MODEL_PATH
 from metricflow.configuration.yaml_handler import YamlFileHandler
 from metricflow.errors.errors import ModelCreationException
@@ -39,54 +39,9 @@ def model_build_result_from_config(
         raise ModelCreationException from e
 
 
-def model_build_result_from_dbt_config(
-    handler: YamlFileHandler,
-    raise_issues_as_exceptions: bool = True,
-    profile: Optional[str] = None,
-    target: Optional[str] = None,
-) -> ModelBuildResult:
-    """Given a yaml file, creates a ModelBuildResult.
-
-    Args:
-        handler: a file handler for loading the configs from
-        raise_issues_as_exceptions: determines if issues should be raised, or returned as issues
-        profile: a dbt profile to override the project default, default None
-        target: a dbt target to overide the profile default, default None
-
-    Returns:
-        ModelBuildResult that contains the UserConfigureModel and any associated ValidationIssues
-    """
-    dbt_models_path = path_to_models(handler=handler)
-    try:
-        # This import results in eventually importing dbt, and dbt is an
-        # optional dep meaning it isn't guaranteed to be installed. If the
-        # import is at the top ofthe file MetricFlow will blow up if dbt
-        # isn't installed. Thus by importing it here, we only run into the
-        # exception if this method is called without dbt installed.
-        from metricflow.model.parsing.dbt_dir_to_model import parse_dbt_project_to_model
-
-        return parse_dbt_project_to_model(directory=dbt_models_path, profile=profile, target=target)
-    except Exception as e:
-        raise ModelCreationException from e
-
-
 def build_semantic_manifest_from_config(handler: YamlFileHandler) -> SemanticManifest:
     """Given a yaml file, create a SemanticManifest."""
     return model_build_result_from_config(handler=handler).model
-
-
-def build_semantic_manifest_from_dbt_config(
-    handler: YamlFileHandler, profile: Optional[str] = None, target: Optional[str] = None
-) -> SemanticManifest:
-    """Given a yaml file, create a SemanticManifest."""
-    return model_build_result_from_dbt_config(handler=handler, profile=profile, target=target).model
-
-
-def build_semantic_manifest_from_dbt_cloud(job_id: str, service_token: str) -> SemanticManifest:
-    """Given dbt cloud params, create a SemanticManifest."""
-    from metricflow.model.parsing.dbt_cloud_to_model import model_build_result_for_dbt_cloud_job
-
-    return model_build_result_for_dbt_cloud_job(auth=service_token, job_id=job_id).model
 
 
 def convert_to_datetime(datetime_str: Optional[str]) -> Optional[dt.datetime]:

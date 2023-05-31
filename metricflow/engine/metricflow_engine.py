@@ -7,15 +7,10 @@ from dataclasses import dataclass
 from typing import List, Optional, Sequence
 
 import pandas as pd
+
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.references import DimensionReference, MetricReference
-
 from metricflow.configuration.constants import (
-    CONFIG_DBT_CLOUD_JOB_ID,
-    CONFIG_DBT_CLOUD_SERVICE_TOKEN,
-    CONFIG_DBT_PROFILE,
-    CONFIG_DBT_REPO,
-    CONFIG_DBT_TARGET,
     CONFIG_DWH_SCHEMA,
 )
 from metricflow.configuration.yaml_handler import YamlFileHandler
@@ -35,7 +30,6 @@ from metricflow.engine.models import Dimension, Metric
 from metricflow.engine.time_source import ServerTimeSource
 from metricflow.engine.utils import (
     build_semantic_manifest_from_config,
-    build_semantic_manifest_from_dbt_cloud,
 )
 from metricflow.errors.errors import ExecutionException
 from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
@@ -254,31 +248,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         sql_client = make_sql_client_from_config(handler)
 
         # Ideally we should put this getting of of CONFIG_DBT_REPO in a helper
-        dbt_repo = handler.get_value(CONFIG_DBT_REPO) or ""
-        dbt_cloud_job_id = handler.get_value(CONFIG_DBT_CLOUD_JOB_ID) or ""
-        if dbt_repo.lower() in ["yes", "y", "true", "t", "1"]:
-            # This import results in eventually importing dbt, and dbt is an
-            # optional dep meaning it isn't guaranteed to be installed. If the
-            # import is at the top ofthe file MetricFlow will blow up if dbt
-            # isn't installed. Thus by importing it here, we only run into the
-            # exception if this conditional is hit without dbt installed
-            from metricflow.engine.utils import build_semantic_manifest_from_dbt_config
-
-            dbt_profile = handler.get_value(CONFIG_DBT_PROFILE)
-            dbt_target = handler.get_value(CONFIG_DBT_TARGET)
-
-            semantic_manifest_lookup = SemanticManifestLookup(
-                build_semantic_manifest_from_dbt_config(handler=handler, profile=dbt_profile, target=dbt_target)
-            )
-        elif dbt_cloud_job_id != "":
-            dbt_cloud_service_token = handler.get_value(CONFIG_DBT_CLOUD_SERVICE_TOKEN) or ""
-            assert dbt_cloud_service_token != "", "A dbt cloud service token is required for using MF with dbt cloud"
-
-            semantic_manifest_lookup = SemanticManifestLookup(
-                build_semantic_manifest_from_dbt_cloud(job_id=dbt_cloud_job_id, service_token=dbt_cloud_service_token)
-            )
-        else:
-            semantic_manifest_lookup = SemanticManifestLookup(build_semantic_manifest_from_config(handler))
+        semantic_manifest_lookup = SemanticManifestLookup(build_semantic_manifest_from_config(handler))
         system_schema = not_empty(handler.get_value(CONFIG_DWH_SCHEMA), CONFIG_DWH_SCHEMA, handler.url)
         return MetricFlowEngine(
             semantic_manifest_lookup=semantic_manifest_lookup,
