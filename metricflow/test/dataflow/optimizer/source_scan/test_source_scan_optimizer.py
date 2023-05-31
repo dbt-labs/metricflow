@@ -41,7 +41,7 @@ from metricflow.specs.specs import (
     MetricFlowQuerySpec,
     MetricSpec,
 )
-from metricflow.specs.where_filter_transform import ConvertToWhereSpec
+from metricflow.specs.where_filter_transform import WhereSpecFactory
 from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.plan_utils import assert_plan_snapshot_text_equal
@@ -241,10 +241,10 @@ def test_constrained_metric_not_combined(  # noqa: D
                 MetricSpec(element_name="booking_value"),
                 MetricSpec(
                     element_name="instant_booking_value",
-                    constraint=WhereFilter(where_sql_template="{{ dimension('is_instant') }} ").transform(
-                        ConvertToWhereSpec(
+                    constraint=(
+                        WhereSpecFactory(
                             column_association_resolver=column_association_resolver,
-                        )
+                        ).create_from_where_filter(WhereFilter(where_sql_template="{{ dimension('is_instant') }} "))
                     ),
                 ),
             ),

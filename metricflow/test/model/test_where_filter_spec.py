@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 
-from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
+from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
@@ -13,7 +13,7 @@ from metricflow.specs.specs import (
     LinkableSpecSet,
     TimeDimensionSpec,
 )
-from metricflow.specs.where_filter_transform import ConvertToWhereSpec
+from metricflow.specs.where_filter_transform import WhereSpecFactory
 
 logger = logging.getLogger(__name__)
 
@@ -21,13 +21,11 @@ logger = logging.getLogger(__name__)
 def test_dimension_in_filter(  # noqa: D
     column_association_resolver: ColumnAssociationResolver,
 ) -> None:
-    where_filter = WhereFilter(where_sql_template="{{ dimension('country_latest', entity_path=['listing']) }} = 'US'")
+    where_filter = PydanticWhereFilter(where_sql_template="{{ dimension('country_latest', entity_path=['listing']) }} = 'US'")
 
-    where_filter_spec = where_filter.transform(
-        ConvertToWhereSpec(
-            column_association_resolver=column_association_resolver,
-        )
-    )
+    where_filter_spec = WhereSpecFactory(
+        column_association_resolver=column_association_resolver,
+    ).create_from_where_filter(where_filter)
 
     assert where_filter_spec.where_sql == "listing__country_latest = 'US'"
     assert where_filter_spec.linkable_spec_set == LinkableSpecSet(
@@ -42,15 +40,13 @@ def test_dimension_in_filter(  # noqa: D
 def test_time_dimension_in_filter(  # noqa: D
     column_association_resolver: ColumnAssociationResolver,
 ) -> None:
-    where_filter = WhereFilter(
+    where_filter = PydanticWhereFilter(
         where_sql_template="{{ time_dimension('created_at', 'month', entity_path=['listing']) }} = '2020-01-01'"
     )
 
-    where_filter_spec = where_filter.transform(
-        ConvertToWhereSpec(
-            column_association_resolver=column_association_resolver,
-        )
-    )
+    where_filter_spec = WhereSpecFactory(
+        column_association_resolver=column_association_resolver,
+    ).create_from_where_filter(where_filter)
 
     assert where_filter_spec.where_sql == "listing__created_at__month = '2020-01-01'"
     assert where_filter_spec.linkable_spec_set == LinkableSpecSet(
@@ -69,13 +65,11 @@ def test_time_dimension_in_filter(  # noqa: D
 def test_entity_in_filter(  # noqa: D
     column_association_resolver: ColumnAssociationResolver,
 ) -> None:
-    where_filter = WhereFilter(where_sql_template="{{ entity('user', entity_path=['listing']) }} == 'example_user_id'")
+    where_filter = PydanticWhereFilter(where_sql_template="{{ entity('user', entity_path=['listing']) }} == 'example_user_id'")
 
-    where_filter_spec = where_filter.transform(
-        ConvertToWhereSpec(
-            column_association_resolver=column_association_resolver,
-        )
-    )
+    where_filter_spec = WhereSpecFactory(
+        column_association_resolver=column_association_resolver,
+    ).create_from_where_filter(where_filter)
 
     assert where_filter_spec.where_sql == "listing__user == 'example_user_id'"
     assert where_filter_spec.linkable_spec_set == LinkableSpecSet(
