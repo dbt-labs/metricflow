@@ -15,14 +15,14 @@ from typing import Callable, Iterator, List, Optional
 import click
 import jinja2
 import pandas as pd
-from dbt_semantic_interfaces.model_validator import ModelValidator
-from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationResults
 from halo import Halo
 from packaging.version import parse
 from update_checker import UpdateChecker
 
 import metricflow.cli.custom_click_types as click_custom
+from dbt_semantic_interfaces.model_validator import ModelValidator
+from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
+from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationResults
 from metricflow.cli import PACKAGE_NAME
 from metricflow.cli.cli_context import CLIContext
 from metricflow.cli.constants import DEFAULT_RESULT_DECIMAL_PLACES, MAX_LIST_OBJECT_ELEMENTS
@@ -449,8 +449,8 @@ def list_metrics(cfg: CLIContext, show_all_dims: bool = False, search: Optional[
     num_dims_to_show = MAX_LIST_OBJECT_ELEMENTS
     for m in metrics:
         # sort dimensions by whether they're local first(if / then global else local) then the dim name
-        dimensions = sorted(map(lambda d: d.name, filter(lambda d: "/" not in d.name, m.dimensions))) + sorted(
-            map(lambda d: d.name, filter(lambda d: "/" in d.name, m.dimensions))
+        dimensions = sorted([dim.qualified_name for dim in m.dimensions if "/" not in dim.qualified_name]) + sorted(
+            [dim.qualified_name for dim in m.dimensions if "/" in dim.qualified_name]
         )
         if show_all_dims:
             num_dims_to_show = len(dimensions)
@@ -483,7 +483,7 @@ def list_dimensions(cfg: CLIContext, metric_names: List[str]) -> None:
 
     spinner.succeed(f"🌱 We've found {len(dimensions)} common dimensions for metrics {metric_names}.")
     for d in dimensions:
-        click.echo(f"• {click.style(d.name, bold=True, fg='green')}")
+        click.echo(f"• {click.style(d.qualified_name, bold=True, fg='green')}")
 
 
 @cli.command()

@@ -7,9 +7,9 @@ from dataclasses import dataclass
 from typing import List, Optional, Sequence
 
 import pandas as pd
+
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.references import DimensionReference, MetricReference
-
 from metricflow.configuration.constants import (
     CONFIG_DBT_CLOUD_JOB_ID,
     CONFIG_DBT_CLOUD_SERVICE_TOKEN,
@@ -204,7 +204,7 @@ class AbstractMetricFlowEngine(ABC):
         """Retrieves a list of all common dimensions for metric_names.
 
         "simple" dimensions are the ones that people expect from a UI perspective. For example, if "ds" is a time
-        dimension at a day granularity, this would not list "ds__week".
+        dimension at a day granularity, this would not list "ds__week". Also excludes local dimensions.
 
         Args:
             metric_names: Names of metrics to get common dimensions from.
@@ -470,7 +470,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                     {
                         LinkableElementProperties.ENTITY,
                         LinkableElementProperties.DERIVED_TIME_GRANULARITY,
-                        LinkableElementProperties.LOCAL_LINKED,
+                        LinkableElementProperties.LOCAL,
                     }
                 ),
             )
