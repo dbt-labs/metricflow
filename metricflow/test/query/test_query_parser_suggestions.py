@@ -66,7 +66,6 @@ EXTENDED_BOOKINGS_YAML = textwrap.dedent(
         - name: ds
           type: time
           type_params:
-            is_primary: True
             time_granularity: day
 
       entities:
@@ -96,7 +95,6 @@ LISTINGS_YAML = textwrap.dedent(
           type: time
           expr: created_at
           type_params:
-            is_primary: True
             time_granularity: day
         - name: created_at
           type: time

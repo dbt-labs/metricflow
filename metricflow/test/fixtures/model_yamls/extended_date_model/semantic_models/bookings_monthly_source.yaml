@@ -16,7 +16,6 @@ semantic_model:
     - name: ds
       type: time
       type_params:
-        is_primary: True
         time_granularity: month
     - name: is_instant
       type: categorical

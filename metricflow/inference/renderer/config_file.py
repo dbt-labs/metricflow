@@ -18,7 +18,6 @@ yaml = YAML()
 
 class RenderedTimeColumnConfigTypeParams(TypedDict):  # noqa: D
     time_granularity: Literal["day"]
-    is_primary: NotRequired[bool]
 
 
 class RenderedColumnConfig(TypedDict):  # noqa: D

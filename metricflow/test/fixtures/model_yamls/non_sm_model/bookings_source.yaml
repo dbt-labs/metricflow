@@ -19,7 +19,6 @@ semantic_model:
     - name: dt
       type: time
       type_params:
-        is_primary: True
         time_granularity: day
 
   entities:

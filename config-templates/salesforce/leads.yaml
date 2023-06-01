@@ -24,7 +24,6 @@ semantic_model:
     - name: ds
       type: time
       type_params:
-        is_primary: true
         time_granularity: day
       expr: created_date
     - name: converted_date
