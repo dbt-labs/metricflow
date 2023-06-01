@@ -17,7 +17,6 @@ from dbt_semantic_interfaces.references import (
     TimeDimensionReference,
 )
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.dataflow_plan import BaseOutput
 from metricflow.dataset.dataset import DataSet

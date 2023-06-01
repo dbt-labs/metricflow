@@ -3,9 +3,9 @@ from __future__ import annotations
 import datetime
 
 import pytest
+
 from dbt_semantic_interfaces.references import MetricReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter

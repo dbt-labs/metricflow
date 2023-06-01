@@ -4,9 +4,9 @@ from typing import List
 
 from dbt_metadata_client.client import Client, Operation
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode, dbt_metadata_api_schema
+
 from dbt_semantic_interfaces.model_transformer import ModelTransformer
 from dbt_semantic_interfaces.parsing.dir_to_model import ModelBuildResult
-
 from metricflow.model.dbt_converter import DbtConverter
 
 

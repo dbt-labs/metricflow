@@ -10,7 +10,6 @@ from dbt_semantic_interfaces.validations.validator_helpers import (
     ValidationFutureError,
     ValidationWarning,
 )
-
 from metricflow.cli.cli_context import CLIContext
 from metricflow.cli.main import (
     get_dimension_values,

@@ -4,13 +4,13 @@ import traceback
 from typing import List, Tuple
 
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode
+
 from dbt_semantic_interfaces.objects.semantic_model import NodeRelation
 from dbt_semantic_interfaces.validations.validator_helpers import (
     ModelValidationResults,
     ValidationError,
     ValidationIssue,
 )
-
 from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
     DbtMappingRule,
     MappedObjects,

@@ -6,9 +6,10 @@ from dataclasses import dataclass, field
 from typing import Any, DefaultDict, Dict, Tuple
 
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode, ModelNode
+from typing_extensions import TypeAlias
+
 from dbt_semantic_interfaces.objects.metric import MetricType
 from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationResults
-from typing_extensions import TypeAlias
 
 TransformedObjectsValueType: TypeAlias = Any  # type: ignore[misc]
 

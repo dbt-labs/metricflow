@@ -3,9 +3,9 @@ from __future__ import annotations
 import logging
 
 from _pytest.fixtures import FixtureRequest
+
 from dbt_semantic_interfaces.references import SemanticModelReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.specs.specs import (
     DimensionSpec,

@@ -4,6 +4,7 @@ import traceback
 from typing import Dict, List, Optional, Tuple
 
 from dbt_metadata_client.dbt_metadata_api_schema import CatalogColumn, MetricFilter, MetricNode
+
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.validations.validator_helpers import (
@@ -11,7 +12,6 @@ from dbt_semantic_interfaces.validations.validator_helpers import (
     ValidationError,
     ValidationIssue,
 )
-
 from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
     DbtMappingRule,
     MappedObjects,

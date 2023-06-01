@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-
 from metricflow.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,
     SqlExpressionRenderer,

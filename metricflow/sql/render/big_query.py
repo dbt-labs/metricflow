@@ -3,7 +3,6 @@ from __future__ import annotations
 from fractions import Fraction
 
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-
 from metricflow.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,
     SqlExpressionRenderer,

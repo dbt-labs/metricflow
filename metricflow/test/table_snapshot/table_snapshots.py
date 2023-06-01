@@ -12,9 +12,9 @@ from typing import List, Optional, Sequence, Tuple, Union
 import dateutil.parser
 import pandas as pd
 import yaml
+
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.objects.base import FrozenBaseModel
-
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.specs.specs import hash_items

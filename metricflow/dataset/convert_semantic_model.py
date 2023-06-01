@@ -11,7 +11,6 @@ from dbt_semantic_interfaces.objects.elements.measure import Measure
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.references import SemanticModelElementReference, SemanticModelReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-
 from metricflow.aggregation_properties import AggregationState
 from metricflow.dag.id_generation import IdGeneratorRegistry
 from metricflow.dataflow.sql_table import SqlTable

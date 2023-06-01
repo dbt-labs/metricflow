@@ -4,7 +4,6 @@ import logging
 
 from dbt_semantic_interfaces.references import SemanticModelElementReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-
 from metricflow.aggregation_properties import AggregationState
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.dataflow_plan import JoinDescription, JoinToBaseOutputNode, ReadSqlSourceNode

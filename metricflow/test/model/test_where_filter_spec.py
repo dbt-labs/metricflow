@@ -5,7 +5,6 @@ import logging
 from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
     DimensionSpec,

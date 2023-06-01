@@ -7,9 +7,9 @@ from typing import Sequence, Set, Union
 
 import pandas as pd
 import pytest
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from sqlalchemy.exc import ProgrammingError
 
+from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.random_id import random_id

@@ -11,6 +11,7 @@ from dbt.contracts.graph.nodes import Metric as DbtMetric
 from dbt.contracts.graph.nodes import ModelNode as DbtModelNode
 from dbt.contracts.graph.unparsed import MetricFilter as DbtMetricFilter
 from dbt.exceptions import ref_invalid_args
+
 from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType, DimensionTypeParams
 from dbt_semantic_interfaces.objects.elements.entity import Entity
 from dbt_semantic_interfaces.objects.elements.measure import Measure

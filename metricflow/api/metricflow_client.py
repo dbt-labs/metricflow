@@ -6,7 +6,6 @@ from typing import Dict, List, Optional
 from dbt_semantic_interfaces.model_validator import ModelValidator
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationResults
-
 from metricflow.configuration.config_handler import ConfigHandler
 from metricflow.configuration.constants import CONFIG_DWH_SCHEMA
 from metricflow.configuration.yaml_handler import YamlFileHandler

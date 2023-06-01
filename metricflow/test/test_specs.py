@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import Sequence
 
 import pytest
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow.specs.specs import (
     DimensionSpec,
     EntityReference,

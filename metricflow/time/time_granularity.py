@@ -4,6 +4,7 @@ from datetime import date
 from typing import Union
 
 import pandas as pd
+
 from dbt_semantic_interfaces.enum_extension import ExtendedEnum, assert_values_exhausted
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 

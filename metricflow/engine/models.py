@@ -14,7 +14,6 @@ from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
 from dbt_semantic_interfaces.objects.metadata import Metadata
 from dbt_semantic_interfaces.objects.metric import Metric as SemanticManifestMetric
 from dbt_semantic_interfaces.objects.metric import MetricType, MetricTypeParams
-
 from metricflow.model.semantics.linkable_spec_resolver import ElementPathKey
 from metricflow.specs.specs import DimensionSpec, EntityReference
 

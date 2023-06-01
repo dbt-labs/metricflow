@@ -8,10 +8,10 @@ from dataclasses import dataclass
 from itertools import chain
 from typing import Dict, List, Optional, Sequence, Tuple
 
-from dbt_semantic_interfaces.references import SemanticModelReference
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from more_itertools import bucket
 
+from dbt_semantic_interfaces.references import SemanticModelReference
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow.aggregation_properties import AggregationState
 from metricflow.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.dataflow.dataflow_plan import ValidityWindowJoinDescription

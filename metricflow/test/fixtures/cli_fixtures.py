@@ -5,9 +5,9 @@ from typing import Optional, Sequence
 import click
 import pytest
 from click.testing import CliRunner, Result
+
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.test_utils import as_datetime
-
 from metricflow.cli.cli_context import CLIContext
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup

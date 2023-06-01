@@ -25,7 +25,6 @@ from dbt_semantic_interfaces.references import (
     SemanticModelReference,
     TimeDimensionReference,
 )
-
 from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.specs.column_assoc import ColumnAssociationResolver

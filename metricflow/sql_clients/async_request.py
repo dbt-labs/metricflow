@@ -5,9 +5,9 @@ import logging
 from dataclasses import dataclass, field
 from typing import List, Optional
 
-from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from pydantic import ValidationError
 
+from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from metricflow.protocols.sql_request import SqlJsonTag, SqlRequestTagSet
 
 logger = logging.getLogger(__name__)

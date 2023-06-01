@@ -6,8 +6,8 @@ import textwrap
 import time
 
 import pytest
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 
+from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.protocols.sql_client import SqlEngine

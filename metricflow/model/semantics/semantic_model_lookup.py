@@ -20,7 +20,6 @@ from dbt_semantic_interfaces.references import (
     TimeDimensionReference,
 )
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
-
 from metricflow.errors.errors import InvalidSemanticModelError
 from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.spec_converters import MeasureConverter

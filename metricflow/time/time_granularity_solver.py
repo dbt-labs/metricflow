@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Set, Tuple
 
 import pandas as pd
+
 from dbt_semantic_interfaces.objects.metric import MetricType
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import (
@@ -16,7 +17,6 @@ from dbt_semantic_interfaces.references import (
     TimeDimensionReference,
 )
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.dataflow_plan import BaseOutput
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet

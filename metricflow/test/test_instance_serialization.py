@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import pytest
-from dbt_semantic_interfaces.dataclass_serialization import DataClassDeserializer, DataclassSerializer
 
+from dbt_semantic_interfaces.dataclass_serialization import DataClassDeserializer, DataclassSerializer
 from metricflow.instances import InstanceSet
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 

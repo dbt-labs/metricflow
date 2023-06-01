@@ -6,6 +6,7 @@ from copy import deepcopy
 from typing import Collection, FrozenSet, List, Tuple, Type
 
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode
+
 from dbt_semantic_interfaces.objects.metric import Metric
 from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
@@ -15,7 +16,6 @@ from dbt_semantic_interfaces.validations.validator_helpers import (
     ValidationError,
     ValidationIssue,
 )
-
 from metricflow.model.dbt_mapping_rules.dbt_mapping_rule import (
     DbtMappingResults,
     DbtMappingRule,

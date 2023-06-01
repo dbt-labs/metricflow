@@ -9,8 +9,8 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 import jinja2
 import pandas as pd
-from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 
+from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.logging.formatting import indent_log_line
 from metricflow.protocols.async_sql_client import AsyncSqlClient

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any, Dict
 
+from jsonschema import RefResolver
+
 from dbt_semantic_interfaces.parsing.schema_validator import SchemaValidator
 from dbt_semantic_interfaces.parsing.schemas import (
     aggregation_type_params_schema,
@@ -19,7 +21,6 @@ from dbt_semantic_interfaces.parsing.schemas import (
     semantic_model_schema,
     validity_params_schema,
 )
-from jsonschema import RefResolver
 
 
 def add_transform_metadata_fields_to_spec(spec: Dict[str, Any]) -> None:  # type: ignore[misc]

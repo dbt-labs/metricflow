@@ -7,9 +7,9 @@ from dbt import tracking
 from dbt.lib import get_dbt_config
 from dbt.parser.manifest import Manifest as DbtManifest
 from dbt.parser.manifest import ManifestLoader as DbtManifestLoader
+
 from dbt_semantic_interfaces.model_transformer import ModelTransformer
 from dbt_semantic_interfaces.parsing.dir_to_model import ModelBuildResult
-
 from metricflow.model.transformations.dbt_to_metricflow import DbtManifestTransformer
 
 

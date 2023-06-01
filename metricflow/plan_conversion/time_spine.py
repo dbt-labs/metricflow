@@ -7,8 +7,8 @@ from dataclasses import dataclass
 from typing import List, Tuple
 
 import pandas as pd
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.protocols.sql_client import SqlClient

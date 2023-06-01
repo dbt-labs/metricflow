@@ -4,8 +4,8 @@ from typing import Tuple
 
 import pytest
 from dbt_metadata_client.dbt_metadata_api_schema import MetricNode
-from dbt_semantic_interfaces.objects.metric import MetricType
 
+from dbt_semantic_interfaces.objects.metric import MetricType
 from metricflow.model.dbt_converter import DbtConverter
 
 

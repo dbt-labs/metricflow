@@ -127,3 +127,6 @@ filterwarnings = [
     "ignore:Deprecated call to.*",
     "ignore:pkg_resources is deprecated as an API"
 ]
+
+[tool.isort]
+profile = "black"

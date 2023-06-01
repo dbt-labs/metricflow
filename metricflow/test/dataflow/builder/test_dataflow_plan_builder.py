@@ -4,9 +4,9 @@ import logging
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+
 from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.dataset.dataset import DataSet
