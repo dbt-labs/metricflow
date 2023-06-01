@@ -203,8 +203,8 @@ integration_test:
     ON a.ds = b.ds
 ---
 integration_test:
-  name: min_measure_proxy
-  description: Test measure_proxy metric with a min.
+  name: min_SIMPLE
+  description: Test SIMPLE metric with a min.
   model: SIMPLE_MODEL
   metrics: ["min_booking_value"]
   group_bys: []
@@ -214,8 +214,8 @@ integration_test:
     FROM {{ source_schema }}.fct_bookings
 ---
 integration_test:
-  name: max_measure_proxy
-  description: Test measure_proxy metric with a max.
+  name: max_SIMPLE
+  description: Test SIMPLE metric with a max.
   model: SIMPLE_MODEL
   metrics: ["max_booking_value"]
   group_bys: []

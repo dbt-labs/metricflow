@@ -75,7 +75,7 @@ semantic_model:
 ---
 metric:
   name: cancellations
-  type: measure_proxy
+  type: SIMPLE
   type_params:
     measure: cancellations_usd
 ---
@@ -98,7 +98,7 @@ metric:
 ---
 metric:
   name: cancellations_mx
-  type: measure_proxy
+  type: SIMPLE
   type_params:
     measure: cancellations_usd
   filter: |
@@ -106,7 +106,7 @@ metric:
 ---
 metric:
   name: transaction_usd_na
-  type: measure_proxy
+  type: SIMPLE
   type_params:
     measure: transaction_amount_usd
   filter: |
