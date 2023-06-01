@@ -62,7 +62,7 @@ metric:
   name: closed_won_opps
   owners:
     - support@transformdata.io
-  type: measure_proxy
+  type: SIMPLE
   type_params:
     measures:
       - opps
@@ -74,7 +74,7 @@ metric:
   name: closed_won_amount
   owners:
     - support@transformdata.io
-  type: measure_proxy
+  type: SIMPLE
   type_params:
     measures:
       - amount
