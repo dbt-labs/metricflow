@@ -7,6 +7,9 @@ semantic_model:
     schema_name: $source_schema
     alias: account_month_txns
 
+  defaults:
+    agg_time_dimension: ds
+
   measures:
     - name: txn_count
       agg: sum

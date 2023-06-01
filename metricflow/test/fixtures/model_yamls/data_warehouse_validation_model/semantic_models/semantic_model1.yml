@@ -7,15 +7,18 @@ semantic_model:
     schema_name: $source_schema
     alias: fct_animals
 
+  defaults:
+    agg_time_dimension: ds
+
   dimensions:
     - name: ds
       type: time
       type_params:
-        is_primary: True
         time_granularity: day
     - name: is_dog
       type: categorical
       is_partition: True
+
   measures:
     - name: count_dogs
       agg: sum

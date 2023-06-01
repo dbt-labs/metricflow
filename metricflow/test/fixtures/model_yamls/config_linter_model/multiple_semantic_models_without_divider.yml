@@ -4,11 +4,12 @@ semantic_model:
   node_relation:
     schema_name: $source_schema
     alias: fct_animals
+  defaults:
+    agg_time_dimension: ds
   dimensions:
     - name: ds
       type: time
       type_params:
-        is_primary: True
         time_granularity: day
     - name: is_dog
       type: categorical
@@ -24,11 +25,12 @@ semantic_model:
   node_relation:
     schema_name: $source_schema
     alias: fct_animals
+  defaults:
+    agg_time_dimension: ds
   dimensions:
     - name: ds
       type: time
       type_params:
-        is_primary: True
         time_granularity: day
     - name: is_dog
       type: categorical

@@ -7,6 +7,9 @@ semantic_model:
     schema_name: $source_schema
     alias: fct_views
 
+  defaults:
+    agg_time_dimension: ds
+
   measures:
     - name: views
       expr: "1"
