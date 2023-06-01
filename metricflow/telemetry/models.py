@@ -5,7 +5,7 @@ from abc import ABC
 from enum import Enum, IntEnum
 from typing import Optional, Tuple
 
-from dbt_semantic_interfaces.objects.base import FrozenBaseModel
+from dbt_semantic_interfaces.implementations.base import FrozenBaseModel
 
 EVENT_SCHEMA = "v1.0"
 

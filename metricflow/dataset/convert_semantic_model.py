@@ -5,10 +5,10 @@ import re
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple
 
-from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
-from dbt_semantic_interfaces.objects.elements.entity import Entity
-from dbt_semantic_interfaces.objects.elements.measure import Measure
-from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
+from dbt_semantic_interfaces.protocols.dimension import Dimension, DimensionType
+from dbt_semantic_interfaces.protocols.entity import Entity
+from dbt_semantic_interfaces.protocols.measure import Measure
+from dbt_semantic_interfaces.protocols.semantic_model import SemanticModel
 from dbt_semantic_interfaces.references import SemanticModelElementReference, SemanticModelReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 

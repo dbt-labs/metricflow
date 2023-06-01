@@ -6,8 +6,8 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Set, Tuple
 
 import pandas as pd
-from dbt_semantic_interfaces.objects.metric import MetricType
-from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
+from dbt_semantic_interfaces.protocols.metric import MetricType
+from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import (
     EntityReference,
     MeasureReference,

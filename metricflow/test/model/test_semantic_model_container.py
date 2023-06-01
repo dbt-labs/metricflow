@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 
 import pytest
-from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
+from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from dbt_semantic_interfaces.references import EntityReference, MeasureReference, MetricReference
 
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 @pytest.fixture
-def semantic_model_lookup(simple_semantic_manifest: SemanticManifest) -> SemanticModelLookup:  # Noqa: D
+def semantic_model_lookup(simple_semantic_manifest: PydanticSemanticManifest) -> SemanticModelLookup:  # Noqa: D
     return SemanticModelLookup(
         model=simple_semantic_manifest,
     )
@@ -22,7 +22,7 @@ def semantic_model_lookup(simple_semantic_manifest: SemanticManifest) -> Semanti
 
 @pytest.fixture
 def metric_lookup(  # Noqa: D
-    simple_semantic_manifest: SemanticManifest, semantic_model_lookup: SemanticModelLookup
+    simple_semantic_manifest: PydanticSemanticManifest, semantic_model_lookup: SemanticModelLookup
 ) -> MetricLookup:
     return MetricLookup(semantic_manifest=simple_semantic_manifest, semantic_model_lookup=semantic_model_lookup)
 

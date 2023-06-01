@@ -7,9 +7,9 @@ from dataclasses import dataclass
 from typing import List, Optional, Sequence
 
 import pandas as pd
-
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.references import DimensionReference, MetricReference
+
 from metricflow.configuration.constants import (
     CONFIG_DWH_SCHEMA,
 )

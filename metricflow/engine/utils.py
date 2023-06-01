@@ -4,9 +4,9 @@ import datetime as dt
 from typing import Optional
 
 from dateutil.parser import parse
-from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
-
+from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from dbt_semantic_interfaces.parsing.dir_to_model import ModelBuildResult, parse_directory_of_yaml_files_to_model
+
 from metricflow.configuration.constants import CONFIG_MODEL_PATH
 from metricflow.configuration.yaml_handler import YamlFileHandler
 from metricflow.errors.errors import ModelCreationException
@@ -39,7 +39,7 @@ def model_build_result_from_config(
         raise ModelCreationException from e
 
 
-def build_semantic_manifest_from_config(handler: YamlFileHandler) -> SemanticManifest:
+def build_semantic_manifest_from_config(handler: YamlFileHandler) -> PydanticSemanticManifest:
     """Given a yaml file, create a SemanticManifest."""
     return model_build_result_from_config(handler=handler).model
 

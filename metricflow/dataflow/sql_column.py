@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from dbt_semantic_interfaces.objects.base import FrozenBaseModel
+from dbt_semantic_interfaces.implementations.base import FrozenBaseModel
 
 from metricflow.dataflow.sql_table import SqlTable
 

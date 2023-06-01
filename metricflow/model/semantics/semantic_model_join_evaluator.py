@@ -3,8 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, List, Optional
 
-from dbt_semantic_interfaces.objects.elements.entity import EntityType
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
+from dbt_semantic_interfaces.protocols.entity import EntityType
 from dbt_semantic_interfaces.references import (
     EntityReference,
     SemanticModelElementReference,

@@ -6,8 +6,8 @@ import time
 from dataclasses import dataclass
 from typing import DefaultDict, Dict, Generic, List, Optional, Sequence, Set, Tuple, TypeVar, Union
 
-from dbt_semantic_interfaces.objects.metric import MetricTimeWindow, MetricType
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
+from dbt_semantic_interfaces.protocols.metric import MetricTimeWindow, MetricType
 from dbt_semantic_interfaces.references import TimeDimensionReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 

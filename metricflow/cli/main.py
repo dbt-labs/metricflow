@@ -15,14 +15,14 @@ from typing import Callable, Iterator, List, Optional
 import click
 import jinja2
 import pandas as pd
-from dbt_semantic_interfaces.model_validator import ModelValidator
-from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
+from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
+from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
+from dbt_semantic_interfaces.validations.validator_helpers import SemanticManifestValidationResults
 from halo import Halo
 from packaging.version import parse
 from update_checker import UpdateChecker
 
 import metricflow.cli.custom_click_types as click_custom
-from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationResults
 from metricflow.cli import PACKAGE_NAME
 from metricflow.cli.cli_context import CLIContext
 from metricflow.cli.constants import DEFAULT_RESULT_DECIMAL_PLACES, MAX_LIST_OBJECT_ELEMENTS
@@ -559,7 +559,7 @@ def get_dimension_values(
 
 
 def _print_issues(
-    issues: ModelValidationResults, show_non_blocking: bool = False, verbose: bool = False
+    issues: SemanticManifestValidationResults, show_non_blocking: bool = False, verbose: bool = False
 ) -> None:  # noqa: D
     for issue in issues.errors:
         print(f"• {issue.as_cli_formatted_str(verbose=verbose)}")
@@ -571,11 +571,11 @@ def _print_issues(
 
 
 def _run_dw_validations(
-    validation_func: Callable[[SemanticManifest, Optional[int]], ModelValidationResults],
+    validation_func: Callable[[PydanticSemanticManifest, Optional[int]], SemanticManifestValidationResults],
     validation_type: str,
-    model: SemanticManifest,
+    model: PydanticSemanticManifest,
     timeout: Optional[int],
-) -> ModelValidationResults:
+) -> SemanticManifestValidationResults:
     """Helper handles the calling of data warehouse issue generating functions."""
     spinner = Halo(text=f"Validating {validation_type} against data warehouse...", spinner="dots")
     spinner.start()
@@ -591,8 +591,8 @@ def _run_dw_validations(
 
 
 def _data_warehouse_validations_runner(
-    dw_validator: DataWarehouseModelValidator, model: SemanticManifest, timeout: Optional[int]
-) -> ModelValidationResults:
+    dw_validator: DataWarehouseModelValidator, model: PydanticSemanticManifest, timeout: Optional[int]
+) -> SemanticManifestValidationResults:
     """Helper which calls the individual data warehouse validations to run and prints collected issues."""
     semantic_model_results = _run_dw_validations(
         dw_validator.validate_semantic_models, model=model, validation_type="semantic models", timeout=timeout
@@ -610,7 +610,7 @@ def _data_warehouse_validations_runner(
         dw_validator.validate_metrics, model=model, validation_type="metrics", timeout=timeout
     )
 
-    return ModelValidationResults.merge(
+    return SemanticManifestValidationResults.merge(
         [semantic_model_results, dimension_results, entity_results, measure_results, metric_results]
     )
 
@@ -673,7 +673,9 @@ def validate_configs(
     # Semantic validation
     semantic_spinner = Halo(text="Validating semantics of built model", spinner="dots")
     semantic_spinner.start()
-    model_issues = ModelValidator(max_workers=semantic_validation_workers).validate_model(user_model)
+    model_issues = SemanticManifestValidator[PydanticSemanticManifest](
+        max_workers=semantic_validation_workers
+    ).validate_model(user_model)
 
     if not model_issues.has_blocking_issues:
         semantic_spinner.succeed(f"🎉 Successfully validated the semantics of built model ({model_issues.summary()})")
@@ -684,12 +686,12 @@ def validate_configs(
         _print_issues(model_issues, show_non_blocking=show_all, verbose=verbose_issues)
         return
 
-    dw_results = ModelValidationResults()
+    dw_results = SemanticManifestValidationResults()
     if not skip_dw:
         dw_validator = DataWarehouseModelValidator(sql_client=cfg.sql_client, system_schema=cfg.mf_system_schema)
         dw_results = _data_warehouse_validations_runner(dw_validator=dw_validator, model=user_model, timeout=dw_timeout)
 
-    merged_results = ModelValidationResults.merge([parsing_result.issues, model_issues, dw_results])
+    merged_results = SemanticManifestValidationResults.merge([parsing_result.issues, model_issues, dw_results])
     _print_issues(merged_results, show_non_blocking=show_all, verbose=verbose_issues)
 
 

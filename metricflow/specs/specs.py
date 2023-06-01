@@ -17,7 +17,7 @@ from hashlib import sha1
 from typing import Any, Generic, List, Optional, Sequence, Tuple, TypeVar
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
-from dbt_semantic_interfaces.objects.metric import MetricTimeWindow
+from dbt_semantic_interfaces.protocols.metric import MetricTimeWindow
 from dbt_semantic_interfaces.references import (
     DimensionReference,
     EntityReference,

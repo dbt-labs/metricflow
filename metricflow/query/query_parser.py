@@ -6,10 +6,10 @@ import time
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 
-from dbt_semantic_interfaces.objects.elements.dimension import DimensionType
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
-from dbt_semantic_interfaces.objects.metric import MetricType
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
+from dbt_semantic_interfaces.protocols.dimension import DimensionType
+from dbt_semantic_interfaces.protocols.metric import MetricType
 from dbt_semantic_interfaces.protocols.where_filter import WhereFilter
 from dbt_semantic_interfaces.references import (
     DimensionReference,

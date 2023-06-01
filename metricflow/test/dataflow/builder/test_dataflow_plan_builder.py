@@ -4,7 +4,7 @@ import logging
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
+from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
@@ -350,7 +350,7 @@ def test_where_constrained_plan(  # noqa: D
                 WhereSpecFactory(
                     column_association_resolver=column_association_resolver,
                 ).create_from_where_filter(
-                    WhereFilter(
+                    PydanticWhereFilter(
                         where_sql_template="{{ dimension('country_latest', entity_path=['listing']) }} = 'us'",
                     )
                 )
@@ -392,7 +392,7 @@ def test_where_constrained_plan_time_dimension(  # noqa: D
                 WhereSpecFactory(
                     column_association_resolver=column_association_resolver,
                 ).create_from_where_filter(
-                    WhereFilter(
+                    PydanticWhereFilter(
                         where_sql_template="{{ time_dimension('metric_time', 'day') }} >= '2020-01-01'",
                     )
                 )
@@ -434,7 +434,7 @@ def test_where_constrained_with_common_linkable_plan(  # noqa: D
                 WhereSpecFactory(
                     column_association_resolver=column_association_resolver,
                 ).create_from_where_filter(
-                    WhereFilter(
+                    PydanticWhereFilter(
                         where_sql_template="{{ dimension('country_latest', entity_path=['listing']) }} = 'us'",
                     )
                 )

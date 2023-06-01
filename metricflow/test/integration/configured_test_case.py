@@ -7,7 +7,7 @@ from enum import Enum
 from typing import Optional, Sequence, Tuple
 
 import yaml
-from dbt_semantic_interfaces.objects.base import FrozenBaseModel
+from dbt_semantic_interfaces.implementations.base import FrozenBaseModel
 
 logger = logging.getLogger(__name__)
 

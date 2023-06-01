@@ -9,7 +9,7 @@ from operator import itemgetter
 from typing import Any, Dict, Optional, Sequence
 
 import pandas as pd
-from dbt_semantic_interfaces.objects.base import FrozenBaseModel
+from dbt_semantic_interfaces.implementations.base import FrozenBaseModel
 from pydantic import Field
 
 from metricflow.assert_one_arg import assert_exactly_one_arg_set

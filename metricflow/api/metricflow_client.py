@@ -3,9 +3,9 @@ from __future__ import annotations
 import logging
 from typing import Dict, List, Optional
 
-from dbt_semantic_interfaces.model_validator import ModelValidator
-from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationResults
+from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
+from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
+from dbt_semantic_interfaces.validations.validator_helpers import SemanticManifestValidationResults
 
 from metricflow.configuration.config_handler import ConfigHandler
 from metricflow.configuration.constants import CONFIG_DWH_SCHEMA
@@ -54,7 +54,7 @@ class MetricFlowClient:
     def __init__(
         self,
         sql_client: AsyncSqlClient,
-        semantic_manifest: SemanticManifest,
+        semantic_manifest: PydanticSemanticManifest,
         system_schema: str,
     ):
         """Initializer for MetricFlowClient.
@@ -229,10 +229,10 @@ class MetricFlowClient:
             time_constraint_end=parsed_end_time,
         )
 
-    def validate_configs(self) -> ModelValidationResults:
+    def validate_configs(self) -> SemanticManifestValidationResults:
         """Validate a model according to configured rules.
 
         Returns:
             Tuple of validation issues with the model provided.
         """
-        return ModelValidator().validate_model(self.semantic_manifest)
+        return SemanticManifestValidator[PydanticSemanticManifest]().validate_model(self.semantic_manifest)

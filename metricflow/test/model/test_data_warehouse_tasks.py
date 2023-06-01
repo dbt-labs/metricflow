@@ -5,12 +5,14 @@ from typing import Tuple
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.model_transformer import ModelTransformer
-from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
-from dbt_semantic_interfaces.objects.elements.entity import Entity, EntityType
-from dbt_semantic_interfaces.objects.elements.measure import Measure
-from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
+from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimension
+from dbt_semantic_interfaces.implementations.elements.entity import PydanticEntity
+from dbt_semantic_interfaces.implementations.elements.measure import PydanticMeasure
+from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
+from dbt_semantic_interfaces.protocols.dimension import DimensionType
+from dbt_semantic_interfaces.protocols.entity import EntityType
 from dbt_semantic_interfaces.test_utils import semantic_model_with_guaranteed_meta
+from dbt_semantic_interfaces.transformations.semantic_manifest_transformer import PydanticSemanticManifestTransformer
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 
 from metricflow.model.data_warehouse_model_validator import (
@@ -27,8 +29,8 @@ from metricflow.test.plan_utils import assert_snapshot_text_equal, make_schema_r
 @pytest.fixture(scope="session")
 def dw_backed_warehouse_validation_model(
     create_source_tables: None,
-    data_warehouse_validation_model: SemanticManifest,
-) -> SemanticManifest:
+    data_warehouse_validation_model: PydanticSemanticManifest,
+) -> PydanticSemanticManifest:
     """Model-generating fixture to ensure the underlying tables are created for querying.
 
     Without an explicit invocation of the create_data_warehouse_validation_model_tables fixture the
@@ -42,7 +44,7 @@ def dw_backed_warehouse_validation_model(
 
 def test_build_semantic_model_tasks(  # noqa:D
     mf_test_session_state: MetricFlowTestSessionState,
-    data_warehouse_validation_model: SemanticManifest,
+    data_warehouse_validation_model: PydanticSemanticManifest,
     async_sql_client: AsyncSqlClient,
 ) -> None:
     tasks = DataWarehouseTaskBuilder.gen_semantic_model_tasks(
@@ -84,7 +86,7 @@ def test_task_runner(  # noqa: D
 
 
 def test_validate_semantic_models(  # noqa: D
-    dw_backed_warehouse_validation_model: SemanticManifest,
+    dw_backed_warehouse_validation_model: PydanticSemanticManifest,
     async_sql_client: AsyncSqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
@@ -111,7 +113,7 @@ def test_validate_semantic_models(  # noqa: D
 
 
 def test_build_dimension_tasks(  # noqa: D
-    data_warehouse_validation_model: SemanticManifest,
+    data_warehouse_validation_model: PydanticSemanticManifest,
     async_sql_client: AsyncSqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
@@ -127,7 +129,7 @@ def test_build_dimension_tasks(  # noqa: D
 
 
 def test_validate_dimensions(  # noqa: D
-    dw_backed_warehouse_validation_model: SemanticManifest,
+    dw_backed_warehouse_validation_model: PydanticSemanticManifest,
     async_sql_client: AsyncSqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
@@ -141,7 +143,7 @@ def test_validate_dimensions(  # noqa: D
     assert len(issues.all_issues) == 0
 
     dimensions = list(model.semantic_models[0].dimensions)
-    dimensions.append(Dimension(name="doesnt_exist", type=DimensionType.CATEGORICAL))
+    dimensions.append(PydanticDimension(name="doesnt_exist", type=DimensionType.CATEGORICAL))
     model.semantic_models[0].dimensions = dimensions
 
     issues = dw_validator.validate_dimensions(model)
@@ -151,7 +153,7 @@ def test_validate_dimensions(  # noqa: D
 
 
 def test_build_entities_tasks(  # noqa: D
-    data_warehouse_validation_model: SemanticManifest,
+    data_warehouse_validation_model: PydanticSemanticManifest,
     async_sql_client: AsyncSqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
@@ -165,7 +167,7 @@ def test_build_entities_tasks(  # noqa: D
 
 
 def test_validate_entities(  # noqa: D
-    dw_backed_warehouse_validation_model: SemanticManifest,
+    dw_backed_warehouse_validation_model: PydanticSemanticManifest,
     async_sql_client: AsyncSqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
@@ -179,7 +181,7 @@ def test_validate_entities(  # noqa: D
     assert len(issues.all_issues) == 0
 
     entities = list(model.semantic_models[0].entities)
-    entities.append(Entity(name="doesnt_exist", type=EntityType.UNIQUE))
+    entities.append(PydanticEntity(name="doesnt_exist", type=EntityType.UNIQUE))
     model.semantic_models[0].entities = entities
 
     issues = dw_validator.validate_entities(model)
@@ -189,7 +191,7 @@ def test_validate_entities(  # noqa: D
 
 
 def test_build_measure_tasks(  # noqa: D
-    data_warehouse_validation_model: SemanticManifest,
+    data_warehouse_validation_model: PydanticSemanticManifest,
     async_sql_client: AsyncSqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
@@ -203,7 +205,7 @@ def test_build_measure_tasks(  # noqa: D
 
 
 def test_validate_measures(  # noqa: D
-    dw_backed_warehouse_validation_model: SemanticManifest,
+    dw_backed_warehouse_validation_model: PydanticSemanticManifest,
     async_sql_client: AsyncSqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
@@ -217,7 +219,7 @@ def test_validate_measures(  # noqa: D
     assert len(issues.all_issues) == 0
 
     measures = list(model.semantic_models[0].measures)
-    measures.append(Measure(name="doesnt_exist", agg=AggregationType.SUM, agg_time_dimension="ds"))
+    measures.append(PydanticMeasure(name="doesnt_exist", agg=AggregationType.SUM, agg_time_dimension="ds"))
     model.semantic_models[0].measures = measures
 
     issues = dw_validator.validate_measures(model)
@@ -228,7 +230,7 @@ def test_validate_measures(  # noqa: D
 
 def test_build_metric_tasks(  # noqa: D
     request: FixtureRequest,
-    data_warehouse_validation_model: SemanticManifest,
+    data_warehouse_validation_model: PydanticSemanticManifest,
     async_sql_client: AsyncSqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
@@ -254,7 +256,7 @@ def test_build_metric_tasks(  # noqa: D
 
 
 def test_validate_metrics(  # noqa: D
-    dw_backed_warehouse_validation_model: SemanticManifest,
+    dw_backed_warehouse_validation_model: PydanticSemanticManifest,
     async_sql_client: AsyncSqlClient,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
@@ -269,7 +271,7 @@ def test_validate_metrics(  # noqa: D
     # Update model to have a new measure which creates a new metric by proxy
     new_measures = list(model.semantic_models[0].measures)
     new_measures.append(
-        Measure(
+        PydanticMeasure(
             name="count_cats",
             agg=AggregationType.SUM,
             expr="is_cat",  # doesn't exist as column
@@ -278,7 +280,7 @@ def test_validate_metrics(  # noqa: D
     )
     model.semantic_models[0].measures = new_measures
     model.metrics = []
-    model = ModelTransformer.transform(model)
+    model = PydanticSemanticManifestTransformer.transform(model)
 
     # Validate new metric created by proxy causes an issue (because the column used doesn't exist)
     dw_validator = DataWarehouseModelValidator(

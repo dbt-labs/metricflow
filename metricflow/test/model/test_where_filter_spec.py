@@ -21,7 +21,9 @@ logger = logging.getLogger(__name__)
 def test_dimension_in_filter(  # noqa: D
     column_association_resolver: ColumnAssociationResolver,
 ) -> None:
-    where_filter = PydanticWhereFilter(where_sql_template="{{ dimension('country_latest', entity_path=['listing']) }} = 'US'")
+    where_filter = PydanticWhereFilter(
+        where_sql_template="{{ dimension('country_latest', entity_path=['listing']) }} = 'US'"
+    )
 
     where_filter_spec = WhereSpecFactory(
         column_association_resolver=column_association_resolver,
@@ -65,7 +67,9 @@ def test_time_dimension_in_filter(  # noqa: D
 def test_entity_in_filter(  # noqa: D
     column_association_resolver: ColumnAssociationResolver,
 ) -> None:
-    where_filter = PydanticWhereFilter(where_sql_template="{{ entity('user', entity_path=['listing']) }} == 'example_user_id'")
+    where_filter = PydanticWhereFilter(
+        where_sql_template="{{ entity('user', entity_path=['listing']) }} == 'example_user_id'"
+    )
 
     where_filter_spec = WhereSpecFactory(
         column_association_resolver=column_association_resolver,

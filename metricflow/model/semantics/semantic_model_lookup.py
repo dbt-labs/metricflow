@@ -5,11 +5,11 @@ from collections import defaultdict
 from copy import deepcopy
 from typing import Dict, List, Optional, Sequence, Set
 
+from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from dbt_semantic_interfaces.implementations.semantic_model import PydanticSemanticModel
 from dbt_semantic_interfaces.protocols.dimension import Dimension
 from dbt_semantic_interfaces.protocols.entity import Entity
 from dbt_semantic_interfaces.protocols.measure import Measure
-from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from dbt_semantic_interfaces.protocols.semantic_model import SemanticModel
 from dbt_semantic_interfaces.references import (
     DimensionReference,
@@ -135,7 +135,9 @@ class SemanticModelLookup(SemanticModelAccessor):
 
         return None
 
-    def get_by_reference(self, semantic_model_reference: SemanticModelReference) -> Optional[PydanticSemanticModel]:  # noqa: D
+    def get_by_reference(  # noqa: D
+        self, semantic_model_reference: SemanticModelReference
+    ) -> Optional[PydanticSemanticModel]:
         return self._semantic_model_reference_to_semantic_model.get(semantic_model_reference)
 
     def _add_semantic_model(self, semantic_model: PydanticSemanticModel) -> None:

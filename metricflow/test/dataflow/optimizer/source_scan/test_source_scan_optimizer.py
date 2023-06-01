@@ -4,7 +4,7 @@ import logging
 from typing import Generic
 
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
+from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
@@ -244,7 +244,9 @@ def test_constrained_metric_not_combined(  # noqa: D
                     constraint=(
                         WhereSpecFactory(
                             column_association_resolver=column_association_resolver,
-                        ).create_from_where_filter(WhereFilter(where_sql_template="{{ dimension('is_instant') }} "))
+                        ).create_from_where_filter(
+                            PydanticWhereFilter(where_sql_template="{{ dimension('is_instant') }} ")
+                        )
                     ),
                 ),
             ),
