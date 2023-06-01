@@ -7,6 +7,9 @@ semantic_model:
     schema_name: $source_schema
     alias: fct_bookings
 
+  defaults:
+    agg_time_dimension: ds
+
   measures:
     - name: bookings
       expr: "1"

@@ -23,6 +23,9 @@ EXTENDED_BOOKINGS_YAML = textwrap.dedent(
         schema_name: some_schema
         alias: bookings_source_table
 
+      defaults:
+        agg_time_dimension: ds
+
       measures:
         - name: bookings
           expr: "1"
@@ -84,6 +87,9 @@ LISTINGS_YAML = textwrap.dedent(
       node_relation:
         schema_name: schema
         alias: table
+
+      defaults:
+        agg_time_dimension: ds
 
       measures:
         - name: listings
