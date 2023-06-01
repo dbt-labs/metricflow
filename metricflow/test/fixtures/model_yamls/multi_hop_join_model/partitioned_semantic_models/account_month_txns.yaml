@@ -16,13 +16,11 @@ semantic_model:
     - name: ds_partitioned
       type: time
       type_params:
-        is_primary: false
         time_granularity: day
       is_partition: true
     - name: ds
       type: time
       type_params:
-        is_primary: true
         time_granularity: day
     - name: account_month
       type: categorical

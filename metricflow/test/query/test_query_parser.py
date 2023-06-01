@@ -46,7 +46,6 @@ BOOKINGS_YAML = textwrap.dedent(
         - name: ds
           type: time
           type_params:
-            is_primary: True
             time_granularity: day
 
       entities:
@@ -78,7 +77,6 @@ REVENUE_YAML = textwrap.dedent(
           type: time
           expr: created_at
           type_params:
-            is_primary: True
             time_granularity: month
         - name: country
           type: categorical

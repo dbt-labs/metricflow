@@ -15,7 +15,6 @@ semantic_model:
     - name: ds_partitioned
       type: time
       type_params:
-        is_primary: false
         time_granularity: day
       is_partition: true
 
