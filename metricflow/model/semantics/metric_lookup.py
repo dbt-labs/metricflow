@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 from typing import Dict, FrozenSet, List, Sequence
 
+from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
 from dbt_semantic_interfaces.protocols.metric import Metric, MetricType
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import MetricReference
@@ -177,7 +178,12 @@ class MetricLookup(MetricAccessor):  # noqa: D
                 element_name=input_metric.name,
                 constraint=combined_filter,
                 alias=input_metric.alias,
-                offset_window=input_metric.offset_window,
+                offset_window=PydanticMetricTimeWindow(
+                    count=input_metric.offset_window.count,
+                    granularity=input_metric.offset_window.granularity,
+                )
+                if input_metric.offset_window
+                else None,
                 offset_to_grain=input_metric.offset_to_grain,
             )
             input_metric_specs.append(spec)

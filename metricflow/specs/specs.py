@@ -17,7 +17,7 @@ from hashlib import sha1
 from typing import Any, Generic, List, Optional, Sequence, Tuple, TypeVar
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
-from dbt_semantic_interfaces.protocols.metric import MetricTimeWindow
+from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
 from dbt_semantic_interfaces.references import (
     DimensionReference,
     EntityReference,
@@ -410,7 +410,7 @@ class MetricSpec(InstanceSpec):  # noqa: D
     element_name: str
     constraint: Optional[WhereFilterSpec] = None
     alias: Optional[str] = None
-    offset_window: Optional[MetricTimeWindow] = None
+    offset_window: Optional[PydanticMetricTimeWindow] = None
     offset_to_grain: Optional[TimeGranularity] = None
 
     @staticmethod
