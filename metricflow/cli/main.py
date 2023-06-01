@@ -668,7 +668,7 @@ def validate_configs(
         _print_issues(parsing_result.issues, show_non_blocking=show_all, verbose=verbose_issues)
         return
 
-    user_model = parsing_result.model
+    user_model = parsing_result.semantic_manifest
 
     # Semantic validation
     semantic_spinner = Halo(text="Validating semantics of built model", spinner="dots")
