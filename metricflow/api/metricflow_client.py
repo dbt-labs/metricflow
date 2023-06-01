@@ -235,4 +235,4 @@ class MetricFlowClient:
         Returns:
             Tuple of validation issues with the model provided.
         """
-        return SemanticManifestValidator[PydanticSemanticManifest]().validate_model(self.semantic_manifest)
+        return SemanticManifestValidator[PydanticSemanticManifest]().validate_semantic_manifest(self.semantic_manifest)

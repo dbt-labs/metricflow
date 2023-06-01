@@ -675,7 +675,7 @@ def validate_configs(
     semantic_spinner.start()
     model_issues = SemanticManifestValidator[PydanticSemanticManifest](
         max_workers=semantic_validation_workers
-    ).validate_model(user_model)
+    ).validate_semantic_manifest(user_model)
 
     if not model_issues.has_blocking_issues:
         semantic_spinner.succeed(f"🎉 Successfully validated the semantics of built model ({model_issues.summary()})")
