@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dbt_semantic_interfaces.validations.validator_helpers import ModelValidationResults
+from dbt_semantic_interfaces.validations.validator_helpers import SemanticManifestValidationResults
 
 from metricflow.api.metricflow_client import MetricFlowClient
 from metricflow.dataflow.sql_table import SqlTable
@@ -88,4 +88,4 @@ def test_get_dimension_values(mf_client: MetricFlowClient) -> None:  # noqa: D
 
 def test_validate_configs(mf_client: MetricFlowClient) -> None:  # noqa: D
     issues = mf_client.validate_configs()
-    assert isinstance(issues, ModelValidationResults)
+    assert isinstance(issues, SemanticManifestValidationResults)

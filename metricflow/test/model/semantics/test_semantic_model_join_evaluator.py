@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Dict, Sequence
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.objects.elements.entity import EntityType
+from dbt_semantic_interfaces.protocols.entity import EntityType
 from dbt_semantic_interfaces.references import EntityReference, SemanticModelReference
 
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup

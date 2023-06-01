@@ -4,8 +4,8 @@ from typing import List
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
-from dbt_semantic_interfaces.objects.metric import MetricTimeWindow
+from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
+from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
 from dbt_semantic_interfaces.references import EntityReference, TimeDimensionReference
 from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
@@ -210,7 +210,7 @@ def test_filter_with_where_constraint_node(  # noqa: D
             WhereSpecFactory(
                 column_association_resolver=column_association_resolver,
             ).create_from_where_filter(
-                WhereFilter(
+                PydanticWhereFilter(
                     where_sql_template="{{ time_dimension('ds', 'day') }} = '2020-01-01'",
                 )
             )
@@ -626,7 +626,7 @@ def test_join_to_time_spine_node_with_offset_window(  # noqa: D
         time_range_constraint=TimeRangeConstraint(
             start_time=as_datetime("2020-01-01"), end_time=as_datetime("2021-01-01")
         ),
-        offset_window=MetricTimeWindow(count=10, granularity=TimeGranularity.DAY),
+        offset_window=PydanticMetricTimeWindow(count=10, granularity=TimeGranularity.DAY),
     )
 
     sink_node = WriteToResultDataframeNode[SemanticModelDataSet](join_to_time_spine_node)
@@ -949,7 +949,7 @@ def test_filter_with_where_constraint_on_join_dim(
                 WhereSpecFactory(
                     column_association_resolver=column_association_resolver,
                 ).create_from_where_filter(
-                    WhereFilter(
+                    PydanticWhereFilter(
                         where_sql_template="{{ dimension('country_latest', entity_path=['listing']) }} = 'us'",
                     )
                 )
@@ -1540,9 +1540,9 @@ def test_join_to_scd_dimension(
                         WhereSpecFactory(
                             column_association_resolver=scd_column_association_resolver,
                         ).create_from_where_filter(
-                            WhereFilter(
+                            PydanticWhereFilter(
                                 where_sql_template="{{ dimension('capacity', entity_path=['listing']) }} > 2",
-                            ).transform
+                            )
                         )
                     ),
                 ),

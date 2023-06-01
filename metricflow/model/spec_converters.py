@@ -10,7 +10,7 @@ shims likely point to the need for a bit of an internal refactor, but that's a c
 """
 from __future__ import annotations
 
-from dbt_semantic_interfaces.objects.elements.measure import Measure
+from dbt_semantic_interfaces.protocols.measure import Measure
 
 from metricflow.specs.specs import (
     MeasureSpec,

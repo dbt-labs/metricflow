@@ -3,17 +3,17 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Optional
 
-from dbt_semantic_interfaces.objects.elements.dimension import (
+from dbt_semantic_interfaces.protocols.dimension import (
     Dimension as SemanticManifestDimension,
 )
-from dbt_semantic_interfaces.objects.elements.dimension import (
+from dbt_semantic_interfaces.protocols.dimension import (
     DimensionType,
     DimensionTypeParams,
 )
+from dbt_semantic_interfaces.protocols.metadata import Metadata
+from dbt_semantic_interfaces.protocols.metric import Metric as SemanticManifestMetric
+from dbt_semantic_interfaces.protocols.metric import MetricType, MetricTypeParams
 from dbt_semantic_interfaces.protocols.where_filter import WhereFilter
-from dbt_semantic_interfaces.objects.metadata import Metadata
-from dbt_semantic_interfaces.objects.metric import Metric as SemanticManifestMetric
-from dbt_semantic_interfaces.objects.metric import MetricInputMeasure, MetricType, MetricTypeParams
 
 from metricflow.model.semantics.linkable_spec_resolver import ElementPathKey
 from metricflow.specs.specs import DimensionSpec, EntityReference

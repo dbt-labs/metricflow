@@ -3,8 +3,8 @@ from __future__ import annotations
 import logging
 from typing import Dict, FrozenSet, List, Sequence
 
-from dbt_semantic_interfaces.objects.metric import Metric, MetricType
-from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
+from dbt_semantic_interfaces.protocols.metric import Metric, MetricType
+from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import MetricReference
 
 from metricflow.errors.errors import DuplicateMetricError, MetricNotFoundError, NonExistentMeasureError

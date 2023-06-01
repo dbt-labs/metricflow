@@ -4,15 +4,15 @@ import logging
 from typing import Sequence
 
 import jinja2
-
 from dbt_semantic_interfaces.implementations.filters.call_parameter_sets import (
     DimensionCallParameterSet,
-    TimeDimensionCallParameterSet,
     EntityCallParameterSet,
+    TimeDimensionCallParameterSet,
 )
 from dbt_semantic_interfaces.protocols.where_filter import WhereFilter
 from dbt_semantic_interfaces.references import DimensionReference, EntityReference, TimeDimensionReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
     DimensionSpec,

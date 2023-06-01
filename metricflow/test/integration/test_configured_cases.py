@@ -8,7 +8,7 @@ import jinja2
 import pytest
 from dateutil import parser
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.objects.elements.measure import MeasureAggregationParameters
+from dbt_semantic_interfaces.implementations.elements.measure import PydanticMeasureAggregationParameters
 from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
@@ -111,7 +111,7 @@ class CheckQueryHelpers:
     ) -> str:
         """Return the percentile call that can be used for computing a percentile aggregation."""
         percentile_args = SqlPercentileExpressionArgument.from_aggregation_parameters(
-            MeasureAggregationParameters(
+            PydanticMeasureAggregationParameters(
                 percentile=percentile,
                 use_discrete_percentile=use_discrete_percentile,
                 use_approximate_percentile=use_approximate_percentile,

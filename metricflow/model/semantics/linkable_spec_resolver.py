@@ -6,11 +6,11 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import Dict, FrozenSet, List, Optional, Sequence, Set, Tuple
 
-from dbt_semantic_interfaces.objects.elements.dimension import Dimension, DimensionType
-from dbt_semantic_interfaces.objects.elements.entity import EntityType
-from dbt_semantic_interfaces.objects.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.objects.semantic_model import SemanticModel
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
+from dbt_semantic_interfaces.protocols.dimension import Dimension, DimensionType
+from dbt_semantic_interfaces.protocols.entity import EntityType
+from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
+from dbt_semantic_interfaces.protocols.semantic_model import SemanticModel
 from dbt_semantic_interfaces.references import MeasureReference, MetricReference, SemanticModelReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 

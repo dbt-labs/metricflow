@@ -5,7 +5,7 @@ from collections import OrderedDict
 from typing import Generic, List, Optional, Sequence, TypeVar, Union
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.objects.metric import MetricType
+from dbt_semantic_interfaces.protocols.metric import MetricType
 from dbt_semantic_interfaces.references import MetricModelReference
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 
@@ -670,7 +670,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                         )
                     ),
                 )
-            elif metric.type is MetricType.MEASURE_PROXY:
+            elif metric.type is MetricType.SIMPLE:
                 if len(metric.input_measures) > 0:
                     assert (
                         len(metric.input_measures) == 1

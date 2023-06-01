@@ -13,7 +13,7 @@ import dateutil.parser
 import pandas as pd
 import yaml
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.objects.base import FrozenBaseModel
+from dbt_semantic_interfaces.implementations.base import FrozenBaseModel
 
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_client import SqlClient
