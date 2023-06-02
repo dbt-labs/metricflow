@@ -13,7 +13,7 @@ from dbt_semantic_interfaces.objects.elements.dimension import (
 from dbt_semantic_interfaces.objects.filters.where_filter import WhereFilter
 from dbt_semantic_interfaces.objects.metadata import Metadata
 from dbt_semantic_interfaces.objects.metric import Metric as SemanticManifestMetric
-from dbt_semantic_interfaces.objects.metric import MetricType, MetricTypeParams
+from dbt_semantic_interfaces.objects.metric import MetricInputMeasure, MetricType, MetricTypeParams
 
 from metricflow.model.semantics.linkable_spec_resolver import ElementPathKey
 from metricflow.specs.specs import DimensionSpec, EntityReference
@@ -43,6 +43,19 @@ class Metric:
             metadata=pydantic_metric.metadata,
             dimensions=dimensions,
         )
+
+    @property
+    def input_measures(self) -> List[MetricInputMeasure]:
+        """Return the complete list of input measure configurations for this metric."""
+        type_params = self.type_params
+        measures = type_params.measures or []
+        if type_params.measure:
+            measures.append(type_params.measure)
+        if type_params.numerator:
+            measures.append(type_params.numerator)
+        if type_params.denominator:
+            measures.append(type_params.denominator)
+        return measures
 
 
 @dataclass(frozen=True)
