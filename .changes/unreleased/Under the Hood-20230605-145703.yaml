@@ -1,0 +1,7 @@
+kind: Under the Hood
+body: Enable the ability to return only dimensions requested in the query, specifically
+  used for dimension values queries.
+time: 2023-06-05T14:57:03.614589-04:00
+custom:
+  Author: WilliamDee
+  Issue: None
