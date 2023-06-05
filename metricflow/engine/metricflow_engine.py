@@ -57,7 +57,7 @@ from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.random_id import random_id
 from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.specs.specs import MetricFlowQuerySpec
+from metricflow.specs.specs import InstanceSpecSet, MetricFlowQuerySpec
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.sql_clients.common_client import not_empty
 from metricflow.sql_clients.sql_utils import make_sql_client_from_config
@@ -449,9 +449,18 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         if mf_query_request.output_table is not None:
             output_table = SqlTable.from_string(mf_query_request.output_table)
 
+        filter_column_spec_set: Optional[InstanceSpecSet] = None
+        if mf_query_request.query_type == MetricFlowQueryType.DIMENSION_VALUES:
+            # Filter result by dimension columns if it's a dimension values query
+            filter_column_spec_set = InstanceSpecSet(
+                dimension_specs=query_spec.dimension_specs,
+                time_dimension_specs=query_spec.time_dimension_specs,
+            )
+
         dataflow_plan = self._dataflow_plan_builder.build_plan(
             query_spec=query_spec,
             output_sql_table=output_table,
+            filter_column_spec_set=filter_column_spec_set,
             optimizers=(SourceScanOptimizer[SemanticModelDataSet](),),
         )
 
