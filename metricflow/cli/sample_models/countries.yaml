@@ -1,8 +1,6 @@
 semantic_model:
   name: countries
   description: Regions mapped to countries.
-  owners:
-    - support@transformdata.io
   entities:
     - name: country
       type: primary
