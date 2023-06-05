@@ -12,7 +12,7 @@ from dbt_semantic_interfaces.protocols.dimension import (
 )
 from dbt_semantic_interfaces.protocols.metadata import Metadata
 from dbt_semantic_interfaces.protocols.metric import Metric as SemanticManifestMetric
-from dbt_semantic_interfaces.protocols.metric import MetricType, MetricTypeParams
+from dbt_semantic_interfaces.protocols.metric import MetricInputMeasure, MetricType, MetricTypeParams
 from dbt_semantic_interfaces.protocols.where_filter import WhereFilter
 
 from metricflow.model.semantics.linkable_spec_resolver import ElementPathKey
@@ -48,7 +48,10 @@ class Metric:
     def input_measures(self) -> List[MetricInputMeasure]:
         """Return the complete list of input measure configurations for this metric."""
         type_params = self.type_params
-        measures = type_params.measures or []
+
+        measures: List[MetricInputMeasure] = list(
+            type_params.measures if type_params is not None and type_params.measures is not None else []
+        )
         if type_params.measure:
             measures.append(type_params.measure)
         if type_params.numerator:
