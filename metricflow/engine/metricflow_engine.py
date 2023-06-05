@@ -4,6 +4,7 @@ import datetime
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from enum import Enum
 from typing import List, Optional, Sequence
 
 import pandas as pd
@@ -77,6 +78,13 @@ class MetricFlowRequestId:
     mf_rid: str
 
 
+class MetricFlowQueryType(Enum):
+    """An enum to designate what type of MetricFlow query it is."""
+
+    METRIC = "metric"
+    DIMENSION_VALUES = "dimension_values"
+
+
 @dataclass(frozen=True)
 class MetricFlowQueryRequest:
     """Encapsulates the parameters for a metric query.
@@ -90,6 +98,7 @@ class MetricFlowQueryRequest:
     order_by_names: metric and group by names to order by. A "-" can be used to specify reverse order e.g. "-ds"
     output_table: If specified, output the result data to this table instead of a result dataframe.
     sql_optimization_level: The level of optimization for the generated SQL.
+    query_type: Type of MetricFlow query.
     """
 
     request_id: MetricFlowRequestId
@@ -102,6 +111,7 @@ class MetricFlowQueryRequest:
     order_by_names: Optional[Sequence[str]] = None
     output_table: Optional[str] = None
     sql_optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O4
+    query_type: MetricFlowQueryType = MetricFlowQueryType.METRIC
 
     @staticmethod
     def create_with_random_request_id(  # noqa: D
@@ -114,6 +124,7 @@ class MetricFlowQueryRequest:
         order_by_names: Optional[Sequence[str]] = None,
         output_table: Optional[str] = None,
         sql_optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O4,
+        query_type: MetricFlowQueryType = MetricFlowQueryType.METRIC,
     ) -> MetricFlowQueryRequest:
         return MetricFlowQueryRequest(
             request_id=MetricFlowRequestId(mf_rid=f"{random_id()}"),
@@ -126,6 +137,7 @@ class MetricFlowQueryRequest:
             order_by_names=order_by_names,
             output_table=output_table,
             sql_optimization_level=sql_optimization_level,
+            query_type=query_type,
         )
 
 
