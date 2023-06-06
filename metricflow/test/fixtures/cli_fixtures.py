@@ -13,14 +13,14 @@ from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource
-from metricflow.protocols.async_sql_client import AsyncSqlClient
+from metricflow.protocols.sql_client import SqlClient
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.time.configurable_time_source import ConfigurableTimeSource
 
 
 @pytest.fixture
 def cli_context(  # noqa: D
-    async_sql_client: AsyncSqlClient,
+    sql_client: SqlClient,
     simple_semantic_manifest: PydanticSemanticManifest,
     time_spine_source: TimeSpineSource,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -29,7 +29,7 @@ def cli_context(  # noqa: D
     semantic_manifest_lookup = SemanticManifestLookup(simple_semantic_manifest)
     mf_engine = MetricFlowEngine(
         semantic_manifest_lookup=semantic_manifest_lookup,
-        sql_client=async_sql_client,
+        sql_client=sql_client,
         column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup=semantic_manifest_lookup),
         time_source=ConfigurableTimeSource(as_datetime("2020-01-01")),
         time_spine_source=time_spine_source,
@@ -37,7 +37,7 @@ def cli_context(  # noqa: D
     )
     context = CLIContext()
     context._mf = mf_engine
-    context._sql_client = async_sql_client
+    context._sql_client = sql_client
     context._semantic_manifest = simple_semantic_manifest
     context._semantic_manifest_lookup = semantic_manifest_lookup
     context._mf_system_schema = mf_test_session_state.mf_system_schema

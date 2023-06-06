@@ -44,7 +44,6 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.plan_conversion.time_spine import TimeSpineSource
-from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.specs.specs import DimensionSpec, InstanceSpecSet, LinkableInstanceSpec, MeasureSpec
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
@@ -456,7 +455,7 @@ class DataWarehouseTaskBuilder:
 
     @classmethod
     def gen_metric_tasks(
-        cls, model: PydanticSemanticManifest, sql_client: AsyncSqlClient, system_schema: str
+        cls, model: PydanticSemanticManifest, sql_client: SqlClient, system_schema: str
     ) -> List[DataWarehouseValidationTask]:
         """Generates a list of tasks for validating the metrics of the model."""
         mf_engine = MetricFlowEngine(
@@ -492,7 +491,7 @@ class DataWarehouseModelValidator:
     them (assuming the model has passed these validations before use).
     """
 
-    def __init__(self, sql_client: AsyncSqlClient, system_schema: str) -> None:  # noqa: D
+    def __init__(self, sql_client: SqlClient, system_schema: str) -> None:  # noqa: D
         self._sql_client = sql_client
         self._sql_schema = system_schema
 

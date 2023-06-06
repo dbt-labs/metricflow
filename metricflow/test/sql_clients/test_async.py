@@ -9,8 +9,7 @@ import pytest
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.protocols.async_sql_client import AsyncSqlClient
-from metricflow.protocols.sql_client import SqlEngine
+from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.protocols.sql_request import MF_EXTRA_TAGS_KEY, SqlJsonTag
 from metricflow.sql_clients.async_request import CombinedSqlTags
 from metricflow.sql_clients.sql_utils import make_df
@@ -20,58 +19,48 @@ from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 logger = logging.getLogger(__name__)
 
 
-def create_table_with_n_rows(async_sql_client: AsyncSqlClient, schema_name: str, num_rows: int) -> SqlTable:
+def create_table_with_n_rows(sql_client: SqlClient, schema_name: str, num_rows: int) -> SqlTable:
     """Create a table with a specific number of rows."""
     sql_table = SqlTable(
         schema_name=schema_name,
         table_name=f"table_with_{num_rows}_rows",
     )
-    async_sql_client.drop_table(sql_table)
-    async_sql_client.create_table_from_dataframe(
+    sql_client.drop_table(sql_table)
+    sql_client.create_table_from_dataframe(
         sql_table=sql_table,
-        df=make_df(sql_client=async_sql_client, columns=["example_string"], data=(("foo",) for _ in range(num_rows))),
+        df=make_df(sql_client=sql_client, columns=["example_string"], data=(("foo",) for _ in range(num_rows))),
     )
     return sql_table
 
 
-def test_async_query(  # noqa: D
-    async_sql_client: AsyncSqlClient, mf_test_session_state: MetricFlowTestSessionState
-) -> None:
-    request_id = async_sql_client.async_query("SELECT 1 AS foo")
-    result = async_sql_client.async_request_result(request_id)
+def test_async_query(sql_client: SqlClient, mf_test_session_state: MetricFlowTestSessionState) -> None:  # noqa: D
+    request_id = sql_client.async_query("SELECT 1 AS foo")
+    result = sql_client.async_request_result(request_id)
     assert_dataframes_equal(
         actual=result.df,
-        expected=make_df(sql_client=async_sql_client, columns=["foo"], data=((1,),)),
+        expected=make_df(sql_client=sql_client, columns=["foo"], data=((1,),)),
     )
     assert result.exception is None
 
 
-def test_async_execute(  # noqa: D
-    async_sql_client: AsyncSqlClient, mf_test_session_state: MetricFlowTestSessionState
-) -> None:
-    request_id = async_sql_client.async_execute("SELECT 1 AS foo")
-    result = async_sql_client.async_request_result(request_id)
+def test_async_execute(sql_client: SqlClient, mf_test_session_state: MetricFlowTestSessionState) -> None:  # noqa: D
+    request_id = sql_client.async_execute("SELECT 1 AS foo")
+    result = sql_client.async_request_result(request_id)
     assert result.exception is None
 
 
-def test_cancel_request(  # noqa: D
-    async_sql_client: AsyncSqlClient, mf_test_session_state: MetricFlowTestSessionState
-) -> None:
-    if not async_sql_client.sql_engine_attributes.cancel_submitted_queries_supported:
+def test_cancel_request(sql_client: SqlClient, mf_test_session_state: MetricFlowTestSessionState) -> None:  # noqa: D
+    if not sql_client.sql_engine_attributes.cancel_submitted_queries_supported:
         pytest.skip("Cancellation not yet supported in this SQL engine")
     # Execute a query that will be slow, giving the test the opportunity to cancel it.
-    table_with_1000_rows = create_table_with_n_rows(
-        async_sql_client, mf_test_session_state.mf_system_schema, num_rows=1000
-    )
-    table_with_100_rows = create_table_with_n_rows(
-        async_sql_client, mf_test_session_state.mf_system_schema, num_rows=100
-    )
+    table_with_1000_rows = create_table_with_n_rows(sql_client, mf_test_session_state.mf_system_schema, num_rows=1000)
+    table_with_100_rows = create_table_with_n_rows(sql_client, mf_test_session_state.mf_system_schema, num_rows=100)
 
     num_attempts = 3
     cancel_using_request_id_successful = False
     for attempt_num in range(num_attempts):
         if try_cancel_request(
-            async_sql_client=async_sql_client,
+            sql_client=sql_client,
             table_with_1000_rows=table_with_1000_rows,
             table_with_100_rows=table_with_100_rows,
             attempt_num=attempt_num,
@@ -87,7 +76,7 @@ def test_cancel_request(  # noqa: D
     cancel_using_extra_tag_successful = False
     for attempt_num in range(num_attempts - 1):
         if try_cancel_request(
-            async_sql_client=async_sql_client,
+            sql_client=sql_client,
             table_with_1000_rows=table_with_1000_rows,
             table_with_100_rows=table_with_100_rows,
             attempt_num=attempt_num,
@@ -102,7 +91,7 @@ def test_cancel_request(  # noqa: D
 
 
 def try_cancel_request(
-    async_sql_client: AsyncSqlClient,
+    sql_client: SqlClient,
     table_with_1000_rows: SqlTable,
     table_with_100_rows: SqlTable,
     attempt_num: int,
@@ -112,10 +101,10 @@ def try_cancel_request(
     extra_tag_key = "example_key"
     extra_tag_value = "example_value"
 
-    request_id = async_sql_client.async_execute(
+    request_id = sql_client.async_execute(
         textwrap.dedent(
             f"""
-            SELECT MAX({async_sql_client.sql_engine_attributes.random_function_name}()) AS max_value
+            SELECT MAX({sql_client.sql_engine_attributes.random_function_name}()) AS max_value
             FROM {table_with_1000_rows.sql} a
             CROSS JOIN {table_with_1000_rows.sql} b
             CROSS JOIN {table_with_1000_rows.sql} c
@@ -135,18 +124,18 @@ def try_cancel_request(
             def _match_function(combined_tags: CombinedSqlTags) -> bool:
                 return combined_tags.extra_tag.json_dict.get(extra_tag_key) == extra_tag_value
 
-            num_cancelled = async_sql_client.cancel_request(_match_function)
+            num_cancelled = sql_client.cancel_request(_match_function)
         else:
 
             def _match_function(combined_tags: CombinedSqlTags) -> bool:
                 return combined_tags.system_tags.request_id == request_id
 
-            num_cancelled = async_sql_client.cancel_request(_match_function)
+            num_cancelled = sql_client.cancel_request(_match_function)
 
         if num_cancelled > 0:
             break
 
-    result_exception = async_sql_client.async_request_result(request_id).exception
+    result_exception = sql_client.async_request_result(request_id).exception
     if result_exception is not None and num_cancelled >= 1:
         assert num_cancelled == 1, f"Should have cancelled exactly 1 query, but instead cancelled {num_cancelled}"
         return True
@@ -158,28 +147,26 @@ def try_cancel_request(
     return False
 
 
-def test_isolation_level(  # noqa: D
-    mf_test_session_state: MetricFlowTestSessionState, async_sql_client: AsyncSqlClient
-) -> None:
-    for isolation_level in async_sql_client.sql_engine_attributes.supported_isolation_levels:
+def test_isolation_level(mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient) -> None:  # noqa: D
+    for isolation_level in sql_client.sql_engine_attributes.supported_isolation_levels:
         logger.info(f"Testing isolation level: {isolation_level}")
-        request_id = async_sql_client.async_query("SELECT 1", isolation_level=isolation_level)
-        async_sql_client.async_request_result(request_id)
+        request_id = sql_client.async_query("SELECT 1", isolation_level=isolation_level)
+        sql_client.async_request_result(request_id)
 
 
 def test_request_tags(
     mf_test_session_state: MetricFlowTestSessionState,
-    async_sql_client: AsyncSqlClient,
+    sql_client: SqlClient,
 ) -> None:
     """Test whether request tags are appropriately used in queries to the SQL engine."""
-    engine_type = async_sql_client.sql_engine_attributes.sql_engine_type
+    engine_type = sql_client.sql_engine_attributes.sql_engine_type
     extra_tags = SqlJsonTag({"example_key": "example_value"})
     if engine_type is SqlEngine.SNOWFLAKE:
-        request_id0 = async_sql_client.async_query(
+        request_id0 = sql_client.async_query(
             "SHOW PARAMETERS LIKE 'QUERY_TAG'",
             extra_tags=extra_tags,
         )
-        result0 = async_sql_client.async_request_result(request_id0)
+        result0 = sql_client.async_request_result(request_id0)
         df = result0.df
         assert df is not None
         assert result0.exception is None

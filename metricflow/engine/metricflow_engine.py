@@ -47,7 +47,7 @@ from metricflow.plan_conversion.dataflow_to_execution import (
 )
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.plan_conversion.time_spine import TimeSpineSource, TimeSpineTableBuilder
-from metricflow.protocols.async_sql_client import AsyncSqlClient
+from metricflow.protocols.sql_client import SqlClient
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.random_id import random_id
@@ -293,7 +293,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     def __init__(
         self,
         semantic_manifest_lookup: SemanticManifestLookup,
-        sql_client: AsyncSqlClient,
+        sql_client: SqlClient,
         system_schema: str,
         time_source: TimeSource = ServerTimeSource(),
         column_association_resolver: Optional[ColumnAssociationResolver] = None,

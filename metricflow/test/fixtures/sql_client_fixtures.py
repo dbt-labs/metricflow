@@ -5,7 +5,6 @@ from typing import Generator
 
 import pytest
 
-from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql_clients.sql_utils import make_sql_client
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
@@ -14,8 +13,8 @@ logger = logging.getLogger(__name__)
 
 
 @pytest.fixture(scope="session")
-def async_sql_client(mf_test_session_state: MetricFlowTestSessionState) -> Generator[AsyncSqlClient, None, None]:
-    """Provides an AsyncSqlClient requiring warehouse access."""
+def sql_client(mf_test_session_state: MetricFlowTestSessionState) -> Generator[SqlClient, None, None]:
+    """Provides an SqlClient requiring warehouse access."""
     sql_client = make_sql_client(
         url=mf_test_session_state.sql_engine_url,
         password=mf_test_session_state.sql_engine_password,
@@ -39,11 +38,3 @@ def async_sql_client(mf_test_session_state: MetricFlowTestSessionState) -> Gener
 
     sql_client.close()
     return None
-
-
-@pytest.fixture(scope="session")
-def sql_client(
-    mf_test_session_state: MetricFlowTestSessionState, async_sql_client: AsyncSqlClient
-) -> Generator[SqlClient, None, None]:
-    """Similar to async_sql_client, but with a smaller feature set."""
-    yield async_sql_client

@@ -13,8 +13,8 @@ from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.logging.formatting import indent_log_line
-from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.protocols.sql_client import (
+    SqlClient,
     SqlEngineAttributes,
     SqlIsolationLevel,
 )
@@ -33,7 +33,7 @@ class SqlClientException(Exception):
     pass
 
 
-class BaseSqlClientImplementation(ABC, AsyncSqlClient):
+class BaseSqlClientImplementation(ABC, SqlClient):
     """Abstract implementation that other SQL clients are based on."""
 
     def __init__(self) -> None:  # noqa: D
