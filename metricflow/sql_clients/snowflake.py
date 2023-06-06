@@ -24,8 +24,8 @@ from metricflow.protocols.sql_request import (
 from metricflow.sql.render.snowflake import SnowflakeSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.sql_clients.async_request import CombinedSqlTags, SqlStatementCommentMetadata
 from metricflow.sql_clients.common_client import SqlDialect, check_isolation_level, not_empty
+from metricflow.sql_clients.sql_statement_metadata import CombinedSqlTags, SqlStatementCommentMetadata
 from metricflow.sql_clients.sqlalchemy_dialect import SqlAlchemySqlClient
 
 logger = logging.getLogger(__name__)

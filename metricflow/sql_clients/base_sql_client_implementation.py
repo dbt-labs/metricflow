@@ -21,8 +21,8 @@ from metricflow.protocols.sql_client import (
 from metricflow.protocols.sql_request import SqlJsonTag, SqlRequestId, SqlRequestResult, SqlRequestTagSet
 from metricflow.random_id import random_id
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.sql_clients.async_request import CombinedSqlTags, SqlStatementCommentMetadata
 from metricflow.sql_clients.common_client import check_isolation_level
+from metricflow.sql_clients.sql_statement_metadata import CombinedSqlTags, SqlStatementCommentMetadata
 
 logger = logging.getLogger(__name__)
 

@@ -11,7 +11,7 @@ from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.protocols.sql_request import MF_EXTRA_TAGS_KEY, SqlJsonTag
-from metricflow.sql_clients.async_request import CombinedSqlTags
+from metricflow.sql_clients.sql_statement_metadata import CombinedSqlTags
 from metricflow.sql_clients.sql_utils import make_df
 from metricflow.test.compare_df import assert_dataframes_equal
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState

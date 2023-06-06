@@ -14,9 +14,9 @@ from metricflow.protocols.sql_request import SqlJsonTag, SqlRequestTagSet
 from metricflow.sql.render.databricks import DatabricksSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters, SqlColumnType
-from metricflow.sql_clients.async_request import CombinedSqlTags
 from metricflow.sql_clients.base_sql_client_implementation import BaseSqlClientImplementation
 from metricflow.sql_clients.common_client import SqlDialect, check_isolation_level
+from metricflow.sql_clients.sql_statement_metadata import CombinedSqlTags
 
 logger = logging.getLogger(__name__)
 

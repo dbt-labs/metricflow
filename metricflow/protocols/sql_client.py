@@ -10,7 +10,7 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_request import SqlJsonTag, SqlRequestId, SqlRequestResult
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.sql_clients.async_request import CombinedSqlTags
+from metricflow.sql_clients.sql_statement_metadata import CombinedSqlTags
 
 
 class SqlEngine(Enum):
