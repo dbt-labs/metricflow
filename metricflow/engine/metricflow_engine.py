@@ -54,6 +54,7 @@ from metricflow.plan_conversion.dataflow_to_execution import (
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.plan_conversion.time_spine import TimeSpineSource, TimeSpineTableBuilder
 from metricflow.protocols.async_sql_client import AsyncSqlClient
+from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.random_id import random_id
 from metricflow.specs.column_assoc import ColumnAssociationResolver
@@ -452,6 +453,8 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         output_selection_specs: Optional[InstanceSpecSet] = None
         if mf_query_request.query_type == MetricFlowQueryType.DIMENSION_VALUES:
             # Filter result by dimension columns if it's a dimension values query
+            if len(query_spec.entity_specs) > 0:
+                raise InvalidQueryException("Querying dimension values for entities is not allowed.")
             output_selection_specs = InstanceSpecSet(
                 dimension_specs=query_spec.dimension_specs,
                 time_dimension_specs=query_spec.time_dimension_specs,
