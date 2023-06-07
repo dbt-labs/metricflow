@@ -3,11 +3,10 @@ from __future__ import annotations
 import logging
 from typing import Dict, FrozenSet, List, Sequence
 
-from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
-from dbt_semantic_interfaces.protocols.metric import Metric, MetricType
-from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
+from dbt_semantic_interfaces.implementations.metric import PydanticMetric, PydanticMetricTimeWindow
+from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from dbt_semantic_interfaces.references import MetricReference
-
+from dbt_semantic_interfaces.type_enums.metric_type import MetricType
 from metricflow.errors.errors import DuplicateMetricError, MetricNotFoundError, NonExistentMeasureError
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.linkable_spec_resolver import LinkableElementSet, ValidLinkableSpecResolver
@@ -28,10 +27,10 @@ logger = logging.getLogger(__name__)
 
 class MetricLookup(MetricAccessor):  # noqa: D
     def __init__(  # noqa: D
-        self, semantic_manifest: SemanticManifest, semantic_model_lookup: SemanticModelLookup
+        self, semantic_manifest: PydanticSemanticManifest, semantic_model_lookup: SemanticModelLookup
     ) -> None:
         self._semantic_manifest = semantic_manifest
-        self._metrics: Dict[MetricReference, Metric] = {}
+        self._metrics: Dict[MetricReference, PydanticMetric] = {}
         self._semantic_model_lookup = semantic_model_lookup
 
         for metric in self._semantic_manifest.metrics:
@@ -71,7 +70,7 @@ class MetricLookup(MetricAccessor):  # noqa: D
             without_any_of=without_any_property,
         )
 
-    def get_metrics(self, metric_references: Sequence[MetricReference]) -> Sequence[Metric]:  # noqa: D
+    def get_metrics(self, metric_references: Sequence[MetricReference]) -> Sequence[PydanticMetric]:  # noqa: D
         res = []
         for metric_reference in metric_references:
             if metric_reference not in self._metrics:
@@ -86,12 +85,12 @@ class MetricLookup(MetricAccessor):  # noqa: D
     def metric_references(self) -> Sequence[MetricReference]:  # noqa: D
         return list(self._metrics.keys())
 
-    def get_metric(self, metric_reference: MetricReference) -> Metric:  # noqa:D
+    def get_metric(self, metric_reference: MetricReference) -> PydanticMetric:  # noqa:D
         if metric_reference not in self._metrics:
             raise MetricNotFoundError(f"Unable to find metric `{metric_reference}`. Perhaps it has not been registered")
         return self._metrics[metric_reference]
 
-    def add_metric(self, metric: Metric) -> None:
+    def add_metric(self, metric: PydanticMetric) -> None:
         """Add metric, validating presence of required measures."""
         metric_reference = MetricReference(element_name=metric.name)
         if metric_reference in self._metrics:

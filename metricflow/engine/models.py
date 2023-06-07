@@ -3,18 +3,18 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Optional
 
-from dbt_semantic_interfaces.protocols.dimension import (
-    Dimension as SemanticManifestDimension,
+from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimension, PydanticDimensionTypeParams
+from dbt_semantic_interfaces.implementations.filters.where_filter import (
+    PydanticWhereFilter,
 )
-from dbt_semantic_interfaces.protocols.dimension import (
-    DimensionType,
-    DimensionTypeParams,
+from dbt_semantic_interfaces.implementations.metadata import PydanticMetadata
+from dbt_semantic_interfaces.implementations.metric import (
+    PydanticMetric,
+    PydanticMetricInputMeasure,
+    PydanticMetricTypeParams,
 )
-from dbt_semantic_interfaces.protocols.metadata import Metadata
-from dbt_semantic_interfaces.protocols.metric import Metric as SemanticManifestMetric
-from dbt_semantic_interfaces.protocols.metric import MetricInputMeasure, MetricType, MetricTypeParams
-from dbt_semantic_interfaces.protocols.where_filter import WhereFilter
-
+from dbt_semantic_interfaces.type_enums.dimension_type import DimensionType
+from dbt_semantic_interfaces.type_enums.metric_type import MetricType
 from metricflow.model.semantics.linkable_spec_resolver import ElementPathKey
 from metricflow.specs.specs import DimensionSpec, EntityReference
 
@@ -26,13 +26,13 @@ class Metric:
     name: str
     description: Optional[str]
     type: MetricType
-    type_params: MetricTypeParams
-    filter: Optional[WhereFilter]
-    metadata: Optional[Metadata]
+    type_params: PydanticMetricTypeParams
+    filter: Optional[PydanticWhereFilter]
+    metadata: Optional[PydanticMetadata]
     dimensions: List[Dimension]
 
     @classmethod
-    def from_pydantic(cls, pydantic_metric: SemanticManifestMetric, dimensions: List[Dimension]) -> Metric:
+    def from_pydantic(cls, pydantic_metric: PydanticMetric, dimensions: List[Dimension]) -> Metric:
         """Build from pydantic Metric object and list of Dimensions."""
         return cls(
             name=pydantic_metric.name,
@@ -45,11 +45,11 @@ class Metric:
         )
 
     @property
-    def input_measures(self) -> List[MetricInputMeasure]:
+    def input_measures(self) -> List[PydanticMetricInputMeasure]:
         """Return the complete list of input measure configurations for this metric."""
         type_params = self.type_params
 
-        measures: List[MetricInputMeasure] = list(
+        measures: List[PydanticMetricInputMeasure] = list(
             type_params.measures if type_params is not None and type_params.measures is not None else []
         )
         if type_params.measure:
@@ -69,13 +69,13 @@ class Dimension:
     qualified_name: str
     description: Optional[str]
     type: DimensionType
-    type_params: Optional[DimensionTypeParams]
-    metadata: Optional[Metadata]
+    type_params: Optional[PydanticDimensionTypeParams]
+    metadata: Optional[PydanticMetadata]
     is_partition: bool = False
     expr: Optional[str] = None
 
     @classmethod
-    def from_pydantic(cls, pydantic_dimension: SemanticManifestDimension, path_key: ElementPathKey) -> Dimension:
+    def from_pydantic(cls, pydantic_dimension: PydanticDimension, path_key: ElementPathKey) -> Dimension:
         """Build from pydantic Dimension and entity_key."""
         qualified_name = DimensionSpec(
             element_name=path_key.element_name,
