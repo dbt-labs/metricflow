@@ -1,6 +1,8 @@
 semantic_model:
   name: customers
   description: Location and description of all customers.
+  defaults:
+    agg_time_dimension: ds
   entities:
     - name: customer
       type: primary
