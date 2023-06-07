@@ -7,6 +7,8 @@ semantic_model:
     every transaction. There is only one transaction id per
     transaction, but there can be many rows per order id and
     customer id. The `ds` or date is reflected in UTC.
+  defaults:
+    agg_time_dimension: ds
   entities:
     - name: transaction
       type: primary

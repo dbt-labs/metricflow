@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+import os
+import pathlib
 from datetime import datetime
 from unittest.mock import MagicMock, patch
 
+from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
+from dbt_semantic_interfaces.parsing.dir_to_model import parse_directory_of_yaml_files_to_semantic_manifest
 from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 from dbt_semantic_interfaces.validations.validator_helpers import (
     SemanticManifestValidationResults,
@@ -18,8 +22,14 @@ from metricflow.cli.main import (
     list_dimensions,
     list_metrics,
     query,
+    tutorial,
     validate_configs,
     version,
+)
+from metricflow.cli.tutorial import (
+    COUNTRIES_TABLE,
+    CUSTOMERS_TABLE,
+    TRANSACTIONS_TABLE,
 )
 from metricflow.test.fixtures.cli_fixtures import MetricFlowCliRunner
 
@@ -145,3 +155,35 @@ def test_health_checks(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
 
     assert "SELECT 1: Success!" in resp.output
     assert resp.exit_code == 0
+
+
+def test_tutorial(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
+    cli_context = cli_runner.cli_context
+
+    resp = cli_runner.run(tutorial, args=["-m"])
+    assert "Please run the following steps" in resp.output
+
+    pathlib.Path(cli_context.config.file_path).touch()
+    resp = cli_runner.run(tutorial, args=["--skip-dw"])
+    assert "Attempting to generate model configs to your local filesystem in" in resp.output
+
+    table_names = cli_context.sql_client.list_tables(schema_name=cli_context.mf_system_schema)
+    assert CUSTOMERS_TABLE in table_names
+    assert TRANSACTIONS_TABLE in table_names
+    assert COUNTRIES_TABLE in table_names
+
+
+def test_build_tutorial_model(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
+    TOP_LEVEL_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+    cli_sample_template_mapping = {
+        "customers_table": CUSTOMERS_TABLE,
+        "transactions_table": TRANSACTIONS_TABLE,
+        "countries_table": COUNTRIES_TABLE,
+        "system_schema": cli_runner.cli_context.mf_system_schema,
+    }
+    model_build_result = parse_directory_of_yaml_files_to_semantic_manifest(
+        os.path.join(TOP_LEVEL_PATH, "cli/sample_models"), template_mapping=cli_sample_template_mapping
+    )
+    assert model_build_result.issues.has_blocking_issues is False
+
+    SemanticManifestValidator[PydanticSemanticManifest]().checked_validations(model_build_result.semantic_manifest)
