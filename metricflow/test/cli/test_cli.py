@@ -5,6 +5,7 @@ import pathlib
 from datetime import datetime
 from unittest.mock import MagicMock, patch
 
+from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from dbt_semantic_interfaces.parsing.dir_to_model import parse_directory_of_yaml_files_to_semantic_manifest
 from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 from dbt_semantic_interfaces.validations.validator_helpers import (
@@ -184,3 +185,5 @@ def test_build_tutorial_model(cli_runner: MetricFlowCliRunner) -> None:  # noqa:
         os.path.join(TOP_LEVEL_PATH, "cli/sample_models"), template_mapping=cli_sample_template_mapping
     )
     assert model_build_result.issues.has_blocking_issues is False
+
+    SemanticManifestValidator[PydanticSemanticManifest]().checked_validations(model_build_result.semantic_manifest)
