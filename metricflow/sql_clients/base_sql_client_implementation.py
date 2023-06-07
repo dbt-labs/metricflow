@@ -98,6 +98,8 @@ class BaseSqlClientImplementation(ABC, SqlClient):
         self,
         stmt: str,
         sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
+        extra_tags: SqlJsonTag = SqlJsonTag(),
+        isolation_level: Optional[SqlIsolationLevel] = None,
     ) -> pd.DataFrame:
         """Query statement; result expected to be data which will be returned as a DataFrame.
 
@@ -107,8 +109,19 @@ class BaseSqlClientImplementation(ABC, SqlClient):
                 concrete values for SQL query parameters.
         """
         start = time.time()
-        logger.info(BaseSqlClientImplementation._format_run_query_log_message(stmt, sql_bind_parameters))
-        df = self._engine_specific_query_implementation(stmt, sql_bind_parameters)
+        request_id = SqlRequestId(f"mf_rid__{random_id()}")
+        combined_tags = BaseSqlClientImplementation._consolidate_tags(json_tags=extra_tags, request_id=request_id)
+        statement = SqlStatementCommentMetadata.add_tag_metadata_as_comment(
+            sql_statement=stmt, combined_tags=combined_tags
+        )
+        logger.info(BaseSqlClientImplementation._format_run_query_log_message(statement, sql_bind_parameters))
+        df = self._engine_specific_query_implementation(
+            stmt=statement,
+            bind_params=sql_bind_parameters,
+            isolation_level=isolation_level,
+            system_tags=combined_tags.system_tags,
+            extra_tags=combined_tags.extra_tag,
+        )
         if not isinstance(df, pd.DataFrame):
             raise RuntimeError(f"Expected query to return a DataFrame, got {type(df)}")
         stop = time.time()
@@ -119,10 +132,23 @@ class BaseSqlClientImplementation(ABC, SqlClient):
         self,
         stmt: str,
         sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
+        extra_tags: SqlJsonTag = SqlJsonTag(),
+        isolation_level: Optional[SqlIsolationLevel] = None,
     ) -> None:
         start = time.time()
-        logger.info(BaseSqlClientImplementation._format_run_query_log_message(stmt, sql_bind_parameters))
-        self._engine_specific_execute_implementation(stmt, sql_bind_parameters)
+        request_id = SqlRequestId(f"mf_rid__{random_id()}")
+        combined_tags = BaseSqlClientImplementation._consolidate_tags(json_tags=extra_tags, request_id=request_id)
+        statement = SqlStatementCommentMetadata.add_tag_metadata_as_comment(
+            sql_statement=stmt, combined_tags=combined_tags
+        )
+        logger.info(BaseSqlClientImplementation._format_run_query_log_message(statement, sql_bind_parameters))
+        self._engine_specific_execute_implementation(
+            stmt=statement,
+            bind_params=sql_bind_parameters,
+            isolation_level=isolation_level,
+            system_tags=combined_tags.system_tags,
+            extra_tags=combined_tags.extra_tag,
+        )
         stop = time.time()
         logger.info(f"Finished running the query in {stop - start:.2f}s")
         return None
@@ -302,6 +328,14 @@ class BaseSqlClientImplementation(ABC, SqlClient):
         with self._state_lock:
             return tuple(executor_thread.request_id for executor_thread in self._request_id_to_thread.values())
 
+    @staticmethod
+    def _consolidate_tags(json_tags: SqlJsonTag, request_id: SqlRequestId) -> CombinedSqlTags:
+        """Consolidates json tags and request ID into a single set of tags."""
+        return CombinedSqlTags(
+            system_tags=SqlRequestTagSet().add_request_id(request_id=request_id),
+            extra_tag=json_tags,
+        )
+
     class SqlRequestExecutorThread(threading.Thread):
         """Thread that helps to execute a request to the SQL engine asynchronously."""
 
@@ -339,9 +373,8 @@ class BaseSqlClientImplementation(ABC, SqlClient):
         def run(self) -> None:  # noqa: D
             start_time = time.time()
             try:
-                combined_tags = CombinedSqlTags(
-                    system_tags=SqlRequestTagSet().add_request_id(self._request_id),
-                    extra_tag=self._extra_tag,
+                combined_tags = BaseSqlClientImplementation._consolidate_tags(
+                    json_tags=self._extra_tag, request_id=self._request_id
                 )
                 statement = SqlStatementCommentMetadata.add_tag_metadata_as_comment(
                     sql_statement=self._statement, combined_tags=combined_tags
