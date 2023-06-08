@@ -29,6 +29,8 @@ dependencies = [
   "SQLAlchemy~=1.4.42",
   "click>=7.1.2",
   "databricks-sql-connector==2.0.3",
+  # Pin to 1.5 for now
+  "dbt-core==1.5.0",
   "dbt-semantic-interfaces==0.1.0.dev4",
   "duckdb-engine~=0.1.8",
   "duckdb==0.3.4",
@@ -69,23 +71,7 @@ Documentation = "https://transform.co/metricflow"
 mf = 'metricflow.cli.main:cli'
 
 [project.optional-dependencies]
-dbt-snowflake = [
-  "dbt-snowflake==1.4.2"
-]
-dbt-redshift = [
-  "dbt-redshift==1.4.0"
-]
-dbt-postgres = [
-  "dbt-postgres==1.4.0"
-]
-dbt-bigquery = [
-  "dbt-bigquery==1.4.3"
-]
-dbt-metadata-client = [
-  "dbt-metadata-client~=0.1.0"
-]
 dev-packages = [
-  "dbt-core==1.4.0",
   "mypy~=1.3.0",
   "pre-commit~=3.2.2",
   "pytest-mock~=3.7.0",
@@ -111,11 +97,6 @@ exclude = [
 [tool.hatch.envs.dev-env]
 description = "Environment for development."
 features = [
-  "dbt-redshift",
-  "dbt-snowflake",
-  "dbt-bigquery",
-  "dbt-metadata-client",
-  "dbt-postgres",
   "dev-packages",
 ]
 
