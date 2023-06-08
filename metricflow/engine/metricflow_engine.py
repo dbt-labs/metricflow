@@ -251,6 +251,27 @@ class AbstractMetricFlowEngine(ABC):
         """
         pass
 
+    @abstractmethod
+    def explain_get_dimension_values(  # noqa: D
+        self,
+        metric_name: str,
+        get_group_by_values: str,
+        time_constraint_start: Optional[datetime.datetime] = None,
+        time_constraint_end: Optional[datetime.datetime] = None,
+    ) -> MetricFlowExplainResult:
+        """Returns the SQL query for get_dimension_values.
+
+        Args:
+            metric_name: Name of metric that contains the group_by.
+            get_group_by_values: Name of group_by to get values from.
+            time_constraint_start: Get data for the start of this time range.
+            time_constraint_end: Get data for the end of this time range.
+
+        Returns:
+            An object with the rendered SQL and generated plans.
+        """
+        pass
+
 
 class MetricFlowEngine(AbstractMetricFlowEngine):
     """Main entry point for queries."""
