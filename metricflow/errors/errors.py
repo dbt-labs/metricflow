@@ -81,6 +81,7 @@ class ModelCreationException(Exception):
 class InferenceError(Exception):
     """Exception to represent errors related to inference."""
 
+
 class BigQueryApproximatePercentileError(RuntimeError):
     """Raised when percentile aggregations are used without approximation for BigQuery."""
 

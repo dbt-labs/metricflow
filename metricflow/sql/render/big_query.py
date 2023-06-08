@@ -4,6 +4,7 @@ from fractions import Fraction
 
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
+from metricflow.errors.errors import BigQueryApproximatePercentileError
 from metricflow.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,
     SqlExpressionRenderer,
@@ -20,7 +21,7 @@ from metricflow.sql.sql_exprs import (
     SqlTimeDeltaExpression,
 )
 from metricflow.sql.sql_plan import SqlSelectColumn
-from metricflow.errors.errors import BigQueryApproximatePercentileError
+
 
 class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
     """Expression renderer for the BigQuery engine."""
