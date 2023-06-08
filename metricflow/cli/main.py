@@ -395,13 +395,20 @@ def query(
             click.echo(f"Plan SVG saved to: {svg_path}")
 
 
-@cli.command()
+@cli.group()
+@pass_config
+@log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
+def list(cfg: CLIContext) -> None:  # noqa: D
+    """Retrieve metadata values about metrics/dimensions/entities/dimension values."""
+
+
+@list.command()
 @click.option("--search", required=False, type=str, help="Filter available metrics by this search term")
 @click.option("--show-all-dims", is_flag=True, default=False, help="Show all dimensions associated with a metric.")
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-def list_metrics(cfg: CLIContext, show_all_dims: bool = False, search: Optional[str] = None) -> None:
+def metrics(cfg: CLIContext, show_all_dims: bool = False, search: Optional[str] = None) -> None:
     """List the metrics with their available dimensions.
 
     Automatically truncates long lists of dimensions, pass --show-all-dims to see all.
@@ -436,7 +443,7 @@ def list_metrics(cfg: CLIContext, show_all_dims: bool = False, search: Optional[
         )
 
 
-@cli.command()
+@list.command()
 @click.option(
     "--metric-names",
     type=click_custom.SequenceParamType(),
@@ -445,7 +452,7 @@ def list_metrics(cfg: CLIContext, show_all_dims: bool = False, search: Optional[
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-def list_dimensions(cfg: CLIContext, metric_names: List[str]) -> None:
+def dimensions(cfg: CLIContext, metric_names: List[str]) -> None:
     """List all unique dimensions."""
     spinner = Halo(
         text="🔍 Looking for all available dimensions...",
