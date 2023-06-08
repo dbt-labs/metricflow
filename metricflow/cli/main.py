@@ -404,11 +404,13 @@ def list(cfg: CLIContext) -> None:  # noqa: D
 
 @list.command()
 @click.option("--search", required=False, type=str, help="Filter available metrics by this search term")
-@click.option("--show-all-dims", is_flag=True, default=False, help="Show all dimensions associated with a metric.")
+@click.option(
+    "--show-all-dimensions", is_flag=True, default=False, help="Show all dimensions associated with a metric."
+)
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-def metrics(cfg: CLIContext, show_all_dims: bool = False, search: Optional[str] = None) -> None:
+def metrics(cfg: CLIContext, show_all_dimensions: bool = False, search: Optional[str] = None) -> None:
     """List the metrics with their available dimensions.
 
     Automatically truncates long lists of dimensions, pass --show-all-dims to see all.
@@ -435,7 +437,7 @@ def metrics(cfg: CLIContext, show_all_dims: bool = False, search: Optional[str] 
         dimensions = sorted(map(lambda d: d.name, filter(lambda d: "/" not in d.name, m.dimensions))) + sorted(
             map(lambda d: d.name, filter(lambda d: "/" in d.name, m.dimensions))
         )
-        if show_all_dims:
+        if show_all_dimensions:
             num_dims_to_show = len(dimensions)
         click.echo(
             f"• {click.style(m.name, bold=True, fg='green')}: {', '.join(dimensions[:num_dims_to_show])}"
@@ -445,14 +447,15 @@ def metrics(cfg: CLIContext, show_all_dims: bool = False, search: Optional[str] 
 
 @list.command()
 @click.option(
-    "--metric-names",
-    type=click_custom.SequenceParamType(),
-    help="List dimensions by given metrics (intersection). Ex. --metric-names bookings,messages",
+    "--metrics",
+    type=click_custom.SequenceParamType(min_length=1),
+    default="",
+    help="List dimensions by given metrics (intersection). Ex. --metrics bookings,messages",
 )
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-def dimensions(cfg: CLIContext, metric_names: List[str]) -> None:
+def dimensions(cfg: CLIContext, metrics: List[str]) -> None:
     """List all unique dimensions."""
     spinner = Halo(
         text="🔍 Looking for all available dimensions...",
@@ -460,11 +463,11 @@ def dimensions(cfg: CLIContext, metric_names: List[str]) -> None:
     )
     spinner.start()
 
-    dimensions = cfg.mf.simple_dimensions_for_metrics(metric_names)
+    dimensions = cfg.mf.simple_dimensions_for_metrics(metrics)
     if not dimensions:
         spinner.fail("List of dimensions unavailable.")
 
-    spinner.succeed(f"🌱 We've found {len(dimensions)} common dimensions for metrics {metric_names}.")
+    spinner.succeed(f"🌱 We've found {len(dimensions)} common dimensions for metrics {metrics}.")
     for d in dimensions:
         click.echo(f"• {click.style(d.name, bold=True, fg='green')}")
 
