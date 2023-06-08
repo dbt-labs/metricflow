@@ -20,7 +20,7 @@ from metricflow.sql.sql_exprs import (
     SqlTimeDeltaExpression,
 )
 from metricflow.sql.sql_plan import SqlSelectColumn
-
+from metricflow.errors.errors import BigQueryApproximatePercentileError
 
 class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
     """Expression renderer for the BigQuery engine."""
@@ -65,10 +65,7 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
                 sql=f"APPROX_QUANTILES({arg_rendered.sql}, {fraction.denominator})[OFFSET({fraction.numerator})]",
                 bind_parameters=params,
             )
-        raise RuntimeError(
-            "Only approximate continous percentile aggregations are supported for BigQuery. Set "
-            + "use_approximate_percentile and disable use_discrete_percentile in all percentile measures."
-        )
+        raise BigQueryApproximatePercentileError()
 
     def visit_cast_to_timestamp_expr(self, node: SqlCastToTimestampExpression) -> SqlExpressionRenderResult:
         """Casts the time value expression to DATETIME, as per standard BigQuery preferences."""
