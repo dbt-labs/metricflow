@@ -257,12 +257,6 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool,
 @cli.command()
 @query_options
 @click.option(
-    "--as-table",
-    required=False,
-    type=str,
-    help="Output the data to a specified SQL table in the form of '<schema>.<table>'",
-)
-@click.option(
     "--csv",
     type=click.File("wb"),
     required=False,
@@ -306,13 +300,12 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool,
 def query(
     cfg: CLIContext,
     metrics: List[str],
-    dimensions: List[str] = [],
+    group_bys: List[str] = [],
     where: Optional[str] = None,
     start_time: Optional[dt.datetime] = None,
     end_time: Optional[dt.datetime] = None,
     order: Optional[List[str]] = None,
     limit: Optional[int] = None,
-    as_table: Optional[str] = None,
     csv: Optional[click.utils.LazyFile] = None,
     explain: bool = False,
     show_dataflow_plan: bool = False,
@@ -327,13 +320,12 @@ def query(
 
     mf_request = MetricFlowQueryRequest.create_with_random_request_id(
         metric_names=metrics,
-        group_by_names=dimensions,
+        group_by_names=group_bys,
         limit=limit,
         time_constraint_start=start_time,
         time_constraint_end=end_time,
         where_constraint=where,
         order_by_names=order,
-        output_table=as_table,
     )
 
     explain_result: Optional[MetricFlowExplainResult] = None

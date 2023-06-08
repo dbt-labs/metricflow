@@ -54,8 +54,13 @@ class SequenceParamType(click.ParamType, Generic[T]):
         self, value: str, param: Optional[click.Parameter], ctx: Optional[click.Context]
     ) -> Sequence[T]:
         if len(value) == 0:
+            if self.min_length > 0:
+                self.fail(
+                    f"Input is empty, when the minimum expected number of input is {self.min_length}",
+                    param,
+                    ctx,
+                )
             return []
-
         str_values = value.split(self.separator)
 
         if len(str_values) < self.min_length:
