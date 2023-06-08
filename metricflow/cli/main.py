@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import contextlib
 import datetime as dt
 import logging
 import os
@@ -10,7 +9,7 @@ import sys
 import textwrap
 import time
 from importlib.metadata import version as pkg_version
-from typing import Callable, Iterator, List, Optional
+from typing import Callable, List, Optional
 
 import click
 import jinja2
@@ -43,18 +42,9 @@ from metricflow.cli.utils import (
 from metricflow.configuration.config_builder import YamlTemplateBuilder
 from metricflow.dag.dag_visualization import display_dag_as_svg
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
-from metricflow.dataflow.sql_table import SqlTable
 from metricflow.engine.metricflow_engine import MetricFlowExplainResult, MetricFlowQueryRequest, MetricFlowQueryResult
 from metricflow.engine.utils import model_build_result_from_config
-from metricflow.inference.context.snowflake import SnowflakeInferenceContextProvider
-from metricflow.inference.models import InferenceSignalConfidence
-from metricflow.inference.renderer.config_file import ConfigFileRenderer
-from metricflow.inference.renderer.stream import StreamInferenceRenderer
-from metricflow.inference.rule.defaults import DEFAULT_RULESET
-from metricflow.inference.runner import InferenceProgressReporter, InferenceRunner
-from metricflow.inference.solver.weighted_tree import WeightedTypeTreeInferenceSolver
 from metricflow.model.data_warehouse_model_validator import DataWarehouseModelValidator
-from metricflow.protocols.sql_client import SqlEngine
 from metricflow.sql_clients.common_client import SqlDialect
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
@@ -111,12 +101,6 @@ def cli(cfg: CLIContext, verbose: bool) -> None:  # noqa: D
 
     signal.signal(signal.SIGINT, exit_signal_handler)
     signal.signal(signal.SIGTERM, exit_signal_handler)
-
-
-@cli.command()
-def version() -> None:
-    """Print the current version of the MetricFlow CLI."""
-    click.echo(pkg_version(PACKAGE_NAME))
 
 
 @cli.command()
@@ -273,12 +257,6 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool,
 @cli.command()
 @query_options
 @click.option(
-    "--as-table",
-    required=False,
-    type=str,
-    help="Output the data to a specified SQL table in the form of '<schema>.<table>'",
-)
-@click.option(
     "--csv",
     type=click.File("wb"),
     required=False,
@@ -322,13 +300,12 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool,
 def query(
     cfg: CLIContext,
     metrics: List[str],
-    dimensions: List[str] = [],
+    group_bys: List[str] = [],
     where: Optional[str] = None,
     start_time: Optional[dt.datetime] = None,
     end_time: Optional[dt.datetime] = None,
     order: Optional[List[str]] = None,
     limit: Optional[int] = None,
-    as_table: Optional[str] = None,
     csv: Optional[click.utils.LazyFile] = None,
     explain: bool = False,
     show_dataflow_plan: bool = False,
@@ -343,13 +320,12 @@ def query(
 
     mf_request = MetricFlowQueryRequest.create_with_random_request_id(
         metric_names=metrics,
-        group_by_names=dimensions,
+        group_by_names=group_bys,
         limit=limit,
         time_constraint_start=start_time,
         time_constraint_end=end_time,
         where_constraint=where,
         order_by_names=order,
-        output_table=as_table,
     )
 
     explain_result: Optional[MetricFlowExplainResult] = None
@@ -419,13 +395,22 @@ def query(
             click.echo(f"Plan SVG saved to: {svg_path}")
 
 
-@cli.command()
+@cli.group()
+@pass_config
+@log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
+def list(cfg: CLIContext) -> None:  # noqa: D
+    """Retrieve metadata values about metrics/dimensions/entities/dimension values."""
+
+
+@list.command()
 @click.option("--search", required=False, type=str, help="Filter available metrics by this search term")
-@click.option("--show-all-dims", is_flag=True, default=False, help="Show all dimensions associated with a metric.")
+@click.option(
+    "--show-all-dimensions", is_flag=True, default=False, help="Show all dimensions associated with a metric."
+)
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-def list_metrics(cfg: CLIContext, show_all_dims: bool = False, search: Optional[str] = None) -> None:
+def metrics(cfg: CLIContext, show_all_dimensions: bool = False, search: Optional[str] = None) -> None:
     """List the metrics with their available dimensions.
 
     Automatically truncates long lists of dimensions, pass --show-all-dims to see all.
@@ -452,7 +437,7 @@ def list_metrics(cfg: CLIContext, show_all_dims: bool = False, search: Optional[
         dimensions = sorted(map(lambda d: d.name, filter(lambda d: "/" not in d.name, m.dimensions))) + sorted(
             map(lambda d: d.name, filter(lambda d: "/" in d.name, m.dimensions))
         )
-        if show_all_dims:
+        if show_all_dimensions:
             num_dims_to_show = len(dimensions)
         click.echo(
             f"• {click.style(m.name, bold=True, fg='green')}: {', '.join(dimensions[:num_dims_to_show])}"
@@ -460,16 +445,17 @@ def list_metrics(cfg: CLIContext, show_all_dims: bool = False, search: Optional[
         )
 
 
-@cli.command()
+@list.command()
 @click.option(
-    "--metric-names",
-    type=click_custom.SequenceParamType(),
-    help="List dimensions by given metrics (intersection). Ex. --metric-names bookings,messages",
+    "--metrics",
+    type=click_custom.SequenceParamType(min_length=1),
+    default="",
+    help="List dimensions by given metrics (intersection). Ex. --metrics bookings,messages",
 )
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-def list_dimensions(cfg: CLIContext, metric_names: List[str]) -> None:
+def dimensions(cfg: CLIContext, metrics: List[str]) -> None:
     """List all unique dimensions."""
     spinner = Halo(
         text="🔍 Looking for all available dimensions...",
@@ -477,11 +463,11 @@ def list_dimensions(cfg: CLIContext, metric_names: List[str]) -> None:
     )
     spinner.start()
 
-    dimensions = cfg.mf.simple_dimensions_for_metrics(metric_names)
+    dimensions = cfg.mf.simple_dimensions_for_metrics(metrics)
     if not dimensions:
         spinner.fail("List of dimensions unavailable.")
 
-    spinner.succeed(f"🌱 We've found {len(dimensions)} common dimensions for metrics {metric_names}.")
+    spinner.succeed(f"🌱 We've found {len(dimensions)} common dimensions for metrics {metrics}.")
     for d in dimensions:
         click.echo(f"• {click.style(d.name, bold=True, fg='green')}")
 
@@ -508,23 +494,23 @@ def health_checks(cfg: CLIContext) -> None:
             click.echo(f"• ✅ {click.style(test, bold=True, fg=('green'))}: Success!")
 
 
-@cli.command()
-@click.option("--dimension-name", required=True, type=str, help="Dimension to query values from")
-@click.option("--metric-name", required=True, type=str, help="Metric that is associated with the dimension")
+@list.command()
+@click.option("--dimension", required=True, type=str, help="Dimension to query values from")
+@click.option("--metric", required=True, type=str, help="Metric that is associated with the dimension")
 @start_end_time_options
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-def get_dimension_values(
+def dimension_values(
     cfg: CLIContext,
-    metric_name: str,
-    dimension_name: str,
+    metric: str,
+    dimension: str,
     start_time: Optional[dt.datetime] = None,
     end_time: Optional[dt.datetime] = None,
 ) -> None:
     """List all dimension values with the corresponding metric."""
     spinner = Halo(
-        text=f"🔍 Retrieving dimension values for dimension '{dimension_name}' of metric '{metric_name}'...",
+        text=f"🔍 Retrieving dimension values for dimension '{dimension}' of metric '{metric}'...",
         spinner="dots",
     )
     spinner.start()
@@ -533,8 +519,8 @@ def get_dimension_values(
 
     try:
         dim_vals = cfg.mf.get_dimension_values(
-            metric_name=metric_name,
-            get_group_by_values=dimension_name,
+            metric_name=metric,
+            get_group_by_values=dimension,
             time_constraint_start=start_time,
             time_constraint_end=end_time,
         )
@@ -543,7 +529,7 @@ def get_dimension_values(
         click.echo(
             textwrap.dedent(
                 f"""\
-                ❌ Failed to query dimension values for dimension {dimension_name} of metric {metric_name}.
+                ❌ Failed to query dimension values for dimension {dimension} of metric {metric}.
                     ERROR: {str(e)}
                 """
             )
@@ -551,9 +537,7 @@ def get_dimension_values(
         exit(1)
 
     assert dim_vals
-    spinner.succeed(
-        f"🌱 We've found {len(dim_vals)} dimension values for dimension {dimension_name} of metric {metric_name}."
-    )
+    spinner.succeed(f"🌱 We've found {len(dim_vals)} dimension values for dimension {dimension} of metric {metric}.")
     for dim_val in dim_vals:
         click.echo(f"• {click.style(dim_val, bold=True, fg='green')}")
 
@@ -693,201 +677,6 @@ def validate_configs(
 
     merged_results = SemanticManifestValidationResults.merge([parsing_result.issues, model_issues, dw_results])
     _print_issues(merged_results, show_non_blocking=show_all, verbose=verbose_issues)
-
-
-@contextlib.contextmanager
-def _get_spin_context_manager(text: str) -> Iterator[None]:
-    """Get a context manager that produces a spinner."""
-    start_ms = int(time.perf_counter() * 1000)
-    spinner = Halo(text=text, spinner="dots")
-    spinner.start()
-    yield
-    end_ms = int(time.perf_counter() * 1000)
-    total_ms = end_ms - start_ms
-    spinner.succeed(text=(click.style(f"{total_ms}ms ", fg="yellow") + text))
-
-
-class CLIInferenceProgressReporter(InferenceProgressReporter):
-    """Writes inference progress to stdout as pretty output."""
-
-    @staticmethod
-    @contextlib.contextmanager
-    def warehouse() -> Iterator[None]:  # noqa: D
-        yield
-
-    @staticmethod
-    @contextlib.contextmanager
-    def table(table: SqlTable, index: int, total: int) -> Iterator[None]:  # noqa: D
-        with _get_spin_context_manager(f"🔍 Querying `{table.sql}` ({index + 1} out of {total})"):
-            yield
-
-    @staticmethod
-    @contextlib.contextmanager
-    def rules() -> Iterator[None]:  # noqa: D
-        with _get_spin_context_manager("🤔 Processing inference rules"):
-            yield
-
-    @staticmethod
-    @contextlib.contextmanager
-    def solver() -> Iterator[None]:  # noqa: D
-        with _get_spin_context_manager("🧠 Solving column types"):
-            yield
-
-    @staticmethod
-    @contextlib.contextmanager
-    def renderers() -> Iterator[None]:  # noqa: D
-        with _get_spin_context_manager("📝 Writing output"):
-            yield
-
-
-@cli.command()
-@click.option(
-    "--tables",
-    cls=click_custom.MutuallyExclusiveOption,
-    mutually_exclusive=["schema"],
-    type=click_custom.SequenceParamType(
-        value_converter=lambda table_str: SqlTable.from_string(table_str),
-        min_length=1,
-    ),
-    required=False,
-    help="Comma-separated list of table names to be queried for inference.",
-)
-@click.option(
-    "--schema",
-    cls=click_custom.MutuallyExclusiveOption,
-    mutually_exclusive=["tables"],
-    type=str,
-    required=False,
-    help="Name of a schema to be queried for inference. Will list all tables in this schema.",
-)
-@click.option(
-    "--max-sample-size",
-    type=click.IntRange(min=1),
-    required=True,
-    default=10000,
-    help="The maximum number of rows to sample from the warehouse, for each table.",
-)
-@click.option(
-    "--solver-threshold",
-    type=click.FloatRange(min=0.5, max=1),
-    required=False,
-    default=0.6,
-    help="The inference solver weight threshold.",
-)
-@click.option(
-    "--solver-weights",
-    type=click_custom.SequenceParamType(
-        value_converter=lambda weight_str: int(weight_str),
-        min_length=4,
-        max_length=4,
-    ),
-    required=False,
-    default="1,2,4,8",
-    help="Comma-separated list of 4 integer weights to be assigned for each confidence value. "
-    "Interpreted weights will be assigned to confidences LOW,MEDIUM,HIGH,VERY_HIGH",
-)
-@click.option(
-    "--output-dir",
-    type=click.Path(
-        dir_okay=True,
-        file_okay=False,
-        writable=True,
-        readable=True,
-    ),
-    required=True,
-    help="Output directory for the inferred config files.",
-)
-@click.option(
-    "--overwrite",
-    is_flag=True,
-    required=True,
-    default=False,
-    help="If specified, allows existing configuration files to be overwritten by inference.",
-)
-@pass_config
-@exception_handler
-@log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-def infer(
-    cfg: CLIContext,
-    tables: Optional[List[SqlTable]],
-    schema: Optional[str],
-    max_sample_size: int,
-    solver_threshold: float,
-    solver_weights: List[int],
-    output_dir: str,
-    overwrite: bool,
-) -> None:
-    """Infer semantic model configurations from warehouse information."""
-    click.echo(
-        click.style("‼️ Warning: Semantic Model Inference is still in Beta 🧪. ", fg="red", bold=True)
-        + "As such, you should not expect it to be 100% stable or be free of bugs. Any public CLI or Python interfaces may change without prior notice."
-        " If you find any bugs or feel like something is not behaving as it should, feel free to open an issue on the Metricflow Github repo: https://github.com/transform-data/metricflow/issues \n"
-    )
-
-    if cfg.sql_client.sql_engine_attributes.sql_engine_type is not SqlEngine.SNOWFLAKE:
-        click.echo(
-            "Semantic Model Inference is currently only supported for Snowflake. "
-            "We will add support for all the other warehouses before it becomes a "
-            "stable feature. Stay tuned!"
-        )
-        return
-
-    if tables is None:
-        tables = []
-
-    if len(tables) == 0 and schema is None:
-        raise click.UsageError("Either `--tables` or `--schema` have to be provided.")
-
-    click.echo("Running semantic model inference...")
-
-    start_ms = int(time.perf_counter() * 1000)
-
-    if schema is not None and len(tables) == 0:
-        with _get_spin_context_manager(f"🔍 Fetching available tables for schema `{schema}`"):
-            # we know it's a Snowflake client, but `list_tables` is not in the `SqlClient` interface.
-            tables_strs: List[str] = cfg.sql_client.list_tables(schema)  # type: ignore
-            tables = [SqlTable(schema_name=schema, table_name=table_name.upper()) for table_name in tables_strs]
-
-        if len(tables) == 0:
-            click.echo("Schema has no tables.")
-            return
-
-    provider = SnowflakeInferenceContextProvider(client=cfg.sql_client, tables=tables, max_sample_size=max_sample_size)
-
-    # set up the solver
-    def solver_weighter_function(confidence: InferenceSignalConfidence) -> int:
-        weights = {
-            InferenceSignalConfidence.LOW: solver_weights[0],
-            InferenceSignalConfidence.MEDIUM: solver_weights[1],
-            InferenceSignalConfidence.HIGH: solver_weights[2],
-            InferenceSignalConfidence.VERY_HIGH: solver_weights[3],
-        }
-        return weights[confidence]
-
-    solver = WeightedTypeTreeInferenceSolver(
-        weight_percent_threshold=solver_threshold, weighter_function=solver_weighter_function
-    )
-
-    pathlib.Path(output_dir).mkdir(exist_ok=True)
-
-    # set up the runner
-    runner = InferenceRunner(
-        context_providers=[provider],
-        ruleset=DEFAULT_RULESET,
-        solver=solver,
-        renderers=[
-            StreamInferenceRenderer.file(os.path.join(output_dir, "reasons.txt")),
-            ConfigFileRenderer(dir_path=output_dir, overwrite=overwrite),
-        ],
-        progress_reporter=CLIInferenceProgressReporter(),
-    )
-
-    runner.run()
-
-    end_ms = int(time.perf_counter() * 1000)
-    total_ms = end_ms - start_ms
-
-    click.echo(f"🎉 Done running inference! Took {click.style(f'{total_ms}ms', fg='yellow')}.")
 
 
 if __name__ == "__main__":

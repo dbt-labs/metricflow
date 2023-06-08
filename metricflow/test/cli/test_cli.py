@@ -17,14 +17,13 @@ from dbt_semantic_interfaces.validations.validator_helpers import (
 
 from metricflow.cli.cli_context import CLIContext
 from metricflow.cli.main import (
-    get_dimension_values,
+    dimension_values,
+    dimensions,
     health_checks,
-    list_dimensions,
-    list_metrics,
+    metrics,
     query,
     tutorial,
     validate_configs,
-    version,
 )
 from metricflow.cli.tutorial import (
     COUNTRIES_TABLE,
@@ -35,27 +34,27 @@ from metricflow.test.fixtures.cli_fixtures import MetricFlowCliRunner
 
 
 def test_query(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    resp = cli_runner.run(query, args=["--metrics", "bookings", "--dimensions", "ds"])
+    resp = cli_runner.run(query, args=["--metrics", "bookings", "--group-bys", "ds"])
     assert "bookings" in resp.output
     assert resp.exit_code == 0
 
 
 def test_list_dimensions(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    resp = cli_runner.run(list_dimensions, args=["--metric-names", "bookings"])
+    resp = cli_runner.run(dimensions, args=["--metrics", "bookings"])
 
     assert "ds" in resp.output
     assert resp.exit_code == 0
 
 
 def test_list_metrics(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    resp = cli_runner.run(list_metrics)
+    resp = cli_runner.run(metrics)
 
     assert "bookings_per_listing: ds" in resp.output
     assert resp.exit_code == 0
 
 
 def test_get_dimension_values(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    resp = cli_runner.run(get_dimension_values, args=["--metric-name", "bookings", "--dimension-name", "is_instant"])
+    resp = cli_runner.run(dimension_values, args=["--metric", "bookings", "--dimension", "is_instant"])
 
     actual_output_lines = sorted(resp.output.split("\n"))
     assert ["", "• False", "• True"] == actual_output_lines
@@ -140,13 +139,6 @@ def test_validate_configs_skip_data_warehouse_validations(cli_runner: MetricFlow
             resp = cli_runner.run(validate_configs, args=["--skip-dw"])
 
     assert "Data Warehouse Error" not in resp.output
-    assert resp.exit_code == 0
-
-
-def test_version(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    resp = cli_runner.run(version)
-
-    assert resp.output
     assert resp.exit_code == 0
 
 

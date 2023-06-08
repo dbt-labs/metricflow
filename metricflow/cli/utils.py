@@ -124,7 +124,7 @@ def query_options(function: Callable) -> Callable:
     function = click.option(
         "--order",
         type=click_custom.SequenceParamType(),
-        help='Metrics or dimensions to order by ("-" prefix for DESC). For example: --order -ds or --order ds,-revenue',
+        help='Metrics or group bys to order by ("-" prefix for DESC). For example: --order -ds or --order ds,-revenue',
         required=False,
     )(function)
     function = click.option(
@@ -141,14 +141,15 @@ def query_options(function: Callable) -> Callable:
     )(function)
     function = start_end_time_options(function)
     function = click.option(
-        "--dimensions",
+        "--group-bys",
         type=click_custom.SequenceParamType(),
         default="",
-        help="Dimensions to group by: syntax is --dimensions ds or for multiple dimensions --dimensions ds,org",
+        help="Dimensions and/or entities to group by: syntax is --group-bys ds or for multiple group bys --group-bys ds,org",
     )(function)
     function = click.option(
         "--metrics",
-        type=click_custom.SequenceParamType(),
+        type=click_custom.SequenceParamType(min_length=1),
+        default="",
         help="Metrics to query for: syntax is --metrics bookings or for multiple metrics --metrics bookings,messages",
     )(function)
     return function
