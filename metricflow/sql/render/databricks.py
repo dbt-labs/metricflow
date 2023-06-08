@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 
+from metricflow.errors.errors import UnsupportedEngineFeatureError
 from metricflow.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,
     SqlExpressionRenderer,
@@ -24,12 +25,12 @@ class DatabricksSqlExpressionRenderer(DefaultSqlExpressionRenderer):
             function_str = "PERCENTILE_CONT"
         elif node.percentile_args.function_type is SqlPercentileFunctionType.DISCRETE:
             # discrete percentile only supported on databricks 11.0 >=. Disable for now.
-            raise RuntimeError(
+            raise UnsupportedEngineFeatureError(
                 "Discrete percentile aggregate not supported for Databricks.  Use "
                 + "continuous or approximate discrete percentile in all percentile measures."
             )
         elif node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS:
-            raise RuntimeError(
+            raise UnsupportedEngineFeatureError(
                 "Approximate continuous percentile aggregate not supported for Databricks. Use "
                 + "continuous or approximate discrete percentile in all percentile measures."
             )

@@ -3,6 +3,7 @@ from __future__ import annotations
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
+from metricflow.errors.errors import UnsupportedEngineFeatureError
 from metricflow.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,
     SqlExpressionRenderer,
@@ -61,12 +62,12 @@ class PostgresSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         elif node.percentile_args.function_type is SqlPercentileFunctionType.DISCRETE:
             function_str = "PERCENTILE_DISC"
         elif node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS:
-            raise RuntimeError(
+            raise UnsupportedEngineFeatureError(
                 "Approximate continuous percentile aggregate not supported for Postgres. Set "
                 + "use_approximate_percentile to false in all percentile measures."
             )
         elif node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_DISCRETE:
-            raise RuntimeError(
+            raise UnsupportedEngineFeatureError(
                 "Approximate discrete percentile aggregate not supported for Postgres. Set "
                 + "use_approximate_percentile to false in all percentile measures."
             )

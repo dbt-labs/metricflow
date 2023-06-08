@@ -4,6 +4,7 @@ from fractions import Fraction
 
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
+from metricflow.errors.errors import UnsupportedEngineFeatureError
 from metricflow.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,
     SqlExpressionRenderer,
@@ -65,7 +66,7 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
                 sql=f"APPROX_QUANTILES({arg_rendered.sql}, {fraction.denominator})[OFFSET({fraction.numerator})]",
                 bind_parameters=params,
             )
-        raise RuntimeError(
+        raise UnsupportedEngineFeatureError(
             "Only approximate continous percentile aggregations are supported for BigQuery. Set "
             + "use_approximate_percentile and disable use_discrete_percentile in all percentile measures."
         )

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 
+from metricflow.errors.errors import UnsupportedEngineFeatureError
 from metricflow.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,
     SqlExpressionRenderer,
@@ -37,7 +38,7 @@ class SnowflakeSqlExpressionRenderer(DefaultSqlExpressionRenderer):
                 bind_parameters=params,
             )
         elif node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_DISCRETE:
-            raise RuntimeError(
+            raise UnsupportedEngineFeatureError(
                 "Approximate discrete percentile aggregate not supported for Snowflake. Set "
                 + "use_discrete_percentile and/or use_approximate_percentile to false in all percentile measures."
             )

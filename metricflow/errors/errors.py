@@ -80,3 +80,7 @@ class ModelCreationException(Exception):
 
 class InferenceError(Exception):
     """Exception to represent errors related to inference."""
+
+
+class UnsupportedEngineFeatureError(RuntimeError):
+    """Raised when the user attempts to use a feature that isn't supported by the data platform."""
