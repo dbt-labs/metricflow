@@ -4,6 +4,7 @@ import datetime
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from enum import Enum
 from typing import List, Optional, Sequence
 
 import pandas as pd
@@ -47,10 +48,11 @@ from metricflow.plan_conversion.dataflow_to_execution import (
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.plan_conversion.time_spine import TimeSpineSource, TimeSpineTableBuilder
 from metricflow.protocols.async_sql_client import AsyncSqlClient
+from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.random_id import random_id
 from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.specs.specs import MetricFlowQuerySpec
+from metricflow.specs.specs import InstanceSpecSet, MetricFlowQuerySpec
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.sql_clients.common_client import not_empty
 from metricflow.sql_clients.sql_utils import make_sql_client_from_config
@@ -71,6 +73,13 @@ class MetricFlowRequestId:
     mf_rid: str
 
 
+class MetricFlowQueryType(Enum):
+    """An enum to designate what type of MetricFlow query it is."""
+
+    METRIC = "metric"
+    DIMENSION_VALUES = "dimension_values"
+
+
 @dataclass(frozen=True)
 class MetricFlowQueryRequest:
     """Encapsulates the parameters for a metric query.
@@ -84,6 +93,7 @@ class MetricFlowQueryRequest:
     order_by_names: metric and group by names to order by. A "-" can be used to specify reverse order e.g. "-ds"
     output_table: If specified, output the result data to this table instead of a result dataframe.
     sql_optimization_level: The level of optimization for the generated SQL.
+    query_type: Type of MetricFlow query.
     """
 
     request_id: MetricFlowRequestId
@@ -96,6 +106,7 @@ class MetricFlowQueryRequest:
     order_by_names: Optional[Sequence[str]] = None
     output_table: Optional[str] = None
     sql_optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O4
+    query_type: MetricFlowQueryType = MetricFlowQueryType.METRIC
 
     @staticmethod
     def create_with_random_request_id(  # noqa: D
@@ -108,6 +119,7 @@ class MetricFlowQueryRequest:
         order_by_names: Optional[Sequence[str]] = None,
         output_table: Optional[str] = None,
         sql_optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O4,
+        query_type: MetricFlowQueryType = MetricFlowQueryType.METRIC,
     ) -> MetricFlowQueryRequest:
         return MetricFlowQueryRequest(
             request_id=MetricFlowRequestId(mf_rid=f"{random_id()}"),
@@ -120,6 +132,7 @@ class MetricFlowQueryRequest:
             order_by_names=order_by_names,
             output_table=output_table,
             sql_optimization_level=sql_optimization_level,
+            query_type=query_type,
         )
 
 
@@ -407,9 +420,20 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         if mf_query_request.output_table is not None:
             output_table = SqlTable.from_string(mf_query_request.output_table)
 
+        output_selection_specs: Optional[InstanceSpecSet] = None
+        if mf_query_request.query_type == MetricFlowQueryType.DIMENSION_VALUES:
+            # Filter result by dimension columns if it's a dimension values query
+            if len(query_spec.entity_specs) > 0:
+                raise InvalidQueryException("Querying dimension values for entities is not allowed.")
+            output_selection_specs = InstanceSpecSet(
+                dimension_specs=query_spec.dimension_specs,
+                time_dimension_specs=query_spec.time_dimension_specs,
+            )
+
         dataflow_plan = self._dataflow_plan_builder.build_plan(
             query_spec=query_spec,
             output_sql_table=output_table,
+            output_selection_specs=output_selection_specs,
             optimizers=(SourceScanOptimizer[SemanticModelDataSet](),),
         )
 
@@ -493,13 +517,28 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 group_by_names=[get_group_by_values],
                 time_constraint_start=time_constraint_start,
                 time_constraint_end=time_constraint_end,
+                query_type=MetricFlowQueryType.DIMENSION_VALUES,
             )
         )
         result_dataframe = query_result.result_df
         if result_dataframe is None:
             return []
+        return [str(val) for val in result_dataframe[get_group_by_values]]
 
-        # Process the dimension values
-        result_dataframe.dropna(inplace=True)
-        dimension_values = [str(val) for val in result_dataframe[get_group_by_values]]
-        return dimension_values
+    @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
+    def explain_get_dimension_values(  # noqa: D
+        self,
+        metric_name: str,
+        get_group_by_values: str,
+        time_constraint_start: Optional[datetime.datetime] = None,
+        time_constraint_end: Optional[datetime.datetime] = None,
+    ) -> MetricFlowExplainResult:
+        return self._create_execution_plan(
+            MetricFlowQueryRequest.create_with_random_request_id(
+                metric_names=[metric_name],
+                group_by_names=[get_group_by_values],
+                time_constraint_start=time_constraint_start,
+                time_constraint_end=time_constraint_end,
+                query_type=MetricFlowQueryType.DIMENSION_VALUES,
+            )
+        )

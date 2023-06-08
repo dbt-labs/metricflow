@@ -141,6 +141,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         self,
         query_spec: MetricFlowQuerySpec,
         output_sql_table: Optional[SqlTable] = None,
+        output_selection_specs: Optional[InstanceSpecSet] = None,
         optimizers: Sequence[DataflowPlanOptimizer[SqlDataSetT]] = (),
     ) -> DataflowPlan[SqlDataSetT]:
         """Generate a plan for reading the results of a query with the given spec into a dataframe or table."""
@@ -156,6 +157,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             order_by_specs=query_spec.order_by_specs,
             output_sql_table=output_sql_table,
             limit=query_spec.limit,
+            output_selection_specs=output_selection_specs,
         )
 
         plan_id = IdGeneratorRegistry.for_class(DataflowPlanBuilder).create_id(DATAFLOW_PLAN_PREFIX)
@@ -331,25 +333,32 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         order_by_specs: Sequence[OrderBySpec],
         output_sql_table: Optional[SqlTable] = None,
         limit: Optional[int] = None,
+        output_selection_specs: Optional[InstanceSpecSet] = None,
     ) -> SinkOutput[SqlDataSetT]:
         """Adds order by / limit / write nodes."""
-        order_by_limit: Optional[OrderByLimitNode[SqlDataSetT]] = None
+        pre_result_node: Optional[BaseOutput[SqlDataSetT]] = None
 
         if order_by_specs or limit:
-            order_by_limit = OrderByLimitNode[SqlDataSetT](
+            pre_result_node = OrderByLimitNode[SqlDataSetT](
                 order_by_specs=list(order_by_specs),
                 limit=limit,
                 parent_node=computed_metrics_output,
             )
 
+        if output_selection_specs:
+            pre_result_node = FilterElementsNode(
+                parent_node=pre_result_node or computed_metrics_output,
+                include_specs=output_selection_specs,
+            )
+
         write_result_node: SinkOutput[SqlDataSetT]
         if not output_sql_table:
             write_result_node = WriteToResultDataframeNode[SqlDataSetT](
-                parent_node=order_by_limit or computed_metrics_output,
+                parent_node=pre_result_node or computed_metrics_output,
             )
         else:
             write_result_node = WriteToResultTableNode[SqlDataSetT](
-                parent_node=order_by_limit or computed_metrics_output,
+                parent_node=pre_result_node or computed_metrics_output,
                 output_sql_table=output_sql_table,
             )
 
