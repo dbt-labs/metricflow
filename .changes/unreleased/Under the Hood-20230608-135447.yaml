@@ -1,0 +1,7 @@
+kind: Under the Hood
+body: Raising a UnsupportedEngineFeatureError instead of a generic RuntimeError when
+  a data platform doesn't support a feature
+time: 2023-06-08T13:54:47.478597-05:00
+custom:
+  Author: DevonFulcher
+  Issue: None

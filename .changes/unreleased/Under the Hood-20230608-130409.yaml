@@ -1,7 +1,0 @@
-kind: Under the Hood
-body: Change the generic RuntimeError to be a BigQueryApproximatePercentileError when
-  using percentile expressions with BigQuery
-time: 2023-06-08T13:04:09.342061-05:00
-custom:
-  Author: DevonFulcher
-  Issue: None
