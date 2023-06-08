@@ -82,11 +82,5 @@ class InferenceError(Exception):
     """Exception to represent errors related to inference."""
 
 
-class BigQueryApproximatePercentileError(RuntimeError):
-    """Raised when percentile aggregations are used without approximation for BigQuery."""
-
-    def __init__(self) -> None:  # noqa: D
-        super().__init__(
-            "Only approximate continous percentile aggregations are supported for BigQuery. Set "
-            + "use_approximate_percentile and disable use_discrete_percentile in all percentile measures.",
-        )
+class UnsupportedEngineFeatureError(RuntimeError):
+    """Raised when the user attempts to use a feature that isn't supported by the data platform."""
