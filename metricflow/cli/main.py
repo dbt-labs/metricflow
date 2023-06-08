@@ -494,23 +494,23 @@ def health_checks(cfg: CLIContext) -> None:
             click.echo(f"• ✅ {click.style(test, bold=True, fg=('green'))}: Success!")
 
 
-@cli.command()
-@click.option("--dimension-name", required=True, type=str, help="Dimension to query values from")
-@click.option("--metric-name", required=True, type=str, help="Metric that is associated with the dimension")
+@list.command()
+@click.option("--dimension", required=True, type=str, help="Dimension to query values from")
+@click.option("--metric", required=True, type=str, help="Metric that is associated with the dimension")
 @start_end_time_options
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-def get_dimension_values(
+def dimension_values(
     cfg: CLIContext,
-    metric_name: str,
-    dimension_name: str,
+    metric: str,
+    dimension: str,
     start_time: Optional[dt.datetime] = None,
     end_time: Optional[dt.datetime] = None,
 ) -> None:
     """List all dimension values with the corresponding metric."""
     spinner = Halo(
-        text=f"🔍 Retrieving dimension values for dimension '{dimension_name}' of metric '{metric_name}'...",
+        text=f"🔍 Retrieving dimension values for dimension '{dimension}' of metric '{metric}'...",
         spinner="dots",
     )
     spinner.start()
@@ -519,8 +519,8 @@ def get_dimension_values(
 
     try:
         dim_vals = cfg.mf.get_dimension_values(
-            metric_name=metric_name,
-            get_group_by_values=dimension_name,
+            metric_name=metric,
+            get_group_by_values=dimension,
             time_constraint_start=start_time,
             time_constraint_end=end_time,
         )
@@ -529,7 +529,7 @@ def get_dimension_values(
         click.echo(
             textwrap.dedent(
                 f"""\
-                ❌ Failed to query dimension values for dimension {dimension_name} of metric {metric_name}.
+                ❌ Failed to query dimension values for dimension {dimension} of metric {metric}.
                     ERROR: {str(e)}
                 """
             )
@@ -537,9 +537,7 @@ def get_dimension_values(
         exit(1)
 
     assert dim_vals
-    spinner.succeed(
-        f"🌱 We've found {len(dim_vals)} dimension values for dimension {dimension_name} of metric {metric_name}."
-    )
+    spinner.succeed(f"🌱 We've found {len(dim_vals)} dimension values for dimension {dimension} of metric {metric}.")
     for dim_val in dim_vals:
         click.echo(f"• {click.style(dim_val, bold=True, fg='green')}")
 
