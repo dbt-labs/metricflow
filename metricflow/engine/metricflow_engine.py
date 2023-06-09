@@ -9,7 +9,7 @@ from typing import List, Optional, Sequence
 
 import pandas as pd
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
-from dbt_semantic_interfaces.references import DimensionReference, MetricReference
+from dbt_semantic_interfaces.references import DimensionReference, EntityReference, MetricReference
 
 from metricflow.configuration.constants import (
     CONFIG_DWH_SCHEMA,
@@ -27,7 +27,7 @@ from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import (
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
-from metricflow.engine.models import Dimension, Metric
+from metricflow.engine.models import Dimension, Entity, Metric
 from metricflow.engine.time_source import ServerTimeSource
 from metricflow.engine.utils import (
     build_semantic_manifest_from_config,
@@ -218,6 +218,18 @@ class AbstractMetricFlowEngine(ABC):
 
         Returns:
             A list of Dimension objects containing metadata.
+        """
+        pass
+
+    @abstractmethod
+    def entities_for_metrics(self, metric_names: List[str]) -> List[Entity]:
+        """Retrieves a list of all entities for metric_names.
+
+        Args:
+            metric_names: Names of metrics to get common entities from.
+
+        Returns:
+            A list of Entity objects containing metadata.
         """
         pass
 
@@ -510,6 +522,37 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                     )
                 )
         return dimensions
+
+    def entities_for_metrics(self, metric_names: List[str]) -> List[Entity]:  # noqa: D
+        path_key_to_linkable_entities = (
+            self._semantic_manifest_lookup.metric_lookup.linkable_set_for_metrics(
+                metric_references=[MetricReference(element_name=mname) for mname in metric_names],
+                with_any_property=frozenset(
+                    {
+                        LinkableElementProperties.ENTITY,
+                    }
+                ),
+            )
+        ).path_key_to_linkable_entities
+
+        entities: List[Entity] = []
+        for (
+            path_key,
+            linkable_entity_tuple,
+        ) in path_key_to_linkable_entities.items():
+            for linkable_entity in linkable_entity_tuple:
+                semantic_model = self._semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
+                    linkable_entity.semantic_model_origin
+                )
+                assert semantic_model
+                entities.append(
+                    Entity.from_pydantic(
+                        pydantic_entity=semantic_model.get_entity(
+                            EntityReference(element_name=linkable_entity.element_name)
+                        )
+                    )
+                )
+        return entities
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def list_metrics(self) -> List[Metric]:  # noqa: D

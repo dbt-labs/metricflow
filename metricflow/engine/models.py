@@ -10,10 +10,12 @@ from dbt_semantic_interfaces.protocols.dimension import (
     DimensionType,
     DimensionTypeParams,
 )
+from dbt_semantic_interfaces.protocols.entity import Entity as SemanticManifestEntity
 from dbt_semantic_interfaces.protocols.metadata import Metadata
 from dbt_semantic_interfaces.protocols.metric import Metric as SemanticManifestMetric
 from dbt_semantic_interfaces.protocols.metric import MetricInputMeasure, MetricType, MetricTypeParams
 from dbt_semantic_interfaces.protocols.where_filter import WhereFilter
+from dbt_semantic_interfaces.type_enums.entity_type import EntityType
 
 from metricflow.model.semantics.linkable_spec_resolver import ElementPathKey
 from metricflow.specs.specs import DimensionSpec, EntityReference
@@ -90,4 +92,26 @@ class Dimension:
             metadata=pydantic_dimension.metadata,
             is_partition=pydantic_dimension.is_partition,
             expr=pydantic_dimension.expr,
+        )
+
+
+@dataclass(frozen=True)
+class Entity:
+    """Dataclass representation of a Entity."""
+
+    name: str
+    description: Optional[str]
+    type: EntityType
+    role: Optional[str]
+    expr: Optional[str] = None
+
+    @classmethod
+    def from_pydantic(cls, pydantic_entity: SemanticManifestEntity) -> Entity:
+        """Build from pydantic Entity."""
+        return cls(
+            name=pydantic_entity.name,
+            description=pydantic_entity.description,
+            type=pydantic_entity.type,
+            role=pydantic_entity.role,
+            expr=pydantic_entity.expr,
         )
