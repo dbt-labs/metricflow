@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import json
 import logging
-import textwrap
-import time
 
 import pytest
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
@@ -11,7 +9,6 @@ from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.protocols.sql_request import MF_EXTRA_TAGS_KEY, SqlJsonTag
-from metricflow.sql_clients.sql_statement_metadata import CombinedSqlTags
 from metricflow.sql_clients.sql_utils import make_df
 from metricflow.test.compare_df import assert_dataframes_equal
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
@@ -47,104 +44,6 @@ def test_async_execute(sql_client: SqlClient, mf_test_session_state: MetricFlowT
     request_id = sql_client.async_execute("SELECT 1 AS foo")
     result = sql_client.async_request_result(request_id)
     assert result.exception is None
-
-
-def test_cancel_request(sql_client: SqlClient, mf_test_session_state: MetricFlowTestSessionState) -> None:  # noqa: D
-    if not sql_client.sql_engine_attributes.cancel_submitted_queries_supported:
-        pytest.skip("Cancellation not yet supported in this SQL engine")
-    # Execute a query that will be slow, giving the test the opportunity to cancel it.
-    table_with_1000_rows = create_table_with_n_rows(sql_client, mf_test_session_state.mf_system_schema, num_rows=1000)
-    table_with_100_rows = create_table_with_n_rows(sql_client, mf_test_session_state.mf_system_schema, num_rows=100)
-
-    num_attempts = 3
-    cancel_using_request_id_successful = False
-    for attempt_num in range(num_attempts):
-        if try_cancel_request(
-            sql_client=sql_client,
-            table_with_1000_rows=table_with_1000_rows,
-            table_with_100_rows=table_with_100_rows,
-            attempt_num=attempt_num,
-            cancel_using_extra_tag=False,
-        ):
-            cancel_using_request_id_successful = True
-            break
-
-    assert (
-        cancel_using_request_id_successful
-    ), f"Was not able to cancel a request using the request ID after {num_attempts} attempts"
-
-    cancel_using_extra_tag_successful = False
-    for attempt_num in range(num_attempts - 1):
-        if try_cancel_request(
-            sql_client=sql_client,
-            table_with_1000_rows=table_with_1000_rows,
-            table_with_100_rows=table_with_100_rows,
-            attempt_num=attempt_num,
-            cancel_using_extra_tag=True,
-        ):
-            cancel_using_extra_tag_successful = True
-            break
-
-    assert (
-        cancel_using_extra_tag_successful
-    ), f"Was not able to cancel a request using the extra tag after {num_attempts} attempts"
-
-
-def try_cancel_request(
-    sql_client: SqlClient,
-    table_with_1000_rows: SqlTable,
-    table_with_100_rows: SqlTable,
-    attempt_num: int,
-    cancel_using_extra_tag: bool,
-) -> bool:
-    """Try to cancel a query and return True if successful."""
-    extra_tag_key = "example_key"
-    extra_tag_value = "example_value"
-
-    request_id = sql_client.async_execute(
-        textwrap.dedent(
-            f"""
-            SELECT MAX({sql_client.sql_engine_attributes.random_function_name}()) AS max_value
-            FROM {table_with_1000_rows.sql} a
-            CROSS JOIN {table_with_1000_rows.sql} b
-            CROSS JOIN {table_with_1000_rows.sql} c
-            CROSS JOIN {table_with_100_rows.sql} d
-            """
-        ),
-        extra_tags=SqlJsonTag({extra_tag_key: extra_tag_value}),
-    )
-    # Need to wait a little bit as some clients like BQ doesn't show the query as running right away.
-    start_time = time.time()
-    num_cancelled = 0
-    while time.time() - start_time < 30:
-        time.sleep(1)
-
-        if cancel_using_extra_tag:
-
-            def _match_function(combined_tags: CombinedSqlTags) -> bool:
-                return combined_tags.extra_tag.json_dict.get(extra_tag_key) == extra_tag_value
-
-            num_cancelled = sql_client.cancel_request(_match_function)
-        else:
-
-            def _match_function(combined_tags: CombinedSqlTags) -> bool:
-                return combined_tags.system_tags.request_id == request_id
-
-            num_cancelled = sql_client.cancel_request(_match_function)
-
-        if num_cancelled > 0:
-            break
-
-    result_exception = sql_client.async_request_result(request_id).exception
-    if result_exception is not None and num_cancelled >= 1:
-        assert num_cancelled == 1, f"Should have cancelled exactly 1 query, but instead cancelled {num_cancelled}"
-        return True
-
-    logger.warning(
-        f"Cancellation did not occur successfully on attempt #{attempt_num}. This may be okay as SQL engines do not "
-        f"guarantee cancellation requests: num_cancelled={num_cancelled} result_exception={result_exception}"
-    )
-    return False
 
 
 def test_isolation_level(mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient) -> None:  # noqa: D

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import time
-from typing import Callable, ClassVar, Dict, Optional, Sequence
+from typing import ClassVar, Dict, Optional, Sequence
 
 import pandas as pd
 import sqlalchemy
@@ -16,7 +16,6 @@ from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters, SqlColumnType
 from metricflow.sql_clients.base_sql_client_implementation import BaseSqlClientImplementation
 from metricflow.sql_clients.common_client import SqlDialect, check_isolation_level
-from metricflow.sql_clients.sql_statement_metadata import CombinedSqlTags
 
 logger = logging.getLogger(__name__)
 
@@ -53,8 +52,6 @@ class DatabricksEngineAttributes:
     multi_threading_supported: ClassVar[bool] = True
     timestamp_type_supported: ClassVar[bool] = True
     timestamp_to_string_comparison_supported: ClassVar[bool] = True
-    # So far the only clear way to cancel a query is through the Databricks UI.
-    cancel_submitted_queries_supported: ClassVar[bool] = False
     continuous_percentile_aggregation_supported: ClassVar[bool] = True
     discrete_percentile_aggregation_supported: ClassVar[bool] = False
     approximate_continuous_percentile_aggregation_supported: ClassVar[bool] = False
@@ -261,9 +258,6 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
                 cursor.tables(schema_name=schema_name)
                 return [table.TABLE_NAME for table in cursor.fetchall()]
 
-    def cancel_submitted_queries(self) -> None:  # noqa: D
-        pass
-
     def render_bind_parameter_key(self, bind_parameter_key: str) -> str:
         """Wrap execution parameter key with syntax accepted by engine."""
         return f"%({bind_parameter_key})s"
@@ -273,6 +267,3 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
         """Check if SQL statement is renaming a table."""
         stmt_uppercased = stmt.upper()
         return SQL_RENAME in stmt_uppercased and SQL_ALTER_TABLE in stmt_uppercased
-
-    def cancel_request(self, match_function: Callable[[CombinedSqlTags], bool]) -> int:  # noqa: D
-        raise NotImplementedError

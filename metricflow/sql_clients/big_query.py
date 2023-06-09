@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import Callable, ClassVar, Dict, Optional, Sequence
+from typing import ClassVar, Dict, Optional, Sequence
 
 import google.oauth2.service_account
 import sqlalchemy
-from google.cloud.bigquery import Client, QueryJob
+from google.cloud.bigquery import Client
 
 from metricflow.protocols.sql_client import (
     SqlEngine,
@@ -17,7 +17,6 @@ from metricflow.sql.render.big_query import BigQuerySqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_clients.common_client import SqlDialect
-from metricflow.sql_clients.sql_statement_metadata import CombinedSqlTags, SqlStatementCommentMetadata
 from metricflow.sql_clients.sqlalchemy_dialect import SqlAlchemySqlClient
 
 logger = logging.getLogger(__name__)
@@ -39,8 +38,6 @@ class BigQueryEngineAttributes:
     multi_threading_supported: ClassVar[bool] = True
     timestamp_type_supported: ClassVar[bool] = True
     timestamp_to_string_comparison_supported: ClassVar[bool] = False
-    # Cancelling should be possible, but not yet implemented.
-    cancel_submitted_queries_supported: ClassVar[bool] = True
     continuous_percentile_aggregation_supported: ClassVar[bool] = False
     discrete_percentile_aggregation_supported: ClassVar[bool] = False
     approximate_continuous_percentile_aggregation_supported: ClassVar[bool] = True
@@ -134,25 +131,3 @@ class BigQuerySqlClient(SqlAlchemySqlClient):
             insp = sqlalchemy.inspection.inspect(conn)
             schema_dot_tables = insp.get_table_names(schema=schema_name)
             return [x.replace(schema_name + ".", "") for x in schema_dot_tables]
-
-    def cancel_submitted_queries(self) -> None:  # noqa: D
-        raise NotImplementedError
-
-    def cancel_request(self, match_function: Callable[[CombinedSqlTags], bool]) -> int:  # noqa: D
-        job: QueryJob
-        canceled_job_ids = []
-        # Couldn't find where these states were defined in the BQ libraries.
-        for state in ["PENDING", "RUNNING"]:
-            for job in self._bq_client.list_jobs(
-                project=self._project_id,
-                state_filter=state,
-                # Considering putting a creation_time_min filter as well.
-            ):
-                parsed_tags = SqlStatementCommentMetadata.parse_tag_metadata_in_comments(job.query)
-
-                # A job can move from the pending to the running state during iteration, so dedupe.
-                if match_function(parsed_tags) and job.job_id not in canceled_job_ids:
-                    logger.info(f"Canceling BQ job ID: {job.job_id}")
-                    canceled_job_ids.append(job.job_id)
-                    self._bq_client.cancel_job(job.job_id)
-        return len(canceled_job_ids)

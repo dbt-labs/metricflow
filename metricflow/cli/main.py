@@ -92,10 +92,8 @@ def cli(cfg: CLIContext, verbose: bool) -> None:  # noqa: D
             return
 
         try:
-            if cfg.sql_client.sql_engine_attributes.cancel_submitted_queries_supported:
-                logger.info("Cancelling submitted queries")
-                cfg.sql_client.cancel_submitted_queries()
-                cfg.sql_client.close()
+            # Note: we may wish to add support for canceling all queries if zombie queries are a problem
+            cfg.sql_client.close()
         finally:
             sys.exit(-1)
 

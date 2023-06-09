@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import threading
-from typing import Callable, ClassVar, Optional, Sequence
+from typing import ClassVar, Optional, Sequence
 
 import pandas as pd
 import sqlalchemy
@@ -16,7 +16,6 @@ from metricflow.sql.render.duckdb_renderer import DuckDbSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_clients.common_client import SqlDialect
-from metricflow.sql_clients.sql_statement_metadata import CombinedSqlTags
 from metricflow.sql_clients.sqlalchemy_dialect import SqlAlchemySqlClient
 
 logger = logging.getLogger(__name__)
@@ -35,8 +34,6 @@ class DuckDbEngineAttributes:
     multi_threading_supported: ClassVar[bool] = True
     timestamp_type_supported: ClassVar[bool] = True
     timestamp_to_string_comparison_supported: ClassVar[bool] = True
-    # Cancelling should be possible, but not yet implemented.
-    cancel_submitted_queries_supported: ClassVar[bool] = False
     continuous_percentile_aggregation_supported: ClassVar[bool] = True
     discrete_percentile_aggregation_supported: ClassVar[bool] = True
     approximate_continuous_percentile_aggregation_supported: ClassVar[bool] = True
@@ -83,9 +80,6 @@ class DuckDbSqlClient(SqlAlchemySqlClient):
         """Collection of attributes and features specific to the Snowflake SQL engine."""
         return DuckDbEngineAttributes()
 
-    def cancel_submitted_queries(self) -> None:  # noqa: D
-        raise NotImplementedError
-
     def _engine_specific_query_implementation(
         self,
         stmt: str,
@@ -125,9 +119,6 @@ class DuckDbSqlClient(SqlAlchemySqlClient):
                 df=df,
                 chunk_size=chunk_size,
             )
-
-    def cancel_request(self, match_function: Callable[[CombinedSqlTags], bool]) -> int:  # noqa: D
-        raise NotImplementedError
 
     def list_tables(self, schema_name: str) -> Sequence[str]:  # noqa: D
         with self._concurrency_lock:

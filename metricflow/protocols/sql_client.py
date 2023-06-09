@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from enum import Enum
-from typing import Callable, ClassVar, Dict, Optional, Protocol, Sequence
+from typing import ClassVar, Dict, Optional, Protocol, Sequence
 
 from pandas import DataFrame
 
@@ -10,7 +10,6 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_request import SqlJsonTag, SqlRequestId, SqlRequestResult
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.sql_clients.sql_statement_metadata import CombinedSqlTags
 
 
 class SqlEngine(Enum):
@@ -164,11 +163,6 @@ class SqlClient(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    def cancel_submitted_queries(self) -> None:  # noqa: D
-        """Cancel queries submitted through this client (that may be still running) with best-effort."""
-        raise NotImplementedError
-
-    @abstractmethod
     def render_bind_parameter_key(self, bind_parameter_key: str) -> str:
         """Wrap the bind parameter key with syntax accepted by engine."""
         raise NotImplementedError
@@ -197,15 +191,6 @@ class SqlClient(Protocol):
         isolation_level: Optional[SqlIsolationLevel] = None,
     ) -> SqlRequestId:
         """Execute a statement that does not return values asynchronously."""
-        raise NotImplementedError
-
-    @abstractmethod
-    def cancel_request(self, match_function: Callable[[CombinedSqlTags], bool]) -> int:
-        """Make a best-effort at canceling requests with tags that match the supplied function.
-
-        The function arguments are the tags associated with the query, and should return a bool indicating whether
-        the given query should be cancelled. Returns the number of cancellation commands sent.
-        """
         raise NotImplementedError
 
     @abstractmethod
@@ -242,7 +227,6 @@ class SqlEngineAttributes(Protocol):
     multi_threading_supported: ClassVar[bool]
     timestamp_type_supported: ClassVar[bool]
     timestamp_to_string_comparison_supported: ClassVar[bool]
-    cancel_submitted_queries_supported: ClassVar[bool]
     continuous_percentile_aggregation_supported: ClassVar[bool]
     discrete_percentile_aggregation_supported: ClassVar[bool]
     approximate_continuous_percentile_aggregation_supported: ClassVar[bool]
