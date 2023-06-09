@@ -7,7 +7,7 @@ from typing import ClassVar, Dict, Optional, Protocol, Sequence
 from pandas import DataFrame
 
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.protocols.sql_request import SqlJsonTag, SqlRequestId, SqlRequestResult
+from metricflow.protocols.sql_request import SqlJsonTag
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 
@@ -165,40 +165,6 @@ class SqlClient(Protocol):
     @abstractmethod
     def render_bind_parameter_key(self, bind_parameter_key: str) -> str:
         """Wrap the bind parameter key with syntax accepted by engine."""
-        raise NotImplementedError
-
-    def async_query(
-        self,
-        statement: str,
-        bind_parameters: SqlBindParameters = SqlBindParameters(),
-        extra_tags: SqlJsonTag = SqlJsonTag(),
-        isolation_level: Optional[SqlIsolationLevel] = None,
-    ) -> SqlRequestId:
-        """Execute a query asynchronously."""
-        raise NotImplementedError
-
-    @abstractmethod
-    def async_request_result(self, request_id: SqlRequestId) -> SqlRequestResult:
-        """Wait until a async query has finished, and then return the result."""
-        raise NotImplementedError
-
-    @abstractmethod
-    def async_execute(
-        self,
-        statement: str,
-        bind_parameters: SqlBindParameters = SqlBindParameters(),
-        extra_tags: SqlJsonTag = SqlJsonTag(),
-        isolation_level: Optional[SqlIsolationLevel] = None,
-    ) -> SqlRequestId:
-        """Execute a statement that does not return values asynchronously."""
-        raise NotImplementedError
-
-    @abstractmethod
-    def active_requests(self) -> Sequence[SqlRequestId]:
-        """Return requests that are still in progress.
-
-        If the results for a request have not yet been fetched with async_request_result(), it's considered in progress.
-        """
         raise NotImplementedError
 
 

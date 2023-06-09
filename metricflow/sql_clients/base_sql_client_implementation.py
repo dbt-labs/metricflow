@@ -2,10 +2,9 @@ from __future__ import annotations
 
 import logging
 import textwrap
-import threading
 import time
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import jinja2
 import pandas as pd
@@ -18,10 +17,9 @@ from metricflow.protocols.sql_client import (
     SqlEngineAttributes,
     SqlIsolationLevel,
 )
-from metricflow.protocols.sql_request import SqlJsonTag, SqlRequestId, SqlRequestResult, SqlRequestTagSet
+from metricflow.protocols.sql_request import SqlJsonTag, SqlRequestId, SqlRequestTagSet
 from metricflow.random_id import random_id
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.sql_clients.common_client import check_isolation_level
 from metricflow.sql_clients.sql_statement_metadata import CombinedSqlTags, SqlStatementCommentMetadata
 
 logger = logging.getLogger(__name__)
@@ -35,10 +33,6 @@ class SqlClientException(Exception):
 
 class BaseSqlClientImplementation(ABC, SqlClient):
     """Abstract implementation that other SQL clients are based on."""
-
-    def __init__(self) -> None:  # noqa: D
-        self._request_id_to_thread: Dict[SqlRequestId, BaseSqlClientImplementation.SqlRequestExecutorThread] = {}
-        self._state_lock = threading.Lock()
 
     def generate_health_check_tests(self, schema_name: str) -> List[Tuple[str, Any]]:  # type: ignore
         """List of base health checks we want to perform."""
@@ -264,70 +258,6 @@ class BaseSqlClientImplementation(ABC, SqlClient):
         """Wrap execution parameter key with syntax accepted by engine."""
         return f":{bind_parameter_key}"
 
-    def async_query(  # noqa: D
-        self,
-        statement: str,
-        bind_parameters: SqlBindParameters = SqlBindParameters(),
-        extra_tags: SqlJsonTag = SqlJsonTag(),
-        isolation_level: Optional[SqlIsolationLevel] = None,
-    ) -> SqlRequestId:
-        check_isolation_level(self, isolation_level)
-        with self._state_lock:
-            request_id = SqlRequestId(f"mf_rid__{random_id()}")
-            thread = BaseSqlClientImplementation.SqlRequestExecutorThread(
-                sql_client=self,
-                request_id=request_id,
-                statement=statement,
-                bind_parameters=bind_parameters,
-                extra_tag=extra_tags,
-                isolation_level=isolation_level,
-            )
-            self._request_id_to_thread[request_id] = thread
-            self._request_id_to_thread[request_id].start()
-            return request_id
-
-    def async_execute(  # noqa: D
-        self,
-        statement: str,
-        bind_parameters: SqlBindParameters = SqlBindParameters(),
-        extra_tags: SqlJsonTag = SqlJsonTag(),
-        isolation_level: Optional[SqlIsolationLevel] = None,
-    ) -> SqlRequestId:
-        check_isolation_level(self, isolation_level)
-        with self._state_lock:
-            request_id = SqlRequestId(f"mf_rid__{random_id()}")
-            thread = BaseSqlClientImplementation.SqlRequestExecutorThread(
-                sql_client=self,
-                request_id=request_id,
-                statement=statement,
-                bind_parameters=bind_parameters,
-                extra_tag=extra_tags,
-                is_query=False,
-                isolation_level=isolation_level,
-            )
-            self._request_id_to_thread[request_id] = thread
-            self._request_id_to_thread[request_id].start()
-            return request_id
-
-    def async_request_result(self, query_id: SqlRequestId) -> SqlRequestResult:  # noqa: D
-        thread: Optional[BaseSqlClientImplementation.SqlRequestExecutorThread] = None
-        with self._state_lock:
-            thread = self._request_id_to_thread.get(query_id)
-            if thread is None:
-                raise RuntimeError(
-                    f"Query ID: {query_id} is not known. Either the query ID is invalid, or results for the query ID "
-                    f"were already fetched."
-                )
-
-        thread.join()
-        with self._state_lock:
-            del self._request_id_to_thread[query_id]
-        return thread.result
-
-    def active_requests(self) -> Sequence[SqlRequestId]:  # noqa: D
-        with self._state_lock:
-            return tuple(executor_thread.request_id for executor_thread in self._request_id_to_thread.values())
-
     @staticmethod
     def _consolidate_tags(json_tags: SqlJsonTag, request_id: SqlRequestId) -> CombinedSqlTags:
         """Consolidates json tags and request ID into a single set of tags."""
@@ -335,87 +265,3 @@ class BaseSqlClientImplementation(ABC, SqlClient):
             system_tags=SqlRequestTagSet().add_request_id(request_id=request_id),
             extra_tag=json_tags,
         )
-
-    class SqlRequestExecutorThread(threading.Thread):
-        """Thread that helps to execute a request to the SQL engine asynchronously."""
-
-        def __init__(  # noqa: D
-            self,
-            sql_client: BaseSqlClientImplementation,
-            request_id: SqlRequestId,
-            statement: str,
-            bind_parameters: SqlBindParameters,
-            extra_tag: SqlJsonTag = SqlJsonTag(),
-            is_query: bool = True,
-            isolation_level: Optional[SqlIsolationLevel] = None,
-        ) -> None:
-            """Initializer.
-
-            Args:
-                sql_client: SQL client used to execute statements.
-                request_id: The request ID associated with the statement.
-                statement: The statement to execute.
-                bind_parameters: The parameters to use for the statement.
-                extra_tag: Tags that should be associated with the request for the statement.
-                is_query: Whether the request is for .query (returns data) or .execute (does not return data)
-                isolation_level: The isolation level to use for the query.
-            """
-            self._sql_client = sql_client
-            self._request_id = request_id
-            self._statement = statement
-            self._bind_parameters = bind_parameters
-            self._extra_tag = extra_tag
-            self._result: Optional[SqlRequestResult] = None
-            self._is_query = is_query
-            self._isolation_level = isolation_level
-            super().__init__(name=f"Async Execute SQL Request ID: {request_id}", daemon=True)
-
-        def run(self) -> None:  # noqa: D
-            start_time = time.time()
-            try:
-                combined_tags = BaseSqlClientImplementation._consolidate_tags(
-                    json_tags=self._extra_tag, request_id=self._request_id
-                )
-                statement = SqlStatementCommentMetadata.add_tag_metadata_as_comment(
-                    sql_statement=self._statement, combined_tags=combined_tags
-                )
-
-                logger.info(
-                    BaseSqlClientImplementation._format_run_query_log_message(
-                        statement=self._statement, sql_bind_parameters=self._bind_parameters
-                    )
-                )
-
-                if self._is_query:
-                    df = self._sql_client._engine_specific_query_implementation(
-                        statement,
-                        bind_params=self._bind_parameters,
-                        isolation_level=self._isolation_level,
-                        system_tags=combined_tags.system_tags,
-                        extra_tags=self._extra_tag,
-                    )
-                    self._result = SqlRequestResult(df=df)
-                else:
-                    self._sql_client._engine_specific_execute_implementation(
-                        statement,
-                        bind_params=self._bind_parameters,
-                        isolation_level=self._isolation_level,
-                        system_tags=combined_tags.system_tags,
-                        extra_tags=self._extra_tag,
-                    )
-                    self._result = SqlRequestResult(df=pd.DataFrame())
-                logger.info(f"Successfully executed {self._request_id} in {time.time() - start_time:.2f}s")
-            except Exception as e:
-                logger.exception(
-                    f"Unsuccessfully executed {self._request_id} in {time.time() - start_time:.2f}s with exception:"
-                )
-                self._result = SqlRequestResult(exception=e)
-
-        @property
-        def result(self) -> SqlRequestResult:  # noqa: D
-            assert self._result is not None, ".result() should only be called once the thread is finished running"
-            return self._result
-
-        @property
-        def request_id(self) -> SqlRequestId:  # noqa: D
-            return self._request_id
