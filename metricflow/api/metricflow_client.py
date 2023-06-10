@@ -19,7 +19,7 @@ from metricflow.engine.metricflow_engine import (
 from metricflow.engine.models import Dimension, Metric
 from metricflow.engine.utils import build_semantic_manifest_from_config, convert_to_datetime
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.protocols.async_sql_client import AsyncSqlClient
+from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.sql_clients.common_client import not_empty
 from metricflow.sql_clients.sql_utils import make_sql_client_from_config
@@ -53,7 +53,7 @@ class MetricFlowClient:
 
     def __init__(
         self,
-        sql_client: AsyncSqlClient,
+        sql_client: SqlClient,
         semantic_manifest: PydanticSemanticManifest,
         system_schema: str,
     ):

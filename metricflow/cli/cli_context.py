@@ -14,7 +14,7 @@ from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.engine.utils import build_semantic_manifest_from_config
 from metricflow.errors.errors import MetricFlowInitException, SqlClientCreationException
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.protocols.async_sql_client import AsyncSqlClient
+from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql_clients.sql_utils import make_sql_client_from_config
 
 logger = logging.getLogger(__name__)
@@ -26,7 +26,7 @@ class CLIContext:
     def __init__(self) -> None:  # noqa: D
         self.verbose = False
         self._mf: Optional[MetricFlowEngine] = None
-        self._sql_client: Optional[AsyncSqlClient] = None
+        self._sql_client: Optional[SqlClient] = None
         self._semantic_manifest: Optional[PydanticSemanticManifest] = None
         self._semantic_manifest_lookup: Optional[SemanticManifestLookup] = None
         self._mf_system_schema: Optional[str] = None
@@ -70,7 +70,7 @@ class CLIContext:
             raise SqlClientCreationException from e
 
     @property
-    def sql_client(self) -> AsyncSqlClient:  # noqa: D
+    def sql_client(self) -> SqlClient:  # noqa: D
         if self._sql_client is None:
             # Initialize the SqlClient if not set
             self.__initialize_sql_client()

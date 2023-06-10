@@ -21,7 +21,7 @@ from metricflow.execution.execution_plan import (
     SelectSqlQueryToTableTask,
 )
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter, SqlDataSetT
-from metricflow.protocols.async_sql_client import AsyncSqlClient
+from metricflow.protocols.sql_client import SqlClient
 from metricflow.protocols.sql_request import SqlJsonTag
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_plan import SqlQueryPlan
@@ -37,7 +37,7 @@ class DataflowToExecutionPlanConverter(Generic[SqlDataSetT], SinkNodeVisitor[Sql
         self,
         sql_plan_converter: DataflowToSqlQueryPlanConverter[SqlDataSetT],
         sql_plan_renderer: SqlQueryPlanRenderer,
-        sql_client: AsyncSqlClient,
+        sql_client: SqlClient,
         extra_sql_tags: SqlJsonTag = SqlJsonTag(),
     ) -> None:
         """Constructor.

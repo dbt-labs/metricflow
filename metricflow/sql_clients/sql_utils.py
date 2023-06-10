@@ -21,7 +21,6 @@ from metricflow.configuration.constants import (
     CONFIG_DWH_WAREHOUSE,
 )
 from metricflow.configuration.yaml_handler import YamlFileHandler
-from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.protocols.sql_client import SqlClient, SqlIsolationLevel
 from metricflow.protocols.sql_request import SqlJsonTag
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
@@ -65,7 +64,7 @@ def make_df(  # type: ignore [misc]
     )
 
 
-def make_sql_client(url: str, password: str) -> AsyncSqlClient:
+def make_sql_client(url: str, password: str) -> SqlClient:
     """Build SQL client based on env configs. Used only in tests."""
     dialect_protocol = make_url(url.split(";")[0]).drivername.split("+")
     dialect = SqlDialect(dialect_protocol[0])
@@ -88,7 +87,7 @@ def make_sql_client(url: str, password: str) -> AsyncSqlClient:
         raise ValueError(f"Unknown dialect: `{dialect}` in URL {url}")
 
 
-def make_sql_client_from_config(handler: YamlFileHandler) -> AsyncSqlClient:
+def make_sql_client_from_config(handler: YamlFileHandler) -> SqlClient:
     """Construct a SqlClient given a yaml file config."""
     url = handler.url
     dialect = not_empty(handler.get_value(CONFIG_DWH_DIALECT), CONFIG_DWH_DIALECT, url).lower()
@@ -161,20 +160,20 @@ def make_sql_client_from_config(handler: YamlFileHandler) -> AsyncSqlClient:
 
 
 def sync_execute(  # noqa: D
-    async_sql_client: AsyncSqlClient,
+    sql_client: SqlClient,
     statement: str,
     bind_parameters: SqlBindParameters = SqlBindParameters(),
     extra_sql_tags: SqlJsonTag = SqlJsonTag(),
     isolation_level: Optional[SqlIsolationLevel] = None,
 ) -> None:
-    request_id = async_sql_client.async_execute(
+    request_id = sql_client.async_execute(
         statement=statement,
         bind_parameters=bind_parameters,
         extra_tags=extra_sql_tags,
         isolation_level=isolation_level,
     )
 
-    result = async_sql_client.async_request_result(request_id)
+    result = sql_client.async_request_result(request_id)
     if result.exception:
         raise SqlClientException(
             f"Got an exception when trying to execute a statement: {result.exception}"
@@ -183,20 +182,20 @@ def sync_execute(  # noqa: D
 
 
 def sync_query(  # noqa: D
-    async_sql_client: AsyncSqlClient,
+    sql_client: SqlClient,
     statement: str,
     bind_parameters: SqlBindParameters = SqlBindParameters(),
     extra_sql_tags: SqlJsonTag = SqlJsonTag(),
     isolation_level: Optional[SqlIsolationLevel] = None,
 ) -> pd.DataFrame:
-    request_id = async_sql_client.async_query(
+    request_id = sql_client.async_query(
         statement=statement,
         bind_parameters=bind_parameters,
         extra_tags=extra_sql_tags,
         isolation_level=isolation_level,
     )
 
-    result = async_sql_client.async_request_result(request_id)
+    result = sql_client.async_request_result(request_id)
     if result.exception:
         raise SqlClientException(
             f"Got an exception when trying to execute a statement: {result.exception}"

@@ -13,7 +13,7 @@ import pandas as pd
 from metricflow.dag.id_generation import EXEC_NODE_READ_SQL_QUERY, EXEC_NODE_WRITE_TO_TABLE
 from metricflow.dag.mf_dag import DagNode, DisplayedProperty, MetricFlowDag, NodeId
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.protocols.async_sql_client import AsyncSqlClient
+from metricflow.protocols.sql_client import SqlClient
 from metricflow.protocols.sql_request import SqlJsonTag
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_clients.sql_utils import sync_execute, sync_query
@@ -95,7 +95,7 @@ class SelectSqlQueryToDataFrameTask(ExecutionPlanTask):
 
     def __init__(  # noqa: D
         self,
-        sql_client: AsyncSqlClient,
+        sql_client: SqlClient,
         sql_query: str,
         bind_parameters: SqlBindParameters,
         extra_sql_tags: SqlJsonTag = SqlJsonTag(),
@@ -154,7 +154,7 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
 
     def __init__(  # noqa: D
         self,
-        sql_client: AsyncSqlClient,
+        sql_client: SqlClient,
         sql_query: str,
         bind_parameters: SqlBindParameters,
         output_table: SqlTable,

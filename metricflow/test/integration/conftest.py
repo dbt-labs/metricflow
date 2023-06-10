@@ -9,7 +9,6 @@ from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource
-from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.time.configurable_time_source import ConfigurableTimeSource
@@ -27,7 +26,7 @@ class IntegrationTestHelpers:
 
 @pytest.fixture
 def it_helpers(  # noqa: D
-    async_sql_client: AsyncSqlClient,
+    sql_client: SqlClient,
     create_source_tables: bool,
     simple_semantic_manifest_lookup: SemanticManifestLookup,
     time_spine_source: TimeSpineSource,
@@ -36,7 +35,7 @@ def it_helpers(  # noqa: D
     return IntegrationTestHelpers(
         mf_engine=MetricFlowEngine(
             semantic_manifest_lookup=simple_semantic_manifest_lookup,
-            sql_client=async_sql_client,
+            sql_client=sql_client,
             column_association_resolver=DunderColumnAssociationResolver(
                 semantic_manifest_lookup=simple_semantic_manifest_lookup
             ),
@@ -46,5 +45,5 @@ def it_helpers(  # noqa: D
         ),
         mf_system_schema=mf_test_session_state.mf_system_schema,
         source_schema=mf_test_session_state.mf_source_schema,
-        sql_client=async_sql_client,
+        sql_client=sql_client,
     )

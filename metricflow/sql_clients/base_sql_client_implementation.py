@@ -13,16 +13,16 @@ from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.logging.formatting import indent_log_line
-from metricflow.protocols.async_sql_client import AsyncSqlClient
 from metricflow.protocols.sql_client import (
+    SqlClient,
     SqlEngineAttributes,
     SqlIsolationLevel,
 )
 from metricflow.protocols.sql_request import SqlJsonTag, SqlRequestId, SqlRequestResult, SqlRequestTagSet
 from metricflow.random_id import random_id
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.sql_clients.async_request import CombinedSqlTags, SqlStatementCommentMetadata
 from metricflow.sql_clients.common_client import check_isolation_level
+from metricflow.sql_clients.sql_statement_metadata import CombinedSqlTags, SqlStatementCommentMetadata
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +33,7 @@ class SqlClientException(Exception):
     pass
 
 
-class BaseSqlClientImplementation(ABC, AsyncSqlClient):
+class BaseSqlClientImplementation(ABC, SqlClient):
     """Abstract implementation that other SQL clients are based on."""
 
     def __init__(self) -> None:  # noqa: D
