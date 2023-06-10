@@ -81,3 +81,4 @@ convention = "google"
 
 [isort]
 required-imports = ["from __future__ import annotations"]
+known-third-party = ["dbt_semantic_interfaces"]
