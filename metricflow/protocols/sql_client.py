@@ -90,6 +90,8 @@ class SqlClient(Protocol):
         self,
         stmt: str,
         sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
+        extra_tags: SqlJsonTag = SqlJsonTag(),
+        isolation_level: Optional[SqlIsolationLevel] = None,
     ) -> DataFrame:
         """Base query method, upon execution will run a query that returns a pandas DataFrame."""
         raise NotImplementedError
@@ -99,6 +101,8 @@ class SqlClient(Protocol):
         self,
         stmt: str,
         sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
+        extra_tags: SqlJsonTag = SqlJsonTag(),
+        isolation_level: Optional[SqlIsolationLevel] = None,
     ) -> None:
         """Base execute method."""
         raise NotImplementedError
