@@ -7,7 +7,7 @@ import threading
 import urllib.parse
 from collections import OrderedDict
 from contextlib import contextmanager
-from typing import Any, Callable, ClassVar, Dict, Iterator, List, Optional, Sequence, Set, Tuple
+from typing import Any, ClassVar, Dict, Iterator, List, Optional, Sequence, Set, Tuple
 
 import pandas as pd
 import sqlalchemy
@@ -25,7 +25,6 @@ from metricflow.sql.render.snowflake import SnowflakeSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_clients.common_client import SqlDialect, check_isolation_level, not_empty
-from metricflow.sql_clients.sql_statement_metadata import CombinedSqlTags, SqlStatementCommentMetadata
 from metricflow.sql_clients.sqlalchemy_dialect import SqlAlchemySqlClient
 
 logger = logging.getLogger(__name__)
@@ -47,7 +46,6 @@ class SnowflakeEngineAttributes:
     multi_threading_supported: ClassVar[bool] = True
     timestamp_type_supported: ClassVar[bool] = True
     timestamp_to_string_comparison_supported: ClassVar[bool] = True
-    cancel_submitted_queries_supported: ClassVar[bool] = True
     continuous_percentile_aggregation_supported: ClassVar[bool] = True
     discrete_percentile_aggregation_supported: ClassVar[bool] = True
     approximate_continuous_percentile_aggregation_supported: ClassVar[bool] = True
@@ -294,35 +292,3 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
         """Snowflake will hang pytest if this is not done."""
         with self._engine_lock:
             self._engine.dispose()
-
-    def cancel_submitted_queries(self) -> None:  # noqa: D
-        with super()._engine_connection(self._engine) as conn:
-            with self._known_sessions_ids_lock:
-                for session_id in self._known_session_ids:
-                    logger.info(f"Cancelling queries associated with session id: {session_id}")
-                    conn.execute(f"SELECT SYSTEM$cancel_all_queries({session_id})")
-
-    def cancel_request(self, match_function: Callable[[CombinedSqlTags], bool]) -> int:  # noqa: D
-        # Running queries have an end_time set to the epoch time:
-        # https://docs.snowflake.com/en/sql-reference/functions/query_history.html
-        # Using '1970-01-01' to avoid timezone issues.
-        result = self.query(
-            """
-            SELECT query_id, query_text
-            FROM TABLE(INFORMATION_SCHEMA.QUERY_HISTORY())
-            WHERE end_time <= '1971-01-01'
-            ORDER BY start_time
-            LIMIT 100
-            """
-        )
-        num_cancelled_queries = 0
-        logger.info(f"Found {len(result.values)} queries to examine for cancelling")
-        for query_id, query_text in result.values:
-            parsed_tags = SqlStatementCommentMetadata.parse_tag_metadata_in_comments(query_text)
-            logger.info(f"Tags for {query_id} are: {parsed_tags}")
-            if match_function(parsed_tags):
-                logger.info(f"Cancelling query ID: {query_id}")
-                self.execute(f"SELECT SYSTEM$CANCEL_QUERY('{query_id}')")
-                num_cancelled_queries += 1
-
-        return num_cancelled_queries

@@ -16,7 +16,6 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.protocols.sql_request import SqlJsonTag
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.sql_clients.sql_utils import sync_execute, sync_query
 from metricflow.visitor import Visitable
 
 logger = logging.getLogger(__name__)
@@ -126,11 +125,10 @@ class SelectSqlQueryToDataFrameTask(ExecutionPlanTask):
     def execute(self) -> TaskExecutionResult:  # noqa: D
         start_time = time.time()
 
-        df = sync_query(
-            self._sql_client,
+        df = self._sql_client.query(
             self._sql_query,
-            bind_parameters=self.bind_parameters,
-            extra_sql_tags=self._extra_sql_tags,
+            sql_bind_parameters=self.bind_parameters,
+            extra_tags=self._extra_sql_tags,
         )
 
         end_time = time.time()
@@ -191,11 +189,10 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
         logger.info(f"Creating table {self._output_table} using a SELECT query")
         sql_query = self.sql_query
         assert sql_query
-        sync_execute(
-            self._sql_client,
+        self._sql_client.execute(
             sql_query.sql_query,
-            bind_parameters=sql_query.bind_parameters,
-            extra_sql_tags=self._extra_sql_tags,
+            sql_bind_parameters=sql_query.bind_parameters,
+            extra_tags=self._extra_sql_tags,
         )
 
         end_time = time.time()
