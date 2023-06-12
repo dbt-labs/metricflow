@@ -1,8 +1,6 @@
 semantic_model:
   name: countries
   description: Regions mapped to countries.
-  defaults:
-    agg_time_dimension: ds
   entities:
     - name: country
       type: primary
