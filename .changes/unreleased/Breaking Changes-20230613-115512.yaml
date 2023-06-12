@@ -1,0 +1,7 @@
+kind: Breaking Changes
+body: Remove time spine introspection and table creation, which may break cumulative
+  metric queries
+time: 2023-06-13T11:55:12.601662-07:00
+custom:
+  Author: tlento
+  Issue: "592"
