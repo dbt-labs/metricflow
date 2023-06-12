@@ -11,7 +11,6 @@ from typing import Callable, DefaultDict, Dict, List, Optional, Sequence, Tuple,
 
 from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimension
 from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
-from dbt_semantic_interfaces.implementations.semantic_model import PydanticSemanticModel
 from dbt_semantic_interfaces.protocols.dimension import DimensionType
 from dbt_semantic_interfaces.protocols.metric import Metric
 from dbt_semantic_interfaces.protocols.semantic_model import SemanticModel
@@ -539,7 +538,7 @@ class DataWarehouseModelValidator:
         return SemanticManifestValidationResults.from_issues_sequence(issues)
 
     def validate_semantic_models(
-        self, model: PydanticSemanticModel, timeout: Optional[int] = None
+        self, model: PydanticSemanticManifest, timeout: Optional[int] = None
     ) -> SemanticManifestValidationResults:
         """Generates a list of tasks for validating the semantic models of the model and then runs them.
 
