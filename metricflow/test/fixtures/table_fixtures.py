@@ -4,11 +4,9 @@ import logging
 import os
 from pathlib import Path
 
-import pandas as pd
 import pytest
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 
-from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.table_snapshot.table_snapshots import (
@@ -17,18 +15,6 @@ from metricflow.test.table_snapshot.table_snapshots import (
 )
 
 logger = logging.getLogger(__name__)
-
-DEFAULT_DS = "ds"
-
-
-def create_table(sql_client: SqlClient, sql_table: SqlTable, df: pd.DataFrame) -> None:  # noqa: D
-    # TODO: Replace with table_exists() check.
-    sql_client.drop_table(sql_table)
-
-    sql_client.create_table_from_dataframe(
-        sql_table=sql_table,
-        df=df,
-    )
 
 
 @pytest.fixture(scope="session")
