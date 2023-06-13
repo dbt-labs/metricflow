@@ -19,6 +19,7 @@ from metricflow.cli.cli_context import CLIContext
 from metricflow.cli.main import (
     dimension_values,
     dimensions,
+    entities,
     health_checks,
     metrics,
     query,
@@ -179,3 +180,10 @@ def test_build_tutorial_model(cli_runner: MetricFlowCliRunner) -> None:  # noqa:
     assert model_build_result.issues.has_blocking_issues is False
 
     SemanticManifestValidator[PydanticSemanticManifest]().checked_validations(model_build_result.semantic_manifest)
+
+
+def test_list_entities(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
+    resp = cli_runner.run(entities, args=["--metrics", "bookings"])
+
+    assert "guest" in resp.output
+    assert "host" in resp.output

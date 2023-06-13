@@ -470,6 +470,33 @@ def dimensions(cfg: CLIContext, metrics: List[str]) -> None:
         click.echo(f"• {click.style(d.name, bold=True, fg='green')}")
 
 
+@list.command()
+@click.option(
+    "--metrics",
+    type=click_custom.SequenceParamType(min_length=1),
+    default="",
+    help="List entities by given metrics (intersection). Ex. --metrics bookings,messages",
+)
+@pass_config
+@exception_handler
+@log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
+def entities(cfg: CLIContext, metrics: List[str]) -> None:
+    """List all unique entities."""
+    spinner = Halo(
+        text="🔍 Looking for all available entities...",
+        spinner="dots",
+    )
+    spinner.start()
+
+    entities = cfg.mf.entities_for_metrics(metrics)
+    if not entities:
+        spinner.fail("List of entities unavailable.")
+
+    spinner.succeed(f"🌱 We've found {len(entities)} common entities for metrics {metrics}.")
+    for entity in entities:
+        click.echo(f"• {click.style(entity.name, bold=True, fg='green')}")
+
+
 @cli.command()
 @pass_config
 @exception_handler
