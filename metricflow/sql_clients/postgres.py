@@ -5,7 +5,7 @@ from typing import ClassVar, Mapping, Optional, Sequence, Union
 
 import sqlalchemy
 
-from metricflow.protocols.sql_client import SqlEngine, SqlEngineAttributes, SqlIsolationLevel
+from metricflow.protocols.sql_client import SqlEngine, SqlEngineAttributes
 from metricflow.sql.render.postgres import PostgresSQLSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql_clients.common_client import SqlDialect, not_empty
@@ -23,7 +23,6 @@ class PostgresEngineAttributes:
     sql_engine_type: ClassVar[SqlEngine] = SqlEngine.POSTGRES
 
     # SQL Engine capabilities
-    supported_isolation_levels: ClassVar[Sequence[SqlIsolationLevel]] = ()
     date_trunc_supported: ClassVar[bool] = True
     full_outer_joins_supported: ClassVar[bool] = True
     indexes_supported: ClassVar[bool] = True

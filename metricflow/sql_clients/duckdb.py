@@ -10,7 +10,7 @@ from sqlalchemy import inspect
 from sqlalchemy.pool import StaticPool
 
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.protocols.sql_client import SqlEngine, SqlEngineAttributes, SqlIsolationLevel
+from metricflow.protocols.sql_client import SqlEngine, SqlEngineAttributes
 from metricflow.protocols.sql_request import SqlJsonTag, SqlRequestTagSet
 from metricflow.sql.render.duckdb_renderer import DuckDbSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
@@ -27,7 +27,6 @@ class DuckDbEngineAttributes:
     sql_engine_type: ClassVar[SqlEngine] = SqlEngine.DUCKDB
 
     # SQL Engine capabilities
-    supported_isolation_levels: ClassVar[Sequence[SqlIsolationLevel]] = ()
     date_trunc_supported: ClassVar[bool] = True
     full_outer_joins_supported: ClassVar[bool] = True
     indexes_supported: ClassVar[bool] = True
@@ -84,27 +83,21 @@ class DuckDbSqlClient(SqlAlchemySqlClient):
         self,
         stmt: str,
         bind_params: SqlBindParameters,
-        isolation_level: Optional[SqlIsolationLevel] = None,
         system_tags: SqlRequestTagSet = SqlRequestTagSet(),
         extra_tags: SqlJsonTag = SqlJsonTag(),
     ) -> pd.DataFrame:
         with self._concurrency_lock:
-            return super()._engine_specific_query_implementation(
-                stmt=stmt, bind_params=bind_params, isolation_level=isolation_level
-            )
+            return super()._engine_specific_query_implementation(stmt=stmt, bind_params=bind_params)
 
     def _engine_specific_execute_implementation(
         self,
         stmt: str,
         bind_params: SqlBindParameters,
-        isolation_level: Optional[SqlIsolationLevel] = None,
         system_tags: SqlRequestTagSet = SqlRequestTagSet(),
         extra_tags: SqlJsonTag = SqlJsonTag(),
     ) -> None:
         with self._concurrency_lock:
-            return super()._engine_specific_execute_implementation(
-                stmt=stmt, bind_params=bind_params, isolation_level=isolation_level
-            )
+            return super()._engine_specific_execute_implementation(stmt=stmt, bind_params=bind_params)
 
     def _engine_specific_dry_run_implementation(self, stmt: str, bind_params: SqlBindParameters) -> None:  # noqa: D
         with self._concurrency_lock:

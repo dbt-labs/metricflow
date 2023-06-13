@@ -11,7 +11,6 @@ from google.cloud.bigquery import Client
 from metricflow.protocols.sql_client import (
     SqlEngine,
     SqlEngineAttributes,
-    SqlIsolationLevel,
 )
 from metricflow.sql.render.big_query import BigQuerySqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
@@ -31,7 +30,6 @@ class BigQueryEngineAttributes:
     sql_engine_type: ClassVar[SqlEngine] = SqlEngine.BIGQUERY
 
     # SQL Engine capabilities
-    supported_isolation_levels: ClassVar[Sequence[SqlIsolationLevel]] = ()
     date_trunc_supported: ClassVar[bool] = True
     full_outer_joins_supported: ClassVar[bool] = True
     indexes_supported: ClassVar[bool] = False

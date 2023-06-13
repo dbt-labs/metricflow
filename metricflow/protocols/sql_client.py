@@ -23,18 +23,6 @@ class SqlEngine(Enum):
     DATABRICKS = "Databricks"
 
 
-class SqlIsolationLevel(Enum):
-    """Describes the isolation levels used to execute SQL queries. Values are passed as options to SQLAlchemy."""
-
-    READ_UNCOMMITTED = "READ_UNCOMMITTED"
-    READ_COMMITTED = "READ_COMMITTED"
-    REPEATABLE_READ = "REPEATABLE_READ"
-    SNAPSHOT = "SNAPSHOT"
-    # Unique to Databricks.
-    WRITE_SERIALIZABLE = "WRITE_SERIALIZABLE"
-    SERIALIZABLE = "SERIALIZABLE"
-
-
 class SqlClient(Protocol):
     """Base interface for SqlClient instances used inside MetricFlow.
 
@@ -90,7 +78,6 @@ class SqlClient(Protocol):
         stmt: str,
         sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
         extra_tags: SqlJsonTag = SqlJsonTag(),
-        isolation_level: Optional[SqlIsolationLevel] = None,
     ) -> DataFrame:
         """Base query method, upon execution will run a query that returns a pandas DataFrame."""
         raise NotImplementedError
@@ -101,7 +88,6 @@ class SqlClient(Protocol):
         stmt: str,
         sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
         extra_tags: SqlJsonTag = SqlJsonTag(),
-        isolation_level: Optional[SqlIsolationLevel] = None,
     ) -> None:
         """Base execute method."""
         raise NotImplementedError
@@ -184,9 +170,6 @@ class SqlEngineAttributes(Protocol):
     sql_engine_type: ClassVar[SqlEngine]
 
     # SQL Engine capabilities
-    # The isolation levels supported as options through the SqlClient API. This may be a subset of the isolation levels
-    # supported by the engine until implementation / testing is complete.
-    supported_isolation_levels: ClassVar[Sequence[SqlIsolationLevel]]
     date_trunc_supported: ClassVar[bool]
     full_outer_joins_supported: ClassVar[bool]
     indexes_supported: ClassVar[bool]

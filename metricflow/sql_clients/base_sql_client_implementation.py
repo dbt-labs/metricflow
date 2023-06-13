@@ -15,7 +15,6 @@ from metricflow.logging.formatting import indent_log_line
 from metricflow.protocols.sql_client import (
     SqlClient,
     SqlEngineAttributes,
-    SqlIsolationLevel,
 )
 from metricflow.protocols.sql_request import SqlJsonTag, SqlRequestId, SqlRequestTagSet
 from metricflow.random_id import random_id
@@ -93,7 +92,6 @@ class BaseSqlClientImplementation(ABC, SqlClient):
         stmt: str,
         sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
         extra_tags: SqlJsonTag = SqlJsonTag(),
-        isolation_level: Optional[SqlIsolationLevel] = None,
     ) -> pd.DataFrame:
         """Query statement; result expected to be data which will be returned as a DataFrame.
 
@@ -112,7 +110,6 @@ class BaseSqlClientImplementation(ABC, SqlClient):
         df = self._engine_specific_query_implementation(
             stmt=statement,
             bind_params=sql_bind_parameters,
-            isolation_level=isolation_level,
             system_tags=combined_tags.system_tags,
             extra_tags=combined_tags.extra_tag,
         )
@@ -127,7 +124,6 @@ class BaseSqlClientImplementation(ABC, SqlClient):
         stmt: str,
         sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
         extra_tags: SqlJsonTag = SqlJsonTag(),
-        isolation_level: Optional[SqlIsolationLevel] = None,
     ) -> None:
         start = time.time()
         request_id = SqlRequestId(f"mf_rid__{random_id()}")
@@ -139,7 +135,6 @@ class BaseSqlClientImplementation(ABC, SqlClient):
         self._engine_specific_execute_implementation(
             stmt=statement,
             bind_params=sql_bind_parameters,
-            isolation_level=isolation_level,
             system_tags=combined_tags.system_tags,
             extra_tags=combined_tags.extra_tag,
         )
@@ -184,7 +179,6 @@ class BaseSqlClientImplementation(ABC, SqlClient):
         self,
         stmt: str,
         bind_params: SqlBindParameters,
-        isolation_level: Optional[SqlIsolationLevel] = None,
         system_tags: SqlRequestTagSet = SqlRequestTagSet(),
         extra_tags: SqlJsonTag = SqlJsonTag(),
     ) -> pd.DataFrame:
@@ -196,7 +190,6 @@ class BaseSqlClientImplementation(ABC, SqlClient):
         self,
         stmt: str,
         bind_params: SqlBindParameters,
-        isolation_level: Optional[SqlIsolationLevel] = None,
         system_tags: SqlRequestTagSet = SqlRequestTagSet(),
         extra_tags: SqlJsonTag = SqlJsonTag(),
     ) -> None:

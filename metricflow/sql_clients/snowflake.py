@@ -13,7 +13,7 @@ import pandas as pd
 import sqlalchemy
 from sqlalchemy.exc import ProgrammingError
 
-from metricflow.protocols.sql_client import SqlEngine, SqlEngineAttributes, SqlIsolationLevel
+from metricflow.protocols.sql_client import SqlEngine, SqlEngineAttributes
 from metricflow.protocols.sql_request import (
     MF_EXTRA_TAGS_KEY,
     MF_SYSTEM_TAGS_KEY,
@@ -24,7 +24,7 @@ from metricflow.protocols.sql_request import (
 from metricflow.sql.render.snowflake import SnowflakeSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.sql_clients.common_client import SqlDialect, check_isolation_level, not_empty
+from metricflow.sql_clients.common_client import SqlDialect, not_empty
 from metricflow.sql_clients.sqlalchemy_dialect import SqlAlchemySqlClient
 
 logger = logging.getLogger(__name__)
@@ -39,7 +39,6 @@ class SnowflakeEngineAttributes:
     sql_engine_type: ClassVar[SqlEngine] = SqlEngine.SNOWFLAKE
 
     # SQL Engine capabilities
-    supported_isolation_levels: ClassVar[Sequence[SqlIsolationLevel]] = ()
     date_trunc_supported: ClassVar[bool] = True
     full_outer_joins_supported: ClassVar[bool] = True
     indexes_supported: ClassVar[bool] = False
@@ -172,7 +171,6 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
     def _engine_connection(
         self,
         engine: sqlalchemy.engine.Engine,
-        isolation_level: Optional[SqlIsolationLevel] = None,
         system_tags: SqlRequestTagSet = SqlRequestTagSet(),
         extra_tags: SqlJsonTag = SqlJsonTag(),
     ) -> Iterator[sqlalchemy.engine.Connection]:
@@ -183,8 +181,7 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
         options construct, which the DBClient could read in at initialization and use here (for example).
         At this time we hard-code the ISO standard.
         """
-        check_isolation_level(self, isolation_level)
-        with super()._engine_connection(self._engine, isolation_level=isolation_level) as conn:
+        with super()._engine_connection(self._engine) as conn:
             # WEEK_START 1 means Monday.
             conn.execute("ALTER SESSION SET WEEK_START = 1;")
             combined_tags: JsonDict = OrderedDict()
@@ -214,15 +211,11 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
         self,
         stmt: str,
         bind_params: SqlBindParameters = SqlBindParameters(),
-        isolation_level: Optional[SqlIsolationLevel] = None,
         allow_re_auth: bool = True,
         system_tags: SqlRequestTagSet = SqlRequestTagSet(),
         extra_tags: SqlJsonTag = SqlJsonTag(),
     ) -> pd.DataFrame:
-        check_isolation_level(self, isolation_level)
-        with self._engine_connection(
-            engine=self._engine, isolation_level=isolation_level, system_tags=system_tags, extra_tags=extra_tags
-        ) as conn:
+        with self._engine_connection(engine=self._engine, system_tags=system_tags, extra_tags=extra_tags) as conn:
             try:
                 return pd.read_sql_query(sqlalchemy.text(stmt), conn, params=bind_params.param_dict)
             except ProgrammingError as e:
@@ -234,23 +227,19 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
                         self._engine.dispose()
                         self._engine = self._create_engine()
                     # this was our one chance to re-auth
-                    return self._query(
-                        stmt, allow_re_auth=False, bind_params=bind_params, isolation_level=isolation_level
-                    )
+                    return self._query(stmt, allow_re_auth=False, bind_params=bind_params)
                 raise e
 
     def _engine_specific_query_implementation(
         self,
         stmt: str,
         bind_params: SqlBindParameters,
-        isolation_level: Optional[SqlIsolationLevel] = None,
         system_tags: SqlRequestTagSet = SqlRequestTagSet(),
         extra_tags: SqlJsonTag = SqlJsonTag(),
     ) -> pd.DataFrame:
         return self._query(
             stmt,
             bind_params=bind_params,
-            isolation_level=isolation_level,
             system_tags=system_tags,
             extra_tags=extra_tags,
         )

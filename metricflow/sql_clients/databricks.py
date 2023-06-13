@@ -9,13 +9,13 @@ import sqlalchemy
 from databricks import sql
 
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.protocols.sql_client import SqlEngine, SqlEngineAttributes, SqlIsolationLevel
+from metricflow.protocols.sql_client import SqlEngine, SqlEngineAttributes
 from metricflow.protocols.sql_request import SqlJsonTag, SqlRequestTagSet
 from metricflow.sql.render.databricks import DatabricksSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters, SqlColumnType
 from metricflow.sql_clients.base_sql_client_implementation import BaseSqlClientImplementation
-from metricflow.sql_clients.common_client import SqlDialect, check_isolation_level
+from metricflow.sql_clients.common_client import SqlDialect
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +45,6 @@ class DatabricksEngineAttributes:
     sql_engine_type: ClassVar[SqlEngine] = SqlEngine.DATABRICKS
 
     # SQL Engine capabilities
-    supported_isolation_levels: ClassVar[Sequence[SqlIsolationLevel]] = ()
     date_trunc_supported: ClassVar[bool] = True
     full_outer_joins_supported: ClassVar[bool] = True
     indexes_supported: ClassVar[bool] = False
@@ -155,11 +154,9 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
         self,
         stmt: str,
         bind_params: SqlBindParameters,
-        isolation_level: Optional[SqlIsolationLevel] = None,
         system_tags: SqlRequestTagSet = SqlRequestTagSet(),
         extra_tags: SqlJsonTag = SqlJsonTag(),
     ) -> pd.DataFrame:
-        check_isolation_level(self, isolation_level)
         with self.get_connection() as connection:
             with connection.cursor() as cursor:
                 self._execute_stmt(cursor=cursor, stmt=stmt, bind_params=bind_params)
@@ -179,7 +176,6 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
         self,
         stmt: str,
         bind_params: SqlBindParameters,
-        isolation_level: Optional[SqlIsolationLevel] = None,
         system_tags: SqlRequestTagSet = SqlRequestTagSet(),
         extra_tags: SqlJsonTag = SqlJsonTag(),
     ) -> None:
