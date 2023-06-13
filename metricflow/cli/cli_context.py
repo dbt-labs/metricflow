@@ -88,8 +88,8 @@ class CLIContext:
                 (f"Create schema '{schema_name}'", lambda: self.sql_client.create_schema(schema_name)),
                 (
                     f"Create table '{schema_name}.{table_name}' with a SELECT",
-                    lambda: self.sql_client.create_table_as_select(
-                        SqlTable(schema_name=schema_name, table_name="health_report"), "SELECT 'test' AS test_col"
+                    lambda: self.sql_client.execute(
+                        f"CREATE TABLE {schema_name}.{table_name} AS SELECT 'test' AS test_col"
                     ),
                 ),
                 (

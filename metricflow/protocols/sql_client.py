@@ -41,22 +41,6 @@ class SqlClient(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    def create_table_as_select(
-        self,
-        sql_table: SqlTable,
-        select_query: str,
-        sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
-    ) -> None:
-        """Method for creating a table from the provided select query.
-
-        Args:
-            sql_table: The SqlTable metadata of the table to create
-            select_query: The query to use to populate the table
-            sql_bind_parameters: Map of values to substitute in to parameterized sql query strings
-        """
-        raise NotImplementedError
-
-    @abstractmethod
     def create_table_from_dataframe(
         self,
         sql_table: SqlTable,

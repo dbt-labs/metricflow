@@ -87,13 +87,6 @@ def test_failed_query_with_execution_params(sql_client: SqlClient) -> None:  # n
         sql_client.query("this is garbage")
 
 
-def test_create_table(mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient) -> None:  # noqa: D
-    sql_table = SqlTable(schema_name=mf_test_session_state.mf_system_schema, table_name=_random_table())
-    sql_client.create_table_as_select(sql_table, _select_x_as_y())
-    df = sql_client.query(f"SELECT * FROM {sql_table.sql}")
-    _check_1col(df)
-
-
 def test_create_table_from_dataframe(  # noqa: D
     mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient
 ) -> None:
@@ -116,7 +109,7 @@ def test_create_table_from_dataframe(  # noqa: D
 
 def test_table_exists(mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient) -> None:  # noqa: D
     sql_table = SqlTable(schema_name=mf_test_session_state.mf_system_schema, table_name=_random_table())
-    sql_client.create_table_as_select(sql_table, _select_x_as_y())
+    sql_client.execute(f"CREATE TABLE {sql_table.sql} AS {_select_x_as_y()}")
     assert sql_client.table_exists(sql_table)
 
 
@@ -177,7 +170,7 @@ def test_list_tables(mf_test_session_state: MetricFlowTestSessionState, sql_clie
     schema = mf_test_session_state.mf_system_schema
     sql_table = SqlTable(schema_name=schema, table_name=_random_table())
     table_count_before_create = len(sql_client.list_tables(schema))
-    sql_client.create_table_as_select(sql_table, _select_x_as_y())
+    sql_client.execute(f"CREATE TABLE {sql_table.sql} AS {_select_x_as_y()}")
     table_list = sql_client.list_tables(schema)
     table_count_after_create = len(table_list)
     assert table_count_after_create == table_count_before_create + 1

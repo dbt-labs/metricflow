@@ -1,12 +1,10 @@
 from __future__ import annotations
 
 import logging
-import textwrap
 import time
 from abc import ABC, abstractmethod
 from typing import Optional
 
-import jinja2
 import pandas as pd
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 
@@ -171,28 +169,6 @@ class BaseSqlClientImplementation(ABC, SqlClient):
 
     def table_exists(self, sql_table: SqlTable) -> bool:  # noqa: D
         return sql_table.table_name in self.list_tables(sql_table.schema_name)
-
-    def create_table_as_select(  # noqa: D
-        self,
-        sql_table: SqlTable,
-        select_query: str,
-        sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
-    ) -> None:
-        self.execute(
-            jinja2.Template(
-                textwrap.dedent(
-                    """\
-                    CREATE TABLE {{ sql_table }} AS
-                      {{ select_query | indent(2) }}
-                    """
-                ),
-                undefined=jinja2.StrictUndefined,
-            ).render(
-                sql_table=sql_table.sql,
-                select_query=select_query,
-            ),
-            sql_bind_parameters=sql_bind_parameters,
-        )
 
     def create_schema(self, schema_name: str) -> None:  # noqa: D
         self.execute(f"CREATE SCHEMA IF NOT EXISTS {schema_name}")
