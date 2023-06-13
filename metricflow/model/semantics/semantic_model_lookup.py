@@ -67,7 +67,7 @@ class SemanticModelLookup(SemanticModelAccessor):
 
     @staticmethod
     def get_dimension_from_semantic_model(
-        semantic_model: SemanticModel, dimension_reference: DimensionReference
+        semantic_model: SemanticModel, dimension_reference: LinkableElementReference
     ) -> Dimension:
         """Get dimension from semantic model."""
         for dim in semantic_model.dimensions:
@@ -231,3 +231,16 @@ class SemanticModelLookup(SemanticModelAccessor):
         """Return all semantic models associated with an entity reference."""
         entity = self._entity_ref_to_entity[entity_reference]
         return set(self._entity_index[entity])
+
+    @staticmethod
+    def get_entity_from_semantic_model(
+        semantic_model: SemanticModel, entity_reference: LinkableElementReference
+    ) -> Entity:
+        """Get entity from semantic model."""
+        for entity in semantic_model.entities:
+            if entity.reference == entity_reference:
+                return entity
+
+        raise ValueError(
+            f"No entity with name ({entity_reference}) in semantic_model with name ({semantic_model.name})"
+        )
