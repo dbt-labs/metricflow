@@ -4,7 +4,7 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 from typing import Dict, Optional
 
-from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
+from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 
 from metricflow.configuration.config_handler import ConfigHandler
 from metricflow.configuration.constants import (
@@ -27,7 +27,7 @@ class CLIContext:
         self.verbose = False
         self._mf: Optional[MetricFlowEngine] = None
         self._sql_client: Optional[SqlClient] = None
-        self._semantic_manifest: Optional[PydanticSemanticManifest] = None
+        self._semantic_manifest: Optional[SemanticManifest] = None
         self._semantic_manifest_lookup: Optional[SemanticManifestLookup] = None
         self._mf_system_schema: Optional[str] = None
         self.config = ConfigHandler()
@@ -110,7 +110,7 @@ class CLIContext:
         return self._semantic_manifest_lookup
 
     @property
-    def semantic_manifest(self) -> PydanticSemanticManifest:  # noqa: D
+    def semantic_manifest(self) -> SemanticManifest:  # noqa: D
         if self._semantic_manifest is None:
             self._semantic_manifest = build_semantic_manifest_from_config(self.config)
 

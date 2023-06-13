@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from typing import Dict, List, Optional
 
-from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
+from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 from dbt_semantic_interfaces.validations.validator_helpers import SemanticManifestValidationResults
 
@@ -54,7 +54,7 @@ class MetricFlowClient:
     def __init__(
         self,
         sql_client: SqlClient,
-        semantic_manifest: PydanticSemanticManifest,
+        semantic_manifest: SemanticManifest,
         system_schema: str,
     ):
         """Initializer for MetricFlowClient.
@@ -235,4 +235,4 @@ class MetricFlowClient:
         Returns:
             Tuple of validation issues with the model provided.
         """
-        return SemanticManifestValidator[PydanticSemanticManifest]().validate_semantic_manifest(self.semantic_manifest)
+        return SemanticManifestValidator[SemanticManifest]().validate_semantic_manifest(self.semantic_manifest)

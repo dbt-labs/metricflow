@@ -14,7 +14,7 @@ from typing import Callable, List, Optional
 import click
 import jinja2
 import pandas as pd
-from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
+from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 from dbt_semantic_interfaces.validations.validator_helpers import SemanticManifestValidationResults
 from halo import Halo
@@ -580,9 +580,9 @@ def _print_issues(
 
 
 def _run_dw_validations(
-    validation_func: Callable[[PydanticSemanticManifest, Optional[int]], SemanticManifestValidationResults],
+    validation_func: Callable[[SemanticManifest, Optional[int]], SemanticManifestValidationResults],
     validation_type: str,
-    model: PydanticSemanticManifest,
+    model: SemanticManifest,
     timeout: Optional[int],
 ) -> SemanticManifestValidationResults:
     """Helper handles the calling of data warehouse issue generating functions."""
@@ -600,7 +600,7 @@ def _run_dw_validations(
 
 
 def _data_warehouse_validations_runner(
-    dw_validator: DataWarehouseModelValidator, model: PydanticSemanticManifest, timeout: Optional[int]
+    dw_validator: DataWarehouseModelValidator, model: SemanticManifest, timeout: Optional[int]
 ) -> SemanticManifestValidationResults:
     """Helper which calls the individual data warehouse validations to run and prints collected issues."""
     semantic_model_results = _run_dw_validations(
@@ -682,7 +682,7 @@ def validate_configs(
     # Semantic validation
     semantic_spinner = Halo(text="Validating semantics of built model", spinner="dots")
     semantic_spinner.start()
-    model_issues = SemanticManifestValidator[PydanticSemanticManifest](
+    model_issues = SemanticManifestValidator[SemanticManifest](
         max_workers=semantic_validation_workers
     ).validate_semantic_manifest(user_model)
 

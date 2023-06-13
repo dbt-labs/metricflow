@@ -59,7 +59,7 @@ class QueryRenderingTools:
     time_spine_source: TimeSpineSource
     plan_converter: DataflowToSqlQueryPlanConverter
 
-    def __init__(self, model: PydanticSemanticManifest, system_schema: str) -> None:  # noqa: D
+    def __init__(self, model: SemanticManifest, system_schema: str) -> None:  # noqa: D
         self.semantic_manifest_lookup = SemanticManifestLookup(semantic_manifest=model)
         self.source_node_builder = SourceNodeBuilder(semantic_manifest_lookup=self.semantic_manifest_lookup)
         self.time_spine_source = TimeSpineSource(schema_name=system_schema)
@@ -134,7 +134,7 @@ class DataWarehouseTaskBuilder:
 
     @classmethod
     def gen_semantic_model_tasks(
-        cls, model: PydanticSemanticManifest, sql_client: SqlClient, system_schema: str
+        cls, model: SemanticManifest, sql_client: SqlClient, system_schema: str
     ) -> List[DataWarehouseValidationTask]:
         """Generates a list of tasks for validating the semantic models of the model."""
         tasks: List[DataWarehouseValidationTask] = []
@@ -159,7 +159,7 @@ class DataWarehouseTaskBuilder:
 
     @classmethod
     def gen_dimension_tasks(
-        cls, model: PydanticSemanticManifest, sql_client: SqlClient, system_schema: str
+        cls, model: SemanticManifest, sql_client: SqlClient, system_schema: str
     ) -> List[DataWarehouseValidationTask]:
         """Generates a list of tasks for validating the dimensions of the model.
 
@@ -258,7 +258,7 @@ class DataWarehouseTaskBuilder:
 
     @classmethod
     def gen_entity_tasks(
-        cls, model: PydanticSemanticManifest, sql_client: SqlClient, system_schema: str
+        cls, model: SemanticManifest, sql_client: SqlClient, system_schema: str
     ) -> List[DataWarehouseValidationTask]:
         """Generates a list of tasks for validating the entities of the model.
 
@@ -332,7 +332,7 @@ class DataWarehouseTaskBuilder:
 
     @classmethod
     def gen_measure_tasks(
-        cls, model: PydanticSemanticManifest, sql_client: SqlClient, system_schema: str
+        cls, model: SemanticManifest, sql_client: SqlClient, system_schema: str
     ) -> List[DataWarehouseValidationTask]:
         """Generates a list of tasks for validating the measures of the model.
 
@@ -430,7 +430,7 @@ class DataWarehouseTaskBuilder:
 
     @classmethod
     def gen_metric_tasks(
-        cls, model: PydanticSemanticManifest, sql_client: SqlClient, system_schema: str
+        cls, model: SemanticManifest, sql_client: SqlClient, system_schema: str
     ) -> List[DataWarehouseValidationTask]:
         """Generates a list of tasks for validating the metrics of the model."""
         mf_engine = MetricFlowEngine(
@@ -514,7 +514,7 @@ class DataWarehouseModelValidator:
         return SemanticManifestValidationResults.from_issues_sequence(issues)
 
     def validate_semantic_models(
-        self, model: PydanticSemanticManifest, timeout: Optional[int] = None
+        self, model: SemanticManifest, timeout: Optional[int] = None
     ) -> SemanticManifestValidationResults:
         """Generates a list of tasks for validating the semantic models of the model and then runs them.
 
@@ -531,7 +531,7 @@ class DataWarehouseModelValidator:
         return self.run_tasks(tasks=tasks, timeout=timeout)
 
     def validate_dimensions(
-        self, model: PydanticSemanticManifest, timeout: Optional[int] = None
+        self, model: SemanticManifest, timeout: Optional[int] = None
     ) -> SemanticManifestValidationResults:
         """Generates a list of tasks for validating the dimensions of the model and then runs them.
 
@@ -548,7 +548,7 @@ class DataWarehouseModelValidator:
         return self.run_tasks(tasks=tasks, timeout=timeout)
 
     def validate_entities(
-        self, model: PydanticSemanticManifest, timeout: Optional[int] = None
+        self, model: SemanticManifest, timeout: Optional[int] = None
     ) -> SemanticManifestValidationResults:
         """Generates a list of tasks for validating the entities of the model and then runs them.
 
@@ -565,7 +565,7 @@ class DataWarehouseModelValidator:
         return self.run_tasks(tasks=tasks, timeout=timeout)
 
     def validate_measures(
-        self, model: PydanticSemanticManifest, timeout: Optional[int] = None
+        self, model: SemanticManifest, timeout: Optional[int] = None
     ) -> SemanticManifestValidationResults:
         """Generates a list of tasks for validating the measures of the model and then runs them.
 
@@ -582,7 +582,7 @@ class DataWarehouseModelValidator:
         return self.run_tasks(tasks=tasks, timeout=timeout)
 
     def validate_metrics(
-        self, model: PydanticSemanticManifest, timeout: Optional[int] = None
+        self, model: SemanticManifest, timeout: Optional[int] = None
     ) -> SemanticManifestValidationResults:
         """Generates a list of tasks for validating the metrics of the model and then runs them.
 

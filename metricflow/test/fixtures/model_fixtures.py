@@ -7,7 +7,6 @@ from dataclasses import dataclass
 from typing import Dict, List, Sequence
 
 import pytest
-from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from dbt_semantic_interfaces.parsing.dir_to_model import (
     parse_directory_of_yaml_files_to_semantic_manifest,
     parse_yaml_files_to_validation_ready_semantic_manifest,
@@ -64,9 +63,7 @@ def query_parser_from_yaml(
             yaml_contents, apply_transformations=True
         ).semantic_manifest
     )
-    SemanticManifestValidator[PydanticSemanticManifest]().checked_validations(
-        semantic_manifest_lookup.semantic_manifest
-    )
+    SemanticManifestValidator[SemanticManifest]().checked_validations(semantic_manifest_lookup.semantic_manifest)
     source_nodes = _data_set_to_source_nodes(semantic_manifest_lookup, create_data_sets(semantic_manifest_lookup))
     return MetricFlowQueryParser(
         model=semantic_manifest_lookup,
@@ -235,7 +232,7 @@ def scd_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> SemanticMa
 
 
 @pytest.fixture(scope="session")
-def data_warehouse_validation_model(template_mapping: Dict[str, str]) -> PydanticSemanticManifest:
+def data_warehouse_validation_model(template_mapping: Dict[str, str]) -> SemanticManifest:
     """Model used for data warehouse validation tests."""
     build_result = parse_directory_of_yaml_files_to_semantic_manifest(
         os.path.join(os.path.dirname(__file__), "model_yamls/data_warehouse_validation_model"),
