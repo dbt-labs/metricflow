@@ -7,9 +7,9 @@ from typing import Dict
 import pandas as pd
 
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.filters.time_constraint import TimeRangeConstraint
+from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.sql_clients.sql_utils import make_df
+from metricflow.sql_clients.sql_utils import create_time_spine_table_if_necessary, make_df
 
 COUNTRIES = [("US", "NA"), ("MX", "NA"), ("CA", "NA"), ("BR", "SA"), ("GR", "EU"), ("FR", "EU")]
 TRANSACTION_TYPE = ["cancellation", "alteration", "quick-buy", "buy"]
@@ -131,13 +131,8 @@ def create_sample_data(sql_client: SqlClient, system_schema: str) -> bool:
     for table_name in dummy_data:
         sql_table = SqlTable.from_string(f"{system_schema}.{table_name}")
         sql_client.create_table_from_dataframe(sql_table=sql_table, df=dummy_data[table_name])
-    # TODO: consolidate with the test helper
-    time_spine_table = SqlTable.from_string(f"{system_schema}.{TIME_SPINE_TABLE}")
-    if not sql_client.table_exists(time_spine_table):
-        time_spine_data_frame = pd.date_range(
-            start=TimeRangeConstraint.ALL_TIME_BEGIN(), end=TimeRangeConstraint.ALL_TIME_END()
-        ).to_frame(index=False, name="ds")
-        sql_client.create_table_from_dataframe(time_spine_table, time_spine_data_frame, chunk_size=1000)
+    time_spine_source = TimeSpineSource(schema_name=system_schema, table_name=TIME_SPINE_TABLE, time_column_name="ds")
+    create_time_spine_table_if_necessary(time_spine_source, sql_client)
 
     return True
 
