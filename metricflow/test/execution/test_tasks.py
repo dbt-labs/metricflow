@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pandas as pd
+
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.execution.execution_plan import (
     ExecutionPlan,
@@ -10,7 +12,6 @@ from metricflow.execution.executor import SequentialPlanExecutor
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.random_id import random_id
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.sql_clients.sql_utils import make_df
 from metricflow.test.compare_df import assert_dataframes_equal
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 
@@ -27,8 +28,7 @@ def test_read_sql_task(sql_client: SqlClient) -> None:  # noqa: D
 
     assert_dataframes_equal(
         actual=task_result.df,
-        expected=make_df(
-            sql_client=sql_client,
+        expected=pd.DataFrame(
             columns=["foo"],
             data=[(1,)],
         ),
@@ -52,8 +52,7 @@ def test_write_table_task(mf_test_session_state: MetricFlowTestSessionState, sql
 
     assert_dataframes_equal(
         actual=sql_client.query(f"SELECT * FROM {output_table.sql}"),
-        expected=make_df(
-            sql_client=sql_client,
+        expected=pd.DataFrame(
             columns=["foo"],
             data=[(1,)],
         ),

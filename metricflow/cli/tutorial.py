@@ -9,7 +9,7 @@ import pandas as pd
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.sql_clients.sql_utils import create_time_spine_table_if_necessary, make_df
+from metricflow.sql_clients.sql_utils import create_time_spine_table_if_necessary
 
 COUNTRIES = [("US", "NA"), ("MX", "NA"), ("CA", "NA"), ("BR", "SA"), ("GR", "EU"), ("FR", "EU")]
 TRANSACTION_TYPE = ["cancellation", "alteration", "quick-buy", "buy"]
@@ -95,11 +95,8 @@ def build_dataframe(sql_client: SqlClient) -> Dict[str, pd.DataFrame]:
     ]
 
     return {
-        CUSTOMERS_TABLE: make_df(
-            sql_client=sql_client, columns=["id_customer", "country", "ds"], time_columns={"ds"}, data=customer_data
-        ),
-        TRANSACTIONS_TABLE: make_df(
-            sql_client=sql_client,
+        CUSTOMERS_TABLE: pd.DataFrame(columns=["id_customer", "country", "ds"], data=customer_data),
+        TRANSACTIONS_TABLE: pd.DataFrame(
             columns=[
                 "id_transaction",
                 "id_order",
@@ -108,10 +105,9 @@ def build_dataframe(sql_client: SqlClient) -> Dict[str, pd.DataFrame]:
                 "transaction_type_name",
                 "ds",
             ],
-            time_columns={"ds"},
             data=transaction_data,
         ),
-        COUNTRIES_TABLE: make_df(sql_client=sql_client, columns=["country", "region"], data=COUNTRIES),
+        COUNTRIES_TABLE: pd.DataFrame(columns=["country", "region"], data=COUNTRIES),
     }
 
 

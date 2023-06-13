@@ -12,7 +12,6 @@ from metricflow.protocols.sql_client import SqlClient
 from metricflow.random_id import random_id
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_column_type import SqlColumnType
-from metricflow.sql_clients.sql_utils import make_df
 from metricflow.test.compare_df import assert_dataframes_equal
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 
@@ -98,10 +97,8 @@ def test_create_table(mf_test_session_state: MetricFlowTestSessionState, sql_cli
 def test_create_table_from_dataframe(  # noqa: D
     mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient
 ) -> None:
-    expected_df = make_df(
-        sql_client=sql_client,
+    expected_df = pd.DataFrame(
         columns=["int_col", "str_col", "float_col", "bool_col", "time_col"],
-        time_columns={"time_col"},
         data=[
             (1, "abc", 1.23, False, "2020-01-01"),
             (2, "def", 4.56, True, "2020-01-02"),
