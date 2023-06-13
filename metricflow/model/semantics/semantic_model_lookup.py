@@ -5,7 +5,7 @@ from collections import defaultdict
 from copy import deepcopy
 from typing import Dict, List, Optional, Sequence, Set
 
-from dbt_semantic_interfaces.implementations.semantic_model import PydanticSemanticModel
+from dbt_semantic_interfaces.protocols.semantic_model import SemanticModel
 from dbt_semantic_interfaces.protocols.dimension import Dimension
 from dbt_semantic_interfaces.protocols.entity import Entity
 from dbt_semantic_interfaces.protocols.measure import Measure
@@ -43,15 +43,15 @@ class SemanticModelLookup(SemanticModelAccessor):
         model: SemanticManifest,
     ) -> None:
         self._model = model
-        self._measure_index: Dict[MeasureReference, List[PydanticSemanticModel]] = defaultdict(list)
+        self._measure_index: Dict[MeasureReference, List[SemanticModel]] = defaultdict(list)
         self._measure_aggs: Dict[
             MeasureReference, AggregationType
         ] = {}  # maps measures to their one consistent aggregation
         self._measure_agg_time_dimension: Dict[MeasureReference, TimeDimensionReference] = {}
         self._measure_non_additive_dimension_specs: Dict[MeasureReference, NonAdditiveDimensionSpec] = {}
-        self._dimension_index: Dict[DimensionReference, List[PydanticSemanticModel]] = defaultdict(list)
-        self._linkable_reference_index: Dict[LinkableElementReference, List[PydanticSemanticModel]] = defaultdict(list)
-        self._entity_index: Dict[Optional[str], List[PydanticSemanticModel]] = defaultdict(list)
+        self._dimension_index: Dict[DimensionReference, List[SemanticModel]] = defaultdict(list)
+        self._linkable_reference_index: Dict[LinkableElementReference, List[SemanticModel]] = defaultdict(list)
+        self._entity_index: Dict[Optional[str], List[SemanticModel]] = defaultdict(list)
         self._entity_ref_to_entity: Dict[EntityReference, Optional[str]] = {}
         self._semantic_model_names: Set[str] = set()
 
@@ -59,7 +59,7 @@ class SemanticModelLookup(SemanticModelAccessor):
             SemanticModelReference, ElementGrouper[TimeDimensionReference, MeasureSpec]
         ] = {}
 
-        self._semantic_model_reference_to_semantic_model: Dict[SemanticModelReference, PydanticSemanticModel] = {}
+        self._semantic_model_reference_to_semantic_model: Dict[SemanticModelReference, SemanticModel] = {}
         for semantic_model in self._model.semantic_models:
             self._add_semantic_model(semantic_model)
 
@@ -116,7 +116,7 @@ class SemanticModelLookup(SemanticModelAccessor):
     # DSC interface
     def get_semantic_models_for_measure(  # noqa: D
         self, measure_reference: MeasureReference
-    ) -> Sequence[PydanticSemanticModel]:
+    ) -> Sequence[SemanticModel]:
         return self._measure_index[measure_reference]
 
     def get_agg_time_dimension_for_measure(  # noqa: D
@@ -137,10 +137,10 @@ class SemanticModelLookup(SemanticModelAccessor):
 
     def get_by_reference(  # noqa: D
         self, semantic_model_reference: SemanticModelReference
-    ) -> Optional[PydanticSemanticModel]:
+    ) -> Optional[SemanticModel]:
         return self._semantic_model_reference_to_semantic_model.get(semantic_model_reference)
 
-    def _add_semantic_model(self, semantic_model: PydanticSemanticModel) -> None:
+    def _add_semantic_model(self, semantic_model: SemanticModel) -> None:
         """Add semantic model semantic information, validating consistency with existing semantic models."""
         errors = []
 
