@@ -2,17 +2,14 @@ from __future__ import annotations
 
 import collections
 import traceback
-from copy import deepcopy
 from dataclasses import dataclass, field
 from functools import partial
 from math import floor
 from time import perf_counter
 from typing import Callable, DefaultDict, Dict, List, Optional, Sequence, Tuple, TypeVar
 
-from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimension
-from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
-from dbt_semantic_interfaces.protocols.dimension import DimensionType
 from dbt_semantic_interfaces.protocols.metric import Metric
+from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.protocols.semantic_model import SemanticModel
 from dbt_semantic_interfaces.references import (
     MetricModelReference,
@@ -44,7 +41,7 @@ from metricflow.plan_conversion.column_resolver import DunderColumnAssociationRe
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.specs.specs import DimensionSpec, InstanceSpecSet, LinkableInstanceSpec, MeasureSpec
+from metricflow.specs.specs import InstanceSpecSet, LinkableInstanceSpec, MeasureSpec
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 
 
@@ -140,36 +137,15 @@ class DataWarehouseTaskBuilder:
         cls, model: PydanticSemanticManifest, sql_client: SqlClient, system_schema: str
     ) -> List[DataWarehouseValidationTask]:
         """Generates a list of tasks for validating the semantic models of the model."""
-        # we need a dimension to query that we know exists (i.e. the dimension
-        # is guaranteed to not cause a problem) on each semantic model.
-        # Additionally, we don't want to modify the original model, so we
-        # first make a deep copy of it
-        model = deepcopy(model)
-        for semantic_model in model.semantic_models:
-            semantic_model.dimensions = list(semantic_model.dimensions) + [
-                PydanticDimension(
-                    name=f"validation_dim_for_{semantic_model.name}", type=DimensionType.CATEGORICAL, expr="1"
-                )
-            ]
-
-        render_tools = QueryRenderingTools(model=model, system_schema=system_schema)
-
         tasks: List[DataWarehouseValidationTask] = []
         for semantic_model in model.semantic_models:
-            source_node = cls._semantic_model_nodes(render_tools=render_tools, semantic_model=semantic_model)[0]
-            spec = DimensionSpec.from_name(name=f"validation_dim_for_{semantic_model.name}")
-            filter_elements_node = FilterElementsNode(
-                parent_node=source_node, include_specs=InstanceSpecSet(dimension_specs=(spec,))
-            )
-
             tasks.append(
                 DataWarehouseValidationTask(
                     query_and_params_callable=partial(
-                        cls.renderize,
-                        sql_client=sql_client,
-                        plan_converter=render_tools.plan_converter,
-                        plan_id=f"{semantic_model.name}_validation",
-                        nodes=filter_elements_node,
+                        lambda name=semantic_model.node_relation.relation_name: (
+                            f"SELECT * FROM {name}",
+                            SqlBindParameters(),
+                        )
                     ),
                     context=SemanticModelContext(
                         file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
