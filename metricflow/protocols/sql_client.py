@@ -157,9 +157,6 @@ class SqlClient(Protocol):
 class SqlEngineAttributes(Protocol):
     """Base interface for SQL engine-specific attributes and features.
 
-    These include items like support for language features (e.g., FULL OUTER JOIN support), dialect differences
-    (e.g., DOUBLE type name), and things of that nature.
-
     Concrete implementations would typically be the equivalent of frozen dataclass literals, one per
     MetricFlowSupportedDBEngine, as we would not expect these properties to change from one client to the next.
 
@@ -170,21 +167,15 @@ class SqlEngineAttributes(Protocol):
     sql_engine_type: ClassVar[SqlEngine]
 
     # SQL Engine capabilities
-    date_trunc_supported: ClassVar[bool]
-    full_outer_joins_supported: ClassVar[bool]
-    indexes_supported: ClassVar[bool]
-    multi_threading_supported: ClassVar[bool]
-    timestamp_type_supported: ClassVar[bool]
-    timestamp_to_string_comparison_supported: ClassVar[bool]
     continuous_percentile_aggregation_supported: ClassVar[bool]
     discrete_percentile_aggregation_supported: ClassVar[bool]
     approximate_continuous_percentile_aggregation_supported: ClassVar[bool]
     approximate_discrete_percentile_aggregation_supported: ClassVar[bool]
 
     # SQL Dialect replacement strings
+    # TODO: Move these to rendering classes
     double_data_type_name: ClassVar[str]
     timestamp_type_name: ClassVar[Optional[str]]
-    random_function_name: ClassVar[str]
 
     # MetricFlow attributes
     sql_query_plan_renderer: ClassVar[SqlQueryPlanRenderer]

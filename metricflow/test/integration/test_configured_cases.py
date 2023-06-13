@@ -66,10 +66,7 @@ class CheckQueryHelpers:
 
     def cast_expr_to_ts(self, expr: str) -> str:
         """Returns the expression as a new expression cast to the timestamp type, if applicable for the DB."""
-        if self._sql_client.sql_engine_attributes.timestamp_type_supported:
-            return f"CAST({expr} AS {self._sql_client.sql_engine_attributes.timestamp_type_name})"
-
-        return expr
+        return f"CAST({expr} AS {self._sql_client.sql_engine_attributes.timestamp_type_name})"
 
     def cast_to_ts(self, string_literal: str) -> str:
         """Similar to cast_expr_to_ts, but assumes the input string is to be converted into a string literal."""
@@ -168,13 +165,7 @@ def filter_not_supported_features(
     """Given a list of required features, return a list of features not supported by the given SQLClient."""
     not_supported_features: List[RequiredDwEngineFeatures] = []
     for required_feature in required_features:
-        if required_feature is RequiredDwEngineFeatures.DATE_TRUNC:
-            if not sql_client.sql_engine_attributes.date_trunc_supported:
-                not_supported_features.append(required_feature)
-        elif required_feature is RequiredDwEngineFeatures.FULL_OUTER_JOIN:
-            if not sql_client.sql_engine_attributes.full_outer_joins_supported:
-                not_supported_features.append(required_feature)
-        elif required_feature is RequiredDwEngineFeatures.CONTINUOUS_PERCENTILE_AGGREGATION:
+        if required_feature is RequiredDwEngineFeatures.CONTINUOUS_PERCENTILE_AGGREGATION:
             if not sql_client.sql_engine_attributes.continuous_percentile_aggregation_supported:
                 not_supported_features.append(required_feature)
         elif required_feature is RequiredDwEngineFeatures.DISCRETE_PERCENTILE_AGGREGATION:

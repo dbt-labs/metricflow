@@ -4,7 +4,6 @@ integration_test:
   description: |
     Tests querying a metric with a measure constraint on a local dimension
   model: SIMPLE_MODEL
-  required_features: ["FULL_OUTER_JOIN"]
   metrics: ["instant_booking_fraction_of_max_value"]
   group_bys: ["metric_time"]
   check_query: |
@@ -33,7 +32,6 @@ integration_test:
   description: |
     Tests querying a metric with a measure constraint on a dimension requiring a join
   model: SIMPLE_MODEL
-  required_features: ["FULL_OUTER_JOIN"]
   metrics: ["lux_booking_fraction_of_max_value"]
   group_bys: ["metric_time"]
   check_query: |
@@ -64,7 +62,6 @@ integration_test:
   description: |
     Tests querying an expr metric with a measure constraint on a dimension requiring a join
   model: SIMPLE_MODEL
-  required_features: ["FULL_OUTER_JOIN"]
   metrics: ["lux_booking_value_rate_expr"]
   group_bys: ["metric_time"]
   check_query: |
@@ -96,7 +93,6 @@ integration_test:
   description: |
     Tests querying a metric with a measure constraint on a local dimension
   model: SIMPLE_MODEL
-  required_features: ["FULL_OUTER_JOIN"]
   metrics: ["instant_booking_value_ratio"]
   group_bys: ["metric_time"]
   check_query: |
@@ -125,7 +121,6 @@ integration_test:
   description: |
     Tests querying a metric with measure constraints on semi-additive input measures
   model: SIMPLE_MODEL
-  required_features: ["FULL_OUTER_JOIN"]
   metrics: ["regional_starting_balance_ratios"]
   group_bys: ["metric_time"]
   check_query: |

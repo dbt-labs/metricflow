@@ -45,12 +45,6 @@ class DatabricksEngineAttributes:
     sql_engine_type: ClassVar[SqlEngine] = SqlEngine.DATABRICKS
 
     # SQL Engine capabilities
-    date_trunc_supported: ClassVar[bool] = True
-    full_outer_joins_supported: ClassVar[bool] = True
-    indexes_supported: ClassVar[bool] = False
-    multi_threading_supported: ClassVar[bool] = True
-    timestamp_type_supported: ClassVar[bool] = True
-    timestamp_to_string_comparison_supported: ClassVar[bool] = True
     continuous_percentile_aggregation_supported: ClassVar[bool] = True
     discrete_percentile_aggregation_supported: ClassVar[bool] = False
     approximate_continuous_percentile_aggregation_supported: ClassVar[bool] = False
@@ -59,7 +53,6 @@ class DatabricksEngineAttributes:
     # SQL Dialect replacement strings
     double_data_type_name: ClassVar[str] = "DOUBLE"
     timestamp_type_name: ClassVar[Optional[str]] = "TIMESTAMP"
-    random_function_name: ClassVar[str] = "RANDOM"
     # MetricFlow attributes
     sql_query_plan_renderer: ClassVar[SqlQueryPlanRenderer] = DatabricksSqlQueryPlanRenderer()
 

@@ -30,12 +30,6 @@ class BigQueryEngineAttributes:
     sql_engine_type: ClassVar[SqlEngine] = SqlEngine.BIGQUERY
 
     # SQL Engine capabilities
-    date_trunc_supported: ClassVar[bool] = True
-    full_outer_joins_supported: ClassVar[bool] = True
-    indexes_supported: ClassVar[bool] = False
-    multi_threading_supported: ClassVar[bool] = True
-    timestamp_type_supported: ClassVar[bool] = True
-    timestamp_to_string_comparison_supported: ClassVar[bool] = False
     continuous_percentile_aggregation_supported: ClassVar[bool] = False
     discrete_percentile_aggregation_supported: ClassVar[bool] = False
     approximate_continuous_percentile_aggregation_supported: ClassVar[bool] = True
@@ -44,7 +38,6 @@ class BigQueryEngineAttributes:
     # SQL Dialect replacement strings
     double_data_type_name: ClassVar[str] = "FLOAT64"
     timestamp_type_name: ClassVar[Optional[str]] = "DATETIME"
-    random_function_name: ClassVar[str] = "RAND"
 
     # MetricFlow attributes
     sql_query_plan_renderer: ClassVar[SqlQueryPlanRenderer] = BigQuerySqlQueryPlanRenderer()

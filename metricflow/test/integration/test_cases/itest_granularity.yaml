@@ -3,7 +3,6 @@ integration_test:
   name: query_granularity_for_sum_day
   description: Query a sum metric by time granularities.
   model: EXTENDED_DATE_MODEL
-  required_features: ["DATE_TRUNC"]
   metrics: ["bookings"]
   group_bys: ["metric_time__day"]
   check_query: |
@@ -18,7 +17,6 @@ integration_test:
   name: query_granularity_for_sum_week
   description: Query a sum metric by time granularities.
   model: EXTENDED_DATE_MODEL
-  required_features: ["DATE_TRUNC"]
   metrics: ["bookings"]
   group_bys: ["metric_time__week"]
   check_query: |
@@ -33,7 +31,6 @@ integration_test:
   name: query_granularity_for_sum_month
   description: Query a sum metric by time granularities.
   model: EXTENDED_DATE_MODEL
-  required_features: ["DATE_TRUNC"]
   metrics: ["bookings"]
   group_bys: ["metric_time__month"]
   check_query: |
@@ -48,7 +45,6 @@ integration_test:
   name: query_granularity_for_sum_quarter
   description: Query a sum metric by time granularities.
   model: EXTENDED_DATE_MODEL
-  required_features: ["DATE_TRUNC"]
   metrics: ["bookings"]
   group_bys: ["metric_time__quarter"]
   check_query: |
@@ -63,7 +59,6 @@ integration_test:
   name: query_granularity_for_sum_year
   description: Query a sum metric by time granularities.
   model: EXTENDED_DATE_MODEL
-  required_features: ["DATE_TRUNC"]
   metrics: ["bookings"]
   group_bys: ["metric_time__year"]
   check_query: |
@@ -78,7 +73,6 @@ integration_test:
   name: query_granularity_for_count_distinct_day
   description: Query a count distinct metric by time granularities.
   model: EXTENDED_DATE_MODEL
-  required_features: ["DATE_TRUNC"]
   metrics: ["unique_listings_booked"]
   group_bys: ["metric_time__day"]
   check_query: |
@@ -93,7 +87,6 @@ integration_test:
   name: query_granularity_for_count_distinct_week
   description: Query a count distinct metric by time granularities.
   model: EXTENDED_DATE_MODEL
-  required_features: ["DATE_TRUNC"]
   metrics: ["unique_listings_booked"]
   group_bys: ["metric_time__week"]
   check_query: |
@@ -108,7 +101,6 @@ integration_test:
   name: query_granularity_for_count_distinct_month
   description: Query a count distinct metric by time granularities.
   model: EXTENDED_DATE_MODEL
-  required_features: ["DATE_TRUNC"]
   metrics: ["unique_listings_booked"]
   group_bys: ["metric_time__month"]
   check_query: |
@@ -123,7 +115,6 @@ integration_test:
   name: query_granularity_for_count_distinct_quarter
   description: Query a count distinct metric by time granularities.
   model: EXTENDED_DATE_MODEL
-  required_features: ["DATE_TRUNC"]
   metrics: ["unique_listings_booked"]
   group_bys: ["metric_time__quarter"]
   check_query: |
@@ -138,7 +129,6 @@ integration_test:
   name: query_granularity_for_count_distinct_year
   description: Query a count distinct metric by time granularities.
   model: EXTENDED_DATE_MODEL
-  required_features: ["DATE_TRUNC"]
   metrics: ["unique_listings_booked"]
   group_bys: ["metric_time__year"]
   check_query: |
@@ -153,7 +143,6 @@ integration_test:
   name: query_granularity_for_joined_dundered_dimension_day
   description: Query a count distinct metric by time granularities.
   model: EXTENDED_DATE_MODEL
-  required_features: ["DATE_TRUNC"]
   metrics: ["bookings"]
   group_bys: ["listing_id__listing_creation_ds__day"]
   check_query: |
@@ -170,7 +159,6 @@ integration_test:
   name: query_granularity_for_joined_dundered_dimension_month
   description: Query a count distinct metric by time granularities.
   model: EXTENDED_DATE_MODEL
-  required_features: ["DATE_TRUNC"]
   metrics: ["bookings"]
   group_bys: ["listing_id__listing_creation_ds__month"]
   check_query: |
@@ -187,7 +175,6 @@ integration_test:
   name: query_granularity_from_sql_query
   description: Query a metric from a sql query by time granularities.
   model: EXTENDED_DATE_MODEL
-  required_features: ["DATE_TRUNC"]
   metrics: ["bookings_from_sql_query"]
   group_bys: ["metric_time__week"]
   check_query: |
@@ -234,7 +221,6 @@ integration_test:
   name: weekly_metric_on_non_boundaries
   description: Query a metric from a sql query by time granularities.
   model: EXTENDED_DATE_MODEL
-  required_features: ["DATE_TRUNC"]
   metrics: ["bookings"]
   group_bys: ["metric_time__week"]
   time_constraint: ["2020-01-15", "2020-01-22"]
@@ -251,7 +237,6 @@ integration_test:
   name: daily_metric_with_monthly_time_dimension
   description: Query a metric with a month-granularity time dimensions.
   model: EXTENDED_DATE_MODEL
-  required_features: ["DATE_TRUNC"]
   metrics: ["bookings"]
   group_bys: ["metric_time__month"]
   time_constraint: ["2020-01-01", "2020-01-02"]
@@ -268,7 +253,6 @@ integration_test:
   name: metrics_with_different_time_granularities
   description: Query two metrics with different time granularities.
   model: EXTENDED_DATE_MODEL
-  required_features: ["FULL_OUTER_JOIN", "DATE_TRUNC"]
   metrics: ["bookings_monthly", "bookings"]
   group_bys: ["metric_time"]
   time_constraint: ["2020-01-01", "2020-02-29"]
@@ -309,7 +293,6 @@ integration_test:
   name: metrics_with_different_time_granularities_and_no_time_dim
   description: Query two metrics with different time granularities, but without a time dimension.
   model: EXTENDED_DATE_MODEL
-  required_features: ["FULL_OUTER_JOIN"]
   metrics: ["bookings_monthly", "bookings"]
   group_bys: ["is_instant"]
   time_constraint: ["2020-01-15", "2020-02-15"]
