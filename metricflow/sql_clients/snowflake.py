@@ -7,7 +7,7 @@ import threading
 import urllib.parse
 from collections import OrderedDict
 from contextlib import contextmanager
-from typing import Any, ClassVar, Dict, Iterator, List, Optional, Sequence, Set, Tuple
+from typing import ClassVar, Dict, Iterator, Optional, Sequence, Set
 
 import pandas as pd
 import sqlalchemy
@@ -256,19 +256,6 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
 
         # Lower casing table names to be similar to other SQL clients. TBD on the implications of this.
         return [t.lower() for t in df["table_name"]]
-
-    def generate_health_check_tests(self, schema_name: str) -> List[Tuple[str, Any]]:  # type: ignore # noqa: D
-        additional_tests = [
-            (
-                "Connection State",
-                lambda: str(
-                    self.query(
-                        "SELECT CURRENT_USER(), CURRENT_ROLE(), CURRENT_DATABASE(), CURRENT_WAREHOUSE(), CURRENT_SCHEMA();"
-                    )
-                ),
-            )
-        ]
-        return super().generate_health_check_tests(schema_name=schema_name) + additional_tests
 
     def close(self) -> None:
         """Snowflake will hang pytest if this is not done."""

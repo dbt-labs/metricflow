@@ -140,10 +140,6 @@ def example_df() -> pd.DataFrame:
     )
 
 
-def test_health_checks(mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient) -> None:  # noqa: D
-    sql_client.health_checks(schema_name=mf_test_session_state.mf_system_schema)
-
-
 def test_dry_run(mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient) -> None:  # noqa: D
     test_table = SqlTable(schema_name=mf_test_session_state.mf_system_schema, table_name=_random_table())
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from enum import Enum
-from typing import ClassVar, Dict, Optional, Protocol, Sequence
+from typing import ClassVar, Optional, Protocol, Sequence
 
 from pandas import DataFrame
 
@@ -124,23 +124,6 @@ class SqlClient(Protocol):
     @abstractmethod
     def drop_schema(self, schema_name: str, cascade: bool) -> None:  # noqa: D
         """Drop the given schema if it exists. If cascade is set, drop the tables in the schema first."""
-        raise NotImplementedError
-
-    @abstractmethod
-    def health_checks(self, schema_name: str) -> Dict[str, Dict[str, str]]:
-        """Run health checks against the underlying Data Warehouse.
-
-        TODO: Consider restructuring this so the health checks are separate from the SqlClient
-        TODO: Re-evaluate the return type to see if there's a more structured option available
-
-        This method fires a bunch of queries and collects results inside of a flexible output object for
-        later processing. This method has been ported over to the SqlClient Protocol from the original
-        closed-source client classes. It was included there because certain health checks are warehouse-specific,
-        e.g., there are checks to verify that specific session values are properly configured for Snowflake
-        instances, and migrating to a new model will be quite messy in the short term. Longer term it likely
-        makes sense for these to be in a separate module, but for the time being the CLI will invoke health
-        checks and therefore this needs to remain part of the core Protocol.
-        """
         raise NotImplementedError
 
     @abstractmethod

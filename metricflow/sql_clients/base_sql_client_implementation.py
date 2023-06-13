@@ -4,7 +4,7 @@ import logging
 import textwrap
 import time
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Optional
 
 import jinja2
 import pandas as pd
@@ -32,47 +32,6 @@ class SqlClientException(Exception):
 
 class BaseSqlClientImplementation(ABC, SqlClient):
     """Abstract implementation that other SQL clients are based on."""
-
-    def generate_health_check_tests(self, schema_name: str) -> List[Tuple[str, Any]]:  # type: ignore
-        """List of base health checks we want to perform."""
-        table_name = "health_report"
-        return [
-            ("SELECT 1", lambda: self.execute("SELECT 1")),
-            (f"Create schema '{schema_name}'", lambda: self.create_schema(schema_name)),
-            (
-                f"Create table '{schema_name}.{table_name}' with a SELECT",
-                lambda: self.create_table_as_select(
-                    SqlTable(schema_name=schema_name, table_name="health_report"), "SELECT 'test' AS test_col"
-                ),
-            ),
-            (
-                f"Drop table '{schema_name}.{table_name}'",
-                lambda: self.drop_table(SqlTable(schema_name=schema_name, table_name="health_report")),
-            ),
-        ]
-
-    def health_checks(self, schema_name: str) -> Dict[str, Dict[str, str]]:
-        """Perform health checks."""
-        checks_to_run = self.generate_health_check_tests(schema_name)
-        results: Dict[str, Dict[str, str]] = {}
-
-        for step, check in checks_to_run:
-            status = "SUCCESS"
-            err_string = ""
-            try:
-                resp = check()
-                logger.info(f"Health Check Item {step}: succeeded" + f" with response {str(resp)}" if resp else None)
-            except Exception as e:
-                status = "FAIL"
-                err_string = str(e)
-                logger.error(f"Health Check Item {step}: failed with error {err_string}")
-
-            results[f"{type(self).__name__.lower()} - {step}"] = {
-                "status": status,
-                "error_message": err_string,
-            }
-
-        return results
 
     @staticmethod
     def _format_run_query_log_message(statement: str, sql_bind_parameters: SqlBindParameters) -> str:
