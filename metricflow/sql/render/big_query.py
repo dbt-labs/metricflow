@@ -3,6 +3,7 @@ from __future__ import annotations
 from fractions import Fraction
 
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from typing_extensions import override
 
 from metricflow.errors.errors import UnsupportedEngineFeatureError
 from metricflow.sql.render.expr_renderer import (
@@ -27,9 +28,21 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
     """Expression renderer for the BigQuery engine."""
 
     @property
+    @override
     def double_data_type(self) -> str:
         """Custom double data type for BigQuery engine."""
         return "FLOAT64"
+
+    @property
+    @override
+    def timestamp_data_type(self) -> str:
+        """Custom timestamp type override for use in BigQuery.
+
+        We use DATETIME for BigQuery because it is time zone agnostic, which more closely matches the
+        runtime behavior of the TIMESTAMP types as used in other engines. This, however, is a choice we
+        may need to re-examine in the future.
+        """
+        return "DATETIME"
 
     def render_group_by_expr(self, group_by_column: SqlSelectColumn) -> SqlExpressionRenderResult:
         """Custom rendering of group by column expressions.
@@ -75,7 +88,7 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
         """Casts the time value expression to DATETIME, as per standard BigQuery preferences."""
         arg_rendered = self.render_sql_expr(node.arg)
         return SqlExpressionRenderResult(
-            sql=f"CAST({arg_rendered.sql} AS DATETIME)",
+            sql=f"CAST({arg_rendered.sql} AS {self.timestamp_data_type})",
             bind_parameters=arg_rendered.bind_parameters,
         )
 
@@ -106,7 +119,7 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
             )
 
         return SqlExpressionRenderResult(
-            sql=f"DATE_SUB(CAST({column.sql} AS DATETIME), INTERVAL {node.count} {node.granularity.value})",
+            sql=f"DATE_SUB(CAST({column.sql} AS {self.timestamp_data_type}), INTERVAL {node.count} {node.granularity.value})",
             bind_parameters=column.bind_parameters,
         )
 

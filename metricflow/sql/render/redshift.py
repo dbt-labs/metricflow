@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
+from typing_extensions import override
 
 from metricflow.errors.errors import UnsupportedEngineFeatureError
 from metricflow.sql.render.expr_renderer import (
@@ -17,6 +18,7 @@ class RedshiftSqlExpressionRenderer(DefaultSqlExpressionRenderer):
     """Expression renderer for the Redshift engine."""
 
     @property
+    @override
     def double_data_type(self) -> str:
         """Custom double data type for the Redshift engine."""
         return "DOUBLE PRECISION"

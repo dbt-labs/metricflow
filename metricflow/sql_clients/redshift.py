@@ -28,10 +28,6 @@ class RedshiftEngineAttributes:
     approximate_continuous_percentile_aggregation_supported: ClassVar[bool] = False
     approximate_discrete_percentile_aggregation_supported: ClassVar[bool] = True
 
-    # SQL Dialect replacement strings
-    double_data_type_name: ClassVar[str] = "DOUBLE PRECISION"
-    timestamp_type_name: ClassVar[Optional[str]] = "TIMESTAMP"
-
     # MetricFlow attributes
     sql_query_plan_renderer: ClassVar[SqlQueryPlanRenderer] = RedshiftSqlQueryPlanRenderer()
 

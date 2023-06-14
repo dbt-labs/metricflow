@@ -139,10 +139,5 @@ class SqlEngineAttributes(Protocol):
     approximate_continuous_percentile_aggregation_supported: ClassVar[bool]
     approximate_discrete_percentile_aggregation_supported: ClassVar[bool]
 
-    # SQL Dialect replacement strings
-    # TODO: Move these to rendering classes
-    double_data_type_name: ClassVar[str]
-    timestamp_type_name: ClassVar[Optional[str]]
-
     # MetricFlow attributes
     sql_query_plan_renderer: ClassVar[SqlQueryPlanRenderer]

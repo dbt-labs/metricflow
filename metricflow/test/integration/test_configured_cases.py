@@ -66,7 +66,7 @@ class CheckQueryHelpers:
 
     def cast_expr_to_ts(self, expr: str) -> str:
         """Returns the expression as a new expression cast to the timestamp type, if applicable for the DB."""
-        return f"CAST({expr} AS {self._sql_client.sql_engine_attributes.timestamp_type_name})"
+        return f"CAST({expr} AS {self._sql_client.sql_engine_attributes.sql_query_plan_renderer.expr_renderer.timestamp_data_type})"
 
     def cast_to_ts(self, string_literal: str) -> str:
         """Similar to cast_expr_to_ts, but assumes the input string is to be converted into a string literal."""
@@ -128,7 +128,7 @@ class CheckQueryHelpers:
     @property
     def double_data_type_name(self) -> str:
         """Return the name of the double data type for the relevant SQL engine."""
-        return self._sql_client.sql_engine_attributes.double_data_type_name
+        return self._sql_client.sql_engine_attributes.sql_query_plan_renderer.expr_renderer.double_data_type
 
     def render_dimension_template(self, dimension_name: str, entity_path: Sequence[str] = ()) -> str:
         """Renders a template that can be used to retrieve a dimension.

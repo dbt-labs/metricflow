@@ -35,10 +35,6 @@ class BigQueryEngineAttributes:
     approximate_continuous_percentile_aggregation_supported: ClassVar[bool] = True
     approximate_discrete_percentile_aggregation_supported: ClassVar[bool] = False
 
-    # SQL Dialect replacement strings
-    double_data_type_name: ClassVar[str] = "FLOAT64"
-    timestamp_type_name: ClassVar[Optional[str]] = "DATETIME"
-
     # MetricFlow attributes
     sql_query_plan_renderer: ClassVar[SqlQueryPlanRenderer] = BigQuerySqlQueryPlanRenderer()
 

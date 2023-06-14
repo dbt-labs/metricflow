@@ -2,13 +2,14 @@ from __future__ import annotations
 
 import logging
 import textwrap
-from abc import ABC
+from abc import ABC, abstractmethod
 from collections import namedtuple
 from dataclasses import dataclass
 from typing import List
 
 import jinja2
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from typing_extensions import override
 
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_exprs import (
@@ -62,16 +63,30 @@ class SqlExpressionRenderer(SqlExpressionNodeVisitor[SqlExpressionRenderResult],
         return self.render_sql_expr(sql_expr=group_by_column.expr)
 
     @property
+    @abstractmethod
     def double_data_type(self) -> str:
-        """Property for the double data type, for engine-specific type casting.
+        """Property for the double data type, for engine-specific type casting."""
+        raise NotImplementedError
 
-        TODO: Eliminate this in favor of some kind of engine properties struct
-        """
-        return "DOUBLE"
+    @property
+    @abstractmethod
+    def timestamp_data_type(self) -> str:
+        """Property for the timestamp data type, for engine-specific type casting."""
+        raise NotImplementedError
 
 
 class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
     """Renders the SQL query plan assuming ANSI SQL."""
+
+    @property
+    @override
+    def double_data_type(self) -> str:
+        return "DOUBLE"
+
+    @property
+    @override
+    def timestamp_data_type(self) -> str:
+        return "TIMESTAMP"
 
     def visit_string_expr(self, node: SqlStringExpression) -> SqlExpressionRenderResult:  # noqa: D
         """Renders an arbitrary string expression like 1+1=2."""
@@ -224,7 +239,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
     def visit_cast_to_timestamp_expr(self, node: SqlCastToTimestampExpression) -> SqlExpressionRenderResult:  # noqa: D
         arg_rendered = self.render_sql_expr(node.arg)
         return SqlExpressionRenderResult(
-            sql=f"CAST({arg_rendered.sql} AS TIMESTAMP)",
+            sql=f"CAST({arg_rendered.sql} AS {self.timestamp_data_type})",
             bind_parameters=arg_rendered.bind_parameters,
         )
 
