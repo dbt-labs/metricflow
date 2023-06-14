@@ -23,6 +23,7 @@ class DatabricksSqlExpressionRenderer(DefaultSqlExpressionRenderer):
     def supported_percentile_function_types(self) -> Collection[SqlPercentileFunctionType]:
         return {SqlPercentileFunctionType.CONTINUOUS, SqlPercentileFunctionType.APPROXIMATE_DISCRETE}
 
+    @override
     def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:
         """Render a percentile expression for Databricks."""
         arg_rendered = self.render_sql_expr(node.order_by_arg)
@@ -62,5 +63,6 @@ class DatabricksSqlQueryPlanRenderer(DefaultSqlQueryPlanRenderer):
     EXPR_RENDERER = DatabricksSqlExpressionRenderer()
 
     @property
-    def expr_renderer(self) -> SqlExpressionRenderer:  # noqa :D
+    @override
+    def expr_renderer(self) -> SqlExpressionRenderer:
         return self.EXPR_RENDERER

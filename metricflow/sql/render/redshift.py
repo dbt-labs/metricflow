@@ -30,6 +30,7 @@ class RedshiftSqlExpressionRenderer(DefaultSqlExpressionRenderer):
     def supported_percentile_function_types(self) -> Collection[SqlPercentileFunctionType]:
         return {SqlPercentileFunctionType.CONTINUOUS, SqlPercentileFunctionType.APPROXIMATE_DISCRETE}
 
+    @override
     def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:
         """Render a percentile expression for Redshift."""
         arg_rendered = self.render_sql_expr(node.order_by_arg)
@@ -58,7 +59,8 @@ class RedshiftSqlExpressionRenderer(DefaultSqlExpressionRenderer):
             bind_parameters=params,
         )
 
-    def visit_generate_uuid_expr(self, node: SqlGenerateUuidExpression) -> SqlExpressionRenderResult:  # noqa: D
+    @override
+    def visit_generate_uuid_expr(self, node: SqlGenerateUuidExpression) -> SqlExpressionRenderResult:
         """Generates a "good enough" random key to simulate a UUID.
 
         NOTE: This is a temporary hacky solution as redshift does not have any UUID generation function.
@@ -78,5 +80,6 @@ class RedshiftSqlQueryPlanRenderer(DefaultSqlQueryPlanRenderer):
     EXPR_RENDERER = RedshiftSqlExpressionRenderer()
 
     @property
-    def expr_renderer(self) -> SqlExpressionRenderer:  # noqa :D
+    @override
+    def expr_renderer(self) -> SqlExpressionRenderer:
         return self.EXPR_RENDERER

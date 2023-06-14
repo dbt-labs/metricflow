@@ -28,12 +28,14 @@ class SnowflakeSqlExpressionRenderer(DefaultSqlExpressionRenderer):
             SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS,
         }
 
-    def visit_generate_uuid_expr(self, node: SqlGenerateUuidExpression) -> SqlExpressionRenderResult:  # noqa: D
+    @override
+    def visit_generate_uuid_expr(self, node: SqlGenerateUuidExpression) -> SqlExpressionRenderResult:
         return SqlExpressionRenderResult(
             sql="UUID_STRING()",
             bind_parameters=SqlBindParameters(),
         )
 
+    @override
     def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:
         """Render a percentile expression for Snowflake."""
         arg_rendered = self.render_sql_expr(node.order_by_arg)
@@ -69,5 +71,6 @@ class SnowflakeSqlQueryPlanRenderer(DefaultSqlQueryPlanRenderer):
     EXPR_RENDERER = SnowflakeSqlExpressionRenderer()
 
     @property
-    def expr_renderer(self) -> SqlExpressionRenderer:  # noqa :D
+    @override
+    def expr_renderer(self) -> SqlExpressionRenderer:
         return self.EXPR_RENDERER

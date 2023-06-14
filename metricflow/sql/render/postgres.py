@@ -36,7 +36,9 @@ class PostgresSqlExpressionRenderer(DefaultSqlExpressionRenderer):
     def supported_percentile_function_types(self) -> Collection[SqlPercentileFunctionType]:
         return {SqlPercentileFunctionType.CONTINUOUS, SqlPercentileFunctionType.DISCRETE}
 
-    def visit_time_delta_expr(self, node: SqlTimeDeltaExpression) -> SqlExpressionRenderResult:  # noqa: D
+    @override
+    def visit_time_delta_expr(self, node: SqlTimeDeltaExpression) -> SqlExpressionRenderResult:
+        """Render time delta operations for PostgreSQL, which needs custom support for quarterly granularity."""
         arg_rendered = node.arg.accept(self)
         if node.grain_to_date:
             return SqlExpressionRenderResult(
@@ -54,12 +56,14 @@ class PostgresSqlExpressionRenderer(DefaultSqlExpressionRenderer):
             bind_parameters=arg_rendered.bind_parameters,
         )
 
-    def visit_generate_uuid_expr(self, node: SqlGenerateUuidExpression) -> SqlExpressionRenderResult:  # noqa: D
+    @override
+    def visit_generate_uuid_expr(self, node: SqlGenerateUuidExpression) -> SqlExpressionRenderResult:
         return SqlExpressionRenderResult(
             sql="GEN_RANDOM_UUID()",
             bind_parameters=SqlBindParameters(),
         )
 
+    @override
     def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:
         """Render a percentile expression for Postgres."""
         arg_rendered = self.render_sql_expr(node.order_by_arg)
@@ -95,5 +99,6 @@ class PostgresSQLSqlQueryPlanRenderer(DefaultSqlQueryPlanRenderer):
     EXPR_RENDERER = PostgresSqlExpressionRenderer()
 
     @property
-    def expr_renderer(self) -> SqlExpressionRenderer:  # noqa :D
+    @override
+    def expr_renderer(self) -> SqlExpressionRenderer:
         return self.EXPR_RENDERER
