@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Collection
+
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
@@ -28,6 +30,11 @@ class PostgresSqlExpressionRenderer(DefaultSqlExpressionRenderer):
     def double_data_type(self) -> str:
         """Custom double data type for the PostgreSQL engine."""
         return "DOUBLE PRECISION"
+
+    @property
+    @override
+    def supported_percentile_function_types(self) -> Collection[SqlPercentileFunctionType]:
+        return {SqlPercentileFunctionType.CONTINUOUS, SqlPercentileFunctionType.DISCRETE}
 
     def visit_time_delta_expr(self, node: SqlTimeDeltaExpression) -> SqlExpressionRenderResult:  # noqa: D
         arg_rendered = node.arg.accept(self)

@@ -133,11 +133,5 @@ class SqlEngineAttributes(Protocol):
 
     sql_engine_type: ClassVar[SqlEngine]
 
-    # SQL Engine capabilities
-    continuous_percentile_aggregation_supported: ClassVar[bool]
-    discrete_percentile_aggregation_supported: ClassVar[bool]
-    approximate_continuous_percentile_aggregation_supported: ClassVar[bool]
-    approximate_discrete_percentile_aggregation_supported: ClassVar[bool]
-
     # MetricFlow attributes
     sql_query_plan_renderer: ClassVar[SqlQueryPlanRenderer]

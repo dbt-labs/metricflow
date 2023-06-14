@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Collection
+
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from typing_extensions import override
 
@@ -22,6 +24,11 @@ class RedshiftSqlExpressionRenderer(DefaultSqlExpressionRenderer):
     def double_data_type(self) -> str:
         """Custom double data type for the Redshift engine."""
         return "DOUBLE PRECISION"
+
+    @property
+    @override
+    def supported_percentile_function_types(self) -> Collection[SqlPercentileFunctionType]:
+        return {SqlPercentileFunctionType.CONTINUOUS, SqlPercentileFunctionType.APPROXIMATE_DISCRETE}
 
     def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:
         """Render a percentile expression for Redshift."""

@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from fractions import Fraction
+from typing import Collection
 
+from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
 
@@ -44,6 +46,11 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
         """
         return "DATETIME"
 
+    @property
+    @override
+    def supported_percentile_function_types(self) -> Collection[SqlPercentileFunctionType]:
+        return {SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS}
+
     def render_group_by_expr(self, group_by_column: SqlSelectColumn) -> SqlExpressionRenderResult:
         """Custom rendering of group by column expressions.
 
@@ -79,10 +86,17 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
                 sql=f"APPROX_QUANTILES({arg_rendered.sql}, {fraction.denominator})[OFFSET({fraction.numerator})]",
                 bind_parameters=params,
             )
-        raise UnsupportedEngineFeatureError(
-            "Only approximate continous percentile aggregations are supported for BigQuery. Set "
-            + "use_approximate_percentile and disable use_discrete_percentile in all percentile measures."
-        )
+        elif (
+            node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_DISCRETE
+            or node.percentile_args.function_type is SqlPercentileFunctionType.CONTINUOUS
+            or node.percentile_args.function_type is SqlPercentileFunctionType.DISCRETE
+        ):
+            raise UnsupportedEngineFeatureError(
+                "Only approximate continous percentile aggregations are supported for BigQuery. Set "
+                + "use_approximate_percentile and disable use_discrete_percentile in all percentile measures."
+            )
+        else:
+            assert_values_exhausted(node.percentile_args.function_type)
 
     def visit_cast_to_timestamp_expr(self, node: SqlCastToTimestampExpression) -> SqlExpressionRenderResult:
         """Casts the time value expression to DATETIME, as per standard BigQuery preferences."""

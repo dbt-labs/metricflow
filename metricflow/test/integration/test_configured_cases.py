@@ -26,6 +26,7 @@ from metricflow.sql.sql_exprs import (
     SqlDateTruncExpression,
     SqlPercentileExpression,
     SqlPercentileExpressionArgument,
+    SqlPercentileFunctionType,
     SqlStringExpression,
     SqlTimeDeltaExpression,
 )
@@ -166,16 +167,24 @@ def filter_not_supported_features(
     not_supported_features: List[RequiredDwEngineFeatures] = []
     for required_feature in required_features:
         if required_feature is RequiredDwEngineFeatures.CONTINUOUS_PERCENTILE_AGGREGATION:
-            if not sql_client.sql_engine_attributes.continuous_percentile_aggregation_supported:
+            if not sql_client.sql_engine_attributes.sql_query_plan_renderer.expr_renderer.can_render_percentile_function(
+                SqlPercentileFunctionType.CONTINUOUS
+            ):
                 not_supported_features.append(required_feature)
         elif required_feature is RequiredDwEngineFeatures.DISCRETE_PERCENTILE_AGGREGATION:
-            if not sql_client.sql_engine_attributes.discrete_percentile_aggregation_supported:
+            if not sql_client.sql_engine_attributes.sql_query_plan_renderer.expr_renderer.can_render_percentile_function(
+                SqlPercentileFunctionType.DISCRETE
+            ):
                 not_supported_features.append(required_feature)
         elif required_feature is RequiredDwEngineFeatures.APPROXIMATE_CONTINUOUS_PERCENTILE_AGGREGATION:
-            if not sql_client.sql_engine_attributes.approximate_continuous_percentile_aggregation_supported:
+            if not sql_client.sql_engine_attributes.sql_query_plan_renderer.expr_renderer.can_render_percentile_function(
+                SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS
+            ):
                 not_supported_features.append(required_feature)
         elif required_feature is RequiredDwEngineFeatures.APPROXIMATE_DISCRETE_PERCENTILE_AGGREGATION:
-            if not sql_client.sql_engine_attributes.approximate_discrete_percentile_aggregation_supported:
+            if not sql_client.sql_engine_attributes.sql_query_plan_renderer.expr_renderer.can_render_percentile_function(
+                SqlPercentileFunctionType.APPROXIMATE_DISCRETE
+            ):
                 not_supported_features.append(required_feature)
         else:
             assert_values_exhausted(required_feature)

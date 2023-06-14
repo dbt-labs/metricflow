@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+from typing import Collection
+
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
+from typing_extensions import override
 
 from metricflow.errors.errors import UnsupportedEngineFeatureError
 from metricflow.sql.render.expr_renderer import (
@@ -14,6 +17,11 @@ from metricflow.sql.sql_exprs import SqlPercentileExpression, SqlPercentileFunct
 
 class DatabricksSqlExpressionRenderer(DefaultSqlExpressionRenderer):
     """Expression renderer for the Databricks engine."""
+
+    @property
+    @override
+    def supported_percentile_function_types(self) -> Collection[SqlPercentileFunctionType]:
+        return {SqlPercentileFunctionType.CONTINUOUS, SqlPercentileFunctionType.APPROXIMATE_DISCRETE}
 
     def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:
         """Render a percentile expression for Databricks."""

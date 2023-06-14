@@ -29,12 +29,6 @@ class BigQueryEngineAttributes:
 
     sql_engine_type: ClassVar[SqlEngine] = SqlEngine.BIGQUERY
 
-    # SQL Engine capabilities
-    continuous_percentile_aggregation_supported: ClassVar[bool] = False
-    discrete_percentile_aggregation_supported: ClassVar[bool] = False
-    approximate_continuous_percentile_aggregation_supported: ClassVar[bool] = True
-    approximate_discrete_percentile_aggregation_supported: ClassVar[bool] = False
-
     # MetricFlow attributes
     sql_query_plan_renderer: ClassVar[SqlQueryPlanRenderer] = BigQuerySqlQueryPlanRenderer()
 

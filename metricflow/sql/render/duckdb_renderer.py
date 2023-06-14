@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+from typing import Collection
+
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from typing_extensions import override
 
 from metricflow.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,
@@ -20,6 +23,15 @@ from metricflow.sql.sql_exprs import (
 
 class DuckDbSqlExpressionRenderer(DefaultSqlExpressionRenderer):
     """Expression renderer for the DuckDB engine."""
+
+    @property
+    @override
+    def supported_percentile_function_types(self) -> Collection[SqlPercentileFunctionType]:
+        return {
+            SqlPercentileFunctionType.CONTINUOUS,
+            SqlPercentileFunctionType.DISCRETE,
+            SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS,
+        }
 
     def visit_time_delta_expr(self, node: SqlTimeDeltaExpression) -> SqlExpressionRenderResult:  # noqa: D
         arg_rendered = node.arg.accept(self)

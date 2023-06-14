@@ -5,7 +5,7 @@ import textwrap
 from abc import ABC, abstractmethod
 from collections import namedtuple
 from dataclasses import dataclass
-from typing import List
+from typing import Collection, List
 
 import jinja2
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
@@ -28,6 +28,7 @@ from metricflow.sql.sql_exprs import (
     SqlLogicalExpression,
     SqlNullExpression,
     SqlPercentileExpression,
+    SqlPercentileFunctionType,
     SqlRatioComputationExpression,
     SqlStringExpression,
     SqlStringLiteralExpression,
@@ -74,6 +75,16 @@ class SqlExpressionRenderer(SqlExpressionNodeVisitor[SqlExpressionRenderResult],
         """Property for the timestamp data type, for engine-specific type casting."""
         raise NotImplementedError
 
+    @property
+    @abstractmethod
+    def supported_percentile_function_types(self) -> Collection[SqlPercentileFunctionType]:
+        """Returns the sequence of supported percentile function types for the implementing renderer."""
+        raise NotImplementedError
+
+    def can_render_percentile_function(self, percentile_type: SqlPercentileFunctionType) -> bool:
+        """Whether or not this SQL renderer supports rendering the particular percentile function type."""
+        return percentile_type in self.supported_percentile_function_types
+
 
 class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
     """Renders the SQL query plan assuming ANSI SQL."""
@@ -87,6 +98,11 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
     @override
     def timestamp_data_type(self) -> str:
         return "TIMESTAMP"
+
+    @property
+    @override
+    def supported_percentile_function_types(self) -> Collection[SqlPercentileFunctionType]:
+        return {}
 
     def visit_string_expr(self, node: SqlStringExpression) -> SqlExpressionRenderResult:  # noqa: D
         """Renders an arbitrary string expression like 1+1=2."""

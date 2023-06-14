@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+from typing import Collection
+
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
+from typing_extensions import override
 
 from metricflow.errors.errors import UnsupportedEngineFeatureError
 from metricflow.sql.render.expr_renderer import (
@@ -15,6 +18,15 @@ from metricflow.sql.sql_exprs import SqlGenerateUuidExpression, SqlPercentileExp
 
 class SnowflakeSqlExpressionRenderer(DefaultSqlExpressionRenderer):
     """Expression renderer for the Snowflake engine."""
+
+    @property
+    @override
+    def supported_percentile_function_types(self) -> Collection[SqlPercentileFunctionType]:
+        return {
+            SqlPercentileFunctionType.CONTINUOUS,
+            SqlPercentileFunctionType.DISCRETE,
+            SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS,
+        }
 
     def visit_generate_uuid_expr(self, node: SqlGenerateUuidExpression) -> SqlExpressionRenderResult:  # noqa: D
         return SqlExpressionRenderResult(
