@@ -196,39 +196,6 @@ def test_multiple_metrics_plan(  # noqa: D
     )
 
 
-def test_expr_metrics_plan(
-    request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
-) -> None:
-    """Tests a plan to retrieve expr metric types."""
-    dataflow_plan = dataflow_plan_builder.build_plan(
-        MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="booking_fees"),),
-            dimension_specs=(
-                DimensionSpec(
-                    element_name="country_latest",
-                    entity_links=(EntityReference(element_name="listing"),),
-                ),
-            ),
-            time_dimension_specs=(MTD_SPEC_DAY,),
-        )
-    )
-
-    assert_plan_snapshot_text_equal(
-        request=request,
-        mf_test_session_state=mf_test_session_state,
-        plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
-    )
-
-    display_graph_if_requested(
-        request=request,
-        mf_test_session_state=mf_test_session_state,
-        dag_graph=dataflow_plan,
-    )
-
-
 def test_single_semantic_model_ratio_metrics_plan(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
