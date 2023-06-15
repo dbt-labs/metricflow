@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Optional, Sequence
 
 from dbt_semantic_interfaces.protocols.dimension import (
     Dimension as SemanticManifestDimension,
@@ -15,6 +15,7 @@ from dbt_semantic_interfaces.protocols.metadata import Metadata
 from dbt_semantic_interfaces.protocols.metric import Metric as SemanticManifestMetric
 from dbt_semantic_interfaces.protocols.metric import MetricInputMeasure, MetricType, MetricTypeParams
 from dbt_semantic_interfaces.protocols.where_filter import WhereFilter
+from dbt_semantic_interfaces.transformations.add_input_metric_measures import AddInputMetricMeasuresRule
 from dbt_semantic_interfaces.type_enums.entity_type import EntityType
 
 from metricflow.model.semantics.linkable_spec_resolver import ElementPathKey
@@ -47,20 +48,13 @@ class Metric:
         )
 
     @property
-    def input_measures(self) -> List[MetricInputMeasure]:
+    def input_measures(self) -> Sequence[MetricInputMeasure]:
         """Return the complete list of input measure configurations for this metric."""
-        type_params = self.type_params
-
-        measures: List[MetricInputMeasure] = list(
-            type_params.measures if type_params is not None and type_params.measures is not None else []
+        assert self.type_params.input_measures, (
+            f"Metric {self.name} should have had input_measures populated by "
+            f"{AddInputMetricMeasuresRule.__class__.__name__}"
         )
-        if type_params.measure:
-            measures.append(type_params.measure)
-        if type_params.numerator:
-            measures.append(type_params.numerator)
-        if type_params.denominator:
-            measures.append(type_params.denominator)
-        return measures
+        return self.type_params.input_measures
 
 
 @dataclass(frozen=True)
