@@ -2,7 +2,7 @@
 metric:
   name: "bookings"
   description: "bookings metric"
-  type: SIMPLE
+  type: simple
   type_params:
     measures:
       - bookings
@@ -10,7 +10,7 @@ metric:
 metric:
   name: "average_booking_value"
   description: "average booking value metric"
-  type: SIMPLE
+  type: simple
   type_params:
     measures:
       - average_booking_value
@@ -18,7 +18,7 @@ metric:
 metric:
   name: "instant_bookings"
   description: "instant bookings"
-  type: SIMPLE
+  type: simple
   type_params:
     measures:
       - instant_bookings
@@ -26,7 +26,7 @@ metric:
 metric:
   name: "booking_value"
   description: "booking value"
-  type: SIMPLE
+  type: simple
   type_params:
     measures:
       - booking_value
@@ -34,7 +34,7 @@ metric:
 metric:
   name: "max_booking_value"
   description: "max booking value"
-  type: SIMPLE
+  type: simple
   type_params:
     measures:
       - max_booking_value
@@ -42,7 +42,7 @@ metric:
 metric:
   name: "min_booking_value"
   description: "min booking value"
-  type: SIMPLE
+  type: simple
   type_params:
     measures:
       - min_booking_value
@@ -50,7 +50,7 @@ metric:
 metric:
   name: "instant_booking_value"
   description: "booking value of instant bookings"
-  type: SIMPLE
+  type: simple
   type_params:
     measures:
       - booking_value
@@ -59,7 +59,7 @@ metric:
 metric:
   name: "average_instant_booking_value"
   description: "average booking value of instant bookings"
-  type: SIMPLE
+  type: simple
   type_params:
     measures:
       - average_booking_value
@@ -68,7 +68,7 @@ metric:
 metric:
   name: "booking_value_for_non_null_listing_id"
   description: "booking value of instant bookings"
-  type: SIMPLE
+  type: simple
   type_params:
     measures:
       - booking_value
@@ -77,7 +77,7 @@ metric:
 metric:
   name: "bookers"
   description: "bookers"
-  type: SIMPLE
+  type: simple
   type_params:
     measures:
       - bookers
@@ -85,7 +85,7 @@ metric:
 metric:
   name: "booking_payments"
   description: "Booking payments."
-  type: SIMPLE
+  type: simple
   type_params:
     measures:
       - booking_payments
@@ -93,7 +93,7 @@ metric:
 metric:
   name: "views"
   description: "views"
-  type: SIMPLE
+  type: simple
   type_params:
     measures:
       - views
@@ -101,7 +101,7 @@ metric:
 metric:
   name: "listings"
   description: "listings"
-  type: SIMPLE
+  type: simple
   type_params:
     measures:
       - listings
@@ -109,7 +109,7 @@ metric:
 metric:
   name: "lux_listings"
   description: "lux_listings"
-  type: SIMPLE
+  type: simple
   type_params:
     measures:
       - listings
@@ -118,7 +118,7 @@ metric:
 metric:
   name: "smallest_listing"
   description: "smallest listing"
-  type: SIMPLE
+  type: simple
   type_params:
     measures:
       - smallest_listing
@@ -126,7 +126,7 @@ metric:
 metric:
   name: "largest_listing"
   description: "largest listing"
-  type: SIMPLE
+  type: simple
   type_params:
     measures:
       - largest_listing
@@ -134,7 +134,7 @@ metric:
 metric:
   name: "identity_verifications"
   description: "identity_verifications"
-  type: SIMPLE
+  type: simple
   type_params:
     measures:
       - identity_verifications
@@ -142,7 +142,7 @@ metric:
 metric:
   name: "revenue"
   description: "revenue"
-  type: SIMPLE
+  type: simple
   type_params:
     measures:
       - txn_revenue
@@ -185,31 +185,31 @@ metric:
 metric:
   name: booking_fees
   description: Booking value multiplied by constant - simple expr metric test
-  type: expr
+  type: derived
   type_params:
     expr: "booking_value * 0.05"
-    measures:
-      - booking_value
+    metrics:
+      - name: booking_value
 ---
 metric:
   name: booking_fees_per_booker
   description: booking_fees divided by bookers - single source multi measure expr test
-  type: expr
+  type: derived
   type_params:
     expr: "booking_value * 0.05 / bookers"
-    measures:
-      - booking_value
-      - bookers
+    metrics:
+      - name: booking_value
+      - name: bookers
 ---
 metric:
   name: views_times_booking_value
   description: Booking_value multiplied by views - expr metric test
-  type: expr
+  type: derived
   type_params:
     expr: "booking_value * views"
-    measures:
-      - booking_value
-      - views
+    metrics:
+      - name: booking_value
+      - name: views
 ---
 metric:
   name: bookings_per_booker
@@ -246,7 +246,7 @@ metric:
 metric:
   name: "total_account_balance_first_day"
   description: "total_account_balance_first_day"
-  type: SIMPLE
+  type: simple
   type_params:
     measures:
       - total_account_balance_first_day
@@ -254,7 +254,7 @@ metric:
 metric:
   name: "current_account_balance_by_user"
   description: "current_account_balance_by_user"
-  type: SIMPLE
+  type: simple
   type_params:
     measures:
       - current_account_balance_by_user
@@ -290,10 +290,10 @@ metric:
   description: |
     Lux booking value defined as an expr with lux booking value, lux bookings, and total value as inputs.
     Tests constrained measure expr metric with external dimension join.
-  type: expr
+  type: derived
   type_params:
     expr: "average_booking_value * bookings / NULLIF(booking_value, 0)"
-    measures:
+    metrics:
       - name: average_booking_value
         filter: "{{ dimension('is_lux_latest', entity_path=['listing']) }}"
       - name: bookings
@@ -334,10 +334,10 @@ metric:
   name: double_counted_delayed_bookings
   description: |
     Minimal repro case for an expr with a single constrained and aliased measure as input.
-  type: expr
+  type: derived
   type_params:
     expr: delayed_bookings * 2
-    measures:
+    metrics:
       - name: bookings
         filter: "NOT {{ dimension('is_instant') }}"
         alias: delayed_bookings
@@ -345,7 +345,7 @@ metric:
 metric:
   name: "referred_bookings"
   description: "bookings made through a referral"
-  type: SIMPLE
+  type: simple
   type_params:
     measures:
       - referred_bookings
@@ -431,7 +431,7 @@ metric:
 metric:
   name: "median_booking_value"
   description: "median booking value"
-  type: SIMPLE
+  type: simple
   type_params:
     measures:
       - median_booking_value
@@ -439,7 +439,7 @@ metric:
 metric:
   name: "booking_value_p99"
   description: "p99 booking value"
-  type: SIMPLE
+  type: simple
   type_params:
     measures:
       - booking_value_p99
@@ -447,7 +447,7 @@ metric:
 metric:
   name: "discrete_booking_value_p99"
   description: "discrete p99 booking value"
-  type: SIMPLE
+  type: simple
   type_params:
     measures:
       - discrete_booking_value_p99
@@ -455,7 +455,7 @@ metric:
 metric:
   name: "approximate_continuous_booking_value_p99"
   description: "approximate continuous p99 booking value"
-  type: SIMPLE
+  type: simple
   type_params:
     measures:
       - approximate_continuous_booking_value_p99
@@ -463,7 +463,7 @@ metric:
 metric:
   name: "approximate_discrete_booking_value_p99"
   description: "approximate discrete p99 booking value"
-  type: SIMPLE
+  type: simple
   type_params:
     measures:
       - approximate_discrete_booking_value_p99

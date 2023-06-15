@@ -702,7 +702,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                         column_name=expr,
                     )
                 )
-            elif metric.type == MetricType.EXPR or metric.type == MetricType.DERIVED:
+            elif metric.type is MetricType.DERIVED:
                 assert metric.type_params.expr
                 metric_expr = SqlStringExpression(sql_expr=metric.type_params.expr)
             else:

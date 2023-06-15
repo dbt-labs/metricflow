@@ -51,6 +51,7 @@ semantic_model:
                    altered.
       expr: CASE WHEN transaction_type_name = 'alteration' THEN transaction_amount_usd ELSE 0 END
       agg: SUM
+      create_metric: true
     - name: transacting_customers
       description: The distinct count of customers transacting on any given day.
       expr: id_customer
@@ -76,7 +77,7 @@ semantic_model:
 
 ---
 metric:
-  name: cancellations
+  name: cancellations_usd
   type: SIMPLE
   type_params:
     measure: cancellations_usd
@@ -90,13 +91,13 @@ metric:
 ---
 metric:
   name: revenue_usd
-  type: expr
+  type: derived
   type_params:
     expr: transaction_amount_usd - cancellations_usd + alterations_usd
-    measures:
-      - transaction_amount_usd
-      - cancellations_usd
-      - alterations_usd
+    metrics:
+      - name: transaction_amount_usd
+      - name: cancellations_usd
+      - name: alterations_usd
 ---
 metric:
   name: cancellations_mx
