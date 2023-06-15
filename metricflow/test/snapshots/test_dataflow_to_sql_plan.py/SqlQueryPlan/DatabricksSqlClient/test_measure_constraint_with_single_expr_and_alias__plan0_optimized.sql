@@ -7,6 +7,7 @@ FROM (
   -- Pass Only Elements:
   --   ['bookings', 'metric_time']
   -- Aggregate Measures
+  -- Compute Metrics via Expressions
   SELECT
     metric_time
     , SUM(bookings) AS delayed_bookings
@@ -20,8 +21,8 @@ FROM (
       , is_instant
       , 1 AS bookings
     FROM ***************************.fct_bookings bookings_source_src_10001
-  ) subq_8
+  ) subq_9
   WHERE NOT is_instant
   GROUP BY
     metric_time
-) subq_11
+) subq_13
