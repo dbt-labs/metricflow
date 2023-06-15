@@ -1,0 +1,7 @@
+kind: Breaking Changes
+body: Remove SqlEngineAttributes construct from SqlClient interface in favor of dialect
+  rendering and engine type properties
+time: 2023-06-14T17:36:09.827638-07:00
+custom:
+  Author: tlento
+  Issue: "577"

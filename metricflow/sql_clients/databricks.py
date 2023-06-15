@@ -2,14 +2,15 @@ from __future__ import annotations
 
 import logging
 import time
-from typing import ClassVar, Dict, Optional, Sequence
+from typing import Dict, Optional, Sequence
 
 import pandas as pd
 import sqlalchemy
 from databricks import sql
+from typing_extensions import override
 
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.protocols.sql_client import SqlEngine, SqlEngineAttributes
+from metricflow.protocols.sql_client import SqlEngine
 from metricflow.protocols.sql_request import SqlJsonTag, SqlRequestTagSet
 from metricflow.sql.render.databricks import DatabricksSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
@@ -37,15 +38,6 @@ PANDAS_TO_SQL_DTYPES = {
     "int64": "int",
     "datetime64[ns]": "timestamp",
 }
-
-
-class DatabricksEngineAttributes:
-    """SQL engine attributes for Databricks."""
-
-    sql_engine_type: ClassVar[SqlEngine] = SqlEngine.DATABRICKS
-
-    # MetricFlow attributes
-    sql_query_plan_renderer: ClassVar[SqlQueryPlanRenderer] = DatabricksSqlQueryPlanRenderer()
 
 
 class DatabricksSqlClient(BaseSqlClientImplementation):
@@ -118,9 +110,14 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
         )
 
     @property
-    def sql_engine_attributes(self) -> SqlEngineAttributes:
-        """Databricks engine attributes."""
-        return DatabricksEngineAttributes()
+    @override
+    def sql_engine_type(self) -> SqlEngine:
+        return SqlEngine.DATABRICKS
+
+    @property
+    @override
+    def sql_query_plan_renderer(self) -> SqlQueryPlanRenderer:
+        return DatabricksSqlQueryPlanRenderer()
 
     @staticmethod
     def params_or_none(bind_params: SqlBindParameters) -> Optional[Dict[str, SqlColumnType]]:

@@ -94,7 +94,7 @@ def convert_and_check(
     """Convert the dataflow plan to SQL and compare with snapshots."""
     # Generate plans w/o optimizers
     sql_query_plan = dataflow_to_sql_converter.convert_to_sql_query_plan(
-        sql_engine_attributes=sql_client.sql_engine_attributes,
+        sql_engine_type=sql_client.sql_engine_type,
         sql_query_plan_id="plan0",
         dataflow_plan_node=node,
         optimization_level=SqlQueryOptimizationLevel.O0,
@@ -121,7 +121,7 @@ def convert_and_check(
 
     # Generate plans with optimizers
     sql_query_plan = dataflow_to_sql_converter.convert_to_sql_query_plan(
-        sql_engine_attributes=sql_client.sql_engine_attributes,
+        sql_engine_type=sql_client.sql_engine_type,
         sql_query_plan_id="plan0_optimized",
         dataflow_plan_node=node,
         optimization_level=SqlQueryOptimizationLevel.O4,

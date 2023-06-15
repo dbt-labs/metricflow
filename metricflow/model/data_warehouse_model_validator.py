@@ -128,12 +128,12 @@ class DataWarehouseTaskBuilder:
     ) -> Tuple[str, SqlBindParameters]:
         """Generates a sql query plan and returns the rendered sql and bind_parameters."""
         sql_plan = plan_converter.convert_to_sql_query_plan(
-            sql_engine_attributes=sql_client.sql_engine_attributes,
+            sql_engine_type=sql_client.sql_engine_type,
             sql_query_plan_id=plan_id,
             dataflow_plan_node=nodes,
         )
 
-        rendered_plan = sql_client.sql_engine_attributes.sql_query_plan_renderer.render_sql_query_plan(sql_plan)
+        rendered_plan = sql_client.sql_query_plan_renderer.render_sql_query_plan(sql_plan)
         return (rendered_plan.sql, rendered_plan.bind_parameters)
 
     @classmethod

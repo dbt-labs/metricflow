@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from enum import Enum
-from typing import ClassVar, Optional, Protocol, Sequence
+from typing import Optional, Protocol, Sequence
 
 from pandas import DataFrame
 
@@ -31,12 +31,17 @@ class SqlClient(Protocol):
 
     @property
     @abstractmethod
-    def sql_engine_attributes(self) -> SqlEngineAttributes:
-        """Return a struct of engine-specific metadata.
+    def sql_engine_type(self) -> SqlEngine:
+        """Enumerated value representing the underlying SqlEngine for this SqlClient instance."""
+        raise NotImplementedError
 
-        See documentation on SqlEngineAttributes for details. This property is configured as a tagged
-        method rather than a simple property because defining it as a simple property makes it settable,
-        and we should not be re-using SqlClient instances with different SqlEngineAttributes.
+    @property
+    @abstractmethod
+    def sql_query_plan_renderer(self) -> SqlQueryPlanRenderer:
+        """Dialect-specific SQL query plan renderer used for converting MetricFlow's query plan to executable SQL.
+
+        This is bundled with the SqlClient partly as a convenenience for accessing a single instance of the renderer,
+        and partly due to the close relationship between dialect and engine capabilities.
         """
         raise NotImplementedError
 
@@ -119,19 +124,3 @@ class SqlClient(Protocol):
     def render_bind_parameter_key(self, bind_parameter_key: str) -> str:
         """Wrap the bind parameter key with syntax accepted by engine."""
         raise NotImplementedError
-
-
-class SqlEngineAttributes(Protocol):
-    """Base interface for SQL engine-specific attributes and features.
-
-    Concrete implementations would typically be the equivalent of frozen dataclass literals, one per
-    MetricFlowSupportedDBEngine, as we would not expect these properties to change from one client to the next.
-
-    Concrete implementations SHOULD NOT inherit from this protocol, as the typechecker may not catch issues
-    caused by changes to the protocol itself when inheritance is used.
-    """
-
-    sql_engine_type: ClassVar[SqlEngine]
-
-    # MetricFlow attributes
-    sql_query_plan_renderer: ClassVar[SqlQueryPlanRenderer]

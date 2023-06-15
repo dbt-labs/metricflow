@@ -12,7 +12,6 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.logging.formatting import indent_log_line
 from metricflow.protocols.sql_client import (
     SqlClient,
-    SqlEngineAttributes,
 )
 from metricflow.protocols.sql_request import SqlJsonTag, SqlRequestId, SqlRequestTagSet
 from metricflow.random_id import random_id
@@ -121,15 +120,6 @@ class BaseSqlClientImplementation(ABC, SqlClient):
         stop = time.time()
         logger.info(f"Finished running the dry_run in {stop - start:.2f}s")
         return results
-
-    @property
-    @abstractmethod
-    def sql_engine_attributes(self) -> SqlEngineAttributes:
-        """Struct of SQL engine attributes.
-
-        This is used by MetricFlow for things like SQL rendering and safe use of multi-threading.
-        """
-        raise NotImplementedError
 
     @abstractmethod
     def _engine_specific_query_implementation(

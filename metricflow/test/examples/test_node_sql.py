@@ -44,7 +44,7 @@ def test_view_sql_generated_at_a_node(
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
         time_spine_source=time_spine_source,
     )
-    sql_renderer: SqlQueryPlanRenderer = sql_client.sql_engine_attributes.sql_query_plan_renderer
+    sql_renderer: SqlQueryPlanRenderer = sql_client.sql_query_plan_renderer
     node_output_resolver = DataflowPlanNodeOutputDataSetResolver[SqlDataSet](
         column_association_resolver=column_association_resolver,
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
@@ -55,7 +55,7 @@ def test_view_sql_generated_at_a_node(
     bookings_source_data_set = to_data_set_converter.create_sql_source_data_set(bookings_semantic_model)
     read_source_node = ReadSqlSourceNode[SqlDataSet](bookings_source_data_set)
     sql_plan_at_read_node = to_sql_plan_converter.convert_to_sql_query_plan(
-        sql_engine_attributes=sql_client.sql_engine_attributes,
+        sql_engine_type=sql_client.sql_engine_type,
         sql_query_plan_id="example_sql_plan",
         dataflow_plan_node=read_source_node,
         optimization_level=SqlQueryOptimizationLevel.O4,
@@ -80,7 +80,7 @@ def test_view_sql_generated_at_a_node(
         ),
     )
     sql_plan_at_filter_elements_node = to_sql_plan_converter.convert_to_sql_query_plan(
-        sql_engine_attributes=sql_client.sql_engine_attributes,
+        sql_engine_type=sql_client.sql_engine_type,
         sql_query_plan_id="example_sql_plan",
         dataflow_plan_node=filter_elements_node,
         optimization_level=SqlQueryOptimizationLevel.O4,

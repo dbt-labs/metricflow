@@ -358,7 +358,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         )
         self._to_execution_plan_converter = DataflowToExecutionPlanConverter[SemanticModelDataSet](
             sql_plan_converter=self._to_sql_query_plan_converter,
-            sql_plan_renderer=self._sql_client.sql_engine_attributes.sql_query_plan_renderer,
+            sql_plan_renderer=self._sql_client.sql_query_plan_renderer,
             sql_client=sql_client,
         )
         self._executor = SequentialPlanExecutor()
