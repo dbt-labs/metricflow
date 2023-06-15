@@ -7,7 +7,7 @@ from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilde
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
-from metricflow.plan_conversion.time_spine import TimeSpineSource, TimeSpineTableBuilder
+from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
@@ -83,7 +83,4 @@ def scd_dataflow_plan_builder(  # noqa: D
 def time_spine_source(  # noqa: D
     sql_client: SqlClient, mf_test_session_state: MetricFlowTestSessionState  # noqa: F811
 ) -> TimeSpineSource:
-    time_spine_source = TimeSpineSource(schema_name=mf_test_session_state.mf_system_schema)
-    time_spine_table_builder = TimeSpineTableBuilder(time_spine_source=time_spine_source, sql_client=sql_client)
-    time_spine_table_builder.create_if_necessary()
-    return time_spine_source
+    return TimeSpineSource(schema_name=mf_test_session_state.mf_system_schema)

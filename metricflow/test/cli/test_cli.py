@@ -29,6 +29,7 @@ from metricflow.cli.main import (
 from metricflow.cli.tutorial import (
     COUNTRIES_TABLE,
     CUSTOMERS_TABLE,
+    TIME_SPINE_TABLE,
     TRANSACTIONS_TABLE,
 )
 from metricflow.test.fixtures.cli_fixtures import MetricFlowCliRunner
@@ -158,12 +159,15 @@ def test_tutorial(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
 
     pathlib.Path(cli_context.config.file_path).touch()
     resp = cli_runner.run(tutorial, args=["--skip-dw"])
-    assert "Attempting to generate model configs to your local filesystem in" in resp.output
+    assert (
+        "Attempting to generate model configs to your local filesystem in" in resp.output
+    ), f"Unexpected output: {resp.output}"
 
     table_names = cli_context.sql_client.list_tables(schema_name=cli_context.mf_system_schema)
     assert CUSTOMERS_TABLE in table_names
     assert TRANSACTIONS_TABLE in table_names
     assert COUNTRIES_TABLE in table_names
+    assert TIME_SPINE_TABLE in table_names
 
 
 def test_build_tutorial_model(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D

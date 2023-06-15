@@ -46,7 +46,7 @@ from metricflow.plan_conversion.dataflow_to_execution import (
     DataflowToExecutionPlanConverter,
 )
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
-from metricflow.plan_conversion.time_spine import TimeSpineSource, TimeSpineTableBuilder
+from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.query.query_parser import MetricFlowQueryParser
@@ -58,6 +58,7 @@ from metricflow.sql_clients.common_client import not_empty
 from metricflow.sql_clients.sql_utils import make_sql_client_from_config
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
+from metricflow.time.time_granularity import TimeGranularity
 from metricflow.time.time_source import TimeSource
 
 logger = logging.getLogger(__name__)
@@ -326,9 +327,6 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         )
         self._time_source = time_source
         self._time_spine_source = time_spine_source or TimeSpineSource(schema_name=system_schema)
-        self._time_spine_table_builder = TimeSpineTableBuilder(
-            time_spine_source=self._time_spine_source, sql_client=self._sql_client
-        )
 
         self._schema = system_schema
 
@@ -421,7 +419,14 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         if self._semantic_manifest_lookup.metric_lookup.contains_cumulative_or_time_offset_metric(
             tuple(m.as_reference for m in query_spec.metric_specs)
         ):
-            self._time_spine_table_builder.create_if_necessary()
+            if self._time_spine_source.time_column_granularity != TimeGranularity.DAY:
+                raise RuntimeError(
+                    f"A time spine source with a granularity {self._time_spine_source.time_column_granularity} is not "
+                    f"yet supported."
+                )
+            logger.warning(
+                f"Query spec requires a time spine dataset conforming to the following spec: {self._time_spine_source}. "
+            )
             time_constraint_updated = False
             if not mf_query_request.time_constraint_start:
                 time_constraint_start = self._time_source.get_time() - datetime.timedelta(days=365)

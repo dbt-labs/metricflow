@@ -7,6 +7,7 @@ from typing import Dict
 import pandas as pd
 
 from metricflow.dataflow.sql_table import SqlTable
+from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql_clients.sql_utils import make_df
 
@@ -16,6 +17,8 @@ TRANSACTION_TYPE = ["cancellation", "alteration", "quick-buy", "buy"]
 CUSTOMERS_TABLE = "mf_demo_customers"
 TRANSACTIONS_TABLE = "mf_demo_transactions"
 COUNTRIES_TABLE = "mf_demo_countries"
+# TODO: Give this a custom name when we support config-level overrides
+TIME_SPINE_TABLE = "mf_time_spine"
 
 TRANSACTIONS_YAML_FILE = os.path.join(os.path.dirname(__file__), "sample_models/transactions.yaml")
 CUSTOMERS_YAML_FILE = os.path.join(os.path.dirname(__file__), "sample_models/customers.yaml")
@@ -90,6 +93,7 @@ def build_dataframe(sql_client: SqlClient) -> Dict[str, pd.DataFrame]:
         ("c500000", "US", "2022-03-10"),
         ("c500002", "CA", "2022-03-07"),
     ]
+
     return {
         CUSTOMERS_TABLE: make_df(
             sql_client=sql_client, columns=["id_customer", "country", "ds"], time_columns={"ds"}, data=customer_data
@@ -127,6 +131,14 @@ def create_sample_data(sql_client: SqlClient, system_schema: str) -> bool:
     for table_name in dummy_data:
         sql_table = SqlTable.from_string(f"{system_schema}.{table_name}")
         sql_client.create_table_from_dataframe(sql_table=sql_table, df=dummy_data[table_name])
+    # TODO: consolidate with the test helper
+    time_spine_table = SqlTable.from_string(f"{system_schema}.{TIME_SPINE_TABLE}")
+    if not sql_client.table_exists(time_spine_table):
+        time_spine_data_frame = pd.date_range(
+            start=TimeRangeConstraint.ALL_TIME_BEGIN(), end=TimeRangeConstraint.ALL_TIME_END()
+        ).to_frame(index=False, name="ds")
+        sql_client.create_table_from_dataframe(time_spine_table, time_spine_data_frame, chunk_size=1000)
+
     return True
 
 
@@ -135,6 +147,7 @@ def remove_sample_tables(sql_client: SqlClient, system_schema: str) -> None:
     sql_client.drop_table(SqlTable.from_string(f"{system_schema}.{CUSTOMERS_TABLE}"))
     sql_client.drop_table(SqlTable.from_string(f"{system_schema}.{TRANSACTIONS_TABLE}"))
     sql_client.drop_table(SqlTable.from_string(f"{system_schema}.{COUNTRIES_TABLE}"))
+    sql_client.drop_table(SqlTable.from_string(f"{system_schema}.{TIME_SPINE_TABLE}"))
 
 
 def gen_sample_model_configs(dir_path: str, system_schema: str) -> None:
