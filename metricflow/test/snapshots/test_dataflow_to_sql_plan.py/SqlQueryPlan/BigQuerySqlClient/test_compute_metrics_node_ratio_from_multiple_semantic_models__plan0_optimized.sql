@@ -1,20 +1,19 @@
--- Join Aggregated Measures with Standard Outputs
--- Pass Only Elements:
---   ['bookings', 'views', 'listing__country_latest', 'ds']
+-- Combine Metrics
 -- Compute Metrics via Expressions
 SELECT
-  subq_28.ds AS ds
-  , subq_28.listing__country_latest AS listing__country_latest
-  , CAST(subq_28.bookings AS FLOAT64) / CAST(NULLIF(subq_37.views, 0) AS FLOAT64) AS bookings_per_view
+  COALESCE(subq_30.ds, subq_40.ds) AS ds
+  , COALESCE(subq_30.listing__country_latest, subq_40.listing__country_latest) AS listing__country_latest
+  , CAST(subq_30.bookings AS FLOAT64) / CAST(NULLIF(subq_40.views, 0) AS FLOAT64) AS bookings_per_view
 FROM (
   -- Join Standard Outputs
   -- Pass Only Elements:
   --   ['bookings', 'listing__country_latest', 'ds']
   -- Aggregate Measures
+  -- Compute Metrics via Expressions
   SELECT
-    subq_22.ds AS ds
+    subq_23.ds AS ds
     , listings_latest_src_10004.country AS listing__country_latest
-    , SUM(subq_22.bookings) AS bookings
+    , SUM(subq_23.bookings) AS bookings
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
@@ -25,24 +24,25 @@ FROM (
       , listing_id AS listing
       , 1 AS bookings
     FROM ***************************.fct_bookings bookings_source_src_10001
-  ) subq_22
+  ) subq_23
   LEFT OUTER JOIN
     ***************************.dim_listings_latest listings_latest_src_10004
   ON
-    subq_22.listing = listings_latest_src_10004.listing_id
+    subq_23.listing = listings_latest_src_10004.listing_id
   GROUP BY
     ds
     , listing__country_latest
-) subq_28
+) subq_30
 INNER JOIN (
   -- Join Standard Outputs
   -- Pass Only Elements:
   --   ['views', 'listing__country_latest', 'ds']
   -- Aggregate Measures
+  -- Compute Metrics via Expressions
   SELECT
-    subq_31.ds AS ds
+    subq_33.ds AS ds
     , listings_latest_src_10004.country AS listing__country_latest
-    , SUM(subq_31.views) AS views
+    , SUM(subq_33.views) AS views
   FROM (
     -- Read Elements From Semantic Model 'views_source'
     -- Metric Time Dimension 'ds'
@@ -53,30 +53,30 @@ INNER JOIN (
       , listing_id AS listing
       , 1 AS views
     FROM ***************************.fct_views views_source_src_10009
-  ) subq_31
+  ) subq_33
   LEFT OUTER JOIN
     ***************************.dim_listings_latest listings_latest_src_10004
   ON
-    subq_31.listing = listings_latest_src_10004.listing_id
+    subq_33.listing = listings_latest_src_10004.listing_id
   GROUP BY
     ds
     , listing__country_latest
-) subq_37
+) subq_40
 ON
   (
     (
-      subq_28.ds = subq_37.ds
+      subq_30.listing__country_latest = subq_40.listing__country_latest
     ) OR (
-      (subq_28.ds IS NULL) AND (subq_37.ds IS NULL)
+      (
+        subq_30.listing__country_latest IS NULL
+      ) AND (
+        subq_40.listing__country_latest IS NULL
+      )
     )
   ) AND (
     (
-      subq_28.listing__country_latest = subq_37.listing__country_latest
+      subq_30.ds = subq_40.ds
     ) OR (
-      (
-        subq_28.listing__country_latest IS NULL
-      ) AND (
-        subq_37.listing__country_latest IS NULL
-      )
+      (subq_30.ds IS NULL) AND (subq_40.ds IS NULL)
     )
   )

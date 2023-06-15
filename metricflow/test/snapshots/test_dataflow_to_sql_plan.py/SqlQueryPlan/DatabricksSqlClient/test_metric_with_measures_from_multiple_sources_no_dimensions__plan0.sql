@@ -1,17 +1,15 @@
 -- Compute Metrics via Expressions
 SELECT
-  CAST(subq_9.bookings AS DOUBLE) / CAST(NULLIF(subq_9.listings, 0) AS DOUBLE) AS bookings_per_listing
+  CAST(subq_10.bookings AS DOUBLE) / CAST(NULLIF(subq_10.listings, 0) AS DOUBLE) AS bookings_per_listing
 FROM (
-  -- Pass Only Elements:
-  --   ['bookings', 'listings']
+  -- Combine Metrics
   SELECT
-    subq_8.bookings
-    , subq_8.listings
+    subq_4.bookings AS bookings
+    , subq_9.listings AS listings
   FROM (
-    -- Join Aggregated Measures with Standard Outputs
+    -- Compute Metrics via Expressions
     SELECT
-      subq_3.bookings AS bookings
-      , subq_7.listings AS listings
+      subq_3.bookings
     FROM (
       -- Aggregate Measures
       SELECT
@@ -142,55 +140,60 @@ FROM (
         ) subq_1
       ) subq_2
     ) subq_3
-    CROSS JOIN (
+  ) subq_4
+  CROSS JOIN (
+    -- Compute Metrics via Expressions
+    SELECT
+      subq_8.listings
+    FROM (
       -- Aggregate Measures
       SELECT
-        SUM(subq_6.listings) AS listings
+        SUM(subq_7.listings) AS listings
       FROM (
         -- Pass Only Elements:
         --   ['listings']
         SELECT
-          subq_5.listings
+          subq_6.listings
         FROM (
           -- Metric Time Dimension 'ds'
           SELECT
-            subq_4.ds
-            , subq_4.ds__week
-            , subq_4.ds__month
-            , subq_4.ds__quarter
-            , subq_4.ds__year
-            , subq_4.created_at
-            , subq_4.created_at__week
-            , subq_4.created_at__month
-            , subq_4.created_at__quarter
-            , subq_4.created_at__year
-            , subq_4.listing__ds
-            , subq_4.listing__ds__week
-            , subq_4.listing__ds__month
-            , subq_4.listing__ds__quarter
-            , subq_4.listing__ds__year
-            , subq_4.listing__created_at
-            , subq_4.listing__created_at__week
-            , subq_4.listing__created_at__month
-            , subq_4.listing__created_at__quarter
-            , subq_4.listing__created_at__year
-            , subq_4.ds AS metric_time
-            , subq_4.ds__week AS metric_time__week
-            , subq_4.ds__month AS metric_time__month
-            , subq_4.ds__quarter AS metric_time__quarter
-            , subq_4.ds__year AS metric_time__year
-            , subq_4.listing
-            , subq_4.user
-            , subq_4.listing__user
-            , subq_4.country_latest
-            , subq_4.is_lux_latest
-            , subq_4.capacity_latest
-            , subq_4.listing__country_latest
-            , subq_4.listing__is_lux_latest
-            , subq_4.listing__capacity_latest
-            , subq_4.listings
-            , subq_4.largest_listing
-            , subq_4.smallest_listing
+            subq_5.ds
+            , subq_5.ds__week
+            , subq_5.ds__month
+            , subq_5.ds__quarter
+            , subq_5.ds__year
+            , subq_5.created_at
+            , subq_5.created_at__week
+            , subq_5.created_at__month
+            , subq_5.created_at__quarter
+            , subq_5.created_at__year
+            , subq_5.listing__ds
+            , subq_5.listing__ds__week
+            , subq_5.listing__ds__month
+            , subq_5.listing__ds__quarter
+            , subq_5.listing__ds__year
+            , subq_5.listing__created_at
+            , subq_5.listing__created_at__week
+            , subq_5.listing__created_at__month
+            , subq_5.listing__created_at__quarter
+            , subq_5.listing__created_at__year
+            , subq_5.ds AS metric_time
+            , subq_5.ds__week AS metric_time__week
+            , subq_5.ds__month AS metric_time__month
+            , subq_5.ds__quarter AS metric_time__quarter
+            , subq_5.ds__year AS metric_time__year
+            , subq_5.listing
+            , subq_5.user
+            , subq_5.listing__user
+            , subq_5.country_latest
+            , subq_5.is_lux_latest
+            , subq_5.capacity_latest
+            , subq_5.listing__country_latest
+            , subq_5.listing__is_lux_latest
+            , subq_5.listing__capacity_latest
+            , subq_5.listings
+            , subq_5.largest_listing
+            , subq_5.smallest_listing
           FROM (
             -- Read Elements From Semantic Model 'listings_latest'
             SELECT
@@ -227,9 +230,9 @@ FROM (
               , listings_latest_src_10004.user_id AS user
               , listings_latest_src_10004.user_id AS listing__user
             FROM ***************************.dim_listings_latest listings_latest_src_10004
-          ) subq_4
-        ) subq_5
-      ) subq_6
-    ) subq_7
-  ) subq_8
-) subq_9
+          ) subq_5
+        ) subq_6
+      ) subq_7
+    ) subq_8
+  ) subq_9
+) subq_10

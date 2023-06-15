@@ -1,23 +1,21 @@
 -- Compute Metrics via Expressions
 SELECT
-  subq_19.ds
-  , subq_19.listing__country_latest
-  , CAST(subq_19.bookings AS DOUBLE) / CAST(NULLIF(subq_19.views, 0) AS DOUBLE) AS bookings_per_view
+  subq_20.ds
+  , subq_20.listing__country_latest
+  , CAST(subq_20.bookings AS DOUBLE) / CAST(NULLIF(subq_20.views, 0) AS DOUBLE) AS bookings_per_view
 FROM (
-  -- Pass Only Elements:
-  --   ['bookings', 'views', 'listing__country_latest', 'ds']
+  -- Combine Metrics
   SELECT
-    subq_18.ds
-    , subq_18.listing__country_latest
-    , subq_18.bookings
-    , subq_18.views
+    COALESCE(subq_9.ds, subq_19.ds) AS ds
+    , COALESCE(subq_9.listing__country_latest, subq_19.listing__country_latest) AS listing__country_latest
+    , subq_9.bookings AS bookings
+    , subq_19.views AS views
   FROM (
-    -- Join Aggregated Measures with Standard Outputs
+    -- Compute Metrics via Expressions
     SELECT
-      subq_8.ds AS ds
-      , subq_8.listing__country_latest AS listing__country_latest
-      , subq_8.bookings AS bookings
-      , subq_17.views AS views
+      subq_8.ds
+      , subq_8.listing__country_latest
+      , subq_8.bookings
     FROM (
       -- Aggregate Measures
       SELECT
@@ -258,67 +256,74 @@ FROM (
         subq_7.ds
         , subq_7.listing__country_latest
     ) subq_8
-    INNER JOIN (
+  ) subq_9
+  INNER JOIN (
+    -- Compute Metrics via Expressions
+    SELECT
+      subq_18.ds
+      , subq_18.listing__country_latest
+      , subq_18.views
+    FROM (
       -- Aggregate Measures
       SELECT
-        subq_16.ds
-        , subq_16.listing__country_latest
-        , SUM(subq_16.views) AS views
+        subq_17.ds
+        , subq_17.listing__country_latest
+        , SUM(subq_17.views) AS views
       FROM (
         -- Pass Only Elements:
         --   ['views', 'listing__country_latest', 'ds']
         SELECT
-          subq_15.ds
-          , subq_15.listing__country_latest
-          , subq_15.views
+          subq_16.ds
+          , subq_16.listing__country_latest
+          , subq_16.views
         FROM (
           -- Join Standard Outputs
           SELECT
-            subq_11.ds AS ds
-            , subq_11.listing AS listing
-            , subq_14.country_latest AS listing__country_latest
-            , subq_11.views AS views
+            subq_12.ds AS ds
+            , subq_12.listing AS listing
+            , subq_15.country_latest AS listing__country_latest
+            , subq_12.views AS views
           FROM (
             -- Pass Only Elements:
             --   ['views', 'ds', 'listing']
             SELECT
-              subq_10.ds
-              , subq_10.listing
-              , subq_10.views
+              subq_11.ds
+              , subq_11.listing
+              , subq_11.views
             FROM (
               -- Metric Time Dimension 'ds'
               SELECT
-                subq_9.ds
-                , subq_9.ds__week
-                , subq_9.ds__month
-                , subq_9.ds__quarter
-                , subq_9.ds__year
-                , subq_9.ds_partitioned
-                , subq_9.ds_partitioned__week
-                , subq_9.ds_partitioned__month
-                , subq_9.ds_partitioned__quarter
-                , subq_9.ds_partitioned__year
-                , subq_9.create_a_cycle_in_the_join_graph__ds
-                , subq_9.create_a_cycle_in_the_join_graph__ds__week
-                , subq_9.create_a_cycle_in_the_join_graph__ds__month
-                , subq_9.create_a_cycle_in_the_join_graph__ds__quarter
-                , subq_9.create_a_cycle_in_the_join_graph__ds__year
-                , subq_9.create_a_cycle_in_the_join_graph__ds_partitioned
-                , subq_9.create_a_cycle_in_the_join_graph__ds_partitioned__week
-                , subq_9.create_a_cycle_in_the_join_graph__ds_partitioned__month
-                , subq_9.create_a_cycle_in_the_join_graph__ds_partitioned__quarter
-                , subq_9.create_a_cycle_in_the_join_graph__ds_partitioned__year
-                , subq_9.ds AS metric_time
-                , subq_9.ds__week AS metric_time__week
-                , subq_9.ds__month AS metric_time__month
-                , subq_9.ds__quarter AS metric_time__quarter
-                , subq_9.ds__year AS metric_time__year
-                , subq_9.listing
-                , subq_9.user
-                , subq_9.create_a_cycle_in_the_join_graph
-                , subq_9.create_a_cycle_in_the_join_graph__listing
-                , subq_9.create_a_cycle_in_the_join_graph__user
-                , subq_9.views
+                subq_10.ds
+                , subq_10.ds__week
+                , subq_10.ds__month
+                , subq_10.ds__quarter
+                , subq_10.ds__year
+                , subq_10.ds_partitioned
+                , subq_10.ds_partitioned__week
+                , subq_10.ds_partitioned__month
+                , subq_10.ds_partitioned__quarter
+                , subq_10.ds_partitioned__year
+                , subq_10.create_a_cycle_in_the_join_graph__ds
+                , subq_10.create_a_cycle_in_the_join_graph__ds__week
+                , subq_10.create_a_cycle_in_the_join_graph__ds__month
+                , subq_10.create_a_cycle_in_the_join_graph__ds__quarter
+                , subq_10.create_a_cycle_in_the_join_graph__ds__year
+                , subq_10.create_a_cycle_in_the_join_graph__ds_partitioned
+                , subq_10.create_a_cycle_in_the_join_graph__ds_partitioned__week
+                , subq_10.create_a_cycle_in_the_join_graph__ds_partitioned__month
+                , subq_10.create_a_cycle_in_the_join_graph__ds_partitioned__quarter
+                , subq_10.create_a_cycle_in_the_join_graph__ds_partitioned__year
+                , subq_10.ds AS metric_time
+                , subq_10.ds__week AS metric_time__week
+                , subq_10.ds__month AS metric_time__month
+                , subq_10.ds__quarter AS metric_time__quarter
+                , subq_10.ds__year AS metric_time__year
+                , subq_10.listing
+                , subq_10.user
+                , subq_10.create_a_cycle_in_the_join_graph
+                , subq_10.create_a_cycle_in_the_join_graph__listing
+                , subq_10.create_a_cycle_in_the_join_graph__user
+                , subq_10.views
               FROM (
                 -- Read Elements From Semantic Model 'views_source'
                 SELECT
@@ -349,55 +354,55 @@ FROM (
                   , views_source_src_10009.listing_id AS create_a_cycle_in_the_join_graph__listing
                   , views_source_src_10009.user_id AS create_a_cycle_in_the_join_graph__user
                 FROM ***************************.fct_views views_source_src_10009
-              ) subq_9
-            ) subq_10
-          ) subq_11
+              ) subq_10
+            ) subq_11
+          ) subq_12
           LEFT OUTER JOIN (
             -- Pass Only Elements:
             --   ['country_latest', 'listing']
             SELECT
-              subq_13.listing
-              , subq_13.country_latest
+              subq_14.listing
+              , subq_14.country_latest
             FROM (
               -- Metric Time Dimension 'ds'
               SELECT
-                subq_12.ds
-                , subq_12.ds__week
-                , subq_12.ds__month
-                , subq_12.ds__quarter
-                , subq_12.ds__year
-                , subq_12.created_at
-                , subq_12.created_at__week
-                , subq_12.created_at__month
-                , subq_12.created_at__quarter
-                , subq_12.created_at__year
-                , subq_12.listing__ds
-                , subq_12.listing__ds__week
-                , subq_12.listing__ds__month
-                , subq_12.listing__ds__quarter
-                , subq_12.listing__ds__year
-                , subq_12.listing__created_at
-                , subq_12.listing__created_at__week
-                , subq_12.listing__created_at__month
-                , subq_12.listing__created_at__quarter
-                , subq_12.listing__created_at__year
-                , subq_12.ds AS metric_time
-                , subq_12.ds__week AS metric_time__week
-                , subq_12.ds__month AS metric_time__month
-                , subq_12.ds__quarter AS metric_time__quarter
-                , subq_12.ds__year AS metric_time__year
-                , subq_12.listing
-                , subq_12.user
-                , subq_12.listing__user
-                , subq_12.country_latest
-                , subq_12.is_lux_latest
-                , subq_12.capacity_latest
-                , subq_12.listing__country_latest
-                , subq_12.listing__is_lux_latest
-                , subq_12.listing__capacity_latest
-                , subq_12.listings
-                , subq_12.largest_listing
-                , subq_12.smallest_listing
+                subq_13.ds
+                , subq_13.ds__week
+                , subq_13.ds__month
+                , subq_13.ds__quarter
+                , subq_13.ds__year
+                , subq_13.created_at
+                , subq_13.created_at__week
+                , subq_13.created_at__month
+                , subq_13.created_at__quarter
+                , subq_13.created_at__year
+                , subq_13.listing__ds
+                , subq_13.listing__ds__week
+                , subq_13.listing__ds__month
+                , subq_13.listing__ds__quarter
+                , subq_13.listing__ds__year
+                , subq_13.listing__created_at
+                , subq_13.listing__created_at__week
+                , subq_13.listing__created_at__month
+                , subq_13.listing__created_at__quarter
+                , subq_13.listing__created_at__year
+                , subq_13.ds AS metric_time
+                , subq_13.ds__week AS metric_time__week
+                , subq_13.ds__month AS metric_time__month
+                , subq_13.ds__quarter AS metric_time__quarter
+                , subq_13.ds__year AS metric_time__year
+                , subq_13.listing
+                , subq_13.user
+                , subq_13.listing__user
+                , subq_13.country_latest
+                , subq_13.is_lux_latest
+                , subq_13.capacity_latest
+                , subq_13.listing__country_latest
+                , subq_13.listing__is_lux_latest
+                , subq_13.listing__capacity_latest
+                , subq_13.listings
+                , subq_13.largest_listing
+                , subq_13.smallest_listing
               FROM (
                 -- Read Elements From Semantic Model 'listings_latest'
                 SELECT
@@ -434,34 +439,34 @@ FROM (
                   , listings_latest_src_10004.user_id AS user
                   , listings_latest_src_10004.user_id AS listing__user
                 FROM ***************************.dim_listings_latest listings_latest_src_10004
-              ) subq_12
-            ) subq_13
-          ) subq_14
+              ) subq_13
+            ) subq_14
+          ) subq_15
           ON
-            subq_11.listing = subq_14.listing
-        ) subq_15
-      ) subq_16
+            subq_12.listing = subq_15.listing
+        ) subq_16
+      ) subq_17
       GROUP BY
-        subq_16.ds
-        , subq_16.listing__country_latest
-    ) subq_17
-    ON
+        subq_17.ds
+        , subq_17.listing__country_latest
+    ) subq_18
+  ) subq_19
+  ON
+    (
       (
+        subq_9.listing__country_latest = subq_19.listing__country_latest
+      ) OR (
         (
-          subq_8.ds = subq_17.ds
-        ) OR (
-          (subq_8.ds IS NULL) AND (subq_17.ds IS NULL)
-        )
-      ) AND (
-        (
-          subq_8.listing__country_latest = subq_17.listing__country_latest
-        ) OR (
-          (
-            subq_8.listing__country_latest IS NULL
-          ) AND (
-            subq_17.listing__country_latest IS NULL
-          )
+          subq_9.listing__country_latest IS NULL
+        ) AND (
+          subq_19.listing__country_latest IS NULL
         )
       )
-  ) subq_18
-) subq_19
+    ) AND (
+      (
+        subq_9.ds = subq_19.ds
+      ) OR (
+        (subq_9.ds IS NULL) AND (subq_19.ds IS NULL)
+      )
+    )
+) subq_20
