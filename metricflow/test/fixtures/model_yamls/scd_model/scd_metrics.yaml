@@ -4,8 +4,7 @@ metric:
   description: raw booking count
   type: SIMPLE
   type_params:
-    measures:
-      - bookings
+    measure: bookings
 ---
 metric:
   name: family_bookings
@@ -14,8 +13,7 @@ metric:
   filter:
     "{{ dimension('capacity', entity_path=['listing']) }} > 2"
   type_params:
-    measures:
-      - bookings
+    measure: bookings
 ---
 metric:
   name: potentially_lux_bookings
@@ -24,5 +22,4 @@ metric:
   filter:
     "{{ dimension('is_lux', entity_path=['listing']) }} OR {{ dimension('is_lux', entity_path=['listing']) }} IS NULL"
   type_params:
-    measures:
-      - bookings
+    measure: bookings
