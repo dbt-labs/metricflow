@@ -194,32 +194,40 @@ metric:
   description: bookings divided by bookers - single semantic model ratio metric test
   type: ratio
   type_params:
-    numerator: bookings
-    denominator: bookers
+    numerator:
+      name: bookings
+    denominator:
+      name: bookers
 ---
 metric:
   name: bookings_per_view
   description: Bookings divided by views - ratio metric test
   type: ratio
   type_params:
-    numerator: bookings
-    denominator: views
+    numerator:
+      name: bookings
+    denominator:
+      name: views
 ---
 metric:
   name: bookings_per_listing
   description: Bookings divided by listings - ratio with primary identifier test
   type: ratio
   type_params:
-    numerator: bookings
-    denominator: listings
+    numerator:
+      name: bookings
+    denominator:
+      name: listings
 ---
 metric:
   name: bookings_per_dollar
   description: Number of bookings per dollar of value
   type: ratio
   type_params:
-    numerator: bookings
-    denominator: booking_value
+    numerator:
+      name: bookings
+    denominator:
+      name: booking_value
 ---
 metric:
   name: "total_account_balance_first_day"

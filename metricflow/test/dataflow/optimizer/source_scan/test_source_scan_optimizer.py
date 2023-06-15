@@ -350,6 +350,6 @@ def test_2_ratio_metrics_from_1_semantic_model(  # noqa: D
             ),
             dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
         ),
-        expected_num_sources_in_unoptimized=2,
+        expected_num_sources_in_unoptimized=4,
         expected_num_sources_in_optimized=1,
     )

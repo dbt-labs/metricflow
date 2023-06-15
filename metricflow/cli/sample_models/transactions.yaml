@@ -86,8 +86,10 @@ metric:
   name: cancellation_rate
   type: ratio
   type_params:
-    numerator: cancellations_usd
-    denominator: transaction_amount_usd
+    numerator:
+      name: cancellations_usd
+    denominator:
+      name: transaction_amount_usd
 ---
 metric:
   name: revenue_usd
@@ -119,8 +121,7 @@ metric:
   name: transaction_usd_l7d_mx
   type: cumulative
   type_params:
-    measures:
-      - transaction_amount_usd
+    measure: transaction_amount_usd
     window: 7 days
   filter: |
     {{ dimension('country', entity_path=['customer']) }} = 'MX'
@@ -129,16 +130,14 @@ metric:
   name: transaction_usd_mtd
   type: cumulative
   type_params:
-    measures:
-      - transaction_amount_usd
+    measure: transaction_amount_usd
     grain_to_date: month
 ---
 metric:
   name: transaction_usd_na_l7d
   type: cumulative
   type_params:
-    measures:
-      - transaction_amount_usd
+    measure: transaction_amount_usd
     window: 7 days
   filter: |
     {{ dimension('region', entity_path=['customer', 'country']) }} = 'NA'

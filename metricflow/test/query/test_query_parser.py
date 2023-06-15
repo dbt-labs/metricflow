@@ -103,8 +103,7 @@ METRICS_YAML = textwrap.dedent(
       description: Cumulative metric for revenue for testing purposes
       type: cumulative
       type_params:
-        measures:
-          - revenue
+        measure: revenue
         window: 7 days
     ---
     metric:
