@@ -1,13 +1,18 @@
-semantic_model:
-  name: countries
-  description: Regions mapped to countries.
-  entities:
-    - name: country
-      type: primary
-  dimensions:
-    - name: region
-      description: The region associated with the country.
-      type: categorical
-  node_relation:
-    alias: $countries_table
-    schema_name: $system_schema
+---
+sources:
+  - name: countries
+    schema: $system_schema
+    tables:
+      - name: $countries_table
+---
+semantic_models:
+  - name: countries
+    description: Regions mapped to countries.
+    model: source('countries', '$countries_table')
+    entities:
+      - name: country
+        type: primary
+    dimensions:
+      - name: region
+        description: The region associated with the country.
+        type: categorical
