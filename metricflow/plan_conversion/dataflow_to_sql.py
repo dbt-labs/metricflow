@@ -650,10 +650,10 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                     numerator is not None and denominator is not None
                 ), "Missing numerator or denominator for ratio metric, this should have been caught in validation!"
                 numerator_column_name = self._column_association_resolver.resolve_spec(
-                    MeasureSpec(element_name=numerator.post_aggregation_measure_reference.element_name)
+                    MetricSpec.from_reference(numerator.post_aggregation_reference)
                 ).column_name
                 denominator_column_name = self._column_association_resolver.resolve_spec(
-                    MeasureSpec(element_name=denominator.post_aggregation_measure_reference.element_name)
+                    MetricSpec.from_reference(denominator.post_aggregation_reference)
                 ).column_name
 
                 metric_expr = SqlRatioComputationExpression(

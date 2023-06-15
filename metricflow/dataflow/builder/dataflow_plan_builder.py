@@ -6,6 +6,7 @@ import time
 from dataclasses import dataclass
 from typing import DefaultDict, Dict, Generic, List, Optional, Sequence, Set, Tuple, TypeVar, Union
 
+from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.protocols.metric import MetricTimeWindow, MetricType
 from dbt_semantic_interfaces.references import TimeDimensionReference
@@ -195,13 +196,13 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             metric_reference = metric_spec.as_reference
             metric = self._metric_lookup.get_metric(metric_reference)
 
-            if metric.type == MetricType.DERIVED:
+            if metric.type is MetricType.DERIVED or metric.type is MetricType.RATIO:
                 metric_input_specs = self._metric_lookup.metric_input_specs_for_metric(
                     metric_reference=metric_reference,
                     column_association_resolver=self._column_association_resolver,
                 )
                 logger.info(
-                    f"For derived metric: {metric_spec}, needed metrics are:\n"
+                    f"For {metric.type} metric: {metric_spec}, needed metrics are:\n"
                     f"{pformat_big_objects(metric_input_specs=metric_input_specs)}"
                 )
 
@@ -215,7 +216,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                     ),
                     metric_specs=[metric_spec],
                 )
-            else:
+            elif metric.type is MetricType.SIMPLE or MetricType.CUMULATIVE:
                 metric_input_measure_specs = self._metric_lookup.measures_for_metric(
                     metric_reference=metric_reference,
                     column_association_resolver=self._column_association_resolver,
@@ -245,6 +246,8 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                     metric_spec=metric_spec,
                     aggregated_measures_node=aggregated_measures_node,
                 )
+            else:
+                assert_values_exhausted(metric.type)
 
             if metric_spec.offset_window or metric_spec.offset_to_grain:
                 join_to_time_spine_node = JoinToTimeSpineNode(
