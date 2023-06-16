@@ -72,10 +72,11 @@ class MetricFlowInitException(Exception):
 class ModelCreationException(Exception):
     """Exception to represent errors related to the building a model."""
 
-    def __init__(self) -> None:  # noqa: D
-        super().__init__(
-            "An error occurred when attempting to build the semantic model",
-        )
+    def __init__(self, msg: str = "") -> None:  # noqa: D
+        error_msg = "An error occurred when attempting to build the semantic model"
+        if msg:
+            error_msg += f"\n{msg}"
+        super().__init__(error_msg)
 
 
 class InferenceError(Exception):
