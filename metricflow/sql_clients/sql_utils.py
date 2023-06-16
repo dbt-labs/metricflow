@@ -5,7 +5,6 @@ import pathlib
 from typing import List, Tuple
 
 import pandas as pd
-from sqlalchemy.engine import make_url
 
 from metricflow.configuration.constants import (
     CONFIG_DWH_ACCESS_TOKEN,
@@ -63,34 +62,6 @@ def create_time_spine_table_if_necessary(time_spine_source: TimeSpineSource, sql
         ),
         chunk_size=1000,
     )
-
-
-def dialect_from_url(url: str) -> SqlDialect:
-    """Return the SQL dialect specified in the URL in the configuration."""
-    dialect_protocol = make_url(url.split(";")[0]).drivername.split("+")
-    if len(dialect_protocol) > 2:
-        raise ValueError(f"Invalid # of +'s in {url}")
-    return SqlDialect(dialect_protocol[0])
-
-
-def make_sql_client(url: str, password: str) -> SqlClient:
-    """Build SQL client based on env configs. Used only in tests."""
-    dialect = dialect_from_url(url)
-
-    if dialect == SqlDialect.REDSHIFT:
-        return RedshiftSqlClient.from_connection_details(url, password)
-    elif dialect == SqlDialect.SNOWFLAKE:
-        return SnowflakeSqlClient.from_connection_details(url, password)
-    elif dialect == SqlDialect.BIGQUERY:
-        return BigQuerySqlClient.from_connection_details(url, password)
-    elif dialect == SqlDialect.POSTGRESQL:
-        return PostgresSqlClient.from_connection_details(url, password)
-    elif dialect == SqlDialect.DUCKDB:
-        return DuckDbSqlClient.from_connection_details(url, password)
-    elif dialect == SqlDialect.DATABRICKS:
-        return DatabricksSqlClient.from_connection_details(url, password)
-    else:
-        raise ValueError(f"Unknown dialect: `{dialect}` in URL {url}")
 
 
 def make_sql_client_from_config(handler: YamlFileHandler) -> SqlClient:
