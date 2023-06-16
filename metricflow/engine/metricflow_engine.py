@@ -31,6 +31,7 @@ from metricflow.engine.models import Dimension, Entity, Metric
 from metricflow.engine.time_source import ServerTimeSource
 from metricflow.engine.utils import (
     build_semantic_manifest_from_config,
+    build_semantic_manifest_from_dbt_project_root,
 )
 from metricflow.errors.errors import ExecutionException
 from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
@@ -298,6 +299,19 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         # Ideally we should put this getting of of CONFIG_DBT_REPO in a helper
         semantic_manifest_lookup = SemanticManifestLookup(build_semantic_manifest_from_config(handler))
         system_schema = not_empty(handler.get_value(CONFIG_DWH_SCHEMA), CONFIG_DWH_SCHEMA, handler.url)
+        return MetricFlowEngine(
+            semantic_manifest_lookup=semantic_manifest_lookup,
+            sql_client=sql_client,
+            system_schema=system_schema,
+        )
+
+    @staticmethod
+    def from_dbt_project_root(handler: YamlFileHandler) -> MetricFlowEngine:
+        """Initialize MetricFlowEngine via the dbt project root directory."""
+        sql_client = make_sql_client_from_config(handler)
+        system_schema = not_empty(handler.get_value(CONFIG_DWH_SCHEMA), CONFIG_DWH_SCHEMA, handler.url)
+        semantic_manifest_lookup = SemanticManifestLookup(build_semantic_manifest_from_dbt_project_root())
+
         return MetricFlowEngine(
             semantic_manifest_lookup=semantic_manifest_lookup,
             sql_client=sql_client,

@@ -5,6 +5,7 @@ import pathlib
 from typing import Optional
 
 from dateutil.parser import parse
+from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from dbt_semantic_interfaces.parsing.dir_to_model import (
     SemanticManifestBuildResult,
     parse_directory_of_yaml_files_to_semantic_manifest,
@@ -48,7 +49,7 @@ def build_semantic_manifest_from_config(handler: YamlFileHandler) -> SemanticMan
     return model_build_result_from_config(handler=handler).semantic_manifest
 
 
-def parse_semantic_manifest_from_json_file(filepath: str) -> PydanticSemanticManifest:
+def parse_semantic_manifest_from_json_file(filepath: str) -> SemanticManifest:
     """Parses a semantic_manifest json to the pydantic object."""
     try:
         with open(filepath, "r") as file:
@@ -58,7 +59,7 @@ def parse_semantic_manifest_from_json_file(filepath: str) -> PydanticSemanticMan
         raise ModelCreationException from e
 
 
-def build_semantic_manifest_from_dbt_project_root() -> PydanticSemanticManifest:
+def build_semantic_manifest_from_dbt_project_root() -> SemanticManifest:
     """In the dbt project root, retrieve the manifest path and parse the SemanticManifest."""
     DEFAULT_TARGET_PATH = "target/semantic_manifest.json"
     full_path_to_manifest = pathlib.Path(DEFAULT_TARGET_PATH).resolve()
