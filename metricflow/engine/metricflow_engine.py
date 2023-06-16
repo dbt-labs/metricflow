@@ -510,7 +510,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             linkable_dimensions_tuple,
         ) in path_key_to_linkable_dimensions.items():
             for linkable_dimension in linkable_dimensions_tuple:
-                semantic_model = semantic_model = self._semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
+                semantic_model = self._semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
                     linkable_dimension.semantic_model_origin
                 )
                 assert semantic_model

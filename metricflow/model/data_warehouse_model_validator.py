@@ -59,8 +59,8 @@ class QueryRenderingTools:
     time_spine_source: TimeSpineSource
     plan_converter: DataflowToSqlQueryPlanConverter
 
-    def __init__(self, model: SemanticManifest, system_schema: str) -> None:  # noqa: D
-        self.semantic_manifest_lookup = SemanticManifestLookup(semantic_manifest=model)
+    def __init__(self, manifest: SemanticManifest, system_schema: str) -> None:  # noqa: D
+        self.semantic_manifest_lookup = SemanticManifestLookup(semantic_manifest=manifest)
         self.source_node_builder = SourceNodeBuilder(semantic_manifest_lookup=self.semantic_manifest_lookup)
         self.time_spine_source = TimeSpineSource(schema_name=system_schema)
         self.converter = SemanticModelToDataSetConverter(
@@ -134,11 +134,11 @@ class DataWarehouseTaskBuilder:
 
     @classmethod
     def gen_semantic_model_tasks(
-        cls, model: SemanticManifest, sql_client: SqlClient, system_schema: str
+        cls, manifest: SemanticManifest, sql_client: SqlClient, system_schema: str
     ) -> List[DataWarehouseValidationTask]:
-        """Generates a list of tasks for validating the semantic models of the model."""
+        """Generates a list of tasks for validating the semantic models of the manifest."""
         tasks: List[DataWarehouseValidationTask] = []
-        for semantic_model in model.semantic_models:
+        for semantic_model in manifest.semantic_models:
             tasks.append(
                 DataWarehouseValidationTask(
                     query_and_params_callable=partial(
@@ -159,9 +159,9 @@ class DataWarehouseTaskBuilder:
 
     @classmethod
     def gen_dimension_tasks(
-        cls, model: SemanticManifest, sql_client: SqlClient, system_schema: str
+        cls, manifest: SemanticManifest, sql_client: SqlClient, system_schema: str
     ) -> List[DataWarehouseValidationTask]:
-        """Generates a list of tasks for validating the dimensions of the model.
+        """Generates a list of tasks for validating the dimensions of the manifest.
 
         The high level tasks returned are "short cut" queries which try to
         query all the dimensions for a given semantic model. If that query fails,
@@ -169,10 +169,10 @@ class DataWarehouseTaskBuilder:
         query fails, there are subtasks which query the individual dimensions
         on the semantic model to identify which have issues.
         """
-        render_tools = QueryRenderingTools(model=model, system_schema=system_schema)
+        render_tools = QueryRenderingTools(manifest=manifest, system_schema=system_schema)
 
         tasks: List[DataWarehouseValidationTask] = []
-        for semantic_model in model.semantic_models:
+        for semantic_model in manifest.semantic_models:
             if not semantic_model.dimensions:
                 continue
 
@@ -258,9 +258,9 @@ class DataWarehouseTaskBuilder:
 
     @classmethod
     def gen_entity_tasks(
-        cls, model: SemanticManifest, sql_client: SqlClient, system_schema: str
+        cls, manifest: SemanticManifest, sql_client: SqlClient, system_schema: str
     ) -> List[DataWarehouseValidationTask]:
-        """Generates a list of tasks for validating the entities of the model.
+        """Generates a list of tasks for validating the entities of the manifest.
 
         The high level tasks returned are "short cut" queries which try to
         query all the entities for a given semantic model. If that query fails,
@@ -268,10 +268,10 @@ class DataWarehouseTaskBuilder:
         query fails, there are subtasks which query the individual entities
         on the semantic model to identify which have issues.
         """
-        render_tools = QueryRenderingTools(model=model, system_schema=system_schema)
+        render_tools = QueryRenderingTools(manifest=manifest, system_schema=system_schema)
 
         tasks: List[DataWarehouseValidationTask] = []
-        for semantic_model in model.semantic_models:
+        for semantic_model in manifest.semantic_models:
             if not semantic_model.entities:
                 continue
             source_node = cls._semantic_model_nodes(render_tools=render_tools, semantic_model=semantic_model)[0]
@@ -332,9 +332,9 @@ class DataWarehouseTaskBuilder:
 
     @classmethod
     def gen_measure_tasks(
-        cls, model: SemanticManifest, sql_client: SqlClient, system_schema: str
+        cls, manifest: SemanticManifest, sql_client: SqlClient, system_schema: str
     ) -> List[DataWarehouseValidationTask]:
-        """Generates a list of tasks for validating the measures of the model.
+        """Generates a list of tasks for validating the measures of the manifest.
 
         The high level tasks returned are "short cut" queries which try to
         query all the measures for a given semantic model. If that query fails,
@@ -342,10 +342,10 @@ class DataWarehouseTaskBuilder:
         query fails, there are subtasks which query the individual measures
         on the semantic model to identify which have issues.
         """
-        render_tools = QueryRenderingTools(model=model, system_schema=system_schema)
+        render_tools = QueryRenderingTools(manifest=manifest, system_schema=system_schema)
 
         tasks: List[DataWarehouseValidationTask] = []
-        for semantic_model in model.semantic_models:
+        for semantic_model in manifest.semantic_models:
             if not semantic_model.measures:
                 continue
 
@@ -430,16 +430,16 @@ class DataWarehouseTaskBuilder:
 
     @classmethod
     def gen_metric_tasks(
-        cls, model: SemanticManifest, sql_client: SqlClient, system_schema: str
+        cls, manifest: SemanticManifest, sql_client: SqlClient, system_schema: str
     ) -> List[DataWarehouseValidationTask]:
-        """Generates a list of tasks for validating the metrics of the model."""
+        """Generates a list of tasks for validating the metrics of the manifest."""
         mf_engine = MetricFlowEngine(
-            semantic_manifest_lookup=SemanticManifestLookup(semantic_manifest=model),
+            semantic_manifest_lookup=SemanticManifestLookup(semantic_manifest=manifest),
             sql_client=sql_client,
             system_schema=system_schema,
         )
         tasks: List[DataWarehouseValidationTask] = []
-        for metric in model.metrics:
+        for metric in manifest.metrics:
             tasks.append(
                 DataWarehouseValidationTask(
                     query_and_params_callable=partial(
@@ -458,12 +458,12 @@ class DataWarehouseTaskBuilder:
 
 
 class DataWarehouseModelValidator:
-    """A Validator for checking specific tasks for the model against the Data Warehouse.
+    """A Validator for checking specific tasks for the manifest against the Data Warehouse.
 
     Data Warehouse Validations are validations that are done against the data
-    warehouse based on the model configured by the user. Their purpose is to
+    warehouse based on the manifest configured by the user. Their purpose is to
     ensure that queries generated by MetricFlow won't fail when you go to use
-    them (assuming the model has passed these validations before use).
+    them (assuming the manifest has passed these validations before use).
     """
 
     def __init__(self, sql_client: SqlClient, system_schema: str) -> None:  # noqa: D
@@ -514,86 +514,86 @@ class DataWarehouseModelValidator:
         return SemanticManifestValidationResults.from_issues_sequence(issues)
 
     def validate_semantic_models(
-        self, model: SemanticManifest, timeout: Optional[int] = None
+        self, manifest: SemanticManifest, timeout: Optional[int] = None
     ) -> SemanticManifestValidationResults:
         """Generates a list of tasks for validating the semantic models of the model and then runs them.
 
         Args:
-            model: Model which to run data warehouse validations on
+            manifest: SemanticManifest which to run data warehouse validations on
             timeout: An optional timeout. Default is None. When the timeout is hit, function will return early.
 
         Returns:
             A list of validation issues discovered when running the passed in tasks against the data warehosue
         """
         tasks = DataWarehouseTaskBuilder.gen_semantic_model_tasks(
-            model=model, sql_client=self._sql_client, system_schema=self._sql_schema
+            manifest=manifest, sql_client=self._sql_client, system_schema=self._sql_schema
         )
         return self.run_tasks(tasks=tasks, timeout=timeout)
 
     def validate_dimensions(
-        self, model: SemanticManifest, timeout: Optional[int] = None
+        self, manifest: SemanticManifest, timeout: Optional[int] = None
     ) -> SemanticManifestValidationResults:
-        """Generates a list of tasks for validating the dimensions of the model and then runs them.
+        """Generates a list of tasks for validating the dimensions of the manifest and then runs them.
 
         Args:
-            model: Model which to run data warehouse validations on
+            manifest: SemanticManifest which to run data warehouse validations on
             timeout: An optional timeout. Default is None. When the timeout is hit, function will return early.
 
         Returns:
             A list of validation issues. If there are no validation issues, an empty list is returned.
         """
         tasks = DataWarehouseTaskBuilder.gen_dimension_tasks(
-            model=model, sql_client=self._sql_client, system_schema=self._sql_schema
+            manifest=manifest, sql_client=self._sql_client, system_schema=self._sql_schema
         )
         return self.run_tasks(tasks=tasks, timeout=timeout)
 
     def validate_entities(
-        self, model: SemanticManifest, timeout: Optional[int] = None
+        self, manifest: SemanticManifest, timeout: Optional[int] = None
     ) -> SemanticManifestValidationResults:
-        """Generates a list of tasks for validating the entities of the model and then runs them.
+        """Generates a list of tasks for validating the entities of the manifest and then runs them.
 
         Args:
-            model: Model which to run data warehouse validations on
+            manifest: SemanticManifest which to run data warehouse validations on
             timeout: An optional timeout. Default is None. When the timeout is hit, function will return early.
 
         Returns:
             A list of validation issues. If there are no validation issues, an empty list is returned.
         """
         tasks = DataWarehouseTaskBuilder.gen_entity_tasks(
-            model=model, sql_client=self._sql_client, system_schema=self._sql_schema
+            manifest=manifest, sql_client=self._sql_client, system_schema=self._sql_schema
         )
         return self.run_tasks(tasks=tasks, timeout=timeout)
 
     def validate_measures(
-        self, model: SemanticManifest, timeout: Optional[int] = None
+        self, manifest: SemanticManifest, timeout: Optional[int] = None
     ) -> SemanticManifestValidationResults:
-        """Generates a list of tasks for validating the measures of the model and then runs them.
+        """Generates a list of tasks for validating the measures of the manifest and then runs them.
 
         Args:
-            model: Model which to run data warehouse validations on
+            manifest: SemanticManifest which to run data warehouse validations on
             timeout: An optional timeout. Default is None. When the timeout is hit, function will return early.
 
         Returns:
             A list of validation issues. If there are no validation issues, an empty list is returned.
         """
         tasks = DataWarehouseTaskBuilder.gen_measure_tasks(
-            model=model, sql_client=self._sql_client, system_schema=self._sql_schema
+            manifest=manifest, sql_client=self._sql_client, system_schema=self._sql_schema
         )
         return self.run_tasks(tasks=tasks, timeout=timeout)
 
     def validate_metrics(
-        self, model: SemanticManifest, timeout: Optional[int] = None
+        self, manifest: SemanticManifest, timeout: Optional[int] = None
     ) -> SemanticManifestValidationResults:
-        """Generates a list of tasks for validating the metrics of the model and then runs them.
+        """Generates a list of tasks for validating the metrics of the manifest and then runs them.
 
         Args:
-            model: Model which to run data warehouse validations on
+            manifest: SemanticManifest which to run data warehouse validations on
             timeout: An optional timeout. Default is None. When the timeout is hit, function will return early.
 
         Returns:
             A list of validation issues. If there are no validation issues, an empty list is returned.
         """
         tasks = DataWarehouseTaskBuilder.gen_metric_tasks(
-            model=model, sql_client=self._sql_client, system_schema=self._sql_schema
+            manifest=manifest, sql_client=self._sql_client, system_schema=self._sql_schema
         )
         return self.run_tasks(tasks=tasks, timeout=timeout)
