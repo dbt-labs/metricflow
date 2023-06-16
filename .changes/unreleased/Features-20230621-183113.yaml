@@ -1,0 +1,6 @@
+kind: Features
+body: Add dbt adapter support for postgres and enable it for tests
+time: 2023-06-21T18:31:13.407396-07:00
+custom:
+  Author: tlento
+  Issue: "578"

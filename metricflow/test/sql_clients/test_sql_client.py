@@ -7,6 +7,7 @@ from typing import Sequence, Set, Union
 import pandas as pd
 import pytest
 
+from metricflow.cli.dbt_connectors.adapter_backed_client import AdapterBackedSqlClient
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.random_id import random_id
@@ -40,6 +41,8 @@ def test_query(sql_client: SqlClient) -> None:  # noqa: D
 
 def test_query_with_execution_params(sql_client: SqlClient) -> None:
     """Test querying with execution parameters of all supported datatypes."""
+    if isinstance(sql_client, AdapterBackedSqlClient):
+        pytest.skip(reason="The dbt Adapter-backed SqlClient implementation does not support bind parameters.")
     params: Sequence[SqlColumnType] = [
         2,
         "hi",
@@ -79,6 +82,8 @@ def test_select_one_query(sql_client: SqlClient) -> None:  # noqa: D
 
 
 def test_failed_query_with_execution_params(sql_client: SqlClient) -> None:  # noqa: D
+    if isinstance(sql_client, AdapterBackedSqlClient):
+        pytest.skip(reason="The dbt Adapter-backed SqlClient implementation does not support bind parameters.")
     expr = f"SELECT {sql_client.render_bind_parameter_key('x')}"
     sql_execution_params = SqlBindParameters.create_from_dict({"x": 1})
 

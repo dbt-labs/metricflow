@@ -1,0 +1,11 @@
+postgres:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: "127.0.0.1"
+      port: 5432
+      user: metricflow
+      pass: metricflowing
+      dbname: metricflow
+      schema: mf_demo
