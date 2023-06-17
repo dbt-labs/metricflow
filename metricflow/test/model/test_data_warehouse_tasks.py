@@ -48,7 +48,7 @@ def test_build_semantic_model_tasks(  # noqa:D
     sql_client: SqlClient,
 ) -> None:
     tasks = DataWarehouseTaskBuilder.gen_semantic_model_tasks(
-        model=data_warehouse_validation_model,
+        manifest=data_warehouse_validation_model,
         sql_client=sql_client,
         system_schema=mf_test_session_state.mf_system_schema,
     )
@@ -116,7 +116,7 @@ def test_build_dimension_tasks(  # noqa: D
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
     tasks = DataWarehouseTaskBuilder.gen_dimension_tasks(
-        model=data_warehouse_validation_model,
+        manifest=data_warehouse_validation_model,
         sql_client=sql_client,
         system_schema=mf_test_session_state.mf_system_schema,
     )
@@ -156,7 +156,7 @@ def test_build_entities_tasks(  # noqa: D
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
     tasks = DataWarehouseTaskBuilder.gen_entity_tasks(
-        model=data_warehouse_validation_model,
+        manifest=data_warehouse_validation_model,
         sql_client=sql_client,
         system_schema=mf_test_session_state.mf_system_schema,
     )
@@ -194,7 +194,7 @@ def test_build_measure_tasks(  # noqa: D
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
     tasks = DataWarehouseTaskBuilder.gen_measure_tasks(
-        model=data_warehouse_validation_model,
+        manifest=data_warehouse_validation_model,
         sql_client=sql_client,
         system_schema=mf_test_session_state.mf_system_schema,
     )
@@ -233,7 +233,7 @@ def test_build_metric_tasks(  # noqa: D
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
     tasks = DataWarehouseTaskBuilder.gen_metric_tasks(
-        model=data_warehouse_validation_model,
+        manifest=data_warehouse_validation_model,
         system_schema=mf_test_session_state.mf_system_schema,
         sql_client=sql_client,
     )

@@ -14,7 +14,7 @@ from typing import Callable, List, Optional
 import click
 import jinja2
 import pandas as pd
-from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
+from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 from dbt_semantic_interfaces.validations.validator_helpers import SemanticManifestValidationResults
 from halo import Halo
@@ -580,16 +580,16 @@ def _print_issues(
 
 
 def _run_dw_validations(
-    validation_func: Callable[[PydanticSemanticManifest, Optional[int]], SemanticManifestValidationResults],
+    validation_func: Callable[[SemanticManifest, Optional[int]], SemanticManifestValidationResults],
     validation_type: str,
-    model: PydanticSemanticManifest,
+    manifest: SemanticManifest,
     timeout: Optional[int],
 ) -> SemanticManifestValidationResults:
     """Helper handles the calling of data warehouse issue generating functions."""
     spinner = Halo(text=f"Validating {validation_type} against data warehouse...", spinner="dots")
     spinner.start()
 
-    results = validation_func(model, timeout)
+    results = validation_func(manifest, timeout)
     if not results.has_blocking_issues:
         spinner.succeed(f"🎉 Successfully validated {validation_type} against data warehouse ({results.summary()})")
     else:
@@ -600,23 +600,23 @@ def _run_dw_validations(
 
 
 def _data_warehouse_validations_runner(
-    dw_validator: DataWarehouseModelValidator, model: PydanticSemanticManifest, timeout: Optional[int]
+    dw_validator: DataWarehouseModelValidator, manifest: SemanticManifest, timeout: Optional[int]
 ) -> SemanticManifestValidationResults:
     """Helper which calls the individual data warehouse validations to run and prints collected issues."""
     semantic_model_results = _run_dw_validations(
-        dw_validator.validate_semantic_models, model=model, validation_type="semantic models", timeout=timeout
+        dw_validator.validate_semantic_models, manifest=manifest, validation_type="semantic models", timeout=timeout
     )
     dimension_results = _run_dw_validations(
-        dw_validator.validate_dimensions, model=model, validation_type="dimensions", timeout=timeout
+        dw_validator.validate_dimensions, manifest=manifest, validation_type="dimensions", timeout=timeout
     )
     entity_results = _run_dw_validations(
-        dw_validator.validate_entities, model=model, validation_type="entities", timeout=timeout
+        dw_validator.validate_entities, manifest=manifest, validation_type="entities", timeout=timeout
     )
     measure_results = _run_dw_validations(
-        dw_validator.validate_measures, model=model, validation_type="measures", timeout=timeout
+        dw_validator.validate_measures, manifest=manifest, validation_type="measures", timeout=timeout
     )
     metric_results = _run_dw_validations(
-        dw_validator.validate_metrics, model=model, validation_type="metrics", timeout=timeout
+        dw_validator.validate_metrics, manifest=manifest, validation_type="metrics", timeout=timeout
     )
 
     return SemanticManifestValidationResults.merge(
@@ -677,14 +677,14 @@ def validate_configs(
         _print_issues(parsing_result.issues, show_non_blocking=show_all, verbose=verbose_issues)
         return
 
-    user_model = parsing_result.semantic_manifest
+    semantic_manifest = parsing_result.semantic_manifest
 
     # Semantic validation
     semantic_spinner = Halo(text="Validating semantics of built model", spinner="dots")
     semantic_spinner.start()
-    model_issues = SemanticManifestValidator[PydanticSemanticManifest](
+    model_issues = SemanticManifestValidator[SemanticManifest](
         max_workers=semantic_validation_workers
-    ).validate_semantic_manifest(user_model)
+    ).validate_semantic_manifest(semantic_manifest)
 
     if not model_issues.has_blocking_issues:
         semantic_spinner.succeed(f"🎉 Successfully validated the semantics of built model ({model_issues.summary()})")
@@ -698,7 +698,9 @@ def validate_configs(
     dw_results = SemanticManifestValidationResults()
     if not skip_dw:
         dw_validator = DataWarehouseModelValidator(sql_client=cfg.sql_client, system_schema=cfg.mf_system_schema)
-        dw_results = _data_warehouse_validations_runner(dw_validator=dw_validator, model=user_model, timeout=dw_timeout)
+        dw_results = _data_warehouse_validations_runner(
+            dw_validator=dw_validator, manifest=semantic_manifest, timeout=dw_timeout
+        )
 
     merged_results = SemanticManifestValidationResults.merge([parsing_result.issues, model_issues, dw_results])
     _print_issues(merged_results, show_non_blocking=show_all, verbose=verbose_issues)

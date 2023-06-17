@@ -41,6 +41,7 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.model.semantics.linkable_element_properties import (
     LinkableElementProperties,
 )
+from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_execution import (
     DataflowToExecutionPlanConverter,
@@ -520,8 +521,9 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 assert semantic_model
                 dimensions.append(
                     Dimension.from_pydantic(
-                        pydantic_dimension=semantic_model.get_dimension(
-                            DimensionReference(element_name=linkable_dimension.element_name)
+                        pydantic_dimension=SemanticModelLookup.get_dimension_from_semantic_model(
+                            semantic_model=semantic_model,
+                            dimension_reference=DimensionReference(element_name=linkable_dimension.element_name),
                         ),
                         path_key=path_key,
                     )
@@ -552,8 +554,9 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 assert semantic_model
                 entities.append(
                     Entity.from_pydantic(
-                        pydantic_entity=semantic_model.get_entity(
-                            EntityReference(element_name=linkable_entity.element_name)
+                        pydantic_entity=SemanticModelLookup.get_entity_from_semantic_model(
+                            semantic_model=semantic_model,
+                            entity_reference=EntityReference(element_name=linkable_entity.element_name),
                         )
                     )
                 )
