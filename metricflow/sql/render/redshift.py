@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+from typing import Collection
+
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
+from typing_extensions import override
 
 from metricflow.errors.errors import UnsupportedEngineFeatureError
 from metricflow.sql.render.expr_renderer import (
@@ -17,10 +20,17 @@ class RedshiftSqlExpressionRenderer(DefaultSqlExpressionRenderer):
     """Expression renderer for the Redshift engine."""
 
     @property
+    @override
     def double_data_type(self) -> str:
         """Custom double data type for the Redshift engine."""
         return "DOUBLE PRECISION"
 
+    @property
+    @override
+    def supported_percentile_function_types(self) -> Collection[SqlPercentileFunctionType]:
+        return {SqlPercentileFunctionType.CONTINUOUS, SqlPercentileFunctionType.APPROXIMATE_DISCRETE}
+
+    @override
     def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:
         """Render a percentile expression for Redshift."""
         arg_rendered = self.render_sql_expr(node.order_by_arg)
@@ -49,7 +59,8 @@ class RedshiftSqlExpressionRenderer(DefaultSqlExpressionRenderer):
             bind_parameters=params,
         )
 
-    def visit_generate_uuid_expr(self, node: SqlGenerateUuidExpression) -> SqlExpressionRenderResult:  # noqa: D
+    @override
+    def visit_generate_uuid_expr(self, node: SqlGenerateUuidExpression) -> SqlExpressionRenderResult:
         """Generates a "good enough" random key to simulate a UUID.
 
         NOTE: This is a temporary hacky solution as redshift does not have any UUID generation function.
@@ -69,5 +80,6 @@ class RedshiftSqlQueryPlanRenderer(DefaultSqlQueryPlanRenderer):
     EXPR_RENDERER = RedshiftSqlExpressionRenderer()
 
     @property
-    def expr_renderer(self) -> SqlExpressionRenderer:  # noqa :D
+    @override
+    def expr_renderer(self) -> SqlExpressionRenderer:
         return self.EXPR_RENDERER

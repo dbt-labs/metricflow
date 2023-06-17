@@ -58,7 +58,7 @@ def assert_rendered_sql_from_plan_equal(
     sql_client: SqlClient,
 ) -> None:
     """Similar to assert_rendered_sql_equal, but takes in a SQL query plan."""
-    rendered_sql = sql_client.sql_engine_attributes.sql_query_plan_renderer.render_sql_query_plan(sql_query_plan).sql
+    rendered_sql = sql_client.sql_query_plan_renderer.render_sql_query_plan(sql_query_plan).sql
 
     assert_plan_snapshot_text_equal(
         request=request,

@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 from fractions import Fraction
+from typing import Collection
 
+from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from typing_extensions import override
 
 from metricflow.errors.errors import UnsupportedEngineFeatureError
 from metricflow.sql.render.expr_renderer import (
@@ -27,10 +30,28 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
     """Expression renderer for the BigQuery engine."""
 
     @property
+    @override
     def double_data_type(self) -> str:
         """Custom double data type for BigQuery engine."""
         return "FLOAT64"
 
+    @property
+    @override
+    def timestamp_data_type(self) -> str:
+        """Custom timestamp type override for use in BigQuery.
+
+        We use DATETIME for BigQuery because it is time zone agnostic, which more closely matches the
+        runtime behavior of the TIMESTAMP types as used in other engines. This, however, is a choice we
+        may need to re-examine in the future.
+        """
+        return "DATETIME"
+
+    @property
+    @override
+    def supported_percentile_function_types(self) -> Collection[SqlPercentileFunctionType]:
+        return {SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS}
+
+    @override
     def render_group_by_expr(self, group_by_column: SqlSelectColumn) -> SqlExpressionRenderResult:
         """Custom rendering of group by column expressions.
 
@@ -48,6 +69,7 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
             bind_parameters=group_by_column.expr.bind_parameters,
         )
 
+    @override
     def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:
         """Render a percentile expression for BigQuery.
 
@@ -66,19 +88,34 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
                 sql=f"APPROX_QUANTILES({arg_rendered.sql}, {fraction.denominator})[OFFSET({fraction.numerator})]",
                 bind_parameters=params,
             )
-        raise UnsupportedEngineFeatureError(
-            "Only approximate continous percentile aggregations are supported for BigQuery. Set "
-            + "use_approximate_percentile and disable use_discrete_percentile in all percentile measures."
-        )
+        elif (
+            node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_DISCRETE
+            or node.percentile_args.function_type is SqlPercentileFunctionType.CONTINUOUS
+            or node.percentile_args.function_type is SqlPercentileFunctionType.DISCRETE
+        ):
+            raise UnsupportedEngineFeatureError(
+                "Only approximate continous percentile aggregations are supported for BigQuery. Set "
+                + "use_approximate_percentile and disable use_discrete_percentile in all percentile measures."
+            )
+        else:
+            assert_values_exhausted(node.percentile_args.function_type)
 
+    @override
     def visit_cast_to_timestamp_expr(self, node: SqlCastToTimestampExpression) -> SqlExpressionRenderResult:
-        """Casts the time value expression to DATETIME, as per standard BigQuery preferences."""
+        """Casts the time value expression to DATETIME.
+
+        BigQuery's TIMESTAMP type requires timezone inputs to convert to and from different formats, whereas its
+        DATETIME data type does not. This is different from Databricks, which simply returns and renders inUTC by
+        default, or Snowflake which does something user-configurable but defaults to TIMESTAMP_NTZ, or PostgreSQL,
+        which adheres to the SQL standard of TIMESTAMP_NTZ.
+        """
         arg_rendered = self.render_sql_expr(node.arg)
         return SqlExpressionRenderResult(
-            sql=f"CAST({arg_rendered.sql} AS DATETIME)",
+            sql=f"CAST({arg_rendered.sql} AS {self.timestamp_data_type})",
             bind_parameters=arg_rendered.bind_parameters,
         )
 
+    @override
     def visit_date_trunc_expr(self, node: SqlDateTruncExpression) -> SqlExpressionRenderResult:
         """Render DATE_TRUNC for BigQuery, which takes the opposite argument order from Snowflake and Redshift."""
         arg_rendered = self.render_sql_expr(node.arg)
@@ -92,7 +129,9 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
             bind_parameters=arg_rendered.bind_parameters,
         )
 
-    def visit_time_delta_expr(self, node: SqlTimeDeltaExpression) -> SqlExpressionRenderResult:  # noqa: D
+    @override
+    def visit_time_delta_expr(self, node: SqlTimeDeltaExpression) -> SqlExpressionRenderResult:
+        """Render time delta for BigQuery, which requires ISO prefixing on granularity values."""
         column = node.arg.accept(self)
         if node.grain_to_date:
             granularity = node.granularity
@@ -106,11 +145,12 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
             )
 
         return SqlExpressionRenderResult(
-            sql=f"DATE_SUB(CAST({column.sql} AS DATETIME), INTERVAL {node.count} {node.granularity.value})",
+            sql=f"DATE_SUB(CAST({column.sql} AS {self.timestamp_data_type}), INTERVAL {node.count} {node.granularity.value})",
             bind_parameters=column.bind_parameters,
         )
 
-    def visit_generate_uuid_expr(self, node: SqlGenerateUuidExpression) -> SqlExpressionRenderResult:  # noqa: D
+    @override
+    def visit_generate_uuid_expr(self, node: SqlGenerateUuidExpression) -> SqlExpressionRenderResult:
         return SqlExpressionRenderResult(
             sql="GENERATE_UUID()",
             bind_parameters=SqlBindParameters(),
@@ -123,5 +163,6 @@ class BigQuerySqlQueryPlanRenderer(DefaultSqlQueryPlanRenderer):
     EXPR_RENDERER = BigQuerySqlExpressionRenderer()
 
     @property
-    def expr_renderer(self) -> SqlExpressionRenderer:  # noqa :D
+    @override
+    def expr_renderer(self) -> SqlExpressionRenderer:
         return self.EXPR_RENDERER

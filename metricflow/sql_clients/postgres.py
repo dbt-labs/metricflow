@@ -1,39 +1,18 @@
 from __future__ import annotations
 
 import logging
-from typing import ClassVar, Mapping, Optional, Sequence, Union
+from typing import Mapping, Optional, Sequence, Union
 
 import sqlalchemy
+from typing_extensions import override
 
-from metricflow.protocols.sql_client import SqlEngine, SqlEngineAttributes
+from metricflow.protocols.sql_client import SqlEngine
 from metricflow.sql.render.postgres import PostgresSQLSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql_clients.common_client import SqlDialect, not_empty
 from metricflow.sql_clients.sqlalchemy_dialect import SqlAlchemySqlClient
 
 logger = logging.getLogger(__name__)
-
-
-class PostgresEngineAttributes:
-    """Engine-specific attributes for the Postgres query engine.
-
-    This is an implementation of the SqlEngineAttributes protocol for Postgres
-    """
-
-    sql_engine_type: ClassVar[SqlEngine] = SqlEngine.POSTGRES
-
-    # SQL Engine capabilities
-    continuous_percentile_aggregation_supported: ClassVar[bool] = True
-    discrete_percentile_aggregation_supported: ClassVar[bool] = True
-    approximate_continuous_percentile_aggregation_supported: ClassVar[bool] = False
-    approximate_discrete_percentile_aggregation_supported: ClassVar[bool] = False
-
-    # SQL Dialect replacement strings
-    double_data_type_name: ClassVar[str] = "DOUBLE PRECISION"
-    timestamp_type_name: ClassVar[Optional[str]] = "TIMESTAMP"
-
-    # MetricFlow attributes
-    sql_query_plan_renderer: ClassVar[SqlQueryPlanRenderer] = PostgresSQLSqlQueryPlanRenderer()
 
 
 class PostgresSqlClient(SqlAlchemySqlClient):
@@ -81,6 +60,11 @@ class PostgresSqlClient(SqlAlchemySqlClient):
         )
 
     @property
-    def sql_engine_attributes(self) -> SqlEngineAttributes:
-        """Collection of attributes and features specific to the Postgres SQL engine."""
-        return PostgresEngineAttributes()
+    @override
+    def sql_engine_type(self) -> SqlEngine:
+        return SqlEngine.POSTGRES
+
+    @property
+    @override
+    def sql_query_plan_renderer(self) -> SqlQueryPlanRenderer:
+        return PostgresSQLSqlQueryPlanRenderer()

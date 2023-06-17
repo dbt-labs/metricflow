@@ -2,15 +2,16 @@ from __future__ import annotations
 
 import logging
 import threading
-from typing import ClassVar, Optional, Sequence
+from typing import Optional, Sequence
 
 import pandas as pd
 import sqlalchemy
 from sqlalchemy import inspect
 from sqlalchemy.pool import StaticPool
+from typing_extensions import override
 
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.protocols.sql_client import SqlEngine, SqlEngineAttributes
+from metricflow.protocols.sql_client import SqlEngine
 from metricflow.protocols.sql_request import SqlJsonTag, SqlRequestTagSet
 from metricflow.sql.render.duckdb_renderer import DuckDbSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
@@ -19,25 +20,6 @@ from metricflow.sql_clients.common_client import SqlDialect
 from metricflow.sql_clients.sqlalchemy_dialect import SqlAlchemySqlClient
 
 logger = logging.getLogger(__name__)
-
-
-class DuckDbEngineAttributes:
-    """Engine-specific attributes for the DuckDb query engine."""
-
-    sql_engine_type: ClassVar[SqlEngine] = SqlEngine.DUCKDB
-
-    # SQL Engine capabilities
-    continuous_percentile_aggregation_supported: ClassVar[bool] = True
-    discrete_percentile_aggregation_supported: ClassVar[bool] = True
-    approximate_continuous_percentile_aggregation_supported: ClassVar[bool] = True
-    approximate_discrete_percentile_aggregation_supported: ClassVar[bool] = False
-
-    # SQL Dialect replacement strings
-    double_data_type_name: ClassVar[str] = "DOUBLE"
-    timestamp_type_name: ClassVar[Optional[str]] = "TIMESTAMP"
-
-    # MetricFlow attributes
-    sql_query_plan_renderer: ClassVar[SqlQueryPlanRenderer] = DuckDbSqlQueryPlanRenderer()
 
 
 class DuckDbSqlClient(SqlAlchemySqlClient):
@@ -68,9 +50,14 @@ class DuckDbSqlClient(SqlAlchemySqlClient):
         )
 
     @property
-    def sql_engine_attributes(self) -> SqlEngineAttributes:
-        """Collection of attributes and features specific to the Snowflake SQL engine."""
-        return DuckDbEngineAttributes()
+    @override
+    def sql_engine_type(self) -> SqlEngine:
+        return SqlEngine.DUCKDB
+
+    @property
+    @override
+    def sql_query_plan_renderer(self) -> SqlQueryPlanRenderer:
+        return DuckDbSqlQueryPlanRenderer()
 
     def _engine_specific_query_implementation(
         self,

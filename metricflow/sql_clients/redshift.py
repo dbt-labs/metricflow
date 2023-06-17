@@ -1,39 +1,18 @@
 from __future__ import annotations
 
 import logging
-from typing import ClassVar, Mapping, Optional, Sequence, Union
+from typing import Mapping, Optional, Sequence, Union
 
 import sqlalchemy
+from typing_extensions import override
 
-from metricflow.protocols.sql_client import SqlEngine, SqlEngineAttributes
+from metricflow.protocols.sql_client import SqlEngine
 from metricflow.sql.render.redshift import RedshiftSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql_clients.common_client import SqlDialect, not_empty
 from metricflow.sql_clients.sqlalchemy_dialect import SqlAlchemySqlClient
 
 logger = logging.getLogger(__name__)
-
-
-class RedshiftEngineAttributes:
-    """Engine-specific attributes for the Redshift query engine.
-
-    This is an implementation of the SqlEngineAttributes protocol for Redshift
-    """
-
-    sql_engine_type: ClassVar[SqlEngine] = SqlEngine.REDSHIFT
-
-    # SQL Engine capabilities
-    continuous_percentile_aggregation_supported: ClassVar[bool] = True
-    discrete_percentile_aggregation_supported: ClassVar[bool] = False
-    approximate_continuous_percentile_aggregation_supported: ClassVar[bool] = False
-    approximate_discrete_percentile_aggregation_supported: ClassVar[bool] = True
-
-    # SQL Dialect replacement strings
-    double_data_type_name: ClassVar[str] = "DOUBLE PRECISION"
-    timestamp_type_name: ClassVar[Optional[str]] = "TIMESTAMP"
-
-    # MetricFlow attributes
-    sql_query_plan_renderer: ClassVar[SqlQueryPlanRenderer] = RedshiftSqlQueryPlanRenderer()
 
 
 class RedshiftSqlClient(SqlAlchemySqlClient):
@@ -81,6 +60,11 @@ class RedshiftSqlClient(SqlAlchemySqlClient):
         )
 
     @property
-    def sql_engine_attributes(self) -> SqlEngineAttributes:
-        """Collection of attributes and features specific to the Snowflake SQL engine."""
-        return RedshiftEngineAttributes()
+    @override
+    def sql_engine_type(self) -> SqlEngine:
+        return SqlEngine.REDSHIFT
+
+    @property
+    @override
+    def sql_query_plan_renderer(self) -> SqlQueryPlanRenderer:
+        return RedshiftSqlQueryPlanRenderer()

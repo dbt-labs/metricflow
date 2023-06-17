@@ -2,15 +2,15 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import ClassVar, Dict, Optional, Sequence
+from typing import Dict, Optional, Sequence
 
 import google.oauth2.service_account
 import sqlalchemy
 from google.cloud.bigquery import Client
+from typing_extensions import override
 
 from metricflow.protocols.sql_client import (
     SqlEngine,
-    SqlEngineAttributes,
 )
 from metricflow.sql.render.big_query import BigQuerySqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
@@ -19,28 +19,6 @@ from metricflow.sql_clients.common_client import SqlDialect
 from metricflow.sql_clients.sqlalchemy_dialect import SqlAlchemySqlClient
 
 logger = logging.getLogger(__name__)
-
-
-class BigQueryEngineAttributes:
-    """Engine-specific attributes for the BigQuery query engine.
-
-    This is an implementation of the SqlEngineAttributes protocol for BigQuery
-    """
-
-    sql_engine_type: ClassVar[SqlEngine] = SqlEngine.BIGQUERY
-
-    # SQL Engine capabilities
-    continuous_percentile_aggregation_supported: ClassVar[bool] = False
-    discrete_percentile_aggregation_supported: ClassVar[bool] = False
-    approximate_continuous_percentile_aggregation_supported: ClassVar[bool] = True
-    approximate_discrete_percentile_aggregation_supported: ClassVar[bool] = False
-
-    # SQL Dialect replacement strings
-    double_data_type_name: ClassVar[str] = "FLOAT64"
-    timestamp_type_name: ClassVar[Optional[str]] = "DATETIME"
-
-    # MetricFlow attributes
-    sql_query_plan_renderer: ClassVar[SqlQueryPlanRenderer] = BigQuerySqlQueryPlanRenderer()
 
 
 class BigQuerySqlClient(SqlAlchemySqlClient):
@@ -113,9 +91,15 @@ class BigQuerySqlClient(SqlAlchemySqlClient):
         )
 
     @property
-    def sql_engine_attributes(self) -> SqlEngineAttributes:
+    @override
+    def sql_engine_type(self) -> SqlEngine:
         """Collection of attributes and features specific to the BigQuery SQL engine."""
-        return BigQueryEngineAttributes()
+        return SqlEngine.BIGQUERY
+
+    @property
+    @override
+    def sql_query_plan_renderer(self) -> SqlQueryPlanRenderer:
+        return BigQuerySqlQueryPlanRenderer()
 
     def list_tables(self, schema_name: str) -> Sequence[str]:  # noqa: D
         with self._engine_connection(engine=self._engine) as conn:

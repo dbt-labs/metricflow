@@ -70,7 +70,7 @@ from metricflow.plan_conversion.sql_join_builder import (
     SqlQueryPlanJoinBuilder,
 )
 from metricflow.plan_conversion.time_spine import TimeSpineSource
-from metricflow.protocols.sql_client import SqlEngine, SqlEngineAttributes
+from metricflow.protocols.sql_client import SqlEngine
 from metricflow.specs.column_assoc import ColumnAssociation, ColumnAssociationResolver, SingleColumnCorrelationKey
 from metricflow.specs.specs import (
     MeasureSpec,
@@ -1061,7 +1061,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
 
     def convert_to_sql_query_plan(
         self,
-        sql_engine_attributes: SqlEngineAttributes,
+        sql_engine_type: SqlEngine,
         sql_query_plan_id: str,
         dataflow_plan_node: Union[BaseOutput, ComputedMetricsOutput],
         optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O4,
@@ -1071,7 +1071,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
 
         # TODO: Make this a more generally accessible attribute instead of checking against the
         # BigQuery-ness of the engine
-        use_column_alias_in_group_by = sql_engine_attributes.sql_engine_type is SqlEngine.BIGQUERY
+        use_column_alias_in_group_by = sql_engine_type is SqlEngine.BIGQUERY
 
         for optimizer in SqlQueryOptimizerConfiguration.optimizers_for_level(
             optimization_level, use_column_alias_in_group_by=use_column_alias_in_group_by

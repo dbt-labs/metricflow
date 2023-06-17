@@ -7,13 +7,14 @@ import threading
 import urllib.parse
 from collections import OrderedDict
 from contextlib import contextmanager
-from typing import ClassVar, Dict, Iterator, Optional, Sequence, Set
+from typing import Dict, Iterator, Optional, Sequence, Set
 
 import pandas as pd
 import sqlalchemy
 from sqlalchemy.exc import ProgrammingError
+from typing_extensions import override
 
-from metricflow.protocols.sql_client import SqlEngine, SqlEngineAttributes
+from metricflow.protocols.sql_client import SqlEngine
 from metricflow.protocols.sql_request import (
     MF_EXTRA_TAGS_KEY,
     MF_SYSTEM_TAGS_KEY,
@@ -28,28 +29,6 @@ from metricflow.sql_clients.common_client import SqlDialect, not_empty
 from metricflow.sql_clients.sqlalchemy_dialect import SqlAlchemySqlClient
 
 logger = logging.getLogger(__name__)
-
-
-class SnowflakeEngineAttributes:
-    """Engine-specific attributes for the Snowflake query engine.
-
-    This is an implementation of the SqlEngineAttributes protocol for Snowflake
-    """
-
-    sql_engine_type: ClassVar[SqlEngine] = SqlEngine.SNOWFLAKE
-
-    # SQL Engine capabilities
-    continuous_percentile_aggregation_supported: ClassVar[bool] = True
-    discrete_percentile_aggregation_supported: ClassVar[bool] = True
-    approximate_continuous_percentile_aggregation_supported: ClassVar[bool] = True
-    approximate_discrete_percentile_aggregation_supported: ClassVar[bool] = False
-
-    # SQL Dialect replacement strings
-    double_data_type_name: ClassVar[str] = "DOUBLE"
-    timestamp_type_name: ClassVar[Optional[str]] = "TIMESTAMP"
-
-    # MetricFlow attributes
-    sql_query_plan_renderer: ClassVar[SqlQueryPlanRenderer] = SnowflakeSqlQueryPlanRenderer()
 
 
 class SnowflakeSqlClient(SqlAlchemySqlClient):
@@ -156,9 +135,14 @@ class SnowflakeSqlClient(SqlAlchemySqlClient):
         )
 
     @property
-    def sql_engine_attributes(self) -> SqlEngineAttributes:
-        """Collection of attributes and features specific to the Snowflake SQL engine."""
-        return SnowflakeEngineAttributes()
+    @override
+    def sql_engine_type(self) -> SqlEngine:
+        return SqlEngine.SNOWFLAKE
+
+    @property
+    @override
+    def sql_query_plan_renderer(self) -> SqlQueryPlanRenderer:
+        return SnowflakeSqlQueryPlanRenderer()
 
     @contextmanager
     def _engine_connection(

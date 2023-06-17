@@ -113,7 +113,7 @@ class CLIContext:
                     err_string = str(e)
                     logger.error(f"Health Check Item {step}: failed with error {err_string}")
 
-                results[f"{self.sql_client.sql_engine_attributes.sql_engine_type} - {step}"] = {
+                results[f"{self.sql_client.sql_engine_type} - {step}"] = {
                     "status": status,
                     "error_message": err_string,
                 }
