@@ -12,7 +12,6 @@ from metricflow.protocols.sql_client import SqlClient
 from metricflow.random_id import random_id
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_column_type import SqlColumnType
-from metricflow.sql_clients.sql_utils import make_df
 from metricflow.test.compare_df import assert_dataframes_equal
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 
@@ -88,20 +87,11 @@ def test_failed_query_with_execution_params(sql_client: SqlClient) -> None:  # n
         sql_client.query("this is garbage")
 
 
-def test_create_table(mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient) -> None:  # noqa: D
-    sql_table = SqlTable(schema_name=mf_test_session_state.mf_system_schema, table_name=_random_table())
-    sql_client.create_table_as_select(sql_table, _select_x_as_y())
-    df = sql_client.query(f"SELECT * FROM {sql_table.sql}")
-    _check_1col(df)
-
-
 def test_create_table_from_dataframe(  # noqa: D
     mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient
 ) -> None:
-    expected_df = make_df(
-        sql_client=sql_client,
+    expected_df = pd.DataFrame(
         columns=["int_col", "str_col", "float_col", "bool_col", "time_col"],
-        time_columns={"time_col"},
         data=[
             (1, "abc", 1.23, False, "2020-01-01"),
             (2, "def", 4.56, True, "2020-01-02"),
@@ -119,7 +109,7 @@ def test_create_table_from_dataframe(  # noqa: D
 
 def test_table_exists(mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient) -> None:  # noqa: D
     sql_table = SqlTable(schema_name=mf_test_session_state.mf_system_schema, table_name=_random_table())
-    sql_client.create_table_as_select(sql_table, _select_x_as_y())
+    sql_client.execute(f"CREATE TABLE {sql_table.sql} AS {_select_x_as_y()}")
     assert sql_client.table_exists(sql_table)
 
 
@@ -141,10 +131,6 @@ def example_df() -> pd.DataFrame:
             (2, "def", 4.56, True),
         ],
     )
-
-
-def test_health_checks(mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient) -> None:  # noqa: D
-    sql_client.health_checks(schema_name=mf_test_session_state.mf_system_schema)
 
 
 def test_dry_run(mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient) -> None:  # noqa: D
@@ -184,7 +170,7 @@ def test_list_tables(mf_test_session_state: MetricFlowTestSessionState, sql_clie
     schema = mf_test_session_state.mf_system_schema
     sql_table = SqlTable(schema_name=schema, table_name=_random_table())
     table_count_before_create = len(sql_client.list_tables(schema))
-    sql_client.create_table_as_select(sql_table, _select_x_as_y())
+    sql_client.execute(f"CREATE TABLE {sql_table.sql} AS {_select_x_as_y()}")
     table_list = sql_client.list_tables(schema)
     table_count_after_create = len(table_list)
     assert table_count_after_create == table_count_before_create + 1

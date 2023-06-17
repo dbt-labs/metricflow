@@ -99,7 +99,6 @@ integration_test:
   name: query_with_multiple_metrics_ordered_by_metric
   description: Tests query with multiple metrics ordered by metric.
   model: SIMPLE_MODEL
-  required_features: ["FULL_OUTER_JOIN"]
   metrics: ["bookings", "booking_value"]
   group_bys: ["metric_time"]
   order_bys: ["-booking_value"]
@@ -118,7 +117,6 @@ integration_test:
   name: query_with_multiple_metrics_ordered_by_dimension
   description: Tests query with multiple metrics ordered by dimension.
   model: SIMPLE_MODEL
-  required_features: ["FULL_OUTER_JOIN"]
   metrics: ["bookings", "booking_value"]
   group_bys: ["metric_time"]
   order_bys: ["-metric_time"]

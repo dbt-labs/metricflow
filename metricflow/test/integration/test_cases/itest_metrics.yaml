@@ -70,7 +70,6 @@ integration_test:
   name: constrained_metric_with_non_constrained_metric_same_source
   description: Testing querying a constrained metric and a non-constrained metric, but sharing a common measure.
   model: SIMPLE_MODEL
-  required_features: ["FULL_OUTER_JOIN"]
   metrics: ["booking_value", "instant_booking_value"]
   group_bys: ["metric_time"]
   check_query: |
@@ -99,7 +98,6 @@ integration_test:
   name: constrained_metric_with_non_constrained_metric_diff_source
   description: Query both a constrained and non-constrained metric.
   model: SIMPLE_MODEL
-  required_features: ["FULL_OUTER_JOIN"]
   metrics: ["instant_booking_value", "views"]
   group_bys: ["metric_time"]
   check_query: |
@@ -177,7 +175,6 @@ integration_test:
     Query metrics based on the same measure, but where one is constrained. Uses a FULL OUTER JOIN in the check query to
     produce NULL values correctly.
   model: SIMPLE_MODEL
-  required_features: ["FULL_OUTER_JOIN"]
   metrics: ["booking_value", "instant_booking_value"]
   group_bys: ["metric_time"]
   check_query: |
@@ -368,7 +365,6 @@ integration_test:
   name: metrics_with_different_dimension_values
   description: Test querying two metrics with a different primary date dimension.
   model: SIMPLE_MODEL
-  required_features: ["FULL_OUTER_JOIN"]
   metrics: ["bookings", "views"]
   group_bys: ["metric_time"]
   check_query: |
@@ -397,7 +393,6 @@ integration_test:
   name: ratio_with_non_ratio
   description: Test ratio metric with a non ratio metric with the same measure.
   model: SIMPLE_MODEL
-  required_features: ["FULL_OUTER_JOIN"]
   metrics: ["bookings", "bookings_per_view"]
   group_bys: ["metric_time"]
   check_query: |
@@ -429,7 +424,6 @@ integration_test:
   description: |
     Tests query with 3 metrics, and also checks an optimizing issue when there is a expression metric that is joined.
   model: SIMPLE_MODEL
-  required_features: ["FULL_OUTER_JOIN"]
   metrics: ["bookings", "bookings_per_booker", "booking_value"]
   group_bys: ["metric_time"]
   check_query: |
@@ -462,7 +456,6 @@ integration_test:
   description: |
     Tests querying multiple metrics based on different aggregation time dimensions
   model: SIMPLE_MODEL
-  required_features: ["FULL_OUTER_JOIN"]
   metrics: ["booking_value", "booking_payments"]
   group_bys: ["metric_time"]
   check_query: |

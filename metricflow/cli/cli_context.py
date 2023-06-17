@@ -10,6 +10,7 @@ from metricflow.configuration.config_handler import ConfigHandler
 from metricflow.configuration.constants import (
     CONFIG_DWH_SCHEMA,
 )
+from metricflow.dataflow.sql_table import SqlTable
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.engine.utils import build_semantic_manifest_from_config
 from metricflow.errors.errors import MetricFlowInitException, SqlClientCreationException
@@ -80,7 +81,44 @@ class CLIContext:
     def run_health_checks(self) -> Dict[str, Dict[str, str]]:
         """Execute the DB health checks."""
         try:
-            return self.sql_client.health_checks(self.mf_system_schema)
+            schema_name = self.mf_system_schema
+            table_name = "health_report"
+            checks_to_run = [
+                ("SELECT 1", lambda: self.sql_client.execute("SELECT 1")),
+                (f"Create schema '{schema_name}'", lambda: self.sql_client.create_schema(schema_name)),
+                (
+                    f"Create table '{schema_name}.{table_name}' with a SELECT",
+                    lambda: self.sql_client.execute(
+                        f"CREATE TABLE {schema_name}.{table_name} AS SELECT 'test' AS test_col"
+                    ),
+                ),
+                (
+                    f"Drop table '{schema_name}.{table_name}'",
+                    lambda: self.sql_client.drop_table(SqlTable(schema_name=schema_name, table_name="health_report")),
+                ),
+            ]
+
+            results: Dict[str, Dict[str, str]] = {}
+
+            for step, check in checks_to_run:
+                status = "SUCCESS"
+                err_string = ""
+                try:
+                    resp = check()
+                    logger.info(
+                        f"Health Check Item {step}: succeeded" + f" with response {str(resp)}" if resp else None
+                    )
+                except Exception as e:
+                    status = "FAIL"
+                    err_string = str(e)
+                    logger.error(f"Health Check Item {step}: failed with error {err_string}")
+
+                results[f"{self.sql_client.sql_engine_attributes.sql_engine_type} - {step}"] = {
+                    "status": status,
+                    "error_message": err_string,
+                }
+
+            return results
         except Exception as e:
             raise SqlClientCreationException from e
 

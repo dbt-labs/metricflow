@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from enum import Enum
-from typing import ClassVar, Dict, Optional, Protocol, Sequence
+from typing import ClassVar, Optional, Protocol, Sequence
 
 from pandas import DataFrame
 
@@ -23,18 +23,6 @@ class SqlEngine(Enum):
     DATABRICKS = "Databricks"
 
 
-class SqlIsolationLevel(Enum):
-    """Describes the isolation levels used to execute SQL queries. Values are passed as options to SQLAlchemy."""
-
-    READ_UNCOMMITTED = "READ_UNCOMMITTED"
-    READ_COMMITTED = "READ_COMMITTED"
-    REPEATABLE_READ = "REPEATABLE_READ"
-    SNAPSHOT = "SNAPSHOT"
-    # Unique to Databricks.
-    WRITE_SERIALIZABLE = "WRITE_SERIALIZABLE"
-    SERIALIZABLE = "SERIALIZABLE"
-
-
 class SqlClient(Protocol):
     """Base interface for SqlClient instances used inside MetricFlow.
 
@@ -49,22 +37,6 @@ class SqlClient(Protocol):
         See documentation on SqlEngineAttributes for details. This property is configured as a tagged
         method rather than a simple property because defining it as a simple property makes it settable,
         and we should not be re-using SqlClient instances with different SqlEngineAttributes.
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def create_table_as_select(
-        self,
-        sql_table: SqlTable,
-        select_query: str,
-        sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
-    ) -> None:
-        """Method for creating a table from the provided select query.
-
-        Args:
-            sql_table: The SqlTable metadata of the table to create
-            select_query: The query to use to populate the table
-            sql_bind_parameters: Map of values to substitute in to parameterized sql query strings
         """
         raise NotImplementedError
 
@@ -90,7 +62,6 @@ class SqlClient(Protocol):
         stmt: str,
         sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
         extra_tags: SqlJsonTag = SqlJsonTag(),
-        isolation_level: Optional[SqlIsolationLevel] = None,
     ) -> DataFrame:
         """Base query method, upon execution will run a query that returns a pandas DataFrame."""
         raise NotImplementedError
@@ -101,7 +72,6 @@ class SqlClient(Protocol):
         stmt: str,
         sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
         extra_tags: SqlJsonTag = SqlJsonTag(),
-        isolation_level: Optional[SqlIsolationLevel] = None,
     ) -> None:
         """Base execute method."""
         raise NotImplementedError
@@ -141,23 +111,6 @@ class SqlClient(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    def health_checks(self, schema_name: str) -> Dict[str, Dict[str, str]]:
-        """Run health checks against the underlying Data Warehouse.
-
-        TODO: Consider restructuring this so the health checks are separate from the SqlClient
-        TODO: Re-evaluate the return type to see if there's a more structured option available
-
-        This method fires a bunch of queries and collects results inside of a flexible output object for
-        later processing. This method has been ported over to the SqlClient Protocol from the original
-        closed-source client classes. It was included there because certain health checks are warehouse-specific,
-        e.g., there are checks to verify that specific session values are properly configured for Snowflake
-        instances, and migrating to a new model will be quite messy in the short term. Longer term it likely
-        makes sense for these to be in a separate module, but for the time being the CLI will invoke health
-        checks and therefore this needs to remain part of the core Protocol.
-        """
-        raise NotImplementedError
-
-    @abstractmethod
     def close(self) -> None:  # noqa: D
         """Close the connections / engines used by this client."""
         raise NotImplementedError
@@ -171,9 +124,6 @@ class SqlClient(Protocol):
 class SqlEngineAttributes(Protocol):
     """Base interface for SQL engine-specific attributes and features.
 
-    These include items like support for language features (e.g., FULL OUTER JOIN support), dialect differences
-    (e.g., DOUBLE type name), and things of that nature.
-
     Concrete implementations would typically be the equivalent of frozen dataclass literals, one per
     MetricFlowSupportedDBEngine, as we would not expect these properties to change from one client to the next.
 
@@ -184,24 +134,15 @@ class SqlEngineAttributes(Protocol):
     sql_engine_type: ClassVar[SqlEngine]
 
     # SQL Engine capabilities
-    # The isolation levels supported as options through the SqlClient API. This may be a subset of the isolation levels
-    # supported by the engine until implementation / testing is complete.
-    supported_isolation_levels: ClassVar[Sequence[SqlIsolationLevel]]
-    date_trunc_supported: ClassVar[bool]
-    full_outer_joins_supported: ClassVar[bool]
-    indexes_supported: ClassVar[bool]
-    multi_threading_supported: ClassVar[bool]
-    timestamp_type_supported: ClassVar[bool]
-    timestamp_to_string_comparison_supported: ClassVar[bool]
     continuous_percentile_aggregation_supported: ClassVar[bool]
     discrete_percentile_aggregation_supported: ClassVar[bool]
     approximate_continuous_percentile_aggregation_supported: ClassVar[bool]
     approximate_discrete_percentile_aggregation_supported: ClassVar[bool]
 
     # SQL Dialect replacement strings
+    # TODO: Move these to rendering classes
     double_data_type_name: ClassVar[str]
     timestamp_type_name: ClassVar[Optional[str]]
-    random_function_name: ClassVar[str]
 
     # MetricFlow attributes
     sql_query_plan_renderer: ClassVar[SqlQueryPlanRenderer]

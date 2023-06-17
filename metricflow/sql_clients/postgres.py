@@ -5,7 +5,7 @@ from typing import ClassVar, Mapping, Optional, Sequence, Union
 
 import sqlalchemy
 
-from metricflow.protocols.sql_client import SqlEngine, SqlEngineAttributes, SqlIsolationLevel
+from metricflow.protocols.sql_client import SqlEngine, SqlEngineAttributes
 from metricflow.sql.render.postgres import PostgresSQLSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql_clients.common_client import SqlDialect, not_empty
@@ -23,13 +23,6 @@ class PostgresEngineAttributes:
     sql_engine_type: ClassVar[SqlEngine] = SqlEngine.POSTGRES
 
     # SQL Engine capabilities
-    supported_isolation_levels: ClassVar[Sequence[SqlIsolationLevel]] = ()
-    date_trunc_supported: ClassVar[bool] = True
-    full_outer_joins_supported: ClassVar[bool] = True
-    indexes_supported: ClassVar[bool] = True
-    multi_threading_supported: ClassVar[bool] = True
-    timestamp_type_supported: ClassVar[bool] = True
-    timestamp_to_string_comparison_supported: ClassVar[bool] = True
     continuous_percentile_aggregation_supported: ClassVar[bool] = True
     discrete_percentile_aggregation_supported: ClassVar[bool] = True
     approximate_continuous_percentile_aggregation_supported: ClassVar[bool] = False
@@ -38,7 +31,6 @@ class PostgresEngineAttributes:
     # SQL Dialect replacement strings
     double_data_type_name: ClassVar[str] = "DOUBLE PRECISION"
     timestamp_type_name: ClassVar[Optional[str]] = "TIMESTAMP"
-    random_function_name: ClassVar[str] = "RANDOM"
 
     # MetricFlow attributes
     sql_query_plan_renderer: ClassVar[SqlQueryPlanRenderer] = PostgresSQLSqlQueryPlanRenderer()

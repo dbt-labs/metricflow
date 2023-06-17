@@ -1,0 +1,7 @@
+kind: Under the Hood
+body: Remove SqlIsolationLevel constructs and other vestigial remnants of defunct
+  SqlClient features
+time: 2023-06-13T11:47:14.505052-07:00
+custom:
+  Author: tlento
+  Issue: "577"

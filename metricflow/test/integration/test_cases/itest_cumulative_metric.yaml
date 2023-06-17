@@ -3,7 +3,6 @@ integration_test:
   name: windowed_cumulative_metric
   description: Query a cumulative metric that aggregates the last 2 months.
   model: SIMPLE_MODEL
-  required_features: ["DATE_TRUNC"]
   metrics: ["trailing_2_months_revenue"]
   group_bys: ["metric_time"]
   order_bys: ["metric_time"]
@@ -31,7 +30,6 @@ integration_test:
   name: windowed_cumulative_metric_with_joined_dim
   description: Query a cumulative metric that aggregates the last 2 months with a joined dimension.
   model: SIMPLE_MODEL
-  required_features: ["DATE_TRUNC"]
   metrics: ["trailing_2_months_revenue"]
   group_bys: ["metric_time", "user__home_state_latest"]
   order_bys: ["metric_time", "user__home_state_latest"]
@@ -101,7 +99,6 @@ integration_test:
   name: multiple_cumulative_metrics
   description: Query two different cumulative metrics.
   model: SIMPLE_MODEL
-  required_features: ["FULL_OUTER_JOIN"]
   metrics: ["revenue_all_time", "trailing_2_months_revenue"]
   group_bys: ["metric_time"]
   order_bys: ["metric_time"]
@@ -156,7 +153,6 @@ integration_test:
   name: windowed_cumulative_metric_by_time_dimension_with_granularity
   description: Query a windowed cumulative metric by a time dimension with the granularity suffix.
   model: SIMPLE_MODEL
-  required_features: ["DATE_TRUNC"]
   metrics: ["trailing_2_months_revenue"]
   group_bys: ["metric_time__day"]
   order_bys: ["metric_time__day"]
@@ -265,7 +261,6 @@ integration_test:
   name: grain_to_date_cumulative_metric
   description: Query a cumulative metric with a non-additive measure and a limited time range.
   model: SIMPLE_MODEL
-  required_features: [DATE_TRUNC]
   metrics: ["revenue_mtd"]
   group_bys: ["metric_time"]
   order_bys: ["metric_time"]

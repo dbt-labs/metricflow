@@ -1,12 +1,10 @@
 from __future__ import annotations
 
 import logging
-import textwrap
 import time
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Optional
 
-import jinja2
 import pandas as pd
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 
@@ -15,7 +13,6 @@ from metricflow.logging.formatting import indent_log_line
 from metricflow.protocols.sql_client import (
     SqlClient,
     SqlEngineAttributes,
-    SqlIsolationLevel,
 )
 from metricflow.protocols.sql_request import SqlJsonTag, SqlRequestId, SqlRequestTagSet
 from metricflow.random_id import random_id
@@ -33,47 +30,6 @@ class SqlClientException(Exception):
 
 class BaseSqlClientImplementation(ABC, SqlClient):
     """Abstract implementation that other SQL clients are based on."""
-
-    def generate_health_check_tests(self, schema_name: str) -> List[Tuple[str, Any]]:  # type: ignore
-        """List of base health checks we want to perform."""
-        table_name = "health_report"
-        return [
-            ("SELECT 1", lambda: self.execute("SELECT 1")),
-            (f"Create schema '{schema_name}'", lambda: self.create_schema(schema_name)),
-            (
-                f"Create table '{schema_name}.{table_name}' with a SELECT",
-                lambda: self.create_table_as_select(
-                    SqlTable(schema_name=schema_name, table_name="health_report"), "SELECT 'test' AS test_col"
-                ),
-            ),
-            (
-                f"Drop table '{schema_name}.{table_name}'",
-                lambda: self.drop_table(SqlTable(schema_name=schema_name, table_name="health_report")),
-            ),
-        ]
-
-    def health_checks(self, schema_name: str) -> Dict[str, Dict[str, str]]:
-        """Perform health checks."""
-        checks_to_run = self.generate_health_check_tests(schema_name)
-        results: Dict[str, Dict[str, str]] = {}
-
-        for step, check in checks_to_run:
-            status = "SUCCESS"
-            err_string = ""
-            try:
-                resp = check()
-                logger.info(f"Health Check Item {step}: succeeded" + f" with response {str(resp)}" if resp else None)
-            except Exception as e:
-                status = "FAIL"
-                err_string = str(e)
-                logger.error(f"Health Check Item {step}: failed with error {err_string}")
-
-            results[f"{type(self).__name__.lower()} - {step}"] = {
-                "status": status,
-                "error_message": err_string,
-            }
-
-        return results
 
     @staticmethod
     def _format_run_query_log_message(statement: str, sql_bind_parameters: SqlBindParameters) -> str:
@@ -93,7 +49,6 @@ class BaseSqlClientImplementation(ABC, SqlClient):
         stmt: str,
         sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
         extra_tags: SqlJsonTag = SqlJsonTag(),
-        isolation_level: Optional[SqlIsolationLevel] = None,
     ) -> pd.DataFrame:
         """Query statement; result expected to be data which will be returned as a DataFrame.
 
@@ -112,7 +67,6 @@ class BaseSqlClientImplementation(ABC, SqlClient):
         df = self._engine_specific_query_implementation(
             stmt=statement,
             bind_params=sql_bind_parameters,
-            isolation_level=isolation_level,
             system_tags=combined_tags.system_tags,
             extra_tags=combined_tags.extra_tag,
         )
@@ -127,7 +81,6 @@ class BaseSqlClientImplementation(ABC, SqlClient):
         stmt: str,
         sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
         extra_tags: SqlJsonTag = SqlJsonTag(),
-        isolation_level: Optional[SqlIsolationLevel] = None,
     ) -> None:
         start = time.time()
         request_id = SqlRequestId(f"mf_rid__{random_id()}")
@@ -139,7 +92,6 @@ class BaseSqlClientImplementation(ABC, SqlClient):
         self._engine_specific_execute_implementation(
             stmt=statement,
             bind_params=sql_bind_parameters,
-            isolation_level=isolation_level,
             system_tags=combined_tags.system_tags,
             extra_tags=combined_tags.extra_tag,
         )
@@ -184,7 +136,6 @@ class BaseSqlClientImplementation(ABC, SqlClient):
         self,
         stmt: str,
         bind_params: SqlBindParameters,
-        isolation_level: Optional[SqlIsolationLevel] = None,
         system_tags: SqlRequestTagSet = SqlRequestTagSet(),
         extra_tags: SqlJsonTag = SqlJsonTag(),
     ) -> pd.DataFrame:
@@ -196,7 +147,6 @@ class BaseSqlClientImplementation(ABC, SqlClient):
         self,
         stmt: str,
         bind_params: SqlBindParameters,
-        isolation_level: Optional[SqlIsolationLevel] = None,
         system_tags: SqlRequestTagSet = SqlRequestTagSet(),
         extra_tags: SqlJsonTag = SqlJsonTag(),
     ) -> None:
@@ -219,28 +169,6 @@ class BaseSqlClientImplementation(ABC, SqlClient):
 
     def table_exists(self, sql_table: SqlTable) -> bool:  # noqa: D
         return sql_table.table_name in self.list_tables(sql_table.schema_name)
-
-    def create_table_as_select(  # noqa: D
-        self,
-        sql_table: SqlTable,
-        select_query: str,
-        sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
-    ) -> None:
-        self.execute(
-            jinja2.Template(
-                textwrap.dedent(
-                    """\
-                    CREATE TABLE {{ sql_table }} AS
-                      {{ select_query | indent(2) }}
-                    """
-                ),
-                undefined=jinja2.StrictUndefined,
-            ).render(
-                sql_table=sql_table.sql,
-                select_query=select_query,
-            ),
-            sql_bind_parameters=sql_bind_parameters,
-        )
 
     def create_schema(self, schema_name: str) -> None:  # noqa: D
         self.execute(f"CREATE SCHEMA IF NOT EXISTS {schema_name}")
