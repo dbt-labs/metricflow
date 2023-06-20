@@ -1,10 +1,10 @@
-resolves #
-
 <!---
   Include the number of the issue addressed by this PR above if applicable.
   PRs for code changes without an associated issue *will not be merged*.
   See CONTRIBUTING.md for more information.
 -->
+Resolves Issue #
+
 
 ### Description
 
