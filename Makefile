@@ -39,3 +39,7 @@ lint:
 postgresql postgres:
 	make -C local-data-warehouses postgresql
 
+# Re-generate test snapshots using all supported SQL engines.
+.PHONY: regenerate-test-snapshots
+regenerate-test-snapshots:
+	hatch -v run dev-env:python metricflow/test/generate_snapshots.py
