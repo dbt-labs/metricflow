@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import datetime as dt
+import pathlib
 from typing import Optional
 
 from dateutil.parser import parse
+from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from dbt_semantic_interfaces.parsing.dir_to_model import (
     SemanticManifestBuildResult,
     parse_directory_of_yaml_files_to_semantic_manifest,
@@ -45,6 +47,31 @@ def model_build_result_from_config(
 def build_semantic_manifest_from_config(handler: YamlFileHandler) -> SemanticManifest:
     """Given a yaml file, create a SemanticManifest."""
     return model_build_result_from_config(handler=handler).semantic_manifest
+
+
+def parse_semantic_manifest_from_json_file(filepath: str) -> SemanticManifest:
+    """Parses a semantic_manifest json to the pydantic object."""
+    try:
+        with open(filepath, "r") as file:
+            raw_contents = file.read()
+            return PydanticSemanticManifest.parse_raw(raw_contents)
+    except Exception as e:
+        raise ModelCreationException from e
+
+
+def build_semantic_manifest_from_dbt_project_root() -> SemanticManifest:
+    """In the dbt project root, retrieve the manifest path and parse the SemanticManifest."""
+    DEFAULT_TARGET_PATH = "target/semantic_manifest.json"
+    full_path_to_manifest = pathlib.Path(DEFAULT_TARGET_PATH).resolve()
+    if not full_path_to_manifest.exists():
+        raise ModelCreationException(
+            "Unable to find {DBT_PROJECT_ROOT}/"
+            + DEFAULT_TARGET_PATH
+            + "\nPlease ensure that you are running `mf` in the root directory of a dbt project"
+            + " and that the semantic_manifest JSON exists."
+        )
+
+    return parse_semantic_manifest_from_json_file(full_path_to_manifest.as_posix())
 
 
 def convert_to_datetime(datetime_str: Optional[str]) -> Optional[dt.datetime]:

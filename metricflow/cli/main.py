@@ -43,7 +43,7 @@ from metricflow.configuration.config_builder import YamlTemplateBuilder
 from metricflow.dag.dag_visualization import display_dag_as_svg
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.engine.metricflow_engine import MetricFlowExplainResult, MetricFlowQueryRequest, MetricFlowQueryResult
-from metricflow.engine.utils import model_build_result_from_config
+from metricflow.engine.utils import build_semantic_manifest_from_dbt_project_root
 from metricflow.model.data_warehouse_model_validator import DataWarehouseModelValidator
 from metricflow.sql_clients.common_client import SqlDialect
 from metricflow.telemetry.models import TelemetryLevel
@@ -663,34 +663,28 @@ def validate_configs(
         print("(To see warnings and future-errors, run again with flag `--show-all`)")
 
     # Parsing Validation
-    parsing_spinner = Halo(text="Building model from configs", spinner="dots")
+    parsing_spinner = Halo(text="Building manifest from dbt project root", spinner="dots")
     parsing_spinner.start()
 
-    parsing_result = model_build_result_from_config(handler=cfg.config, raise_issues_as_exceptions=False)
-
-    if not parsing_result.issues.has_blocking_issues:
-        parsing_spinner.succeed(f"🎉 Successfully built model from configs ({parsing_result.issues.summary()})")
-    else:
-        parsing_spinner.fail(
-            f"Breaking issues found when building model from configs ({parsing_result.issues.summary()})"
-        )
-        _print_issues(parsing_result.issues, show_non_blocking=show_all, verbose=verbose_issues)
+    try:
+        semantic_manifest = build_semantic_manifest_from_dbt_project_root()
+        parsing_spinner.succeed("🎉 Successfully parsed manifest from dbt project")
+    except Exception as e:
+        parsing_spinner.fail(f"Exception found when parsing manifest from dbt project ({str(e)})")
         return
 
-    semantic_manifest = parsing_result.semantic_manifest
-
     # Semantic validation
-    semantic_spinner = Halo(text="Validating semantics of built model", spinner="dots")
+    semantic_spinner = Halo(text="Validating semantics of built manifest", spinner="dots")
     semantic_spinner.start()
     model_issues = SemanticManifestValidator[SemanticManifest](
         max_workers=semantic_validation_workers
     ).validate_semantic_manifest(semantic_manifest)
 
     if not model_issues.has_blocking_issues:
-        semantic_spinner.succeed(f"🎉 Successfully validated the semantics of built model ({model_issues.summary()})")
+        semantic_spinner.succeed(f"🎉 Successfully validated the semantics of built manifest ({model_issues.summary()})")
     else:
         semantic_spinner.fail(
-            f"Breaking issues found when checking semantics of built model ({model_issues.summary()})"
+            f"Breaking issues found when checking semantics of built manifest ({model_issues.summary()})"
         )
         _print_issues(model_issues, show_non_blocking=show_all, verbose=verbose_issues)
         return
@@ -702,7 +696,7 @@ def validate_configs(
             dw_validator=dw_validator, manifest=semantic_manifest, timeout=dw_timeout
         )
 
-    merged_results = SemanticManifestValidationResults.merge([parsing_result.issues, model_issues, dw_results])
+    merged_results = SemanticManifestValidationResults.merge([model_issues, dw_results])
     _print_issues(merged_results, show_non_blocking=show_all, verbose=verbose_issues)
 
 
