@@ -66,7 +66,7 @@ When running any one of the hatch commands, the environment is automatically set
 5. To see how your changes work with more interactive queries, use your repo-local CLI.
     - Run `hatch run dev-env:mf --help`
     - Follow the CLI help from there, just remember your local CLI is always `hatch run dev-env:run mf <COMMAND>`!
-
+6. Some tests generate snapshots in the test directory. Separate snapshots may be generated for each SQL engine. You can regenerate these snapshots by running `make regenerate-test-snapshots`.
 ## Adding or modifying a CHANGELOG Entry!
 
 We use [changie](https://changie.dev) to generate `CHANGELOG` entries. **Note:** Do not edit the `CHANGELOG.md` directly. Your modifications will be lost.
