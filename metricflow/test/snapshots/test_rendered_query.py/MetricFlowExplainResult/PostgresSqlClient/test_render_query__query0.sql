@@ -11,7 +11,7 @@ FROM (
   SELECT
     ds
     , 1 AS bookings
-  FROM ***************************.fct_bookings bookings_source_src_3
+  FROM ***************************.fct_bookings bookings_source_src_1
 ) subq_2
 GROUP BY
   ds
