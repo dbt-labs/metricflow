@@ -333,7 +333,9 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
         self._source_data_sets: List[SemanticModelDataSet] = []
         converter = SemanticModelToDataSetConverter(column_association_resolver=self._column_association_resolver)
-        for semantic_model in self._semantic_manifest_lookup.semantic_manifest.semantic_models:
+        for semantic_model in sorted(
+            self._semantic_manifest_lookup.semantic_manifest.semantic_models, key=lambda model: model.name
+        ):
             data_set = converter.create_sql_source_data_set(semantic_model)
             self._source_data_sets.append(data_set)
             logger.info(f"Created source dataset from semantic model '{semantic_model.name}'")
