@@ -2,20 +2,21 @@ from __future__ import annotations
 
 import os
 import pathlib
-from datetime import datetime
-from unittest.mock import MagicMock, patch
+import shutil
+import textwrap
+from contextlib import contextmanager
+from pathlib import Path
+from typing import Iterator
 
-from dbt_semantic_interfaces.parsing.dir_to_model import parse_directory_of_yaml_files_to_semantic_manifest
-from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
-from dbt_semantic_interfaces.validations.validator_helpers import (
-    SemanticManifestValidationResults,
-    ValidationError,
-    ValidationFutureError,
-    ValidationWarning,
+from dbt_semantic_interfaces.parsing.dir_to_model import (
+    parse_directory_of_yaml_files_to_semantic_manifest,
+    parse_yaml_files_to_validation_ready_semantic_manifest,
 )
+from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
+from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
+from dbt_semantic_interfaces.test_utils import base_semantic_manifest_file
+from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 
-from metricflow.cli.cli_context import CLIContext
 from metricflow.cli.main import (
     dimension_values,
     dimensions,
@@ -63,85 +64,44 @@ def test_get_dimension_values(cli_runner: MetricFlowCliRunner) -> None:  # noqa:
     assert resp.exit_code == 0
 
 
+@contextmanager
+def create_directory(directory_path: str) -> Iterator[None]:
+    """Creates a temporary directory (errors if it exists) and removes it."""
+    path = Path(directory_path)
+    path.mkdir(parents=True)
+    yield
+    shutil.rmtree(path)
+
+
 def test_validate_configs(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    # Mock build result for `model_build_result_from_config`
-    mocked_parsing_result = MagicMock(issues=SemanticManifestValidationResults())
-    # Mock validation errors in validate_model function
-    issues = (
-        ValidationWarning(context=None, message="warning_message"),  # type: ignore
-        ValidationFutureError(context=None, message="future_error_message", error_date=datetime.now()),  # type: ignore
-        ValidationError(context=None, message="error_message"),  # type: ignore
+    yaml_contents = textwrap.dedent(
+        """\
+        semantic_model:
+          name: bad_semantic_model
+          node_relation:
+            schema_name: some_schema
+            alias: some_table
+          defaults:
+            agg_time_dimension: ds
+          dimensions:
+            - name: country
+              type: categorical
+        """
     )
-    mocked_validate_model = SemanticManifestValidationResults.from_issues_sequence(issues)
-    with patch("metricflow.cli.main.model_build_result_from_config", return_value=mocked_parsing_result):
-        with patch.object(SemanticManifestValidator, "validate_semantic_manifest", return_value=mocked_validate_model):
-            resp = cli_runner.run(validate_configs)
+    bad_semantic_model = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
+    manifest = parse_yaml_files_to_validation_ready_semantic_manifest(
+        [base_semantic_manifest_file(), bad_semantic_model]
+    ).semantic_manifest
 
-    assert "error_message" in resp.output
-    assert resp.exit_code == 0
+    target_directory = Path().absolute() / "target"
+    with create_directory(target_directory.as_posix()):
+        manifest_file = target_directory / "semantic_manifest.json"
+        manifest_file.write_text(manifest.json())
 
+        resp = cli_runner.run(validate_configs)
 
-def test_future_errors_and_warnings_conditionally_show_up(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    # Mock build result for `model_build_result_from_config`
-    mocked_parsing_result = MagicMock(issues=SemanticManifestValidationResults())
-    # Mock validation errors in validate_model function
-    issues = (
-        ValidationWarning(context=None, message="warning_message"),  # type: ignore
-        ValidationFutureError(context=None, message="future_error_message", error_date=datetime.now()),  # type: ignore
-        ValidationError(context=None, message="error_message"),  # type: ignore
-    )
-    mocked_validate_model = SemanticManifestValidationResults.from_issues_sequence(issues)
-    with patch("metricflow.cli.main.model_build_result_from_config", return_value=mocked_parsing_result):
-        with patch.object(SemanticManifestValidator, "validate_semantic_manifest", return_value=mocked_validate_model):
-            resp = cli_runner.run(validate_configs)
-
-    assert "warning_message" not in resp.output
-    assert "future_error_message" not in resp.output
-    assert resp.exit_code == 0
-
-    with patch("metricflow.cli.main.model_build_result_from_config", return_value=mocked_parsing_result):
-        with patch.object(SemanticManifestValidator, "validate_semantic_manifest", return_value=mocked_validate_model):
-            resp = cli_runner.run(validate_configs, ["--show-all"])
-
-    assert "warning_message" in resp.output
-    assert "future_error_message" in resp.output
-    assert resp.exit_code == 0
-
-
-def test_validate_configs_data_warehouse_validations(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    # Mock build result for `model_build_result_from_config`
-    mocked_parsing_result = MagicMock(issues=SemanticManifestValidationResults())
-    dw_validation_issues = [
-        ValidationError(context=None, message="Data Warehouse Error"),  # type: ignore
-    ]
-    with patch("metricflow.cli.main.model_build_result_from_config", return_value=mocked_parsing_result):
-        with patch.object(
-            SemanticManifestValidator, "validate_semantic_manifest", return_value=SemanticManifestValidationResults()
-        ):
-            with patch.object(CLIContext, "sql_client", return_value=None):  # type: ignore
-                with patch(
-                    "metricflow.cli.main._run_dw_validations",
-                    return_value=SemanticManifestValidationResults(errors=dw_validation_issues),
-                ):
-                    resp = cli_runner.run(validate_configs)
-
-    assert "Data Warehouse Error" in resp.output
-    assert resp.exit_code == 0
-
-
-def test_validate_configs_skip_data_warehouse_validations(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    # Mock build result for `model_build_result_from_config`
-    mocked_parsing_result = MagicMock(issues=SemanticManifestValidationResults())
-    with patch("metricflow.cli.main.model_build_result_from_config", return_value=mocked_parsing_result):
-        with patch.object(
-            SemanticManifestValidator,
-            "validate_semantic_manifest",
-            return_value=MagicMock(issues=SemanticManifestValidationResults()),
-        ):
-            resp = cli_runner.run(validate_configs, args=["--skip-dw"])
-
-    assert "Data Warehouse Error" not in resp.output
-    assert resp.exit_code == 0
+        assert "ERROR" in resp.output
+        assert resp.exit_code == 0
 
 
 def test_health_checks(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
