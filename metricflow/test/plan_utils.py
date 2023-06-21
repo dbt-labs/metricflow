@@ -228,7 +228,7 @@ def assert_execution_plan_text_equal(  # noqa: D
             system_schema=mf_test_session_state.mf_system_schema,
             source_schema=mf_test_session_state.mf_source_schema,
         ),
-        additional_sub_directories_for_snapshots=(sql_client.__class__.__name__,),
+        additional_sub_directories_for_snapshots=(sql_client.sql_engine_type.value,),
     )
 
 
@@ -244,5 +244,5 @@ def assert_dataflow_plan_text_equal(  # noqa: D
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
         incomparable_strings_replacement_function=replace_dataset_id_hash,
-        additional_sub_directories_for_snapshots=(sql_client.__class__.__name__,),
+        additional_sub_directories_for_snapshots=(sql_client.sql_engine_type.value,),
     )

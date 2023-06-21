@@ -33,7 +33,7 @@ def test_render_query(  # noqa: D
             system_schema=it_helpers.mf_system_schema, source_schema=it_helpers.source_schema
         ),
         exclude_line_regex=_EXCLUDE_TABLE_ALIAS_REGEX,
-        additional_sub_directories_for_snapshots=(it_helpers.sql_client.__class__.__name__,),
+        additional_sub_directories_for_snapshots=(it_helpers.sql_client.sql_engine_type.value,),
     )
 
 
@@ -59,5 +59,5 @@ def test_render_write_to_table_query(  # noqa: D
             system_schema=it_helpers.mf_system_schema, source_schema=it_helpers.source_schema
         ),
         exclude_line_regex=_EXCLUDE_TABLE_ALIAS_REGEX,
-        additional_sub_directories_for_snapshots=(it_helpers.sql_client.__class__.__name__,),
+        additional_sub_directories_for_snapshots=(it_helpers.sql_client.sql_engine_type.value,),
     )

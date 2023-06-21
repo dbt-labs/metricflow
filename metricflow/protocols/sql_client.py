@@ -13,7 +13,10 @@ from metricflow.sql.sql_bind_parameters import SqlBindParameters
 
 
 class SqlEngine(Enum):
-    """Enumeration of SQL engines, including ones that are not yet supported."""
+    """Enumeration of supported SQL engines.
+
+    Values are normalized engine names used for things like snapshot file locations.
+    """
 
     BIGQUERY = "BigQuery"
     DUCKDB = "DuckDB"
