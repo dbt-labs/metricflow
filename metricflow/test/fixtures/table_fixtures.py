@@ -17,9 +17,16 @@ from metricflow.test.table_snapshot.table_snapshots import (
 logger = logging.getLogger(__name__)
 
 
+# Prefer to use the fixture, but there are some cases where fixtures aren't available. e.g. when defining a
+# parameterized test.
+CONFIGURED_SOURCE_TABLE_SNAPSHOT_REPOSITORY = SqlTableSnapshotRepository(
+    Path(os.path.dirname(__file__)).joinpath("source_table_snapshots")
+)
+
+
 @pytest.fixture(scope="session")
 def source_table_snapshot_repository() -> SqlTableSnapshotRepository:  # noqa: D
-    return SqlTableSnapshotRepository(Path(os.path.dirname(__file__)).joinpath("source_table_snapshots"))
+    return CONFIGURED_SOURCE_TABLE_SNAPSHOT_REPOSITORY
 
 
 @pytest.fixture(scope="session", autouse=True)
