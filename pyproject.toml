@@ -29,8 +29,7 @@ dependencies = [
   "SQLAlchemy~=1.4.42",
   "click>=7.1.2",
   "databricks-sql-connector==2.0.3",
-  # Pin to 1.5 for now
-  "dbt-core==1.5.0",
+  "dbt-core==1.6.0b5",
   "dbt-semantic-interfaces==0.1.0.dev7",
   "duckdb-engine~=0.1.8",
   "duckdb==0.3.4",
