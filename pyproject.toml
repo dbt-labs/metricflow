@@ -107,3 +107,4 @@ filterwarnings = [
     "ignore:Deprecated call to.*",
     "ignore:pkg_resources is deprecated as an API"
 ]
+python_functions = "test_* populate_source_schema"
