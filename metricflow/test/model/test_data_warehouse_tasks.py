@@ -249,7 +249,7 @@ def test_build_metric_tasks(  # noqa: D
         incomparable_strings_replacement_function=make_schema_replacement_function(
             system_schema=mf_test_session_state.mf_system_schema, source_schema=mf_test_session_state.mf_source_schema
         ),
-        additional_sub_directories_for_snapshots=(sql_client.__class__.__name__,),
+        additional_sub_directories_for_snapshots=(sql_client.sql_engine_type.value,),
     )
 
 
