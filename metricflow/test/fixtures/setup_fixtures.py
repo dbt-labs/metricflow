@@ -78,6 +78,7 @@ class MetricFlowTestEnvironmentVariables:
 @pytest.fixture(scope="session")
 def mf_test_session_state(  # noqa: D
     request: FixtureRequest,
+    disable_sql_alchemy_deprecation_warning: None,
     source_table_snapshot_repository: SqlTableSnapshotRepository,
 ) -> MetricFlowTestSessionState:
     engine_url = MetricFlowTestEnvironmentVariables.MF_SQL_ENGINE_URL.get_optional()

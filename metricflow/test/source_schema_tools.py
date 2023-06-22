@@ -27,7 +27,8 @@ def create_tables_listed_in_table_snapshot_repository(
         [table_snapshot.table_name for table_snapshot in table_snapshot_repository.table_snapshots]
     )
     logger.info(
-        f"The following tables are needed in schema {schema_name}:\n" f"{pformat_big_objects(expected_table_names)}"
+        f"The following tables will be created if they don't exist in {schema_name}:\n" 
+        f"{pformat_big_objects(expected_table_names)}"
     )
     source_schema_table_names = sorted(sql_client.list_tables(schema_name=schema_name))
 
