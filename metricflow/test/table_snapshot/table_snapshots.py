@@ -143,7 +143,11 @@ class SqlTableSnapshotRestorer:
         )
 
 
-class TableSnapshotParseException(Exception):  # noqa: D
+class TableSnapshotException(Exception):  # noqa: D
+    pass
+
+
+class TableSnapshotParseException(TableSnapshotException):  # noqa: D
     pass
 
 
