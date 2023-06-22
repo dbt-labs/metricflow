@@ -83,4 +83,4 @@ def scd_dataflow_plan_builder(  # noqa: D
 def time_spine_source(  # noqa: D
     sql_client: SqlClient, mf_test_session_state: MetricFlowTestSessionState  # noqa: F811
 ) -> TimeSpineSource:
-    return TimeSpineSource(schema_name=mf_test_session_state.mf_system_schema)
+    return TimeSpineSource(schema_name=mf_test_session_state.mf_source_schema, table_name="mf_time_spine")
