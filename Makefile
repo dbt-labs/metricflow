@@ -41,3 +41,4 @@ postgresql postgres:
 .PHONY: regenerate-test-snapshots
 regenerate-test-snapshots:
 	hatch -v run dev-env:python metricflow/test/generate_snapshots.py
+	hatch -v run postgres-env:pytest -vv -n ${PARALLELISM} --overwrite-snapshots metricflow/test
