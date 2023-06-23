@@ -72,6 +72,13 @@ def create_source_tables(
 
     If a table with a given name already exists in the source schema, it's assumed to have the expected schema / data.
     """
+    if mf_test_session_state.use_persistent_source_schema:
+        logger.info(
+            "This session was configured to use a persistent source schema, so this fixture won't create new tables. "
+            "See populate_source_schema() for more details."
+        )
+        return
+
     create_tables_listed_in_table_snapshot_repository(
         sql_client=sql_client,
         schema_name=mf_test_session_state.mf_source_schema,
