@@ -99,19 +99,25 @@ features = [
   "dev-packages",
 ]
 
+[tool.hatch.envs.postgres-env.env-vars]
+	MF_SQL_ENGINE_URL="postgresql://metricflow@localhost:5432/metricflow"
+	MF_SQL_ENGINE_PASSWORD="metricflowing"
+	MF_TEST_ADAPTER_TYPE="postgres"
+
 [tool.hatch.envs.postgres-env]
 description = "Dev environment for working with Postgres adapter"
+# Install the dbt postgres package as a pre-install extra
+# This helps us avoid having to do version pegs, although it relies on pip's
+# current "pretend version conflicts aren't a problem" behavior for existing
+# installations. In future, this will be updated to use an editable dependency
+# on the dbt-metricflow bundle, which will allow for local version management
+# for testing.
 pre-install-commands = [
   "pip install dbt-postgres",
 ]
 features = [
   "dev-packages",
 ]
-
-[tool.hatch.envs.postgres-env.env-vars]
-	MF_SQL_ENGINE_URL="postgresql://metricflow@localhost:5432/metricflow"
-	MF_SQL_ENGINE_PASSWORD="metricflowing"
-	MF_TEST_ADAPTER_TYPE="postgres"
 
 # Many deprecation warnings come from 3rd-party libraries and make the
 # output of pytest noisy. Since no action is going to be taken, hide those
