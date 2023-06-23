@@ -1,0 +1,74 @@
+---
+metrics: 
+  - name: new_customers
+    type: SIMPLE
+    type_params:
+    measure: new_customers 
+  - name: quick_buy_transactions
+    type: SIMPLE
+    type_params:
+    measure: quick_buy_transactions 
+  - name: quick_buy_amount_usd
+    type: SIMPLE
+    type_params:
+    measure: quick_buy_amount_usd 
+  - name: cancellations
+    type: SIMPLE
+    type_params:
+    measure: cancellations_usd 
+  - name: transactions
+    type: SIMPLE
+    type_params:
+    measure: transaction
+  - name: alterations
+    type: SIMPLE
+    type_params:
+    measure: alterations_usd
+  - name: transaction_amount
+    type: SIMPLE
+    type_params:
+    measure: transaction_amount_usd
+  - name: cancellation_rate
+    type: ratio
+    type_params:
+      numerator: cancellations_usd
+      denominator: transaction_amount_usd
+  - name: revenue_usd
+    type: derived
+    type_params:
+      expr: transaction_amount - cancellations + alterations
+    metrics:
+      - transaction_amount
+      - cancellations
+      - alterations
+  - name: cancellations_mx
+    type: SIMPLE
+    type_params:
+      measure: cancellations_usd
+    filter: |
+      {{ dimension('country', entity_path=['customer']) }} = 'MX'
+  - name: transaction_usd_na
+    type: SIMPLE
+    type_params:
+      measure: transaction_amount_usd
+    filter: |
+      {{ dimension('region', entity_path=['customer', 'country']) }} = 'NA'
+  - name: transaction_usd_l7d_mx
+    type: cumulative
+    type_params:
+      measure: transaction_amount_usd
+      window: 7 days
+    filter: |
+      {{ dimension('country', entity_path=['customer']) }} = 'MX'
+  - name: transaction_usd_mtd
+    type: cumulative
+    type_params:
+      measure: transaction_amount_usd
+      grain_to_date: month
+  - name: transaction_usd_na_l7d
+    type: cumulative
+    type_params:
+      measures: transaction_amount_usd
+      window: 7 days
+    filter: |
+      {{ dimension('region', entity_path=['customer', 'country']) }} = 'NA'
