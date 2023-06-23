@@ -269,8 +269,8 @@ class AbstractMetricFlowEngine(ABC):
     @abstractmethod
     def explain_get_dimension_values(  # noqa: D
         self,
-        metric_name: str,
-        get_group_by_values: str,
+        metric_names: List[str],
+        get_group_by_values: List[str],
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
     ) -> MetricFlowExplainResult:
@@ -616,15 +616,15 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def explain_get_dimension_values(  # noqa: D
         self,
-        metric_name: str,
-        get_group_by_values: str,
+        metric_names: List[str],
+        get_group_by_values: List[str],
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
     ) -> MetricFlowExplainResult:
         return self._create_execution_plan(
             MetricFlowQueryRequest.create_with_random_request_id(
-                metric_names=[metric_name],
-                group_by_names=[get_group_by_values],
+                metric_names=metric_names,
+                group_by_names=get_group_by_values,
                 time_constraint_start=time_constraint_start,
                 time_constraint_end=time_constraint_end,
                 query_type=MetricFlowQueryType.DIMENSION_VALUES,
