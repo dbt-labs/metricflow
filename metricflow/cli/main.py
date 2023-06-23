@@ -181,7 +181,7 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool,
         """\
         🤓 Please run the following steps,
 
-            1.  In '{$HOME}/.metricflow/config.yml', `model_path` should be '{$HOME}/.metricflow/sample_models'.
+            1.  Make sure you're at the root of your dbt project.Sample semantic models should be created in {$dbt_project_root}/sample_semantic_models
             2.  Try validating your data model: `mf validate-configs`
             3.  Check out your metrics: `mf list metrics`
             4.  Check out dimensions for your metric `mf list dimensions --metrics transactions`
