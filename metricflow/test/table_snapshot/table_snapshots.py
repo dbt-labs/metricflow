@@ -140,6 +140,8 @@ class SqlTableSnapshotRestorer:
         self._sql_client.create_table_from_dataframe(
             sql_table=sql_table,
             df=table_snapshot.as_df,
+            # Without this set, the insert queries may be too long.
+            chunk_size=500,
         )
 
 
