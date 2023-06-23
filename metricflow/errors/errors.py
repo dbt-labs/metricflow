@@ -85,3 +85,7 @@ class InferenceError(Exception):
 
 class UnsupportedEngineFeatureError(RuntimeError):
     """Raised when the user attempts to use a feature that isn't supported by the data platform."""
+
+
+class SqlBindParametersNotSupportedError(Exception):
+    """Raised when a SqlClient that does not have support for bind parameters receives a non-empty set of params."""

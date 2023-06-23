@@ -8,10 +8,6 @@ export MF_TEST_ENGINE_CREDENTIALS=$(cat <<EOF
         "engine_url": null,
         "engine_password": null
     },
-    "postgres": {
-        "engine_url": "postgresql://...",
-        "engine_password": "..."
-    },
     "redshift": {
         "engine_url": "redshift://...",
         "engine_password": "..."
@@ -53,7 +49,6 @@ class MetricFlowTestCredentialSet(FrozenBaseModel):  # noqa: D
 
 class MetricFlowTestCredentialSetForAllEngines(FrozenBaseModel):  # noqa: D
     duck_db: MetricFlowTestCredentialSet
-    postgres: MetricFlowTestCredentialSet
     redshift: MetricFlowTestCredentialSet
     snowflake: MetricFlowTestCredentialSet
     big_query: MetricFlowTestCredentialSet
@@ -61,7 +56,7 @@ class MetricFlowTestCredentialSetForAllEngines(FrozenBaseModel):  # noqa: D
 
     @property
     def as_sequence(self) -> Sequence[MetricFlowTestCredentialSet]:  # noqa: D
-        return (self.duck_db, self.postgres, self.redshift, self.snowflake, self.big_query, self.databricks)
+        return (self.duck_db, self.redshift, self.snowflake, self.big_query, self.databricks)
 
 
 SNAPSHOT_GENERATING_TEST_FILES = (

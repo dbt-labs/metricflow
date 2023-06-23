@@ -9,11 +9,11 @@ import _pytest.config
 import pytest
 import sqlalchemy.util
 from _pytest.fixtures import FixtureRequest
+from sqlalchemy.engine import make_url
 
 from metricflow.configuration.env_var import EnvironmentVariable
 from metricflow.random_id import random_id
 from metricflow.sql_clients.common_client import SqlDialect
-from metricflow.sql_clients.sql_utils import dialect_from_url
 from metricflow.test.table_snapshot.table_snapshots import SqlTableSnapshotHash, SqlTableSnapshotRepository
 
 logger = logging.getLogger(__name__)
@@ -144,6 +144,14 @@ def mf_test_session_state(  # noqa: D
             request.config.getoption(USE_PERSISTENT_SOURCE_SCHEMA_CLI_FLAG, default=False)
         ),
     )
+
+
+def dialect_from_url(url: str) -> SqlDialect:
+    """Return the SQL dialect specified in the URL in the configuration."""
+    dialect_protocol = make_url(url.split(";")[0]).drivername.split("+")
+    if len(dialect_protocol) > 2:
+        raise ValueError(f"Invalid # of +'s in {url}")
+    return SqlDialect(dialect_protocol[0])
 
 
 @pytest.fixture(scope="session", autouse=True)

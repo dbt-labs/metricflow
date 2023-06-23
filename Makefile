@@ -26,9 +26,7 @@ test:
 
 .PHONY: test-postgresql
 test-postgresql:
-	MF_SQL_ENGINE_URL="postgresql://metricflow@localhost:5432/metricflow" \
-	MF_SQL_ENGINE_PASSWORD="metricflowing" \
-	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) metricflow/test/
+	hatch -v run postgres-env:pytest -vv -n $(PARALLELISM) metricflow/test/
 
 .PHONY: lint
 lint:
@@ -43,3 +41,4 @@ postgresql postgres:
 .PHONY: regenerate-test-snapshots
 regenerate-test-snapshots:
 	hatch -v run dev-env:python metricflow/test/generate_snapshots.py
+	hatch -v run postgres-env:pytest -vv -n ${PARALLELISM} --overwrite-snapshots metricflow/test

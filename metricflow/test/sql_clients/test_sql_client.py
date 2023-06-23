@@ -8,7 +8,7 @@ import pandas as pd
 import pytest
 
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.protocols.sql_client import SqlClient
+from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.random_id import random_id
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_column_type import SqlColumnType
@@ -38,8 +38,19 @@ def test_query(sql_client: SqlClient) -> None:  # noqa: D
     _check_1col(df)
 
 
+def _skip_execution_param_tests_for_unsupported_clients(sql_client: SqlClient) -> None:
+    if sql_client.sql_engine_type is not SqlEngine.DUCKDB:
+        pytest.skip(
+            reason=(
+                "The dbt Adapter-backed SqlClient implementation does not support bind parameters, so we restrict "
+                "this test to our DuckDB client, which retains an example implementation."
+            )
+        )
+
+
 def test_query_with_execution_params(sql_client: SqlClient) -> None:
     """Test querying with execution parameters of all supported datatypes."""
+    _skip_execution_param_tests_for_unsupported_clients(sql_client)
     params: Sequence[SqlColumnType] = [
         2,
         "hi",
@@ -79,6 +90,7 @@ def test_select_one_query(sql_client: SqlClient) -> None:  # noqa: D
 
 
 def test_failed_query_with_execution_params(sql_client: SqlClient) -> None:  # noqa: D
+    _skip_execution_param_tests_for_unsupported_clients(sql_client)
     expr = f"SELECT {sql_client.render_bind_parameter_key('x')}"
     sql_execution_params = SqlBindParameters.create_from_dict({"x": 1})
 
