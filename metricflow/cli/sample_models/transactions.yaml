@@ -9,6 +9,7 @@ semantic_model:
     customer id. The `ds` or date is reflected in UTC.
   defaults:
     agg_time_dimension: ds
+  model: ref('transactions')
   entities:
     - name: transaction
       type: primary
@@ -70,9 +71,6 @@ semantic_model:
           WHEN transaction_type_name = 'quick-buy' THEN 'Quick Buy'
           ELSE 'Not Quick Buy'
         END
-  node_relation:
-    alias: $transactions_table
-    schema_name: $system_schema
 
 ---
 metric:

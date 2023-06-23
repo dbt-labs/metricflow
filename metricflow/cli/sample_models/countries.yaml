@@ -1,14 +1,7 @@
----
-sources:
-  - name: countries
-    schema: $system_schema
-    tables:
-      - name: $countries_table
----
 semantic_models:
   - name: countries
     description: Regions mapped to countries.
-    model: source('countries', '$countries_table')
+    model: ref('countries')
     entities:
       - name: country
         type: primary

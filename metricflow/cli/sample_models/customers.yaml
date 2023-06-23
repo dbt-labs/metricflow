@@ -3,6 +3,7 @@ semantic_model:
   description: Location and description of all customers.
   defaults:
     agg_time_dimension: ds
+  model: ref('customers')
   entities:
     - name: customer
       type: primary
@@ -19,6 +20,3 @@ semantic_model:
       type: time
       type_params:
         time_granularity: day
-  node_relation:
-    alias: $customers_table
-    schema_name: $system_schema
