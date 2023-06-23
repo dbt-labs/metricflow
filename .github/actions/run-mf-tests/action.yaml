@@ -21,6 +21,10 @@ inputs:
     description: "The target to use for the make command."
     required: false
     default: "test"
+  additional-pytest-options:
+    description: "Additional options to pass into pytest."
+    required: false
+    default: ""
 runs:
   using: "composite"
   steps:
@@ -30,7 +34,11 @@ runs:
       python-version: "${{ inputs.python-version }}"
   - name: Run Tests
     shell: bash
-    run: make -e PARALLELISM=${{ inputs.parallelism }} ${{ inputs.make-target }}
+    run: >
+      make -e
+      PARALLELISM=${{ inputs.parallelism }}
+      ADDITIONAL_PYTEST_OPTIONS="${{ inputs.additional-pytest-options }}"
+      ${{ inputs.make-target }}
     env:
       MF_SQL_ENGINE_URL: ${{ inputs.mf_sql_engine_url }}
       MF_SQL_ENGINE_PASSWORD: ${{ inputs.mf_sql_engine_password }}

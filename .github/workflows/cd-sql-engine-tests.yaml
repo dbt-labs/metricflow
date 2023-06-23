@@ -12,6 +12,7 @@ on:
 env:
   PYTHON_VERSION: "3.8"
   EXTERNAL_ENGINE_TEST_PARALLELISM: 8
+  ADDITIONAL_PYTEST_OPTIONS: "--use-persistent-source-schema"
 
 jobs:
   snowflake-tests:
@@ -31,6 +32,7 @@ jobs:
           mf_sql_engine_url: ${{ secrets.MF_SNOWFLAKE_URL }}
           mf_sql_engine_password: ${{ secrets.MF_SNOWFLAKE_PWD }}
           parallelism: ${{ env.EXTERNAL_ENGINE_TEST_PARALLELISM }}
+          additional-pytest-options: ${{ env.ADDITIONAL_PYTEST_OPTIONS }}
 
   redshift-tests:
     environment: DW_INTEGRATION_TESTS
@@ -49,6 +51,7 @@ jobs:
           mf_sql_engine_url: ${{ secrets.MF_REDSHIFT_URL }}
           mf_sql_engine_password: ${{ secrets.MF_REDSHIFT_PWD }}
           parallelism: ${{ env.EXTERNAL_ENGINE_TEST_PARALLELISM }}
+          additional-pytest-options: ${{ env.ADDITIONAL_PYTEST_OPTIONS }}
 
   bigquery-tests:
     environment: DW_INTEGRATION_TESTS
@@ -67,6 +70,7 @@ jobs:
           MF_SQL_ENGINE_URL: ${{ secrets.MF_BIGQUERY_URL }}
           MF_SQL_ENGINE_PASSWORD: ${{ secrets.MF_BIGQUERY_PWD }}
           parallelism: ${{ env.EXTERNAL_ENGINE_TEST_PARALLELISM }}
+          additional-pytest-options: ${{ env.ADDITIONAL_PYTEST_OPTIONS }}
 
   databricks-cluster-tests:
     environment: DW_INTEGRATION_TESTS
@@ -85,6 +89,7 @@ jobs:
           mf_sql_engine_url: ${{ secrets.MF_DATABRICKS_CLUSTER_URL }}
           mf_sql_engine_password: ${{ secrets.MF_DATABRICKS_PWD }}
           parallelism: ${{ env.EXTERNAL_ENGINE_TEST_PARALLELISM }}
+          additional-pytest-options: ${{ env.ADDITIONAL_PYTEST_OPTIONS }}
 
   databricks-sql-warehouse-tests:
     environment: DW_INTEGRATION_TESTS
@@ -103,6 +108,7 @@ jobs:
           mf_sql_engine_url: ${{ secrets.MF_DATABRICKS_SQL_WAREHOUSE_URL }}
           mf_sql_engine_password: ${{ secrets.MF_DATABRICKS_PWD }}
           parallelism: ${{ env.EXTERNAL_ENGINE_TEST_PARALLELISM }}
+          additional-pytest-options: ${{ env.ADDITIONAL_PYTEST_OPTIONS }}
 
   slack-failure:
     environment: DW_INTEGRATION_TESTS

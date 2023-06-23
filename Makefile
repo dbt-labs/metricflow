@@ -4,6 +4,8 @@
 
 # Controls the number of parallel workers running tests. Try "make -e PARALLELISM=4 test".
 PARALLELISM = "auto"
+# Additional command line options to pass to pytest.
+ADDITIONAL_PYTEST_OPTIONS = ""
 
 # Install Hatch package / project manager
 .PHONY: install-hatch
@@ -13,20 +15,20 @@ install-hatch:
 # Testing and linting
 .PHONY: test-core
 test-core:
-	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) metricflow/test --ignore metricflow/test/model/dbt_cloud_parsing/
+	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) metricflow/test --ignore metricflow/test/model/dbt_cloud_parsing/
 
 # Test that depend on dbt-related packages.
 .PHONY: test-dbt-associated
 test-dbt-associated:
-	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) metricflow/test/model/dbt_cloud_parsing/
+	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) metricflow/test/model/dbt_cloud_parsing/
 
 .PHONY: test
 test:
-	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) metricflow/test/
+	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) metricflow/test/
 
 .PHONY: test-postgresql
 test-postgresql:
-	hatch -v run postgres-env:pytest -vv -n $(PARALLELISM) metricflow/test/
+	hatch -v run postgres-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) metricflow/test/
 
 .PHONY: lint
 lint:
