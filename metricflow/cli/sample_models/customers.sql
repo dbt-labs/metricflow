@@ -1,3 +1,3 @@
 select 
     *
-from {{source('tutorial', '$customer_table')}}
+from {{source('tutorial', 'customers')}}

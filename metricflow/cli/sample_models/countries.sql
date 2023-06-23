@@ -1,3 +1,3 @@
 select 
     *
-from {{source('tutorial', '$countries_table')}}
+from {{source('tutorial', 'countries')}}

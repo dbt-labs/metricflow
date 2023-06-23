@@ -1,3 +1,3 @@
 select 
     *
-from {{source('tutorial', '$transactions_table')}}
+from {{source('tutorial', 'transactions')}}
