@@ -8,6 +8,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Iterator
 
+import pytest
 from dbt_semantic_interfaces.parsing.dir_to_model import (
     parse_directory_of_yaml_files_to_semantic_manifest,
     parse_yaml_files_to_validation_ready_semantic_manifest,
@@ -112,6 +113,7 @@ def test_health_checks(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
     assert resp.exit_code == 0
 
 
+@pytest.mark.skip("Skipping tutorial tests pending update to work with dbt integration")
 def test_tutorial(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
     cli_context = cli_runner.cli_context
 

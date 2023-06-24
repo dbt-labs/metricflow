@@ -176,7 +176,8 @@ def setup(cfg: CLIContext, restart: bool) -> None:
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool, drop_tables: bool) -> None:
     """Run user through a tutorial."""
-    # This text is also located in the projects top-level README.md
+    click.echo("The mf tutorial command has not yet been updated to work with the dbt integration!")
+    exit()
     help_msg = textwrap.dedent(
         """\
         🤓 Please run the following steps,
@@ -210,11 +211,7 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool,
         click.echo(help_msg)
         exit()
 
-    # Check if the MetricFlow configuration file exists
-    path = pathlib.Path(cfg.config.file_path)
-    if not path.absolute().exists():
-        click.echo("💡 Please run `mf setup` to get your configs set up before going through the tutorial.")
-        exit()
+    # TODO: Add check for dbt project root here
 
     # Validate that the data warehouse connection is successful
     if not skip_dw:
@@ -222,6 +219,7 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool,
         click.confirm("❓ Are the health-checks all passing? Please fix them before continuing", abort=True)
         click.echo("💡 For future reference, you can continue with the tutorial by adding `--skip-dw`\n")
 
+    # TODO: decide whether or not to allow management of tutorial datasets from the mf CLI and update accordingly
     if drop_tables:
         spinner = Halo(text="Dropping tables...", spinner="dots")
         spinner.start()
@@ -239,7 +237,9 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool,
         spinner.succeed("📀 Sample tables have been successfully created into your data warehouse.")
 
     # Seed sample model file
-    model_path = os.path.join(cfg.config.dir_path, "sample_models")
+    # TODO: Make this work with the new dbt project locations. For now, put it in cwd to remove the reference
+    # to the model path from the MetricFlow config
+    model_path = os.path.join(os.getcwd(), "sample_models")
     pathlib.Path(model_path).mkdir(parents=True, exist_ok=True)
     click.echo(f"🤖 Attempting to generate model configs to your local filesystem in '{str(model_path)}'.")
     spinner = Halo(text="Dropping tables...", spinner="dots")
