@@ -27,25 +27,16 @@ from metricflow.cli.cli_context import CLIContext
 from metricflow.cli.constants import DEFAULT_RESULT_DECIMAL_PLACES, MAX_LIST_OBJECT_ELEMENTS
 from metricflow.cli.tutorial import create_sample_data, gen_sample_model_configs, remove_sample_tables
 from metricflow.cli.utils import (
-    MF_BIGQUERY_KEYS,
-    MF_CONFIG_KEYS,
-    MF_DATABRICKS_KEYS,
-    MF_POSTGRESQL_KEYS,
-    MF_REDSHIFT_KEYS,
-    MF_SNOWFLAKE_KEYS,
     exception_handler,
-    generate_duckdb_demo_keys,
     get_data_warehouse_config_link,
     query_options,
     start_end_time_options,
 )
-from metricflow.configuration.config_builder import YamlTemplateBuilder
 from metricflow.dag.dag_visualization import display_dag_as_svg
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.engine.metricflow_engine import MetricFlowExplainResult, MetricFlowQueryRequest, MetricFlowQueryResult
 from metricflow.engine.utils import build_semantic_manifest_from_dbt_project_root
 from metricflow.model.data_warehouse_model_validator import DataWarehouseModelValidator
-from metricflow.sql_clients.common_client import SqlDialect
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
 
@@ -99,72 +90,6 @@ def cli(cfg: CLIContext, verbose: bool) -> None:  # noqa: D
 
     signal.signal(signal.SIGINT, exit_signal_handler)
     signal.signal(signal.SIGTERM, exit_signal_handler)
-
-
-@cli.command()
-@click.option("--restart", is_flag=True, help="Wipe the config file and start over")
-@pass_config
-@log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-def setup(cfg: CLIContext, restart: bool) -> None:
-    """Setup MetricFlow."""
-    click.echo(
-        textwrap.dedent(
-            """\
-            🎉 Welcome to MetricFlow! 🎉
-            """
-        )
-    )
-
-    path = pathlib.Path(cfg.config.file_path)
-    abs_path = path.absolute()
-    to_create = not path.exists() or restart
-
-    # Seed the config template to the config file
-    if to_create:
-        dialect_map = {
-            SqlDialect.SNOWFLAKE.value: MF_SNOWFLAKE_KEYS,
-            SqlDialect.BIGQUERY.value: MF_BIGQUERY_KEYS,
-            SqlDialect.REDSHIFT.value: MF_REDSHIFT_KEYS,
-            SqlDialect.POSTGRESQL.value: MF_POSTGRESQL_KEYS,
-            SqlDialect.DUCKDB.value: generate_duckdb_demo_keys(config_dir=cfg.config.dir_path),
-            SqlDialect.DATABRICKS.value: MF_DATABRICKS_KEYS,
-        }
-
-        click.echo("Please enter your data warehouse dialect.")
-        click.echo("Use 'duckdb' for a standalone demo.")
-        click.echo("")
-        dialect = click.prompt(
-            "Dialect",
-            type=click.Choice(sorted([x for x in dialect_map.keys()])),
-            show_choices=True,
-        )
-
-        # If there is a collision, prefer to use the key in the dialect.
-        config_keys = list(dialect_map[dialect])
-        for mf_config_key in MF_CONFIG_KEYS:
-            if not any(x.key == mf_config_key.key for x in config_keys):
-                config_keys.append(mf_config_key)
-
-        with open(abs_path, "w") as file:
-            YamlTemplateBuilder.write_yaml(config_keys, file)
-
-    template_description = (
-        f"A template config file has been created in {abs_path}.\n"
-        if to_create
-        else f"A template config file already exists in {abs_path}, so it was left alone.\n"
-    )
-    click.echo(
-        textwrap.dedent(
-            f"""\
-            💻 {template_description}
-            If you are new to MetricFlow, we recommend you to run through our tutorial with `mf tutorial`\n
-            Next steps:
-              1. Review and fill out relevant fields.
-              2. Run `mf health-checks` to validate the data warehouse connection.
-              3. Run `mf validate-configs` to validate the model configurations.
-            """
-        )
-    )
 
 
 @cli.command()
