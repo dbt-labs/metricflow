@@ -521,7 +521,12 @@ def health_checks(cfg: CLIContext) -> None:
 
 @list.command()
 @click.option("--dimension", required=True, type=str, help="Dimension to query values from")
-@click.option("--metrics", required=True, type=click_custom.SequenceParamType(min_length=1), help="Metrics that are associated with the dimension")
+@click.option(
+    "--metrics",
+    required=True,
+    type=click_custom.SequenceParamType(min_length=1),
+    help="Metrics that are associated with the dimension",
+)
 @start_end_time_options
 @pass_config
 @exception_handler
@@ -562,7 +567,9 @@ def dimension_values(
         exit(1)
 
     assert dim_vals
-    spinner.succeed(f"🌱 We've found {len(dim_vals)} dimension values for dimension {dimension} of metrics {', '.join(metrics)}.")
+    spinner.succeed(
+        f"🌱 We've found {len(dim_vals)} dimension values for dimension {dimension} of metrics {', '.join(metrics)}."
+    )
     for dim_val in dim_vals:
         click.echo(f"• {click.style(dim_val, bold=True, fg='green')}")
 

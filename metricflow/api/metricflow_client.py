@@ -207,7 +207,11 @@ class MetricFlowClient:
         return self.engine.simple_dimensions_for_metrics(metric_names=metric_names)
 
     def get_dimension_values(
-        self, metric_names: List[str], dimension_name: str, start_time: Optional[str] = None, end_time: Optional[str] = None
+        self,
+        metric_names: List[str],
+        dimension_name: str,
+        start_time: Optional[str] = None,
+        end_time: Optional[str] = None,
     ) -> List[str]:
         """Retrieves a list of dimension values given a [metric_name, dimension_name].
 
