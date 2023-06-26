@@ -270,7 +270,7 @@ class AbstractMetricFlowEngine(ABC):
     def explain_get_dimension_values(  # noqa: D
         self,
         metric_names: List[str],
-        get_group_by_values: List[str],
+        get_group_by_value: str,
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
     ) -> MetricFlowExplainResult:
@@ -617,14 +617,14 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     def explain_get_dimension_values(  # noqa: D
         self,
         metric_names: List[str],
-        get_group_by_values: List[str],
+        get_group_by_value: str,
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
     ) -> MetricFlowExplainResult:
         return self._create_execution_plan(
             MetricFlowQueryRequest.create_with_random_request_id(
                 metric_names=metric_names,
-                group_by_names=get_group_by_values,
+                group_by_names=[get_group_by_value],
                 time_constraint_start=time_constraint_start,
                 time_constraint_end=time_constraint_end,
                 query_type=MetricFlowQueryType.DIMENSION_VALUES,
