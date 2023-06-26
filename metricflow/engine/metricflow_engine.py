@@ -256,7 +256,7 @@ class AbstractMetricFlowEngine(ABC):
         """Retrieves a list of dimension values given a [metric_name, get_group_by_values].
 
         Args:
-            metric_name: Names of metric that contain the group_by.
+            metric_name: Names of metrics that contain the group_by.
             get_group_by_values: Name of group_by to get values from.
             time_constraint_start: Get data for the start of this time range.
             time_constraint_end: Get data for the end of this time range.

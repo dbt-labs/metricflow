@@ -212,7 +212,7 @@ class MetricFlowClient:
         """Retrieves a list of dimension values given a [metric_name, dimension_name].
 
         Args:
-            metric_name: Name of metric that contains the group_by.
+            metric_names: Names of metrics that contain the group_by.
             dimension_name: Name of group_by to get values from.
             start_time: Get data for the start of this time range.
             end_time: Get data for the end of this time range.

@@ -533,7 +533,7 @@ def dimension_values(
     start_time: Optional[dt.datetime] = None,
     end_time: Optional[dt.datetime] = None,
 ) -> None:
-    """List all dimension values with the corresponding metric."""
+    """List all dimension values with the corresponding metrics."""
     spinner = Halo(
         text=f"🔍 Retrieving dimension values for dimension '{dimension}' of metrics '{', '.join(metrics)}'...",
         spinner="dots",
