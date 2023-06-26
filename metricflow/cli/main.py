@@ -25,6 +25,7 @@ import metricflow.cli.custom_click_types as click_custom
 from metricflow.cli import PACKAGE_NAME
 from metricflow.cli.cli_context import CLIContext
 from metricflow.cli.constants import DEFAULT_RESULT_DECIMAL_PLACES, MAX_LIST_OBJECT_ELEMENTS
+from metricflow.cli.dbt_connectors.adapter_backed_client import AdapterBackedSqlClient
 from metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts
 from metricflow.cli.tutorial import create_sample_data, gen_sample_model_configs, remove_sample_tables
 from metricflow.cli.utils import (
@@ -590,9 +591,10 @@ def validate_configs(
     # Parsing Validation
     parsing_spinner = Halo(text="Building manifest from dbt project root", spinner="dots")
     parsing_spinner.start()
+    project_root = pathlib.Path.cwd()
 
     try:
-        semantic_manifest = dbtArtifacts.build_semantic_manifest_from_dbt_project_root(pathlib.Path.cwd())
+        semantic_manifest = dbtArtifacts.build_semantic_manifest_from_dbt_project_root(project_root=project_root)
         parsing_spinner.succeed("🎉 Successfully parsed manifest from dbt project")
     except Exception as e:
         parsing_spinner.fail(f"Exception found when parsing manifest from dbt project ({str(e)})")
@@ -616,7 +618,11 @@ def validate_configs(
 
     dw_results = SemanticManifestValidationResults()
     if not skip_dw:
-        dw_validator = DataWarehouseModelValidator(sql_client=cfg.sql_client, system_schema=cfg.mf_system_schema)
+        # fetch dbt adapters. This rebuilds the manifest again, but whatever.
+        dbt_artifacts = dbtArtifacts.load_from_project_path(project_path=project_root)
+        sql_client = AdapterBackedSqlClient(dbt_artifacts.adapter)
+        schema = dbt_artifacts.profile.credentials.schema
+        dw_validator = DataWarehouseModelValidator(sql_client=sql_client, system_schema=schema)
         dw_results = _data_warehouse_validations_runner(
             dw_validator=dw_validator, manifest=semantic_manifest, timeout=dw_timeout
         )
