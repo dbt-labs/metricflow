@@ -207,12 +207,16 @@ class MetricFlowClient:
         return self.engine.simple_dimensions_for_metrics(metric_names=metric_names)
 
     def get_dimension_values(
-        self, metric_name: str, dimension_name: str, start_time: Optional[str] = None, end_time: Optional[str] = None
+        self,
+        metric_names: List[str],
+        dimension_name: str,
+        start_time: Optional[str] = None,
+        end_time: Optional[str] = None,
     ) -> List[str]:
         """Retrieves a list of dimension values given a [metric_name, dimension_name].
 
         Args:
-            metric_name: Name of metric that contains the group_by.
+            metric_names: Names of metrics that contain the group_by.
             dimension_name: Name of group_by to get values from.
             start_time: Get data for the start of this time range.
             end_time: Get data for the end of this time range.
@@ -223,7 +227,7 @@ class MetricFlowClient:
         parsed_start_time = convert_to_datetime(start_time)
         parsed_end_time = convert_to_datetime(end_time)
         return self.engine.get_dimension_values(
-            metric_name=metric_name,
+            metric_names=metric_names,
             get_group_by_values=dimension_name,
             time_constraint_start=parsed_start_time,
             time_constraint_end=parsed_end_time,

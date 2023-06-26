@@ -521,21 +521,26 @@ def health_checks(cfg: CLIContext) -> None:
 
 @list.command()
 @click.option("--dimension", required=True, type=str, help="Dimension to query values from")
-@click.option("--metric", required=True, type=str, help="Metric that is associated with the dimension")
+@click.option(
+    "--metrics",
+    required=True,
+    type=click_custom.SequenceParamType(min_length=1),
+    help="Metrics that are associated with the dimension",
+)
 @start_end_time_options
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 def dimension_values(
     cfg: CLIContext,
-    metric: str,
+    metrics: List[str],
     dimension: str,
     start_time: Optional[dt.datetime] = None,
     end_time: Optional[dt.datetime] = None,
 ) -> None:
-    """List all dimension values with the corresponding metric."""
+    """List all dimension values with the corresponding metrics."""
     spinner = Halo(
-        text=f"🔍 Retrieving dimension values for dimension '{dimension}' of metric '{metric}'...",
+        text=f"🔍 Retrieving dimension values for dimension '{dimension}' of metrics '{', '.join(metrics)}'...",
         spinner="dots",
     )
     spinner.start()
@@ -544,7 +549,7 @@ def dimension_values(
 
     try:
         dim_vals = cfg.mf.get_dimension_values(
-            metric_name=metric,
+            metric_names=metrics,
             get_group_by_values=dimension,
             time_constraint_start=start_time,
             time_constraint_end=end_time,
@@ -554,7 +559,7 @@ def dimension_values(
         click.echo(
             textwrap.dedent(
                 f"""\
-                ❌ Failed to query dimension values for dimension {dimension} of metric {metric}.
+                ❌ Failed to query dimension values for dimension {dimension} of metrics {', '.join(metrics)}.
                     ERROR: {str(e)}
                 """
             )
@@ -562,7 +567,9 @@ def dimension_values(
         exit(1)
 
     assert dim_vals
-    spinner.succeed(f"🌱 We've found {len(dim_vals)} dimension values for dimension {dimension} of metric {metric}.")
+    spinner.succeed(
+        f"🌱 We've found {len(dim_vals)} dimension values for dimension {dimension} of metrics {', '.join(metrics)}."
+    )
     for dim_val in dim_vals:
         click.echo(f"• {click.style(dim_val, bold=True, fg='green')}")
 
