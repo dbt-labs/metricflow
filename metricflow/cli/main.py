@@ -544,7 +544,7 @@ def dimension_values(
 
     try:
         dim_vals = cfg.mf.get_dimension_values(
-            metric_name=metric,
+            metric_names=[metric],
             get_group_by_values=dimension,
             time_constraint_start=start_time,
             time_constraint_end=end_time,

@@ -82,7 +82,7 @@ def test_list_dimensions(mf_client: MetricFlowClient) -> None:  # noqa: D
 
 
 def test_get_dimension_values(mf_client: MetricFlowClient) -> None:  # noqa: D
-    dim_vals = mf_client.get_dimension_values("bookings", "ds", start_time="2020-01-01", end_time="2024-01-01")
+    dim_vals = mf_client.get_dimension_values(["bookings"], "ds", start_time="2020-01-01", end_time="2024-01-01")
     assert dim_vals
 
 
