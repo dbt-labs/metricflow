@@ -89,8 +89,9 @@ def test_validate_configs(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
         """
     )
     bad_semantic_model = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
+    # JSON-stored manifests from dbt are not transformed, so we run this test on that style of output
     manifest = parse_yaml_files_to_validation_ready_semantic_manifest(
-        [base_semantic_manifest_file(), bad_semantic_model]
+        [base_semantic_manifest_file(), bad_semantic_model], apply_transformations=False
     ).semantic_manifest
 
     target_directory = Path().absolute() / "target"
