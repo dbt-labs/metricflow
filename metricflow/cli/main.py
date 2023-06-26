@@ -25,6 +25,7 @@ import metricflow.cli.custom_click_types as click_custom
 from metricflow.cli import PACKAGE_NAME
 from metricflow.cli.cli_context import CLIContext
 from metricflow.cli.constants import DEFAULT_RESULT_DECIMAL_PLACES, MAX_LIST_OBJECT_ELEMENTS
+from metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts
 from metricflow.cli.tutorial import create_sample_data, gen_sample_model_configs, remove_sample_tables
 from metricflow.cli.utils import (
     exception_handler,
@@ -35,7 +36,6 @@ from metricflow.cli.utils import (
 from metricflow.dag.dag_visualization import display_dag_as_svg
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.engine.metricflow_engine import MetricFlowExplainResult, MetricFlowQueryRequest, MetricFlowQueryResult
-from metricflow.engine.utils import build_semantic_manifest_from_dbt_project_root
 from metricflow.model.data_warehouse_model_validator import DataWarehouseModelValidator
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
@@ -592,7 +592,7 @@ def validate_configs(
     parsing_spinner.start()
 
     try:
-        semantic_manifest = build_semantic_manifest_from_dbt_project_root()
+        semantic_manifest = dbtArtifacts.build_semantic_manifest_from_dbt_project_root()
         parsing_spinner.succeed("🎉 Successfully parsed manifest from dbt project")
     except Exception as e:
         parsing_spinner.fail(f"Exception found when parsing manifest from dbt project ({str(e)})")

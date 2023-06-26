@@ -1,17 +1,14 @@
 from __future__ import annotations
 
 import datetime as dt
-import pathlib
 from typing import Optional
 
 from dateutil.parser import parse
-from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from dbt_semantic_interfaces.parsing.dir_to_model import (
     SemanticManifestBuildResult,
     parse_directory_of_yaml_files_to_semantic_manifest,
 )
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.transformations.semantic_manifest_transformer import PydanticSemanticManifestTransformer
 
 from metricflow.configuration.constants import CONFIG_MODEL_PATH
 from metricflow.configuration.yaml_handler import YamlFileHandler
@@ -48,29 +45,6 @@ def model_build_result_from_config(
 def build_semantic_manifest_from_config(handler: YamlFileHandler) -> SemanticManifest:
     """Given a yaml file, create a SemanticManifest."""
     return model_build_result_from_config(handler=handler).semantic_manifest
-
-
-def build_semantic_manifest_from_dbt_project_root() -> SemanticManifest:
-    """In the dbt project root, retrieve the manifest path and parse the SemanticManifest."""
-    DEFAULT_TARGET_PATH = "target/semantic_manifest.json"
-    full_path_to_manifest = pathlib.Path(DEFAULT_TARGET_PATH).resolve()
-    if not full_path_to_manifest.exists():
-        raise ModelCreationException(
-            "Unable to find {DBT_PROJECT_ROOT}/"
-            + DEFAULT_TARGET_PATH
-            + "\nPlease ensure that you are running `mf` in the root directory of a dbt project"
-            + " and that the semantic_manifest JSON exists."
-        )
-    try:
-        with open(full_path_to_manifest, "r") as file:
-            raw_contents = file.read()
-            raw_model = PydanticSemanticManifest.parse_raw(raw_contents)
-            # The serialized object in the dbt project does not have transformations applied to it,
-            # since dbt-specific transformations do not rely on the PydanticSemanticManifest implementation
-            model = PydanticSemanticManifestTransformer.transform(raw_model)
-            return model
-    except Exception as e:
-        raise ModelCreationException from e
 
 
 def convert_to_datetime(datetime_str: Optional[str]) -> Optional[dt.datetime]:

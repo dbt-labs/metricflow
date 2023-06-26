@@ -125,7 +125,7 @@ class CLIContext:
     def _initialize_metricflow_engine(self) -> None:
         """Initialize the MetricFlowEngine."""
         try:
-            self._mf = MetricFlowEngine.from_dbt_project_root(self.config)
+            self._mf = MetricFlowEngine.from_dbt_project_root()
         except Exception as e:
             raise MetricFlowInitException from e
 
