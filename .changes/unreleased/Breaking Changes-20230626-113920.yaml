@@ -1,0 +1,7 @@
+kind: Breaking Changes
+body: '`explain_get_dimension_values` & `get_dimension_values` take a list of metrics
+  parameters'
+time: 2023-06-26T11:39:20.189704-05:00
+custom:
+  Author: DevonFulcher
+  Issue: None
