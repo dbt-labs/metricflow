@@ -312,8 +312,8 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     @staticmethod
     def from_dbt_project_root() -> MetricFlowEngine:
         """Initialize MetricFlowEngine via the dbt project root directory."""
-        semantic_manifest_lookup = SemanticManifestLookup(dbtArtifacts.build_semantic_manifest_from_dbt_project_root())
         dbt_artifacts = dbtArtifacts.load_from_project_path(Path.cwd())
+        semantic_manifest_lookup = SemanticManifestLookup(dbt_artifacts.semantic_manifest)
         sql_client = AdapterBackedSqlClient(dbt_artifacts.adapter)
         # TODO: remove this if possible after the time spine schema is sourced from the semantic manifest
         system_schema = dbt_artifacts.profile.credentials.schema

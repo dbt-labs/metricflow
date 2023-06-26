@@ -29,6 +29,7 @@ class dbtArtifacts:
     profile: Profile
     project: Project
     adapter: BaseAdapter
+    semantic_manifest: SemanticManifest
 
     @classmethod
     def load_from_project_path(cls: Type[Self], project_path: Path) -> Self:
@@ -43,26 +44,27 @@ class dbtArtifacts:
         # from get_adapter here rather than spinning up a full RuntimeConfig instance
         # TODO: Move to a fully supported interface when one becomes available
         adapter = get_adapter_by_type(profile.credentials.type)
-        return cls(profile=profile, project=project, adapter=adapter)
+        semantic_manifest = dbtArtifacts.build_semantic_manifest_from_dbt_project_root(project_root=project_path)
+        return cls(profile=profile, project=project, adapter=adapter, semantic_manifest=semantic_manifest)
 
     @staticmethod
-    def build_semantic_manifest_from_dbt_project_root() -> SemanticManifest:
+    def build_semantic_manifest_from_dbt_project_root(project_root: Path) -> SemanticManifest:
         """In the dbt project root, retrieve the manifest path and parse the SemanticManifest."""
         DEFAULT_TARGET_PATH = "target/semantic_manifest.json"
-        full_path_to_manifest = Path(DEFAULT_TARGET_PATH).resolve()
+        full_path_to_manifest = Path(project_root, DEFAULT_TARGET_PATH).resolve()
         if not full_path_to_manifest.exists():
             raise ModelCreationException(
-                "Unable to find {DBT_PROJECT_ROOT}/"
-                + DEFAULT_TARGET_PATH
-                + "\nPlease ensure that you are running `mf` in the root directory of a dbt project"
-                + " and that the semantic_manifest JSON exists."
+                f"Unable to find {full_path_to_manifest}\n"
+                "Please ensure that you are running `mf` in the root directory of a dbt project "
+                "and that the semantic_manifest JSON exists."
             )
         try:
             with open(full_path_to_manifest, "r") as file:
                 raw_contents = file.read()
                 raw_model = PydanticSemanticManifest.parse_raw(raw_contents)
-                # The serialized object in the dbt project does not have all transformations applied to it,
-                # since dbt-specific transformations do not rely on the PydanticSemanticManifest implementation
+                # The serialized object in the dbt project does not have all transformations applied to it at
+                # this time, which causes failures with input measure resolution.
+                # TODO: remove this transform call once the upstream changes are integrated into our dependency tree
                 model = PydanticSemanticManifestTransformer.transform(raw_model)
                 return model
         except Exception as e:
