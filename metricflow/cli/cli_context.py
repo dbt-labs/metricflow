@@ -1,22 +1,19 @@
 from __future__ import annotations
 
 import logging
+import pathlib
 from logging.handlers import TimedRotatingFileHandler
 from typing import Dict, Optional
 
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 
-from metricflow.configuration.config_handler import ConfigHandler
-from metricflow.configuration.constants import (
-    CONFIG_DWH_SCHEMA,
-)
+from metricflow.cli.dbt_connectors.adapter_backed_client import AdapterBackedSqlClient
+from metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.engine.metricflow_engine import MetricFlowEngine
-from metricflow.engine.utils import build_semantic_manifest_from_config
 from metricflow.errors.errors import MetricFlowInitException, SqlClientCreationException
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.sql_clients.sql_utils import make_sql_client_from_config
 
 logger = logging.getLogger(__name__)
 
@@ -24,22 +21,36 @@ logger = logging.getLogger(__name__)
 class CLIContext:
     """Context for MetricFlow CLI."""
 
-    def __init__(self) -> None:  # noqa: D
+    def __init__(self) -> None:
+        """Initialize the CLI context for executing commands.
+
+        The dbt_artifacts construct must be loaded in order for logging configuration to work correctly.
+        """
         self.verbose = False
+        self._dbt_artifacts: Optional[dbtArtifacts] = None
         self._mf: Optional[MetricFlowEngine] = None
         self._sql_client: Optional[SqlClient] = None
         self._semantic_manifest: Optional[SemanticManifest] = None
         self._semantic_manifest_lookup: Optional[SemanticManifestLookup] = None
-        self._mf_system_schema: Optional[str] = None
-        self.config = ConfigHandler()
-        self._configure_logging()
+        # self.log_file_path invokes the dbtRunner. If this is done after the configure_logging call all of the
+        # dbt CLI logging configuration could be overridden, resulting in lots of things printing to console
+        self._configure_logging(log_file_path=self.log_file_path)
 
-    def _configure_logging(self) -> None:  # noqa: D
+    def _configure_logging(self, log_file_path: pathlib.Path) -> None:
+        """Initialize the logging spec for the CLI.
+
+        This requires a fully loaded dbt project, including what amounts to a call to dbt debug.
+        As a practical matter, this should not have much end user impact except in cases where they are
+        using commands that do not require a working adapter AND the call to dbt debug runs slowly.
+        In future we may have better API access to the log file location for the project, at which time
+        we can swap this out and return to full lazy loading for any context attributes that are slow
+        to initialize.
+        """
         log_format = "%(asctime)s %(levelname)s %(filename)s:%(lineno)d [%(threadName)s] - %(message)s"
         logging.basicConfig(level=logging.INFO, format=log_format)
 
         log_file_handler = TimedRotatingFileHandler(
-            filename=self.config.log_file_path,
+            filename=log_file_path,
             # Rotate every day to a new file, keep 7 days worth.
             when="D",
             interval=1,
@@ -57,25 +68,35 @@ class CLIContext:
         root_logger.addHandler(log_file_handler)
 
     @property
-    def mf_system_schema(self) -> str:  # noqa: D
-        if self._mf_system_schema is None:
-            self._mf_system_schema = self.config.get_value(CONFIG_DWH_SCHEMA)
-        assert self._mf_system_schema
-        return self._mf_system_schema
-
-    def __initialize_sql_client(self) -> None:
-        """Initializes the SqlClient given the credentials."""
-        try:
-            self._sql_client = make_sql_client_from_config(self.config)
-        except Exception as e:
-            raise SqlClientCreationException from e
+    def dbt_artifacts(self) -> dbtArtifacts:
+        """Property accessor for all dbt artifacts, used for powering the sql client (among other things)."""
+        if self._dbt_artifacts is None:
+            self._dbt_artifacts = dbtArtifacts.load_from_project_path(pathlib.Path.cwd())
+        return self._dbt_artifacts
 
     @property
-    def sql_client(self) -> SqlClient:  # noqa: D
+    def log_file_path(self) -> pathlib.Path:
+        """Returns the location of the log file path for this CLI invocation."""
+        # The dbt Project.log_path attribute is currently sourced from the final runtime config value accessible
+        # through the CLI state flags. As such, it will deviate from the default based on the DBT_LOG_PATH environment
+        # variable. Should this behavior change, we will need to update this call.
+        return pathlib.Path(self.dbt_artifacts.project.log_path, "metricflow.log")
+
+    @property
+    def mf_system_schema(self) -> str:
+        """Schema to use for MF system operations, such as creating the time spine dataset.
+
+        This is currently sourced from the dbt profile configuration. In the long run, this property
+        should be removed in favor of always sourcing schema locations from manifest entries.
+        """
+        return self.dbt_artifacts.profile.credentials.schema
+
+    @property
+    def sql_client(self) -> SqlClient:
+        """Property accessor for the sql_client class used in the CLI."""
         if self._sql_client is None:
-            # Initialize the SqlClient if not set
-            self.__initialize_sql_client()
-        assert self._sql_client is not None
+            self._sql_client = AdapterBackedSqlClient(self.dbt_artifacts.adapter)
+
         return self._sql_client
 
     def run_health_checks(self) -> Dict[str, Dict[str, str]]:
@@ -125,7 +146,11 @@ class CLIContext:
     def _initialize_metricflow_engine(self) -> None:
         """Initialize the MetricFlowEngine."""
         try:
-            self._mf = MetricFlowEngine.from_dbt_project_root()
+            self._mf = MetricFlowEngine(
+                semantic_manifest_lookup=self.semantic_manifest_lookup,
+                sql_client=self.sql_client,
+                system_schema=self.mf_system_schema,
+            )
         except Exception as e:
             raise MetricFlowInitException from e
 
@@ -148,9 +173,6 @@ class CLIContext:
         return self._semantic_manifest_lookup
 
     @property
-    def semantic_manifest(self) -> SemanticManifest:  # noqa: D
-        if self._semantic_manifest is None:
-            self._semantic_manifest = build_semantic_manifest_from_config(self.config)
-
-        assert self._semantic_manifest is not None
-        return self._semantic_manifest
+    def semantic_manifest(self) -> SemanticManifest:
+        """Retrieve the semantic manifest from the dbt project root."""
+        return self.dbt_artifacts.semantic_manifest

@@ -6,8 +6,10 @@ import os
 import pathlib
 import signal
 import sys
+import tempfile
 import textwrap
 import time
+import warnings
 from importlib.metadata import version as pkg_version
 from typing import Callable, List, Optional
 
@@ -25,12 +27,10 @@ import metricflow.cli.custom_click_types as click_custom
 from metricflow.cli import PACKAGE_NAME
 from metricflow.cli.cli_context import CLIContext
 from metricflow.cli.constants import DEFAULT_RESULT_DECIMAL_PLACES, MAX_LIST_OBJECT_ELEMENTS
-from metricflow.cli.dbt_connectors.adapter_backed_client import AdapterBackedSqlClient
 from metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts
 from metricflow.cli.tutorial import create_sample_data, gen_sample_model_configs, remove_sample_tables
 from metricflow.cli.utils import (
     exception_handler,
-    get_data_warehouse_config_link,
     query_options,
     start_end_time_options,
 )
@@ -54,6 +54,11 @@ _telemetry_reporter.add_rudderstack_handler()
 @pass_config
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 def cli(cfg: CLIContext, verbose: bool) -> None:  # noqa: D
+    # Some HTTP logging callback somewhere is failing to close its SSL connections correctly.
+    # For now, filter those warnings so they don't pop up in CLI stderr
+    # note - this should be addressed as adapter connection issues might produce these as well
+    warnings.filterwarnings("ignore", category=ResourceWarning, message="unclosed.*<ssl.SSLSocket.*>")
+
     cfg.verbose = verbose
 
     checker = UpdateChecker()
@@ -85,6 +90,7 @@ def cli(cfg: CLIContext, verbose: bool) -> None:  # noqa: D
 
         try:
             # Note: we may wish to add support for canceling all queries if zombie queries are a problem
+            logger.info("Closing client connections")
             cfg.sql_client.close()
         finally:
             sys.exit(-1)
@@ -241,7 +247,6 @@ def query(
     start = time.time()
     spinner = Halo(text="Initiating query…", spinner="dots")
     spinner.start()
-
     mf_request = MetricFlowQueryRequest.create_with_random_request_id(
         metric_names=metrics,
         group_by_names=group_bys,
@@ -292,7 +297,9 @@ def query(
             )
         click.echo(sql)
         if display_plans:
-            svg_path = display_dag_as_svg(explain_result.dataflow_plan, cfg.config.dir_path)
+            click.echo("Creating temporary directory for storing visualization output.")
+            temp_path = tempfile.mkdtemp()
+            svg_path = display_dag_as_svg(explain_result.dataflow_plan, temp_path)
             click.echo("")
             click.echo(f"Plan SVG saved to: {svg_path}")
         exit()
@@ -315,7 +322,8 @@ def query(
                 click.echo(df.to_string(index=False, float_format=lambda x: format(x, f".{decimals}f")))
 
         if display_plans:
-            svg_path = display_dag_as_svg(query_result.dataflow_plan, cfg.config.dir_path)
+            temp_path = tempfile.mkdtemp()
+            svg_path = display_dag_as_svg(query_result.dataflow_plan, temp_path)
             click.echo(f"Plan SVG saved to: {svg_path}")
 
 
@@ -429,7 +437,6 @@ def entities(cfg: CLIContext, metrics: List[str]) -> None:
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 def health_checks(cfg: CLIContext) -> None:
     """Performs a health check against the DW provided in the configs."""
-    click.echo(f"For specifics on the health-checks, please visit {get_data_warehouse_config_link(cfg.config)}")
     spinner = Halo(
         text="🏥 Running health checks against your data warehouse... (This should not take longer than 30s for a successful connection)",
         spinner="dots",
@@ -626,10 +633,7 @@ def validate_configs(
     dw_results = SemanticManifestValidationResults()
     if not skip_dw:
         # fetch dbt adapters. This rebuilds the manifest again, but whatever.
-        dbt_artifacts = dbtArtifacts.load_from_project_path(project_path=project_root)
-        sql_client = AdapterBackedSqlClient(dbt_artifacts.adapter)
-        schema = dbt_artifacts.profile.credentials.schema
-        dw_validator = DataWarehouseModelValidator(sql_client=sql_client, system_schema=schema)
+        dw_validator = DataWarehouseModelValidator(sql_client=cfg.sql_client, system_schema=cfg.mf_system_schema)
         dw_results = _data_warehouse_validations_runner(
             dw_validator=dw_validator, manifest=semantic_manifest, timeout=dw_timeout
         )
