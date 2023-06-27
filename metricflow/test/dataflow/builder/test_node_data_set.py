@@ -42,7 +42,6 @@ def test_no_parent_node_data_set(
     resolver: DataflowPlanNodeOutputDataSetResolver = DataflowPlanNodeOutputDataSetResolver(
         column_association_resolver=DunderColumnAssociationResolver(simple_semantic_manifest_lookup),
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
-        time_spine_source=time_spine_source,
     )
 
     data_set = SqlDataSet(
@@ -100,7 +99,6 @@ def test_joined_node_data_set(
     resolver: DataflowPlanNodeOutputDataSetResolver = DataflowPlanNodeOutputDataSetResolver(
         column_association_resolver=DunderColumnAssociationResolver(simple_semantic_manifest_lookup),
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
-        time_spine_source=time_spine_source,
     )
 
     # Join "revenue" with "users_latest" to get "user__home_state_latest"

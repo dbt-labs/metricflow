@@ -20,7 +20,6 @@ from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.node_processor import PreDimensionJoinNodeProcessor
-from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.specs.specs import (
     DimensionSpec,
     EntityReference,
@@ -39,13 +38,11 @@ def node_evaluator(
     consistent_id_object_repository: ConsistentIdObjectRepository,
     simple_semantic_manifest_lookup: SemanticManifestLookup,
     dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
-    time_spine_source: TimeSpineSource,
 ) -> NodeEvaluatorForLinkableInstances:  # noqa: D
     """Return a node evaluator using the nodes in semantic_model_name_to_nodes."""
     node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver = DataflowPlanNodeOutputDataSetResolver(
         column_association_resolver=DunderColumnAssociationResolver(simple_semantic_manifest_lookup),
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
-        time_spine_source=time_spine_source,
     )
 
     source_nodes = tuple(consistent_id_object_repository.simple_model_read_nodes.values())
@@ -62,13 +59,11 @@ def make_multihop_node_evaluator(
     model_source_nodes: Sequence[BaseOutput[SemanticModelDataSet]],
     semantic_manifest_lookup_with_multihop_links: SemanticManifestLookup,
     desired_linkable_specs: Sequence[LinkableInstanceSpec],
-    time_spine_source: TimeSpineSource,
 ) -> NodeEvaluatorForLinkableInstances:  # noqa: D
     """Return a node evaluator using the nodes in multihop_semantic_model_name_to_nodes."""
     node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver = DataflowPlanNodeOutputDataSetResolver(
         column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup_with_multihop_links),
         semantic_manifest_lookup=semantic_manifest_lookup_with_multihop_links,
-        time_spine_source=time_spine_source,
     )
 
     node_processor = PreDimensionJoinNodeProcessor(
@@ -339,7 +334,6 @@ def test_node_evaluator_with_multiple_joined_specs(  # noqa: D
 def test_node_evaluator_with_multihop_joined_spec(  # noqa: D
     consistent_id_object_repository: ConsistentIdObjectRepository,
     multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
-    time_spine_source: TimeSpineSource,
 ) -> None:
     """Tests the case where multiple nodes need to be joined to get all linkable specs."""
     txn_source = consistent_id_object_repository.multihop_model_read_nodes["account_month_txns"]
@@ -358,7 +352,6 @@ def test_node_evaluator_with_multihop_joined_spec(  # noqa: D
         model_source_nodes=consistent_id_object_repository.multihop_model_source_nodes,
         semantic_manifest_lookup_with_multihop_links=multi_hop_join_semantic_manifest_lookup,
         desired_linkable_specs=linkable_specs,
-        time_spine_source=time_spine_source,
     )
 
     evaluation = multihop_node_evaluator.evaluate_node(
@@ -464,13 +457,11 @@ def test_node_evaluator_with_partition_joined_spec(  # noqa: D
 def test_node_evaluator_with_scd_target(
     consistent_id_object_repository: ConsistentIdObjectRepository,
     scd_semantic_manifest_lookup: SemanticManifestLookup,
-    time_spine_source: TimeSpineSource,
 ) -> None:
     """Tests the case where the joined node is an SCD with a validity window filter."""
     node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver = DataflowPlanNodeOutputDataSetResolver(
         column_association_resolver=DunderColumnAssociationResolver(scd_semantic_manifest_lookup),
         semantic_manifest_lookup=scd_semantic_manifest_lookup,
-        time_spine_source=time_spine_source,
     )
 
     source_nodes = tuple(consistent_id_object_repository.scd_model_read_nodes.values())
@@ -525,7 +516,6 @@ def test_node_evaluator_with_scd_target(
 def test_node_evaluator_with_multi_hop_scd_target(
     consistent_id_object_repository: ConsistentIdObjectRepository,
     scd_semantic_manifest_lookup: SemanticManifestLookup,
-    time_spine_source: TimeSpineSource,
 ) -> None:
     """Tests the case where the joined node is an SCD reached through another node.
 
@@ -537,7 +527,6 @@ def test_node_evaluator_with_multi_hop_scd_target(
         model_source_nodes=consistent_id_object_repository.scd_model_source_nodes,
         semantic_manifest_lookup_with_multihop_links=scd_semantic_manifest_lookup,
         desired_linkable_specs=linkable_specs,
-        time_spine_source=time_spine_source,
     )
 
     evaluation = node_evaluator.evaluate_node(
@@ -588,7 +577,6 @@ def test_node_evaluator_with_multi_hop_scd_target(
 def test_node_evaluator_with_multi_hop_through_scd(
     consistent_id_object_repository: ConsistentIdObjectRepository,
     scd_semantic_manifest_lookup: SemanticManifestLookup,
-    time_spine_source: TimeSpineSource,
 ) -> None:
     """Tests the case where the joined node is reached via an SCD.
 
@@ -600,7 +588,6 @@ def test_node_evaluator_with_multi_hop_through_scd(
         model_source_nodes=consistent_id_object_repository.scd_model_source_nodes,
         semantic_manifest_lookup_with_multihop_links=scd_semantic_manifest_lookup,
         desired_linkable_specs=linkable_specs,
-        time_spine_source=time_spine_source,
     )
 
     evaluation = node_evaluator.evaluate_node(
@@ -647,7 +634,6 @@ def test_node_evaluator_with_multi_hop_through_scd(
 def test_node_evaluator_with_invalid_multi_hop_scd(
     consistent_id_object_repository: ConsistentIdObjectRepository,
     scd_semantic_manifest_lookup: SemanticManifestLookup,
-    time_spine_source: TimeSpineSource,
 ) -> None:
     """Tests the case where the joined node is reached via an illegal SCD <-> SCD join.
 
@@ -658,7 +644,6 @@ def test_node_evaluator_with_invalid_multi_hop_scd(
         model_source_nodes=consistent_id_object_repository.scd_model_source_nodes,
         semantic_manifest_lookup_with_multihop_links=scd_semantic_manifest_lookup,
         desired_linkable_specs=linkable_specs,
-        time_spine_source=time_spine_source,
     )
 
     evaluation = node_evaluator.evaluate_node(

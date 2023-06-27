@@ -40,7 +40,6 @@ from metricflow.plan_conversion.dataflow_to_execution import (
     DataflowToExecutionPlanConverter,
 )
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
-from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.query.query_parser import MetricFlowQueryParser
@@ -288,7 +287,6 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         system_schema: str,
         time_source: TimeSource = ServerTimeSource(),
         column_association_resolver: Optional[ColumnAssociationResolver] = None,
-        time_spine_source: Optional[TimeSpineSource] = None,
     ) -> None:
         """Initializer for MetricFlowEngine.
 
@@ -304,7 +302,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             DunderColumnAssociationResolver(semantic_manifest_lookup)
         )
         self._time_source = time_source
-        self._time_spine_source = time_spine_source or TimeSpineSource(schema_name=system_schema)
+        self._time_spine_source = semantic_manifest_lookup.time_spine_source
 
         self._schema = system_schema
 

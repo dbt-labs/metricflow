@@ -62,7 +62,7 @@ class QueryRenderingTools:
     def __init__(self, manifest: SemanticManifest, system_schema: str) -> None:  # noqa: D
         self.semantic_manifest_lookup = SemanticManifestLookup(semantic_manifest=manifest)
         self.source_node_builder = SourceNodeBuilder(semantic_manifest_lookup=self.semantic_manifest_lookup)
-        self.time_spine_source = TimeSpineSource(schema_name=system_schema)
+        self.time_spine_source = self.semantic_manifest_lookup.time_spine_source
         self.converter = SemanticModelToDataSetConverter(
             column_association_resolver=DunderColumnAssociationResolver(
                 semantic_manifest_lookup=self.semantic_manifest_lookup

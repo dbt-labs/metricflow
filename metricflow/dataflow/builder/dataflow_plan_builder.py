@@ -52,7 +52,6 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.node_processor import PreDimensionJoinNodeProcessor
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
-from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
     DimensionSpec,
@@ -109,7 +108,6 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         self,
         source_nodes: Sequence[BaseOutput[SqlDataSetT]],
         semantic_manifest_lookup: SemanticManifestLookup,
-        time_spine_source: TimeSpineSource,
         cost_function: DataflowPlanNodeCostFunction = DefaultCostFunction[SqlDataSetT](),
         node_output_resolver: Optional[DataflowPlanNodeOutputDataSetResolver[SqlDataSetT]] = None,
         column_association_resolver: Optional[ColumnAssociationResolver] = None,
@@ -132,7 +130,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                     else column_association_resolver
                 ),
                 semantic_manifest_lookup=semantic_manifest_lookup,
-                time_spine_source=time_spine_source,
+                time_spine_source=semantic_manifest_lookup.time_spine_source,
             )
             if not node_output_resolver
             else node_output_resolver
