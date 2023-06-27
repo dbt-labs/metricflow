@@ -156,7 +156,8 @@ def template_mapping(mf_test_session_state: MetricFlowTestSessionState) -> Dict[
 @pytest.fixture(scope="session")
 def simple_semantic_manifest_lookup_non_ds(template_mapping: Dict[str, str]) -> SemanticManifestLookup:  # noqa: D
     build_result = parse_directory_of_yaml_files_to_semantic_manifest(
-        os.path.join(os.path.dirname(__file__), "model_yamls/non_sm_model"), template_mapping=template_mapping
+        os.path.join(os.path.dirname(__file__), "semantic_manifest_yamls/non_sm_manifest"),
+        template_mapping=template_mapping,
     )
     return SemanticManifestLookup(build_result.semantic_manifest)
 
@@ -164,7 +165,8 @@ def simple_semantic_manifest_lookup_non_ds(template_mapping: Dict[str, str]) -> 
 @pytest.fixture(scope="session")
 def simple_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> SemanticManifestLookup:  # noqa: D
     build_result = parse_directory_of_yaml_files_to_semantic_manifest(
-        os.path.join(os.path.dirname(__file__), "model_yamls/simple_model"), template_mapping=template_mapping
+        os.path.join(os.path.dirname(__file__), "semantic_manifest_yamls/simple_manifest"),
+        template_mapping=template_mapping,
     )
     return SemanticManifestLookup(build_result.semantic_manifest)
 
@@ -172,7 +174,9 @@ def simple_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> Semanti
 @pytest.fixture(scope="session")
 def multi_hop_join_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> SemanticManifestLookup:  # noqa: D
     build_result = parse_directory_of_yaml_files_to_semantic_manifest(
-        os.path.join(os.path.dirname(__file__), "model_yamls/multi_hop_join_model/partitioned_semantic_models"),
+        os.path.join(
+            os.path.dirname(__file__), "semantic_manifest_yamls/multi_hop_join_manifest/partitioned_semantic_models"
+        ),
         template_mapping=template_mapping,
     )
     return SemanticManifestLookup(build_result.semantic_manifest)
@@ -183,7 +187,9 @@ def unpartitioned_multi_hop_join_semantic_manifest_lookup(  # noqa: D
     template_mapping: Dict[str, str]
 ) -> SemanticManifestLookup:
     build_result = parse_directory_of_yaml_files_to_semantic_manifest(
-        os.path.join(os.path.dirname(__file__), "model_yamls/multi_hop_join_model/unpartitioned_semantic_models"),
+        os.path.join(
+            os.path.dirname(__file__), "semantic_manifest_yamls/multi_hop_join_manifest/unpartitioned_semantic_models"
+        ),
         template_mapping=template_mapping,
     )
     return SemanticManifestLookup(build_result.semantic_manifest)
@@ -193,7 +199,8 @@ def unpartitioned_multi_hop_join_semantic_manifest_lookup(  # noqa: D
 def simple_semantic_manifest(template_mapping: Dict[str, str]) -> SemanticManifest:
     """Model used for many tests."""
     build_result = parse_directory_of_yaml_files_to_semantic_manifest(
-        os.path.join(os.path.dirname(__file__), "model_yamls/simple_model"), template_mapping=template_mapping
+        os.path.join(os.path.dirname(__file__), "semantic_manifest_yamls/simple_manifest"),
+        template_mapping=template_mapping,
     )
     return build_result.semantic_manifest
 
@@ -202,7 +209,7 @@ def simple_semantic_manifest(template_mapping: Dict[str, str]) -> SemanticManife
 def simple_model__with_primary_transforms(template_mapping: Dict[str, str]) -> SemanticManifest:
     """Model used for tests pre-transformations."""
     build_result = parse_directory_of_yaml_files_to_semantic_manifest(
-        os.path.join(os.path.dirname(__file__), "model_yamls/simple_model"),
+        os.path.join(os.path.dirname(__file__), "semantic_manifest_yamls/simple_manifest"),
         template_mapping=template_mapping,
         apply_transformations=False,
     )
@@ -216,7 +223,7 @@ def simple_model__with_primary_transforms(template_mapping: Dict[str, str]) -> S
 @pytest.fixture(scope="session")
 def extended_date_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> SemanticManifestLookup:  # noqa: D
     build_result = parse_directory_of_yaml_files_to_semantic_manifest(
-        os.path.join(os.path.dirname(__file__), "model_yamls/extended_date_model"),
+        os.path.join(os.path.dirname(__file__), "semantic_manifest_yamls/extended_date_manifest"),
         template_mapping=template_mapping,
     )
     return SemanticManifestLookup(build_result.semantic_manifest)
@@ -226,7 +233,8 @@ def extended_date_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> 
 def scd_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> SemanticManifestLookup:
     """Initialize semantic model for SCD tests."""
     build_result = parse_directory_of_yaml_files_to_semantic_manifest(
-        os.path.join(os.path.dirname(__file__), "model_yamls/scd_model"), template_mapping=template_mapping
+        os.path.join(os.path.dirname(__file__), "semantic_manifest_yamls/scd_manifest"),
+        template_mapping=template_mapping,
     )
     return SemanticManifestLookup(build_result.semantic_manifest)
 
@@ -235,7 +243,7 @@ def scd_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> SemanticMa
 def data_warehouse_validation_model(template_mapping: Dict[str, str]) -> SemanticManifest:
     """Model used for data warehouse validation tests."""
     build_result = parse_directory_of_yaml_files_to_semantic_manifest(
-        os.path.join(os.path.dirname(__file__), "model_yamls/data_warehouse_validation_model"),
+        os.path.join(os.path.dirname(__file__), "semantic_manifest_yamls/data_warehouse_validation_manifest"),
         template_mapping=template_mapping,
     )
     return build_result.semantic_manifest

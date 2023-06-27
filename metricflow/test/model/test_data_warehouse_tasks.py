@@ -34,7 +34,7 @@ def dw_backed_warehouse_validation_model(
     """Model-generating fixture to ensure the underlying tables are created for querying.
 
     Without an explicit invocation of the create_data_warehouse_validation_model_tables fixture the
-    tables used by the data_warehouse_validation_model are not guaranteed to exist. This fixture
+    tables used by the data_warehouse_validation_manifest are not guaranteed to exist. This fixture
     guarantees execution of the underlying create table statements for the model, and can be used in
     any test that executes warehouse validation queries. It is not needed for test cases which simply
     use the model to construct tasks without executing them.
@@ -242,7 +242,7 @@ def test_build_metric_tasks(  # noqa: D
     assert_snapshot_text_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        group_id="data_warehouse_validation_model",
+        group_id="data_warehouse_validation_manifest",
         snapshot_id="query0",
         snapshot_text=query_string,
         snapshot_file_extension=".sql",
