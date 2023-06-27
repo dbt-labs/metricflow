@@ -3,6 +3,6 @@ sources:
     schema: $system_schema
     description: Data sets for running mf tutorial
     tables:
-      - name: transactions
-      - name: customers
-      - name: countries
+      - name: transactions_seed
+      - name: customers_seed
+      - name: countries_seed

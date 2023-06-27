@@ -3,56 +3,67 @@ metrics:
   - name: new_customers
     type: SIMPLE
     type_params:
-    measure: new_customers 
+      measure: new_customers 
+    label: "test"
   - name: quick_buy_transactions
     type: SIMPLE
     type_params:
-    measure: quick_buy_transactions 
+      measure: quick_buy_transactions 
+    label: "test"
   - name: quick_buy_amount_usd
     type: SIMPLE
     type_params:
-    measure: quick_buy_amount_usd 
+      measure: quick_buy_amount_usd 
+    label: "test"
   - name: cancellations
     type: SIMPLE
     type_params:
-    measure: cancellations_usd 
+      measure: cancellations_usd 
+    label: "test"
   - name: transactions
     type: SIMPLE
     type_params:
-    measure: transaction
+      measure: transactions
+    label: "test"
   - name: alterations
     type: SIMPLE
     type_params:
-    measure: alterations_usd
+      measure: alterations_usd
+    label: "test"
   - name: transaction_amount
     type: SIMPLE
     type_params:
-    measure: transaction_amount_usd
+      measure: transaction_amount_usd
+    label: "test"
   - name: cancellation_rate
     type: ratio
     type_params:
-      numerator: cancellations_usd
-      denominator: transaction_amount_usd
-  - name: revenue_usd
-    type: derived
-    type_params:
-      expr: transaction_amount - cancellations + alterations
-    metrics:
-      - transaction_amount
-      - cancellations
-      - alterations
+      numerator: cancellations
+      denominator: transaction_amount
+    label: "test"  
+  # - name: revenue_usd
+  #   type: derived
+  #   type_params:
+  #     expr: transaction_amount - cancellations + alterations
+  #   metrics:
+  #     - transaction_amount
+  #     - cancellations
+  #     - alterations
+  #   label: "test"
   - name: cancellations_mx
     type: SIMPLE
     type_params:
       measure: cancellations_usd
     filter: |
       {{ dimension('country', entity_path=['customer']) }} = 'MX'
+    label: "test"
   - name: transaction_usd_na
     type: SIMPLE
     type_params:
       measure: transaction_amount_usd
     filter: |
       {{ dimension('region', entity_path=['customer', 'country']) }} = 'NA'
+    label: "test"
   - name: transaction_usd_l7d_mx
     type: cumulative
     type_params:
@@ -60,15 +71,18 @@ metrics:
       window: 7 days
     filter: |
       {{ dimension('country', entity_path=['customer']) }} = 'MX'
+    label: "test"
   - name: transaction_usd_mtd
     type: cumulative
     type_params:
       measure: transaction_amount_usd
       grain_to_date: month
+    label: "test"
   - name: transaction_usd_na_l7d
     type: cumulative
     type_params:
-      measures: transaction_amount_usd
+      measure: transaction_amount_usd
       window: 7 days
     filter: |
       {{ dimension('region', entity_path=['customer', 'country']) }} = 'NA'
+    label: "test"
