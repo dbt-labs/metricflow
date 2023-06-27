@@ -40,7 +40,6 @@ def it_helpers(  # noqa: D
                 semantic_manifest_lookup=simple_semantic_manifest_lookup
             ),
             time_source=ConfigurableTimeSource(as_datetime("2020-01-01")),
-            time_spine_source=time_spine_source,
             system_schema=mf_test_session_state.mf_system_schema,
         ),
         mf_system_schema=mf_test_session_state.mf_system_schema,

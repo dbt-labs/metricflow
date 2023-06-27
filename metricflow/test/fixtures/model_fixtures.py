@@ -25,7 +25,6 @@ from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConv
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
-from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.test.fixtures.id_fixtures import IdNumberSpace, patch_id_generators_helper
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
@@ -54,9 +53,7 @@ def _data_set_to_source_nodes(
     return source_node_builder.create_from_data_sets(list(data_sets.values()))
 
 
-def query_parser_from_yaml(
-    yaml_contents: List[YamlConfigFile], time_spine_source: TimeSpineSource
-) -> MetricFlowQueryParser:
+def query_parser_from_yaml(yaml_contents: List[YamlConfigFile]) -> MetricFlowQueryParser:
     """Given yaml files, return a query parser using default source nodes, resolvers and time spine source."""
     semantic_manifest_lookup = SemanticManifestLookup(
         parse_yaml_files_to_validation_ready_semantic_manifest(
@@ -72,7 +69,6 @@ def query_parser_from_yaml(
         node_output_resolver=DataflowPlanNodeOutputDataSetResolver(
             column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup),
             semantic_manifest_lookup=semantic_manifest_lookup,
-            time_spine_source=time_spine_source,
         ),
     )
 

@@ -5,10 +5,9 @@ import logging
 import textwrap
 
 import pytest
-
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
+
 from metricflow.errors.errors import UnableToSatisfyQueryError
-from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.test.fixtures.model_fixtures import query_parser_from_yaml
 
 logger = logging.getLogger(__name__)
@@ -124,9 +123,9 @@ LISTINGS_YAML = textwrap.dedent(
 )
 
 
-def test_nonexistent_metric(time_spine_source: TimeSpineSource) -> None:  # noqa: D
+def test_nonexistent_metric() -> None:  # noqa: D
     bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=EXTENDED_BOOKINGS_YAML)
-    query_parser = query_parser_from_yaml([bookings_yaml_file], time_spine_source)
+    query_parser = query_parser_from_yaml([bookings_yaml_file])
 
     with pytest.raises(UnableToSatisfyQueryError) as exception_info:
         query_parser.parse_and_validate_query(metric_names=["booking"], group_by_names=["is_instant"])
@@ -149,9 +148,9 @@ def test_nonexistent_metric(time_spine_source: TimeSpineSource) -> None:  # noqa
     )
 
 
-def test_non_existent_group_by(time_spine_source: TimeSpineSource) -> None:  # noqa: D
+def test_non_existent_group_by() -> None:  # noqa: D
     bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=EXTENDED_BOOKINGS_YAML)
-    query_parser = query_parser_from_yaml([bookings_yaml_file], time_spine_source)
+    query_parser = query_parser_from_yaml([bookings_yaml_file])
 
     with pytest.raises(UnableToSatisfyQueryError) as exception_info:
         query_parser.parse_and_validate_query(metric_names=["bookings"], group_by_names=["is_instan"])
@@ -169,11 +168,11 @@ def test_non_existent_group_by(time_spine_source: TimeSpineSource) -> None:  # n
     )
 
 
-def test_invalid_group_by(time_spine_source: TimeSpineSource) -> None:  # noqa: D
+def test_invalid_group_by() -> None:  # noqa: D
     bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=EXTENDED_BOOKINGS_YAML)
     listings_yaml_file = YamlConfigFile(filepath="inline_for_test_2", contents=LISTINGS_YAML)
 
-    query_parser = query_parser_from_yaml([bookings_yaml_file, listings_yaml_file], time_spine_source)
+    query_parser = query_parser_from_yaml([bookings_yaml_file, listings_yaml_file])
 
     with pytest.raises(UnableToSatisfyQueryError) as exception_info:
         query_parser.parse_and_validate_query(metric_names=["bookings"], group_by_names=["capacity_latest"])

@@ -8,7 +8,6 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_execution import DataflowToExecutionPlanConverter
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
-from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.specs.specs import (
     DimensionSpec,
@@ -25,13 +24,11 @@ from metricflow.test.plan_utils import assert_execution_plan_text_equal
 def make_execution_plan_converter(  # noqa: D
     semantic_manifest_lookup: SemanticManifestLookup,
     sql_client: SqlClient,
-    time_spine_source: TimeSpineSource,
 ) -> DataflowToExecutionPlanConverter:
     return DataflowToExecutionPlanConverter[SemanticModelDataSet](
         sql_plan_converter=DataflowToSqlQueryPlanConverter[SemanticModelDataSet](
             column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup),
             semantic_manifest_lookup=semantic_manifest_lookup,
-            time_spine_source=time_spine_source,
         ),
         sql_plan_renderer=DefaultSqlQueryPlanRenderer(),
         sql_client=sql_client,
@@ -44,7 +41,6 @@ def test_joined_plan(  # noqa: D
     dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
     simple_semantic_manifest_lookup: SemanticManifestLookup,
     sql_client: SqlClient,
-    time_spine_source: TimeSpineSource,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
@@ -63,7 +59,8 @@ def test_joined_plan(  # noqa: D
     )
 
     to_execution_plan_converter = make_execution_plan_converter(
-        simple_semantic_manifest_lookup, sql_client, time_spine_source
+        semantic_manifest_lookup=simple_semantic_manifest_lookup,
+        sql_client=sql_client,
     )
 
     execution_plan = to_execution_plan_converter.convert_to_execution_plan(dataflow_plan)
@@ -82,7 +79,6 @@ def test_small_combined_metrics_plan(  # noqa: D
     sql_client: SqlClient,
     dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
     simple_semantic_manifest_lookup: SemanticManifestLookup,
-    time_spine_source: TimeSpineSource,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
@@ -102,7 +98,6 @@ def test_small_combined_metrics_plan(  # noqa: D
     to_execution_plan_converter = make_execution_plan_converter(
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
         sql_client=sql_client,
-        time_spine_source=time_spine_source,
     )
     execution_plan = to_execution_plan_converter.convert_to_execution_plan(dataflow_plan)
 
@@ -120,7 +115,6 @@ def test_combined_metrics_plan(  # noqa: D
     sql_client: SqlClient,
     dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
     simple_semantic_manifest_lookup: SemanticManifestLookup,
-    time_spine_source: TimeSpineSource,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
@@ -142,7 +136,6 @@ def test_combined_metrics_plan(  # noqa: D
     to_execution_plan_converter = make_execution_plan_converter(
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
         sql_client=sql_client,
-        time_spine_source=time_spine_source,
     )
     execution_plan = to_execution_plan_converter.convert_to_execution_plan(dataflow_plan)
 
@@ -160,7 +153,6 @@ def test_multihop_joined_plan(  # noqa: D
     multihop_dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
     multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
     sql_client: SqlClient,
-    time_spine_source: TimeSpineSource,
 ) -> None:
     """Tests a plan getting a measure and a joined dimension."""
     dataflow_plan = multihop_dataflow_plan_builder.build_plan(
@@ -182,7 +174,6 @@ def test_multihop_joined_plan(  # noqa: D
         sql_plan_converter=DataflowToSqlQueryPlanConverter[SemanticModelDataSet](
             column_association_resolver=DunderColumnAssociationResolver(multi_hop_join_semantic_manifest_lookup),
             semantic_manifest_lookup=multi_hop_join_semantic_manifest_lookup,
-            time_spine_source=time_spine_source,
         ),
         sql_plan_renderer=DefaultSqlQueryPlanRenderer(),
         sql_client=sql_client,

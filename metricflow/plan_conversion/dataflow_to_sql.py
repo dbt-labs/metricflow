@@ -144,7 +144,6 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         self,
         column_association_resolver: ColumnAssociationResolver,
         semantic_manifest_lookup: SemanticManifestLookup,
-        time_spine_source: TimeSpineSource,
     ) -> None:
         """Constructor.
 
@@ -152,12 +151,11 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             column_association_resolver: controls how columns for instances are generated and used between nested
             queries.
             semantic_manifest_lookup: Self-explanatory.
-            time_spine_source: Allows getting dates for use in cumulative joins
         """
         self._column_association_resolver = column_association_resolver
         self._metric_lookup = semantic_manifest_lookup.metric_lookup
         self._semantic_model_lookup = semantic_manifest_lookup.semantic_model_lookup
-        self._time_spine_source = time_spine_source
+        self._time_spine_source = semantic_manifest_lookup.time_spine_source
 
     @property
     def column_association_resolver(self) -> ColumnAssociationResolver:  # noqa: D

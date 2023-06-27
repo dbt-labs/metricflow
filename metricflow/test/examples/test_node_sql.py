@@ -14,7 +14,6 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
-from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.specs.specs import InstanceSpecSet, TimeDimensionReference, TimeDimensionSpec
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
@@ -27,7 +26,6 @@ logger = logging.getLogger(__name__)
 def test_view_sql_generated_at_a_node(
     sql_client: SqlClient,
     simple_semantic_manifest_lookup: SemanticManifestLookup,
-    time_spine_source: TimeSpineSource,
 ) -> None:
     """Example that shows how to view generated SQL for nodes in a dataflow plan."""
     bookings_semantic_model = simple_semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
@@ -42,13 +40,11 @@ def test_view_sql_generated_at_a_node(
     to_sql_plan_converter = DataflowToSqlQueryPlanConverter[SqlDataSet](
         column_association_resolver=DunderColumnAssociationResolver(simple_semantic_manifest_lookup),
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
-        time_spine_source=time_spine_source,
     )
     sql_renderer: SqlQueryPlanRenderer = sql_client.sql_query_plan_renderer
     node_output_resolver = DataflowPlanNodeOutputDataSetResolver[SqlDataSet](
         column_association_resolver=column_association_resolver,
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
-        time_spine_source=time_spine_source,
     )
 
     # Show SQL and spec set at a source node.

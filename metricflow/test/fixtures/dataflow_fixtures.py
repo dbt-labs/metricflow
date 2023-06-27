@@ -32,13 +32,11 @@ def column_association_resolver(  # noqa: D
 def dataflow_plan_builder(  # noqa: D
     simple_semantic_manifest_lookup: SemanticManifestLookup,
     consistent_id_object_repository: ConsistentIdObjectRepository,
-    time_spine_source: TimeSpineSource,
 ) -> DataflowPlanBuilder[SemanticModelDataSet]:
     return DataflowPlanBuilder(
         source_nodes=consistent_id_object_repository.simple_model_source_nodes,
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
         cost_function=DefaultCostFunction[SemanticModelDataSet](),
-        time_spine_source=time_spine_source,
     )
 
 
@@ -52,7 +50,6 @@ def multihop_dataflow_plan_builder(  # noqa: D
         source_nodes=consistent_id_object_repository.multihop_model_source_nodes,
         semantic_manifest_lookup=multi_hop_join_semantic_manifest_lookup,
         cost_function=DefaultCostFunction[SemanticModelDataSet](),
-        time_spine_source=time_spine_source,
     )
 
 
@@ -74,7 +71,6 @@ def scd_dataflow_plan_builder(  # noqa: D
         source_nodes=consistent_id_object_repository.scd_model_source_nodes,
         semantic_manifest_lookup=scd_semantic_manifest_lookup,
         cost_function=DefaultCostFunction[SemanticModelDataSet](),
-        time_spine_source=time_spine_source,
         column_association_resolver=scd_column_association_resolver,
     )
 

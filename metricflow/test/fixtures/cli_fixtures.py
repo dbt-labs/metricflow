@@ -16,7 +16,6 @@ from metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts, dbtP
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
-from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.time.configurable_time_source import ConfigurableTimeSource
@@ -86,7 +85,6 @@ class FakeCLIContext(CLIContext):
 def cli_context(  # noqa: D
     sql_client: SqlClient,
     simple_semantic_manifest: SemanticManifest,
-    time_spine_source: TimeSpineSource,
     mf_test_session_state: MetricFlowTestSessionState,
     create_source_tables: bool,
 ) -> Generator[CLIContext, None, None]:
@@ -96,7 +94,6 @@ def cli_context(  # noqa: D
         sql_client=sql_client,
         column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup=semantic_manifest_lookup),
         time_source=ConfigurableTimeSource(as_datetime("2020-01-01")),
-        time_spine_source=time_spine_source,
         system_schema=mf_test_session_state.mf_system_schema,
     )
     context = FakeCLIContext()

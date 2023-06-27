@@ -14,7 +14,6 @@ from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
-from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.test.time.metric_time_dimension import MTD_REFERENCE, MTD_SPEC_DAY, MTD_SPEC_MONTH, MTD_SPEC_YEAR
 from metricflow.time.time_granularity_solver import (
     PartialTimeDimensionSpec,
@@ -26,13 +25,11 @@ from metricflow.time.time_granularity_solver import (
 @pytest.fixture(scope="session")
 def time_granularity_solver(  # noqa: D
     extended_date_semantic_manifest_lookup: SemanticManifestLookup,
-    time_spine_source: TimeSpineSource,
 ) -> TimeGranularitySolver:
     column_association_resolver = DunderColumnAssociationResolver(extended_date_semantic_manifest_lookup)
     node_output_resolver = DataflowPlanNodeOutputDataSetResolver[SemanticModelDataSet](
         column_association_resolver=column_association_resolver,
         semantic_manifest_lookup=extended_date_semantic_manifest_lookup,
-        time_spine_source=time_spine_source,
     )
     to_data_set_converter = SemanticModelToDataSetConverter(column_association_resolver)
     source_data_sets = [

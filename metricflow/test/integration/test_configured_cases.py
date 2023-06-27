@@ -17,7 +17,6 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import (
     DunderColumnAssociationResolver,
 )
-from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_exprs import (
     SqlCastToTimestampExpression,
@@ -203,7 +202,6 @@ def test_case(
     scd_semantic_manifest_lookup: SemanticManifestLookup,
     sql_client: SqlClient,
     create_source_tables: bool,
-    time_spine_source: TimeSpineSource,
 ) -> None:
     """Runs all integration tests configured in the test case YAML directory."""
     case = CONFIGURED_INTEGRATION_TESTS_REPOSITORY.get_test_case(name)
@@ -236,7 +234,6 @@ def test_case(
         sql_client=sql_client,
         column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup),
         time_source=ConfigurableTimeSource(as_datetime("2021-01-04")),
-        time_spine_source=time_spine_source,
         system_schema=mf_test_session_state.mf_system_schema,
     )
 
@@ -259,7 +256,7 @@ def test_case(
                 render_date_sub=check_query_helpers.render_date_sub,
                 render_date_trunc=check_query_helpers.render_date_trunc,
                 render_percentile_expr=check_query_helpers.render_percentile_expr,
-                mf_time_spine_source=time_spine_source.spine_table.sql,
+                mf_time_spine_source=semantic_manifest_lookup.time_spine_source.spine_table.sql,
                 double_data_type_name=check_query_helpers.double_data_type_name,
                 render_dimension_template=check_query_helpers.render_dimension_template,
                 render_entity_template=check_query_helpers.render_entity_template,
@@ -284,7 +281,7 @@ def test_case(
             render_date_sub=check_query_helpers.render_date_sub,
             render_date_trunc=check_query_helpers.render_date_trunc,
             render_percentile_expr=check_query_helpers.render_percentile_expr,
-            mf_time_spine_source=time_spine_source.spine_table.sql,
+            mf_time_spine_source=semantic_manifest_lookup.time_spine_source.spine_table.sql,
             double_data_type_name=check_query_helpers.double_data_type_name,
         )
     )

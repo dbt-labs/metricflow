@@ -35,7 +35,6 @@ from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
-from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
@@ -63,7 +62,6 @@ from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY
 @pytest.fixture(scope="session")
 def multihop_dataflow_to_sql_converter(  # noqa: D
     multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
-    time_spine_source: TimeSpineSource,
 ) -> DataflowToSqlQueryPlanConverter[SemanticModelDataSet]:
     return DataflowToSqlQueryPlanConverter[SemanticModelDataSet](
         column_association_resolver=DunderColumnAssociationResolver(multi_hop_join_semantic_manifest_lookup),
@@ -75,7 +73,6 @@ def multihop_dataflow_to_sql_converter(  # noqa: D
 @pytest.fixture(scope="session")
 def scd_dataflow_to_sql_converter(  # noqa: D
     scd_semantic_manifest_lookup: SemanticManifestLookup,
-    time_spine_source: TimeSpineSource,
 ) -> DataflowToSqlQueryPlanConverter[SemanticModelDataSet]:
     return DataflowToSqlQueryPlanConverter[SemanticModelDataSet](
         column_association_resolver=DunderColumnAssociationResolver(scd_semantic_manifest_lookup),
