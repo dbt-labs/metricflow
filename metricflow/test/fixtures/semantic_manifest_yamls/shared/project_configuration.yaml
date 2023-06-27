@@ -1,0 +1,7 @@
+---
+# Note: This file may be symlinked.
+project_configuration:
+  time_spine_table_configurations:
+    - location: $source_schema.mf_time_spine
+      column_name: ds
+      grain: day

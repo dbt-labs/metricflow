@@ -1,0 +1,5 @@
+project_configuration:
+  time_spine_table_configurations:
+    - location: $system_schema.mf_time_spine
+      column_name: ds
+      grain: day
