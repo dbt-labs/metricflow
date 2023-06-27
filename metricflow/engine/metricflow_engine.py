@@ -5,12 +5,17 @@ import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
+from pathlib import Path
 from typing import List, Optional, Sequence
 
 import pandas as pd
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.references import DimensionReference, EntityReference, MetricReference
 
+from metricflow.cli.dbt_connectors.adapter_backed_client import AdapterBackedSqlClient
+from metricflow.cli.dbt_connectors.dbt_config_accessor import (
+    dbtArtifacts,
+)
 from metricflow.configuration.constants import (
     CONFIG_DWH_SCHEMA,
 )
@@ -31,7 +36,6 @@ from metricflow.engine.models import Dimension, Entity, Metric
 from metricflow.engine.time_source import ServerTimeSource
 from metricflow.engine.utils import (
     build_semantic_manifest_from_config,
-    build_semantic_manifest_from_dbt_project_root,
 )
 from metricflow.errors.errors import ExecutionException
 from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
@@ -306,11 +310,13 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         )
 
     @staticmethod
-    def from_dbt_project_root(handler: YamlFileHandler) -> MetricFlowEngine:
+    def from_dbt_project_root() -> MetricFlowEngine:
         """Initialize MetricFlowEngine via the dbt project root directory."""
-        sql_client = make_sql_client_from_config(handler)
-        system_schema = not_empty(handler.get_value(CONFIG_DWH_SCHEMA), CONFIG_DWH_SCHEMA, handler.url)
-        semantic_manifest_lookup = SemanticManifestLookup(build_semantic_manifest_from_dbt_project_root())
+        dbt_artifacts = dbtArtifacts.load_from_project_path(Path.cwd())
+        semantic_manifest_lookup = SemanticManifestLookup(dbt_artifacts.semantic_manifest)
+        sql_client = AdapterBackedSqlClient(dbt_artifacts.adapter)
+        # TODO: remove this if possible after the time spine schema is sourced from the semantic manifest
+        system_schema = dbt_artifacts.profile.credentials.schema
 
         return MetricFlowEngine(
             semantic_manifest_lookup=semantic_manifest_lookup,

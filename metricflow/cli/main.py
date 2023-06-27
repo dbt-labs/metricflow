@@ -25,27 +25,19 @@ import metricflow.cli.custom_click_types as click_custom
 from metricflow.cli import PACKAGE_NAME
 from metricflow.cli.cli_context import CLIContext
 from metricflow.cli.constants import DEFAULT_RESULT_DECIMAL_PLACES, MAX_LIST_OBJECT_ELEMENTS
+from metricflow.cli.dbt_connectors.adapter_backed_client import AdapterBackedSqlClient
+from metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts
 from metricflow.cli.tutorial import create_sample_data, gen_sample_model_configs, remove_sample_tables
 from metricflow.cli.utils import (
-    MF_BIGQUERY_KEYS,
-    MF_CONFIG_KEYS,
-    MF_DATABRICKS_KEYS,
-    MF_POSTGRESQL_KEYS,
-    MF_REDSHIFT_KEYS,
-    MF_SNOWFLAKE_KEYS,
     exception_handler,
-    generate_duckdb_demo_keys,
     get_data_warehouse_config_link,
     query_options,
     start_end_time_options,
 )
-from metricflow.configuration.config_builder import YamlTemplateBuilder
 from metricflow.dag.dag_visualization import display_dag_as_svg
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.engine.metricflow_engine import MetricFlowExplainResult, MetricFlowQueryRequest, MetricFlowQueryResult
-from metricflow.engine.utils import build_semantic_manifest_from_dbt_project_root
 from metricflow.model.data_warehouse_model_validator import DataWarehouseModelValidator
-from metricflow.sql_clients.common_client import SqlDialect
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
 
@@ -102,72 +94,6 @@ def cli(cfg: CLIContext, verbose: bool) -> None:  # noqa: D
 
 
 @cli.command()
-@click.option("--restart", is_flag=True, help="Wipe the config file and start over")
-@pass_config
-@log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-def setup(cfg: CLIContext, restart: bool) -> None:
-    """Setup MetricFlow."""
-    click.echo(
-        textwrap.dedent(
-            """\
-            🎉 Welcome to MetricFlow! 🎉
-            """
-        )
-    )
-
-    path = pathlib.Path(cfg.config.file_path)
-    abs_path = path.absolute()
-    to_create = not path.exists() or restart
-
-    # Seed the config template to the config file
-    if to_create:
-        dialect_map = {
-            SqlDialect.SNOWFLAKE.value: MF_SNOWFLAKE_KEYS,
-            SqlDialect.BIGQUERY.value: MF_BIGQUERY_KEYS,
-            SqlDialect.REDSHIFT.value: MF_REDSHIFT_KEYS,
-            SqlDialect.POSTGRESQL.value: MF_POSTGRESQL_KEYS,
-            SqlDialect.DUCKDB.value: generate_duckdb_demo_keys(config_dir=cfg.config.dir_path),
-            SqlDialect.DATABRICKS.value: MF_DATABRICKS_KEYS,
-        }
-
-        click.echo("Please enter your data warehouse dialect.")
-        click.echo("Use 'duckdb' for a standalone demo.")
-        click.echo("")
-        dialect = click.prompt(
-            "Dialect",
-            type=click.Choice(sorted([x for x in dialect_map.keys()])),
-            show_choices=True,
-        )
-
-        # If there is a collision, prefer to use the key in the dialect.
-        config_keys = list(dialect_map[dialect])
-        for mf_config_key in MF_CONFIG_KEYS:
-            if not any(x.key == mf_config_key.key for x in config_keys):
-                config_keys.append(mf_config_key)
-
-        with open(abs_path, "w") as file:
-            YamlTemplateBuilder.write_yaml(config_keys, file)
-
-    template_description = (
-        f"A template config file has been created in {abs_path}.\n"
-        if to_create
-        else f"A template config file already exists in {abs_path}, so it was left alone.\n"
-    )
-    click.echo(
-        textwrap.dedent(
-            f"""\
-            💻 {template_description}
-            If you are new to MetricFlow, we recommend you to run through our tutorial with `mf tutorial`\n
-            Next steps:
-              1. Review and fill out relevant fields.
-              2. Run `mf health-checks` to validate the data warehouse connection.
-              3. Run `mf validate-configs` to validate the model configurations.
-            """
-        )
-    )
-
-
-@cli.command()
 @click.option("-m", "--msg", is_flag=True, help="Output the final steps dialogue")
 @click.option("--skip-dw", is_flag=True, help="Skip the data warehouse health checks")
 @click.option("--drop-tables", is_flag=True, help="Drop all the dummy tables created via tutorial")
@@ -176,7 +102,8 @@ def setup(cfg: CLIContext, restart: bool) -> None:
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool, drop_tables: bool) -> None:
     """Run user through a tutorial."""
-    # This text is also located in the projects top-level README.md
+    click.echo("The mf tutorial command has not yet been updated to work with the dbt integration!")
+    exit()
     help_msg = textwrap.dedent(
         """\
         🤓 Please run the following steps,
@@ -210,11 +137,7 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool,
         click.echo(help_msg)
         exit()
 
-    # Check if the MetricFlow configuration file exists
-    path = pathlib.Path(cfg.config.file_path)
-    if not path.absolute().exists():
-        click.echo("💡 Please run `mf setup` to get your configs set up before going through the tutorial.")
-        exit()
+    # TODO: Add check for dbt project root here
 
     # Validate that the data warehouse connection is successful
     if not skip_dw:
@@ -222,6 +145,7 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool,
         click.confirm("❓ Are the health-checks all passing? Please fix them before continuing", abort=True)
         click.echo("💡 For future reference, you can continue with the tutorial by adding `--skip-dw`\n")
 
+    # TODO: decide whether or not to allow management of tutorial datasets from the mf CLI and update accordingly
     if drop_tables:
         spinner = Halo(text="Dropping tables...", spinner="dots")
         spinner.start()
@@ -239,7 +163,9 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool,
         spinner.succeed("📀 Sample tables have been successfully created into your data warehouse.")
 
     # Seed sample model file
-    model_path = os.path.join(cfg.config.dir_path, "sample_models")
+    # TODO: Make this work with the new dbt project locations. For now, put it in cwd to remove the reference
+    # to the model path from the MetricFlow config
+    model_path = os.path.join(os.getcwd(), "sample_models")
     pathlib.Path(model_path).mkdir(parents=True, exist_ok=True)
     click.echo(f"🤖 Attempting to generate model configs to your local filesystem in '{str(model_path)}'.")
     spinner = Halo(text="Dropping tables...", spinner="dots")
@@ -672,9 +598,10 @@ def validate_configs(
     # Parsing Validation
     parsing_spinner = Halo(text="Building manifest from dbt project root", spinner="dots")
     parsing_spinner.start()
+    project_root = pathlib.Path.cwd()
 
     try:
-        semantic_manifest = build_semantic_manifest_from_dbt_project_root()
+        semantic_manifest = dbtArtifacts.build_semantic_manifest_from_dbt_project_root(project_root=project_root)
         parsing_spinner.succeed("🎉 Successfully parsed manifest from dbt project")
     except Exception as e:
         parsing_spinner.fail(f"Exception found when parsing manifest from dbt project ({str(e)})")
@@ -698,7 +625,11 @@ def validate_configs(
 
     dw_results = SemanticManifestValidationResults()
     if not skip_dw:
-        dw_validator = DataWarehouseModelValidator(sql_client=cfg.sql_client, system_schema=cfg.mf_system_schema)
+        # fetch dbt adapters. This rebuilds the manifest again, but whatever.
+        dbt_artifacts = dbtArtifacts.load_from_project_path(project_path=project_root)
+        sql_client = AdapterBackedSqlClient(dbt_artifacts.adapter)
+        schema = dbt_artifacts.profile.credentials.schema
+        dw_validator = DataWarehouseModelValidator(sql_client=sql_client, system_schema=schema)
         dw_results = _data_warehouse_validations_runner(
             dw_validator=dw_validator, manifest=semantic_manifest, timeout=dw_timeout
         )
