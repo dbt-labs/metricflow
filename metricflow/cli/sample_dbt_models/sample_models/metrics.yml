@@ -1,0 +1,66 @@
+---
+metrics:
+  - name: new_customers
+    type: SIMPLE
+    type_params:
+      measure: new_customers
+    label: "test"
+  - name: quick_buy_transactions
+    type: SIMPLE
+    type_params:
+      measure: quick_buy_transactions
+    label: "test"
+  - name: quick_buy_amount_usd
+    type: SIMPLE
+    type_params:
+      measure: quick_buy_amount_usd
+    label: "test"
+  - name: cancellations
+    type: SIMPLE
+    type_params:
+      measure: cancellations_usd
+    label: "test"
+  - name: transactions
+    type: SIMPLE
+    type_params:
+      measure: transactions
+    label: "test"
+  - name: alterations
+    type: SIMPLE
+    type_params:
+      measure: alterations_usd
+    label: "test"
+  - name: transaction_amount
+    type: SIMPLE
+    type_params:
+      measure: transaction_amount_usd
+    label: "test"
+  - name: cancellation_rate
+    type: ratio
+    type_params:
+      numerator: cancellations
+      denominator: transaction_amount
+    label: "test"
+  - name: revenue_usd
+    type: derived
+    type_params:
+      expr: transaction_amount - cancellations + alterations
+      metrics:
+        - name: transaction_amount
+        - name: cancellations
+        - name: alterations
+    label: "test"
+  - name: cancellations_mx
+    type: SIMPLE
+    type_params:
+      measure: cancellations_usd
+    filter: |
+      {{ dimension('customer_country', entity_path=['customer']) }} = 'MX'
+    label: "test"
+  - name: transaction_usd_na
+    type: SIMPLE
+    type_params:
+      measure: transaction_amount_usd
+    filter: |
+      {{ dimension('region', entity_path=['customer', 'country']) }} = 'NA'
+    label: "test"

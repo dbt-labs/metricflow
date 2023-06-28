@@ -1,0 +1,8 @@
+sources:
+  - name: tutorial
+    schema: $system_schema
+    description: Data sets for running mf tutorial
+    tables:
+      - name: transactions_seed
+      - name: customers_seed
+      - name: countries_seed

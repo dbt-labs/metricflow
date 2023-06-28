@@ -1,0 +1,24 @@
+semantic_models:
+  - name: customers
+    description: Location and description of all customers.
+    defaults:
+      agg_time_dimension: ds
+    model: ref('customers')
+    entities:
+      - name: customer
+        type: primary
+        expr: id_customer
+      - name: country
+        type: foreign
+    measures:
+      - name: new_customers
+        expr: "1"
+        agg: SUM
+    dimensions:
+      - name: ds
+        type: time
+        type_params:
+          time_granularity: day
+      - name: customer_country
+        type: categorical
+        expr: country
