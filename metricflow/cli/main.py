@@ -104,12 +104,12 @@ def cli(cfg: CLIContext, verbose: bool) -> None:  # noqa: D
 
 @cli.command()
 @click.option("-m", "--msg", is_flag=True, help="Output the final steps dialogue")
-@click.option("--skip-dw", is_flag=True, help="Skip the data warehouse health checks")
-@click.option("--drop-tables", is_flag=True, help="Drop all the dummy tables created via tutorial")
+# @click.option("--skip-dw", is_flag=True, help="Skip the data warehouse health checks") # TODO: re-enable this
+# @click.option("--drop-tables", is_flag=True, help="Drop all the dummy tables created via tutorial") # TODO: re-enable this
 @pass_config
 @click.pass_context
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool, drop_tables: bool) -> None:
+def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool) -> None:
     """Run user through a tutorial."""
     help_msg = textwrap.dedent(
         """\
@@ -152,6 +152,8 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool,
             "Unable to detect dbt project. Please ensure that your current working directory is at the root of the dbt project."
         )
         exit()
+
+    # TODO: Health checks
 
     # Load the metadata from dbt project
     try:
