@@ -30,6 +30,7 @@ from metricflow.cli.constants import DEFAULT_RESULT_DECIMAL_PLACES, MAX_LIST_OBJ
 from metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts
 from metricflow.cli.tutorial import create_sample_data, gen_sample_model_configs, remove_sample_tables
 from metricflow.cli.utils import (
+    error_if_not_in_dbt_project,
     exception_handler,
     query_options,
     start_end_time_options,
@@ -226,6 +227,7 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool,
 )
 @pass_config
 @exception_handler
+@error_if_not_in_dbt_project
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 def query(
     cfg: CLIContext,
@@ -329,6 +331,7 @@ def query(
 
 @cli.group()
 @pass_config
+@error_if_not_in_dbt_project
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 def list(cfg: CLIContext) -> None:  # noqa: D
     """Retrieve metadata values about metrics/dimensions/entities/dimension values."""
@@ -340,6 +343,7 @@ def list(cfg: CLIContext) -> None:  # noqa: D
     "--show-all-dimensions", is_flag=True, default=False, help="Show all dimensions associated with a metric."
 )
 @pass_config
+@error_if_not_in_dbt_project
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 def metrics(cfg: CLIContext, show_all_dimensions: bool = False, search: Optional[str] = None) -> None:
@@ -433,6 +437,7 @@ def entities(cfg: CLIContext, metrics: List[str]) -> None:
 
 @cli.command()
 @pass_config
+@error_if_not_in_dbt_project
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 def health_checks(cfg: CLIContext) -> None:

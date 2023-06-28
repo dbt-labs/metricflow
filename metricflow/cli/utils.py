@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import datetime as dt
 import logging
+import pathlib
 import traceback
-from functools import wraps
+from functools import update_wrapper, wraps
 from typing import Any, Callable, List, Optional
 
 import click
@@ -131,3 +132,25 @@ def exception_handler(func: Callable[..., Any]) -> Callable[..., Any]:  # type: 
             exit(1)
 
     return wrapper
+
+
+def dbt_project_file_exists() -> bool:
+    """Check that the cwd is a dbt project root. Currently done by checking for existence of dbt_project.yml."""
+    return pathlib.Path("dbt_project.yml").exists()
+
+
+def error_if_not_in_dbt_project(func: Callable) -> Callable:
+    """Decorator to output an error message and exit if caller is not in a root directory of a dbt project."""
+
+    @click.pass_context
+    def new_func(ctx: click.core.Context, *args: Any, **kwargs: Any) -> Any:  # type: ignore[misc]
+        if not dbt_project_file_exists():
+            click.echo(
+                "❌ Unable to locate 'dbt_project.yml' in the current directory\n"
+                "In order to run the MetricFlow CLI, you must be running in the root directory of a complete dbt project.\n"
+                "Please run `mf tutorial` if you want to get started on building a dbt project."
+            )
+            exit(1)
+        return ctx.invoke(func, *args, **kwargs)
+
+    return update_wrapper(new_func, func)
