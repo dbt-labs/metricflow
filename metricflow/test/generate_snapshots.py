@@ -23,7 +23,11 @@ export MF_TEST_ENGINE_CREDENTIALS=$(cat <<EOF
     "databricks": {
         "engine_url": "databricks://...",
         "engine_password": "..."
-    }
+    },
+    "postgres": {
+        "engine_url": postgres://...",
+        "engine_password": "..."
+    },
 }
 EOF
 )
@@ -140,10 +144,9 @@ def run_tests(test_configuration: MetricFlowTestConfiguration, test_file_paths: 
         or test_configuration.engine is SqlEngine.SNOWFLAKE
         or test_configuration.engine is SqlEngine.BIGQUERY
         or test_configuration.engine is SqlEngine.DATABRICKS
+        or test_configuration.engine is SqlEngine.POSTGRES
     ):
         run_command(f"pytest -x -vv -n 4 --overwrite-snapshots --use-persistent-source-schema {combined_paths}")
-    elif test_configuration.engine is SqlEngine.POSTGRES:
-        raise NotImplementedError(f"{test_configuration.engine} is not yet supported in this script.")
     else:
         assert_values_exhausted(test_configuration.engine)
 
