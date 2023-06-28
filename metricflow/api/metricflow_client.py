@@ -1,15 +1,14 @@
 from __future__ import annotations
 
+import datetime as dt
 import logging
 from typing import Dict, List, Optional
 
+from dateutil.parser import parse
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 from dbt_semantic_interfaces.validations.validator_helpers import SemanticManifestValidationResults
 
-from metricflow.configuration.config_handler import ConfigHandler
-from metricflow.configuration.constants import CONFIG_DWH_SCHEMA
-from metricflow.configuration.yaml_handler import YamlFileHandler
 from metricflow.engine.metricflow_engine import (
     MetricFlowEngine,
     MetricFlowExplainResult,
@@ -17,39 +16,15 @@ from metricflow.engine.metricflow_engine import (
     MetricFlowQueryResult,
 )
 from metricflow.engine.models import Dimension, Metric
-from metricflow.engine.utils import build_semantic_manifest_from_config, convert_to_datetime
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
-from metricflow.sql_clients.common_client import not_empty
-from metricflow.sql_clients.sql_utils import make_sql_client_from_config
 
 logger = logging.getLogger(__name__)
 
 
 class MetricFlowClient:
     """MetricFlow Python client for running basic queries and other standard commands."""
-
-    @staticmethod
-    def from_config(config_file_path: Optional[str] = None) -> MetricFlowClient:
-        """Builds a MetricFlowClient via config yaml file.
-
-        If config_file_path is not passed, it will use the default config location.
-        """
-        if config_file_path is not None:
-            handler = YamlFileHandler(yaml_file_path=config_file_path)
-        else:
-            handler = ConfigHandler()
-        logger.debug(f"Constructing a MetricFlowClient with the config in {handler.yaml_file_path}")
-        sql_client = make_sql_client_from_config(handler)
-        semantic_manifest = build_semantic_manifest_from_config(handler)
-        schema = not_empty(handler.get_value(CONFIG_DWH_SCHEMA), CONFIG_DWH_SCHEMA, handler.url)
-
-        return MetricFlowClient(
-            sql_client=sql_client,
-            semantic_manifest=semantic_manifest,
-            system_schema=schema,
-        )
 
     def __init__(
         self,
@@ -88,8 +63,8 @@ class MetricFlowClient:
     ) -> MetricFlowQueryRequest:
         """Build MetricFlowQueryRequest given common query parameters."""
         parsed_optimization_level = SqlQueryOptimizationLevel(f"O{sql_optimization_level}")
-        parsed_start_time = convert_to_datetime(start_time)
-        parsed_end_time = convert_to_datetime(end_time)
+        parsed_start_time = _convert_to_datetime(start_time)
+        parsed_end_time = _convert_to_datetime(end_time)
         return MetricFlowQueryRequest.create_with_random_request_id(
             metric_names=metrics,
             group_by_names=dimensions,
@@ -224,8 +199,8 @@ class MetricFlowClient:
         Returns:
             A list of dimension values as string.
         """
-        parsed_start_time = convert_to_datetime(start_time)
-        parsed_end_time = convert_to_datetime(end_time)
+        parsed_start_time = _convert_to_datetime(start_time)
+        parsed_end_time = _convert_to_datetime(end_time)
         return self.engine.get_dimension_values(
             metric_names=metric_names,
             get_group_by_values=dimension_name,
@@ -240,3 +215,14 @@ class MetricFlowClient:
             Tuple of validation issues with the model provided.
         """
         return SemanticManifestValidator[SemanticManifest]().validate_semantic_manifest(self.semantic_manifest)
+
+
+def _convert_to_datetime(datetime_str: Optional[str]) -> Optional[dt.datetime]:
+    """Callback to convert string to datetime given as an iso8601 timestamp."""
+    if datetime_str is None:
+        return None
+
+    try:
+        return parse(datetime_str)
+    except Exception:
+        raise ValueError(f"'{datetime_str}' is not a valid iso8601 timestamp")

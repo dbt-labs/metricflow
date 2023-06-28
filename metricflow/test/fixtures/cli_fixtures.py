@@ -1,14 +1,18 @@
 from __future__ import annotations
 
-from typing import Optional, Sequence
+import pathlib
+import tempfile
+from typing import Generator, Optional, Sequence
 
 import click
 import pytest
 from click.testing import CliRunner, Result
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.test_utils import as_datetime
+from typing_extensions import override
 
 from metricflow.cli.cli_context import CLIContext
+from metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
@@ -18,6 +22,61 @@ from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.time.configurable_time_source import ConfigurableTimeSource
 
 
+class FakeCLIContext(CLIContext):
+    """Fake context for testing. Manually initialize or override params used by CLIContext as appropriate.
+
+    Note - this construct should not exist. It bypasses a fundamental initialization process within the CLI which
+    can currently only be tested manually. Eventually, we need to refactor the CLI itself to allow for more robust
+    testing. This will, however, allow us to test the invocation of CLI commands assuming the required configuration
+    components are all in place.
+    """
+
+    def __init__(self) -> None:
+        """Initializer configures only the two required parameters and leaves the remainder for inline override."""
+        self.verbose = False
+        self._mf: Optional[MetricFlowEngine] = None
+        self._sql_client: Optional[SqlClient] = None
+        self._semantic_manifest: Optional[SemanticManifest] = None
+        self._semantic_manifest_lookup: Optional[SemanticManifestLookup] = None
+        self._mf_system_schema: Optional[str] = None
+        self._log_file_path: Optional[pathlib.Path] = None
+
+    @property
+    @override
+    def dbt_artifacts(self) -> dbtArtifacts:
+        raise NotImplementedError("FakeCLIContext does not load full dbt artifacts!")
+
+    @property
+    @override
+    def log_file_path(self) -> pathlib.Path:
+        assert self._log_file_path
+        return self._log_file_path
+
+    @property
+    @override
+    def mf_system_schema(self) -> str:
+        assert self._mf_system_schema, "Must set _mf_system_schema before use!"
+        return self._mf_system_schema
+
+    @property
+    @override
+    def sql_client(self) -> SqlClient:
+        assert self._sql_client, "Must set _sql_client before use!"
+        return self._sql_client
+
+    @property
+    @override
+    def mf(self) -> MetricFlowEngine:
+        assert self._mf, "Must set _mf before use!"
+        return self._mf
+
+    @property
+    @override
+    def semantic_manifest(self) -> SemanticManifest:
+        assert self._semantic_manifest, "Must set _semantic_manifest before use!"
+        return self._semantic_manifest
+
+
 @pytest.fixture
 def cli_context(  # noqa: D
     sql_client: SqlClient,
@@ -25,7 +84,7 @@ def cli_context(  # noqa: D
     time_spine_source: TimeSpineSource,
     mf_test_session_state: MetricFlowTestSessionState,
     create_source_tables: bool,
-) -> CLIContext:
+) -> Generator[CLIContext, None, None]:
     semantic_manifest_lookup = SemanticManifestLookup(simple_semantic_manifest)
     mf_engine = MetricFlowEngine(
         semantic_manifest_lookup=semantic_manifest_lookup,
@@ -35,13 +94,15 @@ def cli_context(  # noqa: D
         time_spine_source=time_spine_source,
         system_schema=mf_test_session_state.mf_system_schema,
     )
-    context = CLIContext()
+    context = FakeCLIContext()
     context._mf = mf_engine
     context._sql_client = sql_client
     context._semantic_manifest = simple_semantic_manifest
     context._semantic_manifest_lookup = semantic_manifest_lookup
     context._mf_system_schema = mf_test_session_state.mf_system_schema
-    return context
+    with tempfile.NamedTemporaryFile() as file:
+        context._log_file_path = pathlib.Path(file.name)
+        yield context
 
 
 class MetricFlowCliRunner(CliRunner):

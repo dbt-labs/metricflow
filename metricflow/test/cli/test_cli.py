@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import os
-import pathlib
 import shutil
 import textwrap
 from contextlib import contextmanager
@@ -119,8 +118,8 @@ def test_tutorial(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
 
     resp = cli_runner.run(tutorial, args=["-m"])
     assert "Please run the following steps" in resp.output
-
-    pathlib.Path(cli_context.config.file_path).touch()
+    # TODO: update model test to reflect fixes in tutorial
+    # pathlib.Path(cli_context.config.file_path).touch()
     resp = cli_runner.run(tutorial, args=["--skip-dw"])
     assert (
         "Attempting to generate model configs to your local filesystem in" in resp.output

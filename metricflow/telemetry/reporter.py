@@ -14,8 +14,6 @@ from typing import Callable, List, Optional, TypeVar
 
 from typing_extensions import ParamSpec
 
-from metricflow.configuration.config_handler import ConfigHandler
-from metricflow.configuration.constants import CONFIG_EMAIL
 from metricflow.random_id import random_id
 from metricflow.telemetry.handlers.handlers import (
     RudderstackTelemetryHandler,
@@ -39,7 +37,7 @@ class TelemetryReporter:
         """If fully_anonymous is set, use a client_id that is not unique."""
         self._report_levels_higher_or_equal_to = report_levels_higher_or_equal_to
         self._fully_anonymous = fully_anonymous
-        self._email = os.getenv(TelemetryReporter.ENV_EMAIL_OVERRIDE) or ConfigHandler().get_value(CONFIG_EMAIL)
+        self._email = os.getenv(TelemetryReporter.ENV_EMAIL_OVERRIDE)
 
         if fully_anonymous:
             self._client_id = TelemetryReporter.FULLY_ANONYMOUS_CLIENT_ID

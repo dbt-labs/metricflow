@@ -2,120 +2,17 @@ from __future__ import annotations
 
 import datetime as dt
 import logging
-import os.path
-import pathlib
 import traceback
 from functools import wraps
-from typing import Any, Callable, List, Optional, Tuple
+from typing import Any, Callable, List, Optional
 
 import click
 from dateutil.parser import parse
 
 import metricflow.cli.custom_click_types as click_custom
 from metricflow.cli.cli_context import CLIContext
-from metricflow.configuration.config_builder import ConfigKey
-from metricflow.configuration.constants import (
-    CONFIG_DWH_ACCESS_TOKEN,
-    CONFIG_DWH_CREDS_PATH,
-    CONFIG_DWH_DB,
-    CONFIG_DWH_DIALECT,
-    CONFIG_DWH_HOST,
-    CONFIG_DWH_HTTP_PATH,
-    CONFIG_DWH_PASSWORD,
-    CONFIG_DWH_PORT,
-    CONFIG_DWH_PROJECT_ID,
-    CONFIG_DWH_SCHEMA,
-    CONFIG_DWH_USER,
-    CONFIG_DWH_WAREHOUSE,
-    CONFIG_EMAIL,
-    CONFIG_MODEL_PATH,
-)
-from metricflow.configuration.yaml_handler import YamlFileHandler
-from metricflow.sql_clients.common_client import SqlDialect
 
 logger = logging.getLogger(__name__)
-
-# MetricFlow config keys
-MF_CONFIG_KEYS = (
-    ConfigKey(key=CONFIG_EMAIL, comment="Optional"),
-    ConfigKey(
-        key=CONFIG_MODEL_PATH,
-        value=f"{pathlib.Path.home()}/.metricflow/sample_models",
-        comment="Path to directory containing defined models (Leave until after DWH setup)",
-    ),
-    ConfigKey(key=CONFIG_DWH_SCHEMA),
-)
-# BigQuery config keys
-MF_BIGQUERY_KEYS = (
-    ConfigKey(
-        key=CONFIG_DWH_CREDS_PATH, comment="Provide the path to the BigQuery credential file, ignore to use ADC auth"
-    ),
-    ConfigKey(
-        key=CONFIG_DWH_PROJECT_ID, comment="Provide the GCP Project ID, ignore if using service account credentials"
-    ),
-    ConfigKey(key=CONFIG_DWH_DIALECT, value=SqlDialect.BIGQUERY.value),
-)
-
-# Postgres config keys
-MF_POSTGRESQL_KEYS = (
-    ConfigKey(key=CONFIG_DWH_DB),
-    ConfigKey(key=CONFIG_DWH_PASSWORD, comment="Password associated with the provided user"),
-    ConfigKey(key=CONFIG_DWH_USER, comment="Username for the data warehouse"),
-    ConfigKey(key=CONFIG_DWH_PORT),
-    ConfigKey(key=CONFIG_DWH_HOST, comment="Host name"),
-    ConfigKey(key=CONFIG_DWH_DIALECT, value=SqlDialect.POSTGRESQL.value),
-)
-
-# Redshift config keys
-MF_REDSHIFT_KEYS = (
-    ConfigKey(key=CONFIG_DWH_DB),
-    ConfigKey(key=CONFIG_DWH_PASSWORD, comment="Password associated with the provided user"),
-    ConfigKey(key=CONFIG_DWH_USER, comment="Username for the data warehouse"),
-    ConfigKey(key=CONFIG_DWH_PORT),
-    ConfigKey(key=CONFIG_DWH_HOST, comment="Host name"),
-    ConfigKey(key=CONFIG_DWH_DIALECT, value=SqlDialect.REDSHIFT.value),
-)
-# Snowflake config keys
-MF_SNOWFLAKE_KEYS = (
-    ConfigKey(key=CONFIG_DWH_WAREHOUSE, comment="Provide the warehouse to use"),
-    ConfigKey(key=CONFIG_DWH_DB),
-    ConfigKey(key=CONFIG_DWH_PASSWORD, comment="Password associated with the provided user"),
-    ConfigKey(key=CONFIG_DWH_USER, comment="Username for the data warehouse"),
-    ConfigKey(key=CONFIG_DWH_HOST, comment="Snowflake account name"),
-    ConfigKey(key=CONFIG_DWH_DIALECT, value=SqlDialect.SNOWFLAKE.value),
-)
-
-# Databricks config keys
-MF_DATABRICKS_KEYS = (
-    ConfigKey(key=CONFIG_DWH_HTTP_PATH),
-    ConfigKey(key=CONFIG_DWH_HOST),
-    ConfigKey(key=CONFIG_DWH_ACCESS_TOKEN),
-    ConfigKey(key=CONFIG_DWH_DIALECT, value=SqlDialect.DATABRICKS.value),
-)
-
-
-def generate_duckdb_demo_keys(config_dir: str) -> Tuple[ConfigKey, ...]:
-    """Generate configuration keys for DuckDB with a file in the config_dir."""
-    return (
-        ConfigKey(
-            key=CONFIG_DWH_DB, value=os.path.join(config_dir, "duck.db"), comment="For DuckDB, this is the data file."
-        ),
-        ConfigKey(key=CONFIG_DWH_DIALECT, value="duckdb"),
-        ConfigKey(key=CONFIG_DWH_SCHEMA, value="mf_demo"),
-    )
-
-
-# Data Warehouse link retriever
-def get_data_warehouse_config_link(handler: YamlFileHandler) -> str:
-    """Returns the URL to the docs on data warehouse specific configurations."""
-    dialect = handler.get_value(CONFIG_DWH_DIALECT) or ""
-    url_map = {
-        SqlDialect.SNOWFLAKE.value: "dw-snowflake",
-        SqlDialect.BIGQUERY.value: "dw-bigquery",
-        SqlDialect.DATABRICKS.value: "dw-databricks",
-        SqlDialect.REDSHIFT.value: "dw-redshift",
-    }
-    return f"https://docs.transform.co/docs/deployment/integrations/dw/{url_map.get(dialect, '')}"
 
 
 # Click Options
@@ -220,7 +117,7 @@ def exception_handler(func: Callable[..., Any]) -> Callable[..., Any]:  # type: 
 
             if isinstance(args[0], CLIContext):
                 cli_context: CLIContext = args[0]
-                click.echo(f"\nERROR: {str(e)}\nLog file: {cli_context.config.log_file_path}")
+                click.echo(f"\nERROR: {str(e)}\nLog file: {cli_context.log_file_path}")
             else:
                 if not isinstance(args[0], CLIContext):
                     logger.error(
