@@ -49,8 +49,6 @@ dependencies = [
   "requests~=2.27.1",
   "ruamel.yaml~=0.17.21",
   "rudder-sdk-python~=1.0.3",
-  "snowflake-connector-python>=2.7.8",
-  "snowflake-sqlalchemy~=1.4.3",
   "sqlalchemy-bigquery~=1.6.1",
   "sqlalchemy-redshift==0.8.1",
   "sqlalchemy2-stubs~=0.0.2a21",
