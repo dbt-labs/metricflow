@@ -9,6 +9,7 @@ from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 
 from metricflow.errors.errors import UnableToSatisfyQueryError
 from metricflow.test.fixtures.model_fixtures import query_parser_from_yaml
+from metricflow.test.model.example_project_configuration import EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE
 
 logger = logging.getLogger(__name__)
 
@@ -125,7 +126,7 @@ LISTINGS_YAML = textwrap.dedent(
 
 def test_nonexistent_metric() -> None:  # noqa: D
     bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=EXTENDED_BOOKINGS_YAML)
-    query_parser = query_parser_from_yaml([bookings_yaml_file])
+    query_parser = query_parser_from_yaml([EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, bookings_yaml_file])
 
     with pytest.raises(UnableToSatisfyQueryError) as exception_info:
         query_parser.parse_and_validate_query(metric_names=["booking"], group_by_names=["is_instant"])
@@ -150,7 +151,7 @@ def test_nonexistent_metric() -> None:  # noqa: D
 
 def test_non_existent_group_by() -> None:  # noqa: D
     bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=EXTENDED_BOOKINGS_YAML)
-    query_parser = query_parser_from_yaml([bookings_yaml_file])
+    query_parser = query_parser_from_yaml([EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, bookings_yaml_file])
 
     with pytest.raises(UnableToSatisfyQueryError) as exception_info:
         query_parser.parse_and_validate_query(metric_names=["bookings"], group_by_names=["is_instan"])
@@ -172,7 +173,9 @@ def test_invalid_group_by() -> None:  # noqa: D
     bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=EXTENDED_BOOKINGS_YAML)
     listings_yaml_file = YamlConfigFile(filepath="inline_for_test_2", contents=LISTINGS_YAML)
 
-    query_parser = query_parser_from_yaml([bookings_yaml_file, listings_yaml_file])
+    query_parser = query_parser_from_yaml(
+        [EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, bookings_yaml_file, listings_yaml_file]
+    )
 
     with pytest.raises(UnableToSatisfyQueryError) as exception_info:
         query_parser.parse_and_validate_query(metric_names=["bookings"], group_by_names=["capacity_latest"])

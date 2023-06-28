@@ -321,18 +321,15 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         node_output_resolver = DataflowPlanNodeOutputDataSetResolver[SemanticModelDataSet](
             column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup),
             semantic_manifest_lookup=semantic_manifest_lookup,
-            time_spine_source=self._time_spine_source,
         )
 
         self._dataflow_plan_builder = DataflowPlanBuilder[SemanticModelDataSet](
             source_nodes=source_nodes,
             semantic_manifest_lookup=self._semantic_manifest_lookup,
-            time_spine_source=self._time_spine_source,
         )
         self._to_sql_query_plan_converter = DataflowToSqlQueryPlanConverter[SemanticModelDataSet](
             column_association_resolver=self._column_association_resolver,
             semantic_manifest_lookup=self._semantic_manifest_lookup,
-            time_spine_source=self._time_spine_source,
         )
         self._to_execution_plan_converter = DataflowToExecutionPlanConverter[SemanticModelDataSet](
             sql_plan_converter=self._to_sql_query_plan_converter,

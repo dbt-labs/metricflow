@@ -5,7 +5,6 @@ from typing import Any, Dict
 from dbt_semantic_interfaces.parsing.schema_validator import SchemaValidator
 from dbt_semantic_interfaces.parsing.schemas import (
     aggregation_type_params_schema,
-    derived_group_by_element_schema,
     dimension_schema,
     dimension_type_params_schema,
     entity_schema,
@@ -86,14 +85,12 @@ add_transform_metadata_fields_to_spec(metric_schema)
 add_locked_metadata_to_spec(metric_schema)
 
 add_transform_metadata_fields_to_spec(semantic_model_schema)
-add_transform_metadata_fields_to_spec(derived_group_by_element_schema)
 
 
 schema_store = {
     # Top level schemas
     metric_schema["$id"]: metric_schema,
     semantic_model_schema["$id"]: semantic_model_schema,
-    derived_group_by_element_schema["$id"]: derived_group_by_element_schema,
     # Sub-object schemas
     metric_input_measure_schema["$id"]: metric_input_measure_schema,
     metric_type_params_schema["$id"]: metric_type_params_schema,
@@ -111,5 +108,4 @@ schema_store = {
 
 resolver = RefResolver.from_schema(schema=metric_schema, store=schema_store)
 semantic_model_validator = SchemaValidator(semantic_model_schema, resolver=resolver)
-derived_group_by_element_validator = SchemaValidator(derived_group_by_element_schema, resolver=resolver)
 metric_validator = SchemaValidator(metric_schema, resolver=resolver)
