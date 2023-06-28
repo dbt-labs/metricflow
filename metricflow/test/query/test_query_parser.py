@@ -18,6 +18,7 @@ from metricflow.specs.specs import (
     TimeDimensionSpec,
 )
 from metricflow.test.fixtures.model_fixtures import query_parser_from_yaml
+from metricflow.test.model.example_project_configuration import EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE
 from metricflow.test.time.metric_time_dimension import MTD
 from metricflow.time.time_granularity_solver import RequestTimeGranularityException
 
@@ -131,7 +132,7 @@ METRICS_YAML = textwrap.dedent(
 
 def test_query_parser() -> None:  # noqa: D
     bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=BOOKINGS_YAML)
-    query_parser = query_parser_from_yaml([bookings_yaml_file])
+    query_parser = query_parser_from_yaml([EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, bookings_yaml_file])
 
     query_spec = query_parser.parse_and_validate_query(
         metric_names=["bookings"], group_by_names=["is_instant", "listing", MTD], order=[MTD, "-bookings"]
@@ -167,7 +168,9 @@ def test_order_by_granularity_conversion() -> None:
     bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=BOOKINGS_YAML)
     revenue_yaml_file = YamlConfigFile(filepath="inline_for_test_2", contents=REVENUE_YAML)
 
-    query_parser = query_parser_from_yaml([bookings_yaml_file, revenue_yaml_file])
+    query_parser = query_parser_from_yaml(
+        [EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, bookings_yaml_file, revenue_yaml_file]
+    )
     query_spec = query_parser.parse_and_validate_query(
         metric_names=["bookings", "revenue"], group_by_names=[MTD], order=[f"-{MTD}"]
     )
@@ -186,7 +189,7 @@ def test_order_by_granularity_conversion() -> None:
 def test_order_by_granularity_no_conversion() -> None:  # noqa: D
     bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=BOOKINGS_YAML)
 
-    query_parser = query_parser_from_yaml([bookings_yaml_file])
+    query_parser = query_parser_from_yaml([EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, bookings_yaml_file])
 
     query_spec = query_parser.parse_and_validate_query(metric_names=["bookings"], group_by_names=[MTD], order=[MTD])
 
@@ -206,7 +209,9 @@ def test_time_range_constraint_conversion() -> None:
     bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=BOOKINGS_YAML)
     revenue_yaml_file = YamlConfigFile(filepath="inline_for_test_2", contents=REVENUE_YAML)
 
-    query_parser = query_parser_from_yaml([bookings_yaml_file, revenue_yaml_file])
+    query_parser = query_parser_from_yaml(
+        [EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, bookings_yaml_file, revenue_yaml_file]
+    )
 
     # "bookings" has a granularity of DAY, "revenue" has a granularity of MONTH
     query_spec = query_parser.parse_and_validate_query(
@@ -227,7 +232,7 @@ def test_parse_and_validate_where_constraint_dims() -> None:
 
     bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=BOOKINGS_YAML)
 
-    query_parser = query_parser_from_yaml([bookings_yaml_file])
+    query_parser = query_parser_from_yaml([EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, bookings_yaml_file])
 
     with pytest.raises(UnableToSatisfyQueryError):
         query_parser.parse_and_validate_query(
@@ -252,7 +257,7 @@ def test_parse_and_validate_where_constraint_metric_time() -> None:
     """Test that granularity of metric_time reference in where constraint is at least that of the ds dimension."""
     revenue_yaml_file = YamlConfigFile(filepath="inline_for_test_2", contents=REVENUE_YAML)
 
-    query_parser = query_parser_from_yaml([revenue_yaml_file])
+    query_parser = query_parser_from_yaml([EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, revenue_yaml_file])
     with pytest.raises(RequestTimeGranularityException):
         query_parser.parse_and_validate_query(
             metric_names=["revenue"],
@@ -264,7 +269,7 @@ def test_parse_and_validate_where_constraint_metric_time() -> None:
 def test_parse_and_validate_metric_constraint_dims() -> None:
     """Test that the returned time constraint in the query spec is adjusted to match the granularity of the query."""
     revenue_yaml_file = YamlConfigFile(filepath="inline_for_test_2", contents=REVENUE_YAML)
-    query_parser = query_parser_from_yaml([revenue_yaml_file])
+    query_parser = query_parser_from_yaml([EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, revenue_yaml_file])
 
     # check constraint on invalid_dim raises UnableToSatisfyQueryError
     with pytest.raises(UnableToSatisfyQueryError):
@@ -281,7 +286,9 @@ def test_derived_metric_query_parsing() -> None:
     bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=BOOKINGS_YAML)
     metrics_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=METRICS_YAML)
     revenue_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=REVENUE_YAML)
-    query_parser = query_parser_from_yaml([bookings_yaml_file, revenue_yaml_file, metrics_yaml_file])
+    query_parser = query_parser_from_yaml(
+        [EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, bookings_yaml_file, revenue_yaml_file, metrics_yaml_file]
+    )
     # Attempt to query with no dimension
     with pytest.raises(UnableToSatisfyQueryError):
         query_parser.parse_and_validate_query(
@@ -308,7 +315,9 @@ def test_derived_metric_with_offset_parsing() -> None:
     bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=BOOKINGS_YAML)
     bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=REVENUE_YAML)
     metrics_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=METRICS_YAML)
-    query_parser = query_parser_from_yaml([bookings_yaml_file, metrics_yaml_file])
+    query_parser = query_parser_from_yaml(
+        [EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, bookings_yaml_file, metrics_yaml_file]
+    )
     # Attempt to query with no dimension
     with pytest.raises(UnableToSatisfyQueryError):
         query_parser.parse_and_validate_query(

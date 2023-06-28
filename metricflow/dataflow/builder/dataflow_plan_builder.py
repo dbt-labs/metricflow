@@ -130,7 +130,6 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                     else column_association_resolver
                 ),
                 semantic_manifest_lookup=semantic_manifest_lookup,
-                time_spine_source=semantic_manifest_lookup.time_spine_source,
             )
             if not node_output_resolver
             else node_output_resolver
@@ -189,6 +188,8 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             combine_metrics_join_type: The join used when combining the computed metrics.
         """
         output_nodes: List[BaseOutput[SqlDataSetT]] = []
+        compute_metrics_node: Optional[ComputeMetricsNode[SqlDataSetT]] = None
+
         for metric_spec in metric_specs:
             logger.info(f"Generating compute metrics node for {metric_spec}")
             metric_reference = metric_spec.as_reference
@@ -246,6 +247,8 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 )
             else:
                 assert_values_exhausted(metric.type)
+
+            assert compute_metrics_node is not None
 
             if metric_spec.offset_window or metric_spec.offset_to_grain:
                 join_to_time_spine_node = JoinToTimeSpineNode(

@@ -71,12 +71,10 @@ class QueryRenderingTools:
         self.plan_converter = DataflowToSqlQueryPlanConverter(
             column_association_resolver=DunderColumnAssociationResolver(self.semantic_manifest_lookup),
             semantic_manifest_lookup=self.semantic_manifest_lookup,
-            time_spine_source=self.time_spine_source,
         )
         self.node_resolver = DataflowPlanNodeOutputDataSetResolver[SemanticModelDataSet](
             column_association_resolver=DunderColumnAssociationResolver(self.semantic_manifest_lookup),
             semantic_manifest_lookup=self.semantic_manifest_lookup,
-            time_spine_source=self.time_spine_source,
         )
 
 

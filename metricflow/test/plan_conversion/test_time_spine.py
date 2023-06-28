@@ -9,7 +9,9 @@ from metricflow.time.time_constants import ISO8601_PYTHON_TS_FORMAT
 
 
 def test_date_spine_date_range(  # noqa: D
-    sql_client: SqlClient, simple_semantic_manifest_lookup: SemanticManifestLookup
+    sql_client: SqlClient,
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
+    create_source_tables: None,
 ) -> None:
     time_spine_source = simple_semantic_manifest_lookup.time_spine_source
     range_df: DataFrame = sql_client.query(

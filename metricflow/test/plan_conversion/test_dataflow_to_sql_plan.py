@@ -66,7 +66,6 @@ def multihop_dataflow_to_sql_converter(  # noqa: D
     return DataflowToSqlQueryPlanConverter[SemanticModelDataSet](
         column_association_resolver=DunderColumnAssociationResolver(multi_hop_join_semantic_manifest_lookup),
         semantic_manifest_lookup=multi_hop_join_semantic_manifest_lookup,
-        time_spine_source=time_spine_source,
     )
 
 
@@ -77,7 +76,6 @@ def scd_dataflow_to_sql_converter(  # noqa: D
     return DataflowToSqlQueryPlanConverter[SemanticModelDataSet](
         column_association_resolver=DunderColumnAssociationResolver(scd_semantic_manifest_lookup),
         semantic_manifest_lookup=scd_semantic_manifest_lookup,
-        time_spine_source=time_spine_source,
     )
 
 

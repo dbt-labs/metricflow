@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import textwrap
 
 from dbt_semantic_interfaces.implementations.project_configuration import (
