@@ -3,7 +3,7 @@ from __future__ import annotations
 import dataclasses
 import logging
 from pathlib import Path
-from typing import Type
+from typing import List, Type
 
 from dbt.adapters.base.impl import BaseAdapter
 from dbt.adapters.factory import get_adapter_by_type
@@ -23,22 +23,58 @@ logger = logging.getLogger(__name__)
 
 
 @dataclasses.dataclass
-class dbtArtifacts:
-    """Container with access to the dbt artifacts required to power the MetricFlow CLI."""
+class dbtPaths:
+    """Bundle of dbt configuration paths."""
+
+    model_paths: List[str]
+    seed_paths: List[str]
+    target_path: str
+
+
+@dataclasses.dataclass
+class dbtProjectMetadata:
+    """Container to access dbt project metadata such as dbt_project.yml and profiles.yml."""
 
     profile: Profile
     project: Project
+
+    @classmethod
+    def load_from_project_path(cls: Type[Self], project_path: Path) -> Self:
+        """Loads all dbt artifacts for the project associated with the given project path."""
+        logger.info(f"Loading dbt project metadata for project located at {project_path}")
+        dbtRunner().invoke(["-q", "debug"], project_dir=str(project_path))
+        profile = load_profile(str(project_path), {})
+        project = load_project(str(project_path), version_check=False, profile=profile)
+        logger.info(f"Loaded project {project.project_name} with profile details:\n{pformat_big_objects(profile)}")
+        return cls(profile=profile, project=project)
+
+    @property
+    def dbt_paths(self) -> dbtPaths:
+        """Return the bundle of configuration paths."""
+        return dbtPaths(
+            model_paths=self.project.model_paths,
+            seed_paths=self.project.seed_paths,
+            target_path=self.project.target_path,
+        )
+
+    @property
+    def schema(self) -> str:
+        """Return the adapter schema."""
+        return self.profile.credentials.schema
+
+
+@dataclasses.dataclass
+class dbtArtifacts(dbtProjectMetadata):
+    """Container with access to the dbt artifacts required to power the MetricFlow CLI."""
+
     adapter: BaseAdapter
     semantic_manifest: SemanticManifest
 
     @classmethod
     def load_from_project_path(cls: Type[Self], project_path: Path) -> Self:
         """Loads all dbt artifacts for the project associated with the given project path."""
-        logger.info(f"Loading dbt artifacts for project located at {project_path}")
-        dbtRunner().invoke(["-q", "debug"], project_dir=str(project_path))
-        profile = load_profile(str(project_path), {})
-        project = load_project(str(project_path), version_check=False, profile=profile)
-        logger.info(f"Loaded project {project.project_name} with profile details:\n{pformat_big_objects(profile)}")
+        project_metadata = dbtProjectMetadata.load_from_project_path(project_path=project_path)
+        profile, project = project_metadata.profile, project_metadata.project
         # dbt's get_adapter helper expects an AdapterRequiredConfig, but `project` is missing cli_vars
         # In practice, get_adapter only actually requires HasCredentials, so we replicate the type extraction
         # from get_adapter here rather than spinning up a full RuntimeConfig instance

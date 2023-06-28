@@ -132,6 +132,7 @@ def test_tutorial(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
     assert TIME_SPINE_TABLE in table_names
 
 
+@pytest.mark.skip("Skipping tutorial tests pending update to work with dbt integration")
 def test_build_tutorial_model(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
     TOP_LEVEL_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
     cli_sample_template_mapping = {

@@ -1,0 +1,67 @@
+semantic_models:
+  - name: transactions
+    description: |
+      Each row represents one transaction. There
+      will be a new row for any cancellations or alterations.
+      There is a transaction, order, and customer id for
+      every transaction. There is only one transaction id per
+      transaction, but there can be many rows per order id and
+      customer id. The `ds` or date is reflected in UTC.
+    defaults:
+      agg_time_dimension: ds
+    model: ref('transactions')
+    entities:
+      - name: transaction
+        type: primary
+        expr: id_transaction
+      - name: customer
+        type: foreign
+        expr: id_customer
+      - name: id_order
+        type: foreign
+    measures:
+      - name: transaction_amount_usd
+        description: The total USD value of the transaction.
+        agg: SUM
+      - name: transactions
+        description: The total number of transactions.
+        expr: "1"
+        agg: SUM
+      - name: quick_buy_amount_usd
+        description: The total USD value of the transactions that were
+                    purchased using the "quick buy" button.
+        expr: CASE WHEN transaction_type_name = 'quick-buy' THEN transaction_amount_usd ELSE 0 END
+        agg: SUM
+      - name: quick_buy_transactions
+        description: The total transactions bought as quick buy.
+        expr: CASE WHEN transaction_type_name = 'quick-buy' THEN TRUE ELSE FALSE END
+        agg: SUM_BOOLEAN
+      - name: cancellations_usd
+        description: The total USD value of the transactions that were
+                    cancelled.
+        expr: CASE WHEN transaction_type_name = 'cancellation' THEN transaction_amount_usd ELSE 0 END
+        agg: SUM
+      - name: alterations_usd
+        description: The total USD value of the transactions that were
+                    altered.
+        expr: CASE WHEN transaction_type_name = 'alteration' THEN transaction_amount_usd ELSE 0 END
+        agg: SUM
+      - name: transacting_customers
+        description: The distinct count of customers transacting on any given day.
+        expr: id_customer
+        agg: COUNT_DISTINCT
+    dimensions:
+      - name: ds
+        type: time
+        type_params:
+          time_granularity: day
+      - name: is_large
+        type: categorical
+        expr: CASE WHEN transaction_amount_usd >= 30 THEN TRUE ELSE FALSE END
+      - name: quick_buy_transaction
+        type: categorical
+        expr: |
+          CASE
+            WHEN transaction_type_name = 'quick-buy' THEN 'Quick Buy'
+            ELSE 'Not Quick Buy'
+          END

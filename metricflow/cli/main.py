@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import datetime as dt
 import logging
-import os
 import pathlib
 import signal
 import sys
@@ -27,9 +26,13 @@ import metricflow.cli.custom_click_types as click_custom
 from metricflow.cli import PACKAGE_NAME
 from metricflow.cli.cli_context import CLIContext
 from metricflow.cli.constants import DEFAULT_RESULT_DECIMAL_PLACES, MAX_LIST_OBJECT_ELEMENTS
-from metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts
-from metricflow.cli.tutorial import create_sample_data, gen_sample_model_configs, remove_sample_tables
+from metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts, dbtProjectMetadata
+from metricflow.cli.tutorial import (
+    dbtMetricFlowTutorialHelper,
+)
 from metricflow.cli.utils import (
+    dbt_project_file_exists,
+    error_if_not_in_dbt_project,
     exception_handler,
     query_options,
     start_end_time_options,
@@ -101,41 +104,35 @@ def cli(cfg: CLIContext, verbose: bool) -> None:  # noqa: D
 
 @cli.command()
 @click.option("-m", "--msg", is_flag=True, help="Output the final steps dialogue")
-@click.option("--skip-dw", is_flag=True, help="Skip the data warehouse health checks")
-@click.option("--drop-tables", is_flag=True, help="Drop all the dummy tables created via tutorial")
+# @click.option("--skip-dw", is_flag=True, help="Skip the data warehouse health checks") # TODO: re-enable this
+@click.option("--clean", is_flag=True, help="Remove sample model files.")
 @pass_config
 @click.pass_context
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool, drop_tables: bool) -> None:
+def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, clean: bool) -> None:
     """Run user through a tutorial."""
-    click.echo("The mf tutorial command has not yet been updated to work with the dbt integration!")
-    exit()
     help_msg = textwrap.dedent(
         """\
         🤓 Please run the following steps,
-
-            1.  In '{$HOME}/.metricflow/config.yml', `model_path` should be '{$HOME}/.metricflow/sample_models'.
-            2.  Try validating your data model: `mf validate-configs`
-            3.  Check out your metrics: `mf list-metrics`
-            4.  Check out dimensions for your metric `mf list-dimensions --metric-names transactions`
-            5.  Query your first metric: `mf query --metrics transactions --dimensions metric_time --order metric_time`
-            6.  Show the SQL MetricFlow generates:
-                `mf query --metrics transactions --dimensions metric_time --order metric_time --explain`
-            7.  Visualize the plan:
-                `mf query --metrics transactions --dimensions metric_time --order metric_time --explain --display-plans`
+            1.  Verify that your adapter credentials are correct in `profiles.yml`
+            2.  Run `dbt seed`, check to see that the steps related to countries, transactions, customers are passing.
+            3.  Try validating your data model: `mf validate-configs`
+            4.  Check out your metrics: `mf list metrics`
+            5.  Check out dimensions for your metric `mf list dimensions --metrics transactions`
+            6.  Query your first metric: `mf query --metrics transactions --group-bys metric_time --order metric_time`
+            7.  Show the SQL MetricFlow generates:
+                `mf query --metrics transactions --group-bys metric_time --order metric_time --explain`
+            8.  Visualize the plan:
+                `mf query --metrics transactions --group-bys metric_time --order metric_time --explain --display-plans`
                 * This only works if you have graphviz installed - see README.
-            8.  Add another dimension:
-                `mf query --metrics transactions --dimensions metric_time,customer__country --order metric_time`
-            9.  Add a coarser time granularity:
-                `mf query --metrics transactions --dimensions metric_time__week --order metric_time__week`
-            10. Try a more complicated query:
-                `mf query \\
-                  --metrics transactions,transaction_usd_na,transaction_usd_na_l7d --dimensions metric_time,is_large \\
-                  --order metric_time --start-time 2022-03-20 --end-time 2022-04-01`
-                * You can also add `--explain` or `--display-plans`.
-            11. For more ways to interact with the sample models, go to
+            9.  Add another dimension:
+                `mf query --metrics transactions --group-bys metric_time,customer__customer_country --order metric_time`
+            10.  Add a coarser time granularity:
+                `mf query --metrics transactions --group-bys metric_time__week --order metric_time__week`
+            11. Try a more complicated query: mf query --metrics transactions,transaction_usd_na --group-bys metric_time,is_large --order metric_time --start-time 2022-03-20 --end-time 2022-04-01.
+            12. For more ways to interact with the sample models, go to
                 ‘https://docs.transform.co/docs/metricflow/metricflow-tutorial’.
-            12. Once you’re done, run `mf tutorial --skip-dw --drop-tables` to drop the sample tables.
+            13. When you're done with the tutorial, run mf tutorial --clean to delete sample models and seeds.
         """
     )
 
@@ -143,41 +140,73 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool,
         click.echo(help_msg)
         exit()
 
-    # TODO: Add check for dbt project root here
-
-    # Validate that the data warehouse connection is successful
-    if not skip_dw:
-        ctx.invoke(health_checks)
-        click.confirm("❓ Are the health-checks all passing? Please fix them before continuing", abort=True)
-        click.echo("💡 For future reference, you can continue with the tutorial by adding `--skip-dw`\n")
-
-    # TODO: decide whether or not to allow management of tutorial datasets from the mf CLI and update accordingly
-    if drop_tables:
-        spinner = Halo(text="Dropping tables...", spinner="dots")
-        spinner.start()
-        remove_sample_tables(sql_client=cfg.sql_client, system_schema=cfg.mf_system_schema)
-        spinner.succeed("Tables dropped")
+    if not clean and not click.confirm("Do you have a dbt project configured?"):
+        click.echo(
+            "Please create a dbt project via `dbt init` and after you are done setting that up, "
+            "please run `mf tutorial` again in the root directory of the dbt project you just created."
+        )
         exit()
 
-    # Seed sample data into data warehouse
-    spinner = Halo(text=f"🤖 Generating sample data into schema {cfg.mf_system_schema}...", spinner="dots")
-    spinner.start()
-    created = create_sample_data(sql_client=cfg.sql_client, system_schema=cfg.mf_system_schema)
-    if not created:
-        spinner.warn("🙊 Skipped creating sample tables since they already exist.")
-    else:
-        spinner.succeed("📀 Sample tables have been successfully created into your data warehouse.")
+    if not dbt_project_file_exists():
+        click.echo(
+            "Unable to detect dbt project. Please ensure that your current working directory is at the root of the dbt project."
+        )
+        exit()
 
-    # Seed sample model file
-    # TODO: Make this work with the new dbt project locations. For now, put it in cwd to remove the reference
-    # to the model path from the MetricFlow config
-    model_path = os.path.join(os.getcwd(), "sample_models")
-    pathlib.Path(model_path).mkdir(parents=True, exist_ok=True)
-    click.echo(f"🤖 Attempting to generate model configs to your local filesystem in '{str(model_path)}'.")
-    spinner = Halo(text="Dropping tables...", spinner="dots")
+    # TODO: Health checks
+
+    # Load the metadata from dbt project
+    try:
+        dbt_project_metadata = dbtProjectMetadata.load_from_project_path(pathlib.Path.cwd())
+        dbt_paths = dbt_project_metadata.dbt_paths
+        model_path = pathlib.Path(dbt_paths.model_paths[0]) / "sample_model"
+        seed_path = pathlib.Path(dbt_paths.seed_paths[0]) / "sample_seed"
+        manifest_path = pathlib.Path(dbt_paths.target_path) / "semantic_manifest.json"
+    except Exception as e:
+        click.echo(f"Unable to parse path metadata from dbt project.\nERROR: {str(e)}")
+        exit(1)
+
+    # Remove sample files from dbt project
+    if clean:
+        click.confirm("Would you like to remove all the sample files?", abort=True)
+        spinner = Halo(text="Removing sample files...", spinner="dots")
+        spinner.start()
+        try:
+            dbtMetricFlowTutorialHelper.remove_sample_files(model_path=model_path, seed_path=seed_path)
+            spinner.succeed("🗑️ Sample files has been removed.")
+            exit()
+        except Exception as e:
+            spinner.fail(f"❌ Unable to remove sample files.\nERROR: {str(e)}")
+            exit(1)
+
+    click.echo(
+        textwrap.dedent(
+            f"""\
+        To begin building and querying metrics, you must define semantic models and
+        metric configuration files in your dbt project. dbt will use these files to generate a
+        semantic manifest artifact, which MetricFlow will use to create a semantic graph for querying.
+        As part of this tutorial, we will generate the following files to help you get started:
+
+        📜 model files -> {model_path.absolute().as_posix()}
+        🌱 seed files -> {seed_path.absolute().as_posix()}
+        ✅ semantic manifest json file -> {manifest_path.absolute().as_posix()}
+        """
+        )
+    )
+    click.confirm("Continue and generate the files?", abort=True)
+
+    # Generate sample files into dbt project
+    if dbtMetricFlowTutorialHelper.check_if_path_exists([model_path, seed_path]):
+        click.confirm("There are existing files in the paths above, would you like to overwrite them?", abort=True)
+        dbtMetricFlowTutorialHelper.remove_sample_files(model_path=model_path, seed_path=seed_path)
+
+    spinner = Halo(text="Generating sample files...", spinner="dots")
     spinner.start()
-    gen_sample_model_configs(dir_path=str(model_path), system_schema=cfg.mf_system_schema)
-    spinner.succeed(f"📜 Model configs has been generated into '{model_path}'")
+    dbtMetricFlowTutorialHelper.generate_model_files(model_path=model_path, profile_schema=dbt_project_metadata.schema)
+    dbtMetricFlowTutorialHelper.generate_seed_files(seed_path=seed_path)
+    dbtMetricFlowTutorialHelper.generate_semantic_manifest_file(manifest_path=manifest_path)
+
+    spinner.succeed("📜 Sample files has been generated.")
 
     click.echo(help_msg)
     click.echo("💡 Run `mf tutorial --msg` to see this message again without executing everything else")
@@ -226,6 +255,7 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, skip_dw: bool,
 )
 @pass_config
 @exception_handler
+@error_if_not_in_dbt_project
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 def query(
     cfg: CLIContext,
@@ -329,6 +359,7 @@ def query(
 
 @cli.group()
 @pass_config
+@error_if_not_in_dbt_project
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 def list(cfg: CLIContext) -> None:  # noqa: D
     """Retrieve metadata values about metrics/dimensions/entities/dimension values."""
@@ -340,6 +371,7 @@ def list(cfg: CLIContext) -> None:  # noqa: D
     "--show-all-dimensions", is_flag=True, default=False, help="Show all dimensions associated with a metric."
 )
 @pass_config
+@error_if_not_in_dbt_project
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 def metrics(cfg: CLIContext, show_all_dimensions: bool = False, search: Optional[str] = None) -> None:
@@ -433,6 +465,7 @@ def entities(cfg: CLIContext, metrics: List[str]) -> None:
 
 @cli.command()
 @pass_config
+@error_if_not_in_dbt_project
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 def health_checks(cfg: CLIContext) -> None:

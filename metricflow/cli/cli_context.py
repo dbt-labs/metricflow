@@ -9,7 +9,6 @@ from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 
 from metricflow.cli.dbt_connectors.adapter_backed_client import AdapterBackedSqlClient
 from metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts
-from metricflow.dataflow.sql_table import SqlTable
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.errors.errors import MetricFlowInitException, SqlClientCreationException
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
@@ -102,21 +101,8 @@ class CLIContext:
     def run_health_checks(self) -> Dict[str, Dict[str, str]]:
         """Execute the DB health checks."""
         try:
-            schema_name = self.mf_system_schema
-            table_name = "health_report"
             checks_to_run = [
                 ("SELECT 1", lambda: self.sql_client.execute("SELECT 1")),
-                (f"Create schema '{schema_name}'", lambda: self.sql_client.create_schema(schema_name)),
-                (
-                    f"Create table '{schema_name}.{table_name}' with a SELECT",
-                    lambda: self.sql_client.execute(
-                        f"CREATE TABLE {schema_name}.{table_name} AS SELECT 'test' AS test_col"
-                    ),
-                ),
-                (
-                    f"Drop table '{schema_name}.{table_name}'",
-                    lambda: self.sql_client.drop_table(SqlTable(schema_name=schema_name, table_name="health_report")),
-                ),
             ]
 
             results: Dict[str, Dict[str, str]] = {}

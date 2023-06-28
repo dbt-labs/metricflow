@@ -113,7 +113,12 @@ class MetricFlowCliRunner(CliRunner):
         super().__init__()
 
     def run(self, cli: click.BaseCommand, args: Optional[Sequence[str]] = None) -> Result:  # noqa: D
-        return super().invoke(cli, args, obj=self.cli_context)
+        # TODO: configure CLI to use a dbt_project fixture
+        dummy_dbt_project = pathlib.Path("dbt_project.yml")
+        dummy_dbt_project.touch()
+        result = super().invoke(cli, args, obj=self.cli_context)
+        dummy_dbt_project.unlink()
+        return result
 
 
 @pytest.fixture
