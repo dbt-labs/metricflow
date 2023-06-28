@@ -1,0 +1,46 @@
+[build-system]
+requires = ["hatchling~=1.14.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "dbt-metricflow"
+version = "0.0.1"
+description = "Execute commands against the MetricFlow semantic layer with dbt."
+readme = "README.md"
+requires-python = ">=3.8,<3.10"
+license = "BUSL-1.1"
+authors = [
+  { name = "dbt Labs", email = "info@dbtlabs.com" },
+]
+
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = [
+  "dbt-core==1.6.0b6",
+  "metricflow==0.200.0.dev9"
+]
+
+[project.optional-dependencies]
+postgres = [
+  "dbt-postgres>=1.6.0b6"
+]
+snowflake = [
+  "dbt-snowflake>=1.6.0b3"
+]
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+  "/.github",
+  "/.changes",
+  ".changie.yaml",
+  ".gitignore",
+  ".pre-commit-config.yaml",
+  "CONTRIBUTING.md",
+  "MAKEFILE",
+]
