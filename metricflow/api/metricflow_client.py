@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import datetime as dt
 import logging
 from typing import Dict, List, Optional
 
+from dateutil.parser import parse
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 from dbt_semantic_interfaces.validations.validator_helpers import SemanticManifestValidationResults
@@ -14,7 +16,6 @@ from metricflow.engine.metricflow_engine import (
     MetricFlowQueryResult,
 )
 from metricflow.engine.models import Dimension, Metric
-from metricflow.engine.utils import convert_to_datetime
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
@@ -62,8 +63,8 @@ class MetricFlowClient:
     ) -> MetricFlowQueryRequest:
         """Build MetricFlowQueryRequest given common query parameters."""
         parsed_optimization_level = SqlQueryOptimizationLevel(f"O{sql_optimization_level}")
-        parsed_start_time = convert_to_datetime(start_time)
-        parsed_end_time = convert_to_datetime(end_time)
+        parsed_start_time = _convert_to_datetime(start_time)
+        parsed_end_time = _convert_to_datetime(end_time)
         return MetricFlowQueryRequest.create_with_random_request_id(
             metric_names=metrics,
             group_by_names=dimensions,
@@ -198,8 +199,8 @@ class MetricFlowClient:
         Returns:
             A list of dimension values as string.
         """
-        parsed_start_time = convert_to_datetime(start_time)
-        parsed_end_time = convert_to_datetime(end_time)
+        parsed_start_time = _convert_to_datetime(start_time)
+        parsed_end_time = _convert_to_datetime(end_time)
         return self.engine.get_dimension_values(
             metric_names=metric_names,
             get_group_by_values=dimension_name,
@@ -214,3 +215,14 @@ class MetricFlowClient:
             Tuple of validation issues with the model provided.
         """
         return SemanticManifestValidator[SemanticManifest]().validate_semantic_manifest(self.semantic_manifest)
+
+
+def _convert_to_datetime(datetime_str: Optional[str]) -> Optional[dt.datetime]:
+    """Callback to convert string to datetime given as an iso8601 timestamp."""
+    if datetime_str is None:
+        return None
+
+    try:
+        return parse(datetime_str)
+    except Exception:
+        raise ValueError(f"'{datetime_str}' is not a valid iso8601 timestamp")
