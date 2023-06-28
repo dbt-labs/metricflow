@@ -1,0 +1,6 @@
+kind: Breaking Changes
+body: Update to dbt-semantic-interfaces==0.1.0.dev8.
+time: 2023-06-28T10:35:48.433301-07:00
+custom:
+  Author: plypaul
+  Issue: "634"
