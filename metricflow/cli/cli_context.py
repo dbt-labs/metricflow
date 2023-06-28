@@ -8,7 +8,7 @@ from typing import Dict, Optional
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 
 from metricflow.cli.dbt_connectors.adapter_backed_client import AdapterBackedSqlClient
-from metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts
+from metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts, dbtProjectMetadata
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.errors.errors import MetricFlowInitException, SqlClientCreationException
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
@@ -27,6 +27,7 @@ class CLIContext:
         """
         self.verbose = False
         self._dbt_artifacts: Optional[dbtArtifacts] = None
+        self._dbt_project_metadata: Optional[dbtProjectMetadata] = None
         self._mf: Optional[MetricFlowEngine] = None
         self._sql_client: Optional[SqlClient] = None
         self._semantic_manifest: Optional[SemanticManifest] = None
@@ -74,12 +75,19 @@ class CLIContext:
         return self._dbt_artifacts
 
     @property
+    def dbt_project_metadata(self) -> dbtProjectMetadata:
+        """Property accessor for dbt project metadata, similar to dbt_artifacts but without building the adapters/manifest."""
+        if self._dbt_project_metadata is None:
+            self._dbt_project_metadata = dbtProjectMetadata.load_from_project_path(pathlib.Path.cwd())
+        return self._dbt_project_metadata
+
+    @property
     def log_file_path(self) -> pathlib.Path:
         """Returns the location of the log file path for this CLI invocation."""
         # The dbt Project.log_path attribute is currently sourced from the final runtime config value accessible
         # through the CLI state flags. As such, it will deviate from the default based on the DBT_LOG_PATH environment
         # variable. Should this behavior change, we will need to update this call.
-        return pathlib.Path(self.dbt_artifacts.project.log_path, "metricflow.log")
+        return pathlib.Path(self.dbt_project_metadata.project.log_path, "metricflow.log")
 
     @property
     def mf_system_schema(self) -> str:
@@ -88,7 +96,7 @@ class CLIContext:
         This is currently sourced from the dbt profile configuration. In the long run, this property
         should be removed in favor of always sourcing schema locations from manifest entries.
         """
-        return self.dbt_artifacts.profile.credentials.schema
+        return self.dbt_project_metadata.profile.credentials.schema
 
     @property
     def sql_client(self) -> SqlClient:

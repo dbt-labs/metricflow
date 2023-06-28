@@ -147,8 +147,8 @@ def error_if_not_in_dbt_project(func: Callable) -> Callable:
         if not dbt_project_file_exists():
             click.echo(
                 "❌ Unable to locate 'dbt_project.yml' in the current directory\n"
-                "In order to run the MetricFlow CLI, you must be running in the root directory of a complete dbt project.\n"
-                "Please run `mf tutorial` if you want to get started on building a dbt project."
+                "In order to run the MetricFlow CLI, you must be running in the root directory of a working dbt project.\n"
+                "Please check out `https://docs.getdbt.com/reference/commands/init` if you want to get started on building a dbt project."
             )
             exit(1)
         return ctx.invoke(func, *args, **kwargs)
