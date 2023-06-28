@@ -5,6 +5,7 @@ import os
 from typing import Generator
 
 import pytest
+import sqlalchemy
 from dbt.adapters.factory import get_adapter_by_type
 from dbt.cli.main import dbtRunner
 
@@ -21,8 +22,53 @@ from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState, 
 logger = logging.getLogger(__name__)
 
 
-def make_test_sql_client(url: str, password: str) -> SqlClient:
+MF_SQL_ENGINE_DATABASE = "MF_SQL_ENGINE_DATABASE"
+MF_SQL_ENGINE_HOST = "MF_SQL_ENGINE_HOST"
+MF_SQL_ENGINE_PORT = "MF_SQL_ENGINE_PORT"
+MF_SQL_ENGINE_USER = "MF_SQL_ENGINE_USER"
+MF_SQL_ENGINE_SCHEMA = "MF_SQL_ENGINE_SCHEMA"
+
+
+def configure_test_env_from_url(url: str, schema: str) -> sqlalchemy.engine.URL:
+    """Populates default env var mapping from a sqlalchemy URL string.
+
+    This is used to configure the test environment from the original MF_SQL_ENGINE_URL environment variable in
+    a manner compatible with the dbt profile configurations laid out for most supported engines. We return
+    the parsed URL object so that individual engine configurations can override the environment variables
+    as needed to match their dbt profile configuration.
+    """
+    parsed_url = sqlalchemy.engine.make_url(url)
+
+    assert parsed_url.host, "Engine host is not set in engine connection URL!"
+    os.environ[MF_SQL_ENGINE_HOST] = parsed_url.host
+
+    assert parsed_url.username, "Username must be set in engine connection URL!"
+    os.environ[MF_SQL_ENGINE_USER] = parsed_url.username
+
+    assert parsed_url.database, "Database must be set in engine connection URL!"
+    os.environ[MF_SQL_ENGINE_DATABASE] = parsed_url.database
+
+    os.environ[MF_SQL_ENGINE_SCHEMA] = schema
+
+    if parsed_url.port:
+        os.environ[MF_SQL_ENGINE_PORT] = str(parsed_url.port)
+
+    return parsed_url
+
+
+def __initialize_dbt() -> None:
+    """Invoke the dbt runner from the appropriate directory so we can fetch the relevant adapter.
+
+    We use the debug command to initialize the profile and make it accessible. This has the nice property of
+    triggering a failure with reasonable error messages in the event the dbt configs are not set up correctly.
+    """
+    dbt_dir = os.path.join(os.path.dirname(__file__), "dbt_projects/metricflow_testing/")
+    dbtRunner().invoke(["-q", "debug"], project_dir=dbt_dir, PROFILES_DIR=dbt_dir)
+
+
+def make_test_sql_client(url: str, password: str, schema: str) -> SqlClient:
     """Build SQL client based on env configs."""
+    # TODO: Switch on an enum of adapter type when all engines are cut over
     dialect = dialect_from_url(url=url)
 
     if dialect == SqlDialect.REDSHIFT:
@@ -32,13 +78,9 @@ def make_test_sql_client(url: str, password: str) -> SqlClient:
     elif dialect == SqlDialect.BIGQUERY:
         return BigQuerySqlClient.from_connection_details(url, password)
     elif dialect == SqlDialect.POSTGRESQL:
-        dbt_dir = os.path.join(os.path.dirname(__file__), "dbt_projects/metricflow_testing/")
-        # We inovke the debug command to initialize the profile and make it accessible.
-        # This has the nice property of triggering a failure with reasonable error messages
-        # in the event the dbt configs are not set up correctly.
-        dbtRunner().invoke(["-q", "debug"], project_dir=dbt_dir, PROFILES_DIR=dbt_dir)
-        adapter = get_adapter_by_type("postgres")
-        return AdapterBackedSqlClient(adapter=adapter)
+        configure_test_env_from_url(url, "mf_demo")
+        __initialize_dbt()
+        return AdapterBackedSqlClient(adapter=get_adapter_by_type("postgres"))
     elif dialect == SqlDialect.DUCKDB:
         return DuckDbSqlClient.from_connection_details(url, password)
     elif dialect == SqlDialect.DATABRICKS:
@@ -53,6 +95,7 @@ def sql_client(mf_test_session_state: MetricFlowTestSessionState) -> Generator[S
     sql_client = make_test_sql_client(
         url=mf_test_session_state.sql_engine_url,
         password=mf_test_session_state.sql_engine_password,
+        schema=mf_test_session_state.mf_source_schema,
     )
     logger.info(f"Creating schema '{mf_test_session_state.mf_system_schema}'")
     sql_client.create_schema(mf_test_session_state.mf_system_schema)
