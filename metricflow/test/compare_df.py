@@ -43,12 +43,24 @@ def _dataframes_contain_same_data(
 
 
 def assert_dataframes_equal(
-    actual: pd.DataFrame, expected: pd.DataFrame, sort_columns: bool = True, allow_empty: bool = False
+    actual: pd.DataFrame,
+    expected: pd.DataFrame,
+    sort_columns: bool = True,
+    allow_empty: bool = False,
+    compare_names_using_lowercase: bool = False,
 ) -> None:
     """Check that contents of DataFrames are the same.
 
     If sort_columns is set to false, value and column order needs to be the same.
+    If compare_names_using_lowercase is set to True, we copy the dataframes and lower-case their names.
+    This is useful for Snowflake query output comparisons.
     """
+    if compare_names_using_lowercase:
+        actual = actual.copy()
+        expected = expected.copy()
+        actual.columns = actual.columns.str.lower()
+        expected.columns = expected.columns.str.lower()
+
     if set(actual.columns) != set(expected.columns):
         raise ValueError(
             f"DataFrames do not contain the same columns. actual: {set(actual.columns)}, "

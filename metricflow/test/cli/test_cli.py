@@ -33,12 +33,15 @@ from metricflow.cli.tutorial import (
     TIME_SPINE_TABLE,
     TRANSACTIONS_TABLE,
 )
+from metricflow.protocols.sql_client import SqlEngine
 from metricflow.test.fixtures.cli_fixtures import MetricFlowCliRunner
 
 
 def test_query(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
     resp = cli_runner.run(query, args=["--metrics", "bookings", "--group-bys", "ds"])
-    assert "bookings" in resp.output
+    # case insensitive matches are needed for snowflake due to the capitalization thing
+    engine_is_snowflake = cli_runner.cli_context.sql_client.sql_engine_type is SqlEngine.SNOWFLAKE
+    assert "bookings" in resp.output or ("bookings" in resp.output.lower() and engine_is_snowflake)
     assert resp.exit_code == 0
 
 

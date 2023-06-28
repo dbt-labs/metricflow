@@ -7,7 +7,7 @@ import pandas as pd
 import pytest
 from dbt_semantic_interfaces.test_utils import as_datetime
 
-from metricflow.protocols.sql_client import SqlClient
+from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.random_id import random_id
 from metricflow.test.compare_df import assert_dataframes_equal
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
@@ -68,7 +68,11 @@ def test_restore(
         snapshot_restorer.restore(table_snapshot)
 
         actual = sql_client.query(f"SELECT * FROM {schema_name}.{table_snapshot.table_name}")
-        assert_dataframes_equal(actual=actual, expected=table_snapshot.as_df)
+        assert_dataframes_equal(
+            actual=actual,
+            expected=table_snapshot.as_df,
+            compare_names_using_lowercase=sql_client.sql_engine_type is SqlEngine.SNOWFLAKE,
+        )
 
     finally:
         sql_client.drop_schema(schema_name, cascade=True)

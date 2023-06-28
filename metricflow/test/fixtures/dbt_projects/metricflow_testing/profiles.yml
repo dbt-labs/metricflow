@@ -9,3 +9,15 @@ postgres:
       pass: "{{ env_var('MF_SQL_ENGINE_PASSWORD') }}"
       dbname: "{{ env_var('MF_SQL_ENGINE_DATABASE') }}"
       schema: "{{ env_var('MF_SQL_ENGINE_SCHEMA') }}"
+snowflake:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      # The snowflake account is equivalent to the host value in the SqlAlchemy parsed URL
+      account: "{{ env_var('MF_SQL_ENGINE_HOST') }}"
+      user: "{{ env_var('MF_SQL_ENGINE_USER') }}"
+      password: "{{ env_var('MF_SQL_ENGINE_PASSWORD') }}"
+      warehouse: "{{ env_var('MF_SQL_ENGINE_WAREHOUSE') }}"
+      database: "{{ env_var('MF_SQL_ENGINE_DATABASE') }}"
+      schema: "{{ env_var('MF_SQL_ENGINE_SCHEMA') }}"

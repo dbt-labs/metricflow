@@ -4,6 +4,7 @@ import textwrap
 
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest
+from metricflow.protocols.sql_client import SqlEngine
 from metricflow.random_id import random_id
 from metricflow.test.compare_df import assert_dataframes_equal
 from metricflow.test.integration.conftest import IntegrationTestHelpers
@@ -38,6 +39,10 @@ def test_write_to_table(it_helpers: IntegrationTestHelpers) -> None:  # noqa: D
                 """
             )
         )
-        assert_dataframes_equal(actual=actual, expected=expected)
+        assert_dataframes_equal(
+            actual=actual,
+            expected=expected,
+            compare_names_using_lowercase=it_helpers.sql_client.sql_engine_type is SqlEngine.SNOWFLAKE,
+        )
     finally:
         it_helpers.sql_client.drop_table(output_table)

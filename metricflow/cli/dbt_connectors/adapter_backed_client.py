@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import enum
 import logging
 import textwrap
 import time
@@ -7,6 +8,7 @@ from typing import Optional, Sequence
 
 import pandas as pd
 from dbt.adapters.base.impl import BaseAdapter
+from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 
 from metricflow.dataflow.sql_table import SqlTable
@@ -16,11 +18,39 @@ from metricflow.protocols.sql_client import SqlEngine
 from metricflow.protocols.sql_request import SqlJsonTag, SqlRequestId, SqlRequestTagSet
 from metricflow.random_id import random_id
 from metricflow.sql.render.postgres import PostgresSQLSqlQueryPlanRenderer
+from metricflow.sql.render.snowflake import SnowflakeSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_clients.sql_statement_metadata import CombinedSqlTags, SqlStatementCommentMetadata
 
 logger = logging.getLogger(__name__)
+
+
+class SupportedAdapterTypes(enum.Enum):
+    """Enumeration of supported dbt adapter types."""
+
+    POSTGRES = "postgres"
+    SNOWFLAKE = "snowflake"
+
+    @property
+    def sql_engine_type(self) -> SqlEngine:
+        """Return the SqlEngine corresponding to the supported adapter type."""
+        if self is SupportedAdapterTypes.POSTGRES:
+            return SqlEngine.POSTGRES
+        elif self is SupportedAdapterTypes.SNOWFLAKE:
+            return SqlEngine.SNOWFLAKE
+        else:
+            assert_values_exhausted(self)
+
+    @property
+    def sql_query_plan_renderer(self) -> SqlQueryPlanRenderer:
+        """Return the SqlQueryPlanRenderer corresponding to the supported adapter type."""
+        if self is SupportedAdapterTypes.POSTGRES:
+            return PostgresSQLSqlQueryPlanRenderer()
+        elif self is SupportedAdapterTypes.SNOWFLAKE:
+            return SnowflakeSqlQueryPlanRenderer()
+        else:
+            assert_values_exhausted(self)
 
 
 class AdapterBackedSqlClient:
@@ -38,15 +68,18 @@ class AdapterBackedSqlClient:
         The dbt BaseAdapter should already be fully initialized, including all credential verification, and
         ready for use for establishing connections and issuing queries.
         """
-        if adapter.type() != "postgres":
-            raise ValueError(
-                f"Received dbt adapter with unsupported type {adapter.type()}, but we only support postgres!"
-            )
         self._adapter = adapter
-        # TODO: normalize from adapter.type()
-        self._sql_engine_type = SqlEngine.POSTGRES
-        # TODO: create factory based on SqlEngine type
-        self._sql_query_plan_renderer = PostgresSQLSqlQueryPlanRenderer()
+        try:
+            adapter_type = SupportedAdapterTypes(self._adapter.type())
+        except ValueError as e:
+            raise ValueError(
+                f"Adapter type {self._adapter.type()} is not supported. Must be one "
+                f"of {[item.value for item in SupportedAdapterTypes]}."
+            ) from e
+
+        self._sql_engine_type = adapter_type.sql_engine_type
+        self._sql_query_plan_renderer = adapter_type.sql_query_plan_renderer
+        logger.info(f"Initialized AdapterBackedSqlClient with dbt adapter type `{adapter_type.value}`")
 
     @property
     def sql_engine_type(self) -> SqlEngine:
@@ -246,6 +279,11 @@ class AdapterBackedSqlClient:
     def list_tables(self, schema_name: str) -> Sequence[str]:
         """Get a list of the table names in a given schema. Only used in tutorials and tests."""
         # TODO: Short term, make this work with as many engines as possible. Medium term, remove this altogether.
+        if self.sql_engine_type is SqlEngine.SNOWFLAKE:
+            # Snowflake likes capitalizing things, except when it doesn't. We can get away with this due to its
+            # limited scope of usage.
+            schema_name = schema_name.upper()
+
         df = self.query(
             textwrap.dedent(
                 f"""\
@@ -257,7 +295,9 @@ class AdapterBackedSqlClient:
         if df.empty:
             return []
 
-        # Lower casing table names for consistency between Snowflake and other clients.
+        # Lower casing table names and data frame names for consistency between Snowflake and other clients.
+        # As above, we can do this because it isn't used in any consequential situations.
+        df.columns = df.columns.str.lower()
         return [t.lower() for t in df["table_name"]]
 
     def table_exists(self, sql_table: SqlTable) -> bool:
