@@ -11,10 +11,6 @@ import pandas as pd
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.references import DimensionReference, EntityReference, MetricReference
 
-from metricflow.configuration.constants import (
-    CONFIG_DWH_SCHEMA,
-)
-from metricflow.configuration.yaml_handler import YamlFileHandler
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.builder.node_data_set import (
     DataflowPlanNodeOutputDataSetResolver,
@@ -29,9 +25,6 @@ from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConv
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.engine.models import Dimension, Entity, Metric
 from metricflow.engine.time_source import ServerTimeSource
-from metricflow.engine.utils import (
-    build_semantic_manifest_from_config,
-)
 from metricflow.errors.errors import ExecutionException
 from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
 from metricflow.execution.execution_plan_to_text import execution_plan_to_text
@@ -55,8 +48,6 @@ from metricflow.random_id import random_id
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import InstanceSpecSet, MetricFlowQuerySpec
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
-from metricflow.sql_clients.common_client import not_empty
-from metricflow.sql_clients.sql_utils import make_sql_client_from_config
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
 from metricflow.time.time_granularity import TimeGranularity
@@ -289,20 +280,6 @@ class AbstractMetricFlowEngine(ABC):
 
 class MetricFlowEngine(AbstractMetricFlowEngine):
     """Main entry point for queries."""
-
-    @staticmethod
-    def from_config(handler: YamlFileHandler) -> MetricFlowEngine:
-        """Initialize MetricFlowEngine via yaml config file."""
-        sql_client = make_sql_client_from_config(handler)
-
-        # Ideally we should put this getting of of CONFIG_DBT_REPO in a helper
-        semantic_manifest_lookup = SemanticManifestLookup(build_semantic_manifest_from_config(handler))
-        system_schema = not_empty(handler.get_value(CONFIG_DWH_SCHEMA), CONFIG_DWH_SCHEMA, handler.url)
-        return MetricFlowEngine(
-            semantic_manifest_lookup=semantic_manifest_lookup,
-            sql_client=sql_client,
-            system_schema=system_schema,
-        )
 
     def __init__(
         self,

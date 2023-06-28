@@ -7,9 +7,6 @@ from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 from dbt_semantic_interfaces.validations.validator_helpers import SemanticManifestValidationResults
 
-from metricflow.configuration.config_handler import ConfigHandler
-from metricflow.configuration.constants import CONFIG_DWH_SCHEMA
-from metricflow.configuration.yaml_handler import YamlFileHandler
 from metricflow.engine.metricflow_engine import (
     MetricFlowEngine,
     MetricFlowExplainResult,
@@ -17,39 +14,16 @@ from metricflow.engine.metricflow_engine import (
     MetricFlowQueryResult,
 )
 from metricflow.engine.models import Dimension, Metric
-from metricflow.engine.utils import build_semantic_manifest_from_config, convert_to_datetime
+from metricflow.engine.utils import convert_to_datetime
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
-from metricflow.sql_clients.common_client import not_empty
-from metricflow.sql_clients.sql_utils import make_sql_client_from_config
 
 logger = logging.getLogger(__name__)
 
 
 class MetricFlowClient:
     """MetricFlow Python client for running basic queries and other standard commands."""
-
-    @staticmethod
-    def from_config(config_file_path: Optional[str] = None) -> MetricFlowClient:
-        """Builds a MetricFlowClient via config yaml file.
-
-        If config_file_path is not passed, it will use the default config location.
-        """
-        if config_file_path is not None:
-            handler = YamlFileHandler(yaml_file_path=config_file_path)
-        else:
-            handler = ConfigHandler()
-        logger.debug(f"Constructing a MetricFlowClient with the config in {handler.yaml_file_path}")
-        sql_client = make_sql_client_from_config(handler)
-        semantic_manifest = build_semantic_manifest_from_config(handler)
-        schema = not_empty(handler.get_value(CONFIG_DWH_SCHEMA), CONFIG_DWH_SCHEMA, handler.url)
-
-        return MetricFlowClient(
-            sql_client=sql_client,
-            semantic_manifest=semantic_manifest,
-            system_schema=schema,
-        )
 
     def __init__(
         self,
