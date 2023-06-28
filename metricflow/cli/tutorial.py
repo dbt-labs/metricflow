@@ -5,7 +5,7 @@ import os
 import pathlib
 import shutil
 from string import Template
-from typing import Dict, List, Tuple
+from typing import Dict, List, Sequence, Tuple
 
 import pandas as pd
 
@@ -234,13 +234,14 @@ class dbtMetricFlowTutorialHelper:
         shutil.copytree(src=sample_seed_path, dst=seed_path)
 
     @staticmethod
-    def generate_semantic_manifest_file(target_path: pathlib.Path) -> None:
-        """Generates the sample semantic manifest to the given dbt target path."""
+    def generate_semantic_manifest_file(manifest_path: pathlib.Path) -> None:
+        """Generates the sample semantic manifest to the given dbt semantic manifest path."""
+        target_path = manifest_path.parent
         if not target_path.exists():
             target_path.mkdir()
 
         sample_manifest_path = pathlib.Path(__file__).parent / dbtMetricFlowTutorialHelper.SAMPLE_SEMANTIC_MANIFEST
-        shutil.copy(src=sample_manifest_path, dst=target_path / "semantic_manifest.json")
+        shutil.copy(src=sample_manifest_path, dst=manifest_path)
 
     @staticmethod
     def remove_sample_files(model_path: pathlib.Path, seed_path: pathlib.Path) -> None:
@@ -249,3 +250,8 @@ class dbtMetricFlowTutorialHelper:
             shutil.rmtree(model_path)
         if seed_path.exists():
             shutil.rmtree(seed_path)
+
+    @staticmethod
+    def check_if_path_exists(paths: Sequence[pathlib.Path]) -> bool:
+        """Check if the given set of paths already exists, return True if any of the paths exists."""
+        return any(p.exists() for p in paths)

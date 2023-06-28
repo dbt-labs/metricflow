@@ -161,13 +161,14 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, clean: bool) -
         dbt_paths = dbt_project_metadata.dbt_paths
         model_path = pathlib.Path(dbt_paths.model_paths[0]) / "sample_model"
         seed_path = pathlib.Path(dbt_paths.seed_paths[0]) / "sample_seed"
-        target_path = pathlib.Path(dbt_paths.target_path)
+        manifest_path = pathlib.Path(dbt_paths.target_path) / "semantic_manifest.json"
     except Exception as e:
         click.echo(f"Unable to parse path metadata from dbt project.\nERROR: {str(e)}")
         exit(1)
 
     # Remove sample files from dbt project
     if clean:
+        click.confirm("Would you like to remove all the sample files?", abort=True)
         spinner = Halo(text="Removing sample files...", spinner="dots")
         spinner.start()
         try:
@@ -188,23 +189,24 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, clean: bool) -
 
         📜 model files -> {model_path.absolute().as_posix()}
         🌱 seed files -> {seed_path.absolute().as_posix()}
-        ✅ semantic manifest json file -> {(target_path / "semantic_manifest.json").absolute().as_posix()}
+        ✅ semantic manifest json file -> {manifest_path.absolute().as_posix()}
         """
         )
     )
     click.confirm("Continue and generate the files?", abort=True)
 
     # Generate sample files into dbt project
+    if dbtMetricFlowTutorialHelper.check_if_path_exists([model_path, seed_path]):
+        click.confirm("There are existing files in the paths above, would you like to overwrite them?", abort=True)
+        dbtMetricFlowTutorialHelper.remove_sample_files(model_path=model_path, seed_path=seed_path)
+
     spinner = Halo(text="Generating sample files...", spinner="dots")
     spinner.start()
     dbtMetricFlowTutorialHelper.generate_model_files(model_path=model_path, profile_schema=dbt_project_metadata.schema)
     dbtMetricFlowTutorialHelper.generate_seed_files(seed_path=seed_path)
-    dbtMetricFlowTutorialHelper.generate_semantic_manifest_file(target_path=target_path)
+    dbtMetricFlowTutorialHelper.generate_semantic_manifest_file(manifest_path=manifest_path)
 
     spinner.succeed("📜 Sample files has been generated.")
-
-    # TODO: decide whether or not to allow management of tutorial datasets from the mf CLI and update accordingly
-    # Either dropping tables or removing the sample files
 
     click.echo(help_msg)
     click.echo("💡 Run `mf tutorial --msg` to see this message again without executing everything else")
