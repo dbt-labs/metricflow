@@ -3,9 +3,9 @@ postgres:
   outputs:
     dev:
       type: postgres
-      host: "127.0.0.1"
-      port: 5432
-      user: metricflow
-      pass: metricflowing
-      dbname: metricflow
-      schema: mf_demo
+      host: "{{ env_var('MF_SQL_ENGINE_HOST') }}"
+      port: "{{ env_var('MF_SQL_ENGINE_PORT') | int }}"
+      user: "{{ env_var('MF_SQL_ENGINE_USER') }}"
+      pass: "{{ env_var('MF_SQL_ENGINE_PASSWORD') }}"
+      dbname: "{{ env_var('MF_SQL_ENGINE_DATABASE') }}"
+      schema: "{{ env_var('MF_SQL_ENGINE_SCHEMA') }}"
