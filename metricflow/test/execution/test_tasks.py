@@ -9,7 +9,7 @@ from metricflow.execution.execution_plan import (
     SelectSqlQueryToTableTask,
 )
 from metricflow.execution.executor import SequentialPlanExecutor
-from metricflow.protocols.sql_client import SqlClient
+from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.random_id import random_id
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.test.compare_df import assert_dataframes_equal
@@ -32,6 +32,7 @@ def test_read_sql_task(sql_client: SqlClient) -> None:  # noqa: D
             columns=["foo"],
             data=[(1,)],
         ),
+        compare_names_using_lowercase=sql_client.sql_engine_type is SqlEngine.SNOWFLAKE,
     )
 
 
@@ -56,5 +57,6 @@ def test_write_table_task(mf_test_session_state: MetricFlowTestSessionState, sql
             columns=["foo"],
             data=[(1,)],
         ),
+        compare_names_using_lowercase=sql_client.sql_engine_type is SqlEngine.SNOWFLAKE,
     )
     sql_client.drop_table(output_table)

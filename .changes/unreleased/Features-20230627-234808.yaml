@@ -1,0 +1,6 @@
+kind: Features
+body: Enable Snowflake queries in dbt <-> MetricFlow CLI integration
+time: 2023-06-27T23:48:08.287586-07:00
+custom:
+  Author: tlento
+  Issue: "579"

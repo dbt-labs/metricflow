@@ -574,6 +574,12 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         result_dataframe = query_result.result_df
         if result_dataframe is None:
             return []
+        if get_group_by_values not in result_dataframe.columns:
+            # Snowflake likes upper-casing things in result output, so we lower-case all names and
+            # see if we can get the value from there.
+            get_group_by_values = get_group_by_values.lower()
+            result_dataframe.columns = result_dataframe.columns.str.lower()
+
         return [str(val) for val in result_dataframe[get_group_by_values]]
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)

@@ -30,6 +30,10 @@ test:
 test-postgresql:
 	hatch -v run postgres-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) metricflow/test/
 
+.PHONY: test-snowflake
+test-snowflake:
+	hatch -v run snowflake-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) metricflow/test/
+
 .PHONY: lint
 lint:
 	hatch -v run dev-env:pre-commit run --all-files

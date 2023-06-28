@@ -6,7 +6,7 @@ import warnings
 import pytest
 
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.protocols.sql_client import SqlClient
+from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.test.compare_df import assert_dataframes_equal
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.fixtures.table_fixtures import CONFIGURED_SOURCE_TABLE_SNAPSHOT_REPOSITORY
@@ -61,6 +61,7 @@ def test_validate_data_in_source_schema(
             assert_dataframes_equal(
                 actual=actual_table_df,
                 expected=expected_table_df,
+                compare_names_using_lowercase=sql_client.sql_engine_type is SqlEngine.SNOWFLAKE,
             )
         except Exception as e:
             error_message = (

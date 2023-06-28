@@ -26,7 +26,13 @@ def _select_x_as_y(x: int = 1, y: str = "y") -> str:  # noqa: D
     return f"SELECT {x} AS {y}"
 
 
-def _check_1col(df: pd.DataFrame, col: str = "y", vals: Set[Union[int, str]] = {1}) -> None:  # noqa: D
+def _check_1col(df: pd.DataFrame, col: str = "y", vals: Set[Union[int, str]] = {1}) -> None:
+    """Helper to check that 1 column has the same value and a case-insensitive matching name.
+
+    We lower-case the names due to snowflake's tendency to capitalize things. This isn't ideal but it'll do for now.
+    """
+    df.columns = df.columns.str.lower()
+    col = col.lower()
     assert isinstance(df, pd.DataFrame)
     assert df.shape == (len(vals), 1)
     assert df.columns.tolist() == [col]
@@ -116,7 +122,11 @@ def test_create_table_from_dataframe(  # noqa: D
     sql_client.create_table_from_dataframe(sql_table=sql_table, df=expected_df)
 
     actual_df = sql_client.query(f"SELECT * FROM {sql_table.sql}")
-    assert_dataframes_equal(actual=actual_df, expected=expected_df)
+    assert_dataframes_equal(
+        actual=actual_df,
+        expected=expected_df,
+        compare_names_using_lowercase=sql_client.sql_engine_type is SqlEngine.SNOWFLAKE,
+    )
 
 
 def test_table_exists(mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient) -> None:  # noqa: D
@@ -159,7 +169,7 @@ def test_dry_run_of_bad_query_raises_exception(sql_client: SqlClient) -> None:  
     bad_stmt = "SELECT bad_col"
     # Tests that a bad query raises an exception. Different engines may raise different exceptions e.g.
     # ProgrammingError, OperationalError, google.api_core.exceptions.BadRequest, etc.
-    with pytest.raises(Exception, match=r"bad_col"):
+    with pytest.raises(Exception, match=r"(?i)bad_col"):
         sql_client.dry_run(bad_stmt)
 
 
