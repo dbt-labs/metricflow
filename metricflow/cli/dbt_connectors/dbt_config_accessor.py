@@ -37,6 +37,7 @@ class dbtProjectMetadata:
 
     profile: Profile
     project: Project
+    project_path: Path
 
     @classmethod
     def load_from_project_path(cls: Type[Self], project_path: Path) -> Self:
@@ -45,8 +46,9 @@ class dbtProjectMetadata:
         dbtRunner().invoke(["-q", "debug"], project_dir=str(project_path))
         profile = load_profile(str(project_path), {})
         project = load_project(str(project_path), version_check=False, profile=profile)
+        project_path = project_path
         logger.info(f"Loaded project {project.project_name} with profile details:\n{pformat_big_objects(profile)}")
-        return cls(profile=profile, project=project)
+        return cls(profile=profile, project=project, project_path=project_path)
 
     @property
     def dbt_paths(self) -> dbtPaths:
@@ -64,24 +66,36 @@ class dbtProjectMetadata:
 
 
 @dataclasses.dataclass
-class dbtArtifacts(dbtProjectMetadata):
-    """Container with access to the dbt artifacts required to power the MetricFlow CLI."""
+class dbtArtifacts:
+    """Container with access to the dbt artifacts required to power the MetricFlow CLI.
 
+    In order to avoid double-loading this should generally be built from the dbtProjectMetadata struct.
+    This does not inherit because it is a slightly different struct. In most cases this is the object
+    we want to reference.
+    """
+
+    profile: Profile
+    project: Project
     adapter: BaseAdapter
     semantic_manifest: SemanticManifest
 
     @classmethod
-    def load_from_project_path(cls: Type[Self], project_path: Path) -> Self:
-        """Loads all dbt artifacts for the project associated with the given project path."""
-        project_metadata = dbtProjectMetadata.load_from_project_path(project_path=project_path)
-        profile, project = project_metadata.profile, project_metadata.project
+    def load_from_project_metadata(cls: Type[Self], project_metadata: dbtProjectMetadata) -> Self:
+        """Loads adapter and semantic manifest associated with the previously-fetched project metadata."""
         # dbt's get_adapter helper expects an AdapterRequiredConfig, but `project` is missing cli_vars
         # In practice, get_adapter only actually requires HasCredentials, so we replicate the type extraction
         # from get_adapter here rather than spinning up a full RuntimeConfig instance
         # TODO: Move to a fully supported interface when one becomes available
-        adapter = get_adapter_by_type(profile.credentials.type)
-        semantic_manifest = dbtArtifacts.build_semantic_manifest_from_dbt_project_root(project_root=project_path)
-        return cls(profile=profile, project=project, adapter=adapter, semantic_manifest=semantic_manifest)
+        adapter = get_adapter_by_type(project_metadata.profile.credentials.type)
+        semantic_manifest = dbtArtifacts.build_semantic_manifest_from_dbt_project_root(
+            project_root=project_metadata.project_path
+        )
+        return cls(
+            profile=project_metadata.profile,
+            project=project_metadata.project,
+            adapter=adapter,
+            semantic_manifest=semantic_manifest,
+        )
 
     @staticmethod
     def build_semantic_manifest_from_dbt_project_root(project_root: Path) -> SemanticManifest:

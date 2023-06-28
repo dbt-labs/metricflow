@@ -8,7 +8,7 @@ from typing import Dict, Optional
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 
 from metricflow.cli.dbt_connectors.adapter_backed_client import AdapterBackedSqlClient
-from metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts
+from metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts, dbtProjectMetadata
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.errors.errors import MetricFlowInitException, SqlClientCreationException
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
@@ -26,6 +26,7 @@ class CLIContext:
         The dbt_artifacts construct must be loaded in order for logging configuration to work correctly.
         """
         self.verbose = False
+        self._dbt_project_metadata: dbtProjectMetadata = dbtProjectMetadata.load_from_project_path(pathlib.Path.cwd())
         self._dbt_artifacts: Optional[dbtArtifacts] = None
         self._mf: Optional[MetricFlowEngine] = None
         self._sql_client: Optional[SqlClient] = None
@@ -67,10 +68,15 @@ class CLIContext:
         root_logger.addHandler(log_file_handler)
 
     @property
+    def dbt_project_metadata(self) -> dbtProjectMetadata:
+        """Property accessor for dbt project metadata, useful in cases where the full manifest load is not needed."""
+        return self._dbt_project_metadata
+
+    @property
     def dbt_artifacts(self) -> dbtArtifacts:
         """Property accessor for all dbt artifacts, used for powering the sql client (among other things)."""
         if self._dbt_artifacts is None:
-            self._dbt_artifacts = dbtArtifacts.load_from_project_path(pathlib.Path.cwd())
+            self._dbt_artifacts = dbtArtifacts.load_from_project_metadata(self._dbt_project_metadata)
         return self._dbt_artifacts
 
     @property
@@ -79,7 +85,7 @@ class CLIContext:
         # The dbt Project.log_path attribute is currently sourced from the final runtime config value accessible
         # through the CLI state flags. As such, it will deviate from the default based on the DBT_LOG_PATH environment
         # variable. Should this behavior change, we will need to update this call.
-        return pathlib.Path(self.dbt_artifacts.project.log_path, "metricflow.log")
+        return pathlib.Path(self._dbt_project_metadata.project.log_path, "metricflow.log")
 
     @property
     def mf_system_schema(self) -> str:

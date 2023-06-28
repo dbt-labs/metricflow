@@ -12,7 +12,7 @@ from dbt_semantic_interfaces.test_utils import as_datetime
 from typing_extensions import override
 
 from metricflow.cli.cli_context import CLIContext
-from metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts
+from metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts, dbtProjectMetadata
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
@@ -45,6 +45,11 @@ class FakeCLIContext(CLIContext):
     @override
     def dbt_artifacts(self) -> dbtArtifacts:
         raise NotImplementedError("FakeCLIContext does not load full dbt artifacts!")
+
+    @property
+    @override
+    def dbt_project_metadata(self) -> dbtProjectMetadata:
+        raise NotImplementedError("FakeCLIContext does not load dbt project metadata!")
 
     @property
     @override
