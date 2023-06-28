@@ -26,7 +26,7 @@ import metricflow.cli.custom_click_types as click_custom
 from metricflow.cli import PACKAGE_NAME
 from metricflow.cli.cli_context import CLIContext
 from metricflow.cli.constants import DEFAULT_RESULT_DECIMAL_PLACES, MAX_LIST_OBJECT_ELEMENTS
-from metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts, dbtProjectMetadata
+from metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts
 from metricflow.cli.tutorial import (
     dbtMetricFlowTutorialHelper,
 )
@@ -54,6 +54,7 @@ _telemetry_reporter.add_rudderstack_handler()
 
 @click.group()
 @click.option("-v", "--verbose", is_flag=True)
+@error_if_not_in_dbt_project
 @pass_config
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 def cli(cfg: CLIContext, verbose: bool) -> None:  # noqa: D
@@ -140,13 +141,6 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, clean: bool) -
         click.echo(help_msg)
         exit()
 
-    if not clean and not click.confirm("Do you have a dbt project configured?"):
-        click.echo(
-            "Please create a dbt project via `dbt init` and after you are done setting that up, "
-            "please run `mf tutorial` again in the root directory of the dbt project you just created."
-        )
-        exit()
-
     if not dbt_project_file_exists():
         click.echo(
             "Unable to detect dbt project. Please ensure that your current working directory is at the root of the dbt project."
@@ -157,7 +151,7 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, clean: bool) -
 
     # Load the metadata from dbt project
     try:
-        dbt_project_metadata = dbtProjectMetadata.load_from_project_path(pathlib.Path.cwd())
+        dbt_project_metadata = cfg.dbt_project_metadata
         dbt_paths = dbt_project_metadata.dbt_paths
         model_path = pathlib.Path(dbt_paths.model_paths[0]) / "sample_model"
         seed_path = pathlib.Path(dbt_paths.seed_paths[0]) / "sample_seed"
@@ -255,7 +249,6 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, clean: bool) -
 )
 @pass_config
 @exception_handler
-@error_if_not_in_dbt_project
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 def query(
     cfg: CLIContext,
@@ -359,7 +352,6 @@ def query(
 
 @cli.group()
 @pass_config
-@error_if_not_in_dbt_project
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 def list(cfg: CLIContext) -> None:  # noqa: D
     """Retrieve metadata values about metrics/dimensions/entities/dimension values."""
@@ -371,7 +363,6 @@ def list(cfg: CLIContext) -> None:  # noqa: D
     "--show-all-dimensions", is_flag=True, default=False, help="Show all dimensions associated with a metric."
 )
 @pass_config
-@error_if_not_in_dbt_project
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 def metrics(cfg: CLIContext, show_all_dimensions: bool = False, search: Optional[str] = None) -> None:
@@ -465,7 +456,6 @@ def entities(cfg: CLIContext, metrics: List[str]) -> None:
 
 @cli.command()
 @pass_config
-@error_if_not_in_dbt_project
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 def health_checks(cfg: CLIContext) -> None:
