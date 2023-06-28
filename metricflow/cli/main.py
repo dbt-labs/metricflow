@@ -105,11 +105,11 @@ def cli(cfg: CLIContext, verbose: bool) -> None:  # noqa: D
 @cli.command()
 @click.option("-m", "--msg", is_flag=True, help="Output the final steps dialogue")
 # @click.option("--skip-dw", is_flag=True, help="Skip the data warehouse health checks") # TODO: re-enable this
-# @click.option("--drop-tables", is_flag=True, help="Drop all the dummy tables created via tutorial") # TODO: re-enable this
+@click.option("--clean", is_flag=True, help="Remove sample model files.")
 @pass_config
 @click.pass_context
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool) -> None:
+def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, clean: bool) -> None:
     """Run user through a tutorial."""
     help_msg = textwrap.dedent(
         """\
@@ -140,7 +140,7 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool) -> None:
         click.echo(help_msg)
         exit()
 
-    if not click.confirm("Do you have a dbt project configured?"):
+    if not clean and not click.confirm("Do you have a dbt project configured?"):
         click.echo(
             "Please create a dbt project via `dbt init` and after you are done setting that up, "
             "please run `mf tutorial` again in the root directory of the dbt project you just created."
@@ -165,6 +165,18 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool) -> None:
     except Exception as e:
         click.echo(f"Unable to parse path metadata from dbt project.\nERROR: {str(e)}")
         exit(1)
+
+    # Remove sample files from dbt project
+    if clean:
+        spinner = Halo(text="Removing sample files...", spinner="dots")
+        spinner.start()
+        try:
+            dbtMetricFlowTutorialHelper.remove_sample_files(model_path=model_path, seed_path=seed_path)
+            spinner.succeed("🗑️ Sample files has been removed.")
+            exit()
+        except Exception as e:
+            spinner.fail(f"❌ Unable to remove sample files.\nERROR: {str(e)}")
+            exit(1)
 
     click.echo(
         textwrap.dedent(

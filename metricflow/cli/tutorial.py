@@ -241,3 +241,11 @@ class dbtMetricFlowTutorialHelper:
 
         sample_manifest_path = pathlib.Path(__file__).parent / dbtMetricFlowTutorialHelper.SAMPLE_SEMANTIC_MANIFEST
         shutil.copy(src=sample_manifest_path, dst=target_path / "semantic_manifest.json")
+
+    @staticmethod
+    def remove_sample_files(model_path: pathlib.Path, seed_path: pathlib.Path) -> None:
+        """Remove the sample files generated."""
+        if model_path.exists():
+            shutil.rmtree(model_path)
+        if seed_path.exists():
+            shutil.rmtree(seed_path)
