@@ -253,7 +253,7 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, clean: bool) -
 def query(
     cfg: CLIContext,
     metrics: List[str],
-    group_bys: List[str] = [],
+    group_by: List[str] = [],
     where: Optional[str] = None,
     start_time: Optional[dt.datetime] = None,
     end_time: Optional[dt.datetime] = None,
@@ -272,7 +272,7 @@ def query(
     spinner.start()
     mf_request = MetricFlowQueryRequest.create_with_random_request_id(
         metric_names=metrics,
-        group_by_names=group_bys,
+        group_by_names=group_by,
         limit=limit,
         time_constraint_start=start_time,
         time_constraint_end=end_time,
