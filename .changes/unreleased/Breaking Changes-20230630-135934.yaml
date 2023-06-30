@@ -1,0 +1,6 @@
+kind: Breaking Changes
+body: Changed the --group-bys option in mf query to be --group-by
+time: 2023-06-30T13:59:34.521502-04:00
+custom:
+  Author: WilliamDee
+  Issue: None

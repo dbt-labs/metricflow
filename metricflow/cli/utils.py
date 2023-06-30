@@ -39,10 +39,10 @@ def query_options(function: Callable) -> Callable:
     )(function)
     function = start_end_time_options(function)
     function = click.option(
-        "--group-bys",
+        "--group-by",
         type=click_custom.SequenceParamType(),
         default="",
-        help="Dimensions and/or entities to group by: syntax is --group-bys ds or for multiple group bys --group-bys ds,org",
+        help="Dimensions and/or entities to group by: syntax is --group-by ds or for multiple group bys --group-by ds,org",
     )(function)
     function = click.option(
         "--metrics",
