@@ -48,7 +48,7 @@ MetricFlow provides a set of abstractions that help you construct complicated lo
 
 As a developer, you can also use MetricFlow's interfaces to construct APIs for integrations to bring metrics into downstream tools in your data stack.
 
-To get up and running with your own metrics, you should rely on MetricFlow’s documentation available at [MetricFlow docs](https://docs.transform.co/docs/metricflow/guides/introduction).
+To get up and running with your own metrics, you should rely on [MetricFlow’s documentation](https://docs.getdbt.com/docs/build/build-metrics-intro).
 
 ## Licensing
 
