@@ -1,21 +1,16 @@
 from __future__ import annotations
 
-import os
 import shutil
 import textwrap
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Iterator
 
-import pytest
 from dbt_semantic_interfaces.parsing.dir_to_model import (
-    parse_directory_of_yaml_files_to_semantic_manifest,
     parse_yaml_files_to_validation_ready_semantic_manifest,
 )
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
-from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.test_utils import base_semantic_manifest_file
-from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 
 from metricflow.cli.main import (
     dimension_values,
@@ -26,12 +21,6 @@ from metricflow.cli.main import (
     query,
     tutorial,
     validate_configs,
-)
-from metricflow.cli.tutorial import (
-    COUNTRIES_TABLE,
-    CUSTOMERS_TABLE,
-    TIME_SPINE_TABLE,
-    TRANSACTIONS_TABLE,
 )
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.test.fixtures.cli_fixtures import MetricFlowCliRunner
@@ -115,41 +104,20 @@ def test_health_checks(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
     assert resp.exit_code == 0
 
 
-@pytest.mark.skip("Skipping tutorial tests pending update to work with dbt integration")
-def test_tutorial(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    cli_context = cli_runner.cli_context
+def test_tutorial_message(cli_runner: MetricFlowCliRunner) -> None:
+    """Tests the message output of the tutorial.
 
+    The tutorial now essentially compiles a semantic manifest and then asks the user to run dbt seed,
+    so from an end user perspective it's little more than the output with -m.
+
+    The tutorial currently requires execution from a dbt project path. Rather than go all the way on testing the
+    tutorial given the path and dbt project requirements, we simply check the message output. When we allow for
+    project path overrides it might warrant a more complete test of the semantic manifest building steps in the
+    tutorial flow.
+    """
     resp = cli_runner.run(tutorial, args=["-m"])
     assert "Please run the following steps" in resp.output
-    # TODO: update model test to reflect fixes in tutorial
-    # pathlib.Path(cli_context.config.file_path).touch()
-    resp = cli_runner.run(tutorial, args=["--skip-dw"])
-    assert (
-        "Attempting to generate model configs to your local filesystem in" in resp.output
-    ), f"Unexpected output: {resp.output}"
-
-    table_names = cli_context.sql_client.list_tables(schema_name=cli_context.mf_system_schema)
-    assert CUSTOMERS_TABLE in table_names
-    assert TRANSACTIONS_TABLE in table_names
-    assert COUNTRIES_TABLE in table_names
-    assert TIME_SPINE_TABLE in table_names
-
-
-@pytest.mark.skip("Skipping tutorial tests pending update to work with dbt integration")
-def test_build_tutorial_model(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    TOP_LEVEL_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
-    cli_sample_template_mapping = {
-        "customers_table": CUSTOMERS_TABLE,
-        "transactions_table": TRANSACTIONS_TABLE,
-        "countries_table": COUNTRIES_TABLE,
-        "system_schema": cli_runner.cli_context.mf_system_schema,
-    }
-    model_build_result = parse_directory_of_yaml_files_to_semantic_manifest(
-        os.path.join(TOP_LEVEL_PATH, "cli/sample_models"), template_mapping=cli_sample_template_mapping
-    )
-    assert model_build_result.issues.has_blocking_issues is False
-
-    SemanticManifestValidator[SemanticManifest]().checked_validations(model_build_result.semantic_manifest)
+    assert "dbt seed" in resp.output
 
 
 def test_list_entities(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D

@@ -1,23 +1,9 @@
 from __future__ import annotations
 
-import os
 import pathlib
 import shutil
 from string import Template
 from typing import Sequence
-
-COUNTRIES = [("US", "NA"), ("MX", "NA"), ("CA", "NA"), ("BR", "SA"), ("GR", "EU"), ("FR", "EU")]
-TRANSACTION_TYPE = ["cancellation", "alteration", "quick-buy", "buy"]
-
-CUSTOMERS_TABLE = "mf_demo_customers"
-TRANSACTIONS_TABLE = "mf_demo_transactions"
-COUNTRIES_TABLE = "mf_demo_countries"
-# TODO: Give this a custom name when we support config-level overrides
-TIME_SPINE_TABLE = "mf_time_spine"
-
-TRANSACTIONS_YAML_FILE = os.path.join(os.path.dirname(__file__), "sample_models/transactions.yaml")
-CUSTOMERS_YAML_FILE = os.path.join(os.path.dirname(__file__), "sample_models/customers.yaml")
-COUNTRIES_YAML_FILE = os.path.join(os.path.dirname(__file__), "sample_models/countries.yaml")
 
 
 class dbtMetricFlowTutorialHelper:
