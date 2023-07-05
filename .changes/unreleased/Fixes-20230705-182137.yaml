@@ -1,0 +1,6 @@
+kind: Fixes
+body: Improve error message rendering in MetricFlow CLI
+time: 2023-07-05T18:21:37.717453-04:00
+custom:
+  Author: tlento
+  Issue: "646"
