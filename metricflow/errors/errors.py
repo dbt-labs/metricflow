@@ -89,3 +89,7 @@ class UnsupportedEngineFeatureError(RuntimeError):
 
 class SqlBindParametersNotSupportedError(Exception):
     """Raised when a SqlClient that does not have support for bind parameters receives a non-empty set of params."""
+
+
+class UnknownMetricLinkingError(ValueError):
+    """Raised during linking when a user attempts to use a metric that isn't specified."""
