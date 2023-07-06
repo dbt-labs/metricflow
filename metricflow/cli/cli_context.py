@@ -10,7 +10,6 @@ from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from metricflow.cli.dbt_connectors.adapter_backed_client import AdapterBackedSqlClient
 from metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts, dbtProjectMetadata
 from metricflow.engine.metricflow_engine import MetricFlowEngine
-from metricflow.errors.errors import MetricFlowInitException, SqlClientCreationException
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.protocols.sql_client import SqlClient
 
@@ -106,50 +105,38 @@ class CLIContext:
 
     def run_health_checks(self) -> Dict[str, Dict[str, str]]:
         """Execute the DB health checks."""
-        try:
-            checks_to_run = [
-                ("SELECT 1", lambda: self.sql_client.execute("SELECT 1")),
-            ]
+        checks_to_run = [
+            ("SELECT 1", lambda: self.sql_client.execute("SELECT 1")),
+        ]
 
-            results: Dict[str, Dict[str, str]] = {}
+        results: Dict[str, Dict[str, str]] = {}
 
-            for step, check in checks_to_run:
-                status = "SUCCESS"
-                err_string = ""
-                try:
-                    resp = check()
-                    logger.info(
-                        f"Health Check Item {step}: succeeded" + f" with response {str(resp)}" if resp else None
-                    )
-                except Exception as e:
-                    status = "FAIL"
-                    err_string = str(e)
-                    logger.error(f"Health Check Item {step}: failed with error {err_string}")
+        for step, check in checks_to_run:
+            status = "SUCCESS"
+            err_string = ""
+            try:
+                resp = check()
+                logger.info(f"Health Check Item {step}: succeeded" + f" with response {str(resp)}" if resp else None)
+            except Exception as e:
+                status = "FAIL"
+                err_string = str(e)
+                logger.error(f"Health Check Item {step}: failed with error {err_string}")
 
-                results[f"{self.sql_client.sql_engine_type} - {step}"] = {
-                    "status": status,
-                    "error_message": err_string,
-                }
+            results[f"{self.sql_client.sql_engine_type} - {step}"] = {
+                "status": status,
+                "error_message": err_string,
+            }
 
-            return results
-        except Exception as e:
-            raise SqlClientCreationException from e
+        return results
 
-    def _initialize_metricflow_engine(self) -> None:
-        """Initialize the MetricFlowEngine."""
-        try:
+    @property
+    def mf(self) -> MetricFlowEngine:  # noqa: D
+        if self._mf is None:
             self._mf = MetricFlowEngine(
                 semantic_manifest_lookup=self.semantic_manifest_lookup,
                 sql_client=self.sql_client,
                 system_schema=self.mf_system_schema,
             )
-        except Exception as e:
-            raise MetricFlowInitException from e
-
-    @property
-    def mf(self) -> MetricFlowEngine:  # noqa: D
-        if self._mf is None:
-            self._initialize_metricflow_engine()
         assert self._mf is not None
         return self._mf
 
