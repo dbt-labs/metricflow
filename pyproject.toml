@@ -27,7 +27,7 @@ dependencies = [
   "MarkupSafe==2.0.1",
   "PyYAML~=6.0",
   "SQLAlchemy~=1.4.42",
-  "click>=7.1.2",
+  "click>=7.1.2, <8.1.4",
   "databricks-sql-connector==2.0.3",
   "dbt-core==1.6.0b8",
   "dbt-semantic-interfaces==0.1.0.dev8",
