@@ -1,0 +1,6 @@
+kind: Fixes
+body: Added --version and fix manifest transformer rules for dbt-core-=1.6.0b8
+time: 2023-07-11T13:20:46.973302-04:00
+custom:
+  Author: WilliamDee
+  Issue: "650"

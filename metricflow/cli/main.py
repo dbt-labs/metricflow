@@ -54,6 +54,7 @@ _telemetry_reporter.add_rudderstack_handler()
 
 @click.group()
 @click.option("-v", "--verbose", is_flag=True)
+@click.version_option()
 @error_if_not_in_dbt_project
 @pass_config
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
