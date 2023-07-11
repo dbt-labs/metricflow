@@ -11,13 +11,12 @@ from dbt.cli.main import dbtRunner
 from dbt.config.profile import Profile
 from dbt.config.project import Project
 from dbt.config.runtime import load_profile, load_project
-from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.transformations.semantic_manifest_transformer import PydanticSemanticManifestTransformer
 from typing_extensions import Self
 
 from metricflow.errors.errors import ModelCreationException
+from metricflow.model.dbt_manifest_parser import parse_manifest_from_dbt_generated_manifest
 
 logger = logging.getLogger(__name__)
 
@@ -111,11 +110,6 @@ class dbtArtifacts:
         try:
             with open(full_path_to_manifest, "r") as file:
                 raw_contents = file.read()
-                raw_model = PydanticSemanticManifest.parse_raw(raw_contents)
-                # The serialized object in the dbt project does not have all transformations applied to it at
-                # this time, which causes failures with input measure resolution.
-                # TODO: remove this transform call once the upstream changes are integrated into our dependency tree
-                model = PydanticSemanticManifestTransformer.transform(raw_model)
-                return model
+                return parse_manifest_from_dbt_generated_manifest(manifest_json_string=raw_contents)
         except Exception as e:
             raise ModelCreationException from e
