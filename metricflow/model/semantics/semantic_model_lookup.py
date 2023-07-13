@@ -190,7 +190,9 @@ class SemanticModelLookup(SemanticModelAccessor):
         for measure in semantic_model.measures:
             self._measure_aggs[measure.reference] = measure.agg
             self._measure_index[measure.reference].append(semantic_model)
-            agg_time_dimension = measure.checked_agg_time_dimension
+            agg_time_dimension = semantic_model.checked_agg_time_dimension_for_measure(
+                measure_reference=measure.reference
+            )
             self._semantic_model_to_aggregation_time_dimensions[semantic_model.reference].add_value(
                 key=agg_time_dimension,
                 value=MeasureConverter.convert_to_measure_spec(measure=measure),
