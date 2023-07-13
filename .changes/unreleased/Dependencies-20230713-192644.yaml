@@ -1,0 +1,6 @@
+kind: Dependencies
+body: Bump dbt-metricflow package to dbt 1.6.0-b8 and mf 0.200.0.dev12
+time: 2023-07-13T19:26:44.4916055Z
+custom:
+  Author: gwenwindflower
+  PR: "657"
