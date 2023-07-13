@@ -22,8 +22,8 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
-  "dbt-core==1.6.0b6",
-  "metricflow==0.200.0.dev10"
+  "dbt-core==1.6.0b8",
+  "metricflow==0.200.0.dev12"
 ]
 
 [project.optional-dependencies]
