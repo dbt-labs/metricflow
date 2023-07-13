@@ -46,7 +46,7 @@ dependencies = [
   "pydantic~=1.10.0",
   "python-dateutil==2.8.2",
   "rapidfuzz==3.0.0",
-  "requests~=2.27.1",
+  "requests~=2.31.0",
   "ruamel.yaml~=0.17.21",
   "rudder-sdk-python~=1.0.3",
   "sqlalchemy-bigquery~=1.6.1",
