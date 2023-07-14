@@ -6,6 +6,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Iterator
 
+import pytest
 from dbt_semantic_interfaces.parsing.dir_to_model import (
     parse_yaml_files_to_validation_ready_semantic_manifest,
 )
@@ -27,30 +28,38 @@ from metricflow.test.fixtures.cli_fixtures import MetricFlowCliRunner
 from metricflow.test.model.example_project_configuration import EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE
 
 
-def test_query(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    resp = cli_runner.run(query, args=["--metrics", "bookings", "--group-by", "ds"])
+def test_query(capsys: pytest.CaptureFixture, cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
+    # Disabling capsys to resolve error "ValueError: I/O operation on closed file". Better solution TBD.
+    with capsys.disabled():
+        resp = cli_runner.run(query, args=["--metrics", "bookings", "--group-by", "ds"])
     # case insensitive matches are needed for snowflake due to the capitalization thing
     engine_is_snowflake = cli_runner.cli_context.sql_client.sql_engine_type is SqlEngine.SNOWFLAKE
     assert "bookings" in resp.output or ("bookings" in resp.output.lower() and engine_is_snowflake)
     assert resp.exit_code == 0
 
 
-def test_list_dimensions(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    resp = cli_runner.run(dimensions, args=["--metrics", "bookings"])
+def test_list_dimensions(capsys: pytest.CaptureFixture, cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
+    # Disabling capsys to resolve error "ValueError: I/O operation on closed file". Better solution TBD.
+    with capsys.disabled():
+        resp = cli_runner.run(dimensions, args=["--metrics", "bookings"])
 
     assert "ds" in resp.output
     assert resp.exit_code == 0
 
 
-def test_list_metrics(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    resp = cli_runner.run(metrics)
+def test_list_metrics(capsys: pytest.CaptureFixture, cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
+    # Disabling capsys to resolve error "ValueError: I/O operation on closed file". Better solution TBD.
+    with capsys.disabled():
+        resp = cli_runner.run(metrics)
 
     assert "bookings_per_listing: ds" in resp.output
     assert resp.exit_code == 0
 
 
-def test_get_dimension_values(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    resp = cli_runner.run(dimension_values, args=["--metrics", "bookings", "--dimension", "is_instant"])
+def test_get_dimension_values(capsys: pytest.CaptureFixture, cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
+    # Disabling capsys to resolve error "ValueError: I/O operation on closed file". Better solution TBD.
+    with capsys.disabled():
+        resp = cli_runner.run(dimension_values, args=["--metrics", "bookings", "--dimension", "is_instant"])
 
     actual_output_lines = sorted(resp.output.split("\n"))
     assert ["", "• False", "• True"] == actual_output_lines
@@ -61,12 +70,12 @@ def test_get_dimension_values(cli_runner: MetricFlowCliRunner) -> None:  # noqa:
 def create_directory(directory_path: str) -> Iterator[None]:
     """Creates a temporary directory (errors if it exists) and removes it."""
     path = Path(directory_path)
-    path.mkdir(parents=True)
+    path.mkdir(parents=True, exist_ok=True)
     yield
     shutil.rmtree(path)
 
 
-def test_validate_configs(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
+def test_validate_configs(capsys: pytest.CaptureFixture, cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
     yaml_contents = textwrap.dedent(
         """\
         semantic_model:
@@ -93,20 +102,24 @@ def test_validate_configs(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
         manifest_file = target_directory / "semantic_manifest.json"
         manifest_file.write_text(manifest.json())
 
-        resp = cli_runner.run(validate_configs)
+        # Disabling capsys to resolve error "ValueError: I/O operation on closed file". Better solution TBD.
+        with capsys.disabled():
+            resp = cli_runner.run(validate_configs)
 
         assert "ERROR" in resp.output
         assert resp.exit_code == 0
 
 
-def test_health_checks(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    resp = cli_runner.run(health_checks)
+def test_health_checks(capsys: pytest.CaptureFixture, cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
+    # Disabling capsys to resolve error "ValueError: I/O operation on closed file". Better solution TBD.
+    with capsys.disabled():
+        resp = cli_runner.run(health_checks)
 
     assert "SELECT 1: Success!" in resp.output
     assert resp.exit_code == 0
 
 
-def test_tutorial_message(cli_runner: MetricFlowCliRunner) -> None:
+def test_tutorial_message(capsys: pytest.CaptureFixture, cli_runner: MetricFlowCliRunner) -> None:
     """Tests the message output of the tutorial.
 
     The tutorial now essentially compiles a semantic manifest and then asks the user to run dbt seed,
@@ -117,13 +130,17 @@ def test_tutorial_message(cli_runner: MetricFlowCliRunner) -> None:
     project path overrides it might warrant a more complete test of the semantic manifest building steps in the
     tutorial flow.
     """
-    resp = cli_runner.run(tutorial, args=["-m"])
+    # Disabling capsys to resolve error "ValueError: I/O operation on closed file". Better solution TBD.
+    with capsys.disabled():
+        resp = cli_runner.run(tutorial, args=["-m"])
     assert "Please run the following steps" in resp.output
     assert "dbt seed" in resp.output
 
 
-def test_list_entities(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    resp = cli_runner.run(entities, args=["--metrics", "bookings"])
+def test_list_entities(capsys: pytest.CaptureFixture, cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
+    # Disabling capsys to resolve error "ValueError: I/O operation on closed file". Better solution TBD.
+    with capsys.disabled():
+        resp = cli_runner.run(entities, args=["--metrics", "bookings"])
 
     assert "guest" in resp.output
     assert "host" in resp.output
