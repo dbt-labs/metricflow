@@ -38,13 +38,12 @@ class DuckDbSqlClient(SqlAlchemySqlClient):
         return DuckDbSqlClient(file_path=parsed_url.database)
 
     def __init__(self, file_path: Optional[str] = None) -> None:  # noqa: D
-        # DuckDB is not designed with concurrency, but in can work in multi-threaded settings with
-        # check_same_thread=False, StaticPool, and serializing of queries via a lock.
+        # DuckDB is thread-safe w/ a single connection.
+        # https://duckdb.org/docs/archive/0.2.9/api/python.html
         self._concurrency_lock = threading.Lock()
         super().__init__(
             sqlalchemy.create_engine(
                 f"duckdb:///{file_path if file_path else ':memory:'}",
-                connect_args={"check_same_thread": False},
                 poolclass=StaticPool,
             )
         )
