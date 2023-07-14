@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.8", "3.9"]
+        python-version: ["3.8", "3.11"]
     steps:
 
       - name: Check-out the repo
@@ -47,10 +47,10 @@ jobs:
       - name: Check-out the repo
         uses: actions/checkout@v3
 
-      - name: Test w/ Python 3.9
+      - name: Test w/ Python 3.11
         uses: ./.github/actions/run-mf-tests
         with:
-          python-version: "3.9"
+          python-version: "3.11"
           make-target: "test-postgresql"
 
   metricflow-unit-tests:
