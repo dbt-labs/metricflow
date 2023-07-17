@@ -31,7 +31,7 @@ dependencies = [
   "SQLAlchemy~=1.4.42",
   "click>=7.1.2, <8.1.4",
   "databricks-sql-connector~=2.0",
-  "dbt-core==1.6.0b8",
+  "dbt-core~=1.6.0rc1",
   "dbt-semantic-interfaces~=0.1.0rc1",
   "duckdb-engine~=0.9",
   "duckdb~=0.8",
