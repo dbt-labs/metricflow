@@ -13,15 +13,6 @@ install-hatch:
 	pip3 install hatch
 
 # Testing and linting
-.PHONY: test-core
-test-core:
-	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) metricflow/test --ignore metricflow/test/model/dbt_cloud_parsing/
-
-# Test that depend on dbt-related packages.
-.PHONY: test-dbt-associated
-test-dbt-associated:
-	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) metricflow/test/model/dbt_cloud_parsing/
-
 .PHONY: test
 test:
 	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) metricflow/test/
