@@ -20,3 +20,4 @@ Resolves #
   1. read [the contributing guide](https://github.com/dbt-labs/metricflow/blob/main/CONTRIBUTING.md),
   2. signed the [CLA](https://docs.getdbt.com/docs/contributor-license-agreements)
   3. run `changie new` to [create a changelog entry](https://github.com/dbt-labs/metricflow/blob/main/CONTRIBUTING.md#adding-a-changelog-entry)
+-->
