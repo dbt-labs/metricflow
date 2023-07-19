@@ -3,7 +3,7 @@
   PRs for code changes without an associated issue *will not be merged*.
   See CONTRIBUTING.md for more information.
 -->
-Resolves Issue #
+Resolves #
 
 
 ### Description
