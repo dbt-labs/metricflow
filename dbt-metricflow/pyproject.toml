@@ -26,6 +26,9 @@ dependencies = [
   "metricflow==0.200.0.dev13"
 ]
 
+[project.urls]
+"Source Code" = "https://github.com/dbt-labs/metricflow/tree/main/dbt-metricflow"
+
 [project.optional-dependencies]
 postgres = [
   "dbt-postgres>=1.6.0b6"
