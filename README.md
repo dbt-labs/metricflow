@@ -61,7 +61,7 @@ MetricFlow is distributed under a Business Source License (BUSL-1.1). For detail
 MetricFlow can be installed from PyPi for use as a Python library with the following command:
 
 ```
-pip install metricflow
+pip install dbt-metricflow
 ```
 
 Once installed, MetricFlow can be setup and connected to a data warehouse by following the instructions after issuing the command:
