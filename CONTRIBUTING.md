@@ -9,7 +9,7 @@ Welcome to the MetricFlow developer community, we're thrilled to have you aboard
 
 ## Environment setup
 
-1. Ensure you have Python `3.8` or `3.9`.
+1. Ensure you have a relevant version of Python.
 2. Install the following required system dependencies:
     - MySqlClient:
         - Follow the [instructions from MySQL](https://dev.mysql.com/doc/mysql-getting-started/en/)
