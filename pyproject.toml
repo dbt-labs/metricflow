@@ -30,7 +30,7 @@ dependencies = [
   "PyYAML~=6.0",
   "SQLAlchemy~=1.4.42",
   "click>=7.1.2, <8.1.4",
-  "databricks-sql-connector~=2.0",
+  "databricks-sql-connector==2.7.0",
   "dbt-core~=1.6.0rc1",
   "dbt-semantic-interfaces~=0.1.0rc1",
   "duckdb-engine~=0.9",
@@ -48,7 +48,6 @@ dependencies = [
   "pydantic~=1.10.0",
   "python-dateutil==2.8.2",
   "rapidfuzz==3.0.0",
-  "requests~=2.27.1",
   "ruamel.yaml~=0.17.21",
   "rudder-sdk-python~=1.0.3",
   "sqlalchemy-bigquery~=1.6.1",
@@ -82,11 +81,23 @@ dev-packages = [
 ]
 
 dbt-postgres = [
-  "dbt-postgres>=1.6.0.b6",
+  "dbt-postgres~=1.6.0rc1",
+]
+
+dbt-bigquery = [
+  "dbt-bigquery~=1.6.0rc1",
+]
+
+dbt-databricks = [
+  "dbt-databricks==1.6.0rc2",
+]
+
+dbt-redshift = [
+  "dbt-redshift~=1.6.0rc1",
 ]
 
 dbt-snowflake = [
-  "dbt-snowflake>=1.6.0b3",
+  "dbt-snowflake~=1.6.0rc1",
 ]
 
 [tool.hatch.build.targets.sdist]
@@ -102,7 +113,7 @@ exclude = [
 ]
 
 [tool.hatch.envs.dev-env]
-description = "Environment for development."
+description = "Environment for development. Includes a DuckDB-backed client."
 features = [
   "dev-packages",
 ]
@@ -119,14 +130,44 @@ features = [
   "dbt-postgres",
 ]
 
+# NOTE: All of the below should have their authentication credentials
+# configured independently of the hatch env construction
+
+[tool.hatch.envs.bigquery-env.env-vars]
+	MF_TEST_ADAPTER_TYPE="bigquery"
+
+[tool.hatch.envs.bigquery-env]
+description = "Dev environment for working with the BigQuery adapter"
+features = [
+  "dev-packages",
+  "dbt-bigquery",
+]
+
+[tool.hatch.envs.databricks-env.env-vars]
+	MF_TEST_ADAPTER_TYPE="databricks"
+
+[tool.hatch.envs.databricks-env]
+description = "Dev environment for working with the Databricks adapter"
+features = [
+  "dev-packages",
+  "dbt-databricks",
+]
+
+[tool.hatch.envs.redshift-env.env-vars]
+	MF_TEST_ADAPTER_TYPE="redshift"
+
+[tool.hatch.envs.redshift-env]
+description = "Dev environment for working with the Redshift adapter"
+features = [
+  "dev-packages",
+  "dbt-redshift",
+]
+
 [tool.hatch.envs.snowflake-env.env-vars]
 	MF_TEST_ADAPTER_TYPE="snowflake"
-  # Note - the snowflake URL and password should be set via environment secrets
-  # in the calling process
 
 [tool.hatch.envs.snowflake-env]
 description = "Dev environment for working with Snowflake adapter"
-# Install the dbt snowflake package as a pre-install extra, just as with postgres
 features = [
   "dev-packages",
   "dbt-snowflake",

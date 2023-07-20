@@ -21,6 +21,20 @@ test:
 test-postgresql:
 	hatch -v run postgres-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) metricflow/test/
 
+# Engine-specific test environments. In most cases you should run these with
+# `make -e ADDITIONAL_PYTEST_OPTIONS="--use-persistent-source-schema" test-<engine_type>`
+.PHONY: test-bigquery
+test-bigquery:
+	hatch -v run bigquery-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) metricflow/test/
+
+.PHONY: test-databricks
+test-databricks:
+	hatch -v run databricks-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) metricflow/test/
+
+.PHONY: test-redshift
+test-redshift:
+	hatch -v run redshift-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) metricflow/test/
+
 .PHONY: test-snowflake
 test-snowflake:
 	hatch -v run snowflake-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) metricflow/test/
