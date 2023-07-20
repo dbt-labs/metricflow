@@ -29,7 +29,7 @@ dependencies.
 You're ready to start! Note all `make` and `hatch` commands should be run from your repository root unless otherwise indicated.
 
 `pyproject.yaml` includes a definition for a Hatch environment named `dev-env` that is similar to a virtual environment
-and allows packages to be installed in isolation.
+and allows packages to be installed in isolation. The `Makefile` includes a number of other useful commands as well, such as `make test`, which handle the environment switching. For engine-specific testing refer to the `<engine>-env` environments defined in `pyproject.yaml` and the `test-<engine>` commands in the `Makefile` - for example, postgres tests are most easily run through the `postgres-env` instead of `dev-env`, or via `make test-postgresql`.
 
 When running any one of the hatch commands, the environment is automatically set up for you.
 
@@ -41,10 +41,10 @@ When running any one of the hatch commands, the environment is automatically set
     - Working with integration tests
         - These tests are driven by a set of test configs in [metricflow/test/integration/test_cases](metricflow/test/integration/test_cases/). They compare the output of a MetricFlow query against the output of a similar SQL query.
         - These tests all run on consistent input data, which is [created in the target warehouse via setup fixtures](metricflow/test/fixtures/table_fixtures.py).
-            - Modify this file if you are looking to test boundary cases involving things like repeated rows of data.
+            - Modify the test inputs if you are looking to test boundary cases involving things like repeated rows of data.
         - Let's break a test!
             - Change a SQL query inside of [metricflow/test/integration/test_cases/itest_simple.yaml](metricflow/test/integration/test_cases/itest_simple.yaml)
-            - Run the test case: `hatch run dev-env:pytest -k "itest_simple.yaml" metricflow/test/integration`. Did it fail?
+            - Run the test case: `hatch run dev-env:pytest -k "itest_simple" metricflow/test/integration`. Did it fail?
     - Working with module and component tests
         - These are generally laid out in a similar hierarchy to the main package.
         - Let's try them out:
@@ -57,8 +57,8 @@ When running any one of the hatch commands, the environment is automatically set
     - Run the following commands in your shell, replacing the tags with the appropriate values:
         - `export MF_SQL_ENGINE_URL=<YOUR_WAREHOUSE_CONNECTION_URL>`
         - `export MF_SQL_ENGINE_PASSWORD=<YOUR_WAREHOUSE_PASSWORD>`
-    - Run `make test` to execute the entire test suite against the target engine.
-    - By default, without `MF_SQL_ENGINE_URL` and `MF_SQL_ENGINE_PASSWORD` set, your tests will run against SQLite.
+    - Run `make test-<engine>` to execute the entire test suite against the target engine. This will also set the `MF_TEST_ADAPTER_TYPE` to the proper engine identifier and pull in and configure the necessary dbt adapter dependencies for query execution. For example, to run tests against BigQuery, run `make test-bigquery`
+    - By default, without `MF_SQL_ENGINE_URL` and `MF_SQL_ENGINE_PASSWORD` set, your tests will run against DuckDB.
 4. Run the linters with `make lint` at any time, but especially before submitting a PR. We use:
     - `Black` for formatting
     - `Ruff` for general Python linting
@@ -66,7 +66,9 @@ When running any one of the hatch commands, the environment is automatically set
 5. To see how your changes work with more interactive queries, use your repo-local CLI.
     - Run `hatch run dev-env:mf --help`
     - Follow the CLI help from there, just remember your local CLI is always `hatch run dev-env:run mf <COMMAND>`!
+    - Note this will only work if you invoke the command from within a properly configured dbt project, so it may be simpler to clone the [jaffle-sl-template repo](https://github.com/dbt-labs/jaffle-sl-template) and do an editable install (via `pip install -e /path/to/metricflow/repo`) in a separate Python virtual environment.
 6. Some tests generate snapshots in the test directory. Separate snapshots may be generated for each SQL engine. You can regenerate these snapshots by running `make regenerate-test-snapshots`.
+
 ## Adding or modifying a CHANGELOG Entry!
 
 We use [changie](https://changie.dev) to generate `CHANGELOG` entries. **Note:** Do not edit the `CHANGELOG.md` directly. Your modifications will be lost.
