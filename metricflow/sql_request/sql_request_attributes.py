@@ -8,11 +8,8 @@ from enum import Enum
 from operator import itemgetter
 from typing import Any, Dict, Optional, Sequence
 
-import pandas as pd
 from dbt_semantic_interfaces.implementations.base import FrozenBaseModel
 from pydantic import Field
-
-from metricflow.assert_one_arg import assert_exactly_one_arg_set
 
 logger = logging.getLogger(__name__)
 
@@ -25,17 +22,6 @@ class SqlRequestId:
 
     def __repr__(self) -> str:  # noqa: D
         return self.id_str
-
-
-@dataclass(frozen=True)
-class SqlRequestResult:
-    """The result from a request to the SQL engine."""
-
-    df: Optional[pd.DataFrame] = None
-    exception: Optional[Exception] = None
-
-    def __post_init__(self) -> None:  # noqa: D
-        assert_exactly_one_arg_set(df=self.df, exception=self.exception)
 
 
 class SqlRequestTagSet(FrozenBaseModel):

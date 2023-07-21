@@ -13,7 +13,7 @@ from sqlalchemy.engine import make_url
 
 from metricflow.configuration.env_var import EnvironmentVariable
 from metricflow.random_id import random_id
-from metricflow.sql_clients.common_client import SqlDialect
+from metricflow.test.fixtures.sql_clients.common_client import SqlDialect
 from metricflow.test.table_snapshot.table_snapshots import SqlTableSnapshotHash, SqlTableSnapshotRepository
 
 logger = logging.getLogger(__name__)

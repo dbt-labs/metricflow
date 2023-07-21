@@ -13,10 +13,10 @@ from metricflow.logging.formatting import indent_log_line
 from metricflow.protocols.sql_client import (
     SqlClient,
 )
-from metricflow.protocols.sql_request import SqlJsonTag, SqlRequestId, SqlRequestTagSet
 from metricflow.random_id import random_id
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.sql_clients.sql_statement_metadata import CombinedSqlTags, SqlStatementCommentMetadata
+from metricflow.sql_request.sql_request_attributes import SqlJsonTag, SqlRequestId, SqlRequestTagSet
+from metricflow.sql_request.sql_statement_metadata import CombinedSqlTags, SqlStatementCommentMetadata
 
 logger = logging.getLogger(__name__)
 

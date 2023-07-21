@@ -28,15 +28,9 @@ dependencies = [
   "Jinja2>=2.11.3",
   "MarkupSafe==2.0.1",
   "PyYAML~=6.0",
-  "SQLAlchemy~=1.4.42",
   "click>=7.1.2, <8.1.4",
-  "databricks-sql-connector==2.7.0",
   "dbt-core~=1.6.0rc1",
   "dbt-semantic-interfaces~=0.1.0rc1",
-  "duckdb-engine~=0.9",
-  "duckdb~=0.8",
-  "google-auth~=2.13.0",
-  "google-cloud-bigquery~=3.4.2",
   "graphviz==0.18.2",
   "halo~=0.0.31",
   "jsonschema==3.2.0",
@@ -44,15 +38,11 @@ dependencies = [
   "more-itertools==8.10.0",
   "numpy>=1.22.2",
   "pandas~=1.3.0",
-  "psycopg2-binary~=2.9.3",
   "pydantic~=1.10.0",
   "python-dateutil==2.8.2",
   "rapidfuzz==3.0.0",
   "ruamel.yaml~=0.17.21",
   "rudder-sdk-python~=1.0.3",
-  "sqlalchemy-bigquery~=1.6.1",
-  "sqlalchemy-redshift==0.8.1",
-  "sqlalchemy2-stubs~=0.0.2a21",
   "tabulate~=0.8.9",
   "typing_extensions>=4.0.0",
   "update-checker~=0.18.0",
@@ -78,6 +68,21 @@ dev-packages = [
   "types-PyYAML",
   "types-jsonschema",
   "types-python-dateutil",
+]
+
+# These are currently separate for ease of removal, but due to the way Python
+# handles import statements they are required in all test environments
+sql-client-packages = [
+  "SQLAlchemy~=1.4.42",
+  "databricks-sql-connector==2.7.0",
+  "duckdb-engine~=0.9",
+  "duckdb~=0.8",
+  "google-auth~=2.13.0",
+  "google-cloud-bigquery~=3.4.2",
+  "psycopg2-binary~=2.9.3",
+  "sqlalchemy-bigquery~=1.6.1",
+  "sqlalchemy-redshift==0.8.1",
+  "sqlalchemy2-stubs~=0.0.2a21",
 ]
 
 dbt-postgres = [
@@ -116,6 +121,7 @@ exclude = [
 description = "Environment for development. Includes a DuckDB-backed client."
 features = [
   "dev-packages",
+  "sql-client-packages",
 ]
 
 [tool.hatch.envs.postgres-env.env-vars]
@@ -128,6 +134,7 @@ description = "Dev environment for working with Postgres adapter"
 features = [
   "dev-packages",
   "dbt-postgres",
+  "sql-client-packages",
 ]
 
 # NOTE: All of the below should have their authentication credentials
@@ -141,6 +148,7 @@ description = "Dev environment for working with the BigQuery adapter"
 features = [
   "dev-packages",
   "dbt-bigquery",
+  "sql-client-packages",
 ]
 
 [tool.hatch.envs.databricks-env.env-vars]
@@ -151,6 +159,7 @@ description = "Dev environment for working with the Databricks adapter"
 features = [
   "dev-packages",
   "dbt-databricks",
+  "sql-client-packages",
 ]
 
 [tool.hatch.envs.redshift-env.env-vars]
@@ -161,6 +170,7 @@ description = "Dev environment for working with the Redshift adapter"
 features = [
   "dev-packages",
   "dbt-redshift",
+  "sql-client-packages",
 ]
 
 [tool.hatch.envs.snowflake-env.env-vars]
@@ -171,6 +181,7 @@ description = "Dev environment for working with Snowflake adapter"
 features = [
   "dev-packages",
   "dbt-snowflake",
+  "sql-client-packages",
 ]
 
 
