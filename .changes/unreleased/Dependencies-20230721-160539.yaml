@@ -1,0 +1,6 @@
+kind: Dependencies
+body: Move SQLAlchemy and SQL engine dependencies out of the production package
+time: 2023-07-21T16:05:39.977086-04:00
+custom:
+  Author: tlento
+  PR: "672"
