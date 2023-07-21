@@ -129,12 +129,6 @@ def test_create_table_from_dataframe(  # noqa: D
     )
 
 
-def test_table_exists(mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient) -> None:  # noqa: D
-    sql_table = SqlTable(schema_name=mf_test_session_state.mf_system_schema, table_name=_random_table())
-    sql_client.execute(f"CREATE TABLE {sql_table.sql} AS {_select_x_as_y()}")
-    assert sql_client.table_exists(sql_table)
-
-
 def test_percent_signs_in_query(sql_client: SqlClient) -> None:
     """Note: this only syntax works for Datbricks if no execution params are passed."""
     stmt = "SELECT foo FROM ( SELECT 'abba' AS foo ) source0 WHERE foo LIKE '%a'"
@@ -160,9 +154,18 @@ def test_dry_run(mf_test_session_state: MetricFlowTestSessionState, sql_client: 
 
     stmt = f"CREATE TABLE {test_table.sql} AS SELECT 1 AS foo"
     sql_client.dry_run(stmt)
-    assert not sql_client.table_exists(
-        test_table
-    ), f"Table {test_table.sql} should not exist if the CREATE TABLE was a dry run."
+    with pytest.raises(expected_exception=Exception) as excinfo:
+        sql_client.execute(stmt=f"SELECT * FROM {test_table.sql}")
+
+    exception_message = repr(excinfo.value)
+    match = (
+        test_table.table_name
+        if sql_client.sql_engine_type is not SqlEngine.SNOWFLAKE
+        else str.upper(test_table.table_name)
+    )
+    assert (
+        exception_message.find(f"{match}") != -1
+    ), f"Expected an exception about table {match} not found, but got `{exception_message}`"
 
 
 def test_dry_run_of_bad_query_raises_exception(sql_client: SqlClient) -> None:  # noqa: D

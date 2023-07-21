@@ -99,11 +99,6 @@ class SqlClient(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    def table_exists(self, sql_table: SqlTable) -> bool:
-        """Determines whether or not the given table exists in the data warehouse."""
-        raise NotImplementedError
-
-    @abstractmethod
     def drop_table(self, sql_table: SqlTable) -> None:
         """Drop the given table from the data warehouse."""
         raise NotImplementedError

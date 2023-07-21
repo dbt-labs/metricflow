@@ -300,10 +300,6 @@ class AdapterBackedSqlClient:
         df.columns = df.columns.str.lower()
         return [t.lower() for t in df["table_name"]]
 
-    def table_exists(self, sql_table: SqlTable) -> bool:
-        """Check if a given table exists. Only used in tutorials and tests."""
-        return sql_table.table_name in self.list_tables(sql_table.schema_name)
-
     def create_schema(self, schema_name: str) -> None:
         """Create the given schema in a data warehouse. Only used in tutorials and tests."""
         self.execute(f"CREATE SCHEMA IF NOT EXISTS {schema_name}")

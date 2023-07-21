@@ -49,7 +49,6 @@ def test_write_table_task(mf_test_session_state: MetricFlowTestSessionState, sql
     results = SequentialPlanExecutor().execute_plan(execution_plan)
 
     assert not results.contains_task_errors
-    assert sql_client.table_exists(output_table)
 
     assert_dataframes_equal(
         actual=sql_client.query(f"SELECT * FROM {output_table.sql}"),

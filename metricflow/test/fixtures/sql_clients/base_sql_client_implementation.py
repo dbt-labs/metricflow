@@ -157,9 +157,6 @@ class BaseSqlClientImplementation(ABC, SqlClient):
     ) -> None:
         pass
 
-    def table_exists(self, sql_table: SqlTable) -> bool:  # noqa: D
-        return sql_table.table_name in self.list_tables(sql_table.schema_name)
-
     def create_schema(self, schema_name: str) -> None:  # noqa: D
         self.execute(f"CREATE SCHEMA IF NOT EXISTS {schema_name}")
 
