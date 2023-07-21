@@ -13,15 +13,6 @@ install-hatch:
 	pip3 install hatch
 
 # Testing and linting
-.PHONY: test-core
-test-core:
-	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) metricflow/test --ignore metricflow/test/model/dbt_cloud_parsing/
-
-# Test that depend on dbt-related packages.
-.PHONY: test-dbt-associated
-test-dbt-associated:
-	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) metricflow/test/model/dbt_cloud_parsing/
-
 .PHONY: test
 test:
 	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) metricflow/test/
@@ -29,6 +20,20 @@ test:
 .PHONY: test-postgresql
 test-postgresql:
 	hatch -v run postgres-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) metricflow/test/
+
+# Engine-specific test environments. In most cases you should run these with
+# `make -e ADDITIONAL_PYTEST_OPTIONS="--use-persistent-source-schema" test-<engine_type>`
+.PHONY: test-bigquery
+test-bigquery:
+	hatch -v run bigquery-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) metricflow/test/
+
+.PHONY: test-databricks
+test-databricks:
+	hatch -v run databricks-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) metricflow/test/
+
+.PHONY: test-redshift
+test-redshift:
+	hatch -v run redshift-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) metricflow/test/
 
 .PHONY: test-snowflake
 test-snowflake:

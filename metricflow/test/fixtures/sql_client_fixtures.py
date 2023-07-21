@@ -84,7 +84,7 @@ def make_test_sql_client(url: str, password: str, schema: str) -> SqlClient:
     elif dialect == SqlDialect.BIGQUERY:
         return BigQuerySqlClient.from_connection_details(url, password)
     elif dialect == SqlDialect.POSTGRESQL:
-        configure_test_env_from_url(url, "mf_demo")
+        configure_test_env_from_url(url, schema)
         __initialize_dbt()
         return AdapterBackedSqlClient(adapter=get_adapter_by_type("postgres"))
     elif dialect == SqlDialect.DUCKDB:
