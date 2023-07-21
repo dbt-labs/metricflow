@@ -14,8 +14,8 @@ from metricflow.dag.id_generation import EXEC_NODE_READ_SQL_QUERY, EXEC_NODE_WRI
 from metricflow.dag.mf_dag import DagNode, DisplayedProperty, MetricFlowDag, NodeId
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.protocols.sql_request import SqlJsonTag
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from metricflow.sql_request.sql_request_attributes import SqlJsonTag
 from metricflow.visitor import Visitable
 
 logger = logging.getLogger(__name__)

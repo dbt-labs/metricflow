@@ -22,10 +22,10 @@ from metricflow.execution.execution_plan import (
 )
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter, SqlDataSetT
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.protocols.sql_request import SqlJsonTag
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_plan import SqlQueryPlan
 from metricflow.sql.sql_plan_to_text import sql_query_plan_as_text
+from metricflow.sql_request.sql_request_attributes import SqlJsonTag
 
 logger = logging.getLogger(__name__)
 

@@ -7,9 +7,9 @@ from typing import Optional, Protocol, Sequence
 from pandas import DataFrame
 
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.protocols.sql_request import SqlJsonTag
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from metricflow.sql_request.sql_request_attributes import SqlJsonTag
 
 
 class SqlEngine(Enum):
