@@ -2,9 +2,8 @@ from __future__ import annotations
 
 import enum
 import logging
-import textwrap
 import time
-from typing import Optional, Sequence
+from typing import Optional
 
 import pandas as pd
 from dbt.adapters.base.impl import BaseAdapter
@@ -275,30 +274,6 @@ class AdapterBackedSqlClient:
             return self._sql_query_plan_renderer.expr_renderer.timestamp_data_type
         else:
             raise ValueError(f"Encountered unexpected Pandas dtype ({dtype})!")
-
-    def list_tables(self, schema_name: str) -> Sequence[str]:
-        """Get a list of the table names in a given schema. Only used in tutorials and tests."""
-        # TODO: Short term, make this work with as many engines as possible. Medium term, remove this altogether.
-        if self.sql_engine_type is SqlEngine.SNOWFLAKE:
-            # Snowflake likes capitalizing things, except when it doesn't. We can get away with this due to its
-            # limited scope of usage.
-            schema_name = schema_name.upper()
-
-        df = self.query(
-            textwrap.dedent(
-                f"""\
-                SELECT table_name FROM information_schema.tables
-                WHERE table_schema = '{schema_name}'
-                """
-            ),
-        )
-        if df.empty:
-            return []
-
-        # Lower casing table names and data frame names for consistency between Snowflake and other clients.
-        # As above, we can do this because it isn't used in any consequential situations.
-        df.columns = df.columns.str.lower()
-        return [t.lower() for t in df["table_name"]]
 
     def create_schema(self, schema_name: str) -> None:
         """Create the given schema in a data warehouse. Only used in tutorials and tests."""

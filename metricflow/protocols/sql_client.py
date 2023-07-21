@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from enum import Enum
-from typing import Optional, Protocol, Sequence
+from typing import Optional, Protocol
 
 from pandas import DataFrame
 
@@ -91,11 +91,6 @@ class SqlClient(Protocol):
         sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
     ) -> None:
         """Base dry_run method."""
-        raise NotImplementedError
-
-    @abstractmethod
-    def list_tables(self, schema_name: str) -> Sequence[str]:
-        """List the tables in the given schema."""
         raise NotImplementedError
 
     @abstractmethod

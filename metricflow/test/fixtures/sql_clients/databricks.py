@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import time
-from typing import Dict, Optional, Sequence
+from typing import Dict, Optional
 
 import pandas as pd
 import sqlalchemy
@@ -228,12 +228,6 @@ class DatabricksSqlClient(BaseSqlClientImplementation):
                     self._execute_stmt(cursor=cursor, stmt=f"INSERT INTO {sql_table.sql} VALUES {values}")
 
         logger.info(f"Created table '{sql_table.sql}' from a DataFrame in {time.time() - start_time:.2f}s")
-
-    def list_tables(self, schema_name: str) -> Sequence[str]:  # noqa: D
-        with self.get_connection() as connection:
-            with connection.cursor() as cursor:
-                cursor.tables(schema_name=schema_name)
-                return [table.TABLE_NAME for table in cursor.fetchall()]
 
     def render_bind_parameter_key(self, bind_parameter_key: str) -> str:
         """Wrap execution parameter key with syntax accepted by engine."""

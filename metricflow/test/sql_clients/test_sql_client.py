@@ -189,14 +189,3 @@ def test_update_params_with_same_key_different_values() -> None:  # noqa: D
 
     with pytest.raises(RuntimeError):
         bind_params0.combine(bind_params1)
-
-
-def test_list_tables(mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient) -> None:  # noqa: D
-    schema = mf_test_session_state.mf_system_schema
-    sql_table = SqlTable(schema_name=schema, table_name=_random_table())
-    table_count_before_create = len(sql_client.list_tables(schema))
-    sql_client.execute(f"CREATE TABLE {sql_table.sql} AS {_select_x_as_y()}")
-    table_list = sql_client.list_tables(schema)
-    table_count_after_create = len(table_list)
-    assert table_count_after_create == table_count_before_create + 1
-    assert len([x for x in table_list if x == sql_table.table_name]) == 1
