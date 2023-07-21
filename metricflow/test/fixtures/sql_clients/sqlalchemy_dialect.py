@@ -12,8 +12,8 @@ from sqlalchemy import inspect
 
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.sql_clients.base_sql_client_implementation import BaseSqlClientImplementation
 from metricflow.sql_request.sql_request_attributes import SqlJsonTag, SqlRequestTagSet
+from metricflow.test.fixtures.sql_clients.base_sql_client_implementation import BaseSqlClientImplementation
 
 logger = logging.getLogger(__name__)
 

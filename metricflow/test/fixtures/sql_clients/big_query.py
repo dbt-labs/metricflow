@@ -15,8 +15,8 @@ from metricflow.protocols.sql_client import (
 from metricflow.sql.render.big_query import BigQuerySqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.sql_clients.common_client import SqlDialect
-from metricflow.sql_clients.sqlalchemy_dialect import SqlAlchemySqlClient
+from metricflow.test.fixtures.sql_clients.common_client import SqlDialect
+from metricflow.test.fixtures.sql_clients.sqlalchemy_dialect import SqlAlchemySqlClient
 
 logger = logging.getLogger(__name__)
 

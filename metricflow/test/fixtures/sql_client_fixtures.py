@@ -11,12 +11,12 @@ from dbt.cli.main import dbtRunner
 
 from metricflow.cli.dbt_connectors.adapter_backed_client import AdapterBackedSqlClient
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.sql_clients.big_query import BigQuerySqlClient
-from metricflow.sql_clients.common_client import SqlDialect
-from metricflow.sql_clients.databricks import DatabricksSqlClient
-from metricflow.sql_clients.duckdb import DuckDbSqlClient
-from metricflow.sql_clients.redshift import RedshiftSqlClient
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState, dialect_from_url
+from metricflow.test.fixtures.sql_clients.big_query import BigQuerySqlClient
+from metricflow.test.fixtures.sql_clients.common_client import SqlDialect
+from metricflow.test.fixtures.sql_clients.databricks import DatabricksSqlClient
+from metricflow.test.fixtures.sql_clients.duckdb import DuckDbSqlClient
+from metricflow.test.fixtures.sql_clients.redshift import RedshiftSqlClient
 
 logger = logging.getLogger(__name__)
 
