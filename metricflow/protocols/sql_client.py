@@ -94,11 +94,6 @@ class SqlClient(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    def drop_table(self, sql_table: SqlTable) -> None:
-        """Drop the given table from the data warehouse."""
-        raise NotImplementedError
-
-    @abstractmethod
     def create_schema(self, schema_name: str) -> None:
         """Create the given schema if it doesn't already exist."""
         raise NotImplementedError

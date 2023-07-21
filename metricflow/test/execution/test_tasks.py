@@ -58,4 +58,4 @@ def test_write_table_task(mf_test_session_state: MetricFlowTestSessionState, sql
         ),
         compare_names_using_lowercase=sql_client.sql_engine_type is SqlEngine.SNOWFLAKE,
     )
-    sql_client.drop_table(output_table)
+    sql_client.execute(f"DROP TABLE IF EXISTS {output_table.sql}")

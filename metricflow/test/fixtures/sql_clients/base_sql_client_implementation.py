@@ -163,9 +163,6 @@ class BaseSqlClientImplementation(ABC, SqlClient):
     def drop_schema(self, schema_name: str, cascade: bool = True) -> None:  # noqa: D
         self.execute(f"DROP SCHEMA IF EXISTS {schema_name}{' CASCADE' if cascade else ''}")
 
-    def drop_table(self, sql_table: SqlTable) -> None:  # noqa: D
-        self.execute(f"DROP TABLE IF EXISTS {sql_table.sql}")
-
     def close(self) -> None:  # noqa: D
         pass
 

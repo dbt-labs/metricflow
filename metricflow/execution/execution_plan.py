@@ -185,7 +185,7 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
     def execute(self) -> TaskExecutionResult:  # noqa: D
         start_time = time.time()
         logger.info(f"Dropping table {self._output_table} in case it already exists")
-        self._sql_client.drop_table(self._output_table)
+        self._sql_client.execute(f"DROP TABLE IF EXISTS {self._output_table.sql}")
         logger.info(f"Creating table {self._output_table} using a SELECT query")
         sql_query = self.sql_query
         assert sql_query

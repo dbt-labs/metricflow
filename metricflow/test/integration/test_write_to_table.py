@@ -45,4 +45,4 @@ def test_write_to_table(it_helpers: IntegrationTestHelpers) -> None:  # noqa: D
             compare_names_using_lowercase=it_helpers.sql_client.sql_engine_type is SqlEngine.SNOWFLAKE,
         )
     finally:
-        it_helpers.sql_client.drop_table(output_table)
+        it_helpers.sql_client.execute(f"DROP TABLE IF EXISTS {output_table.sql}")

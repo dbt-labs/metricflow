@@ -283,10 +283,6 @@ class AdapterBackedSqlClient:
         """Drop the given schema from the data warehouse. Only used in tests."""
         self.execute(f"DROP SCHEMA IF EXISTS {schema_name}{' CASCADE' if cascade else ''}")
 
-    def drop_table(self, sql_table: SqlTable) -> None:
-        """Drop the given table from the data warehouse. Only used in tutorials and tests."""
-        self.execute(f"DROP TABLE IF EXISTS {sql_table.sql}")
-
     def close(self) -> None:  # noqa: D
         self._adapter.cancel_open_connections()
 
