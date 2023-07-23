@@ -5,11 +5,13 @@ import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from typing import List, Optional, Sequence
+from typing import List, Optional, Sequence, Tuple
 
 import pandas as pd
+from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimensionTypeParams
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
-from dbt_semantic_interfaces.references import DimensionReference, EntityReference, MetricReference
+from dbt_semantic_interfaces.references import EntityReference, MetricReference
+from dbt_semantic_interfaces.type_enums import DimensionType
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.builder.node_data_set import (
@@ -22,6 +24,7 @@ from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import (
 )
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
+from metricflow.dataset.dataset import DataSet
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.engine.models import Dimension, Entity, Metric
 from metricflow.engine.time_source import ServerTimeSource
@@ -34,7 +37,9 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.model.semantics.linkable_element_properties import (
     LinkableElementProperties,
 )
+from metricflow.model.semantics.linkable_spec_resolver import LinkableDimension
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
+from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_execution import (
     DataflowToExecutionPlanConverter,
@@ -484,6 +489,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         ).path_key_to_linkable_dimensions
 
         dimensions: List[Dimension] = []
+        linkable_dimensions_tuple: Tuple[LinkableDimension, ...]
         for (
             path_key,
             linkable_dimensions_tuple,
@@ -493,16 +499,44 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                     linkable_dimension.semantic_model_origin
                 )
                 assert semantic_model
-                dimensions.append(
-                    Dimension.from_pydantic(
-                        pydantic_dimension=SemanticModelLookup.get_dimension_from_semantic_model(
-                            semantic_model=semantic_model,
-                            dimension_reference=DimensionReference(element_name=linkable_dimension.element_name),
-                        ),
-                        path_key=path_key,
+
+                if LinkableElementProperties.METRIC_TIME in linkable_dimension.properties:
+                    metric_time_name = DataSet.metric_time_dimension_name()
+                    assert linkable_dimension.element_name == metric_time_name, (
+                        f"{linkable_dimension} has the {LinkableElementProperties.METRIC_TIME}, but the name does not"
+                        f"match."
                     )
-                )
-        return dimensions
+
+                    dimensions.append(
+                        Dimension(
+                            name=metric_time_name,
+                            qualified_name=StructuredLinkableSpecName(
+                                element_name=metric_time_name,
+                                entity_link_names=linkable_dimension.entity_links,
+                                time_granularity=linkable_dimension.time_granularity,
+                            ).qualified_name,
+                            description="Event time for metrics.",
+                            metadata=None,
+                            type_params=PydanticDimensionTypeParams(
+                                time_granularity=linkable_dimension.time_granularity,
+                                validity_params=None,
+                            ),
+                            is_partition=False,
+                            type=DimensionType.TIME,
+                        )
+                    )
+                else:
+                    dimensions.append(
+                        Dimension.from_pydantic(
+                            pydantic_dimension=SemanticModelLookup.get_dimension_from_semantic_model(
+                                semantic_model=semantic_model,
+                                dimension_reference=linkable_dimension.reference,
+                            ),
+                            path_key=path_key,
+                        )
+                    )
+        logger.error(f"Dimensions is:\n{pformat_big_objects(dimensions)}")
+        return sorted(dimensions, key=lambda dimension: dimension.qualified_name)
 
     def entities_for_metrics(self, metric_names: List[str]) -> List[Entity]:  # noqa: D
         path_key_to_linkable_entities = (

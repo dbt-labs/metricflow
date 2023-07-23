@@ -6,14 +6,23 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import Dict, FrozenSet, List, Optional, Sequence, Set, Tuple
 
+from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.protocols.dimension import Dimension, DimensionType
 from dbt_semantic_interfaces.protocols.entity import EntityType
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.protocols.semantic_model import SemanticModel
-from dbt_semantic_interfaces.references import MeasureReference, MetricReference, SemanticModelReference
+from dbt_semantic_interfaces.references import (
+    DimensionReference,
+    MeasureReference,
+    MetricReference,
+    SemanticModelReference,
+    TimeDimensionReference,
+)
+from dbt_semantic_interfaces.type_enums import MetricType
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
+from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnknownMetricLinkingError
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
@@ -58,6 +67,10 @@ class LinkableDimension:
             entity_links=self.entity_links,
             time_granularity=self.time_granularity,
         )
+
+    @property
+    def reference(self) -> DimensionReference:  # noqa: D
+        return DimensionReference(element_name=self.element_name)
 
 
 @dataclass(frozen=True)
@@ -183,12 +196,16 @@ class LinkableElementSet:
         )
 
     def filter(
-        self, with_any_of: FrozenSet[LinkableElementProperties], without_any_of: FrozenSet[LinkableElementProperties]
+        self,
+        with_any_of: FrozenSet[LinkableElementProperties],
+        without_any_of: FrozenSet[LinkableElementProperties] = frozenset(),
+        without_all_of: FrozenSet[LinkableElementProperties] = frozenset(),
     ) -> LinkableElementSet:
         """Filter elements in the set.
 
         First, only elements with at least one property in the "with_any_of" set are retained. Then, any elements with
-        a property in "without_any_of" set are removed.
+        a property in "without_any_of" set are removed. Lastly, any elements with all properties in without_all_of
+        are removed.
         """
         key_to_linkable_dimensions: Dict[ElementPathKey, Tuple[LinkableDimension, ...]] = {}
         key_to_linkable_entities: Dict[ElementPathKey, Tuple[LinkableEntity, ...]] = {}
@@ -199,6 +216,10 @@ class LinkableElementSet:
                 for linkable_dimension in linkable_dimensions
                 if len(linkable_dimension.properties.intersection(with_any_of)) > 0
                 and len(linkable_dimension.properties.intersection(without_any_of)) == 0
+                and (
+                    len(without_all_of) == 0
+                    or linkable_dimension.properties.intersection(without_all_of) != without_all_of
+                )
             )
             if len(filtered_linkable_dimensions) > 0:
                 key_to_linkable_dimensions[path_key] = filtered_linkable_dimensions
@@ -209,6 +230,10 @@ class LinkableElementSet:
                 for linkable_entity in linkable_entities
                 if len(linkable_entity.properties.intersection(with_any_of)) > 0
                 and len(linkable_entity.properties.intersection(without_any_of)) == 0
+                and (
+                    len(without_all_of) == 0
+                    or linkable_entity.properties.intersection(without_all_of) != without_all_of
+                )
             )
             if len(filtered_linkable_entities) > 0:
                 key_to_linkable_entities[path_key] = filtered_linkable_entities
@@ -428,7 +453,27 @@ class ValidLinkableSpecResolver:
         for metric in self._semantic_manifest.metrics:
             linkable_sets_for_measure = []
             for measure in metric.measure_references:
-                linkable_sets_for_measure.append(self._get_linkable_element_set_for_measure(measure))
+                # Cumulative metrics currently can't be queried by other time granularities.
+                if metric.type is MetricType.CUMULATIVE:
+                    linkable_sets_for_measure.append(
+                        self._get_linkable_element_set_for_measure(measure).filter(
+                            with_any_of=LinkableElementProperties.all_properties(),
+                            without_all_of=frozenset(
+                                {
+                                    LinkableElementProperties.METRIC_TIME,
+                                    LinkableElementProperties.DERIVED_TIME_GRANULARITY,
+                                }
+                            ),
+                        )
+                    )
+                elif (
+                    metric.type is MetricType.SIMPLE
+                    or metric.type is MetricType.DERIVED
+                    or metric.type is MetricType.RATIO
+                ):
+                    linkable_sets_for_measure.append(self._get_linkable_element_set_for_measure(measure))
+                else:
+                    assert_values_exhausted(metric.type)
 
             self._metric_to_linkable_element_sets[metric.name] = linkable_sets_for_measure
         logger.info(f"Building the [metric -> valid linkable element] index took: {time.time() - start_time:.2f}s")
@@ -448,8 +493,12 @@ class ValidLinkableSpecResolver:
             )
         return semantic_models_where_measure_was_found[0]
 
-    def _get_local_set(self, semantic_model: SemanticModel) -> LinkableElementSet:
-        """Gets the local elements for a given semantic model."""
+    @staticmethod
+    def _get_elements_in_semantic_model(semantic_model: SemanticModel) -> LinkableElementSet:
+        """Gets the elements in the semantic model, without requiring any joins.
+
+        Elements related to metric_time are handled separately in _create_elements_for_metric_time().
+        """
         linkable_dimensions = []
         linkable_entities = []
 
@@ -533,15 +582,92 @@ class ValidLinkableSpecResolver:
                 valid_semantic_models.append(semantic_model)
         return valid_semantic_models
 
-    def _get_linkable_element_set_for_measure(self, measure_reference: MeasureReference) -> LinkableElementSet:
-        """Get the valid linkable elements for the given measure."""
+    @staticmethod
+    def _get_time_granularity_for_dimension(
+        semantic_model: SemanticModel, time_dimension_reference: TimeDimensionReference
+    ) -> TimeGranularity:
+        matching_dimensions = tuple(
+            dimension
+            for dimension in semantic_model.dimensions
+            if dimension.type is DimensionType.TIME and dimension.time_dimension_reference == time_dimension_reference
+        )
+
+        if len(matching_dimensions) != 1:
+            raise RuntimeError(
+                f"Did not find a matching time dimension for {time_dimension_reference} in {semantic_model}"
+            )
+        time_dimension = matching_dimensions[0]
+        type_params = time_dimension.type_params
+        assert (
+            type_params is not None
+        ), f"type_params should have been set for {time_dimension_reference} in {semantic_model}"
+
+        assert (
+            type_params.time_granularity is not None
+        ), f"time_granularity should have been set for {time_dimension_reference} in {semantic_model}"
+
+        return type_params.time_granularity
+
+    def _get_metric_time_elements(self, measure_reference: MeasureReference) -> LinkableElementSet:
+        """Create elements for metric_time for a given measure in a semantic model.
+
+        metric_time is a virtual dimension that is the same as aggregation time dimension for a measure, but with a
+        different name. Because it doesn't actually exist in the semantic model, these elements need to be created based
+        on what aggregation time dimension was used to define the measure.
+        """
         measure_semantic_model = self._get_semantic_model_for_measure(measure_reference)
 
-        # Create local elements
-        local_linkable_elements = self._get_local_set(measure_semantic_model)
-        join_paths = []
+        measure_agg_time_dimension_reference = measure_semantic_model.checked_agg_time_dimension_for_measure(
+            measure_reference=measure_reference
+        )
 
-        # Create 1-hop elements
+        agg_time_dimension_granularity = ValidLinkableSpecResolver._get_time_granularity_for_dimension(
+            semantic_model=measure_semantic_model,
+            time_dimension_reference=measure_agg_time_dimension_reference,
+        )
+
+        # It's possible to aggregate measures to coarser time granularities (except with cumulative metrics).
+        possible_metric_time_granularities = tuple(
+            time_granularity
+            for time_granularity in TimeGranularity
+            if agg_time_dimension_granularity.is_smaller_than_or_equal(time_granularity)
+        )
+
+        # For each of the possible time granularities, create a LinkableDimension for each one.
+        return LinkableElementSet(
+            path_key_to_linkable_dimensions={
+                ElementPathKey(
+                    element_name=DataSet.metric_time_dimension_name(),
+                    entity_links=(),
+                    time_granularity=time_granularity,
+                ): (
+                    LinkableDimension(
+                        semantic_model_origin=measure_semantic_model.reference,
+                        element_name=DataSet.metric_time_dimension_name(),
+                        entity_links=(),
+                        join_path=(),
+                        # Anything that's not at the base time granularity of the measure's aggregation time dimension
+                        # should be considered derived.
+                        properties=frozenset({LinkableElementProperties.METRIC_TIME})
+                        if time_granularity is agg_time_dimension_granularity
+                        else frozenset(
+                            {
+                                LinkableElementProperties.METRIC_TIME,
+                                LinkableElementProperties.DERIVED_TIME_GRANULARITY,
+                            }
+                        ),
+                        time_granularity=time_granularity,
+                    ),
+                )
+                for time_granularity in possible_metric_time_granularities
+            },
+            path_key_to_linkable_entities={},
+        )
+
+    def _get_joined_elements(self, measure_semantic_model: SemanticModel) -> LinkableElementSet:
+        """Get the elements that can be generated by joining other models to the given model."""
+        # Create single-hop elements
+        join_paths = []
         for entity in measure_semantic_model.entities:
             semantic_models = self._get_semantic_models_with_joinable_entity(
                 left_semantic_model_reference=measure_semantic_model.reference,
@@ -560,19 +686,20 @@ class ValidLinkableSpecResolver:
                         )
                     )
                 )
-        all_linkable_elements = LinkableElementSet.merge_by_path_key(
-            [local_linkable_elements]
-            + [
-                x.create_linkable_element_set(
+        single_hop_elements = LinkableElementSet.merge_by_path_key(
+            [
+                join_path.create_linkable_element_set(
                     semantic_model_accessor=self._semantic_model_lookup,
                     with_properties=frozenset({LinkableElementProperties.JOINED}),
                 )
-                for x in join_paths
+                for join_path in join_paths
             ]
         )
 
         # Create multi-hop elements. At each iteration, we generate the list of valid elements based on the current join
         # path, extend all paths to include the next valid semantic model, then repeat.
+        multi_hop_elements = LinkableElementSet(path_key_to_linkable_dimensions={}, path_key_to_linkable_entities={})
+
         for i in range(self._max_entity_links - 1):
             new_join_paths: List[SemanticModelJoinPath] = []
             for join_path in join_paths:
@@ -583,22 +710,39 @@ class ValidLinkableSpecResolver:
                 )
 
             if len(new_join_paths) == 0:
-                return all_linkable_elements
+                break
 
-            all_linkable_elements = LinkableElementSet.merge_by_path_key(
-                [all_linkable_elements]
-                + [
-                    x.create_linkable_element_set(
+            multi_hop_elements = LinkableElementSet.merge_by_path_key(
+                (multi_hop_elements,)
+                + tuple(
+                    new_join_path.create_linkable_element_set(
                         semantic_model_accessor=self._semantic_model_lookup,
                         with_properties=frozenset(
                             {LinkableElementProperties.JOINED, LinkableElementProperties.MULTI_HOP}
                         ),
                     )
-                    for x in new_join_paths
-                ]
+                    for new_join_path in new_join_paths
+                )
             )
             join_paths = new_join_paths
-        return all_linkable_elements
+
+        return LinkableElementSet.merge_by_path_key((single_hop_elements, multi_hop_elements))
+
+    def _get_linkable_element_set_for_measure(self, measure_reference: MeasureReference) -> LinkableElementSet:
+        """Get the valid linkable elements for the given measure."""
+        measure_semantic_model = self._get_semantic_model_for_measure(measure_reference)
+
+        elements_in_semantic_model = self._get_elements_in_semantic_model(measure_semantic_model)
+        metric_time_elements = self._get_metric_time_elements(measure_reference)
+        joined_elements = self._get_joined_elements(measure_semantic_model)
+
+        return LinkableElementSet.merge_by_path_key(
+            (
+                elements_in_semantic_model,
+                metric_time_elements,
+                joined_elements,
+            )
+        )
 
     def get_linkable_elements_for_metrics(
         self,

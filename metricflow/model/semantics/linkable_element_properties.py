@@ -23,6 +23,8 @@ class LinkableElementProperties(Enum):
     DERIVED_TIME_GRANULARITY = "derived_time_granularity"
     # Refers to an entity, not a dimension.
     ENTITY = "entity"
+    # See metric_time in DataSet
+    METRIC_TIME = "metric_time"
 
     @staticmethod
     def all_properties() -> FrozenSet[LinkableElementProperties]:  # noqa: D
@@ -33,5 +35,6 @@ class LinkableElementProperties(Enum):
                 LinkableElementProperties.JOINED,
                 LinkableElementProperties.MULTI_HOP,
                 LinkableElementProperties.DERIVED_TIME_GRANULARITY,
+                LinkableElementProperties.METRIC_TIME,
             }
         )
