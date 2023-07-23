@@ -116,7 +116,12 @@ def test_elements_for_metric(metric_lookup: MetricLookup) -> None:  # noqa: D
             x.qualified_name
             for x in metric_lookup.element_specs_for_metrics(
                 [MetricReference(element_name="views")],
-                without_any_property=frozenset({LinkableElementProperties.DERIVED_TIME_GRANULARITY}),
+                without_any_property=frozenset(
+                    {
+                        LinkableElementProperties.DERIVED_TIME_GRANULARITY,
+                        LinkableElementProperties.METRIC_TIME,
+                    }
+                ),
             )
         ]
     ) == {
@@ -202,7 +207,12 @@ def test_get_semantic_models_for_entity(semantic_model_lookup: SemanticModelLook
 def test_linkable_set(metric_lookup: MetricLookup) -> None:  # noqa: D
     linkable_set = metric_lookup.linkable_set_for_metrics(
         (MetricReference(element_name="views"),),
-        without_any_property=frozenset({LinkableElementProperties.DERIVED_TIME_GRANULARITY}),
+        without_any_property=frozenset(
+            {
+                LinkableElementProperties.DERIVED_TIME_GRANULARITY,
+                LinkableElementProperties.METRIC_TIME,
+            }
+        ),
     )
 
     result_to_compare = sorted(
@@ -253,7 +263,11 @@ def test_linkable_set_for_common_dimensions_in_different_models(metric_lookup: M
     """
     linkable_set = metric_lookup.linkable_set_for_metrics(
         (MetricReference(element_name="bookings_per_view"),),
-        without_any_property=frozenset({LinkableElementProperties.DERIVED_TIME_GRANULARITY}),
+        without_any_property=frozenset(
+            {
+                LinkableElementProperties.DERIVED_TIME_GRANULARITY,
+            }
+        ),
     )
 
     result_to_compare = sorted(
@@ -279,6 +293,8 @@ def test_linkable_set_for_common_dimensions_in_different_models(metric_lookup: M
         ((), "ds", "views_source", ()),
         ((), "ds_partitioned", "bookings_source", ()),
         ((), "ds_partitioned", "views_source", ()),
+        ((), "metric_time", "bookings_source", ()),
+        ((), "metric_time", "views_source", ()),
         (("create_a_cycle_in_the_join_graph",), "booking_paid_at", "bookings_source", ()),
         (("create_a_cycle_in_the_join_graph",), "booking_paid_at", "bookings_source", ()),
         (("create_a_cycle_in_the_join_graph",), "is_instant", "bookings_source", ()),

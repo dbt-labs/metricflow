@@ -31,7 +31,11 @@ def test_linkable_spec_resolver(simple_model_spec_resolver: ValidLinkableSpecRes
     result = simple_model_spec_resolver.get_linkable_elements_for_metrics(
         metric_references=[MetricReference(element_name="bookings"), MetricReference(element_name="views")],
         with_any_of=LinkableElementProperties.all_properties(),
-        without_any_of=frozenset({LinkableElementProperties.DERIVED_TIME_GRANULARITY}),
+        without_any_of=frozenset(
+            {
+                LinkableElementProperties.DERIVED_TIME_GRANULARITY,
+            }
+        ),
     ).as_spec_set
 
     assert [
@@ -56,6 +60,7 @@ def test_linkable_spec_resolver(simple_model_spec_resolver: ValidLinkableSpecRes
         "listing__ds",
         "listing__user__created_at",
         "listing__user__ds_partitioned",
+        "metric_time",
     ] == sorted(tuple(x.qualified_name for x in result.time_dimension_specs))
     assert [
         "create_a_cycle_in_the_join_graph",
@@ -217,6 +222,10 @@ def test_derived_time_granularity_property(simple_model_spec_resolver: ValidLink
             "listing__ds__quarter",
             "listing__ds__week",
             "listing__ds__year",
+            "metric_time__month",
+            "metric_time__quarter",
+            "metric_time__week",
+            "metric_time__year",
             "user__created_at__month",
             "user__created_at__quarter",
             "user__created_at__week",
@@ -235,4 +244,32 @@ def test_entity_property(simple_model_spec_resolver: ValidLinkableSpecResolver) 
         metric_references=[MetricReference(element_name="listings")],
         element_property=LinkableElementProperties.ENTITY,
         expected_names=["listing", "listing__lux_listing", "user", "user__company"],
+    )
+
+
+def test_metric_time_property_for_cumulative_metric(  # noqa: D
+    simple_model_spec_resolver: ValidLinkableSpecResolver,
+) -> None:
+    property_check_helper(
+        spec_resolver=simple_model_spec_resolver,
+        metric_references=[MetricReference(element_name="trailing_2_months_revenue")],
+        element_property=LinkableElementProperties.METRIC_TIME,
+        expected_names=["metric_time"],
+    )
+
+
+def test_metric_time_property_for_derived_metrics(  # noqa: D
+    simple_model_spec_resolver: ValidLinkableSpecResolver,
+) -> None:
+    property_check_helper(
+        spec_resolver=simple_model_spec_resolver,
+        metric_references=[MetricReference(element_name="bookings_per_view")],
+        element_property=LinkableElementProperties.METRIC_TIME,
+        expected_names=[
+            "metric_time",
+            "metric_time__month",
+            "metric_time__quarter",
+            "metric_time__week",
+            "metric_time__year",
+        ],
     )
