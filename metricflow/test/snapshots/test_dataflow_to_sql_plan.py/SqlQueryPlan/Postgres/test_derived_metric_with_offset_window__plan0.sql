@@ -37,11 +37,11 @@ FROM (
             , subq_0.ds_partitioned__month
             , subq_0.ds_partitioned__quarter
             , subq_0.ds_partitioned__year
-            , subq_0.booking_paid_at
-            , subq_0.booking_paid_at__week
-            , subq_0.booking_paid_at__month
-            , subq_0.booking_paid_at__quarter
-            , subq_0.booking_paid_at__year
+            , subq_0.paid_at
+            , subq_0.paid_at__week
+            , subq_0.paid_at__month
+            , subq_0.paid_at__quarter
+            , subq_0.paid_at__year
             , subq_0.ds AS metric_time
             , subq_0.ds__week AS metric_time__week
             , subq_0.ds__month AS metric_time__month
@@ -92,11 +92,11 @@ FROM (
               , DATE_TRUNC('month', bookings_source_src_10001.ds_partitioned) AS ds_partitioned__month
               , DATE_TRUNC('quarter', bookings_source_src_10001.ds_partitioned) AS ds_partitioned__quarter
               , DATE_TRUNC('year', bookings_source_src_10001.ds_partitioned) AS ds_partitioned__year
-              , bookings_source_src_10001.booking_paid_at
-              , DATE_TRUNC('week', bookings_source_src_10001.booking_paid_at) AS booking_paid_at__week
-              , DATE_TRUNC('month', bookings_source_src_10001.booking_paid_at) AS booking_paid_at__month
-              , DATE_TRUNC('quarter', bookings_source_src_10001.booking_paid_at) AS booking_paid_at__quarter
-              , DATE_TRUNC('year', bookings_source_src_10001.booking_paid_at) AS booking_paid_at__year
+              , bookings_source_src_10001.paid_at
+              , DATE_TRUNC('week', bookings_source_src_10001.paid_at) AS paid_at__week
+              , DATE_TRUNC('month', bookings_source_src_10001.paid_at) AS paid_at__month
+              , DATE_TRUNC('quarter', bookings_source_src_10001.paid_at) AS paid_at__quarter
+              , DATE_TRUNC('year', bookings_source_src_10001.paid_at) AS paid_at__year
               , bookings_source_src_10001.listing_id AS listing
               , bookings_source_src_10001.guest_id AS guest
               , bookings_source_src_10001.host_id AS host
@@ -148,11 +148,11 @@ FROM (
               , subq_5.ds_partitioned__month
               , subq_5.ds_partitioned__quarter
               , subq_5.ds_partitioned__year
-              , subq_5.booking_paid_at
-              , subq_5.booking_paid_at__week
-              , subq_5.booking_paid_at__month
-              , subq_5.booking_paid_at__quarter
-              , subq_5.booking_paid_at__year
+              , subq_5.paid_at
+              , subq_5.paid_at__week
+              , subq_5.paid_at__month
+              , subq_5.paid_at__quarter
+              , subq_5.paid_at__year
               , subq_5.ds AS metric_time
               , subq_5.ds__week AS metric_time__week
               , subq_5.ds__month AS metric_time__month
@@ -203,11 +203,11 @@ FROM (
                 , DATE_TRUNC('month', bookings_source_src_10001.ds_partitioned) AS ds_partitioned__month
                 , DATE_TRUNC('quarter', bookings_source_src_10001.ds_partitioned) AS ds_partitioned__quarter
                 , DATE_TRUNC('year', bookings_source_src_10001.ds_partitioned) AS ds_partitioned__year
-                , bookings_source_src_10001.booking_paid_at
-                , DATE_TRUNC('week', bookings_source_src_10001.booking_paid_at) AS booking_paid_at__week
-                , DATE_TRUNC('month', bookings_source_src_10001.booking_paid_at) AS booking_paid_at__month
-                , DATE_TRUNC('quarter', bookings_source_src_10001.booking_paid_at) AS booking_paid_at__quarter
-                , DATE_TRUNC('year', bookings_source_src_10001.booking_paid_at) AS booking_paid_at__year
+                , bookings_source_src_10001.paid_at
+                , DATE_TRUNC('week', bookings_source_src_10001.paid_at) AS paid_at__week
+                , DATE_TRUNC('month', bookings_source_src_10001.paid_at) AS paid_at__month
+                , DATE_TRUNC('quarter', bookings_source_src_10001.paid_at) AS paid_at__quarter
+                , DATE_TRUNC('year', bookings_source_src_10001.paid_at) AS paid_at__year
                 , bookings_source_src_10001.listing_id AS listing
                 , bookings_source_src_10001.guest_id AS guest
                 , bookings_source_src_10001.host_id AS host

@@ -1,5 +1,5 @@
 -- Read Elements From Semantic Model 'bookings_source'
--- Metric Time Dimension 'booking_paid_at'
+-- Metric Time Dimension 'paid_at'
 SELECT
   ds
   , DATE_TRUNC('week', ds) AS ds__week
@@ -11,16 +11,16 @@ SELECT
   , DATE_TRUNC('month', ds_partitioned) AS ds_partitioned__month
   , DATE_TRUNC('quarter', ds_partitioned) AS ds_partitioned__quarter
   , DATE_TRUNC('year', ds_partitioned) AS ds_partitioned__year
-  , booking_paid_at
-  , DATE_TRUNC('week', booking_paid_at) AS booking_paid_at__week
-  , DATE_TRUNC('month', booking_paid_at) AS booking_paid_at__month
-  , DATE_TRUNC('quarter', booking_paid_at) AS booking_paid_at__quarter
-  , DATE_TRUNC('year', booking_paid_at) AS booking_paid_at__year
-  , booking_paid_at AS metric_time
-  , DATE_TRUNC('week', booking_paid_at) AS metric_time__week
-  , DATE_TRUNC('month', booking_paid_at) AS metric_time__month
-  , DATE_TRUNC('quarter', booking_paid_at) AS metric_time__quarter
-  , DATE_TRUNC('year', booking_paid_at) AS metric_time__year
+  , paid_at
+  , DATE_TRUNC('week', paid_at) AS paid_at__week
+  , DATE_TRUNC('month', paid_at) AS paid_at__month
+  , DATE_TRUNC('quarter', paid_at) AS paid_at__quarter
+  , DATE_TRUNC('year', paid_at) AS paid_at__year
+  , paid_at AS metric_time
+  , DATE_TRUNC('week', paid_at) AS metric_time__week
+  , DATE_TRUNC('month', paid_at) AS metric_time__month
+  , DATE_TRUNC('quarter', paid_at) AS metric_time__quarter
+  , DATE_TRUNC('year', paid_at) AS metric_time__year
   , listing_id AS listing
   , guest_id AS guest
   , host_id AS host
