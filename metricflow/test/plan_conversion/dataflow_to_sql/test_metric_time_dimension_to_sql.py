@@ -47,7 +47,7 @@ def test_metric_time_dimension_transform_node_using_non_primary_time(  # noqa: D
     source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
     metric_time_dimension_transform_node = MetricTimeDimensionTransformNode(
         parent_node=source_node,
-        aggregation_time_dimension_reference=TimeDimensionReference(element_name="booking_paid_at"),
+        aggregation_time_dimension_reference=TimeDimensionReference(element_name="paid_at"),
     )
     convert_and_check(
         request=request,

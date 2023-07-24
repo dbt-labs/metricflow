@@ -34,7 +34,7 @@ semantic_model:
     - name: booking_payments
       expr: booking_value
       agg: sum
-      agg_time_dimension: booking_paid_at
+      agg_time_dimension: paid_at
     - name: referred_bookings
       expr: referrer_id
       agg: count
@@ -79,7 +79,7 @@ semantic_model:
       is_partition: true
       type_params:
         time_granularity: day
-    - name: booking_paid_at
+    - name: paid_at
       type: time
       type_params:
         time_granularity: day
