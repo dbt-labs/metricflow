@@ -126,23 +126,23 @@
                             <!-- col10 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
                             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_199),  -->
-                            <!--    'column_alias': 'booking_paid_at'}                     -->
+                            <!--    'column_alias': 'paid_at'}                             -->
                             <!-- col11 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
                             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_200),  -->
-                            <!--    'column_alias': 'booking_paid_at__week'}               -->
+                            <!--    'column_alias': 'paid_at__week'}                       -->
                             <!-- col12 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
                             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_201),  -->
-                            <!--    'column_alias': 'booking_paid_at__month'}              -->
+                            <!--    'column_alias': 'paid_at__month'}                      -->
                             <!-- col13 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
                             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_202),  -->
-                            <!--    'column_alias': 'booking_paid_at__quarter'}            -->
+                            <!--    'column_alias': 'paid_at__quarter'}                    -->
                             <!-- col14 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
                             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_203),  -->
-                            <!--    'column_alias': 'booking_paid_at__year'}               -->
+                            <!--    'column_alias': 'paid_at__year'}                       -->
                             <!-- col15 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
                             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_204),  -->
@@ -339,23 +339,23 @@
                                 <!-- col25 =                                                     -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
                                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10032),  -->
-                                <!--    'column_alias': 'booking_paid_at'}                       -->
+                                <!--    'column_alias': 'paid_at'}                               -->
                                 <!-- col26 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
                                 <!--    'expr': SqlDateTruncExpression(node_id=dt_10012),  -->
-                                <!--    'column_alias': 'booking_paid_at__week'}           -->
+                                <!--    'column_alias': 'paid_at__week'}                   -->
                                 <!-- col27 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
                                 <!--    'expr': SqlDateTruncExpression(node_id=dt_10013),  -->
-                                <!--    'column_alias': 'booking_paid_at__month'}          -->
+                                <!--    'column_alias': 'paid_at__month'}                  -->
                                 <!-- col28 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
                                 <!--    'expr': SqlDateTruncExpression(node_id=dt_10014),  -->
-                                <!--    'column_alias': 'booking_paid_at__quarter'}        -->
+                                <!--    'column_alias': 'paid_at__quarter'}                -->
                                 <!-- col29 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
                                 <!--    'expr': SqlDateTruncExpression(node_id=dt_10015),  -->
-                                <!--    'column_alias': 'booking_paid_at__year'}           -->
+                                <!--    'column_alias': 'paid_at__year'}                   -->
                                 <!-- col30 =                                                     -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
                                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10037),  -->
@@ -505,23 +505,23 @@
                                 <!-- col10 =                                                   -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
                                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_242),  -->
-                                <!--    'column_alias': 'booking_paid_at'}                     -->
+                                <!--    'column_alias': 'paid_at'}                             -->
                                 <!-- col11 =                                                   -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
                                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_243),  -->
-                                <!--    'column_alias': 'booking_paid_at__week'}               -->
+                                <!--    'column_alias': 'paid_at__week'}                       -->
                                 <!-- col12 =                                                   -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
                                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_244),  -->
-                                <!--    'column_alias': 'booking_paid_at__month'}              -->
+                                <!--    'column_alias': 'paid_at__month'}                      -->
                                 <!-- col13 =                                                   -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
                                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_245),  -->
-                                <!--    'column_alias': 'booking_paid_at__quarter'}            -->
+                                <!--    'column_alias': 'paid_at__quarter'}                    -->
                                 <!-- col14 =                                                   -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
                                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_246),  -->
-                                <!--    'column_alias': 'booking_paid_at__year'}               -->
+                                <!--    'column_alias': 'paid_at__year'}                       -->
                                 <!-- col15 =                                                   -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
                                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_247),  -->
@@ -718,23 +718,23 @@
                                     <!-- col25 =                                                     -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
                                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10032),  -->
-                                    <!--    'column_alias': 'booking_paid_at'}                       -->
+                                    <!--    'column_alias': 'paid_at'}                               -->
                                     <!-- col26 =                                               -->
                                     <!--   {'class': 'SqlSelectColumn',                        -->
                                     <!--    'expr': SqlDateTruncExpression(node_id=dt_10012),  -->
-                                    <!--    'column_alias': 'booking_paid_at__week'}           -->
+                                    <!--    'column_alias': 'paid_at__week'}                   -->
                                     <!-- col27 =                                               -->
                                     <!--   {'class': 'SqlSelectColumn',                        -->
                                     <!--    'expr': SqlDateTruncExpression(node_id=dt_10013),  -->
-                                    <!--    'column_alias': 'booking_paid_at__month'}          -->
+                                    <!--    'column_alias': 'paid_at__month'}                  -->
                                     <!-- col28 =                                               -->
                                     <!--   {'class': 'SqlSelectColumn',                        -->
                                     <!--    'expr': SqlDateTruncExpression(node_id=dt_10014),  -->
-                                    <!--    'column_alias': 'booking_paid_at__quarter'}        -->
+                                    <!--    'column_alias': 'paid_at__quarter'}                -->
                                     <!-- col29 =                                               -->
                                     <!--   {'class': 'SqlSelectColumn',                        -->
                                     <!--    'expr': SqlDateTruncExpression(node_id=dt_10015),  -->
-                                    <!--    'column_alias': 'booking_paid_at__year'}           -->
+                                    <!--    'column_alias': 'paid_at__year'}                   -->
                                     <!-- col30 =                                                     -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
                                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10037),  -->
