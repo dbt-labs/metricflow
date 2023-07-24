@@ -6,15 +6,10 @@ import pytest
 from dbt_semantic_interfaces.references import MetricReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
-from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
-from metricflow.dataflow.builder.source_node import SourceNodeBuilder
-from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.dataset.dataset import DataSet
-from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
-from metricflow.test.time.metric_time_dimension import MTD_REFERENCE, MTD_SPEC_DAY, MTD_SPEC_MONTH, MTD_SPEC_YEAR
+from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_MONTH
 from metricflow.time.time_granularity_solver import (
     PartialTimeDimensionSpec,
     RequestTimeGranularityException,
@@ -26,23 +21,8 @@ from metricflow.time.time_granularity_solver import (
 def time_granularity_solver(  # noqa: D
     extended_date_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> TimeGranularitySolver:
-    column_association_resolver = DunderColumnAssociationResolver(extended_date_semantic_manifest_lookup)
-    node_output_resolver = DataflowPlanNodeOutputDataSetResolver[SemanticModelDataSet](
-        column_association_resolver=column_association_resolver,
-        semantic_manifest_lookup=extended_date_semantic_manifest_lookup,
-    )
-    to_data_set_converter = SemanticModelToDataSetConverter(column_association_resolver)
-    source_data_sets = [
-        to_data_set_converter.create_sql_source_data_set(x)
-        for x in extended_date_semantic_manifest_lookup.semantic_manifest.semantic_models
-    ]
-
-    source_node_builder = SourceNodeBuilder(extended_date_semantic_manifest_lookup)
-    source_nodes = source_node_builder.create_from_data_sets(source_data_sets)
     return TimeGranularitySolver(
         semantic_manifest_lookup=extended_date_semantic_manifest_lookup,
-        source_nodes=source_nodes,
-        node_output_resolver=node_output_resolver,
     )
 
 
@@ -113,7 +93,6 @@ def test_granularity_solution_for_day_metric(time_granularity_solver: TimeGranul
     assert time_granularity_solver.resolve_granularity_for_partial_time_dimension_specs(
         metric_references=[MetricReference(element_name="bookings")],
         partial_time_dimension_specs=[PARTIAL_PTD_SPEC],
-        metric_time_dimension_reference=MTD_REFERENCE,
     ) == {
         PARTIAL_PTD_SPEC: MTD_SPEC_DAY,
     }
@@ -123,7 +102,6 @@ def test_granularity_solution_for_month_metric(time_granularity_solver: TimeGran
     assert time_granularity_solver.resolve_granularity_for_partial_time_dimension_specs(
         metric_references=[MetricReference(element_name="bookings_monthly")],
         partial_time_dimension_specs=[PARTIAL_PTD_SPEC],
-        metric_time_dimension_reference=MTD_REFERENCE,
     ) == {
         PARTIAL_PTD_SPEC: MTD_SPEC_MONTH,
     }
@@ -135,7 +113,6 @@ def test_granularity_solution_for_day_and_month_metrics(  # noqa: D
     assert time_granularity_solver.resolve_granularity_for_partial_time_dimension_specs(
         metric_references=[MetricReference(element_name="bookings"), MetricReference(element_name="bookings_monthly")],
         partial_time_dimension_specs=[PARTIAL_PTD_SPEC],
-        metric_time_dimension_reference=MTD_REFERENCE,
     ) == {PARTIAL_PTD_SPEC: MTD_SPEC_MONTH}
 
 
@@ -149,32 +126,6 @@ def test_granularity_error_for_cumulative_metric(  # noqa: D
                 MetricReference(element_name="bookings_monthly"),
             ],
             time_dimension_specs=[MTD_SPEC_MONTH],
-        )
-
-
-def test_time_granularity_parameter(  # noqa: D
-    time_granularity_solver: TimeGranularitySolver,
-) -> None:
-    assert time_granularity_solver.resolve_granularity_for_partial_time_dimension_specs(
-        metric_references=[MetricReference(element_name="bookings"), MetricReference(element_name="bookings_monthly")],
-        partial_time_dimension_specs=[PARTIAL_PTD_SPEC],
-        metric_time_dimension_reference=MTD_REFERENCE,
-        time_granularity=TimeGranularity.YEAR,
-    ) == {PARTIAL_PTD_SPEC: MTD_SPEC_YEAR}
-
-
-def test_invalid_time_granularity_parameter(  # noqa: D
-    time_granularity_solver: TimeGranularitySolver,
-) -> None:
-    with pytest.raises(RequestTimeGranularityException, match="Can't use time granularity.*"):
-        time_granularity_solver.resolve_granularity_for_partial_time_dimension_specs(
-            metric_references=[
-                MetricReference(element_name="bookings"),
-                MetricReference(element_name="bookings_monthly"),
-            ],
-            partial_time_dimension_specs=[PARTIAL_PTD_SPEC],
-            metric_time_dimension_reference=MTD_REFERENCE,
-            time_granularity=TimeGranularity.DAY,
         )
 
 

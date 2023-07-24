@@ -136,8 +136,6 @@ class MetricFlowQueryParser:
         self._metric_time_dimension_reference = DataSet.metric_time_dimension_reference()
         self._time_granularity_solver = TimeGranularitySolver(
             semantic_manifest_lookup=self._model,
-            source_nodes=source_nodes,
-            node_output_resolver=node_output_resolver,
         )
 
     @staticmethod
@@ -371,8 +369,6 @@ class MetricFlowQueryParser:
             self._time_granularity_solver.resolve_granularity_for_partial_time_dimension_specs(
                 metric_references=metric_references,
                 partial_time_dimension_specs=requested_linkable_specs.partial_time_dimension_specs,
-                metric_time_dimension_reference=self._metric_time_dimension_reference,
-                time_granularity=time_granularity,
             )
         )
 
@@ -497,17 +493,25 @@ class MetricFlowQueryParser:
         smallest_primary_time_granularity_in_query = self._find_smallest_metric_time_dimension_spec_granularity(
             time_dimension_specs
         )
-        if smallest_primary_time_granularity_in_query:
-            adjusted_to_granularity = smallest_primary_time_granularity_in_query
+        if smallest_primary_time_granularity_in_query is not None:
+            adjust_to_granularity = smallest_primary_time_granularity_in_query
 
         else:
-            _, adjusted_to_granularity = self._time_granularity_solver.local_dimension_granularity_range(
-                metric_references=metric_references,
-                local_time_dimension_reference=self._metric_time_dimension_reference,
+            partial_metric_time_spec = PartialTimeDimensionSpec(
+                entity_links=(),
+                element_name=DataSet.metric_time_dimension_name(),
             )
-        logger.info(f"Adjusted primary time granularity is {adjusted_to_granularity}")
+            partial_time_dimension_spec_to_time_dimension_spec = (
+                self._time_granularity_solver.resolve_granularity_for_partial_time_dimension_specs(
+                    metric_references=metric_references, partial_time_dimension_specs=(partial_metric_time_spec,)
+                )
+            )
+            adjust_to_granularity = partial_time_dimension_spec_to_time_dimension_spec[
+                partial_metric_time_spec
+            ].time_granularity
+        logger.info(f"Adjusted metric time granularity is {adjust_to_granularity}")
         return self._time_granularity_solver.adjust_time_range_to_granularity(
-            time_range_constraint, adjusted_to_granularity
+            time_range_constraint, adjust_to_granularity
         )
 
     def _find_replacement_for_metric_time_dimension(
@@ -535,16 +539,6 @@ class MetricFlowQueryParser:
             ):
                 return True
         return False
-
-    def _metrics_have_same_time_granularities(self, metric_references: Sequence[MetricReference]) -> bool:
-        (
-            min_granularity,
-            max_granularity,
-        ) = self._time_granularity_solver.local_dimension_granularity_range(
-            metric_references=metric_references,
-            local_time_dimension_reference=self._metric_time_dimension_reference,
-        )
-        return min_granularity == max_granularity
 
     def _find_smallest_metric_time_dimension_spec_granularity(
         self, time_dimension_specs: Sequence[TimeDimensionSpec]
