@@ -446,10 +446,10 @@ integration_test:
   check_query: |
     SELECT
       SUM(booking_value) AS booking_payments
-      , booking_paid_at AS metric_time
+      , paid_at AS metric_time
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
-      booking_paid_at
+      paid_at
 ---
 integration_test:
   name: metrics_with_different_aggregation_time_dimensions
@@ -474,10 +474,10 @@ integration_test:
     FULL OUTER JOIN (
       SELECT
         SUM(booking_value) AS booking_payments
-        , booking_paid_at AS metric_time
+        , paid_at AS metric_time
       FROM {{ source_schema }}.fct_bookings
       GROUP BY
-        booking_paid_at
+        paid_at
     ) b
     ON a.metric_time = b.metric_time
 ---
