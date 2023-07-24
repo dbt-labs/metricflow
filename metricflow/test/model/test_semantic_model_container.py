@@ -219,7 +219,7 @@ def test_linkable_set(metric_lookup: MetricLookup) -> None:  # noqa: D
         tuple(
             (
                 # Checking a limited set of fields as the result is large due to the paths in the object.
-                linkable_dimension.entity_links,
+                tuple(entity_link.element_name for entity_link in linkable_dimension.entity_links),
                 linkable_dimension.element_name,
                 linkable_dimension.semantic_model_origin.semantic_model_name,
             )
@@ -274,7 +274,7 @@ def test_linkable_set_for_common_dimensions_in_different_models(metric_lookup: M
         tuple(
             (
                 # Checking a limited set of fields as the result is large due to the paths in the object.
-                linkable_dimension.entity_links,
+                tuple(entity_link.element_name for entity_link in linkable_dimension.entity_links),
                 linkable_dimension.element_name,
                 linkable_dimension.semantic_model_origin.semantic_model_name,
                 # Abbreviated version of the join path.
