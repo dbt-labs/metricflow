@@ -27,6 +27,17 @@ def simple_model_spec_resolver(  # noqa: D
     )
 
 
+@pytest.fixture
+def cyclic_join_manifest_spec_resolver(  # noqa: D
+    cyclic_join_semantic_manifest_lookup: SemanticManifestLookup,
+) -> ValidLinkableSpecResolver:
+    return ValidLinkableSpecResolver(
+        semantic_manifest=cyclic_join_semantic_manifest_lookup.semantic_manifest,
+        semantic_model_lookup=cyclic_join_semantic_manifest_lookup.semantic_model_lookup,
+        max_entity_links=MAX_JOIN_HOPS,
+    )
+
+
 def test_linkable_spec_resolver(simple_model_spec_resolver: ValidLinkableSpecResolver) -> None:  # noqa: D
     result = simple_model_spec_resolver.get_linkable_elements_for_metrics(
         metric_references=[MetricReference(element_name="bookings"), MetricReference(element_name="views")],
@@ -262,3 +273,31 @@ def test_metric_time_property_for_derived_metrics(  # noqa: D
             "metric_time__year",
         ],
     )
+
+
+def test_cyclic_join_manifest(  # noqa: D
+    cyclic_join_manifest_spec_resolver: ValidLinkableSpecResolver,
+) -> None:
+    result = cyclic_join_manifest_spec_resolver.get_linkable_elements_for_metrics(
+        metric_references=[MetricReference(element_name="listings")],
+        with_any_of=LinkableElementProperties.all_properties(),
+        without_any_of=frozenset(
+            {
+                LinkableElementProperties.DERIVED_TIME_GRANULARITY,
+            }
+        ),
+    ).as_spec_set
+
+    assert [
+        "country_latest",
+        "cyclic_entity",
+        "cyclic_entity__capacity_latest",
+        "cyclic_entity__listing",
+        "ds",
+        "listing",
+        "listing__capacity_latest",
+        "listing__country_latest",
+        "listing__cyclic_entity",
+        "listing__ds",
+        "metric_time",
+    ] == sorted([spec.qualified_name for spec in result.as_tuple])

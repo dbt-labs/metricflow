@@ -1,0 +1,35 @@
+---
+semantic_model:
+  name: listings_latest
+  description: listings_latest
+
+  node_relation:
+    schema_name: $source_schema
+    alias: dim_listings_latest
+
+  defaults:
+    agg_time_dimension: ds
+
+  measures:
+    - name: listings
+      expr: 1
+      agg: sum
+      create_metric: true
+
+  dimensions:
+    - name: ds
+      type: time
+      expr: created_at
+      type_params:
+        time_granularity: day
+    - name: country_latest
+      type: categorical
+      expr: country
+
+  entities:
+    - name: listing
+      type: primary
+      expr: listing_id
+    - name: cyclic_entity
+      type: unique
+      expr: listing_id
