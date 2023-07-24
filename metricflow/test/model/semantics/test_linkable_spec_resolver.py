@@ -39,10 +39,6 @@ def test_linkable_spec_resolver(simple_model_spec_resolver: ValidLinkableSpecRes
     ).as_spec_set
 
     assert [
-        "create_a_cycle_in_the_join_graph__is_instant",
-        "create_a_cycle_in_the_join_graph__listing__capacity_latest",
-        "create_a_cycle_in_the_join_graph__listing__country_latest",
-        "create_a_cycle_in_the_join_graph__listing__is_lux_latest",
         "listing__capacity_latest",
         "listing__country_latest",
         "listing__is_lux_latest",
@@ -51,9 +47,6 @@ def test_linkable_spec_resolver(simple_model_spec_resolver: ValidLinkableSpecRes
         "listing__user__home_state_latest",
     ] == sorted(tuple(x.qualified_name for x in result.dimension_specs))
     assert [
-        "create_a_cycle_in_the_join_graph__booking_paid_at",
-        "create_a_cycle_in_the_join_graph__listing__created_at",
-        "create_a_cycle_in_the_join_graph__listing__ds",
         "ds",
         "ds_partitioned",
         "listing__created_at",
@@ -63,10 +56,6 @@ def test_linkable_spec_resolver(simple_model_spec_resolver: ValidLinkableSpecRes
         "metric_time",
     ] == sorted(tuple(x.qualified_name for x in result.time_dimension_specs))
     assert [
-        "create_a_cycle_in_the_join_graph",
-        "create_a_cycle_in_the_join_graph__listing",
-        "create_a_cycle_in_the_join_graph__listing__lux_listing",
-        "create_a_cycle_in_the_join_graph__listing__user",
         "listing",
         "listing__lux_listing",
         "listing__user",

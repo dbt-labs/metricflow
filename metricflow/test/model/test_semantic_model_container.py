@@ -74,7 +74,6 @@ def test_get_names(semantic_model_lookup: SemanticModelLookup) -> None:  # noqa:
 
     expected = [
         "company",
-        "create_a_cycle_in_the_join_graph",
         "guest",
         "host",
         "listing",
@@ -125,19 +124,6 @@ def test_elements_for_metric(metric_lookup: MetricLookup) -> None:  # noqa: D
             )
         ]
     ) == {
-        "create_a_cycle_in_the_join_graph",
-        "create_a_cycle_in_the_join_graph__booking_paid_at",
-        "create_a_cycle_in_the_join_graph__guest",
-        "create_a_cycle_in_the_join_graph__host",
-        "create_a_cycle_in_the_join_graph__is_instant",
-        "create_a_cycle_in_the_join_graph__listing",
-        "create_a_cycle_in_the_join_graph__listing__ds",
-        "create_a_cycle_in_the_join_graph__listing__capacity_latest",
-        "create_a_cycle_in_the_join_graph__listing__country_latest",
-        "create_a_cycle_in_the_join_graph__listing__created_at",
-        "create_a_cycle_in_the_join_graph__listing__is_lux_latest",
-        "create_a_cycle_in_the_join_graph__listing__user",
-        "create_a_cycle_in_the_join_graph__listing__lux_listing",
         "ds",
         "ds_partitioned",
         "listing",
@@ -169,7 +155,6 @@ def test_elements_for_metric(metric_lookup: MetricLookup) -> None:  # noqa: D
         without_any_property=frozenset({LinkableElementProperties.DERIVED_TIME_GRANULARITY}),
     )
     assert set([x.qualified_name for x in local_specs]) == {
-        "create_a_cycle_in_the_join_graph",
         "ds",
         "ds_partitioned",
         "listing",
@@ -231,13 +216,6 @@ def test_linkable_set(metric_lookup: MetricLookup) -> None:  # noqa: D
     assert result_to_compare == [
         ((), "ds", "views_source"),
         ((), "ds_partitioned", "views_source"),
-        (("create_a_cycle_in_the_join_graph",), "booking_paid_at", "bookings_source"),
-        (("create_a_cycle_in_the_join_graph",), "is_instant", "bookings_source"),
-        (("create_a_cycle_in_the_join_graph", "listing"), "capacity_latest", "listings_latest"),
-        (("create_a_cycle_in_the_join_graph", "listing"), "country_latest", "listings_latest"),
-        (("create_a_cycle_in_the_join_graph", "listing"), "created_at", "listings_latest"),
-        (("create_a_cycle_in_the_join_graph", "listing"), "ds", "listings_latest"),
-        (("create_a_cycle_in_the_join_graph", "listing"), "is_lux_latest", "listings_latest"),
         (("listing",), "capacity_latest", "listings_latest"),
         (("listing",), "country_latest", "listings_latest"),
         (("listing",), "created_at", "listings_latest"),
@@ -295,48 +273,6 @@ def test_linkable_set_for_common_dimensions_in_different_models(metric_lookup: M
         ((), "ds_partitioned", "views_source", ()),
         ((), "metric_time", "bookings_source", ()),
         ((), "metric_time", "views_source", ()),
-        (("create_a_cycle_in_the_join_graph",), "booking_paid_at", "bookings_source", ()),
-        (("create_a_cycle_in_the_join_graph",), "booking_paid_at", "bookings_source", ()),
-        (("create_a_cycle_in_the_join_graph",), "is_instant", "bookings_source", ()),
-        (("create_a_cycle_in_the_join_graph",), "is_instant", "bookings_source", ("bookings_source",)),
-        (
-            ("create_a_cycle_in_the_join_graph", "listing"),
-            "capacity_latest",
-            "listings_latest",
-            ("bookings_source", "listings_latest"),
-        ),
-        (
-            ("create_a_cycle_in_the_join_graph", "listing"),
-            "capacity_latest",
-            "listings_latest",
-            ("views_source", "listings_latest"),
-        ),
-        (
-            ("create_a_cycle_in_the_join_graph", "listing"),
-            "country_latest",
-            "listings_latest",
-            ("bookings_source", "listings_latest"),
-        ),
-        (
-            ("create_a_cycle_in_the_join_graph", "listing"),
-            "country_latest",
-            "listings_latest",
-            ("views_source", "listings_latest"),
-        ),
-        (("create_a_cycle_in_the_join_graph", "listing"), "created_at", "listings_latest", ()),
-        (("create_a_cycle_in_the_join_graph", "listing"), "ds", "listings_latest", ()),
-        (
-            ("create_a_cycle_in_the_join_graph", "listing"),
-            "is_lux_latest",
-            "listings_latest",
-            ("bookings_source", "listings_latest"),
-        ),
-        (
-            ("create_a_cycle_in_the_join_graph", "listing"),
-            "is_lux_latest",
-            "listings_latest",
-            ("views_source", "listings_latest"),
-        ),
         (("listing",), "capacity_latest", "listings_latest", ("listings_latest",)),
         (("listing",), "country_latest", "listings_latest", ("listings_latest",)),
         (("listing",), "created_at", "listings_latest", ()),
