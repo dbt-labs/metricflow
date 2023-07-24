@@ -7,8 +7,8 @@ from pathlib import Path
 import pytest
 
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.protocols.sql_client import SqlClient
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 from metricflow.test.source_schema_tools import create_tables_listed_in_table_snapshot_repository
 from metricflow.test.table_snapshot.table_snapshots import (
     SqlTableSnapshotRepository,
@@ -66,7 +66,7 @@ def check_time_spine_source(
 @pytest.fixture(scope="session")
 def create_source_tables(
     mf_test_session_state: MetricFlowTestSessionState,
-    sql_client: SqlClient,
+    ddl_sql_client: SqlClientWithDDLMethods,
     source_table_snapshot_repository: SqlTableSnapshotRepository,
 ) -> None:
     """Creates all tables that should be in the source schema.
@@ -81,7 +81,7 @@ def create_source_tables(
         return
 
     create_tables_listed_in_table_snapshot_repository(
-        sql_client=sql_client,
+        ddl_sql_client=ddl_sql_client,
         schema_name=mf_test_session_state.mf_source_schema,
         table_snapshot_repository=source_table_snapshot_repository,
     )

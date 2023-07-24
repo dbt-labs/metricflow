@@ -16,8 +16,8 @@ from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.implementations.base import FrozenBaseModel
 
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.protocols.sql_client import SqlClient
 from metricflow.specs.specs import hash_items
+from metricflow.test.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 
 logger = logging.getLogger(__name__)
 
@@ -125,14 +125,14 @@ class SqlTableSnapshot(FrozenBaseModel):
 class SqlTableSnapshotLoader:
     """Loads a snapshot of a table into the SQL engine."""
 
-    def __init__(self, sql_client: SqlClient, schema_name: str) -> None:  # noqa: D
-        self._sql_client = sql_client
+    def __init__(self, ddl_sql_client: SqlClientWithDDLMethods, schema_name: str) -> None:  # noqa: D
+        self._ddl_sql_client = ddl_sql_client
         self._schema_name = schema_name
 
     def load(self, table_snapshot: SqlTableSnapshot) -> None:  # noqa: D
         sql_table = SqlTable(schema_name=self._schema_name, table_name=table_snapshot.table_name)
 
-        self._sql_client.create_table_from_dataframe(
+        self._ddl_sql_client.create_table_from_dataframe(
             sql_table=sql_table,
             df=table_snapshot.as_df,
             # Without this set, the insert queries may be too long.

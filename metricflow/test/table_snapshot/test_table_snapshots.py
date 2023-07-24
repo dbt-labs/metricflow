@@ -7,10 +7,11 @@ import pandas as pd
 import pytest
 from dbt_semantic_interfaces.test_utils import as_datetime
 
-from metricflow.protocols.sql_client import SqlClient, SqlEngine
+from metricflow.protocols.sql_client import SqlEngine
 from metricflow.random_id import random_id
 from metricflow.test.compare_df import assert_dataframes_equal
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 from metricflow.test.table_snapshot.table_snapshots import (
     SqlTableColumnDefinition,
     SqlTableColumnType,
@@ -56,26 +57,28 @@ def test_as_df(table_snapshot: SqlTableSnapshot) -> None:
 
 
 def test_load(
-    mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient, table_snapshot: SqlTableSnapshot
+    mf_test_session_state: MetricFlowTestSessionState,
+    ddl_sql_client: SqlClientWithDDLMethods,
+    table_snapshot: SqlTableSnapshot,
 ) -> None:
     """Test loading a snapshot to the engine."""
     schema_name = f"mf_test_snapshot_schema_{random_id()}"
 
     try:
-        sql_client.create_schema(schema_name)
+        ddl_sql_client.create_schema(schema_name)
 
-        snapshot_loader = SqlTableSnapshotLoader(sql_client=sql_client, schema_name=schema_name)
+        snapshot_loader = SqlTableSnapshotLoader(ddl_sql_client=ddl_sql_client, schema_name=schema_name)
         snapshot_loader.load(table_snapshot)
 
-        actual = sql_client.query(f"SELECT * FROM {schema_name}.{table_snapshot.table_name}")
+        actual = ddl_sql_client.query(f"SELECT * FROM {schema_name}.{table_snapshot.table_name}")
         assert_dataframes_equal(
             actual=actual,
             expected=table_snapshot.as_df,
-            compare_names_using_lowercase=sql_client.sql_engine_type is SqlEngine.SNOWFLAKE,
+            compare_names_using_lowercase=ddl_sql_client.sql_engine_type is SqlEngine.SNOWFLAKE,
         )
 
     finally:
-        sql_client.drop_schema(schema_name, cascade=True)
+        ddl_sql_client.drop_schema(schema_name, cascade=True)
 
 
 def test_snapshot_repository() -> None:

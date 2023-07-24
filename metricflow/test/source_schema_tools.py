@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import logging
 
-from metricflow.protocols.sql_client import SqlClient
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 from metricflow.test.table_snapshot.table_snapshots import (
     SqlTableSnapshotLoader,
     SqlTableSnapshotRepository,
@@ -13,12 +13,12 @@ logger = logging.getLogger(__name__)
 
 
 def create_tables_listed_in_table_snapshot_repository(
-    sql_client: SqlClient,
+    ddl_sql_client: SqlClientWithDDLMethods,
     schema_name: str,
     table_snapshot_repository: SqlTableSnapshotRepository,
 ) -> None:
     """Creates all tables in the table snapshot repository in the given schema."""
-    snapshot_loader = SqlTableSnapshotLoader(sql_client=sql_client, schema_name=schema_name)
+    snapshot_loader = SqlTableSnapshotLoader(ddl_sql_client=ddl_sql_client, schema_name=schema_name)
     for table_snapshot in table_snapshot_repository.table_snapshots:
         logger.info(f"Loading: {table_snapshot.table_name}")
         snapshot_loader.load(table_snapshot)
@@ -35,7 +35,7 @@ POPULATE_SOURCE_SCHEMA_SHELL_COMMAND = (
 
 def populate_source_schema(
     mf_test_session_state: MetricFlowTestSessionState,
-    sql_client: SqlClient,
+    ddl_sql_client: SqlClientWithDDLMethods,
     source_table_snapshot_repository: SqlTableSnapshotRepository,
 ) -> None:
     """Populate the source schema with the tables listed in table_snapshots.
@@ -50,11 +50,11 @@ def populate_source_schema(
     schema_name = mf_test_session_state.mf_source_schema
 
     logger.info(f"Dropping schema {schema_name}")
-    sql_client.drop_schema(schema_name=schema_name, cascade=True)
+    ddl_sql_client.drop_schema(schema_name=schema_name, cascade=True)
     logger.info(f"Creating schema {schema_name}")
-    sql_client.create_schema(schema_name=schema_name)
+    ddl_sql_client.create_schema(schema_name=schema_name)
     create_tables_listed_in_table_snapshot_repository(
-        sql_client=sql_client,
+        ddl_sql_client=ddl_sql_client,
         schema_name=schema_name,
         table_snapshot_repository=source_table_snapshot_repository,
     )

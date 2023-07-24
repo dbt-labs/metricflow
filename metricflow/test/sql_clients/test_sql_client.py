@@ -14,6 +14,7 @@ from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_column_type import SqlColumnType
 from metricflow.test.compare_df import assert_dataframes_equal
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 
 logger = logging.getLogger(__name__)
 
@@ -106,7 +107,7 @@ def test_failed_query_with_execution_params(sql_client: SqlClient) -> None:  # n
 
 
 def test_create_table_from_dataframe(  # noqa: D
-    mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient
+    mf_test_session_state: MetricFlowTestSessionState, ddl_sql_client: SqlClientWithDDLMethods
 ) -> None:
     expected_df = pd.DataFrame(
         columns=["int_col", "str_col", "float_col", "bool_col", "time_col"],
@@ -119,13 +120,13 @@ def test_create_table_from_dataframe(  # noqa: D
         ],
     )
     sql_table = SqlTable(schema_name=mf_test_session_state.mf_system_schema, table_name=_random_table())
-    sql_client.create_table_from_dataframe(sql_table=sql_table, df=expected_df)
+    ddl_sql_client.create_table_from_dataframe(sql_table=sql_table, df=expected_df)
 
-    actual_df = sql_client.query(f"SELECT * FROM {sql_table.sql}")
+    actual_df = ddl_sql_client.query(f"SELECT * FROM {sql_table.sql}")
     assert_dataframes_equal(
         actual=actual_df,
         expected=expected_df,
-        compare_names_using_lowercase=sql_client.sql_engine_type is SqlEngine.SNOWFLAKE,
+        compare_names_using_lowercase=ddl_sql_client.sql_engine_type is SqlEngine.SNOWFLAKE,
     )
 
 
