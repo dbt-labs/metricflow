@@ -38,6 +38,8 @@ semantic_model:
     - name: account_type
       type: categorical
 
+  primary_entity: account
+
   entities:
     - name: user
       type: foreign
