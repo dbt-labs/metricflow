@@ -243,3 +243,13 @@ def data_warehouse_validation_model(template_mapping: Dict[str, str]) -> Semanti
         template_mapping=template_mapping,
     )
     return build_result.semantic_manifest
+
+
+@pytest.fixture(scope="session")
+def cyclic_join_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> SemanticManifestLookup:
+    """Manifest that contains a potential cycle in the join graph (if not handled properly)."""
+    build_result = parse_directory_of_yaml_files_to_semantic_manifest(
+        os.path.join(os.path.dirname(__file__), "semantic_manifest_yamls/cyclic_join_manifest"),
+        template_mapping=template_mapping,
+    )
+    return SemanticManifestLookup(build_result.semantic_manifest)

@@ -1,0 +1,21 @@
+---
+semantic_model:
+  name: listings_latest_cyclic
+  description: This can create a join cycle with listings_latest since they share primary / unique keys.
+
+  node_relation:
+    schema_name: $source_schema
+    alias: dim_listings_latest
+
+  dimensions:
+    - name: capacity_latest
+      type: categorical
+      expr: capacity
+
+  entities:
+    - name: listing
+      type: primary
+      expr: listing_id
+    - name: cyclic_entity
+      type: unique
+      expr: listing_id
