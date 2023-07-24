@@ -94,6 +94,3 @@ semantic_model:
     - name: host
       type: foreign
       expr: host_id
-    - name: create_a_cycle_in_the_join_graph
-      type: primary
-      expr: guest_id
