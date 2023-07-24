@@ -30,7 +30,6 @@ def metric_lookup(  # Noqa: D
 def test_get_names(semantic_model_lookup: SemanticModelLookup) -> None:  # noqa: D
     expected = [
         "account_type",
-        "booking_paid_at",
         "capacity_latest",
         "company_name",
         "country_latest",
@@ -41,6 +40,7 @@ def test_get_names(semantic_model_lookup: SemanticModelLookup) -> None:  # noqa:
         "home_state_latest",
         "is_instant",
         "is_lux_latest",
+        "paid_at",
         "verification_type",
     ]
     assert sorted([d.element_name for d in semantic_model_lookup.get_dimension_references()]) == expected

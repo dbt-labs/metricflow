@@ -6,7 +6,7 @@ table_snapshot:
       type: TIME
     - name: dt_partitioned
       type: TIME
-    - name: booking_paid_at
+    - name: paid_at
       type: TIME
     - name: guest_id
       type: STRING
