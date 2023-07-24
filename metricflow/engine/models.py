@@ -19,7 +19,7 @@ from dbt_semantic_interfaces.transformations.add_input_metric_measures import Ad
 from dbt_semantic_interfaces.type_enums.entity_type import EntityType
 
 from metricflow.model.semantics.linkable_spec_resolver import ElementPathKey
-from metricflow.specs.specs import DimensionSpec, EntityReference
+from metricflow.specs.specs import DimensionSpec
 
 
 @dataclass(frozen=True)
@@ -75,7 +75,7 @@ class Dimension:
         """Build from pydantic Dimension and entity_key."""
         qualified_name = DimensionSpec(
             element_name=path_key.element_name,
-            entity_links=tuple(EntityReference(element_name=x) for x in path_key.entity_links),
+            entity_links=path_key.entity_links,
         ).qualified_name
         return cls(
             name=pydantic_dimension.name,

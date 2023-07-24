@@ -44,7 +44,7 @@ class ElementPathKey:
     """A key that can uniquely identify an element and the joins used to realize the element."""
 
     element_name: str
-    entity_links: Tuple[str, ...]
+    entity_links: Tuple[EntityReference, ...]
     time_granularity: Optional[TimeGranularity]
 
 
@@ -55,7 +55,7 @@ class LinkableDimension:
     # The semantic model where this dimension was defined.
     semantic_model_origin: SemanticModelReference
     element_name: str
-    entity_links: Tuple[str, ...]
+    entity_links: Tuple[EntityReference, ...]
     join_path: Tuple[SemanticModelJoinPathElement, ...]
     properties: FrozenSet[LinkableElementProperties]
     time_granularity: Optional[TimeGranularity] = None
@@ -81,7 +81,7 @@ class LinkableEntity:
     semantic_model_origin: SemanticModelReference
     element_name: str
     properties: FrozenSet[LinkableElementProperties]
-    entity_links: Tuple[str, ...]
+    entity_links: Tuple[EntityReference, ...]
     join_path: Tuple[SemanticModelJoinPathElement, ...]
 
     @property
@@ -249,7 +249,7 @@ class LinkableElementSet:
             dimension_specs=tuple(
                 DimensionSpec(
                     element_name=path_key.element_name,
-                    entity_links=tuple(EntityReference(element_name=x) for x in path_key.entity_links),
+                    entity_links=path_key.entity_links,
                 )
                 for path_key in self.path_key_to_linkable_dimensions.keys()
                 if not path_key.time_granularity
@@ -257,7 +257,7 @@ class LinkableElementSet:
             time_dimension_specs=tuple(
                 TimeDimensionSpec(
                     element_name=path_key.element_name,
-                    entity_links=tuple(EntityReference(element_name=x) for x in path_key.entity_links),
+                    entity_links=path_key.entity_links,
                     time_granularity=path_key.time_granularity,
                 )
                 for path_key in self.path_key_to_linkable_dimensions.keys()
@@ -266,7 +266,7 @@ class LinkableElementSet:
             entity_specs=tuple(
                 EntitySpec(
                     element_name=path_key.element_name,
-                    entity_links=tuple(EntityReference(element_name=x) for x in path_key.entity_links),
+                    entity_links=path_key.entity_links,
                 )
                 for path_key in self.path_key_to_linkable_entities
             ),
@@ -294,13 +294,13 @@ class SemanticModelJoinPathElement:
     """Describes joining a semantic model by the given entity."""
 
     semantic_model_reference: SemanticModelReference
-    join_on_entity: str
+    join_on_entity: EntityReference
 
 
 def _generate_linkable_time_dimensions(
     semantic_model_origin: SemanticModelReference,
     dimension: Dimension,
-    entity_links: Tuple[str, ...],
+    entity_links: Tuple[EntityReference, ...],
     join_path: Sequence[SemanticModelJoinPathElement],
     with_properties: FrozenSet[LinkableElementProperties],
 ) -> Sequence[LinkableDimension]:
@@ -384,7 +384,7 @@ class SemanticModelJoinPath:
 
         for entity in semantic_model.entities:
             # Avoid creating "booking_id__booking_id"
-            if entity.reference.element_name != entity_links[-1]:
+            if entity.reference != entity_links[-1]:
                 linkable_entities.append(
                     LinkableEntity(
                         semantic_model_origin=semantic_model.reference,
@@ -548,7 +548,7 @@ class ValidLinkableSpecResolver:
                         LinkableDimension(
                             semantic_model_origin=semantic_model.reference,
                             element_name=linkable_dimension.element_name,
-                            entity_links=(entity.reference.element_name,),
+                            entity_links=(entity.reference,),
                             join_path=(),
                             time_granularity=linkable_dimension.time_granularity,
                             properties=frozenset(linkable_dimension.properties.union(properties)),
@@ -681,7 +681,7 @@ class ValidLinkableSpecResolver:
                         path_elements=(
                             SemanticModelJoinPathElement(
                                 semantic_model_reference=semantic_model.reference,
-                                join_on_entity=entity.reference.element_name,
+                                join_on_entity=entity.reference,
                             ),
                         )
                     )
@@ -781,10 +781,10 @@ class ValidLinkableSpecResolver:
         new_join_paths = []
 
         for entity in last_semantic_model_in_path.entities:
-            entity_name = entity.reference.element_name
+            entity_reference = entity.reference
 
             # Don't create cycles in the join path by joining on the same entity.
-            if entity_name in set(x.join_on_entity for x in current_join_path.path_elements):
+            if entity_reference in set(x.join_on_entity for x in current_join_path.path_elements):
                 continue
 
             semantic_models_that_can_be_joined = self._get_semantic_models_with_joinable_entity(
@@ -805,7 +805,7 @@ class ValidLinkableSpecResolver:
                     path_elements=current_join_path.path_elements
                     + (
                         SemanticModelJoinPathElement(
-                            semantic_model_reference=semantic_model.reference, join_on_entity=entity_name
+                            semantic_model_reference=semantic_model.reference, join_on_entity=entity_reference
                         ),
                     )
                 )
