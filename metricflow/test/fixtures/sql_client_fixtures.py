@@ -9,9 +9,9 @@ import sqlalchemy
 from dbt.adapters.factory import get_adapter_by_type
 from dbt.cli.main import dbtRunner
 
-from metricflow.cli.dbt_connectors.adapter_backed_client import AdapterBackedSqlClient
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState, dialect_from_url
+from metricflow.test.fixtures.sql_clients.adapter_backed_ddl_client import AdapterBackedDDLSqlClient
 from metricflow.test.fixtures.sql_clients.big_query import BigQuerySqlClient
 from metricflow.test.fixtures.sql_clients.common_client import SqlDialect
 from metricflow.test.fixtures.sql_clients.databricks import DatabricksSqlClient
@@ -81,13 +81,13 @@ def make_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithD
         assert len(warehouses) == 1, f"Found more than 1 warehouse in Snowflake URL: `{warehouses}`"
         os.environ[MF_SQL_ENGINE_WAREHOUSE] = warehouses[0]
         __initialize_dbt()
-        return AdapterBackedSqlClient(adapter=get_adapter_by_type("snowflake"))
+        return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("snowflake"))
     elif dialect == SqlDialect.BIGQUERY:
         return BigQuerySqlClient.from_connection_details(url, password)
     elif dialect == SqlDialect.POSTGRESQL:
         configure_test_env_from_url(url, schema)
         __initialize_dbt()
-        return AdapterBackedSqlClient(adapter=get_adapter_by_type("postgres"))
+        return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("postgres"))
     elif dialect == SqlDialect.DUCKDB:
         return DuckDbSqlClient.from_connection_details(url, password)
     elif dialect == SqlDialect.DATABRICKS:
