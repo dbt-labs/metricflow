@@ -10,7 +10,7 @@ from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 
 from metricflow.errors.errors import SqlBindParametersNotSupportedError
-from metricflow.logging.formatting import indent_log_line
+from metricflow.formatting import indent_log_line
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.random_id import random_id
 from metricflow.sql.render.postgres import PostgresSQLSqlQueryPlanRenderer

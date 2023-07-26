@@ -29,7 +29,7 @@ from metricflow.errors.errors import ExecutionException
 from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
 from metricflow.execution.execution_plan_to_text import execution_plan_to_text
 from metricflow.execution.executor import SequentialPlanExecutor
-from metricflow.logging.formatting import indent_log_line
+from metricflow.formatting import indent_log_line
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.model.semantics.linkable_element_properties import (
     LinkableElementProperties,
