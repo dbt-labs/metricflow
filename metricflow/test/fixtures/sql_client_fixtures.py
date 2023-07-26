@@ -9,12 +9,13 @@ import sqlalchemy
 from dbt.adapters.factory import get_adapter_by_type
 from dbt.cli.main import dbtRunner
 
-from metricflow.cli.dbt_connectors.adapter_backed_client import AdapterBackedSqlClient
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState, dialect_from_url
+from metricflow.test.fixtures.sql_clients.adapter_backed_ddl_client import AdapterBackedDDLSqlClient
 from metricflow.test.fixtures.sql_clients.big_query import BigQuerySqlClient
 from metricflow.test.fixtures.sql_clients.common_client import SqlDialect
 from metricflow.test.fixtures.sql_clients.databricks import DatabricksSqlClient
+from metricflow.test.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 from metricflow.test.fixtures.sql_clients.duckdb import DuckDbSqlClient
 from metricflow.test.fixtures.sql_clients.redshift import RedshiftSqlClient
 
@@ -66,7 +67,7 @@ def __initialize_dbt() -> None:
     dbtRunner().invoke(["-q", "debug"], project_dir=dbt_dir, PROFILES_DIR=dbt_dir)
 
 
-def make_test_sql_client(url: str, password: str, schema: str) -> SqlClient:
+def make_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithDDLMethods:
     """Build SQL client based on env configs."""
     # TODO: Switch on an enum of adapter type when all engines are cut over
     dialect = dialect_from_url(url=url)
@@ -80,13 +81,13 @@ def make_test_sql_client(url: str, password: str, schema: str) -> SqlClient:
         assert len(warehouses) == 1, f"Found more than 1 warehouse in Snowflake URL: `{warehouses}`"
         os.environ[MF_SQL_ENGINE_WAREHOUSE] = warehouses[0]
         __initialize_dbt()
-        return AdapterBackedSqlClient(adapter=get_adapter_by_type("snowflake"))
+        return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("snowflake"))
     elif dialect == SqlDialect.BIGQUERY:
         return BigQuerySqlClient.from_connection_details(url, password)
     elif dialect == SqlDialect.POSTGRESQL:
         configure_test_env_from_url(url, schema)
         __initialize_dbt()
-        return AdapterBackedSqlClient(adapter=get_adapter_by_type("postgres"))
+        return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("postgres"))
     elif dialect == SqlDialect.DUCKDB:
         return DuckDbSqlClient.from_connection_details(url, password)
     elif dialect == SqlDialect.DATABRICKS:
@@ -96,8 +97,12 @@ def make_test_sql_client(url: str, password: str, schema: str) -> SqlClient:
 
 
 @pytest.fixture(scope="session")
-def sql_client(mf_test_session_state: MetricFlowTestSessionState) -> Generator[SqlClient, None, None]:
-    """Provides an SqlClient requiring warehouse access."""
+def ddl_sql_client(mf_test_session_state: MetricFlowTestSessionState) -> Generator[SqlClientWithDDLMethods, None, None]:
+    """Provides a SqlClient with the necessary DDL and data loading methods for test configuration.
+
+    This allows us to provide the operations necessary for executing the test suite without exposing those methods in
+    MetricFlow's core SqlClient protocol.
+    """
     sql_client = make_test_sql_client(
         url=mf_test_session_state.sql_engine_url,
         password=mf_test_session_state.sql_engine_password,
@@ -122,3 +127,12 @@ def sql_client(mf_test_session_state: MetricFlowTestSessionState) -> Generator[S
 
     sql_client.close()
     return None
+
+
+@pytest.fixture(scope="session")
+def sql_client(ddl_sql_client: SqlClientWithDDLMethods) -> SqlClient:
+    """Provides a standard SqlClient instance for running MetricFlow tests.
+
+    Unless the test case itself requires the DDL methods, this is the fixture we should use.
+    """
+    return ddl_sql_client

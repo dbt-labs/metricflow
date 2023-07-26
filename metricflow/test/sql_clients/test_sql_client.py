@@ -14,6 +14,7 @@ from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_column_type import SqlColumnType
 from metricflow.test.compare_df import assert_dataframes_equal
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 
 logger = logging.getLogger(__name__)
 
@@ -106,7 +107,7 @@ def test_failed_query_with_execution_params(sql_client: SqlClient) -> None:  # n
 
 
 def test_create_table_from_dataframe(  # noqa: D
-    mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient
+    mf_test_session_state: MetricFlowTestSessionState, ddl_sql_client: SqlClientWithDDLMethods
 ) -> None:
     expected_df = pd.DataFrame(
         columns=["int_col", "str_col", "float_col", "bool_col", "time_col"],
@@ -119,20 +120,14 @@ def test_create_table_from_dataframe(  # noqa: D
         ],
     )
     sql_table = SqlTable(schema_name=mf_test_session_state.mf_system_schema, table_name=_random_table())
-    sql_client.create_table_from_dataframe(sql_table=sql_table, df=expected_df)
+    ddl_sql_client.create_table_from_dataframe(sql_table=sql_table, df=expected_df)
 
-    actual_df = sql_client.query(f"SELECT * FROM {sql_table.sql}")
+    actual_df = ddl_sql_client.query(f"SELECT * FROM {sql_table.sql}")
     assert_dataframes_equal(
         actual=actual_df,
         expected=expected_df,
-        compare_names_using_lowercase=sql_client.sql_engine_type is SqlEngine.SNOWFLAKE,
+        compare_names_using_lowercase=ddl_sql_client.sql_engine_type is SqlEngine.SNOWFLAKE,
     )
-
-
-def test_table_exists(mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient) -> None:  # noqa: D
-    sql_table = SqlTable(schema_name=mf_test_session_state.mf_system_schema, table_name=_random_table())
-    sql_client.execute(f"CREATE TABLE {sql_table.sql} AS {_select_x_as_y()}")
-    assert sql_client.table_exists(sql_table)
 
 
 def test_percent_signs_in_query(sql_client: SqlClient) -> None:
@@ -160,9 +155,18 @@ def test_dry_run(mf_test_session_state: MetricFlowTestSessionState, sql_client: 
 
     stmt = f"CREATE TABLE {test_table.sql} AS SELECT 1 AS foo"
     sql_client.dry_run(stmt)
-    assert not sql_client.table_exists(
-        test_table
-    ), f"Table {test_table.sql} should not exist if the CREATE TABLE was a dry run."
+    with pytest.raises(expected_exception=Exception) as excinfo:
+        sql_client.execute(stmt=f"SELECT * FROM {test_table.sql}")
+
+    exception_message = repr(excinfo.value)
+    match = (
+        test_table.table_name
+        if sql_client.sql_engine_type is not SqlEngine.SNOWFLAKE
+        else str.upper(test_table.table_name)
+    )
+    assert (
+        exception_message.find(f"{match}") != -1
+    ), f"Expected an exception about table {match} not found, but got `{exception_message}`"
 
 
 def test_dry_run_of_bad_query_raises_exception(sql_client: SqlClient) -> None:  # noqa: D
@@ -186,14 +190,3 @@ def test_update_params_with_same_key_different_values() -> None:  # noqa: D
 
     with pytest.raises(RuntimeError):
         bind_params0.combine(bind_params1)
-
-
-def test_list_tables(mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient) -> None:  # noqa: D
-    schema = mf_test_session_state.mf_system_schema
-    sql_table = SqlTable(schema_name=schema, table_name=_random_table())
-    table_count_before_create = len(sql_client.list_tables(schema))
-    sql_client.execute(f"CREATE TABLE {sql_table.sql} AS {_select_x_as_y()}")
-    table_list = sql_client.list_tables(schema)
-    table_count_after_create = len(table_list)
-    assert table_count_after_create == table_count_before_create + 1
-    assert len([x for x in table_list if x == sql_table.table_name]) == 1

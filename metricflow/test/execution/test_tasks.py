@@ -49,7 +49,6 @@ def test_write_table_task(mf_test_session_state: MetricFlowTestSessionState, sql
     results = SequentialPlanExecutor().execute_plan(execution_plan)
 
     assert not results.contains_task_errors
-    assert sql_client.table_exists(output_table)
 
     assert_dataframes_equal(
         actual=sql_client.query(f"SELECT * FROM {output_table.sql}"),
@@ -59,4 +58,4 @@ def test_write_table_task(mf_test_session_state: MetricFlowTestSessionState, sql
         ),
         compare_names_using_lowercase=sql_client.sql_engine_type is SqlEngine.SNOWFLAKE,
     )
-    sql_client.drop_table(output_table)
+    sql_client.execute(f"DROP TABLE IF EXISTS {output_table.sql}")

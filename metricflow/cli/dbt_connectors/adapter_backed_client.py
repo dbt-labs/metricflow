@@ -2,16 +2,13 @@ from __future__ import annotations
 
 import enum
 import logging
-import textwrap
 import time
-from typing import Optional, Sequence
 
 import pandas as pd
 from dbt.adapters.base.impl import BaseAdapter
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 
-from metricflow.dataflow.sql_table import SqlTable
 from metricflow.errors.errors import SqlBindParametersNotSupportedError
 from metricflow.logging.formatting import indent_log_line
 from metricflow.protocols.sql_client import SqlEngine
@@ -188,133 +185,6 @@ class AdapterBackedSqlClient:
         stop = time.time()
         logger.info(f"Finished running the dry_run in {stop - start:.2f}s")
         return
-
-    def create_table_from_dataframe(
-        self,
-        sql_table: SqlTable,
-        df: pd.DataFrame,
-        chunk_size: Optional[int] = None,
-    ) -> None:
-        """Create a table in the data warehouse containing the contents of the dataframe.
-
-        Only used in tutorials and tests.
-
-        Args:
-            sql_table: The SqlTable object representing the table location to use
-            df: The Pandas DataFrame object containing the column schema and data to load
-            chunk_size: The number of rows to insert per transaction
-        """
-        logger.info(f"Creating table '{sql_table.sql}' from a DataFrame with {df.shape[0]} row(s)")
-        start_time = time.time()
-        with self._adapter.connection_named("MetricFlow_create_from_dataframe"):
-            # Create table
-            # update dtypes to convert None to NA in boolean columns.
-            # This mirrors the SQLAlchemy schema detection logic in pandas.io.sql
-            df = df.convert_dtypes()
-            columns = df.columns
-            columns_to_insert = []
-            for i in range(len(df.columns)):
-                # Format as "column_name column_type"
-                columns_to_insert.append(
-                    f"{columns[i]} {self._get_type_from_pandas_dtype(str(df[columns[i]].dtype).lower())}"
-                )
-            self._adapter.execute(
-                f"CREATE TABLE IF NOT EXISTS {sql_table.sql} ({', '.join(columns_to_insert)})",
-                auto_begin=True,
-                fetch=False,
-            )
-            self._adapter.commit_if_has_connection()
-
-            # Insert rows
-            values = []
-            for row in df.itertuples(index=False, name=None):
-                cells = []
-                for cell in row:
-                    if pd.isnull(cell):
-                        # use null keyword instead of isNA/None/etc.
-                        cells.append("null")
-                    elif type(cell) in [str, pd.Timestamp]:
-                        # Wrap cell in quotes & escape existing single quotes
-                        escaped_cell = str(cell).replace("'", "''")
-                        cells.append(f"'{escaped_cell}'")
-                    else:
-                        cells.append(str(cell))
-
-                values.append(f"({', '.join(cells)})")
-                if chunk_size and len(values) == chunk_size:
-                    value_string = ",\n".join(values)
-                    self._adapter.execute(
-                        f"INSERT INTO {sql_table.sql} VALUES {value_string}", auto_begin=True, fetch=False
-                    )
-                    values = []
-            if values:
-                value_string = ",\n".join(values)
-                self._adapter.execute(
-                    f"INSERT INTO {sql_table.sql} VALUES {value_string}", auto_begin=True, fetch=False
-                )
-            # Commit all insert transaction at once
-            self._adapter.commit_if_has_connection()
-
-        logger.info(f"Created table '{sql_table.sql}' from a DataFrame in {time.time() - start_time:.2f}s")
-
-    def _get_type_from_pandas_dtype(self, dtype: str) -> str:
-        """Helper method to get the engine-specific type value.
-
-        The dtype dict here is non-exhaustive but should be adequate for our needs.
-        """
-        # TODO: add type handling for string/bool/bigint types for all engines
-        if dtype == "string" or dtype == "object":
-            return "text"
-        elif dtype == "boolean" or dtype == "bool":
-            return "boolean"
-        elif dtype == "int64":
-            return "bigint"
-        elif dtype == "float64":
-            return self._sql_query_plan_renderer.expr_renderer.double_data_type
-        elif dtype == "datetime64[ns]":
-            return self._sql_query_plan_renderer.expr_renderer.timestamp_data_type
-        else:
-            raise ValueError(f"Encountered unexpected Pandas dtype ({dtype})!")
-
-    def list_tables(self, schema_name: str) -> Sequence[str]:
-        """Get a list of the table names in a given schema. Only used in tutorials and tests."""
-        # TODO: Short term, make this work with as many engines as possible. Medium term, remove this altogether.
-        if self.sql_engine_type is SqlEngine.SNOWFLAKE:
-            # Snowflake likes capitalizing things, except when it doesn't. We can get away with this due to its
-            # limited scope of usage.
-            schema_name = schema_name.upper()
-
-        df = self.query(
-            textwrap.dedent(
-                f"""\
-                SELECT table_name FROM information_schema.tables
-                WHERE table_schema = '{schema_name}'
-                """
-            ),
-        )
-        if df.empty:
-            return []
-
-        # Lower casing table names and data frame names for consistency between Snowflake and other clients.
-        # As above, we can do this because it isn't used in any consequential situations.
-        df.columns = df.columns.str.lower()
-        return [t.lower() for t in df["table_name"]]
-
-    def table_exists(self, sql_table: SqlTable) -> bool:
-        """Check if a given table exists. Only used in tutorials and tests."""
-        return sql_table.table_name in self.list_tables(sql_table.schema_name)
-
-    def create_schema(self, schema_name: str) -> None:
-        """Create the given schema in a data warehouse. Only used in tutorials and tests."""
-        self.execute(f"CREATE SCHEMA IF NOT EXISTS {schema_name}")
-
-    def drop_schema(self, schema_name: str, cascade: bool = True) -> None:
-        """Drop the given schema from the data warehouse. Only used in tests."""
-        self.execute(f"DROP SCHEMA IF EXISTS {schema_name}{' CASCADE' if cascade else ''}")
-
-    def drop_table(self, sql_table: SqlTable) -> None:
-        """Drop the given table from the data warehouse. Only used in tutorials and tests."""
-        self.execute(f"DROP TABLE IF EXISTS {sql_table.sql}")
 
     def close(self) -> None:  # noqa: D
         self._adapter.cancel_open_connections()

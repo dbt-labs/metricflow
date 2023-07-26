@@ -2,11 +2,10 @@ from __future__ import annotations
 
 import logging
 import threading
-from typing import Optional, Sequence
+from typing import Optional
 
 import pandas as pd
 import sqlalchemy
-from sqlalchemy import inspect
 from sqlalchemy.pool import StaticPool
 from typing_extensions import override
 
@@ -91,8 +90,3 @@ class DuckDbSqlClient(SqlAlchemySqlClient):
                 df=df,
                 chunk_size=chunk_size,
             )
-
-    def list_tables(self, schema_name: str) -> Sequence[str]:  # noqa: D
-        with self._concurrency_lock:
-            insp = inspect(self._engine)
-            return insp.get_table_names(schema=schema_name)

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import Dict, Optional, Sequence
+from typing import Dict, Optional
 
 import google.oauth2.service_account
 import sqlalchemy
@@ -100,9 +100,3 @@ class BigQuerySqlClient(SqlAlchemySqlClient):
     @override
     def sql_query_plan_renderer(self) -> SqlQueryPlanRenderer:
         return BigQuerySqlQueryPlanRenderer()
-
-    def list_tables(self, schema_name: str) -> Sequence[str]:  # noqa: D
-        with self._engine_connection(engine=self._engine) as conn:
-            insp = sqlalchemy.inspection.inspect(conn)
-            schema_dot_tables = insp.get_table_names(schema=schema_name)
-            return [x.replace(schema_name + ".", "") for x in schema_dot_tables]

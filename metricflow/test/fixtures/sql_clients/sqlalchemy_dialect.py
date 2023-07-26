@@ -8,7 +8,6 @@ from typing import Iterator, Mapping, Optional, Sequence, Set, Union
 
 import pandas as pd
 import sqlalchemy
-from sqlalchemy import inspect
 
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
@@ -75,10 +74,6 @@ class SqlAlchemySqlClient(BaseSqlClientImplementation, ABC):
             max_overflow=10,
             pool_pre_ping=True,
         )
-
-    def list_tables(self, schema_name: str) -> Sequence[str]:  # noqa: D
-        insp = inspect(self._engine)
-        return insp.get_table_names(schema=schema_name)
 
     @contextmanager
     def _engine_connection(

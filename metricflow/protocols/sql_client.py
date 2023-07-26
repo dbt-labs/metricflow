@@ -2,11 +2,10 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from enum import Enum
-from typing import Optional, Protocol, Sequence
+from typing import Protocol
 
 from pandas import DataFrame
 
-from metricflow.dataflow.sql_table import SqlTable
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_request.sql_request_attributes import SqlJsonTag
@@ -49,22 +48,6 @@ class SqlClient(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    def create_table_from_dataframe(
-        self,
-        sql_table: SqlTable,
-        df: DataFrame,
-        chunk_size: Optional[int] = None,
-    ) -> None:
-        """Creates a table and populates it with the contents of the dataframe.
-
-        Args:
-            sql_table: The SqlTable metadata of the table to create
-            df: The Pandas DataFrame with the contents of the target table
-            chunk_size: The number of rows to write per query
-        """
-        raise NotImplementedError
-
-    @abstractmethod
     def query(
         self,
         stmt: str,
@@ -91,31 +74,6 @@ class SqlClient(Protocol):
         sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
     ) -> None:
         """Base dry_run method."""
-        raise NotImplementedError
-
-    @abstractmethod
-    def list_tables(self, schema_name: str) -> Sequence[str]:
-        """List the tables in the given schema."""
-        raise NotImplementedError
-
-    @abstractmethod
-    def table_exists(self, sql_table: SqlTable) -> bool:
-        """Determines whether or not the given table exists in the data warehouse."""
-        raise NotImplementedError
-
-    @abstractmethod
-    def drop_table(self, sql_table: SqlTable) -> None:
-        """Drop the given table from the data warehouse."""
-        raise NotImplementedError
-
-    @abstractmethod
-    def create_schema(self, schema_name: str) -> None:
-        """Create the given schema if it doesn't already exist."""
-        raise NotImplementedError
-
-    @abstractmethod
-    def drop_schema(self, schema_name: str, cascade: bool) -> None:  # noqa: D
-        """Drop the given schema if it exists. If cascade is set, drop the tables in the schema first."""
         raise NotImplementedError
 
     @abstractmethod
