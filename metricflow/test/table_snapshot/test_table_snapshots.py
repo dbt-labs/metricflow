@@ -15,8 +15,8 @@ from metricflow.test.table_snapshot.table_snapshots import (
     SqlTableColumnDefinition,
     SqlTableColumnType,
     SqlTableSnapshot,
+    SqlTableSnapshotLoader,
     SqlTableSnapshotRepository,
-    SqlTableSnapshotRestorer,
 )
 
 
@@ -55,17 +55,17 @@ def test_as_df(table_snapshot: SqlTableSnapshot) -> None:
     )
 
 
-def test_restore(
+def test_load(
     mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient, table_snapshot: SqlTableSnapshot
 ) -> None:
-    """Test restoring a snapshot to the engine."""
+    """Test loading a snapshot to the engine."""
     schema_name = f"mf_test_snapshot_schema_{random_id()}"
 
     try:
         sql_client.create_schema(schema_name)
 
-        snapshot_restorer = SqlTableSnapshotRestorer(sql_client=sql_client, schema_name=schema_name)
-        snapshot_restorer.restore(table_snapshot)
+        snapshot_loader = SqlTableSnapshotLoader(sql_client=sql_client, schema_name=schema_name)
+        snapshot_loader.load(table_snapshot)
 
         actual = sql_client.query(f"SELECT * FROM {schema_name}.{table_snapshot.table_name}")
         assert_dataframes_equal(
@@ -83,7 +83,7 @@ def test_snapshot_repository() -> None:
     repo = SqlTableSnapshotRepository(config_directory=Path(os.path.dirname(__file__)))
     assert len(repo.table_snapshots) == 1
 
-    # Replace the filepath can be compared consistently between hosts.
+    # Replace the filepath so it can be compared consistently between hosts.
     example_snapshot = repo.table_snapshots[0]
     dummy_file_path = Path("/a/b/c")
     snapshot_to_check = SqlTableSnapshot(
