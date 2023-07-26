@@ -1,0 +1,6 @@
+kind: Features
+body: Enable support for Redshift queries in dbt-metricflow integration
+time: 2023-07-26T08:46:15.952401-07:00
+custom:
+  Author: tlento
+  Issue: "582"

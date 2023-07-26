@@ -14,6 +14,7 @@ from metricflow.formatting import indent_log_line
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.random_id import random_id
 from metricflow.sql.render.postgres import PostgresSQLSqlQueryPlanRenderer
+from metricflow.sql.render.redshift import RedshiftSqlQueryPlanRenderer
 from metricflow.sql.render.snowflake import SnowflakeSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
@@ -28,12 +29,15 @@ class SupportedAdapterTypes(enum.Enum):
 
     POSTGRES = "postgres"
     SNOWFLAKE = "snowflake"
+    REDSHIFT = "redshift"
 
     @property
     def sql_engine_type(self) -> SqlEngine:
         """Return the SqlEngine corresponding to the supported adapter type."""
         if self is SupportedAdapterTypes.POSTGRES:
             return SqlEngine.POSTGRES
+        elif self is SupportedAdapterTypes.REDSHIFT:
+            return SqlEngine.REDSHIFT
         elif self is SupportedAdapterTypes.SNOWFLAKE:
             return SqlEngine.SNOWFLAKE
         else:
@@ -44,6 +48,8 @@ class SupportedAdapterTypes(enum.Enum):
         """Return the SqlQueryPlanRenderer corresponding to the supported adapter type."""
         if self is SupportedAdapterTypes.POSTGRES:
             return PostgresSQLSqlQueryPlanRenderer()
+        elif self is SupportedAdapterTypes.REDSHIFT:
+            return RedshiftSqlQueryPlanRenderer()
         elif self is SupportedAdapterTypes.SNOWFLAKE:
             return SnowflakeSqlQueryPlanRenderer()
         else:
