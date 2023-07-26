@@ -88,12 +88,15 @@ class ConsistentIdObjectRepository:
     scd_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[SemanticModelDataSet]]
     scd_model_source_nodes: Sequence[BaseOutput[SemanticModelDataSet]]
 
+    cyclic_join_source_nodes: Sequence[BaseOutput[SemanticModelDataSet]]
+
 
 @pytest.fixture(scope="session")
 def consistent_id_object_repository(
     simple_semantic_manifest_lookup: SemanticManifestLookup,
     multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
     scd_semantic_manifest_lookup: SemanticManifestLookup,
+    cyclic_join_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> ConsistentIdObjectRepository:  # noqa: D
     """Create objects that have incremental numeric IDs with a consistent value.
 
@@ -104,6 +107,7 @@ def consistent_id_object_repository(
         sm_data_sets = create_data_sets(simple_semantic_manifest_lookup)
         multihop_data_sets = create_data_sets(multi_hop_join_semantic_manifest_lookup)
         scd_data_sets = create_data_sets(scd_semantic_manifest_lookup)
+        cyclic_join_data_sets = create_data_sets(cyclic_join_semantic_manifest_lookup)
 
         return ConsistentIdObjectRepository(
             simple_model_data_sets=sm_data_sets,
@@ -117,6 +121,9 @@ def consistent_id_object_repository(
             scd_model_read_nodes=_data_set_to_read_nodes(scd_data_sets),
             scd_model_source_nodes=_data_set_to_source_nodes(
                 semantic_manifest_lookup=scd_semantic_manifest_lookup, data_sets=scd_data_sets
+            ),
+            cyclic_join_source_nodes=_data_set_to_source_nodes(
+                semantic_manifest_lookup=cyclic_join_semantic_manifest_lookup, data_sets=cyclic_join_data_sets
             ),
         )
 
