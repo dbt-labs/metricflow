@@ -1,3 +1,13 @@
+databricks:
+  target: dev
+  outputs:
+    dev:
+      type: databricks
+      host: "{{ env_var('MF_SQL_ENGINE_HOST') }}"
+      port: "{{ env_var('MF_SQL_ENGINE_PORT') | int }}"
+      token: "{{ env_var('MF_SQL_ENGINE_PASSWORD') }}"
+      http_path: "{{ env_var('MF_DATABRICKS_HTTP_PATH') }}"
+      schema: "{{ env_var('MF_SQL_ENGINE_SCHEMA') }}"
 postgres:
   target: dev
   outputs:
