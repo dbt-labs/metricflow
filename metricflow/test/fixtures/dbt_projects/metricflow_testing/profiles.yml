@@ -1,3 +1,22 @@
+bigquery:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: service-account-json
+      project: "{{ env_var('DBT_ENV_SECRET_PROJECT_ID') }}"
+      dataset: "{{ env_var('DBT_ENV_SECRET_SCHEMA') }}"
+      keyfile_json:
+        type: "{{ env_var('DBT_ENV_SECRET_AUTH_TYPE') }}"
+        project_id: "{{ env_var('DBT_ENV_SECRET_PROJECT_ID') }}"
+        private_key_id: "{{ env_var('DBT_ENV_SECRET_PRIVATE_KEY_ID') }}"
+        private_key: "{{ env_var('DBT_ENV_SECRET_PRIVATE_KEY') }}"
+        client_email: "{{ env_var('DBT_ENV_SECRET_CLIENT_EMAIL') }}"
+        client_id: "{{ env_var('DBT_ENV_SECRET_CLIENT_ID') }}"
+        auth_uri: "{{ env_var('DBT_ENV_SECRET_AUTH_URI') }}"
+        token_uri: "{{ env_var('DBT_ENV_SECRET_TOKEN_URI') }}"
+        auth_provider_x509_cert_url: "{{ env_var('DBT_ENV_SECRET_AUTH_PROVIDER_CERT_URL') }}"
+        client_x509_cert_url: "{{ env_var('DBT_ENV_SECRET_CLIENT_CERT_URL') }}"
 databricks:
   target: dev
   outputs:

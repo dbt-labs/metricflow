@@ -14,6 +14,7 @@ from metricflow.errors.errors import SqlBindParametersNotSupportedError
 from metricflow.formatting import indent_log_line
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.random_id import random_id
+from metricflow.sql.render.big_query import BigQuerySqlQueryPlanRenderer
 from metricflow.sql.render.databricks import DatabricksSqlQueryPlanRenderer
 from metricflow.sql.render.postgres import PostgresSQLSqlQueryPlanRenderer
 from metricflow.sql.render.redshift import RedshiftSqlQueryPlanRenderer
@@ -38,11 +39,14 @@ class SupportedAdapterTypes(enum.Enum):
     POSTGRES = "postgres"
     SNOWFLAKE = "snowflake"
     REDSHIFT = "redshift"
+    BIGQUERY = "bigquery"
 
     @property
     def sql_engine_type(self) -> SqlEngine:
         """Return the SqlEngine corresponding to the supported adapter type."""
-        if self is SupportedAdapterTypes.DATABRICKS:
+        if self is SupportedAdapterTypes.BIGQUERY:
+            return SqlEngine.BIGQUERY
+        elif self is SupportedAdapterTypes.DATABRICKS:
             return SqlEngine.DATABRICKS
         elif self is SupportedAdapterTypes.POSTGRES:
             return SqlEngine.POSTGRES
@@ -56,7 +60,9 @@ class SupportedAdapterTypes(enum.Enum):
     @property
     def sql_query_plan_renderer(self) -> SqlQueryPlanRenderer:
         """Return the SqlQueryPlanRenderer corresponding to the supported adapter type."""
-        if self is SupportedAdapterTypes.DATABRICKS:
+        if self is SupportedAdapterTypes.BIGQUERY:
+            return BigQuerySqlQueryPlanRenderer()
+        elif self is SupportedAdapterTypes.DATABRICKS:
             return DatabricksSqlQueryPlanRenderer()
         elif self is SupportedAdapterTypes.POSTGRES:
             return PostgresSQLSqlQueryPlanRenderer()
@@ -198,9 +204,11 @@ class AdapterBackedSqlClient:
             f"\n\n{indent_log_line(stmt)}\n"
             + (f"\nwith parameters: {dict(sql_bind_parameters.param_dict)}" if sql_bind_parameters.param_dict else "")
         )
-        # TODO - rely on self._adapter.dry_run() when it is available so this will work for BigQuery and Databricks
-        # without any gymnastics.
-        if self.sql_engine_type is SqlEngine.DATABRICKS:
+        # TODO - consolidate to self._adapter.validate_sql() when all implementations will work from within MetricFlow
+        if self.sql_engine_type is SqlEngine.BIGQUERY:
+            with self._adapter.connection_named(f"Metricflow_BigQuery_dry_run_attempt_{start}"):
+                self._adapter.validate_sql(stmt)
+        elif self.sql_engine_type is SqlEngine.DATABRICKS:
             # We have to parse the output results from adapter.execute, but only in Databricks. We should probably use
             # a subclass for this and override things properly, but there's hopefully an upstream fix in our near
             # future so let's just put this ugly bit in for now.

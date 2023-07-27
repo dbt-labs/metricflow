@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import logging
 import os
 from typing import Generator
@@ -12,7 +13,6 @@ from dbt.cli.main import dbtRunner
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState, dialect_from_url
 from metricflow.test.fixtures.sql_clients.adapter_backed_ddl_client import AdapterBackedDDLSqlClient
-from metricflow.test.fixtures.sql_clients.big_query import BigQuerySqlClient
 from metricflow.test.fixtures.sql_clients.common_client import SqlDialect
 from metricflow.test.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 from metricflow.test.fixtures.sql_clients.duckdb import DuckDbSqlClient
@@ -30,6 +30,18 @@ DBT_ENV_SECRET_PASSWORD = "DBT_ENV_SECRET_PASSWORD"
 DBT_ENV_SECRET_SCHEMA = "DBT_ENV_SECRET_SCHEMA"
 DBT_ENV_SECRET_USER = "DBT_ENV_SECRET_USER"
 DBT_ENV_SECRET_WAREHOUSE = "DBT_ENV_SECRET_WAREHOUSE"
+
+# BigQuery is special, so it gets its own set of env vars. Keeping them split out here for consistency.
+DBT_ENV_SECRET_AUTH_PROVIDER_CERT_URL = "DBT_ENV_SECRET_AUTH_PROVIDER_CERT_URL"
+DBT_ENV_SECRET_AUTH_TYPE = "DBT_ENV_SECRET_AUTH_TYPE"
+DBT_ENV_SECRET_AUTH_URI = "DBT_ENV_SECRET_AUTH_URI"
+DBT_ENV_SECRET_CLIENT_CERT_URL = "DBT_ENV_SECRET_CLIENT_CERT_URL"
+DBT_ENV_SECRET_CLIENT_EMAIL = "DBT_ENV_SECRET_CLIENT_EMAIL"
+DBT_ENV_SECRET_CLIENT_ID = "DBT_ENV_SECRET_CLIENT_ID"
+DBT_ENV_SECRET_PRIVATE_KEY = "DBT_ENV_SECRET_PRIVATE_KEY"
+DBT_ENV_SECRET_PRIVATE_KEY_ID = "DBT_ENV_SECRET_PRIVATE_KEY_ID"
+DBT_ENV_SECRET_PROJECT_ID = "DBT_ENV_SECRET_PROJECT_ID"
+DBT_ENV_SECRET_TOKEN_URI = "DBT_ENV_SECRET_TOKEN_URI"
 
 
 def __configure_test_env_from_url(url: str, password: str, schema: str) -> sqlalchemy.engine.URL:
@@ -60,6 +72,36 @@ def __configure_test_env_from_url(url: str, password: str, schema: str) -> sqlal
     return parsed_url
 
 
+def __configure_bigquery_env_from_credential_string(password: str, schema: str) -> None:
+    credential_string = password.replace("'", "")
+    credentials = json.loads(credential_string)
+
+    assert isinstance(credentials, dict), "JSON credential string did not parse to dict type!"
+
+    bq_env = {
+        DBT_ENV_SECRET_AUTH_PROVIDER_CERT_URL: credentials.get("auth_provider_x509_cert_url"),
+        DBT_ENV_SECRET_AUTH_TYPE: credentials.get("type"),
+        DBT_ENV_SECRET_AUTH_URI: credentials.get("auth_uri"),
+        DBT_ENV_SECRET_CLIENT_CERT_URL: credentials.get("client_x509_cert_url"),
+        DBT_ENV_SECRET_CLIENT_EMAIL: credentials.get("client_email"),
+        DBT_ENV_SECRET_CLIENT_ID: credentials.get("client_id"),
+        DBT_ENV_SECRET_PRIVATE_KEY: credentials.get("private_key"),
+        DBT_ENV_SECRET_PRIVATE_KEY_ID: credentials.get("private_key_id"),
+        DBT_ENV_SECRET_PROJECT_ID: credentials.get("project_id"),
+        DBT_ENV_SECRET_TOKEN_URI: credentials.get("token_uri"),
+    }
+
+    empty_keys = [k for k, v in bq_env.items() if v is None or v == ""]
+
+    assert (
+        not empty_keys
+    ), f"BigQuery credentials did not contain all required values! Missing value for keys {empty_keys}."
+
+    # Reconstruct the dict to refine the value type to str
+    os.environ.update({k: v for k, v in bq_env.items() if v is not None})
+    os.environ[DBT_ENV_SECRET_SCHEMA] = schema
+
+
 def __configure_databricks_env_from_url(url: str, password: str, schema: str) -> None:
     """Databricks has a custom http path attribute, which we have encoded into a SqlAlchemy-like URL appendage.
 
@@ -85,7 +127,7 @@ def __initialize_dbt() -> None:
     triggering a failure with reasonable error messages in the event the dbt configs are not set up correctly.
     """
     dbt_dir = os.path.join(os.path.dirname(__file__), "dbt_projects/metricflow_testing/")
-    dbtRunner().invoke(["-q", "debug"], project_dir=dbt_dir, PROFILES_DIR=dbt_dir)
+    dbtRunner().invoke(["debug"], project_dir=dbt_dir, PROFILES_DIR=dbt_dir)
 
 
 def make_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithDDLMethods:
@@ -106,7 +148,9 @@ def make_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithD
         __initialize_dbt()
         return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("snowflake"))
     elif dialect == SqlDialect.BIGQUERY:
-        return BigQuerySqlClient.from_connection_details(url, password)
+        __configure_bigquery_env_from_credential_string(password=password, schema=schema)
+        __initialize_dbt()
+        return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("bigquery"))
     elif dialect == SqlDialect.POSTGRESQL:
         __configure_test_env_from_url(url, password=password, schema=schema)
         __initialize_dbt()
