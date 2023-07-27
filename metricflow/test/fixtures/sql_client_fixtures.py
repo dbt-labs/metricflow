@@ -20,16 +20,19 @@ from metricflow.test.fixtures.sql_clients.duckdb import DuckDbSqlClient
 logger = logging.getLogger(__name__)
 
 
-MF_DATABRICKS_HTTP_PATH = "MF_DATABRICKS_HTTP_PATH"
-MF_SQL_ENGINE_DATABASE = "MF_SQL_ENGINE_DATABASE"
-MF_SQL_ENGINE_HOST = "MF_SQL_ENGINE_HOST"
-MF_SQL_ENGINE_PORT = "MF_SQL_ENGINE_PORT"
-MF_SQL_ENGINE_USER = "MF_SQL_ENGINE_USER"
-MF_SQL_ENGINE_SCHEMA = "MF_SQL_ENGINE_SCHEMA"
-MF_SQL_ENGINE_WAREHOUSE = "MF_SQL_ENGINE_WAREHOUSE"
+# Env vars for dbt profile configuration. We use DBT_ENV_SECRET to avoid leaking secrets in CI logs.
+# Note port cannot use the secret obfuscation because it must be type-cast to int
+DBT_PROFILE_PORT = "DBT_PROFILE_PORT"
+DBT_ENV_SECRET_HTTP_PATH = "DBT_ENV_SECRET_HTTP_PATH"
+DBT_ENV_SECRET_DATABASE = "DBT_ENV_SECRET_DATABASE"
+DBT_ENV_SECRET_HOST = "DBT_ENV_SECRET_HOST"
+DBT_ENV_SECRET_USER = "DBT_ENV_SECRET_USER"
+DBT_ENV_SECRET_SCHEMA = "DBT_ENV_SECRET_SCHEMA"
+DBT_ENV_SECRET_WAREHOUSE = "DBT_ENV_SECRET_WAREHOUSE"
+DBT_ENV_SECRET_PASSWORD = "DBT_ENV_SECRET_PASSWORD"
 
 
-def configure_test_env_from_url(url: str, schema: str) -> sqlalchemy.engine.URL:
+def configure_test_env_from_url(url: str, password: str, schema: str) -> sqlalchemy.engine.URL:
     """Populates default env var mapping from a sqlalchemy URL string.
 
     This is used to configure the test environment from the original MF_SQL_ENGINE_URL environment variable in
@@ -40,23 +43,24 @@ def configure_test_env_from_url(url: str, schema: str) -> sqlalchemy.engine.URL:
     parsed_url = sqlalchemy.engine.make_url(url)
 
     assert parsed_url.host, "Engine host is not set in engine connection URL!"
-    os.environ[MF_SQL_ENGINE_HOST] = parsed_url.host
+    os.environ[DBT_ENV_SECRET_HOST] = parsed_url.host
 
     if parsed_url.username:
-        os.environ[MF_SQL_ENGINE_USER] = parsed_url.username
+        os.environ[DBT_ENV_SECRET_USER] = parsed_url.username
 
     if parsed_url.database:
-        os.environ[MF_SQL_ENGINE_DATABASE] = parsed_url.database
+        os.environ[DBT_ENV_SECRET_DATABASE] = parsed_url.database
 
     if parsed_url.port:
-        os.environ[MF_SQL_ENGINE_PORT] = str(parsed_url.port)
+        os.environ[DBT_PROFILE_PORT] = str(parsed_url.port)
 
-    os.environ[MF_SQL_ENGINE_SCHEMA] = schema
+    os.environ[DBT_ENV_SECRET_PASSWORD] = password
+    os.environ[DBT_ENV_SECRET_SCHEMA] = schema
 
     return parsed_url
 
 
-def __configure_databricks_env_from_url(url: str, schema: str) -> None:
+def __configure_databricks_env_from_url(url: str, password: str, schema: str) -> None:
     """Databricks has a custom http path attribute, which we have encoded into a SqlAlchemy-like URL appendage.
 
     This custom parsing was ported from our original client implementation for backwards compatibility with the
@@ -70,8 +74,8 @@ def __configure_databricks_env_from_url(url: str, schema: str) -> None:
         f"{http_paths} in url {url}!"
     )
     http_path = http_paths[0].split("=")[1]
-    os.environ[MF_DATABRICKS_HTTP_PATH] = http_path
-    configure_test_env_from_url(url_pieces[0], schema)
+    os.environ[DBT_ENV_SECRET_HTTP_PATH] = http_path
+    configure_test_env_from_url(url_pieces[0], password=password, schema=schema)
 
 
 def __initialize_dbt() -> None:
@@ -90,27 +94,27 @@ def make_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithD
     dialect = dialect_from_url(url=url)
 
     if dialect == SqlDialect.REDSHIFT:
-        configure_test_env_from_url(url, schema)
+        configure_test_env_from_url(url, password=password, schema=schema)
         __initialize_dbt()
         return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("redshift"))
     elif dialect == SqlDialect.SNOWFLAKE:
-        parsed_url = configure_test_env_from_url(url, schema)
+        parsed_url = configure_test_env_from_url(url, password=password, schema=schema)
         assert "warehouse" in parsed_url.normalized_query, "Sql engine URL params did not include Snowflake warehouse!"
         warehouses = parsed_url.normalized_query["warehouse"]
         assert len(warehouses) == 1, f"Found more than 1 warehouse in Snowflake URL: `{warehouses}`"
-        os.environ[MF_SQL_ENGINE_WAREHOUSE] = warehouses[0]
+        os.environ[DBT_ENV_SECRET_WAREHOUSE] = warehouses[0]
         __initialize_dbt()
         return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("snowflake"))
     elif dialect == SqlDialect.BIGQUERY:
         return BigQuerySqlClient.from_connection_details(url, password)
     elif dialect == SqlDialect.POSTGRESQL:
-        configure_test_env_from_url(url, schema)
+        configure_test_env_from_url(url, password=password, schema=schema)
         __initialize_dbt()
         return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("postgres"))
     elif dialect == SqlDialect.DUCKDB:
         return DuckDbSqlClient.from_connection_details(url, password)
     elif dialect == SqlDialect.DATABRICKS:
-        __configure_databricks_env_from_url(url, schema)
+        __configure_databricks_env_from_url(url, password=password, schema=schema)
         __initialize_dbt()
         return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("databricks"))
     else:
