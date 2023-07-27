@@ -105,7 +105,8 @@ class dbtArtifacts:
             raise ModelCreationException(
                 f"Unable to find {full_path_to_manifest}\n"
                 "Please ensure that you are running `mf` in the root directory of a dbt project "
-                "and that the semantic_manifest JSON exists."
+                "and that the semantic_manifest JSON exists. If this is your first time running "
+                "`mf`, run `dbt parse` to generate the semantic_manifest JSON."
             )
         try:
             with open(full_path_to_manifest, "r") as file:
