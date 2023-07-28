@@ -74,6 +74,71 @@ def test_linkable_spec_resolver(simple_model_spec_resolver: ValidLinkableSpecRes
     ] == sorted(tuple(x.qualified_name for x in result.entity_specs))
 
 
+def test_primary_entity(simple_model_spec_resolver: ValidLinkableSpecResolver) -> None:
+    """Checks that local dimensions show up with the primary entity."""
+    result = simple_model_spec_resolver.get_linkable_elements_for_metrics(
+        metric_references=(MetricReference(element_name="bookings"),),
+        with_any_of=LinkableElementProperties.all_properties(),
+        without_any_of=frozenset(),
+    ).as_spec_set
+
+    assert sorted(tuple(spec.qualified_name for spec in result.as_tuple)) == [
+        "booking__ds",
+        "booking__ds__month",
+        "booking__ds__quarter",
+        "booking__ds__week",
+        "booking__ds__year",
+        "booking__ds_partitioned",
+        "booking__ds_partitioned__month",
+        "booking__ds_partitioned__quarter",
+        "booking__ds_partitioned__week",
+        "booking__ds_partitioned__year",
+        "booking__guest",
+        "booking__host",
+        "booking__is_instant",
+        "booking__listing",
+        "booking__paid_at",
+        "booking__paid_at__month",
+        "booking__paid_at__quarter",
+        "booking__paid_at__week",
+        "booking__paid_at__year",
+        "listing__capacity_latest",
+        "listing__country_latest",
+        "listing__created_at",
+        "listing__created_at__month",
+        "listing__created_at__quarter",
+        "listing__created_at__week",
+        "listing__created_at__year",
+        "listing__ds",
+        "listing__ds__month",
+        "listing__ds__quarter",
+        "listing__ds__week",
+        "listing__ds__year",
+        "listing__is_lux_latest",
+        "listing__lux_listing",
+        "listing__user",
+        "listing__user__company",
+        "listing__user__company_name",
+        "listing__user__created_at",
+        "listing__user__created_at__month",
+        "listing__user__created_at__quarter",
+        "listing__user__created_at__week",
+        "listing__user__created_at__year",
+        "listing__user__ds_partitioned",
+        "listing__user__ds_partitioned__month",
+        "listing__user__ds_partitioned__quarter",
+        "listing__user__ds_partitioned__week",
+        "listing__user__ds_partitioned__year",
+        "listing__user__home_state",
+        "listing__user__home_state_latest",
+        "metric_time",
+        "metric_time__month",
+        "metric_time__quarter",
+        "metric_time__week",
+        "metric_time__year",
+    ]
+
+
 def property_check_helper(  # noqa: D
     spec_resolver: ValidLinkableSpecResolver,
     metric_references: Sequence[MetricReference],

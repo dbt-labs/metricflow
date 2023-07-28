@@ -9,7 +9,6 @@ from typing import Dict, FrozenSet, List, Optional, Sequence, Set, Tuple
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.protocols.dimension import Dimension, DimensionType
-from dbt_semantic_interfaces.protocols.entity import EntityType
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.protocols.semantic_model import SemanticModel
 from dbt_semantic_interfaces.references import (
@@ -26,6 +25,7 @@ from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnknownMetricLinkingError
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
+from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.protocols.semantics import SemanticModelAccessor
 from metricflow.specs.specs import (
     DEFAULT_TIME_GRANULARITY,
@@ -501,67 +501,50 @@ class ValidLinkableSpecResolver:
         """
         linkable_dimensions = []
         linkable_entities = []
-
-        for dimension in semantic_model.dimensions:
-            dimension_type = dimension.type
-            if dimension_type == DimensionType.CATEGORICAL:
-                linkable_dimensions.append(
-                    LinkableDimension(
+        for entity_link in SemanticModelLookup.entity_links_for_local_elements(semantic_model):
+            for entity in semantic_model.entities:
+                linkable_entities.append(
+                    LinkableEntity(
                         semantic_model_origin=semantic_model.reference,
-                        element_name=dimension.reference.element_name,
-                        entity_links=(),
+                        element_name=entity.reference.element_name,
+                        entity_links=(entity_link,),
                         join_path=(),
-                        properties=frozenset({LinkableElementProperties.LOCAL}),
+                        properties=frozenset({LinkableElementProperties.LOCAL, LinkableElementProperties.ENTITY}),
                     )
                 )
-            elif dimension_type == DimensionType.TIME:
-                linkable_dimensions.extend(
-                    _generate_linkable_time_dimensions(
-                        semantic_model_origin=semantic_model.reference,
-                        dimension=dimension,
-                        entity_links=(),
-                        join_path=(),
-                        with_properties=frozenset({LinkableElementProperties.LOCAL}),
-                    )
-                )
-            else:
-                raise RuntimeError(f"Unhandled type: {dimension_type}")
 
-        additional_linkable_dimensions = []
-        for entity in semantic_model.entities:
-            linkable_entities.append(
-                LinkableEntity(
-                    semantic_model_origin=semantic_model.reference,
-                    element_name=entity.reference.element_name,
-                    entity_links=(),
-                    join_path=(),
-                    properties=frozenset({LinkableElementProperties.LOCAL, LinkableElementProperties.ENTITY}),
-                )
-            )
-            # If a semantic model has a primary entity, we allow users to query using the dundered syntax, even though
-            # there is no join involved. e.g. in the test model, the "listings_latest" semantic model would allow using
-            # "listing__country_latest" for the "listings" metric.
-            if entity.type == EntityType.PRIMARY:
-                for linkable_dimension in linkable_dimensions:
-                    properties = {LinkableElementProperties.LOCAL, LinkableElementProperties.LOCAL_LINKED}
-                    additional_linkable_dimensions.append(
+            dimension_properties = frozenset({LinkableElementProperties.LOCAL})
+            for dimension in semantic_model.dimensions:
+                dimension_type = dimension.type
+                if dimension_type is DimensionType.CATEGORICAL:
+                    linkable_dimensions.append(
                         LinkableDimension(
                             semantic_model_origin=semantic_model.reference,
-                            element_name=linkable_dimension.element_name,
-                            entity_links=(entity.reference,),
+                            element_name=dimension.reference.element_name,
+                            entity_links=(entity_link,),
                             join_path=(),
-                            time_granularity=linkable_dimension.time_granularity,
-                            properties=frozenset(linkable_dimension.properties.union(properties)),
+                            properties=dimension_properties,
                         )
                     )
+                elif dimension_type is DimensionType.TIME:
+                    linkable_dimensions.extend(
+                        _generate_linkable_time_dimensions(
+                            semantic_model_origin=semantic_model.reference,
+                            dimension=dimension,
+                            entity_links=(entity_link,),
+                            join_path=(),
+                            with_properties=dimension_properties,
+                        )
+                    )
+                else:
+                    assert_values_exhausted(dimension_type)
 
         return LinkableElementSet(
             path_key_to_linkable_dimensions={
-                linkable_dimension.path_key: (linkable_dimension,)
-                for linkable_dimension in tuple(linkable_dimensions + additional_linkable_dimensions)
+                linkable_dimension.path_key: (linkable_dimension,) for linkable_dimension in linkable_dimensions
             },
             path_key_to_linkable_entities={
-                linkabe_entity.path_key: (linkabe_entity,) for linkabe_entity in tuple(linkable_entities)
+                linkable_entity.path_key: (linkable_entity,) for linkable_entity in linkable_entities
             },
         )
 

@@ -19,13 +19,15 @@ from dbt_semantic_interfaces.references import (
     SemanticModelReference,
     TimeDimensionReference,
 )
+from dbt_semantic_interfaces.type_enums import DimensionType, EntityType
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
+from typing_extensions import override
 
 from metricflow.errors.errors import InvalidSemanticModelError
 from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.spec_converters import MeasureConverter
 from metricflow.protocols.semantics import SemanticModelAccessor
-from metricflow.specs.specs import MeasureSpec, NonAdditiveDimensionSpec
+from metricflow.specs.specs import MeasureSpec, NonAdditiveDimensionSpec, TimeDimensionSpec
 
 logger = logging.getLogger(__name__)
 
@@ -55,7 +57,7 @@ class SemanticModelLookup(SemanticModelAccessor):
         self._semantic_model_names: Set[str] = set()
 
         self._semantic_model_to_aggregation_time_dimensions: Dict[
-            SemanticModelReference, ElementGrouper[TimeDimensionReference, MeasureSpec]
+            SemanticModelReference, ElementGrouper[TimeDimensionSpec, MeasureSpec]
         ] = {}
 
         self._semantic_model_reference_to_semantic_model: Dict[SemanticModelReference, SemanticModel] = {}
@@ -184,20 +186,48 @@ class SemanticModelLookup(SemanticModelAccessor):
             raise InvalidSemanticModelError(f"Error adding {semantic_model.reference}. Got errors: {errors}")
 
         self._semantic_model_to_aggregation_time_dimensions[semantic_model.reference] = ElementGrouper[
-            TimeDimensionReference, MeasureSpec
+            TimeDimensionSpec, MeasureSpec
         ]()
 
         for measure in semantic_model.measures:
             self._measure_aggs[measure.reference] = measure.agg
             self._measure_index[measure.reference].append(semantic_model)
-            agg_time_dimension = semantic_model.checked_agg_time_dimension_for_measure(
-                measure_reference=measure.reference
+            agg_time_dimension_reference = semantic_model.checked_agg_time_dimension_for_measure(measure.reference)
+
+            matching_dimensions = tuple(
+                dimension
+                for dimension in semantic_model.dimensions
+                if dimension.type == DimensionType.TIME
+                and dimension.time_dimension_reference == agg_time_dimension_reference
             )
+
+            matching_dimensions_count = len(matching_dimensions)
+            if matching_dimensions_count != 1:
+                raise RuntimeError(
+                    f"Found {matching_dimensions_count} matching dimensions for {agg_time_dimension_reference} "
+                    f"in {semantic_model}"
+                )
+            agg_time_dimension = matching_dimensions[0]
+            if agg_time_dimension.type_params is None or agg_time_dimension.type_params.time_granularity is None:
+                raise RuntimeError(
+                    f"Aggregation time dimension does not have a time granularity set: {agg_time_dimension}"
+                )
+
+            primary_entity = SemanticModelLookup._resolved_primary_entity(semantic_model)
+            if primary_entity is None:
+                raise RuntimeError(f"Expected a primary entity in {semantic_model}")
+
             self._semantic_model_to_aggregation_time_dimensions[semantic_model.reference].add_value(
-                key=agg_time_dimension,
+                key=TimeDimensionSpec(
+                    element_name=agg_time_dimension.name,
+                    entity_links=(primary_entity,),
+                    time_granularity=agg_time_dimension.type_params.time_granularity,
+                ),
                 value=MeasureConverter.convert_to_measure_spec(measure=measure),
             )
-            self._measure_agg_time_dimension[measure.reference] = agg_time_dimension
+            self._measure_agg_time_dimension[measure.reference] = TimeDimensionReference(
+                element_name=agg_time_dimension.name
+            )
             if measure.non_additive_dimension:
                 non_additive_dimension_spec = NonAdditiveDimensionSpec(
                     name=measure.non_additive_dimension.name,
@@ -222,7 +252,7 @@ class SemanticModelLookup(SemanticModelAccessor):
 
     def get_aggregation_time_dimensions_with_measures(
         self, semantic_model_reference: SemanticModelReference
-    ) -> ElementGrouper[TimeDimensionReference, MeasureSpec]:
+    ) -> ElementGrouper[TimeDimensionSpec, MeasureSpec]:
         """Return all time dimensions in a semantic model with their associated measures."""
         assert (
             semantic_model_reference in self._semantic_model_to_aggregation_time_dimensions
@@ -246,3 +276,43 @@ class SemanticModelLookup(SemanticModelAccessor):
         raise ValueError(
             f"No entity with name ({entity_reference}) in semantic_model with name ({semantic_model.name})"
         )
+
+    @staticmethod
+    def _resolved_primary_entity(semantic_model: SemanticModel) -> Optional[EntityReference]:
+        """Return the primary entity for dimensions in the model."""
+        primary_entity_reference = semantic_model.primary_entity_reference
+
+        entities_with_type_primary = tuple(
+            entity for entity in semantic_model.entities if entity.type == EntityType.PRIMARY
+        )
+
+        # This should be caught by the validation, but adding sanity check.
+        assert len(entities_with_type_primary) <= 1, f"Found >1 primary entity in {semantic_model}"
+        if primary_entity_reference is not None:
+            assert len(entities_with_type_primary) == 0, (
+                f"The primary_time field was set to {primary_entity_reference}, but there are non-zero entities with "
+                f"type {EntityType.PRIMARY} in {semantic_model}"
+            )
+
+        if primary_entity_reference is not None:
+            return primary_entity_reference
+
+        if len(entities_with_type_primary) > 0:
+            return entities_with_type_primary[0].reference
+
+        return None
+
+    @staticmethod
+    @override
+    def entity_links_for_local_elements(semantic_model: SemanticModel) -> Sequence[EntityReference]:
+        primary_entity_reference = semantic_model.primary_entity_reference
+
+        possible_entity_links = set()
+        if primary_entity_reference is not None:
+            possible_entity_links.add(primary_entity_reference)
+
+        for entity in semantic_model.entities:
+            if entity.is_linkable_entity_type:
+                possible_entity_links.add(entity.reference)
+
+        return sorted(possible_entity_links, key=lambda entity_reference: entity_reference.element_name)
