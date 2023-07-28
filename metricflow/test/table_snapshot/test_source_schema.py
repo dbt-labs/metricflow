@@ -10,7 +10,7 @@ from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.test.compare_df import assert_dataframes_equal
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.fixtures.table_fixtures import CONFIGURED_SOURCE_TABLE_SNAPSHOT_REPOSITORY
-from metricflow.test.source_schema_tools import POPULATE_SOURCE_SCHEMA_SHELL_COMMAND
+from metricflow.test.source_schema_tools import get_populate_source_schema_shell_command
 from metricflow.test.table_snapshot.table_snapshots import (
     SqlTableSnapshotRepository,
     TableSnapshotException,
@@ -66,7 +66,8 @@ def test_validate_data_in_source_schema(
         except Exception as e:
             error_message = (
                 f"Error verifying that a table corresponding to {table_snapshot} exists in the persistent source "
-                f"schema {schema_name}. Try re-populating with: {POPULATE_SOURCE_SCHEMA_SHELL_COMMAND}"
+                f"schema {schema_name}. \nTry re-populating with: \n\n"
+                f"{get_populate_source_schema_shell_command(sql_client.sql_engine_type)}"
             )
             # Add it to the warnings so that it stands out in a sea of test failures.
             warnings.warn(error_message)

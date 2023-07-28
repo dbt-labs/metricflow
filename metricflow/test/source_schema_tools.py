@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 
+from metricflow.protocols.sql_client import SqlEngine
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 from metricflow.test.table_snapshot.table_snapshots import (
@@ -24,13 +25,19 @@ def create_tables_listed_in_table_snapshot_repository(
         snapshot_loader.load(table_snapshot)
 
 
-POPULATE_SOURCE_SCHEMA_SHELL_COMMAND = (
-    f"hatch -v run dev-env:pytest "
-    f"-vv "
-    f"--log-cli-level info "
-    f"--use-persistent-source-schema "
-    f"{__file__}::populate_source_schema"
-)
+def get_populate_source_schema_shell_command(engine: SqlEngine) -> str:
+    """Creates the environment-specific shell command for populating a source schema.
+
+    This needs to be built in this way because different engines use different environments.
+    """
+    # The hatch environments are named in all lower-case, but otherwise should match the values.
+    return (
+        f"hatch -v run {engine.value.lower()}-env:pytest "
+        f"-vv "
+        f"--log-cli-level info "
+        f"--use-persistent-source-schema "
+        f"{__file__}::populate_source_schema"
+    )
 
 
 def populate_source_schema(
