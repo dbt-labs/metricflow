@@ -74,7 +74,6 @@ dev-packages = [
 # handles import statements they are required in all test environments
 sql-client-packages = [
   "SQLAlchemy~=1.4.42",
-  "databricks-sql-connector==2.7.0",
   "duckdb-engine~=0.9",
   "duckdb~=0.8",
   "sqlalchemy2-stubs~=0.0.2a21",
