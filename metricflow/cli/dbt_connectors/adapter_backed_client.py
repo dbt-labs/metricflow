@@ -204,25 +204,29 @@ class AdapterBackedSqlClient:
             f"\n\n{indent_log_line(stmt)}\n"
             + (f"\nwith parameters: {dict(sql_bind_parameters.param_dict)}" if sql_bind_parameters.param_dict else "")
         )
+        request_id = SqlRequestId(f"mf_rid__{random_id()}")
+        connection_name = f"MetricFlow_dry_run_request_{request_id}"
         # TODO - consolidate to self._adapter.validate_sql() when all implementations will work from within MetricFlow
         if self.sql_engine_type is SqlEngine.BIGQUERY:
-            with self._adapter.connection_named(f"Metricflow_BigQuery_dry_run_attempt_{start}"):
+            with self._adapter.connection_named(connection_name):
                 self._adapter.validate_sql(stmt)
-        elif self.sql_engine_type is SqlEngine.DATABRICKS:
-            # We have to parse the output results from adapter.execute, but only in Databricks. We should probably use
-            # a subclass for this and override things properly, but there's hopefully an upstream fix in our near
-            # future so let's just put this ugly bit in for now.
-            with self._adapter.connection_named(f"MetricFlow_Databricks_dry_run_attempt_{start}"):
-                results = self._adapter.execute(f"EXPLAIN {stmt}", auto_begin=True, fetch=True)
-            plan_output_str = "\n".join([",".join(row.values()) for row in results[1].rows])
-            if (
-                plan_output_str.find(DATABRICKS_CLUSTER_EXPLAIN_PLAN_ERROR_KEY) != -1
-                or plan_output_str.find(DATABRICKS_SQL_WAREHOUSE_EXPLAIN_PLAN_ERROR_KEY) != -1
-            ):
-                raise DbtDatabaseError(f"Encountered error in Databricks dry run. Full output: {plan_output_str}")
         else:
-            # We skip the exhaustive switch here because this should work with most engine types
-            self.execute(f"EXPLAIN {stmt}")
+            is_databricks = self.sql_engine_type is SqlEngine.DATABRICKS
+            with self._adapter.connection_named(connection_name):
+                results = self._adapter.execute(f"EXPLAIN {stmt}", auto_begin=True, fetch=is_databricks)
+
+            if is_databricks:
+                # We have to parse the output results from adapter.execute, but only in Databricks. We should probably use
+                # a subclass for this and override things properly, but there's hopefully an upstream fix in our near
+                # future so let's just put this ugly bit in for now.
+                plan_output_str = "\n".join([",".join(row.values()) for row in results[1].rows])
+                has_error = (
+                    plan_output_str.find(DATABRICKS_CLUSTER_EXPLAIN_PLAN_ERROR_KEY) != -1
+                    or plan_output_str.find(DATABRICKS_SQL_WAREHOUSE_EXPLAIN_PLAN_ERROR_KEY) != -1
+                )
+                if has_error:
+                    raise DbtDatabaseError(f"Encountered error in Databricks dry run. Full output: {plan_output_str}")
+
         stop = time.time()
         logger.info(f"Finished running the dry_run in {stop - start:.2f}s")
         return
