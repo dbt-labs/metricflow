@@ -6,6 +6,7 @@ import time
 
 import pandas as pd
 from dbt.adapters.base.impl import BaseAdapter
+from dbt.exceptions import DbtDatabaseError
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 
@@ -13,6 +14,7 @@ from metricflow.errors.errors import SqlBindParametersNotSupportedError
 from metricflow.formatting import indent_log_line
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.random_id import random_id
+from metricflow.sql.render.databricks import DatabricksSqlQueryPlanRenderer
 from metricflow.sql.render.postgres import PostgresSQLSqlQueryPlanRenderer
 from metricflow.sql.render.redshift import RedshiftSqlQueryPlanRenderer
 from metricflow.sql.render.snowflake import SnowflakeSqlQueryPlanRenderer
@@ -24,9 +26,15 @@ from metricflow.sql_request.sql_statement_metadata import CombinedSqlTags, SqlSt
 logger = logging.getLogger(__name__)
 
 
+# Discovered via trial and error from the original, and now defunct DatabricksSqlClient implementation
+DATABRICKS_SQL_WAREHOUSE_EXPLAIN_PLAN_ERROR_KEY = "Error occurred during query planning"
+DATABRICKS_CLUSTER_EXPLAIN_PLAN_ERROR_KEY = "org.apache.spark.sql.AnalysisException"
+
+
 class SupportedAdapterTypes(enum.Enum):
     """Enumeration of supported dbt adapter types."""
 
+    DATABRICKS = "databricks"
     POSTGRES = "postgres"
     SNOWFLAKE = "snowflake"
     REDSHIFT = "redshift"
@@ -34,7 +42,9 @@ class SupportedAdapterTypes(enum.Enum):
     @property
     def sql_engine_type(self) -> SqlEngine:
         """Return the SqlEngine corresponding to the supported adapter type."""
-        if self is SupportedAdapterTypes.POSTGRES:
+        if self is SupportedAdapterTypes.DATABRICKS:
+            return SqlEngine.DATABRICKS
+        elif self is SupportedAdapterTypes.POSTGRES:
             return SqlEngine.POSTGRES
         elif self is SupportedAdapterTypes.REDSHIFT:
             return SqlEngine.REDSHIFT
@@ -46,7 +56,9 @@ class SupportedAdapterTypes(enum.Enum):
     @property
     def sql_query_plan_renderer(self) -> SqlQueryPlanRenderer:
         """Return the SqlQueryPlanRenderer corresponding to the supported adapter type."""
-        if self is SupportedAdapterTypes.POSTGRES:
+        if self is SupportedAdapterTypes.DATABRICKS:
+            return DatabricksSqlQueryPlanRenderer()
+        elif self is SupportedAdapterTypes.POSTGRES:
             return PostgresSQLSqlQueryPlanRenderer()
         elif self is SupportedAdapterTypes.REDSHIFT:
             return RedshiftSqlQueryPlanRenderer()
@@ -186,8 +198,23 @@ class AdapterBackedSqlClient:
             f"\n\n{indent_log_line(stmt)}\n"
             + (f"\nwith parameters: {dict(sql_bind_parameters.param_dict)}" if sql_bind_parameters.param_dict else "")
         )
-        # TODO - rely on self._adapter.dry_run() when it is available so this will work for BigQuery.
-        self.execute(f"EXPLAIN {stmt}")
+        # TODO - rely on self._adapter.dry_run() when it is available so this will work for BigQuery and Databricks
+        # without any gymnastics.
+        if self.sql_engine_type is SqlEngine.DATABRICKS:
+            # We have to parse the output results from adapter.execute, but only in Databricks. We should probably use
+            # a subclass for this and override things properly, but there's hopefully an upstream fix in our near
+            # future so let's just put this ugly bit in for now.
+            with self._adapter.connection_named(f"MetricFlow_Databricks_dry_run_attempt_{start}"):
+                results = self._adapter.execute(f"EXPLAIN {stmt}", auto_begin=True, fetch=True)
+            plan_output_str = "\n".join([",".join(row.values()) for row in results[1].rows])
+            if (
+                plan_output_str.find(DATABRICKS_CLUSTER_EXPLAIN_PLAN_ERROR_KEY) != -1
+                or plan_output_str.find(DATABRICKS_SQL_WAREHOUSE_EXPLAIN_PLAN_ERROR_KEY) != -1
+            ):
+                raise DbtDatabaseError(f"Encountered error in Databricks dry run. Full output: {plan_output_str}")
+        else:
+            # We skip the exhaustive switch here because this should work with most engine types
+            self.execute(f"EXPLAIN {stmt}")
         stop = time.time()
         logger.info(f"Finished running the dry_run in {stop - start:.2f}s")
         return

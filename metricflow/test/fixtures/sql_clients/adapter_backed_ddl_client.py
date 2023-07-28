@@ -8,6 +8,7 @@ import pandas as pd
 
 from metricflow.cli.dbt_connectors.adapter_backed_client import AdapterBackedSqlClient
 from metricflow.dataflow.sql_table import SqlTable
+from metricflow.protocols.sql_client import SqlEngine
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +62,7 @@ class AdapterBackedDDLSqlClient(AdapterBackedSqlClient):
                         cells.append("null")
                     elif type(cell) in [str, pd.Timestamp]:
                         # Wrap cell in quotes & escape existing single quotes
-                        escaped_cell = str(cell).replace("'", "''")
+                        escaped_cell = self._quote_escape_value(str(cell))
                         cells.append(f"'{escaped_cell}'")
                     else:
                         cells.append(str(cell))
@@ -90,7 +91,7 @@ class AdapterBackedDDLSqlClient(AdapterBackedSqlClient):
         """
         # TODO: add type handling for string/bool/bigint types for all engines
         if dtype == "string" or dtype == "object":
-            return "text"
+            return "text" if self.sql_engine_type is not SqlEngine.DATABRICKS else "string"
         elif dtype == "boolean" or dtype == "bool":
             return "boolean"
         elif dtype == "int64":
@@ -101,6 +102,18 @@ class AdapterBackedDDLSqlClient(AdapterBackedSqlClient):
             return self._sql_query_plan_renderer.expr_renderer.timestamp_data_type
         else:
             raise ValueError(f"Encountered unexpected Pandas dtype ({dtype})!")
+
+    def _quote_escape_value(self, value: str) -> str:
+        """Escape single quotes in string-like values for create_table_from_dataframe.
+
+        This is necessary because Databricks uses backslash as its escape character.
+        We don't bother with the exhaustive switch here because we expect most engines
+        to fit into the default single quote condition.
+        """
+        if self.sql_engine_type is SqlEngine.DATABRICKS:
+            return value.replace("'", "\\'")
+
+        return value.replace("'", "''")
 
     def create_schema(self, schema_name: str) -> None:
         """Create the given schema in a data warehouse. Only used in tutorials and tests."""

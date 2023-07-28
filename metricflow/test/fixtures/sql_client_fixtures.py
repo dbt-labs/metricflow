@@ -14,13 +14,13 @@ from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState, 
 from metricflow.test.fixtures.sql_clients.adapter_backed_ddl_client import AdapterBackedDDLSqlClient
 from metricflow.test.fixtures.sql_clients.big_query import BigQuerySqlClient
 from metricflow.test.fixtures.sql_clients.common_client import SqlDialect
-from metricflow.test.fixtures.sql_clients.databricks import DatabricksSqlClient
 from metricflow.test.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 from metricflow.test.fixtures.sql_clients.duckdb import DuckDbSqlClient
 
 logger = logging.getLogger(__name__)
 
 
+MF_DATABRICKS_HTTP_PATH = "MF_DATABRICKS_HTTP_PATH"
 MF_SQL_ENGINE_DATABASE = "MF_SQL_ENGINE_DATABASE"
 MF_SQL_ENGINE_HOST = "MF_SQL_ENGINE_HOST"
 MF_SQL_ENGINE_PORT = "MF_SQL_ENGINE_PORT"
@@ -42,18 +42,36 @@ def configure_test_env_from_url(url: str, schema: str) -> sqlalchemy.engine.URL:
     assert parsed_url.host, "Engine host is not set in engine connection URL!"
     os.environ[MF_SQL_ENGINE_HOST] = parsed_url.host
 
-    assert parsed_url.username, "Username must be set in engine connection URL!"
-    os.environ[MF_SQL_ENGINE_USER] = parsed_url.username
+    if parsed_url.username:
+        os.environ[MF_SQL_ENGINE_USER] = parsed_url.username
 
-    assert parsed_url.database, "Database must be set in engine connection URL!"
-    os.environ[MF_SQL_ENGINE_DATABASE] = parsed_url.database
-
-    os.environ[MF_SQL_ENGINE_SCHEMA] = schema
+    if parsed_url.database:
+        os.environ[MF_SQL_ENGINE_DATABASE] = parsed_url.database
 
     if parsed_url.port:
         os.environ[MF_SQL_ENGINE_PORT] = str(parsed_url.port)
 
+    os.environ[MF_SQL_ENGINE_SCHEMA] = schema
+
     return parsed_url
+
+
+def __configure_databricks_env_from_url(url: str, schema: str) -> None:
+    """Databricks has a custom http path attribute, which we have encoded into a SqlAlchemy-like URL appendage.
+
+    This custom parsing was ported from our original client implementation for backwards compatibility with the
+    existing CI job configurations.
+    """
+    http_path_key = "httppath="
+    url_pieces = url.split(";")
+    http_paths = [url_piece for url_piece in url_pieces[1:] if url_piece.lower().startswith(http_path_key)]
+    assert len(http_paths) == 1, (
+        f"There should be exactly one http path in a Databricks test engine URL, but we found http paths: "
+        f"{http_paths} in url {url}!"
+    )
+    http_path = http_paths[0].split("=")[1]
+    os.environ[MF_DATABRICKS_HTTP_PATH] = http_path
+    configure_test_env_from_url(url_pieces[0], schema)
 
 
 def __initialize_dbt() -> None:
@@ -92,7 +110,9 @@ def make_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithD
     elif dialect == SqlDialect.DUCKDB:
         return DuckDbSqlClient.from_connection_details(url, password)
     elif dialect == SqlDialect.DATABRICKS:
-        return DatabricksSqlClient.from_connection_details(url, password)
+        __configure_databricks_env_from_url(url, schema)
+        __initialize_dbt()
+        return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("databricks"))
     else:
         raise ValueError(f"Unknown dialect: `{dialect}` in URL {url}")
 

@@ -1,0 +1,6 @@
+kind: Features
+body: Enable Databricks support for the dbt-metricflow integration
+time: 2023-07-26T17:31:29.847808-07:00
+custom:
+  Author: tlento
+  Issue: "580"
