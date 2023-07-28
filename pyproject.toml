@@ -77,9 +77,6 @@ sql-client-packages = [
   "databricks-sql-connector==2.7.0",
   "duckdb-engine~=0.9",
   "duckdb~=0.8",
-  "google-auth~=2.13.0",
-  "google-cloud-bigquery~=3.4.2",
-  "sqlalchemy-bigquery~=1.6.1",
   "sqlalchemy2-stubs~=0.0.2a21",
 ]
 

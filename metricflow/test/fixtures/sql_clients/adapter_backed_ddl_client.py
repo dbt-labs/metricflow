@@ -91,7 +91,9 @@ class AdapterBackedDDLSqlClient(AdapterBackedSqlClient):
         """
         # TODO: add type handling for string/bool/bigint types for all engines
         if dtype == "string" or dtype == "object":
-            return "text" if self.sql_engine_type is not SqlEngine.DATABRICKS else "string"
+            if self.sql_engine_type is SqlEngine.DATABRICKS or self.sql_engine_type is SqlEngine.BIGQUERY:
+                return "string"
+            return "text"
         elif dtype == "boolean" or dtype == "bool":
             return "boolean"
         elif dtype == "int64":
@@ -110,7 +112,7 @@ class AdapterBackedDDLSqlClient(AdapterBackedSqlClient):
         We don't bother with the exhaustive switch here because we expect most engines
         to fit into the default single quote condition.
         """
-        if self.sql_engine_type is SqlEngine.DATABRICKS:
+        if self.sql_engine_type is SqlEngine.DATABRICKS or self.sql_engine_type is SqlEngine.BIGQUERY:
             return value.replace("'", "\\'")
 
         return value.replace("'", "''")
