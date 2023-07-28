@@ -17,7 +17,6 @@ from metricflow.test.fixtures.sql_clients.common_client import SqlDialect
 from metricflow.test.fixtures.sql_clients.databricks import DatabricksSqlClient
 from metricflow.test.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 from metricflow.test.fixtures.sql_clients.duckdb import DuckDbSqlClient
-from metricflow.test.fixtures.sql_clients.redshift import RedshiftSqlClient
 
 logger = logging.getLogger(__name__)
 
@@ -73,7 +72,9 @@ def make_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithD
     dialect = dialect_from_url(url=url)
 
     if dialect == SqlDialect.REDSHIFT:
-        return RedshiftSqlClient.from_connection_details(url, password)
+        configure_test_env_from_url(url, schema)
+        __initialize_dbt()
+        return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("redshift"))
     elif dialect == SqlDialect.SNOWFLAKE:
         parsed_url = configure_test_env_from_url(url, schema)
         assert "warehouse" in parsed_url.normalized_query, "Sql engine URL params did not include Snowflake warehouse!"

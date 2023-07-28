@@ -79,9 +79,7 @@ sql-client-packages = [
   "duckdb~=0.8",
   "google-auth~=2.13.0",
   "google-cloud-bigquery~=3.4.2",
-  "psycopg2-binary~=2.9.3",
   "sqlalchemy-bigquery~=1.6.1",
-  "sqlalchemy-redshift==0.8.1",
   "sqlalchemy2-stubs~=0.0.2a21",
 ]
 

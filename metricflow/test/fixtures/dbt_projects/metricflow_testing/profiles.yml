@@ -9,6 +9,17 @@ postgres:
       pass: "{{ env_var('MF_SQL_ENGINE_PASSWORD') }}"
       dbname: "{{ env_var('MF_SQL_ENGINE_DATABASE') }}"
       schema: "{{ env_var('MF_SQL_ENGINE_SCHEMA') }}"
+redshift:
+  target: dev
+  outputs:
+    dev:
+      type: redshift
+      host: "{{ env_var('MF_SQL_ENGINE_HOST') }}"
+      port: "{{ env_var('MF_SQL_ENGINE_PORT') | int }}"
+      user: "{{ env_var('MF_SQL_ENGINE_USER') }}"
+      password: "{{ env_var('MF_SQL_ENGINE_PASSWORD') }}"
+      dbname: "{{ env_var('MF_SQL_ENGINE_DATABASE') }}"
+      schema: "{{ env_var('MF_SQL_ENGINE_SCHEMA') }}"
 snowflake:
   target: dev
   outputs:

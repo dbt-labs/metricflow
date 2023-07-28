@@ -538,7 +538,7 @@ integration_test:
   group_bys: ["metric_time"]
   check_query: |
     SELECT
-      (instant_bookings / CAST(bookings AS {{ double_data_type_name }})) + ((bookings - ref_bookings) / CAST(bookings AS {{ double_data_type_name }})) AS instant_plus_non_referred_bookings_pct
+      (instant_bookings * 1.0 / bookings) + ((bookings - ref_bookings) * 1.0 / bookings) AS instant_plus_non_referred_bookings_pct
       , metric_time
     FROM (
       SELECT
