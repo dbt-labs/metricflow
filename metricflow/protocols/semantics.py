@@ -124,6 +124,12 @@ class SemanticModelAccessor(ABC):
         """Return all semantic models associated with an entity reference."""
         raise NotImplementedError
 
+    @staticmethod
+    @abstractmethod
+    def entity_links_for_local_elements(semantic_model: SemanticModel) -> Sequence[EntityReference]:
+        """Return the entity prefix that can be used to access dimensions defined in the semantic model."""
+        raise NotImplementedError
+
 
 class MetricAccessor(ABC):
     """Interface for accessing semantic information about a set of metric objects.
