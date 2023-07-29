@@ -9,6 +9,7 @@ from dbt_semantic_interfaces.call_parameter_sets import (
     EntityCallParameterSet,
     TimeDimensionCallParameterSet,
 )
+from dbt_semantic_interfaces.naming.dundered import DunderedNameFormatter
 from dbt_semantic_interfaces.protocols.where_filter import WhereFilter
 from dbt_semantic_interfaces.references import DimensionReference, EntityReference, TimeDimensionReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
@@ -69,11 +70,14 @@ class WhereSpecFactory:
         entity_specs = []
 
         def _dimension_call(dimension_name: str, entity_path: Sequence[str] = ()) -> str:
-            """Gets called by Jinja when rendering {{ dimension(...) }}."""
+            """Gets called by Jinja when rendering {{ Dimension(...) }}."""
+            structured_name = DunderedNameFormatter.parse_name(dimension_name)
+
             dimension_spec = WhereSpecFactory._convert_to_dimension_spec(
                 DimensionCallParameterSet(
-                    dimension_reference=DimensionReference(element_name=dimension_name),
-                    entity_path=tuple(EntityReference(element_name=arg) for arg in entity_path),
+                    dimension_reference=DimensionReference(element_name=structured_name.element_name),
+                    entity_path=tuple(EntityReference(element_name=arg) for arg in entity_path)
+                    + structured_name.entity_links,
                 )
             )
             dimension_specs.append(dimension_spec)
@@ -82,36 +86,42 @@ class WhereSpecFactory:
         def _time_dimension_call(
             time_dimension_name: str, time_granularity_name: str, entity_path: Sequence[str] = ()
         ) -> str:
-            """Gets called by Jinja when rendering {{ time_dimension(...) }}."""
+            """Gets called by Jinja when rendering {{ TimeDimension(...) }}."""
+            structured_name = DunderedNameFormatter.parse_name(time_dimension_name)
+
             time_dimension_spec = WhereSpecFactory._convert_to_time_dimension_spec(
                 TimeDimensionCallParameterSet(
-                    time_dimension_reference=TimeDimensionReference(element_name=time_dimension_name),
+                    time_dimension_reference=TimeDimensionReference(element_name=structured_name.element_name),
                     time_granularity=TimeGranularity(time_granularity_name),
-                    entity_path=tuple(EntityReference(element_name=arg) for arg in entity_path),
+                    entity_path=tuple(EntityReference(element_name=arg) for arg in entity_path)
+                    + structured_name.entity_links,
                 )
             )
             time_dimension_specs.append(time_dimension_spec)
             return self._column_association_resolver.resolve_spec(time_dimension_spec).column_name
 
         def _entity_call(entity_name: str, entity_path: Sequence[str] = ()) -> str:
+            """Gets called by Jinja when rendering {{ Entity(...) }}."""
+            structured_name = DunderedNameFormatter.parse_name(entity_name)
+
             entity_spec = WhereSpecFactory._convert_to_entity_spec(
                 EntityCallParameterSet(
                     entity_reference=EntityReference(element_name=entity_name),
-                    entity_path=tuple(EntityReference(element_name=arg) for arg in entity_path),
+                    entity_path=tuple(EntityReference(element_name=arg) for arg in entity_path)
+                    + structured_name.entity_links,
                 )
             )
 
             entity_specs.append(entity_spec)
-            """Gets called by Jinja when rendering {{ entity(...) }}"""
             return self._column_association_resolver.resolve_spec(entity_spec).column_name
 
         try:
             rendered_sql_template = jinja2.Template(
                 where_filter.where_sql_template, undefined=jinja2.StrictUndefined
             ).render(
-                dimension=_dimension_call,
-                time_dimension=_time_dimension_call,
-                entity=_entity_call,
+                Dimension=_dimension_call,
+                TimeDimension=_time_dimension_call,
+                Entity=_entity_call,
             )
         except (jinja2.exceptions.UndefinedError, jinja2.exceptions.TemplateSyntaxError) as e:
             raise RenderSqlTemplateException(
