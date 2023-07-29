@@ -29,6 +29,8 @@ semantic_model:
     - name: capacity
       type: categorical
 
+  primary_entity: listing
+
   entities:
     - name: listing
       type: natural
