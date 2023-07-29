@@ -1,0 +1,3 @@
+Semantic Model    Entity Links    Name         Time Granularity    Properties
+----------------  --------------  -----------  ------------------  ---------------
+revenue           ()              metric_time  DAY                 ['METRIC_TIME']

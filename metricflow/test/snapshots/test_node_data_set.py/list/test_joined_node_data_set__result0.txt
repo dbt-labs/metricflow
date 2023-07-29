@@ -1,0 +1,13 @@
+['ds',
+ 'ds__month',
+ 'ds__quarter',
+ 'ds__week',
+ 'ds__year',
+ 'txn_revenue',
+ 'user',
+ 'user__ds',
+ 'user__ds__month',
+ 'user__ds__quarter',
+ 'user__ds__week',
+ 'user__ds__year',
+ 'user__home_state_latest']

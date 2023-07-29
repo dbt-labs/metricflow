@@ -1,0 +1,12 @@
+Semantic Model    Entity Links    Name         Time Granularity    Properties
+----------------  --------------  -----------  ------------------  -------------------------------------------
+bookings_source   ()              metric_time  DAY                 ['METRIC_TIME']
+bookings_source   ()              metric_time  MONTH               ['DERIVED_TIME_GRANULARITY', 'METRIC_TIME']
+bookings_source   ()              metric_time  QUARTER             ['DERIVED_TIME_GRANULARITY', 'METRIC_TIME']
+bookings_source   ()              metric_time  WEEK                ['DERIVED_TIME_GRANULARITY', 'METRIC_TIME']
+bookings_source   ()              metric_time  YEAR                ['DERIVED_TIME_GRANULARITY', 'METRIC_TIME']
+views_source      ()              metric_time  DAY                 ['METRIC_TIME']
+views_source      ()              metric_time  MONTH               ['DERIVED_TIME_GRANULARITY', 'METRIC_TIME']
+views_source      ()              metric_time  QUARTER             ['DERIVED_TIME_GRANULARITY', 'METRIC_TIME']
+views_source      ()              metric_time  WEEK                ['DERIVED_TIME_GRANULARITY', 'METRIC_TIME']
+views_source      ()              metric_time  YEAR                ['DERIVED_TIME_GRANULARITY', 'METRIC_TIME']
