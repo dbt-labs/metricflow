@@ -1,0 +1,6 @@
+kind: Breaking Changes
+body: 'Add Support for `primary_entity` in Semantic Models '
+time: 2023-07-29T01:45:06.963866-07:00
+custom:
+  Author: plypaul
+  Issue: "694"
