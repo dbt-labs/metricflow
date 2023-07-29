@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import logging
 
+from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.references import SemanticModelElementReference
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.aggregation_properties import AggregationState
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
@@ -19,17 +19,14 @@ from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.specs.column_assoc import ColumnAssociation, SingleColumnCorrelationKey
 from metricflow.specs.specs import (
-    DimensionSpec,
-    EntityReference,
-    EntitySpec,
-    InstanceSpecSet,
     LinklessEntitySpec,
     MeasureSpec,
-    TimeDimensionSpec,
 )
 from metricflow.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpression
 from metricflow.sql.sql_plan import SqlSelectColumn, SqlSelectStatementNode, SqlTableFromClauseNode
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.snapshot_utils import assert_spec_set_equal
 
 logger = logging.getLogger(__name__)
 
@@ -90,7 +87,9 @@ def test_no_parent_node_data_set(
     assert resolver.get_output_data_set(node).instance_set == data_set.instance_set
 
 
-def test_joined_node_data_set(
+def test_joined_node_data_set(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
     consistent_id_object_repository: ConsistentIdObjectRepository,
     simple_semantic_manifest_lookup: SemanticManifestLookup,
     time_spine_source: TimeSpineSource,
@@ -117,50 +116,10 @@ def test_joined_node_data_set(
     )
 
     join_node_output_data_set = resolver.get_output_data_set(join_node)
-    assert join_node_output_data_set.instance_set.spec_set == InstanceSpecSet(
-        metric_specs=(),
-        measure_specs=(
-            MeasureSpec(
-                element_name="txn_revenue",
-            ),
-        ),
-        dimension_specs=(
-            DimensionSpec(
-                element_name="home_state_latest",
-                entity_links=(EntityReference(element_name="user"),),
-            ),
-        ),
-        entity_specs=(EntitySpec(element_name="user", entity_links=()),),
-        time_dimension_specs=(
-            TimeDimensionSpec(element_name="ds", entity_links=(), time_granularity=TimeGranularity.DAY),
-            TimeDimensionSpec(element_name="ds", entity_links=(), time_granularity=TimeGranularity.WEEK),
-            TimeDimensionSpec(element_name="ds", entity_links=(), time_granularity=TimeGranularity.MONTH),
-            TimeDimensionSpec(element_name="ds", entity_links=(), time_granularity=TimeGranularity.QUARTER),
-            TimeDimensionSpec(element_name="ds", entity_links=(), time_granularity=TimeGranularity.YEAR),
-            TimeDimensionSpec(
-                element_name="ds",
-                entity_links=(EntityReference(element_name="user"),),
-                time_granularity=TimeGranularity.DAY,
-            ),
-            TimeDimensionSpec(
-                element_name="ds",
-                entity_links=(EntityReference(element_name="user"),),
-                time_granularity=TimeGranularity.WEEK,
-            ),
-            TimeDimensionSpec(
-                element_name="ds",
-                entity_links=(EntityReference(element_name="user"),),
-                time_granularity=TimeGranularity.MONTH,
-            ),
-            TimeDimensionSpec(
-                element_name="ds",
-                entity_links=(EntityReference(element_name="user"),),
-                time_granularity=TimeGranularity.QUARTER,
-            ),
-            TimeDimensionSpec(
-                element_name="ds",
-                entity_links=(EntityReference(element_name="user"),),
-                time_granularity=TimeGranularity.YEAR,
-            ),
-        ),
+
+    assert_spec_set_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        set_id="result0",
+        spec_set=join_node_output_data_set.instance_set.spec_set,
     )
