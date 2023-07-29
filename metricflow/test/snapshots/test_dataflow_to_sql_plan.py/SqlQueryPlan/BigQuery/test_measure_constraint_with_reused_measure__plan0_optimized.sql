@@ -16,14 +16,14 @@ FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
     -- Pass Only Elements:
-    --   ['booking_value', 'is_instant', 'metric_time']
+    --   ['booking_value', 'booking__is_instant', 'metric_time']
     SELECT
       ds AS metric_time
-      , is_instant
+      , is_instant AS booking__is_instant
       , booking_value
     FROM ***************************.fct_bookings bookings_source_src_10001
   ) subq_15
-  WHERE is_instant
+  WHERE booking__is_instant
   GROUP BY
     metric_time
 ) subq_19

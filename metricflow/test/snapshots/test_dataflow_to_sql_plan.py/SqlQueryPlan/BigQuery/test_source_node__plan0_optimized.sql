@@ -25,12 +25,31 @@ SELECT
   , DATE_TRUNC(ds_partitioned, month) AS ds_partitioned__month
   , DATE_TRUNC(ds_partitioned, quarter) AS ds_partitioned__quarter
   , DATE_TRUNC(ds_partitioned, isoyear) AS ds_partitioned__year
-  , booking_paid_at
-  , DATE_TRUNC(booking_paid_at, isoweek) AS booking_paid_at__week
-  , DATE_TRUNC(booking_paid_at, month) AS booking_paid_at__month
-  , DATE_TRUNC(booking_paid_at, quarter) AS booking_paid_at__quarter
-  , DATE_TRUNC(booking_paid_at, isoyear) AS booking_paid_at__year
+  , paid_at
+  , DATE_TRUNC(paid_at, isoweek) AS paid_at__week
+  , DATE_TRUNC(paid_at, month) AS paid_at__month
+  , DATE_TRUNC(paid_at, quarter) AS paid_at__quarter
+  , DATE_TRUNC(paid_at, isoyear) AS paid_at__year
+  , is_instant AS booking__is_instant
+  , ds AS booking__ds
+  , DATE_TRUNC(ds, isoweek) AS booking__ds__week
+  , DATE_TRUNC(ds, month) AS booking__ds__month
+  , DATE_TRUNC(ds, quarter) AS booking__ds__quarter
+  , DATE_TRUNC(ds, isoyear) AS booking__ds__year
+  , ds_partitioned AS booking__ds_partitioned
+  , DATE_TRUNC(ds_partitioned, isoweek) AS booking__ds_partitioned__week
+  , DATE_TRUNC(ds_partitioned, month) AS booking__ds_partitioned__month
+  , DATE_TRUNC(ds_partitioned, quarter) AS booking__ds_partitioned__quarter
+  , DATE_TRUNC(ds_partitioned, isoyear) AS booking__ds_partitioned__year
+  , paid_at AS booking__paid_at
+  , DATE_TRUNC(paid_at, isoweek) AS booking__paid_at__week
+  , DATE_TRUNC(paid_at, month) AS booking__paid_at__month
+  , DATE_TRUNC(paid_at, quarter) AS booking__paid_at__quarter
+  , DATE_TRUNC(paid_at, isoyear) AS booking__paid_at__year
   , listing_id AS listing
   , guest_id AS guest
   , host_id AS host
+  , listing_id AS booking__listing
+  , guest_id AS booking__guest
+  , host_id AS booking__host
 FROM ***************************.fct_bookings bookings_source_src_10001
