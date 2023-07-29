@@ -11,7 +11,7 @@ from metricflow.model.semantics.linkable_element_properties import LinkableEleme
 from metricflow.model.semantics.metric_lookup import MetricLookup
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
-from metricflow.test.snapshot_utils import assert_linkable_element_set_equal, assert_object_equal
+from metricflow.test.snapshot_utils import assert_linkable_element_set_snapshot_equal, assert_object_snapshot_equal
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +35,7 @@ def test_get_names(  # noqa: D
     mf_test_session_state: MetricFlowTestSessionState,
     semantic_model_lookup: SemanticModelLookup,
 ) -> None:
-    assert_object_equal(
+    assert_object_snapshot_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
         obj_id="result0",
@@ -75,7 +75,7 @@ def test_get_semantic_models_for_measure(semantic_model_lookup: SemanticModelLoo
 def test_elements_for_metric(  # noqa: D
     request: FixtureRequest, mf_test_session_state: MetricFlowTestSessionState, metric_lookup: MetricLookup
 ) -> None:
-    assert_object_equal(
+    assert_object_snapshot_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
         obj_id="result0",
@@ -97,7 +97,7 @@ def test_elements_for_metric(  # noqa: D
 def test_local_linked_elements_for_metric(  # noqa: D
     request: FixtureRequest, mf_test_session_state: MetricFlowTestSessionState, metric_lookup: MetricLookup
 ) -> None:
-    assert_object_equal(
+    assert_object_snapshot_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
         obj_id="result0",
@@ -121,7 +121,7 @@ def test_get_semantic_models_for_entity(semantic_model_lookup: SemanticModelLook
 def test_linkable_set(  # noqa: D
     request: FixtureRequest, mf_test_session_state: MetricFlowTestSessionState, metric_lookup: MetricLookup
 ) -> None:
-    assert_linkable_element_set_equal(
+    assert_linkable_element_set_snapshot_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
         set_id="result0",
@@ -144,7 +144,7 @@ def test_linkable_set_for_common_dimensions_in_different_models(
 
     In this example, "ds" is defined in both "bookings_source" and "views_source".
     """
-    assert_linkable_element_set_equal(
+    assert_linkable_element_set_snapshot_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
         set_id="result0",
