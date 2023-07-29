@@ -133,11 +133,11 @@ def test_node_evaluator_with_local_spec(  # noqa: D
     """Tests the case where the requested linkable spec in available in the start node."""
     bookings_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
     evaluation = node_evaluator.evaluate_node(
-        required_linkable_specs=[DimensionSpec(element_name="is_instant", entity_links=())],
+        required_linkable_specs=[DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),))],
         start_node=bookings_source_node,
     )
     assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
-        local_linkable_specs=(DimensionSpec(element_name="is_instant", entity_links=()),),
+        local_linkable_specs=(DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),),
         joinable_linkable_specs=(),
         join_recipes=(),
         unjoinable_linkable_specs=(),
@@ -180,7 +180,7 @@ def test_node_evaluator_with_joined_spec(  # noqa: D
     bookings_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
     evaluation = node_evaluator.evaluate_node(
         required_linkable_specs=[
-            DimensionSpec(element_name="is_instant", entity_links=()),
+            DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),
             DimensionSpec(
                 element_name="country_latest",
                 entity_links=(EntityReference(element_name="listing"),),
@@ -194,7 +194,7 @@ def test_node_evaluator_with_joined_spec(  # noqa: D
     )
 
     assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
-        local_linkable_specs=(DimensionSpec(element_name="is_instant", entity_links=()),),
+        local_linkable_specs=(DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),),
         joinable_linkable_specs=(
             DimensionSpec(
                 element_name="country_latest",

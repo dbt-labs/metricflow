@@ -5,6 +5,7 @@ import textwrap
 
 import pytest
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
+from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
@@ -51,6 +52,8 @@ BOOKINGS_YAML = textwrap.dedent(
           type_params:
             time_granularity: day
 
+      primary_entity: booking
+
       entities:
         - name: listing
           type: foreign
@@ -87,6 +90,8 @@ REVENUE_YAML = textwrap.dedent(
         - name: country
           type: categorical
           expr: country
+
+      primary_entity: company
 
       entities:
         - name: user
@@ -135,11 +140,13 @@ def test_query_parser() -> None:  # noqa: D
     query_parser = query_parser_from_yaml([EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, bookings_yaml_file])
 
     query_spec = query_parser.parse_and_validate_query(
-        metric_names=["bookings"], group_by_names=["is_instant", "listing", MTD], order=[MTD, "-bookings"]
+        metric_names=["bookings"], group_by_names=["booking__is_instant", "listing", MTD], order=[MTD, "-bookings"]
     )
 
     assert query_spec.metric_specs == (MetricSpec(element_name="bookings"),)
-    assert query_spec.dimension_specs == (DimensionSpec(element_name="is_instant", entity_links=()),)
+    assert query_spec.dimension_specs == (
+        DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),
+    )
     assert query_spec.time_dimension_specs == (
         TimeDimensionSpec(element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY),
     )
@@ -240,7 +247,7 @@ def test_parse_and_validate_where_constraint_dims() -> None:
             group_by_names=[MTD],
             time_constraint_start=as_datetime("2020-01-15"),
             time_constraint_end=as_datetime("2020-02-15"),
-            where_constraint_str="{{ dimension('invalid_dim') }} = '1'",
+            where_constraint_str="{{ Dimension('invalid_dim') }} = '1'",
         )
 
     query_spec = query_parser.parse_and_validate_query(
@@ -248,9 +255,12 @@ def test_parse_and_validate_where_constraint_dims() -> None:
         group_by_names=[MTD],
         time_constraint_start=as_datetime("2020-01-15"),
         time_constraint_end=as_datetime("2020-02-15"),
-        where_constraint_str="{{ dimension('is_instant') }} = '1'",
+        where_constraint_str="{{ Dimension('booking__is_instant') }} = '1'",
     )
-    assert DimensionSpec(element_name="is_instant", entity_links=()) not in query_spec.dimension_specs
+    assert (
+        DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),))
+        not in query_spec.dimension_specs
+    )
 
 
 def test_parse_and_validate_where_constraint_metric_time() -> None:
@@ -262,7 +272,7 @@ def test_parse_and_validate_where_constraint_metric_time() -> None:
         query_parser.parse_and_validate_query(
             metric_names=["revenue"],
             group_by_names=[MTD],
-            where_constraint_str="{{ time_dimension('metric_time', 'day') }} > '2020-01-15'",
+            where_constraint_str="{{ TimeDimension('metric_time', 'day') }} > '2020-01-15'",
         )
 
 

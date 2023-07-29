@@ -11,7 +11,7 @@ from metricflow.random_id import random_id
 def test_query(mf_client: MetricFlowClient) -> None:  # noqa: D
     result = mf_client.query(
         ["bookings"],
-        ["ds"],
+        ["metric_time"],
         limit=2,
         start_time="2019-01-01",
         end_time="2024-01-01",
@@ -25,7 +25,12 @@ def test_query(mf_client: MetricFlowClient) -> None:  # noqa: D
 
     output_table = SqlTable(schema_name=mf_client.system_schema, table_name=f"test_table_{random_id()}")
     result = mf_client.query(
-        ["bookings"], ["ds"], limit=2, start_time="2019-01-01", end_time="2024-01-01", as_table=output_table.sql
+        ["bookings"],
+        ["metric_time"],
+        limit=2,
+        start_time="2019-01-01",
+        end_time="2024-01-01",
+        as_table=output_table.sql,
     )
     assert result.query_spec
     assert result.dataflow_plan
@@ -37,7 +42,7 @@ def test_query(mf_client: MetricFlowClient) -> None:  # noqa: D
 def test_explain(mf_client: MetricFlowClient) -> None:  # noqa: D
     result = mf_client.explain(
         ["bookings"],
-        ["ds"],
+        ["metric_time"],
         limit=2,
         start_time="2019-01-01",
         end_time="2024-01-01",
@@ -49,7 +54,12 @@ def test_explain(mf_client: MetricFlowClient) -> None:  # noqa: D
 
     output_table = SqlTable(schema_name=mf_client.system_schema, table_name=f"test_table_{random_id()}")
     result = mf_client.explain(
-        ["bookings"], ["ds"], limit=2, start_time="2019-01-01", end_time="2024-01-01", as_table=output_table.sql
+        ["bookings"],
+        ["metric_time"],
+        limit=2,
+        start_time="2019-01-01",
+        end_time="2024-01-01",
+        as_table=output_table.sql,
     )
     assert result.query_spec
     assert result.dataflow_plan
@@ -78,12 +88,14 @@ def test_list_dimensions(mf_client: MetricFlowClient) -> None:  # noqa: D
 
     dimensions = mf_client.list_dimensions(["bookings", "revenue"])
 
-    assert len(dimensions) == 4
-    assert tuple(dim.name for dim in dimensions) == ("ds", "ds", "metric_time", "metric_time")
+    assert len(dimensions) == 2
+    assert tuple(dim.name for dim in dimensions) == ("metric_time", "metric_time")
 
 
 def test_get_dimension_values(mf_client: MetricFlowClient) -> None:  # noqa: D
-    dim_vals = mf_client.get_dimension_values(["bookings"], "ds", start_time="2020-01-01", end_time="2024-01-01")
+    dim_vals = mf_client.get_dimension_values(
+        ["bookings"], "metric_time", start_time="2020-01-01", end_time="2024-01-01"
+    )
     assert dim_vals
 
 

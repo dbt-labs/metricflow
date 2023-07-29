@@ -31,7 +31,7 @@ from metricflow.test.model.example_project_configuration import EXAMPLE_PROJECT_
 def test_query(capsys: pytest.CaptureFixture, cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
     # Disabling capsys to resolve error "ValueError: I/O operation on closed file". Better solution TBD.
     with capsys.disabled():
-        resp = cli_runner.run(query, args=["--metrics", "bookings", "--group-by", "ds"])
+        resp = cli_runner.run(query, args=["--metrics", "bookings", "--group-by", "metric_time"])
     # case insensitive matches are needed for snowflake due to the capitalization thing
     engine_is_snowflake = cli_runner.cli_context.sql_client.sql_engine_type is SqlEngine.SNOWFLAKE
     assert "bookings" in resp.output or ("bookings" in resp.output.lower() and engine_is_snowflake)
@@ -52,14 +52,14 @@ def test_list_metrics(capsys: pytest.CaptureFixture, cli_runner: MetricFlowCliRu
     with capsys.disabled():
         resp = cli_runner.run(metrics)
 
-    assert "bookings_per_listing: ds" in resp.output
+    assert "bookings_per_listing: capacity_latest" in resp.output
     assert resp.exit_code == 0
 
 
 def test_get_dimension_values(capsys: pytest.CaptureFixture, cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
     # Disabling capsys to resolve error "ValueError: I/O operation on closed file". Better solution TBD.
     with capsys.disabled():
-        resp = cli_runner.run(dimension_values, args=["--metrics", "bookings", "--dimension", "is_instant"])
+        resp = cli_runner.run(dimension_values, args=["--metrics", "bookings", "--dimension", "booking__is_instant"])
 
     actual_output_lines = sorted(resp.output.split("\n"))
     assert ["", "• False", "• True"] == actual_output_lines

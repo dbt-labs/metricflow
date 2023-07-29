@@ -71,6 +71,8 @@ EXTENDED_BOOKINGS_YAML = textwrap.dedent(
           type_params:
             time_granularity: day
 
+      primary_entity: booking
+
       entities:
         - name: listing
           type: foreign
@@ -129,7 +131,7 @@ def test_nonexistent_metric() -> None:  # noqa: D
     query_parser = query_parser_from_yaml([EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, bookings_yaml_file])
 
     with pytest.raises(UnableToSatisfyQueryError) as exception_info:
-        query_parser.parse_and_validate_query(metric_names=["booking"], group_by_names=["is_instant"])
+        query_parser.parse_and_validate_query(metric_names=["booking"], group_by_names=["booking__is_instant"])
 
     assert (
         textwrap.dedent(
@@ -162,7 +164,7 @@ def test_non_existent_group_by() -> None:  # noqa: D
             Unable To Satisfy Query Error: Unknown element name 'is_instan' in dimension name 'is_instan'
 
             Suggestions for 'is_instan':
-                ['is_instant']
+                ['booking__is_instant']
             """
         ).rstrip()
         == str(exception_info.value)

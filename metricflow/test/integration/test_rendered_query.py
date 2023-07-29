@@ -18,7 +18,7 @@ def test_render_query(  # noqa: D
     result = it_helpers.mf_engine.explain(
         MetricFlowQueryRequest.create_with_random_request_id(
             metric_names=["bookings"],
-            group_by_names=["ds"],
+            group_by_names=["metric_time"],
         )
     )
 
@@ -44,7 +44,7 @@ def test_render_write_to_table_query(  # noqa: D
 
     result = it_helpers.mf_engine.explain(
         MetricFlowQueryRequest.create_with_random_request_id(
-            metric_names=["bookings"], group_by_names=["ds"], output_table=output_table.sql
+            metric_names=["bookings"], group_by_names=["metric_time"], output_table=output_table.sql
         )
     )
 
