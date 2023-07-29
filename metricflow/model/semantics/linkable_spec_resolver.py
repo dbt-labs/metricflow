@@ -501,8 +501,17 @@ class ValidLinkableSpecResolver:
         """
         linkable_dimensions = []
         linkable_entities = []
-        for entity_link in SemanticModelLookup.entity_links_for_local_elements(semantic_model):
-            for entity in semantic_model.entities:
+        for entity in semantic_model.entities:
+            linkable_entities.append(
+                LinkableEntity(
+                    semantic_model_origin=semantic_model.reference,
+                    element_name=entity.reference.element_name,
+                    entity_links=(),
+                    join_path=(),
+                    properties=frozenset({LinkableElementProperties.LOCAL, LinkableElementProperties.ENTITY}),
+                )
+            )
+            for entity_link in SemanticModelLookup.entity_links_for_local_elements(semantic_model):
                 linkable_entities.append(
                     LinkableEntity(
                         semantic_model_origin=semantic_model.reference,
@@ -513,6 +522,7 @@ class ValidLinkableSpecResolver:
                     )
                 )
 
+        for entity_link in SemanticModelLookup.entity_links_for_local_elements(semantic_model):
             dimension_properties = frozenset({LinkableElementProperties.LOCAL})
             for dimension in semantic_model.dimensions:
                 dimension_type = dimension.type

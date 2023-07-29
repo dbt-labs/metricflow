@@ -41,7 +41,7 @@ def test_simple_plan(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="is_instant",
-                    entity_links=(),
+                    entity_links=(EntityReference("booking"),),
                 ),
             ),
         )
@@ -106,7 +106,7 @@ def test_joined_plan(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="is_instant",
-                    entity_links=(),
+                    entity_links=(EntityReference("booking"),),
                 ),
                 DimensionSpec(
                     element_name="country_latest",
@@ -207,7 +207,7 @@ def test_multiple_metrics_plan(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="is_instant",
-                    entity_links=(),
+                    entity_links=(EntityReference("booking"),),
                 ),
             ),
             time_dimension_specs=(MTD_SPEC_DAY,),
@@ -342,7 +342,7 @@ def test_where_constrained_plan(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="is_instant",
-                    entity_links=(),
+                    entity_links=(EntityReference("booking"),),
                 ),
             ),
             where_constraint=(
@@ -384,7 +384,7 @@ def test_where_constrained_plan_time_dimension(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="is_instant",
-                    entity_links=(),
+                    entity_links=(EntityReference("booking"),),
                 ),
             ),
             where_constraint=(

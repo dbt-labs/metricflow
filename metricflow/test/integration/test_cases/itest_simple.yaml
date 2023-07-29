@@ -4,11 +4,11 @@ integration_test:
   description: Tests selecting a metric and an associated local dimension.
   model: SIMPLE_MODEL
   metrics: ["booking_value"]
-  group_bys: ["is_instant"]
+  group_bys: ["booking__is_instant"]
   check_query: |
     SELECT
       SUM(booking_value) AS booking_value
-      , is_instant
+      , is_instant AS booking__is_instant
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       is_instant
@@ -67,12 +67,12 @@ integration_test:
   description: Tests simple constrained query.
   model: SIMPLE_MODEL
   metrics: ["booking_value"]
-  group_bys: ["is_instant"]
-  where_filter: "{{ render_dimension_template('is_instant') }}"
+  group_bys: ["booking__is_instant"]
+  where_filter: "{{ render_dimension_template('booking__is_instant') }}"
   check_query: |
     SELECT
       SUM(booking_value) AS booking_value
-      , is_instant
+      , is_instant AS booking__is_instant
     FROM {{ source_schema }}.fct_bookings
     WHERE
       is_instant
@@ -84,11 +84,11 @@ integration_test:
   description: Tests an ordered query.
   model: SIMPLE_MODEL
   metrics: ["booking_value"]
-  group_bys: ["is_instant"]
+  group_bys: ["booking__is_instant"]
   check_query: |
     SELECT
       SUM(booking_value) AS booking_value
-      , is_instant
+      , is_instant AS booking__is_instant
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       is_instant
@@ -136,11 +136,11 @@ integration_test:
   description: Tests query with a join.
   model: SIMPLE_MODEL
   metrics: ["booking_value"]
-  group_bys: ["is_instant", "listing__country_latest"]
+  group_bys: ["booking__is_instant", "listing__country_latest"]
   check_query: |
     SELECT
       SUM(b.booking_value) AS booking_value
-      , b.is_instant
+      , b.is_instant AS booking__is_instant
       , l.country AS listing__country_latest
     FROM {{ source_schema }}.fct_bookings b
     LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest l

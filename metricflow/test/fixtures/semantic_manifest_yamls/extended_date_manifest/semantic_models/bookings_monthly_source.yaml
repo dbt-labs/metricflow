@@ -15,7 +15,7 @@ semantic_model:
       agg: sum
       create_metric: true
 
-  primary_entity: booking
+  primary_entity: booking_id
 
   dimensions:
     - name: ds

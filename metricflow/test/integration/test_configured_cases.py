@@ -140,18 +140,18 @@ class CheckQueryHelpers:
          This is needed as the where_filter field in the definition files are rendered twice through Jinja - once
          by the test framework, and again by MF.
         """
-        return f"{{{{ dimension('{dimension_name}', entity_path={repr(entity_path)}) }}}}"
+        return f"{{{{ Dimension('{dimension_name}', entity_path={repr(entity_path)}) }}}}"
 
     def render_entity_template(self, entity_name: str, entity_path: Sequence[str] = ()) -> str:
         """Similar to render_dimension_template() but for entities."""
-        return f"{{{{ entity('{entity_name}', entity_path={repr(entity_path)}) }}}}"
+        return f"{{{{ Entity('{entity_name}', entity_path={repr(entity_path)}) }}}}"
 
     def render_time_dimension_template(
         self, time_dimension_name: str, time_granularity: str, entity_path: Sequence[str] = ()
     ) -> str:
         """Similar to render_dimension_template() but for time dimensions."""
         return (
-            f"{{{{ time_dimension('{time_dimension_name}', '{time_granularity}', entity_path={repr(entity_path)}) }}}}"
+            f"{{{{ TimeDimension('{time_dimension_name}', '{time_granularity}', entity_path={repr(entity_path)}) }}}}"
         )
 
 

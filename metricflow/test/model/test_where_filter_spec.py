@@ -66,7 +66,7 @@ def test_entity_in_filter(  # noqa: D
     column_association_resolver: ColumnAssociationResolver,
 ) -> None:
     where_filter = PydanticWhereFilter(
-        where_sql_template="{{ entity('user', entity_path=['listing']) }} == 'example_user_id'"
+        where_sql_template="{{ Entity('user', entity_path=['listing']) }} == 'example_user_id'"
     )
 
     where_filter_spec = WhereSpecFactory(

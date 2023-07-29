@@ -18,7 +18,22 @@ FROM (
       FROM (
         -- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-01T00:00:00]
         SELECT
-          subq_1.booking__ds
+          subq_1.ds
+          , subq_1.ds__week
+          , subq_1.ds__month
+          , subq_1.ds__quarter
+          , subq_1.ds__year
+          , subq_1.ds_partitioned
+          , subq_1.ds_partitioned__week
+          , subq_1.ds_partitioned__month
+          , subq_1.ds_partitioned__quarter
+          , subq_1.ds_partitioned__year
+          , subq_1.paid_at
+          , subq_1.paid_at__week
+          , subq_1.paid_at__month
+          , subq_1.paid_at__quarter
+          , subq_1.paid_at__year
+          , subq_1.booking__ds
           , subq_1.booking__ds__week
           , subq_1.booking__ds__month
           , subq_1.booking__ds__quarter
@@ -34,12 +49,17 @@ FROM (
           , subq_1.booking__paid_at__quarter
           , subq_1.booking__paid_at__year
           , subq_1.metric_time
+          , subq_1.metric_time__week
+          , subq_1.metric_time__month
+          , subq_1.metric_time__quarter
+          , subq_1.metric_time__year
           , subq_1.listing
           , subq_1.guest
           , subq_1.host
           , subq_1.booking__listing
           , subq_1.booking__guest
           , subq_1.booking__host
+          , subq_1.is_instant
           , subq_1.booking__is_instant
           , subq_1.bookings
           , subq_1.instant_bookings
@@ -57,7 +77,22 @@ FROM (
         FROM (
           -- Metric Time Dimension 'ds'
           SELECT
-            subq_0.booking__ds
+            subq_0.ds
+            , subq_0.ds__week
+            , subq_0.ds__month
+            , subq_0.ds__quarter
+            , subq_0.ds__year
+            , subq_0.ds_partitioned
+            , subq_0.ds_partitioned__week
+            , subq_0.ds_partitioned__month
+            , subq_0.ds_partitioned__quarter
+            , subq_0.ds_partitioned__year
+            , subq_0.paid_at
+            , subq_0.paid_at__week
+            , subq_0.paid_at__month
+            , subq_0.paid_at__quarter
+            , subq_0.paid_at__year
+            , subq_0.booking__ds
             , subq_0.booking__ds__week
             , subq_0.booking__ds__month
             , subq_0.booking__ds__quarter
@@ -72,13 +107,18 @@ FROM (
             , subq_0.booking__paid_at__month
             , subq_0.booking__paid_at__quarter
             , subq_0.booking__paid_at__year
-            , subq_0.booking__ds AS metric_time
+            , subq_0.ds AS metric_time
+            , subq_0.ds__week AS metric_time__week
+            , subq_0.ds__month AS metric_time__month
+            , subq_0.ds__quarter AS metric_time__quarter
+            , subq_0.ds__year AS metric_time__year
             , subq_0.listing
             , subq_0.guest
             , subq_0.host
             , subq_0.booking__listing
             , subq_0.booking__guest
             , subq_0.booking__host
+            , subq_0.is_instant
             , subq_0.booking__is_instant
             , subq_0.bookings
             , subq_0.instant_bookings
@@ -110,6 +150,22 @@ FROM (
               , bookings_source_src_10001.booking_value AS discrete_booking_value_p99
               , bookings_source_src_10001.booking_value AS approximate_continuous_booking_value_p99
               , bookings_source_src_10001.booking_value AS approximate_discrete_booking_value_p99
+              , bookings_source_src_10001.is_instant
+              , bookings_source_src_10001.ds
+              , DATE_TRUNC('week', bookings_source_src_10001.ds) AS ds__week
+              , DATE_TRUNC('month', bookings_source_src_10001.ds) AS ds__month
+              , DATE_TRUNC('quarter', bookings_source_src_10001.ds) AS ds__quarter
+              , DATE_TRUNC('year', bookings_source_src_10001.ds) AS ds__year
+              , bookings_source_src_10001.ds_partitioned
+              , DATE_TRUNC('week', bookings_source_src_10001.ds_partitioned) AS ds_partitioned__week
+              , DATE_TRUNC('month', bookings_source_src_10001.ds_partitioned) AS ds_partitioned__month
+              , DATE_TRUNC('quarter', bookings_source_src_10001.ds_partitioned) AS ds_partitioned__quarter
+              , DATE_TRUNC('year', bookings_source_src_10001.ds_partitioned) AS ds_partitioned__year
+              , bookings_source_src_10001.paid_at
+              , DATE_TRUNC('week', bookings_source_src_10001.paid_at) AS paid_at__week
+              , DATE_TRUNC('month', bookings_source_src_10001.paid_at) AS paid_at__month
+              , DATE_TRUNC('quarter', bookings_source_src_10001.paid_at) AS paid_at__quarter
+              , DATE_TRUNC('year', bookings_source_src_10001.paid_at) AS paid_at__year
               , bookings_source_src_10001.is_instant AS booking__is_instant
               , bookings_source_src_10001.ds AS booking__ds
               , DATE_TRUNC('week', bookings_source_src_10001.ds) AS booking__ds__week
@@ -156,7 +212,17 @@ CROSS JOIN (
       FROM (
         -- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-01T00:00:00]
         SELECT
-          subq_7.listing__ds
+          subq_7.ds
+          , subq_7.ds__week
+          , subq_7.ds__month
+          , subq_7.ds__quarter
+          , subq_7.ds__year
+          , subq_7.created_at
+          , subq_7.created_at__week
+          , subq_7.created_at__month
+          , subq_7.created_at__quarter
+          , subq_7.created_at__year
+          , subq_7.listing__ds
           , subq_7.listing__ds__week
           , subq_7.listing__ds__month
           , subq_7.listing__ds__quarter
@@ -167,9 +233,16 @@ CROSS JOIN (
           , subq_7.listing__created_at__quarter
           , subq_7.listing__created_at__year
           , subq_7.metric_time
+          , subq_7.metric_time__week
+          , subq_7.metric_time__month
+          , subq_7.metric_time__quarter
+          , subq_7.metric_time__year
           , subq_7.listing
           , subq_7.user
           , subq_7.listing__user
+          , subq_7.country_latest
+          , subq_7.is_lux_latest
+          , subq_7.capacity_latest
           , subq_7.listing__country_latest
           , subq_7.listing__is_lux_latest
           , subq_7.listing__capacity_latest
@@ -179,7 +252,17 @@ CROSS JOIN (
         FROM (
           -- Metric Time Dimension 'ds'
           SELECT
-            subq_6.listing__ds
+            subq_6.ds
+            , subq_6.ds__week
+            , subq_6.ds__month
+            , subq_6.ds__quarter
+            , subq_6.ds__year
+            , subq_6.created_at
+            , subq_6.created_at__week
+            , subq_6.created_at__month
+            , subq_6.created_at__quarter
+            , subq_6.created_at__year
+            , subq_6.listing__ds
             , subq_6.listing__ds__week
             , subq_6.listing__ds__month
             , subq_6.listing__ds__quarter
@@ -189,10 +272,17 @@ CROSS JOIN (
             , subq_6.listing__created_at__month
             , subq_6.listing__created_at__quarter
             , subq_6.listing__created_at__year
-            , subq_6.listing__ds AS metric_time
+            , subq_6.ds AS metric_time
+            , subq_6.ds__week AS metric_time__week
+            , subq_6.ds__month AS metric_time__month
+            , subq_6.ds__quarter AS metric_time__quarter
+            , subq_6.ds__year AS metric_time__year
             , subq_6.listing
             , subq_6.user
             , subq_6.listing__user
+            , subq_6.country_latest
+            , subq_6.is_lux_latest
+            , subq_6.capacity_latest
             , subq_6.listing__country_latest
             , subq_6.listing__is_lux_latest
             , subq_6.listing__capacity_latest
@@ -205,6 +295,19 @@ CROSS JOIN (
               1 AS listings
               , listings_latest_src_10004.capacity AS largest_listing
               , listings_latest_src_10004.capacity AS smallest_listing
+              , listings_latest_src_10004.created_at AS ds
+              , DATE_TRUNC('week', listings_latest_src_10004.created_at) AS ds__week
+              , DATE_TRUNC('month', listings_latest_src_10004.created_at) AS ds__month
+              , DATE_TRUNC('quarter', listings_latest_src_10004.created_at) AS ds__quarter
+              , DATE_TRUNC('year', listings_latest_src_10004.created_at) AS ds__year
+              , listings_latest_src_10004.created_at
+              , DATE_TRUNC('week', listings_latest_src_10004.created_at) AS created_at__week
+              , DATE_TRUNC('month', listings_latest_src_10004.created_at) AS created_at__month
+              , DATE_TRUNC('quarter', listings_latest_src_10004.created_at) AS created_at__quarter
+              , DATE_TRUNC('year', listings_latest_src_10004.created_at) AS created_at__year
+              , listings_latest_src_10004.country AS country_latest
+              , listings_latest_src_10004.is_lux AS is_lux_latest
+              , listings_latest_src_10004.capacity AS capacity_latest
               , listings_latest_src_10004.created_at AS listing__ds
               , DATE_TRUNC('week', listings_latest_src_10004.created_at) AS listing__ds__week
               , DATE_TRUNC('month', listings_latest_src_10004.created_at) AS listing__ds__month

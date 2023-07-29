@@ -52,6 +52,8 @@ BOOKINGS_YAML = textwrap.dedent(
           type_params:
             time_granularity: day
 
+      primary_entity: booking
+      
       entities:
         - name: listing
           type: foreign
@@ -89,6 +91,8 @@ REVENUE_YAML = textwrap.dedent(
           type: categorical
           expr: country
 
+      primary_entity: company
+      
       entities:
         - name: user
           type: foreign
@@ -136,7 +140,7 @@ def test_query_parser() -> None:  # noqa: D
     query_parser = query_parser_from_yaml([EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, bookings_yaml_file])
 
     query_spec = query_parser.parse_and_validate_query(
-        metric_names=["bookings"], group_by_names=["is_instant", "listing", MTD], order=[MTD, "-bookings"]
+        metric_names=["bookings"], group_by_names=["booking__is_instant", "listing", MTD], order=[MTD, "-bookings"]
     )
 
     assert query_spec.metric_specs == (MetricSpec(element_name="bookings"),)

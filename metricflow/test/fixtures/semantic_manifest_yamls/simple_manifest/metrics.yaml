@@ -63,7 +63,7 @@ metric:
   type: simple
   type_params:
     measure: booking_value
-  filter: "{{ entity('listing') }} IS NOT NULL"
+  filter: "{{ Entity('listing') }} IS NOT NULL"
 ---
 metric:
   name: "bookers"

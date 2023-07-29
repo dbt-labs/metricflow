@@ -41,9 +41,28 @@ FROM (
       , DATE_TRUNC('month', bookings_source_src_10001.paid_at) AS paid_at__month
       , DATE_TRUNC('quarter', bookings_source_src_10001.paid_at) AS paid_at__quarter
       , DATE_TRUNC('year', bookings_source_src_10001.paid_at) AS paid_at__year
+      , bookings_source_src_10001.is_instant AS booking__is_instant
+      , bookings_source_src_10001.ds AS booking__ds
+      , DATE_TRUNC('week', bookings_source_src_10001.ds) AS booking__ds__week
+      , DATE_TRUNC('month', bookings_source_src_10001.ds) AS booking__ds__month
+      , DATE_TRUNC('quarter', bookings_source_src_10001.ds) AS booking__ds__quarter
+      , DATE_TRUNC('year', bookings_source_src_10001.ds) AS booking__ds__year
+      , bookings_source_src_10001.ds_partitioned AS booking__ds_partitioned
+      , DATE_TRUNC('week', bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__week
+      , DATE_TRUNC('month', bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__month
+      , DATE_TRUNC('quarter', bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__quarter
+      , DATE_TRUNC('year', bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__year
+      , bookings_source_src_10001.paid_at AS booking__paid_at
+      , DATE_TRUNC('week', bookings_source_src_10001.paid_at) AS booking__paid_at__week
+      , DATE_TRUNC('month', bookings_source_src_10001.paid_at) AS booking__paid_at__month
+      , DATE_TRUNC('quarter', bookings_source_src_10001.paid_at) AS booking__paid_at__quarter
+      , DATE_TRUNC('year', bookings_source_src_10001.paid_at) AS booking__paid_at__year
       , bookings_source_src_10001.listing_id AS listing
       , bookings_source_src_10001.guest_id AS guest
       , bookings_source_src_10001.host_id AS host
+      , bookings_source_src_10001.listing_id AS booking__listing
+      , bookings_source_src_10001.guest_id AS booking__guest
+      , bookings_source_src_10001.host_id AS booking__host
     FROM ***************************.fct_bookings bookings_source_src_10001
   ) subq_0
 ) subq_1

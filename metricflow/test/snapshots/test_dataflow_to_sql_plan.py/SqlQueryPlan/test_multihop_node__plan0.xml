@@ -220,99 +220,99 @@
                                 <!-- node_id = ss_10010 -->
                                 <!-- col0 =                                                      -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10171),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10215),  -->
                                 <!--    'column_alias': 'txn_count'}                             -->
                                 <!-- col1 =                                                      -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10172),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10216),  -->
                                 <!--    'column_alias': 'ds_partitioned'}                        -->
                                 <!-- col2 =                                                -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10092),  -->
+                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10120),  -->
                                 <!--    'column_alias': 'ds_partitioned__week'}            -->
                                 <!-- col3 =                                                -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10093),  -->
+                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10121),  -->
                                 <!--    'column_alias': 'ds_partitioned__month'}           -->
                                 <!-- col4 =                                                -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10094),  -->
+                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10122),  -->
                                 <!--    'column_alias': 'ds_partitioned__quarter'}         -->
                                 <!-- col5 =                                                -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10095),  -->
+                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10123),  -->
                                 <!--    'column_alias': 'ds_partitioned__year'}            -->
                                 <!-- col6 =                                                      -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10177),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10221),  -->
                                 <!--    'column_alias': 'ds'}                                    -->
                                 <!-- col7 =                                                -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10096),  -->
+                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10124),  -->
                                 <!--    'column_alias': 'ds__week'}                        -->
                                 <!-- col8 =                                                -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10097),  -->
+                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10125),  -->
                                 <!--    'column_alias': 'ds__month'}                       -->
                                 <!-- col9 =                                                -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10098),  -->
+                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10126),  -->
                                 <!--    'column_alias': 'ds__quarter'}                     -->
                                 <!-- col10 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10099),  -->
+                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10127),  -->
                                 <!--    'column_alias': 'ds__year'}                        -->
                                 <!-- col11 =                                                     -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10182),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10226),  -->
                                 <!--    'column_alias': 'account_month'}                         -->
                                 <!-- col12 =                                                     -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10183),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10227),  -->
                                 <!--    'column_alias': 'account_id__ds_partitioned'}            -->
                                 <!-- col13 =                                                 -->
                                 <!--   {'class': 'SqlSelectColumn',                          -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10100),    -->
+                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10128),    -->
                                 <!--    'column_alias': 'account_id__ds_partitioned__week'}  -->
                                 <!-- col14 =                                                  -->
                                 <!--   {'class': 'SqlSelectColumn',                           -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10101),     -->
+                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10129),     -->
                                 <!--    'column_alias': 'account_id__ds_partitioned__month'}  -->
                                 <!-- col15 =                                                    -->
                                 <!--   {'class': 'SqlSelectColumn',                             -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10102),       -->
+                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10130),       -->
                                 <!--    'column_alias': 'account_id__ds_partitioned__quarter'}  -->
                                 <!-- col16 =                                                 -->
                                 <!--   {'class': 'SqlSelectColumn',                          -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10103),    -->
+                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10131),    -->
                                 <!--    'column_alias': 'account_id__ds_partitioned__year'}  -->
                                 <!-- col17 =                                                     -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10188),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10232),  -->
                                 <!--    'column_alias': 'account_id__ds'}                        -->
                                 <!-- col18 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10104),  -->
+                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10132),  -->
                                 <!--    'column_alias': 'account_id__ds__week'}            -->
                                 <!-- col19 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10105),  -->
+                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10133),  -->
                                 <!--    'column_alias': 'account_id__ds__month'}           -->
                                 <!-- col20 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10106),  -->
+                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10134),  -->
                                 <!--    'column_alias': 'account_id__ds__quarter'}         -->
                                 <!-- col21 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10107),  -->
+                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10135),  -->
                                 <!--    'column_alias': 'account_id__ds__year'}            -->
                                 <!-- col22 =                                                     -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10193),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10237),  -->
                                 <!--    'column_alias': 'account_id__account_month'}             -->
                                 <!-- col23 =                                                     -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10194),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10238),  -->
                                 <!--    'column_alias': 'account_id'}                            -->
                                 <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10010) -->
                                 <!-- where = None -->
@@ -447,63 +447,63 @@
                                 <!-- node_id = ss_10011 -->
                                 <!-- col0 =                                                      -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10195),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10239),  -->
                                 <!--    'column_alias': 'extra_dim'}                             -->
                                 <!-- col1 =                                                      -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10196),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10240),  -->
                                 <!--    'column_alias': 'ds_partitioned'}                        -->
                                 <!-- col2 =                                                -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10108),  -->
+                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10136),  -->
                                 <!--    'column_alias': 'ds_partitioned__week'}            -->
                                 <!-- col3 =                                                -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10109),  -->
+                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10137),  -->
                                 <!--    'column_alias': 'ds_partitioned__month'}           -->
                                 <!-- col4 =                                                -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10110),  -->
+                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10138),  -->
                                 <!--    'column_alias': 'ds_partitioned__quarter'}         -->
                                 <!-- col5 =                                                -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10111),  -->
+                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10139),  -->
                                 <!--    'column_alias': 'ds_partitioned__year'}            -->
                                 <!-- col6 =                                                      -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10201),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10245),  -->
                                 <!--    'column_alias': 'account_id__extra_dim'}                 -->
                                 <!-- col7 =                                                      -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10202),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10246),  -->
                                 <!--    'column_alias': 'account_id__ds_partitioned'}            -->
                                 <!-- col8 =                                                  -->
                                 <!--   {'class': 'SqlSelectColumn',                          -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10112),    -->
+                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10140),    -->
                                 <!--    'column_alias': 'account_id__ds_partitioned__week'}  -->
                                 <!-- col9 =                                                   -->
                                 <!--   {'class': 'SqlSelectColumn',                           -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10113),     -->
+                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10141),     -->
                                 <!--    'column_alias': 'account_id__ds_partitioned__month'}  -->
                                 <!-- col10 =                                                    -->
                                 <!--   {'class': 'SqlSelectColumn',                             -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10114),       -->
+                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10142),       -->
                                 <!--    'column_alias': 'account_id__ds_partitioned__quarter'}  -->
                                 <!-- col11 =                                                 -->
                                 <!--   {'class': 'SqlSelectColumn',                          -->
-                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10115),    -->
+                                <!--    'expr': SqlDateTruncExpression(node_id=dt_10143),    -->
                                 <!--    'column_alias': 'account_id__ds_partitioned__year'}  -->
                                 <!-- col12 =                                                     -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10207),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10251),  -->
                                 <!--    'column_alias': 'account_id'}                            -->
                                 <!-- col13 =                                                     -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10208),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10252),  -->
                                 <!--    'column_alias': 'customer_id'}                           -->
                                 <!-- col14 =                                                     -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10209),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10253),  -->
                                 <!--    'column_alias': 'account_id__customer_id'}               -->
                                 <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10011) -->
                                 <!-- where = None -->
@@ -599,63 +599,63 @@
                                     <!-- node_id = ss_10013 -->
                                     <!-- col0 =                                                      -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10217),  -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10261),  -->
                                     <!--    'column_alias': 'customer_name'}                         -->
                                     <!-- col1 =                                                      -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10218),  -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10262),  -->
                                     <!--    'column_alias': 'customer_atomic_weight'}                -->
                                     <!-- col2 =                                                      -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10219),  -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10263),  -->
                                     <!--    'column_alias': 'ds_partitioned'}                        -->
                                     <!-- col3 =                                                -->
                                     <!--   {'class': 'SqlSelectColumn',                        -->
-                                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10116),  -->
+                                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10144),  -->
                                     <!--    'column_alias': 'ds_partitioned__week'}            -->
                                     <!-- col4 =                                                -->
                                     <!--   {'class': 'SqlSelectColumn',                        -->
-                                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10117),  -->
+                                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10145),  -->
                                     <!--    'column_alias': 'ds_partitioned__month'}           -->
                                     <!-- col5 =                                                -->
                                     <!--   {'class': 'SqlSelectColumn',                        -->
-                                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10118),  -->
+                                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10146),  -->
                                     <!--    'column_alias': 'ds_partitioned__quarter'}         -->
                                     <!-- col6 =                                                -->
                                     <!--   {'class': 'SqlSelectColumn',                        -->
-                                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10119),  -->
+                                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10147),  -->
                                     <!--    'column_alias': 'ds_partitioned__year'}            -->
                                     <!-- col7 =                                                      -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10224),  -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10268),  -->
                                     <!--    'column_alias': 'customer_id__customer_name'}            -->
                                     <!-- col8 =                                                      -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10225),  -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10269),  -->
                                     <!--    'column_alias': 'customer_id__customer_atomic_weight'}   -->
                                     <!-- col9 =                                                      -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10226),  -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10270),  -->
                                     <!--    'column_alias': 'customer_id__ds_partitioned'}           -->
                                     <!-- col10 =                                                  -->
                                     <!--   {'class': 'SqlSelectColumn',                           -->
-                                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10120),     -->
+                                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10148),     -->
                                     <!--    'column_alias': 'customer_id__ds_partitioned__week'}  -->
                                     <!-- col11 =                                                   -->
                                     <!--   {'class': 'SqlSelectColumn',                            -->
-                                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10121),      -->
+                                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10149),      -->
                                     <!--    'column_alias': 'customer_id__ds_partitioned__month'}  -->
                                     <!-- col12 =                                                     -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10122),        -->
+                                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10150),        -->
                                     <!--    'column_alias': 'customer_id__ds_partitioned__quarter'}  -->
                                     <!-- col13 =                                                  -->
                                     <!--   {'class': 'SqlSelectColumn',                           -->
-                                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10123),     -->
+                                    <!--    'expr': SqlDateTruncExpression(node_id=dt_10151),     -->
                                     <!--    'column_alias': 'customer_id__ds_partitioned__year'}  -->
                                     <!-- col14 =                                                     -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10231),  -->
+                                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10275),  -->
                                     <!--    'column_alias': 'customer_id'}                           -->
                                     <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10013) -->
                                     <!-- where = None -->

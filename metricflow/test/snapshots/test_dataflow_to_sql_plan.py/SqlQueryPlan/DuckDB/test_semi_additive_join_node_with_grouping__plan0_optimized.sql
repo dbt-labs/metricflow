@@ -1,12 +1,18 @@
 -- Join on MAX(ds) and ['user'] grouping by None
 SELECT
-  subq_3.account__ds AS account__ds
+  subq_3.ds AS ds
+  , subq_3.ds__week AS ds__week
+  , subq_3.ds__month AS ds__month
+  , subq_3.ds__quarter AS ds__quarter
+  , subq_3.ds__year AS ds__year
+  , subq_3.account__ds AS account__ds
   , subq_3.account__ds__week AS account__ds__week
   , subq_3.account__ds__month AS account__ds__month
   , subq_3.account__ds__quarter AS account__ds__quarter
   , subq_3.account__ds__year AS account__ds__year
   , subq_3.user AS user
   , subq_3.account__user AS account__user
+  , subq_3.account_type AS account_type
   , subq_3.account__account_type AS account__account_type
   , subq_3.account_balance AS account_balance
   , subq_3.total_account_balance_first_day AS total_account_balance_first_day
@@ -17,6 +23,12 @@ FROM (
     account_balance
     , account_balance AS total_account_balance_first_day
     , account_balance AS current_account_balance_by_user
+    , ds
+    , DATE_TRUNC('week', ds) AS ds__week
+    , DATE_TRUNC('month', ds) AS ds__month
+    , DATE_TRUNC('quarter', ds) AS ds__quarter
+    , DATE_TRUNC('year', ds) AS ds__year
+    , account_type
     , ds AS account__ds
     , DATE_TRUNC('week', ds) AS account__ds__week
     , DATE_TRUNC('month', ds) AS account__ds__month
