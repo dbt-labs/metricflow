@@ -66,4 +66,4 @@ FROM (
     FROM ***************************.fct_bookings bookings_source_src_10001
   ) subq_0
 ) subq_1
-WHERE ds = '2020-01-01'
+WHERE booking__ds = '2020-01-01'
