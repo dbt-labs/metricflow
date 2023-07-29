@@ -6,6 +6,7 @@ import time
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 
+from dbt_semantic_interfaces.call_parameter_sets import ParseWhereFilterException
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.protocols.dimension import DimensionType
@@ -351,9 +352,12 @@ class MetricFlowQueryParser:
         requested_linkable_specs = self._parse_linkable_element_names(group_by_names, metric_references)
         where_filter_spec: Optional[WhereFilterSpec] = None
         if where_filter is not None:
-            where_filter_spec = WhereSpecFactory(
-                column_association_resolver=self._column_association_resolver,
-            ).create_from_where_filter(where_filter)
+            try:
+                where_filter_spec = WhereSpecFactory(
+                    column_association_resolver=self._column_association_resolver,
+                ).create_from_where_filter(where_filter)
+            except ParseWhereFilterException as e:
+                raise InvalidQueryException(f"Error parsing the where filter: {where_filter.where_sql_template}") from e
 
             where_spec_set = QueryTimeLinkableSpecSet.create_from_linkable_spec_set(where_filter_spec.linkable_spec_set)
             requested_linkable_specs_with_requested_filter_specs = QueryTimeLinkableSpecSet.combine(
