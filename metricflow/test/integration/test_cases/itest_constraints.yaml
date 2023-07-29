@@ -36,7 +36,7 @@ integration_test:
   model: SIMPLE_MODEL
   metrics: ["booking_value"]
   group_bys: ["booking__is_instant"]
-  where_filter: "{{ render_dimension_template('country_latest', entity_path=['listing']) }} = 'us'"
+  where_filter: "{{ render_dimension_template('listing__country_latest') }} = 'us'"
   check_query: |
     SELECT SUM(booking_value) AS booking_value
       , is_instant AS booking__is_instant
@@ -98,7 +98,7 @@ integration_test:
   model: SIMPLE_MODEL
   metrics: ["booking_value"]
   group_bys: ["metric_time"]
-  where_filter: "{{ render_dimension_template('capacity_latest', entity_path=['listing']) }} >= 4"
+  where_filter: "{{ render_dimension_template('listing__capacity_latest') }} >= 4"
   check_query: |
     SELECT  SUM(b.booking_value) AS booking_value
       , b.ds AS metric_time

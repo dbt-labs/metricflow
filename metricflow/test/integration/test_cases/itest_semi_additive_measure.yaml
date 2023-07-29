@@ -103,7 +103,7 @@ integration_test:
   model: SIMPLE_MODEL
   metrics: ["current_account_balance_by_user"]
   group_bys: ["user"]
-  where_filter: "{{ render_dimension_template('home_state_latest', entity_path=['user']) }} = 'CA'"
+  where_filter: "{{ render_dimension_template('user__home_state_latest') }} = 'CA'"
   check_query: |
     SELECT
       e.user AS user
