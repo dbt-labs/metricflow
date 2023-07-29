@@ -1,0 +1,5 @@
+('listing__capacity_latest',
+ 'listing__country_latest',
+ 'listing__created_at',
+ 'listing__ds',
+ 'listing__is_lux_latest')
