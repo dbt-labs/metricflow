@@ -55,12 +55,12 @@ metrics:
     type_params:
       measure: cancellations_usd
     filter: |
-      {{ dimension('customer_country', entity_path=['customer']) }} = 'MX'
+      {{ Dimension('customer__customer_country') }} = 'MX'
     label: "test"
   - name: transaction_usd_na
     type: SIMPLE
     type_params:
       measure: transaction_amount_usd
     filter: |
-      {{ dimension('region', entity_path=['customer', 'country']) }} = 'NA'
+      {{ Dimension('country__region', entity_path=['customer']) }} = 'NA'
     label: "test"
