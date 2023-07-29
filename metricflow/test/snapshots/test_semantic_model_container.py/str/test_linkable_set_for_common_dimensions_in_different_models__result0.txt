@@ -1,7 +1,5 @@
 Semantic Model       Entity Links         Name               Time Granularity    Properties
 -------------------  -------------------  -----------------  ------------------  ---------------------------------
-bookings_source      ()                   ds                 DAY                 ['LOCAL']
-bookings_source      ()                   ds_partitioned     DAY                 ['LOCAL']
 bookings_source      ()                   listing                                ['ENTITY', 'LOCAL']
 bookings_source      ()                   metric_time        DAY                 ['METRIC_TIME']
 companies            ('listing', 'user')  company                                ['ENTITY', 'JOINED', 'MULTI_HOP']
@@ -17,7 +15,5 @@ users_ds_source      ('listing', 'user')  created_at         DAY                
 users_ds_source      ('listing', 'user')  ds_partitioned     DAY                 ['JOINED', 'MULTI_HOP']
 users_ds_source      ('listing', 'user')  home_state                             ['JOINED', 'MULTI_HOP']
 users_latest         ('listing', 'user')  home_state_latest                      ['JOINED', 'MULTI_HOP']
-views_source         ()                   ds                 DAY                 ['LOCAL']
-views_source         ()                   ds_partitioned     DAY                 ['LOCAL']
 views_source         ()                   listing                                ['ENTITY', 'LOCAL']
 views_source         ()                   metric_time        DAY                 ['METRIC_TIME']

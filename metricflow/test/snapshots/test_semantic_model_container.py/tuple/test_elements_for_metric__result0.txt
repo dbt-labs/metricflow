@@ -1,6 +1,4 @@
-('ds',
- 'ds_partitioned',
- 'listing',
+('listing',
  'listing__capacity_latest',
  'listing__country_latest',
  'listing__created_at',
@@ -20,4 +18,8 @@
  'user__created_at',
  'user__ds_partitioned',
  'user__home_state',
- 'user__home_state_latest')
+ 'user__home_state_latest',
+ 'view__ds',
+ 'view__ds_partitioned',
+ 'view__listing',
+ 'view__user')
