@@ -22,11 +22,11 @@ integration_test:
   description: Tests selecting an SCD-constrained metric with a separate group by
   model: SCD_MODEL
   metrics: ["family_bookings"]
-  group_bys: ["metric_time", "is_instant"]
+  group_bys: ["metric_time", "booking__is_instant"]
   check_query: |
     SELECT
       a.ds AS metric_time
-      , a.is_instant
+      , a.is_instant AS booking__is_instant
       , SUM(1) AS family_bookings
     FROM {{ source_schema }}.fct_bookings a
     LEFT OUTER JOIN {{ source_schema }}.dim_listings b
@@ -47,11 +47,11 @@ integration_test:
     the results would be silently incorrect, as the is_instant count would be off by one in the output.
   model: SCD_MODEL
   metrics: ["potentially_lux_bookings"]
-  group_bys: ["metric_time", "is_instant", "listing__is_lux"]
+  group_bys: ["metric_time", "booking__is_instant", "listing__is_lux"]
   check_query: |
     SELECT
       a.ds AS metric_time
-      , a.is_instant
+      , a.is_instant AS booking__is_instant
       , b.is_lux AS listing__is_lux
       , SUM(1) AS potentially_lux_bookings
     FROM {{ source_schema }}.fct_bookings a

@@ -180,7 +180,7 @@ integration_test:
   model: SIMPLE_MODEL
   metrics: ["current_account_balance_by_user"]
   group_bys: ["user"]
-  where_filter: "{{ render_dimension_template('account_type') }} = 'savings'"
+  where_filter: "{{ render_dimension_template('account__account_type') }} = 'savings'"
   check_query: |
     SELECT
       b.user AS user
@@ -225,11 +225,11 @@ integration_test:
   description: Tests selecting a semi-additive measure with a time constraint written as a where clause
   model: SIMPLE_MODEL
   metrics: ["total_account_balance_first_day"]
-  group_bys: ["account_type"]
-  where_filter: "{{ render_time_dimension_template('ds', 'day') }} >= '2020-01-03'"
+  group_bys: ["account__account_type"]
+  where_filter: "{{ render_time_dimension_template('account__ds', 'day') }} >= '2020-01-03'"
   check_query: |
     SELECT
-      b.account_type AS account_type
+      b.account_type AS account__account_type
       , SUM(b.total_account_balance_first_day) AS total_account_balance_first_day
     FROM (
       SELECT

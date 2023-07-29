@@ -294,13 +294,13 @@ integration_test:
   description: Query two metrics with different time granularities, but without a time dimension.
   model: EXTENDED_DATE_MODEL
   metrics: ["bookings_monthly", "bookings"]
-  group_bys: ["is_instant"]
+  group_bys: ["booking_id__is_instant"]
   time_constraint: ["2020-01-15", "2020-02-15"]
   check_query: |
     SELECT
       SUM(bookings_monthly) AS bookings_monthly
       , SUM(bookings) AS bookings
-      , a.is_instant AS is_instant
+      , a.is_instant AS booking_id__is_instant
     FROM (
       SELECT
         SUM(bookings_monthly) AS bookings_monthly
