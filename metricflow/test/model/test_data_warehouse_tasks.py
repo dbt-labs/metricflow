@@ -23,7 +23,7 @@ from metricflow.model.data_warehouse_model_validator import (
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
-from metricflow.test.plan_utils import assert_snapshot_text_equal, make_schema_replacement_function
+from metricflow.test.snapshot_utils import assert_snapshot_text_equal, make_schema_replacement_function
 
 
 @pytest.fixture(scope="session")

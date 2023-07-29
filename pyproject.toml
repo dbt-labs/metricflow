@@ -68,6 +68,7 @@ dev-packages = [
   "types-PyYAML",
   "types-jsonschema",
   "types-python-dateutil",
+  "types-tabulate",
 ]
 
 # These are currently separate for ease of removal, but due to the way Python

@@ -20,7 +20,7 @@ from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.fixtures.sql_client_fixtures import sql_client  # noqa: F401, F403
-from metricflow.test.plan_utils import assert_plan_snapshot_text_equal
+from metricflow.test.snapshot_utils import assert_plan_snapshot_text_equal
 
 logger = logging.getLogger(__name__)
 

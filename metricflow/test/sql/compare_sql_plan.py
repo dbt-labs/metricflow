@@ -7,7 +7,7 @@ from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from metricflow.sql.sql_plan import SqlQueryPlan, SqlQueryPlanNode, SqlSelectStatementNode
 from metricflow.sql.sql_plan_to_text import sql_query_plan_as_text
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
-from metricflow.test.plan_utils import (
+from metricflow.test.snapshot_utils import (
     assert_plan_snapshot_text_equal,
     make_schema_replacement_function,
 )

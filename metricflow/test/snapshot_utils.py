@@ -5,16 +5,20 @@ import logging
 import os
 import re
 import webbrowser
-from typing import Callable, List, Optional, Tuple, TypeVar
+from typing import Any, Callable, List, Optional, Tuple, TypeVar
 
+import tabulate
 from _pytest.fixtures import FixtureRequest
+from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 
 from metricflow.dag.mf_dag import MetricFlowDag
 from metricflow.dataflow.dataflow_plan import DataflowPlan
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.execution.execution_plan import ExecutionPlan
 from metricflow.execution.execution_plan_to_text import execution_plan_to_text
+from metricflow.model.semantics.linkable_spec_resolver import LinkableElementSet
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.specs.specs import InstanceSpecSet
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 
 logger = logging.getLogger(__name__)
@@ -245,4 +249,75 @@ def assert_dataflow_plan_text_equal(  # noqa: D
         plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
         incomparable_strings_replacement_function=replace_dataset_id_hash,
         additional_sub_directories_for_snapshots=(sql_client.sql_engine_type.value,),
+    )
+
+
+def assert_object_equal(  # type: ignore[misc]
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    obj_id: str,
+    obj: Any,
+) -> None:
+    """For tests to compare large objects, this can be used to snapshot a text representation of the object."""
+    assert_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        group_id=obj.__class__.__name__,
+        snapshot_id=obj_id,
+        snapshot_text=pformat_big_objects(obj),
+        snapshot_file_extension=".txt",
+    )
+
+
+def assert_linkable_element_set_equal(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    set_id: str,
+    linkable_element_set: LinkableElementSet,
+) -> None:
+    headers = ("Semantic Model", "Entity Links", "Name", "Time Granularity", "Properties")
+    rows = []
+    for linkable_dimension_iterable in linkable_element_set.path_key_to_linkable_dimensions.values():
+        for linkable_dimension in linkable_dimension_iterable:
+            rows.append(
+                (
+                    # Checking a limited set of fields as the result is large due to the paths in the object.
+                    linkable_dimension.semantic_model_origin.semantic_model_name,
+                    tuple(entity_link.element_name for entity_link in linkable_dimension.entity_links),
+                    linkable_dimension.element_name,
+                    linkable_dimension.time_granularity.name if linkable_dimension.time_granularity is not None else "",
+                    sorted(
+                        linkable_element_property.name for linkable_element_property in linkable_dimension.properties
+                    ),
+                )
+            )
+
+    for linkable_entity_iterable in linkable_element_set.path_key_to_linkable_entities.values():
+        for linkable_entity in linkable_entity_iterable:
+            rows.append(
+                (
+                    # Checking a limited set of fields as the result is large due to the paths in the object.
+                    linkable_entity.semantic_model_origin.semantic_model_name,
+                    tuple(entity_link.element_name for entity_link in linkable_entity.entity_links),
+                    linkable_entity.element_name,
+                    "",
+                    sorted(linkable_element_property.name for linkable_element_property in linkable_entity.properties),
+                )
+            )
+    assert_object_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        obj_id=set_id,
+        obj=tabulate.tabulate(headers=headers, tabular_data=sorted(rows)),
+    )
+
+
+def assert_spec_set_equal(  # noqa: D
+    request: FixtureRequest, mf_test_session_state: MetricFlowTestSessionState, set_id: str, spec_set: InstanceSpecSet
+) -> None:
+    assert_object_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        obj_id=set_id,
+        obj=sorted(spec.qualified_name for spec in spec_set.all_specs),
     )
