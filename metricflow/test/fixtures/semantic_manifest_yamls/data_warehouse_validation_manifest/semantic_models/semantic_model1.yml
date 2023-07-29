@@ -24,6 +24,7 @@ semantic_model:
       agg: sum
       expr: 1
       create_metric: True
+
   entities:
     - name: id
       type: primary
