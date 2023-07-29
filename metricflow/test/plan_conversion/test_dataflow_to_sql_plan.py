@@ -206,7 +206,7 @@ def test_filter_with_where_constraint_node(  # noqa: D
                 column_association_resolver=column_association_resolver,
             ).create_from_where_filter(
                 PydanticWhereFilter(
-                    where_sql_template="{{ TimeDimension('ds', 'day') }} = '2020-01-01'",
+                    where_sql_template="{{ TimeDimension('booking__ds', 'day') }} = '2020-01-01'",
                 )
             )
         ),
