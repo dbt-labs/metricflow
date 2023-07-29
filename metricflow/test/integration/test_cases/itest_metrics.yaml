@@ -139,7 +139,7 @@ integration_test:
   model: SIMPLE_MODEL
   metrics: ["lux_listings"]
   group_bys: ["listing__country_latest"]
-  where_filter: "{{ render_dimension_template('country_latest', entity_path=['listing']) }} = 'us'"
+  where_filter: "{{ render_dimension_template('listing__country_latest') }} = 'us'"
   check_query: |
     SELECT
       SUM(1) AS lux_listings
@@ -156,7 +156,7 @@ integration_test:
   model: SIMPLE_MODEL
   metrics: ["instant_booking_value"]
   group_bys: ["metric_time"]
-  where_filter: "{{ render_dimension_template('is_lux_latest', entity_path=['listing']) }}"
+  where_filter: "{{ render_dimension_template('listing__is_lux_latest') }}"
   check_query: |
     SELECT
       SUM(b.booking_value) AS instant_booking_value
