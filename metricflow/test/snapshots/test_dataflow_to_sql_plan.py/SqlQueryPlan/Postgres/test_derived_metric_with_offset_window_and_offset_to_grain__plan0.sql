@@ -53,6 +53,21 @@ FROM (
               , subq_0.paid_at__month
               , subq_0.paid_at__quarter
               , subq_0.paid_at__year
+              , subq_0.booking__ds
+              , subq_0.booking__ds__week
+              , subq_0.booking__ds__month
+              , subq_0.booking__ds__quarter
+              , subq_0.booking__ds__year
+              , subq_0.booking__ds_partitioned
+              , subq_0.booking__ds_partitioned__week
+              , subq_0.booking__ds_partitioned__month
+              , subq_0.booking__ds_partitioned__quarter
+              , subq_0.booking__ds_partitioned__year
+              , subq_0.booking__paid_at
+              , subq_0.booking__paid_at__week
+              , subq_0.booking__paid_at__month
+              , subq_0.booking__paid_at__quarter
+              , subq_0.booking__paid_at__year
               , subq_0.ds AS metric_time
               , subq_0.ds__week AS metric_time__week
               , subq_0.ds__month AS metric_time__month
@@ -61,7 +76,11 @@ FROM (
               , subq_0.listing
               , subq_0.guest
               , subq_0.host
+              , subq_0.booking__listing
+              , subq_0.booking__guest
+              , subq_0.booking__host
               , subq_0.is_instant
+              , subq_0.booking__is_instant
               , subq_0.bookings
               , subq_0.instant_bookings
               , subq_0.booking_value
@@ -108,9 +127,28 @@ FROM (
                 , DATE_TRUNC('month', bookings_source_src_10001.paid_at) AS paid_at__month
                 , DATE_TRUNC('quarter', bookings_source_src_10001.paid_at) AS paid_at__quarter
                 , DATE_TRUNC('year', bookings_source_src_10001.paid_at) AS paid_at__year
+                , bookings_source_src_10001.is_instant AS booking__is_instant
+                , bookings_source_src_10001.ds AS booking__ds
+                , DATE_TRUNC('week', bookings_source_src_10001.ds) AS booking__ds__week
+                , DATE_TRUNC('month', bookings_source_src_10001.ds) AS booking__ds__month
+                , DATE_TRUNC('quarter', bookings_source_src_10001.ds) AS booking__ds__quarter
+                , DATE_TRUNC('year', bookings_source_src_10001.ds) AS booking__ds__year
+                , bookings_source_src_10001.ds_partitioned AS booking__ds_partitioned
+                , DATE_TRUNC('week', bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__week
+                , DATE_TRUNC('month', bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__month
+                , DATE_TRUNC('quarter', bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__quarter
+                , DATE_TRUNC('year', bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__year
+                , bookings_source_src_10001.paid_at AS booking__paid_at
+                , DATE_TRUNC('week', bookings_source_src_10001.paid_at) AS booking__paid_at__week
+                , DATE_TRUNC('month', bookings_source_src_10001.paid_at) AS booking__paid_at__month
+                , DATE_TRUNC('quarter', bookings_source_src_10001.paid_at) AS booking__paid_at__quarter
+                , DATE_TRUNC('year', bookings_source_src_10001.paid_at) AS booking__paid_at__year
                 , bookings_source_src_10001.listing_id AS listing
                 , bookings_source_src_10001.guest_id AS guest
                 , bookings_source_src_10001.host_id AS host
+                , bookings_source_src_10001.listing_id AS booking__listing
+                , bookings_source_src_10001.guest_id AS booking__guest
+                , bookings_source_src_10001.host_id AS booking__host
               FROM ***************************.fct_bookings bookings_source_src_10001
             ) subq_0
           ) subq_1
@@ -167,6 +205,21 @@ FROM (
               , subq_8.paid_at__month
               , subq_8.paid_at__quarter
               , subq_8.paid_at__year
+              , subq_8.booking__ds
+              , subq_8.booking__ds__week
+              , subq_8.booking__ds__month
+              , subq_8.booking__ds__quarter
+              , subq_8.booking__ds__year
+              , subq_8.booking__ds_partitioned
+              , subq_8.booking__ds_partitioned__week
+              , subq_8.booking__ds_partitioned__month
+              , subq_8.booking__ds_partitioned__quarter
+              , subq_8.booking__ds_partitioned__year
+              , subq_8.booking__paid_at
+              , subq_8.booking__paid_at__week
+              , subq_8.booking__paid_at__month
+              , subq_8.booking__paid_at__quarter
+              , subq_8.booking__paid_at__year
               , subq_8.ds AS metric_time
               , subq_8.ds__week AS metric_time__week
               , subq_8.ds__month AS metric_time__month
@@ -175,7 +228,11 @@ FROM (
               , subq_8.listing
               , subq_8.guest
               , subq_8.host
+              , subq_8.booking__listing
+              , subq_8.booking__guest
+              , subq_8.booking__host
               , subq_8.is_instant
+              , subq_8.booking__is_instant
               , subq_8.bookings
               , subq_8.instant_bookings
               , subq_8.booking_value
@@ -222,9 +279,28 @@ FROM (
                 , DATE_TRUNC('month', bookings_source_src_10001.paid_at) AS paid_at__month
                 , DATE_TRUNC('quarter', bookings_source_src_10001.paid_at) AS paid_at__quarter
                 , DATE_TRUNC('year', bookings_source_src_10001.paid_at) AS paid_at__year
+                , bookings_source_src_10001.is_instant AS booking__is_instant
+                , bookings_source_src_10001.ds AS booking__ds
+                , DATE_TRUNC('week', bookings_source_src_10001.ds) AS booking__ds__week
+                , DATE_TRUNC('month', bookings_source_src_10001.ds) AS booking__ds__month
+                , DATE_TRUNC('quarter', bookings_source_src_10001.ds) AS booking__ds__quarter
+                , DATE_TRUNC('year', bookings_source_src_10001.ds) AS booking__ds__year
+                , bookings_source_src_10001.ds_partitioned AS booking__ds_partitioned
+                , DATE_TRUNC('week', bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__week
+                , DATE_TRUNC('month', bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__month
+                , DATE_TRUNC('quarter', bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__quarter
+                , DATE_TRUNC('year', bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__year
+                , bookings_source_src_10001.paid_at AS booking__paid_at
+                , DATE_TRUNC('week', bookings_source_src_10001.paid_at) AS booking__paid_at__week
+                , DATE_TRUNC('month', bookings_source_src_10001.paid_at) AS booking__paid_at__month
+                , DATE_TRUNC('quarter', bookings_source_src_10001.paid_at) AS booking__paid_at__quarter
+                , DATE_TRUNC('year', bookings_source_src_10001.paid_at) AS booking__paid_at__year
                 , bookings_source_src_10001.listing_id AS listing
                 , bookings_source_src_10001.guest_id AS guest
                 , bookings_source_src_10001.host_id AS host
+                , bookings_source_src_10001.listing_id AS booking__listing
+                , bookings_source_src_10001.guest_id AS booking__guest
+                , bookings_source_src_10001.host_id AS booking__host
               FROM ***************************.fct_bookings bookings_source_src_10001
             ) subq_8
           ) subq_9

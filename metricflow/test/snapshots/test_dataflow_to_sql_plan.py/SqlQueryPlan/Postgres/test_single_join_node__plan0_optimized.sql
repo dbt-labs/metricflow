@@ -1,7 +1,6 @@
 -- Join Standard Outputs
 SELECT
   subq_5.listing AS listing
-  , listings_latest_src_10004.country AS listing__country_latest
   , subq_5.bookings AS bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
