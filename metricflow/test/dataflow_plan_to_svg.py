@@ -6,7 +6,7 @@ from _pytest.fixtures import FixtureRequest
 
 from metricflow.dag.dag_visualization import DagGraphT, render_via_graphviz
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
-from metricflow.test.plan_utils import snapshot_path_prefix
+from metricflow.test.snapshot_utils import snapshot_path_prefix
 
 
 def display_graph_if_requested(

@@ -19,7 +19,7 @@ from metricflow.specs.specs import InstanceSpecSet, MeasureSpec
 from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
-from metricflow.test.plan_utils import assert_plan_snapshot_text_equal
+from metricflow.test.snapshot_utils import assert_plan_snapshot_text_equal
 
 
 def make_dataflow_plan(node: BaseOutput[SourceDataSetT]) -> DataflowPlan[SourceDataSetT]:  # noqa: D

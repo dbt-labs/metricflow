@@ -6,7 +6,7 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.integration.conftest import IntegrationTestHelpers
-from metricflow.test.plan_utils import assert_snapshot_text_equal, make_schema_replacement_function
+from metricflow.test.snapshot_utils import assert_snapshot_text_equal, make_schema_replacement_function
 
 # Needed as the table alias can vary from run to run.
 _EXCLUDE_TABLE_ALIAS_REGEX = "^.*_src.*$"
