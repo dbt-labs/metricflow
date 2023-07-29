@@ -252,7 +252,7 @@ def assert_dataflow_plan_text_equal(  # noqa: D
     )
 
 
-def assert_object_equal(  # type: ignore[misc]
+def assert_object_snapshot_equal(  # type: ignore[misc]
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     obj_id: str,
@@ -269,7 +269,7 @@ def assert_object_equal(  # type: ignore[misc]
     )
 
 
-def assert_linkable_element_set_equal(  # noqa: D
+def assert_linkable_element_set_snapshot_equal(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     set_id: str,
@@ -304,7 +304,7 @@ def assert_linkable_element_set_equal(  # noqa: D
                     sorted(linkable_element_property.name for linkable_element_property in linkable_entity.properties),
                 )
             )
-    assert_object_equal(
+    assert_object_snapshot_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
         obj_id=set_id,
@@ -312,10 +312,10 @@ def assert_linkable_element_set_equal(  # noqa: D
     )
 
 
-def assert_spec_set_equal(  # noqa: D
+def assert_spec_set_snapshot_equal(  # noqa: D
     request: FixtureRequest, mf_test_session_state: MetricFlowTestSessionState, set_id: str, spec_set: InstanceSpecSet
 ) -> None:
-    assert_object_equal(
+    assert_object_snapshot_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
         obj_id=set_id,

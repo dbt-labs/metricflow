@@ -26,7 +26,7 @@ from metricflow.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpre
 from metricflow.sql.sql_plan import SqlSelectColumn, SqlSelectStatementNode, SqlTableFromClauseNode
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
-from metricflow.test.snapshot_utils import assert_spec_set_equal
+from metricflow.test.snapshot_utils import assert_spec_set_snapshot_equal
 
 logger = logging.getLogger(__name__)
 
@@ -117,7 +117,7 @@ def test_joined_node_data_set(  # noqa: D
 
     join_node_output_data_set = resolver.get_output_data_set(join_node)
 
-    assert_spec_set_equal(
+    assert_spec_set_snapshot_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
         set_id="result0",

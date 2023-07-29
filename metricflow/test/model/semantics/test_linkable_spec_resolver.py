@@ -13,7 +13,7 @@ from metricflow.model.semantics.linkable_spec_resolver import (
 )
 from metricflow.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
-from metricflow.test.snapshot_utils import assert_linkable_element_set_equal
+from metricflow.test.snapshot_utils import assert_linkable_element_set_snapshot_equal
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +45,7 @@ def test_all_properties(  # noqa: D
     mf_test_session_state: MetricFlowTestSessionState,
     simple_model_spec_resolver: ValidLinkableSpecResolver,
 ) -> None:
-    assert_linkable_element_set_equal(
+    assert_linkable_element_set_snapshot_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
         set_id="result0",
@@ -62,7 +62,7 @@ def test_one_property(  # noqa: D
     mf_test_session_state: MetricFlowTestSessionState,
     simple_model_spec_resolver: ValidLinkableSpecResolver,
 ) -> None:
-    assert_linkable_element_set_equal(
+    assert_linkable_element_set_snapshot_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
         set_id="result0",
@@ -79,7 +79,7 @@ def test_metric_time_property_for_cumulative_metric(  # noqa: D
     mf_test_session_state: MetricFlowTestSessionState,
     simple_model_spec_resolver: ValidLinkableSpecResolver,
 ) -> None:
-    assert_linkable_element_set_equal(
+    assert_linkable_element_set_snapshot_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
         set_id="result0",
@@ -96,7 +96,7 @@ def test_metric_time_property_for_derived_metrics(  # noqa: D
     mf_test_session_state: MetricFlowTestSessionState,
     simple_model_spec_resolver: ValidLinkableSpecResolver,
 ) -> None:
-    assert_linkable_element_set_equal(
+    assert_linkable_element_set_snapshot_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
         set_id="result0",
@@ -113,7 +113,7 @@ def test_cyclic_join_manifest(  # noqa: D
     mf_test_session_state: MetricFlowTestSessionState,
     cyclic_join_manifest_spec_resolver: ValidLinkableSpecResolver,
 ) -> None:
-    assert_linkable_element_set_equal(
+    assert_linkable_element_set_snapshot_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
         set_id="result0",
