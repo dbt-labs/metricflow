@@ -15,7 +15,7 @@ def test_write_to_table(it_helpers: IntegrationTestHelpers) -> None:  # noqa: D
     try:
         it_helpers.mf_engine.query(
             MetricFlowQueryRequest.create_with_random_request_id(
-                metric_names=["bookings"], group_by_names=["ds"], output_table=output_table.sql
+                metric_names=["bookings"], group_by_names=["metric_time"], output_table=output_table.sql
             )
         )
         expected = it_helpers.sql_client.query(
@@ -23,7 +23,7 @@ def test_write_to_table(it_helpers: IntegrationTestHelpers) -> None:  # noqa: D
                 f"""\
                 SELECT
                   SUM(1) AS bookings
-                  , ds
+                  , ds AS metric_time
                 FROM {it_helpers.source_schema}.fct_bookings
                 GROUP BY ds
                 """
@@ -34,7 +34,7 @@ def test_write_to_table(it_helpers: IntegrationTestHelpers) -> None:  # noqa: D
                 f"""\
                 SELECT
                   bookings
-                  , ds
+                  , metric_time
                 FROM {output_table.sql}
                 """
             )

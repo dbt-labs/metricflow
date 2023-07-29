@@ -41,7 +41,39 @@ def test_simple_plan(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="is_instant",
-                    entity_links=(),
+                    entity_links=(EntityReference("booking"),),
+                ),
+            ),
+        )
+    )
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dag_graph=dataflow_plan,
+    )
+
+
+def test_primary_entity_dimension(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+) -> None:
+    """Tests a simple plan getting a metric and a local dimension."""
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings"),),
+            dimension_specs=(
+                DimensionSpec(
+                    element_name="is_instant",
+                    entity_links=(EntityReference(element_name="booking"),),
                 ),
             ),
         )
@@ -74,7 +106,7 @@ def test_joined_plan(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="is_instant",
-                    entity_links=(),
+                    entity_links=(EntityReference("booking"),),
                 ),
                 DimensionSpec(
                     element_name="country_latest",
@@ -175,7 +207,7 @@ def test_multiple_metrics_plan(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="is_instant",
-                    entity_links=(),
+                    entity_links=(EntityReference("booking"),),
                 ),
             ),
             time_dimension_specs=(MTD_SPEC_DAY,),
@@ -310,7 +342,7 @@ def test_where_constrained_plan(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="is_instant",
-                    entity_links=(),
+                    entity_links=(EntityReference("booking"),),
                 ),
             ),
             where_constraint=(
@@ -318,7 +350,7 @@ def test_where_constrained_plan(  # noqa: D
                     column_association_resolver=column_association_resolver,
                 ).create_from_where_filter(
                     PydanticWhereFilter(
-                        where_sql_template="{{ dimension('country_latest', entity_path=['listing']) }} = 'us'",
+                        where_sql_template="{{ Dimension('listing__country_latest') }} = 'us'",
                     )
                 )
             ),
@@ -352,7 +384,7 @@ def test_where_constrained_plan_time_dimension(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="is_instant",
-                    entity_links=(),
+                    entity_links=(EntityReference("booking"),),
                 ),
             ),
             where_constraint=(
@@ -360,7 +392,7 @@ def test_where_constrained_plan_time_dimension(  # noqa: D
                     column_association_resolver=column_association_resolver,
                 ).create_from_where_filter(
                     PydanticWhereFilter(
-                        where_sql_template="{{ time_dimension('metric_time', 'day') }} >= '2020-01-01'",
+                        where_sql_template="{{ TimeDimension('metric_time', 'day') }} >= '2020-01-01'",
                     )
                 )
             ),
@@ -402,7 +434,7 @@ def test_where_constrained_with_common_linkable_plan(  # noqa: D
                     column_association_resolver=column_association_resolver,
                 ).create_from_where_filter(
                     PydanticWhereFilter(
-                        where_sql_template="{{ dimension('country_latest', entity_path=['listing']) }} = 'us'",
+                        where_sql_template="{{ Dimension('listing__country_latest') }} = 'us'",
                     )
                 )
             ),
