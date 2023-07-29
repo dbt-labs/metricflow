@@ -11,6 +11,7 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.errors.errors import UnableToSatisfyQueryError
 from metricflow.filters.time_constraint import TimeRangeConstraint
+from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.specs.specs import (
     DimensionSpec,
     EntitySpec,
@@ -247,7 +248,16 @@ def test_parse_and_validate_where_constraint_dims() -> None:
             group_by_names=[MTD],
             time_constraint_start=as_datetime("2020-01-15"),
             time_constraint_end=as_datetime("2020-02-15"),
-            where_constraint_str="{{ Dimension('invalid_dim') }} = '1'",
+            where_constraint_str="{{ Dimension('booking__invalid_dim') }} = '1'",
+        )
+
+    with pytest.raises(InvalidQueryException):
+        query_parser.parse_and_validate_query(
+            metric_names=["bookings"],
+            group_by_names=[MTD],
+            time_constraint_start=as_datetime("2020-01-15"),
+            time_constraint_end=as_datetime("2020-02-15"),
+            where_constraint_str="{{ Dimension('invalid_format') }} = '1'",
         )
 
     query_spec = query_parser.parse_and_validate_query(
