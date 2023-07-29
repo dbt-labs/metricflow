@@ -206,7 +206,7 @@ def test_filter_with_where_constraint_node(  # noqa: D
                 column_association_resolver=column_association_resolver,
             ).create_from_where_filter(
                 PydanticWhereFilter(
-                    where_sql_template="{{ time_dimension('ds', 'day') }} = '2020-01-01'",
+                    where_sql_template="{{ TimeDimension('ds', 'day') }} = '2020-01-01'",
                 )
             )
         ),
@@ -289,7 +289,7 @@ def test_single_join_node(  # noqa: D
 
     dimension_spec = DimensionSpec(
         element_name="country_latest",
-        entity_links=(),
+        entity_links=(EntityReference("listing"),),
     )
     dimension_source_node = consistent_id_object_repository.simple_model_read_nodes["listings_latest"]
     filtered_dimension_node = FilterElementsNode[SemanticModelDataSet](
@@ -540,6 +540,7 @@ def test_join_to_time_spine_node_without_offset(  # noqa: D
         parent_node=measure_source_node,
         aggregation_time_dimension_reference=TimeDimensionReference(element_name="ds"),
     )
+
     filtered_measure_node = FilterElementsNode[SemanticModelDataSet](
         parent_node=metric_time_node,
         include_specs=InstanceSpecSet(
@@ -945,7 +946,7 @@ def test_filter_with_where_constraint_on_join_dim(
                     column_association_resolver=column_association_resolver,
                 ).create_from_where_filter(
                     PydanticWhereFilter(
-                        where_sql_template="{{ dimension('country_latest', entity_path=['listing']) }} = 'us'",
+                        where_sql_template="{{ Dimension('listing__country_latest') }} = 'us'",
                     )
                 )
             ),
@@ -1536,7 +1537,7 @@ def test_join_to_scd_dimension(
                             column_association_resolver=scd_column_association_resolver,
                         ).create_from_where_filter(
                             PydanticWhereFilter(
-                                where_sql_template="{{ dimension('capacity', entity_path=['listing']) }} > 2",
+                                where_sql_template="{{ Dimension('listing__capacity') }} > 2",
                             )
                         )
                     ),

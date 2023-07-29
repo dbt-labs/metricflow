@@ -23,6 +23,7 @@ from metricflow.instances import (
     MeasureInstance,
     TimeDimensionInstance,
 )
+from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.model.spec_converters import MeasureConverter
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
@@ -347,14 +348,13 @@ class SemanticModelToDataSetConverter:
             all_measure_instances.extend(measure_instances)
             all_select_columns.extend(select_columns)
 
-        # For dimensions in a semantic model, we can access them through the local form, or the dundered form.
-        # e.g. in the "users" semantic model, with the "country" dimension and the "user_id" entity,
-        # the dimensions "country" and "user_id__country" both mean the same thing. To make matching easier, create both
-        # instances in the instance set. We'll create a different instance for each "possible_entity_links".
-        possible_entity_links: List[Tuple[EntityReference, ...]] = [()]
-        for entity in semantic_model.entities:
-            if entity.is_linkable_entity_type:
-                possible_entity_links.append((entity.reference,))
+        # Group by items in the semantic model can be accessed though a subset of the entities defined in the model.
+        possible_entity_links: List[Tuple[EntityReference, ...]] = [
+            (),
+        ]
+
+        for entity_link in SemanticModelLookup.entity_links_for_local_elements(semantic_model):
+            possible_entity_links.append((entity_link,))
 
         # Handle dimensions
         conversion_results = [

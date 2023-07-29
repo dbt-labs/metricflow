@@ -702,7 +702,7 @@ class WhereFilterSpec(SerializableDataclass):
 
     For example:
 
-    WhereFilter(where_sql_template="{{ dimension('country', entity_path=['listing']) }} == 'US'"))
+    WhereFilter(where_sql_template="{{ Dimension('listing__country') }} == 'US'"))
 
     ->
 

@@ -22,6 +22,8 @@ semantic_model:
       type_params:
         time_granularity: day
 
+  primary_entity: end_of_day_revenue
+
   entities:
     - name: user
       type: foreign

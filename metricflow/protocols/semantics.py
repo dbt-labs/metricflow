@@ -35,7 +35,6 @@ from metricflow.specs.specs import (
     MetricInputMeasureSpec,
     MetricSpec,
     NonAdditiveDimensionSpec,
-    TimeDimensionSpec,
 )
 
 
@@ -116,7 +115,7 @@ class SemanticModelAccessor(ABC):
     @abstractmethod
     def get_aggregation_time_dimensions_with_measures(
         self, semantic_model_reference: SemanticModelReference
-    ) -> ElementGrouper[TimeDimensionSpec, MeasureSpec]:
+    ) -> ElementGrouper[TimeDimensionReference, MeasureSpec]:
         """Return all aggregation time dimensions in the given semantic model with their associated measures."""
         raise NotImplementedError
 

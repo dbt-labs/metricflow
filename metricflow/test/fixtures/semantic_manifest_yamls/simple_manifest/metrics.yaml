@@ -47,7 +47,7 @@ metric:
   type: simple
   type_params:
     measure: booking_value
-  filter: "{{ dimension('is_instant') }}"
+  filter: "{{ Dimension('booking__is_instant') }}"
 ---
 metric:
   name: "average_instant_booking_value"
@@ -55,7 +55,7 @@ metric:
   type: simple
   type_params:
     measure: average_booking_value
-  filter:  "{{ dimension('is_instant') }}"
+  filter:  "{{ Dimension('booking__is_instant') }}"
 ---
 metric:
   name: "booking_value_for_non_null_listing_id"
@@ -99,7 +99,7 @@ metric:
   type: simple
   type_params:
     measure: listings
-  filter: "{{ dimension('is_lux_latest') }}"
+  filter: "{{ Dimension('listing__is_lux_latest') }}"
 ---
 metric:
   name: "smallest_listing"
@@ -252,7 +252,7 @@ metric:
   type_params:
     numerator:
       name: average_booking_value
-      filter: "{{ dimension('is_instant') }}"
+      filter: "{{ Dimension('booking__is_instant') }}"
     denominator:
       name: max_booking_value
 ---
@@ -265,7 +265,7 @@ metric:
   type_params:
     numerator:
       name: average_booking_value
-      filter: "{{ dimension('is_lux_latest', entity_path=['listing']) }}"
+      filter: "{{ Dimension('listing__is_lux_latest') }}"
     denominator:
       name: max_booking_value
 ---
@@ -279,9 +279,9 @@ metric:
     expr: "average_booking_value * bookings / NULLIF(booking_value, 0)"
     metrics:
       - name: average_booking_value
-        filter: "{{ dimension('is_lux_latest', entity_path=['listing']) }}"
+        filter: "{{ Dimension('listing__is_lux_latest') }}"
       - name: bookings
-        filter: "{{ dimension('is_lux_latest', entity_path=['listing']) }}"
+        filter: "{{ Dimension('listing__is_lux_latest') }}"
       - name: booking_value
 ---
 metric:
@@ -293,7 +293,7 @@ metric:
   type_params:
     numerator:
       name: booking_value
-      filter: "{{ dimension('is_instant') }}"
+      filter: "{{ Dimension('booking__is_instant') }}"
       alias: booking_value_with_is_instant_constraint
     denominator:
       name: booking_value
@@ -307,11 +307,11 @@ metric:
   type_params:
     numerator:
       name: total_account_balance_first_day
-      filter: "{{ dimension('home_state_latest', entity_path=['user']) }} IN ('CA', 'HI', 'WA')"
+      filter: "{{ Dimension('user__home_state_latest') }} IN ('CA', 'HI', 'WA')"
       alias: west_coast_balance_first_day
     denominator:
       name: total_account_balance_first_day
-      filter: "{{ dimension('home_state_latest', entity_path=['user']) }} IN ('MD', 'NY', 'TX')"
+      filter: "{{ Dimension('user__home_state_latest') }} IN ('MD', 'NY', 'TX')"
       alias: east_coast_balance_first_dat
 ---
 metric:
@@ -323,7 +323,7 @@ metric:
     expr: delayed_bookings * 2
     metrics:
       - name: bookings
-        filter: "NOT {{ dimension('is_instant') }}"
+        filter: "NOT {{ Dimension('booking__is_instant') }}"
         alias: delayed_bookings
 ---
 metric:
@@ -373,7 +373,7 @@ metric:
       - name: bookings
       - name: listings
         alias: lux_listing
-        filter: "{{ dimension('is_lux_latest') }}"
+        filter: "{{ Dimension('listing__is_lux_latest') }}"
 ---
 metric:
   name: "instant_plus_non_referred_bookings_pct"

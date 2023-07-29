@@ -107,11 +107,13 @@ def test_qualified_name() -> None:  # noqa: D
 
 def test_merge_spec_set() -> None:  # noqa: D
     spec_set1 = InstanceSpecSet(metric_specs=(MetricSpec(element_name="bookings"),))
-    spec_set2 = InstanceSpecSet(dimension_specs=(DimensionSpec(element_name="is_instant", entity_links=()),))
+    spec_set2 = InstanceSpecSet(
+        dimension_specs=(DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),)
+    )
 
     assert InstanceSpecSet.merge((spec_set1, spec_set2)) == InstanceSpecSet(
         metric_specs=(MetricSpec(element_name="bookings"),),
-        dimension_specs=(DimensionSpec(element_name="is_instant", entity_links=()),),
+        dimension_specs=(DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),),
     )
 
 
@@ -124,7 +126,7 @@ def spec_set() -> InstanceSpecSet:  # noqa: D
                 element_name="bookings",
             ),
         ),
-        dimension_specs=(DimensionSpec(element_name="is_instant", entity_links=()),),
+        dimension_specs=(DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),),
         time_dimension_specs=(
             TimeDimensionSpec(
                 element_name="ds",
@@ -143,7 +145,7 @@ def spec_set() -> InstanceSpecSet:  # noqa: D
 
 def test_spec_set_linkable_specs(spec_set: InstanceSpecSet) -> None:  # noqa: D
     assert set(spec_set.linkable_specs) == {
-        DimensionSpec(element_name="is_instant", entity_links=()),
+        DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),
         TimeDimensionSpec(
             element_name="ds",
             entity_links=(),
@@ -162,7 +164,7 @@ def test_spec_set_all_specs(spec_set: InstanceSpecSet) -> None:  # noqa: D
         MeasureSpec(
             element_name="bookings",
         ),
-        DimensionSpec(element_name="is_instant", entity_links=()),
+        DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),
         TimeDimensionSpec(
             element_name="ds",
             entity_links=(),

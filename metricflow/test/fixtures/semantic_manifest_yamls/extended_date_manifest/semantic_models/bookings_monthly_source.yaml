@@ -15,6 +15,8 @@ semantic_model:
       agg: sum
       create_metric: true
 
+  primary_entity: booking
+
   dimensions:
     - name: ds
       type: time

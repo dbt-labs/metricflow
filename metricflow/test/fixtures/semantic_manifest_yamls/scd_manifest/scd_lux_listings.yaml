@@ -41,6 +41,8 @@ semantic_model:
     - name: is_confirmed_lux
       type: categorical
 
+  primary_entity: lux_listing
+
   entities:
     - name: lux_listing
       type: natural

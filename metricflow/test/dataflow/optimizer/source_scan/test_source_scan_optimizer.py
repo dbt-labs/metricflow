@@ -245,7 +245,7 @@ def test_constrained_metric_not_combined(  # noqa: D
                         WhereSpecFactory(
                             column_association_resolver=column_association_resolver,
                         ).create_from_where_filter(
-                            PydanticWhereFilter(where_sql_template="{{ dimension('is_instant') }} ")
+                            PydanticWhereFilter(where_sql_template="{{ Dimension('booking__is_instant') }} ")
                         )
                     ),
                 ),

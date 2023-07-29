@@ -109,9 +109,9 @@ class WhereSpecFactory:
             rendered_sql_template = jinja2.Template(
                 where_filter.where_sql_template, undefined=jinja2.StrictUndefined
             ).render(
-                dimension=_dimension_call,
-                time_dimension=_time_dimension_call,
-                entity=_entity_call,
+                Dimension=_dimension_call,
+                TimeDimension=_time_dimension_call,
+                Entity=_entity_call,
             )
         except (jinja2.exceptions.UndefinedError, jinja2.exceptions.TemplateSyntaxError) as e:
             raise RenderSqlTemplateException(

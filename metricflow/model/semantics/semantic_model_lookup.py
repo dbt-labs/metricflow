@@ -5,6 +5,7 @@ from collections import defaultdict
 from copy import deepcopy
 from typing import Dict, List, Optional, Sequence, Set
 
+from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.protocols.dimension import Dimension
 from dbt_semantic_interfaces.protocols.entity import Entity
 from dbt_semantic_interfaces.protocols.measure import Measure
@@ -27,7 +28,7 @@ from metricflow.errors.errors import InvalidSemanticModelError
 from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.spec_converters import MeasureConverter
 from metricflow.protocols.semantics import SemanticModelAccessor
-from metricflow.specs.specs import MeasureSpec, NonAdditiveDimensionSpec, TimeDimensionSpec
+from metricflow.specs.specs import MeasureSpec, NonAdditiveDimensionSpec
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +58,7 @@ class SemanticModelLookup(SemanticModelAccessor):
         self._semantic_model_names: Set[str] = set()
 
         self._semantic_model_to_aggregation_time_dimensions: Dict[
-            SemanticModelReference, ElementGrouper[TimeDimensionSpec, MeasureSpec]
+            SemanticModelReference, ElementGrouper[TimeDimensionReference, MeasureSpec]
         ] = {}
 
         self._semantic_model_reference_to_semantic_model: Dict[SemanticModelReference, SemanticModel] = {}
@@ -186,7 +187,7 @@ class SemanticModelLookup(SemanticModelAccessor):
             raise InvalidSemanticModelError(f"Error adding {semantic_model.reference}. Got errors: {errors}")
 
         self._semantic_model_to_aggregation_time_dimensions[semantic_model.reference] = ElementGrouper[
-            TimeDimensionSpec, MeasureSpec
+            TimeDimensionReference, MeasureSpec
         ]()
 
         for measure in semantic_model.measures:
@@ -214,20 +215,23 @@ class SemanticModelLookup(SemanticModelAccessor):
                 )
 
             primary_entity = SemanticModelLookup._resolved_primary_entity(semantic_model)
+
             if primary_entity is None:
-                raise RuntimeError(f"Expected a primary entity in {semantic_model}")
+                raise RuntimeError(
+                    f"The semantic model should have a primary entity since there are measures, but it does not. "
+                    f"Semantic model is:\n{pformat_big_objects(semantic_model)}"
+                )
 
             self._semantic_model_to_aggregation_time_dimensions[semantic_model.reference].add_value(
-                key=TimeDimensionSpec(
+                key=TimeDimensionReference(
                     element_name=agg_time_dimension.name,
-                    entity_links=(primary_entity,),
-                    time_granularity=agg_time_dimension.type_params.time_granularity,
                 ),
                 value=MeasureConverter.convert_to_measure_spec(measure=measure),
             )
             self._measure_agg_time_dimension[measure.reference] = TimeDimensionReference(
                 element_name=agg_time_dimension.name
             )
+
             if measure.non_additive_dimension:
                 non_additive_dimension_spec = NonAdditiveDimensionSpec(
                     name=measure.non_additive_dimension.name,
@@ -252,7 +256,7 @@ class SemanticModelLookup(SemanticModelAccessor):
 
     def get_aggregation_time_dimensions_with_measures(
         self, semantic_model_reference: SemanticModelReference
-    ) -> ElementGrouper[TimeDimensionSpec, MeasureSpec]:
+    ) -> ElementGrouper[TimeDimensionReference, MeasureSpec]:
         """Return all time dimensions in a semantic model with their associated measures."""
         assert (
             semantic_model_reference in self._semantic_model_to_aggregation_time_dimensions

@@ -538,7 +538,6 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                             path_key=path_key,
                         )
                     )
-        logger.error(f"Dimensions is:\n{pformat_big_objects(dimensions)}")
         return sorted(dimensions, key=lambda dimension: dimension.qualified_name)
 
     def entities_for_metrics(self, metric_names: List[str]) -> List[Entity]:  # noqa: D
