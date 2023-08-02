@@ -1,36 +1,36 @@
 -- Metric Time Dimension 'ds'
 SELECT
-  subq_0.ds
+  subq_0.ds__day
   , subq_0.ds__week
   , subq_0.ds__month
   , subq_0.ds__quarter
   , subq_0.ds__year
-  , subq_0.ds_partitioned
+  , subq_0.ds_partitioned__day
   , subq_0.ds_partitioned__week
   , subq_0.ds_partitioned__month
   , subq_0.ds_partitioned__quarter
   , subq_0.ds_partitioned__year
-  , subq_0.paid_at
+  , subq_0.paid_at__day
   , subq_0.paid_at__week
   , subq_0.paid_at__month
   , subq_0.paid_at__quarter
   , subq_0.paid_at__year
-  , subq_0.booking__ds
+  , subq_0.booking__ds__day
   , subq_0.booking__ds__week
   , subq_0.booking__ds__month
   , subq_0.booking__ds__quarter
   , subq_0.booking__ds__year
-  , subq_0.booking__ds_partitioned
+  , subq_0.booking__ds_partitioned__day
   , subq_0.booking__ds_partitioned__week
   , subq_0.booking__ds_partitioned__month
   , subq_0.booking__ds_partitioned__quarter
   , subq_0.booking__ds_partitioned__year
-  , subq_0.booking__paid_at
+  , subq_0.booking__paid_at__day
   , subq_0.booking__paid_at__week
   , subq_0.booking__paid_at__month
   , subq_0.booking__paid_at__quarter
   , subq_0.booking__paid_at__year
-  , subq_0.ds AS metric_time
+  , subq_0.ds__day AS metric_time__day
   , subq_0.ds__week AS metric_time__week
   , subq_0.ds__month AS metric_time__month
   , subq_0.ds__quarter AS metric_time__quarter
@@ -74,33 +74,33 @@ FROM (
     , bookings_source_src_10001.booking_value AS approximate_continuous_booking_value_p99
     , bookings_source_src_10001.booking_value AS approximate_discrete_booking_value_p99
     , bookings_source_src_10001.is_instant
-    , bookings_source_src_10001.ds
+    , bookings_source_src_10001.ds AS ds__day
     , DATE_TRUNC(bookings_source_src_10001.ds, isoweek) AS ds__week
     , DATE_TRUNC(bookings_source_src_10001.ds, month) AS ds__month
     , DATE_TRUNC(bookings_source_src_10001.ds, quarter) AS ds__quarter
     , DATE_TRUNC(bookings_source_src_10001.ds, isoyear) AS ds__year
-    , bookings_source_src_10001.ds_partitioned
+    , bookings_source_src_10001.ds_partitioned AS ds_partitioned__day
     , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, isoweek) AS ds_partitioned__week
     , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, month) AS ds_partitioned__month
     , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, quarter) AS ds_partitioned__quarter
     , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, isoyear) AS ds_partitioned__year
-    , bookings_source_src_10001.paid_at
+    , bookings_source_src_10001.paid_at AS paid_at__day
     , DATE_TRUNC(bookings_source_src_10001.paid_at, isoweek) AS paid_at__week
     , DATE_TRUNC(bookings_source_src_10001.paid_at, month) AS paid_at__month
     , DATE_TRUNC(bookings_source_src_10001.paid_at, quarter) AS paid_at__quarter
     , DATE_TRUNC(bookings_source_src_10001.paid_at, isoyear) AS paid_at__year
     , bookings_source_src_10001.is_instant AS booking__is_instant
-    , bookings_source_src_10001.ds AS booking__ds
+    , bookings_source_src_10001.ds AS booking__ds__day
     , DATE_TRUNC(bookings_source_src_10001.ds, isoweek) AS booking__ds__week
     , DATE_TRUNC(bookings_source_src_10001.ds, month) AS booking__ds__month
     , DATE_TRUNC(bookings_source_src_10001.ds, quarter) AS booking__ds__quarter
     , DATE_TRUNC(bookings_source_src_10001.ds, isoyear) AS booking__ds__year
-    , bookings_source_src_10001.ds_partitioned AS booking__ds_partitioned
+    , bookings_source_src_10001.ds_partitioned AS booking__ds_partitioned__day
     , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, isoweek) AS booking__ds_partitioned__week
     , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, month) AS booking__ds_partitioned__month
     , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, quarter) AS booking__ds_partitioned__quarter
     , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, isoyear) AS booking__ds_partitioned__year
-    , bookings_source_src_10001.paid_at AS booking__paid_at
+    , bookings_source_src_10001.paid_at AS booking__paid_at__day
     , DATE_TRUNC(bookings_source_src_10001.paid_at, isoweek) AS booking__paid_at__week
     , DATE_TRUNC(bookings_source_src_10001.paid_at, month) AS booking__paid_at__month
     , DATE_TRUNC(bookings_source_src_10001.paid_at, quarter) AS booking__paid_at__quarter

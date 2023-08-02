@@ -9,13 +9,13 @@ integration_test:
   check_order: true
   check_query: |
     SELECT
-      ds AS metric_time
+      ds AS metric_time__day
       , SUM(booking_value) AS booking_value
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       ds
     ORDER BY
-      booking_value DESC, metric_time
+      booking_value DESC, metric_time__day
 ---
 integration_test:
   name: order_asc
@@ -27,13 +27,13 @@ integration_test:
   check_order: true
   check_query: |
     SELECT
-      ds AS metric_time
+      ds AS metric_time__day
       , SUM(booking_value) AS booking_value
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       ds
     ORDER BY
-      booking_value, metric_time
+      booking_value, metric_time__day
 ---
 integration_test:
   name: order_limit
@@ -46,13 +46,13 @@ integration_test:
   check_order: true
   check_query: |
     SELECT
-      ds AS metric_time
+      ds AS metric_time__day
       , SUM(booking_value) AS booking_value
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       ds
     ORDER BY
-      booking_value, metric_time
+      booking_value, metric_time__day
     LIMIT 2
 ---
 integration_test:

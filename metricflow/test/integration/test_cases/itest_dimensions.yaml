@@ -42,7 +42,7 @@ integration_test:
   check_query: |
     SELECT
       SUM(booking_value) AS booking_value
-      , ds AS metric_time
+      , ds AS metric_time__day
       , listing_id AS listing
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
@@ -78,8 +78,8 @@ integration_test:
   check_query: |
     SELECT
       SUM(1) AS identity_verifications
-      , ds AS metric_time
-      , ds AS verification__ds
+      , ds AS metric_time__day
+      , ds AS verification__ds__day
     FROM {{ source_schema }}.fct_id_verifications
     GROUP BY
       ds
@@ -94,7 +94,7 @@ integration_test:
     SELECT
       SUM(1) AS identity_verifications
       , u.home_state AS user__home_state
-      , v.ds AS metric_time
+      , v.ds AS metric_time__day
     FROM {{ source_schema }}.fct_id_verifications v
     LEFT OUTER JOIN {{ source_schema }}.dim_users u
       ON u.user_id = v.user_id

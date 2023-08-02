@@ -9,7 +9,7 @@ integration_test:
   check_query: |
     SELECT
       a.average_booking_value / b.max_booking_value AS instant_booking_fraction_of_max_value
-      , COALESCE(a.ds, b.ds) AS metric_time
+      , COALESCE(a.ds, b.ds) AS metric_time__day
     FROM (
       SELECT
         CAST(AVG(booking_value) AS {{ double_data_type_name }} ) AS average_booking_value
@@ -37,7 +37,7 @@ integration_test:
   check_query: |
     SELECT
       a.average_booking_value / b.max_booking_value AS lux_booking_fraction_of_max_value
-      , COALESCE(a.ds, b.ds) AS metric_time
+      , COALESCE(a.ds, b.ds) AS metric_time__day
     FROM (
       SELECT
         CAST(AVG(fct_bookings.booking_value) AS {{ double_data_type_name }} ) AS average_booking_value
@@ -67,7 +67,7 @@ integration_test:
   check_query: |
     SELECT
       a.average_booking_value * a.bookings / b.booking_value AS lux_booking_value_rate_expr
-      , COALESCE(a.ds, b.ds) AS metric_time
+      , COALESCE(a.ds, b.ds) AS metric_time__day
     FROM (
       SELECT
         CAST(AVG(fct_bookings.booking_value) AS {{ double_data_type_name }} ) AS average_booking_value
@@ -98,7 +98,7 @@ integration_test:
   check_query: |
     SELECT
       a.booking_value / b.booking_value AS instant_booking_value_ratio
-      , COALESCE(a.ds, b.ds) AS metric_time
+      , COALESCE(a.ds, b.ds) AS metric_time__day
     FROM (
       SELECT
         CAST(SUM(booking_value) AS {{ double_data_type_name }} ) AS booking_value
@@ -126,7 +126,7 @@ integration_test:
   check_query: |
     SELECT
       a.total_account_balance_first_day / b.total_account_balance_first_day AS regional_starting_balance_ratios
-      , COALESCE(a.ds, b.ds) AS metric_time
+      , COALESCE(a.ds, b.ds) AS metric_time__day
     FROM (
       SELECT
         CAST(SUM(account_balance) AS {{ double_data_type_name }}) AS total_account_balance_first_day
@@ -134,7 +134,7 @@ integration_test:
       FROM (
         SELECT
           fa_west.ds
-          , fa_west.ds AS metric_time
+          , fa_west.ds AS metric_time__day
           , user_id AS user
           , account_balance
         FROM {{ source_schema }}.fct_accounts fa_west
@@ -160,7 +160,7 @@ integration_test:
       FROM (
         SELECT
           fa_east.ds
-          , fa_east.ds AS metric_time
+          , fa_east.ds AS metric_time__day
           , user_id AS user
           , account_balance
         FROM {{ source_schema }}.fct_accounts fa_east
@@ -191,7 +191,7 @@ integration_test:
   check_query: |
     SELECT
       SUM(1) * 2 AS double_counted_delayed_bookings
-      , ds AS metric_time
+      , ds AS metric_time__day
     FROM {{ source_schema }}.fct_bookings
     WHERE NOT is_instant
     GROUP BY ds

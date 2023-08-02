@@ -8,7 +8,7 @@ integration_test:
   check_query: |
     SELECT
       SUM(booking_value) * 0.05 AS booking_fees
-      , ds AS metric_time
+      , ds AS metric_time__day
     FROM {{ source_schema }}.fct_bookings
     GROUP BY ds;
 ---
@@ -21,7 +21,7 @@ integration_test:
   check_query: |
     SELECT
       SUM(booking_value) * 0.05 / COUNT(DISTINCT guest_id) AS booking_fees_per_booker
-      , ds AS metric_time
+      , ds AS metric_time__day
     FROM {{ source_schema }}.fct_bookings
     GROUP BY ds;
 ---
@@ -34,7 +34,7 @@ integration_test:
   check_query: |
     SELECT
       booking_value * views AS views_times_booking_value
-      , b.ds AS metric_time
+      , b.ds AS metric_time__day
     FROM (
       SELECT
         SUM(booking_value) AS booking_value
@@ -61,7 +61,7 @@ integration_test:
   check_query: |
     SELECT
       SUM(booking_value) AS instant_booking_value
-      , ds AS metric_time
+      , ds AS metric_time__day
     FROM {{ source_schema }}.fct_bookings
     WHERE is_instant
     GROUP BY ds
@@ -76,7 +76,7 @@ integration_test:
     SELECT
       booking_value
       , instant_booking_value
-      , a.ds AS metric_time
+      , a.ds AS metric_time__day
     FROM (
       SELECT
         SUM(booking_value) AS booking_value
@@ -101,7 +101,7 @@ integration_test:
   metrics: ["instant_booking_value", "views"]
   group_bys: ["metric_time"]
   check_query: |
-    SELECT instant_booking_value, views, a.ds AS metric_time
+    SELECT instant_booking_value, views, a.ds AS metric_time__day
     FROM (
       SELECT
         SUM(booking_value) AS instant_booking_value
@@ -128,7 +128,7 @@ integration_test:
   check_query: |
     SELECT
       SUM(booking_value) AS booking_value_for_non_null_listing_id
-      , ds AS metric_time
+      , ds AS metric_time__day
     FROM {{ source_schema }}.fct_bookings
     WHERE listing_id IS NOT NULL
     GROUP BY ds
@@ -160,7 +160,7 @@ integration_test:
   check_query: |
     SELECT
       SUM(b.booking_value) AS instant_booking_value
-      , b.ds AS metric_time
+      , b.ds AS metric_time__day
     FROM {{ source_schema }}.fct_bookings b
     LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest l
       ON l.listing_id = b.listing_id
@@ -181,7 +181,7 @@ integration_test:
     SELECT
       a.booking_value
       , b.instant_booking_value
-      , COALESCE(a.ds, b.ds) AS metric_time
+      , COALESCE(a.ds, b.ds) AS metric_time__day
     FROM (
       SELECT
         SUM(booking_value) AS booking_value
@@ -231,7 +231,7 @@ integration_test:
     SELECT
       COUNT(DISTINCT guest_id) AS bookers
       , is_instant AS booking__is_instant
-      , ds AS metric_time
+      , ds AS metric_time__day
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       is_instant
@@ -247,7 +247,7 @@ integration_test:
   check_query: |
     SELECT
       COUNT(DISTINCT guest_id) AS bookers
-      , ds AS metric_time
+      , ds AS metric_time__day
     FROM {{ source_schema }}.fct_bookings
     where is_instant
     GROUP BY
@@ -262,7 +262,7 @@ integration_test:
   check_query: |
     SELECT
       CAST(SUM(1) AS {{ double_data_type_name }}) / COUNT(DISTINCT guest_id) AS bookings_per_booker
-      , ds AS metric_time
+      , ds AS metric_time__day
     FROM {{ source_schema }}.fct_bookings
     GROUP BY ds
 ---
@@ -275,7 +275,7 @@ integration_test:
   check_query: |
     SELECT
       CAST(bookings AS {{ double_data_type_name }}) / NULLIF(views, 0) AS bookings_per_view
-      , groupby_8cbdaa28.ds AS metric_time
+      , groupby_8cbdaa28.ds AS metric_time__day
     FROM (
       SELECT
         COUNT(*) AS bookings
@@ -305,7 +305,7 @@ integration_test:
   check_query: |
     SELECT
       CAST(SUM(1) AS {{ double_data_type_name }}) / COUNT(DISTINCT guest_id) AS bookings_per_booker
-      , ds AS metric_time
+      , ds AS metric_time__day
     FROM {{ source_schema }}.fct_bookings
     GROUP BY ds
     ORDER BY ds
@@ -320,7 +320,7 @@ integration_test:
   check_query: |
     SELECT
       CAST(bookings AS {{ double_data_type_name }}) / NULLIF(booking_value, 0) AS bookings_per_dollar
-      , bookings_source.ds AS metric_time
+      , bookings_source.ds AS metric_time__day
     FROM (
       SELECT
         SUM(1) AS bookings
@@ -341,7 +341,7 @@ integration_test:
   check_query: |
     SELECT
       CAST(bookings AS {{ double_data_type_name }}) / NULLIF(listings, 0) AS bookings_per_listing
-      , groupby_8cbdaa28.ds AS metric_time
+      , groupby_8cbdaa28.ds AS metric_time__day
     FROM (
       SELECT
         COUNT(*) AS bookings
@@ -371,7 +371,7 @@ integration_test:
     SELECT
       views
       , bookings
-      , COALESCE(a.ds, b.ds) AS metric_time
+      , COALESCE(a.ds, b.ds) AS metric_time__day
     FROM (
         SELECT
           SUM(1) AS views
@@ -399,7 +399,7 @@ integration_test:
     SELECT
       bookings,
       CAST(bookings AS {{ double_data_type_name }}) / NULLIF(views, 0) AS bookings_per_view
-      , COALESCE(a.ds, b.ds) AS metric_time
+      , COALESCE(a.ds, b.ds) AS metric_time__day
     FROM (
       SELECT
         COUNT(*) AS bookings
@@ -431,7 +431,7 @@ integration_test:
       SUM(1) AS bookings
       , CAST(SUM(1) AS {{ double_data_type_name }}) / COUNT(DISTINCT guest_id) AS bookings_per_booker
       , SUM(booking_value) AS booking_value
-      , ds AS metric_time
+      , ds AS metric_time__day
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       ds
@@ -446,7 +446,7 @@ integration_test:
   check_query: |
     SELECT
       SUM(booking_value) AS booking_payments
-      , paid_at AS metric_time
+      , paid_at AS metric_time__day
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       paid_at
@@ -462,11 +462,11 @@ integration_test:
     SELECT
       booking_value
       , booking_payments
-      , COALESCE(a.metric_time, b.metric_time) AS metric_time
+      , COALESCE(a.metric_time__day, b.metric_time__day) AS metric_time__day
     FROM (
       SELECT
         SUM(booking_value) AS booking_value
-        , ds AS metric_time
+        , ds AS metric_time__day
       FROM {{ source_schema }}.fct_bookings
       GROUP BY
         ds
@@ -474,12 +474,12 @@ integration_test:
     FULL OUTER JOIN (
       SELECT
         SUM(booking_value) AS booking_payments
-        , paid_at AS metric_time
+        , paid_at AS metric_time__day
       FROM {{ source_schema }}.fct_bookings
       GROUP BY
         paid_at
     ) b
-    ON a.metric_time = b.metric_time
+    ON a.metric_time__day = b.metric_time__day
 ---
 integration_test:
   name: derived_metric
@@ -490,12 +490,12 @@ integration_test:
   check_query: |
     SELECT
       (bookings - ref_bookings) / CAST(bookings AS {{ double_data_type_name }}) AS non_referred_bookings_pct
-      , metric_time
+      , metric_time__day
     FROM (
       SELECT
         SUM(CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END) AS ref_bookings
         , SUM(1) AS bookings
-        , ds AS metric_time
+        , ds AS metric_time__day
       FROM {{ source_schema }}.fct_bookings
       GROUP BY
         ds
@@ -510,11 +510,11 @@ integration_test:
   check_query: |
     SELECT
       bookings / CAST(NULLIF(lux_listings, 0) AS {{ double_data_type_name }}) AS bookings_per_lux_listing_derived
-      , a.metric_time
+      , a.metric_time__day
     FROM (
       SELECT
         SUM(1) AS bookings
-        , ds AS metric_time
+        , ds AS metric_time__day
       FROM {{ source_schema }}.fct_bookings
       GROUP BY
         ds
@@ -522,13 +522,13 @@ integration_test:
     INNER JOIN (
       SELECT
         SUM(1) AS lux_listings
-        , created_at AS metric_time
+        , created_at AS metric_time__day
       FROM {{ source_schema }}.dim_listings_latest
       WHERE is_lux
       GROUP BY
         created_at
     ) b
-    ON a.metric_time = b.metric_time
+    ON a.metric_time__day = b.metric_time__day
 ---
 integration_test:
   name: nested_derived_metric
@@ -539,13 +539,13 @@ integration_test:
   check_query: |
     SELECT
       (instant_bookings * 1.0 / bookings) + ((bookings - ref_bookings) * 1.0 / bookings) AS instant_plus_non_referred_bookings_pct
-      , metric_time
+      , metric_time__day
     FROM (
       SELECT
         SUM(CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END) AS ref_bookings
         , SUM(CASE WHEN is_instant THEN 1 ELSE 0 END) AS instant_bookings
         , SUM(1) AS bookings
-        , ds AS metric_time
+        , ds AS metric_time__day
       FROM {{ source_schema }}.fct_bookings
       GROUP BY
         ds
@@ -562,12 +562,12 @@ integration_test:
     SELECT
       MAX(bk.bookings) AS bookings
       ,MAX(vw.views) AS views
-      ,COALESCE(bk.metric_time, vw.metric_time) AS metric_time
+      ,COALESCE(bk.metric_time__day, vw.metric_time__day) AS metric_time__day
       ,COALESCE(bk.is_lux, vw.is_lux) AS listing__is_lux_latest
       ,COALESCE(bk.country, vw.country) AS listing__country_latest
     FROM (
       SELECT
-        a.ds AS metric_time
+        a.ds AS metric_time__day
         ,b.is_lux
         ,b.country
         ,SUM(1) AS bookings
@@ -578,7 +578,7 @@ integration_test:
     ) bk
     FULL OUTER JOIN (
       SELECT
-        c.ds AS metric_time
+        c.ds AS metric_time__day
         ,d.is_lux
         ,d.country
         ,SUM(1) AS views
@@ -587,7 +587,7 @@ integration_test:
         ON c.listing_id = d.listing_id
         GROUP BY 1,2,3
     ) vw
-    ON bk.metric_time = vw.metric_time AND bk.is_lux = vw.is_lux AND bk.country = vw.country
+    ON bk.metric_time__day = vw.metric_time__day AND bk.is_lux = vw.is_lux AND bk.country = vw.country
     GROUP BY 3,4,5
 ---
 integration_test:
@@ -673,32 +673,32 @@ integration_test:
   group_bys: ["metric_time"]
   check_query: |
     SELECT
-      COALESCE(a.metric_time, b.metric_time) AS metric_time
+      COALESCE(a.metric_time__day, b.metric_time__day) AS metric_time__day
       , bookings - bookings_2_weeks_ago AS bookings_growth_2_weeks
     FROM (
       SELECT
-        ds AS metric_time
+        ds AS metric_time__day
         , SUM(1) AS bookings
       FROM {{ source_schema }}.fct_bookings
       GROUP BY
-        metric_time
+        metric_time__day
     ) a
     INNER JOIN (
       SELECT
-        c.ds AS metric_time
+        c.ds AS metric_time__day
         , d.bookings_2_weeks_ago AS bookings_2_weeks_ago
       FROM {{ mf_time_spine_source }} c
       INNER JOIN (
         SELECT
-          ds AS metric_time
+          ds AS metric_time__day
           , SUM(1) AS bookings_2_weeks_ago
         FROM {{ source_schema }}.fct_bookings
         GROUP BY
-          metric_time
+          metric_time__day
       ) d
-      ON {{ render_date_sub("C", "ds", 14, TimeGranularity.DAY) }} = d.metric_time
+      ON {{ render_date_sub("C", "ds", 14, TimeGranularity.DAY) }} = d.metric_time__day
     ) b
-    ON a.metric_time = b.metric_time
+    ON a.metric_time__day = b.metric_time__day
 ---
 integration_test:
   name: derived_metric_with_offset_to_grain
@@ -708,32 +708,32 @@ integration_test:
   group_bys: ["metric_time"]
   check_query: |
     SELECT
-      COALESCE(a.metric_time, b.metric_time) AS metric_time
+      COALESCE(a.metric_time__day, b.metric_time__day) AS metric_time__day
       , bookings - bookings_at_start_of_month AS bookings_growth_since_start_of_month
     FROM (
       SELECT
-        ds AS metric_time
+        ds AS metric_time__day
         , SUM(1) AS bookings
       FROM {{ source_schema }}.fct_bookings
       GROUP BY
-        metric_time
+        metric_time__day
     ) a
     INNER JOIN (
       SELECT
-        c.ds AS metric_time
+        c.ds AS metric_time__day
         , d.bookings_at_start_of_month AS bookings_at_start_of_month
       FROM {{ mf_time_spine_source }} c
       INNER JOIN (
         SELECT
-          ds AS metric_time
+          ds AS metric_time__day
           , SUM(1) AS bookings_at_start_of_month
         FROM {{ source_schema }}.fct_bookings
         GROUP BY
-          metric_time
+          metric_time__day
       ) d
-      ON {{ render_date_trunc("c.ds", TimeGranularity.MONTH) }} = d.metric_time
+      ON {{ render_date_trunc("c.ds", TimeGranularity.MONTH) }} = d.metric_time__day
     ) b
-    ON a.metric_time = b.metric_time
+    ON a.metric_time__day = b.metric_time__day
 ---
 integration_test:
   name: derived_metric_with_offset_window_and_offset_to_grain
@@ -743,39 +743,39 @@ integration_test:
   group_bys: ["metric_time"]
   check_query: |
     SELECT
-      COALESCE(a.metric_time, b.metric_time) AS metric_time
+      COALESCE(a.metric_time__day, b.metric_time__day) AS metric_time__day
       , month_start_bookings - bookings_1_month_ago AS bookings_month_start_compared_to_1_month_prior
     FROM (
       SELECT
-        g.ds AS metric_time
+        g.ds AS metric_time__day
         , f.bookings AS bookings_1_month_ago
       FROM {{ mf_time_spine_source }} g
       INNER JOIN (
         SELECT
-          ds AS metric_time
+          ds AS metric_time__day
           , SUM(1) AS bookings
         FROM {{ source_schema }}.fct_bookings
         GROUP BY
-          metric_time
+          metric_time__day
       ) f
-      ON {{ render_date_sub("g", "ds", 1, TimeGranularity.MONTH) }} = f.metric_time
+      ON {{ render_date_sub("g", "ds", 1, TimeGranularity.MONTH) }} = f.metric_time__day
     ) a
     INNER JOIN (
       SELECT
-        c.ds AS metric_time
+        c.ds AS metric_time__day
         , d.bookings AS month_start_bookings
       FROM {{ mf_time_spine_source }} c
       INNER JOIN (
         SELECT
-          ds AS metric_time
+          ds AS metric_time__day
           , SUM(1) AS bookings
         FROM {{ source_schema }}.fct_bookings
         GROUP BY
-          metric_time
+          metric_time__day
       ) d
-      ON {{ render_date_trunc("c.ds", TimeGranularity.MONTH) }} = d.metric_time
+      ON {{ render_date_trunc("c.ds", TimeGranularity.MONTH) }} = d.metric_time__day
     ) b
-    ON a.metric_time = b.metric_time
+    ON a.metric_time__day = b.metric_time__day
 ---
 integration_test:
   name: derived_metric_offset_with_one_metric_input
@@ -785,18 +785,18 @@ integration_test:
   group_bys: ["metric_time"]
   check_query: |
     SELECT
-      a.ds AS metric_time
+      a.ds AS metric_time__day
       , b.bookings_5_day_lag
     FROM {{ mf_time_spine_source }} a
     INNER JOIN (
       SELECT
-        ds AS metric_time
+        ds AS metric_time__day
         , SUM(1) AS bookings_5_day_lag
       FROM {{ source_schema }}.fct_bookings
       GROUP BY
-        metric_time
+        metric_time__day
     ) b
-    ON {{ render_date_sub("a", "ds", 5, TimeGranularity.DAY) }} = b.metric_time
+    ON {{ render_date_sub("a", "ds", 5, TimeGranularity.DAY) }} = b.metric_time__day
 ---
 integration_test:
   name: derived_metric_with_input_metric_with_constraint
@@ -808,11 +808,11 @@ integration_test:
   check_query: |
     SELECT
       booking_value - instant_booking_value AS booking_value_sub_instant
-      , a.metric_time
+      , a.metric_time__day
     FROM (
       SELECT
         SUM(booking_value) AS instant_booking_value
-        , ds AS metric_time
+        , ds AS metric_time__day
       FROM {{ source_schema }}.fct_bookings
       WHERE is_instant
       GROUP BY
@@ -821,12 +821,12 @@ integration_test:
     INNER JOIN (
       SELECT
         SUM(booking_value) AS booking_value
-        , ds AS metric_time
+        , ds AS metric_time__day
       FROM {{ source_schema }}.fct_bookings
       GROUP BY
         ds
     ) b
-    ON a.metric_time = b.metric_time
+    ON a.metric_time__day = b.metric_time__day
 ---
 integration_test:
   name: nested_derived_metric_with_input_metric_with_constraint
@@ -839,15 +839,15 @@ integration_test:
   check_query: |
     SELECT
       c.booking_value_sub_instant + 10 AS booking_value_sub_instant_add_10
-      , c.metric_time
+      , c.metric_time__day
     FROM (
       SELECT
         booking_value - instant_booking_value AS booking_value_sub_instant
-        , a.metric_time AS metric_time
+        , a.metric_time__day AS metric_time__day
       FROM (
         SELECT
           SUM(booking_value) AS instant_booking_value
-          , ds AS metric_time
+          , ds AS metric_time__day
         FROM {{ source_schema }}.fct_bookings
         WHERE is_instant
         GROUP BY
@@ -856,10 +856,10 @@ integration_test:
       INNER JOIN (
         SELECT
           SUM(booking_value) AS booking_value
-          , ds AS metric_time
+          , ds AS metric_time__day
         FROM {{ source_schema }}.fct_bookings
         GROUP BY
           ds
       ) b
-      ON a.metric_time = b.metric_time
+      ON a.metric_time__day = b.metric_time__day
     ) c

@@ -16,27 +16,27 @@ FROM (
     FROM (
       -- Metric Time Dimension 'ds'
       SELECT
-        subq_0.ds
+        subq_0.ds__day
         , subq_0.ds__week
         , subq_0.ds__month
         , subq_0.ds__quarter
         , subq_0.ds__year
-        , subq_0.created_at
+        , subq_0.created_at__day
         , subq_0.created_at__week
         , subq_0.created_at__month
         , subq_0.created_at__quarter
         , subq_0.created_at__year
-        , subq_0.listing__ds
+        , subq_0.listing__ds__day
         , subq_0.listing__ds__week
         , subq_0.listing__ds__month
         , subq_0.listing__ds__quarter
         , subq_0.listing__ds__year
-        , subq_0.listing__created_at
+        , subq_0.listing__created_at__day
         , subq_0.listing__created_at__week
         , subq_0.listing__created_at__month
         , subq_0.listing__created_at__quarter
         , subq_0.listing__created_at__year
-        , subq_0.ds AS metric_time
+        , subq_0.ds__day AS metric_time__day
         , subq_0.ds__week AS metric_time__week
         , subq_0.ds__month AS metric_time__month
         , subq_0.ds__quarter AS metric_time__quarter
@@ -59,12 +59,12 @@ FROM (
           1 AS listings
           , listings_latest_src_10004.capacity AS largest_listing
           , listings_latest_src_10004.capacity AS smallest_listing
-          , listings_latest_src_10004.created_at AS ds
+          , listings_latest_src_10004.created_at AS ds__day
           , DATE_TRUNC('week', listings_latest_src_10004.created_at) AS ds__week
           , DATE_TRUNC('month', listings_latest_src_10004.created_at) AS ds__month
           , DATE_TRUNC('quarter', listings_latest_src_10004.created_at) AS ds__quarter
           , DATE_TRUNC('year', listings_latest_src_10004.created_at) AS ds__year
-          , listings_latest_src_10004.created_at
+          , listings_latest_src_10004.created_at AS created_at__day
           , DATE_TRUNC('week', listings_latest_src_10004.created_at) AS created_at__week
           , DATE_TRUNC('month', listings_latest_src_10004.created_at) AS created_at__month
           , DATE_TRUNC('quarter', listings_latest_src_10004.created_at) AS created_at__quarter
@@ -72,12 +72,12 @@ FROM (
           , listings_latest_src_10004.country AS country_latest
           , listings_latest_src_10004.is_lux AS is_lux_latest
           , listings_latest_src_10004.capacity AS capacity_latest
-          , listings_latest_src_10004.created_at AS listing__ds
+          , listings_latest_src_10004.created_at AS listing__ds__day
           , DATE_TRUNC('week', listings_latest_src_10004.created_at) AS listing__ds__week
           , DATE_TRUNC('month', listings_latest_src_10004.created_at) AS listing__ds__month
           , DATE_TRUNC('quarter', listings_latest_src_10004.created_at) AS listing__ds__quarter
           , DATE_TRUNC('year', listings_latest_src_10004.created_at) AS listing__ds__year
-          , listings_latest_src_10004.created_at AS listing__created_at
+          , listings_latest_src_10004.created_at AS listing__created_at__day
           , DATE_TRUNC('week', listings_latest_src_10004.created_at) AS listing__created_at__week
           , DATE_TRUNC('month', listings_latest_src_10004.created_at) AS listing__created_at__month
           , DATE_TRUNC('quarter', listings_latest_src_10004.created_at) AS listing__created_at__quarter

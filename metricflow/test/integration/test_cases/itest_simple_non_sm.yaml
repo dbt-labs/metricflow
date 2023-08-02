@@ -11,7 +11,7 @@ integration_test:
       SUM(1) AS bookings
       , b.is_instant AS booking__is_instant
       , l.country AS listing__country_latest
-      , b.dt AS booking__dt
+      , b.dt AS booking__dt__day
     FROM {{ source_schema }}.fct_bookings_dt b
     LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest l
       ON b.listing_id = l.listing_id

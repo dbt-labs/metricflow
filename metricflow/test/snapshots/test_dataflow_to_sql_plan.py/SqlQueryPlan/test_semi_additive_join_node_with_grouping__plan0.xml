@@ -5,7 +5,7 @@
         <!-- col0 =                                                   -->
         <!--   {'class': 'SqlSelectColumn',                           -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_11),  -->
-        <!--    'column_alias': 'ds'}                                 -->
+        <!--    'column_alias': 'ds__day'}                            -->
         <!-- col1 =                                                   -->
         <!--   {'class': 'SqlSelectColumn',                           -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_12),  -->
@@ -25,7 +25,7 @@
         <!-- col5 =                                                   -->
         <!--   {'class': 'SqlSelectColumn',                           -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_16),  -->
-        <!--    'column_alias': 'account__ds'}                        -->
+        <!--    'column_alias': 'account__ds__day'}                   -->
         <!-- col6 =                                                   -->
         <!--   {'class': 'SqlSelectColumn',                           -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_17),  -->
@@ -96,7 +96,7 @@
             <!-- col3 =                                                      -->
             <!--   {'class': 'SqlSelectColumn',                              -->
             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10003),  -->
-            <!--    'column_alias': 'ds'}                                    -->
+            <!--    'column_alias': 'ds__day'}                               -->
             <!-- col4 =                                                -->
             <!--   {'class': 'SqlSelectColumn',                        -->
             <!--    'expr': SqlDateTruncExpression(node_id=dt_10000),  -->
@@ -120,7 +120,7 @@
             <!-- col9 =                                                      -->
             <!--   {'class': 'SqlSelectColumn',                              -->
             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10009),  -->
-            <!--    'column_alias': 'account__ds'}                           -->
+            <!--    'column_alias': 'account__ds__day'}                      -->
             <!-- col10 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                        -->
             <!--    'expr': SqlDateTruncExpression(node_id=dt_10004),  -->
@@ -158,7 +158,7 @@
             </SqlTableFromClauseNode>
         </SqlSelectStatementNode>
         <SqlSelectStatementNode>
-            <!-- description = Filter row on MAX(ds) -->
+            <!-- description = Filter row on MAX(ds__day) -->
             <!-- node_id = ss_0 -->
             <!-- col0 =                                                  -->
             <!--   {'class': 'SqlSelectColumn',                          -->
@@ -167,7 +167,7 @@
             <!-- col1 =                                                                       -->
             <!--   {'class': 'SqlSelectColumn',                                               -->
             <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_0, sql_function=MAX),  -->
-            <!--    'column_alias': 'ds__complete'}                                           -->
+            <!--    'column_alias': 'ds__day__complete'}                                      -->
             <!-- from_source = SqlSelectStatementNode(node_id=ss_10000) -->
             <!-- group_by0 =                                             -->
             <!--   {'class': 'SqlSelectColumn',                          -->
@@ -192,7 +192,7 @@
                 <!-- col3 =                                                      -->
                 <!--   {'class': 'SqlSelectColumn',                              -->
                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10003),  -->
-                <!--    'column_alias': 'ds'}                                    -->
+                <!--    'column_alias': 'ds__day'}                               -->
                 <!-- col4 =                                                -->
                 <!--   {'class': 'SqlSelectColumn',                        -->
                 <!--    'expr': SqlDateTruncExpression(node_id=dt_10000),  -->
@@ -216,7 +216,7 @@
                 <!-- col9 =                                                      -->
                 <!--   {'class': 'SqlSelectColumn',                              -->
                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10009),  -->
-                <!--    'column_alias': 'account__ds'}                           -->
+                <!--    'column_alias': 'account__ds__day'}                      -->
                 <!-- col10 =                                               -->
                 <!--   {'class': 'SqlSelectColumn',                        -->
                 <!--    'expr': SqlDateTruncExpression(node_id=dt_10004),  -->

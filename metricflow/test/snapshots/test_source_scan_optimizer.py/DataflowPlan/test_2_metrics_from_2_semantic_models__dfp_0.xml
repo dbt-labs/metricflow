@@ -21,9 +21,9 @@
                     <!-- description = Aggregate Measures -->
                     <!-- node_id = am_0 -->
                     <FilterElementsNode>
-                        <!-- description =                    -->
-                        <!--   Pass Only Elements:            -->
-                        <!--     ['bookings', 'metric_time']  -->
+                        <!-- description =                         -->
+                        <!--   Pass Only Elements:                 -->
+                        <!--     ['bookings', 'metric_time__day']  -->
                         <!-- node_id = pfe_0 -->
                         <!-- include_spec =                           -->
                         <!--   {'class': 'MeasureSpec',               -->
@@ -64,9 +64,9 @@
                     <!-- description = Aggregate Measures -->
                     <!-- node_id = am_1 -->
                     <FilterElementsNode>
-                        <!-- description =                    -->
-                        <!--   Pass Only Elements:            -->
-                        <!--     ['listings', 'metric_time']  -->
+                        <!-- description =                         -->
+                        <!--   Pass Only Elements:                 -->
+                        <!--     ['listings', 'metric_time__day']  -->
                         <!-- node_id = pfe_1 -->
                         <!-- include_spec =                           -->
                         <!--   {'class': 'MeasureSpec',               -->

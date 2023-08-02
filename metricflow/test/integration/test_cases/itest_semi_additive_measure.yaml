@@ -71,7 +71,7 @@ integration_test:
   group_bys: ["metric_time"]
   check_query: |
     SELECT
-      a.ds AS metric_time
+      a.ds AS metric_time__day
       , SUM(a.total_account_balance_first_day) AS total_account_balance_first_day
     FROM (
       SELECT
@@ -82,10 +82,10 @@ integration_test:
     INNER JOIN (
       SELECT
         MIN(ds) AS ds
-        , {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time
+        , {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
       FROM {{ source_schema }}.fct_accounts
       GROUP BY
-        metric_time
+        metric_time__day
     ) b
     ON
       a.ds = b.ds

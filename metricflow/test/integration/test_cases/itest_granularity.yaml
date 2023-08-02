@@ -8,7 +8,7 @@ integration_test:
   check_query: |
     SELECT
       SUM(booking) AS bookings
-      , {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time
+      , {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
     FROM {{ source_schema }}.fct_bookings_extended
     GROUP BY
       ds
@@ -78,7 +78,7 @@ integration_test:
   check_query: |
     SELECT
       COUNT(DISTINCT listing_id) AS unique_listings_booked
-      , {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time
+      , {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
     FROM {{ source_schema }}.fct_bookings_extended
     GROUP BY
       ds
@@ -148,12 +148,12 @@ integration_test:
   check_query: |
     SELECT
       SUM(booking) AS bookings
-      , {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS listing_id__listing_creation_ds
+      , {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS listing_id__listing_creation_ds__day
     FROM {{ source_schema }}.fct_bookings_extended b
     LEFT OUTER JOIN {{ source_schema }}.dim_listings_extended l
     ON b.listing_id = l.listing_id
     GROUP BY
-      listing_id__listing_creation_ds
+      listing_id__listing_creation_ds__day
 ---
 integration_test:
   name: query_granularity_for_joined_dundered_dimension_month

@@ -54,9 +54,9 @@
                     <!-- description = Aggregate Measures -->
                     <!-- node_id = am_10 -->
                     <FilterElementsNode>
-                        <!-- description =                                                -->
-                        <!--   Pass Only Elements:                                        -->
-                        <!--     ['bookings', 'bookers', 'booking_value', 'metric_time']  -->
+                        <!-- description =                                                     -->
+                        <!--   Pass Only Elements:                                             -->
+                        <!--     ['bookings', 'bookers', 'booking_value', 'metric_time__day']  -->
                         <!-- node_id = pfe_10 -->
                         <!-- include_spec =                           -->
                         <!--   {'class': 'MeasureSpec',               -->

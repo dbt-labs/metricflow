@@ -52,9 +52,9 @@
                         <!--                                                                                'aggregation_state': None}},),            -->
                         <!--    'validity_window': None}                                                                                              -->
                         <FilterElementsNode>
-                            <!-- description =                                      -->
-                            <!--   Pass Only Elements:                              -->
-                            <!--     ['txn_count', 'ds_partitioned', 'account_id']  -->
+                            <!-- description =                                           -->
+                            <!--   Pass Only Elements:                                   -->
+                            <!--     ['txn_count', 'ds_partitioned__day', 'account_id']  -->
                             <!-- node_id = pfe_1 -->
                             <!-- include_spec =                           -->
                             <!--   {'class': 'MeasureSpec',               -->
@@ -84,9 +84,9 @@
                             </MetricTimeDimensionTransformNode>
                         </FilterElementsNode>
                         <FilterElementsNode>
-                            <!-- description =                                                       -->
-                            <!--   Pass Only Elements:                                               -->
-                            <!--     ['customer_id__customer_name', 'ds_partitioned', 'account_id']  -->
+                            <!-- description =                                                            -->
+                            <!--   Pass Only Elements:                                                    -->
+                            <!--     ['customer_id__customer_name', 'ds_partitioned__day', 'account_id']  -->
                             <!-- node_id = pfe_2 -->
                             <!-- include_spec =                                                                      -->
                             <!--   {'class': 'DimensionSpec',                                                        -->
@@ -138,12 +138,12 @@
                                     <!--      'customer_atomic_weight',                -->
                                     <!--      'customer_id__customer_name',            -->
                                     <!--      'customer_id__customer_atomic_weight',   -->
-                                    <!--      'ds_partitioned',                        -->
+                                    <!--      'ds_partitioned__day',                   -->
                                     <!--      'ds_partitioned__week',                  -->
                                     <!--      'ds_partitioned__month',                 -->
                                     <!--      'ds_partitioned__quarter',               -->
                                     <!--      'ds_partitioned__year',                  -->
-                                    <!--      'customer_id__ds_partitioned',           -->
+                                    <!--      'customer_id__ds_partitioned__day',      -->
                                     <!--      'customer_id__ds_partitioned__week',     -->
                                     <!--      'customer_id__ds_partitioned__month',    -->
                                     <!--      'customer_id__ds_partitioned__quarter',  -->

@@ -9,7 +9,7 @@ integration_test:
     SELECT
       SUM(1) AS identity_verifications
       , verification_type AS verification__verification_type
-      , ds_partitioned AS verification__ds_partitioned
+      , ds_partitioned AS verification__ds_partitioned__day
     FROM {{ source_schema }}.fct_id_verifications
     GROUP BY
       verification_type
@@ -41,7 +41,7 @@ integration_test:
   check_query: |
     SELECT
       SUM(1) AS identity_verifications
-      , fct.ds_partitioned AS verification__ds_partitioned
+      , fct.ds_partitioned AS verification__ds_partitioned__day
       , dim.home_state AS user__home_state
     FROM {{ source_schema }}.fct_id_verifications fct
     LEFT OUTER JOIN {{ source_schema }}.dim_users dim
@@ -77,7 +77,7 @@ integration_test:
   check_query: |
     SELECT
       SUM(1) AS identity_verifications
-      , fct.ds_partitioned AS verification__ds_partitioned
+      , fct.ds_partitioned AS verification__ds_partitioned__day
       , dim.home_state AS user__home_state
     FROM {{ source_schema }}.fct_id_verifications fct
     LEFT OUTER JOIN {{ source_schema }}.dim_users dim

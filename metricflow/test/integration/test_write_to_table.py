@@ -23,7 +23,7 @@ def test_write_to_table(it_helpers: IntegrationTestHelpers) -> None:  # noqa: D
                 f"""\
                 SELECT
                   SUM(1) AS bookings
-                  , ds AS metric_time
+                  , ds AS metric_time__day
                 FROM {it_helpers.source_schema}.fct_bookings
                 GROUP BY ds
                 """
@@ -34,7 +34,7 @@ def test_write_to_table(it_helpers: IntegrationTestHelpers) -> None:  # noqa: D
                 f"""\
                 SELECT
                   bookings
-                  , metric_time
+                  , metric_time__day
                 FROM {output_table.sql}
                 """
             )

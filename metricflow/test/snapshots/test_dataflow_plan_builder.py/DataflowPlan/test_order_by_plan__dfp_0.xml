@@ -3,7 +3,7 @@
         <!-- description = Write to Dataframe -->
         <!-- node_id = wrd_0 -->
         <OrderByLimitNode>
-            <!-- description = Order By ['metric_time', 'bookings'] -->
+            <!-- description = Order By ['metric_time__day', 'bookings'] -->
             <!-- node_id = obl_0 -->
             <!-- order_by_spec =                                                      -->
             <!--   {'class': 'OrderBySpec',                                           -->
@@ -43,9 +43,9 @@
                     <!-- description = Aggregate Measures -->
                     <!-- node_id = am_0 -->
                     <FilterElementsNode>
-                        <!-- description =                    -->
-                        <!--   Pass Only Elements:            -->
-                        <!--     ['bookings', 'metric_time']  -->
+                        <!-- description =                         -->
+                        <!--   Pass Only Elements:                 -->
+                        <!--     ['bookings', 'metric_time__day']  -->
                         <!-- node_id = pfe_0 -->
                         <!-- include_spec =                           -->
                         <!--   {'class': 'MeasureSpec',               -->
