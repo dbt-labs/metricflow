@@ -87,15 +87,6 @@ class CLIContext:
         return pathlib.Path(self._dbt_project_metadata.project.log_path, "metricflow.log")
 
     @property
-    def mf_system_schema(self) -> str:
-        """Schema to use for MF system operations, such as creating the time spine dataset.
-
-        This is currently sourced from the dbt profile configuration. In the long run, this property
-        should be removed in favor of always sourcing schema locations from manifest entries.
-        """
-        return self.dbt_artifacts.profile.credentials.schema
-
-    @property
     def sql_client(self) -> SqlClient:
         """Property accessor for the sql_client class used in the CLI."""
         if self._sql_client is None:

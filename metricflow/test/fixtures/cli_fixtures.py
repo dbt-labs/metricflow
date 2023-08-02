@@ -17,7 +17,6 @@ from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.time.configurable_time_source import ConfigurableTimeSource
 
 
@@ -37,7 +36,6 @@ class FakeCLIContext(CLIContext):
         self._sql_client: Optional[SqlClient] = None
         self._semantic_manifest: Optional[SemanticManifest] = None
         self._semantic_manifest_lookup: Optional[SemanticManifestLookup] = None
-        self._mf_system_schema: Optional[str] = None
         self._log_file_path: Optional[pathlib.Path] = None
 
     @property
@@ -55,12 +53,6 @@ class FakeCLIContext(CLIContext):
     def log_file_path(self) -> pathlib.Path:
         assert self._log_file_path
         return self._log_file_path
-
-    @property
-    @override
-    def mf_system_schema(self) -> str:
-        assert self._mf_system_schema, "Must set _mf_system_schema before use!"
-        return self._mf_system_schema
 
     @property
     @override
@@ -85,7 +77,6 @@ class FakeCLIContext(CLIContext):
 def cli_context(  # noqa: D
     sql_client: SqlClient,
     simple_semantic_manifest: SemanticManifest,
-    mf_test_session_state: MetricFlowTestSessionState,
     create_source_tables: bool,
 ) -> Generator[CLIContext, None, None]:
     semantic_manifest_lookup = SemanticManifestLookup(simple_semantic_manifest)
@@ -100,7 +91,6 @@ def cli_context(  # noqa: D
     context._sql_client = sql_client
     context._semantic_manifest = simple_semantic_manifest
     context._semantic_manifest_lookup = semantic_manifest_lookup
-    context._mf_system_schema = mf_test_session_state.mf_system_schema
     with tempfile.NamedTemporaryFile() as file:
         context._log_file_path = pathlib.Path(file.name)
         yield context
