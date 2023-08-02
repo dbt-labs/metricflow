@@ -15,33 +15,33 @@ SELECT
   , booking_value AS approximate_continuous_booking_value_p99
   , booking_value AS approximate_discrete_booking_value_p99
   , is_instant
-  , ds
+  , ds AS ds__day
   , DATE_TRUNC('week', ds) AS ds__week
   , DATE_TRUNC('month', ds) AS ds__month
   , DATE_TRUNC('quarter', ds) AS ds__quarter
   , DATE_TRUNC('year', ds) AS ds__year
-  , ds_partitioned
+  , ds_partitioned AS ds_partitioned__day
   , DATE_TRUNC('week', ds_partitioned) AS ds_partitioned__week
   , DATE_TRUNC('month', ds_partitioned) AS ds_partitioned__month
   , DATE_TRUNC('quarter', ds_partitioned) AS ds_partitioned__quarter
   , DATE_TRUNC('year', ds_partitioned) AS ds_partitioned__year
-  , paid_at
+  , paid_at AS paid_at__day
   , DATE_TRUNC('week', paid_at) AS paid_at__week
   , DATE_TRUNC('month', paid_at) AS paid_at__month
   , DATE_TRUNC('quarter', paid_at) AS paid_at__quarter
   , DATE_TRUNC('year', paid_at) AS paid_at__year
   , is_instant AS booking__is_instant
-  , ds AS booking__ds
+  , ds AS booking__ds__day
   , DATE_TRUNC('week', ds) AS booking__ds__week
   , DATE_TRUNC('month', ds) AS booking__ds__month
   , DATE_TRUNC('quarter', ds) AS booking__ds__quarter
   , DATE_TRUNC('year', ds) AS booking__ds__year
-  , ds_partitioned AS booking__ds_partitioned
+  , ds_partitioned AS booking__ds_partitioned__day
   , DATE_TRUNC('week', ds_partitioned) AS booking__ds_partitioned__week
   , DATE_TRUNC('month', ds_partitioned) AS booking__ds_partitioned__month
   , DATE_TRUNC('quarter', ds_partitioned) AS booking__ds_partitioned__quarter
   , DATE_TRUNC('year', ds_partitioned) AS booking__ds_partitioned__year
-  , paid_at AS booking__paid_at
+  , paid_at AS booking__paid_at__day
   , DATE_TRUNC('week', paid_at) AS booking__paid_at__week
   , DATE_TRUNC('month', paid_at) AS booking__paid_at__month
   , DATE_TRUNC('quarter', paid_at) AS booking__paid_at__quarter

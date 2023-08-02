@@ -5,7 +5,7 @@
         <!-- col0 =                                                    -->
         <!--   {'class': 'SqlSelectColumn',                            -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_174),  -->
-        <!--    'column_alias': 'metric_time'}                         -->
+        <!--    'column_alias': 'metric_time__day'}                    -->
         <!-- col1 =                                                    -->
         <!--   {'class': 'SqlSelectColumn',                            -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_175),  -->
@@ -18,7 +18,7 @@
             <!-- col0 =                                                    -->
             <!--   {'class': 'SqlSelectColumn',                            -->
             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_173),  -->
-            <!--    'column_alias': 'metric_time'}                         -->
+            <!--    'column_alias': 'metric_time__day'}                    -->
             <!-- col1 =                                                                       -->
             <!--   {'class': 'SqlSelectColumn',                                               -->
             <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_0, sql_function=SUM),  -->
@@ -27,17 +27,17 @@
             <!-- group_by0 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                            -->
             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_173),  -->
-            <!--    'column_alias': 'metric_time'}                         -->
+            <!--    'column_alias': 'metric_time__day'}                    -->
             <!-- where = None -->
             <SqlSelectStatementNode>
-                <!-- description =                    -->
-                <!--   Pass Only Elements:            -->
-                <!--     ['bookings', 'metric_time']  -->
+                <!-- description =                         -->
+                <!--   Pass Only Elements:                 -->
+                <!--     ['bookings', 'metric_time__day']  -->
                 <!-- node_id = ss_8 -->
                 <!-- col0 =                                                    -->
                 <!--   {'class': 'SqlSelectColumn',                            -->
                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_171),  -->
-                <!--    'column_alias': 'metric_time'}                         -->
+                <!--    'column_alias': 'metric_time__day'}                    -->
                 <!-- col1 =                                                    -->
                 <!--   {'class': 'SqlSelectColumn',                            -->
                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_170),  -->
@@ -50,7 +50,7 @@
                     <!-- col0 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_169),  -->
-                    <!--    'column_alias': 'metric_time'}                         -->
+                    <!--    'column_alias': 'metric_time__day'}                    -->
                     <!-- col1 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_168),  -->
@@ -63,14 +63,14 @@
                     <!-- where =                                                              -->
                     <!--   SqlStringExpression(node_id=str_0 sql_expr=listing__capacity > 2)  -->
                     <SqlSelectStatementNode>
-                        <!-- description =                                         -->
-                        <!--   Pass Only Elements:                                 -->
-                        <!--     ['bookings', 'listing__capacity', 'metric_time']  -->
+                        <!-- description =                                              -->
+                        <!--   Pass Only Elements:                                      -->
+                        <!--     ['bookings', 'listing__capacity', 'metric_time__day']  -->
                         <!-- node_id = ss_6 -->
                         <!-- col0 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
                         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_166),  -->
-                        <!--    'column_alias': 'metric_time'}                         -->
+                        <!--    'column_alias': 'metric_time__day'}                    -->
                         <!-- col1 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
                         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_165),  -->
@@ -87,15 +87,15 @@
                             <!-- col0 =                                                    -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
                             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_159),  -->
-                            <!--    'column_alias': 'metric_time'}                         -->
+                            <!--    'column_alias': 'metric_time__day'}                    -->
                             <!-- col1 =                                                    -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
                             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_162),  -->
-                            <!--    'column_alias': 'listing__window_start'}               -->
+                            <!--    'column_alias': 'listing__window_start__day'}          -->
                             <!-- col2 =                                                    -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
                             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_163),  -->
-                            <!--    'column_alias': 'listing__window_end'}                 -->
+                            <!--    'column_alias': 'listing__window_end__day'}            -->
                             <!-- col3 =                                                    -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
                             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_160),  -->
@@ -117,14 +117,14 @@
                             <!--    'on_condition': SqlLogicalExpression(node_id=lo_2)}    -->
                             <!-- where = None -->
                             <SqlSelectStatementNode>
-                                <!-- description =                               -->
-                                <!--   Pass Only Elements:                       -->
-                                <!--     ['bookings', 'metric_time', 'listing']  -->
+                                <!-- description =                                    -->
+                                <!--   Pass Only Elements:                            -->
+                                <!--     ['bookings', 'metric_time__day', 'listing']  -->
                                 <!-- node_id = ss_3 -->
                                 <!-- col0 =                                                    -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
                                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_147),  -->
-                                <!--    'column_alias': 'metric_time'}                         -->
+                                <!--    'column_alias': 'metric_time__day'}                    -->
                                 <!-- col1 =                                                    -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
                                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_148),  -->
@@ -141,7 +141,7 @@
                                     <!-- col0 =                                                    -->
                                     <!--   {'class': 'SqlSelectColumn',                            -->
                                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_103),  -->
-                                    <!--    'column_alias': 'ds'}                                  -->
+                                    <!--    'column_alias': 'ds__day'}                             -->
                                     <!-- col1 =                                                    -->
                                     <!--   {'class': 'SqlSelectColumn',                            -->
                                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_104),  -->
@@ -161,7 +161,7 @@
                                     <!-- col5 =                                                    -->
                                     <!--   {'class': 'SqlSelectColumn',                            -->
                                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_108),  -->
-                                    <!--    'column_alias': 'ds_partitioned'}                      -->
+                                    <!--    'column_alias': 'ds_partitioned__day'}                 -->
                                     <!-- col6 =                                                    -->
                                     <!--   {'class': 'SqlSelectColumn',                            -->
                                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_109),  -->
@@ -181,7 +181,7 @@
                                     <!-- col10 =                                                   -->
                                     <!--   {'class': 'SqlSelectColumn',                            -->
                                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_113),  -->
-                                    <!--    'column_alias': 'paid_at'}                             -->
+                                    <!--    'column_alias': 'paid_at__day'}                        -->
                                     <!-- col11 =                                                   -->
                                     <!--   {'class': 'SqlSelectColumn',                            -->
                                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_114),  -->
@@ -201,7 +201,7 @@
                                     <!-- col15 =                                                   -->
                                     <!--   {'class': 'SqlSelectColumn',                            -->
                                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_118),  -->
-                                    <!--    'column_alias': 'booking__ds'}                         -->
+                                    <!--    'column_alias': 'booking__ds__day'}                    -->
                                     <!-- col16 =                                                   -->
                                     <!--   {'class': 'SqlSelectColumn',                            -->
                                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_119),  -->
@@ -221,7 +221,7 @@
                                     <!-- col20 =                                                   -->
                                     <!--   {'class': 'SqlSelectColumn',                            -->
                                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_123),  -->
-                                    <!--    'column_alias': 'booking__ds_partitioned'}             -->
+                                    <!--    'column_alias': 'booking__ds_partitioned__day'}        -->
                                     <!-- col21 =                                                   -->
                                     <!--   {'class': 'SqlSelectColumn',                            -->
                                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_124),  -->
@@ -241,7 +241,7 @@
                                     <!-- col25 =                                                   -->
                                     <!--   {'class': 'SqlSelectColumn',                            -->
                                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_128),  -->
-                                    <!--    'column_alias': 'booking__paid_at'}                    -->
+                                    <!--    'column_alias': 'booking__paid_at__day'}               -->
                                     <!-- col26 =                                                   -->
                                     <!--   {'class': 'SqlSelectColumn',                            -->
                                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_129),  -->
@@ -261,7 +261,7 @@
                                     <!-- col30 =                                                   -->
                                     <!--   {'class': 'SqlSelectColumn',                            -->
                                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_133),  -->
-                                    <!--    'column_alias': 'metric_time'}                         -->
+                                    <!--    'column_alias': 'metric_time__day'}                    -->
                                     <!-- col31 =                                                   -->
                                     <!--   {'class': 'SqlSelectColumn',                            -->
                                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_134),  -->
@@ -374,7 +374,7 @@
                                         <!-- col7 =                                                      -->
                                         <!--   {'class': 'SqlSelectColumn',                              -->
                                         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10284),  -->
-                                        <!--    'column_alias': 'ds'}                                    -->
+                                        <!--    'column_alias': 'ds__day'}                               -->
                                         <!-- col8 =                                                -->
                                         <!--   {'class': 'SqlSelectColumn',                        -->
                                         <!--    'expr': SqlDateTruncExpression(node_id=dt_10152),  -->
@@ -394,7 +394,7 @@
                                         <!-- col12 =                                                     -->
                                         <!--   {'class': 'SqlSelectColumn',                              -->
                                         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10289),  -->
-                                        <!--    'column_alias': 'ds_partitioned'}                        -->
+                                        <!--    'column_alias': 'ds_partitioned__day'}                   -->
                                         <!-- col13 =                                               -->
                                         <!--   {'class': 'SqlSelectColumn',                        -->
                                         <!--    'expr': SqlDateTruncExpression(node_id=dt_10156),  -->
@@ -414,7 +414,7 @@
                                         <!-- col17 =                                                     -->
                                         <!--   {'class': 'SqlSelectColumn',                              -->
                                         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10294),  -->
-                                        <!--    'column_alias': 'paid_at'}                               -->
+                                        <!--    'column_alias': 'paid_at__day'}                          -->
                                         <!-- col18 =                                               -->
                                         <!--   {'class': 'SqlSelectColumn',                        -->
                                         <!--    'expr': SqlDateTruncExpression(node_id=dt_10160),  -->
@@ -438,7 +438,7 @@
                                         <!-- col23 =                                                     -->
                                         <!--   {'class': 'SqlSelectColumn',                              -->
                                         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10300),  -->
-                                        <!--    'column_alias': 'booking__ds'}                           -->
+                                        <!--    'column_alias': 'booking__ds__day'}                      -->
                                         <!-- col24 =                                               -->
                                         <!--   {'class': 'SqlSelectColumn',                        -->
                                         <!--    'expr': SqlDateTruncExpression(node_id=dt_10164),  -->
@@ -458,7 +458,7 @@
                                         <!-- col28 =                                                     -->
                                         <!--   {'class': 'SqlSelectColumn',                              -->
                                         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10305),  -->
-                                        <!--    'column_alias': 'booking__ds_partitioned'}               -->
+                                        <!--    'column_alias': 'booking__ds_partitioned__day'}          -->
                                         <!-- col29 =                                               -->
                                         <!--   {'class': 'SqlSelectColumn',                        -->
                                         <!--    'expr': SqlDateTruncExpression(node_id=dt_10168),  -->
@@ -478,7 +478,7 @@
                                         <!-- col33 =                                                     -->
                                         <!--   {'class': 'SqlSelectColumn',                              -->
                                         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10310),  -->
-                                        <!--    'column_alias': 'booking__paid_at'}                      -->
+                                        <!--    'column_alias': 'booking__paid_at__day'}                 -->
                                         <!-- col34 =                                               -->
                                         <!--   {'class': 'SqlSelectColumn',                        -->
                                         <!--    'expr': SqlDateTruncExpression(node_id=dt_10172),  -->
@@ -538,18 +538,18 @@
                                 </SqlSelectStatementNode>
                             </SqlSelectStatementNode>
                             <SqlSelectStatementNode>
-                                <!-- description =                                              -->
-                                <!--   Pass Only Elements:                                      -->
-                                <!--     ['capacity', 'window_start', 'window_end', 'listing']  -->
+                                <!-- description =                                                        -->
+                                <!--   Pass Only Elements:                                                -->
+                                <!--     ['capacity', 'window_start__day', 'window_end__day', 'listing']  -->
                                 <!-- node_id = ss_4 -->
                                 <!-- col0 =                                                    -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
                                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_150),  -->
-                                <!--    'column_alias': 'window_start'}                        -->
+                                <!--    'column_alias': 'window_start__day'}                   -->
                                 <!-- col1 =                                                    -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
                                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_151),  -->
-                                <!--    'column_alias': 'window_end'}                          -->
+                                <!--    'column_alias': 'window_end__day'}                     -->
                                 <!-- col2 =                                                    -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
                                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_152),  -->
@@ -566,7 +566,7 @@
                                     <!-- col0 =                                                      -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
                                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10330),  -->
-                                    <!--    'column_alias': 'window_start'}                          -->
+                                    <!--    'column_alias': 'window_start__day'}                     -->
                                     <!-- col1 =                                                -->
                                     <!--   {'class': 'SqlSelectColumn',                        -->
                                     <!--    'expr': SqlDateTruncExpression(node_id=dt_10176),  -->
@@ -586,7 +586,7 @@
                                     <!-- col5 =                                                      -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
                                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10335),  -->
-                                    <!--    'column_alias': 'window_end'}                            -->
+                                    <!--    'column_alias': 'window_end__day'}                       -->
                                     <!-- col6 =                                                -->
                                     <!--   {'class': 'SqlSelectColumn',                        -->
                                     <!--    'expr': SqlDateTruncExpression(node_id=dt_10180),  -->
@@ -618,7 +618,7 @@
                                     <!-- col13 =                                                     -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
                                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10343),  -->
-                                    <!--    'column_alias': 'listing__window_start'}                 -->
+                                    <!--    'column_alias': 'listing__window_start__day'}            -->
                                     <!-- col14 =                                               -->
                                     <!--   {'class': 'SqlSelectColumn',                        -->
                                     <!--    'expr': SqlDateTruncExpression(node_id=dt_10184),  -->
@@ -638,7 +638,7 @@
                                     <!-- col18 =                                                     -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
                                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10348),  -->
-                                    <!--    'column_alias': 'listing__window_end'}                   -->
+                                    <!--    'column_alias': 'listing__window_end__day'}              -->
                                     <!-- col19 =                                               -->
                                     <!--   {'class': 'SqlSelectColumn',                        -->
                                     <!--    'expr': SqlDateTruncExpression(node_id=dt_10188),  -->

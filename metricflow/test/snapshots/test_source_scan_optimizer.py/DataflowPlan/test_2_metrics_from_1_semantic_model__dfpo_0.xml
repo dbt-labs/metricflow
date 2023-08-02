@@ -23,9 +23,9 @@
                 <!-- description = Aggregate Measures -->
                 <!-- node_id = am_4 -->
                 <FilterElementsNode>
-                    <!-- description =                                                                -->
-                    <!--   Pass Only Elements:                                                        -->
-                    <!--     ['bookings', 'booking_value', 'metric_time', 'listing__country_latest']  -->
+                    <!-- description =                                                                     -->
+                    <!--   Pass Only Elements:                                                             -->
+                    <!--     ['bookings', 'booking_value', 'metric_time__day', 'listing__country_latest']  -->
                     <!-- node_id = pfe_14 -->
                     <!-- include_spec =                           -->
                     <!--   {'class': 'MeasureSpec',               -->
@@ -58,9 +58,9 @@
                         <!--    'join_on_partition_time_dimensions': (),           -->
                         <!--    'validity_window': None}                           -->
                         <FilterElementsNode>
-                            <!-- description =                                                -->
-                            <!--   Pass Only Elements:                                        -->
-                            <!--     ['bookings', 'booking_value', 'metric_time', 'listing']  -->
+                            <!-- description =                                                     -->
+                            <!--   Pass Only Elements:                                             -->
+                            <!--     ['bookings', 'booking_value', 'metric_time__day', 'listing']  -->
                             <!-- node_id = pfe_12 -->
                             <!-- include_spec =                           -->
                             <!--   {'class': 'MeasureSpec',               -->

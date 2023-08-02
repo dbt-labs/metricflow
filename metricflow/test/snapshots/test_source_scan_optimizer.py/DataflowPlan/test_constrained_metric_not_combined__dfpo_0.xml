@@ -21,9 +21,9 @@
                     <!-- description = Aggregate Measures -->
                     <!-- node_id = am_2 -->
                     <FilterElementsNode>
-                        <!-- description =                         -->
-                        <!--   Pass Only Elements:                 -->
-                        <!--     ['booking_value', 'metric_time']  -->
+                        <!-- description =                              -->
+                        <!--   Pass Only Elements:                      -->
+                        <!--     ['booking_value', 'metric_time__day']  -->
                         <!-- node_id = pfe_3 -->
                         <!-- include_spec =                           -->
                         <!--   {'class': 'MeasureSpec',               -->
@@ -74,9 +74,9 @@
                     <!-- description = Aggregate Measures -->
                     <!-- node_id = am_3 -->
                     <FilterElementsNode>
-                        <!-- description =                         -->
-                        <!--   Pass Only Elements:                 -->
-                        <!--     ['booking_value', 'metric_time']  -->
+                        <!-- description =                              -->
+                        <!--   Pass Only Elements:                      -->
+                        <!--     ['booking_value', 'metric_time__day']  -->
                         <!-- node_id = pfe_5 -->
                         <!-- include_spec =                           -->
                         <!--   {'class': 'MeasureSpec',               -->
@@ -103,9 +103,9 @@
                             <!--                          'time_dimension_specs': (),                                              -->
                             <!--                          'entity_specs': ()}}                                                     -->
                             <FilterElementsNode>
-                                <!-- description =                                                -->
-                                <!--   Pass Only Elements:                                        -->
-                                <!--     ['booking_value', 'booking__is_instant', 'metric_time']  -->
+                                <!-- description =                                                     -->
+                                <!--   Pass Only Elements:                                             -->
+                                <!--     ['booking_value', 'booking__is_instant', 'metric_time__day']  -->
                                 <!-- node_id = pfe_4 -->
                                 <!-- include_spec =                           -->
                                 <!--   {'class': 'MeasureSpec',               -->

@@ -33,7 +33,7 @@
                         <!-- node_id = wcc_0 -->
                         <!-- where_condition =                                                                            -->
                         <!--   {'class': 'WhereFilterSpec',                                                               -->
-                        <!--    'where_sql': "metric_time >= '2020-01-01'",                                               -->
+                        <!--    'where_sql': "metric_time__day >= '2020-01-01'",                                          -->
                         <!--    'bind_parameters': {'class': 'SqlBindParameters', 'param_items': ()},                     -->
                         <!--    'linkable_spec_set': {'class': 'LinkableSpecSet',                                         -->
                         <!--                          'dimension_specs': (),                                              -->
@@ -44,9 +44,9 @@
                         <!--                                                    'aggregation_state': None},),             -->
                         <!--                          'entity_specs': ()}}                                                -->
                         <FilterElementsNode>
-                            <!-- description =                                           -->
-                            <!--   Pass Only Elements:                                   -->
-                            <!--     ['bookings', 'booking__is_instant', 'metric_time']  -->
+                            <!-- description =                                                -->
+                            <!--   Pass Only Elements:                                        -->
+                            <!--     ['bookings', 'booking__is_instant', 'metric_time__day']  -->
                             <!-- node_id = pfe_0 -->
                             <!-- include_spec =                           -->
                             <!--   {'class': 'MeasureSpec',               -->

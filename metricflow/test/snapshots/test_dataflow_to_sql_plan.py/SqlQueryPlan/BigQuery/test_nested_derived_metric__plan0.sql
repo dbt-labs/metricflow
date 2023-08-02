@@ -1,75 +1,75 @@
 -- Compute Metrics via Expressions
 SELECT
-  subq_22.metric_time
+  subq_22.metric_time__day
   , non_referred + (instant * 1.0 / bookings) AS instant_plus_non_referred_bookings_pct
 FROM (
   -- Combine Metrics
   SELECT
-    COALESCE(subq_11.metric_time, subq_16.metric_time, subq_21.metric_time) AS metric_time
+    COALESCE(subq_11.metric_time__day, subq_16.metric_time__day, subq_21.metric_time__day) AS metric_time__day
     , subq_11.non_referred AS non_referred
     , subq_16.instant AS instant
     , subq_21.bookings AS bookings
   FROM (
     -- Compute Metrics via Expressions
     SELECT
-      subq_10.metric_time
+      subq_10.metric_time__day
       , (bookings - ref_bookings) * 1.0 / bookings AS non_referred
     FROM (
       -- Combine Metrics
       SELECT
-        COALESCE(subq_4.metric_time, subq_9.metric_time) AS metric_time
+        COALESCE(subq_4.metric_time__day, subq_9.metric_time__day) AS metric_time__day
         , subq_4.ref_bookings AS ref_bookings
         , subq_9.bookings AS bookings
       FROM (
         -- Compute Metrics via Expressions
         SELECT
-          subq_3.metric_time
+          subq_3.metric_time__day
           , subq_3.referred_bookings AS ref_bookings
         FROM (
           -- Aggregate Measures
           SELECT
-            subq_2.metric_time
+            subq_2.metric_time__day
             , SUM(subq_2.referred_bookings) AS referred_bookings
           FROM (
             -- Pass Only Elements:
-            --   ['referred_bookings', 'metric_time']
+            --   ['referred_bookings', 'metric_time__day']
             SELECT
-              subq_1.metric_time
+              subq_1.metric_time__day
               , subq_1.referred_bookings
             FROM (
               -- Metric Time Dimension 'ds'
               SELECT
-                subq_0.ds
+                subq_0.ds__day
                 , subq_0.ds__week
                 , subq_0.ds__month
                 , subq_0.ds__quarter
                 , subq_0.ds__year
-                , subq_0.ds_partitioned
+                , subq_0.ds_partitioned__day
                 , subq_0.ds_partitioned__week
                 , subq_0.ds_partitioned__month
                 , subq_0.ds_partitioned__quarter
                 , subq_0.ds_partitioned__year
-                , subq_0.paid_at
+                , subq_0.paid_at__day
                 , subq_0.paid_at__week
                 , subq_0.paid_at__month
                 , subq_0.paid_at__quarter
                 , subq_0.paid_at__year
-                , subq_0.booking__ds
+                , subq_0.booking__ds__day
                 , subq_0.booking__ds__week
                 , subq_0.booking__ds__month
                 , subq_0.booking__ds__quarter
                 , subq_0.booking__ds__year
-                , subq_0.booking__ds_partitioned
+                , subq_0.booking__ds_partitioned__day
                 , subq_0.booking__ds_partitioned__week
                 , subq_0.booking__ds_partitioned__month
                 , subq_0.booking__ds_partitioned__quarter
                 , subq_0.booking__ds_partitioned__year
-                , subq_0.booking__paid_at
+                , subq_0.booking__paid_at__day
                 , subq_0.booking__paid_at__week
                 , subq_0.booking__paid_at__month
                 , subq_0.booking__paid_at__quarter
                 , subq_0.booking__paid_at__year
-                , subq_0.ds AS metric_time
+                , subq_0.ds__day AS metric_time__day
                 , subq_0.ds__week AS metric_time__week
                 , subq_0.ds__month AS metric_time__month
                 , subq_0.ds__quarter AS metric_time__quarter
@@ -113,33 +113,33 @@ FROM (
                   , bookings_source_src_10001.booking_value AS approximate_continuous_booking_value_p99
                   , bookings_source_src_10001.booking_value AS approximate_discrete_booking_value_p99
                   , bookings_source_src_10001.is_instant
-                  , bookings_source_src_10001.ds
+                  , bookings_source_src_10001.ds AS ds__day
                   , DATE_TRUNC(bookings_source_src_10001.ds, isoweek) AS ds__week
                   , DATE_TRUNC(bookings_source_src_10001.ds, month) AS ds__month
                   , DATE_TRUNC(bookings_source_src_10001.ds, quarter) AS ds__quarter
                   , DATE_TRUNC(bookings_source_src_10001.ds, isoyear) AS ds__year
-                  , bookings_source_src_10001.ds_partitioned
+                  , bookings_source_src_10001.ds_partitioned AS ds_partitioned__day
                   , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, isoweek) AS ds_partitioned__week
                   , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, month) AS ds_partitioned__month
                   , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, quarter) AS ds_partitioned__quarter
                   , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, isoyear) AS ds_partitioned__year
-                  , bookings_source_src_10001.paid_at
+                  , bookings_source_src_10001.paid_at AS paid_at__day
                   , DATE_TRUNC(bookings_source_src_10001.paid_at, isoweek) AS paid_at__week
                   , DATE_TRUNC(bookings_source_src_10001.paid_at, month) AS paid_at__month
                   , DATE_TRUNC(bookings_source_src_10001.paid_at, quarter) AS paid_at__quarter
                   , DATE_TRUNC(bookings_source_src_10001.paid_at, isoyear) AS paid_at__year
                   , bookings_source_src_10001.is_instant AS booking__is_instant
-                  , bookings_source_src_10001.ds AS booking__ds
+                  , bookings_source_src_10001.ds AS booking__ds__day
                   , DATE_TRUNC(bookings_source_src_10001.ds, isoweek) AS booking__ds__week
                   , DATE_TRUNC(bookings_source_src_10001.ds, month) AS booking__ds__month
                   , DATE_TRUNC(bookings_source_src_10001.ds, quarter) AS booking__ds__quarter
                   , DATE_TRUNC(bookings_source_src_10001.ds, isoyear) AS booking__ds__year
-                  , bookings_source_src_10001.ds_partitioned AS booking__ds_partitioned
+                  , bookings_source_src_10001.ds_partitioned AS booking__ds_partitioned__day
                   , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, isoweek) AS booking__ds_partitioned__week
                   , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, month) AS booking__ds_partitioned__month
                   , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, quarter) AS booking__ds_partitioned__quarter
                   , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, isoyear) AS booking__ds_partitioned__year
-                  , bookings_source_src_10001.paid_at AS booking__paid_at
+                  , bookings_source_src_10001.paid_at AS booking__paid_at__day
                   , DATE_TRUNC(bookings_source_src_10001.paid_at, isoweek) AS booking__paid_at__week
                   , DATE_TRUNC(bookings_source_src_10001.paid_at, month) AS booking__paid_at__month
                   , DATE_TRUNC(bookings_source_src_10001.paid_at, quarter) AS booking__paid_at__quarter
@@ -155,59 +155,59 @@ FROM (
             ) subq_1
           ) subq_2
           GROUP BY
-            metric_time
+            metric_time__day
         ) subq_3
       ) subq_4
       INNER JOIN (
         -- Compute Metrics via Expressions
         SELECT
-          subq_8.metric_time
+          subq_8.metric_time__day
           , subq_8.bookings
         FROM (
           -- Aggregate Measures
           SELECT
-            subq_7.metric_time
+            subq_7.metric_time__day
             , SUM(subq_7.bookings) AS bookings
           FROM (
             -- Pass Only Elements:
-            --   ['bookings', 'metric_time']
+            --   ['bookings', 'metric_time__day']
             SELECT
-              subq_6.metric_time
+              subq_6.metric_time__day
               , subq_6.bookings
             FROM (
               -- Metric Time Dimension 'ds'
               SELECT
-                subq_5.ds
+                subq_5.ds__day
                 , subq_5.ds__week
                 , subq_5.ds__month
                 , subq_5.ds__quarter
                 , subq_5.ds__year
-                , subq_5.ds_partitioned
+                , subq_5.ds_partitioned__day
                 , subq_5.ds_partitioned__week
                 , subq_5.ds_partitioned__month
                 , subq_5.ds_partitioned__quarter
                 , subq_5.ds_partitioned__year
-                , subq_5.paid_at
+                , subq_5.paid_at__day
                 , subq_5.paid_at__week
                 , subq_5.paid_at__month
                 , subq_5.paid_at__quarter
                 , subq_5.paid_at__year
-                , subq_5.booking__ds
+                , subq_5.booking__ds__day
                 , subq_5.booking__ds__week
                 , subq_5.booking__ds__month
                 , subq_5.booking__ds__quarter
                 , subq_5.booking__ds__year
-                , subq_5.booking__ds_partitioned
+                , subq_5.booking__ds_partitioned__day
                 , subq_5.booking__ds_partitioned__week
                 , subq_5.booking__ds_partitioned__month
                 , subq_5.booking__ds_partitioned__quarter
                 , subq_5.booking__ds_partitioned__year
-                , subq_5.booking__paid_at
+                , subq_5.booking__paid_at__day
                 , subq_5.booking__paid_at__week
                 , subq_5.booking__paid_at__month
                 , subq_5.booking__paid_at__quarter
                 , subq_5.booking__paid_at__year
-                , subq_5.ds AS metric_time
+                , subq_5.ds__day AS metric_time__day
                 , subq_5.ds__week AS metric_time__week
                 , subq_5.ds__month AS metric_time__month
                 , subq_5.ds__quarter AS metric_time__quarter
@@ -251,33 +251,33 @@ FROM (
                   , bookings_source_src_10001.booking_value AS approximate_continuous_booking_value_p99
                   , bookings_source_src_10001.booking_value AS approximate_discrete_booking_value_p99
                   , bookings_source_src_10001.is_instant
-                  , bookings_source_src_10001.ds
+                  , bookings_source_src_10001.ds AS ds__day
                   , DATE_TRUNC(bookings_source_src_10001.ds, isoweek) AS ds__week
                   , DATE_TRUNC(bookings_source_src_10001.ds, month) AS ds__month
                   , DATE_TRUNC(bookings_source_src_10001.ds, quarter) AS ds__quarter
                   , DATE_TRUNC(bookings_source_src_10001.ds, isoyear) AS ds__year
-                  , bookings_source_src_10001.ds_partitioned
+                  , bookings_source_src_10001.ds_partitioned AS ds_partitioned__day
                   , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, isoweek) AS ds_partitioned__week
                   , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, month) AS ds_partitioned__month
                   , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, quarter) AS ds_partitioned__quarter
                   , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, isoyear) AS ds_partitioned__year
-                  , bookings_source_src_10001.paid_at
+                  , bookings_source_src_10001.paid_at AS paid_at__day
                   , DATE_TRUNC(bookings_source_src_10001.paid_at, isoweek) AS paid_at__week
                   , DATE_TRUNC(bookings_source_src_10001.paid_at, month) AS paid_at__month
                   , DATE_TRUNC(bookings_source_src_10001.paid_at, quarter) AS paid_at__quarter
                   , DATE_TRUNC(bookings_source_src_10001.paid_at, isoyear) AS paid_at__year
                   , bookings_source_src_10001.is_instant AS booking__is_instant
-                  , bookings_source_src_10001.ds AS booking__ds
+                  , bookings_source_src_10001.ds AS booking__ds__day
                   , DATE_TRUNC(bookings_source_src_10001.ds, isoweek) AS booking__ds__week
                   , DATE_TRUNC(bookings_source_src_10001.ds, month) AS booking__ds__month
                   , DATE_TRUNC(bookings_source_src_10001.ds, quarter) AS booking__ds__quarter
                   , DATE_TRUNC(bookings_source_src_10001.ds, isoyear) AS booking__ds__year
-                  , bookings_source_src_10001.ds_partitioned AS booking__ds_partitioned
+                  , bookings_source_src_10001.ds_partitioned AS booking__ds_partitioned__day
                   , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, isoweek) AS booking__ds_partitioned__week
                   , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, month) AS booking__ds_partitioned__month
                   , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, quarter) AS booking__ds_partitioned__quarter
                   , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, isoyear) AS booking__ds_partitioned__year
-                  , bookings_source_src_10001.paid_at AS booking__paid_at
+                  , bookings_source_src_10001.paid_at AS booking__paid_at__day
                   , DATE_TRUNC(bookings_source_src_10001.paid_at, isoweek) AS booking__paid_at__week
                   , DATE_TRUNC(bookings_source_src_10001.paid_at, month) AS booking__paid_at__month
                   , DATE_TRUNC(bookings_source_src_10001.paid_at, quarter) AS booking__paid_at__quarter
@@ -293,67 +293,71 @@ FROM (
             ) subq_6
           ) subq_7
           GROUP BY
-            metric_time
+            metric_time__day
         ) subq_8
       ) subq_9
       ON
         (
-          subq_4.metric_time = subq_9.metric_time
+          subq_4.metric_time__day = subq_9.metric_time__day
         ) OR (
-          (subq_4.metric_time IS NULL) AND (subq_9.metric_time IS NULL)
+          (
+            subq_4.metric_time__day IS NULL
+          ) AND (
+            subq_9.metric_time__day IS NULL
+          )
         )
     ) subq_10
   ) subq_11
   INNER JOIN (
     -- Compute Metrics via Expressions
     SELECT
-      subq_15.metric_time
+      subq_15.metric_time__day
       , subq_15.instant_bookings AS instant
     FROM (
       -- Aggregate Measures
       SELECT
-        subq_14.metric_time
+        subq_14.metric_time__day
         , SUM(subq_14.instant_bookings) AS instant_bookings
       FROM (
         -- Pass Only Elements:
-        --   ['instant_bookings', 'metric_time']
+        --   ['instant_bookings', 'metric_time__day']
         SELECT
-          subq_13.metric_time
+          subq_13.metric_time__day
           , subq_13.instant_bookings
         FROM (
           -- Metric Time Dimension 'ds'
           SELECT
-            subq_12.ds
+            subq_12.ds__day
             , subq_12.ds__week
             , subq_12.ds__month
             , subq_12.ds__quarter
             , subq_12.ds__year
-            , subq_12.ds_partitioned
+            , subq_12.ds_partitioned__day
             , subq_12.ds_partitioned__week
             , subq_12.ds_partitioned__month
             , subq_12.ds_partitioned__quarter
             , subq_12.ds_partitioned__year
-            , subq_12.paid_at
+            , subq_12.paid_at__day
             , subq_12.paid_at__week
             , subq_12.paid_at__month
             , subq_12.paid_at__quarter
             , subq_12.paid_at__year
-            , subq_12.booking__ds
+            , subq_12.booking__ds__day
             , subq_12.booking__ds__week
             , subq_12.booking__ds__month
             , subq_12.booking__ds__quarter
             , subq_12.booking__ds__year
-            , subq_12.booking__ds_partitioned
+            , subq_12.booking__ds_partitioned__day
             , subq_12.booking__ds_partitioned__week
             , subq_12.booking__ds_partitioned__month
             , subq_12.booking__ds_partitioned__quarter
             , subq_12.booking__ds_partitioned__year
-            , subq_12.booking__paid_at
+            , subq_12.booking__paid_at__day
             , subq_12.booking__paid_at__week
             , subq_12.booking__paid_at__month
             , subq_12.booking__paid_at__quarter
             , subq_12.booking__paid_at__year
-            , subq_12.ds AS metric_time
+            , subq_12.ds__day AS metric_time__day
             , subq_12.ds__week AS metric_time__week
             , subq_12.ds__month AS metric_time__month
             , subq_12.ds__quarter AS metric_time__quarter
@@ -397,33 +401,33 @@ FROM (
               , bookings_source_src_10001.booking_value AS approximate_continuous_booking_value_p99
               , bookings_source_src_10001.booking_value AS approximate_discrete_booking_value_p99
               , bookings_source_src_10001.is_instant
-              , bookings_source_src_10001.ds
+              , bookings_source_src_10001.ds AS ds__day
               , DATE_TRUNC(bookings_source_src_10001.ds, isoweek) AS ds__week
               , DATE_TRUNC(bookings_source_src_10001.ds, month) AS ds__month
               , DATE_TRUNC(bookings_source_src_10001.ds, quarter) AS ds__quarter
               , DATE_TRUNC(bookings_source_src_10001.ds, isoyear) AS ds__year
-              , bookings_source_src_10001.ds_partitioned
+              , bookings_source_src_10001.ds_partitioned AS ds_partitioned__day
               , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, isoweek) AS ds_partitioned__week
               , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, month) AS ds_partitioned__month
               , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, quarter) AS ds_partitioned__quarter
               , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, isoyear) AS ds_partitioned__year
-              , bookings_source_src_10001.paid_at
+              , bookings_source_src_10001.paid_at AS paid_at__day
               , DATE_TRUNC(bookings_source_src_10001.paid_at, isoweek) AS paid_at__week
               , DATE_TRUNC(bookings_source_src_10001.paid_at, month) AS paid_at__month
               , DATE_TRUNC(bookings_source_src_10001.paid_at, quarter) AS paid_at__quarter
               , DATE_TRUNC(bookings_source_src_10001.paid_at, isoyear) AS paid_at__year
               , bookings_source_src_10001.is_instant AS booking__is_instant
-              , bookings_source_src_10001.ds AS booking__ds
+              , bookings_source_src_10001.ds AS booking__ds__day
               , DATE_TRUNC(bookings_source_src_10001.ds, isoweek) AS booking__ds__week
               , DATE_TRUNC(bookings_source_src_10001.ds, month) AS booking__ds__month
               , DATE_TRUNC(bookings_source_src_10001.ds, quarter) AS booking__ds__quarter
               , DATE_TRUNC(bookings_source_src_10001.ds, isoyear) AS booking__ds__year
-              , bookings_source_src_10001.ds_partitioned AS booking__ds_partitioned
+              , bookings_source_src_10001.ds_partitioned AS booking__ds_partitioned__day
               , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, isoweek) AS booking__ds_partitioned__week
               , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, month) AS booking__ds_partitioned__month
               , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, quarter) AS booking__ds_partitioned__quarter
               , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, isoyear) AS booking__ds_partitioned__year
-              , bookings_source_src_10001.paid_at AS booking__paid_at
+              , bookings_source_src_10001.paid_at AS booking__paid_at__day
               , DATE_TRUNC(bookings_source_src_10001.paid_at, isoweek) AS booking__paid_at__week
               , DATE_TRUNC(bookings_source_src_10001.paid_at, month) AS booking__paid_at__month
               , DATE_TRUNC(bookings_source_src_10001.paid_at, quarter) AS booking__paid_at__quarter
@@ -439,65 +443,69 @@ FROM (
         ) subq_13
       ) subq_14
       GROUP BY
-        metric_time
+        metric_time__day
     ) subq_15
   ) subq_16
   ON
     (
-      subq_11.metric_time = subq_16.metric_time
+      subq_11.metric_time__day = subq_16.metric_time__day
     ) OR (
-      (subq_11.metric_time IS NULL) AND (subq_16.metric_time IS NULL)
+      (
+        subq_11.metric_time__day IS NULL
+      ) AND (
+        subq_16.metric_time__day IS NULL
+      )
     )
   INNER JOIN (
     -- Compute Metrics via Expressions
     SELECT
-      subq_20.metric_time
+      subq_20.metric_time__day
       , subq_20.bookings
     FROM (
       -- Aggregate Measures
       SELECT
-        subq_19.metric_time
+        subq_19.metric_time__day
         , SUM(subq_19.bookings) AS bookings
       FROM (
         -- Pass Only Elements:
-        --   ['bookings', 'metric_time']
+        --   ['bookings', 'metric_time__day']
         SELECT
-          subq_18.metric_time
+          subq_18.metric_time__day
           , subq_18.bookings
         FROM (
           -- Metric Time Dimension 'ds'
           SELECT
-            subq_17.ds
+            subq_17.ds__day
             , subq_17.ds__week
             , subq_17.ds__month
             , subq_17.ds__quarter
             , subq_17.ds__year
-            , subq_17.ds_partitioned
+            , subq_17.ds_partitioned__day
             , subq_17.ds_partitioned__week
             , subq_17.ds_partitioned__month
             , subq_17.ds_partitioned__quarter
             , subq_17.ds_partitioned__year
-            , subq_17.paid_at
+            , subq_17.paid_at__day
             , subq_17.paid_at__week
             , subq_17.paid_at__month
             , subq_17.paid_at__quarter
             , subq_17.paid_at__year
-            , subq_17.booking__ds
+            , subq_17.booking__ds__day
             , subq_17.booking__ds__week
             , subq_17.booking__ds__month
             , subq_17.booking__ds__quarter
             , subq_17.booking__ds__year
-            , subq_17.booking__ds_partitioned
+            , subq_17.booking__ds_partitioned__day
             , subq_17.booking__ds_partitioned__week
             , subq_17.booking__ds_partitioned__month
             , subq_17.booking__ds_partitioned__quarter
             , subq_17.booking__ds_partitioned__year
-            , subq_17.booking__paid_at
+            , subq_17.booking__paid_at__day
             , subq_17.booking__paid_at__week
             , subq_17.booking__paid_at__month
             , subq_17.booking__paid_at__quarter
             , subq_17.booking__paid_at__year
-            , subq_17.ds AS metric_time
+            , subq_17.ds__day AS metric_time__day
             , subq_17.ds__week AS metric_time__week
             , subq_17.ds__month AS metric_time__month
             , subq_17.ds__quarter AS metric_time__quarter
@@ -541,33 +549,33 @@ FROM (
               , bookings_source_src_10001.booking_value AS approximate_continuous_booking_value_p99
               , bookings_source_src_10001.booking_value AS approximate_discrete_booking_value_p99
               , bookings_source_src_10001.is_instant
-              , bookings_source_src_10001.ds
+              , bookings_source_src_10001.ds AS ds__day
               , DATE_TRUNC(bookings_source_src_10001.ds, isoweek) AS ds__week
               , DATE_TRUNC(bookings_source_src_10001.ds, month) AS ds__month
               , DATE_TRUNC(bookings_source_src_10001.ds, quarter) AS ds__quarter
               , DATE_TRUNC(bookings_source_src_10001.ds, isoyear) AS ds__year
-              , bookings_source_src_10001.ds_partitioned
+              , bookings_source_src_10001.ds_partitioned AS ds_partitioned__day
               , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, isoweek) AS ds_partitioned__week
               , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, month) AS ds_partitioned__month
               , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, quarter) AS ds_partitioned__quarter
               , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, isoyear) AS ds_partitioned__year
-              , bookings_source_src_10001.paid_at
+              , bookings_source_src_10001.paid_at AS paid_at__day
               , DATE_TRUNC(bookings_source_src_10001.paid_at, isoweek) AS paid_at__week
               , DATE_TRUNC(bookings_source_src_10001.paid_at, month) AS paid_at__month
               , DATE_TRUNC(bookings_source_src_10001.paid_at, quarter) AS paid_at__quarter
               , DATE_TRUNC(bookings_source_src_10001.paid_at, isoyear) AS paid_at__year
               , bookings_source_src_10001.is_instant AS booking__is_instant
-              , bookings_source_src_10001.ds AS booking__ds
+              , bookings_source_src_10001.ds AS booking__ds__day
               , DATE_TRUNC(bookings_source_src_10001.ds, isoweek) AS booking__ds__week
               , DATE_TRUNC(bookings_source_src_10001.ds, month) AS booking__ds__month
               , DATE_TRUNC(bookings_source_src_10001.ds, quarter) AS booking__ds__quarter
               , DATE_TRUNC(bookings_source_src_10001.ds, isoyear) AS booking__ds__year
-              , bookings_source_src_10001.ds_partitioned AS booking__ds_partitioned
+              , bookings_source_src_10001.ds_partitioned AS booking__ds_partitioned__day
               , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, isoweek) AS booking__ds_partitioned__week
               , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, month) AS booking__ds_partitioned__month
               , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, quarter) AS booking__ds_partitioned__quarter
               , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, isoyear) AS booking__ds_partitioned__year
-              , bookings_source_src_10001.paid_at AS booking__paid_at
+              , bookings_source_src_10001.paid_at AS booking__paid_at__day
               , DATE_TRUNC(bookings_source_src_10001.paid_at, isoweek) AS booking__paid_at__week
               , DATE_TRUNC(bookings_source_src_10001.paid_at, month) AS booking__paid_at__month
               , DATE_TRUNC(bookings_source_src_10001.paid_at, quarter) AS booking__paid_at__quarter
@@ -583,13 +591,17 @@ FROM (
         ) subq_18
       ) subq_19
       GROUP BY
-        metric_time
+        metric_time__day
     ) subq_20
   ) subq_21
   ON
     (
-      subq_11.metric_time = subq_21.metric_time
+      subq_11.metric_time__day = subq_21.metric_time__day
     ) OR (
-      (subq_11.metric_time IS NULL) AND (subq_21.metric_time IS NULL)
+      (
+        subq_11.metric_time__day IS NULL
+      ) AND (
+        subq_21.metric_time__day IS NULL
+      )
     )
 ) subq_22

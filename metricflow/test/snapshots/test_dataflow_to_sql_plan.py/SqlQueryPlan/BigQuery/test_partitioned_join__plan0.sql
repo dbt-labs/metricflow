@@ -16,42 +16,42 @@ FROM (
     FROM (
       -- Join Standard Outputs
       SELECT
-        subq_2.ds_partitioned AS ds_partitioned
-        , subq_4.ds_partitioned AS user__ds_partitioned
+        subq_2.ds_partitioned__day AS ds_partitioned__day
+        , subq_4.ds_partitioned__day AS user__ds_partitioned__day
         , subq_2.user AS user
         , subq_4.home_state AS user__home_state
         , subq_2.identity_verifications AS identity_verifications
       FROM (
         -- Pass Only Elements:
-        --   ['identity_verifications', 'ds_partitioned', 'user']
+        --   ['identity_verifications', 'ds_partitioned__day', 'user']
         SELECT
-          subq_1.ds_partitioned
+          subq_1.ds_partitioned__day
           , subq_1.user
           , subq_1.identity_verifications
         FROM (
           -- Metric Time Dimension 'ds'
           SELECT
-            subq_0.ds
+            subq_0.ds__day
             , subq_0.ds__week
             , subq_0.ds__month
             , subq_0.ds__quarter
             , subq_0.ds__year
-            , subq_0.ds_partitioned
+            , subq_0.ds_partitioned__day
             , subq_0.ds_partitioned__week
             , subq_0.ds_partitioned__month
             , subq_0.ds_partitioned__quarter
             , subq_0.ds_partitioned__year
-            , subq_0.verification__ds
+            , subq_0.verification__ds__day
             , subq_0.verification__ds__week
             , subq_0.verification__ds__month
             , subq_0.verification__ds__quarter
             , subq_0.verification__ds__year
-            , subq_0.verification__ds_partitioned
+            , subq_0.verification__ds_partitioned__day
             , subq_0.verification__ds_partitioned__week
             , subq_0.verification__ds_partitioned__month
             , subq_0.verification__ds_partitioned__quarter
             , subq_0.verification__ds_partitioned__year
-            , subq_0.ds AS metric_time
+            , subq_0.ds__day AS metric_time__day
             , subq_0.ds__week AS metric_time__week
             , subq_0.ds__month AS metric_time__month
             , subq_0.ds__quarter AS metric_time__quarter
@@ -66,23 +66,23 @@ FROM (
             -- Read Elements From Semantic Model 'id_verifications'
             SELECT
               1 AS identity_verifications
-              , id_verifications_src_10003.ds
+              , id_verifications_src_10003.ds AS ds__day
               , DATE_TRUNC(id_verifications_src_10003.ds, isoweek) AS ds__week
               , DATE_TRUNC(id_verifications_src_10003.ds, month) AS ds__month
               , DATE_TRUNC(id_verifications_src_10003.ds, quarter) AS ds__quarter
               , DATE_TRUNC(id_verifications_src_10003.ds, isoyear) AS ds__year
-              , id_verifications_src_10003.ds_partitioned
+              , id_verifications_src_10003.ds_partitioned AS ds_partitioned__day
               , DATE_TRUNC(id_verifications_src_10003.ds_partitioned, isoweek) AS ds_partitioned__week
               , DATE_TRUNC(id_verifications_src_10003.ds_partitioned, month) AS ds_partitioned__month
               , DATE_TRUNC(id_verifications_src_10003.ds_partitioned, quarter) AS ds_partitioned__quarter
               , DATE_TRUNC(id_verifications_src_10003.ds_partitioned, isoyear) AS ds_partitioned__year
               , id_verifications_src_10003.verification_type
-              , id_verifications_src_10003.ds AS verification__ds
+              , id_verifications_src_10003.ds AS verification__ds__day
               , DATE_TRUNC(id_verifications_src_10003.ds, isoweek) AS verification__ds__week
               , DATE_TRUNC(id_verifications_src_10003.ds, month) AS verification__ds__month
               , DATE_TRUNC(id_verifications_src_10003.ds, quarter) AS verification__ds__quarter
               , DATE_TRUNC(id_verifications_src_10003.ds, isoyear) AS verification__ds__year
-              , id_verifications_src_10003.ds_partitioned AS verification__ds_partitioned
+              , id_verifications_src_10003.ds_partitioned AS verification__ds_partitioned__day
               , DATE_TRUNC(id_verifications_src_10003.ds_partitioned, isoweek) AS verification__ds_partitioned__week
               , DATE_TRUNC(id_verifications_src_10003.ds_partitioned, month) AS verification__ds_partitioned__month
               , DATE_TRUNC(id_verifications_src_10003.ds_partitioned, quarter) AS verification__ds_partitioned__quarter
@@ -97,41 +97,41 @@ FROM (
       ) subq_2
       LEFT OUTER JOIN (
         -- Pass Only Elements:
-        --   ['home_state', 'ds_partitioned', 'user']
+        --   ['home_state', 'ds_partitioned__day', 'user']
         SELECT
-          subq_3.ds_partitioned
+          subq_3.ds_partitioned__day
           , subq_3.user
           , subq_3.home_state
         FROM (
           -- Read Elements From Semantic Model 'users_ds_source'
           SELECT
-            users_ds_source_src_10007.ds
+            users_ds_source_src_10007.ds AS ds__day
             , DATE_TRUNC(users_ds_source_src_10007.ds, isoweek) AS ds__week
             , DATE_TRUNC(users_ds_source_src_10007.ds, month) AS ds__month
             , DATE_TRUNC(users_ds_source_src_10007.ds, quarter) AS ds__quarter
             , DATE_TRUNC(users_ds_source_src_10007.ds, isoyear) AS ds__year
-            , users_ds_source_src_10007.created_at
+            , users_ds_source_src_10007.created_at AS created_at__day
             , DATE_TRUNC(users_ds_source_src_10007.created_at, isoweek) AS created_at__week
             , DATE_TRUNC(users_ds_source_src_10007.created_at, month) AS created_at__month
             , DATE_TRUNC(users_ds_source_src_10007.created_at, quarter) AS created_at__quarter
             , DATE_TRUNC(users_ds_source_src_10007.created_at, isoyear) AS created_at__year
-            , users_ds_source_src_10007.ds_partitioned
+            , users_ds_source_src_10007.ds_partitioned AS ds_partitioned__day
             , DATE_TRUNC(users_ds_source_src_10007.ds_partitioned, isoweek) AS ds_partitioned__week
             , DATE_TRUNC(users_ds_source_src_10007.ds_partitioned, month) AS ds_partitioned__month
             , DATE_TRUNC(users_ds_source_src_10007.ds_partitioned, quarter) AS ds_partitioned__quarter
             , DATE_TRUNC(users_ds_source_src_10007.ds_partitioned, isoyear) AS ds_partitioned__year
             , users_ds_source_src_10007.home_state
-            , users_ds_source_src_10007.ds AS user__ds
+            , users_ds_source_src_10007.ds AS user__ds__day
             , DATE_TRUNC(users_ds_source_src_10007.ds, isoweek) AS user__ds__week
             , DATE_TRUNC(users_ds_source_src_10007.ds, month) AS user__ds__month
             , DATE_TRUNC(users_ds_source_src_10007.ds, quarter) AS user__ds__quarter
             , DATE_TRUNC(users_ds_source_src_10007.ds, isoyear) AS user__ds__year
-            , users_ds_source_src_10007.created_at AS user__created_at
+            , users_ds_source_src_10007.created_at AS user__created_at__day
             , DATE_TRUNC(users_ds_source_src_10007.created_at, isoweek) AS user__created_at__week
             , DATE_TRUNC(users_ds_source_src_10007.created_at, month) AS user__created_at__month
             , DATE_TRUNC(users_ds_source_src_10007.created_at, quarter) AS user__created_at__quarter
             , DATE_TRUNC(users_ds_source_src_10007.created_at, isoyear) AS user__created_at__year
-            , users_ds_source_src_10007.ds_partitioned AS user__ds_partitioned
+            , users_ds_source_src_10007.ds_partitioned AS user__ds_partitioned__day
             , DATE_TRUNC(users_ds_source_src_10007.ds_partitioned, isoweek) AS user__ds_partitioned__week
             , DATE_TRUNC(users_ds_source_src_10007.ds_partitioned, month) AS user__ds_partitioned__month
             , DATE_TRUNC(users_ds_source_src_10007.ds_partitioned, quarter) AS user__ds_partitioned__quarter
@@ -145,7 +145,7 @@ FROM (
         (
           subq_2.user = subq_4.user
         ) AND (
-          subq_2.ds_partitioned = subq_4.ds_partitioned
+          subq_2.ds_partitioned__day = subq_4.ds_partitioned__day
         )
     ) subq_5
   ) subq_6

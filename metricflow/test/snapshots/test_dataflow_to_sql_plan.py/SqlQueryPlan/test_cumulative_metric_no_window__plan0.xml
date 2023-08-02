@@ -50,7 +50,7 @@
                     <!-- col0 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_239),  -->
-                    <!--    'column_alias': 'ds'}                                  -->
+                    <!--    'column_alias': 'ds__day'}                             -->
                     <!-- col1 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_240),  -->
@@ -70,7 +70,7 @@
                     <!-- col5 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_244),  -->
-                    <!--    'column_alias': 'company__ds'}                         -->
+                    <!--    'column_alias': 'company__ds__day'}                    -->
                     <!-- col6 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_245),  -->
@@ -90,7 +90,7 @@
                     <!-- col10 =                                                   -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_249),  -->
-                    <!--    'column_alias': 'metric_time'}                         -->
+                    <!--    'column_alias': 'metric_time__day'}                    -->
                     <!-- col11 =                                                   -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_250),  -->
@@ -131,7 +131,7 @@
                         <!-- col1 =                                                      -->
                         <!--   {'class': 'SqlSelectColumn',                              -->
                         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10133),  -->
-                        <!--    'column_alias': 'ds'}                                    -->
+                        <!--    'column_alias': 'ds__day'}                               -->
                         <!-- col2 =                                                -->
                         <!--   {'class': 'SqlSelectColumn',                        -->
                         <!--    'expr': SqlDateTruncExpression(node_id=dt_10064),  -->
@@ -151,7 +151,7 @@
                         <!-- col6 =                                                      -->
                         <!--   {'class': 'SqlSelectColumn',                              -->
                         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10138),  -->
-                        <!--    'column_alias': 'company__ds'}                           -->
+                        <!--    'column_alias': 'company__ds__day'}                      -->
                         <!-- col7 =                                                -->
                         <!--   {'class': 'SqlSelectColumn',                        -->
                         <!--    'expr': SqlDateTruncExpression(node_id=dt_10068),  -->

@@ -13,17 +13,17 @@ FROM (
     FROM (
       -- Metric Time Dimension 'ds'
       SELECT
-        subq_0.ds
+        subq_0.ds__day
         , subq_0.ds__week
         , subq_0.ds__month
         , subq_0.ds__quarter
         , subq_0.ds__year
-        , subq_0.company__ds
+        , subq_0.company__ds__day
         , subq_0.company__ds__week
         , subq_0.company__ds__month
         , subq_0.company__ds__quarter
         , subq_0.company__ds__year
-        , subq_0.ds AS metric_time
+        , subq_0.ds__day AS metric_time__day
         , subq_0.ds__week AS metric_time__week
         , subq_0.ds__month AS metric_time__month
         , subq_0.ds__quarter AS metric_time__quarter
@@ -35,12 +35,12 @@ FROM (
         -- Read Elements From Semantic Model 'revenue'
         SELECT
           revenue_src_10006.revenue AS txn_revenue
-          , revenue_src_10006.created_at AS ds
+          , revenue_src_10006.created_at AS ds__day
           , DATE_TRUNC(revenue_src_10006.created_at, isoweek) AS ds__week
           , DATE_TRUNC(revenue_src_10006.created_at, month) AS ds__month
           , DATE_TRUNC(revenue_src_10006.created_at, quarter) AS ds__quarter
           , DATE_TRUNC(revenue_src_10006.created_at, isoyear) AS ds__year
-          , revenue_src_10006.created_at AS company__ds
+          , revenue_src_10006.created_at AS company__ds__day
           , DATE_TRUNC(revenue_src_10006.created_at, isoweek) AS company__ds__week
           , DATE_TRUNC(revenue_src_10006.created_at, month) AS company__ds__month
           , DATE_TRUNC(revenue_src_10006.created_at, quarter) AS company__ds__quarter

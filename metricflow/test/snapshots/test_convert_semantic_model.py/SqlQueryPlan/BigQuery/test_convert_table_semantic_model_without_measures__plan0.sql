@@ -1,12 +1,12 @@
 -- Read Elements From Semantic Model 'users_latest'
 SELECT
-  users_latest_src_10008.ds
+  users_latest_src_10008.ds AS ds__day
   , DATE_TRUNC(users_latest_src_10008.ds, isoweek) AS ds__week
   , DATE_TRUNC(users_latest_src_10008.ds, month) AS ds__month
   , DATE_TRUNC(users_latest_src_10008.ds, quarter) AS ds__quarter
   , DATE_TRUNC(users_latest_src_10008.ds, isoyear) AS ds__year
   , users_latest_src_10008.home_state_latest
-  , users_latest_src_10008.ds AS user__ds
+  , users_latest_src_10008.ds AS user__ds__day
   , DATE_TRUNC(users_latest_src_10008.ds, isoweek) AS user__ds__week
   , DATE_TRUNC(users_latest_src_10008.ds, month) AS user__ds__month
   , DATE_TRUNC(users_latest_src_10008.ds, quarter) AS user__ds__quarter
