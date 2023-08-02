@@ -8,7 +8,7 @@ integration_test:
   check_query: |
     SELECT
       MAX(capacity) as largest_listing
-      , created_at AS metric_time
+      , created_at AS metric_time__day
     FROM {{ source_schema }}.dim_listings_latest
     GROUP BY
       2
@@ -22,7 +22,7 @@ integration_test:
   check_query: |
     SELECT
       MIN(capacity) as smallest_listing
-      , created_at AS metric_time
+      , created_at AS metric_time__day
       FROM {{ source_schema }}.dim_listings_latest
       GROUP BY
         2
@@ -36,7 +36,7 @@ integration_test:
   check_query: |
     SELECT
       SUM(1) as listings
-      , created_at AS metric_time
+      , created_at AS metric_time__day
       FROM {{ source_schema }}.dim_listings_latest
       GROUP BY
         2
@@ -50,7 +50,7 @@ integration_test:
   check_query: |
     SELECT
       COUNT(DISTINCT guest_id) as bookers
-      , ds AS metric_time
+      , ds AS metric_time__day
       FROM {{ source_schema }}.fct_bookings
       GROUP BY
         2
@@ -64,7 +64,7 @@ integration_test:
   check_query: |
     SELECT
       AVG(CAST(booking_value AS {{ double_data_type_name }})) as average_booking_value
-      , ds AS metric_time
+      , ds AS metric_time__day
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       ds
@@ -78,7 +78,7 @@ integration_test:
   check_query: |
     SELECT
       SUM(CASE WHEN is_instant THEN 1 ELSE 0 END) AS instant_bookings
-      , ds AS metric_time
+      , ds AS metric_time__day
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       ds
@@ -92,7 +92,7 @@ integration_test:
   check_query: |
     SELECT
       SUM(CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END) AS referred_bookings
-      , ds AS metric_time
+      , ds AS metric_time__day
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       ds
@@ -106,7 +106,7 @@ integration_test:
   check_query: |
     SELECT
       COUNT(referrer_id) AS referred_bookings
-      , ds AS metric_time
+      , ds AS metric_time__day
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       ds
@@ -121,7 +121,7 @@ integration_test:
   check_query: |
     SELECT
       {{ render_percentile_expr("booking_value", 0.99, False, False) }} AS booking_value_p99
-      , ds AS metric_time
+      , ds AS metric_time__day
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       ds
@@ -136,7 +136,7 @@ integration_test:
   check_query: |
     SELECT
       {{ render_percentile_expr("booking_value", 0.99, True, False) }} AS discrete_booking_value_p99
-      , ds AS metric_time
+      , ds AS metric_time__day
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       ds
@@ -151,7 +151,7 @@ integration_test:
   check_query: |
     SELECT
       {{ render_percentile_expr("booking_value", 0.99, False, True) }} AS approximate_continuous_booking_value_p99
-      , ds AS metric_time
+      , ds AS metric_time__day
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       ds
@@ -166,7 +166,7 @@ integration_test:
   check_query: |
     SELECT
       {{ render_percentile_expr("booking_value", 0.99, True, True) }} AS approximate_discrete_booking_value_p99
-      , ds AS metric_time
+      , ds AS metric_time__day
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       ds
@@ -181,7 +181,7 @@ integration_test:
   check_query: |
     SELECT
       {{ render_percentile_expr("booking_value", 0.5, False, False) }} AS median_booking_value
-      , ds AS metric_time
+      , ds AS metric_time__day
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       ds

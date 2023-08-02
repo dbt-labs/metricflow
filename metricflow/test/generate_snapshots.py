@@ -177,6 +177,8 @@ def run_cli() -> None:  # noqa: D
     )
 
     for test_configuration in credential_sets.as_configurations:
+        if test_configuration.engine is SqlEngine.BIGQUERY:
+            continue
         logger.info(
             f"Running tests for {test_configuration.engine} with URL: {test_configuration.credential_set.engine_url}"
         )

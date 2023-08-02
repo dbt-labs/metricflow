@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import logging
 
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.naming.linkable_spec_name import DUNDER, StructuredLinkableSpecName
 from metricflow.specs.column_assoc import (
@@ -53,17 +51,11 @@ class DunderColumnAssociationResolverVisitor(InstanceSpecVisitor[ColumnAssociati
         )
 
     def visit_time_dimension_spec(self, time_dimension_spec: TimeDimensionSpec) -> ColumnAssociation:  # noqa: D
-        if time_dimension_spec.time_granularity == TimeGranularity.DAY:
-            column_name = StructuredLinkableSpecName(
-                entity_link_names=tuple(x.element_name for x in time_dimension_spec.entity_links),
-                element_name=time_dimension_spec.element_name,
-            ).qualified_name
-        else:
-            column_name = StructuredLinkableSpecName(
-                entity_link_names=tuple(x.element_name for x in time_dimension_spec.entity_links),
-                element_name=time_dimension_spec.element_name,
-                time_granularity=time_dimension_spec.time_granularity,
-            ).qualified_name
+        column_name = StructuredLinkableSpecName(
+            entity_link_names=tuple(x.element_name for x in time_dimension_spec.entity_links),
+            element_name=time_dimension_spec.element_name,
+            time_granularity=time_dimension_spec.time_granularity,
+        ).qualified_name
 
         return ColumnAssociation(
             column_name=column_name

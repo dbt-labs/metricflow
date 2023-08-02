@@ -7,7 +7,7 @@ integration_test:
   group_bys: ["metric_time", "listing__capacity"]
   check_query: |
     SELECT
-      a.ds AS metric_time
+      a.ds AS metric_time__day
       , b.capacity AS listing__capacity
       , SUM(1) AS bookings
     FROM {{ source_schema }}.fct_bookings a
@@ -15,7 +15,7 @@ integration_test:
     ON a.listing_id = b.listing_id
       AND a.ds >= b.active_from AND (a.ds < b.active_to OR b.active_to is NULL)
     GROUP BY
-      listing__capacity, metric_time
+      listing__capacity, metric_time__day
 ---
 integration_test:
   name: basic_scd_constrained_metric
@@ -25,7 +25,7 @@ integration_test:
   group_bys: ["metric_time", "booking__is_instant"]
   check_query: |
     SELECT
-      a.ds AS metric_time
+      a.ds AS metric_time__day
       , a.is_instant AS booking__is_instant
       , SUM(1) AS family_bookings
     FROM {{ source_schema }}.fct_bookings a
@@ -35,7 +35,7 @@ integration_test:
     WHERE b.capacity >= 3
     GROUP BY
       is_instant
-      , metric_time
+      , metric_time__day
 ---
 integration_test:
   name: scd_constrained_metric_with_nulls
@@ -50,7 +50,7 @@ integration_test:
   group_bys: ["metric_time", "booking__is_instant", "listing__is_lux"]
   check_query: |
     SELECT
-      a.ds AS metric_time
+      a.ds AS metric_time__day
       , a.is_instant AS booking__is_instant
       , b.is_lux AS listing__is_lux
       , SUM(1) AS potentially_lux_bookings
@@ -61,7 +61,7 @@ integration_test:
     WHERE b.is_lux OR b.is_lux IS NULL
     GROUP BY
       is_instant
-      , metric_time
+      , metric_time__day
       , listing__is_lux
 ---
 integration_test:
@@ -76,7 +76,7 @@ integration_test:
     ["metric_time", "listing__is_lux", "listing__user__home_state_latest"]
   check_query: |
     SELECT
-      a.ds AS metric_time
+      a.ds AS metric_time__day
       , b.is_lux AS listing__is_lux
       , c.home_state_latest AS listing__user__home_state_latest
       , SUM(1) AS bookings
@@ -87,7 +87,7 @@ integration_test:
     LEFT OUTER JOIN {{ source_schema }}.dim_users_latest c
     ON b.user_id = c.user_id
     GROUP BY
-      metric_time
+      metric_time__day
       , listing__is_lux
       , listing__user__home_state_latest
 ---
@@ -102,7 +102,7 @@ integration_test:
   group_bys: ["metric_time", "listing__user__home_state_latest"]
   check_query: |
     SELECT
-      a.ds AS metric_time
+      a.ds AS metric_time__day
       , c.home_state_latest AS listing__user__home_state_latest
       , SUM(1) AS bookings
     FROM {{ source_schema }}.fct_bookings a
@@ -112,7 +112,7 @@ integration_test:
     LEFT OUTER JOIN {{ source_schema }}.dim_users_latest c
     ON b.user_id = c.user_id
     GROUP BY
-      metric_time
+      metric_time__day
       , listing__user__home_state_latest
 ---
 integration_test:
@@ -126,7 +126,7 @@ integration_test:
   group_bys: ["metric_time", "listing__lux_listing__is_confirmed_lux"]
   check_query: |
     SELECT
-      a.ds AS metric_time
+      a.ds AS metric_time__day
       , c.is_confirmed_lux AS listing__lux_listing__is_confirmed_lux
       , SUM(1) AS bookings
     FROM {{ source_schema }}.fct_bookings a
@@ -136,5 +136,5 @@ integration_test:
     ON b.lux_listing_id = c.lux_listing_id
         AND a.ds >= c.valid_from AND (a.ds < c.valid_to OR c.valid_to is NULL)
     GROUP BY
-      metric_time
+      metric_time__day
       , listing__lux_listing__is_confirmed_lux

@@ -24,7 +24,7 @@ integration_test:
   check_query: |
     SELECT
       SUM(booking_value) AS booking_value
-      , ds AS metric_time
+      , ds AS metric_time__day
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       ds
@@ -40,7 +40,7 @@ integration_test:
   check_query: |
     SELECT
       SUM(booking_value) AS booking_value
-      , ds AS metric_time
+      , ds AS metric_time__day
     FROM {{ source_schema }}.fct_bookings
     WHERE {{ render_time_constraint("ds", "2020-01-01", "2020-01-01") }}
     GROUP BY
@@ -106,7 +106,7 @@ integration_test:
     SELECT
       SUM(1) AS bookings
       , SUM(booking_value) AS booking_value
-      , ds AS metric_time
+      , ds AS metric_time__day
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       ds
@@ -124,7 +124,7 @@ integration_test:
     SELECT
       SUM(1) AS bookings
       , SUM(booking_value) AS booking_value
-      , ds AS metric_time
+      , ds AS metric_time__day
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       ds

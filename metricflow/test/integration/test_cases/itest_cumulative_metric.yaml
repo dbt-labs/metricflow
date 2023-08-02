@@ -10,7 +10,7 @@ integration_test:
   check_query: |
     SELECT
       SUM(b.txn_revenue) as trailing_2_months_revenue
-      , a.ds AS metric_time
+      , a.ds AS metric_time__day
     FROM (
       SELECT ds
       FROM {{ mf_time_spine_source }}
@@ -38,7 +38,7 @@ integration_test:
     SELECT
       SUM(revenue) as trailing_2_months_revenue
       , b.user__home_state_latest as user__home_state_latest
-      , a.ds AS metric_time
+      , a.ds AS metric_time__day
     FROM (
       SELECT ds
       FROM {{ mf_time_spine_source }}
@@ -69,7 +69,7 @@ integration_test:
   check_query: |
     SELECT
       SUM(revenue) AS revenue_all_time
-      , a.ds AS metric_time
+      , a.ds AS metric_time__day
     FROM (
       SELECT ds
       FROM {{ mf_time_spine_source }}
@@ -104,7 +104,7 @@ integration_test:
   order_bys: ["metric_time"]
   time_constraint: ["2019-12-31", "2021-01-05"]
   check_query: |
-    SELECT revenue_all_time, trailing_2_months_revenue, a.ds AS metric_time
+    SELECT revenue_all_time, trailing_2_months_revenue, a.ds AS metric_time__day
     FROM (
         SELECT
           SUM(revenue) as revenue_all_time
@@ -160,7 +160,7 @@ integration_test:
   check_query: |
     SELECT
       SUM(b.txn_revenue) as trailing_2_months_revenue
-      , a.ds AS metric_time
+      , a.ds AS metric_time__day
     FROM (
       SELECT ds
       FROM {{ mf_time_spine_source }}
@@ -187,7 +187,7 @@ integration_test:
   check_query: |
     SELECT
       SUM(revenue) AS revenue_all_time
-      , a.ds AS metric_time
+      , a.ds AS metric_time__day
     FROM (
       SELECT ds
       FROM {{ mf_time_spine_source }}
@@ -214,7 +214,7 @@ integration_test:
   check_query: |
     SELECT
       COUNT (DISTINCT(b.guest_id)) as every_two_days_bookers
-      , a.ds AS metric_time
+      , a.ds AS metric_time__day
     FROM (
       SELECT ds
       FROM {{ mf_time_spine_source }}
@@ -241,7 +241,7 @@ integration_test:
   check_query: |
     SELECT
       COUNT (DISTINCT(b.guest_id)) as every_two_days_bookers
-      , a.ds AS metric_time
+      , a.ds AS metric_time__day
     FROM (
       SELECT ds
       FROM {{ mf_time_spine_source }}
@@ -268,7 +268,7 @@ integration_test:
   check_query: |
     SELECT
       SUM(b.txn_revenue) as revenue_mtd
-      , a.ds AS metric_time
+      , a.ds AS metric_time__day
     FROM (
       SELECT ds
       FROM {{ mf_time_spine_source }}
@@ -295,7 +295,7 @@ integration_test:
   check_query: |
     SELECT
       SUM(revenue) AS revenue_all_time
-      , a.ds AS metric_time
+      , a.ds AS metric_time__day
     FROM (
       SELECT ds
       FROM {{ mf_time_spine_source }}

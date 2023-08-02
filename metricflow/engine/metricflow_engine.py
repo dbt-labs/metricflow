@@ -599,13 +599,19 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         result_dataframe = query_result.result_df
         if result_dataframe is None:
             return []
-        if get_group_by_values not in result_dataframe.columns:
-            # Snowflake likes upper-casing things in result output, so we lower-case all names and
-            # see if we can get the value from there.
-            get_group_by_values = get_group_by_values.lower()
-            result_dataframe.columns = result_dataframe.columns.str.lower()
 
-        return [str(val) for val in result_dataframe[get_group_by_values]]
+        # Snowflake likes upper-casing things in result output, so we lower-case all names
+        # before operating on the dataframe.
+        metric_names = [metric_name.lower() for metric_name in metric_names]
+        result_dataframe.columns = result_dataframe.columns.str.lower()
+
+        # Get dimension values regardless of input name -> output dimension mapping. This is necessary befcause
+        # granularity adjustments on time dimensions produce different output names for dimension values.
+        # Note: this only works as long as we have exactly one column of group by values
+        # and no other extraneous output columns
+        dim_vals = result_dataframe[result_dataframe.columns[~result_dataframe.columns.isin(metric_names)]].iloc[:, 0]
+
+        return [str(val) for val in dim_vals]
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def explain_get_dimension_values(  # noqa: D
