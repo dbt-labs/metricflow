@@ -427,14 +427,11 @@ class DataWarehouseTaskBuilder:
         return (explain_result.rendered_sql.sql_query, explain_result.rendered_sql.bind_parameters)
 
     @classmethod
-    def gen_metric_tasks(
-        cls, manifest: SemanticManifest, sql_client: SqlClient, system_schema: str
-    ) -> List[DataWarehouseValidationTask]:
+    def gen_metric_tasks(cls, manifest: SemanticManifest, sql_client: SqlClient) -> List[DataWarehouseValidationTask]:
         """Generates a list of tasks for validating the metrics of the manifest."""
         mf_engine = MetricFlowEngine(
             semantic_manifest_lookup=SemanticManifestLookup(semantic_manifest=manifest),
             sql_client=sql_client,
-            system_schema=system_schema,
         )
         tasks: List[DataWarehouseValidationTask] = []
         for metric in manifest.metrics:
@@ -591,7 +588,5 @@ class DataWarehouseModelValidator:
         Returns:
             A list of validation issues. If there are no validation issues, an empty list is returned.
         """
-        tasks = DataWarehouseTaskBuilder.gen_metric_tasks(
-            manifest=manifest, sql_client=self._sql_client, system_schema=self._sql_schema
-        )
+        tasks = DataWarehouseTaskBuilder.gen_metric_tasks(manifest=manifest, sql_client=self._sql_client)
         return self.run_tasks(tasks=tasks, timeout=timeout)

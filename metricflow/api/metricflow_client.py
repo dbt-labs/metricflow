@@ -30,23 +30,19 @@ class MetricFlowClient:
         self,
         sql_client: SqlClient,
         semantic_manifest: SemanticManifest,
-        system_schema: str,
     ):
         """Initializer for MetricFlowClient.
 
         Args:
             sql_client: Client that is connected to your data warehouse.
             semantic_manifest: Model containing all the information about your metric configs.
-            system_schema: schema of where MF system tables are stored.
         """
         self.sql_client = sql_client
         self.semantic_manifest = semantic_manifest
-        self.system_schema = system_schema
         self.semantic_manifest_lookup = SemanticManifestLookup(self.semantic_manifest)
         self.engine = MetricFlowEngine(
             semantic_manifest_lookup=self.semantic_manifest_lookup,
             sql_client=self.sql_client,
-            system_schema=self.system_schema,
         )
 
     def _create_mf_request(

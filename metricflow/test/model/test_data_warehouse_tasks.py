@@ -234,7 +234,6 @@ def test_build_metric_tasks(  # noqa: D
 ) -> None:
     tasks = DataWarehouseTaskBuilder.gen_metric_tasks(
         manifest=data_warehouse_validation_model,
-        system_schema=mf_test_session_state.mf_system_schema,
         sql_client=sql_client,
     )
     assert len(tasks) == 1

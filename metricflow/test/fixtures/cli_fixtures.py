@@ -94,7 +94,6 @@ def cli_context(  # noqa: D
         sql_client=sql_client,
         column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup=semantic_manifest_lookup),
         time_source=ConfigurableTimeSource(as_datetime("2020-01-01")),
-        system_schema=mf_test_session_state.mf_system_schema,
     )
     context = FakeCLIContext()
     context._mf = mf_engine

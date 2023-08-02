@@ -135,7 +135,6 @@ class CLIContext:
             self._mf = MetricFlowEngine(
                 semantic_manifest_lookup=self.semantic_manifest_lookup,
                 sql_client=self.sql_client,
-                system_schema=self.mf_system_schema,
             )
         assert self._mf is not None
         return self._mf
