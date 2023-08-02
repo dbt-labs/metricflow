@@ -43,22 +43,14 @@ def dw_backed_warehouse_validation_model(
 
 
 def test_build_semantic_model_tasks(  # noqa:D
-    mf_test_session_state: MetricFlowTestSessionState,
     data_warehouse_validation_model: PydanticSemanticManifest,
-    sql_client: SqlClient,
 ) -> None:
-    tasks = DataWarehouseTaskBuilder.gen_semantic_model_tasks(
-        manifest=data_warehouse_validation_model,
-        sql_client=sql_client,
-        system_schema=mf_test_session_state.mf_system_schema,
-    )
+    tasks = DataWarehouseTaskBuilder.gen_semantic_model_tasks(manifest=data_warehouse_validation_model)
     assert len(tasks) == len(data_warehouse_validation_model.semantic_models)
 
 
 def test_task_runner(sql_client: SqlClient, mf_test_session_state: MetricFlowTestSessionState) -> None:  # noqa: D
-    dw_validator = DataWarehouseModelValidator(
-        sql_client=sql_client, system_schema=mf_test_session_state.mf_system_schema
-    )
+    dw_validator = DataWarehouseModelValidator(sql_client=sql_client)
 
     def good_query() -> Tuple[str, SqlBindParameters]:
         return ("SELECT 'foo' AS foo", SqlBindParameters())
@@ -90,9 +82,7 @@ def test_validate_semantic_models(  # noqa: D
 ) -> None:
     model = deepcopy(dw_backed_warehouse_validation_model)
 
-    dw_validator = DataWarehouseModelValidator(
-        sql_client=sql_client, system_schema=mf_test_session_state.mf_system_schema
-    )
+    dw_validator = DataWarehouseModelValidator(sql_client=sql_client)
 
     issues = dw_validator.validate_semantic_models(model)
     assert len(issues.all_issues) == 0
@@ -113,12 +103,10 @@ def test_validate_semantic_models(  # noqa: D
 def test_build_dimension_tasks(  # noqa: D
     data_warehouse_validation_model: PydanticSemanticManifest,
     sql_client: SqlClient,
-    mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
     tasks = DataWarehouseTaskBuilder.gen_dimension_tasks(
         manifest=data_warehouse_validation_model,
         sql_client=sql_client,
-        system_schema=mf_test_session_state.mf_system_schema,
     )
     # on semantic model query with all dimensions
     assert len(tasks) == 1
@@ -133,9 +121,7 @@ def test_validate_dimensions(  # noqa: D
 ) -> None:
     model = deepcopy(dw_backed_warehouse_validation_model)
 
-    dw_validator = DataWarehouseModelValidator(
-        sql_client=sql_client, system_schema=mf_test_session_state.mf_system_schema
-    )
+    dw_validator = DataWarehouseModelValidator(sql_client=sql_client)
 
     issues = dw_validator.validate_dimensions(model)
     assert len(issues.all_issues) == 0
@@ -153,12 +139,10 @@ def test_validate_dimensions(  # noqa: D
 def test_build_entities_tasks(  # noqa: D
     data_warehouse_validation_model: PydanticSemanticManifest,
     sql_client: SqlClient,
-    mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
     tasks = DataWarehouseTaskBuilder.gen_entity_tasks(
         manifest=data_warehouse_validation_model,
         sql_client=sql_client,
-        system_schema=mf_test_session_state.mf_system_schema,
     )
     assert len(tasks) == 1  # on semantic model query with all entities
     assert len(tasks[0].on_fail_subtasks) == 1  # a sub task for each entity on the semantic model
@@ -171,9 +155,7 @@ def test_validate_entities(  # noqa: D
 ) -> None:
     model = deepcopy(dw_backed_warehouse_validation_model)
 
-    dw_validator = DataWarehouseModelValidator(
-        sql_client=sql_client, system_schema=mf_test_session_state.mf_system_schema
-    )
+    dw_validator = DataWarehouseModelValidator(sql_client=sql_client)
 
     issues = dw_validator.validate_entities(model)
     assert len(issues.all_issues) == 0
@@ -191,12 +173,10 @@ def test_validate_entities(  # noqa: D
 def test_build_measure_tasks(  # noqa: D
     data_warehouse_validation_model: PydanticSemanticManifest,
     sql_client: SqlClient,
-    mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
     tasks = DataWarehouseTaskBuilder.gen_measure_tasks(
         manifest=data_warehouse_validation_model,
         sql_client=sql_client,
-        system_schema=mf_test_session_state.mf_system_schema,
     )
     assert len(tasks) == 1  # on semantic model query with all measures
     assert len(tasks[0].on_fail_subtasks) == 1  # a sub task for each measure on the semantic model
@@ -209,9 +189,7 @@ def test_validate_measures(  # noqa: D
 ) -> None:
     model = deepcopy(dw_backed_warehouse_validation_model)
 
-    dw_validator = DataWarehouseModelValidator(
-        sql_client=sql_client, system_schema=mf_test_session_state.mf_system_schema
-    )
+    dw_validator = DataWarehouseModelValidator(sql_client=sql_client)
 
     issues = dw_validator.validate_measures(model)
     assert len(issues.all_issues) == 0
@@ -234,7 +212,6 @@ def test_build_metric_tasks(  # noqa: D
 ) -> None:
     tasks = DataWarehouseTaskBuilder.gen_metric_tasks(
         manifest=data_warehouse_validation_model,
-        system_schema=mf_test_session_state.mf_system_schema,
         sql_client=sql_client,
     )
     assert len(tasks) == 1
@@ -259,9 +236,7 @@ def test_validate_metrics(  # noqa: D
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
     model = deepcopy(dw_backed_warehouse_validation_model)
-    dw_validator = DataWarehouseModelValidator(
-        sql_client=sql_client, system_schema=mf_test_session_state.mf_system_schema
-    )
+    dw_validator = DataWarehouseModelValidator(sql_client=sql_client)
 
     issues = dw_validator.validate_metrics(model)
     assert len(issues.all_issues) == 0
@@ -281,9 +256,7 @@ def test_validate_metrics(  # noqa: D
     model = PydanticSemanticManifestTransformer.transform(model)
 
     # Validate new metric created by proxy causes an issue (because the column used doesn't exist)
-    dw_validator = DataWarehouseModelValidator(
-        sql_client=sql_client, system_schema=mf_test_session_state.mf_system_schema
-    )
+    dw_validator = DataWarehouseModelValidator(sql_client=sql_client)
     issues = dw_validator.validate_metrics(model)
     assert len(issues.all_issues) == 1
     assert len(issues.errors) == 1

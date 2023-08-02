@@ -289,7 +289,6 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         self,
         semantic_manifest_lookup: SemanticManifestLookup,
         sql_client: SqlClient,
-        system_schema: str,
         time_source: TimeSource = ServerTimeSource(),
         column_association_resolver: Optional[ColumnAssociationResolver] = None,
     ) -> None:
@@ -308,8 +307,6 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         )
         self._time_source = time_source
         self._time_spine_source = semantic_manifest_lookup.time_spine_source
-
-        self._schema = system_schema
 
         self._source_data_sets: List[SemanticModelDataSet] = []
         converter = SemanticModelToDataSetConverter(column_association_resolver=self._column_association_resolver)
@@ -349,9 +346,6 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             source_nodes=source_nodes,
             node_output_resolver=node_output_resolver,
         )
-
-    def _generate_sql_table(self, table_name: str) -> SqlTable:
-        return SqlTable.from_string(f"{self._schema}.{table_name}")
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def query(self, mf_request: MetricFlowQueryRequest) -> MetricFlowQueryResult:  # noqa: D

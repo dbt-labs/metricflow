@@ -657,7 +657,7 @@ def validate_configs(
     dw_results = SemanticManifestValidationResults()
     if not skip_dw:
         # fetch dbt adapters. This rebuilds the manifest again, but whatever.
-        dw_validator = DataWarehouseModelValidator(sql_client=cfg.sql_client, system_schema=cfg.mf_system_schema)
+        dw_validator = DataWarehouseModelValidator(sql_client=cfg.sql_client)
         dw_results = _data_warehouse_validations_runner(
             dw_validator=dw_validator, manifest=semantic_manifest, timeout=dw_timeout
         )
