@@ -611,7 +611,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         # and no other extraneous output columns
         dim_vals = result_dataframe[result_dataframe.columns[~result_dataframe.columns.isin(metric_names)]].iloc[:, 0]
 
-        return [str(val) for val in dim_vals]
+        return sorted([str(val) for val in dim_vals])
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def explain_get_dimension_values(  # noqa: D
