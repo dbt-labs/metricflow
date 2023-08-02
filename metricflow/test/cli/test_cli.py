@@ -52,7 +52,7 @@ def test_list_metrics(capsys: pytest.CaptureFixture, cli_runner: MetricFlowCliRu
     with capsys.disabled():
         resp = cli_runner.run(metrics)
 
-    assert "bookings_per_listing: capacity_latest" in resp.output
+    assert "bookings_per_listing: listing__capacity_latest" in resp.output
     assert resp.exit_code == 0
 
 

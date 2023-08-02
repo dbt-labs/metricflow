@@ -19,6 +19,7 @@ from dbt_semantic_interfaces.transformations.add_input_metric_measures import Ad
 from dbt_semantic_interfaces.type_enums.entity_type import EntityType
 
 from metricflow.model.semantics.linkable_spec_resolver import ElementPathKey
+from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.specs.specs import DimensionSpec
 
 
@@ -87,6 +88,22 @@ class Dimension:
             is_partition=pydantic_dimension.is_partition,
             expr=pydantic_dimension.expr,
         )
+
+    @property
+    def granularity_free_qualified_name(self) -> str:
+        """Renders the qualified name without the granularity suffix.
+
+        In the list metrics and list dimensions outputs we want to render the qualified name of the dimension, but
+        without including the base granularity for time dimensions. This method is useful in those contexts.
+
+        Note: in most cases you should be using the qualified_name - this is only useful in cases where the
+        Dimension set has de-duplicated TimeDimensions such that you never have more than one granularity
+        in your set for each TimeDimension.
+        """
+        parsed_name = StructuredLinkableSpecName.from_name(qualified_name=self.qualified_name)
+        return StructuredLinkableSpecName(
+            entity_link_names=parsed_name.entity_link_names, element_name=self.name
+        ).qualified_name
 
 
 @dataclass(frozen=True)
