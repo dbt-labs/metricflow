@@ -390,9 +390,7 @@ def metrics(cfg: CLIContext, show_all_dimensions: bool = False, search: Optional
     num_dims_to_show = MAX_LIST_OBJECT_ELEMENTS
     for m in metrics:
         # sort dimensions by whether they're local first(if / then global else local) then the dim name
-        dimensions = sorted(map(lambda d: d.name, filter(lambda d: "/" not in d.name, m.dimensions))) + sorted(
-            map(lambda d: d.name, filter(lambda d: "/" in d.name, m.dimensions))
-        )
+        dimensions = sorted([dimension.granularity_free_qualified_name for dimension in m.dimensions])
         if show_all_dimensions:
             num_dims_to_show = len(dimensions)
         click.echo(
@@ -424,8 +422,8 @@ def dimensions(cfg: CLIContext, metrics: List[str]) -> None:
         spinner.fail("List of dimensions unavailable.")
 
     spinner.succeed(f"🌱 We've found {len(dimensions)} common dimensions for metrics {metrics}.")
-    for d in dimensions:
-        click.echo(f"• {click.style(d.name, bold=True, fg='green')}")
+    for dimension in dimensions:
+        click.echo(f"• {click.style(dimension.granularity_free_qualified_name, bold=True, fg='green')}")
 
 
 @list.command()
