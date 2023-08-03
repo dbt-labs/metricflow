@@ -1,6 +1,0 @@
-kind: Dependencies
-body: Update dbt dependencies to support development on the new integration
-time: 2023-06-07T15:31:54.780642-07:00
-custom:
-  Author: tlento
-  PR: "571"

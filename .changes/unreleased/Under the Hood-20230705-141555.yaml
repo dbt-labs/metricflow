@@ -1,6 +1,0 @@
-kind: Under the Hood
-body: Raise a more specific exception when a Metric isn't found during linking.
-time: 2023-07-05T14:15:55.013987-05:00
-custom:
-  Author: DevonFulcher
-  Issue: None

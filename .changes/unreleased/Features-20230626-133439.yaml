@@ -1,6 +1,0 @@
-kind: Features
-body: Use dbt adapter to run queries and warehouse validations from MetricFlow CLI
-time: 2023-06-26T13:34:39.613243-07:00
-custom:
-  Author: tlento
-  Issue: "624"

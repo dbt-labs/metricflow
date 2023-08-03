@@ -1,6 +1,0 @@
-kind: Breaking Changes
-body: Removes async query and query cancel methods from SqlClient protocols
-time: 2023-06-08T18:22:12.793133-07:00
-custom:
-  Author: tlento
-  Issue: "577"

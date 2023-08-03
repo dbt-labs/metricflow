@@ -1,6 +1,0 @@
-kind: Fixes
-body: Removes MySQL from SqlEngine and SqlDialect options since it is not supported.
-time: 2023-04-26T10:49:54.213848-07:00
-custom:
-  Author: courtneyholcomb
-  Issue: "0"

@@ -1,6 +1,0 @@
-kind: Breaking Changes
-body: Use Templates For Defining Metric Filters
-time: 2023-05-08T13:27:30.227408-07:00
-custom:
-  Author: plypaul
-  Issue: "505"

@@ -1,6 +1,0 @@
-kind: Dependencies
-body: Clean up unused dependencies, relax tabulate version pin
-time: 2023-05-25T10:21:00.983433-07:00
-custom:
-  Author: tlento
-  PR: "545"

@@ -1,6 +1,0 @@
-kind: Features
-body: Script to Generate Snapshots for Supported SQL Engines.
-time: 2023-06-20T09:24:30.085044-07:00
-custom:
-  Author: plypaul
-  Issue: "609"

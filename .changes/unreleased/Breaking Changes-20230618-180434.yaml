@@ -1,6 +1,0 @@
-kind: Breaking Changes
-body: Remove expr & ratio metrics and bundle with derived metrics.
-time: 2023-06-18T18:04:34.366416-07:00
-custom:
-  Author: plypaul
-  Issue: "504"

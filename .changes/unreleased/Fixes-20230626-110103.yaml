@@ -1,7 +1,0 @@
-kind: Fixes
-body: Apply transformations to dbt-generated serialized model to fix issue with query
-  generation
-time: 2023-06-26T11:01:03.898209-07:00
-custom:
-  Author: tlento
-  Issue: "624"

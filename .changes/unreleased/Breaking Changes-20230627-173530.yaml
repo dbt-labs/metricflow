@@ -1,7 +1,0 @@
-kind: Breaking Changes
-body: Remove MetricFlow config file - all future configuration must originate with
-  the dbt project
-time: 2023-06-27T17:35:30.450335-07:00
-custom:
-  Author: tlento
-  Issue: "624"

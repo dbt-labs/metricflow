@@ -1,6 +1,0 @@
-kind: Under the Hood
-body: Add pytest flag to use a persistent source schema for faster repeat testing.
-time: 2023-05-03T17:45:26.930661-07:00
-custom:
-  Author: plypaul
-  Issue: "482"
