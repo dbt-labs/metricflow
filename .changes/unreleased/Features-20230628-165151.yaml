@@ -1,6 +1,0 @@
-kind: Features
-body: New package `dbt-metricflow` which bundles dbt-core and metricflow and dbt-adapters
-time: 2023-06-28T16:51:51.657042-04:00
-custom:
-  Author: WilliamDee
-  Issue: None

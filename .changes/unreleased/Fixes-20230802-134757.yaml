@@ -1,7 +1,0 @@
-kind: Fixes
-body: Include granularity suffix on time dimension name rendering for all time dimension
-  granularities
-time: 2023-08-02T13:47:57.935206-06:00
-custom:
-  Author: tlento
-  Issue: None

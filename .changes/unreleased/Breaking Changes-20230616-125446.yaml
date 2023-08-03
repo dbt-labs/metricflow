@@ -1,6 +1,0 @@
-kind: Breaking Changes
-body: CLI needs to be ran in a dbt project root directory
-time: 2023-06-16T12:54:46.372347-04:00
-custom:
-  Author: WilliamDee
-  Issue: None

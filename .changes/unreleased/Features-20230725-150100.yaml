@@ -1,6 +1,0 @@
-kind: Features
-body: Include metric_time in List Dimensions Output Where Appropriate
-time: 2023-07-25T15:01:00.625757-07:00
-custom:
-  Author: plypaul
-  Issue: "673"

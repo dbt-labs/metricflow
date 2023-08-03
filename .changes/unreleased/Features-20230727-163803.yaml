@@ -1,6 +1,0 @@
-kind: Features
-body: Enable support for BigQuery for dbt metricflow integration users
-time: 2023-07-27T16:38:03.535189-07:00
-custom:
-  Author: tlento
-  Issue: "581"

@@ -1,7 +1,0 @@
-kind: Fixes
-body: Derived metrics were not respecting the constraint defined in the original input
-  metric's definition.
-time: 2023-04-28T12:36:28.092934-04:00
-custom:
-  Author: WilliamDee
-  Issue: None
