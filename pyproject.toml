@@ -34,7 +34,6 @@ dependencies = [
   "graphviz==0.18.2",
   "halo~=0.0.31",
   "jsonschema==3.2.0",
-  "mo-sql-parsing~=9.328.23003",
   "more-itertools==8.10.0",
   "numpy>=1.22.2",
   "pandas~=1.3.0",
@@ -46,9 +45,6 @@ dependencies = [
   "tabulate~=0.8.9",
   "typing_extensions>=4.0.0",
   "update-checker~=0.18.0",
-  # Below are pinned transitive dependencies that was done to patch a vulnerability"
-  "cryptography~=39.0.1",
-  "pyopenssl~=23.0.0",
 ]
 
 [project.urls]
@@ -81,23 +77,23 @@ sql-client-packages = [
 ]
 
 dbt-postgres = [
-  "dbt-postgres~=1.6.0rc1",
+  "dbt-postgres~=1.6.0",
 ]
 
 dbt-bigquery = [
-  "dbt-bigquery~=1.6.0rc1",
+  "dbt-bigquery~=1.6.0",
 ]
 
 dbt-databricks = [
-  "dbt-databricks==1.6.0rc2",
+  "dbt-databricks==1.6.0",
 ]
 
 dbt-redshift = [
-  "dbt-redshift~=1.6.0rc1",
+  "dbt-redshift~=1.6.0",
 ]
 
 dbt-snowflake = [
-  "dbt-snowflake~=1.6.0rc1",
+  "dbt-snowflake~=1.6.0",
 ]
 
 [tool.hatch.build.targets.sdist]
