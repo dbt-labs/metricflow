@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "dbt-metricflow"
-version = "0.0.5"
+version = "0.1.0.rc1"
 description = "Execute commands against the MetricFlow semantic layer with dbt."
 readme = "README.md"
 requires-python = ">=3.8,<3.12"
@@ -25,18 +25,27 @@ classifiers = [
 ]
 dependencies = [
   "dbt-core~=1.6.0rc2",
-  "metricflow==0.200.0.dev15"
+  "metricflow==0.200.0.rc1"
 ]
 
 [project.urls]
 "Source Code" = "https://github.com/dbt-labs/metricflow/tree/main/dbt-metricflow"
 
 [project.optional-dependencies]
+bigquery = [
+  "dbt-bigquery~=1.6.0"
+]
+databricks = [
+  "dbt-databricks~=1.6.0"
+]
 postgres = [
-  "dbt-postgres>=1.6.0b6"
+  "dbt-postgres~=1.6.0"
+]
+redshift = [
+  "dbt-redshift~=1.6.0"
 ]
 snowflake = [
-  "dbt-snowflake>=1.6.0b3"
+  "dbt-snowflake~=1.6.0"
 ]
 
 [tool.hatch.build.targets.sdist]
