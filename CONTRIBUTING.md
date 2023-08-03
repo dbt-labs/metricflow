@@ -10,7 +10,7 @@ Welcome to the MetricFlow developer community, we're thrilled to have you aboard
 ## Environment setup
 
 1. Ensure you have a relevant version of Python.
-2. Install the following required system dependencies:
+2. You may need to install the following required system dependencies:
     - MySqlClient:
         - Follow the [instructions from MySQL](https://dev.mysql.com/doc/mysql-getting-started/en/)
         - Mac users might prefer to use Homebrew: `brew install mysql`
@@ -21,8 +21,7 @@ Welcome to the MetricFlow developer community, we're thrilled to have you aboard
         - This is only required if you are developing with Postgres.
         - Follow the [instructions from Docker](https://docs.docker.com/get-docker/)
 3. [Create a fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo) of the [MetricFlow repo](https://github.com/dbt-labs/metricflow) and [clone it locally](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository).
-4. Install [Hatch](https://github.com/pypa/hatch) via `make install-hatch` - this is the tool we use to manage our build
-dependencies.
+4. Install [Hatch](https://github.com/pypa/hatch) via `make install-hatch` - this is the tool we use to manage our build dependencies.
 
 ## Start testing and development
 
@@ -41,7 +40,7 @@ When running any one of the hatch commands, the environment is automatically set
     - Working with integration tests
         - These tests are driven by a set of test configs in [metricflow/test/integration/test_cases](metricflow/test/integration/test_cases/). They compare the output of a MetricFlow query against the output of a similar SQL query.
         - These tests all run on consistent input data, which is [created in the target warehouse via setup fixtures](metricflow/test/fixtures/table_fixtures.py).
-            - Modify the test inputs if you are looking to test boundary cases involving things like repeated rows of data.
+            - Modify the [test inputs](https://github.com/dbt-labs/metricflow/tree/main/metricflow/test/fixtures/source_table_snapshots) for one of the test models if you are looking to test boundary cases involving things like repeated rows of data.
         - Let's break a test!
             - Change a SQL query inside of [metricflow/test/integration/test_cases/itest_simple.yaml](metricflow/test/integration/test_cases/itest_simple.yaml)
             - Run the test case: `hatch run dev-env:pytest -k "itest_simple" metricflow/test/integration`. Did it fail?

@@ -46,8 +46,6 @@ MetricFlow provides a set of abstractions that help you construct complicated lo
 - Metric aggregation to different time granularities
 - And so much more
 
-As a developer, you can also use MetricFlow's interfaces to construct APIs for integrations to bring metrics into downstream tools in your data stack.
-
 To get up and running with your own metrics, you should rely on [MetricFlow’s documentation](https://docs.getdbt.com/docs/build/build-metrics-intro).
 
 ## Licensing
@@ -64,41 +62,34 @@ MetricFlow can be installed from PyPi for use as a Python library with the follo
 pip install dbt-metricflow
 ```
 
-Once installed, MetricFlow can be setup and connected to a data warehouse by following the instructions after issuing the command:
-
-```
-mf setup
-```
-
-In case you don't have a connection to a data warehouse available and want a self-contained demo, DuckDB can be selected.
+MetricFlow currently serves as a query compilation and SQL rendering library, built to work in conjunction with a dbt project. As such, using MetricFlow requires a working dbt project and a dbt adapter. We provide the `dbt-metricflow` bundle for this purpose. You may choose to install other adapters as optional extras from dbt-metricflow.
 
 You may need to install Postgres or Graphviz. You can do so by following the install instructions for [Postgres](https://www.postgresql.org/download/) or [Graphviz](https://www.graphviz.org/download/). Mac users may prefer to use brew: `brew install postgresql` or `brew install graphviz`.
 
 ### Tutorial
 
-The best way to get started is to follow the [tutorial](https://docs.transform.co/docs/metricflow/metricflow-tutorial) steps:
+The best way to get started is to follow the tutorial steps, which you can access by running:
 
 ```
 mf tutorial
 ```
 
-There are several examples of MetricFlow configs on common data sets in the [config-templates](https://github.com/dbt-labs/metricflow/tree/main/config-templates) folder. The tutorial will rely on a small set of [sample configs](https://github.com/dbt-labs/metricflow/tree/main/metricflow/cli/sample_models).
+Note: this must be run from a dbt project root directory.
 
 ## Resources
 
 - [Website](https://transform.co/metricflow)
-- [Documentation](https://docs.transform.co/docs/overview/metricflow-overview)
-- [Slack Community](https://community.transform.co/metricflow-signup)
+- [Documentation](https://docs.getdbt.com/docs/build/build-metrics-intro)
+- [Slack Community](https://www.getdbt.com/community/)
 - [MetricFlow Git Repository](https://github.com/dbt-labs/metricflow)
 - [CHANGELOG.md](https://github.com/dbt-labs/metricflow/blob/main/CHANGELOG.md)
-- [ROADMAP.md](https://github.com/dbt-labs/metricflow/blob/main/ROADMAP.md)
 - [TENETS.md](https://github.com/dbt-labs/metricflow/blob/main/TENETS.md)
 
 ## Contributing and Code of Conduct
 
 This project will be a place where people can easily contribute high-quality updates in a supportive environment.
 
-You might wish to read our [code of conduct](http://community.transform.co/metricflow-signup) and <LINK> engineering practices </LINK> before diving in.
+Please read our [code of conduct](https://docs.getdbt.com/community/resources/code-of-conduct) before diving in.
 
 To get started on direct contributions, head on over to our [contributor guide](https://github.com/dbt-labs/metricflow/blob/main/CONTRIBUTING.md).
 
