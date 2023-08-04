@@ -1,0 +1,106 @@
+# See [Persistent Source Schema](/GLOSSARY.md#persistent-source-schema)
+# Populating the source schema via this workflow ensures that it's done with the same settings as the tests.
+
+name: Reload Test Data in SQL Engines
+
+# We don't want multiple workflows trying to create the same table.
+concurrency:
+  group: POPULATE_PERSISTENT_SOURCE_SCHEMA
+  cancel-in-progress: true
+
+on:
+  pull_request:
+    types: [labeled]
+
+env:
+  # Unclear on how to make 'Reload Test Data in SQL Engines' a constant here as it does not work here.
+  PYTHON_VERSION: "3.8"
+  ADDITIONAL_PYTEST_OPTIONS: "--use-persistent-source-schema"
+
+jobs:
+  snowflake-populate:
+    environment: DW_INTEGRATION_TESTS
+    if: github.event.action == 'labeled' && github.event.label.name == 'Reload Test Data in SQL Engines'
+    name: Snowflake
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check-out the repo
+        uses: actions/checkout@v3
+
+      - name: Populate w/Python ${{ env.PYTHON_VERSION }}
+        uses: ./.github/actions/run-mf-tests
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          mf_sql_engine_url: ${{ secrets.MF_SNOWFLAKE_URL }}
+          mf_sql_engine_password: ${{ secrets.MF_SNOWFLAKE_PWD }}
+          parallelism: 1
+          additional-pytest-options: ${{ env.ADDITIONAL_PYTEST_OPTIONS }}
+          make-target: "populate-persistent-source-schema-snowflake"
+
+  redshift-populate:
+    environment: DW_INTEGRATION_TESTS
+    name: Redshift
+    if: github.event.action == 'labeled' && github.event.label.name == 'Reload Test Data in SQL Engines'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check-out the repo
+        uses: actions/checkout@v3
+
+      - name: Populate w/Python ${{ env.PYTHON_VERSION }}
+        uses: ./.github/actions/run-mf-tests
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          mf_sql_engine_url: ${{ secrets.MF_REDSHIFT_URL }}
+          mf_sql_engine_password: ${{ secrets.MF_REDSHIFT_PWD }}
+          parallelism: 1
+          additional-pytest-options: ${{ env.ADDITIONAL_PYTEST_OPTIONS }}
+          make-target: "populate-persistent-source-schema-redshift"
+
+  bigquery-populate:
+    environment: DW_INTEGRATION_TESTS
+    name: BigQuery
+    if: github.event.action == 'labeled' && github.event.label.name == 'Reload Test Data in SQL Engines'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check-out the repo
+        uses: actions/checkout@v3
+
+      - name: Populate w/Python ${{ env.PYTHON_VERSION }}
+        uses: ./.github/actions/run-mf-tests
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          MF_SQL_ENGINE_URL: ${{ secrets.MF_BIGQUERY_URL }}
+          MF_SQL_ENGINE_PASSWORD: ${{ secrets.MF_BIGQUERY_PWD }}
+          parallelism: 1
+          additional-pytest-options: ${{ env.ADDITIONAL_PYTEST_OPTIONS }}
+          make-target: "populate-persistent-source-schema-bigquery"
+
+  databricks-populate:
+    environment: DW_INTEGRATION_TESTS
+    name: Databricks SQL Warehouse
+    if: github.event.action == 'labeled' && github.event.label.name == 'Reload Test Data in SQL Engines'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check-out the repo
+        uses: actions/checkout@v3
+
+      - name: Populate w/Python ${{ env.PYTHON_VERSION }}
+        uses: ./.github/actions/run-mf-tests
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          mf_sql_engine_url: ${{ secrets.MF_DATABRICKS_SQL_WAREHOUSE_URL }}
+          mf_sql_engine_password: ${{ secrets.MF_DATABRICKS_PWD }}
+          parallelism: 1
+          additional-pytest-options: ${{ env.ADDITIONAL_PYTEST_OPTIONS }}
+          make-target: "populate-persistent-source-schema-databricks"
+
+  remove-label:
+    name: Remove Label After Populating Test Data
+    runs-on: ubuntu-latest
+    needs: [ snowflake-populate, redshift-populate, bigquery-populate, databricks-populate]
+    if: github.event.action == 'labeled' && github.event.label.name == 'Reload Test Data in SQL Engines'
+    steps:
+      - name: Remove Label
+        uses: actions-ecosystem/action-remove-labels@v1
+        with:
+          labels: 'Reload Test Data in SQL Engines'
