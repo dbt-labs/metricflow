@@ -15,7 +15,6 @@ from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState, 
 from metricflow.test.fixtures.sql_clients.adapter_backed_ddl_client import AdapterBackedDDLSqlClient
 from metricflow.test.fixtures.sql_clients.common_client import SqlDialect
 from metricflow.test.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
-from metricflow.test.fixtures.sql_clients.duckdb import DuckDbSqlClient
 
 logger = logging.getLogger(__name__)
 
@@ -54,8 +53,9 @@ def __configure_test_env_from_url(url: str, password: str, schema: str) -> sqlal
     """
     parsed_url = sqlalchemy.engine.make_url(url)
 
-    assert parsed_url.host, "Engine host is not set in engine connection URL!"
-    os.environ[DBT_ENV_SECRET_HOST] = parsed_url.host
+    if parsed_url.drivername != "duckdb":
+        assert parsed_url.host, "Engine host is not set in engine connection URL!"
+        os.environ[DBT_ENV_SECRET_HOST] = parsed_url.host
 
     if parsed_url.username:
         os.environ[DBT_ENV_SECRET_USER] = parsed_url.username
@@ -156,7 +156,9 @@ def make_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithD
         __initialize_dbt()
         return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("postgres"))
     elif dialect == SqlDialect.DUCKDB:
-        return DuckDbSqlClient.from_connection_details(url, password)
+        __configure_test_env_from_url(url, password=password, schema=schema)
+        __initialize_dbt()
+        return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("duckdb"))
     elif dialect == SqlDialect.DATABRICKS:
         __configure_databricks_env_from_url(url, password=password, schema=schema)
         __initialize_dbt()

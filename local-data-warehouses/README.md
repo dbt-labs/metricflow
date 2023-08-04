@@ -3,9 +3,9 @@
 This folder includes utilities to run data warehouses for local development. See the [Contributing guide](../CONTRIBUTING.md)
 to ensure your environment is setup properly.
 
-## SQLite
+## DuckDB
 
-We assume that you have SQLite installed in your environment. By default, tests will run with SQLite.
+By default, tests will run with DuckDB.
 
 ## PostgreSQL
 

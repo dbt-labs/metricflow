@@ -16,6 +16,7 @@ from metricflow.protocols.sql_client import SqlEngine
 from metricflow.random_id import random_id
 from metricflow.sql.render.big_query import BigQuerySqlQueryPlanRenderer
 from metricflow.sql.render.databricks import DatabricksSqlQueryPlanRenderer
+from metricflow.sql.render.duckdb_renderer import DuckDbSqlQueryPlanRenderer
 from metricflow.sql.render.postgres import PostgresSQLSqlQueryPlanRenderer
 from metricflow.sql.render.redshift import RedshiftSqlQueryPlanRenderer
 from metricflow.sql.render.snowflake import SnowflakeSqlQueryPlanRenderer
@@ -40,6 +41,7 @@ class SupportedAdapterTypes(enum.Enum):
     SNOWFLAKE = "snowflake"
     REDSHIFT = "redshift"
     BIGQUERY = "bigquery"
+    DUCKDB = "duckdb"
 
     @property
     def sql_engine_type(self) -> SqlEngine:
@@ -54,6 +56,8 @@ class SupportedAdapterTypes(enum.Enum):
             return SqlEngine.REDSHIFT
         elif self is SupportedAdapterTypes.SNOWFLAKE:
             return SqlEngine.SNOWFLAKE
+        elif self is SupportedAdapterTypes.DUCKDB:
+            return SqlEngine.DUCKDB
         else:
             assert_values_exhausted(self)
 
@@ -70,6 +74,8 @@ class SupportedAdapterTypes(enum.Enum):
             return RedshiftSqlQueryPlanRenderer()
         elif self is SupportedAdapterTypes.SNOWFLAKE:
             return SnowflakeSqlQueryPlanRenderer()
+        elif self is SupportedAdapterTypes.DUCKDB:
+            return DuckDbSqlQueryPlanRenderer()
         else:
             assert_values_exhausted(self)
 

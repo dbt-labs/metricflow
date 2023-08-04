@@ -71,8 +71,6 @@ dev-packages = [
 # handles import statements they are required in all test environments
 sql-client-packages = [
   "SQLAlchemy~=1.4.42",
-  "duckdb-engine~=0.9",
-  "duckdb~=0.8",
   "sqlalchemy2-stubs~=0.0.2a21",
 ]
 
@@ -96,6 +94,10 @@ dbt-snowflake = [
   "dbt-snowflake~=1.6.0",
 ]
 
+dbt-duckdb = [
+  "dbt-duckdb~=1.6.0",
+]
+
 [tool.hatch.build.targets.sdist]
 exclude = [
   "/.github",
@@ -112,8 +114,12 @@ exclude = [
 description = "Environment for development. Includes a DuckDB-backed client."
 features = [
   "dev-packages",
+  "dbt-duckdb",
   "sql-client-packages",
 ]
+
+[tool.hatch.envs.dev-env.env-vars]
+	MF_TEST_ADAPTER_TYPE="duckdb"
 
 [tool.hatch.envs.postgres-env.env-vars]
 	MF_SQL_ENGINE_URL="postgresql://metricflow@localhost:5432/metricflow"
