@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-import datetime
 import logging
-from typing import Sequence, Set, Union
+from typing import Set, Union
 
 import pandas as pd
 import pytest
@@ -11,7 +10,6 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.random_id import random_id
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.sql.sql_column_type import SqlColumnType
 from metricflow.test.compare_df import assert_dataframes_equal
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
@@ -45,63 +43,8 @@ def test_query(sql_client: SqlClient) -> None:  # noqa: D
     _check_1col(df)
 
 
-def _skip_execution_param_tests_for_unsupported_clients(sql_client: SqlClient) -> None:
-    if sql_client.sql_engine_type is not SqlEngine.DUCKDB:
-        pytest.skip(
-            reason=(
-                "The dbt Adapter-backed SqlClient implementation does not support bind parameters, so we restrict "
-                "this test to our DuckDB client, which retains an example implementation."
-            )
-        )
-
-
-def test_query_with_execution_params(sql_client: SqlClient) -> None:
-    """Test querying with execution parameters of all supported datatypes."""
-    _skip_execution_param_tests_for_unsupported_clients(sql_client)
-    params: Sequence[SqlColumnType] = [
-        2,
-        "hi",
-        3.5,
-        True,
-        False,
-        datetime.datetime(2022, 1, 1),
-        datetime.date(2020, 12, 31),
-    ]
-    for param in params:
-        sql_execution_params = SqlBindParameters.create_from_dict(({"x": param}))
-        assert sql_execution_params.param_dict["x"] == param  # check that pydantic did not coerce type unexpectedly
-
-        expr = f"SELECT {sql_client.render_bind_parameter_key('x')} as y"
-        df = sql_client.query(expr, sql_bind_parameters=sql_execution_params)
-        assert isinstance(df, pd.DataFrame)
-        assert df.shape == (1, 1)
-        assert df.columns.tolist() == ["y"]
-
-        # Some engines convert some types to str; convert everything to str for comparison
-        str_param = str(param)
-        str_result = str(df["y"][0])
-        # Some engines use JSON bool syntax (i.e., True -> 'true')
-        if isinstance(param, bool):
-            assert str_result in [str_param, str_param.lower()]
-        # Some engines add decimals to datetime milliseconds; trim here
-        elif isinstance(param, datetime.datetime):
-            assert str_result[: len(str_param)] == str_param
-        else:
-            assert str_result == str_param
-
-
 def test_select_one_query(sql_client: SqlClient) -> None:  # noqa: D
     sql_client.query("SELECT 1")
-    with pytest.raises(Exception):
-        sql_client.query("this is garbage")
-
-
-def test_failed_query_with_execution_params(sql_client: SqlClient) -> None:  # noqa: D
-    _skip_execution_param_tests_for_unsupported_clients(sql_client)
-    expr = f"SELECT {sql_client.render_bind_parameter_key('x')}"
-    sql_execution_params = SqlBindParameters.create_from_dict({"x": 1})
-
-    sql_client.query(expr, sql_bind_parameters=sql_execution_params)
     with pytest.raises(Exception):
         sql_client.query("this is garbage")
 

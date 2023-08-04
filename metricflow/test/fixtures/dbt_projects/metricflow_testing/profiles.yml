@@ -61,3 +61,9 @@ snowflake:
       warehouse: "{{ env_var('DBT_ENV_SECRET_WAREHOUSE') }}"
       database: "{{ env_var('DBT_ENV_SECRET_DATABASE') }}"
       schema: "{{ env_var('DBT_ENV_SECRET_SCHEMA') }}"
+duckdb:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      schema: "{{ env_var('DBT_ENV_SECRET_SCHEMA') }}"

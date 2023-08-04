@@ -1,0 +1,6 @@
+kind: Features
+body: Add dbt-duckdb as a supported adapter and remove legacy DuckDB sql client
+time: 2023-08-04T06:46:52.989851-07:00
+custom:
+  Author: jwills
+  Issue: "583"
