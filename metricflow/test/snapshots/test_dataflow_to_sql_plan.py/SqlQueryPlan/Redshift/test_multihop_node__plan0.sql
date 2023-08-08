@@ -188,6 +188,18 @@ FROM (
             , subq_3.account_id__ds_partitioned__extract_day AS account_id__ds_partitioned__extract_day
             , subq_3.account_id__ds_partitioned__extract_dow AS account_id__ds_partitioned__extract_dow
             , subq_3.account_id__ds_partitioned__extract_doy AS account_id__ds_partitioned__extract_doy
+            , subq_3.bridge_account__ds_partitioned__day AS bridge_account__ds_partitioned__day
+            , subq_3.bridge_account__ds_partitioned__week AS bridge_account__ds_partitioned__week
+            , subq_3.bridge_account__ds_partitioned__month AS bridge_account__ds_partitioned__month
+            , subq_3.bridge_account__ds_partitioned__quarter AS bridge_account__ds_partitioned__quarter
+            , subq_3.bridge_account__ds_partitioned__year AS bridge_account__ds_partitioned__year
+            , subq_3.bridge_account__ds_partitioned__extract_year AS bridge_account__ds_partitioned__extract_year
+            , subq_3.bridge_account__ds_partitioned__extract_quarter AS bridge_account__ds_partitioned__extract_quarter
+            , subq_3.bridge_account__ds_partitioned__extract_month AS bridge_account__ds_partitioned__extract_month
+            , subq_3.bridge_account__ds_partitioned__extract_week AS bridge_account__ds_partitioned__extract_week
+            , subq_3.bridge_account__ds_partitioned__extract_day AS bridge_account__ds_partitioned__extract_day
+            , subq_3.bridge_account__ds_partitioned__extract_dow AS bridge_account__ds_partitioned__extract_dow
+            , subq_3.bridge_account__ds_partitioned__extract_doy AS bridge_account__ds_partitioned__extract_doy
             , subq_5.ds_partitioned__day AS customer_id__ds_partitioned__day
             , subq_5.ds_partitioned__week AS customer_id__ds_partitioned__week
             , subq_5.ds_partitioned__month AS customer_id__ds_partitioned__month
@@ -203,8 +215,11 @@ FROM (
             , subq_3.account_id AS account_id
             , subq_3.customer_id AS customer_id
             , subq_3.account_id__customer_id AS account_id__customer_id
+            , subq_3.bridge_account__account_id AS bridge_account__account_id
+            , subq_3.bridge_account__customer_id AS bridge_account__customer_id
             , subq_3.extra_dim AS extra_dim
             , subq_3.account_id__extra_dim AS account_id__extra_dim
+            , subq_3.bridge_account__extra_dim AS bridge_account__extra_dim
             , subq_5.customer_name AS customer_id__customer_name
             , subq_5.customer_atomic_weight AS customer_id__customer_atomic_weight
           FROM (
@@ -236,9 +251,24 @@ FROM (
               , EXTRACT(day FROM bridge_table_src_10011.ds_partitioned) AS account_id__ds_partitioned__extract_day
               , EXTRACT(dow FROM bridge_table_src_10011.ds_partitioned) AS account_id__ds_partitioned__extract_dow
               , EXTRACT(doy FROM bridge_table_src_10011.ds_partitioned) AS account_id__ds_partitioned__extract_doy
+              , bridge_table_src_10011.extra_dim AS bridge_account__extra_dim
+              , bridge_table_src_10011.ds_partitioned AS bridge_account__ds_partitioned__day
+              , DATE_TRUNC('week', bridge_table_src_10011.ds_partitioned) AS bridge_account__ds_partitioned__week
+              , DATE_TRUNC('month', bridge_table_src_10011.ds_partitioned) AS bridge_account__ds_partitioned__month
+              , DATE_TRUNC('quarter', bridge_table_src_10011.ds_partitioned) AS bridge_account__ds_partitioned__quarter
+              , DATE_TRUNC('year', bridge_table_src_10011.ds_partitioned) AS bridge_account__ds_partitioned__year
+              , EXTRACT(year FROM bridge_table_src_10011.ds_partitioned) AS bridge_account__ds_partitioned__extract_year
+              , EXTRACT(quarter FROM bridge_table_src_10011.ds_partitioned) AS bridge_account__ds_partitioned__extract_quarter
+              , EXTRACT(month FROM bridge_table_src_10011.ds_partitioned) AS bridge_account__ds_partitioned__extract_month
+              , EXTRACT(week FROM bridge_table_src_10011.ds_partitioned) AS bridge_account__ds_partitioned__extract_week
+              , EXTRACT(day FROM bridge_table_src_10011.ds_partitioned) AS bridge_account__ds_partitioned__extract_day
+              , EXTRACT(dow FROM bridge_table_src_10011.ds_partitioned) AS bridge_account__ds_partitioned__extract_dow
+              , EXTRACT(doy FROM bridge_table_src_10011.ds_partitioned) AS bridge_account__ds_partitioned__extract_doy
               , bridge_table_src_10011.account_id
               , bridge_table_src_10011.customer_id
               , bridge_table_src_10011.customer_id AS account_id__customer_id
+              , bridge_table_src_10011.account_id AS bridge_account__account_id
+              , bridge_table_src_10011.customer_id AS bridge_account__customer_id
             FROM ***************************.bridge_table bridge_table_src_10011
           ) subq_3
           LEFT OUTER JOIN (
