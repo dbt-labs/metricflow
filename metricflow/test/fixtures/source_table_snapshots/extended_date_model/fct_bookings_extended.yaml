@@ -4,11 +4,11 @@ table_snapshot:
     - name: ds
       type: TIME
     - name: booking_id
-      type: INT
+      type: STRING
     - name: booking
       type: INT
     - name: listing_id
-      type: INT
+      type: STRING
     - name: is_instant
       type: BOOLEAN
   rows:

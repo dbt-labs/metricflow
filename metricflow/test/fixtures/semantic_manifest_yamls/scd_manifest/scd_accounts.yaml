@@ -25,6 +25,8 @@ semantic_model:
     - name: account_type
       type: categorical
 
+  primary_entity: scd_user
+
   entities:
     - name: user
       type: natural

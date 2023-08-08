@@ -4,7 +4,7 @@ table_snapshot:
     - name: listing_creation_ds
       type: TIME
     - name: listing_id
-      type: INT
+      type: STRING
   rows:
     - ["2020-01-01", "0"]
     - ["2020-01-02", "1"]

@@ -25,11 +25,11 @@ semantic_model:
       type: time
       type_params:
         time_granularity: day
-    - name: is_instant
-      type: categorical
 
   entities:
-    - name: booking_id
+    - name: booking
+      expr: booking_id
       type: primary
-    - name: listing_id
+    - name: listing
+      expr: listing_id
       type: foreign
