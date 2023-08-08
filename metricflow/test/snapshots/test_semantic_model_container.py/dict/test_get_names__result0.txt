@@ -4,6 +4,7 @@
                           'country_latest',
                           'created_at',
                           'ds',
+                          'ds_latest',
                           'ds_partitioned',
                           'home_state',
                           'home_state_latest',

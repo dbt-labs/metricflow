@@ -1,0 +1,13 @@
+['ds_latest__day',
+ 'ds_latest__month',
+ 'ds_latest__quarter',
+ 'ds_latest__week',
+ 'ds_latest__year',
+ 'home_state_latest',
+ 'user',
+ 'user__ds_latest__day',
+ 'user__ds_latest__month',
+ 'user__ds_latest__quarter',
+ 'user__ds_latest__week',
+ 'user__ds_latest__year',
+ 'user__home_state_latest']
