@@ -8,7 +8,7 @@ table_snapshot:
     - name: booking
       type: INT
     - name: listing_id
-      type: INT
+      type: STRING
     - name: is_instant
       type: BOOLEAN
   rows:

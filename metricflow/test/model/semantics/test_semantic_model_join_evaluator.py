@@ -325,7 +325,7 @@ def test_get_joinable_semantic_models_single_hop(  # noqa: D
                 right_semantic_model_reference=SemanticModelReference(semantic_model_name="bridge_table"),
                 entity_reference=EntityReference(element_name="account_id"),
                 join_type=SemanticModelEntityJoinType(
-                    left_entity_type=EntityType.PRIMARY, right_entity_type=EntityType.PRIMARY
+                    left_entity_type=EntityType.PRIMARY, right_entity_type=EntityType.UNIQUE
                 ),
             )
         ],
@@ -352,7 +352,7 @@ def test_get_joinable_semantic_models_multi_hop(  # noqa: D
                 right_semantic_model_reference=SemanticModelReference(semantic_model_name="bridge_table"),
                 entity_reference=EntityReference(element_name="account_id"),
                 join_type=SemanticModelEntityJoinType(
-                    left_entity_type=EntityType.PRIMARY, right_entity_type=EntityType.PRIMARY
+                    left_entity_type=EntityType.PRIMARY, right_entity_type=EntityType.UNIQUE
                 ),
             )
         ],
@@ -364,7 +364,7 @@ def test_get_joinable_semantic_models_multi_hop(  # noqa: D
                 right_semantic_model_reference=SemanticModelReference(semantic_model_name="bridge_table"),
                 entity_reference=EntityReference(element_name="account_id"),
                 join_type=SemanticModelEntityJoinType(
-                    left_entity_type=EntityType.PRIMARY, right_entity_type=EntityType.PRIMARY
+                    left_entity_type=EntityType.PRIMARY, right_entity_type=EntityType.UNIQUE
                 ),
             ),
             SemanticModelEntityJoin(
@@ -383,7 +383,7 @@ def test_get_joinable_semantic_models_multi_hop(  # noqa: D
                 right_semantic_model_reference=SemanticModelReference(semantic_model_name="bridge_table"),
                 entity_reference=EntityReference(element_name="account_id"),
                 join_type=SemanticModelEntityJoinType(
-                    left_entity_type=EntityType.PRIMARY, right_entity_type=EntityType.PRIMARY
+                    left_entity_type=EntityType.PRIMARY, right_entity_type=EntityType.UNIQUE
                 ),
             ),
             SemanticModelEntityJoin(

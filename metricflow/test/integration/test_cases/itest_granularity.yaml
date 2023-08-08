@@ -144,46 +144,32 @@ integration_test:
   description: Query a count distinct metric by time granularities.
   model: EXTENDED_DATE_MODEL
   metrics: ["bookings"]
-  group_bys: ["listing_id__listing_creation_ds__day"]
+  group_bys: ["listing__ds__day"]
   check_query: |
     SELECT
       SUM(booking) AS bookings
-      , {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS listing_id__listing_creation_ds__day
+      , {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS listing__ds__day
     FROM {{ source_schema }}.fct_bookings_extended b
     LEFT OUTER JOIN {{ source_schema }}.dim_listings_extended l
     ON b.listing_id = l.listing_id
     GROUP BY
-      listing_id__listing_creation_ds__day
+      2
 ---
 integration_test:
   name: query_granularity_for_joined_dundered_dimension_month
   description: Query a count distinct metric by time granularities.
   model: EXTENDED_DATE_MODEL
   metrics: ["bookings"]
-  group_bys: ["listing_id__listing_creation_ds__month"]
+  group_bys: ["listing__ds__month"]
   check_query: |
     SELECT
       SUM(booking) AS bookings
-      , {{ render_date_trunc("l.listing_creation_ds", TimeGranularity.MONTH) }} AS listing_id__listing_creation_ds__month
+      , {{ render_date_trunc("l.listing_creation_ds", TimeGranularity.MONTH) }} AS listing__ds__month
     FROM {{ source_schema }}.fct_bookings_extended b
     LEFT OUTER JOIN {{ source_schema }}.dim_listings_extended l
     ON b.listing_id = l.listing_id
     GROUP BY
-      listing_id__listing_creation_ds__month
----
-integration_test:
-  name: query_granularity_from_sql_query
-  description: Query a metric from a sql query by time granularities.
-  model: EXTENDED_DATE_MODEL
-  metrics: ["bookings_from_sql_query"]
-  group_bys: ["metric_time__week"]
-  check_query: |
-    SELECT
-      SUM(booking) AS bookings_from_sql_query
-      , {{ render_date_trunc("ds", TimeGranularity.WEEK) }} AS metric_time__week
-    FROM {{ source_schema }}.fct_bookings_extended
-    GROUP BY
-      metric_time__week
+      2
 ---
 integration_test:
   name: metric_with_non_day_granularity_expected_boundary
@@ -290,34 +276,37 @@ integration_test:
       metric_time__month
 ---
 integration_test:
-  name: metrics_with_different_time_granularities_and_no_time_dim
-  description: Query two metrics with different time granularities, but without a time dimension.
+  name: metrics_with_different_time_granularities_and_no_metric_time
+  description: Query two metrics with different time granularities with a common dimension, but no metric time.
   model: EXTENDED_DATE_MODEL
   metrics: ["bookings_monthly", "bookings"]
-  group_bys: ["booking_id__is_instant"]
+  group_bys: ["listing__ds"]
   time_constraint: ["2020-01-15", "2020-02-15"]
   check_query: |
     SELECT
-      SUM(bookings_monthly) AS bookings_monthly
-      , SUM(bookings) AS bookings
-      , a.is_instant AS booking_id__is_instant
+      a.bookings_monthly AS bookings_monthly
+      , b.bookings AS bookings
+      , COALESCE(a.listing__ds__day, b.listing__ds__day) AS listing__ds__day
     FROM (
       SELECT
         SUM(bookings_monthly) AS bookings_monthly
-        , is_instant
-      FROM {{ source_schema }}.fct_bookings_extended_monthly
+        , l.listing_creation_ds AS listing__ds__day
+      FROM {{ source_schema }}.fct_bookings_extended_monthly b
+      LEFT OUTER JOIN {{ source_schema }}.dim_listings_extended l
+      ON b.listing_id = l.listing_id
       WHERE
         {{ render_time_constraint("ds", "2020-01-01", "2020-02-29") }}
-      GROUP BY is_instant
+      GROUP BY 2
     ) a
     FULL OUTER JOIN (
       SELECT
         SUM(booking) AS bookings
-        , is_instant
-      FROM {{ source_schema }}.fct_bookings_extended
+        , l.listing_creation_ds AS listing__ds__day
+      FROM {{ source_schema }}.fct_bookings_extended b
+      LEFT OUTER JOIN {{ source_schema }}.dim_listings_extended l
+      ON b.listing_id = l.listing_id
       WHERE
         {{ render_time_constraint("ds", "2020-01-01", "2020-02-29") }}
-      GROUP BY is_instant
+      GROUP BY 2
     ) b
-    ON a.is_instant = b.is_instant
-    GROUP BY a.is_instant
+    ON a.listing__ds__day = b.listing__ds__day
