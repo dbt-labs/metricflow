@@ -8,19 +8,23 @@ semantic_model:
     alias: fct_bookings_extended_monthly
 
   defaults:
-    agg_time_dimension: ds
+    agg_time_dimension: monthly_ds
 
   measures:
     - name: bookings_monthly
       agg: sum
       create_metric: true
 
-  primary_entity: booking_id
+  primary_entity: booking
 
   dimensions:
-    - name: ds
+    - name: monthly_ds
+      expr: ds
       type: time
       type_params:
         time_granularity: month
-    - name: is_instant
-      type: categorical
+
+  entities:
+    - name: listing
+      expr: listing_id
+      type: foreign
