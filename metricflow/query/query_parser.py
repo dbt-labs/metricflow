@@ -290,8 +290,8 @@ class MetricFlowQueryParser:
     def _parse_and_validate_query(
         self,
         metric_names: Sequence[str],
-        group_by_names: Sequence[str],
-        group_by: Optional[GroupByParam],
+        group_by_names: Optional[Sequence[str]] = None,
+        group_by: Optional[GroupByParam] = None,
         limit: Optional[int] = None,
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
@@ -304,7 +304,7 @@ class MetricFlowQueryParser:
             where_constraint and where_constraint_str
         ), "Both where_constraint and where_constraint_str should not be set"
         assert not (group_by_names and group_by), "Both group_by_names and group_by should not be set"
-        group_by_names = group_by_names if group_by_names else [str(g) for g in group_by]
+        group_by_names = group_by_names if group_by_names else [str(g) for g in group_by] if group_by else []
 
         where_filter: Optional[WhereFilter]
         if where_constraint_str:
