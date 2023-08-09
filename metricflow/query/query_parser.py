@@ -4,7 +4,7 @@ import datetime
 import logging
 import time
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 from dbt_semantic_interfaces.call_parameter_sets import ParseWhereFilterException
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
@@ -41,6 +41,7 @@ from metricflow.specs.specs import (
     TimeDimensionSpec,
     WhereFilterSpec,
 )
+from metricflow.specs.syntax import JinjaSyntaxDimension, JinjaSyntaxMetric
 from metricflow.specs.where_filter_transform import WhereSpecFactory
 from metricflow.time.time_granularity_solver import (
     PartialTimeDimensionSpec,
@@ -238,7 +239,8 @@ class MetricFlowQueryParser:
             suggestion_sections = {}
             for invalid_group_by in invalid_group_bys:
                 suggestions = MetricFlowQueryParser._top_fuzzy_matches(
-                    item=invalid_group_by.qualified_name, candidate_items=valid_group_by_names_for_metrics
+                    item=invalid_group_by.qualified_name,
+                    candidate_items=valid_group_by_names_for_metrics,
                 )
                 section_key = f"Suggestions for invalid dimension '{invalid_group_by.qualified_name}'"
                 section_value = pformat_big_objects(suggestions)
@@ -281,10 +283,15 @@ class MetricFlowQueryParser:
             )
         return tuple(metric_specs)
 
+    JinjaQuerySyntaxMetricParam = Union[str, JinjaSyntaxMetric]
+    JinjaQuerySyntaxDimensionParam = Union[str, JinjaSyntaxDimension]
+    GroupByParam = Union[Sequence[JinjaQuerySyntaxDimensionParam], JinjaQuerySyntaxDimensionParam]
+
     def _parse_and_validate_query(
         self,
         metric_names: Sequence[str],
         group_by_names: Sequence[str],
+        group_by: Optional[GroupByParam],
         limit: Optional[int] = None,
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
@@ -296,6 +303,8 @@ class MetricFlowQueryParser:
         assert not (
             where_constraint and where_constraint_str
         ), "Both where_constraint and where_constraint_str should not be set"
+        assert not (group_by_names and group_by), "Both group_by_names and group_by should not be set"
+        group_by_names = group_by_names if group_by_names else [str(g) for g in group_by]
 
         where_filter: Optional[WhereFilter]
         if where_constraint_str:
@@ -507,7 +516,8 @@ class MetricFlowQueryParser:
             )
             partial_time_dimension_spec_to_time_dimension_spec = (
                 self._time_granularity_solver.resolve_granularity_for_partial_time_dimension_specs(
-                    metric_references=metric_references, partial_time_dimension_specs=(partial_metric_time_spec,)
+                    metric_references=metric_references,
+                    partial_time_dimension_specs=(partial_metric_time_spec,),
                 )
             )
             adjust_to_granularity = partial_time_dimension_spec_to_time_dimension_spec[
@@ -527,7 +537,10 @@ class MetricFlowQueryParser:
                 == self._metric_time_dimension_reference.element_name
                 and partial_time_dimension_spec_to_replace.entity_links == ()
             ):
-                return partial_time_dimension_spec_to_replace, replace_with_time_dimension_spec
+                return (
+                    partial_time_dimension_spec_to_replace,
+                    replace_with_time_dimension_spec,
+                )
 
         raise RuntimeError(f"Replacement for metric time dimension '{self._metric_time_dimension_reference}' not found")
 
@@ -596,7 +609,9 @@ class MetricFlowQueryParser:
         return tuple(metric_references)
 
     def _parse_linkable_element_names(
-        self, qualified_linkable_names: Sequence[str], metric_references: Sequence[MetricReference]
+        self,
+        qualified_linkable_names: Sequence[str],
+        metric_references: Sequence[MetricReference],
     ) -> QueryTimeLinkableSpecSet:
         """Convert the linkable spec names into the respective specification objects."""
         qualified_linkable_names = [x.lower() for x in qualified_linkable_names]
