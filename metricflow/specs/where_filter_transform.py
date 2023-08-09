@@ -22,7 +22,7 @@ from metricflow.specs.specs import (
     TimeDimensionSpec,
     WhereFilterSpec,
 )
-from metricflow.specs.where_filter_dimension import get_where_filter_dimension_cls
+from metricflow.specs.where_filter_dimension import WhereFilterDimensionFactory
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 
 logger = logging.getLogger(__name__)
@@ -106,9 +106,9 @@ class WhereSpecFactory:
                 where_filter.where_sql_template, undefined=jinja2.StrictUndefined
             ).render(
                 {
-                    "Dimension": get_where_filter_dimension_cls(
+                    "Dimension": WhereFilterDimensionFactory(
                         call_parameter_sets, dimension_specs, self._column_association_resolver
-                    ),
+                    ).create,
                     "TimeDimension": _time_dimension_call,
                     "Entity": _entity_call,
                 }
