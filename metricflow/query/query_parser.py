@@ -41,7 +41,7 @@ from metricflow.specs.specs import (
     TimeDimensionSpec,
     WhereFilterSpec,
 )
-from metricflow.specs.syntax import JinjaSyntaxDimension, JinjaSyntaxMetric
+from metricflow.specs.query_interface import QueryInterfaceDimension, QueryInterfaceMetric
 from metricflow.specs.where_filter_transform import WhereSpecFactory
 from metricflow.time.time_granularity_solver import (
     PartialTimeDimensionSpec,
@@ -283,8 +283,8 @@ class MetricFlowQueryParser:
             )
         return tuple(metric_specs)
 
-    JinjaQuerySyntaxMetricParam = Union[str, JinjaSyntaxMetric]
-    JinjaQuerySyntaxDimensionParam = Union[str, JinjaSyntaxDimension]
+    JinjaQuerySyntaxMetricParam = Union[str, QueryInterfaceMetric]
+    JinjaQuerySyntaxDimensionParam = Union[str, QueryInterfaceDimension]
     GroupByParam = Union[Sequence[JinjaQuerySyntaxDimensionParam], JinjaQuerySyntaxDimensionParam]
 
     def _parse_and_validate_query(

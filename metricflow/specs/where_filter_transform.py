@@ -11,11 +11,7 @@ from dbt_semantic_interfaces.call_parameter_sets import (
 )
 from dbt_semantic_interfaces.naming.dundered import DunderedNameFormatter
 from dbt_semantic_interfaces.protocols.where_filter import WhereFilter
-from dbt_semantic_interfaces.references import (
-    DimensionReference,
-    EntityReference,
-    TimeDimensionReference,
-)
+from dbt_semantic_interfaces.references import EntityReference, TimeDimensionReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.specs.column_assoc import ColumnAssociationResolver
@@ -26,9 +22,7 @@ from metricflow.specs.specs import (
     TimeDimensionSpec,
     WhereFilterSpec,
 )
-from metricflow.specs.where_filter_dimension import (
-    get_where_filter_dimension_cls,
-)
+from metricflow.specs.where_filter_dimension import get_where_filter_dimension_cls
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 
 logger = logging.getLogger(__name__)
@@ -50,15 +44,6 @@ class WhereSpecFactory:
         self._bind_parameters = bind_parameters
 
     @staticmethod
-    def _convert_to_dimension_spec(
-        parameter_set: DimensionCallParameterSet,
-    ) -> DimensionSpec:  # noqa: D
-        return DimensionSpec(
-            element_name=parameter_set.dimension_reference.element_name,
-            entity_links=parameter_set.entity_path,
-        )
-
-    @staticmethod
     def _convert_to_time_dimension_spec(
         parameter_set: TimeDimensionCallParameterSet,
     ) -> TimeDimensionSpec:  # noqa: D
@@ -69,9 +54,7 @@ class WhereSpecFactory:
         )
 
     @staticmethod
-    def _convert_to_entity_spec(
-        parameter_set: EntityCallParameterSet,
-    ) -> EntitySpec:  # noqa: D
+    def _convert_to_entity_spec(parameter_set: EntityCallParameterSet) -> EntitySpec:  # noqa: D
         return EntitySpec(
             element_name=parameter_set.entity_reference.element_name,
             entity_links=parameter_set.entity_path,
@@ -86,9 +69,7 @@ class WhereSpecFactory:
         call_parameter_sets = where_filter.call_parameter_sets
 
         def _time_dimension_call(
-            time_dimension_name: str,
-            time_granularity_name: str,
-            entity_path: Sequence[str] = (),
+            time_dimension_name: str, time_granularity_name: str, entity_path: Sequence[str] = ()
         ) -> str:
             """Gets called by Jinja when rendering {{ TimeDimension(...) }}."""
             structured_name = DunderedNameFormatter.parse_name(time_dimension_name)
@@ -125,15 +106,14 @@ class WhereSpecFactory:
                 where_filter.where_sql_template, undefined=jinja2.StrictUndefined
             ).render(
                 {
-                    "Dimension": get_where_filter_dimension_cls(call_parameter_sets, dimension_specs),
+                    "Dimension": get_where_filter_dimension_cls(
+                        call_parameter_sets, dimension_specs, self._column_association_resolver
+                    ),
                     "TimeDimension": _time_dimension_call,
                     "Entity": _entity_call,
                 }
             )
-        except (
-            jinja2.exceptions.UndefinedError,
-            jinja2.exceptions.TemplateSyntaxError,
-        ) as e:
+        except (jinja2.exceptions.UndefinedError, jinja2.exceptions.TemplateSyntaxError) as e:
             raise RenderSqlTemplateException(
                 f"Error while rendering Jinja template:\n{where_filter.where_sql_template}"
             ) from e
