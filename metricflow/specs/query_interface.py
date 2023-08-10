@@ -3,18 +3,6 @@ from __future__ import annotations
 from typing import Sequence, Protocol
 
 
-class QueryInterfaceMetricFactory(Protocol):
-    def create(self, name: str) -> QueryInterfaceMetric:
-        raise NotImplementedError
-
-
-class QueryInterfaceMetric(Protocol):
-    """Metric for the query  interface."""
-
-    def __init__(self, name: str) -> None:  # noqa: D
-        raise NotImplementedError
-
-
 class QueryInterfaceDimensionFactory(Protocol):
     """Creates a Dimension for the query interface.
 

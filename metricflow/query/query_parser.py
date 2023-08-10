@@ -30,6 +30,7 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.specs.column_assoc import ColumnAssociationResolver
+from metricflow.specs.group_by_dimension import GroupByDimension
 from metricflow.specs.specs import (
     DimensionSpec,
     EntitySpec,
@@ -41,7 +42,7 @@ from metricflow.specs.specs import (
     TimeDimensionSpec,
     WhereFilterSpec,
 )
-from metricflow.specs.query_interface import QueryInterfaceDimension, QueryInterfaceMetric
+from metricflow.specs.query_interface_metric import QueryInterfaceMetric
 from metricflow.specs.where_filter_transform import WhereSpecFactory
 from metricflow.time.time_granularity_solver import (
     PartialTimeDimensionSpec,
@@ -283,28 +284,45 @@ class MetricFlowQueryParser:
             )
         return tuple(metric_specs)
 
-    JinjaQuerySyntaxMetricParam = Union[str, QueryInterfaceMetric]
-    JinjaQuerySyntaxDimensionParam = Union[str, QueryInterfaceDimension]
-    GroupByParam = Union[Sequence[JinjaQuerySyntaxDimensionParam], JinjaQuerySyntaxDimensionParam]
+    def _get_group_by_names(
+        self, group_by_names: Optional[Sequence[str]], group_by: Optional[Sequence[GroupByDimension]]
+    ) -> List[str]:
+        assert not (group_by_names and group_by), "Both group_by_names and group_by should not be set"
+        return group_by_names if group_by_names else [str(g) for g in group_by]
+
+    def _get_metric_names(
+        metric_names: Optional[Sequence[str]], metrics: Optional[Sequence[QueryInterfaceMetric]]
+    ) -> List[str]:
+        assert not (metric_names and metrics), "Both metric_names and metrics should not be set"
+        assert metric_names or metrics, "Must specify either metric_names or metrics"
+        return metric_names if metric_names else [str(m) for m in metrics]
+
+    def _get_order(order: Optional[Sequence[str]], order_objs: Optional[Sequence[str]]) -> List[str]:
+        assert not (order and order_objs), "Both order and order_objs should not be set"
+        return order if order else [str(o) for o in order_objs]
 
     def _parse_and_validate_query(
         self,
-        metric_names: Sequence[str],
+        metric_names: Optional[Sequence[str]] = None,
+        metrics: Optional[Sequence[QueryInterfaceMetric]] = None,
         group_by_names: Optional[Sequence[str]] = None,
-        group_by: Optional[GroupByParam] = None,
+        group_by: Optional[Sequence[GroupByDimension]] = None,  # TODO: can this also be entities?
         limit: Optional[int] = None,
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
         where_constraint: Optional[WhereFilter] = None,
         where_constraint_str: Optional[str] = None,
         order: Optional[Sequence[str]] = None,
+        order_objs: Optional[Sequence[str]] = None,  # TODO
         time_granularity: Optional[TimeGranularity] = None,
     ) -> MetricFlowQuerySpec:
         assert not (
             where_constraint and where_constraint_str
         ), "Both where_constraint and where_constraint_str should not be set"
-        assert not (group_by_names and group_by), "Both group_by_names and group_by should not be set"
-        group_by_names = group_by_names if group_by_names else [str(g) for g in group_by] if group_by else []
+
+        metric_names = self._get_metric_names(metric_names, metrics)
+        group_by_names = self._get_group_by_names(group_by_names, group_by)
+        order = self._get_order(order, order_objs)
 
         where_filter: Optional[WhereFilter]
         if where_constraint_str:
