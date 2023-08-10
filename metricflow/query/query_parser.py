@@ -288,18 +288,18 @@ class MetricFlowQueryParser:
         self, group_by_names: Optional[Sequence[str]], group_by: Optional[Sequence[GroupByDimension]]
     ) -> List[str]:
         assert not (group_by_names and group_by), "Both group_by_names and group_by should not be set"
-        return group_by_names if group_by_names else [str(g) for g in group_by]
+        return group_by_names if group_by_names else [str(g) for g in group_by] if group_by else []
 
     def _get_metric_names(
-        metric_names: Optional[Sequence[str]], metrics: Optional[Sequence[QueryInterfaceMetric]]
+        self, metric_names: Optional[Sequence[str]], metrics: Optional[Sequence[QueryInterfaceMetric]]
     ) -> List[str]:
         assert not (metric_names and metrics), "Both metric_names and metrics should not be set"
         assert metric_names or metrics, "Must specify either metric_names or metrics"
         return metric_names if metric_names else [str(m) for m in metrics]
 
-    def _get_order(order: Optional[Sequence[str]], order_objs: Optional[Sequence[str]]) -> List[str]:
+    def _get_order(self, order: Optional[Sequence[str]], order_objs: Optional[Sequence[str]]) -> List[str]:
         assert not (order and order_objs), "Both order and order_objs should not be set"
-        return order if order else [str(o) for o in order_objs]
+        return order if order else [str(o) for o in order_objs] if order_objs else []
 
     def _parse_and_validate_query(
         self,
