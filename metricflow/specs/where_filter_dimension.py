@@ -23,7 +23,7 @@ from metricflow.specs.specs import DimensionSpec
 class WhereFilterDimension(QueryInterfaceDimension):
     """A dimension that is passed in through the where filter parameter."""
 
-    def __init__(self, column_name) -> None:  # noqa
+    def __init__(self, column_name: str) -> None:  # noqa
         self.column_name = column_name
 
     def grain(self, _grain: str) -> QueryInterfaceDimension:
