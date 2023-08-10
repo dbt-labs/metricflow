@@ -31,7 +31,7 @@ dependencies = [
   "click>=7.1.2, <8.1.4",
   "dbt-core~=1.6.0",
   "dbt-semantic-interfaces~=0.2.0",
-  "graphviz==0.18.2",
+  "graphviz>=0.18.2, <0.21",
   "halo~=0.0.31",
   "jsonschema==3.2.0",
   "more-itertools==8.10.0",
