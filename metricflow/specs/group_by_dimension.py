@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+from typing import Sequence
+
 from metricflow.specs.query_interface import QueryInterfaceDimension, QueryInterfaceDimensionFactory
 
 
 class GroupByDimension(QueryInterfaceDimension):
+    """A dimension that is passed in through the group_by parameter."""
+
     def __init__(self, name: str) -> None:  # noqa: D
         self.name = name
 
@@ -22,5 +26,11 @@ class GroupByDimension(QueryInterfaceDimension):
 
 
 class GroupByDimensionFactory(QueryInterfaceDimensionFactory):
-    def create(self, name: str) -> GroupByDimension:
+    """Creates a GroupByDimension.
+
+    This is useful as a factory to type checking for the Jinja sandbox.
+    """
+
+    def create(self, name: str, entity_path: Sequence[str] = ()) -> GroupByDimension:
+        """Create a GroupByDimension."""
         return GroupByDimension(name)

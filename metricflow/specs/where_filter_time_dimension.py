@@ -1,27 +1,35 @@
-from typing import List, Sequence
-from metricflow.specs.query_interface import QueryInterfaceTimeDimensionFactory, QueryInterfaceTimeDimension
-from typing import Sequence
+from __future__ import annotations
 
-from dbt_semantic_interfaces.call_parameter_sets import TimeDimensionCallParameterSet
+from typing import List, Sequence
+
+from dbt_semantic_interfaces.call_parameter_sets import FilterCallParameterSets, TimeDimensionCallParameterSet
 from dbt_semantic_interfaces.naming.dundered import DunderedNameFormatter
 from dbt_semantic_interfaces.references import EntityReference, TimeDimensionReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-from dbt_semantic_interfaces.call_parameter_sets import FilterCallParameterSets
 
 from metricflow.specs.column_assoc import ColumnAssociationResolver
+from metricflow.specs.query_interface import QueryInterfaceTimeDimension, QueryInterfaceTimeDimensionFactory
 from metricflow.specs.specs import TimeDimensionSpec
 
 
 class WhereFilterTimeDimension(QueryInterfaceTimeDimension):
-    def __init__(self, column_name: str):
+    """A time dimension that is passed in through the where filter parameter."""
+
+    def __init__(self, column_name: str):  # noqa
         self.column_name = column_name
 
-    def __str__(self):
+    def __str__(self) -> str:
+        """Returns the column name.
+
+        Important in the Jinja sandbox.
+        """
         return self.column_name
 
 
 class WhereFilterTimeDimensionFactory(QueryInterfaceTimeDimensionFactory):
-    def __init__(
+    """Creates a WhereFilterTimeDimension."""
+
+    def __init__(  # noqa
         self,
         call_parameter_sets: FilterCallParameterSets,
         time_dimension_specs: List[TimeDimensionSpec],
@@ -34,7 +42,7 @@ class WhereFilterTimeDimensionFactory(QueryInterfaceTimeDimensionFactory):
     def create(
         self, time_dimension_name: str, time_granularity_name: str, entity_path: Sequence[str] = ()
     ) -> WhereFilterTimeDimension:
-        """Gets called by Jinja when rendering {{ TimeDimension(...) }}."""
+        """Create a WhereFilterTimeDimension."""
         structured_name = DunderedNameFormatter.parse_name(time_dimension_name)
         call_parameter_set = TimeDimensionCallParameterSet(
             time_dimension_reference=TimeDimensionReference(element_name=structured_name.element_name),
@@ -48,7 +56,7 @@ class WhereFilterTimeDimensionFactory(QueryInterfaceTimeDimensionFactory):
         time_dimension_spec = self._convert_to_time_dimension_spec(call_parameter_set)
         self._time_dimension_specs.append(time_dimension_spec)
         column_names = self._column_association_resolver.resolve_spec(time_dimension_spec).column_name
-        return column_names
+        return WhereFilterTimeDimension(column_names)
 
     def _convert_to_time_dimension_spec(
         self,

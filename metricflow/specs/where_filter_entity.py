@@ -1,29 +1,37 @@
-from typing import List
-from metricflow.specs.query_interface import QueryInterfaceEntityFactory, QueryInterfaceEntity
+from __future__ import annotations
 
-from typing import Sequence
+from typing import List, Sequence
 
 from dbt_semantic_interfaces.call_parameter_sets import (
     EntityCallParameterSet,
+    FilterCallParameterSets,
 )
 from dbt_semantic_interfaces.naming.dundered import DunderedNameFormatter
+from dbt_semantic_interfaces.references import EntityReference
 
 from metricflow.specs.column_assoc import ColumnAssociationResolver
+from metricflow.specs.query_interface import QueryInterfaceEntity, QueryInterfaceEntityFactory
 from metricflow.specs.specs import EntitySpec
-from dbt_semantic_interfaces.call_parameter_sets import FilterCallParameterSets
-from dbt_semantic_interfaces.references import EntityReference
 
 
 class WhereFilterEntity(QueryInterfaceEntity):
-    def __init__(self, column_name: str):
+    """An entity that is passed in through the where filter parameter."""
+
+    def __init__(self, column_name: str):  # noqa
         self.column_name = column_name
 
-    def __str__(self):
+    def __str__(self) -> str:
+        """Returns the column name.
+
+        Important in the Jinja sandbox.
+        """
         return self.column_name
 
 
 class WhereFilterEntityFactory(QueryInterfaceEntityFactory):
-    def __init__(
+    """Creates a WhereFilterDimension."""
+
+    def __init__(  # noqa
         self,
         call_parameter_sets: FilterCallParameterSets,
         entity_specs: List[EntitySpec],
@@ -34,7 +42,7 @@ class WhereFilterEntityFactory(QueryInterfaceEntityFactory):
         self._column_association_resolver = column_association_resolver
 
     def create(self, entity_name: str, entity_path: Sequence[str] = ()) -> WhereFilterEntity:
-        """Gets called by Jinja when rendering {{ Entity(...) }}."""
+        """Create a WhereFilterEntity."""
         structured_name = DunderedNameFormatter.parse_name(entity_name)
         call_parameter_set = EntityCallParameterSet(
             entity_reference=EntityReference(element_name=entity_name),
@@ -47,7 +55,7 @@ class WhereFilterEntityFactory(QueryInterfaceEntityFactory):
         entity_spec = self._convert_to_entity_spec(call_parameter_set)
         self._entity_specs.append(entity_spec)
         column_name = self._column_association_resolver.resolve_spec(entity_spec).column_name
-        return column_name
+        return WhereFilterEntity(column_name)
 
     def _convert_to_entity_spec(self, parameter_set: EntityCallParameterSet) -> EntitySpec:  # noqa: D
         return EntitySpec(

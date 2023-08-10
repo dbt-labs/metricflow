@@ -4,7 +4,7 @@ import datetime
 import logging
 import time
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Sequence, Tuple, Union
+from typing import Dict, List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.call_parameter_sets import ParseWhereFilterException
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
@@ -31,6 +31,7 @@ from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.group_by_dimension import GroupByDimension
+from metricflow.specs.query_interface_metric import QueryInterfaceMetric
 from metricflow.specs.specs import (
     DimensionSpec,
     EntitySpec,
@@ -42,7 +43,6 @@ from metricflow.specs.specs import (
     TimeDimensionSpec,
     WhereFilterSpec,
 )
-from metricflow.specs.query_interface_metric import QueryInterfaceMetric
 from metricflow.specs.where_filter_transform import WhereSpecFactory
 from metricflow.time.time_granularity_solver import (
     PartialTimeDimensionSpec,
@@ -286,18 +286,18 @@ class MetricFlowQueryParser:
 
     def _get_group_by_names(
         self, group_by_names: Optional[Sequence[str]], group_by: Optional[Sequence[GroupByDimension]]
-    ) -> List[str]:
+    ) -> Sequence[str]:
         assert not (group_by_names and group_by), "Both group_by_names and group_by should not be set"
         return group_by_names if group_by_names else [str(g) for g in group_by] if group_by else []
 
     def _get_metric_names(
         self, metric_names: Optional[Sequence[str]], metrics: Optional[Sequence[QueryInterfaceMetric]]
-    ) -> List[str]:
+    ) -> Sequence[str]:
         assert not (metric_names and metrics), "Both metric_names and metrics should not be set"
         assert metric_names or metrics, "Must specify either metric_names or metrics"
-        return metric_names if metric_names else [str(m) for m in metrics]
+        return metric_names if metric_names else [str(m) for m in metrics] if metrics else []
 
-    def _get_order(self, order: Optional[Sequence[str]], order_objs: Optional[Sequence[str]]) -> List[str]:
+    def _get_order(self, order: Optional[Sequence[str]], order_objs: Optional[Sequence[str]]) -> Sequence[str]:
         assert not (order and order_objs), "Both order and order_objs should not be set"
         return order if order else [str(o) for o in order_objs] if order_objs else []
 

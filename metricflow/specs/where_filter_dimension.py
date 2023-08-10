@@ -1,12 +1,10 @@
-from typing import List, Sequence
-from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.specs.query_interface import QueryInterfaceDimension, QueryInterfaceDimensionFactory
-from dbt_semantic_interfaces.naming.dundered import DunderedNameFormatter
+from __future__ import annotations
 
-from typing import Sequence, Type
+from typing import List, Sequence
 
 from dbt_semantic_interfaces.call_parameter_sets import (
     DimensionCallParameterSet,
+    FilterCallParameterSets,
 )
 from dbt_semantic_interfaces.naming.dundered import DunderedNameFormatter
 from dbt_semantic_interfaces.references import (
@@ -14,15 +12,18 @@ from dbt_semantic_interfaces.references import (
     EntityReference,
 )
 
+from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.query_interface import (
     QueryInterfaceDimension,
+    QueryInterfaceDimensionFactory,
 )
 from metricflow.specs.specs import DimensionSpec
-from dbt_semantic_interfaces.call_parameter_sets import FilterCallParameterSets
 
 
 class WhereFilterDimension(QueryInterfaceDimension):
-    def __init__(self, column_name):
+    """A dimension that is passed in through the where filter parameter."""
+
+    def __init__(self, column_name) -> None:  # noqa
         self.column_name = column_name
 
     def grain(self, _grain: str) -> QueryInterfaceDimension:
@@ -33,12 +34,18 @@ class WhereFilterDimension(QueryInterfaceDimension):
         """Renaming the column."""
         raise NotImplementedError
 
-    def __str__(self) -> str:  # noqa
+    def __str__(self) -> str:
+        """Returns the column name.
+
+        Important in the Jinja sandbox.
+        """
         return self.column_name
 
 
 class WhereFilterDimensionFactory(QueryInterfaceDimensionFactory):
-    def __init__(
+    """Creates a WhereFilterDimension."""
+
+    def __init__(  # noqa
         self,
         call_parameter_sets: FilterCallParameterSets,
         dimension_specs: List[DimensionSpec],
@@ -49,6 +56,7 @@ class WhereFilterDimensionFactory(QueryInterfaceDimensionFactory):
         self.column_association_resolver = column_association_resolver
 
     def create(self, name: str, entity_path: Sequence[str] = ()) -> WhereFilterDimension:
+        """Create a WhereFilterDimension."""
         structured_name = DunderedNameFormatter.parse_name(name)
         call_parameter_set = DimensionCallParameterSet(
             dimension_reference=DimensionReference(element_name=structured_name.element_name),

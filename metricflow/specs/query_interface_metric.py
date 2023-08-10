@@ -2,7 +2,7 @@ from __future__ import annotations
 
 
 class QueryInterfaceMetric:
-    """Metric in the Jinja interface."""
+    """Metric in the query interface."""
 
     def __init__(self, name: str) -> None:  # noqa: D
         self.name = name

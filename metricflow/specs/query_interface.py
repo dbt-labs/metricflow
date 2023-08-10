@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Sequence, Protocol
+from typing import Protocol, Sequence
 
 
 class QueryInterfaceDimensionFactory(Protocol):
@@ -10,6 +10,7 @@ class QueryInterfaceDimensionFactory(Protocol):
     """
 
     def create(self, name: str, entity_path: Sequence[str] = ()) -> QueryInterfaceDimension:
+        """Create a QueryInterfaceDimension."""
         raise NotImplementedError
 
 
@@ -26,12 +27,18 @@ class QueryInterfaceDimension(Protocol):
 
 
 class QueryInterfaceTimeDimensionFactory(Protocol):
+    """Creates a TimeDimension for the query interface.
+
+    Represented as the TimeDimension constructor in the Jinja sandbox.
+    """
+
     def create(
         self,
         time_dimension_name: str,
         time_granularity_name: str,
         entity_path: Sequence[str] = (),
     ) -> QueryInterfaceTimeDimension:
+        """Create a TimeDimension."""
         raise NotImplementedError
 
 
@@ -42,7 +49,13 @@ class QueryInterfaceTimeDimension(Protocol):
 
 
 class QueryInterfaceEntityFactory(Protocol):
+    """Creates an Entity for the query interface.
+
+    Represented as the Entity constructor in the Jinja sandbox.
+    """
+
     def create(self, entity_name: str, entity_path: Sequence[str] = ()) -> QueryInterfaceEntity:
+        """Create an Entity."""
         raise NotImplementedError
 
 
