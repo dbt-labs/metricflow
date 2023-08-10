@@ -1,0 +1,6 @@
+kind: Dependencies
+body: Relax version pins for MetricFlow dependencies
+time: 2023-08-10T11:29:31.987305-07:00
+custom:
+  Author: tlento
+  PR: "720"
