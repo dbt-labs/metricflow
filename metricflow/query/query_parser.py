@@ -30,8 +30,8 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.specs.group_by_dimension import GroupByDimension
-from metricflow.specs.query_interface_metric import QueryInterfaceMetric
+from metricflow.specs.group_by_dimension import GroupByOrderByDimension
+from metricflow.specs.query_interface import QueryInterfaceMetric
 from metricflow.specs.specs import (
     DimensionSpec,
     EntitySpec,
@@ -169,14 +169,17 @@ class MetricFlowQueryParser:
 
     def parse_and_validate_query(
         self,
-        metric_names: Sequence[str],
-        group_by_names: Sequence[str],
+        metric_names: Optional[Sequence[str]] = None,
+        metrics: Optional[Sequence[QueryInterfaceMetric]] = None,
+        group_by_names: Optional[Sequence[str]] = None,
+        group_by: Optional[Sequence[GroupByOrderByDimension]] = None,
         limit: Optional[int] = None,
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
-        where_constraint: Optional[WhereFilter] = None,
+        where_constraint: Optional[WhereFilter] = None,  # TODO: this parameter is only used in tests. Why?
         where_constraint_str: Optional[str] = None,
         order: Optional[Sequence[str]] = None,
+        order_by: Optional[Sequence[GroupByOrderByDimension]] = None,
         time_granularity: Optional[TimeGranularity] = None,
     ) -> MetricFlowQuerySpec:
         """Parse the query into spec objects, validating them in the process.
@@ -187,13 +190,16 @@ class MetricFlowQueryParser:
         try:
             return self._parse_and_validate_query(
                 metric_names=metric_names,
+                metrics=metrics,
                 group_by_names=group_by_names,
+                group_by=group_by,
                 limit=limit,
                 time_constraint_start=time_constraint_start,
                 time_constraint_end=time_constraint_end,
                 where_constraint=where_constraint,
                 where_constraint_str=where_constraint_str,
                 order=order,
+                order_by=order_by,
                 time_granularity=time_granularity,
             )
         finally:
@@ -285,7 +291,7 @@ class MetricFlowQueryParser:
         return tuple(metric_specs)
 
     def _get_group_by_names(
-        self, group_by_names: Optional[Sequence[str]], group_by: Optional[Sequence[GroupByDimension]]
+        self, group_by_names: Optional[Sequence[str]], group_by: Optional[Sequence[GroupByOrderByDimension]]
     ) -> Sequence[str]:
         assert not (group_by_names and group_by), "Both group_by_names and group_by should not be set"
         return group_by_names if group_by_names else [str(g) for g in group_by] if group_by else []
@@ -297,38 +303,43 @@ class MetricFlowQueryParser:
         assert metric_names or metrics, "Must specify either metric_names or metrics"
         return metric_names if metric_names else [str(m) for m in metrics] if metrics else []
 
-    def _get_order(self, order: Optional[Sequence[str]], order_objs: Optional[Sequence[str]]) -> Sequence[str]:
-        assert not (order and order_objs), "Both order and order_objs should not be set"
-        return order if order else [str(o) for o in order_objs] if order_objs else []
+    def _get_where_filter(
+        self,
+        where_constraint: Optional[WhereFilter] = None,
+        where_constraint_str: Optional[str] = None,
+    ) -> Optional[WhereFilter]:
+        assert not (
+            where_constraint and where_constraint_str
+        ), "Both where_constraint and where_constraint_str should not be set"
+        return (
+            PydanticWhereFilter(where_sql_template=where_constraint_str) if where_constraint_str else where_constraint
+        )
+
+    def _get_order(
+        self, order: Optional[Sequence[str]], order_by: Optional[Sequence[GroupByOrderByDimension]]
+    ) -> Sequence[str]:
+        assert not (order and order_by), "Both order and order_by should not be set"
+        return order if order else [str(o) for o in order_by] if order_by else []
 
     def _parse_and_validate_query(
         self,
         metric_names: Optional[Sequence[str]] = None,
         metrics: Optional[Sequence[QueryInterfaceMetric]] = None,
         group_by_names: Optional[Sequence[str]] = None,
-        group_by: Optional[Sequence[GroupByDimension]] = None,  # TODO: can this also be entities?
+        group_by: Optional[Sequence[GroupByOrderByDimension]] = None,
         limit: Optional[int] = None,
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
         where_constraint: Optional[WhereFilter] = None,
         where_constraint_str: Optional[str] = None,
         order: Optional[Sequence[str]] = None,
-        order_objs: Optional[Sequence[str]] = None,  # TODO
+        order_by: Optional[Sequence[GroupByOrderByDimension]] = None,
         time_granularity: Optional[TimeGranularity] = None,
     ) -> MetricFlowQuerySpec:
-        assert not (
-            where_constraint and where_constraint_str
-        ), "Both where_constraint and where_constraint_str should not be set"
-
         metric_names = self._get_metric_names(metric_names, metrics)
         group_by_names = self._get_group_by_names(group_by_names, group_by)
-        order = self._get_order(order, order_objs)
-
-        where_filter: Optional[WhereFilter]
-        if where_constraint_str:
-            where_filter = PydanticWhereFilter(where_sql_template=where_constraint_str)
-        else:
-            where_filter = where_constraint
+        where_filter = self._get_where_filter(where_constraint, where_constraint_str)
+        order = self._get_order(order, order_by)
 
         # Get metric references used for validations
         # In a case of derived metric, all the input metrics would be here.

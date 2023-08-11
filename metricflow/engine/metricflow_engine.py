@@ -50,6 +50,8 @@ from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.random_id import random_id
 from metricflow.specs.column_assoc import ColumnAssociationResolver
+from metricflow.specs.group_by_dimension import GroupByOrderByDimension
+from metricflow.specs.query_interface import QueryInterfaceMetric
 from metricflow.specs.specs import InstanceSpecSet, MetricFlowQuerySpec
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.telemetry.models import TelemetryLevel
@@ -94,39 +96,52 @@ class MetricFlowQueryRequest:
     """
 
     request_id: MetricFlowRequestId
-    metric_names: Sequence[str]
-    group_by_names: Sequence[str]
+    metric_names: Optional[Sequence[str]] = None
+    metrics: Optional[Sequence[QueryInterfaceMetric]] = None
+    group_by_names: Optional[Sequence[str]] = None
+    group_by: Optional[Sequence[GroupByOrderByDimension]] = None
     limit: Optional[int] = None
     time_constraint_start: Optional[datetime.datetime] = None
     time_constraint_end: Optional[datetime.datetime] = None
     where_constraint: Optional[str] = None
     order_by_names: Optional[Sequence[str]] = None
+    order_by: Optional[Sequence[GroupByOrderByDimension]] = None
     output_table: Optional[str] = None
     sql_optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O4
     query_type: MetricFlowQueryType = MetricFlowQueryType.METRIC
 
     @staticmethod
     def create_with_random_request_id(  # noqa: D
-        metric_names: Sequence[str],
-        group_by_names: Sequence[str],
+        metric_names: Optional[Sequence[str]] = None,
+        metrics: Optional[Sequence[QueryInterfaceMetric]] = None,
+        group_by_names: Optional[Sequence[str]] = None,
+        group_by: Optional[Sequence[GroupByOrderByDimension]] = None,
         limit: Optional[int] = None,
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
         where_constraint: Optional[str] = None,
         order_by_names: Optional[Sequence[str]] = None,
+        order_by: Optional[Sequence[GroupByOrderByDimension]] = None,
         output_table: Optional[str] = None,
         sql_optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O4,
         query_type: MetricFlowQueryType = MetricFlowQueryType.METRIC,
     ) -> MetricFlowQueryRequest:
+        assert not (metric_names and metrics), "Both metric_names and metrics should not be set"
+        assert metric_names or metrics, "Must specify either metric_names or metrics"
+        assert not (group_by_names and group_by), "Both group_by_names and group_by should not be set"
+        assert not (order_by_names and order_by), "Both order_by_names and order_by should not be set"
         return MetricFlowQueryRequest(
             request_id=MetricFlowRequestId(mf_rid=f"{random_id()}"),
             metric_names=metric_names,
+            metrics=metrics,
             group_by_names=group_by_names,
+            group_by=group_by,
             limit=limit,
             time_constraint_start=time_constraint_start,
             time_constraint_end=time_constraint_end,
             where_constraint=where_constraint,
             order_by_names=order_by_names,
+            order_by=order_by,
             output_table=output_table,
             sql_optimization_level=sql_optimization_level,
             query_type=query_type,
@@ -263,8 +278,10 @@ class AbstractMetricFlowEngine(ABC):
     @abstractmethod
     def explain_get_dimension_values(  # noqa: D
         self,
-        metric_names: List[str],
-        get_group_by_values: str,
+        metric_names: Optional[List[str]] = None,
+        metrics: Optional[Sequence[QueryInterfaceMetric]] = None,
+        get_group_by_values: Optional[str] = None,
+        group_by: Optional[GroupByOrderByDimension] = None,
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
     ) -> MetricFlowExplainResult:
@@ -381,12 +398,15 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     def _create_execution_plan(self, mf_query_request: MetricFlowQueryRequest) -> MetricFlowExplainResult:
         query_spec = self._query_parser.parse_and_validate_query(
             metric_names=mf_query_request.metric_names,
+            metrics=mf_query_request.metrics,
             group_by_names=mf_query_request.group_by_names,
+            group_by=mf_query_request.group_by,
             limit=mf_query_request.limit,
             time_constraint_start=mf_query_request.time_constraint_start,
             time_constraint_end=mf_query_request.time_constraint_end,
             where_constraint_str=mf_query_request.where_constraint,
             order=mf_query_request.order_by_names,
+            order_by=mf_query_request.order_by,
         )
         logger.info(f"Query spec is:\n{pformat_big_objects(query_spec)}")
 
@@ -616,15 +636,19 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def explain_get_dimension_values(  # noqa: D
         self,
-        metric_names: List[str],
-        get_group_by_values: str,
+        metric_names: Optional[List[str]] = None,
+        metrics: Optional[Sequence[QueryInterfaceMetric]] = None,
+        get_group_by_values: Optional[str] = None,
+        group_by: Optional[GroupByOrderByDimension] = None,
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
     ) -> MetricFlowExplainResult:
         return self._create_execution_plan(
             MetricFlowQueryRequest.create_with_random_request_id(
                 metric_names=metric_names,
-                group_by_names=[get_group_by_values],
+                metrics=metrics,
+                group_by_names=[get_group_by_values] if get_group_by_values else None,
+                group_by=[group_by] if group_by else None,
                 time_constraint_start=time_constraint_start,
                 time_constraint_end=time_constraint_end,
                 query_type=MetricFlowQueryType.DIMENSION_VALUES,
