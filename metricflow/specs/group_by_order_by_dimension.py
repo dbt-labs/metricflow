@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Sequence
+from typing import Optional, Sequence
 
 from metricflow.specs.query_interface import QueryInterfaceDimension, QueryInterfaceDimensionFactory
 
@@ -11,6 +11,7 @@ class GroupByOrderByDimension(QueryInterfaceDimension):
     def __init__(self, name: str, entity_path: Sequence[str] = ()) -> None:  # noqa: D
         self.name = name
         self.entity_path = entity_path
+        self._grain: Optional[str] = None
 
     def grain(self, _grain: str) -> GroupByOrderByDimension:
         """The time granularity."""
