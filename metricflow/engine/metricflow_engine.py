@@ -50,7 +50,7 @@ from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.random_id import random_id
 from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.specs.group_by_dimension import GroupByOrderByDimension
+from metricflow.specs.group_by_order_by_dimension import GroupByOrderByDimension
 from metricflow.specs.query_interface import QueryInterfaceMetric
 from metricflow.specs.specs import InstanceSpecSet, MetricFlowQuerySpec
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel

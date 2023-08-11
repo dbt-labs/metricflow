@@ -30,7 +30,7 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.specs.group_by_dimension import GroupByOrderByDimension
+from metricflow.specs.group_by_order_by_dimension import GroupByOrderByDimension
 from metricflow.specs.query_interface import QueryInterfaceMetric
 from metricflow.specs.specs import (
     DimensionSpec,
