@@ -176,7 +176,7 @@ class MetricFlowQueryParser:
         limit: Optional[int] = None,
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
-        where_constraint: Optional[WhereFilter] = None,  # TODO: this parameter is only used in tests. Why?
+        where_constraint: Optional[WhereFilter] = None,
         where_constraint_str: Optional[str] = None,
         order: Optional[Sequence[str]] = None,
         order_by: Optional[Sequence[GroupByOrderByDimension]] = None,
