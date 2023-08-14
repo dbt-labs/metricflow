@@ -1,0 +1,7 @@
+kind: Features
+body: Add optional parameters to pass in objects instead of strings. Add new protocols
+  for query parameters.
+time: 2023-08-14T11:16:02.275198-05:00
+custom:
+  Author: DevonFulcher
+  Issue: None
