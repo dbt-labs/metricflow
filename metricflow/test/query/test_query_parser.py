@@ -2,9 +2,6 @@ from __future__ import annotations
 
 import logging
 import textwrap
-from metricflow.query.query_parser import MetricFlowQueryParser
-from metricflow.specs.group_by_order_by_dimension import GroupByOrderByDimensionFactory
-from metricflow.specs.query_interface import QueryInterfaceMetric
 
 import pytest
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
@@ -15,6 +12,9 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow.errors.errors import UnableToSatisfyQueryError
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.query.query_exceptions import InvalidQueryException
+from metricflow.query.query_parser import MetricFlowQueryParser
+from metricflow.specs.group_by_order_by_dimension import GroupByOrderByDimensionFactory
+from metricflow.specs.query_interface import QueryInterfaceMetric
 from metricflow.specs.specs import (
     DimensionSpec,
     EntitySpec,
