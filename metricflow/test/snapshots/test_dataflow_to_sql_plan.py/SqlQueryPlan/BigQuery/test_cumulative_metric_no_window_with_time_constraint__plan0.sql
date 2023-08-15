@@ -74,7 +74,7 @@ FROM (
           FROM ***************************.fct_revenue revenue_src_10006
         ) subq_0
       ) subq_1
-      WHERE subq_1.metric_time__day BETWEEN CAST('2000-01-01' AS DATETIME) AND CAST('2020-01-01' AS DATETIME)
+      WHERE subq_1.metric_time__day BETWEEN '2000-01-01' AND '2020-01-01'
     ) subq_2
   ) subq_4
   GROUP BY

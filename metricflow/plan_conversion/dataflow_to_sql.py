@@ -83,7 +83,6 @@ from metricflow.sql.optimizer.optimization_levels import (
 )
 from metricflow.sql.sql_exprs import (
     SqlBetweenExpression,
-    SqlCastToTimestampExpression,
     SqlColumnReference,
     SqlColumnReferenceExpression,
     SqlDateTruncExpression,
@@ -124,15 +123,11 @@ def _make_time_range_comparison_expr(
                 column_name=column_alias,
             )
         ),
-        start_expr=SqlCastToTimestampExpression(
-            arg=SqlStringLiteralExpression(
-                literal_value=time_range_constraint.start_time.strftime(ISO8601_PYTHON_FORMAT),
-            )
+        start_expr=SqlStringLiteralExpression(
+            literal_value=time_range_constraint.start_time.strftime(ISO8601_PYTHON_FORMAT),
         ),
-        end_expr=SqlCastToTimestampExpression(
-            arg=SqlStringLiteralExpression(
-                literal_value=time_range_constraint.end_time.strftime(ISO8601_PYTHON_FORMAT),
-            )
+        end_expr=SqlStringLiteralExpression(
+            literal_value=time_range_constraint.end_time.strftime(ISO8601_PYTHON_FORMAT),
         ),
     )
 
