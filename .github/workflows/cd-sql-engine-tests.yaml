@@ -3,6 +3,7 @@ name: MetricFlow SQL Engine Tests
 #  slower. As the test will be I/O bound, the tests can be run with higher parallelism to get faster runtimes.
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
