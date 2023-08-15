@@ -12,6 +12,7 @@ from dbt_semantic_interfaces.implementations.elements.dimension import PydanticD
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.references import EntityReference, MetricReference
 from dbt_semantic_interfaces.type_enums import DimensionType
+from metricflow.assert_one_arg import assert_exactly_one_arg_set
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.builder.node_data_set import (
@@ -126,8 +127,7 @@ class MetricFlowQueryRequest:
         sql_optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O4,
         query_type: MetricFlowQueryType = MetricFlowQueryType.METRIC,
     ) -> MetricFlowQueryRequest:
-        assert not (metric_names and metrics), "Both metric_names and metrics should not be set"
-        assert metric_names or metrics, "Must specify either metric_names or metrics"
+        assert_exactly_one_arg_set(metric_names=metric_names, metrics=metrics)
         assert not (group_by_names and group_by), "Both group_by_names and group_by should not be set"
         assert not (order_by_names and order_by), "Both order_by_names and order_by should not be set"
         return MetricFlowQueryRequest(

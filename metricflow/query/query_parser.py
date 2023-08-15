@@ -20,6 +20,7 @@ from dbt_semantic_interfaces.references import (
 )
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
+from metricflow.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.dataflow_plan import BaseOutput
 from metricflow.dataset.dataset import DataSet
@@ -299,8 +300,7 @@ class MetricFlowQueryParser:
     def _get_metric_names(
         self, metric_names: Optional[Sequence[str]], metrics: Optional[Sequence[QueryInterfaceMetric]]
     ) -> Sequence[str]:
-        assert not (metric_names and metrics), "Both metric_names and metrics should not be set"
-        assert metric_names or metrics, "Must specify either metric_names or metrics"
+        assert_exactly_one_arg_set(metric_names=metric_names, metrics=metrics)
         return metric_names if metric_names else [str(m) for m in metrics] if metrics else []
 
     def _get_where_filter(
