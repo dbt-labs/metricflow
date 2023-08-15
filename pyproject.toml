@@ -118,6 +118,7 @@ features = [
 
 [tool.hatch.envs.dev-env.env-vars]
 	MF_TEST_ADAPTER_TYPE="duckdb"
+  MF_SQL_ENGINE_URL="duckdb://"
 
 [tool.hatch.envs.postgres-env.env-vars]
 	MF_SQL_ENGINE_URL="postgresql://metricflow@localhost:5432/metricflow"

@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Make duckdb the standard for all dev-env environment runs, including `make test`
+time: 2023-08-14T22:57:29.775028-07:00
+custom:
+  Author: tlento
+  Issue: "723"
