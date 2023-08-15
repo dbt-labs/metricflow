@@ -2,11 +2,18 @@ from __future__ import annotations
 
 from typing import Optional, Sequence
 
+from dbt_semantic_interfaces.protocols.protocol_hint import ProtocolHint
+from typing_extensions import override
+
 from metricflow.specs.query_interface import QueryInterfaceDimension, QueryInterfaceDimensionFactory
 
 
-class GroupByOrderByDimension(QueryInterfaceDimension):
+class GroupByOrderByDimension(ProtocolHint[QueryInterfaceDimension]):
     """A dimension that is passed in through the group_by or order_by parameter."""
+
+    @override
+    def _implements_protocol(self) -> QueryInterfaceDimension:  # noqa: D
+        return self
 
     def __init__(self, name: str, entity_path: Sequence[str] = ()) -> None:  # noqa: D
         self.name = name
@@ -27,11 +34,15 @@ class GroupByOrderByDimension(QueryInterfaceDimension):
         return f"{self.name}__{self._grain}" if self._grain else self.name
 
 
-class GroupByOrderByDimensionFactory(QueryInterfaceDimensionFactory):
+class GroupByOrderByDimensionFactory(ProtocolHint[QueryInterfaceDimensionFactory]):
     """Creates a GroupByOrderByDimension.
 
     This is useful as a factory for the Jinja sandbox.
     """
+
+    @override
+    def _implements_protocol(self) -> GroupByOrderByDimensionFactory:  # noqa: D
+        return self
 
     def create(self, name: str, entity_path: Sequence[str] = ()) -> GroupByOrderByDimension:
         """Create a GroupByOrderByDimension."""

@@ -7,10 +7,12 @@ from dbt_semantic_interfaces.call_parameter_sets import (
     FilterCallParameterSets,
 )
 from dbt_semantic_interfaces.naming.dundered import DunderedNameFormatter
+from dbt_semantic_interfaces.protocols.protocol_hint import ProtocolHint
 from dbt_semantic_interfaces.references import (
     DimensionReference,
     EntityReference,
 )
+from typing_extensions import override
 
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.query_interface import (
@@ -20,8 +22,12 @@ from metricflow.specs.query_interface import (
 from metricflow.specs.specs import DimensionSpec
 
 
-class WhereFilterDimension(QueryInterfaceDimension):
+class WhereFilterDimension(ProtocolHint[QueryInterfaceDimension]):
     """A dimension that is passed in through the where filter parameter."""
+
+    @override
+    def _implements_protocol(self) -> QueryInterfaceDimension:  # noqa: D
+        return self
 
     def __init__(self, column_name: str) -> None:  # noqa
         self.column_name = column_name
@@ -42,8 +48,12 @@ class WhereFilterDimension(QueryInterfaceDimension):
         return self.column_name
 
 
-class WhereFilterDimensionFactory(QueryInterfaceDimensionFactory):
+class WhereFilterDimensionFactory(ProtocolHint[QueryInterfaceDimensionFactory]):
     """Creates a WhereFilterDimension."""
+
+    @override
+    def _implements_protocol(self) -> QueryInterfaceDimensionFactory:  # noqa: D
+        return self
 
     def __init__(  # noqa
         self,

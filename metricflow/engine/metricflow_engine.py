@@ -12,8 +12,8 @@ from dbt_semantic_interfaces.implementations.elements.dimension import PydanticD
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.references import EntityReference, MetricReference
 from dbt_semantic_interfaces.type_enums import DimensionType
-from metricflow.assert_one_arg import assert_exactly_one_arg_set
 
+from metricflow.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.builder.node_data_set import (
     DataflowPlanNodeOutputDataSetResolver,

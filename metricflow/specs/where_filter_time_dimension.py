@@ -4,16 +4,22 @@ from typing import List, Sequence
 
 from dbt_semantic_interfaces.call_parameter_sets import FilterCallParameterSets, TimeDimensionCallParameterSet
 from dbt_semantic_interfaces.naming.dundered import DunderedNameFormatter
+from dbt_semantic_interfaces.protocols.protocol_hint import ProtocolHint
 from dbt_semantic_interfaces.references import EntityReference, TimeDimensionReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from typing_extensions import override
 
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.query_interface import QueryInterfaceTimeDimension, QueryInterfaceTimeDimensionFactory
 from metricflow.specs.specs import TimeDimensionSpec
 
 
-class WhereFilterTimeDimension(QueryInterfaceTimeDimension):
+class WhereFilterTimeDimension(ProtocolHint[QueryInterfaceTimeDimension]):
     """A time dimension that is passed in through the where filter parameter."""
+
+    @override
+    def _implements_protocol(self) -> QueryInterfaceTimeDimension:  # noqa: D
+        return self
 
     def __init__(self, column_name: str):  # noqa
         self.column_name = column_name
@@ -26,8 +32,12 @@ class WhereFilterTimeDimension(QueryInterfaceTimeDimension):
         return self.column_name
 
 
-class WhereFilterTimeDimensionFactory(QueryInterfaceTimeDimensionFactory):
+class WhereFilterTimeDimensionFactory(ProtocolHint[QueryInterfaceTimeDimensionFactory]):
     """Creates a WhereFilterTimeDimension."""
+
+    @override
+    def _implements_protocol(self) -> QueryInterfaceTimeDimensionFactory:  # noqa: D
+        return self
 
     def __init__(  # noqa
         self,
