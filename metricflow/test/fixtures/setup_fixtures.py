@@ -12,7 +12,6 @@ import sqlalchemy.util
 from _pytest.fixtures import FixtureRequest
 from sqlalchemy.engine import make_url
 
-from metricflow.configuration.env_var import EnvironmentVariable
 from metricflow.random_id import random_id
 from metricflow.test.fixtures.sql_clients.common_client import SqlDialect
 from metricflow.test.table_snapshot.table_snapshots import SqlTableSnapshotHash, SqlTableSnapshotRepository
@@ -154,8 +153,15 @@ def warn_user_about_slow_tests_without_parallelism(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
 ) -> None:
-    worker_count_env_var = EnvironmentVariable("PYTEST_XDIST_WORKER_COUNT", "1")
-    num_workers = worker_count_env_var.get_int()
+    worker_count_env_var = os.environ.get("PYTEST_XDIST_WORKER_COUNT", "1")
+    try:
+        num_workers = int(worker_count_env_var)
+    except ValueError as e:
+        raise ValueError(
+            f"Could not convert environment variable PYTEST_XDIST_WORKER_COUNT to int! "
+            f"Value in environ was: {worker_count_env_var}"
+        ) from e
+
     num_items = len(request.session.items)
     dialect = dialect_from_url(mf_test_session_state.sql_engine_url)
 

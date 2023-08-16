@@ -43,7 +43,6 @@ from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.implementations.base import FrozenBaseModel
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 
-from metricflow.configuration.env_var import EnvironmentVariable
 from metricflow.protocols.sql_client import SqlEngine
 
 logger = logging.getLogger(__name__)
@@ -162,15 +161,14 @@ def run_cli() -> None:  # noqa: D
     dev_format = "%(asctime)s %(levelname)s %(filename)s:%(lineno)d [%(threadName)s] - %(message)s"
     logging.basicConfig(level=logging.INFO, format=dev_format)
 
-    credential_sets_json_env_var = EnvironmentVariable("MF_TEST_ENGINE_CREDENTIAL_SETS")
-    if credential_sets_json_env_var.get_optional() is None:
+    credential_sets_json_str = os.environ.get("MF_TEST_ENGINE_CREDENTIAL_SETS")
+    if credential_sets_json_str is None:
         raise ValueError(
-            f"Environment variable: {credential_sets_json_env_var.name} has not been set. Please see the comment in "
+            f"Environment variable: MF_TEST_ENGINE_CREDENTIAL_SETS has not been set. Please see the comment in "
             f"{__file__} for details on how to set it."
         )
 
-    credentials_sets_json_str = credential_sets_json_env_var.get()
-    credential_sets = MetricFlowTestCredentialSetForAllEngines.parse_raw(credentials_sets_json_str)
+    credential_sets = MetricFlowTestCredentialSetForAllEngines.parse_raw(credential_sets_json_str)
 
     logger.info(
         f"Running the following tests to generate snapshots:\n{pformat_big_objects(SNAPSHOT_GENERATING_TEST_FILES)}"
