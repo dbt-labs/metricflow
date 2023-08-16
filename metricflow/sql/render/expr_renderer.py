@@ -8,9 +8,9 @@ from dataclasses import dataclass
 from typing import Collection, List
 
 import jinja2
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
 
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_exprs import (
     SqlAggregateFunctionExpression,

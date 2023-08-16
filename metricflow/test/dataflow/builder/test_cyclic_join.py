@@ -4,8 +4,8 @@ import logging
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-
 from dbt_semantic_interfaces.references import EntityReference
+
 from metricflow.dataflow.builder.costing import DefaultCostFunction
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text

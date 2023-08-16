@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dbt_semantic_interfaces.references import SemanticModelReference
+
 from metricflow.instances import InstanceSet
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.sql.sql_plan import SqlSelectStatementNode

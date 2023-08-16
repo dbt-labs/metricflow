@@ -5,7 +5,6 @@ from typing import Tuple
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-
 from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimension
 from dbt_semantic_interfaces.implementations.elements.entity import PydanticEntity
 from dbt_semantic_interfaces.implementations.elements.measure import PydanticMeasure
@@ -15,6 +14,7 @@ from dbt_semantic_interfaces.protocols.entity import EntityType
 from dbt_semantic_interfaces.test_utils import semantic_model_with_guaranteed_meta
 from dbt_semantic_interfaces.transformations.semantic_manifest_transformer import PydanticSemanticManifestTransformer
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
+
 from metricflow.model.data_warehouse_model_validator import (
     DataWarehouseModelValidator,
     DataWarehouseTaskBuilder,

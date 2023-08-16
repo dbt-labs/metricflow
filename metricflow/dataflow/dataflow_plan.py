@@ -9,12 +9,12 @@ from dataclasses import dataclass
 from typing import Generic, List, Optional, Sequence, Tuple, Type, TypeVar, Union
 
 import jinja2
-
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.protocols.metric import MetricTimeWindow
 from dbt_semantic_interfaces.references import TimeDimensionReference
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+
 from metricflow.dag.id_generation import (
     DATAFLOW_NODE_AGGREGATE_MEASURES_ID_PREFIX,
     DATAFLOW_NODE_COMBINE_METRICS_ID_PREFIX,

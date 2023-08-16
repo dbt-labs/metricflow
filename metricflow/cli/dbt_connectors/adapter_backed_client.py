@@ -7,9 +7,9 @@ import time
 import pandas as pd
 from dbt.adapters.base.impl import BaseAdapter
 from dbt.exceptions import DbtDatabaseError
-
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
+
 from metricflow.errors.errors import SqlBindParametersNotSupportedError
 from metricflow.formatting import indent_log_line
 from metricflow.protocols.sql_client import SqlEngine

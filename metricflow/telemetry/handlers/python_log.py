@@ -4,6 +4,7 @@ import logging
 import textwrap
 
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
+
 from metricflow.telemetry.handlers.handlers import PayloadType, TelemetryHandler
 
 logger = logging.getLogger(__name__)

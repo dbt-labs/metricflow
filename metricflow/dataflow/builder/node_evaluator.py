@@ -22,6 +22,7 @@ from dataclasses import dataclass
 from typing import Generic, List, Optional, Sequence, Tuple, TypeVar
 
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
+
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.partitions import PartitionJoinResolver
 from metricflow.dataflow.dataflow_plan import (

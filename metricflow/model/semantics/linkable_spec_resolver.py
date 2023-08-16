@@ -20,6 +20,7 @@ from dbt_semantic_interfaces.references import (
 )
 from dbt_semantic_interfaces.type_enums import MetricType
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnknownMetricLinkingError
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties

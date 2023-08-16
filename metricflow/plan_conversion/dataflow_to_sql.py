@@ -8,6 +8,7 @@ from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols.metric import MetricType
 from dbt_semantic_interfaces.references import MetricModelReference
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
+
 from metricflow.aggregation_properties import AggregationState
 from metricflow.dag.id_generation import IdGeneratorRegistry
 from metricflow.dataflow.dataflow_plan import (

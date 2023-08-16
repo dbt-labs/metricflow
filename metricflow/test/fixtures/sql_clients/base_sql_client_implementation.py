@@ -6,8 +6,8 @@ from abc import ABC, abstractmethod
 from typing import Optional
 
 import pandas as pd
-
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
+
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.formatting import indent_log_line
 from metricflow.protocols.sql_client import (

@@ -4,13 +4,13 @@ from typing import List
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
 from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
 from dbt_semantic_interfaces.references import EntityReference, TimeDimensionReference
 from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan import (
     AggregateMeasuresNode,

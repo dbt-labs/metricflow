@@ -15,14 +15,14 @@ from typing import Callable, List, Optional
 import click
 import jinja2
 import pandas as pd
+from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
+from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
+from dbt_semantic_interfaces.validations.validator_helpers import SemanticManifestValidationResults
 from halo import Halo
 from packaging.version import parse
 from update_checker import UpdateChecker
 
 import metricflow.cli.custom_click_types as click_custom
-from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
-from dbt_semantic_interfaces.validations.validator_helpers import SemanticManifestValidationResults
 from metricflow.cli import PACKAGE_NAME
 from metricflow.cli.cli_context import CLIContext
 from metricflow.cli.constants import DEFAULT_RESULT_DECIMAL_PLACES, MAX_LIST_OBJECT_ELEMENTS

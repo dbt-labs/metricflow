@@ -11,6 +11,7 @@ from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.protocols.metric import MetricTimeWindow, MetricType
 from dbt_semantic_interfaces.references import TimeDimensionReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+
 from metricflow.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.dag.id_generation import DATAFLOW_PLAN_PREFIX, IdGeneratorRegistry
 from metricflow.dataflow.builder.costing import DataflowPlanNodeCostFunction, DefaultCostFunction

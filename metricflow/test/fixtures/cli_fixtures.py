@@ -7,10 +7,10 @@ from typing import Generator, Optional, Sequence
 import click
 import pytest
 from click.testing import CliRunner, Result
-from typing_extensions import override
-
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.test_utils import as_datetime
+from typing_extensions import override
+
 from metricflow.cli.cli_context import CLIContext
 from metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts, dbtProjectMetadata
 from metricflow.engine.metricflow_engine import MetricFlowEngine

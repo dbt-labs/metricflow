@@ -11,10 +11,10 @@ from dbt.cli.main import dbtRunner
 from dbt.config.profile import Profile
 from dbt.config.project import Project
 from dbt.config.runtime import load_profile, load_project
-from typing_extensions import Self
-
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
+from typing_extensions import Self
+
 from metricflow.errors.errors import ModelCreationException
 from metricflow.model.dbt_manifest_parser import parse_manifest_from_dbt_generated_manifest
 

@@ -8,9 +8,8 @@ from enum import Enum
 from operator import itemgetter
 from typing import Any, Dict, Optional, Sequence
 
-from pydantic import Field
-
 from dbt_semantic_interfaces.implementations.base import FrozenBaseModel
+from pydantic import Field
 
 logger = logging.getLogger(__name__)
 

@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from _pytest.fixtures import FixtureRequest
-
 from dbt_semantic_interfaces.references import TimeDimensionReference
+
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan import MetricTimeDimensionTransformNode
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet

@@ -27,6 +27,7 @@ from dbt_semantic_interfaces.references import (
 )
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+
 from metricflow.aggregation_properties import AggregationState
 from metricflow.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.filters.time_constraint import TimeRangeConstraint

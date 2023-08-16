@@ -5,6 +5,7 @@ import logging
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.type_enums import TimeGranularity
+
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.model.semantics.metric_lookup import MetricLookup
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup

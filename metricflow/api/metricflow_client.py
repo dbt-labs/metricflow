@@ -5,10 +5,10 @@ import logging
 from typing import Dict, List, Optional
 
 from dateutil.parser import parse
-
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 from dbt_semantic_interfaces.validations.validator_helpers import SemanticManifestValidationResults
+
 from metricflow.engine.metricflow_engine import (
     MetricFlowEngine,
     MetricFlowExplainResult,

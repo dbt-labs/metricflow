@@ -7,6 +7,7 @@ from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWin
 from dbt_semantic_interfaces.protocols.metric import Metric, MetricType
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import MetricReference
+
 from metricflow.errors.errors import DuplicateMetricError, MetricNotFoundError, NonExistentMeasureError
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.linkable_spec_resolver import LinkableElementSet, ValidLinkableSpecResolver
