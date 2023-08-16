@@ -29,31 +29,33 @@ FROM (
   ) subq_18
   INNER JOIN (
     -- Join to Time Spine Dataset
+    -- Pass Only Elements:
+    --   ['bookings', 'metric_time__day']
+    -- Aggregate Measures
+    -- Compute Metrics via Expressions
     SELECT
-      subq_25.ds AS metric_time__day
-      , subq_23.bookings_at_start_of_month AS bookings_at_start_of_month
-    FROM ***************************.mf_time_spine subq_25
-    INNER JOIN (
-      -- Aggregate Measures
-      -- Compute Metrics via Expressions
+      DATE_TRUNC('day', subq_21.metric_time__day) AS metric_time__day
+      , SUM(subq_20.bookings) AS bookings_at_start_of_month
+    FROM (
+      -- Date Spine
       SELECT
-        metric_time__day
-        , SUM(bookings) AS bookings_at_start_of_month
-      FROM (
-        -- Read Elements From Semantic Model 'bookings_source'
-        -- Metric Time Dimension 'ds'
-        -- Pass Only Elements:
-        --   ['bookings', 'metric_time__day']
-        SELECT
-          ds AS metric_time__day
-          , 1 AS bookings
-        FROM ***************************.fct_bookings bookings_source_src_10001
-      ) subq_21
+        ds AS metric_time__day
+      FROM ***************************.mf_time_spine subq_22
       GROUP BY
-        metric_time__day
-    ) subq_23
+        ds
+    ) subq_21
+    INNER JOIN (
+      -- Read Elements From Semantic Model 'bookings_source'
+      -- Metric Time Dimension 'ds'
+      SELECT
+        ds AS metric_time__day
+        , 1 AS bookings
+      FROM ***************************.fct_bookings bookings_source_src_10001
+    ) subq_20
     ON
-      DATE_TRUNC('month', subq_25.ds) = subq_23.metric_time__day
+      DATE_TRUNC('month', subq_21.metric_time__day) = subq_20.metric_time__day
+    GROUP BY
+      DATE_TRUNC('day', subq_21.metric_time__day)
   ) subq_26
   ON
     (
