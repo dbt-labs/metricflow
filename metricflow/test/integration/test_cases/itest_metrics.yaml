@@ -877,11 +877,11 @@ integration_test:
     FROM {{ mf_time_spine_source }} a
     INNER JOIN (
       SELECT
-        ds AS metric_time
+        ds AS metric_time__day
         , 1 AS bookings_5_day_lag
       FROM {{ source_schema }}.fct_bookings
     ) b
-    ON {{ render_date_sub("a", "ds", 5, TimeGranularity.DAY) }} = b.metric_time
+    ON {{ render_date_sub("a", "ds", 5, TimeGranularity.DAY) }} = b.metric_time__day
     GROUP BY metric_time__month
 ---
 integration_test:
@@ -908,11 +908,11 @@ integration_test:
       FROM {{ mf_time_spine_source }} c
       INNER JOIN (
         SELECT
-          ds AS metric_time
+          ds AS metric_time__day
           , 1 AS bookings_at_start_of_month
         FROM {{ source_schema }}.fct_bookings
       ) d
-      ON {{ render_date_trunc("c.ds", TimeGranularity.MONTH) }} = d.metric_time
+      ON {{ render_date_trunc("c.ds", TimeGranularity.MONTH) }} = d.metric_time__day
       GROUP BY metric_time__week
     ) b
     ON a.metric_time__week = b.metric_time__week
@@ -936,11 +936,11 @@ integration_test:
       FROM {{ mf_time_spine_source }} g
       INNER JOIN (
         SELECT
-          ds AS metric_time
+          ds AS metric_time__day
           , 1 AS bookings
         FROM {{ source_schema }}.fct_bookings
       ) f
-      ON {{ render_date_sub("g", "ds", 1, TimeGranularity.MONTH) }} = f.metric_time
+      ON {{ render_date_sub("g", "ds", 1, TimeGranularity.MONTH) }} = f.metric_time__day
       GROUP BY metric_time__year
     ) a
     INNER JOIN (
@@ -950,11 +950,11 @@ integration_test:
       FROM {{ mf_time_spine_source }} c
       INNER JOIN (
         SELECT
-          ds AS metric_time
+          ds AS metric_time__day
           , 1 AS bookings
         FROM {{ source_schema }}.fct_bookings
       ) d
-      ON {{ render_date_trunc("c.ds", TimeGranularity.MONTH) }} = d.metric_time
+      ON {{ render_date_trunc("c.ds", TimeGranularity.MONTH) }} = d.metric_time__day
       GROUP BY metric_time__year
     ) b
     ON a.metric_time__year = b.metric_time__year
@@ -968,16 +968,16 @@ integration_test:
   group_bys: ["metric_time"]
   check_query: |
     SELECT
-      d.ds AS metric_time
+      d.ds AS metric_time__day
       , c.every_two_days_bookers AS every_2_days_bookers_2_days_ago
     FROM {{ mf_time_spine_source }} d
     INNER JOIN (
       SELECT
-        a.ds AS metric_time
+        a.ds AS metric_time__day
         , COUNT(DISTINCT b.guest_id) AS every_two_days_bookers
       FROM {{ mf_time_spine_source }} a
       INNER JOIN {{ source_schema }}.fct_bookings b
         ON (b.ds <= a.ds) AND (b.ds > {{ render_date_sub("a", "ds", 2, TimeGranularity.DAY) }})
-      GROUP BY metric_time
+      GROUP BY metric_time__day
     ) c
-    ON {{ render_date_sub("d", "ds", 2, TimeGranularity.DAY) }} = c.metric_time
+    ON {{ render_date_sub("d", "ds", 2, TimeGranularity.DAY) }} = c.metric_time__day
