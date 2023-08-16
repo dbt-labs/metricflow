@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import logging
+import os
 import warnings
 from dataclasses import dataclass
 
@@ -68,24 +69,18 @@ def pytest_addoption(parser: _pytest.config.argparsing.Parser) -> None:
     )
 
 
-class MetricFlowTestEnvironmentVariables:
-    """Environment variables to setup the testing environment."""
-
-    MF_SQL_ENGINE_URL = EnvironmentVariable("MF_SQL_ENGINE_URL")
-    MF_SQL_ENGINE_PASSWORD = EnvironmentVariable("MF_SQL_ENGINE_PASSWORD")
-
-
 @pytest.fixture(scope="session")
 def mf_test_session_state(  # noqa: D
     request: FixtureRequest,
     disable_sql_alchemy_deprecation_warning: None,
     source_table_snapshot_repository: SqlTableSnapshotRepository,
 ) -> MetricFlowTestSessionState:
-    engine_url = MetricFlowTestEnvironmentVariables.MF_SQL_ENGINE_URL.get_optional()
-    if engine_url is None:
-        logger.info(f"{MetricFlowTestEnvironmentVariables.MF_SQL_ENGINE_URL.name} has not been set, so using DuckDb")
-        engine_url = "duckdb://"
-    engine_password = MetricFlowTestEnvironmentVariables.MF_SQL_ENGINE_PASSWORD.get_optional() or ""
+    engine_url = os.environ.get("MF_SQL_ENGINE_URL")
+    assert engine_url is not None, (
+        "MF_SQL_ENGINE_URL environment variable has not been set! Are you running in a properly configured "
+        "environment? Check out our CONTRIBUTING.md for pointers to our environment configurations."
+    )
+    engine_password = os.environ.get("MF_SQL_ENGINE_PASSWORD", "")
 
     current_time = datetime.datetime.now().strftime("%Y_%m_%d")
     random_suffix = random_id()
