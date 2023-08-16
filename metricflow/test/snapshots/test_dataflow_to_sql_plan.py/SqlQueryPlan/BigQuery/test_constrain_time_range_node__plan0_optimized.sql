@@ -8,4 +8,4 @@ SELECT
   , ds AS metric_time__day
   , 1 AS bookings
 FROM ***************************.fct_bookings bookings_source_src_10001
-WHERE ds BETWEEN CAST('2020-01-01' AS DATETIME) AND CAST('2020-01-02' AS DATETIME)
+WHERE ds BETWEEN '2020-01-01' AND '2020-01-02'

@@ -1,0 +1,6 @@
+kind: Fixes
+body: Remove barrier to partition pruning certain time partition filter predicates
+time: 2023-08-14T23:15:16.658262-07:00
+custom:
+  Author: tlento
+  Issue: "712"
