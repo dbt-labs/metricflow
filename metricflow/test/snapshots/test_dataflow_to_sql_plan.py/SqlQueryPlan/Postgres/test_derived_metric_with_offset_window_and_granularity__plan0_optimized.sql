@@ -1,41 +1,41 @@
 -- Compute Metrics via Expressions
 SELECT
-  metric_time__day
-  , bookings - bookings_at_start_of_month AS bookings_growth_since_start_of_month
+  metric_time__quarter
+  , bookings - bookings_2_weeks_ago AS bookings_growth_2_weeks
 FROM (
   -- Combine Metrics
   SELECT
-    COALESCE(subq_18.metric_time__day, subq_26.metric_time__day) AS metric_time__day
+    COALESCE(subq_18.metric_time__quarter, subq_26.metric_time__quarter) AS metric_time__quarter
     , subq_18.bookings AS bookings
-    , subq_26.bookings_at_start_of_month AS bookings_at_start_of_month
+    , subq_26.bookings_2_weeks_ago AS bookings_2_weeks_ago
   FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      metric_time__day
+      metric_time__quarter
       , SUM(bookings) AS bookings
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
       -- Pass Only Elements:
-      --   ['bookings', 'metric_time__day']
+      --   ['bookings', 'metric_time__quarter']
       SELECT
-        ds AS metric_time__day
+        DATE_TRUNC('quarter', ds) AS metric_time__quarter
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_10001
     ) subq_16
     GROUP BY
-      metric_time__day
+      metric_time__quarter
   ) subq_18
   INNER JOIN (
     -- Join to Time Spine Dataset
     -- Pass Only Elements:
-    --   ['bookings', 'metric_time__day']
+    --   ['bookings', 'metric_time__quarter']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      DATE_TRUNC('day', subq_21.metric_time__day) AS metric_time__day
-      , SUM(subq_20.bookings) AS bookings_at_start_of_month
+      DATE_TRUNC('quarter', subq_21.metric_time__quarter) AS metric_time__quarter
+      , SUM(subq_20.bookings) AS bookings_2_weeks_ago
     FROM (
       -- Date Spine
       SELECT
@@ -53,18 +53,18 @@ FROM (
       FROM ***************************.fct_bookings bookings_source_src_10001
     ) subq_20
     ON
-      DATE_TRUNC('month', subq_21.metric_time__day) = subq_20.metric_time__day
+      subq_21.metric_time__day - MAKE_INTERVAL(days => 14) = subq_20.metric_time__day
     GROUP BY
-      DATE_TRUNC('day', subq_21.metric_time__day)
+      DATE_TRUNC('quarter', subq_21.metric_time__quarter)
   ) subq_26
   ON
     (
-      subq_18.metric_time__day = subq_26.metric_time__day
+      subq_18.metric_time__quarter = subq_26.metric_time__quarter
     ) OR (
       (
-        subq_18.metric_time__day IS NULL
+        subq_18.metric_time__quarter IS NULL
       ) AND (
-        subq_26.metric_time__day IS NULL
+        subq_26.metric_time__quarter IS NULL
       )
     )
 ) subq_27

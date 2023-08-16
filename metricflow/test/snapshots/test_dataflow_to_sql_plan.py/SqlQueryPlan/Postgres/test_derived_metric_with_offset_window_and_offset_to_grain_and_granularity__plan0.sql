@@ -1,33 +1,33 @@
 -- Compute Metrics via Expressions
 SELECT
-  subq_16.metric_time__day
+  subq_16.metric_time__year
   , month_start_bookings - bookings_1_month_ago AS bookings_month_start_compared_to_1_month_prior
 FROM (
   -- Combine Metrics
   SELECT
-    COALESCE(subq_7.metric_time__day, subq_15.metric_time__day) AS metric_time__day
+    COALESCE(subq_7.metric_time__year, subq_15.metric_time__year) AS metric_time__year
     , subq_7.month_start_bookings AS month_start_bookings
     , subq_15.bookings_1_month_ago AS bookings_1_month_ago
   FROM (
     -- Compute Metrics via Expressions
     SELECT
-      subq_6.metric_time__day
+      subq_6.metric_time__year
       , subq_6.bookings AS month_start_bookings
     FROM (
       -- Aggregate Measures
       SELECT
-        subq_5.metric_time__day
+        subq_5.metric_time__year
         , SUM(subq_5.bookings) AS bookings
       FROM (
         -- Pass Only Elements:
-        --   ['bookings', 'metric_time__day']
+        --   ['bookings', 'metric_time__year']
         SELECT
-          subq_4.metric_time__day
+          subq_4.metric_time__year
           , subq_4.bookings
         FROM (
           -- Join to Time Spine Dataset
           SELECT
-            DATE_TRUNC('day', subq_2.metric_time__day) AS metric_time__day
+            DATE_TRUNC('year', subq_2.metric_time__year) AS metric_time__year
             , subq_1.ds__day AS ds__day
             , subq_1.ds__week AS ds__week
             , subq_1.ds__month AS ds__month
@@ -209,29 +209,29 @@ FROM (
         ) subq_4
       ) subq_5
       GROUP BY
-        subq_5.metric_time__day
+        subq_5.metric_time__year
     ) subq_6
   ) subq_7
   INNER JOIN (
     -- Compute Metrics via Expressions
     SELECT
-      subq_14.metric_time__day
+      subq_14.metric_time__year
       , subq_14.bookings AS bookings_1_month_ago
     FROM (
       -- Aggregate Measures
       SELECT
-        subq_13.metric_time__day
+        subq_13.metric_time__year
         , SUM(subq_13.bookings) AS bookings
       FROM (
         -- Pass Only Elements:
-        --   ['bookings', 'metric_time__day']
+        --   ['bookings', 'metric_time__year']
         SELECT
-          subq_12.metric_time__day
+          subq_12.metric_time__year
           , subq_12.bookings
         FROM (
           -- Join to Time Spine Dataset
           SELECT
-            DATE_TRUNC('day', subq_10.metric_time__day) AS metric_time__day
+            DATE_TRUNC('year', subq_10.metric_time__year) AS metric_time__year
             , subq_9.ds__day AS ds__day
             , subq_9.ds__week AS ds__week
             , subq_9.ds__month AS ds__month
@@ -413,17 +413,17 @@ FROM (
         ) subq_12
       ) subq_13
       GROUP BY
-        subq_13.metric_time__day
+        subq_13.metric_time__year
     ) subq_14
   ) subq_15
   ON
     (
-      subq_7.metric_time__day = subq_15.metric_time__day
+      subq_7.metric_time__year = subq_15.metric_time__year
     ) OR (
       (
-        subq_7.metric_time__day IS NULL
+        subq_7.metric_time__year IS NULL
       ) AND (
-        subq_15.metric_time__day IS NULL
+        subq_15.metric_time__year IS NULL
       )
     )
 ) subq_16

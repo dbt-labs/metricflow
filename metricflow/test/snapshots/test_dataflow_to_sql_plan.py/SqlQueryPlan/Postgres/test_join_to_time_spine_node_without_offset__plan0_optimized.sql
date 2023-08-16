@@ -1,6 +1,6 @@
 -- Join to Time Spine Dataset
 SELECT
-  subq_12.metric_time__day AS metric_time__day
+  DATE_TRUNC('day', subq_12.metric_time__day) AS metric_time__day
   , subq_11.listing AS listing
   , subq_11.booking_fees AS booking_fees
 FROM (
@@ -9,6 +9,8 @@ FROM (
     ds AS metric_time__day
   FROM ***************************.mf_time_spine subq_13
   WHERE ds BETWEEN '2020-01-01' AND '2021-01-01'
+  GROUP BY
+    ds
 ) subq_12
 INNER JOIN (
   -- Compute Metrics via Expressions
