@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import Collection
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from typing_extensions import override
 
+from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from metricflow.errors.errors import UnsupportedEngineFeatureError
 from metricflow.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,

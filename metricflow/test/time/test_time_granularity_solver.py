@@ -3,9 +3,9 @@ from __future__ import annotations
 import datetime
 
 import pytest
+
 from dbt_semantic_interfaces.references import MetricReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-
 from metricflow.dataset.dataset import DataSet
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup

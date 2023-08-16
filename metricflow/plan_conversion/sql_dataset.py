@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import List, Sequence
 
 import more_itertools
-from dbt_semantic_interfaces.references import SemanticModelReference
 
+from dbt_semantic_interfaces.references import SemanticModelReference
 from metricflow.dataset.dataset import DataSet
 from metricflow.instances import (
     InstanceSet,

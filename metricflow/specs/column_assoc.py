@@ -5,7 +5,6 @@ from dataclasses import dataclass
 from typing import Any
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
-
 from metricflow.specs.specs import InstanceSpec
 
 

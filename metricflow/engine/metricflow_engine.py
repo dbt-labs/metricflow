@@ -8,11 +8,11 @@ from enum import Enum
 from typing import List, Optional, Sequence, Tuple
 
 import pandas as pd
+
 from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimensionTypeParams
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.references import EntityReference, MetricReference
 from dbt_semantic_interfaces.type_enums import DimensionType
-
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.builder.node_data_set import (
     DataflowPlanNodeOutputDataSetResolver,

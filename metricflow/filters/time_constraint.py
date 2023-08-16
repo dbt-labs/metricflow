@@ -6,9 +6,9 @@ from dataclasses import dataclass
 from typing import Optional
 
 import pandas as pd
+
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-
 from metricflow.time.time_granularity import offset_period
 
 logger = logging.getLogger(__name__)

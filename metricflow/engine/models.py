@@ -17,7 +17,6 @@ from dbt_semantic_interfaces.protocols.metric import MetricInputMeasure, MetricT
 from dbt_semantic_interfaces.protocols.where_filter import WhereFilter
 from dbt_semantic_interfaces.transformations.add_input_metric_measures import AddInputMetricMeasuresRule
 from dbt_semantic_interfaces.type_enums.entity_type import EntityType
-
 from metricflow.model.semantics.linkable_spec_resolver import ElementPathKey
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.specs.specs import DimensionSpec

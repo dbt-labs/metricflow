@@ -4,8 +4,8 @@ import logging
 from typing import Sequence
 
 import pytest
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.node_evaluator import (

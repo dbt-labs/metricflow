@@ -11,7 +11,6 @@ from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.protocols.metric import MetricTimeWindow, MetricType
 from dbt_semantic_interfaces.references import TimeDimensionReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-
 from metricflow.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.dag.id_generation import DATAFLOW_PLAN_PREFIX, IdGeneratorRegistry
 from metricflow.dataflow.builder.costing import DataflowPlanNodeCostFunction, DefaultCostFunction
@@ -232,6 +231,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                     )
                 aggregated_measures_node = self.build_aggregated_measures(
                     metric_input_measure_specs=metric_input_measure_specs,
+                    metric_spec=metric_spec,
                     queried_linkable_specs=queried_linkable_specs,
                     where_constraint=combined_where,
                     time_range_constraint=time_range_constraint,
@@ -250,16 +250,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
 
             assert compute_metrics_node is not None
 
-            if metric_spec.offset_window or metric_spec.offset_to_grain:
-                join_to_time_spine_node = JoinToTimeSpineNode(
-                    parent_node=compute_metrics_node,
-                    time_range_constraint=time_range_constraint,
-                    offset_window=metric_spec.offset_window,
-                    offset_to_grain=metric_spec.offset_to_grain,
-                )
-                output_nodes.append(join_to_time_spine_node)
-            else:
-                output_nodes.append(compute_metrics_node)
+            output_nodes.append(compute_metrics_node)
 
         assert len(output_nodes) > 0, "ComputeMetricsNode was not properly constructed"
 
@@ -625,6 +616,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
     def build_aggregated_measures(
         self,
         metric_input_measure_specs: Sequence[MetricInputMeasureSpec],
+        metric_spec: MetricSpec,
         queried_linkable_specs: LinkableSpecSet,
         where_constraint: Optional[WhereFilterSpec] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
@@ -685,6 +677,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 output_nodes.append(
                     self._build_aggregated_measures_from_measure_source_node(
                         metric_input_measure_specs=input_specs,
+                        metric_spec=metric_spec,
                         queried_linkable_specs=queried_linkable_specs,
                         where_constraint=node_where_constraint,
                         time_range_constraint=time_range_constraint,
@@ -712,6 +705,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
     def _build_aggregated_measures_from_measure_source_node(
         self,
         metric_input_measure_specs: Sequence[MetricInputMeasureSpec],
+        metric_spec: MetricSpec,
         queried_linkable_specs: LinkableSpecSet,
         where_constraint: Optional[WhereFilterSpec] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
@@ -780,9 +774,35 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 f"Recipe not found for measure specs: {measure_specs} and linkable specs: {required_linkable_specs}"
             )
 
+        metric_time_dimension_spec: Optional[TimeDimensionSpec] = None
+        for linkable_spec in queried_linkable_specs.time_dimension_specs:
+            if linkable_spec.element_name == self._metric_time_dimension_reference.element_name:
+                metric_time_dimension_spec = linkable_spec
+                break
+
+        time_range_node: Optional[JoinOverTimeRangeNode[SqlDataSetT]] = None
+        if cumulative and metric_time_dimension_spec:
+            time_range_node = JoinOverTimeRangeNode(
+                parent_node=measure_recipe.measure_node,
+                window=cumulative_window,
+                grain_to_date=cumulative_grain_to_date,
+                time_range_constraint=time_range_constraint,
+            )
+
+        join_to_time_spine_node: Optional[JoinToTimeSpineNode] = None
+        if metric_spec.offset_window or metric_spec.offset_to_grain:
+            assert metric_time_dimension_spec, "Joining to time spine requires querying with a time dimension."
+            join_to_time_spine_node = JoinToTimeSpineNode(
+                parent_node=time_range_node or measure_recipe.measure_node,
+                time_dimension_spec=metric_time_dimension_spec,
+                time_range_constraint=time_range_constraint,
+                offset_window=metric_spec.offset_window,
+                offset_to_grain=metric_spec.offset_to_grain,
+            )
+
         # Only get the required measure and the local linkable instances so that aggregations work correctly.
         filtered_measure_source_node = FilterElementsNode[SqlDataSetT](
-            parent_node=measure_recipe.measure_node,
+            parent_node=join_to_time_spine_node or time_range_node or measure_recipe.measure_node,
             include_specs=InstanceSpecSet.merge(
                 (
                     InstanceSpecSet(measure_specs=measure_specs),
@@ -791,18 +811,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             ),
         )
 
-        time_range_node: Optional[JoinOverTimeRangeNode[SqlDataSetT]] = None
-        if cumulative:
-            time_range_node = JoinOverTimeRangeNode(
-                parent_node=filtered_measure_source_node,
-                window=cumulative_window,
-                grain_to_date=cumulative_grain_to_date,
-                time_range_constraint=time_range_constraint,
-            )
-
-        filtered_measure_or_time_range_node = time_range_node or filtered_measure_source_node
         join_targets = []
-
         for join_recipe in measure_recipe.join_linkable_instances_recipes:
             # Figure out what elements to filter from the joined node.
 
@@ -848,7 +857,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         unaggregated_measure_node: BaseOutput[SqlDataSetT]
         if len(join_targets) > 0:
             filtered_measures_with_joined_elements = JoinToBaseOutputNode[SqlDataSetT](
-                left_node=filtered_measure_or_time_range_node,
+                left_node=filtered_measure_source_node,
                 join_targets=join_targets,
             )
 
@@ -864,7 +873,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             )
             unaggregated_measure_node = after_join_filtered_node
         else:
-            unaggregated_measure_node = filtered_measure_or_time_range_node
+            unaggregated_measure_node = filtered_measure_source_node
 
         cumulative_metric_constrained_node: Optional[ConstrainTimeRangeNode] = None
         if (

@@ -3,8 +3,8 @@ from __future__ import annotations
 import logging
 
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.references import SemanticModelElementReference
 
+from dbt_semantic_interfaces.references import SemanticModelElementReference
 from metricflow.aggregation_properties import AggregationState
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.dataflow_plan import JoinDescription, JoinToBaseOutputNode, ReadSqlSourceNode

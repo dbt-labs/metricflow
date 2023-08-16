@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Dict, Optional, Sequence, Tuple
 
 import pandas as pd
+
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.references import (
     EntityReference,
@@ -13,7 +14,6 @@ from dbt_semantic_interfaces.references import (
     TimeDimensionReference,
 )
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.specs.specs import (

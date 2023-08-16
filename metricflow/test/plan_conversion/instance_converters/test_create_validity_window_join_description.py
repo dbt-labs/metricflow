@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import pytest
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow.dataflow.dataflow_plan import ValidityWindowJoinDescription
 from metricflow.instances import InstanceSet
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup

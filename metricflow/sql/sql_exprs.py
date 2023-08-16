@@ -9,11 +9,11 @@ from enum import Enum
 from typing import Dict, Generic, List, Mapping, Optional, Sequence, Tuple
 
 import more_itertools
+
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols.measure import MeasureAggregationParameters
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-
 from metricflow.dag.id_generation import (
     SQL_EXPR_BETWEEN_PREFIX,
     SQL_EXPR_COLUMN_REFERENCE_ID_PREFIX,

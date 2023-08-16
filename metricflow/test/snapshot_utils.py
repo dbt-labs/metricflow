@@ -9,8 +9,8 @@ from typing import Any, Callable, List, Optional, Tuple, TypeVar
 
 import tabulate
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 
+from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from metricflow.dag.mf_dag import MetricFlowDag
 from metricflow.dataflow.dataflow_plan import DataflowPlan
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text

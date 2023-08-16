@@ -10,7 +10,6 @@ from dbt_semantic_interfaces.references import (
     SemanticModelElementReference,
     SemanticModelReference,
 )
-
 from metricflow.instances import EntityInstance, InstanceSet
 from metricflow.protocols.semantics import SemanticModelAccessor
 
