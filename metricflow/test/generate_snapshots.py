@@ -42,6 +42,7 @@ from typing import Optional, Sequence
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.implementations.base import FrozenBaseModel
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
+
 from metricflow.protocols.sql_client import SqlEngine
 
 logger = logging.getLogger(__name__)
