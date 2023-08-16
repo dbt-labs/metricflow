@@ -1,28 +1,28 @@
 -- Compute Metrics via Expressions
 SELECT
-  subq_13.metric_time__day
-  , bookings - bookings_2_weeks_ago AS bookings_growth_2_weeks
+  subq_13.metric_time__week
+  , bookings - bookings_at_start_of_month AS bookings_growth_since_start_of_month
 FROM (
   -- Combine Metrics
   SELECT
-    COALESCE(subq_4.metric_time__day, subq_12.metric_time__day) AS metric_time__day
+    COALESCE(subq_4.metric_time__week, subq_12.metric_time__week) AS metric_time__week
     , subq_4.bookings AS bookings
-    , subq_12.bookings_2_weeks_ago AS bookings_2_weeks_ago
+    , subq_12.bookings_at_start_of_month AS bookings_at_start_of_month
   FROM (
     -- Compute Metrics via Expressions
     SELECT
-      subq_3.metric_time__day
+      subq_3.metric_time__week
       , subq_3.bookings
     FROM (
       -- Aggregate Measures
       SELECT
-        subq_2.metric_time__day
+        subq_2.metric_time__week
         , SUM(subq_2.bookings) AS bookings
       FROM (
         -- Pass Only Elements:
-        --   ['bookings', 'metric_time__day']
+        --   ['bookings', 'metric_time__week']
         SELECT
-          subq_1.metric_time__day
+          subq_1.metric_time__week
           , subq_1.bookings
         FROM (
           -- Metric Time Dimension 'ds'
@@ -143,29 +143,29 @@ FROM (
         ) subq_1
       ) subq_2
       GROUP BY
-        metric_time__day
+        metric_time__week
     ) subq_3
   ) subq_4
   INNER JOIN (
     -- Compute Metrics via Expressions
     SELECT
-      subq_11.metric_time__day
-      , subq_11.bookings AS bookings_2_weeks_ago
+      subq_11.metric_time__week
+      , subq_11.bookings AS bookings_at_start_of_month
     FROM (
       -- Aggregate Measures
       SELECT
-        subq_10.metric_time__day
+        subq_10.metric_time__week
         , SUM(subq_10.bookings) AS bookings
       FROM (
         -- Pass Only Elements:
-        --   ['bookings', 'metric_time__day']
+        --   ['bookings', 'metric_time__week']
         SELECT
-          subq_9.metric_time__day
+          subq_9.metric_time__week
           , subq_9.bookings
         FROM (
           -- Join to Time Spine Dataset
           SELECT
-            DATE_TRUNC(subq_7.metric_time__day, day) AS metric_time__day
+            DATE_TRUNC(subq_7.metric_time__week, isoweek) AS metric_time__week
             , subq_6.ds__day AS ds__day
             , subq_6.ds__week AS ds__week
             , subq_6.ds__month AS ds__month
@@ -343,21 +343,21 @@ FROM (
             ) subq_5
           ) subq_6
           ON
-            DATE_SUB(CAST(subq_7.metric_time__day AS DATETIME), INTERVAL 14 day) = subq_6.metric_time__day
+            DATE_TRUNC(subq_7.metric_time__day, month) = subq_6.metric_time__day
         ) subq_9
       ) subq_10
       GROUP BY
-        metric_time__day
+        metric_time__week
     ) subq_11
   ) subq_12
   ON
     (
-      subq_4.metric_time__day = subq_12.metric_time__day
+      subq_4.metric_time__week = subq_12.metric_time__week
     ) OR (
       (
-        subq_4.metric_time__day IS NULL
+        subq_4.metric_time__week IS NULL
       ) AND (
-        subq_12.metric_time__day IS NULL
+        subq_12.metric_time__week IS NULL
       )
     )
 ) subq_13

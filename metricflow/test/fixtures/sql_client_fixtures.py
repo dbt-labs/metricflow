@@ -74,7 +74,7 @@ def __configure_test_env_from_url(url: str, password: str, schema: str) -> sqlal
 
 def __configure_bigquery_env_from_credential_string(password: str, schema: str) -> None:
     credential_string = password.replace("'", "")
-    credentials = json.loads(credential_string)
+    credentials = json.loads(credential_string, strict=False)
 
     assert isinstance(credentials, dict), "JSON credential string did not parse to dict type!"
 
