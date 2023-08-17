@@ -44,12 +44,11 @@ class WhereFilterEntityFactory(ProtocolHint[QueryInterfaceEntityFactory]):
     def __init__(  # noqa
         self,
         call_parameter_sets: FilterCallParameterSets,
-        entity_specs: List[EntitySpec],
         column_association_resolver: ColumnAssociationResolver,
     ):
         self._call_parameter_sets = call_parameter_sets
-        self._entity_specs = entity_specs
         self._column_association_resolver = column_association_resolver
+        self.entity_specs: List[EntitySpec] = []
 
     def create(self, entity_name: str, entity_path: Sequence[str] = ()) -> WhereFilterEntity:
         """Create a WhereFilterEntity."""
@@ -63,7 +62,7 @@ class WhereFilterEntityFactory(ProtocolHint[QueryInterfaceEntityFactory]):
         assert call_parameter_set in self._call_parameter_sets.entity_call_parameter_sets
 
         entity_spec = self._convert_to_entity_spec(call_parameter_set)
-        self._entity_specs.append(entity_spec)
+        self.entity_specs.append(entity_spec)
         column_name = self._column_association_resolver.resolve_spec(entity_spec).column_name
         return WhereFilterEntity(column_name)
 

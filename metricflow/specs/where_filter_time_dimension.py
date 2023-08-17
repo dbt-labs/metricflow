@@ -42,12 +42,11 @@ class WhereFilterTimeDimensionFactory(ProtocolHint[QueryInterfaceTimeDimensionFa
     def __init__(  # noqa
         self,
         call_parameter_sets: FilterCallParameterSets,
-        time_dimension_specs: List[TimeDimensionSpec],
         column_association_resolver: ColumnAssociationResolver,
     ):
         self._call_parameter_sets = call_parameter_sets
-        self._time_dimension_specs = time_dimension_specs
         self._column_association_resolver = column_association_resolver
+        self.time_dimension_specs: List[TimeDimensionSpec] = []
 
     def create(
         self, time_dimension_name: str, time_granularity_name: str, entity_path: Sequence[str] = ()
@@ -64,7 +63,7 @@ class WhereFilterTimeDimensionFactory(ProtocolHint[QueryInterfaceTimeDimensionFa
         assert call_parameter_set in self._call_parameter_sets.time_dimension_call_parameter_sets
 
         time_dimension_spec = self._convert_to_time_dimension_spec(call_parameter_set)
-        self._time_dimension_specs.append(time_dimension_spec)
+        self.time_dimension_specs.append(time_dimension_spec)
         column_names = self._column_association_resolver.resolve_spec(time_dimension_spec).column_name
         return WhereFilterTimeDimension(column_names)
 

@@ -58,12 +58,11 @@ class WhereFilterDimensionFactory(ProtocolHint[QueryInterfaceDimensionFactory]):
     def __init__(  # noqa
         self,
         call_parameter_sets: FilterCallParameterSets,
-        dimension_specs: List[DimensionSpec],
         column_association_resolver: ColumnAssociationResolver,
     ):
-        self.call_parameter_sets = call_parameter_sets
-        self.dimension_specs = dimension_specs
-        self.column_association_resolver = column_association_resolver
+        self._call_parameter_sets = call_parameter_sets
+        self._column_association_resolver = column_association_resolver
+        self.dimension_specs: List[DimensionSpec] = []
 
     def create(self, name: str, entity_path: Sequence[str] = ()) -> WhereFilterDimension:
         """Create a WhereFilterDimension."""
@@ -74,11 +73,11 @@ class WhereFilterDimensionFactory(ProtocolHint[QueryInterfaceDimensionFactory]):
                 tuple(EntityReference(element_name=arg) for arg in entity_path) + structured_name.entity_links
             ),
         )
-        assert call_parameter_set in self.call_parameter_sets.dimension_call_parameter_sets
+        assert call_parameter_set in self._call_parameter_sets.dimension_call_parameter_sets
 
         dimension_spec = self._convert_to_dimension_spec(call_parameter_set)
         self.dimension_specs.append(dimension_spec)
-        column_name = self.column_association_resolver.resolve_spec(dimension_spec).column_name
+        column_name = self._column_association_resolver.resolve_spec(dimension_spec).column_name
         return WhereFilterDimension(column_name)
 
     def _convert_to_dimension_spec(
