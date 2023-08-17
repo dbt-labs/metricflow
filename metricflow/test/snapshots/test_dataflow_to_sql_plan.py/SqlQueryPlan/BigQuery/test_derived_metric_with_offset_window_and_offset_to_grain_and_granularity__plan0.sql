@@ -27,7 +27,7 @@ FROM (
         FROM (
           -- Join to Time Spine Dataset
           SELECT
-            DATE_TRUNC(subq_2.metric_time__year, isoyear) AS metric_time__year
+            DATE_TRUNC(subq_2.metric_time__day, isoyear) AS metric_time__year
             , subq_1.ds__day AS ds__day
             , subq_1.ds__week AS ds__week
             , subq_1.ds__month AS ds__month
@@ -231,7 +231,7 @@ FROM (
         FROM (
           -- Join to Time Spine Dataset
           SELECT
-            DATE_TRUNC(subq_10.metric_time__year, isoyear) AS metric_time__year
+            DATE_TRUNC(subq_10.metric_time__day, isoyear) AS metric_time__year
             , subq_9.ds__day AS ds__day
             , subq_9.ds__week AS ds__week
             , subq_9.ds__month AS ds__month

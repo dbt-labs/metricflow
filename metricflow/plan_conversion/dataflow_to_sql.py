@@ -1337,12 +1337,12 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 time_dimension_instances += (new_time_dim_instance,)
                 time_spine_select_columns += (
                     SqlSelectColumn(
-                        # need date trunc??
                         expr=SqlDateTruncExpression(
                             time_granularity=node.time_dimension_spec.time_granularity,
                             arg=SqlColumnReferenceExpression(
                                 SqlColumnReference(
-                                    table_alias=time_spine_alias, column_name=new_time_dim_spec.qualified_name
+                                    table_alias=time_spine_alias,
+                                    column_name=original_time_dim_instance.spec.qualified_name,
                                 )
                             ),
                         ),

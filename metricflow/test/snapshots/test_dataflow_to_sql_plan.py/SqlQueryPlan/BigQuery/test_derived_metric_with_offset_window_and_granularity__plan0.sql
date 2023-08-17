@@ -165,7 +165,7 @@ FROM (
         FROM (
           -- Join to Time Spine Dataset
           SELECT
-            DATE_TRUNC(subq_7.metric_time__quarter, quarter) AS metric_time__quarter
+            DATE_TRUNC(subq_7.metric_time__day, quarter) AS metric_time__quarter
             , subq_6.ds__day AS ds__day
             , subq_6.ds__week AS ds__week
             , subq_6.ds__month AS ds__month
