@@ -18,7 +18,7 @@ class WhereFilterTimeDimension(ProtocolHint[QueryInterfaceTimeDimension]):
     """A time dimension that is passed in through the where filter parameter."""
 
     @override
-    def _implements_protocol(self) -> QueryInterfaceTimeDimension:  # noqa: D
+    def _implements_protocol(self) -> QueryInterfaceTimeDimension:
         return self
 
     def __init__(self, column_name: str):  # noqa
@@ -36,7 +36,7 @@ class WhereFilterTimeDimensionFactory(ProtocolHint[QueryInterfaceTimeDimensionFa
     """Creates a WhereFilterTimeDimension."""
 
     @override
-    def _implements_protocol(self) -> QueryInterfaceTimeDimensionFactory:  # noqa: D
+    def _implements_protocol(self) -> QueryInterfaceTimeDimensionFactory:
         return self
 
     def __init__(  # noqa

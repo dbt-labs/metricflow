@@ -26,7 +26,7 @@ class WhereFilterDimension(ProtocolHint[QueryInterfaceDimension]):
     """A dimension that is passed in through the where filter parameter."""
 
     @override
-    def _implements_protocol(self) -> QueryInterfaceDimension:  # noqa: D
+    def _implements_protocol(self) -> QueryInterfaceDimension:
         return self
 
     def __init__(self, column_name: str) -> None:  # noqa
@@ -52,7 +52,7 @@ class WhereFilterDimensionFactory(ProtocolHint[QueryInterfaceDimensionFactory]):
     """Creates a WhereFilterDimension."""
 
     @override
-    def _implements_protocol(self) -> QueryInterfaceDimensionFactory:  # noqa: D
+    def _implements_protocol(self) -> QueryInterfaceDimensionFactory:
         return self
 
     def __init__(  # noqa

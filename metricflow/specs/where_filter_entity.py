@@ -20,7 +20,7 @@ class WhereFilterEntity(ProtocolHint[QueryInterfaceEntity]):
     """An entity that is passed in through the where filter parameter."""
 
     @override
-    def _implements_protocol(self) -> QueryInterfaceEntity:  # noqa: D
+    def _implements_protocol(self) -> QueryInterfaceEntity:
         return self
 
     def __init__(self, column_name: str):  # noqa
@@ -38,7 +38,7 @@ class WhereFilterEntityFactory(ProtocolHint[QueryInterfaceEntityFactory]):
     """Creates a WhereFilterDimension."""
 
     @override
-    def _implements_protocol(self) -> QueryInterfaceEntityFactory:  # noqa: D
+    def _implements_protocol(self) -> QueryInterfaceEntityFactory:
         return self
 
     def __init__(  # noqa

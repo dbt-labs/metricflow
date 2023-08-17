@@ -12,7 +12,7 @@ class GroupByOrderByDimension(ProtocolHint[QueryInterfaceDimension]):
     """A dimension that is passed in through the group_by or order_by parameter."""
 
     @override
-    def _implements_protocol(self) -> QueryInterfaceDimension:  # noqa: D
+    def _implements_protocol(self) -> QueryInterfaceDimension:
         return self
 
     def __init__(self, name: str, entity_path: Sequence[str] = ()) -> None:  # noqa: D
@@ -41,7 +41,7 @@ class GroupByOrderByDimensionFactory(ProtocolHint[QueryInterfaceDimensionFactory
     """
 
     @override
-    def _implements_protocol(self) -> GroupByOrderByDimensionFactory:  # noqa: D
+    def _implements_protocol(self) -> QueryInterfaceDimensionFactory:
         return self
 
     def create(self, name: str, entity_path: Sequence[str] = ()) -> GroupByOrderByDimension:
