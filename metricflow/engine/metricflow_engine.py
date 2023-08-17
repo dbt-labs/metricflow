@@ -128,8 +128,12 @@ class MetricFlowQueryRequest:
         query_type: MetricFlowQueryType = MetricFlowQueryType.METRIC,
     ) -> MetricFlowQueryRequest:
         assert_exactly_one_arg_set(metric_names=metric_names, metrics=metrics)
-        assert not (group_by_names and group_by), "Both group_by_names and group_by should not be set"
-        assert not (order_by_names and order_by), "Both order_by_names and order_by should not be set"
+        assert not (
+            group_by_names and group_by
+        ), "Both group_by_names and group_by were set, but if a group by is specified you should only use one of these!"
+        assert not (
+            order_by_names and order_by
+        ), "Both order_by_names and order_by were set, but if an order by is specified you should only use one of these!"
         return MetricFlowQueryRequest(
             request_id=MetricFlowRequestId(mf_rid=f"{random_id()}"),
             metric_names=metric_names,

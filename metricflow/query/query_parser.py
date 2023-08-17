@@ -294,7 +294,9 @@ class MetricFlowQueryParser:
     def _get_group_by_names(
         self, group_by_names: Optional[Sequence[str]], group_by: Optional[Sequence[GroupByOrderByDimension]]
     ) -> Sequence[str]:
-        assert not (group_by_names and group_by), "Both group_by_names and group_by should not be set"
+        assert not (
+            group_by_names and group_by
+        ), "Both group_by_names and group_by were set, but if a group by is specified you should only use one of these!"
         return group_by_names if group_by_names else [str(g) for g in group_by] if group_by else []
 
     def _get_metric_names(
@@ -310,7 +312,7 @@ class MetricFlowQueryParser:
     ) -> Optional[WhereFilter]:
         assert not (
             where_constraint and where_constraint_str
-        ), "Both where_constraint and where_constraint_str should not be set"
+        ), "Both where_constraint and where_constraint_str were set, but if a where is specified you should only use one of these!"
         return (
             PydanticWhereFilter(where_sql_template=where_constraint_str) if where_constraint_str else where_constraint
         )
@@ -318,7 +320,9 @@ class MetricFlowQueryParser:
     def _get_order(
         self, order: Optional[Sequence[str]], order_by: Optional[Sequence[GroupByOrderByDimension]]
     ) -> Sequence[str]:
-        assert not (order and order_by), "Both order and order_by should not be set"
+        assert not (
+            order and order_by
+        ), "Both order_by_names and order_by were set, but if an order by is specified you should only use one of these!"
         return order if order else [str(o) for o in order_by] if order_by else []
 
     def _parse_and_validate_query(
