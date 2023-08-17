@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 import logging
-from typing import List
 
 import jinja2
 from dbt_semantic_interfaces.protocols.where_filter import WhereFilter
 
 from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.specs.specs import DimensionSpec, EntitySpec, LinkableSpecSet, TimeDimensionSpec, WhereFilterSpec
+from metricflow.specs.specs import LinkableSpecSet, WhereFilterSpec
 from metricflow.specs.where_filter_dimension import WhereFilterDimensionFactory
 from metricflow.specs.where_filter_entity import WhereFilterEntityFactory
 from metricflow.specs.where_filter_time_dimension import WhereFilterTimeDimensionFactory

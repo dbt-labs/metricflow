@@ -5,14 +5,14 @@ from typing import Optional, Sequence
 from dbt_semantic_interfaces.protocols.protocol_hint import ProtocolHint
 from typing_extensions import override
 
-from metricflow.specs.query_interface import QueryInterfaceDimension, QueryInterfaceDimensionFactory
+from metricflow.specs.query_interface import QueryInterfaceDimensionFactory, QueryParameter
 
 
-class GroupByOrderByDimension(ProtocolHint[QueryInterfaceDimension]):
+class GroupByOrderByDimension(ProtocolHint[QueryParameter]):
     """A dimension that is passed in through the group_by or order_by parameter."""
 
     @override
-    def _implements_protocol(self) -> QueryInterfaceDimension:
+    def _implements_protocol(self) -> QueryParameter:
         return self
 
     def __init__(self, name: str, entity_path: Sequence[str] = ()) -> None:  # noqa: D

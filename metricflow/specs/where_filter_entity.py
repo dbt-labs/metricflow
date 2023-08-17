@@ -12,19 +12,27 @@ from dbt_semantic_interfaces.references import EntityReference
 from typing_extensions import override
 
 from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.specs.query_interface import QueryInterfaceEntity, QueryInterfaceEntityFactory
+from metricflow.specs.query_interface import QueryInterfaceEntityFactory, QueryParameter
 from metricflow.specs.specs import EntitySpec
 
 
-class WhereFilterEntity(ProtocolHint[QueryInterfaceEntity]):
+class WhereFilterEntity(ProtocolHint[QueryParameter]):
     """An entity that is passed in through the where filter parameter."""
 
     @override
-    def _implements_protocol(self) -> QueryInterfaceEntity:
+    def _implements_protocol(self) -> QueryParameter:
         return self
 
     def __init__(self, column_name: str):  # noqa
         self.column_name = column_name
+
+    def grain(self, _grain: str) -> WhereFilterEntity:
+        """The time granularity."""
+        raise NotImplementedError
+
+    def alias(self, _alias: str) -> WhereFilterEntity:
+        """Renaming the column."""
+        raise NotImplementedError
 
     def __str__(self) -> str:
         """Returns the column name.

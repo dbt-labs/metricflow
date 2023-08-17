@@ -18,26 +18,26 @@ class QueryInterfaceMetric:
         return self.name
 
 
+class QueryParameter(Protocol):
+    """Represents the interface for Dimension, TimeDimension, and Entity parameters in the query interface."""
+
+    def grain(self, _grain: str) -> QueryParameter:
+        """The time granularity."""
+        raise NotImplementedError
+
+    def alias(self, _alias: str) -> QueryParameter:
+        """Renaming the column."""
+        raise NotImplementedError
+
+
 class QueryInterfaceDimensionFactory(Protocol):
     """Creates a Dimension for the query interface.
 
     Represented as the Dimension constructor in the Jinja sandbox.
     """
 
-    def create(self, name: str, entity_path: Sequence[str] = ()) -> QueryInterfaceDimension:
+    def create(self, name: str, entity_path: Sequence[str] = ()) -> QueryParameter:
         """Create a QueryInterfaceDimension."""
-        raise NotImplementedError
-
-
-class QueryInterfaceDimension(Protocol):
-    """Dimension for the query interface."""
-
-    def grain(self, _grain: str) -> QueryInterfaceDimension:
-        """The time granularity."""
-        raise NotImplementedError
-
-    def alias(self, _alias: str) -> QueryInterfaceDimension:
-        """Renaming the column."""
         raise NotImplementedError
 
 
@@ -52,15 +52,9 @@ class QueryInterfaceTimeDimensionFactory(Protocol):
         time_dimension_name: str,
         time_granularity_name: str,
         entity_path: Sequence[str] = (),
-    ) -> QueryInterfaceTimeDimension:
+    ) -> QueryParameter:
         """Create a TimeDimension."""
         raise NotImplementedError
-
-
-class QueryInterfaceTimeDimension(Protocol):
-    """Time Dimension for the query interface."""
-
-    pass
 
 
 class QueryInterfaceEntityFactory(Protocol):
@@ -69,12 +63,6 @@ class QueryInterfaceEntityFactory(Protocol):
     Represented as the Entity constructor in the Jinja sandbox.
     """
 
-    def create(self, entity_name: str, entity_path: Sequence[str] = ()) -> QueryInterfaceEntity:
+    def create(self, entity_name: str, entity_path: Sequence[str] = ()) -> QueryParameter:
         """Create an Entity."""
         raise NotImplementedError
-
-
-class QueryInterfaceEntity(Protocol):
-    """Entity for the query interface."""
-
-    pass

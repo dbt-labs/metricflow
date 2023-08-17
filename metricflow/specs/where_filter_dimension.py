@@ -16,27 +16,27 @@ from typing_extensions import override
 
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.query_interface import (
-    QueryInterfaceDimension,
     QueryInterfaceDimensionFactory,
+    QueryParameter,
 )
 from metricflow.specs.specs import DimensionSpec
 
 
-class WhereFilterDimension(ProtocolHint[QueryInterfaceDimension]):
+class WhereFilterDimension(ProtocolHint[QueryParameter]):
     """A dimension that is passed in through the where filter parameter."""
 
     @override
-    def _implements_protocol(self) -> QueryInterfaceDimension:
+    def _implements_protocol(self) -> QueryParameter:
         return self
 
     def __init__(self, column_name: str) -> None:  # noqa
         self.column_name = column_name
 
-    def grain(self, _grain: str) -> QueryInterfaceDimension:
+    def grain(self, _grain: str) -> QueryParameter:
         """The time granularity."""
         raise NotImplementedError
 
-    def alias(self, _alias: str) -> QueryInterfaceDimension:
+    def alias(self, _alias: str) -> QueryParameter:
         """Renaming the column."""
         raise NotImplementedError
 
