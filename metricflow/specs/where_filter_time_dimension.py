@@ -10,15 +10,15 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
 
 from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.specs.query_interface import QueryInterfaceTimeDimensionFactory, QueryParameter
+from metricflow.specs.query_interface import QueryInterfaceDimension, QueryInterfaceTimeDimensionFactory
 from metricflow.specs.specs import TimeDimensionSpec
 
 
-class WhereFilterTimeDimension(ProtocolHint[QueryParameter]):
+class WhereFilterTimeDimension(ProtocolHint[QueryInterfaceDimension]):
     """A time dimension that is passed in through the where filter parameter."""
 
     @override
-    def _implements_protocol(self) -> QueryParameter:
+    def _implements_protocol(self) -> QueryInterfaceDimension:
         return self
 
     def __init__(self, column_name: str):  # noqa

@@ -1,31 +1,41 @@
 from __future__ import annotations
 
-from typing import Protocol, Sequence
+from typing import Optional, Protocol, Sequence
+
+from dbt_semantic_interfaces.type_enums import TimeGranularity
 
 
-class QueryInterfaceMetric:
+class QueryInterfaceMetric(Protocol):
     """Metric in the query interface."""
 
-    def __init__(self, name: str) -> None:  # noqa: D
-        self.name = name
-
-    def pct_growth(self) -> QueryInterfaceMetric:
-        """The percentage growth."""
-        raise NotImplementedError("percent growth is not implemented yet")
-
-    def __str__(self) -> str:
-        """The Metric's name."""
-        return self.name
+    @property
+    def name(self) -> str:
+        """The name of the metric."""
+        raise NotImplementedError
 
 
 class QueryParameter(Protocol):
-    """Represents the interface for Dimension, TimeDimension, and Entity parameters in the query interface."""
+    """A query parameter with a grain."""
 
-    def grain(self, _grain: str) -> QueryParameter:
+    @property
+    def name(self) -> str:
+        """The name of the item."""
+        raise NotImplementedError
+
+    @property
+    def grain(self) -> Optional[TimeGranularity]:
         """The time granularity."""
         raise NotImplementedError
 
-    def alias(self, _alias: str) -> QueryParameter:
+
+class QueryInterfaceDimension(Protocol):
+    """Represents the interface for Dimension in the query interface."""
+
+    def grain(self, _grain: str) -> QueryInterfaceDimension:
+        """The time granularity."""
+        raise NotImplementedError
+
+    def alias(self, _alias: str) -> QueryInterfaceDimension:
         """Renaming the column."""
         raise NotImplementedError
 
@@ -36,9 +46,15 @@ class QueryInterfaceDimensionFactory(Protocol):
     Represented as the Dimension constructor in the Jinja sandbox.
     """
 
-    def create(self, name: str, entity_path: Sequence[str] = ()) -> QueryParameter:
+    def create(self, name: str, entity_path: Sequence[str] = ()) -> QueryInterfaceDimension:
         """Create a QueryInterfaceDimension."""
         raise NotImplementedError
+
+
+class QueryInterfaceTimeDimension(Protocol):
+    """Represents the interface for TimeDimension in the query interface."""
+
+    pass
 
 
 class QueryInterfaceTimeDimensionFactory(Protocol):
@@ -52,9 +68,15 @@ class QueryInterfaceTimeDimensionFactory(Protocol):
         time_dimension_name: str,
         time_granularity_name: str,
         entity_path: Sequence[str] = (),
-    ) -> QueryParameter:
+    ) -> QueryInterfaceTimeDimension:
         """Create a TimeDimension."""
         raise NotImplementedError
+
+
+class QueryInterfaceEntity(Protocol):
+    """Represents the interface for Entity in the query interface."""
+
+    pass
 
 
 class QueryInterfaceEntityFactory(Protocol):
@@ -63,6 +85,6 @@ class QueryInterfaceEntityFactory(Protocol):
     Represented as the Entity constructor in the Jinja sandbox.
     """
 
-    def create(self, entity_name: str, entity_path: Sequence[str] = ()) -> QueryParameter:
+    def create(self, entity_name: str, entity_path: Sequence[str] = ()) -> QueryInterfaceEntity:
         """Create an Entity."""
         raise NotImplementedError

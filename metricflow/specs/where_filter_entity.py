@@ -12,15 +12,15 @@ from dbt_semantic_interfaces.references import EntityReference
 from typing_extensions import override
 
 from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.specs.query_interface import QueryInterfaceEntityFactory, QueryParameter
+from metricflow.specs.query_interface import QueryInterfaceDimension, QueryInterfaceEntityFactory
 from metricflow.specs.specs import EntitySpec
 
 
-class WhereFilterEntity(ProtocolHint[QueryParameter]):
+class WhereFilterEntity(ProtocolHint[QueryInterfaceDimension]):
     """An entity that is passed in through the where filter parameter."""
 
     @override
-    def _implements_protocol(self) -> QueryParameter:
+    def _implements_protocol(self) -> QueryInterfaceDimension:
         return self
 
     def __init__(self, column_name: str):  # noqa

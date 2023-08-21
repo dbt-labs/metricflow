@@ -31,8 +31,7 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.specs.group_by_order_by_dimension import GroupByOrderByDimension
-from metricflow.specs.query_interface import QueryInterfaceMetric
+from metricflow.specs.query_interface import QueryInterfaceMetric, QueryParameter
 from metricflow.specs.specs import (
     DimensionSpec,
     EntitySpec,
@@ -173,14 +172,14 @@ class MetricFlowQueryParser:
         metric_names: Optional[Sequence[str]] = None,
         metrics: Optional[Sequence[QueryInterfaceMetric]] = None,
         group_by_names: Optional[Sequence[str]] = None,
-        group_by: Optional[Sequence[GroupByOrderByDimension]] = None,
+        group_by: Optional[Sequence[QueryParameter]] = None,
         limit: Optional[int] = None,
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
         where_constraint: Optional[WhereFilter] = None,
         where_constraint_str: Optional[str] = None,
         order: Optional[Sequence[str]] = None,
-        order_by: Optional[Sequence[GroupByOrderByDimension]] = None,
+        order_by: Optional[Sequence[QueryParameter]] = None,
         time_granularity: Optional[TimeGranularity] = None,
     ) -> MetricFlowQuerySpec:
         """Parse the query into spec objects, validating them in the process.
@@ -292,18 +291,24 @@ class MetricFlowQueryParser:
         return tuple(metric_specs)
 
     def _get_group_by_names(
-        self, group_by_names: Optional[Sequence[str]], group_by: Optional[Sequence[GroupByOrderByDimension]]
+        self, group_by_names: Optional[Sequence[str]], group_by: Optional[Sequence[QueryParameter]]
     ) -> Sequence[str]:
         assert not (
             group_by_names and group_by
         ), "Both group_by_names and group_by were set, but if a group by is specified you should only use one of these!"
-        return group_by_names if group_by_names else [str(g) for g in group_by] if group_by else []
+        return (
+            group_by_names
+            if group_by_names
+            else [f"{g.name}__{g.grain}" if g.grain else g.name for g in group_by]
+            if group_by
+            else []
+        )
 
     def _get_metric_names(
         self, metric_names: Optional[Sequence[str]], metrics: Optional[Sequence[QueryInterfaceMetric]]
     ) -> Sequence[str]:
         assert_exactly_one_arg_set(metric_names=metric_names, metrics=metrics)
-        return metric_names if metric_names else [str(m) for m in metrics] if metrics else []
+        return metric_names if metric_names else [m.name for m in metrics] if metrics else []
 
     def _get_where_filter(
         self,
@@ -317,27 +322,25 @@ class MetricFlowQueryParser:
             PydanticWhereFilter(where_sql_template=where_constraint_str) if where_constraint_str else where_constraint
         )
 
-    def _get_order(
-        self, order: Optional[Sequence[str]], order_by: Optional[Sequence[GroupByOrderByDimension]]
-    ) -> Sequence[str]:
+    def _get_order(self, order: Optional[Sequence[str]], order_by: Optional[Sequence[QueryParameter]]) -> Sequence[str]:
         assert not (
             order and order_by
         ), "Both order_by_names and order_by were set, but if an order by is specified you should only use one of these!"
-        return order if order else [str(o) for o in order_by] if order_by else []
+        return order if order else [f"{o.name}__{o.grain}" if o.grain else o.name for o in order_by] if order_by else []
 
     def _parse_and_validate_query(
         self,
         metric_names: Optional[Sequence[str]] = None,
         metrics: Optional[Sequence[QueryInterfaceMetric]] = None,
         group_by_names: Optional[Sequence[str]] = None,
-        group_by: Optional[Sequence[GroupByOrderByDimension]] = None,
+        group_by: Optional[Sequence[QueryParameter]] = None,
         limit: Optional[int] = None,
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
         where_constraint: Optional[WhereFilter] = None,
         where_constraint_str: Optional[str] = None,
         order: Optional[Sequence[str]] = None,
-        order_by: Optional[Sequence[GroupByOrderByDimension]] = None,
+        order_by: Optional[Sequence[QueryParameter]] = None,
         time_granularity: Optional[TimeGranularity] = None,
     ) -> MetricFlowQuerySpec:
         metric_names = self._get_metric_names(metric_names, metrics)

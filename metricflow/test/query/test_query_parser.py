@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import textwrap
+from collections import namedtuple
 
 import pytest
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
@@ -13,8 +14,6 @@ from metricflow.errors.errors import UnableToSatisfyQueryError
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.query.query_parser import MetricFlowQueryParser
-from metricflow.specs.group_by_order_by_dimension import GroupByOrderByDimensionFactory
-from metricflow.specs.query_interface import QueryInterfaceMetric
 from metricflow.specs.specs import (
     DimensionSpec,
     EntitySpec,
@@ -172,15 +171,22 @@ def test_query_parser(bookings_query_parser: MetricFlowQueryParser) -> None:  # 
     )
 
 
+class MockQueryParameter:  # noqa: D
+    grain = None
+
+    def __init__(self, name: str):  # noqa: D
+        self.name = name
+
+
 def test_query_parser_with_object_params(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D
-    metric = QueryInterfaceMetric("bookings")
-    group_by_order_by_factory = GroupByOrderByDimensionFactory()
+    Metric = namedtuple("Metric", ["name"])
+    metric = Metric("bookings")
     group_by = [
-        group_by_order_by_factory.create("booking__is_instant"),
-        group_by_order_by_factory.create("listing"),
-        group_by_order_by_factory.create(MTD),
+        MockQueryParameter("booking__is_instant"),
+        MockQueryParameter("listing"),
+        MockQueryParameter(MTD),
     ]
-    order_by = [group_by_order_by_factory.create(MTD), group_by_order_by_factory.create("-bookings")]
+    order_by = [MockQueryParameter(MTD), MockQueryParameter("-bookings")]
     query_spec = bookings_query_parser.parse_and_validate_query(metrics=[metric], group_by=group_by, order_by=order_by)
     assert query_spec.metric_specs == (MetricSpec(element_name="bookings"),)
     assert query_spec.dimension_specs == (
