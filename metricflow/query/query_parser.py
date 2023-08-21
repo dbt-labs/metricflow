@@ -511,10 +511,10 @@ class MetricFlowQueryParser:
         metric_specs = [MetricSpec.from_reference(metric_reference) for metric_reference in metric_references]
         for order_by_spec in order_by_specs:
             if not (
-                order_by_spec.item in metric_specs
-                or order_by_spec.item in linkable_specs.dimension_specs
-                or order_by_spec.item in linkable_specs.time_dimension_specs
-                or order_by_spec.item in linkable_specs.entity_specs
+                order_by_spec.instance_spec in metric_specs
+                or order_by_spec.instance_spec in linkable_specs.dimension_specs
+                or order_by_spec.instance_spec in linkable_specs.time_dimension_specs
+                or order_by_spec.instance_spec in linkable_specs.entity_specs
             ):
                 raise InvalidQueryException(f"Order by item {order_by_spec} not in the query")
 
@@ -855,7 +855,7 @@ class MetricFlowQueryParser:
                     raise InvalidQueryException(f"Order by item '{order}' references a metric but has entity links")
                 order_by_specs.append(
                     OrderBySpec(
-                        metric_spec=MetricSpec(element_name=parsed_name.element_name),
+                        instance_spec=MetricSpec(element_name=parsed_name.element_name),
                         descending=descending,
                     )
                 )
@@ -866,7 +866,7 @@ class MetricFlowQueryParser:
                     )
                 order_by_specs.append(
                     OrderBySpec(
-                        dimension_spec=DimensionSpec(
+                        instance_spec=DimensionSpec(
                             element_name=parsed_name.element_name,
                             entity_links=tuple(EntityReference(element_name=x) for x in parsed_name.entity_link_names),
                         ),
@@ -881,7 +881,7 @@ class MetricFlowQueryParser:
                 if time_granularity:
                     order_by_specs.append(
                         OrderBySpec(
-                            time_dimension_spec=TimeDimensionSpec(
+                            instance_spec=TimeDimensionSpec(
                                 element_name=parsed_name.element_name,
                                 entity_links=entity_links,
                                 time_granularity=time_granularity,
@@ -902,7 +902,7 @@ class MetricFlowQueryParser:
                     if partial_time_dimension_spec in time_dimension_spec_replacements:
                         order_by_specs.append(
                             OrderBySpec(
-                                time_dimension_spec=time_dimension_spec_replacements[partial_time_dimension_spec],
+                                instance_spec=time_dimension_spec_replacements[partial_time_dimension_spec],
                                 descending=descending,
                             )
                         )
@@ -919,7 +919,7 @@ class MetricFlowQueryParser:
                     )
                 order_by_specs.append(
                     OrderBySpec(
-                        entity_spec=EntitySpec(
+                        instance_spec=EntitySpec(
                             element_name=parsed_name.element_name,
                             entity_links=tuple(EntityReference(element_name=x) for x in parsed_name.entity_link_names),
                         ),

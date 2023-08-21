@@ -856,11 +856,11 @@ def test_order_by_node(
     order_by_node = OrderByLimitNode(
         order_by_specs=[
             OrderBySpec(
-                time_dimension_spec=time_dimension_spec,
+                instance_spec=time_dimension_spec,
                 descending=False,
             ),
             OrderBySpec(
-                metric_spec=metric_spec,
+                instance_spec=metric_spec,
                 descending=True,
             ),
         ],

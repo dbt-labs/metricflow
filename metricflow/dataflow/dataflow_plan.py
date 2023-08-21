@@ -887,7 +887,7 @@ class OrderByLimitNode(ComputedMetricsOutput):
 
     @property
     def description(self) -> str:  # noqa: D
-        return f"Order By {[x.item.qualified_name for x in self._order_by_specs]}" + (
+        return f"Order By {[order_by_spec.instance_spec.qualified_name for order_by_spec in self._order_by_specs]}" + (
             f" Limit {self._limit}" if self.limit else ""
         )
 
