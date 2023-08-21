@@ -303,9 +303,7 @@ class DataflowPlanBuilder:
             computed_metrics_output=distinct_values_node,
             order_by_specs=(
                 OrderBySpec(
-                    dimension_spec=dimension_spec,
-                    time_dimension_spec=time_dimension_spec,
-                    entity_spec=entity_spec,
+                    instance_spec=linkable_spec,
                     descending=False,
                 ),
             ),

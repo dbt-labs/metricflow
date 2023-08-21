@@ -180,13 +180,11 @@ def test_query_parser(bookings_query_parser: MetricFlowQueryParser) -> None:  # 
     assert query_spec.entity_specs == (EntitySpec(element_name="listing", entity_links=()),)
     assert query_spec.order_by_specs == (
         OrderBySpec(
-            time_dimension_spec=TimeDimensionSpec(
-                element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY
-            ),
+            instance_spec=TimeDimensionSpec(element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY),
             descending=False,
         ),
         OrderBySpec(
-            metric_spec=MetricSpec(element_name="bookings"),
+            instance_spec=MetricSpec(element_name="bookings"),
             descending=True,
         ),
     )
@@ -215,13 +213,11 @@ def test_query_parser_with_object_params(bookings_query_parser: MetricFlowQueryP
     assert query_spec.entity_specs == (EntitySpec(element_name="listing", entity_links=()),)
     assert query_spec.order_by_specs == (
         OrderBySpec(
-            time_dimension_spec=TimeDimensionSpec(
-                element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY
-            ),
+            instance_spec=TimeDimensionSpec(element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY),
             descending=False,
         ),
         OrderBySpec(
-            metric_spec=MetricSpec(element_name="bookings"),
+            instance_spec=MetricSpec(element_name="bookings"),
             descending=True,
         ),
     )
@@ -247,9 +243,7 @@ def test_order_by_granularity_conversion() -> None:
     # The lowest common granularity is MONTH, so we expect the PTD in the order by to have that granularity.
     assert (
         OrderBySpec(
-            time_dimension_spec=TimeDimensionSpec(
-                element_name=MTD, entity_links=(), time_granularity=TimeGranularity.MONTH
-            ),
+            instance_spec=TimeDimensionSpec(element_name=MTD, entity_links=(), time_granularity=TimeGranularity.MONTH),
             descending=True,
         ),
     ) == query_spec.order_by_specs
@@ -263,9 +257,7 @@ def test_order_by_granularity_no_conversion(bookings_query_parser: MetricFlowQue
     # The only granularity is DAY, so we expect the PTD in the order by to have that granularity.
     assert (
         OrderBySpec(
-            time_dimension_spec=TimeDimensionSpec(
-                element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY
-            ),
+            instance_spec=TimeDimensionSpec(element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY),
             descending=False,
         ),
     ) == query_spec.order_by_specs
