@@ -141,11 +141,11 @@ def test_order_by_plan(  # noqa: D
             time_dimension_specs=(MTD_SPEC_DAY,),
             order_by_specs=(
                 OrderBySpec(
-                    time_dimension_spec=MTD_SPEC_DAY,
+                    instance_spec=MTD_SPEC_DAY,
                     descending=False,
                 ),
                 OrderBySpec(
-                    metric_spec=MetricSpec(element_name="bookings"),
+                    instance_spec=MetricSpec(element_name="bookings"),
                     descending=True,
                 ),
             ),

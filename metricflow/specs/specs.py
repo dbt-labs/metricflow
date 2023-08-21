@@ -29,7 +29,6 @@ from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.aggregation_properties import AggregationState
-from metricflow.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
@@ -479,27 +478,8 @@ class MetricInputMeasureSpec(SerializableDataclass):
 
 @dataclass(frozen=True)
 class OrderBySpec(SerializableDataclass):  # noqa: D
+    instance_spec: InstanceSpec
     descending: bool
-    metric_spec: Optional[MetricSpec] = None
-    dimension_spec: Optional[DimensionSpec] = None
-    time_dimension_spec: Optional[TimeDimensionSpec] = None
-    entity_spec: Optional[EntitySpec] = None
-
-    def __post_init__(self) -> None:  # noqa: D
-        assert_exactly_one_arg_set(
-            metric_spec=self.metric_spec,
-            dimension_spec=self.dimension_spec,
-            time_dimension_spec=self.time_dimension_spec,
-            entity_spec=self.entity_spec,
-        )
-
-    @property
-    def item(self) -> InstanceSpec:  # noqa: D
-        result: Optional[InstanceSpec] = (
-            self.metric_spec or self.dimension_spec or self.time_dimension_spec or self.entity_spec
-        )
-        assert result
-        return result
 
 
 @dataclass(frozen=True)
