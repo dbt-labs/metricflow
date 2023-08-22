@@ -9,7 +9,7 @@ FROM (
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
-    DATE_TRUNC('day', subq_10.metric_time__day) AS metric_time__day
+    subq_10.metric_time__day AS metric_time__day
     , SUM(subq_9.bookings) AS bookings_5_days_ago
   FROM (
     -- Date Spine
@@ -30,5 +30,5 @@ FROM (
   ON
     subq_10.metric_time__day - MAKE_INTERVAL(days => 5) = subq_9.metric_time__day
   GROUP BY
-    DATE_TRUNC('day', subq_10.metric_time__day)
+    subq_10.metric_time__day
 ) subq_15

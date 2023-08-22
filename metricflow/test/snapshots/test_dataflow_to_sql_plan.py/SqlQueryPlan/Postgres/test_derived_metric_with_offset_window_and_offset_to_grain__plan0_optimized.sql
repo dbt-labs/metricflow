@@ -15,7 +15,7 @@ FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      DATE_TRUNC('day', subq_19.metric_time__day) AS metric_time__day
+      subq_19.metric_time__day AS metric_time__day
       , SUM(subq_18.bookings) AS month_start_bookings
     FROM (
       -- Date Spine
@@ -36,7 +36,7 @@ FROM (
     ON
       DATE_TRUNC('month', subq_19.metric_time__day) = subq_18.metric_time__day
     GROUP BY
-      DATE_TRUNC('day', subq_19.metric_time__day)
+      subq_19.metric_time__day
   ) subq_24
   INNER JOIN (
     -- Join to Time Spine Dataset
@@ -45,7 +45,7 @@ FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      DATE_TRUNC('day', subq_27.metric_time__day) AS metric_time__day
+      subq_27.metric_time__day AS metric_time__day
       , SUM(subq_26.bookings) AS bookings_1_month_ago
     FROM (
       -- Date Spine
@@ -66,7 +66,7 @@ FROM (
     ON
       subq_27.metric_time__day - MAKE_INTERVAL(months => 1) = subq_26.metric_time__day
     GROUP BY
-      DATE_TRUNC('day', subq_27.metric_time__day)
+      subq_27.metric_time__day
   ) subq_32
   ON
     (
