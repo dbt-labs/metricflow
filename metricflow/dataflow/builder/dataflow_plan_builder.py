@@ -792,10 +792,10 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
 
         join_to_time_spine_node: Optional[JoinToTimeSpineNode] = None
         if metric_spec.offset_window or metric_spec.offset_to_grain:
-            assert metric_time_dimension_spec, "Joining to time spine requires querying with a time dimension."
+            assert metric_time_dimension_spec, "Joining to time spine requires querying with metric time."
             join_to_time_spine_node = JoinToTimeSpineNode(
                 parent_node=time_range_node or measure_recipe.measure_node,
-                time_dimension_spec=metric_time_dimension_spec,
+                metric_time_dimension_spec=metric_time_dimension_spec,
                 time_range_constraint=time_range_constraint,
                 offset_window=metric_spec.offset_window,
                 offset_to_grain=metric_spec.offset_to_grain,

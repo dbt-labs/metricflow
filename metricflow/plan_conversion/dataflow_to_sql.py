@@ -1263,7 +1263,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                     metric_time_dimension_instance = instance
         assert (
             metric_time_dimension_instance
-        ), "Can't query offset metric without a time dimension. Validations should have prevented this."
+        ), "Can't query offset metric without metric time. Validations should have prevented this."
         metric_time_dimension_column_name = self.column_association_resolver.resolve_spec(
             metric_time_dimension_instance.spec
         ).column_name
@@ -1305,7 +1305,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
 
         # Add requested granularity to time spine spec & column.
         # Time spine defaults to DAY, so DAY granularity does not require any change here.
-        if node.time_dimension_spec.time_granularity == TimeGranularity.DAY:
+        if node.metric_time_dimension_spec.time_granularity == TimeGranularity.DAY:
             time_spine_instance_set = time_spine_dataset.instance_set
             time_spine_select_column = time_spine_dataset.sql_select_node.select_columns[0]
         else:
@@ -1313,7 +1313,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             new_time_dim_spec = TimeDimensionSpec(
                 element_name=original_time_dim_instance.spec.element_name,
                 entity_links=original_time_dim_instance.spec.entity_links,
-                time_granularity=node.time_dimension_spec.time_granularity,
+                time_granularity=node.metric_time_dimension_spec.time_granularity,
             )
             new_time_dim_instance = TimeDimensionInstance(
                 defined_from=original_time_dim_instance.defined_from,
@@ -1323,7 +1323,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             time_dimension_instance = new_time_dim_instance
             time_spine_select_column = SqlSelectColumn(
                 expr=SqlDateTruncExpression(
-                    time_granularity=node.time_dimension_spec.time_granularity,
+                    time_granularity=node.metric_time_dimension_spec.time_granularity,
                     arg=SqlColumnReferenceExpression(
                         SqlColumnReference(
                             table_alias=time_spine_alias,
