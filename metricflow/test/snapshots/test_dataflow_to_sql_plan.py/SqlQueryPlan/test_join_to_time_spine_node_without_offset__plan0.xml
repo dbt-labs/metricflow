@@ -2,17 +2,17 @@
     <SqlSelectStatementNode>
         <!-- description = Join to Time Spine Dataset -->
         <!-- node_id = ss_5 -->
-        <!-- col0 =                                            -->
-        <!--   {'class': 'SqlSelectColumn',                    -->
-        <!--    'expr': SqlDateTruncExpression(node_id=dt_0),  -->
-        <!--    'column_alias': 'metric_time__day'}            -->
+        <!-- col0 =                                                   -->
+        <!--   {'class': 'SqlSelectColumn',                           -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_64),  -->
+        <!--    'column_alias': 'metric_time__day'}                   -->
         <!-- col1 =                                                   -->
         <!--   {'class': 'SqlSelectColumn',                           -->
-        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_70),  -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_69),  -->
         <!--    'column_alias': 'listing'}                            -->
         <!-- col2 =                                                   -->
         <!--   {'class': 'SqlSelectColumn',                           -->
-        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_69),  -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_68),  -->
         <!--    'column_alias': 'booking_fees'}                       -->
         <!-- from_source = SqlSelectStatementNode(node_id=ss_4) -->
         <!-- join_0 =                                                    -->
