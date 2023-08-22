@@ -781,6 +781,8 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 metric_time_dimension_spec = linkable_spec
                 break
 
+        # If a cumulative metric is queried with metric time, join over time range.
+        # Otherwise, the measure will be aggregated over all time.
         time_range_node: Optional[JoinOverTimeRangeNode[SqlDataSetT]] = None
         if cumulative and metric_time_dimension_spec:
             time_range_node = JoinOverTimeRangeNode(
@@ -790,6 +792,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 time_range_constraint=time_range_constraint,
             )
 
+        # If querying an offset metric, join to time spine.
         join_to_time_spine_node: Optional[JoinToTimeSpineNode] = None
         if metric_spec.offset_window or metric_spec.offset_to_grain:
             assert metric_time_dimension_spec, "Joining to time spine requires querying with metric time."

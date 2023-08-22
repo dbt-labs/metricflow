@@ -1302,14 +1302,19 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             len(time_spine_dataset.instance_set.time_dimension_instances) == 1
             and len(time_spine_dataset.sql_select_node.select_columns) == 1
         ), "Time spine dataset not configured properly. Expected exactly one column."
+        original_time_dim_instance = time_spine_dataset.instance_set.time_dimension_instances[0]
+        time_spine_select_expr: Union[
+            SqlColumnReferenceExpression, SqlDateTruncExpression
+        ] = SqlColumnReferenceExpression(
+            SqlColumnReference(table_alias=time_spine_alias, column_name=original_time_dim_instance.spec.qualified_name)
+        )
 
         # Add requested granularity to time spine spec & column.
         # Time spine defaults to DAY, so DAY granularity does not require any change here.
         if node.metric_time_dimension_spec.time_granularity == TimeGranularity.DAY:
             time_spine_instance_set = time_spine_dataset.instance_set
-            time_spine_select_column = time_spine_dataset.sql_select_node.select_columns[0]
+            time_spine_column_alias = original_time_dim_instance.associated_column.column_name
         else:
-            original_time_dim_instance = time_spine_dataset.instance_set.time_dimension_instances[0]
             new_time_dim_spec = TimeDimensionSpec(
                 element_name=original_time_dim_instance.spec.element_name,
                 entity_links=original_time_dim_instance.spec.entity_links,
@@ -1320,21 +1325,13 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 associated_columns=(self._column_association_resolver.resolve_spec(new_time_dim_spec),),
                 spec=new_time_dim_spec,
             )
-            time_dimension_instance = new_time_dim_instance
-            time_spine_select_column = SqlSelectColumn(
-                expr=SqlDateTruncExpression(
-                    time_granularity=node.metric_time_dimension_spec.time_granularity,
-                    arg=SqlColumnReferenceExpression(
-                        SqlColumnReference(
-                            table_alias=time_spine_alias,
-                            column_name=original_time_dim_instance.spec.qualified_name,
-                        )
-                    ),
-                ),
-                column_alias=new_time_dim_instance.associated_column.column_name,
+            time_spine_select_expr = SqlDateTruncExpression(
+                time_granularity=node.metric_time_dimension_spec.time_granularity, arg=time_spine_select_expr
             )
-            time_spine_instance_set = InstanceSet(time_dimension_instances=(time_dimension_instance,))
+            time_spine_column_alias = new_time_dim_instance.associated_column.column_name
+            time_spine_instance_set = InstanceSet(time_dimension_instances=(new_time_dim_instance,))
 
+        time_spine_select_column = SqlSelectColumn(expr=time_spine_select_expr, column_alias=time_spine_column_alias)
         select_columns = (time_spine_select_column,) + create_select_columns_for_instance_sets(
             self._column_association_resolver, OrderedDict({parent_alias: non_metric_time_parent_instance_set})
         )

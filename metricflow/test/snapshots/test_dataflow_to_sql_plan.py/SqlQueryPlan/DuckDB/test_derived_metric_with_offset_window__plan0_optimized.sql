@@ -34,7 +34,7 @@ FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      subq_22.ds AS metric_time__day
+      subq_21.metric_time__day AS metric_time__day
       , SUM(subq_20.bookings) AS bookings_2_weeks_ago
     FROM (
       -- Date Spine
@@ -55,7 +55,7 @@ FROM (
     ON
       subq_21.metric_time__day - INTERVAL 14 day = subq_20.metric_time__day
     GROUP BY
-      subq_22.ds
+      subq_21.metric_time__day
   ) subq_26
   ON
     (
