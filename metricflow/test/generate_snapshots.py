@@ -65,6 +65,7 @@ class MetricFlowTestCredentialSetForAllEngines(FrozenBaseModel):  # noqa: D
     snowflake: MetricFlowTestCredentialSet
     big_query: MetricFlowTestCredentialSet
     databricks: MetricFlowTestCredentialSet
+    postgres: MetricFlowTestCredentialSet
 
     @property
     def as_configurations(self) -> Sequence[MetricFlowTestConfiguration]:  # noqa: D
@@ -88,6 +89,10 @@ class MetricFlowTestCredentialSetForAllEngines(FrozenBaseModel):  # noqa: D
             MetricFlowTestConfiguration(
                 engine=SqlEngine.DATABRICKS,
                 credential_set=self.databricks,
+            ),
+            MetricFlowTestConfiguration(
+                engine=SqlEngine.POSTGRES,
+                credential_set=self.postgres,
             ),
         )
 
@@ -175,8 +180,6 @@ def run_cli() -> None:  # noqa: D
     )
 
     for test_configuration in credential_sets.as_configurations:
-        if test_configuration.engine is SqlEngine.BIGQUERY:
-            continue
         logger.info(
             f"Running tests for {test_configuration.engine} with URL: {test_configuration.credential_set.engine_url}"
         )
