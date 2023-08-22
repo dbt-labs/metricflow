@@ -1,6 +1,6 @@
 -- Join to Time Spine Dataset
 SELECT
-  subq_13.ds AS metric_time__day
+  subq_12.metric_time__day AS metric_time__day
   , subq_11.listing AS listing
   , subq_11.booking_fees AS booking_fees
 FROM (
