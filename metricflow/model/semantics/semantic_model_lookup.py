@@ -146,7 +146,9 @@ class SemanticModelLookup(SemanticModelAccessor):
         if not measure.agg_time_dimension:
             agg_time_dimension = self.get_agg_time_dimension_for_measure(measure_reference=measure_reference)
             if agg_time_dimension:
-                # Copy original Measure object, updating the `agg_time_dimension` field
+                # Copy original Measure object, updating the `agg_time_dimension` field.
+                # Note: `Measure`` protocol does not include Pydantic methods.
+                # Could remove this `type: ignore` if we added the `copy` method to the protocol in DSI.
                 return measure.copy(  # type: ignore[attr-defined]
                     update={"agg_time_dimension": agg_time_dimension.element_name}
                 )
