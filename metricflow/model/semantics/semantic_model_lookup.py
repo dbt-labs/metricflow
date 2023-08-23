@@ -141,6 +141,17 @@ class SemanticModelLookup(SemanticModelAccessor):
             semantic_model=semantic_model, measure_reference=measure_reference
         )
 
+    def get_measure_with_agg_time_dimension(self, measure_reference: MeasureReference) -> Measure:  # noqa: D
+        measure = self.get_measure(measure_reference=measure_reference)
+        if not measure.agg_time_dimension:
+            agg_time_dimension = self.get_agg_time_dimension_for_measure(measure_reference=measure_reference)
+            if agg_time_dimension:
+                # Copy original Measure object, updating the `agg_time_dimension` field
+                return measure.copy(  # type: ignore[attr-defined]
+                    update={"agg_time_dimension": agg_time_dimension.element_name}
+                )
+        return measure
+
     def get_entity_references(self) -> Sequence[EntityReference]:  # noqa: D
         return list(self._entity_ref_to_entity.keys())
 

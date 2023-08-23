@@ -10,7 +10,8 @@ from typing import List, Optional, Sequence, Tuple
 import pandas as pd
 from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimensionTypeParams
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
-from dbt_semantic_interfaces.references import EntityReference, MetricReference
+from dbt_semantic_interfaces.protocols.measure import Measure
+from dbt_semantic_interfaces.references import EntityReference, MeasureReference, MetricReference
 from dbt_semantic_interfaces.type_enums import DimensionType
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
@@ -467,6 +468,21 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def explain(self, mf_request: MetricFlowQueryRequest) -> MetricFlowExplainResult:  # noqa: D
         return self._create_execution_plan(mf_request)
+
+    def get_measures_for_metrics(self, metric_names: List[str]) -> List[Measure]:  # noqa: D
+        metrics = self._semantic_manifest_lookup.metric_lookup.get_metrics(
+            metric_references=[MetricReference(element_name=metric_name) for metric_name in metric_names]
+        )
+        measures = set()
+        for metric in metrics:
+            metric_measures = [
+                self._semantic_manifest_lookup.semantic_model_lookup.get_measure_with_agg_time_dimension(
+                    measure_reference=MeasureReference(element_name=measure.name)
+                )
+                for measure in metric.input_measures
+            ]
+            measures.update(metric_measures)
+        return list(measures)
 
     def simple_dimensions_for_metrics(self, metric_names: List[str]) -> List[Dimension]:  # noqa: D
         path_key_to_linkable_dimensions = (
