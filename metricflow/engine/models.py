@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Optional, Sequence
 
+from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimensionTypeParams
 from dbt_semantic_interfaces.protocols.dimension import (
     Dimension as SemanticManifestDimension,
 )
@@ -78,12 +79,18 @@ class Dimension:
             element_name=path_key.element_name,
             entity_links=path_key.entity_links,
         ).qualified_name
+        parsed_type_params: Optional[DimensionTypeParams] = None
+        if pydantic_dimension.type_params:
+            parsed_type_params = PydanticDimensionTypeParams(
+                time_granularity=path_key.time_granularity,
+                validity_params=pydantic_dimension.type_params.validity_params,
+            )
         return cls(
             name=pydantic_dimension.name,
             qualified_name=qualified_name,
             description=pydantic_dimension.description,
             type=pydantic_dimension.type,
-            type_params=pydantic_dimension.type_params,
+            type_params=parsed_type_params,
             metadata=pydantic_dimension.metadata,
             is_partition=pydantic_dimension.is_partition,
             expr=pydantic_dimension.expr,
