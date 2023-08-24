@@ -43,7 +43,7 @@ class WhereFilterEntity(ProtocolHint[QueryInterfaceDimension]):
 
 
 class WhereFilterEntityFactory(ProtocolHint[QueryInterfaceEntityFactory]):
-    """Creates a WhereFilterDimension."""
+    """Creates a WhereFilterEntity."""
 
     @override
     def _implements_protocol(self) -> QueryInterfaceEntityFactory:
