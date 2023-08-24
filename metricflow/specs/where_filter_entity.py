@@ -43,7 +43,10 @@ class WhereFilterEntity(ProtocolHint[QueryInterfaceDimension]):
 
 
 class WhereFilterEntityFactory(ProtocolHint[QueryInterfaceEntityFactory]):
-    """Creates a WhereFilterEntity."""
+    """Creates a WhereFilterEntity.
+
+    Each call to `create` adds an EntitySpec to entity_specs.
+    """
 
     @override
     def _implements_protocol(self) -> QueryInterfaceEntityFactory:

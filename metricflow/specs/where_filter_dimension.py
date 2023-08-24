@@ -49,7 +49,10 @@ class WhereFilterDimension(ProtocolHint[QueryInterfaceDimension]):
 
 
 class WhereFilterDimensionFactory(ProtocolHint[QueryInterfaceDimensionFactory]):
-    """Creates a WhereFilterDimension."""
+    """Creates a WhereFilterDimension.
+
+    Each call to `create` adds a DimensionSpec to dimension_specs.
+    """
 
     @override
     def _implements_protocol(self) -> QueryInterfaceDimensionFactory:

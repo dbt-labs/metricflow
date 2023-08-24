@@ -41,7 +41,10 @@ class WhereFilterTimeDimension(ProtocolHint[QueryInterfaceDimension]):
 
 
 class WhereFilterTimeDimensionFactory(ProtocolHint[QueryInterfaceTimeDimensionFactory]):
-    """Creates a WhereFilterTimeDimension."""
+    """Creates a WhereFilterTimeDimension.
+
+    Each call to `create` adds a TimeDimensionSpec to time_dimension_specs.
+    """
 
     @override
     def _implements_protocol(self) -> QueryInterfaceTimeDimensionFactory:
