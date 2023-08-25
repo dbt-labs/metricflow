@@ -1,0 +1,7 @@
+kind: Features
+body: Adds the option for users to specify group by parameters with object syntax
+  matching the where/filter expressions.
+time: 2023-08-17T10:06:59.615022-05:00
+custom:
+  Author: DevonFulcher
+  Issue: None

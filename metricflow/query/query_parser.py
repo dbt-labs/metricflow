@@ -20,6 +20,7 @@ from dbt_semantic_interfaces.references import (
 )
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
+from metricflow.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.dataflow_plan import BaseOutput
 from metricflow.dataset.dataset import DataSet
@@ -30,6 +31,7 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.specs.column_assoc import ColumnAssociationResolver
+from metricflow.specs.query_interface import QueryInterfaceMetric, QueryParameter
 from metricflow.specs.specs import (
     DimensionSpec,
     EntitySpec,
@@ -167,14 +169,17 @@ class MetricFlowQueryParser:
 
     def parse_and_validate_query(
         self,
-        metric_names: Sequence[str],
-        group_by_names: Sequence[str],
+        metric_names: Optional[Sequence[str]] = None,
+        metrics: Optional[Sequence[QueryInterfaceMetric]] = None,
+        group_by_names: Optional[Sequence[str]] = None,
+        group_by: Optional[Sequence[QueryParameter]] = None,
         limit: Optional[int] = None,
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
         where_constraint: Optional[WhereFilter] = None,
         where_constraint_str: Optional[str] = None,
         order: Optional[Sequence[str]] = None,
+        order_by: Optional[Sequence[QueryParameter]] = None,
         time_granularity: Optional[TimeGranularity] = None,
     ) -> MetricFlowQuerySpec:
         """Parse the query into spec objects, validating them in the process.
@@ -185,13 +190,16 @@ class MetricFlowQueryParser:
         try:
             return self._parse_and_validate_query(
                 metric_names=metric_names,
+                metrics=metrics,
                 group_by_names=group_by_names,
+                group_by=group_by,
                 limit=limit,
                 time_constraint_start=time_constraint_start,
                 time_constraint_end=time_constraint_end,
                 where_constraint=where_constraint,
                 where_constraint_str=where_constraint_str,
                 order=order,
+                order_by=order_by,
                 time_granularity=time_granularity,
             )
         finally:
@@ -238,7 +246,8 @@ class MetricFlowQueryParser:
             suggestion_sections = {}
             for invalid_group_by in invalid_group_bys:
                 suggestions = MetricFlowQueryParser._top_fuzzy_matches(
-                    item=invalid_group_by.qualified_name, candidate_items=valid_group_by_names_for_metrics
+                    item=invalid_group_by.qualified_name,
+                    candidate_items=valid_group_by_names_for_metrics,
                 )
                 section_key = f"Suggestions for invalid dimension '{invalid_group_by.qualified_name}'"
                 section_value = pformat_big_objects(suggestions)
@@ -281,27 +290,63 @@ class MetricFlowQueryParser:
             )
         return tuple(metric_specs)
 
+    def _get_group_by_names(
+        self, group_by_names: Optional[Sequence[str]], group_by: Optional[Sequence[QueryParameter]]
+    ) -> Sequence[str]:
+        assert not (
+            group_by_names and group_by
+        ), "Both group_by_names and group_by were set, but if a group by is specified you should only use one of these!"
+        return (
+            group_by_names
+            if group_by_names
+            else [f"{g.name}__{g.grain}" if g.grain else g.name for g in group_by]
+            if group_by
+            else []
+        )
+
+    def _get_metric_names(
+        self, metric_names: Optional[Sequence[str]], metrics: Optional[Sequence[QueryInterfaceMetric]]
+    ) -> Sequence[str]:
+        assert_exactly_one_arg_set(metric_names=metric_names, metrics=metrics)
+        return metric_names if metric_names else [m.name for m in metrics] if metrics else []
+
+    def _get_where_filter(
+        self,
+        where_constraint: Optional[WhereFilter] = None,
+        where_constraint_str: Optional[str] = None,
+    ) -> Optional[WhereFilter]:
+        assert not (
+            where_constraint and where_constraint_str
+        ), "Both where_constraint and where_constraint_str were set, but if a where is specified you should only use one of these!"
+        return (
+            PydanticWhereFilter(where_sql_template=where_constraint_str) if where_constraint_str else where_constraint
+        )
+
+    def _get_order(self, order: Optional[Sequence[str]], order_by: Optional[Sequence[QueryParameter]]) -> Sequence[str]:
+        assert not (
+            order and order_by
+        ), "Both order_by_names and order_by were set, but if an order by is specified you should only use one of these!"
+        return order if order else [f"{o.name}__{o.grain}" if o.grain else o.name for o in order_by] if order_by else []
+
     def _parse_and_validate_query(
         self,
-        metric_names: Sequence[str],
-        group_by_names: Sequence[str],
+        metric_names: Optional[Sequence[str]] = None,
+        metrics: Optional[Sequence[QueryInterfaceMetric]] = None,
+        group_by_names: Optional[Sequence[str]] = None,
+        group_by: Optional[Sequence[QueryParameter]] = None,
         limit: Optional[int] = None,
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
         where_constraint: Optional[WhereFilter] = None,
         where_constraint_str: Optional[str] = None,
         order: Optional[Sequence[str]] = None,
+        order_by: Optional[Sequence[QueryParameter]] = None,
         time_granularity: Optional[TimeGranularity] = None,
     ) -> MetricFlowQuerySpec:
-        assert not (
-            where_constraint and where_constraint_str
-        ), "Both where_constraint and where_constraint_str should not be set"
-
-        where_filter: Optional[WhereFilter]
-        if where_constraint_str:
-            where_filter = PydanticWhereFilter(where_sql_template=where_constraint_str)
-        else:
-            where_filter = where_constraint
+        metric_names = self._get_metric_names(metric_names, metrics)
+        group_by_names = self._get_group_by_names(group_by_names, group_by)
+        where_filter = self._get_where_filter(where_constraint, where_constraint_str)
+        order = self._get_order(order, order_by)
 
         # Get metric references used for validations
         # In a case of derived metric, all the input metrics would be here.
@@ -507,7 +552,8 @@ class MetricFlowQueryParser:
             )
             partial_time_dimension_spec_to_time_dimension_spec = (
                 self._time_granularity_solver.resolve_granularity_for_partial_time_dimension_specs(
-                    metric_references=metric_references, partial_time_dimension_specs=(partial_metric_time_spec,)
+                    metric_references=metric_references,
+                    partial_time_dimension_specs=(partial_metric_time_spec,),
                 )
             )
             adjust_to_granularity = partial_time_dimension_spec_to_time_dimension_spec[
@@ -527,7 +573,10 @@ class MetricFlowQueryParser:
                 == self._metric_time_dimension_reference.element_name
                 and partial_time_dimension_spec_to_replace.entity_links == ()
             ):
-                return partial_time_dimension_spec_to_replace, replace_with_time_dimension_spec
+                return (
+                    partial_time_dimension_spec_to_replace,
+                    replace_with_time_dimension_spec,
+                )
 
         raise RuntimeError(f"Replacement for metric time dimension '{self._metric_time_dimension_reference}' not found")
 
@@ -596,7 +645,9 @@ class MetricFlowQueryParser:
         return tuple(metric_references)
 
     def _parse_linkable_element_names(
-        self, qualified_linkable_names: Sequence[str], metric_references: Sequence[MetricReference]
+        self,
+        qualified_linkable_names: Sequence[str],
+        metric_references: Sequence[MetricReference],
     ) -> QueryTimeLinkableSpecSet:
         """Convert the linkable spec names into the respective specification objects."""
         qualified_linkable_names = [x.lower() for x in qualified_linkable_names]
