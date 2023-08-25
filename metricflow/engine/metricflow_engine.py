@@ -646,6 +646,9 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
     ) -> MetricFlowExplainResult:
+        assert not (
+            get_group_by_values and group_by
+        ), "Both get_group_by_values and group_by were set, but if a group by is specified you should only use one of these!"
         return self._create_execution_plan(
             MetricFlowQueryRequest.create_with_random_request_id(
                 metric_names=metric_names,
