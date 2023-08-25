@@ -171,7 +171,9 @@ def test_query_parser(bookings_query_parser: MetricFlowQueryParser) -> None:  # 
     )
 
 
-class MockQueryParameter:  # noqa: D
+class MockQueryParameter:
+    """This is a mock that is just used to test the query parser."""
+
     grain = None
 
     def __init__(self, name: str):  # noqa: D
