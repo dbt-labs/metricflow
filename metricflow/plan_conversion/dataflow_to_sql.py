@@ -281,11 +281,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 metric_time_dimension_spec = instance.spec
                 break
 
-        # If the metric time dimension isn't present in the parent node it's because it wasn't requested
-        # and therefore we don't need the time range join because we can just let the metric sum over all time
-        if metric_time_dimension_spec is None:
-            return input_data_set
-
+        assert metric_time_dimension_spec
         time_spine_data_set_alias = self._next_unique_table_alias()
 
         metric_time_dimension_column_name = self.column_association_resolver.resolve_spec(

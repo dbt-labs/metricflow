@@ -791,8 +791,10 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             ),
         )
 
+        # If a cumulative metric is queried with metric_time, join over time range.
+        # Otherwise, the measure will be aggregated over all time.
         time_range_node: Optional[JoinOverTimeRangeNode[SqlDataSetT]] = None
-        if cumulative:
+        if cumulative and metric_time_dimension_requested:
             time_range_node = JoinOverTimeRangeNode(
                 parent_node=filtered_measure_source_node,
                 window=cumulative_window,
