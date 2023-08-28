@@ -1,10 +1,10 @@
 -- Compute Metrics via Expressions
 SELECT
-  subq_4.txn_revenue AS trailing_2_months_revenue
+  subq_3.txn_revenue AS trailing_2_months_revenue
 FROM (
   -- Aggregate Measures
   SELECT
-    SUM(subq_3.txn_revenue) AS txn_revenue
+    SUM(subq_2.txn_revenue) AS txn_revenue
   FROM (
     -- Pass Only Elements:
     --   ['txn_revenue']
@@ -50,5 +50,5 @@ FROM (
         FROM ***************************.fct_revenue revenue_src_10006
       ) subq_0
     ) subq_1
-  ) subq_3
-) subq_4
+  ) subq_2
+) subq_3
