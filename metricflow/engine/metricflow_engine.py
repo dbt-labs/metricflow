@@ -222,7 +222,9 @@ class AbstractMetricFlowEngine(ABC):
         pass
 
     @abstractmethod
-    def simple_dimensions_for_metrics(self, metric_names: List[str]) -> List[Dimension]:
+    def simple_dimensions_for_metrics(
+        self, metric_names: List[str], without_any_property: Sequence[LinkableElementProperties]
+    ) -> List[Dimension]:
         """Retrieves a list of all common dimensions for metric_names.
 
         "simple" dimensions are the ones that people expect from a UI perspective. For example, if "ds" is a time
@@ -230,6 +232,7 @@ class AbstractMetricFlowEngine(ABC):
 
         Args:
             metric_names: Names of metrics to get common dimensions from.
+            without_any_property: Return dimensions not matching these properties.
 
         Returns:
             A list of Dimension objects containing metadata.
@@ -491,17 +494,19 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     def explain(self, mf_request: MetricFlowQueryRequest) -> MetricFlowExplainResult:  # noqa: D
         return self._create_execution_plan(mf_request)
 
-    def simple_dimensions_for_metrics(self, metric_names: List[str]) -> List[Dimension]:  # noqa: D
+    def simple_dimensions_for_metrics(  # noqa: D
+        self,
+        metric_names: List[str],
+        without_any_property: Sequence[LinkableElementProperties] = (
+            LinkableElementProperties.ENTITY,
+            LinkableElementProperties.DERIVED_TIME_GRANULARITY,
+            LinkableElementProperties.LOCAL_LINKED,
+        ),
+    ) -> List[Dimension]:
         path_key_to_linkable_dimensions = (
             self._semantic_manifest_lookup.metric_lookup.linkable_set_for_metrics(
                 metric_references=[MetricReference(element_name=mname) for mname in metric_names],
-                without_any_property=frozenset(
-                    {
-                        LinkableElementProperties.ENTITY,
-                        LinkableElementProperties.DERIVED_TIME_GRANULARITY,
-                        LinkableElementProperties.LOCAL_LINKED,
-                    }
-                ),
+                without_any_property=frozenset(without_any_property),
             )
         ).path_key_to_linkable_dimensions
 
