@@ -83,11 +83,6 @@ class SemanticModelAccessor(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_measure_with_agg_time_dimension(self, measure_reference: MeasureReference) -> Measure:  # noqa: D
-        """Retrieve the measure object, filling in the `agg_time_dimension` if available."""
-        raise NotImplementedError
-
-    @abstractmethod
     def get_entity_references(self) -> Sequence[EntityReference]:
         """Retrieve all entity references from the collection of semantic models."""
         raise NotImplementedError

@@ -502,7 +502,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         measures = set()
         for metric in metrics:
             metric_measures = [
-                self._semantic_manifest_lookup.semantic_model_lookup.get_measure_with_agg_time_dimension(
+                self._semantic_manifest_lookup.semantic_model_lookup.get_measure(
                     measure_reference=MeasureReference(element_name=measure.name)
                 )
                 for measure in metric.input_measures
