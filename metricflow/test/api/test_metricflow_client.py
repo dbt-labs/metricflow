@@ -95,7 +95,7 @@ def test_list_dimensions(mf_client: MetricFlowClient) -> None:  # noqa: D
 
 def test_get_measures_for_metrics(mf_client: MetricFlowClient) -> None:  # noqa: D
     measures = mf_client.engine.get_measures_for_metrics(["bookings"])
-    assert measures
+    assert len(measures) == 1
     measure = measures[0]
     assert measure.name == "bookings"
     assert measure.agg_time_dimension == "ds"
