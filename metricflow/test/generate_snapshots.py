@@ -153,9 +153,12 @@ def run_tests(test_configuration: MetricFlowTestConfiguration, test_file_paths: 
         engine_name = test_configuration.engine.value.lower()
         os.environ["MF_TEST_ADAPTER_TYPE"] = engine_name
         hatch_env = f"{engine_name}-env"
+        use_persistent_source_schema = test_configuration.engine != SqlEngine.POSTGRES
         run_command(
             f"hatch -v run {hatch_env}:pytest -x -vv -n 4 "
-            f"--overwrite-snapshots --use-persistent-source-schema {combined_paths}"
+            f"--overwrite-snapshots"
+            f"{' --use-persistent-source-schema' if use_persistent_source_schema else ''}"
+            f" {combined_paths}"
         )
     else:
         assert_values_exhausted(test_configuration.engine)
