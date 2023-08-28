@@ -1,6 +1,6 @@
 -- Join to Time Spine Dataset
 SELECT
-  DATE_TRUNC(subq_5.metric_time__day, day) AS metric_time__day
+  subq_5.metric_time__day AS metric_time__day
   , subq_4.listing AS listing
   , subq_4.booking_fees AS booking_fees
 FROM (

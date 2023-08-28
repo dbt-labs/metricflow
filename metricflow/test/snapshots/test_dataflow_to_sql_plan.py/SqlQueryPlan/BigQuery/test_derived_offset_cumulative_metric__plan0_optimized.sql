@@ -9,7 +9,7 @@ FROM (
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
-    DATE_TRUNC(subq_16.metric_time__day, day) AS metric_time__day
+    subq_16.metric_time__day AS metric_time__day
     , COUNT(DISTINCT subq_15.bookers) AS every_2_days_bookers_2_days_ago
   FROM (
     -- Date Spine

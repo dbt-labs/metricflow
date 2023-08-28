@@ -15,7 +15,7 @@ FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      DATE_TRUNC(subq_19.metric_time__day, day) AS metric_time__day
+      subq_19.metric_time__day AS metric_time__day
       , SUM(subq_18.bookings) AS month_start_bookings
     FROM (
       -- Date Spine
@@ -45,7 +45,7 @@ FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      DATE_TRUNC(subq_27.metric_time__day, day) AS metric_time__day
+      subq_27.metric_time__day AS metric_time__day
       , SUM(subq_26.bookings) AS bookings_1_month_ago
     FROM (
       -- Date Spine
