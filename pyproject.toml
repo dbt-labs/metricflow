@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "metricflow"
-version = "0.201.0.dev0"
+version = "0.202.0.dev1"
 description = "Translates a simple metric definition into reusable SQL and executes it against the SQL engine of your choice."
 readme = "README.md"
 requires-python = ">=3.8,<3.12"
@@ -182,6 +182,8 @@ features = [
   "sql-client-packages",
 ]
 
+[tool.black]
+line-length = 120
 
 # Many deprecation warnings come from 3rd-party libraries and make the
 # output of pytest noisy. Since no action is going to be taken, hide those
