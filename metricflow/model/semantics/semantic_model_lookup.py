@@ -137,18 +137,9 @@ class SemanticModelLookup(SemanticModelAccessor):
         assert len(self._measure_index[measure_reference]) >= 1
         # Measures should be consistent across semantic models, so just use the first one.
         semantic_model = list(self._measure_index[measure_reference])[0]
-        measure = SemanticModelLookup.get_measure_from_semantic_model(
+        return SemanticModelLookup.get_measure_from_semantic_model(
             semantic_model=semantic_model, measure_reference=measure_reference
         )
-        if not measure.agg_time_dimension:
-            # If agg_time_dimension is inherited from the semantic model default, populate that field here.
-            agg_time_dimension = self.get_agg_time_dimension_for_measure(measure_reference=measure_reference)
-            if agg_time_dimension:
-                # Copy original Measure object, updating the `agg_time_dimension` field.
-                return measure.copy(  # type: ignore[attr-defined]
-                    update={"agg_time_dimension": agg_time_dimension.element_name}
-                )
-        return measure
 
     def get_entity_references(self) -> Sequence[EntityReference]:  # noqa: D
         return list(self._entity_ref_to_entity.keys())
