@@ -12,11 +12,13 @@ from dbt_semantic_interfaces.protocols.dimension import (
     DimensionTypeParams,
 )
 from dbt_semantic_interfaces.protocols.entity import Entity as SemanticManifestEntity
+from dbt_semantic_interfaces.protocols.measure import MeasureAggregationParameters
 from dbt_semantic_interfaces.protocols.metadata import Metadata
 from dbt_semantic_interfaces.protocols.metric import Metric as SemanticManifestMetric
 from dbt_semantic_interfaces.protocols.metric import MetricInputMeasure, MetricType, MetricTypeParams
 from dbt_semantic_interfaces.protocols.where_filter import WhereFilter
 from dbt_semantic_interfaces.transformations.add_input_metric_measures import AddInputMetricMeasuresRule
+from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.entity_type import EntityType
 
 from metricflow.model.semantics.linkable_spec_resolver import ElementPathKey
@@ -133,3 +135,15 @@ class Entity:
             role=pydantic_entity.role,
             expr=pydantic_entity.expr,
         )
+
+
+@dataclass(frozen=True)
+class Measure:
+    """Dataclass representation of a Measure."""
+
+    name: str
+    agg: AggregationType
+    agg_time_dimension: str
+    description: Optional[str] = None
+    expr: Optional[str] = None
+    agg_params: Optional[MeasureAggregationParameters] = None
