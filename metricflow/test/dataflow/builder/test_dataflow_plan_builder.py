@@ -24,7 +24,7 @@ from metricflow.specs.where_filter_transform import WhereSpecFactory
 from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.snapshot_utils import assert_plan_snapshot_text_equal
-from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_MONTH
+from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_MONTH, MTD_SPEC_QUARTER
 
 logger = logging.getLogger(__name__)
 
@@ -477,7 +477,7 @@ def test_multihop_join_plan_ambiguous_dim(  # noqa: D
         )
 
 
-def test_cumulative_metric(  # noqa: D
+def test_cumulative_metric_with_window(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
@@ -488,6 +488,60 @@ def test_cumulative_metric(  # noqa: D
             metric_specs=(MetricSpec(element_name="trailing_2_months_revenue"),),
             dimension_specs=(),
             time_dimension_specs=(MTD_SPEC_MONTH,),
+        )
+    )
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dag_graph=dataflow_plan,
+    )
+
+
+def test_cumulative_metric_no_window_or_grain_with_metric_time(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="revenue_all_time"),),
+            dimension_specs=(),
+            time_dimension_specs=(MTD_SPEC_QUARTER,),
+        )
+    )
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dag_graph=dataflow_plan,
+    )
+
+
+def test_cumulative_metric_no_window_or_grain_without_metric_time(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="revenue_all_time"),),
+            dimension_specs=(),
+            time_dimension_specs=(),
         )
     )
 

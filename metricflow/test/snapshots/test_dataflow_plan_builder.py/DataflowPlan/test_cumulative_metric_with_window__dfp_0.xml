@@ -15,24 +15,24 @@
             <AggregateMeasuresNode>
                 <!-- description = Aggregate Measures -->
                 <!-- node_id = am_0 -->
-                <JoinOverTimeRangeNode>
-                    <!-- description = Join Self Over Time Range -->
-                    <!-- node_id = jotr_0 -->
-                    <FilterElementsNode>
-                        <!-- description =                              -->
-                        <!--   Pass Only Elements:                      -->
-                        <!--     ['txn_revenue', 'metric_time__month']  -->
-                        <!-- node_id = pfe_0 -->
-                        <!-- include_spec =                           -->
-                        <!--   {'class': 'MeasureSpec',               -->
-                        <!--    'element_name': 'txn_revenue',        -->
-                        <!--    'non_additive_dimension_spec': None}  -->
-                        <!-- include_spec =                                 -->
-                        <!--   {'class': 'TimeDimensionSpec',               -->
-                        <!--    'element_name': 'metric_time',              -->
-                        <!--    'entity_links': (),                         -->
-                        <!--    'time_granularity': TimeGranularity.MONTH,  -->
-                        <!--    'aggregation_state': None}                  -->
+                <FilterElementsNode>
+                    <!-- description =                              -->
+                    <!--   Pass Only Elements:                      -->
+                    <!--     ['txn_revenue', 'metric_time__month']  -->
+                    <!-- node_id = pfe_0 -->
+                    <!-- include_spec =                           -->
+                    <!--   {'class': 'MeasureSpec',               -->
+                    <!--    'element_name': 'txn_revenue',        -->
+                    <!--    'non_additive_dimension_spec': None}  -->
+                    <!-- include_spec =                                 -->
+                    <!--   {'class': 'TimeDimensionSpec',               -->
+                    <!--    'element_name': 'metric_time',              -->
+                    <!--    'entity_links': (),                         -->
+                    <!--    'time_granularity': TimeGranularity.MONTH,  -->
+                    <!--    'aggregation_state': None}                  -->
+                    <JoinOverTimeRangeNode>
+                        <!-- description = Join Self Over Time Range -->
+                        <!-- node_id = jotr_0 -->
                         <MetricTimeDimensionTransformNode>
                             <!-- description = Metric Time Dimension 'ds' -->
                             <!-- node_id = sma_10005 -->
@@ -45,8 +45,8 @@
                                 <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='revenue'))  -->
                             </ReadSqlSourceNode>
                         </MetricTimeDimensionTransformNode>
-                    </FilterElementsNode>
-                </JoinOverTimeRangeNode>
+                    </JoinOverTimeRangeNode>
+                </FilterElementsNode>
             </AggregateMeasuresNode>
         </ComputeMetricsNode>
     </WriteToResultDataframeNode>
