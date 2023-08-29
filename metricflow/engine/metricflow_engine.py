@@ -10,7 +10,7 @@ from typing import List, Optional, Sequence, Tuple
 import pandas as pd
 from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimensionTypeParams
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
-from dbt_semantic_interfaces.references import EntityReference, MetricReference
+from dbt_semantic_interfaces.references import EntityReference, MeasureReference, MetricReference
 from dbt_semantic_interfaces.type_enums import DimensionType
 
 from metricflow.assert_one_arg import assert_exactly_one_arg_set
@@ -27,7 +27,7 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.dataset.dataset import DataSet
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
-from metricflow.engine.models import Dimension, Entity, Metric
+from metricflow.engine.models import Dimension, Entity, Measure, Metric
 from metricflow.engine.time_source import ServerTimeSource
 from metricflow.errors.errors import ExecutionException
 from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
@@ -493,6 +493,32 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def explain(self, mf_request: MetricFlowQueryRequest) -> MetricFlowExplainResult:  # noqa: D
         return self._create_execution_plan(mf_request)
+
+    def get_measures_for_metrics(self, metric_names: List[str]) -> List[Measure]:  # noqa: D
+        metrics = self._semantic_manifest_lookup.metric_lookup.get_metrics(
+            metric_references=[MetricReference(element_name=metric_name) for metric_name in metric_names]
+        )
+        semantic_model_lookup = self._semantic_manifest_lookup.semantic_model_lookup
+
+        measures = set()
+        for metric in metrics:
+            for input_measure in metric.input_measures:
+                measure_reference = MeasureReference(element_name=input_measure.name)
+                # populate new obj
+                measure = semantic_model_lookup.get_measure(measure_reference=measure_reference)
+                measures.add(
+                    Measure(
+                        name=measure.name,
+                        agg=measure.agg,
+                        agg_time_dimension=semantic_model_lookup.get_agg_time_dimension_for_measure(
+                            measure_reference=measure_reference
+                        ).element_name,
+                        description=measure.description,
+                        expr=measure.expr,
+                        agg_params=measure.agg_params,
+                    )
+                )
+        return list(measures)
 
     def simple_dimensions_for_metrics(  # noqa: D
         self,
