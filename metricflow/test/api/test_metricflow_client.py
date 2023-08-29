@@ -93,6 +93,32 @@ def test_list_dimensions(mf_client: MetricFlowClient) -> None:  # noqa: D
     assert tuple(dim.name for dim in dimensions) == ("metric_time", "metric_time")
 
 
+def test_get_measures_for_metrics(mf_client: MetricFlowClient) -> None:  # noqa: D
+    measures = mf_client.engine.get_measures_for_metrics(["bookings"])
+    assert len(measures) == 1
+    measure = measures[0]
+    assert measure.name == "bookings"
+    assert measure.agg_time_dimension == "ds"
+
+    # Multiple metrics
+    measures = mf_client.engine.get_measures_for_metrics(["bookings", "revenue"])
+    assert len(measures) == 2
+    assert {measure.name for measure in measures} == {"bookings", "txn_revenue"}
+    assert {measure.agg_time_dimension for measure in measures} == {"ds"}
+
+    # Derived metric with multiple metric inputs
+    measures = mf_client.engine.get_measures_for_metrics(["views_times_booking_value"])
+    assert len(measures) == 2
+    assert {measure.name for measure in measures} == {"views", "booking_value"}
+    assert {measure.agg_time_dimension for measure in measures} == {"ds"}
+
+    # Ratio metric with multiple measure inputs
+    measures = mf_client.engine.get_measures_for_metrics(["bookings_per_booker"])
+    assert len(measures) == 2
+    assert {measure.name for measure in measures} == {"bookings", "bookers"}
+    assert {measure.agg_time_dimension for measure in measures} == {"ds"}
+
+
 def test_get_dimension_values(mf_client: MetricFlowClient) -> None:  # noqa: D
     dim_vals = mf_client.get_dimension_values(
         ["bookings"], "metric_time", start_time="2020-01-01", end_time="2024-01-01"

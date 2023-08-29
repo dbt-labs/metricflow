@@ -1,0 +1,6 @@
+kind: Features
+body: Expose measures for metrics on MFEngine with agg_time_dimension
+time: 2023-08-23T13:17:38.517068-07:00
+custom:
+  Author: courtneyholcomb
+  Issue: "735"
