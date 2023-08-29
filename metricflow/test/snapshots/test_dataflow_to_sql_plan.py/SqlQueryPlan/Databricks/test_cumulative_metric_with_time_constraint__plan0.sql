@@ -1,12 +1,12 @@
 -- Compute Metrics via Expressions
 SELECT
-  subq_5.ds__month
-  , subq_5.txn_revenue AS trailing_2_months_revenue
+  subq_4.ds__month
+  , subq_4.txn_revenue AS trailing_2_months_revenue
 FROM (
   -- Aggregate Measures
   SELECT
-    subq_4.ds__month
-    , SUM(subq_4.txn_revenue) AS txn_revenue
+    subq_3.ds__month
+    , SUM(subq_3.txn_revenue) AS txn_revenue
   FROM (
     -- Pass Only Elements:
     --   ['txn_revenue', 'ds__month']
@@ -76,7 +76,7 @@ FROM (
       ) subq_1
       WHERE subq_1.metric_time__day BETWEEN '2019-12-01' AND '2020-01-01'
     ) subq_2
-  ) subq_4
+  ) subq_3
   GROUP BY
-    subq_4.ds__month
-) subq_5
+    subq_3.ds__month
+) subq_4

@@ -1,12 +1,12 @@
 -- Compute Metrics via Expressions
 SELECT
-  subq_4.ds__month
-  , subq_4.txn_revenue AS revenue_all_time
+  subq_3.ds__month
+  , subq_3.txn_revenue AS revenue_all_time
 FROM (
   -- Aggregate Measures
   SELECT
-    subq_3.ds__month
-    , SUM(subq_3.txn_revenue) AS txn_revenue
+    subq_2.ds__month
+    , SUM(subq_2.txn_revenue) AS txn_revenue
   FROM (
     -- Pass Only Elements:
     --   ['txn_revenue', 'ds__month']
@@ -53,7 +53,7 @@ FROM (
         FROM ***************************.fct_revenue revenue_src_10006
       ) subq_0
     ) subq_1
-  ) subq_3
+  ) subq_2
   GROUP BY
     ds__month
-) subq_4
+) subq_3
