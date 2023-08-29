@@ -981,3 +981,24 @@ integration_test:
       GROUP BY metric_time__day
     ) c
     ON {{ render_date_sub("d", "ds", 2, TimeGranularity.DAY) }} = c.metric_time__day
+---
+integration_test:
+  name: derived_metric_offset_window_and_multiple_granularities
+  description: Tests a derived metric offset query with window and 2 metric_time granularities
+  model: SIMPLE_MODEL
+  metrics: ["bookings_5_day_lag"]
+  group_bys: ["metric_time__month", "metric_time__week"]
+  check_query: |
+    SELECT
+      {{ render_date_trunc("a.ds", TimeGranularity.MONTH) }} AS metric_time__month
+      , {{ render_date_trunc("a.ds", TimeGranularity.WEEK) }} AS metric_time__week
+      , SUM(b.bookings_5_day_lag) AS bookings_5_day_lag
+    FROM {{ mf_time_spine_source }} a
+    INNER JOIN (
+      SELECT
+        ds AS metric_time__day
+        , 1 AS bookings_5_day_lag
+      FROM {{ source_schema }}.fct_bookings
+    ) b
+    ON {{ render_date_sub("a", "ds", 5, TimeGranularity.DAY) }} = b.metric_time__day
+    GROUP BY metric_time__month, metric_time__week
