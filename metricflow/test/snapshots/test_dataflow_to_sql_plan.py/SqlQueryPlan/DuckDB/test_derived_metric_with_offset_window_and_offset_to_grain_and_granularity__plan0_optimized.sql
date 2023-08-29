@@ -1,21 +1,21 @@
 -- Compute Metrics via Expressions
 SELECT
-  metric_time__day
+  metric_time__year
   , month_start_bookings - bookings_1_month_ago AS bookings_month_start_compared_to_1_month_prior
 FROM (
   -- Combine Metrics
   SELECT
-    COALESCE(subq_24.metric_time__day, subq_32.metric_time__day) AS metric_time__day
+    COALESCE(subq_24.metric_time__year, subq_32.metric_time__year) AS metric_time__year
     , subq_24.month_start_bookings AS month_start_bookings
     , subq_32.bookings_1_month_ago AS bookings_1_month_ago
   FROM (
     -- Join to Time Spine Dataset
     -- Pass Only Elements:
-    --   ['bookings', 'metric_time__day']
+    --   ['bookings', 'metric_time__year']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      subq_20.ds AS metric_time__day
+      DATE_TRUNC('year', subq_20.ds) AS metric_time__year
       , SUM(subq_18.bookings) AS month_start_bookings
     FROM ***************************.mf_time_spine subq_20
     INNER JOIN (
@@ -29,16 +29,16 @@ FROM (
     ON
       DATE_TRUNC('month', subq_20.ds) = subq_18.metric_time__day
     GROUP BY
-      subq_20.ds
+      DATE_TRUNC('year', subq_20.ds)
   ) subq_24
   INNER JOIN (
     -- Join to Time Spine Dataset
     -- Pass Only Elements:
-    --   ['bookings', 'metric_time__day']
+    --   ['bookings', 'metric_time__year']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      subq_28.ds AS metric_time__day
+      DATE_TRUNC('year', subq_28.ds) AS metric_time__year
       , SUM(subq_26.bookings) AS bookings_1_month_ago
     FROM ***************************.mf_time_spine subq_28
     INNER JOIN (
@@ -52,16 +52,16 @@ FROM (
     ON
       subq_28.ds - INTERVAL 1 month = subq_26.metric_time__day
     GROUP BY
-      subq_28.ds
+      DATE_TRUNC('year', subq_28.ds)
   ) subq_32
   ON
     (
-      subq_24.metric_time__day = subq_32.metric_time__day
+      subq_24.metric_time__year = subq_32.metric_time__year
     ) OR (
       (
-        subq_24.metric_time__day IS NULL
+        subq_24.metric_time__year IS NULL
       ) AND (
-        subq_32.metric_time__day IS NULL
+        subq_32.metric_time__year IS NULL
       )
     )
 ) subq_33

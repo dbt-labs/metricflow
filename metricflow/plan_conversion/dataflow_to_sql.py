@@ -1326,7 +1326,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             parent_alias=parent_alias,
         )
 
-        # Use metric_time instance from time spine, all instances EXCEPT metric_time from parent data set.
+        # Use all instances EXCEPT metric_time from parent data set.
         non_metric_time_parent_instance_set = InstanceSet(
             measure_instances=parent_data_set.instance_set.measure_instances,
             dimension_instances=parent_data_set.instance_set.dimension_instances,
@@ -1339,17 +1339,55 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             metric_instances=parent_data_set.instance_set.metric_instances,
             metadata_instances=parent_data_set.instance_set.metadata_instances,
         )
-        table_alias_to_instance_set = OrderedDict(
-            {time_spine_alias: time_spine_dataset.instance_set, parent_alias: non_metric_time_parent_instance_set}
+        non_metric_time_select_columns = create_select_columns_for_instance_sets(
+            self._column_association_resolver, OrderedDict({parent_alias: non_metric_time_parent_instance_set})
         )
 
+        # Use metric_time column from time spine.
+        assert (
+            len(time_spine_dataset.instance_set.time_dimension_instances) == 1
+            and len(time_spine_dataset.sql_select_node.select_columns) == 1
+        ), "Time spine dataset not configured properly. Expected exactly one column."
+        original_time_dim_instance = time_spine_dataset.instance_set.time_dimension_instances[0]
+        time_spine_column_select_expr: Union[
+            SqlColumnReferenceExpression, SqlDateTruncExpression
+        ] = SqlColumnReferenceExpression(
+            SqlColumnReference(table_alias=time_spine_alias, column_name=original_time_dim_instance.spec.qualified_name)
+        )
+
+        # Add requested granularities (skip for default granularity).
+        metric_time_select_columns = []
+        metric_time_dimension_instances = []
+        for metric_time_dimension_spec in node.metric_time_dimension_specs:
+            if metric_time_dimension_spec.time_granularity == self._time_spine_source.time_column_granularity:
+                select_expr = time_spine_column_select_expr
+                time_dim_instance = original_time_dim_instance
+                column_alias = original_time_dim_instance.associated_column.column_name
+            else:
+                select_expr = SqlDateTruncExpression(
+                    time_granularity=metric_time_dimension_spec.time_granularity, arg=time_spine_column_select_expr
+                )
+                new_time_dim_spec = TimeDimensionSpec(
+                    element_name=original_time_dim_instance.spec.element_name,
+                    entity_links=original_time_dim_instance.spec.entity_links,
+                    time_granularity=metric_time_dimension_spec.time_granularity,
+                    aggregation_state=original_time_dim_instance.spec.aggregation_state,
+                )
+                time_dim_instance = TimeDimensionInstance(
+                    defined_from=original_time_dim_instance.defined_from,
+                    associated_columns=(self._column_association_resolver.resolve_spec(new_time_dim_spec),),
+                    spec=new_time_dim_spec,
+                )
+                column_alias = time_dim_instance.associated_column.column_name
+            metric_time_dimension_instances.append(time_dim_instance)
+            metric_time_select_columns.append(SqlSelectColumn(expr=select_expr, column_alias=column_alias))
+        metric_time_instance_set = InstanceSet(time_dimension_instances=tuple(metric_time_dimension_instances))
+
         return SqlDataSet(
-            instance_set=InstanceSet.merge(list(table_alias_to_instance_set.values())),
+            instance_set=InstanceSet.merge([metric_time_instance_set, non_metric_time_parent_instance_set]),
             sql_select_node=SqlSelectStatementNode(
                 description=node.description,
-                select_columns=create_select_columns_for_instance_sets(
-                    self._column_association_resolver, table_alias_to_instance_set
-                ),
+                select_columns=tuple(metric_time_select_columns) + non_metric_time_select_columns,
                 from_source=time_spine_dataset.sql_select_node,
                 from_source_alias=time_spine_alias,
                 joins_descs=(join_description,),

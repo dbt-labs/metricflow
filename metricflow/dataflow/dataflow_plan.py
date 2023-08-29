@@ -718,6 +718,7 @@ class JoinToTimeSpineNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT], A
     def __init__(
         self,
         parent_node: BaseOutput[SourceDataSetT],
+        metric_time_dimension_specs: List[TimeDimensionSpec],
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         offset_window: Optional[MetricTimeWindow] = None,
         offset_to_grain: Optional[TimeGranularity] = None,
@@ -726,6 +727,7 @@ class JoinToTimeSpineNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT], A
 
         Args:
             parent_node: Node that returns desired dataset to join to time spine.
+            metric_time_dimension_specs: Metric time dimensions requested in query. Used to determine granularities.
             time_range_constraint: Time range to constrain the time spine to.
             offset_window: Time window to offset the parent dataset by when joining to time spine.
             offset_to_grain: Granularity period to offset the parent dataset to when joining to time spine.
@@ -736,6 +738,7 @@ class JoinToTimeSpineNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT], A
             offset_window and offset_to_grain
         ), "Can't set both offset_window and offset_to_grain when joining to time spine. Choose one or the other."
         self._parent_node = parent_node
+        self._metric_time_dimension_specs = metric_time_dimension_specs
         self._offset_window = offset_window
         self._offset_to_grain = offset_to_grain
         self._time_range_constraint = time_range_constraint
@@ -745,6 +748,11 @@ class JoinToTimeSpineNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT], A
     @classmethod
     def id_prefix(cls) -> str:  # noqa: D
         return DATAFLOW_NODE_JOIN_TO_TIME_SPINE_ID_PREFIX
+
+    @property
+    def metric_time_dimension_specs(self) -> List[TimeDimensionSpec]:  # noqa: D
+        """Time dimension specs to use when creating time spine table."""
+        return self._metric_time_dimension_specs
 
     @property
     def time_range_constraint(self) -> Optional[TimeRangeConstraint]:  # noqa: D
@@ -791,13 +799,13 @@ class JoinToTimeSpineNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT], A
     def with_new_parents(  # noqa: D
         self, new_parent_nodes: Sequence[BaseOutput[SourceDataSetT]]
     ) -> JoinToTimeSpineNode[SourceDataSetT]:
-        # Is this right? how is this method used?
         assert len(new_parent_nodes) == 1
         return JoinToTimeSpineNode[SourceDataSetT](
             parent_node=new_parent_nodes[0],
+            metric_time_dimension_specs=self.metric_time_dimension_specs,
             time_range_constraint=self.time_range_constraint,
-            offset_window=self._offset_window,
-            offset_to_grain=self._offset_to_grain,
+            offset_window=self.offset_window,
+            offset_to_grain=self.offset_to_grain,
         )
 
 

@@ -5,7 +5,7 @@
         <!-- col0 =                                                    -->
         <!--   {'class': 'SqlSelectColumn',                            -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_423),  -->
-        <!--    'column_alias': 'metric_time__day'}                    -->
+        <!--    'column_alias': 'metric_time__quarter'}                -->
         <!-- col1 =                                                                                   -->
         <!--   {'class': 'SqlSelectColumn',                                                           -->
         <!--    'expr': SqlStringExpression(node_id=str_0 sql_expr=bookings - bookings_2_weeks_ago),  -->
@@ -18,7 +18,7 @@
             <!-- col0 =                                                                            -->
             <!--   {'class': 'SqlSelectColumn',                                                    -->
             <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_2, sql_function=COALESCE),  -->
-            <!--    'column_alias': 'metric_time__day'}                                            -->
+            <!--    'column_alias': 'metric_time__quarter'}                                        -->
             <!-- col1 =                                                    -->
             <!--   {'class': 'SqlSelectColumn',                            -->
             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_419),  -->
@@ -41,7 +41,7 @@
                 <!-- col0 =                                                    -->
                 <!--   {'class': 'SqlSelectColumn',                            -->
                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_298),  -->
-                <!--    'column_alias': 'metric_time__day'}                    -->
+                <!--    'column_alias': 'metric_time__quarter'}                -->
                 <!-- col1 =                                                    -->
                 <!--   {'class': 'SqlSelectColumn',                            -->
                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_299),  -->
@@ -54,7 +54,7 @@
                     <!-- col0 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_297),  -->
-                    <!--    'column_alias': 'metric_time__day'}                    -->
+                    <!--    'column_alias': 'metric_time__quarter'}                -->
                     <!-- col1 =                                                                       -->
                     <!--   {'class': 'SqlSelectColumn',                                               -->
                     <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_0, sql_function=SUM),  -->
@@ -63,17 +63,17 @@
                     <!-- group_by0 =                                               -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_297),  -->
-                    <!--    'column_alias': 'metric_time__day'}                    -->
+                    <!--    'column_alias': 'metric_time__quarter'}                -->
                     <!-- where = None -->
                     <SqlSelectStatementNode>
-                        <!-- description =                         -->
-                        <!--   Pass Only Elements:                 -->
-                        <!--     ['bookings', 'metric_time__day']  -->
+                        <!-- description =                             -->
+                        <!--   Pass Only Elements:                     -->
+                        <!--     ['bookings', 'metric_time__quarter']  -->
                         <!-- node_id = ss_8 -->
                         <!-- col0 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
                         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_295),  -->
-                        <!--    'column_alias': 'metric_time__day'}                    -->
+                        <!--    'column_alias': 'metric_time__quarter'}                -->
                         <!-- col1 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
                         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_294),  -->
@@ -538,7 +538,7 @@
                 <!-- col0 =                                                    -->
                 <!--   {'class': 'SqlSelectColumn',                            -->
                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_415),  -->
-                <!--    'column_alias': 'metric_time__day'}                    -->
+                <!--    'column_alias': 'metric_time__quarter'}                -->
                 <!-- col1 =                                                    -->
                 <!--   {'class': 'SqlSelectColumn',                            -->
                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_416),  -->
@@ -551,7 +551,7 @@
                     <!-- col0 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_414),  -->
-                    <!--    'column_alias': 'metric_time__day'}                    -->
+                    <!--    'column_alias': 'metric_time__quarter'}                -->
                     <!-- col1 =                                                                       -->
                     <!--   {'class': 'SqlSelectColumn',                                               -->
                     <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_1, sql_function=SUM),  -->
@@ -560,17 +560,17 @@
                     <!-- group_by0 =                                               -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_414),  -->
-                    <!--    'column_alias': 'metric_time__day'}                    -->
+                    <!--    'column_alias': 'metric_time__quarter'}                -->
                     <!-- where = None -->
                     <SqlSelectStatementNode>
-                        <!-- description =                         -->
-                        <!--   Pass Only Elements:                 -->
-                        <!--     ['bookings', 'metric_time__day']  -->
+                        <!-- description =                             -->
+                        <!--   Pass Only Elements:                     -->
+                        <!--     ['bookings', 'metric_time__quarter']  -->
                         <!-- node_id = ss_14 -->
                         <!-- col0 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
                         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_412),  -->
-                        <!--    'column_alias': 'metric_time__day'}                    -->
+                        <!--    'column_alias': 'metric_time__quarter'}                -->
                         <!-- col1 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
                         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_411),  -->
@@ -580,10 +580,10 @@
                         <SqlSelectStatementNode>
                             <!-- description = Join to Time Spine Dataset -->
                             <!-- node_id = ss_13 -->
-                            <!-- col0 =                                                    -->
-                            <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_410),  -->
-                            <!--    'column_alias': 'metric_time__day'}                    -->
+                            <!-- col0 =                                            -->
+                            <!--   {'class': 'SqlSelectColumn',                    -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_0),  -->
+                            <!--    'column_alias': 'metric_time__quarter'}        -->
                             <!-- col1 =                                                    -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
                             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_374),  -->
