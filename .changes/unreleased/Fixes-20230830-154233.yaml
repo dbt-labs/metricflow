@@ -1,0 +1,7 @@
+kind: Fixes
+body: Update BigQuery YEAR granularity truncation to use January 1st instead of ISOYEAR
+  start
+time: 2023-08-30T15:42:33.979853-07:00
+custom:
+  Author: tlento
+  Issue: "755"

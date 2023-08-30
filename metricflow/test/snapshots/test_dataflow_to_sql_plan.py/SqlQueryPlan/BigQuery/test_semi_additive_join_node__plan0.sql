@@ -27,13 +27,13 @@ FROM (
     , DATE_TRUNC(accounts_source_src_10000.ds, isoweek) AS ds__week
     , DATE_TRUNC(accounts_source_src_10000.ds, month) AS ds__month
     , DATE_TRUNC(accounts_source_src_10000.ds, quarter) AS ds__quarter
-    , DATE_TRUNC(accounts_source_src_10000.ds, isoyear) AS ds__year
+    , DATE_TRUNC(accounts_source_src_10000.ds, year) AS ds__year
     , accounts_source_src_10000.account_type
     , accounts_source_src_10000.ds AS account__ds__day
     , DATE_TRUNC(accounts_source_src_10000.ds, isoweek) AS account__ds__week
     , DATE_TRUNC(accounts_source_src_10000.ds, month) AS account__ds__month
     , DATE_TRUNC(accounts_source_src_10000.ds, quarter) AS account__ds__quarter
-    , DATE_TRUNC(accounts_source_src_10000.ds, isoyear) AS account__ds__year
+    , DATE_TRUNC(accounts_source_src_10000.ds, year) AS account__ds__year
     , accounts_source_src_10000.account_type AS account__account_type
     , accounts_source_src_10000.user_id AS user
     , accounts_source_src_10000.user_id AS account__user
@@ -53,13 +53,13 @@ INNER JOIN (
       , DATE_TRUNC(accounts_source_src_10000.ds, isoweek) AS ds__week
       , DATE_TRUNC(accounts_source_src_10000.ds, month) AS ds__month
       , DATE_TRUNC(accounts_source_src_10000.ds, quarter) AS ds__quarter
-      , DATE_TRUNC(accounts_source_src_10000.ds, isoyear) AS ds__year
+      , DATE_TRUNC(accounts_source_src_10000.ds, year) AS ds__year
       , accounts_source_src_10000.account_type
       , accounts_source_src_10000.ds AS account__ds__day
       , DATE_TRUNC(accounts_source_src_10000.ds, isoweek) AS account__ds__week
       , DATE_TRUNC(accounts_source_src_10000.ds, month) AS account__ds__month
       , DATE_TRUNC(accounts_source_src_10000.ds, quarter) AS account__ds__quarter
-      , DATE_TRUNC(accounts_source_src_10000.ds, isoyear) AS account__ds__year
+      , DATE_TRUNC(accounts_source_src_10000.ds, year) AS account__ds__year
       , accounts_source_src_10000.account_type AS account__account_type
       , accounts_source_src_10000.user_id AS user
       , accounts_source_src_10000.user_id AS account__user

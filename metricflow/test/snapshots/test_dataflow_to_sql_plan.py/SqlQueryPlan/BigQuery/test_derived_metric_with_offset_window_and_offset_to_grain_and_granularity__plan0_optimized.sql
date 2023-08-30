@@ -15,7 +15,7 @@ FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      DATE_TRUNC(subq_20.ds, isoyear) AS metric_time__year
+      DATE_TRUNC(subq_20.ds, year) AS metric_time__year
       , SUM(subq_18.bookings) AS month_start_bookings
     FROM ***************************.mf_time_spine subq_20
     INNER JOIN (
@@ -28,7 +28,7 @@ FROM (
     ) subq_18
     ON
       DATE_TRUNC(subq_20.ds, month) = subq_18.metric_time__day
-    WHERE DATE_TRUNC(subq_20.ds, isoyear) = subq_20.ds
+    WHERE DATE_TRUNC(subq_20.ds, year) = subq_20.ds
     GROUP BY
       metric_time__year
   ) subq_24
@@ -39,7 +39,7 @@ FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      DATE_TRUNC(subq_28.ds, isoyear) AS metric_time__year
+      DATE_TRUNC(subq_28.ds, year) AS metric_time__year
       , SUM(subq_26.bookings) AS bookings_1_month_ago
     FROM ***************************.mf_time_spine subq_28
     INNER JOIN (

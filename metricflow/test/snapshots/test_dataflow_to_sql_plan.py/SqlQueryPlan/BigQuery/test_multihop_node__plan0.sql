@@ -68,23 +68,23 @@ FROM (
               , DATE_TRUNC(account_month_txns_src_10010.ds_partitioned, isoweek) AS ds_partitioned__week
               , DATE_TRUNC(account_month_txns_src_10010.ds_partitioned, month) AS ds_partitioned__month
               , DATE_TRUNC(account_month_txns_src_10010.ds_partitioned, quarter) AS ds_partitioned__quarter
-              , DATE_TRUNC(account_month_txns_src_10010.ds_partitioned, isoyear) AS ds_partitioned__year
+              , DATE_TRUNC(account_month_txns_src_10010.ds_partitioned, year) AS ds_partitioned__year
               , account_month_txns_src_10010.ds AS ds__day
               , DATE_TRUNC(account_month_txns_src_10010.ds, isoweek) AS ds__week
               , DATE_TRUNC(account_month_txns_src_10010.ds, month) AS ds__month
               , DATE_TRUNC(account_month_txns_src_10010.ds, quarter) AS ds__quarter
-              , DATE_TRUNC(account_month_txns_src_10010.ds, isoyear) AS ds__year
+              , DATE_TRUNC(account_month_txns_src_10010.ds, year) AS ds__year
               , account_month_txns_src_10010.account_month
               , account_month_txns_src_10010.ds_partitioned AS account_id__ds_partitioned__day
               , DATE_TRUNC(account_month_txns_src_10010.ds_partitioned, isoweek) AS account_id__ds_partitioned__week
               , DATE_TRUNC(account_month_txns_src_10010.ds_partitioned, month) AS account_id__ds_partitioned__month
               , DATE_TRUNC(account_month_txns_src_10010.ds_partitioned, quarter) AS account_id__ds_partitioned__quarter
-              , DATE_TRUNC(account_month_txns_src_10010.ds_partitioned, isoyear) AS account_id__ds_partitioned__year
+              , DATE_TRUNC(account_month_txns_src_10010.ds_partitioned, year) AS account_id__ds_partitioned__year
               , account_month_txns_src_10010.ds AS account_id__ds__day
               , DATE_TRUNC(account_month_txns_src_10010.ds, isoweek) AS account_id__ds__week
               , DATE_TRUNC(account_month_txns_src_10010.ds, month) AS account_id__ds__month
               , DATE_TRUNC(account_month_txns_src_10010.ds, quarter) AS account_id__ds__quarter
-              , DATE_TRUNC(account_month_txns_src_10010.ds, isoyear) AS account_id__ds__year
+              , DATE_TRUNC(account_month_txns_src_10010.ds, year) AS account_id__ds__year
               , account_month_txns_src_10010.account_month AS account_id__account_month
               , account_month_txns_src_10010.account_id
             FROM ***************************.account_month_txns account_month_txns_src_10010
@@ -131,13 +131,13 @@ FROM (
               , DATE_TRUNC(bridge_table_src_10011.ds_partitioned, isoweek) AS ds_partitioned__week
               , DATE_TRUNC(bridge_table_src_10011.ds_partitioned, month) AS ds_partitioned__month
               , DATE_TRUNC(bridge_table_src_10011.ds_partitioned, quarter) AS ds_partitioned__quarter
-              , DATE_TRUNC(bridge_table_src_10011.ds_partitioned, isoyear) AS ds_partitioned__year
+              , DATE_TRUNC(bridge_table_src_10011.ds_partitioned, year) AS ds_partitioned__year
               , bridge_table_src_10011.extra_dim AS account_id__extra_dim
               , bridge_table_src_10011.ds_partitioned AS account_id__ds_partitioned__day
               , DATE_TRUNC(bridge_table_src_10011.ds_partitioned, isoweek) AS account_id__ds_partitioned__week
               , DATE_TRUNC(bridge_table_src_10011.ds_partitioned, month) AS account_id__ds_partitioned__month
               , DATE_TRUNC(bridge_table_src_10011.ds_partitioned, quarter) AS account_id__ds_partitioned__quarter
-              , DATE_TRUNC(bridge_table_src_10011.ds_partitioned, isoyear) AS account_id__ds_partitioned__year
+              , DATE_TRUNC(bridge_table_src_10011.ds_partitioned, year) AS account_id__ds_partitioned__year
               , bridge_table_src_10011.account_id
               , bridge_table_src_10011.customer_id
               , bridge_table_src_10011.customer_id AS account_id__customer_id
@@ -185,14 +185,14 @@ FROM (
                 , DATE_TRUNC(customer_table_src_10013.ds_partitioned, isoweek) AS ds_partitioned__week
                 , DATE_TRUNC(customer_table_src_10013.ds_partitioned, month) AS ds_partitioned__month
                 , DATE_TRUNC(customer_table_src_10013.ds_partitioned, quarter) AS ds_partitioned__quarter
-                , DATE_TRUNC(customer_table_src_10013.ds_partitioned, isoyear) AS ds_partitioned__year
+                , DATE_TRUNC(customer_table_src_10013.ds_partitioned, year) AS ds_partitioned__year
                 , customer_table_src_10013.customer_name AS customer_id__customer_name
                 , customer_table_src_10013.customer_atomic_weight AS customer_id__customer_atomic_weight
                 , customer_table_src_10013.ds_partitioned AS customer_id__ds_partitioned__day
                 , DATE_TRUNC(customer_table_src_10013.ds_partitioned, isoweek) AS customer_id__ds_partitioned__week
                 , DATE_TRUNC(customer_table_src_10013.ds_partitioned, month) AS customer_id__ds_partitioned__month
                 , DATE_TRUNC(customer_table_src_10013.ds_partitioned, quarter) AS customer_id__ds_partitioned__quarter
-                , DATE_TRUNC(customer_table_src_10013.ds_partitioned, isoyear) AS customer_id__ds_partitioned__year
+                , DATE_TRUNC(customer_table_src_10013.ds_partitioned, year) AS customer_id__ds_partitioned__year
                 , customer_table_src_10013.customer_id
               FROM ***************************.customer_table customer_table_src_10013
             ) subq_4
