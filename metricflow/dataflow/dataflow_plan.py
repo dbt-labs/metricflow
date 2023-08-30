@@ -794,6 +794,7 @@ class JoinToTimeSpineNode(Generic[SourceDataSetT], BaseOutput[SourceDataSetT], A
             and other_node.time_range_constraint == self.time_range_constraint
             and other_node.offset_window == self.offset_window
             and other_node.offset_to_grain == self.offset_to_grain
+            and other_node.metric_time_dimension_specs == self.metric_time_dimension_specs
         )
 
     def with_new_parents(  # noqa: D
