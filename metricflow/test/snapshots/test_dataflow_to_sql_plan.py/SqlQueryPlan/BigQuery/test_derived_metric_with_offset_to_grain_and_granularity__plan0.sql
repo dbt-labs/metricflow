@@ -342,6 +342,7 @@ FROM (
           ) subq_6
           ON
             DATE_TRUNC(subq_7.metric_time__day, month) = subq_6.metric_time__day
+          WHERE DATE_TRUNC(subq_7.metric_time__day, isoweek) = subq_7.metric_time__day
         ) subq_9
       ) subq_10
       GROUP BY

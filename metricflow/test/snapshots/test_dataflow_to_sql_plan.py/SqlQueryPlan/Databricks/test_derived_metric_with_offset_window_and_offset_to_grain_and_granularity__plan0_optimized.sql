@@ -28,6 +28,7 @@ FROM (
     ) subq_18
     ON
       DATE_TRUNC('month', subq_20.ds) = subq_18.metric_time__day
+    WHERE DATE_TRUNC('year', subq_20.ds) = subq_20.ds
     GROUP BY
       DATE_TRUNC('year', subq_20.ds)
   ) subq_24

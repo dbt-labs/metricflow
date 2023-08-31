@@ -204,6 +204,7 @@ FROM (
           ) subq_1
           ON
             DATE_TRUNC(subq_2.metric_time__day, month) = subq_1.metric_time__day
+          WHERE DATE_TRUNC(subq_2.metric_time__day, isoyear) = subq_2.metric_time__day
         ) subq_4
       ) subq_5
       GROUP BY

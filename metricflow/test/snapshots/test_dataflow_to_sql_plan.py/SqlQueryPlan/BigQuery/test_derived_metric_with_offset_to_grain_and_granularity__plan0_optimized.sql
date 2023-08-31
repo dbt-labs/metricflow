@@ -47,6 +47,7 @@ FROM (
     ) subq_20
     ON
       DATE_TRUNC(subq_22.ds, month) = subq_20.metric_time__day
+    WHERE DATE_TRUNC(subq_22.ds, isoweek) = subq_22.ds
     GROUP BY
       metric_time__week
   ) subq_26
