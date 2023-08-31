@@ -913,6 +913,7 @@ integration_test:
         FROM {{ source_schema }}.fct_bookings
       ) d
       ON {{ render_date_trunc("c.ds", TimeGranularity.MONTH) }} = d.metric_time__day
+      WHERE {{ render_date_trunc("c.ds", TimeGranularity.WEEK) }} = c.ds
       GROUP BY metric_time__week
     ) b
     ON a.metric_time__week = b.metric_time__week
@@ -955,6 +956,7 @@ integration_test:
         FROM {{ source_schema }}.fct_bookings
       ) d
       ON {{ render_date_trunc("c.ds", TimeGranularity.MONTH) }} = d.metric_time__day
+      WHERE {{ render_date_trunc("c.ds", TimeGranularity.YEAR) }} = c.ds
       GROUP BY metric_time__year
     ) b
     ON a.metric_time__year = b.metric_time__year
@@ -983,8 +985,8 @@ integration_test:
     ON {{ render_date_sub("d", "ds", 2, TimeGranularity.DAY) }} = c.metric_time__day
 ---
 integration_test:
-  name: derived_metric_offset_window_and_multiple_granularities
-  description: Tests a derived metric offset query with window and 2 metric_time granularities
+  name: derived_metric_with_window_and_multiple_granularities
+  description: Tests a derived metric offset query with offset to grain and 2 metric_time granularities
   model: SIMPLE_MODEL
   metrics: ["bookings_5_day_lag"]
   group_bys: ["metric_time__month", "metric_time__week"]
@@ -1002,3 +1004,42 @@ integration_test:
     ) b
     ON {{ render_date_sub("a", "ds", 5, TimeGranularity.DAY) }} = b.metric_time__day
     GROUP BY metric_time__month, metric_time__week
+---
+integration_test:
+  name: derived_metric_with_offset_to_grain_and_multiple_granularities
+  description: Tests a derived metric query with an offset_to_grain and granularity
+  model: SIMPLE_MODEL
+  metrics: ["bookings_growth_since_start_of_month"]
+  group_bys: ["metric_time__month", "metric_time__week"]
+  check_query: |
+    SELECT
+      COALESCE(a.metric_time__week, b.metric_time__week) AS metric_time__week
+      , COALESCE(a.metric_time__month, b.metric_time__month) AS metric_time__month
+      , bookings - bookings_at_start_of_month AS bookings_growth_since_start_of_month
+    FROM (
+      SELECT
+        {{ render_date_trunc("ds", TimeGranularity.WEEK) }} AS metric_time__week
+        , {{ render_date_trunc("ds", TimeGranularity.MONTH) }} AS metric_time__month
+        , SUM(1) AS bookings
+      FROM {{ source_schema }}.fct_bookings
+      GROUP BY metric_time__week, metric_time__month
+    ) a
+    INNER JOIN (
+      SELECT
+        {{ render_date_trunc("c.ds", TimeGranularity.WEEK) }} AS metric_time__week
+        , {{ render_date_trunc("c.ds", TimeGranularity.MONTH) }} AS metric_time__month
+        , SUM(d.bookings_at_start_of_month) AS bookings_at_start_of_month
+      FROM {{ mf_time_spine_source }} c
+      INNER JOIN (
+        SELECT
+          ds AS metric_time__day
+          , 1 AS bookings_at_start_of_month
+        FROM {{ source_schema }}.fct_bookings
+      ) d
+      ON {{ render_date_trunc("c.ds", TimeGranularity.MONTH) }} = d.metric_time__day
+      WHERE {{ render_date_trunc("c.ds", TimeGranularity.WEEK) }} = c.ds
+        OR {{ render_date_trunc("c.ds", TimeGranularity.MONTH) }} = c.ds
+      GROUP BY metric_time__week, metric_time__month
+    ) b
+    ON a.metric_time__week = b.metric_time__week
+      AND a.metric_time__month = b.metric_time__month

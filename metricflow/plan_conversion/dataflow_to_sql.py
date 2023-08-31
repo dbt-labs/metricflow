@@ -85,9 +85,13 @@ from metricflow.sql.sql_exprs import (
     SqlBetweenExpression,
     SqlColumnReference,
     SqlColumnReferenceExpression,
+    SqlComparison,
+    SqlComparisonExpression,
     SqlDateTruncExpression,
     SqlExpressionNode,
     SqlFunctionExpression,
+    SqlLogicalExpression,
+    SqlLogicalOperator,
     SqlRatioComputationExpression,
     SqlStringExpression,
     SqlStringLiteralExpression,
@@ -1358,6 +1362,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         # Add requested granularities (skip for default granularity).
         metric_time_select_columns = []
         metric_time_dimension_instances = []
+        where: Optional[SqlExpressionNode] = None
         for metric_time_dimension_spec in node.metric_time_dimension_specs:
             if metric_time_dimension_spec.time_granularity == self._time_spine_source.time_column_granularity:
                 select_expr = time_spine_column_select_expr
@@ -1379,6 +1384,15 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                     spec=new_time_dim_spec,
                 )
                 column_alias = time_dim_instance.associated_column.column_name
+                if node.offset_to_grain:
+                    # Filter down to one row per granularity period
+                    new_filter = SqlComparisonExpression(
+                        left_expr=select_expr, comparison=SqlComparison.EQUALS, right_expr=time_spine_column_select_expr
+                    )
+                    if not where:
+                        where = new_filter
+                    else:
+                        where = SqlLogicalExpression(operator=SqlLogicalOperator.OR, args=(where, new_filter))
             metric_time_dimension_instances.append(time_dim_instance)
             metric_time_select_columns.append(SqlSelectColumn(expr=select_expr, column_alias=column_alias))
         metric_time_instance_set = InstanceSet(time_dimension_instances=tuple(metric_time_dimension_instances))
@@ -1393,5 +1407,6 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 joins_descs=(join_description,),
                 group_bys=(),
                 order_bys=(),
+                where=where,
             ),
         )

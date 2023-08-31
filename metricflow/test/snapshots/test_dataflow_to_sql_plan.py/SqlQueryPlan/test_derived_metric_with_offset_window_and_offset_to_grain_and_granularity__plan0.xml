@@ -298,7 +298,7 @@
                             <!--    'right_source_alias': 'subq_1',                          -->
                             <!--    'join_type': SqlJoinType.INNER,                          -->
                             <!--    'on_condition': SqlComparisonExpression(node_id=cmp_0)}  -->
-                            <!-- where = None -->
+                            <!-- where = SqlComparisonExpression(node_id=cmp_1) -->
                             <SqlSelectStatementNode>
                                 <!-- description = Date Spine -->
                                 <!-- node_id = ss_8 -->
@@ -1029,7 +1029,7 @@
                             <!--    'right_source': SqlSelectStatementNode(node_id=ss_13),   -->
                             <!--    'right_source_alias': 'subq_9',                          -->
                             <!--    'join_type': SqlJoinType.INNER,                          -->
-                            <!--    'on_condition': SqlComparisonExpression(node_id=cmp_1)}  -->
+                            <!--    'on_condition': SqlComparisonExpression(node_id=cmp_2)}  -->
                             <!-- where = None -->
                             <SqlSelectStatementNode>
                                 <!-- description = Date Spine -->
