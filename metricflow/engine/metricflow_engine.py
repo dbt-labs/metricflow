@@ -307,7 +307,11 @@ class AbstractMetricFlowEngine(ABC):
 
 
 class MetricFlowEngine(AbstractMetricFlowEngine):
-    """Main entry point for queries."""
+    """Main entry point for queries.
+
+    Attributes on this class should be treated as in use by our APIs.
+    TODO: provide a more stable API layer instead of assuming this class is stable.
+    """
 
     def __init__(
         self,
