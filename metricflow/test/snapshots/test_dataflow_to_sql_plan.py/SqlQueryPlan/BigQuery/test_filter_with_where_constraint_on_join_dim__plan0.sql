@@ -121,33 +121,33 @@ FROM (
                   , DATE_TRUNC(bookings_source_src_10001.ds, isoweek) AS ds__week
                   , DATE_TRUNC(bookings_source_src_10001.ds, month) AS ds__month
                   , DATE_TRUNC(bookings_source_src_10001.ds, quarter) AS ds__quarter
-                  , DATE_TRUNC(bookings_source_src_10001.ds, isoyear) AS ds__year
+                  , DATE_TRUNC(bookings_source_src_10001.ds, year) AS ds__year
                   , bookings_source_src_10001.ds_partitioned AS ds_partitioned__day
                   , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, isoweek) AS ds_partitioned__week
                   , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, month) AS ds_partitioned__month
                   , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, quarter) AS ds_partitioned__quarter
-                  , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, isoyear) AS ds_partitioned__year
+                  , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, year) AS ds_partitioned__year
                   , bookings_source_src_10001.paid_at AS paid_at__day
                   , DATE_TRUNC(bookings_source_src_10001.paid_at, isoweek) AS paid_at__week
                   , DATE_TRUNC(bookings_source_src_10001.paid_at, month) AS paid_at__month
                   , DATE_TRUNC(bookings_source_src_10001.paid_at, quarter) AS paid_at__quarter
-                  , DATE_TRUNC(bookings_source_src_10001.paid_at, isoyear) AS paid_at__year
+                  , DATE_TRUNC(bookings_source_src_10001.paid_at, year) AS paid_at__year
                   , bookings_source_src_10001.is_instant AS booking__is_instant
                   , bookings_source_src_10001.ds AS booking__ds__day
                   , DATE_TRUNC(bookings_source_src_10001.ds, isoweek) AS booking__ds__week
                   , DATE_TRUNC(bookings_source_src_10001.ds, month) AS booking__ds__month
                   , DATE_TRUNC(bookings_source_src_10001.ds, quarter) AS booking__ds__quarter
-                  , DATE_TRUNC(bookings_source_src_10001.ds, isoyear) AS booking__ds__year
+                  , DATE_TRUNC(bookings_source_src_10001.ds, year) AS booking__ds__year
                   , bookings_source_src_10001.ds_partitioned AS booking__ds_partitioned__day
                   , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, isoweek) AS booking__ds_partitioned__week
                   , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, month) AS booking__ds_partitioned__month
                   , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, quarter) AS booking__ds_partitioned__quarter
-                  , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, isoyear) AS booking__ds_partitioned__year
+                  , DATE_TRUNC(bookings_source_src_10001.ds_partitioned, year) AS booking__ds_partitioned__year
                   , bookings_source_src_10001.paid_at AS booking__paid_at__day
                   , DATE_TRUNC(bookings_source_src_10001.paid_at, isoweek) AS booking__paid_at__week
                   , DATE_TRUNC(bookings_source_src_10001.paid_at, month) AS booking__paid_at__month
                   , DATE_TRUNC(bookings_source_src_10001.paid_at, quarter) AS booking__paid_at__quarter
-                  , DATE_TRUNC(bookings_source_src_10001.paid_at, isoyear) AS booking__paid_at__year
+                  , DATE_TRUNC(bookings_source_src_10001.paid_at, year) AS booking__paid_at__year
                   , bookings_source_src_10001.listing_id AS listing
                   , bookings_source_src_10001.guest_id AS guest
                   , bookings_source_src_10001.host_id AS host
@@ -214,12 +214,12 @@ FROM (
                   , DATE_TRUNC(listings_latest_src_10004.created_at, isoweek) AS ds__week
                   , DATE_TRUNC(listings_latest_src_10004.created_at, month) AS ds__month
                   , DATE_TRUNC(listings_latest_src_10004.created_at, quarter) AS ds__quarter
-                  , DATE_TRUNC(listings_latest_src_10004.created_at, isoyear) AS ds__year
+                  , DATE_TRUNC(listings_latest_src_10004.created_at, year) AS ds__year
                   , listings_latest_src_10004.created_at AS created_at__day
                   , DATE_TRUNC(listings_latest_src_10004.created_at, isoweek) AS created_at__week
                   , DATE_TRUNC(listings_latest_src_10004.created_at, month) AS created_at__month
                   , DATE_TRUNC(listings_latest_src_10004.created_at, quarter) AS created_at__quarter
-                  , DATE_TRUNC(listings_latest_src_10004.created_at, isoyear) AS created_at__year
+                  , DATE_TRUNC(listings_latest_src_10004.created_at, year) AS created_at__year
                   , listings_latest_src_10004.country AS country_latest
                   , listings_latest_src_10004.is_lux AS is_lux_latest
                   , listings_latest_src_10004.capacity AS capacity_latest
@@ -227,12 +227,12 @@ FROM (
                   , DATE_TRUNC(listings_latest_src_10004.created_at, isoweek) AS listing__ds__week
                   , DATE_TRUNC(listings_latest_src_10004.created_at, month) AS listing__ds__month
                   , DATE_TRUNC(listings_latest_src_10004.created_at, quarter) AS listing__ds__quarter
-                  , DATE_TRUNC(listings_latest_src_10004.created_at, isoyear) AS listing__ds__year
+                  , DATE_TRUNC(listings_latest_src_10004.created_at, year) AS listing__ds__year
                   , listings_latest_src_10004.created_at AS listing__created_at__day
                   , DATE_TRUNC(listings_latest_src_10004.created_at, isoweek) AS listing__created_at__week
                   , DATE_TRUNC(listings_latest_src_10004.created_at, month) AS listing__created_at__month
                   , DATE_TRUNC(listings_latest_src_10004.created_at, quarter) AS listing__created_at__quarter
-                  , DATE_TRUNC(listings_latest_src_10004.created_at, isoyear) AS listing__created_at__year
+                  , DATE_TRUNC(listings_latest_src_10004.created_at, year) AS listing__created_at__year
                   , listings_latest_src_10004.country AS listing__country_latest
                   , listings_latest_src_10004.is_lux AS listing__is_lux_latest
                   , listings_latest_src_10004.capacity AS listing__capacity_latest

@@ -27,13 +27,13 @@ FROM (
     , DATE_TRUNC(ds, isoweek) AS ds__week
     , DATE_TRUNC(ds, month) AS ds__month
     , DATE_TRUNC(ds, quarter) AS ds__quarter
-    , DATE_TRUNC(ds, isoyear) AS ds__year
+    , DATE_TRUNC(ds, year) AS ds__year
     , account_type
     , ds AS account__ds__day
     , DATE_TRUNC(ds, isoweek) AS account__ds__week
     , DATE_TRUNC(ds, month) AS account__ds__month
     , DATE_TRUNC(ds, quarter) AS account__ds__quarter
-    , DATE_TRUNC(ds, isoyear) AS account__ds__year
+    , DATE_TRUNC(ds, year) AS account__ds__year
     , account_type AS account__account_type
     , user_id AS user
     , user_id AS account__user

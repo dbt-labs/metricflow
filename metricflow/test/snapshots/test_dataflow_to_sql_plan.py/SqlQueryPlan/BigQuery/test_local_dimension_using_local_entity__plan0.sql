@@ -63,12 +63,12 @@ FROM (
           , DATE_TRUNC(listings_latest_src_10004.created_at, isoweek) AS ds__week
           , DATE_TRUNC(listings_latest_src_10004.created_at, month) AS ds__month
           , DATE_TRUNC(listings_latest_src_10004.created_at, quarter) AS ds__quarter
-          , DATE_TRUNC(listings_latest_src_10004.created_at, isoyear) AS ds__year
+          , DATE_TRUNC(listings_latest_src_10004.created_at, year) AS ds__year
           , listings_latest_src_10004.created_at AS created_at__day
           , DATE_TRUNC(listings_latest_src_10004.created_at, isoweek) AS created_at__week
           , DATE_TRUNC(listings_latest_src_10004.created_at, month) AS created_at__month
           , DATE_TRUNC(listings_latest_src_10004.created_at, quarter) AS created_at__quarter
-          , DATE_TRUNC(listings_latest_src_10004.created_at, isoyear) AS created_at__year
+          , DATE_TRUNC(listings_latest_src_10004.created_at, year) AS created_at__year
           , listings_latest_src_10004.country AS country_latest
           , listings_latest_src_10004.is_lux AS is_lux_latest
           , listings_latest_src_10004.capacity AS capacity_latest
@@ -76,12 +76,12 @@ FROM (
           , DATE_TRUNC(listings_latest_src_10004.created_at, isoweek) AS listing__ds__week
           , DATE_TRUNC(listings_latest_src_10004.created_at, month) AS listing__ds__month
           , DATE_TRUNC(listings_latest_src_10004.created_at, quarter) AS listing__ds__quarter
-          , DATE_TRUNC(listings_latest_src_10004.created_at, isoyear) AS listing__ds__year
+          , DATE_TRUNC(listings_latest_src_10004.created_at, year) AS listing__ds__year
           , listings_latest_src_10004.created_at AS listing__created_at__day
           , DATE_TRUNC(listings_latest_src_10004.created_at, isoweek) AS listing__created_at__week
           , DATE_TRUNC(listings_latest_src_10004.created_at, month) AS listing__created_at__month
           , DATE_TRUNC(listings_latest_src_10004.created_at, quarter) AS listing__created_at__quarter
-          , DATE_TRUNC(listings_latest_src_10004.created_at, isoyear) AS listing__created_at__year
+          , DATE_TRUNC(listings_latest_src_10004.created_at, year) AS listing__created_at__year
           , listings_latest_src_10004.country AS listing__country_latest
           , listings_latest_src_10004.is_lux AS listing__is_lux_latest
           , listings_latest_src_10004.capacity AS listing__capacity_latest

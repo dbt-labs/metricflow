@@ -99,33 +99,33 @@ FROM (
               , DATE_TRUNC(bookings_source_src_10015.ds, isoweek) AS ds__week
               , DATE_TRUNC(bookings_source_src_10015.ds, month) AS ds__month
               , DATE_TRUNC(bookings_source_src_10015.ds, quarter) AS ds__quarter
-              , DATE_TRUNC(bookings_source_src_10015.ds, isoyear) AS ds__year
+              , DATE_TRUNC(bookings_source_src_10015.ds, year) AS ds__year
               , bookings_source_src_10015.ds_partitioned AS ds_partitioned__day
               , DATE_TRUNC(bookings_source_src_10015.ds_partitioned, isoweek) AS ds_partitioned__week
               , DATE_TRUNC(bookings_source_src_10015.ds_partitioned, month) AS ds_partitioned__month
               , DATE_TRUNC(bookings_source_src_10015.ds_partitioned, quarter) AS ds_partitioned__quarter
-              , DATE_TRUNC(bookings_source_src_10015.ds_partitioned, isoyear) AS ds_partitioned__year
+              , DATE_TRUNC(bookings_source_src_10015.ds_partitioned, year) AS ds_partitioned__year
               , bookings_source_src_10015.paid_at AS paid_at__day
               , DATE_TRUNC(bookings_source_src_10015.paid_at, isoweek) AS paid_at__week
               , DATE_TRUNC(bookings_source_src_10015.paid_at, month) AS paid_at__month
               , DATE_TRUNC(bookings_source_src_10015.paid_at, quarter) AS paid_at__quarter
-              , DATE_TRUNC(bookings_source_src_10015.paid_at, isoyear) AS paid_at__year
+              , DATE_TRUNC(bookings_source_src_10015.paid_at, year) AS paid_at__year
               , bookings_source_src_10015.is_instant AS booking__is_instant
               , bookings_source_src_10015.ds AS booking__ds__day
               , DATE_TRUNC(bookings_source_src_10015.ds, isoweek) AS booking__ds__week
               , DATE_TRUNC(bookings_source_src_10015.ds, month) AS booking__ds__month
               , DATE_TRUNC(bookings_source_src_10015.ds, quarter) AS booking__ds__quarter
-              , DATE_TRUNC(bookings_source_src_10015.ds, isoyear) AS booking__ds__year
+              , DATE_TRUNC(bookings_source_src_10015.ds, year) AS booking__ds__year
               , bookings_source_src_10015.ds_partitioned AS booking__ds_partitioned__day
               , DATE_TRUNC(bookings_source_src_10015.ds_partitioned, isoweek) AS booking__ds_partitioned__week
               , DATE_TRUNC(bookings_source_src_10015.ds_partitioned, month) AS booking__ds_partitioned__month
               , DATE_TRUNC(bookings_source_src_10015.ds_partitioned, quarter) AS booking__ds_partitioned__quarter
-              , DATE_TRUNC(bookings_source_src_10015.ds_partitioned, isoyear) AS booking__ds_partitioned__year
+              , DATE_TRUNC(bookings_source_src_10015.ds_partitioned, year) AS booking__ds_partitioned__year
               , bookings_source_src_10015.paid_at AS booking__paid_at__day
               , DATE_TRUNC(bookings_source_src_10015.paid_at, isoweek) AS booking__paid_at__week
               , DATE_TRUNC(bookings_source_src_10015.paid_at, month) AS booking__paid_at__month
               , DATE_TRUNC(bookings_source_src_10015.paid_at, quarter) AS booking__paid_at__quarter
-              , DATE_TRUNC(bookings_source_src_10015.paid_at, isoyear) AS booking__paid_at__year
+              , DATE_TRUNC(bookings_source_src_10015.paid_at, year) AS booking__paid_at__year
               , bookings_source_src_10015.listing_id AS listing
               , bookings_source_src_10015.guest_id AS guest
               , bookings_source_src_10015.host_id AS host
@@ -230,23 +230,23 @@ FROM (
                 , DATE_TRUNC(lux_listings_src_10019.valid_from, isoweek) AS window_start__week
                 , DATE_TRUNC(lux_listings_src_10019.valid_from, month) AS window_start__month
                 , DATE_TRUNC(lux_listings_src_10019.valid_from, quarter) AS window_start__quarter
-                , DATE_TRUNC(lux_listings_src_10019.valid_from, isoyear) AS window_start__year
+                , DATE_TRUNC(lux_listings_src_10019.valid_from, year) AS window_start__year
                 , lux_listings_src_10019.valid_to AS window_end__day
                 , DATE_TRUNC(lux_listings_src_10019.valid_to, isoweek) AS window_end__week
                 , DATE_TRUNC(lux_listings_src_10019.valid_to, month) AS window_end__month
                 , DATE_TRUNC(lux_listings_src_10019.valid_to, quarter) AS window_end__quarter
-                , DATE_TRUNC(lux_listings_src_10019.valid_to, isoyear) AS window_end__year
+                , DATE_TRUNC(lux_listings_src_10019.valid_to, year) AS window_end__year
                 , lux_listings_src_10019.is_confirmed_lux
                 , lux_listings_src_10019.valid_from AS lux_listing__window_start__day
                 , DATE_TRUNC(lux_listings_src_10019.valid_from, isoweek) AS lux_listing__window_start__week
                 , DATE_TRUNC(lux_listings_src_10019.valid_from, month) AS lux_listing__window_start__month
                 , DATE_TRUNC(lux_listings_src_10019.valid_from, quarter) AS lux_listing__window_start__quarter
-                , DATE_TRUNC(lux_listings_src_10019.valid_from, isoyear) AS lux_listing__window_start__year
+                , DATE_TRUNC(lux_listings_src_10019.valid_from, year) AS lux_listing__window_start__year
                 , lux_listings_src_10019.valid_to AS lux_listing__window_end__day
                 , DATE_TRUNC(lux_listings_src_10019.valid_to, isoweek) AS lux_listing__window_end__week
                 , DATE_TRUNC(lux_listings_src_10019.valid_to, month) AS lux_listing__window_end__month
                 , DATE_TRUNC(lux_listings_src_10019.valid_to, quarter) AS lux_listing__window_end__quarter
-                , DATE_TRUNC(lux_listings_src_10019.valid_to, isoyear) AS lux_listing__window_end__year
+                , DATE_TRUNC(lux_listings_src_10019.valid_to, year) AS lux_listing__window_end__year
                 , lux_listings_src_10019.is_confirmed_lux AS lux_listing__is_confirmed_lux
                 , lux_listings_src_10019.lux_listing_id AS lux_listing
               FROM ***************************.dim_lux_listings lux_listings_src_10019

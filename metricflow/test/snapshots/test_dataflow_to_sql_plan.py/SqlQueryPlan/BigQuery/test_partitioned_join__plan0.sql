@@ -70,23 +70,23 @@ FROM (
               , DATE_TRUNC(id_verifications_src_10003.ds, isoweek) AS ds__week
               , DATE_TRUNC(id_verifications_src_10003.ds, month) AS ds__month
               , DATE_TRUNC(id_verifications_src_10003.ds, quarter) AS ds__quarter
-              , DATE_TRUNC(id_verifications_src_10003.ds, isoyear) AS ds__year
+              , DATE_TRUNC(id_verifications_src_10003.ds, year) AS ds__year
               , id_verifications_src_10003.ds_partitioned AS ds_partitioned__day
               , DATE_TRUNC(id_verifications_src_10003.ds_partitioned, isoweek) AS ds_partitioned__week
               , DATE_TRUNC(id_verifications_src_10003.ds_partitioned, month) AS ds_partitioned__month
               , DATE_TRUNC(id_verifications_src_10003.ds_partitioned, quarter) AS ds_partitioned__quarter
-              , DATE_TRUNC(id_verifications_src_10003.ds_partitioned, isoyear) AS ds_partitioned__year
+              , DATE_TRUNC(id_verifications_src_10003.ds_partitioned, year) AS ds_partitioned__year
               , id_verifications_src_10003.verification_type
               , id_verifications_src_10003.ds AS verification__ds__day
               , DATE_TRUNC(id_verifications_src_10003.ds, isoweek) AS verification__ds__week
               , DATE_TRUNC(id_verifications_src_10003.ds, month) AS verification__ds__month
               , DATE_TRUNC(id_verifications_src_10003.ds, quarter) AS verification__ds__quarter
-              , DATE_TRUNC(id_verifications_src_10003.ds, isoyear) AS verification__ds__year
+              , DATE_TRUNC(id_verifications_src_10003.ds, year) AS verification__ds__year
               , id_verifications_src_10003.ds_partitioned AS verification__ds_partitioned__day
               , DATE_TRUNC(id_verifications_src_10003.ds_partitioned, isoweek) AS verification__ds_partitioned__week
               , DATE_TRUNC(id_verifications_src_10003.ds_partitioned, month) AS verification__ds_partitioned__month
               , DATE_TRUNC(id_verifications_src_10003.ds_partitioned, quarter) AS verification__ds_partitioned__quarter
-              , DATE_TRUNC(id_verifications_src_10003.ds_partitioned, isoyear) AS verification__ds_partitioned__year
+              , DATE_TRUNC(id_verifications_src_10003.ds_partitioned, year) AS verification__ds_partitioned__year
               , id_verifications_src_10003.verification_type AS verification__verification_type
               , id_verifications_src_10003.verification_id AS verification
               , id_verifications_src_10003.user_id AS user
@@ -109,33 +109,33 @@ FROM (
             , DATE_TRUNC(users_ds_source_src_10007.ds, isoweek) AS ds__week
             , DATE_TRUNC(users_ds_source_src_10007.ds, month) AS ds__month
             , DATE_TRUNC(users_ds_source_src_10007.ds, quarter) AS ds__quarter
-            , DATE_TRUNC(users_ds_source_src_10007.ds, isoyear) AS ds__year
+            , DATE_TRUNC(users_ds_source_src_10007.ds, year) AS ds__year
             , users_ds_source_src_10007.created_at AS created_at__day
             , DATE_TRUNC(users_ds_source_src_10007.created_at, isoweek) AS created_at__week
             , DATE_TRUNC(users_ds_source_src_10007.created_at, month) AS created_at__month
             , DATE_TRUNC(users_ds_source_src_10007.created_at, quarter) AS created_at__quarter
-            , DATE_TRUNC(users_ds_source_src_10007.created_at, isoyear) AS created_at__year
+            , DATE_TRUNC(users_ds_source_src_10007.created_at, year) AS created_at__year
             , users_ds_source_src_10007.ds_partitioned AS ds_partitioned__day
             , DATE_TRUNC(users_ds_source_src_10007.ds_partitioned, isoweek) AS ds_partitioned__week
             , DATE_TRUNC(users_ds_source_src_10007.ds_partitioned, month) AS ds_partitioned__month
             , DATE_TRUNC(users_ds_source_src_10007.ds_partitioned, quarter) AS ds_partitioned__quarter
-            , DATE_TRUNC(users_ds_source_src_10007.ds_partitioned, isoyear) AS ds_partitioned__year
+            , DATE_TRUNC(users_ds_source_src_10007.ds_partitioned, year) AS ds_partitioned__year
             , users_ds_source_src_10007.home_state
             , users_ds_source_src_10007.ds AS user__ds__day
             , DATE_TRUNC(users_ds_source_src_10007.ds, isoweek) AS user__ds__week
             , DATE_TRUNC(users_ds_source_src_10007.ds, month) AS user__ds__month
             , DATE_TRUNC(users_ds_source_src_10007.ds, quarter) AS user__ds__quarter
-            , DATE_TRUNC(users_ds_source_src_10007.ds, isoyear) AS user__ds__year
+            , DATE_TRUNC(users_ds_source_src_10007.ds, year) AS user__ds__year
             , users_ds_source_src_10007.created_at AS user__created_at__day
             , DATE_TRUNC(users_ds_source_src_10007.created_at, isoweek) AS user__created_at__week
             , DATE_TRUNC(users_ds_source_src_10007.created_at, month) AS user__created_at__month
             , DATE_TRUNC(users_ds_source_src_10007.created_at, quarter) AS user__created_at__quarter
-            , DATE_TRUNC(users_ds_source_src_10007.created_at, isoyear) AS user__created_at__year
+            , DATE_TRUNC(users_ds_source_src_10007.created_at, year) AS user__created_at__year
             , users_ds_source_src_10007.ds_partitioned AS user__ds_partitioned__day
             , DATE_TRUNC(users_ds_source_src_10007.ds_partitioned, isoweek) AS user__ds_partitioned__week
             , DATE_TRUNC(users_ds_source_src_10007.ds_partitioned, month) AS user__ds_partitioned__month
             , DATE_TRUNC(users_ds_source_src_10007.ds_partitioned, quarter) AS user__ds_partitioned__quarter
-            , DATE_TRUNC(users_ds_source_src_10007.ds_partitioned, isoyear) AS user__ds_partitioned__year
+            , DATE_TRUNC(users_ds_source_src_10007.ds_partitioned, year) AS user__ds_partitioned__year
             , users_ds_source_src_10007.home_state AS user__home_state
             , users_ds_source_src_10007.user_id AS user
           FROM ***************************.dim_users users_ds_source_src_10007

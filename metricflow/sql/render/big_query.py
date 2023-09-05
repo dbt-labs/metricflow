@@ -121,7 +121,7 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
         arg_rendered = self.render_sql_expr(node.arg)
 
         prefix = ""
-        if node.time_granularity in (TimeGranularity.WEEK, TimeGranularity.YEAR):
+        if node.time_granularity == TimeGranularity.WEEK:
             prefix = "iso"
 
         return SqlExpressionRenderResult(
@@ -131,11 +131,11 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
 
     @override
     def visit_time_delta_expr(self, node: SqlTimeDeltaExpression) -> SqlExpressionRenderResult:
-        """Render time delta for BigQuery, which requires ISO prefixing on granularity values."""
+        """Render time delta for BigQuery, which requires ISO prefixing for the WEEK granularity value."""
         column = node.arg.accept(self)
         if node.grain_to_date:
             granularity = node.granularity
-            if granularity == TimeGranularity.WEEK or granularity == TimeGranularity.YEAR:
+            if granularity == TimeGranularity.WEEK:
                 granularity_value = "ISO" + granularity.value.upper()
             else:
                 granularity_value = granularity.value
