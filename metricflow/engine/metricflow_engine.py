@@ -33,6 +33,7 @@ from metricflow.errors.errors import ExecutionException
 from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
 from metricflow.execution.execution_plan_to_text import execution_plan_to_text
 from metricflow.execution.executor import SequentialPlanExecutor
+from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.formatting import indent_log_line
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.model.semantics.linkable_element_properties import (
@@ -306,7 +307,11 @@ class AbstractMetricFlowEngine(ABC):
 
 
 class MetricFlowEngine(AbstractMetricFlowEngine):
-    """Main entry point for queries."""
+    """Main entry point for queries.
+
+    Attributes on this class should be treated as in use by our APIs.
+    TODO: provide a more stable API layer instead of assuming this class is stable.
+    """
 
     def __init__(
         self,
@@ -400,6 +405,11 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             result_df=task_execution_result.df,
             result_table=explain_result.output_table,
         )
+
+    @property
+    def all_time_constraint(self) -> TimeRangeConstraint:
+        """TimeRangeConstraint representing the min & max dates supported."""
+        return TimeRangeConstraint.all_time()
 
     def _create_execution_plan(self, mf_query_request: MetricFlowQueryRequest) -> MetricFlowExplainResult:
         query_spec = self._query_parser.parse_and_validate_query(
