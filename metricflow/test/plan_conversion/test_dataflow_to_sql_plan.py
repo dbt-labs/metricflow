@@ -56,7 +56,7 @@ from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.snapshot_utils import assert_plan_snapshot_text_equal
 from metricflow.test.sql.compare_sql_plan import assert_rendered_sql_from_plan_equal, assert_sql_plan_text_equal
-from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY
+from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_QUARTER, MTD_SPEC_WEEK, MTD_SPEC_YEAR
 
 
 @pytest.fixture(scope="session")
@@ -556,6 +556,7 @@ def test_join_to_time_spine_node_without_offset(  # noqa: D
     )
     join_to_time_spine_node = JoinToTimeSpineNode(
         parent_node=compute_metrics_node,
+        metric_time_dimension_specs=[MTD_SPEC_DAY],
         time_range_constraint=TimeRangeConstraint(
             start_time=as_datetime("2020-01-01"), end_time=as_datetime("2021-01-01")
         ),
@@ -619,6 +620,7 @@ def test_join_to_time_spine_node_with_offset_window(  # noqa: D
     )
     join_to_time_spine_node = JoinToTimeSpineNode(
         parent_node=compute_metrics_node,
+        metric_time_dimension_specs=[MTD_SPEC_DAY],
         time_range_constraint=TimeRangeConstraint(
             start_time=as_datetime("2020-01-01"), end_time=as_datetime("2021-01-01")
         ),
@@ -684,6 +686,7 @@ def test_join_to_time_spine_node_with_offset_to_grain(
     )
     join_to_time_spine_node = JoinToTimeSpineNode(
         parent_node=compute_metrics_node,
+        metric_time_dimension_specs=[MTD_SPEC_DAY],
         time_range_constraint=TimeRangeConstraint(
             start_time=as_datetime("2020-01-01"), end_time=as_datetime("2021-01-01")
         ),
@@ -714,9 +717,6 @@ def test_join_to_time_spine_node_with_offset_to_grain(
         sql_client=sql_client,
         node=join_to_time_spine_node,
     )
-
-
-# TODO: write test case for both offset window and offset to grain to date once allowed via derived metrics
 
 
 def test_compute_metrics_node_ratio_from_single_semantic_model(
@@ -1745,7 +1745,7 @@ def test_derived_metric_with_offset_window_and_offset_to_grain(  # noqa: D
     )
 
 
-def test_derived_metric_with_one_input_metric(  # noqa: D
+def test_derived_offset_metric_with_one_input_metric(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
@@ -1755,6 +1755,98 @@ def test_derived_metric_with_one_input_metric(  # noqa: D
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="bookings_5_day_lag"),),
+            time_dimension_specs=(MTD_SPEC_DAY,),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+def test_derived_metric_with_offset_window_and_granularity(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    sql_client: SqlClient,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings_growth_2_weeks"),),
+            time_dimension_specs=(MTD_SPEC_QUARTER,),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+def test_derived_metric_with_offset_to_grain_and_granularity(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    sql_client: SqlClient,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings_growth_since_start_of_month"),),
+            time_dimension_specs=(MTD_SPEC_WEEK,),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+def test_derived_metric_with_offset_window_and_offset_to_grain_and_granularity(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    sql_client: SqlClient,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings_month_start_compared_to_1_month_prior"),),
+            time_dimension_specs=(MTD_SPEC_YEAR,),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+def test_derived_offset_cumulative_metric(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    sql_client: SqlClient,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="every_2_days_bookers_2_days_ago"),),
             time_dimension_specs=(MTD_SPEC_DAY,),
         )
     )

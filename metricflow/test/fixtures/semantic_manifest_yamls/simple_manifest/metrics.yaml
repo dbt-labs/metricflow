@@ -145,7 +145,7 @@ metric:
     measure: txn_revenue
 ---
 metric:
-  name: "every_two_days_bookers" # because the bookings test data only spans 3 days
+  name: "every_two_days_bookers"
   description: "every_two_days_bookers"
   type: cumulative
   type_params:
@@ -502,3 +502,16 @@ metric:
       - name: bookings
         offset_window: 5 days
         alias: bookings_5_days_ago
+---
+metric:
+  name: "every_2_days_bookers_2_days_ago"
+  description: |
+    number of bookers 2 days ago. used to test derived metric offset
+    with a cumulative input metric.
+  type: derived
+  type_params:
+    expr: every_2_days_bookers_2_days_ago
+    metrics:
+      - name: every_two_days_bookers
+        offset_window: 2 days
+        alias: every_2_days_bookers_2_days_ago
