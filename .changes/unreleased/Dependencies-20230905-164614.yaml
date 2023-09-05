@@ -1,0 +1,6 @@
+kind: Dependencies
+body: Allow tabulate versions >= 0.8.9
+time: 2023-09-05T16:46:14.56318-07:00
+custom:
+  Author: tlento
+  PR: "762"
