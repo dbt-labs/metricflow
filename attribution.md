@@ -9,7 +9,7 @@ The following 3rd-party software packages may be used by or distributed with **g
 
 Date generated | Revision ID
 :------------: | :----------:
-08/18/23 | 7a4a17e5ac0295511c1cc153b0b02afc96a93f02
+09/06/23 | a26a4123af0b98d9f9d0ca4253f80681046db804
 
 ---
 
@@ -574,7 +574,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ---
 
-### [metricflow (0.200.0)](https://pypi.org/project/metricflow/0.200.0/)
+### [metricflow (0.201.0)](https://pypi.org/project/metricflow/0.202.0.dev3/)
 
 
 #### Declared Licenses
@@ -717,7 +717,7 @@ the Adopting and Developing Business Source License FAQ.
 
 
 #### Other Licenses
-Zlib, NCSA, Unlicense, Python-2.0, OpenSSL, MPL-2.0, mit-old-style-no-advert, mit-nagy, MIT, LGPL-3.0-or-later, LGPL-3.0-only, ISC, IPA, Info-ZIP, GPL-3.0-with-GCC-exception, GPL-3.0-or-later, GPL-3.0-only, GPL-2.0-or-later, GPL-2.0-only, GPL-1.0-or-later, CC0-1.0, CC-BY-SA-4.0, BSD-2-Clause, BSD-3-Clause, bsd-3-clause-open-mpi, BSL-1.0, AAL, Artistic-1.0-Perl, Artistic-1.0, AGPL-3.0-only
+Zlib, NCSA, Unlicense, Python-2.0, openssl-ssleay, OpenSSL, OLDAP-1.1, MPL-2.0, mit-old-style-no-advert, mit-nagy, MIT, LGPL-3.0-only, ISC, IPA, Info-ZIP, GPL-3.0-with-GCC-exception, GPL-3.0-or-later, GPL-3.0-only, GPL-2.0-or-later, GPL-2.0-only, GPL-1.0-or-later, GPL-1.0-only, CC0-1.0, CC-BY-SA-4.0, BSD-2-Clause, BSD-3-Clause, bsd-3-clause-open-mpi, BSL-1.0, bacula-exception, AAL, Artistic-1.0-Perl, Artistic-1.0, AGPL-3.0-only
 
 
 ```
@@ -801,6 +801,134 @@ STICHTING MATHEMATISCH CENTRUM DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFT
 
 
 ```
+LICENSE ISSUES
+  ==============
+
+  The OpenSSL toolkit stays under a dual license, i.e. both the conditions of
+  the OpenSSL License and the original SSLeay license apply to the toolkit.
+  See below for the actual license texts. Actually both licenses are BSD-style
+  Open Source licenses. In case of any license issues related to OpenSSL
+  please contact openssl-core@openssl.org.
+
+  OpenSSL License
+  ---------------
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+1\. Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer. 
+
+2\. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in
+   the documentation and/or other materials provided with the
+   distribution.
+
+3\. All advertising materials mentioning features or use of this
+   software must display the following acknowledgment:
+   "This product includes software developed by the OpenSSL Project
+   for use in the OpenSSL Toolkit. (http://www.openssl.org/)"
+
+4\. The names "OpenSSL Toolkit" and "OpenSSL Project" must not be used to
+   endorse or promote products derived from this software without
+   prior written permission. For written permission, please contact
+   openssl-core@openssl.org.
+
+5\. Products derived from this software may not be called "OpenSSL"
+   nor may "OpenSSL" appear in their names without prior written
+   permission of the OpenSSL Project.
+
+6\. Redistributions of any form whatsoever must retain the following
+   acknowledgment:
+   "This product includes software developed by the OpenSSL Project
+   for use in the OpenSSL Toolkit (http://www.openssl.org/)"
+
+THIS SOFTWARE IS PROVIDED BY THE OpenSSL PROJECT ``AS IS'' AND ANY
+EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE OpenSSL PROJECT OR
+ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+This product includes cryptographic software written by Eric Young
+(eay@cryptsoft.com).  This product includes software written by Tim
+Hudson (tjh@cryptsoft.com).
+
+
+ Original SSLeay License
+ -----------------------
+
+Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
+All rights reserved.
+
+This package is an SSL implementation written
+by Eric Young (eay@cryptsoft.com).
+The implementation was written so as to conform with Netscapes SSL.
+
+This library is free for commercial and non-commercial use as long as
+the following conditions are aheared to.  The following conditions
+apply to all code found in this distribution, be it the RC4, RSA,
+lhash, DES, etc., code; not just the SSL code.  The SSL documentation
+included with this distribution is covered by the same copyright terms
+except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright remains Eric Young's, and as such any Copyright notices in
+the code are not to be removed.
+If this package is used in a product, Eric Young should be given attribution
+as the author of the parts of the library used.
+This can be in the form of a textual message at program startup or
+in documentation (online or textual) provided with the package.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+1\. Redistributions of source code must retain the copyright
+   notice, this list of conditions and the following disclaimer.
+2\. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+3\. All advertising materials mentioning features or use of this software
+   must display the following acknowledgement:
+   "This product includes cryptographic software written by
+    Eric Young (eay@cryptsoft.com)"
+   The word 'cryptographic' can be left out if the rouines from the library
+   being used are not cryptographic related :-).
+4\. If you include any Windows specific code (or a derivative thereof) from 
+   the apps directory (application code) you must include an acknowledgement:
+   "This product includes software written by Tim Hudson (tjh@cryptsoft.com)"
+
+THIS SOFTWARE IS PROVIDED BY ERIC YOUNG ``AS IS'' AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGE.
+
+The licence and distribution terms for any publically available version or
+derivative of this code cannot be changed.  i.e. this code cannot simply be
+copied and put under another distribution licence
+[including the GNU Public Licence.]
+```
+
+
+
+
+
+
+```
 Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
    1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
@@ -825,6 +953,39 @@ Redistribution and use in source and binary forms, with or without modification,
    4. If you include any Windows specific code (or a derivative thereof) from the apps directory (application code) you must include an acknowledgement: "This product includes software written by Tim Hudson (tjh@cryptsoft.com)"
 THIS SOFTWARE IS PROVIDED BY ERIC YOUNG ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 The licence and distribution terms for any publically available version or derivative of this code cannot be changed. i.e. this code cannot simply be copied and put under another distribution licence [including the GNU Public Licence.]
+```
+
+
+
+
+
+
+```
+Copyright 1998, The OpenLDAP Foundation. All Rights Reserved.
+Definitions:
+"Package" refers to the collection of files distributed by the Copyright Holder, and derivatives of that collection of files created through textual modification.
+"Standard Version" refers to such a Package if it has not been modified, or has been modified in accordance with the wishes of the Copyright Holder.
+"Copyright Holder" is whoever is named in the copyright or copyrights for the package.
+"You" is you, if you're thinking about copying or distributing this Package.
+"Reasonable copying fee" is whatever you can justify on the basis of media cost, duplication charges, time of people involved, and so on. (You will not be required to justify it to the Copyright Holder, but only to the computing community at large as a market that must bear the fee.)
+"Freely Available" means that no fee is charged for the item itself, though there may be fees involved in handling the item. It also means that recipients of the item may redistribute it under the same conditions they received it.
+   1. You may make and give away verbatim copies of the source form of the Standard Version of this Package without restriction, provided that you duplicate all of the original copyright notices and associated disclaimers.
+   2. You may apply bug fixes, portability fixes and other modifications derived from the Public Domain or from the Copyright Holder. A Package modified in such a way shall still be considered the Standard Version.
+   3. You may otherwise modify your copy of this Package in any way, provided that you insert a prominent notice in each changed file stating how and when you changed that file, and provided that you do at least ONE of the following:
+      a) place your modifications in the Public Domain or otherwise make them Freely Available, such as by posting said modifications to Usenet or an equivalent medium, or placing the modifications on a major archive site such as uunet.uu.net, or by allowing the Copyright Holder to include your modifications in the Standard Version of the Package.
+      b) use the modified Package only within your corporation or organization.
+      c) rename any non-standard executables so the names do not conflict with standard executables, which must also be provided, and provide a separate manual page for each non-standard executable that clearly documents how it differs from the Standard Version.
+      d) make other distribution arrangements with the Copyright Holder.
+   4. You may distribute the programs of this Package in object code or executable form, provided that you do at least ONE of the following:
+      a) distribute a Standard Version of the executables and library files, together with instructions (in the manual page or equivalent) on where to get the Standard Version.
+      b) accompany the distribution with the machine-readable source of the Package with your modifications.
+      c) accompany any non-standard executables with their corresponding Standard Version executables, giving the non-standard executables non-standard names, and clearly documenting the differences in manual pages (or equivalent), together with instructions on where to get the Standard Version.
+      d) make other distribution arrangements with the Copyright Holder.
+   5. You may charge a reasonable copying fee for any distribution of this Package. You may charge any fee you choose for support of this Package. You may not charge a fee for this Package itself. However, you may distribute this Package in aggregate with other (possibly commercial) programs as part of a larger (possibly commercial) software distribution provided that you do not advertise this Package as a product of your own.
+   6. The scripts and library files supplied as input to or produced as output from the programs of this Package do not automatically fall under the copyright of this Package, but belong to whomever generated them, and may be sold commercially, and may be aggregated with this Package.
+   7. C subroutines supplied by you and linked into this Package in order to emulate subroutines and variables of the language defined by this Package shall not be considered part of this Package, but are the equivalent of input as in Paragraph 6, provided these subroutines do not change the language in any way that would cause it to fail the regression tests for the language.
+   8. The name of the Copyright Holder may not be used to endorse or promote products derived from this software without specific prior written permission.
+   9. THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 ```
 
 
@@ -963,57 +1124,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-```
-
-
-
-
-
-
-```
-Copyright (C) 2007 Free Software Foundation, Inc. <http ://fsf.org/>
-Everyone is permitted to copy and distribute verbatim copies of this license document, but changing it is not allowed.
-This version of the GNU Lesser General Public License incorporates the terms and conditions of version 3 of the GNU General Public License, supplemented by the additional permissions listed below.
-   0. Additional Definitions.
-      
-      As used herein, "this License" refers to version 3 of the GNU Lesser General Public License, and the "GNU GPL" refers to version 3 of the GNU General Public License.
-      
-      "The Library" refers to a covered work governed by this License, other than an Application or a Combined Work as defined below.
-      
-      An "Application" is any work that makes use of an interface provided by the Library, but which is not otherwise based on the Library. Defining a subclass of a class defined by the Library is deemed a mode of using an interface provided by the Library.
-      
-      A "Combined Work" is a work produced by combining or linking an Application with the Library. The particular version of the Library with which the Combined Work was made is also called the "Linked Version".
-      
-      The "Minimal Corresponding Source" for a Combined Work means the Corresponding Source for the Combined Work, excluding any source code for portions of the Combined Work that, considered in isolation, are based on the Application, and not on the Linked Version.
-      
-      The "Corresponding Application Code" for a Combined Work means the object code and/or source code for the Application, including any data and utility programs needed for reproducing the Combined Work from the Application, but excluding the System Libraries of the Combined Work.
-   1. Exception to Section 3 of the GNU GPL.
-   You may convey a covered work under sections 3 and 4 of this License without being bound by section 3 of the GNU GPL.
-   2. Conveying Modified Versions.
-   If you modify a copy of the Library, and, in your modifications, a facility refers to a function or data to be supplied by an Application that uses the facility (other than as an argument passed when the facility is invoked), then you may convey a copy of the modified version:
-      a) under this License, provided that you make a good faith effort to ensure that, in the event an Application does not supply the function or data, the facility still operates, and performs whatever part of its purpose remains meaningful, or
-      b) under the GNU GPL, with none of the additional permissions of this License applicable to that copy.
-   3. Object Code Incorporating Material from Library Header Files.
-   The object code form of an Application may incorporate material from a header file that is part of the Library. You may convey such object code under terms of your choice, provided that, if the incorporated material is not limited to numerical parameters, data structure layouts and accessors, or small macros, inline functions and templates (ten or fewer lines in length), you do both of the following:
-      a) Give prominent notice with each copy of the object code that the Library is used in it and that the Library and its use are covered by this License.
-      b) Accompany the object code with a copy of the GNU GPL and this license document.
-   4. Combined Works.
-   You may convey a Combined Work under terms of your choice that, taken together, effectively do not restrict modification of the portions of the Library contained in the Combined Work and reverse engineering for debugging such modifications, if you also do each of the following:
-      a) Give prominent notice with each copy of the Combined Work that the Library is used in it and that the Library and its use are covered by this License.
-      b) Accompany the Combined Work with a copy of the GNU GPL and this license document.
-      c) For a Combined Work that displays copyright notices during execution, include the copyright notice for the Library among these notices, as well as a reference directing the user to the copies of the GNU GPL and this license document.
-      d) Do one of the following:
-         0) Convey the Minimal Corresponding Source under the terms of this License, and the Corresponding Application Code in a form suitable for, and under terms that permit, the user to recombine or relink the Application with a modified version of the Linked Version to produce a modified Combined Work, in the manner specified by section 6 of the GNU GPL for conveying Corresponding Source.
-         1) Use a suitable shared library mechanism for linking with the Library. A suitable mechanism is one that (a) uses at run time a copy of the Library already present on the user's computer system, and (b) will operate properly with a modified version of the Library that is interface-compatible with the Linked Version.
-      e) Provide Installation Information, but only if you would otherwise be required to provide such information under section 6 of the GNU GPL, and only to the extent that such information is necessary to install and execute a modified version of the Combined Work produced by recombining or relinking the Application with a modified version of the Linked Version. (If you use option 4d0, the Installation Information must accompany the Minimal Corresponding Source and Corresponding Application Code. If you use option 4d1, you must provide the Installation Information in the manner specified by section 6 of the GNU GPL for conveying Corresponding Source.)
-   5. Combined Libraries.
-   You may place library facilities that are a work based on the Library side by side in a single library together with other library facilities that are not Applications and are not covered by this License, and convey such a combined library under terms of your choice, if you do both of the following:
-      a) Accompany the combined library with a copy of the same work based on the Library, uncombined with any other library facilities, conveyed under the terms of this License.
-      b) Give prominent notice with the combined library that part of it is a work based on the Library, and explaining where to find the accompanying uncombined form of the same work.
-   6. Revised Versions of the GNU Lesser General Public License.
-   The Free Software Foundation may publish revised and/or new versions of the GNU Lesser General Public License from time to time. Such new versions will be similar in spirit to the present version, but may differ in detail to address new problems or concerns.
-   Each version is given a distinguishing version number. If the Library as you received it specifies that a certain numbered version of the GNU Lesser General Public License "or any later version" applies to it, you have the option of following the terms and conditions either of that published version or of any later version published by the Free Software Foundation. If the Library as you received it does not specify a version number of the GNU Lesser General Public License, you may choose any version of the GNU Lesser General Public License ever published by the Free Software Foundation.
-   If the Library as you received it specifies that a proxy can decide whether future versions of the GNU Lesser General Public License shall apply, that proxy's public statement of acceptance of any version is permanent authorization for you to choose that version for the Library.
 ```
 
 
@@ -1225,6 +1335,18 @@ You should have received a copy of the GNU General Public License along with thi
 ```
 Copyright (C) 2014 Pallets
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; version 1 or any later version.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+```
+
+
+
+
+
+
+```
+Copyright (C) 2014 Pallets
+This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; version 1.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 ```
@@ -1467,6 +1589,128 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 Permission is hereby granted, free of charge, to any person or organization obtaining a copy of the software and accompanying documentation covered by this license (the "Software") to use, reproduce, display, distribute, execute, and transmit the Software, and to prepare derivative works of the Software, and to permit third-parties to whom the Software is furnished to do so, all subject to the following:
 The copyright notices in the Software and this entire statement, including the above license grant, this restriction and the following disclaimer, must be included in all copies of the Software, in whole or in part, and all derivative works of the Software, unless such copies or derivative works are solely in the form of machine-executable object code generated by a source language processor.
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR ANYONE DISTRIBUTING THE SOFTWARE BE LIABLE FOR ANY DAMAGES OR OTHER LIABILITY, WHETHER IN CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+```
+
+
+
+
+
+
+```
+Last revision: 21 May 2017
+
+Bacula is licensed under the GNU Affero General Public License, version
+3.0 as published by the Free Software Foundation, Inc. ("AGPLv3").
+
+Additional Terms on the work licensed herein, pursuant to Section 7 of
+Affero General Public License are as follows:
+
+  1. The name Bacula is a registered trademark of Kern Sibbald, and Kern
+     Sibbald hereby declines to grant a trademark license to "Bacula"
+     pursuant to AGPLv3, Section 7(e) without a separate agreement with Kern
+     Sibbald.
+
+  2. Pursuant to AGPLv3, Section 7(a), in addition to the warranty and
+     liability disclaimers already found in AGPLv3, the copyright holders
+     specifically disclaim any liability for accusations of patent
+     infringement by any third party.
+
+  3. Pursuant to AGPLv3, Section 7(b), the portions of the file AUTHORS that
+     are deemed to be specified reasonable legal notices and/or author
+     attributions shall be preserved in redistribution of source code and/or
+     modifications thereof. Furthermore, when the following notice appears in
+     a source code file, it must be preserved when source code is conveyed
+     and/or propagated:
+
+   Bacula(R) - The Network Backup Solution
+
+   Copyright (C) 2000-2017 Kern Sibbald
+
+   The original author of Bacula is Kern Sibbald, with contributions
+   from many others, a complete list can be found in the file AUTHORS.
+
+   You may use this file and others of this release according to the
+   license defined in the LICENSE file, which includes the Affero General
+   Public License, v3.0 ("AGPLv3") and some additional permissions and
+   terms pursuant to its AGPLv3 Section 7.
+
+   This notice must be preserved when any source code is conveyed
+   and/or propagated.
+
+   Bacula(R) is a registered trademark of Kern Sibbald.
+
+Additional Permissions on the work licensed herein, pursuant to Section 7 of
+AGPLv3 are as follows:
+
+1\. As a special exception to the AGPLv3, the copyright holders give
+   permission to link the code of its release of Bacula with the OpenSSL
+   project's "OpenSSL" library (or with modified versions of it that use the
+   same license as the "OpenSSL" library), and distribute the linked
+   executables.  You must follow the requirements of AGPLv3 in all respects
+   for all of the code used other than "OpenSSL".
+
+2\. As a special exception to the AGPLv3, the copyright holders give
+   permission to link the code of its release of the Bacula Win32 File daemon
+   with the Microsoft supplied Volume Shadow Copy (VSS) libraries and
+   distribute the linked executables.  You must follow the requirements of
+   the AGPLv3 in all respects for all of the code used other than for the
+   Microsoft VSS code.
+
+If you want to fork Bacula, please read the file LICENSE-FAQ.
+
+The copyright for certain source files may include in addition to what is
+listed above the following copyright:
+
+   Copyright (C) 2000-2014 Free Software Foundation Europe e.V.
+
+The copyright on the Baculum code is:
+
+   Copyright (C) 2013-2017 Marcin Haba
+
+Copyrights of certain "script" files such as headers, shell script, Makefiles,
+etc ...  were previously never explicitly defined.  In almost all cases,
+they have been copyrighted with a BSD 2-Clause copyright to make them
+easier.  However, as is the case of all BSD type copyrights you must keep
+the copyright in place and on any binary only released the copyright notice
+must also be released with the binaries.  An example of such a copyright
+is:
+
+#
+\# Copyright (C) 2000-2017 Kern Sibbald
+\# License: BSD 2-Clause; see file LICENSE-FOSS
+#
+
+It is equivalent to the full BSD copyright of:
+
+=====
+Copyright (C) 2000-2017 Kern Sibbald
+License: BSD 2-Clause; see file LICENSE-FOSS
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1\.  Redistributions of source code must retain the above copyright notice,
+this list of conditions and the following disclaimer.
+
+2\.  Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+====
+
+Note: the exact form of the copyright (dates, name, and text formatting)
+might vary, but the intent is the same, namely that the full BSD 2-Clause
+coypright applies.  The file LICENSE-FOSS has a few more details.
 ```
 
 
@@ -3700,7 +3944,7 @@ There is no warranty.
 
 ---
 
-### [pydantic (1.10.0)](https://pypi.org/project/pydantic/2.2.0/)
+### [pydantic (1.10.0)](https://pypi.org/project/pydantic/2.3.0/)
 
 
 #### Declared Licenses
@@ -6338,6 +6582,73 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ```
 
 
+### GPL-1.0-only
+
+```
+GNU GENERAL PUBLIC LICENSE
+Version 1, February 1989
+Copyright (C) 1989 Free Software Foundation, Inc. 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+Everyone is permitted to copy and distribute verbatim copies of this license document, but changing it is not allowed.
+Preamble
+The license agreements of most software companies try to keep users at the mercy of those companies. By contrast, our General Public License is intended to guarantee your freedom to share and change free software--to make sure the software is free for all its users. The General Public License applies to the Free Software Foundation&#39;s software and to any other program whose authors commit to using it. You can use it for your programs, too.
+When we speak of free software, we are referring to freedom, not price. Specifically, the General Public License is designed to make sure that you have the freedom to give away or sell copies of free software, that you receive source code or can get it if you want it, that you can change the software or use pieces of it in new free programs; and that you know you can do these things.
+To protect your rights, we need to make restrictions that forbid anyone to deny you these rights or to ask you to surrender the rights. These restrictions translate to certain responsibilities for you if you distribute copies of the software, or if you modify it.
+For example, if you distribute copies of a such a program, whether gratis or for a fee, you must give the recipients all the rights that you have. You must make sure that they, too, receive or can get the source code. And you must tell them their rights.
+We protect your rights with two steps: (1) copyright the software, and (2) offer you this license which gives you legal permission to copy, distribute and/or modify the software.
+Also, for each author&#39;s protection and ours, we want to make certain that everyone understands that there is no warranty for this free software. If the software is modified by someone else and passed on, we want its recipients to know that what they have is not the original, so that any problems introduced by others will not reflect on the original authors&#39; reputations.
+The precise terms and conditions for copying, distribution and modification follow.
+GNU GENERAL PUBLIC LICENSE TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+   
+   0. This License Agreement applies to any program or other work which contains a notice placed by the copyright holder saying it may be distributed under the terms of this General Public License. The &quot;Program&quot;, below, refers to any such program or work, and a &quot;work based on the Program&quot; means either the Program or any work containing the Program or a portion of it, either verbatim or with modifications. Each licensee is addressed as &quot;you&quot;.
+   
+   1. You may copy and distribute verbatim copies of the Program&#39;s source code as you receive it, in any medium, provided that you conspicuously and appropriately publish on each copy an appropriate copyright notice and disclaimer of warranty; keep intact all the notices that refer to this General Public License and to the absence of any warranty; and give any other recipients of the Program a copy of this General Public License along with the Program. You may charge a fee for the physical act of transferring a copy.
+   
+   2. You may modify your copy or copies of the Program or any portion of it, and copy and distribute such modifications under the terms of Paragraph 1 above, provided that you also do the following:
+      a) cause the modified files to carry prominent notices stating that you changed the files and the date of any change; and
+      b) cause the whole of any work that you distribute or publish, that in whole or in part contains the Program or any part thereof, either with or without modifications, to be licensed at no charge to all third parties under the terms of this General Public License (except that you may choose to grant warranty protection to some or all third parties, at your option).
+      c) If the modified program normally reads commands interactively when run, you must cause it, when started running for such interactive use in the simplest and most usual way, to print or display an announcement including an appropriate copyright notice and a notice that there is no warranty (or else, saying that you provide a warranty) and that users may redistribute the program under these conditions, and telling the user how to view a copy of this General Public License.
+      d) You may charge a fee for the physical act of transferring a copy, and you may at your option offer warranty protection in exchange for a fee.
+   Mere aggregation of another independent work with the Program (or its derivative) on a volume of a storage or distribution medium does not bring the other work under the scope of these terms.
+   
+   3. You may copy and distribute the Program (or a portion or derivative of it, under Paragraph 2) in object code or executable form under the terms of Paragraphs 1 and 2 above provided that you also do one of the following:
+      a) accompany it with the complete corresponding machine-readable source code, which must be distributed under the terms of Paragraphs 1 and 2 above; or,
+      b) accompany it with a written offer, valid for at least three years, to give any third party free (except for a nominal charge for the cost of distribution) a complete machine-readable copy of the corresponding source code, to be distributed under the terms of Paragraphs 1 and 2 above; or,
+      c) accompany it with the information you received as to where the corresponding source code may be obtained. (This alternative is allowed only for noncommercial distribution and only if you received the program in object code or executable form alone.)
+   Source code for a work means the preferred form of the work for making modifications to it. For an executable file, complete source code means all the source code for all modules it contains; but, as a special exception, it need not include source code for modules which are standard libraries that accompany the operating system on which the executable file runs, or for standard header files or definitions files that accompany that operating system.
+   
+   4. You may not copy, modify, sublicense, distribute or transfer the Program except as expressly provided under this General Public License. Any attempt otherwise to copy, modify, sublicense, distribute or transfer the Program is void, and will automatically terminate your rights to use the Program under this License. However, parties who have received copies, or rights to use copies, from you under this General Public License will not have their licenses terminated so long as such parties remain in full compliance.
+   
+   5. By copying, distributing or modifying the Program (or any work based on the Program) you indicate your acceptance of this license to do so, and all its terms and conditions.
+   
+   6. Each time you redistribute the Program (or any work based on the Program), the recipient automatically receives a license from the original licensor to copy, distribute or modify the Program subject to these terms and conditions. You may not impose any further restrictions on the recipients&#39; exercise of the rights granted herein.
+   
+   7. The Free Software Foundation may publish revised and/or new versions of the General Public License from time to time. Such new versions will be similar in spirit to the present version, but may differ in detail to address new problems or concerns.
+   Each version is given a distinguishing version number. If the Program specifies a version number of the license which applies to it and &quot;any later version&quot;, you have the option of following the terms and conditions either of that version or of any later version published by the Free Software Foundation. If the Program does not specify a version number of the license, you may choose any version ever published by the Free Software Foundation.
+   
+   8. If you wish to incorporate parts of the Program into other free programs whose distribution conditions are different, write to the author to ask for permission. For software which is copyrighted by the Free Software Foundation, write to the Free Software Foundation; we sometimes make exceptions for this. Our decision will be guided by the two goals of preserving the free status of all derivatives of our free software and of promoting the sharing and reuse of software generally.
+   
+   NO WARRANTY
+   9. BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM &quot;AS IS&quot; WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
+   
+   10. IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR REDISTRIBUTE THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. END OF TERMS AND CONDITIONS
+Appendix: How to Apply These Terms to Your New Programs
+If you develop a new program, and you want it to be of the greatest possible use to humanity, the best way to achieve this is to make it free software which everyone can redistribute and change under these terms.
+To do so, attach the following notices to the program. It is safest to attach them to the start of each source file to most effectively convey the exclusion of warranty; and each file should have at least the &quot;copyright&quot; line and a pointer to where the full notice is found.
+&lt;one line to give the program&#39;s name and a brief idea of what it does.&gt; Copyright (C) 19yy &lt;name of author&gt;
+This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 1, or (at your option) any later version.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+Also add information on how to contact you by electronic and paper mail.
+If the program is interactive, make it output a short notice like this when it starts in an interactive mode:
+Gnomovision version 69, Copyright (C) 19xx name of author Gnomovision comes with ABSOLUTELY NO WARRANTY; for details type `show w&#39;. This is free software, and you are welcome to redistribute it under certain conditions; type `show c&#39; for details.
+The hypothetical commands `show w&#39; and `show c&#39; should show the appropriate parts of the General Public License. Of course, the commands you use may be called something other than `show w&#39; and `show c&#39;; they could even be mouse-clicks or menu items--whatever suits your program.
+You should also get your employer (if you work as a programmer) or your school, if any, to sign a &quot;copyright disclaimer&quot; for the program, if necessary. Here a sample; alter the names:
+Yoyodyne, Inc., hereby disclaims all copyright interest in the program `Gnomovision&#39; (a program to direct compilers to make passes at assemblers) written by James Hacker.
+&lt;signature of Ty Coon&gt;, 1 April 1989 Ty Coon, President of Vice
+That&#39;s all there is to it!
+```
+
+
 ### GPL-1.0-or-later
 
 ```
@@ -6941,57 +7252,6 @@ This version of the GNU Lesser General Public License incorporates the terms and
 ```
 
 
-### LGPL-3.0-or-later
-
-```
-GNU LESSER GENERAL PUBLIC LICENSE
-Version 3, 29 June 2007
-Copyright (C) 2007 Free Software Foundation, Inc. &lt;http s ://fsf.org/&gt;
-Everyone is permitted to copy and distribute verbatim copies of this license document, but changing it is not allowed.
-This version of the GNU Lesser General Public License incorporates the terms and conditions of version 3 of the GNU General Public License, supplemented by the additional permissions listed below.
-   0. Additional Definitions.
-      
-      As used herein, &quot;this License&quot; refers to version 3 of the GNU Lesser General Public License, and the &quot;GNU GPL&quot; refers to version 3 of the GNU General Public License.
-      
-      &quot;The Library&quot; refers to a covered work governed by this License, other than an Application or a Combined Work as defined below.
-      
-      An &quot;Application&quot; is any work that makes use of an interface provided by the Library, but which is not otherwise based on the Library. Defining a subclass of a class defined by the Library is deemed a mode of using an interface provided by the Library.
-      
-      A &quot;Combined Work&quot; is a work produced by combining or linking an Application with the Library. The particular version of the Library with which the Combined Work was made is also called the &quot;Linked Version&quot;.
-      
-      The &quot;Minimal Corresponding Source&quot; for a Combined Work means the Corresponding Source for the Combined Work, excluding any source code for portions of the Combined Work that, considered in isolation, are based on the Application, and not on the Linked Version.
-      
-      The &quot;Corresponding Application Code&quot; for a Combined Work means the object code and/or source code for the Application, including any data and utility programs needed for reproducing the Combined Work from the Application, but excluding the System Libraries of the Combined Work.
-   1. Exception to Section 3 of the GNU GPL.
-   You may convey a covered work under sections 3 and 4 of this License without being bound by section 3 of the GNU GPL.
-   2. Conveying Modified Versions.
-   If you modify a copy of the Library, and, in your modifications, a facility refers to a function or data to be supplied by an Application that uses the facility (other than as an argument passed when the facility is invoked), then you may convey a copy of the modified version:
-      a) under this License, provided that you make a good faith effort to ensure that, in the event an Application does not supply the function or data, the facility still operates, and performs whatever part of its purpose remains meaningful, or
-      b) under the GNU GPL, with none of the additional permissions of this License applicable to that copy.
-   3. Object Code Incorporating Material from Library Header Files.
-   The object code form of an Application may incorporate material from a header file that is part of the Library. You may convey such object code under terms of your choice, provided that, if the incorporated material is not limited to numerical parameters, data structure layouts and accessors, or small macros, inline functions and templates (ten or fewer lines in length), you do both of the following:
-      a) Give prominent notice with each copy of the object code that the Library is used in it and that the Library and its use are covered by this License.
-      b) Accompany the object code with a copy of the GNU GPL and this license document.
-   4. Combined Works.
-   You may convey a Combined Work under terms of your choice that, taken together, effectively do not restrict modification of the portions of the Library contained in the Combined Work and reverse engineering for debugging such modifications, if you also do each of the following:
-      a) Give prominent notice with each copy of the Combined Work that the Library is used in it and that the Library and its use are covered by this License.
-      b) Accompany the Combined Work with a copy of the GNU GPL and this license document.
-      c) For a Combined Work that displays copyright notices during execution, include the copyright notice for the Library among these notices, as well as a reference directing the user to the copies of the GNU GPL and this license document.
-      d) Do one of the following:
-         0) Convey the Minimal Corresponding Source under the terms of this License, and the Corresponding Application Code in a form suitable for, and under terms that permit, the user to recombine or relink the Application with a modified version of the Linked Version to produce a modified Combined Work, in the manner specified by section 6 of the GNU GPL for conveying Corresponding Source.
-         1) Use a suitable shared library mechanism for linking with the Library. A suitable mechanism is one that (a) uses at run time a copy of the Library already present on the user&#39;s computer system, and (b) will operate properly with a modified version of the Library that is interface-compatible with the Linked Version.
-      e) Provide Installation Information, but only if you would otherwise be required to provide such information under section 6 of the GNU GPL, and only to the extent that such information is necessary to install and execute a modified version of the Combined Work produced by recombining or relinking the Application with a modified version of the Linked Version. (If you use option 4d0, the Installation Information must accompany the Minimal Corresponding Source and Corresponding Application Code. If you use option 4d1, you must provide the Installation Information in the manner specified by section 6 of the GNU GPL for conveying Corresponding Source.)
-   5. Combined Libraries.
-   You may place library facilities that are a work based on the Library side by side in a single library together with other library facilities that are not Applications and are not covered by this License, and convey such a combined library under terms of your choice, if you do both of the following:
-      a) Accompany the combined library with a copy of the same work based on the Library, uncombined with any other library facilities, conveyed under the terms of this License.
-      b) Give prominent notice with the combined library that part of it is a work based on the Library, and explaining where to find the accompanying uncombined form of the same work.
-   6. Revised Versions of the GNU Lesser General Public License.
-   The Free Software Foundation may publish revised and/or new versions of the GNU Lesser General Public License from time to time. Such new versions will be similar in spirit to the present version, but may differ in detail to address new problems or concerns.
-   Each version is given a distinguishing version number. If the Library as you received it specifies that a certain numbered version of the GNU Lesser General Public License &quot;or any later version&quot; applies to it, you have the option of following the terms and conditions either of that published version or of any later version published by the Free Software Foundation. If the Library as you received it does not specify a version number of the GNU Lesser General Public License, you may choose any version of the GNU Lesser General Public License ever published by the Free Software Foundation.
-   If the Library as you received it specifies that a proxy can decide whether future versions of the GNU Lesser General Public License shall apply, that proxy&#39;s public statement of acceptance of any version is permanent authorization for you to choose that version for the Library.
-```
-
-
 ### Apache-2.0
 
 ```
@@ -7276,6 +7536,41 @@ THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRES
 ```
 
 
+### OLDAP-1.1
+
+```
+The OpenLDAP Public License
+Version 1.1, 25 August 1998
+Copyright 1998, The OpenLDAP Foundation. All Rights Reserved. Note: This license is derived from the &quot;Artistic License&quot; as distributed with the Perl Programming Language. Its terms are different from those of the &quot;Artistic License.&quot;
+PREAMBLE
+The intent of this document is to state the conditions under which a Package may be copied, such that the Copyright Holder maintains some semblance of artistic control over the development of the package, while giving the users of the package the right to use and distribute the Package in a more-or-less customary fashion, plus the right to make reasonable modifications.
+Definitions:
+&quot;Package&quot; refers to the collection of files distributed by the Copyright Holder, and derivatives of that collection of files created through textual modification.
+&quot;Standard Version&quot; refers to such a Package if it has not been modified, or has been modified in accordance with the wishes of the Copyright Holder.
+&quot;Copyright Holder&quot; is whoever is named in the copyright or copyrights for the package.
+&quot;You&quot; is you, if you&#39;re thinking about copying or distributing this Package.
+&quot;Reasonable copying fee&quot; is whatever you can justify on the basis of media cost, duplication charges, time of people involved, and so on. (You will not be required to justify it to the Copyright Holder, but only to the computing community at large as a market that must bear the fee.)
+&quot;Freely Available&quot; means that no fee is charged for the item itself, though there may be fees involved in handling the item. It also means that recipients of the item may redistribute it under the same conditions they received it.
+   1. You may make and give away verbatim copies of the source form of the Standard Version of this Package without restriction, provided that you duplicate all of the original copyright notices and associated disclaimers.
+   2. You may apply bug fixes, portability fixes and other modifications derived from the Public Domain or from the Copyright Holder. A Package modified in such a way shall still be considered the Standard Version.
+   3. You may otherwise modify your copy of this Package in any way, provided that you insert a prominent notice in each changed file stating how and when you changed that file, and provided that you do at least ONE of the following:
+      a) place your modifications in the Public Domain or otherwise make them Freely Available, such as by posting said modifications to Usenet or an equivalent medium, or placing the modifications on a major archive site such as uunet.uu.net, or by allowing the Copyright Holder to include your modifications in the Standard Version of the Package.
+      b) use the modified Package only within your corporation or organization.
+      c) rename any non-standard executables so the names do not conflict with standard executables, which must also be provided, and provide a separate manual page for each non-standard executable that clearly documents how it differs from the Standard Version.
+      d) make other distribution arrangements with the Copyright Holder.
+   4. You may distribute the programs of this Package in object code or executable form, provided that you do at least ONE of the following:
+      a) distribute a Standard Version of the executables and library files, together with instructions (in the manual page or equivalent) on where to get the Standard Version.
+      b) accompany the distribution with the machine-readable source of the Package with your modifications.
+      c) accompany any non-standard executables with their corresponding Standard Version executables, giving the non-standard executables non-standard names, and clearly documenting the differences in manual pages (or equivalent), together with instructions on where to get the Standard Version.
+      d) make other distribution arrangements with the Copyright Holder.
+   5. You may charge a reasonable copying fee for any distribution of this Package. You may charge any fee you choose for support of this Package. You may not charge a fee for this Package itself. However, you may distribute this Package in aggregate with other (possibly commercial) programs as part of a larger (possibly commercial) software distribution provided that you do not advertise this Package as a product of your own.
+   6. The scripts and library files supplied as input to or produced as output from the programs of this Package do not automatically fall under the copyright of this Package, but belong to whomever generated them, and may be sold commercially, and may be aggregated with this Package.
+   7. C subroutines supplied by you and linked into this Package in order to emulate subroutines and variables of the language defined by this Package shall not be considered part of this Package, but are the equivalent of input as in Paragraph 6, provided these subroutines do not change the language in any way that would cause it to fail the regression tests for the language.
+   8. The name of the Copyright Holder may not be used to endorse or promote products derived from this software without specific prior written permission.
+   9. THIS PACKAGE IS PROVIDED &quot;AS IS&quot; AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. The End
+```
+
+
 ### OpenSSL
 
 ```
@@ -7423,6 +7718,126 @@ Permission is granted to anyone to use this software for any purpose, including 
 ```
 
 
+### bacula-exception
+
+```
+Last revision: 21 May 2017
+
+Bacula is licensed under the GNU Affero General Public License, version
+3.0 as published by the Free Software Foundation, Inc. (&quot;AGPLv3&quot;).
+
+Additional Terms on the work licensed herein, pursuant to Section 7 of
+Affero General Public License are as follows:
+
+  1. The name Bacula is a registered trademark of Kern Sibbald, and Kern
+     Sibbald hereby declines to grant a trademark license to &quot;Bacula&quot;
+     pursuant to AGPLv3, Section 7(e) without a separate agreement with Kern
+     Sibbald.
+
+  2. Pursuant to AGPLv3, Section 7(a), in addition to the warranty and
+     liability disclaimers already found in AGPLv3, the copyright holders
+     specifically disclaim any liability for accusations of patent
+     infringement by any third party.
+
+  3. Pursuant to AGPLv3, Section 7(b), the portions of the file AUTHORS that
+     are deemed to be specified reasonable legal notices and/or author
+     attributions shall be preserved in redistribution of source code and/or
+     modifications thereof. Furthermore, when the following notice appears in
+     a source code file, it must be preserved when source code is conveyed
+     and/or propagated:
+
+   Bacula(R) - The Network Backup Solution
+
+   Copyright (C) 2000-2017 Kern Sibbald
+
+   The original author of Bacula is Kern Sibbald, with contributions
+   from many others, a complete list can be found in the file AUTHORS.
+
+   You may use this file and others of this release according to the
+   license defined in the LICENSE file, which includes the Affero General
+   Public License, v3.0 (&quot;AGPLv3&quot;) and some additional permissions and
+   terms pursuant to its AGPLv3 Section 7.
+
+   This notice must be preserved when any source code is conveyed
+   and/or propagated.
+
+   Bacula(R) is a registered trademark of Kern Sibbald.
+
+Additional Permissions on the work licensed herein, pursuant to Section 7 of
+AGPLv3 are as follows:
+
+1. As a special exception to the AGPLv3, the copyright holders give
+   permission to link the code of its release of Bacula with the OpenSSL
+   project&#39;s &quot;OpenSSL&quot; library (or with modified versions of it that use the
+   same license as the &quot;OpenSSL&quot; library), and distribute the linked
+   executables.  You must follow the requirements of AGPLv3 in all respects
+   for all of the code used other than &quot;OpenSSL&quot;.
+
+2. As a special exception to the AGPLv3, the copyright holders give
+   permission to link the code of its release of the Bacula Win32 File daemon
+   with the Microsoft supplied Volume Shadow Copy (VSS) libraries and
+   distribute the linked executables.  You must follow the requirements of
+   the AGPLv3 in all respects for all of the code used other than for the
+   Microsoft VSS code.
+
+If you want to fork Bacula, please read the file LICENSE-FAQ.
+
+The copyright for certain source files may include in addition to what is
+listed above the following copyright:
+
+   Copyright (C) 2000-2014 Free Software Foundation Europe e.V.
+
+The copyright on the Baculum code is:
+
+   Copyright (C) 2013-2017 Marcin Haba
+
+Copyrights of certain &quot;script&quot; files such as headers, shell script, Makefiles,
+etc ...  were previously never explicitly defined.  In almost all cases,
+they have been copyrighted with a BSD 2-Clause copyright to make them
+easier.  However, as is the case of all BSD type copyrights you must keep
+the copyright in place and on any binary only released the copyright notice
+must also be released with the binaries.  An example of such a copyright
+is:
+
+#
+# Copyright (C) 2000-2017 Kern Sibbald
+# License: BSD 2-Clause; see file LICENSE-FOSS
+#
+
+It is equivalent to the full BSD copyright of:
+
+=====
+Copyright (C) 2000-2017 Kern Sibbald
+License: BSD 2-Clause; see file LICENSE-FOSS
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1.  Redistributions of source code must retain the above copyright notice,
+this list of conditions and the following disclaimer.
+
+2.  Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+====
+
+Note: the exact form of the copyright (dates, name, and text formatting)
+might vary, but the intent is the same, namely that the full BSD 2-Clause
+coypright applies.  The file LICENSE-FOSS has a few more details.
+```
+
+
 ### bsd-3-clause-open-mpi
 
 ```
@@ -7521,6 +7936,132 @@ purpose. It is provided &quot;as is&quot; without express or implied warranty.
 ```
 
 
+### openssl-ssleay
+
+```
+LICENSE ISSUES
+  ==============
+
+  The OpenSSL toolkit stays under a dual license, i.e. both the conditions of
+  the OpenSSL License and the original SSLeay license apply to the toolkit.
+  See below for the actual license texts. Actually both licenses are BSD-style
+  Open Source licenses. In case of any license issues related to OpenSSL
+  please contact openssl-core@openssl.org.
+
+  OpenSSL License
+  ---------------
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+1. Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer. 
+
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in
+   the documentation and/or other materials provided with the
+   distribution.
+
+3. All advertising materials mentioning features or use of this
+   software must display the following acknowledgment:
+   &quot;This product includes software developed by the OpenSSL Project
+   for use in the OpenSSL Toolkit. (http://www.openssl.org/)&quot;
+
+4. The names &quot;OpenSSL Toolkit&quot; and &quot;OpenSSL Project&quot; must not be used to
+   endorse or promote products derived from this software without
+   prior written permission. For written permission, please contact
+   openssl-core@openssl.org.
+
+5. Products derived from this software may not be called &quot;OpenSSL&quot;
+   nor may &quot;OpenSSL&quot; appear in their names without prior written
+   permission of the OpenSSL Project.
+
+6. Redistributions of any form whatsoever must retain the following
+   acknowledgment:
+   &quot;This product includes software developed by the OpenSSL Project
+   for use in the OpenSSL Toolkit (http://www.openssl.org/)&quot;
+
+THIS SOFTWARE IS PROVIDED BY THE OpenSSL PROJECT ``AS IS&#39;&#39; AND ANY
+EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE OpenSSL PROJECT OR
+ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+This product includes cryptographic software written by Eric Young
+(eay@cryptsoft.com).  This product includes software written by Tim
+Hudson (tjh@cryptsoft.com).
+
+
+ Original SSLeay License
+ -----------------------
+
+Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
+All rights reserved.
+
+This package is an SSL implementation written
+by Eric Young (eay@cryptsoft.com).
+The implementation was written so as to conform with Netscapes SSL.
+
+This library is free for commercial and non-commercial use as long as
+the following conditions are aheared to.  The following conditions
+apply to all code found in this distribution, be it the RC4, RSA,
+lhash, DES, etc., code; not just the SSL code.  The SSL documentation
+included with this distribution is covered by the same copyright terms
+except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+Copyright remains Eric Young&#39;s, and as such any Copyright notices in
+the code are not to be removed.
+If this package is used in a product, Eric Young should be given attribution
+as the author of the parts of the library used.
+This can be in the form of a textual message at program startup or
+in documentation (online or textual) provided with the package.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+1. Redistributions of source code must retain the copyright
+   notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+3. All advertising materials mentioning features or use of this software
+   must display the following acknowledgement:
+   &quot;This product includes cryptographic software written by
+    Eric Young (eay@cryptsoft.com)&quot;
+   The word &#39;cryptographic&#39; can be left out if the rouines from the library
+   being used are not cryptographic related :-).
+4. If you include any Windows specific code (or a derivative thereof) from 
+   the apps directory (application code) you must include an acknowledgement:
+   &quot;This product includes software written by Tim Hudson (tjh@cryptsoft.com)&quot;
+
+THIS SOFTWARE IS PROVIDED BY ERIC YOUNG ``AS IS&#39;&#39; AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGE.
+
+The licence and distribution terms for any publically available version or
+derivative of this code cannot be changed.  i.e. this code cannot simply be
+copied and put under another distribution licence
+[including the GNU Public Licence.]
+```
+
+
 
 
 
@@ -7529,6 +8070,6 @@ purpose. It is provided &quot;as is&quot; without express or implied warranty.
 
 [FOSSA]: # (Do not touch the comments below)
 
-[FOSSA]: # (==depsig=9a9b423f6a5fcc79082efc3baaafebfbc666c509c9275b3bf05e100ec673c476==)
+[FOSSA]: # (==depsig=17ac0399673c42f81e7a4c21cc956d7e5d359ff6c9eff280c2e02d483e949035==)
 
 

@@ -1,6 +1,0 @@
-kind: Fixes
-body: Removes unneeded JoinOverTimeRangeNode step from dataflow plan.
-time: 2023-08-28T16:53:32.99222-07:00
-custom:
-  Author: courtneyholcomb
-  Issue: "743"
