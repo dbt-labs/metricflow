@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Generic
 
-from metricflow.dataflow.dataflow_plan import DataflowPlan, SourceDataSetT
+from metricflow.dataflow.dataflow_plan import DataflowPlan
 
 
-class DataflowPlanOptimizer(Generic[SourceDataSetT], ABC):
+class DataflowPlanOptimizer(ABC):
     """Converts one dataflow plan into another dataflow plan that is more optimal in some way (e.g. performance)."""
 
     @abstractmethod
-    def optimize(self, dataflow_plan: DataflowPlan[SourceDataSetT]) -> DataflowPlan[SourceDataSetT]:  # noqa: D
+    def optimize(self, dataflow_plan: DataflowPlan) -> DataflowPlan:  # noqa: D
         raise NotImplementedError

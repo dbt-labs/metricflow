@@ -157,7 +157,7 @@ class MetricFlowQueryResult:  # noqa: D
     """The result of a query and context on how it was generated."""
 
     query_spec: MetricFlowQuerySpec
-    dataflow_plan: DataflowPlan[SemanticModelDataSet]
+    dataflow_plan: DataflowPlan
     sql: str
     result_df: Optional[pd.DataFrame] = None
     result_table: Optional[SqlTable] = None
@@ -168,7 +168,7 @@ class MetricFlowExplainResult:
     """Returns plans for resolving a query."""
 
     query_spec: MetricFlowQuerySpec
-    dataflow_plan: DataflowPlan[SemanticModelDataSet]
+    dataflow_plan: DataflowPlan
     execution_plan: ExecutionPlan
     output_table: Optional[SqlTable] = None
 
@@ -348,20 +348,20 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         source_node_builder = SourceNodeBuilder(self._semantic_manifest_lookup)
         source_nodes = source_node_builder.create_from_data_sets(self._source_data_sets)
 
-        node_output_resolver = DataflowPlanNodeOutputDataSetResolver[SemanticModelDataSet](
+        node_output_resolver = DataflowPlanNodeOutputDataSetResolver(
             column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup),
             semantic_manifest_lookup=semantic_manifest_lookup,
         )
 
-        self._dataflow_plan_builder = DataflowPlanBuilder[SemanticModelDataSet](
+        self._dataflow_plan_builder = DataflowPlanBuilder(
             source_nodes=source_nodes,
             semantic_manifest_lookup=self._semantic_manifest_lookup,
         )
-        self._to_sql_query_plan_converter = DataflowToSqlQueryPlanConverter[SemanticModelDataSet](
+        self._to_sql_query_plan_converter = DataflowToSqlQueryPlanConverter(
             column_association_resolver=self._column_association_resolver,
             semantic_manifest_lookup=self._semantic_manifest_lookup,
         )
-        self._to_execution_plan_converter = DataflowToExecutionPlanConverter[SemanticModelDataSet](
+        self._to_execution_plan_converter = DataflowToExecutionPlanConverter(
             sql_plan_converter=self._to_sql_query_plan_converter,
             sql_plan_renderer=self._sql_client.sql_query_plan_renderer,
             sql_client=sql_client,
@@ -482,7 +482,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             query_spec=query_spec,
             output_sql_table=output_table,
             output_selection_specs=output_selection_specs,
-            optimizers=(SourceScanOptimizer[SemanticModelDataSet](),),
+            optimizers=(SourceScanOptimizer(),),
         )
 
         if len(dataflow_plan.sink_output_nodes) > 1:

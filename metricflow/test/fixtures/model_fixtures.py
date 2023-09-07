@@ -32,13 +32,11 @@ from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 logger = logging.getLogger(__name__)
 
 
-def _data_set_to_read_nodes(
-    data_sets: OrderedDict[str, SemanticModelDataSet]
-) -> OrderedDict[str, ReadSqlSourceNode[SemanticModelDataSet]]:
+def _data_set_to_read_nodes(data_sets: OrderedDict[str, SemanticModelDataSet]) -> OrderedDict[str, ReadSqlSourceNode]:
     """Return a mapping from the name of the semantic model to the dataflow plan node that reads from it."""
-    return_dict: OrderedDict[str, ReadSqlSourceNode[SemanticModelDataSet]] = OrderedDict()
+    return_dict: OrderedDict[str, ReadSqlSourceNode] = OrderedDict()
     for semantic_model_name, data_set in data_sets.items():
-        return_dict[semantic_model_name] = ReadSqlSourceNode[SemanticModelDataSet](data_set)
+        return_dict[semantic_model_name] = ReadSqlSourceNode(data_set)
         logger.debug(
             f"For semantic model {semantic_model_name}, creating node_id {return_dict[semantic_model_name].node_id}"
         )
@@ -48,7 +46,7 @@ def _data_set_to_read_nodes(
 
 def _data_set_to_source_nodes(
     semantic_manifest_lookup: SemanticManifestLookup, data_sets: OrderedDict[str, SemanticModelDataSet]
-) -> Sequence[BaseOutput[SemanticModelDataSet]]:
+) -> Sequence[BaseOutput]:
     source_node_builder = SourceNodeBuilder(semantic_manifest_lookup)
     return source_node_builder.create_from_data_sets(list(data_sets.values()))
 
@@ -78,17 +76,17 @@ class ConsistentIdObjectRepository:
     """Stores all objects that should have consistent IDs in tests."""
 
     simple_model_data_sets: OrderedDict[str, SemanticModelDataSet]
-    simple_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[SemanticModelDataSet]]
-    simple_model_source_nodes: Sequence[BaseOutput[SemanticModelDataSet]]
+    simple_model_read_nodes: OrderedDict[str, ReadSqlSourceNode]
+    simple_model_source_nodes: Sequence[BaseOutput]
 
-    multihop_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[SemanticModelDataSet]]
-    multihop_model_source_nodes: Sequence[BaseOutput[SemanticModelDataSet]]
+    multihop_model_read_nodes: OrderedDict[str, ReadSqlSourceNode]
+    multihop_model_source_nodes: Sequence[BaseOutput]
 
     scd_model_data_sets: OrderedDict[str, SemanticModelDataSet]
-    scd_model_read_nodes: OrderedDict[str, ReadSqlSourceNode[SemanticModelDataSet]]
-    scd_model_source_nodes: Sequence[BaseOutput[SemanticModelDataSet]]
+    scd_model_read_nodes: OrderedDict[str, ReadSqlSourceNode]
+    scd_model_source_nodes: Sequence[BaseOutput]
 
-    cyclic_join_source_nodes: Sequence[BaseOutput[SemanticModelDataSet]]
+    cyclic_join_source_nodes: Sequence[BaseOutput]
 
 
 @pytest.fixture(scope="session")

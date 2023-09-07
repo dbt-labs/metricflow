@@ -7,7 +7,6 @@ from metricflow.dataflow.dataflow_plan import (
     BaseOutput,
     DataflowPlan,
     FilterElementsNode,
-    SourceDataSetT,
     WriteToResultDataframeNode,
 )
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
@@ -22,10 +21,10 @@ from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.snapshot_utils import assert_plan_snapshot_text_equal
 
 
-def make_dataflow_plan(node: BaseOutput[SourceDataSetT]) -> DataflowPlan[SourceDataSetT]:  # noqa: D
-    return DataflowPlan[SourceDataSetT](
+def make_dataflow_plan(node: BaseOutput) -> DataflowPlan:  # noqa: D
+    return DataflowPlan(
         plan_id=IdGeneratorRegistry.for_class(ComputeMetricsBranchCombiner).create_id(OPTIMIZED_DATAFLOW_PLAN_PREFIX),
-        sink_output_nodes=[WriteToResultDataframeNode[SourceDataSetT](node)],
+        sink_output_nodes=[WriteToResultDataframeNode(node)],
     )
 
 

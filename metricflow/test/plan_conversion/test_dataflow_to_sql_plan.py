@@ -30,7 +30,6 @@ from metricflow.dataflow.dataflow_plan import (
 )
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.dataset.dataset import DataSet
-from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
@@ -62,8 +61,8 @@ from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_QU
 @pytest.fixture(scope="session")
 def multihop_dataflow_to_sql_converter(  # noqa: D
     multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
-) -> DataflowToSqlQueryPlanConverter[SemanticModelDataSet]:
-    return DataflowToSqlQueryPlanConverter[SemanticModelDataSet](
+) -> DataflowToSqlQueryPlanConverter:
+    return DataflowToSqlQueryPlanConverter(
         column_association_resolver=DunderColumnAssociationResolver(multi_hop_join_semantic_manifest_lookup),
         semantic_manifest_lookup=multi_hop_join_semantic_manifest_lookup,
     )
@@ -72,8 +71,8 @@ def multihop_dataflow_to_sql_converter(  # noqa: D
 @pytest.fixture(scope="session")
 def scd_dataflow_to_sql_converter(  # noqa: D
     scd_semantic_manifest_lookup: SemanticManifestLookup,
-) -> DataflowToSqlQueryPlanConverter[SemanticModelDataSet]:
-    return DataflowToSqlQueryPlanConverter[SemanticModelDataSet](
+) -> DataflowToSqlQueryPlanConverter:
+    return DataflowToSqlQueryPlanConverter(
         column_association_resolver=DunderColumnAssociationResolver(scd_semantic_manifest_lookup),
         semantic_manifest_lookup=scd_semantic_manifest_lookup,
     )
@@ -82,9 +81,9 @@ def scd_dataflow_to_sql_converter(  # noqa: D
 def convert_and_check(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
-    node: BaseOutput[SemanticModelDataSet],
+    node: BaseOutput,
 ) -> None:
     """Convert the dataflow plan to SQL and compare with snapshots."""
     # Generate plans w/o optimizers
@@ -139,7 +138,7 @@ def convert_and_check(
 def test_source_node(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -158,7 +157,7 @@ def test_source_node(  # noqa: D
 def test_filter_node(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -167,7 +166,7 @@ def test_filter_node(  # noqa: D
         element_name="bookings",
     )
     source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
-    filter_node = FilterElementsNode[SemanticModelDataSet](
+    filter_node = FilterElementsNode(
         parent_node=source_node, include_specs=InstanceSpecSet(measure_specs=(measure_spec,))
     )
 
@@ -184,7 +183,7 @@ def test_filter_with_where_constraint_node(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     column_association_resolver: ColumnAssociationResolver,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -195,11 +194,11 @@ def test_filter_with_where_constraint_node(  # noqa: D
     source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
 
     ds_spec = TimeDimensionSpec(element_name="ds", entity_links=(), time_granularity=TimeGranularity.DAY)
-    filter_node = FilterElementsNode[SemanticModelDataSet](
+    filter_node = FilterElementsNode(
         parent_node=source_node,
         include_specs=InstanceSpecSet(measure_specs=(measure_spec,), time_dimension_specs=(ds_spec,)),
     )  # need to include ds_spec because where constraint operates on ds
-    where_constraint_node = WhereConstraintNode[SemanticModelDataSet](
+    where_constraint_node = WhereConstraintNode(
         parent_node=filter_node,
         where_constraint=(
             WhereSpecFactory(
@@ -224,7 +223,7 @@ def test_filter_with_where_constraint_node(  # noqa: D
 def test_measure_aggregation_node(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -248,12 +247,12 @@ def test_measure_aggregation_node(  # noqa: D
     metric_input_measure_specs = tuple(MetricInputMeasureSpec(measure_spec=x) for x in measure_specs)
 
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
-    filtered_measure_node = FilterElementsNode[SemanticModelDataSet](
+    filtered_measure_node = FilterElementsNode(
         parent_node=measure_source_node,
         include_specs=InstanceSpecSet(measure_specs=tuple(measure_specs)),
     )
 
-    aggregated_measure_node = AggregateMeasuresNode[SemanticModelDataSet](
+    aggregated_measure_node = AggregateMeasuresNode(
         parent_node=filtered_measure_node, metric_input_measure_specs=metric_input_measure_specs
     )
 
@@ -269,7 +268,7 @@ def test_measure_aggregation_node(  # noqa: D
 def test_single_join_node(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -279,7 +278,7 @@ def test_single_join_node(  # noqa: D
     )
     entity_spec = LinklessEntitySpec.from_element_name(element_name="listing")
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
-    filtered_measure_node = FilterElementsNode[SemanticModelDataSet](
+    filtered_measure_node = FilterElementsNode(
         parent_node=measure_source_node,
         include_specs=InstanceSpecSet(
             measure_specs=(measure_spec,),
@@ -292,7 +291,7 @@ def test_single_join_node(  # noqa: D
         entity_links=(EntityReference("listing"),),
     )
     dimension_source_node = consistent_id_object_repository.simple_model_read_nodes["listings_latest"]
-    filtered_dimension_node = FilterElementsNode[SemanticModelDataSet](
+    filtered_dimension_node = FilterElementsNode(
         parent_node=dimension_source_node,
         include_specs=InstanceSpecSet(
             entity_specs=(entity_spec,),
@@ -300,7 +299,7 @@ def test_single_join_node(  # noqa: D
         ),
     )
 
-    join_node = JoinToBaseOutputNode[SemanticModelDataSet](
+    join_node = JoinToBaseOutputNode(
         left_node=filtered_measure_node,
         join_targets=[
             JoinDescription(
@@ -324,7 +323,7 @@ def test_single_join_node(  # noqa: D
 def test_multi_join_node(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -334,7 +333,7 @@ def test_multi_join_node(
     )
     entity_spec = LinklessEntitySpec.from_element_name(element_name="listing")
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
-    filtered_measure_node = FilterElementsNode[SemanticModelDataSet](
+    filtered_measure_node = FilterElementsNode(
         parent_node=measure_source_node,
         include_specs=InstanceSpecSet(measure_specs=(measure_spec,), entity_specs=(entity_spec,)),
     )
@@ -344,7 +343,7 @@ def test_multi_join_node(
         entity_links=(),
     )
     dimension_source_node = consistent_id_object_repository.simple_model_read_nodes["listings_latest"]
-    filtered_dimension_node = FilterElementsNode[SemanticModelDataSet](
+    filtered_dimension_node = FilterElementsNode(
         parent_node=dimension_source_node,
         include_specs=InstanceSpecSet(
             entity_specs=(entity_spec,),
@@ -352,7 +351,7 @@ def test_multi_join_node(
         ),
     )
 
-    join_node = JoinToBaseOutputNode[SemanticModelDataSet](
+    join_node = JoinToBaseOutputNode(
         left_node=filtered_measure_node,
         join_targets=[
             JoinDescription(
@@ -382,7 +381,7 @@ def test_multi_join_node(
 def test_compute_metrics_node(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -393,7 +392,7 @@ def test_compute_metrics_node(
     entity_spec = LinklessEntitySpec.from_element_name(element_name="listing")
     metric_input_measure_specs = (MetricInputMeasureSpec(measure_spec=measure_spec),)
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
-    filtered_measure_node = FilterElementsNode[SemanticModelDataSet](
+    filtered_measure_node = FilterElementsNode(
         parent_node=measure_source_node,
         include_specs=InstanceSpecSet(
             measure_specs=(measure_spec,),
@@ -406,7 +405,7 @@ def test_compute_metrics_node(
         entity_links=(),
     )
     dimension_source_node = consistent_id_object_repository.simple_model_read_nodes["listings_latest"]
-    filtered_dimension_node = FilterElementsNode[SemanticModelDataSet](
+    filtered_dimension_node = FilterElementsNode(
         parent_node=dimension_source_node,
         include_specs=InstanceSpecSet(
             entity_specs=(entity_spec,),
@@ -414,7 +413,7 @@ def test_compute_metrics_node(
         ),
     )
 
-    join_node = JoinToBaseOutputNode[SemanticModelDataSet](
+    join_node = JoinToBaseOutputNode(
         left_node=filtered_measure_node,
         join_targets=[
             JoinDescription(
@@ -426,14 +425,12 @@ def test_compute_metrics_node(
         ],
     )
 
-    aggregated_measure_node = AggregateMeasuresNode[SemanticModelDataSet](
+    aggregated_measure_node = AggregateMeasuresNode(
         parent_node=join_node, metric_input_measure_specs=metric_input_measure_specs
     )
 
     metric_spec = MetricSpec(element_name="bookings")
-    compute_metrics_node = ComputeMetricsNode[SemanticModelDataSet](
-        parent_node=aggregated_measure_node, metric_specs=[metric_spec]
-    )
+    compute_metrics_node = ComputeMetricsNode(parent_node=aggregated_measure_node, metric_specs=[metric_spec])
 
     convert_and_check(
         request=request,
@@ -447,7 +444,7 @@ def test_compute_metrics_node(
 def test_compute_metrics_node_simple_expr(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -458,7 +455,7 @@ def test_compute_metrics_node_simple_expr(
     entity_spec = LinklessEntitySpec.from_element_name(element_name="listing")
     metric_input_measure_specs = (MetricInputMeasureSpec(measure_spec=measure_spec),)
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
-    filtered_measure_node = FilterElementsNode[SemanticModelDataSet](
+    filtered_measure_node = FilterElementsNode(
         parent_node=measure_source_node,
         include_specs=InstanceSpecSet(measure_specs=(measure_spec,), entity_specs=(entity_spec,)),
     )
@@ -468,7 +465,7 @@ def test_compute_metrics_node_simple_expr(
         entity_links=(),
     )
     dimension_source_node = consistent_id_object_repository.simple_model_read_nodes["listings_latest"]
-    filtered_dimension_node = FilterElementsNode[SemanticModelDataSet](
+    filtered_dimension_node = FilterElementsNode(
         parent_node=dimension_source_node,
         include_specs=InstanceSpecSet(
             entity_specs=(entity_spec,),
@@ -476,7 +473,7 @@ def test_compute_metrics_node_simple_expr(
         ),
     )
 
-    join_node = JoinToBaseOutputNode[SemanticModelDataSet](
+    join_node = JoinToBaseOutputNode(
         left_node=filtered_measure_node,
         join_targets=[
             JoinDescription(
@@ -488,15 +485,13 @@ def test_compute_metrics_node_simple_expr(
         ],
     )
 
-    aggregated_measures_node = AggregateMeasuresNode[SemanticModelDataSet](
+    aggregated_measures_node = AggregateMeasuresNode(
         parent_node=join_node, metric_input_measure_specs=metric_input_measure_specs
     )
     metric_spec = MetricSpec(element_name="booking_fees")
-    compute_metrics_node = ComputeMetricsNode[SemanticModelDataSet](
-        parent_node=aggregated_measures_node, metric_specs=[metric_spec]
-    )
+    compute_metrics_node = ComputeMetricsNode(parent_node=aggregated_measures_node, metric_specs=[metric_spec])
 
-    sink_node = WriteToResultDataframeNode[SemanticModelDataSet](compute_metrics_node)
+    sink_node = WriteToResultDataframeNode(compute_metrics_node)
     dataflow_plan = DataflowPlan("plan0", sink_output_nodes=[sink_node])
 
     assert_plan_snapshot_text_equal(
@@ -524,7 +519,7 @@ def test_compute_metrics_node_simple_expr(
 def test_join_to_time_spine_node_without_offset(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -541,19 +536,17 @@ def test_join_to_time_spine_node_without_offset(  # noqa: D
         aggregation_time_dimension_reference=TimeDimensionReference(element_name="ds"),
     )
 
-    filtered_measure_node = FilterElementsNode[SemanticModelDataSet](
+    filtered_measure_node = FilterElementsNode(
         parent_node=metric_time_node,
         include_specs=InstanceSpecSet(
             measure_specs=(measure_spec,), entity_specs=(entity_spec,), dimension_specs=(metric_time_spec,)
         ),
     )
-    aggregated_measures_node = AggregateMeasuresNode[SemanticModelDataSet](
+    aggregated_measures_node = AggregateMeasuresNode(
         parent_node=filtered_measure_node, metric_input_measure_specs=metric_input_measure_specs
     )
     metric_spec = MetricSpec(element_name="booking_fees")
-    compute_metrics_node = ComputeMetricsNode[SemanticModelDataSet](
-        parent_node=aggregated_measures_node, metric_specs=[metric_spec]
-    )
+    compute_metrics_node = ComputeMetricsNode(parent_node=aggregated_measures_node, metric_specs=[metric_spec])
     join_to_time_spine_node = JoinToTimeSpineNode(
         parent_node=compute_metrics_node,
         metric_time_dimension_specs=[MTD_SPEC_DAY],
@@ -561,7 +554,7 @@ def test_join_to_time_spine_node_without_offset(  # noqa: D
             start_time=as_datetime("2020-01-01"), end_time=as_datetime("2021-01-01")
         ),
     )
-    sink_node = WriteToResultDataframeNode[SemanticModelDataSet](join_to_time_spine_node)
+    sink_node = WriteToResultDataframeNode(join_to_time_spine_node)
     dataflow_plan = DataflowPlan("plan0", sink_output_nodes=[sink_node])
 
     assert_plan_snapshot_text_equal(
@@ -589,7 +582,7 @@ def test_join_to_time_spine_node_without_offset(  # noqa: D
 def test_join_to_time_spine_node_with_offset_window(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -605,19 +598,17 @@ def test_join_to_time_spine_node_with_offset_window(  # noqa: D
         parent_node=measure_source_node,
         aggregation_time_dimension_reference=TimeDimensionReference(element_name="ds"),
     )
-    filtered_measure_node = FilterElementsNode[SemanticModelDataSet](
+    filtered_measure_node = FilterElementsNode(
         parent_node=metric_time_node,
         include_specs=InstanceSpecSet(
             measure_specs=(measure_spec,), entity_specs=(entity_spec,), dimension_specs=(metric_time_spec,)
         ),
     )
-    aggregated_measures_node = AggregateMeasuresNode[SemanticModelDataSet](
+    aggregated_measures_node = AggregateMeasuresNode(
         parent_node=filtered_measure_node, metric_input_measure_specs=metric_input_measure_specs
     )
     metric_spec = MetricSpec(element_name="booking_fees")
-    compute_metrics_node = ComputeMetricsNode[SemanticModelDataSet](
-        parent_node=aggregated_measures_node, metric_specs=[metric_spec]
-    )
+    compute_metrics_node = ComputeMetricsNode(parent_node=aggregated_measures_node, metric_specs=[metric_spec])
     join_to_time_spine_node = JoinToTimeSpineNode(
         parent_node=compute_metrics_node,
         metric_time_dimension_specs=[MTD_SPEC_DAY],
@@ -627,7 +618,7 @@ def test_join_to_time_spine_node_with_offset_window(  # noqa: D
         offset_window=PydanticMetricTimeWindow(count=10, granularity=TimeGranularity.DAY),
     )
 
-    sink_node = WriteToResultDataframeNode[SemanticModelDataSet](join_to_time_spine_node)
+    sink_node = WriteToResultDataframeNode(join_to_time_spine_node)
     dataflow_plan = DataflowPlan("plan0", sink_output_nodes=[sink_node])
 
     assert_plan_snapshot_text_equal(
@@ -655,7 +646,7 @@ def test_join_to_time_spine_node_with_offset_window(  # noqa: D
 def test_join_to_time_spine_node_with_offset_to_grain(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -671,19 +662,17 @@ def test_join_to_time_spine_node_with_offset_to_grain(
         parent_node=measure_source_node,
         aggregation_time_dimension_reference=TimeDimensionReference(element_name="ds"),
     )
-    filtered_measure_node = FilterElementsNode[SemanticModelDataSet](
+    filtered_measure_node = FilterElementsNode(
         parent_node=metric_time_node,
         include_specs=InstanceSpecSet(
             measure_specs=(measure_spec,), entity_specs=(entity_spec,), dimension_specs=(metric_time_spec,)
         ),
     )
-    aggregated_measures_node = AggregateMeasuresNode[SemanticModelDataSet](
+    aggregated_measures_node = AggregateMeasuresNode(
         parent_node=filtered_measure_node, metric_input_measure_specs=metric_input_measure_specs
     )
     metric_spec = MetricSpec(element_name="booking_fees")
-    compute_metrics_node = ComputeMetricsNode[SemanticModelDataSet](
-        parent_node=aggregated_measures_node, metric_specs=[metric_spec]
-    )
+    compute_metrics_node = ComputeMetricsNode(parent_node=aggregated_measures_node, metric_specs=[metric_spec])
     join_to_time_spine_node = JoinToTimeSpineNode(
         parent_node=compute_metrics_node,
         metric_time_dimension_specs=[MTD_SPEC_DAY],
@@ -694,7 +683,7 @@ def test_join_to_time_spine_node_with_offset_to_grain(
         offset_to_grain=TimeGranularity.MONTH,
     )
 
-    sink_node = WriteToResultDataframeNode[SemanticModelDataSet](join_to_time_spine_node)
+    sink_node = WriteToResultDataframeNode(join_to_time_spine_node)
     dataflow_plan = DataflowPlan("plan0", sink_output_nodes=[sink_node])
 
     assert_plan_snapshot_text_equal(
@@ -722,7 +711,7 @@ def test_join_to_time_spine_node_with_offset_to_grain(
 def test_compute_metrics_node_ratio_from_single_semantic_model(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -739,7 +728,7 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
         MetricInputMeasureSpec(measure_spec=denominator_spec),
     )
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
-    filtered_measures_node = FilterElementsNode[SemanticModelDataSet](
+    filtered_measures_node = FilterElementsNode(
         parent_node=measure_source_node,
         include_specs=InstanceSpecSet(measure_specs=(numerator_spec, denominator_spec), entity_specs=(entity_spec,)),
     )
@@ -749,7 +738,7 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
         entity_links=(),
     )
     dimension_source_node = consistent_id_object_repository.simple_model_read_nodes["listings_latest"]
-    filtered_dimension_node = FilterElementsNode[SemanticModelDataSet](
+    filtered_dimension_node = FilterElementsNode(
         parent_node=dimension_source_node,
         include_specs=InstanceSpecSet(
             entity_specs=(entity_spec,),
@@ -757,7 +746,7 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
         ),
     )
 
-    join_node = JoinToBaseOutputNode[SemanticModelDataSet](
+    join_node = JoinToBaseOutputNode(
         left_node=filtered_measures_node,
         join_targets=[
             JoinDescription(
@@ -769,13 +758,11 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
         ],
     )
 
-    aggregated_measures_node = AggregateMeasuresNode[SemanticModelDataSet](
+    aggregated_measures_node = AggregateMeasuresNode(
         parent_node=join_node, metric_input_measure_specs=metric_input_measure_specs
     )
     metric_spec = MetricSpec(element_name="bookings_per_booker")
-    compute_metrics_node = ComputeMetricsNode[SemanticModelDataSet](
-        parent_node=aggregated_measures_node, metric_specs=[metric_spec]
-    )
+    compute_metrics_node = ComputeMetricsNode(parent_node=aggregated_measures_node, metric_specs=[metric_spec])
 
     convert_and_check(
         request=request,
@@ -790,7 +777,7 @@ def test_compute_metrics_node_ratio_from_multiple_semantic_models(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests the compute metrics node for ratio type metrics.
@@ -829,7 +816,7 @@ def test_order_by_node(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     consistent_id_object_repository: ConsistentIdObjectRepository,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan where there is a leaf compute metrics node."""
@@ -849,7 +836,7 @@ def test_order_by_node(
     )
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
 
-    filtered_measure_node = FilterElementsNode[SemanticModelDataSet](
+    filtered_measure_node = FilterElementsNode(
         parent_node=measure_source_node,
         include_specs=InstanceSpecSet(
             measure_specs=(measure_spec,),
@@ -858,14 +845,12 @@ def test_order_by_node(
         ),
     )
 
-    aggregated_measure_node = AggregateMeasuresNode[SemanticModelDataSet](
+    aggregated_measure_node = AggregateMeasuresNode(
         parent_node=filtered_measure_node, metric_input_measure_specs=metric_input_measure_specs
     )
 
     metric_spec = MetricSpec(element_name="bookings")
-    compute_metrics_node = ComputeMetricsNode[SemanticModelDataSet](
-        parent_node=aggregated_measure_node, metric_specs=[metric_spec]
-    )
+    compute_metrics_node = ComputeMetricsNode(parent_node=aggregated_measure_node, metric_specs=[metric_spec])
 
     order_by_node = OrderByLimitNode(
         order_by_specs=[
@@ -893,8 +878,8 @@ def test_order_by_node(
 def test_multihop_node(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    multihop_dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
-    multihop_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    multihop_dataflow_plan_builder: DataflowPlanBuilder,
+    multihop_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan where there is a join between 1 measure and 2 dimensions."""
@@ -926,8 +911,8 @@ def test_filter_with_where_constraint_on_join_dim(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     column_association_resolver: ColumnAssociationResolver,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -966,7 +951,7 @@ def test_constrain_time_range_node(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     consistent_id_object_repository: ConsistentIdObjectRepository,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests converting the ConstrainTimeRangeNode to SQL."""
@@ -989,7 +974,7 @@ def test_constrain_time_range_node(
         aggregation_time_dimension_reference=TimeDimensionReference(element_name="ds"),
     )
 
-    constrain_time_node = ConstrainTimeRangeNode[SemanticModelDataSet](
+    constrain_time_node = ConstrainTimeRangeNode(
         parent_node=metric_time_node,
         time_range_constraint=TimeRangeConstraint(
             start_time=as_datetime("2020-01-01"),
@@ -1009,8 +994,8 @@ def test_constrain_time_range_node(
 def test_cumulative_metric(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -1041,8 +1026,8 @@ def test_cumulative_metric(
 def test_cumulative_metric_with_time_constraint(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -1076,8 +1061,8 @@ def test_cumulative_metric_with_time_constraint(
 def test_cumulative_metric_no_ds(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -1102,8 +1087,8 @@ def test_cumulative_metric_no_ds(
 def test_cumulative_metric_no_window(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -1134,8 +1119,8 @@ def test_cumulative_metric_no_window(
 def test_cumulative_metric_no_window_with_time_constraint(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -1169,8 +1154,8 @@ def test_cumulative_metric_no_window_with_time_constraint(
 def test_cumulative_metric_grain_to_date(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -1201,8 +1186,8 @@ def test_cumulative_metric_grain_to_date(
 def test_partitioned_join(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
@@ -1231,8 +1216,8 @@ def test_partitioned_join(
 def test_limit_rows(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests a plan with a limit to the number of rows returned."""
@@ -1261,8 +1246,8 @@ def test_limit_rows(  # noqa: D
 def test_distinct_values(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests a plan to get distinct values for a dimension."""
@@ -1287,8 +1272,8 @@ def test_distinct_values(  # noqa: D
 def test_local_dimension_using_local_entity(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -1316,7 +1301,7 @@ def test_semi_additive_join_node(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     consistent_id_object_repository: ConsistentIdObjectRepository,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan using a SemiAdditiveJoinNode."""
@@ -1324,7 +1309,7 @@ def test_semi_additive_join_node(
     time_dimension_spec = TimeDimensionSpec(element_name="ds", entity_links=())
 
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["accounts_source"]
-    semi_additive_join_node = SemiAdditiveJoinNode[SemanticModelDataSet](
+    semi_additive_join_node = SemiAdditiveJoinNode(
         parent_node=measure_source_node,
         entity_specs=tuple(),
         time_dimension_spec=time_dimension_spec,
@@ -1344,7 +1329,7 @@ def test_semi_additive_join_node_with_queried_group_by(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     consistent_id_object_repository: ConsistentIdObjectRepository,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan using a SemiAdditiveJoinNode."""
@@ -1355,7 +1340,7 @@ def test_semi_additive_join_node_with_queried_group_by(
     )
 
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["accounts_source"]
-    semi_additive_join_node = SemiAdditiveJoinNode[SemanticModelDataSet](
+    semi_additive_join_node = SemiAdditiveJoinNode(
         parent_node=measure_source_node,
         entity_specs=tuple(),
         time_dimension_spec=time_dimension_spec,
@@ -1375,7 +1360,7 @@ def test_semi_additive_join_node_with_grouping(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     consistent_id_object_repository: ConsistentIdObjectRepository,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan using a SemiAdditiveJoinNode with a window_grouping."""
@@ -1388,7 +1373,7 @@ def test_semi_additive_join_node_with_grouping(
     time_dimension_spec = TimeDimensionSpec(element_name="ds", entity_links=())
 
     measure_source_node = consistent_id_object_repository.simple_model_read_nodes["accounts_source"]
-    semi_additive_join_node = SemiAdditiveJoinNode[SemanticModelDataSet](
+    semi_additive_join_node = SemiAdditiveJoinNode(
         parent_node=measure_source_node,
         entity_specs=(entity_spec,),
         time_dimension_spec=time_dimension_spec,
@@ -1406,8 +1391,8 @@ def test_semi_additive_join_node_with_grouping(
 def test_measure_constraint(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -1429,8 +1414,8 @@ def test_measure_constraint(  # noqa: D
 def test_measure_constraint_with_reused_measure(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -1452,8 +1437,8 @@ def test_measure_constraint_with_reused_measure(  # noqa: D
 def test_measure_constraint_with_single_expr_and_alias(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -1475,8 +1460,8 @@ def test_measure_constraint_with_single_expr_and_alias(  # noqa: D
 def test_derived_metric(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -1498,8 +1483,8 @@ def test_derived_metric(  # noqa: D
 def test_nested_derived_metric(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -1522,8 +1507,8 @@ def test_join_to_scd_dimension(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     scd_column_association_resolver: ColumnAssociationResolver,
-    scd_dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
-    scd_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    scd_dataflow_plan_builder: DataflowPlanBuilder,
+    scd_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests conversion of a plan using a dimension with a validity window inside a measure constraint."""
@@ -1559,8 +1544,8 @@ def test_join_to_scd_dimension(
 def test_multi_hop_through_scd_dimension(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    scd_dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
-    scd_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    scd_dataflow_plan_builder: DataflowPlanBuilder,
+    scd_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests conversion of a plan using a dimension that is reached through an SCD table."""
@@ -1584,8 +1569,8 @@ def test_multi_hop_through_scd_dimension(
 def test_multi_hop_to_scd_dimension(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    scd_dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
-    scd_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    scd_dataflow_plan_builder: DataflowPlanBuilder,
+    scd_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests conversion of a plan using an SCD dimension that is reached through another table."""
@@ -1609,8 +1594,8 @@ def test_multi_hop_to_scd_dimension(
 def test_multiple_metrics_no_dimensions(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -1634,8 +1619,8 @@ def test_multiple_metrics_no_dimensions(  # noqa: D
 def test_metric_with_measures_from_multiple_sources_no_dimensions(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -1656,8 +1641,8 @@ def test_metric_with_measures_from_multiple_sources_no_dimensions(  # noqa: D
 def test_common_semantic_model(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -1679,8 +1664,8 @@ def test_common_semantic_model(  # noqa: D
 def test_derived_metric_with_offset_window(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -1702,8 +1687,8 @@ def test_derived_metric_with_offset_window(  # noqa: D
 def test_derived_metric_with_offset_to_grain(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -1725,8 +1710,8 @@ def test_derived_metric_with_offset_to_grain(  # noqa: D
 def test_derived_metric_with_offset_window_and_offset_to_grain(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -1748,8 +1733,8 @@ def test_derived_metric_with_offset_window_and_offset_to_grain(  # noqa: D
 def test_derived_offset_metric_with_one_input_metric(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -1771,8 +1756,8 @@ def test_derived_offset_metric_with_one_input_metric(  # noqa: D
 def test_derived_metric_with_offset_window_and_granularity(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -1794,8 +1779,8 @@ def test_derived_metric_with_offset_window_and_granularity(  # noqa: D
 def test_derived_metric_with_offset_to_grain_and_granularity(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -1817,8 +1802,8 @@ def test_derived_metric_with_offset_to_grain_and_granularity(  # noqa: D
 def test_derived_metric_with_offset_window_and_offset_to_grain_and_granularity(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -1840,8 +1825,8 @@ def test_derived_metric_with_offset_window_and_offset_to_grain_and_granularity( 
 def test_derived_offset_cumulative_metric(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(

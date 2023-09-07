@@ -9,7 +9,6 @@ from dbt_semantic_interfaces.references import EntityReference
 from metricflow.dataflow.builder.costing import DefaultCostFunction
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
-from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.specs.specs import (
     DimensionSpec,
@@ -29,21 +28,21 @@ logger = logging.getLogger(__name__)
 def cyclic_join_manifest_dataflow_plan_builder(  # noqa: D
     cyclic_join_semantic_manifest_lookup: SemanticManifestLookup,
     consistent_id_object_repository: ConsistentIdObjectRepository,
-) -> DataflowPlanBuilder[SemanticModelDataSet]:
+) -> DataflowPlanBuilder:
     for source_node in consistent_id_object_repository.cyclic_join_source_nodes:
         logger.error(f"Source node is: {source_node}")
 
     return DataflowPlanBuilder(
         source_nodes=consistent_id_object_repository.cyclic_join_source_nodes,
         semantic_manifest_lookup=cyclic_join_semantic_manifest_lookup,
-        cost_function=DefaultCostFunction[SemanticModelDataSet](),
+        cost_function=DefaultCostFunction(),
     )
 
 
 def test_cyclic_join(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    cyclic_join_manifest_dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    cyclic_join_manifest_dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests that sources with the same joinable keys don't cause cycle issues."""
     dataflow_plan = cyclic_join_manifest_dataflow_plan_builder.build_plan(

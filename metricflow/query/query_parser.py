@@ -24,7 +24,6 @@ from metricflow.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.dataflow_plan import BaseOutput
 from metricflow.dataset.dataset import DataSet
-from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
@@ -113,8 +112,8 @@ class MetricFlowQueryParser:
         self,
         column_association_resolver: ColumnAssociationResolver,
         model: SemanticManifestLookup,
-        source_nodes: Sequence[BaseOutput[SemanticModelDataSet]],
-        node_output_resolver: DataflowPlanNodeOutputDataSetResolver[SemanticModelDataSet],
+        source_nodes: Sequence[BaseOutput],
+        node_output_resolver: DataflowPlanNodeOutputDataSetResolver,
     ) -> None:
         self._column_association_resolver = column_association_resolver
         self._model = model

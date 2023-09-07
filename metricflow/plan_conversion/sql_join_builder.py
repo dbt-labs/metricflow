@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Optional, Sequence, Tuple, TypeVar
+from typing import List, Optional, Sequence, Tuple
 
 from metricflow.dataflow.dataflow_plan import JoinDescription, JoinOverTimeRangeNode, JoinToTimeSpineNode
 from metricflow.plan_conversion.sql_dataset import SqlDataSet
@@ -18,8 +18,6 @@ from metricflow.sql.sql_exprs import (
     SqlTimeDeltaExpression,
 )
 from metricflow.sql.sql_plan import SqlExpressionNode, SqlJoinDescription, SqlJoinType, SqlSelectStatementNode
-
-SqlDataSetT = TypeVar("SqlDataSetT", bound=SqlDataSet)
 
 
 @dataclass(frozen=True)
@@ -406,7 +404,7 @@ class SqlQueryPlanJoinBuilder:
 
     @staticmethod
     def make_cumulative_metric_time_range_join_description(
-        node: JoinOverTimeRangeNode[SqlDataSetT],
+        node: JoinOverTimeRangeNode,
         metric_data_set: AnnotatedSqlDataSet,
         time_spine_data_set: AnnotatedSqlDataSet,
     ) -> SqlJoinDescription:
