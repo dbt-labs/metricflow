@@ -38,8 +38,8 @@ from metricflow.dataflow.builder.partitions import (
     PartitionTimeDimensionJoinDescription,
 )
 from metricflow.dataflow.sql_table import SqlTable
+from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.filters.time_constraint import TimeRangeConstraint
-from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.specs.specs import (
     InstanceSpecSet,
     LinklessEntitySpec,

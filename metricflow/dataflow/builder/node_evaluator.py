@@ -32,10 +32,10 @@ from metricflow.dataflow.dataflow_plan import (
     PartitionTimeDimensionJoinDescription,
     ValidityWindowJoinDescription,
 )
+from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.instances import InstanceSet
 from metricflow.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
 from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
-from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.protocols.semantics import SemanticModelAccessor
 from metricflow.specs.specs import (
     LinkableInstanceSpec,

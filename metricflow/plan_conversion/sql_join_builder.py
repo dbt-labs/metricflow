@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple
 
 from metricflow.dataflow.dataflow_plan import JoinDescription, JoinOverTimeRangeNode, JoinToTimeSpineNode
-from metricflow.plan_conversion.sql_dataset import SqlDataSet
+from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.sql_expression_builders import make_coalesced_expr
 from metricflow.sql.sql_exprs import (
     SqlColumnReference,

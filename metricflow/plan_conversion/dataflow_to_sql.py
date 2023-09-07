@@ -33,6 +33,7 @@ from metricflow.dataflow.dataflow_plan import (
     WriteToResultTableNode,
 )
 from metricflow.dataset.dataset import DataSet
+from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.instances import (
     InstanceSet,
@@ -62,7 +63,6 @@ from metricflow.plan_conversion.spec_transforms import (
     CreateSelectCoalescedColumnsForLinkableSpecs,
     SelectOnlyLinkableSpecs,
 )
-from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.sql_join_builder import (
     AnnotatedSqlDataSet,
     ColumnEqualityDescription,

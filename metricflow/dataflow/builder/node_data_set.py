@@ -5,9 +5,9 @@ from typing import Dict
 from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,
 )
+from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
-from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 
 
