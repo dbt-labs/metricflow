@@ -9,7 +9,6 @@ from metricflow.dataflow.dataflow_plan import (
     JoinDescription,
     JoinToBaseOutputNode,
 )
-from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.specs.specs import (
     DimensionSpec,
     EntitySpec,
@@ -30,7 +29,7 @@ def test_costing(consistent_id_object_repository: ConsistentIdObjectRepository) 
     bookings_spec = MeasureSpec(
         element_name="bookings",
     )
-    bookings_filtered = FilterElementsNode[SemanticModelDataSet](
+    bookings_filtered = FilterElementsNode(
         parent_node=bookings_node,
         include_specs=InstanceSpecSet(
             measure_specs=(bookings_spec,),
@@ -43,7 +42,7 @@ def test_costing(consistent_id_object_repository: ConsistentIdObjectRepository) 
         ),
     )
 
-    listings_filtered = FilterElementsNode[SemanticModelDataSet](
+    listings_filtered = FilterElementsNode(
         parent_node=listings_node,
         include_specs=InstanceSpecSet(
             dimension_specs=(
@@ -61,7 +60,7 @@ def test_costing(consistent_id_object_repository: ConsistentIdObjectRepository) 
         ),
     )
 
-    join_node = JoinToBaseOutputNode[SemanticModelDataSet](
+    join_node = JoinToBaseOutputNode(
         left_node=bookings_filtered,
         join_targets=[
             JoinDescription(
@@ -73,11 +72,11 @@ def test_costing(consistent_id_object_repository: ConsistentIdObjectRepository) 
         ],
     )
 
-    bookings_aggregated = AggregateMeasuresNode[SemanticModelDataSet](
+    bookings_aggregated = AggregateMeasuresNode(
         parent_node=join_node, metric_input_measure_specs=(MetricInputMeasureSpec(measure_spec=bookings_spec),)
     )
 
-    cost_function = DefaultCostFunction[SemanticModelDataSet]()
+    cost_function = DefaultCostFunction()
     cost = cost_function.calculate_cost(bookings_aggregated)
 
     assert cost == DefaultCost(num_joins=1, num_aggregations=1)

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from collections import OrderedDict
-from typing import Generic, List, Optional, Sequence, TypeVar, Union
+from typing import List, Optional, Sequence, Union
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols.metric import MetricType
@@ -28,12 +28,12 @@ from metricflow.dataflow.dataflow_plan import (
     OrderByLimitNode,
     ReadSqlSourceNode,
     SemiAdditiveJoinNode,
-    SourceDataSetT,
     WhereConstraintNode,
     WriteToResultDataframeNode,
     WriteToResultTableNode,
 )
 from metricflow.dataset.dataset import DataSet
+from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.instances import (
     InstanceSet,
@@ -63,7 +63,6 @@ from metricflow.plan_conversion.spec_transforms import (
     CreateSelectCoalescedColumnsForLinkableSpecs,
     SelectOnlyLinkableSpecs,
 )
-from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.sql_join_builder import (
     AnnotatedSqlDataSet,
     ColumnEqualityDescription,
@@ -111,10 +110,6 @@ from metricflow.time.time_constants import ISO8601_PYTHON_FORMAT
 logger = logging.getLogger(__name__)
 
 
-# The type of data set that present at a source node.
-SqlDataSetT = TypeVar("SqlDataSetT", bound=SqlDataSet)
-
-
 def _make_time_range_comparison_expr(
     table_alias: str, column_alias: str, time_range_constraint: TimeRangeConstraint
 ) -> SqlExpressionNode:
@@ -136,7 +131,7 @@ def _make_time_range_comparison_expr(
     )
 
 
-class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisitor[SqlDataSetT, SqlDataSet]):
+class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
     """Generates an SQL query plan from a node in the a metric dataflow plan."""
 
     def __init__(
@@ -263,14 +258,14 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 ),
             )
 
-    def visit_source_node(self, node: ReadSqlSourceNode[SqlDataSetT]) -> SqlDataSet:
+    def visit_source_node(self, node: ReadSqlSourceNode) -> SqlDataSet:
         """Generate the SQL to read from the source."""
         return SqlDataSet(
             sql_select_node=node.data_set.sql_select_node,
             instance_set=node.data_set.instance_set,
         )
 
-    def visit_join_over_time_range_node(self, node: JoinOverTimeRangeNode[SqlDataSetT]) -> SqlDataSet:
+    def visit_join_over_time_range_node(self, node: JoinOverTimeRangeNode) -> SqlDataSet:
         """Generate time range join SQL."""
         table_alias_to_instance_set: OrderedDict[str, InstanceSet] = OrderedDict()
 
@@ -364,7 +359,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             ),
         )
 
-    def visit_join_to_base_output_node(self, node: JoinToBaseOutputNode[SqlDataSetT]) -> SqlDataSet:
+    def visit_join_to_base_output_node(self, node: JoinToBaseOutputNode) -> SqlDataSet:
         """Generates the query that realizes the behavior of the JoinToStandardOutputNode."""
         # Keep a mapping between the table aliases that would be used in the query and the MDO instances in that source.
         # e.g. when building "FROM from_table a JOIN right_table b", the value for key "a" would be the instances in
@@ -785,7 +780,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         """
         raise RuntimeError("This node type is not supported.")
 
-    def visit_write_to_result_table_node(self, node: WriteToResultTableNode[SourceDataSetT]) -> SqlDataSet:
+    def visit_write_to_result_table_node(self, node: WriteToResultTableNode) -> SqlDataSet:
         """Similar to visit_write_to_result_dataframe_node()."""
         raise RuntimeError("This node type is not supported.")
 
@@ -888,7 +883,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                 )
         return select_columns
 
-    def visit_combine_metrics_node(self, node: CombineMetricsNode[SqlDataSetT]) -> SqlDataSet:
+    def visit_combine_metrics_node(self, node: CombineMetricsNode) -> SqlDataSet:
         """Join computed metric datasets together to return a single dataset containing all metrics.
 
         This node may exist in one of two situations: when metrics need to be combined in order to produce a single
@@ -1000,7 +995,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             ),
         )
 
-    def visit_constrain_time_range_node(self, node: ConstrainTimeRangeNode[SourceDataSetT]) -> SqlDataSet:
+    def visit_constrain_time_range_node(self, node: ConstrainTimeRangeNode) -> SqlDataSet:
         """Convert ConstrainTimeRangeNode to a SqlDataSet by building the time constraint comparison.
 
         Use the smallest time granularity to build the comparison since that's what was used in the semantic model
@@ -1074,9 +1069,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
 
         return SqlQueryPlan(plan_id=sql_query_plan_id, render_node=sql_select_node)
 
-    def visit_metric_time_dimension_transform_node(
-        self, node: MetricTimeDimensionTransformNode[SqlDataSetT]
-    ) -> SqlDataSet:
+    def visit_metric_time_dimension_transform_node(self, node: MetricTimeDimensionTransformNode) -> SqlDataSet:
         """Implement the behavior of the MetricTimeDimensionTransformNode.
 
         This node will create an output data set that is similar to the input data set, but the measure instances it
@@ -1294,7 +1287,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             ),
         )
 
-    def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode[SourceDataSetT]) -> SqlDataSet:  # noqa: D
+    def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode) -> SqlDataSet:  # noqa: D
         parent_data_set = node.parent_node.accept(self)
         parent_alias = self._next_unique_table_alias()
 

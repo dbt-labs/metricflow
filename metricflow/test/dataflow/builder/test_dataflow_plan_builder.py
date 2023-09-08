@@ -10,7 +10,6 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.dataset.dataset import DataSet
-from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
@@ -32,7 +31,7 @@ logger = logging.getLogger(__name__)
 def test_simple_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a simple plan getting a metric and a local dimension."""
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -64,7 +63,7 @@ def test_simple_plan(  # noqa: D
 def test_primary_entity_dimension(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a simple plan getting a metric and a local dimension."""
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -97,7 +96,7 @@ def test_joined_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     column_association_resolver: ColumnAssociationResolver,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a plan getting a measure and a joined dimension."""
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -133,7 +132,7 @@ def test_joined_plan(  # noqa: D
 def test_order_by_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a plan with an order by."""
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -170,7 +169,7 @@ def test_order_by_plan(  # noqa: D
 def test_limit_rows_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a plan with a limit to the number of rows returned."""
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -198,7 +197,7 @@ def test_limit_rows_plan(  # noqa: D
 def test_multiple_metrics_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a plan to retrieve multiple metrics."""
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -231,7 +230,7 @@ def test_multiple_metrics_plan(  # noqa: D
 def test_single_semantic_model_ratio_metrics_plan(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a plan to retrieve a ratio where both measures come from one semantic model."""
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -264,7 +263,7 @@ def test_single_semantic_model_ratio_metrics_plan(
 def test_multi_semantic_model_ratio_metrics_plan(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a plan to retrieve a ratio where both measures come from one semantic model."""
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -297,7 +296,7 @@ def test_multi_semantic_model_ratio_metrics_plan(
 def test_multihop_join_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    multihop_dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    multihop_dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a plan with an order by."""
     dataflow_plan = multihop_dataflow_plan_builder.build_plan(
@@ -333,7 +332,7 @@ def test_where_constrained_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     column_association_resolver: ColumnAssociationResolver,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a simple plan getting a metric and a local dimension."""
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -374,7 +373,7 @@ def test_where_constrained_plan(  # noqa: D
 def test_where_constrained_plan_time_dimension(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
     column_association_resolver: ColumnAssociationResolver,
 ) -> None:
     """Tests a simple plan getting a metric and a local dimension."""
@@ -417,7 +416,7 @@ def test_where_constrained_with_common_linkable_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     column_association_resolver: ColumnAssociationResolver,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a dataflow plan where the where clause has a common linkable with the query."""
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -457,7 +456,7 @@ def test_where_constrained_with_common_linkable_plan(  # noqa: D
 
 def test_multihop_join_plan_ambiguous_dim(  # noqa: D
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Checks that an exception is thrown when trying to build a plan with an ambiguous dimension."""
     with pytest.raises(UnableToSatisfyQueryError):
@@ -480,7 +479,7 @@ def test_multihop_join_plan_ambiguous_dim(  # noqa: D
 def test_cumulative_metric_with_window(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a plan to compute a cumulative metric."""
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -508,7 +507,7 @@ def test_cumulative_metric_with_window(  # noqa: D
 def test_cumulative_metric_no_window_or_grain_with_metric_time(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
@@ -535,7 +534,7 @@ def test_cumulative_metric_no_window_or_grain_with_metric_time(  # noqa: D
 def test_cumulative_metric_no_window_or_grain_without_metric_time(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
@@ -562,7 +561,7 @@ def test_cumulative_metric_no_window_or_grain_without_metric_time(  # noqa: D
 def test_distinct_values_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a plan to get distinct values of a dimension."""
     dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
@@ -591,7 +590,7 @@ def test_distinct_values_plan(  # noqa: D
 def test_measure_constraint_plan(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a plan for querying a metric with a constraint on one or more of its input measures."""
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -619,7 +618,7 @@ def test_measure_constraint_plan(
 def test_measure_constraint_with_reused_measure_plan(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a plan for querying a metric with a constraint on one or more of its input measures."""
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -647,7 +646,7 @@ def test_measure_constraint_with_reused_measure_plan(
 def test_common_semantic_model(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a simple plan getting a metric and a local dimension."""
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -677,7 +676,7 @@ def test_common_semantic_model(  # noqa: D
 def test_derived_metric_offset_window(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a simple plan getting a metric and a local dimension."""
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -704,7 +703,7 @@ def test_derived_metric_offset_window(  # noqa: D
 def test_derived_metric_offset_to_grain(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a simple plan getting a metric and a local dimension."""
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -731,7 +730,7 @@ def test_derived_metric_offset_to_grain(  # noqa: D
 def test_derived_metric_offset_with_granularity(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
@@ -757,7 +756,7 @@ def test_derived_metric_offset_with_granularity(  # noqa: D
 def test_derived_offset_cumulative_metric(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Generic, List, Optional, Sequence, Set, TypeVar
+from typing import List, Optional, Sequence, Set
 
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.references import EntityReference, TimeDimensionReference
@@ -18,19 +18,15 @@ from metricflow.dataflow.dataflow_plan import (
 )
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS, SemanticModelJoinEvaluator
-from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.protocols.semantics import SemanticModelAccessor
 from metricflow.specs.spec_set_transforms import ToElementNameSet
 from metricflow.specs.specs import InstanceSpecSet, LinkableInstanceSpec, LinklessEntitySpec
-
-SqlDataSetT = TypeVar("SqlDataSetT", bound=SqlDataSet)
-
 
 logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
-class MultiHopJoinCandidateLineage(Generic[SqlDataSetT]):
+class MultiHopJoinCandidateLineage:
     """Describes how the multi-hop join candidate was formed.
 
     For example, if
@@ -44,23 +40,23 @@ class MultiHopJoinCandidateLineage(Generic[SqlDataSetT]):
     to get the country dimension.
     """
 
-    first_node_to_join: BaseOutput[SqlDataSetT]
-    second_node_to_join: BaseOutput[SqlDataSetT]
+    first_node_to_join: BaseOutput
+    second_node_to_join: BaseOutput
     join_second_node_by_entity: LinklessEntitySpec
 
 
 @dataclass(frozen=True)
-class MultiHopJoinCandidate(Generic[SqlDataSetT]):
+class MultiHopJoinCandidate:
     """A candidate node containing linkable specs that is join of other nodes. It's used to resolve multi-hop queries.
 
     Also see MultiHopJoinCandidateLineage.
     """
 
-    node_with_multi_hop_elements: BaseOutput[SqlDataSetT]
-    lineage: MultiHopJoinCandidateLineage[SqlDataSetT]
+    node_with_multi_hop_elements: BaseOutput
+    lineage: MultiHopJoinCandidateLineage
 
 
-class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
+class PreDimensionJoinNodeProcessor:
     """Processes source nodes before measures are joined to dimensions.
 
     Generally, the source nodes will be combined with other dataflow plan nodes to produce a new set of nodes to realize
@@ -82,7 +78,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
     def __init__(  # noqa: D
         self,
         semantic_model_lookup: SemanticModelAccessor,
-        node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver[SqlDataSetT],
+        node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver,
     ):
         self._node_data_set_resolver = node_data_set_resolver
         self._partition_resolver = PartitionJoinResolver(semantic_model_lookup)
@@ -91,12 +87,12 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
 
     def add_time_range_constraint(
         self,
-        source_nodes: Sequence[BaseOutput[SqlDataSetT]],
+        source_nodes: Sequence[BaseOutput],
         metric_time_dimension_reference: TimeDimensionReference,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
-    ) -> Sequence[BaseOutput[SqlDataSetT]]:
+    ) -> Sequence[BaseOutput]:
         """Adds a time range constraint node to the input nodes."""
-        processed_nodes: List[BaseOutput[SqlDataSetT]] = []
+        processed_nodes: List[BaseOutput] = []
         for source_node in source_nodes:
             # Constrain the time range if specified.
             if time_range_constraint:
@@ -121,7 +117,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
 
     def _node_contains_entity(
         self,
-        node: BaseOutput[SqlDataSetT],
+        node: BaseOutput,
         entity_reference: EntityReference,
     ) -> bool:
         """Returns true if the output of the node contains an entity of the given types."""
@@ -155,7 +151,7 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
     def _get_candidates_nodes_for_multi_hop(
         self,
         desired_linkable_spec: LinkableInstanceSpec,
-        nodes: Sequence[BaseOutput[SqlDataSetT]],
+        nodes: Sequence[BaseOutput],
     ) -> Sequence[MultiHopJoinCandidate]:
         """Assemble nodes representing all possible one-hop joins."""
         if len(desired_linkable_spec.entity_links) > MAX_JOIN_HOPS:
@@ -280,11 +276,11 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
         return multi_hop_join_candidates
 
     def add_multi_hop_joins(
-        self, desired_linkable_specs: Sequence[LinkableInstanceSpec], nodes: Sequence[BaseOutput[SqlDataSetT]]
-    ) -> Sequence[BaseOutput[SqlDataSetT]]:
+        self, desired_linkable_specs: Sequence[LinkableInstanceSpec], nodes: Sequence[BaseOutput]
+    ) -> Sequence[BaseOutput]:
         """Assemble nodes representing all possible one-hop joins."""
-        all_multi_hop_join_candidates: List[MultiHopJoinCandidate[SqlDataSetT]] = []
-        lineage_for_all_multi_hop_join_candidates: Set[MultiHopJoinCandidateLineage[SqlDataSetT]] = set()
+        all_multi_hop_join_candidates: List[MultiHopJoinCandidate] = []
+        lineage_for_all_multi_hop_join_candidates: Set[MultiHopJoinCandidateLineage] = set()
 
         for desired_linkable_spec in desired_linkable_specs:
             for multi_hop_join_candidate in self._get_candidates_nodes_for_multi_hop(
@@ -301,9 +297,9 @@ class PreDimensionJoinNodeProcessor(Generic[SqlDataSetT]):
     def remove_unnecessary_nodes(
         self,
         desired_linkable_specs: Sequence[LinkableInstanceSpec],
-        nodes: Sequence[BaseOutput[SqlDataSetT]],
+        nodes: Sequence[BaseOutput],
         metric_time_dimension_reference: TimeDimensionReference,
-    ) -> Sequence[BaseOutput[SqlDataSetT]]:
+    ) -> Sequence[BaseOutput]:
         """Filters out many of the nodes that can't possibly be useful for joins to obtain the desired linkable specs.
 
         A simple filter is to remove any nodes that don't share a common element with the query. Having a common element

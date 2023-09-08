@@ -1,15 +1,12 @@
 from __future__ import annotations
 
-from typing import List, Sequence
+from typing import Sequence
 
 import more_itertools
-from dbt_semantic_interfaces.references import SemanticModelReference
 
 from metricflow.dataset.dataset import DataSet
 from metricflow.instances import (
     InstanceSet,
-    InstanceSetTransform,
-    SemanticModelElementInstance,
 )
 from metricflow.specs.column_assoc import ColumnAssociation
 from metricflow.specs.specs import DimensionSpec, EntitySpec, TimeDimensionSpec
@@ -119,19 +116,3 @@ class SqlDataSet(DataSet):
             + self.instance_set.time_dimension_instances
         )
         return tuple(more_itertools.flatten([instance.associated_columns for instance in instances]))
-
-
-class SameSemanticModelReferenceChecker(InstanceSetTransform[bool]):
-    """Checks to see that all elements in the instance set come from the same semantic model."""
-
-    def __init__(self, semantic_model_reference: SemanticModelReference) -> None:  # noqa: D
-        self._semantic_model_reference = semantic_model_reference
-
-    def transform(self, instance_set: InstanceSet) -> bool:  # noqa: D
-        combined: List[SemanticModelElementInstance] = []
-        combined.extend(instance_set.measure_instances)
-        combined.extend(instance_set.dimension_instances)
-        combined.extend(instance_set.time_dimension_instances)
-        combined.extend(instance_set.entity_instances)
-
-        return all([all([y.is_from(self._semantic_model_reference) for y in x.defined_from]) for x in combined])

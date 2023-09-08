@@ -19,7 +19,7 @@ from __future__ import annotations
 import itertools
 import logging
 from dataclasses import dataclass
-from typing import Generic, List, Optional, Sequence, Tuple, TypeVar
+from typing import List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 
@@ -32,10 +32,10 @@ from metricflow.dataflow.dataflow_plan import (
     PartitionTimeDimensionJoinDescription,
     ValidityWindowJoinDescription,
 )
+from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.instances import InstanceSet
 from metricflow.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
 from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
-from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.protocols.semantics import SemanticModelAccessor
 from metricflow.specs.specs import (
     LinkableInstanceSpec,
@@ -95,10 +95,7 @@ class LinkableInstanceSatisfiabilityEvaluation:
     unjoinable_linkable_specs: Tuple[LinkableInstanceSpec, ...]
 
 
-SourceDataSetT = TypeVar("SourceDataSetT", bound=SqlDataSet)
-
-
-class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
+class NodeEvaluatorForLinkableInstances:
     """Helps to evaluate if linkable instances can be obtained using the given node, with joins if necessary.
 
     For example, consider a "start_node" containing the "bookings" measure, "is_instant" dimension, and "listing_id"
@@ -115,8 +112,8 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
     def __init__(
         self,
         semantic_model_lookup: SemanticModelAccessor,
-        nodes_available_for_joins: Sequence[BaseOutput[SourceDataSetT]],
-        node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver[SourceDataSetT],
+        nodes_available_for_joins: Sequence[BaseOutput],
+        node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver,
     ) -> None:
         """Constructor.
 
@@ -307,7 +304,7 @@ class NodeEvaluatorForLinkableInstances(Generic[SourceDataSetT]):
 
     def evaluate_node(
         self,
-        start_node: BaseOutput[SourceDataSetT],
+        start_node: BaseOutput,
         required_linkable_specs: Sequence[LinkableInstanceSpec],
     ) -> LinkableInstanceSatisfiabilityEvaluation:
         """Evaluates if the "required_linkable_specs" can be realized by joining the "start_node" with other nodes.

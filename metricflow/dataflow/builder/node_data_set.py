@@ -1,19 +1,17 @@
 from __future__ import annotations
 
-from typing import Dict, Generic, TypeVar
+from typing import Dict
 
 from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,
 )
+from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
-from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 
-SourceDataSetT = TypeVar("SourceDataSetT", bound=SqlDataSet)
 
-
-class DataflowPlanNodeOutputDataSetResolver(Generic[SourceDataSetT], DataflowToSqlQueryPlanConverter[SourceDataSetT]):
+class DataflowPlanNodeOutputDataSetResolver(DataflowToSqlQueryPlanConverter):
     """Given a node in a dataflow plan, figure out what is the data set output by that node.
 
     Recall that in the dataflow plan, the nodes represent computation, and the inputs and outputs of the nodes are
@@ -61,13 +59,13 @@ class DataflowPlanNodeOutputDataSetResolver(Generic[SourceDataSetT], DataflowToS
         column_association_resolver: ColumnAssociationResolver,
         semantic_manifest_lookup: SemanticManifestLookup,
     ) -> None:
-        self._node_to_output_data_set: Dict[DataflowPlanNode[SourceDataSetT], SqlDataSet] = {}
+        self._node_to_output_data_set: Dict[DataflowPlanNode, SqlDataSet] = {}
         super().__init__(
             column_association_resolver=column_association_resolver,
             semantic_manifest_lookup=semantic_manifest_lookup,
         )
 
-    def get_output_data_set(self, node: DataflowPlanNode[SourceDataSetT]) -> SqlDataSet:  # noqa: D
+    def get_output_data_set(self, node: DataflowPlanNode) -> SqlDataSet:  # noqa: D
         """Cached since this will be called repeatedly during the computation of multiple metrics."""
         if node not in self._node_to_output_data_set:
             self._node_to_output_data_set[node] = node.accept(self)

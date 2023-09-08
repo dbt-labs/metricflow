@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Generic, List, Optional, Sequence
+from typing import List, Optional, Sequence
 
 from metricflow.dataflow.dataflow_plan import (
     AggregateMeasuresNode,
@@ -21,7 +21,6 @@ from metricflow.dataflow.dataflow_plan import (
     OrderByLimitNode,
     ReadSqlSourceNode,
     SemiAdditiveJoinNode,
-    SourceDataSetT,
     WhereConstraintNode,
     WriteToResultDataframeNode,
     WriteToResultTableNode,
@@ -33,10 +32,10 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
-class ComputeMetricsBranchCombinerResult(Generic[SourceDataSetT]):  # noqa: D
+class ComputeMetricsBranchCombinerResult:  # noqa: D
     # Perhaps adding more metadata about how nodes got combined would be useful.
     # If combined_branch is None, it means combination could not occur.
-    combined_branch: Optional[BaseOutput[SourceDataSetT]] = None
+    combined_branch: Optional[BaseOutput] = None
 
     @property
     def combined(self) -> bool:
@@ -44,14 +43,12 @@ class ComputeMetricsBranchCombinerResult(Generic[SourceDataSetT]):  # noqa: D
         return self.combined_branch is not None
 
     @property
-    def checked_combined_branch(self) -> BaseOutput[SourceDataSetT]:  # noqa: D
+    def checked_combined_branch(self) -> BaseOutput:  # noqa: D
         assert self.combined_branch is not None
         return self.combined_branch
 
 
-class ComputeMetricsBranchCombiner(
-    Generic[SourceDataSetT], DataflowPlanNodeVisitor[SourceDataSetT, ComputeMetricsBranchCombinerResult]
-):
+class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchCombinerResult]):
     """Combines branches where the leaf node is a ComputeMetricsNode.
 
     This considers two branches, a left branch and a right branch. The left branch is supplied via the argument in the
@@ -126,17 +123,17 @@ class ComputeMetricsBranchCombiner(
     is propagated up to the result at the root node.
     """
 
-    def __init__(self, left_branch_node: BaseOutput[SourceDataSetT]) -> None:  # noqa: D
-        self._current_left_node: DataflowPlanNode[SourceDataSetT] = left_branch_node
+    def __init__(self, left_branch_node: BaseOutput) -> None:  # noqa: D
+        self._current_left_node: DataflowPlanNode = left_branch_node
         self._log_level = logging.DEBUG
 
-    def _log_visit_node_type(self, node: DataflowPlanNode[SourceDataSetT]) -> None:
+    def _log_visit_node_type(self, node: DataflowPlanNode) -> None:
         logger.log(level=self._log_level, msg=f"Visiting {node}")
 
     def _log_combine_failure(
         self,
-        left_node: DataflowPlanNode[SourceDataSetT],
-        right_node: DataflowPlanNode[SourceDataSetT],
+        left_node: DataflowPlanNode,
+        right_node: DataflowPlanNode,
         combine_failure_reason: str,
     ) -> None:
         logger.log(
@@ -147,18 +144,16 @@ class ComputeMetricsBranchCombiner(
 
     def _log_combine_success(
         self,
-        left_node: DataflowPlanNode[SourceDataSetT],
-        right_node: DataflowPlanNode[SourceDataSetT],
-        combined_node: DataflowPlanNode[SourceDataSetT],
+        left_node: DataflowPlanNode,
+        right_node: DataflowPlanNode,
+        combined_node: DataflowPlanNode,
     ) -> None:
         logger.log(
             level=self._log_level,
             msg=f"Combined left_node={left_node} right_node={right_node} combined_node: {combined_node}",
         )
 
-    def _combine_parent_branches(
-        self, current_right_node: BaseOutput[SourceDataSetT]
-    ) -> Optional[Sequence[BaseOutput[SourceDataSetT]]]:
+    def _combine_parent_branches(self, current_right_node: BaseOutput) -> Optional[Sequence[BaseOutput]]:
         if len(self._current_left_node.parent_nodes) != len(current_right_node.parent_nodes):
             self._log_combine_failure(
                 left_node=self._current_left_node,
@@ -188,9 +183,7 @@ class ComputeMetricsBranchCombiner(
 
         return combined_parents
 
-    def _default_handler(  # noqa: D
-        self, current_right_node: BaseOutput[SourceDataSetT]
-    ) -> ComputeMetricsBranchCombinerResult[SourceDataSetT]:
+    def _default_handler(self, current_right_node: BaseOutput) -> ComputeMetricsBranchCombinerResult:  # noqa: D
         combined_parent_nodes = self._combine_parent_branches(current_right_node)
         if combined_parent_nodes is None:
             return ComputeMetricsBranchCombinerResult()
@@ -204,7 +197,7 @@ class ComputeMetricsBranchCombiner(
             self._log_combine_success(
                 left_node=self._current_left_node, right_node=current_right_node, combined_node=combined_node
             )
-            return ComputeMetricsBranchCombinerResult[SourceDataSetT](combined_node)
+            return ComputeMetricsBranchCombinerResult(combined_node)
 
         self._log_combine_failure(
             left_node=self._current_left_node,
@@ -213,26 +206,24 @@ class ComputeMetricsBranchCombiner(
         )
         return ComputeMetricsBranchCombinerResult()
 
-    def visit_source_node(  # noqa: D
-        self, node: ReadSqlSourceNode[SourceDataSetT]
-    ) -> ComputeMetricsBranchCombinerResult:
+    def visit_source_node(self, node: ReadSqlSourceNode) -> ComputeMetricsBranchCombinerResult:  # noqa: D
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
     def visit_join_to_base_output_node(  # noqa: D
-        self, node: JoinToBaseOutputNode[SourceDataSetT]
+        self, node: JoinToBaseOutputNode
     ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
     def visit_join_aggregated_measures_by_groupby_columns_node(  # noqa: D
-        self, node: JoinAggregatedMeasuresByGroupByColumnsNode[SourceDataSetT]
+        self, node: JoinAggregatedMeasuresByGroupByColumnsNode
     ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
     def visit_aggregate_measures_node(  # noqa: D
-        self, node: AggregateMeasuresNode[SourceDataSetT]
+        self, node: AggregateMeasuresNode
     ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         current_right_node = node
@@ -269,7 +260,7 @@ class ComputeMetricsBranchCombiner(
                 )
                 return ComputeMetricsBranchCombinerResult()
 
-        combined_node = AggregateMeasuresNode[SourceDataSetT](
+        combined_node = AggregateMeasuresNode(
             parent_node=combined_parent_node,
             metric_input_measure_specs=combined_metric_input_measure_specs,
         )
@@ -280,9 +271,7 @@ class ComputeMetricsBranchCombiner(
         )
         return ComputeMetricsBranchCombinerResult(combined_node)
 
-    def visit_compute_metrics_node(  # noqa: D
-        self, node: ComputeMetricsNode[SourceDataSetT]
-    ) -> ComputeMetricsBranchCombinerResult:
+    def visit_compute_metrics_node(self, node: ComputeMetricsNode) -> ComputeMetricsBranchCombinerResult:  # noqa: D
         current_right_node = node
         self._log_visit_node_type(current_right_node)
         combined_parent_nodes = self._combine_parent_branches(current_right_node)
@@ -300,7 +289,7 @@ class ComputeMetricsBranchCombiner(
         assert len(combined_parent_nodes) == 1
         combined_parent_node = combined_parent_nodes[0]
         assert combined_parent_node is not None
-        combined_node = ComputeMetricsNode[SourceDataSetT](
+        combined_node = ComputeMetricsNode(
             parent_node=combined_parent_node,
             metric_specs=self._current_left_node.metric_specs + current_right_node.metric_specs,
         )
@@ -321,32 +310,28 @@ class ComputeMetricsBranchCombiner(
         )
         return ComputeMetricsBranchCombinerResult()
 
-    def visit_order_by_limit_node(  # noqa: D
-        self, node: OrderByLimitNode[SourceDataSetT]
-    ) -> ComputeMetricsBranchCombinerResult:
+    def visit_order_by_limit_node(self, node: OrderByLimitNode) -> ComputeMetricsBranchCombinerResult:  # noqa: D
         self._log_visit_node_type(node)
         return self._handle_unsupported_node(node)
 
-    def visit_where_constraint_node(  # noqa: D
-        self, node: WhereConstraintNode[SourceDataSetT]
-    ) -> ComputeMetricsBranchCombinerResult:
+    def visit_where_constraint_node(self, node: WhereConstraintNode) -> ComputeMetricsBranchCombinerResult:  # noqa: D
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
     def visit_write_to_result_dataframe_node(  # noqa: D
-        self, node: WriteToResultDataframeNode[SourceDataSetT]
+        self, node: WriteToResultDataframeNode
     ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._handle_unsupported_node(node)
 
     def visit_write_to_result_table_node(  # noqa: D
-        self, node: WriteToResultTableNode[SourceDataSetT]
+        self, node: WriteToResultTableNode
     ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._handle_unsupported_node(node)
 
     def visit_pass_elements_filter_node(  # noqa: D
-        self, node: FilterElementsNode[SourceDataSetT]
+        self, node: FilterElementsNode
     ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
 
@@ -380,7 +365,7 @@ class ComputeMetricsBranchCombiner(
 
         # De-dupe so that we don't see the same spec twice in include specs. For example, this can happen with dimension
         # specs since any branch that is merged together needs to output the same set of dimensions.
-        combined_node = FilterElementsNode[SourceDataSetT](
+        combined_node = FilterElementsNode(
             parent_node=combined_parent_node,
             include_specs=InstanceSpecSet.merge(
                 (self._current_left_node.include_specs, current_right_node.include_specs)
@@ -393,38 +378,34 @@ class ComputeMetricsBranchCombiner(
         )
         return ComputeMetricsBranchCombinerResult(combined_node)
 
-    def visit_combine_metrics_node(  # noqa: D
-        self, node: CombineMetricsNode[SourceDataSetT]
-    ) -> ComputeMetricsBranchCombinerResult:
+    def visit_combine_metrics_node(self, node: CombineMetricsNode) -> ComputeMetricsBranchCombinerResult:  # noqa: D
         self._log_visit_node_type(node)
         return self._handle_unsupported_node(node)
 
     def visit_constrain_time_range_node(  # noqa: D
-        self, node: ConstrainTimeRangeNode[SourceDataSetT]
+        self, node: ConstrainTimeRangeNode
     ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
     def visit_join_over_time_range_node(  # noqa: D
-        self, node: JoinOverTimeRangeNode[SourceDataSetT]
+        self, node: JoinOverTimeRangeNode
     ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
     def visit_semi_additive_join_node(  # noqa: D
-        self, node: SemiAdditiveJoinNode[SourceDataSetT]
+        self, node: SemiAdditiveJoinNode
     ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
     def visit_metric_time_dimension_transform_node(  # noqa: D
-        self, node: MetricTimeDimensionTransformNode[SourceDataSetT]
+        self, node: MetricTimeDimensionTransformNode
     ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
-    def visit_join_to_time_spine_node(  # noqa: D
-        self, node: JoinToTimeSpineNode[SourceDataSetT]
-    ) -> ComputeMetricsBranchCombinerResult[SourceDataSetT]:
+    def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode) -> ComputeMetricsBranchCombinerResult:  # noqa: D
         self._log_visit_node_type(node)
         return self._default_handler(node)

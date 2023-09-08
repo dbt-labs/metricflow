@@ -4,7 +4,7 @@ import collections
 import logging
 import time
 from dataclasses import dataclass
-from typing import DefaultDict, Dict, Generic, List, Optional, Sequence, Set, Tuple, TypeVar, Union
+from typing import DefaultDict, Dict, List, Optional, Sequence, Set, Tuple, Union
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
@@ -51,7 +51,6 @@ from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.node_processor import PreDimensionJoinNodeProcessor
-from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
     DimensionSpec,
@@ -73,12 +72,9 @@ from metricflow.sql.sql_plan import SqlJoinType
 
 logger = logging.getLogger(__name__)
 
-# The type of data set that at the source nodes.
-SqlDataSetT = TypeVar("SqlDataSetT", bound=SqlDataSet)
-
 
 @dataclass(frozen=True)
-class MeasureRecipe(Generic[SqlDataSetT]):
+class MeasureRecipe:
     """Get a recipe for how to build a dataflow plan node that outputs measures and the needed linkable instances.
 
     The recipe involves filtering the measure node so that it only outputs the measures and the instances associated with
@@ -86,7 +82,7 @@ class MeasureRecipe(Generic[SqlDataSetT]):
     in join_linkable_instances_recipes.
     """
 
-    measure_node: BaseOutput[SqlDataSetT]
+    measure_node: BaseOutput
     required_local_linkable_specs: Tuple[LinkableInstanceSpec, ...]
     join_linkable_instances_recipes: Tuple[JoinLinkableInstancesRecipe, ...]
 
@@ -101,15 +97,15 @@ class MeasureSpecProperties:
     non_additive_dimension_spec: Optional[NonAdditiveDimensionSpec] = None
 
 
-class DataflowPlanBuilder(Generic[SqlDataSetT]):
+class DataflowPlanBuilder:
     """Builds a dataflow plan to satisfy a given query."""
 
     def __init__(  # noqa: D
         self,
-        source_nodes: Sequence[BaseOutput[SqlDataSetT]],
+        source_nodes: Sequence[BaseOutput],
         semantic_manifest_lookup: SemanticManifestLookup,
-        cost_function: DataflowPlanNodeCostFunction = DefaultCostFunction[SqlDataSetT](),
-        node_output_resolver: Optional[DataflowPlanNodeOutputDataSetResolver[SqlDataSetT]] = None,
+        cost_function: DataflowPlanNodeCostFunction = DefaultCostFunction(),
+        node_output_resolver: Optional[DataflowPlanNodeOutputDataSetResolver] = None,
         column_association_resolver: Optional[ColumnAssociationResolver] = None,
     ) -> None:
         self._semantic_model_lookup = semantic_manifest_lookup.semantic_model_lookup
@@ -123,7 +119,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             else column_association_resolver
         )
         self._node_data_set_resolver = (
-            DataflowPlanNodeOutputDataSetResolver[SqlDataSetT](
+            DataflowPlanNodeOutputDataSetResolver(
                 column_association_resolver=(
                     DunderColumnAssociationResolver(semantic_manifest_lookup)
                     if not column_association_resolver
@@ -140,8 +136,8 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         query_spec: MetricFlowQuerySpec,
         output_sql_table: Optional[SqlTable] = None,
         output_selection_specs: Optional[InstanceSpecSet] = None,
-        optimizers: Sequence[DataflowPlanOptimizer[SqlDataSetT]] = (),
-    ) -> DataflowPlan[SqlDataSetT]:
+        optimizers: Sequence[DataflowPlanOptimizer] = (),
+    ) -> DataflowPlan:
         """Generate a plan for reading the results of a query with the given spec into a dataframe or table."""
         metrics_output_node = self._build_metrics_output_node(
             metric_specs=query_spec.metric_specs,
@@ -177,7 +173,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         where_constraint: Optional[WhereFilterSpec] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         combine_metrics_join_type: SqlJoinType = SqlJoinType.FULL_OUTER,
-    ) -> BaseOutput[SqlDataSetT]:
+    ) -> BaseOutput:
         """Builds a computed metrics output node.
 
         Args:
@@ -187,8 +183,8 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             time_range_constraint: Time range constraint used to compute the metric.
             combine_metrics_join_type: The join used when combining the computed metrics.
         """
-        output_nodes: List[BaseOutput[SqlDataSetT]] = []
-        compute_metrics_node: Optional[ComputeMetricsNode[SqlDataSetT]] = None
+        output_nodes: List[BaseOutput] = []
+        compute_metrics_node: Optional[ComputeMetricsNode] = None
 
         for metric_spec in metric_specs:
             logger.info(f"Generating compute metrics node for {metric_spec}")
@@ -205,7 +201,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                     f"{pformat_big_objects(metric_input_specs=metric_input_specs)}"
                 )
 
-                compute_metrics_node = ComputeMetricsNode[SqlDataSetT](
+                compute_metrics_node = ComputeMetricsNode(
                     parent_node=self._build_metrics_output_node(
                         metric_specs=metric_input_specs,
                         queried_linkable_specs=queried_linkable_specs,
@@ -258,7 +254,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         if len(output_nodes) == 1:
             return output_nodes[0]
 
-        return CombineMetricsNode[SqlDataSetT](
+        return CombineMetricsNode(
             parent_nodes=output_nodes,
             join_type=combine_metrics_join_type,
         )
@@ -271,7 +267,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         entity_spec: Optional[EntitySpec] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         limit: Optional[int] = None,
-    ) -> DataflowPlan[SqlDataSetT]:
+    ) -> DataflowPlan:
         """Generate a plan that would get the distinct values of a linkable instance.
 
         e.g. distinct listing__country_latest for bookings by listing__country_latest
@@ -325,17 +321,17 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
 
     @staticmethod
     def build_sink_node_from_metrics_output_node(
-        computed_metrics_output: BaseOutput[SqlDataSetT],
+        computed_metrics_output: BaseOutput,
         order_by_specs: Sequence[OrderBySpec],
         output_sql_table: Optional[SqlTable] = None,
         limit: Optional[int] = None,
         output_selection_specs: Optional[InstanceSpecSet] = None,
-    ) -> SinkOutput[SqlDataSetT]:
+    ) -> SinkOutput:
         """Adds order by / limit / write nodes."""
-        pre_result_node: Optional[BaseOutput[SqlDataSetT]] = None
+        pre_result_node: Optional[BaseOutput] = None
 
         if order_by_specs or limit:
-            pre_result_node = OrderByLimitNode[SqlDataSetT](
+            pre_result_node = OrderByLimitNode(
                 order_by_specs=list(order_by_specs),
                 limit=limit,
                 parent_node=computed_metrics_output,
@@ -347,13 +343,13 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 include_specs=output_selection_specs,
             )
 
-        write_result_node: SinkOutput[SqlDataSetT]
+        write_result_node: SinkOutput
         if not output_sql_table:
-            write_result_node = WriteToResultDataframeNode[SqlDataSetT](
+            write_result_node = WriteToResultDataframeNode(
                 parent_node=pre_result_node or computed_metrics_output,
             )
         else:
-            write_result_node = WriteToResultTableNode[SqlDataSetT](
+            write_result_node = WriteToResultTableNode(
                 parent_node=pre_result_node or computed_metrics_output,
                 output_sql_table=output_sql_table,
             )
@@ -377,22 +373,22 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             )
         return semantic_model_names
 
-    def _sort_by_suitability(self, nodes: Sequence[BaseOutput[SqlDataSetT]]) -> Sequence[BaseOutput[SqlDataSetT]]:
+    def _sort_by_suitability(self, nodes: Sequence[BaseOutput]) -> Sequence[BaseOutput]:
         """Sort nodes by the cost, then by the number of linkable specs.
 
         Lower cost nodes will result in faster queries, and the lower the number of linkable specs means less
         aggregation required.
         """
 
-        def sort_function(node: BaseOutput[SqlDataSetT]) -> Tuple[int, int]:
+        def sort_function(node: BaseOutput) -> Tuple[int, int]:
             data_set = self._node_data_set_resolver.get_output_data_set(node)
             return self._cost_function.calculate_cost(node).as_int, len(data_set.instance_set.spec_set.linkable_specs)
 
         return sorted(nodes, key=sort_function)
 
     def _select_source_nodes_with_measures(
-        self, measure_specs: Set[MeasureSpec], source_nodes: Sequence[BaseOutput[SqlDataSetT]]
-    ) -> Sequence[BaseOutput[SqlDataSetT]]:
+        self, measure_specs: Set[MeasureSpec], source_nodes: Sequence[BaseOutput]
+    ) -> Sequence[BaseOutput]:
         nodes = []
         measure_specs_set = set(measure_specs)
         for source_node in source_nodes:
@@ -472,10 +468,10 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             node_data_set_resolver=self._node_data_set_resolver,
         )
 
-        source_nodes: Sequence[BaseOutput[SqlDataSetT]] = self._source_nodes
+        source_nodes: Sequence[BaseOutput] = self._source_nodes
 
         # We only care about nodes that have all required measures
-        potential_measure_nodes: Sequence[BaseOutput[SqlDataSetT]] = self._select_source_nodes_with_measures(
+        potential_measure_nodes: Sequence[BaseOutput] = self._select_source_nodes_with_measures(
             measure_specs=set(measure_specs), source_nodes=source_nodes
         )
 
@@ -563,7 +559,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         logger.info(f"Found {len(node_to_evaluation)} candidate measure nodes.")
 
         if len(node_to_evaluation) > 0:
-            cost_function = DefaultCostFunction[SqlDataSetT]()
+            cost_function = DefaultCostFunction()
 
             node_with_lowest_cost = min(node_to_evaluation, key=cost_function.calculate_cost)
             evaluation = node_to_evaluation[node_with_lowest_cost]
@@ -606,10 +602,10 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
     def build_computed_metrics_node(
         self,
         metric_spec: MetricSpec,
-        aggregated_measures_node: Union[AggregateMeasuresNode[SqlDataSetT], BaseOutput[SqlDataSetT]],
-    ) -> ComputeMetricsNode[SqlDataSetT]:
+        aggregated_measures_node: Union[AggregateMeasuresNode, BaseOutput],
+    ) -> ComputeMetricsNode:
         """Builds a ComputeMetricsNode from aggregated measures."""
-        return ComputeMetricsNode[SqlDataSetT](
+        return ComputeMetricsNode(
             parent_node=aggregated_measures_node,
             metric_specs=[metric_spec],
         )
@@ -624,14 +620,14 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         cumulative: Optional[bool] = False,
         cumulative_window: Optional[MetricTimeWindow] = None,
         cumulative_grain_to_date: Optional[TimeGranularity] = None,
-    ) -> BaseOutput[SqlDataSetT]:
+    ) -> BaseOutput:
         """Returns a node where the measures are aggregated by the linkable specs and constrained appropriately.
 
         This might be a node representing a single aggregation over one semantic model, or a node representing
         a composite set of aggregations originating from multiple semantic models, and joined into a single
         aggregated set of measures.
         """
-        output_nodes: List[BaseOutput[SqlDataSetT]] = []
+        output_nodes: List[BaseOutput] = []
         semantic_models_and_constraints_to_measures: DefaultDict[
             tuple[str, Optional[WhereFilterSpec]], List[MetricInputMeasureSpec]
         ] = collections.defaultdict(list)
@@ -713,7 +709,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
         cumulative: Optional[bool] = False,
         cumulative_window: Optional[MetricTimeWindow] = None,
         cumulative_grain_to_date: Optional[TimeGranularity] = None,
-    ) -> BaseOutput[SqlDataSetT]:
+    ) -> BaseOutput:
         metric_time_dimension_specs = [
             time_dimension_spec
             for time_dimension_spec in queried_linkable_specs.time_dimension_specs
@@ -780,7 +776,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
 
         # If a cumulative metric is queried with metric_time, join over time range.
         # Otherwise, the measure will be aggregated over all time.
-        time_range_node: Optional[JoinOverTimeRangeNode[SqlDataSetT]] = None
+        time_range_node: Optional[JoinOverTimeRangeNode] = None
         if cumulative and metric_time_dimension_requested:
             time_range_node = JoinOverTimeRangeNode(
                 parent_node=measure_recipe.measure_node,
@@ -802,7 +798,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             )
 
         # Only get the required measure and the local linkable instances so that aggregations work correctly.
-        filtered_measure_source_node = FilterElementsNode[SqlDataSetT](
+        filtered_measure_source_node = FilterElementsNode(
             parent_node=join_to_time_spine_node or time_range_node or measure_recipe.measure_node,
             include_specs=InstanceSpecSet.merge(
                 (
@@ -841,7 +837,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             # e.g. if the node is used to satisfy "user_id__country", then the node must have the entity
             # "user_id" and the "country" dimension so that it can be joined to the measure node.
             include_specs.extend([x.without_first_entity_link for x in join_recipe.satisfiable_linkable_specs])
-            filtered_node_to_join = FilterElementsNode[SqlDataSetT](
+            filtered_node_to_join = FilterElementsNode(
                 parent_node=join_recipe.node_to_join,
                 include_specs=InstanceSpecSet.create_from_linkable_specs(include_specs),
             )
@@ -855,9 +851,9 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 )
             )
 
-        unaggregated_measure_node: BaseOutput[SqlDataSetT]
+        unaggregated_measure_node: BaseOutput
         if len(join_targets) > 0:
-            filtered_measures_with_joined_elements = JoinToBaseOutputNode[SqlDataSetT](
+            filtered_measures_with_joined_elements = JoinToBaseOutputNode(
                 left_node=filtered_measure_source_node,
                 join_targets=join_targets,
             )
@@ -869,7 +865,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 )
             )
 
-            after_join_filtered_node = FilterElementsNode[SqlDataSetT](
+            after_join_filtered_node = FilterElementsNode(
                 parent_node=filtered_measures_with_joined_elements, include_specs=specs_to_keep_after_join
             )
             unaggregated_measure_node = after_join_filtered_node
@@ -886,7 +882,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
                 unaggregated_measure_node, time_range_constraint
             )
 
-        pre_aggregate_node: BaseOutput[SqlDataSetT] = cumulative_metric_constrained_node or unaggregated_measure_node
+        pre_aggregate_node: BaseOutput = cumulative_metric_constrained_node or unaggregated_measure_node
         if where_constraint:
             # Apply where constraint on the node
             pre_aggregate_node = WhereConstraintNode(
@@ -908,7 +904,7 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             window_groupings = tuple(
                 LinklessEntitySpec.from_element_name(name) for name in non_additive_dimension_spec.window_groupings
             )
-            pre_aggregate_node = SemiAdditiveJoinNode[SqlDataSetT](
+            pre_aggregate_node = SemiAdditiveJoinNode(
                 parent_node=pre_aggregate_node,
                 entity_specs=window_groupings,
                 time_dimension_spec=time_dimension_spec,
@@ -922,13 +918,13 @@ class DataflowPlanBuilder(Generic[SqlDataSetT]):
             # show up in the final result.
             #
             # e.g. for "bookings" by "ds" where "is_instant", "is_instant" should not be in the results.
-            pre_aggregate_node = FilterElementsNode[SqlDataSetT](
+            pre_aggregate_node = FilterElementsNode(
                 parent_node=pre_aggregate_node,
                 include_specs=InstanceSpecSet.merge(
                     (InstanceSpecSet(measure_specs=measure_specs), queried_linkable_specs.as_spec_set)
                 ),
             )
-        return AggregateMeasuresNode[SqlDataSetT](
+        return AggregateMeasuresNode(
             parent_node=pre_aggregate_node,
             metric_input_measure_specs=tuple(metric_input_measure_specs),
         )

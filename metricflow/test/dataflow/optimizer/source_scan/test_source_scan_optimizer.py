@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-from typing import Generic
 
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
@@ -25,7 +24,6 @@ from metricflow.dataflow.dataflow_plan import (
     OrderByLimitNode,
     ReadSqlSourceNode,
     SemiAdditiveJoinNode,
-    SourceDataSetT,
     WhereConstraintNode,
     WriteToResultDataframeNode,
     WriteToResultTableNode,
@@ -33,7 +31,6 @@ from metricflow.dataflow.dataflow_plan import (
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import SourceScanOptimizer
 from metricflow.dataset.dataset import DataSet
-from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
     DimensionSpec,
@@ -49,72 +46,70 @@ from metricflow.test.snapshot_utils import assert_plan_snapshot_text_equal
 logger = logging.getLogger(__name__)
 
 
-class ReadSqlSourceNodeCounter(Generic[SourceDataSetT], DataflowPlanNodeVisitor[SourceDataSetT, int]):
+class ReadSqlSourceNodeCounter(DataflowPlanNodeVisitor[int]):
     """Counts the number of ReadSqlSourceNodes in the dataflow plan."""
 
-    def _sum_parents(self, node: DataflowPlanNode[SourceDataSetT]) -> int:
+    def _sum_parents(self, node: DataflowPlanNode) -> int:
         return sum(parent_node.accept(self) for parent_node in node.parent_nodes)
 
-    def visit_source_node(self, node: ReadSqlSourceNode[SourceDataSetT]) -> int:  # noqa: D
+    def visit_source_node(self, node: ReadSqlSourceNode) -> int:  # noqa: D
         return 1
 
-    def visit_join_to_base_output_node(self, node: JoinToBaseOutputNode[SourceDataSetT]) -> int:  # noqa: D
+    def visit_join_to_base_output_node(self, node: JoinToBaseOutputNode) -> int:  # noqa: D
         return self._sum_parents(node)
 
     def visit_join_aggregated_measures_by_groupby_columns_node(  # noqa: D
-        self, node: JoinAggregatedMeasuresByGroupByColumnsNode[SourceDataSetT]
+        self, node: JoinAggregatedMeasuresByGroupByColumnsNode
     ) -> int:
         return self._sum_parents(node)
 
-    def visit_aggregate_measures_node(self, node: AggregateMeasuresNode[SourceDataSetT]) -> int:  # noqa: D
+    def visit_aggregate_measures_node(self, node: AggregateMeasuresNode) -> int:  # noqa: D
         return self._sum_parents(node)
 
-    def visit_compute_metrics_node(self, node: ComputeMetricsNode[SourceDataSetT]) -> int:  # noqa: D
+    def visit_compute_metrics_node(self, node: ComputeMetricsNode) -> int:  # noqa: D
         return self._sum_parents(node)
 
-    def visit_order_by_limit_node(self, node: OrderByLimitNode[SourceDataSetT]) -> int:  # noqa: D
+    def visit_order_by_limit_node(self, node: OrderByLimitNode) -> int:  # noqa: D
         return self._sum_parents(node)
 
-    def visit_where_constraint_node(self, node: WhereConstraintNode[SourceDataSetT]) -> int:  # noqa: D
+    def visit_where_constraint_node(self, node: WhereConstraintNode) -> int:  # noqa: D
         return self._sum_parents(node)
 
-    def visit_write_to_result_dataframe_node(self, node: WriteToResultDataframeNode[SourceDataSetT]) -> int:  # noqa: D
+    def visit_write_to_result_dataframe_node(self, node: WriteToResultDataframeNode) -> int:  # noqa: D
         return self._sum_parents(node)
 
-    def visit_write_to_result_table_node(self, node: WriteToResultTableNode[SourceDataSetT]) -> int:  # noqa: D
+    def visit_write_to_result_table_node(self, node: WriteToResultTableNode) -> int:  # noqa: D
         return self._sum_parents(node)
 
-    def visit_pass_elements_filter_node(self, node: FilterElementsNode[SourceDataSetT]) -> int:  # noqa: D
+    def visit_pass_elements_filter_node(self, node: FilterElementsNode) -> int:  # noqa: D
         return self._sum_parents(node)
 
-    def visit_combine_metrics_node(self, node: CombineMetricsNode[SourceDataSetT]) -> int:  # noqa: D
+    def visit_combine_metrics_node(self, node: CombineMetricsNode) -> int:  # noqa: D
         return self._sum_parents(node)
 
-    def visit_constrain_time_range_node(self, node: ConstrainTimeRangeNode[SourceDataSetT]) -> int:  # noqa: D
+    def visit_constrain_time_range_node(self, node: ConstrainTimeRangeNode) -> int:  # noqa: D
         return self._sum_parents(node)
 
-    def visit_join_over_time_range_node(self, node: JoinOverTimeRangeNode[SourceDataSetT]) -> int:  # noqa: D
+    def visit_join_over_time_range_node(self, node: JoinOverTimeRangeNode) -> int:  # noqa: D
         return self._sum_parents(node)
 
-    def visit_semi_additive_join_node(self, node: SemiAdditiveJoinNode[SourceDataSetT]) -> int:  # noqa: D
+    def visit_semi_additive_join_node(self, node: SemiAdditiveJoinNode) -> int:  # noqa: D
         return self._sum_parents(node)
 
-    def visit_metric_time_dimension_transform_node(  # noqa: D
-        self, node: MetricTimeDimensionTransformNode[SourceDataSetT]
-    ) -> int:
+    def visit_metric_time_dimension_transform_node(self, node: MetricTimeDimensionTransformNode) -> int:  # noqa: D
         return self._sum_parents(node)
 
-    def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode[SourceDataSetT]) -> int:  # noqa: D
+    def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode) -> int:  # noqa: D
         return self._sum_parents(node)
 
-    def count_source_nodes(self, dataflow_plan: DataflowPlan[SourceDataSetT]) -> int:  # noqa: D
+    def count_source_nodes(self, dataflow_plan: DataflowPlan) -> int:  # noqa: D
         return dataflow_plan.sink_output_node.accept(self)
 
 
 def check_optimization(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
     query_spec: MetricFlowQuerySpec,
     expected_num_sources_in_unoptimized: int,
     expected_num_sources_in_optimized: int,
@@ -134,10 +129,10 @@ def check_optimization(  # noqa: D
         dag_graph=dataflow_plan,
     )
 
-    source_counter = ReadSqlSourceNodeCounter[SemanticModelDataSet]()
+    source_counter = ReadSqlSourceNodeCounter()
     assert source_counter.count_source_nodes(dataflow_plan) == expected_num_sources_in_unoptimized
 
-    optimizer = SourceScanOptimizer[SemanticModelDataSet]()
+    optimizer = SourceScanOptimizer()
     optimized_dataflow_plan = optimizer.optimize(dataflow_plan)
 
     assert_plan_snapshot_text_equal(
@@ -158,7 +153,7 @@ def check_optimization(  # noqa: D
 def test_2_metrics_from_1_semantic_model(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests that optimizing the plan for 2 metrics from 2 measure semantic models results in half the number of scans.
 
@@ -183,7 +178,7 @@ def test_2_metrics_from_1_semantic_model(  # noqa: D
 def test_2_metrics_from_2_semantic_models(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests that 2 metrics from the 2 semantic models results in 2 scans."""
     check_optimization(
@@ -202,7 +197,7 @@ def test_2_metrics_from_2_semantic_models(  # noqa: D
 def test_3_metrics_from_2_semantic_models(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests that 3 metrics from the 2 semantic models results in 2 scans."""
     check_optimization(
@@ -226,7 +221,7 @@ def test_constrained_metric_not_combined(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     column_association_resolver: ColumnAssociationResolver,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests that 2 metrics from the same semantic model but where 1 is constrained results in 2 scans.
 
@@ -260,7 +255,7 @@ def test_constrained_metric_not_combined(  # noqa: D
 def test_derived_metric(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests optimization of a query that use a derived metrics with measures coming from a single semantic model.
 
@@ -282,7 +277,7 @@ def test_derived_metric(  # noqa: D
 def test_nested_derived_metric(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests optimization of a query that use a nested derived metric from a single semantic model.
 
@@ -305,7 +300,7 @@ def test_nested_derived_metric(  # noqa: D
 def test_derived_metric_with_non_derived_metric(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests optimization of queries that use derived metrics and non-derived metrics.
 
@@ -336,7 +331,7 @@ def test_derived_metric_with_non_derived_metric(  # noqa: D
 def test_2_ratio_metrics_from_1_semantic_model(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests that 2 ratio metrics with measures from a 1 semantic model result in 1 scan."""
     check_optimization(

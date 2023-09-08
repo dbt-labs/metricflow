@@ -16,7 +16,6 @@ from metricflow.dataflow.builder.node_evaluator import (
 from metricflow.dataflow.builder.partitions import PartitionTimeDimensionJoinDescription
 from metricflow.dataflow.dataflow_plan import BaseOutput, ValidityWindowJoinDescription
 from metricflow.dataset.dataset import DataSet
-from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.node_processor import PreDimensionJoinNodeProcessor
@@ -37,7 +36,7 @@ logger = logging.getLogger(__name__)
 def node_evaluator(
     consistent_id_object_repository: ConsistentIdObjectRepository,
     simple_semantic_manifest_lookup: SemanticManifestLookup,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
 ) -> NodeEvaluatorForLinkableInstances:  # noqa: D
     """Return a node evaluator using the nodes in semantic_model_name_to_nodes."""
     node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver = DataflowPlanNodeOutputDataSetResolver(
@@ -56,7 +55,7 @@ def node_evaluator(
 
 
 def make_multihop_node_evaluator(
-    model_source_nodes: Sequence[BaseOutput[SemanticModelDataSet]],
+    model_source_nodes: Sequence[BaseOutput],
     semantic_manifest_lookup_with_multihop_links: SemanticManifestLookup,
     desired_linkable_specs: Sequence[LinkableInstanceSpec],
 ) -> NodeEvaluatorForLinkableInstances:  # noqa: D

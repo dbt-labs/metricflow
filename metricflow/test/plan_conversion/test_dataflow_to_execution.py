@@ -3,7 +3,6 @@ from __future__ import annotations
 from _pytest.fixtures import FixtureRequest
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_execution import DataflowToExecutionPlanConverter
@@ -25,8 +24,8 @@ def make_execution_plan_converter(  # noqa: D
     semantic_manifest_lookup: SemanticManifestLookup,
     sql_client: SqlClient,
 ) -> DataflowToExecutionPlanConverter:
-    return DataflowToExecutionPlanConverter[SemanticModelDataSet](
-        sql_plan_converter=DataflowToSqlQueryPlanConverter[SemanticModelDataSet](
+    return DataflowToExecutionPlanConverter(
+        sql_plan_converter=DataflowToSqlQueryPlanConverter(
             column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup),
             semantic_manifest_lookup=semantic_manifest_lookup,
         ),
@@ -38,7 +37,7 @@ def make_execution_plan_converter(  # noqa: D
 def test_joined_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
     simple_semantic_manifest_lookup: SemanticManifestLookup,
     sql_client: SqlClient,
 ) -> None:
@@ -77,7 +76,7 @@ def test_small_combined_metrics_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     sql_client: SqlClient,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -113,7 +112,7 @@ def test_combined_metrics_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     sql_client: SqlClient,
-    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_plan_builder: DataflowPlanBuilder,
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -150,7 +149,7 @@ def test_combined_metrics_plan(  # noqa: D
 def test_multihop_joined_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    multihop_dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    multihop_dataflow_plan_builder: DataflowPlanBuilder,
     multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
     sql_client: SqlClient,
 ) -> None:
@@ -171,7 +170,7 @@ def test_multihop_joined_plan(  # noqa: D
     )
 
     to_execution_plan_converter = DataflowToExecutionPlanConverter(
-        sql_plan_converter=DataflowToSqlQueryPlanConverter[SemanticModelDataSet](
+        sql_plan_converter=DataflowToSqlQueryPlanConverter(
             column_association_resolver=DunderColumnAssociationResolver(multi_hop_join_semantic_manifest_lookup),
             semantic_manifest_lookup=multi_hop_join_semantic_manifest_lookup,
         ),

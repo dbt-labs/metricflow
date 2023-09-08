@@ -9,13 +9,13 @@ from metricflow.aggregation_properties import AggregationState
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.dataflow_plan import JoinDescription, JoinToBaseOutputNode, ReadSqlSourceNode
 from metricflow.dataflow.sql_table import SqlTable
+from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.instances import (
     InstanceSet,
     MeasureInstance,
 )
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
-from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.specs.column_assoc import ColumnAssociation, SingleColumnCorrelationKey
 from metricflow.specs.specs import (

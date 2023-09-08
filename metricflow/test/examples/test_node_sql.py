@@ -13,7 +13,6 @@ from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConv
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
-from metricflow.plan_conversion.sql_dataset import SqlDataSet
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.specs.specs import InstanceSpecSet, TimeDimensionReference, TimeDimensionSpec
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
@@ -37,19 +36,19 @@ def test_view_sql_generated_at_a_node(
     )
     to_data_set_converter = SemanticModelToDataSetConverter(column_association_resolver)
 
-    to_sql_plan_converter = DataflowToSqlQueryPlanConverter[SqlDataSet](
+    to_sql_plan_converter = DataflowToSqlQueryPlanConverter(
         column_association_resolver=DunderColumnAssociationResolver(simple_semantic_manifest_lookup),
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
     )
     sql_renderer: SqlQueryPlanRenderer = sql_client.sql_query_plan_renderer
-    node_output_resolver = DataflowPlanNodeOutputDataSetResolver[SqlDataSet](
+    node_output_resolver = DataflowPlanNodeOutputDataSetResolver(
         column_association_resolver=column_association_resolver,
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
     )
 
     # Show SQL and spec set at a source node.
     bookings_source_data_set = to_data_set_converter.create_sql_source_data_set(bookings_semantic_model)
-    read_source_node = ReadSqlSourceNode[SqlDataSet](bookings_source_data_set)
+    read_source_node = ReadSqlSourceNode(bookings_source_data_set)
     sql_plan_at_read_node = to_sql_plan_converter.convert_to_sql_query_plan(
         sql_engine_type=sql_client.sql_engine_type,
         sql_query_plan_id="example_sql_plan",
