@@ -401,6 +401,7 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
                     + time_dimension_instance.spec.entity_links
                 ),
                 time_granularity=time_dimension_instance.spec.time_granularity,
+                date_part=time_dimension_instance.spec.date_part,
             )
             time_dimension_instances_with_additional_link.append(
                 TimeDimensionInstance(

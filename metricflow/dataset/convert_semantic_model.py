@@ -38,6 +38,7 @@ from metricflow.sql.sql_exprs import (
     SqlColumnReferenceExpression,
     SqlDateTruncExpression,
     SqlExpressionNode,
+    SqlExtractExpression,
     SqlStringExpression,
 )
 from metricflow.sql.sql_plan import (
@@ -46,6 +47,7 @@ from metricflow.sql.sql_plan import (
     SqlSelectStatementNode,
     SqlTableFromClauseNode,
 )
+from metricflow.time.date_part import DatePart
 
 logger = logging.getLogger(__name__)
 
@@ -102,12 +104,14 @@ class SemanticModelToDataSetConverter:
         time_dimension: Dimension,
         entity_links: Tuple[EntityReference, ...],
         time_granularity: TimeGranularity = DEFAULT_TIME_GRANULARITY,
+        date_part: Optional[DatePart] = None,
     ) -> TimeDimensionInstance:
         """Create a time dimension instance from the dimension object from a semantic model in the model."""
         time_dimension_spec = TimeDimensionSpec(
             element_name=time_dimension.reference.element_name,
             entity_links=entity_links,
             time_granularity=time_granularity,
+            date_part=date_part,
         )
 
         return TimeDimensionInstance(
@@ -219,6 +223,11 @@ class SemanticModelToDataSetConverter:
         select_columns = []
 
         for dimension in dimensions or []:
+            dimension_select_expr = SemanticModelToDataSetConverter._make_element_sql_expr(
+                table_alias=table_alias,
+                element_name=dimension.reference.element_name,
+                element_expr=dimension.expr,
+            )
             if dimension.type == DimensionType.CATEGORICAL:
                 dimension_instance = self._create_dimension_instance(
                     semantic_model_name=semantic_model_name,
@@ -228,11 +237,7 @@ class SemanticModelToDataSetConverter:
                 dimension_instances.append(dimension_instance)
                 select_columns.append(
                     SqlSelectColumn(
-                        expr=SemanticModelToDataSetConverter._make_element_sql_expr(
-                            table_alias=table_alias,
-                            element_name=dimension.reference.element_name,
-                            element_expr=dimension.expr,
-                        ),
+                        expr=dimension_select_expr,
                         column_alias=dimension_instance.associated_column.column_name,
                     )
                 )
@@ -251,11 +256,7 @@ class SemanticModelToDataSetConverter:
                 time_dimension_instances.append(time_dimension_instance)
                 select_columns.append(
                     SqlSelectColumn(
-                        expr=SemanticModelToDataSetConverter._make_element_sql_expr(
-                            table_alias=table_alias,
-                            element_name=dimension.reference.element_name,
-                            element_expr=dimension.expr,
-                        ),
+                        expr=dimension_select_expr,
                         column_alias=time_dimension_instance.associated_column.column_name,
                     )
                 )
@@ -274,16 +275,31 @@ class SemanticModelToDataSetConverter:
                         select_columns.append(
                             SqlSelectColumn(
                                 expr=SqlDateTruncExpression(
-                                    time_granularity=time_granularity,
-                                    arg=SemanticModelToDataSetConverter._make_element_sql_expr(
-                                        table_alias=table_alias,
-                                        element_name=dimension.reference.element_name,
-                                        element_expr=dimension.expr,
-                                    ),
+                                    time_granularity=time_granularity, arg=dimension_select_expr
                                 ),
                                 column_alias=time_dimension_instance.associated_column.column_name,
                             )
                         )
+
+                # Add all date part options for easy query resolution
+                for date_part in DatePart:
+                    if date_part.to_int() >= defined_time_granularity.to_int():
+                        time_dimension_instance = self._create_time_dimension_instance(
+                            semantic_model_name=semantic_model_name,
+                            time_dimension=dimension,
+                            entity_links=entity_links,
+                            time_granularity=defined_time_granularity,
+                            date_part=date_part,
+                        )
+                        time_dimension_instances.append(time_dimension_instance)
+
+                        select_columns.append(
+                            SqlSelectColumn(
+                                expr=SqlExtractExpression(date_part=date_part, arg=dimension_select_expr),
+                                column_alias=time_dimension_instance.associated_column.column_name,
+                            )
+                        )
+
             else:
                 assert False, f"Unhandled dimension type: {dimension.type}"
 

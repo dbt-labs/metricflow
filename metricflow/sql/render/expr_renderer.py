@@ -22,6 +22,7 @@ from metricflow.sql.sql_exprs import (
     SqlDateTruncExpression,
     SqlExpressionNode,
     SqlExpressionNodeVisitor,
+    SqlExtractExpression,
     SqlFunction,
     SqlGenerateUuidExpression,
     SqlIsNullExpression,
@@ -36,6 +37,7 @@ from metricflow.sql.sql_exprs import (
     SqlWindowFunctionExpression,
 )
 from metricflow.sql.sql_plan import SqlSelectColumn
+from metricflow.time.date_part import DatePart
 
 logger = logging.getLogger(__name__)
 
@@ -266,6 +268,18 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
             sql=f"DATE_TRUNC('{node.time_granularity.value}', {arg_rendered.sql})",
             bind_parameters=arg_rendered.bind_parameters,
         )
+
+    def visit_extract_expr(self, node: SqlExtractExpression) -> SqlExpressionRenderResult:  # noqa: D
+        arg_rendered = self.render_sql_expr(node.arg)
+
+        return SqlExpressionRenderResult(
+            sql=f"EXTRACT({self.render_date_part(node.date_part)} FROM {arg_rendered.sql})",
+            bind_parameters=arg_rendered.bind_parameters,
+        )
+
+    def render_date_part(self, date_part: DatePart) -> str:
+        """Render DATE PART for an EXTRACT expression."""
+        return date_part.name
 
     def visit_time_delta_expr(self, node: SqlTimeDeltaExpression) -> SqlExpressionRenderResult:  # noqa: D
         arg_rendered = node.arg.accept(self)

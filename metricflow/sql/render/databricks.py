@@ -13,6 +13,7 @@ from metricflow.sql.render.expr_renderer import (
 )
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from metricflow.sql.sql_exprs import SqlPercentileExpression, SqlPercentileFunctionType
+from metricflow.time.date_part import DatePart
 
 
 class DatabricksSqlExpressionRenderer(DefaultSqlExpressionRenderer):
@@ -55,6 +56,13 @@ class DatabricksSqlExpressionRenderer(DefaultSqlExpressionRenderer):
             sql=f"{function_str}({percentile}) WITHIN GROUP (ORDER BY ({arg_rendered.sql}))",
             bind_parameters=params,
         )
+
+    @override
+    def render_date_part(self, date_part: DatePart) -> str:
+        if date_part == DatePart.DAYOFYEAR:
+            return "DOY"
+
+        return super().render_date_part(date_part)
 
 
 class DatabricksSqlQueryPlanRenderer(DefaultSqlQueryPlanRenderer):

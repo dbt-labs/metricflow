@@ -1116,6 +1116,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             if (
                 len(time_dimension_instance.spec.entity_links) == 0
                 and time_dimension_instance.spec.reference == node.aggregation_time_dimension_reference
+                and time_dimension_instance.spec.date_part is None
             ):
                 matching_time_dimension_instances.append(time_dimension_instance)
 
@@ -1141,6 +1142,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             output_column_to_input_column[
                 metric_time_dimension_column_association.column_name
             ] = matching_time_dimension_instance.associated_column.column_name
+
         output_instance_set = InstanceSet(
             measure_instances=tuple(output_measure_instances),
             dimension_instances=input_data_set.instance_set.dimension_instances,
@@ -1359,7 +1361,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             SqlColumnReference(table_alias=time_spine_alias, column_name=original_time_dim_instance.spec.qualified_name)
         )
 
-        # Add requested granularities (skip for default granularity).
+        # Add requested granularities (skip for default granularity) and date_parts.
         metric_time_select_columns = []
         metric_time_dimension_instances = []
         where: Optional[SqlExpressionNode] = None
@@ -1376,6 +1378,7 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                     element_name=original_time_dim_instance.spec.element_name,
                     entity_links=original_time_dim_instance.spec.entity_links,
                     time_granularity=metric_time_dimension_spec.time_granularity,
+                    date_part=metric_time_dimension_spec.date_part,
                     aggregation_state=original_time_dim_instance.spec.aggregation_state,
                 )
                 time_dim_instance = TimeDimensionInstance(

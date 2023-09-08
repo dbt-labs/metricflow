@@ -26,8 +26,8 @@ LEFT OUTER JOIN (
   --    'lux_listing__window_end__day',
   --    'listing']
   SELECT
-    lux_listings_src_10019.valid_from AS lux_listing__window_start__day
-    , lux_listings_src_10019.valid_to AS lux_listing__window_end__day
+    EXTRACT(DAYOFWEEK FROM lux_listings_src_10019.valid_from) AS lux_listing__window_start__extract_dayofweek
+    , EXTRACT(MONTH FROM lux_listings_src_10019.valid_to) AS lux_listing__window_end__extract_month
     , lux_listing_mapping_src_10018.listing_id AS listing
     , lux_listings_src_10019.is_confirmed_lux AS lux_listing__is_confirmed_lux
   FROM ***************************.dim_lux_listing_id_mapping lux_listing_mapping_src_10018
@@ -41,12 +41,12 @@ ON
     subq_13.listing = subq_18.listing
   ) AND (
     (
-      subq_13.metric_time__day >= subq_18.lux_listing__window_start__day
+      subq_13.metric_time__day >= subq_18.lux_listing__window_start__extract_dayofweek
     ) AND (
       (
-        subq_13.metric_time__day < subq_18.lux_listing__window_end__day
+        subq_13.metric_time__day < subq_18.lux_listing__window_end__extract_month
       ) OR (
-        subq_18.lux_listing__window_end__day IS NULL
+        subq_18.lux_listing__window_end__extract_month IS NULL
       )
     )
   )

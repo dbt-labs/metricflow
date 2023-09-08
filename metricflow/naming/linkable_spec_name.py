@@ -6,6 +6,8 @@ from typing import Optional, Tuple
 
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
+from metricflow.time.date_part import DatePart
+
 DUNDER = "__"
 
 logger = logging.getLogger(__name__)
@@ -24,6 +26,7 @@ class StructuredLinkableSpecName:
     entity_link_names: Tuple[str, ...]
     element_name: str
     time_granularity: Optional[TimeGranularity] = None
+    date_part: Optional[DatePart] = None
 
     @staticmethod
     def from_name(qualified_name: str) -> StructuredLinkableSpecName:
@@ -32,7 +35,26 @@ class StructuredLinkableSpecName:
 
         # No dunder, e.g. "ds"
         if len(name_parts) == 1:
-            return StructuredLinkableSpecName((), name_parts[0])
+            return StructuredLinkableSpecName(entity_link_names=(), element_name=name_parts[0])
+
+        associated_date_part: Optional[DatePart] = None
+        for date_part in DatePart:
+            if name_parts[-1] == StructuredLinkableSpecName.date_part_suffix(date_part):
+                associated_date_part = date_part
+
+        # Has a date_part
+        if associated_date_part:
+            #  e.g. "ds__extract_month"
+            if len(name_parts) == 2:
+                return StructuredLinkableSpecName(
+                    entity_link_names=(), element_name=name_parts[0], date_part=associated_date_part
+                )
+            # e.g. "messages__ds__extract_month"
+            return StructuredLinkableSpecName(
+                entity_link_names=tuple(name_parts[:-2]),
+                element_name=name_parts[-2],
+                date_part=associated_date_part,
+            )
 
         associated_granularity = None
         granularity: TimeGranularity
@@ -44,19 +66,29 @@ class StructuredLinkableSpecName:
         if associated_granularity:
             #  e.g. "ds__month"
             if len(name_parts) == 2:
-                return StructuredLinkableSpecName((), name_parts[0], associated_granularity)
+                return StructuredLinkableSpecName(
+                    entity_link_names=(), element_name=name_parts[0], time_granularity=associated_granularity
+                )
             # e.g. "messages__ds__month"
-            return StructuredLinkableSpecName(tuple(name_parts[:-2]), name_parts[-2], associated_granularity)
+            return StructuredLinkableSpecName(
+                entity_link_names=tuple(name_parts[:-2]),
+                element_name=name_parts[-2],
+                time_granularity=associated_granularity,
+            )
+
         # e.g. "messages__ds"
         else:
-            return StructuredLinkableSpecName(tuple(name_parts[:-1]), name_parts[-1])
+            return StructuredLinkableSpecName(entity_link_names=tuple(name_parts[:-1]), element_name=name_parts[-1])
 
     @property
     def qualified_name(self) -> str:
         """Return the full name form. e.g. ds or listing__ds__month."""
         items = list(self.entity_link_names) + [self.element_name]
-        if self.time_granularity:
+        if self.date_part:
+            items.append(self.date_part_suffix(date_part=self.date_part))
+        elif self.time_granularity:
             items.append(self.time_granularity.value)
+
         return DUNDER.join(items)
 
     @property
@@ -66,3 +98,8 @@ class StructuredLinkableSpecName:
             return DUNDER.join(self.entity_link_names)
 
         return None
+
+    @staticmethod
+    def date_part_suffix(date_part: DatePart) -> str:
+        """Suffix used for names with a date_part."""
+        return f"extract_{date_part.value}"

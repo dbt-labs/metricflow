@@ -44,11 +44,13 @@
                         <!--                                                                              'element_name': 'ds_partitioned',           -->
                         <!--                                                                              'entity_links': (),                         -->
                         <!--                                                                              'time_granularity': TimeGranularity.DAY,    -->
+                        <!--                                                                              'date_part': None,                          -->
                         <!--                                                                              'aggregation_state': None},                 -->
                         <!--                                           'node_to_join_time_dimension_spec': {'class': 'TimeDimensionSpec',             -->
                         <!--                                                                                'element_name': 'ds_partitioned',         -->
                         <!--                                                                                'entity_links': (),                       -->
                         <!--                                                                                'time_granularity': TimeGranularity.DAY,  -->
+                        <!--                                                                                'date_part': None,                        -->
                         <!--                                                                                'aggregation_state': None}},),            -->
                         <!--    'validity_window': None}                                                                                              -->
                         <FilterElementsNode>
@@ -65,6 +67,7 @@
                             <!--    'element_name': 'ds_partitioned',         -->
                             <!--    'entity_links': (),                       -->
                             <!--    'time_granularity': TimeGranularity.DAY,  -->
+                            <!--    'date_part': None,                        -->
                             <!--    'aggregation_state': None}                -->
                             <!-- include_spec =                     -->
                             <!--   {'class': 'LinklessEntitySpec',  -->
@@ -97,6 +100,7 @@
                             <!--    'element_name': 'ds_partitioned',         -->
                             <!--    'entity_links': (),                       -->
                             <!--    'time_granularity': TimeGranularity.DAY,  -->
+                            <!--    'date_part': None,                        -->
                             <!--    'aggregation_state': None}                -->
                             <!-- include_spec =                     -->
                             <!--   {'class': 'LinklessEntitySpec',  -->
@@ -117,11 +121,13 @@
                                 <!--                                                                              'element_name': 'ds_partitioned',           -->
                                 <!--                                                                              'entity_links': (),                         -->
                                 <!--                                                                              'time_granularity': TimeGranularity.DAY,    -->
+                                <!--                                                                              'date_part': None,                          -->
                                 <!--                                                                              'aggregation_state': None},                 -->
                                 <!--                                           'node_to_join_time_dimension_spec': {'class': 'TimeDimensionSpec',             -->
                                 <!--                                                                                'element_name': 'ds_partitioned',         -->
                                 <!--                                                                                'entity_links': (),                       -->
                                 <!--                                                                                'time_granularity': TimeGranularity.DAY,  -->
+                                <!--                                                                                'date_part': None,                        -->
                                 <!--                                                                                'aggregation_state': None}},),            -->
                                 <!--    'validity_window': None}                                                                                              -->
                                 <ReadSqlSourceNode>
@@ -143,11 +149,25 @@
                                     <!--      'ds_partitioned__month',                 -->
                                     <!--      'ds_partitioned__quarter',               -->
                                     <!--      'ds_partitioned__year',                  -->
+                                    <!--      'ds_partitioned__day',                   -->
+                                    <!--      'ds_partitioned__day',                   -->
+                                    <!--      'ds_partitioned__day',                   -->
+                                    <!--      'ds_partitioned__day',                   -->
+                                    <!--      'ds_partitioned__day',                   -->
+                                    <!--      'ds_partitioned__day',                   -->
+                                    <!--      'ds_partitioned__day',                   -->
                                     <!--      'customer_id__ds_partitioned__day',      -->
                                     <!--      'customer_id__ds_partitioned__week',     -->
                                     <!--      'customer_id__ds_partitioned__month',    -->
                                     <!--      'customer_id__ds_partitioned__quarter',  -->
                                     <!--      'customer_id__ds_partitioned__year',     -->
+                                    <!--      'customer_id__ds_partitioned__day',      -->
+                                    <!--      'customer_id__ds_partitioned__day',      -->
+                                    <!--      'customer_id__ds_partitioned__day',      -->
+                                    <!--      'customer_id__ds_partitioned__day',      -->
+                                    <!--      'customer_id__ds_partitioned__day',      -->
+                                    <!--      'customer_id__ds_partitioned__day',      -->
+                                    <!--      'customer_id__ds_partitioned__day',      -->
                                     <!--      'customer_id']                           -->
                                     <!-- node_id = pfe_0 -->
                                     <!-- include_spec = DimensionSpec(element_name='customer_name', entity_links=()) -->
@@ -168,60 +188,168 @@
                                     <!--    'element_name': 'ds_partitioned',         -->
                                     <!--    'entity_links': (),                       -->
                                     <!--    'time_granularity': TimeGranularity.DAY,  -->
+                                    <!--    'date_part': None,                        -->
                                     <!--    'aggregation_state': None}                -->
                                     <!-- include_spec =                                -->
                                     <!--   {'class': 'TimeDimensionSpec',              -->
                                     <!--    'element_name': 'ds_partitioned',          -->
                                     <!--    'entity_links': (),                        -->
                                     <!--    'time_granularity': TimeGranularity.WEEK,  -->
+                                    <!--    'date_part': None,                         -->
                                     <!--    'aggregation_state': None}                 -->
                                     <!-- include_spec =                                 -->
                                     <!--   {'class': 'TimeDimensionSpec',               -->
                                     <!--    'element_name': 'ds_partitioned',           -->
                                     <!--    'entity_links': (),                         -->
                                     <!--    'time_granularity': TimeGranularity.MONTH,  -->
+                                    <!--    'date_part': None,                          -->
                                     <!--    'aggregation_state': None}                  -->
                                     <!-- include_spec =                                   -->
                                     <!--   {'class': 'TimeDimensionSpec',                 -->
                                     <!--    'element_name': 'ds_partitioned',             -->
                                     <!--    'entity_links': (),                           -->
                                     <!--    'time_granularity': TimeGranularity.QUARTER,  -->
+                                    <!--    'date_part': None,                            -->
                                     <!--    'aggregation_state': None}                    -->
                                     <!-- include_spec =                                -->
                                     <!--   {'class': 'TimeDimensionSpec',              -->
                                     <!--    'element_name': 'ds_partitioned',          -->
                                     <!--    'entity_links': (),                        -->
                                     <!--    'time_granularity': TimeGranularity.YEAR,  -->
+                                    <!--    'date_part': None,                         -->
                                     <!--    'aggregation_state': None}                 -->
+                                    <!-- include_spec =                               -->
+                                    <!--   {'class': 'TimeDimensionSpec',             -->
+                                    <!--    'element_name': 'ds_partitioned',         -->
+                                    <!--    'entity_links': (),                       -->
+                                    <!--    'time_granularity': TimeGranularity.DAY,  -->
+                                    <!--    'date_part': <DatePart.YEAR: 'year'>,     -->
+                                    <!--    'aggregation_state': None}                -->
+                                    <!-- include_spec =                                  -->
+                                    <!--   {'class': 'TimeDimensionSpec',                -->
+                                    <!--    'element_name': 'ds_partitioned',            -->
+                                    <!--    'entity_links': (),                          -->
+                                    <!--    'time_granularity': TimeGranularity.DAY,     -->
+                                    <!--    'date_part': <DatePart.QUARTER: 'quarter'>,  -->
+                                    <!--    'aggregation_state': None}                   -->
+                                    <!-- include_spec =                               -->
+                                    <!--   {'class': 'TimeDimensionSpec',             -->
+                                    <!--    'element_name': 'ds_partitioned',         -->
+                                    <!--    'entity_links': (),                       -->
+                                    <!--    'time_granularity': TimeGranularity.DAY,  -->
+                                    <!--    'date_part': <DatePart.MONTH: 'month'>,   -->
+                                    <!--    'aggregation_state': None}                -->
+                                    <!-- include_spec =                               -->
+                                    <!--   {'class': 'TimeDimensionSpec',             -->
+                                    <!--    'element_name': 'ds_partitioned',         -->
+                                    <!--    'entity_links': (),                       -->
+                                    <!--    'time_granularity': TimeGranularity.DAY,  -->
+                                    <!--    'date_part': <DatePart.WEEK: 'week'>,     -->
+                                    <!--    'aggregation_state': None}                -->
+                                    <!-- include_spec =                               -->
+                                    <!--   {'class': 'TimeDimensionSpec',             -->
+                                    <!--    'element_name': 'ds_partitioned',         -->
+                                    <!--    'entity_links': (),                       -->
+                                    <!--    'time_granularity': TimeGranularity.DAY,  -->
+                                    <!--    'date_part': <DatePart.DAY: 'day'>,       -->
+                                    <!--    'aggregation_state': None}                -->
+                                    <!-- include_spec =                                      -->
+                                    <!--   {'class': 'TimeDimensionSpec',                    -->
+                                    <!--    'element_name': 'ds_partitioned',                -->
+                                    <!--    'entity_links': (),                              -->
+                                    <!--    'time_granularity': TimeGranularity.DAY,         -->
+                                    <!--    'date_part': <DatePart.DAYOFWEEK: 'dayofweek'>,  -->
+                                    <!--    'aggregation_state': None}                       -->
+                                    <!-- include_spec =                                      -->
+                                    <!--   {'class': 'TimeDimensionSpec',                    -->
+                                    <!--    'element_name': 'ds_partitioned',                -->
+                                    <!--    'entity_links': (),                              -->
+                                    <!--    'time_granularity': TimeGranularity.DAY,         -->
+                                    <!--    'date_part': <DatePart.DAYOFYEAR: 'dayofyear'>,  -->
+                                    <!--    'aggregation_state': None}                       -->
                                     <!-- include_spec =                                                                      -->
                                     <!--   {'class': 'TimeDimensionSpec',                                                    -->
                                     <!--    'element_name': 'ds_partitioned',                                                -->
                                     <!--    'entity_links': ({'class': 'EntityReference', 'element_name': 'customer_id'},),  -->
                                     <!--    'time_granularity': TimeGranularity.DAY,                                         -->
+                                    <!--    'date_part': None,                                                               -->
                                     <!--    'aggregation_state': None}                                                       -->
                                     <!-- include_spec =                                                                      -->
                                     <!--   {'class': 'TimeDimensionSpec',                                                    -->
                                     <!--    'element_name': 'ds_partitioned',                                                -->
                                     <!--    'entity_links': ({'class': 'EntityReference', 'element_name': 'customer_id'},),  -->
                                     <!--    'time_granularity': TimeGranularity.WEEK,                                        -->
+                                    <!--    'date_part': None,                                                               -->
                                     <!--    'aggregation_state': None}                                                       -->
                                     <!-- include_spec =                                                                      -->
                                     <!--   {'class': 'TimeDimensionSpec',                                                    -->
                                     <!--    'element_name': 'ds_partitioned',                                                -->
                                     <!--    'entity_links': ({'class': 'EntityReference', 'element_name': 'customer_id'},),  -->
                                     <!--    'time_granularity': TimeGranularity.MONTH,                                       -->
+                                    <!--    'date_part': None,                                                               -->
                                     <!--    'aggregation_state': None}                                                       -->
                                     <!-- include_spec =                                                                      -->
                                     <!--   {'class': 'TimeDimensionSpec',                                                    -->
                                     <!--    'element_name': 'ds_partitioned',                                                -->
                                     <!--    'entity_links': ({'class': 'EntityReference', 'element_name': 'customer_id'},),  -->
                                     <!--    'time_granularity': TimeGranularity.QUARTER,                                     -->
+                                    <!--    'date_part': None,                                                               -->
                                     <!--    'aggregation_state': None}                                                       -->
                                     <!-- include_spec =                                                                      -->
                                     <!--   {'class': 'TimeDimensionSpec',                                                    -->
                                     <!--    'element_name': 'ds_partitioned',                                                -->
                                     <!--    'entity_links': ({'class': 'EntityReference', 'element_name': 'customer_id'},),  -->
                                     <!--    'time_granularity': TimeGranularity.YEAR,                                        -->
+                                    <!--    'date_part': None,                                                               -->
+                                    <!--    'aggregation_state': None}                                                       -->
+                                    <!-- include_spec =                                                                      -->
+                                    <!--   {'class': 'TimeDimensionSpec',                                                    -->
+                                    <!--    'element_name': 'ds_partitioned',                                                -->
+                                    <!--    'entity_links': ({'class': 'EntityReference', 'element_name': 'customer_id'},),  -->
+                                    <!--    'time_granularity': TimeGranularity.DAY,                                         -->
+                                    <!--    'date_part': <DatePart.YEAR: 'year'>,                                            -->
+                                    <!--    'aggregation_state': None}                                                       -->
+                                    <!-- include_spec =                                                                      -->
+                                    <!--   {'class': 'TimeDimensionSpec',                                                    -->
+                                    <!--    'element_name': 'ds_partitioned',                                                -->
+                                    <!--    'entity_links': ({'class': 'EntityReference', 'element_name': 'customer_id'},),  -->
+                                    <!--    'time_granularity': TimeGranularity.DAY,                                         -->
+                                    <!--    'date_part': <DatePart.QUARTER: 'quarter'>,                                      -->
+                                    <!--    'aggregation_state': None}                                                       -->
+                                    <!-- include_spec =                                                                      -->
+                                    <!--   {'class': 'TimeDimensionSpec',                                                    -->
+                                    <!--    'element_name': 'ds_partitioned',                                                -->
+                                    <!--    'entity_links': ({'class': 'EntityReference', 'element_name': 'customer_id'},),  -->
+                                    <!--    'time_granularity': TimeGranularity.DAY,                                         -->
+                                    <!--    'date_part': <DatePart.MONTH: 'month'>,                                          -->
+                                    <!--    'aggregation_state': None}                                                       -->
+                                    <!-- include_spec =                                                                      -->
+                                    <!--   {'class': 'TimeDimensionSpec',                                                    -->
+                                    <!--    'element_name': 'ds_partitioned',                                                -->
+                                    <!--    'entity_links': ({'class': 'EntityReference', 'element_name': 'customer_id'},),  -->
+                                    <!--    'time_granularity': TimeGranularity.DAY,                                         -->
+                                    <!--    'date_part': <DatePart.WEEK: 'week'>,                                            -->
+                                    <!--    'aggregation_state': None}                                                       -->
+                                    <!-- include_spec =                                                                      -->
+                                    <!--   {'class': 'TimeDimensionSpec',                                                    -->
+                                    <!--    'element_name': 'ds_partitioned',                                                -->
+                                    <!--    'entity_links': ({'class': 'EntityReference', 'element_name': 'customer_id'},),  -->
+                                    <!--    'time_granularity': TimeGranularity.DAY,                                         -->
+                                    <!--    'date_part': <DatePart.DAY: 'day'>,                                              -->
+                                    <!--    'aggregation_state': None}                                                       -->
+                                    <!-- include_spec =                                                                      -->
+                                    <!--   {'class': 'TimeDimensionSpec',                                                    -->
+                                    <!--    'element_name': 'ds_partitioned',                                                -->
+                                    <!--    'entity_links': ({'class': 'EntityReference', 'element_name': 'customer_id'},),  -->
+                                    <!--    'time_granularity': TimeGranularity.DAY,                                         -->
+                                    <!--    'date_part': <DatePart.DAYOFWEEK: 'dayofweek'>,                                  -->
+                                    <!--    'aggregation_state': None}                                                       -->
+                                    <!-- include_spec =                                                                      -->
+                                    <!--   {'class': 'TimeDimensionSpec',                                                    -->
+                                    <!--    'element_name': 'ds_partitioned',                                                -->
+                                    <!--    'entity_links': ({'class': 'EntityReference', 'element_name': 'customer_id'},),  -->
+                                    <!--    'time_granularity': TimeGranularity.DAY,                                         -->
+                                    <!--    'date_part': <DatePart.DAYOFYEAR: 'dayofyear'>,                                  -->
                                     <!--    'aggregation_state': None}                                                       -->
                                     <!-- include_spec = EntitySpec(element_name='customer_id', entity_links=()) -->
                                     <ReadSqlSourceNode>

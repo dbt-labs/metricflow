@@ -6,31 +6,73 @@ SELECT
   , DATE_TRUNC(ds, month) AS ds__month
   , DATE_TRUNC(ds, quarter) AS ds__quarter
   , DATE_TRUNC(ds, year) AS ds__year
+  , EXTRACT(YEAR FROM ds) AS ds__extract_year
+  , EXTRACT(QUARTER FROM ds) AS ds__extract_quarter
+  , EXTRACT(MONTH FROM ds) AS ds__extract_month
+  , EXTRACT(WEEK FROM ds) AS ds__extract_week
+  , EXTRACT(DAY FROM ds) AS ds__extract_day
+  , EXTRACT(DAYOFWEEK FROM ds) AS ds__extract_dayofweek
+  , EXTRACT(DAYOFYEAR FROM ds) AS ds__extract_dayofyear
   , ds_partitioned AS ds_partitioned__day
   , DATE_TRUNC(ds_partitioned, isoweek) AS ds_partitioned__week
   , DATE_TRUNC(ds_partitioned, month) AS ds_partitioned__month
   , DATE_TRUNC(ds_partitioned, quarter) AS ds_partitioned__quarter
   , DATE_TRUNC(ds_partitioned, year) AS ds_partitioned__year
+  , EXTRACT(YEAR FROM ds_partitioned) AS ds_partitioned__extract_year
+  , EXTRACT(QUARTER FROM ds_partitioned) AS ds_partitioned__extract_quarter
+  , EXTRACT(MONTH FROM ds_partitioned) AS ds_partitioned__extract_month
+  , EXTRACT(WEEK FROM ds_partitioned) AS ds_partitioned__extract_week
+  , EXTRACT(DAY FROM ds_partitioned) AS ds_partitioned__extract_day
+  , EXTRACT(DAYOFWEEK FROM ds_partitioned) AS ds_partitioned__extract_dayofweek
+  , EXTRACT(DAYOFYEAR FROM ds_partitioned) AS ds_partitioned__extract_dayofyear
   , paid_at AS paid_at__day
   , DATE_TRUNC(paid_at, isoweek) AS paid_at__week
   , DATE_TRUNC(paid_at, month) AS paid_at__month
   , DATE_TRUNC(paid_at, quarter) AS paid_at__quarter
   , DATE_TRUNC(paid_at, year) AS paid_at__year
+  , EXTRACT(YEAR FROM paid_at) AS paid_at__extract_year
+  , EXTRACT(QUARTER FROM paid_at) AS paid_at__extract_quarter
+  , EXTRACT(MONTH FROM paid_at) AS paid_at__extract_month
+  , EXTRACT(WEEK FROM paid_at) AS paid_at__extract_week
+  , EXTRACT(DAY FROM paid_at) AS paid_at__extract_day
+  , EXTRACT(DAYOFWEEK FROM paid_at) AS paid_at__extract_dayofweek
+  , EXTRACT(DAYOFYEAR FROM paid_at) AS paid_at__extract_dayofyear
   , ds AS booking__ds__day
   , DATE_TRUNC(ds, isoweek) AS booking__ds__week
   , DATE_TRUNC(ds, month) AS booking__ds__month
   , DATE_TRUNC(ds, quarter) AS booking__ds__quarter
   , DATE_TRUNC(ds, year) AS booking__ds__year
+  , EXTRACT(YEAR FROM ds) AS booking__ds__extract_year
+  , EXTRACT(QUARTER FROM ds) AS booking__ds__extract_quarter
+  , EXTRACT(MONTH FROM ds) AS booking__ds__extract_month
+  , EXTRACT(WEEK FROM ds) AS booking__ds__extract_week
+  , EXTRACT(DAY FROM ds) AS booking__ds__extract_day
+  , EXTRACT(DAYOFWEEK FROM ds) AS booking__ds__extract_dayofweek
+  , EXTRACT(DAYOFYEAR FROM ds) AS booking__ds__extract_dayofyear
   , ds_partitioned AS booking__ds_partitioned__day
   , DATE_TRUNC(ds_partitioned, isoweek) AS booking__ds_partitioned__week
   , DATE_TRUNC(ds_partitioned, month) AS booking__ds_partitioned__month
   , DATE_TRUNC(ds_partitioned, quarter) AS booking__ds_partitioned__quarter
   , DATE_TRUNC(ds_partitioned, year) AS booking__ds_partitioned__year
+  , EXTRACT(YEAR FROM ds_partitioned) AS booking__ds_partitioned__extract_year
+  , EXTRACT(QUARTER FROM ds_partitioned) AS booking__ds_partitioned__extract_quarter
+  , EXTRACT(MONTH FROM ds_partitioned) AS booking__ds_partitioned__extract_month
+  , EXTRACT(WEEK FROM ds_partitioned) AS booking__ds_partitioned__extract_week
+  , EXTRACT(DAY FROM ds_partitioned) AS booking__ds_partitioned__extract_day
+  , EXTRACT(DAYOFWEEK FROM ds_partitioned) AS booking__ds_partitioned__extract_dayofweek
+  , EXTRACT(DAYOFYEAR FROM ds_partitioned) AS booking__ds_partitioned__extract_dayofyear
   , paid_at AS booking__paid_at__day
   , DATE_TRUNC(paid_at, isoweek) AS booking__paid_at__week
   , DATE_TRUNC(paid_at, month) AS booking__paid_at__month
   , DATE_TRUNC(paid_at, quarter) AS booking__paid_at__quarter
   , DATE_TRUNC(paid_at, year) AS booking__paid_at__year
+  , EXTRACT(YEAR FROM paid_at) AS booking__paid_at__extract_year
+  , EXTRACT(QUARTER FROM paid_at) AS booking__paid_at__extract_quarter
+  , EXTRACT(MONTH FROM paid_at) AS booking__paid_at__extract_month
+  , EXTRACT(WEEK FROM paid_at) AS booking__paid_at__extract_week
+  , EXTRACT(DAY FROM paid_at) AS booking__paid_at__extract_day
+  , EXTRACT(DAYOFWEEK FROM paid_at) AS booking__paid_at__extract_dayofweek
+  , EXTRACT(DAYOFYEAR FROM paid_at) AS booking__paid_at__extract_dayofyear
   , ds AS metric_time__day
   , DATE_TRUNC(ds, isoweek) AS metric_time__week
   , DATE_TRUNC(ds, month) AS metric_time__month

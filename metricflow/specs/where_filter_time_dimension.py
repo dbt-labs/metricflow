@@ -86,4 +86,6 @@ class WhereFilterTimeDimensionFactory(ProtocolHint[QueryInterfaceTimeDimensionFa
             element_name=parameter_set.time_dimension_reference.element_name,
             entity_links=parameter_set.entity_path,
             time_granularity=parameter_set.time_granularity,
+            # TODO: add date_part to TimeDimensionCallParameterSet in DSI
+            # date_part=parameter_set.date_part,
         )

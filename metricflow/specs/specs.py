@@ -34,6 +34,7 @@ from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_column_type import SqlColumnType
+from metricflow.time.date_part import DatePart
 from metricflow.visitor import VisitorOutputT
 
 
@@ -284,6 +285,7 @@ DEFAULT_TIME_GRANULARITY = TimeGranularity.DAY
 @dataclass(frozen=True)
 class TimeDimensionSpec(DimensionSpec):  # noqa: D
     time_granularity: TimeGranularity = DEFAULT_TIME_GRANULARITY
+    date_part: Optional[DatePart] = None
 
     # Used for semi-additive joins. Some more thought is needed, but this may be useful in InstanceSpec.
     aggregation_state: Optional[AggregationState] = None
@@ -295,6 +297,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
             element_name=self.element_name,
             entity_links=self.entity_links[1:],
             time_granularity=self.time_granularity,
+            date_part=self.date_part,
         )
 
     @property
@@ -338,6 +341,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
             element_name=self.element_name,
             entity_links=self.entity_links,
             time_granularity=self.time_granularity,
+            date_part=self.date_part,
             aggregation_state=aggregation_state,
         )
 
