@@ -21,7 +21,7 @@ FROM (
       SELECT
         subq_2.metric_time__day AS metric_time__day
         , subq_7.lux_listing__window_start__day AS listing__lux_listing__window_start__day
-        , subq_7.lux_listing__window_end__extract_day AS listing__lux_listing__window_end__extract_day
+        , subq_7.lux_listing__window_end__day AS listing__lux_listing__window_end__day
         , subq_2.listing AS listing
         , subq_7.lux_listing__is_confirmed_lux AS listing__lux_listing__is_confirmed_lux
         , subq_2.bookings AS bookings
@@ -112,6 +112,13 @@ FROM (
             , subq_0.ds__month AS metric_time__month
             , subq_0.ds__quarter AS metric_time__quarter
             , subq_0.ds__year AS metric_time__year
+            , subq_0.ds__extract_year AS metric_time__extract_year
+            , subq_0.ds__extract_quarter AS metric_time__extract_quarter
+            , subq_0.ds__extract_month AS metric_time__extract_month
+            , subq_0.ds__extract_week AS metric_time__extract_week
+            , subq_0.ds__extract_day AS metric_time__extract_day
+            , subq_0.ds__extract_dayofweek AS metric_time__extract_dayofweek
+            , subq_0.ds__extract_dayofyear AS metric_time__extract_dayofyear
             , subq_0.listing
             , subq_0.guest
             , subq_0.host
@@ -230,7 +237,7 @@ FROM (
         --    'listing']
         SELECT
           subq_6.lux_listing__window_start__day
-          , subq_6.lux_listing__window_end__extract_day
+          , subq_6.lux_listing__window_end__day
           , subq_6.listing
           , subq_6.lux_listing__is_confirmed_lux
         FROM (
@@ -446,9 +453,9 @@ FROM (
             subq_2.metric_time__day >= subq_7.lux_listing__window_start__day
           ) AND (
             (
-              subq_2.metric_time__day < subq_7.lux_listing__window_end__extract_day
+              subq_2.metric_time__day < subq_7.lux_listing__window_end__day
             ) OR (
-              subq_7.lux_listing__window_end__extract_day IS NULL
+              subq_7.lux_listing__window_end__day IS NULL
             )
           )
         )

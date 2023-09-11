@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List, Sequence
+from typing import List, Optional, Sequence
 
 from dbt_semantic_interfaces.call_parameter_sets import FilterCallParameterSets, TimeDimensionCallParameterSet
 from dbt_semantic_interfaces.naming.dundered import DunderedNameFormatter
@@ -26,6 +26,10 @@ class WhereFilterTimeDimension(ProtocolHint[QueryInterfaceDimension]):
 
     def grain(self, _grain: str) -> WhereFilterTimeDimension:
         """The time granularity."""
+        raise NotImplementedError
+
+    def date_part(self, _date_part: str) -> WhereFilterTimeDimension:
+        """Requested date_part to extract."""
         raise NotImplementedError
 
     def alias(self, _alias: str) -> WhereFilterTimeDimension:
@@ -60,7 +64,11 @@ class WhereFilterTimeDimensionFactory(ProtocolHint[QueryInterfaceTimeDimensionFa
         self.time_dimension_specs: List[TimeDimensionSpec] = []
 
     def create(
-        self, time_dimension_name: str, time_granularity_name: str, entity_path: Sequence[str] = ()
+        self,
+        time_dimension_name: str,
+        time_granularity_name: str,
+        date_part_name: Optional[str] = None,
+        entity_path: Sequence[str] = (),
     ) -> WhereFilterTimeDimension:
         """Create a WhereFilterTimeDimension."""
         structured_name = DunderedNameFormatter.parse_name(time_dimension_name)

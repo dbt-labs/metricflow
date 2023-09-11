@@ -4,6 +4,8 @@ from typing import Optional, Protocol, Sequence
 
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 
+from metricflow.time.date_part import DatePart
+
 
 class QueryInterfaceMetric(Protocol):
     """Metric in the query interface."""
@@ -27,6 +29,11 @@ class QueryParameter(Protocol):
         """The time granularity."""
         raise NotImplementedError
 
+    @property
+    def date_part(self) -> Optional[DatePart]:
+        """Date part to extract from the dimension."""
+        raise NotImplementedError
+
 
 class QueryInterfaceDimension(Protocol):
     """Represents the interface for Dimension in the query interface."""
@@ -37,6 +44,10 @@ class QueryInterfaceDimension(Protocol):
 
     def alias(self, _alias: str) -> QueryInterfaceDimension:
         """Renaming the column."""
+        raise NotImplementedError
+
+    def date_part(self, _date_part: str) -> QueryInterfaceDimension:
+        """Date part to extract from the dimension."""
         raise NotImplementedError
 
 
@@ -67,6 +78,7 @@ class QueryInterfaceTimeDimensionFactory(Protocol):
         self,
         time_dimension_name: str,
         time_granularity_name: str,
+        date_part_name: Optional[str] = None,
         entity_path: Sequence[str] = (),
     ) -> QueryInterfaceTimeDimension:
         """Create a TimeDimension."""

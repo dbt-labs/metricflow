@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Sequence
+from typing import Optional, Sequence
 
 from dbt_semantic_interfaces.references import TimeDimensionReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
@@ -9,6 +9,7 @@ from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowRese
 
 from metricflow.instances import InstanceSet, TimeDimensionInstance
 from metricflow.specs.specs import TimeDimensionSpec
+from metricflow.time.date_part import DatePart
 
 logger = logging.getLogger(__name__)
 
@@ -48,12 +49,15 @@ class DataSet:
         return DataSet.metric_time_dimension_reference().element_name
 
     @staticmethod
-    def metric_time_dimension_spec(time_granularity: TimeGranularity) -> TimeDimensionSpec:
+    def metric_time_dimension_spec(
+        time_granularity: TimeGranularity, date_part: Optional[DatePart] = None
+    ) -> TimeDimensionSpec:
         """Spec that corresponds to DataSet.metric_time_dimension_reference."""
         return TimeDimensionSpec(
             element_name=DataSet.metric_time_dimension_reference().element_name,
             entity_links=(),
             time_granularity=time_granularity,
+            date_part=date_part,
         )
 
     def __repr__(self) -> str:  # noqa: D

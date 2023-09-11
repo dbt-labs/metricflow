@@ -24,7 +24,7 @@ LEFT OUTER JOIN (
   --   ['user__home_state_latest', 'window_start__day', 'window_end__day', 'listing']
   SELECT
     EXTRACT(MONTH FROM listings_src_10017.active_from) AS window_start__extract_month
-    , EXTRACT(DAY FROM listings_src_10017.active_to) AS window_end__extract_day
+    , EXTRACT(MONTH FROM listings_src_10017.active_to) AS window_end__extract_month
     , listings_src_10017.listing_id AS listing
     , users_latest_src_10021.home_state_latest AS user__home_state_latest
   FROM ***************************.dim_listings listings_src_10017
@@ -41,9 +41,9 @@ ON
       subq_13.metric_time__day >= subq_18.window_start__extract_month
     ) AND (
       (
-        subq_13.metric_time__day < subq_18.window_end__extract_day
+        subq_13.metric_time__day < subq_18.window_end__extract_month
       ) OR (
-        subq_18.window_end__extract_day IS NULL
+        subq_18.window_end__extract_month IS NULL
       )
     )
   )

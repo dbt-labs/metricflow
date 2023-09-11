@@ -46,8 +46,14 @@ class StructuredLinkableSpecName:
         if associated_date_part:
             #  e.g. "ds__extract_month"
             if len(name_parts) == 2:
+                # Since DAY works with all currently supported DateParts & changing the granularity will not change the
+                # extracted date part, assume day granularity here.
+                time_granularity = TimeGranularity.DAY
                 return StructuredLinkableSpecName(
-                    entity_link_names=(), element_name=name_parts[0], date_part=associated_date_part
+                    entity_link_names=(),
+                    element_name=name_parts[0],
+                    time_granularity=time_granularity,
+                    date_part=associated_date_part,
                 )
             # e.g. "messages__ds__extract_month"
             return StructuredLinkableSpecName(

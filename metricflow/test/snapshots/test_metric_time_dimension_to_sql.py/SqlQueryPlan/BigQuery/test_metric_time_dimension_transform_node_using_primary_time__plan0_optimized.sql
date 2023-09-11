@@ -78,6 +78,13 @@ SELECT
   , DATE_TRUNC(ds, month) AS metric_time__month
   , DATE_TRUNC(ds, quarter) AS metric_time__quarter
   , DATE_TRUNC(ds, year) AS metric_time__year
+  , EXTRACT(YEAR FROM ds) AS metric_time__extract_year
+  , EXTRACT(QUARTER FROM ds) AS metric_time__extract_quarter
+  , EXTRACT(MONTH FROM ds) AS metric_time__extract_month
+  , EXTRACT(WEEK FROM ds) AS metric_time__extract_week
+  , EXTRACT(DAY FROM ds) AS metric_time__extract_day
+  , EXTRACT(DAYOFWEEK FROM ds) AS metric_time__extract_dayofweek
+  , EXTRACT(DAYOFYEAR FROM ds) AS metric_time__extract_dayofyear
   , listing_id AS listing
   , guest_id AS guest
   , host_id AS host

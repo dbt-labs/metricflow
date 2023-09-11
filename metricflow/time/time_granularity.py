@@ -36,7 +36,7 @@ def is_period_start(time_granularity: TimeGranularity, date: Union[pd.Timestamp,
     if time_granularity is TimeGranularity.DAY:
         return True
     elif time_granularity is TimeGranularity.WEEK:
-        return ISODAYOFWEEK.from_pandas_timestamp(pd_date).is_week_start
+        return ISOWeekDay.from_pandas_timestamp(pd_date).is_week_start
     elif time_granularity is TimeGranularity.MONTH:
         return pd_date.is_month_start
     elif time_granularity is TimeGranularity.QUARTER:
@@ -53,7 +53,7 @@ def is_period_end(time_granularity: TimeGranularity, date: Union[pd.Timestamp, d
     if time_granularity is TimeGranularity.DAY:
         return True
     elif time_granularity is TimeGranularity.WEEK:
-        return ISODAYOFWEEK.from_pandas_timestamp(pd_date).is_week_end
+        return ISOWeekDay.from_pandas_timestamp(pd_date).is_week_end
     elif time_granularity is TimeGranularity.MONTH:
         return pd_date.is_month_end
     elif time_granularity is TimeGranularity.QUARTER:
@@ -70,7 +70,7 @@ def period_begin_offset(  # noqa: D
     if time_granularity is TimeGranularity.DAY:
         raise ValueError(f"Can't get period start offset for TimeGranularity.{time_granularity.name}.")
     elif time_granularity is TimeGranularity.WEEK:
-        return pd.offsets.Week(dayofweek=ISODAYOFWEEK.MONDAY.pandas_value)
+        return pd.offsets.Week(weekday=ISOWeekDay.MONDAY.pandas_value)
     elif time_granularity is TimeGranularity.MONTH:
         return pd.offsets.MonthBegin()
     elif time_granularity is TimeGranularity.QUARTER:
@@ -87,7 +87,7 @@ def period_end_offset(  # noqa: D
     if time_granularity is TimeGranularity.DAY:
         raise ValueError(f"Can't get period end offset for TimeGranularity.{time_granularity.name}.")
     elif time_granularity == TimeGranularity.WEEK:
-        return pd.offsets.Week(dayofweek=ISODAYOFWEEK.SUNDAY.pandas_value)
+        return pd.offsets.Week(weekday=ISOWeekDay.SUNDAY.pandas_value)
     elif time_granularity is TimeGranularity.MONTH:
         return pd.offsets.MonthEnd()
     elif time_granularity is TimeGranularity.QUARTER:
@@ -132,7 +132,7 @@ def match_start_or_end_of_period(
         )
 
 
-class ISODAYOFWEEK(ExtendedEnum):
+class ISOWeekDay(ExtendedEnum):
     """Day of week values per ISO standard."""
 
     MONDAY = 1
@@ -144,23 +144,23 @@ class ISODAYOFWEEK(ExtendedEnum):
     SUNDAY = 7
 
     @staticmethod
-    def from_pandas_timestamp(timestamp: pd.Timestamp) -> ISODAYOFWEEK:
-        """Factory for streamlining conversion from a Pandas Timestamp to an ISODAYOFWEEK."""
-        return ISODAYOFWEEK(timestamp.isodayofweek())
+    def from_pandas_timestamp(timestamp: pd.Timestamp) -> ISOWeekDay:
+        """Factory for streamlining conversion from a Pandas Timestamp to an ISOWeekDay."""
+        return ISOWeekDay(timestamp.isoweekday())
 
     @property
     def is_week_start(self) -> bool:
         """Return comparison of instance value against ISO standard start of week (Monday)."""
-        return self is ISODAYOFWEEK.MONDAY
+        return self is ISOWeekDay.MONDAY
 
     @property
     def is_week_end(self) -> bool:
         """Return comparison of instance value against ISO standard end of week (Sunday)."""
-        return self is ISODAYOFWEEK.SUNDAY
+        return self is ISOWeekDay.SUNDAY
 
     @property
     def pandas_value(self) -> int:
-        """Returns the pandas int value representation of the ISODAYOFWEEK."""
+        """Returns the pandas int value representation of the ISOWeekDay."""
         return self.value - 1
 
 

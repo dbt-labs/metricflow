@@ -30,8 +30,8 @@ FROM (
           -- Join Standard Outputs
           SELECT
             subq_2.metric_time__day AS metric_time__day
-            , subq_4.window_start__extract_month AS listing__window_start__extract_month
-            , subq_4.window_end__extract_dayofweek AS listing__window_end__extract_dayofweek
+            , subq_4.window_start__day AS listing__window_start__day
+            , subq_4.window_end__extract_week AS listing__window_end__extract_week
             , subq_2.listing AS listing
             , subq_4.capacity AS listing__capacity
             , subq_2.bookings AS bookings
@@ -122,6 +122,13 @@ FROM (
                 , subq_0.ds__month AS metric_time__month
                 , subq_0.ds__quarter AS metric_time__quarter
                 , subq_0.ds__year AS metric_time__year
+                , subq_0.ds__extract_year AS metric_time__extract_year
+                , subq_0.ds__extract_quarter AS metric_time__extract_quarter
+                , subq_0.ds__extract_month AS metric_time__extract_month
+                , subq_0.ds__extract_week AS metric_time__extract_week
+                , subq_0.ds__extract_day AS metric_time__extract_day
+                , subq_0.ds__extract_dayofweek AS metric_time__extract_dayofweek
+                , subq_0.ds__extract_dayofyear AS metric_time__extract_dayofyear
                 , subq_0.listing
                 , subq_0.guest
                 , subq_0.host
@@ -236,8 +243,8 @@ FROM (
             -- Pass Only Elements:
             --   ['capacity', 'window_start__day', 'window_end__day', 'listing']
             SELECT
-              subq_3.window_start__extract_month
-              , subq_3.window_end__extract_dayofweek
+              subq_3.window_start__day
+              , subq_3.window_end__extract_week
               , subq_3.listing
               , subq_3.capacity
             FROM (
@@ -308,12 +315,12 @@ FROM (
               subq_2.listing = subq_4.listing
             ) AND (
               (
-                subq_2.metric_time__day >= subq_4.window_start__extract_month
+                subq_2.metric_time__day >= subq_4.window_start__day
               ) AND (
                 (
-                  subq_2.metric_time__day < subq_4.window_end__extract_dayofweek
+                  subq_2.metric_time__day < subq_4.window_end__extract_week
                 ) OR (
-                  subq_4.window_end__extract_dayofweek IS NULL
+                  subq_4.window_end__extract_week IS NULL
                 )
               )
             )

@@ -299,7 +299,7 @@ class MetricFlowQueryParser:
         return (
             group_by_names
             if group_by_names
-            else [f"{g.name}__{g.grain}" if g.grain else g.name for g in group_by]
+            else [f"{g.name}__{g.date_part or g.grain}" if (g.date_part or g.grain) else g.name for g in group_by]
             if group_by
             else []
         )
@@ -669,6 +669,7 @@ class MetricFlowQueryParser:
                             element_name=element_name,
                             entity_links=entity_links,
                             time_granularity=structured_name.time_granularity,
+                            date_part=structured_name.date_part,
                         )
                     )
                 else:

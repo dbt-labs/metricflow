@@ -77,6 +77,13 @@ SELECT
   , subq_0.paid_at__month AS metric_time__month
   , subq_0.paid_at__quarter AS metric_time__quarter
   , subq_0.paid_at__year AS metric_time__year
+  , subq_0.paid_at__extract_year AS metric_time__extract_year
+  , subq_0.paid_at__extract_quarter AS metric_time__extract_quarter
+  , subq_0.paid_at__extract_month AS metric_time__extract_month
+  , subq_0.paid_at__extract_week AS metric_time__extract_week
+  , subq_0.paid_at__extract_day AS metric_time__extract_day
+  , subq_0.paid_at__extract_dayofweek AS metric_time__extract_dayofweek
+  , subq_0.paid_at__extract_dayofyear AS metric_time__extract_dayofyear
   , subq_0.listing
   , subq_0.guest
   , subq_0.host

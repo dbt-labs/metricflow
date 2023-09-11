@@ -1116,7 +1116,6 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             if (
                 len(time_dimension_instance.spec.entity_links) == 0
                 and time_dimension_instance.spec.reference == node.aggregation_time_dimension_reference
-                and time_dimension_instance.spec.date_part is None
             ):
                 matching_time_dimension_instances.append(time_dimension_instance)
 
@@ -1127,7 +1126,8 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         # For those matching time dimension instances, create the analog metric time dimension instances for the output.
         for matching_time_dimension_instance in matching_time_dimension_instances:
             metric_time_dimension_spec = DataSet.metric_time_dimension_spec(
-                matching_time_dimension_instance.spec.time_granularity
+                time_granularity=matching_time_dimension_instance.spec.time_granularity,
+                date_part=matching_time_dimension_instance.spec.date_part,
             )
             metric_time_dimension_column_association = self._column_association_resolver.resolve_spec(
                 metric_time_dimension_spec

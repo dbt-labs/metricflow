@@ -201,6 +201,13 @@ FROM (
             , subq_1.metric_time__month AS metric_time__month
             , subq_1.metric_time__quarter AS metric_time__quarter
             , subq_1.metric_time__year AS metric_time__year
+            , subq_1.metric_time__extract_year AS metric_time__extract_year
+            , subq_1.metric_time__extract_quarter AS metric_time__extract_quarter
+            , subq_1.metric_time__extract_month AS metric_time__extract_month
+            , subq_1.metric_time__extract_week AS metric_time__extract_week
+            , subq_1.metric_time__extract_day AS metric_time__extract_day
+            , subq_1.metric_time__extract_dayofweek AS metric_time__extract_dayofweek
+            , subq_1.metric_time__extract_dayofyear AS metric_time__extract_dayofyear
             , subq_1.listing AS listing
             , subq_1.guest AS guest
             , subq_1.host AS host
@@ -308,6 +315,13 @@ FROM (
               , subq_0.ds__month AS metric_time__month
               , subq_0.ds__quarter AS metric_time__quarter
               , subq_0.ds__year AS metric_time__year
+              , subq_0.ds__extract_year AS metric_time__extract_year
+              , subq_0.ds__extract_quarter AS metric_time__extract_quarter
+              , subq_0.ds__extract_month AS metric_time__extract_month
+              , subq_0.ds__extract_week AS metric_time__extract_week
+              , subq_0.ds__extract_day AS metric_time__extract_day
+              , subq_0.ds__extract_dayofweek AS metric_time__extract_dayofweek
+              , subq_0.ds__extract_dayofyear AS metric_time__extract_dayofyear
               , subq_0.listing
               , subq_0.guest
               , subq_0.host

@@ -175,6 +175,7 @@ class MockQueryParameter:
     """This is a mock that is just used to test the query parser."""
 
     grain = None
+    date_part = None
 
     def __init__(self, name: str):  # noqa: D
         self.name = name

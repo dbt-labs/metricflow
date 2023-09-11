@@ -35,9 +35,9 @@ FROM (
         subq_12.metric_time__day >= EXTRACT(MONTH FROM listings_src_10017.active_from)
       ) AND (
         (
-          subq_12.metric_time__day < EXTRACT(DAY FROM listings_src_10017.active_to)
+          subq_12.metric_time__day < EXTRACT(MONTH FROM listings_src_10017.active_to)
         ) OR (
-          EXTRACT(DAY FROM listings_src_10017.active_to) IS NULL
+          EXTRACT(MONTH FROM listings_src_10017.active_to) IS NULL
         )
       )
     )
