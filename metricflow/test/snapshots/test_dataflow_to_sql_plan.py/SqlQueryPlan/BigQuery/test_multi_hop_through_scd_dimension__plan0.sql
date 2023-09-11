@@ -20,7 +20,7 @@ FROM (
       -- Join Standard Outputs
       SELECT
         subq_2.metric_time__day AS metric_time__day
-        , subq_7.window_start__extract_dayofyear AS listing__window_start__extract_dayofyear
+        , subq_7.window_start__day AS listing__window_start__day
         , subq_7.window_end__day AS listing__window_end__day
         , subq_2.listing AS listing
         , subq_7.user__home_state_latest AS listing__user__home_state_latest
@@ -233,7 +233,7 @@ FROM (
         -- Pass Only Elements:
         --   ['user__home_state_latest', 'window_start__day', 'window_end__day', 'listing']
         SELECT
-          subq_6.window_start__extract_dayofyear
+          subq_6.window_start__day
           , subq_6.window_end__day
           , subq_6.listing
           , subq_6.user__home_state_latest
@@ -471,7 +471,7 @@ FROM (
           subq_2.listing = subq_7.listing
         ) AND (
           (
-            subq_2.metric_time__day >= subq_7.window_start__extract_dayofyear
+            subq_2.metric_time__day >= subq_7.window_start__day
           ) AND (
             (
               subq_2.metric_time__day < subq_7.window_end__day

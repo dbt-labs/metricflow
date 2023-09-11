@@ -32,12 +32,12 @@ FROM (
       subq_12.listing = listings_src_10017.listing_id
     ) AND (
       (
-        subq_12.metric_time__day >= EXTRACT(YEAR FROM listings_src_10017.active_from)
+        subq_12.metric_time__day >= listings_src_10017.active_from
       ) AND (
         (
-          subq_12.metric_time__day < EXTRACT(YEAR FROM listings_src_10017.active_to)
+          subq_12.metric_time__day < listings_src_10017.active_to
         ) OR (
-          EXTRACT(YEAR FROM listings_src_10017.active_to) IS NULL
+          listings_src_10017.active_to IS NULL
         )
       )
     )

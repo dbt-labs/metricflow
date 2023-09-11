@@ -23,8 +23,8 @@ LEFT OUTER JOIN (
   -- Pass Only Elements:
   --   ['user__home_state_latest', 'window_start__day', 'window_end__day', 'listing']
   SELECT
-    EXTRACT(YEAR FROM listings_src_10017.active_from) AS window_start__extract_year
-    , EXTRACT(YEAR FROM listings_src_10017.active_to) AS window_end__extract_year
+    listings_src_10017.active_from AS window_start__day
+    , listings_src_10017.active_to AS window_end__day
     , listings_src_10017.listing_id AS listing
     , users_latest_src_10021.home_state_latest AS user__home_state_latest
   FROM ***************************.dim_listings listings_src_10017
@@ -38,12 +38,12 @@ ON
     subq_13.listing = subq_18.listing
   ) AND (
     (
-      subq_13.metric_time__day >= subq_18.window_start__extract_year
+      subq_13.metric_time__day >= subq_18.window_start__day
     ) AND (
       (
-        subq_13.metric_time__day < subq_18.window_end__extract_year
+        subq_13.metric_time__day < subq_18.window_end__day
       ) OR (
-        subq_18.window_end__extract_year IS NULL
+        subq_18.window_end__day IS NULL
       )
     )
   )

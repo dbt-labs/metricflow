@@ -30,7 +30,7 @@ FROM (
           -- Join Standard Outputs
           SELECT
             subq_2.metric_time__day AS metric_time__day
-            , subq_4.window_start__extract_dayofyear AS listing__window_start__extract_dayofyear
+            , subq_4.window_start__day AS listing__window_start__day
             , subq_4.window_end__day AS listing__window_end__day
             , subq_2.listing AS listing
             , subq_4.capacity AS listing__capacity
@@ -243,7 +243,7 @@ FROM (
             -- Pass Only Elements:
             --   ['capacity', 'window_start__day', 'window_end__day', 'listing']
             SELECT
-              subq_3.window_start__extract_dayofyear
+              subq_3.window_start__day
               , subq_3.window_end__day
               , subq_3.listing
               , subq_3.capacity
@@ -315,7 +315,7 @@ FROM (
               subq_2.listing = subq_4.listing
             ) AND (
               (
-                subq_2.metric_time__day >= subq_4.window_start__extract_dayofyear
+                subq_2.metric_time__day >= subq_4.window_start__day
               ) AND (
                 (
                   subq_2.metric_time__day < subq_4.window_end__day
