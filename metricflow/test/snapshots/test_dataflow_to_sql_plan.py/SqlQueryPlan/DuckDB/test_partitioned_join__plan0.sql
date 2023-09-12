@@ -41,8 +41,8 @@ FROM (
             , subq_0.ds__extract_month
             , subq_0.ds__extract_week
             , subq_0.ds__extract_day
-            , subq_0.ds__extract_dayofweek
-            , subq_0.ds__extract_dayofyear
+            , subq_0.ds__extract_dow
+            , subq_0.ds__extract_doy
             , subq_0.ds_partitioned__day
             , subq_0.ds_partitioned__week
             , subq_0.ds_partitioned__month
@@ -53,8 +53,8 @@ FROM (
             , subq_0.ds_partitioned__extract_month
             , subq_0.ds_partitioned__extract_week
             , subq_0.ds_partitioned__extract_day
-            , subq_0.ds_partitioned__extract_dayofweek
-            , subq_0.ds_partitioned__extract_dayofyear
+            , subq_0.ds_partitioned__extract_dow
+            , subq_0.ds_partitioned__extract_doy
             , subq_0.verification__ds__day
             , subq_0.verification__ds__week
             , subq_0.verification__ds__month
@@ -65,8 +65,8 @@ FROM (
             , subq_0.verification__ds__extract_month
             , subq_0.verification__ds__extract_week
             , subq_0.verification__ds__extract_day
-            , subq_0.verification__ds__extract_dayofweek
-            , subq_0.verification__ds__extract_dayofyear
+            , subq_0.verification__ds__extract_dow
+            , subq_0.verification__ds__extract_doy
             , subq_0.verification__ds_partitioned__day
             , subq_0.verification__ds_partitioned__week
             , subq_0.verification__ds_partitioned__month
@@ -77,8 +77,8 @@ FROM (
             , subq_0.verification__ds_partitioned__extract_month
             , subq_0.verification__ds_partitioned__extract_week
             , subq_0.verification__ds_partitioned__extract_day
-            , subq_0.verification__ds_partitioned__extract_dayofweek
-            , subq_0.verification__ds_partitioned__extract_dayofyear
+            , subq_0.verification__ds_partitioned__extract_dow
+            , subq_0.verification__ds_partitioned__extract_doy
             , subq_0.ds__day AS metric_time__day
             , subq_0.ds__week AS metric_time__week
             , subq_0.ds__month AS metric_time__month
@@ -89,8 +89,8 @@ FROM (
             , subq_0.ds__extract_month AS metric_time__extract_month
             , subq_0.ds__extract_week AS metric_time__extract_week
             , subq_0.ds__extract_day AS metric_time__extract_day
-            , subq_0.ds__extract_dayofweek AS metric_time__extract_dayofweek
-            , subq_0.ds__extract_dayofyear AS metric_time__extract_dayofyear
+            , subq_0.ds__extract_dow AS metric_time__extract_dow
+            , subq_0.ds__extract_doy AS metric_time__extract_doy
             , subq_0.verification
             , subq_0.user
             , subq_0.verification__user
@@ -111,8 +111,8 @@ FROM (
               , EXTRACT(MONTH FROM id_verifications_src_10003.ds) AS ds__extract_month
               , EXTRACT(WEEK FROM id_verifications_src_10003.ds) AS ds__extract_week
               , EXTRACT(DAY FROM id_verifications_src_10003.ds) AS ds__extract_day
-              , EXTRACT(DAYOFWEEK FROM id_verifications_src_10003.ds) AS ds__extract_dayofweek
-              , EXTRACT(DAYOFYEAR FROM id_verifications_src_10003.ds) AS ds__extract_dayofyear
+              , EXTRACT(DAYOFWEEK FROM id_verifications_src_10003.ds) AS ds__extract_dow
+              , EXTRACT(DAYOFYEAR FROM id_verifications_src_10003.ds) AS ds__extract_doy
               , id_verifications_src_10003.ds_partitioned AS ds_partitioned__day
               , DATE_TRUNC('week', id_verifications_src_10003.ds_partitioned) AS ds_partitioned__week
               , DATE_TRUNC('month', id_verifications_src_10003.ds_partitioned) AS ds_partitioned__month
@@ -123,8 +123,8 @@ FROM (
               , EXTRACT(MONTH FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_month
               , EXTRACT(WEEK FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_week
               , EXTRACT(DAY FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_day
-              , EXTRACT(DAYOFWEEK FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_dayofweek
-              , EXTRACT(DAYOFYEAR FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_dayofyear
+              , EXTRACT(DAYOFWEEK FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_dow
+              , EXTRACT(DAYOFYEAR FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_doy
               , id_verifications_src_10003.verification_type
               , id_verifications_src_10003.ds AS verification__ds__day
               , DATE_TRUNC('week', id_verifications_src_10003.ds) AS verification__ds__week
@@ -136,8 +136,8 @@ FROM (
               , EXTRACT(MONTH FROM id_verifications_src_10003.ds) AS verification__ds__extract_month
               , EXTRACT(WEEK FROM id_verifications_src_10003.ds) AS verification__ds__extract_week
               , EXTRACT(DAY FROM id_verifications_src_10003.ds) AS verification__ds__extract_day
-              , EXTRACT(DAYOFWEEK FROM id_verifications_src_10003.ds) AS verification__ds__extract_dayofweek
-              , EXTRACT(DAYOFYEAR FROM id_verifications_src_10003.ds) AS verification__ds__extract_dayofyear
+              , EXTRACT(DAYOFWEEK FROM id_verifications_src_10003.ds) AS verification__ds__extract_dow
+              , EXTRACT(DAYOFYEAR FROM id_verifications_src_10003.ds) AS verification__ds__extract_doy
               , id_verifications_src_10003.ds_partitioned AS verification__ds_partitioned__day
               , DATE_TRUNC('week', id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__week
               , DATE_TRUNC('month', id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__month
@@ -148,8 +148,8 @@ FROM (
               , EXTRACT(MONTH FROM id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__extract_month
               , EXTRACT(WEEK FROM id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__extract_week
               , EXTRACT(DAY FROM id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__extract_day
-              , EXTRACT(DAYOFWEEK FROM id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__extract_dayofweek
-              , EXTRACT(DAYOFYEAR FROM id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__extract_dayofyear
+              , EXTRACT(DAYOFWEEK FROM id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__extract_dow
+              , EXTRACT(DAYOFYEAR FROM id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__extract_doy
               , id_verifications_src_10003.verification_type AS verification__verification_type
               , id_verifications_src_10003.verification_id AS verification
               , id_verifications_src_10003.user_id AS user
@@ -178,8 +178,8 @@ FROM (
             , EXTRACT(MONTH FROM users_ds_source_src_10007.ds) AS ds__extract_month
             , EXTRACT(WEEK FROM users_ds_source_src_10007.ds) AS ds__extract_week
             , EXTRACT(DAY FROM users_ds_source_src_10007.ds) AS ds__extract_day
-            , EXTRACT(DAYOFWEEK FROM users_ds_source_src_10007.ds) AS ds__extract_dayofweek
-            , EXTRACT(DAYOFYEAR FROM users_ds_source_src_10007.ds) AS ds__extract_dayofyear
+            , EXTRACT(DAYOFWEEK FROM users_ds_source_src_10007.ds) AS ds__extract_dow
+            , EXTRACT(DAYOFYEAR FROM users_ds_source_src_10007.ds) AS ds__extract_doy
             , users_ds_source_src_10007.created_at AS created_at__day
             , DATE_TRUNC('week', users_ds_source_src_10007.created_at) AS created_at__week
             , DATE_TRUNC('month', users_ds_source_src_10007.created_at) AS created_at__month
@@ -190,8 +190,8 @@ FROM (
             , EXTRACT(MONTH FROM users_ds_source_src_10007.created_at) AS created_at__extract_month
             , EXTRACT(WEEK FROM users_ds_source_src_10007.created_at) AS created_at__extract_week
             , EXTRACT(DAY FROM users_ds_source_src_10007.created_at) AS created_at__extract_day
-            , EXTRACT(DAYOFWEEK FROM users_ds_source_src_10007.created_at) AS created_at__extract_dayofweek
-            , EXTRACT(DAYOFYEAR FROM users_ds_source_src_10007.created_at) AS created_at__extract_dayofyear
+            , EXTRACT(DAYOFWEEK FROM users_ds_source_src_10007.created_at) AS created_at__extract_dow
+            , EXTRACT(DAYOFYEAR FROM users_ds_source_src_10007.created_at) AS created_at__extract_doy
             , users_ds_source_src_10007.ds_partitioned AS ds_partitioned__day
             , DATE_TRUNC('week', users_ds_source_src_10007.ds_partitioned) AS ds_partitioned__week
             , DATE_TRUNC('month', users_ds_source_src_10007.ds_partitioned) AS ds_partitioned__month
@@ -202,8 +202,8 @@ FROM (
             , EXTRACT(MONTH FROM users_ds_source_src_10007.ds_partitioned) AS ds_partitioned__extract_month
             , EXTRACT(WEEK FROM users_ds_source_src_10007.ds_partitioned) AS ds_partitioned__extract_week
             , EXTRACT(DAY FROM users_ds_source_src_10007.ds_partitioned) AS ds_partitioned__extract_day
-            , EXTRACT(DAYOFWEEK FROM users_ds_source_src_10007.ds_partitioned) AS ds_partitioned__extract_dayofweek
-            , EXTRACT(DAYOFYEAR FROM users_ds_source_src_10007.ds_partitioned) AS ds_partitioned__extract_dayofyear
+            , EXTRACT(DAYOFWEEK FROM users_ds_source_src_10007.ds_partitioned) AS ds_partitioned__extract_dow
+            , EXTRACT(DAYOFYEAR FROM users_ds_source_src_10007.ds_partitioned) AS ds_partitioned__extract_doy
             , users_ds_source_src_10007.home_state
             , users_ds_source_src_10007.ds AS user__ds__day
             , DATE_TRUNC('week', users_ds_source_src_10007.ds) AS user__ds__week
@@ -215,8 +215,8 @@ FROM (
             , EXTRACT(MONTH FROM users_ds_source_src_10007.ds) AS user__ds__extract_month
             , EXTRACT(WEEK FROM users_ds_source_src_10007.ds) AS user__ds__extract_week
             , EXTRACT(DAY FROM users_ds_source_src_10007.ds) AS user__ds__extract_day
-            , EXTRACT(DAYOFWEEK FROM users_ds_source_src_10007.ds) AS user__ds__extract_dayofweek
-            , EXTRACT(DAYOFYEAR FROM users_ds_source_src_10007.ds) AS user__ds__extract_dayofyear
+            , EXTRACT(DAYOFWEEK FROM users_ds_source_src_10007.ds) AS user__ds__extract_dow
+            , EXTRACT(DAYOFYEAR FROM users_ds_source_src_10007.ds) AS user__ds__extract_doy
             , users_ds_source_src_10007.created_at AS user__created_at__day
             , DATE_TRUNC('week', users_ds_source_src_10007.created_at) AS user__created_at__week
             , DATE_TRUNC('month', users_ds_source_src_10007.created_at) AS user__created_at__month
@@ -227,8 +227,8 @@ FROM (
             , EXTRACT(MONTH FROM users_ds_source_src_10007.created_at) AS user__created_at__extract_month
             , EXTRACT(WEEK FROM users_ds_source_src_10007.created_at) AS user__created_at__extract_week
             , EXTRACT(DAY FROM users_ds_source_src_10007.created_at) AS user__created_at__extract_day
-            , EXTRACT(DAYOFWEEK FROM users_ds_source_src_10007.created_at) AS user__created_at__extract_dayofweek
-            , EXTRACT(DAYOFYEAR FROM users_ds_source_src_10007.created_at) AS user__created_at__extract_dayofyear
+            , EXTRACT(DAYOFWEEK FROM users_ds_source_src_10007.created_at) AS user__created_at__extract_dow
+            , EXTRACT(DAYOFYEAR FROM users_ds_source_src_10007.created_at) AS user__created_at__extract_doy
             , users_ds_source_src_10007.ds_partitioned AS user__ds_partitioned__day
             , DATE_TRUNC('week', users_ds_source_src_10007.ds_partitioned) AS user__ds_partitioned__week
             , DATE_TRUNC('month', users_ds_source_src_10007.ds_partitioned) AS user__ds_partitioned__month
@@ -239,8 +239,8 @@ FROM (
             , EXTRACT(MONTH FROM users_ds_source_src_10007.ds_partitioned) AS user__ds_partitioned__extract_month
             , EXTRACT(WEEK FROM users_ds_source_src_10007.ds_partitioned) AS user__ds_partitioned__extract_week
             , EXTRACT(DAY FROM users_ds_source_src_10007.ds_partitioned) AS user__ds_partitioned__extract_day
-            , EXTRACT(DAYOFWEEK FROM users_ds_source_src_10007.ds_partitioned) AS user__ds_partitioned__extract_dayofweek
-            , EXTRACT(DAYOFYEAR FROM users_ds_source_src_10007.ds_partitioned) AS user__ds_partitioned__extract_dayofyear
+            , EXTRACT(DAYOFWEEK FROM users_ds_source_src_10007.ds_partitioned) AS user__ds_partitioned__extract_dow
+            , EXTRACT(DAYOFYEAR FROM users_ds_source_src_10007.ds_partitioned) AS user__ds_partitioned__extract_doy
             , users_ds_source_src_10007.home_state AS user__home_state
             , users_ds_source_src_10007.user_id AS user
           FROM ***************************.dim_users users_ds_source_src_10007

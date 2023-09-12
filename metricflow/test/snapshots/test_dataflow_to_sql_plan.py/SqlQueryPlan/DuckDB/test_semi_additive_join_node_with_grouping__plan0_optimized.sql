@@ -10,8 +10,8 @@ SELECT
   , subq_3.ds__extract_month AS ds__extract_month
   , subq_3.ds__extract_week AS ds__extract_week
   , subq_3.ds__extract_day AS ds__extract_day
-  , subq_3.ds__extract_dayofweek AS ds__extract_dayofweek
-  , subq_3.ds__extract_dayofyear AS ds__extract_dayofyear
+  , subq_3.ds__extract_dow AS ds__extract_dow
+  , subq_3.ds__extract_doy AS ds__extract_doy
   , subq_3.account__ds__day AS account__ds__day
   , subq_3.account__ds__week AS account__ds__week
   , subq_3.account__ds__month AS account__ds__month
@@ -22,8 +22,8 @@ SELECT
   , subq_3.account__ds__extract_month AS account__ds__extract_month
   , subq_3.account__ds__extract_week AS account__ds__extract_week
   , subq_3.account__ds__extract_day AS account__ds__extract_day
-  , subq_3.account__ds__extract_dayofweek AS account__ds__extract_dayofweek
-  , subq_3.account__ds__extract_dayofyear AS account__ds__extract_dayofyear
+  , subq_3.account__ds__extract_dow AS account__ds__extract_dow
+  , subq_3.account__ds__extract_doy AS account__ds__extract_doy
   , subq_3.user AS user
   , subq_3.account__user AS account__user
   , subq_3.account_type AS account_type
@@ -47,8 +47,8 @@ FROM (
     , EXTRACT(MONTH FROM ds) AS ds__extract_month
     , EXTRACT(WEEK FROM ds) AS ds__extract_week
     , EXTRACT(DAY FROM ds) AS ds__extract_day
-    , EXTRACT(DAYOFWEEK FROM ds) AS ds__extract_dayofweek
-    , EXTRACT(DAYOFYEAR FROM ds) AS ds__extract_dayofyear
+    , EXTRACT(DAYOFWEEK FROM ds) AS ds__extract_dow
+    , EXTRACT(DAYOFYEAR FROM ds) AS ds__extract_doy
     , account_type
     , ds AS account__ds__day
     , DATE_TRUNC('week', ds) AS account__ds__week
@@ -60,8 +60,8 @@ FROM (
     , EXTRACT(MONTH FROM ds) AS account__ds__extract_month
     , EXTRACT(WEEK FROM ds) AS account__ds__extract_week
     , EXTRACT(DAY FROM ds) AS account__ds__extract_day
-    , EXTRACT(DAYOFWEEK FROM ds) AS account__ds__extract_dayofweek
-    , EXTRACT(DAYOFYEAR FROM ds) AS account__ds__extract_dayofyear
+    , EXTRACT(DAYOFWEEK FROM ds) AS account__ds__extract_dow
+    , EXTRACT(DAYOFYEAR FROM ds) AS account__ds__extract_doy
     , account_type AS account__account_type
     , user_id AS user
     , user_id AS account__user

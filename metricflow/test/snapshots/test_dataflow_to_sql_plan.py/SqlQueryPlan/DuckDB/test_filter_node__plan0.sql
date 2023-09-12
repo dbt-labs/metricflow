@@ -30,8 +30,8 @@ FROM (
     , EXTRACT(MONTH FROM bookings_source_src_10001.ds) AS ds__extract_month
     , EXTRACT(WEEK FROM bookings_source_src_10001.ds) AS ds__extract_week
     , EXTRACT(DAY FROM bookings_source_src_10001.ds) AS ds__extract_day
-    , EXTRACT(DAYOFWEEK FROM bookings_source_src_10001.ds) AS ds__extract_dayofweek
-    , EXTRACT(DAYOFYEAR FROM bookings_source_src_10001.ds) AS ds__extract_dayofyear
+    , EXTRACT(DAYOFWEEK FROM bookings_source_src_10001.ds) AS ds__extract_dow
+    , EXTRACT(DAYOFYEAR FROM bookings_source_src_10001.ds) AS ds__extract_doy
     , bookings_source_src_10001.ds_partitioned AS ds_partitioned__day
     , DATE_TRUNC('week', bookings_source_src_10001.ds_partitioned) AS ds_partitioned__week
     , DATE_TRUNC('month', bookings_source_src_10001.ds_partitioned) AS ds_partitioned__month
@@ -42,8 +42,8 @@ FROM (
     , EXTRACT(MONTH FROM bookings_source_src_10001.ds_partitioned) AS ds_partitioned__extract_month
     , EXTRACT(WEEK FROM bookings_source_src_10001.ds_partitioned) AS ds_partitioned__extract_week
     , EXTRACT(DAY FROM bookings_source_src_10001.ds_partitioned) AS ds_partitioned__extract_day
-    , EXTRACT(DAYOFWEEK FROM bookings_source_src_10001.ds_partitioned) AS ds_partitioned__extract_dayofweek
-    , EXTRACT(DAYOFYEAR FROM bookings_source_src_10001.ds_partitioned) AS ds_partitioned__extract_dayofyear
+    , EXTRACT(DAYOFWEEK FROM bookings_source_src_10001.ds_partitioned) AS ds_partitioned__extract_dow
+    , EXTRACT(DAYOFYEAR FROM bookings_source_src_10001.ds_partitioned) AS ds_partitioned__extract_doy
     , bookings_source_src_10001.paid_at AS paid_at__day
     , DATE_TRUNC('week', bookings_source_src_10001.paid_at) AS paid_at__week
     , DATE_TRUNC('month', bookings_source_src_10001.paid_at) AS paid_at__month
@@ -54,8 +54,8 @@ FROM (
     , EXTRACT(MONTH FROM bookings_source_src_10001.paid_at) AS paid_at__extract_month
     , EXTRACT(WEEK FROM bookings_source_src_10001.paid_at) AS paid_at__extract_week
     , EXTRACT(DAY FROM bookings_source_src_10001.paid_at) AS paid_at__extract_day
-    , EXTRACT(DAYOFWEEK FROM bookings_source_src_10001.paid_at) AS paid_at__extract_dayofweek
-    , EXTRACT(DAYOFYEAR FROM bookings_source_src_10001.paid_at) AS paid_at__extract_dayofyear
+    , EXTRACT(DAYOFWEEK FROM bookings_source_src_10001.paid_at) AS paid_at__extract_dow
+    , EXTRACT(DAYOFYEAR FROM bookings_source_src_10001.paid_at) AS paid_at__extract_doy
     , bookings_source_src_10001.is_instant AS booking__is_instant
     , bookings_source_src_10001.ds AS booking__ds__day
     , DATE_TRUNC('week', bookings_source_src_10001.ds) AS booking__ds__week
@@ -67,8 +67,8 @@ FROM (
     , EXTRACT(MONTH FROM bookings_source_src_10001.ds) AS booking__ds__extract_month
     , EXTRACT(WEEK FROM bookings_source_src_10001.ds) AS booking__ds__extract_week
     , EXTRACT(DAY FROM bookings_source_src_10001.ds) AS booking__ds__extract_day
-    , EXTRACT(DAYOFWEEK FROM bookings_source_src_10001.ds) AS booking__ds__extract_dayofweek
-    , EXTRACT(DAYOFYEAR FROM bookings_source_src_10001.ds) AS booking__ds__extract_dayofyear
+    , EXTRACT(DAYOFWEEK FROM bookings_source_src_10001.ds) AS booking__ds__extract_dow
+    , EXTRACT(DAYOFYEAR FROM bookings_source_src_10001.ds) AS booking__ds__extract_doy
     , bookings_source_src_10001.ds_partitioned AS booking__ds_partitioned__day
     , DATE_TRUNC('week', bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__week
     , DATE_TRUNC('month', bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__month
@@ -79,8 +79,8 @@ FROM (
     , EXTRACT(MONTH FROM bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__extract_month
     , EXTRACT(WEEK FROM bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__extract_week
     , EXTRACT(DAY FROM bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__extract_day
-    , EXTRACT(DAYOFWEEK FROM bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__extract_dayofweek
-    , EXTRACT(DAYOFYEAR FROM bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__extract_dayofyear
+    , EXTRACT(DAYOFWEEK FROM bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__extract_dow
+    , EXTRACT(DAYOFYEAR FROM bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__extract_doy
     , bookings_source_src_10001.paid_at AS booking__paid_at__day
     , DATE_TRUNC('week', bookings_source_src_10001.paid_at) AS booking__paid_at__week
     , DATE_TRUNC('month', bookings_source_src_10001.paid_at) AS booking__paid_at__month
@@ -91,8 +91,8 @@ FROM (
     , EXTRACT(MONTH FROM bookings_source_src_10001.paid_at) AS booking__paid_at__extract_month
     , EXTRACT(WEEK FROM bookings_source_src_10001.paid_at) AS booking__paid_at__extract_week
     , EXTRACT(DAY FROM bookings_source_src_10001.paid_at) AS booking__paid_at__extract_day
-    , EXTRACT(DAYOFWEEK FROM bookings_source_src_10001.paid_at) AS booking__paid_at__extract_dayofweek
-    , EXTRACT(DAYOFYEAR FROM bookings_source_src_10001.paid_at) AS booking__paid_at__extract_dayofyear
+    , EXTRACT(DAYOFWEEK FROM bookings_source_src_10001.paid_at) AS booking__paid_at__extract_dow
+    , EXTRACT(DAYOFYEAR FROM bookings_source_src_10001.paid_at) AS booking__paid_at__extract_doy
     , bookings_source_src_10001.listing_id AS listing
     , bookings_source_src_10001.guest_id AS guest
     , bookings_source_src_10001.host_id AS host

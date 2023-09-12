@@ -17,8 +17,8 @@ class DatePart(Enum):
     MONTH = "month"
     WEEK = "week"
     DAY = "day"
-    DAYOFWEEK = "dayofweek"
-    DAYOFYEAR = "dayofyear"
+    DAYOFWEEK = "dow"
+    DAYOFYEAR = "doy"
 
     def to_int(self) -> int:
         """Convert to an int so that the size of the granularity can be easily compared."""

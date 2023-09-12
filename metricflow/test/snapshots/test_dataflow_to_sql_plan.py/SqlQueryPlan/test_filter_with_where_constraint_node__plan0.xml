@@ -134,11 +134,11 @@
                 <!-- col25 =                                             -->
                 <!--   {'class': 'SqlSelectColumn',                      -->
                 <!--    'expr': SqlExtractExpression(node_id=ex_10019),  -->
-                <!--    'column_alias': 'ds__extract_dayofweek'}         -->
+                <!--    'column_alias': 'ds__extract_dow'}               -->
                 <!-- col26 =                                             -->
                 <!--   {'class': 'SqlSelectColumn',                      -->
                 <!--    'expr': SqlExtractExpression(node_id=ex_10020),  -->
-                <!--    'column_alias': 'ds__extract_dayofyear'}         -->
+                <!--    'column_alias': 'ds__extract_doy'}               -->
                 <!-- col27 =                                                     -->
                 <!--   {'class': 'SqlSelectColumn',                              -->
                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10022),  -->
@@ -179,14 +179,14 @@
                 <!--   {'class': 'SqlSelectColumn',                      -->
                 <!--    'expr': SqlExtractExpression(node_id=ex_10025),  -->
                 <!--    'column_alias': 'ds_partitioned__extract_day'}   -->
-                <!-- col37 =                                                  -->
-                <!--   {'class': 'SqlSelectColumn',                           -->
-                <!--    'expr': SqlExtractExpression(node_id=ex_10026),       -->
-                <!--    'column_alias': 'ds_partitioned__extract_dayofweek'}  -->
-                <!-- col38 =                                                  -->
-                <!--   {'class': 'SqlSelectColumn',                           -->
-                <!--    'expr': SqlExtractExpression(node_id=ex_10027),       -->
-                <!--    'column_alias': 'ds_partitioned__extract_dayofyear'}  -->
+                <!-- col37 =                                             -->
+                <!--   {'class': 'SqlSelectColumn',                      -->
+                <!--    'expr': SqlExtractExpression(node_id=ex_10026),  -->
+                <!--    'column_alias': 'ds_partitioned__extract_dow'}   -->
+                <!-- col38 =                                             -->
+                <!--   {'class': 'SqlSelectColumn',                      -->
+                <!--    'expr': SqlExtractExpression(node_id=ex_10027),  -->
+                <!--    'column_alias': 'ds_partitioned__extract_doy'}   -->
                 <!-- col39 =                                                     -->
                 <!--   {'class': 'SqlSelectColumn',                              -->
                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10023),  -->
@@ -230,11 +230,11 @@
                 <!-- col49 =                                             -->
                 <!--   {'class': 'SqlSelectColumn',                      -->
                 <!--    'expr': SqlExtractExpression(node_id=ex_10033),  -->
-                <!--    'column_alias': 'paid_at__extract_dayofweek'}    -->
+                <!--    'column_alias': 'paid_at__extract_dow'}          -->
                 <!-- col50 =                                             -->
                 <!--   {'class': 'SqlSelectColumn',                      -->
                 <!--    'expr': SqlExtractExpression(node_id=ex_10034),  -->
-                <!--    'column_alias': 'paid_at__extract_dayofyear'}    -->
+                <!--    'column_alias': 'paid_at__extract_doy'}          -->
                 <!-- col51 =                                                     -->
                 <!--   {'class': 'SqlSelectColumn',                              -->
                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10024),  -->
@@ -279,14 +279,14 @@
                 <!--   {'class': 'SqlSelectColumn',                      -->
                 <!--    'expr': SqlExtractExpression(node_id=ex_10039),  -->
                 <!--    'column_alias': 'booking__ds__extract_day'}      -->
-                <!-- col62 =                                               -->
-                <!--   {'class': 'SqlSelectColumn',                        -->
-                <!--    'expr': SqlExtractExpression(node_id=ex_10040),    -->
-                <!--    'column_alias': 'booking__ds__extract_dayofweek'}  -->
-                <!-- col63 =                                               -->
-                <!--   {'class': 'SqlSelectColumn',                        -->
-                <!--    'expr': SqlExtractExpression(node_id=ex_10041),    -->
-                <!--    'column_alias': 'booking__ds__extract_dayofyear'}  -->
+                <!-- col62 =                                             -->
+                <!--   {'class': 'SqlSelectColumn',                      -->
+                <!--    'expr': SqlExtractExpression(node_id=ex_10040),  -->
+                <!--    'column_alias': 'booking__ds__extract_dow'}      -->
+                <!-- col63 =                                             -->
+                <!--   {'class': 'SqlSelectColumn',                      -->
+                <!--    'expr': SqlExtractExpression(node_id=ex_10041),  -->
+                <!--    'column_alias': 'booking__ds__extract_doy'}      -->
                 <!-- col64 =                                                     -->
                 <!--   {'class': 'SqlSelectColumn',                              -->
                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10026),  -->
@@ -327,14 +327,14 @@
                 <!--   {'class': 'SqlSelectColumn',                              -->
                 <!--    'expr': SqlExtractExpression(node_id=ex_10046),          -->
                 <!--    'column_alias': 'booking__ds_partitioned__extract_day'}  -->
-                <!-- col74 =                                                           -->
-                <!--   {'class': 'SqlSelectColumn',                                    -->
-                <!--    'expr': SqlExtractExpression(node_id=ex_10047),                -->
-                <!--    'column_alias': 'booking__ds_partitioned__extract_dayofweek'}  -->
-                <!-- col75 =                                                           -->
-                <!--   {'class': 'SqlSelectColumn',                                    -->
-                <!--    'expr': SqlExtractExpression(node_id=ex_10048),                -->
-                <!--    'column_alias': 'booking__ds_partitioned__extract_dayofyear'}  -->
+                <!-- col74 =                                                     -->
+                <!--   {'class': 'SqlSelectColumn',                              -->
+                <!--    'expr': SqlExtractExpression(node_id=ex_10047),          -->
+                <!--    'column_alias': 'booking__ds_partitioned__extract_dow'}  -->
+                <!-- col75 =                                                     -->
+                <!--   {'class': 'SqlSelectColumn',                              -->
+                <!--    'expr': SqlExtractExpression(node_id=ex_10048),          -->
+                <!--    'column_alias': 'booking__ds_partitioned__extract_doy'}  -->
                 <!-- col76 =                                                     -->
                 <!--   {'class': 'SqlSelectColumn',                              -->
                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10027),  -->
@@ -375,14 +375,14 @@
                 <!--   {'class': 'SqlSelectColumn',                       -->
                 <!--    'expr': SqlExtractExpression(node_id=ex_10053),   -->
                 <!--    'column_alias': 'booking__paid_at__extract_day'}  -->
-                <!-- col86 =                                                    -->
-                <!--   {'class': 'SqlSelectColumn',                             -->
-                <!--    'expr': SqlExtractExpression(node_id=ex_10054),         -->
-                <!--    'column_alias': 'booking__paid_at__extract_dayofweek'}  -->
-                <!-- col87 =                                                    -->
-                <!--   {'class': 'SqlSelectColumn',                             -->
-                <!--    'expr': SqlExtractExpression(node_id=ex_10055),         -->
-                <!--    'column_alias': 'booking__paid_at__extract_dayofyear'}  -->
+                <!-- col86 =                                              -->
+                <!--   {'class': 'SqlSelectColumn',                       -->
+                <!--    'expr': SqlExtractExpression(node_id=ex_10054),   -->
+                <!--    'column_alias': 'booking__paid_at__extract_dow'}  -->
+                <!-- col87 =                                              -->
+                <!--   {'class': 'SqlSelectColumn',                       -->
+                <!--    'expr': SqlExtractExpression(node_id=ex_10055),   -->
+                <!--    'column_alias': 'booking__paid_at__extract_doy'}  -->
                 <!-- col88 =                                                     -->
                 <!--   {'class': 'SqlSelectColumn',                              -->
                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10028),  -->
