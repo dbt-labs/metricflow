@@ -89,6 +89,7 @@ from metricflow.sql.sql_exprs import (
     SqlComparisonExpression,
     SqlDateTruncExpression,
     SqlExpressionNode,
+    SqlExtractExpression,
     SqlFunctionExpression,
     SqlLogicalExpression,
     SqlLogicalOperator,
@@ -292,7 +293,8 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             metric_time_dimension_spec
         ).column_name
 
-        # assemble dataset with metric_time_dimension to join
+        # Assemble time_spine dataset with metric_time_dimension to join.
+        # Granularity of time_spine column should match granularity of metric_time column from parent dataset.
         assert metric_time_dimension_instance
         time_spine_data_set = self._make_time_spine_data_set(
             metric_time_dimension_instance=metric_time_dimension_instance,
@@ -1354,11 +1356,11 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
             len(time_spine_dataset.instance_set.time_dimension_instances) == 1
             and len(time_spine_dataset.sql_select_node.select_columns) == 1
         ), "Time spine dataset not configured properly. Expected exactly one column."
-        original_time_dim_instance = time_spine_dataset.instance_set.time_dimension_instances[0]
+        time_dim_instance = time_spine_dataset.instance_set.time_dimension_instances[0]
         time_spine_column_select_expr: Union[
             SqlColumnReferenceExpression, SqlDateTruncExpression
         ] = SqlColumnReferenceExpression(
-            SqlColumnReference(table_alias=time_spine_alias, column_name=original_time_dim_instance.spec.qualified_name)
+            SqlColumnReference(table_alias=time_spine_alias, column_name=time_dim_instance.spec.qualified_name)
         )
 
         # Add requested granularities (skip for default granularity) and date_parts.
@@ -1366,28 +1368,15 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
         metric_time_dimension_instances = []
         where: Optional[SqlExpressionNode] = None
         for metric_time_dimension_spec in node.metric_time_dimension_specs:
+            # Apply granularity to SQL.
             if metric_time_dimension_spec.time_granularity == self._time_spine_source.time_column_granularity:
-                select_expr = time_spine_column_select_expr
-                time_dim_instance = original_time_dim_instance
-                column_alias = original_time_dim_instance.associated_column.column_name
+                select_expr: SqlExpressionNode = time_spine_column_select_expr
             else:
                 select_expr = SqlDateTruncExpression(
                     time_granularity=metric_time_dimension_spec.time_granularity, arg=time_spine_column_select_expr
                 )
-                new_time_dim_spec = TimeDimensionSpec(
-                    element_name=original_time_dim_instance.spec.element_name,
-                    entity_links=original_time_dim_instance.spec.entity_links,
-                    time_granularity=metric_time_dimension_spec.time_granularity,
-                    date_part=metric_time_dimension_spec.date_part,
-                    aggregation_state=original_time_dim_instance.spec.aggregation_state,
-                )
-                time_dim_instance = TimeDimensionInstance(
-                    defined_from=original_time_dim_instance.defined_from,
-                    associated_columns=(self._column_association_resolver.resolve_spec(new_time_dim_spec),),
-                    spec=new_time_dim_spec,
-                )
-                column_alias = time_dim_instance.associated_column.column_name
                 if node.offset_to_grain:
+                    # TODO: allow offset_to_grain w/ granularity & datepart? what's the expected behavior?
                     # Filter down to one row per granularity period
                     new_filter = SqlComparisonExpression(
                         left_expr=select_expr, comparison=SqlComparison.EQUALS, right_expr=time_spine_column_select_expr
@@ -1396,8 +1385,25 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                         where = new_filter
                     else:
                         where = SqlLogicalExpression(operator=SqlLogicalOperator.OR, args=(where, new_filter))
+            # Apply date_part to SQL.
+            if metric_time_dimension_spec.date_part:
+                select_expr = SqlExtractExpression(date_part=metric_time_dimension_spec.date_part, arg=select_expr)
+            time_dim_spec = TimeDimensionSpec(
+                element_name=time_dim_instance.spec.element_name,
+                entity_links=time_dim_instance.spec.entity_links,
+                time_granularity=metric_time_dimension_spec.time_granularity,
+                date_part=metric_time_dimension_spec.date_part,
+                aggregation_state=time_dim_instance.spec.aggregation_state,
+            )
+            time_dim_instance = TimeDimensionInstance(
+                defined_from=time_dim_instance.defined_from,
+                associated_columns=(self._column_association_resolver.resolve_spec(time_dim_spec),),
+                spec=time_dim_spec,
+            )
             metric_time_dimension_instances.append(time_dim_instance)
-            metric_time_select_columns.append(SqlSelectColumn(expr=select_expr, column_alias=column_alias))
+            metric_time_select_columns.append(
+                SqlSelectColumn(expr=select_expr, column_alias=time_dim_instance.associated_column.column_name)
+            )
         metric_time_instance_set = InstanceSet(time_dimension_instances=tuple(metric_time_dimension_instances))
 
         return SqlDataSet(

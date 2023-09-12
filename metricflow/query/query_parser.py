@@ -797,6 +797,7 @@ class MetricFlowQueryParser:
                                 element_name=parsed_name.element_name,
                                 entity_links=entity_links,
                                 time_granularity=parsed_name.time_granularity,
+                                date_part=parsed_name.date_part,
                             ),
                             descending=descending,
                         )

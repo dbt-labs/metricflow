@@ -23,6 +23,7 @@ from metricflow.sql.sql_exprs import (
     SqlColumnReference,
     SqlColumnReferenceExpression,
     SqlDateTruncExpression,
+    SqlExtractExpression,
     SqlPercentileExpression,
     SqlPercentileExpressionArgument,
     SqlPercentileFunctionType,
@@ -39,6 +40,7 @@ from metricflow.test.integration.configured_test_case import (
 from metricflow.test.time.configurable_time_source import (
     ConfigurableTimeSource,
 )
+from metricflow.time.date_part import DatePart
 
 logger = logging.getLogger(__name__)
 
@@ -91,6 +93,19 @@ class CheckQueryHelpers:
         """Return the DATE_TRUNC() call that can be used for converting the given expr to the granularity."""
         renderable_expr = SqlDateTruncExpression(
             time_granularity=granularity,
+            arg=SqlCastToTimestampExpression(
+                arg=SqlStringExpression(
+                    sql_expr=expr,
+                    requires_parenthesis=False,
+                )
+            ),
+        )
+        return self._sql_client.sql_query_plan_renderer.expr_renderer.render_sql_expr(renderable_expr).sql
+
+    def render_extract(self, expr: str, date_part: DatePart) -> str:
+        """Return the EXTRACT call that can be used for converting the given expr to the date_part."""
+        renderable_expr = SqlExtractExpression(
+            date_part=date_part,
             arg=SqlCastToTimestampExpression(
                 arg=SqlStringExpression(
                     sql_expr=expr,
@@ -252,8 +267,10 @@ def test_case(
                 source_schema=mf_test_session_state.mf_source_schema,
                 render_time_constraint=check_query_helpers.render_time_constraint,
                 TimeGranularity=TimeGranularity,
+                DatePart=DatePart,
                 render_date_sub=check_query_helpers.render_date_sub,
                 render_date_trunc=check_query_helpers.render_date_trunc,
+                render_extract=check_query_helpers.render_extract,
                 render_percentile_expr=check_query_helpers.render_percentile_expr,
                 mf_time_spine_source=semantic_manifest_lookup.time_spine_source.spine_table.sql,
                 double_data_type_name=check_query_helpers.double_data_type_name,
@@ -277,8 +294,10 @@ def test_case(
             source_schema=mf_test_session_state.mf_source_schema,
             render_time_constraint=check_query_helpers.render_time_constraint,
             TimeGranularity=TimeGranularity,
+            DatePart=DatePart,
             render_date_sub=check_query_helpers.render_date_sub,
             render_date_trunc=check_query_helpers.render_date_trunc,
+            render_extract=check_query_helpers.render_extract,
             render_percentile_expr=check_query_helpers.render_percentile_expr,
             mf_time_spine_source=semantic_manifest_lookup.time_spine_source.spine_table.sql,
             double_data_type_name=check_query_helpers.double_data_type_name,

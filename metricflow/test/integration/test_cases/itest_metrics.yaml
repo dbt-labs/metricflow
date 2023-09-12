@@ -1053,7 +1053,31 @@ integration_test:
   check_query: |
     SELECT
       SUM(1) AS bookings
-      , EXTRACT(DAYOFWEEK FROM ds) AS metric_time__extract_dayofweek
+      , {{ render_extract("ds", DatePart.DAYOFWEEK) }} AS metric_time__extract_dayofweek
     FROM {{ source_schema }}.fct_bookings
-    GROUP BY EXTRACT(DAYOFWEEK FROM ds);
-# TODO: test with cumulative metric, offset metric, others?
+    GROUP BY {{ render_extract("ds", DatePart.DAYOFWEEK) }};
+---
+integration_test:
+  name: derived_metric_offset_window_and_date_part
+  description: Tests a derived metric offset query with window and date_part
+  model: SIMPLE_MODEL
+  metrics: ["bookings_5_day_lag"]
+  group_bys: ["metric_time__extract_month"]
+  check_query: |
+    SELECT
+      {{ render_extract("a.ds", DatePart.MONTH) }} AS metric_time__extract_month
+      , SUM(b.bookings_5_day_lag) AS bookings_5_day_lag
+    FROM {{ mf_time_spine_source }} a
+    INNER JOIN (
+      SELECT
+        ds AS metric_time__day
+        , 1 AS bookings_5_day_lag
+      FROM {{ source_schema }}.fct_bookings
+    ) b
+    ON {{ render_date_sub("a", "ds", 5, TimeGranularity.DAY) }} = b.metric_time__day
+    GROUP BY metric_time__extract_month
+
+# TODO:
+# test each date part syntax with each engine
+# dataflow plan tests?
+# dataflow to sql tests?
