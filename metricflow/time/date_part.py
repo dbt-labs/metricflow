@@ -17,16 +17,16 @@ class DatePart(Enum):
     MONTH = "month"
     WEEK = "week"
     DAY = "day"
-    DAYOFWEEK = "dow"
-    DAYOFYEAR = "doy"
+    DOW = "dow"
+    DOY = "doy"
 
     def to_int(self) -> int:
         """Convert to an int so that the size of the granularity can be easily compared."""
         if self is DatePart.DAY:
             return TimeGranularity.DAY.to_int()
-        elif self is DatePart.DAYOFWEEK:
+        elif self is DatePart.DOW:
             return TimeGranularity.DAY.to_int()
-        elif self is DatePart.DAYOFYEAR:
+        elif self is DatePart.DOY:
             return TimeGranularity.DAY.to_int()
         elif self is DatePart.WEEK:
             return TimeGranularity.WEEK.to_int()

@@ -1067,15 +1067,15 @@ integration_test:
     SELECT
       SUM(1) AS bookings
       , {{ render_extract("ds", DatePart.QUARTER) }} AS metric_time__extract_quarter
-      , {{ render_extract("ds", DatePart.DAYOFWEEK) }} AS metric_time__extract_dow
-      , {{ render_extract("ds", DatePart.DAYOFYEAR) }} AS metric_time__extract_doy
+      , {{ render_extract("ds", DatePart.DOW) }} AS metric_time__extract_dow
+      , {{ render_extract("ds", DatePart.DOY) }} AS metric_time__extract_doy
       , {{ render_extract("ds", DatePart.DAY) }} AS metric_time__extract_day
       , {{ render_extract("ds", DatePart.WEEK) }} AS metric_time__extract_week
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       {{ render_extract("ds", DatePart.QUARTER) }}
-      , {{ render_extract("ds", DatePart.DAYOFWEEK) }}
-      , {{ render_extract("ds", DatePart.DAYOFYEAR) }}
+      , {{ render_extract("ds", DatePart.DOW) }}
+      , {{ render_extract("ds", DatePart.DOY) }}
       , {{ render_extract("ds", DatePart.DAY) }}
       , {{ render_extract("ds", DatePart.WEEK) }};
 ---

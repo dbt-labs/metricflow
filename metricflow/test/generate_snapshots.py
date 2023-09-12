@@ -70,30 +70,30 @@ class MetricFlowTestCredentialSetForAllEngines(FrozenBaseModel):  # noqa: D
     @property
     def as_configurations(self) -> Sequence[MetricFlowTestConfiguration]:  # noqa: D
         return (
-            MetricFlowTestConfiguration(
-                engine=SqlEngine.DUCKDB,
-                credential_set=self.duck_db,
-            ),
-            MetricFlowTestConfiguration(
-                engine=SqlEngine.REDSHIFT,
-                credential_set=self.redshift,
-            ),
-            MetricFlowTestConfiguration(
-                engine=SqlEngine.SNOWFLAKE,
-                credential_set=self.snowflake,
-            ),
+            # MetricFlowTestConfiguration(
+            #     engine=SqlEngine.DUCKDB,
+            #     credential_set=self.duck_db,
+            # ),
+            # MetricFlowTestConfiguration(
+            #     engine=SqlEngine.REDSHIFT,
+            #     credential_set=self.redshift,
+            # ),
+            # MetricFlowTestConfiguration(
+            #     engine=SqlEngine.SNOWFLAKE,
+            #     credential_set=self.snowflake,
+            # ),
             MetricFlowTestConfiguration(
                 engine=SqlEngine.BIGQUERY,
                 credential_set=self.big_query,
             ),
-            MetricFlowTestConfiguration(
-                engine=SqlEngine.DATABRICKS,
-                credential_set=self.databricks,
-            ),
-            MetricFlowTestConfiguration(
-                engine=SqlEngine.POSTGRES,
-                credential_set=self.postgres,
-            ),
+            # MetricFlowTestConfiguration(
+            #     engine=SqlEngine.DATABRICKS,
+            #     credential_set=self.databricks,
+            # ),
+            # MetricFlowTestConfiguration(
+            #     engine=SqlEngine.POSTGRES,
+            #     credential_set=self.postgres,
+            # ),
         )
 
 

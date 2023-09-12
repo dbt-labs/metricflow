@@ -279,7 +279,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
 
     def render_date_part(self, date_part: DatePart) -> str:
         """Render DATE PART for an EXTRACT expression."""
-        return date_part.name
+        return date_part.value
 
     def visit_time_delta_expr(self, node: SqlTimeDeltaExpression) -> SqlExpressionRenderResult:  # noqa: D
         arg_rendered = node.arg.accept(self)

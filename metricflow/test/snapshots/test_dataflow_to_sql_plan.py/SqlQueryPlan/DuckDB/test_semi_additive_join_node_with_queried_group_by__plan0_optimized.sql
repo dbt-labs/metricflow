@@ -42,26 +42,26 @@ FROM (
     , DATE_TRUNC('month', ds) AS ds__month
     , DATE_TRUNC('quarter', ds) AS ds__quarter
     , DATE_TRUNC('year', ds) AS ds__year
-    , EXTRACT(YEAR FROM ds) AS ds__extract_year
-    , EXTRACT(QUARTER FROM ds) AS ds__extract_quarter
-    , EXTRACT(MONTH FROM ds) AS ds__extract_month
-    , EXTRACT(WEEK FROM ds) AS ds__extract_week
-    , EXTRACT(DAY FROM ds) AS ds__extract_day
-    , EXTRACT(DAYOFWEEK FROM ds) AS ds__extract_dow
-    , EXTRACT(DAYOFYEAR FROM ds) AS ds__extract_doy
+    , EXTRACT(year FROM ds) AS ds__extract_year
+    , EXTRACT(quarter FROM ds) AS ds__extract_quarter
+    , EXTRACT(month FROM ds) AS ds__extract_month
+    , EXTRACT(week FROM ds) AS ds__extract_week
+    , EXTRACT(day FROM ds) AS ds__extract_day
+    , EXTRACT(dow FROM ds) AS ds__extract_dow
+    , EXTRACT(doy FROM ds) AS ds__extract_doy
     , account_type
     , ds AS account__ds__day
     , DATE_TRUNC('week', ds) AS account__ds__week
     , DATE_TRUNC('month', ds) AS account__ds__month
     , DATE_TRUNC('quarter', ds) AS account__ds__quarter
     , DATE_TRUNC('year', ds) AS account__ds__year
-    , EXTRACT(YEAR FROM ds) AS account__ds__extract_year
-    , EXTRACT(QUARTER FROM ds) AS account__ds__extract_quarter
-    , EXTRACT(MONTH FROM ds) AS account__ds__extract_month
-    , EXTRACT(WEEK FROM ds) AS account__ds__extract_week
-    , EXTRACT(DAY FROM ds) AS account__ds__extract_day
-    , EXTRACT(DAYOFWEEK FROM ds) AS account__ds__extract_dow
-    , EXTRACT(DAYOFYEAR FROM ds) AS account__ds__extract_doy
+    , EXTRACT(year FROM ds) AS account__ds__extract_year
+    , EXTRACT(quarter FROM ds) AS account__ds__extract_quarter
+    , EXTRACT(month FROM ds) AS account__ds__extract_month
+    , EXTRACT(week FROM ds) AS account__ds__extract_week
+    , EXTRACT(day FROM ds) AS account__ds__extract_day
+    , EXTRACT(dow FROM ds) AS account__ds__extract_dow
+    , EXTRACT(doy FROM ds) AS account__ds__extract_doy
     , account_type AS account__account_type
     , user_id AS user
     , user_id AS account__user

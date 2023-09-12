@@ -66,10 +66,10 @@ def test_convert_table_semantic_model_without_measures(  # noqa: D
                 element_name="ds", entity_links=(), time_granularity=TimeGranularity.DAY, date_part=DatePart.DAY
             ),
             TimeDimensionSpec(
-                element_name="ds", entity_links=(), time_granularity=TimeGranularity.DAY, date_part=DatePart.DAYOFWEEK
+                element_name="ds", entity_links=(), time_granularity=TimeGranularity.DAY, date_part=DatePart.DOW
             ),
             TimeDimensionSpec(
-                element_name="ds", entity_links=(), time_granularity=TimeGranularity.DAY, date_part=DatePart.DAYOFYEAR
+                element_name="ds", entity_links=(), time_granularity=TimeGranularity.DAY, date_part=DatePart.DOY
             ),
             TimeDimensionSpec(
                 element_name="ds",
@@ -130,13 +130,13 @@ def test_convert_table_semantic_model_without_measures(  # noqa: D
                 element_name="ds",
                 entity_links=(EntityReference(element_name="user"),),
                 time_granularity=TimeGranularity.DAY,
-                date_part=DatePart.DAYOFWEEK,
+                date_part=DatePart.DOW,
             ),
             TimeDimensionSpec(
                 element_name="ds",
                 entity_links=(EntityReference(element_name="user"),),
                 time_granularity=TimeGranularity.DAY,
-                date_part=DatePart.DAYOFYEAR,
+                date_part=DatePart.DOY,
             ),
         ),
     )
@@ -205,10 +205,10 @@ def test_convert_table_semantic_model_with_measures(  # noqa: D
                 element_name="ds", entity_links=(), time_granularity=TimeGranularity.DAY, date_part=DatePart.DAY
             ),
             TimeDimensionSpec(
-                element_name="ds", entity_links=(), time_granularity=TimeGranularity.DAY, date_part=DatePart.DAYOFWEEK
+                element_name="ds", entity_links=(), time_granularity=TimeGranularity.DAY, date_part=DatePart.DOW
             ),
             TimeDimensionSpec(
-                element_name="ds", entity_links=(), time_granularity=TimeGranularity.DAY, date_part=DatePart.DAYOFYEAR
+                element_name="ds", entity_links=(), time_granularity=TimeGranularity.DAY, date_part=DatePart.DOY
             ),
             TimeDimensionSpec(element_name="ds_partitioned", entity_links=(), time_granularity=TimeGranularity.DAY),
             TimeDimensionSpec(element_name="ds_partitioned", entity_links=(), time_granularity=TimeGranularity.WEEK),
@@ -249,13 +249,13 @@ def test_convert_table_semantic_model_with_measures(  # noqa: D
                 element_name="ds_partitioned",
                 entity_links=(),
                 time_granularity=TimeGranularity.DAY,
-                date_part=DatePart.DAYOFWEEK,
+                date_part=DatePart.DOW,
             ),
             TimeDimensionSpec(
                 element_name="ds_partitioned",
                 entity_links=(),
                 time_granularity=TimeGranularity.DAY,
-                date_part=DatePart.DAYOFYEAR,
+                date_part=DatePart.DOY,
             ),
             TimeDimensionSpec(
                 element_name="ds",
@@ -316,13 +316,13 @@ def test_convert_table_semantic_model_with_measures(  # noqa: D
                 element_name="ds",
                 entity_links=(EntityReference(element_name="verification"),),
                 time_granularity=TimeGranularity.DAY,
-                date_part=DatePart.DAYOFWEEK,
+                date_part=DatePart.DOW,
             ),
             TimeDimensionSpec(
                 element_name="ds",
                 entity_links=(EntityReference(element_name="verification"),),
                 time_granularity=TimeGranularity.DAY,
-                date_part=DatePart.DAYOFYEAR,
+                date_part=DatePart.DOY,
             ),
             TimeDimensionSpec(
                 element_name="ds_partitioned",
@@ -383,13 +383,13 @@ def test_convert_table_semantic_model_with_measures(  # noqa: D
                 element_name="ds_partitioned",
                 entity_links=(EntityReference(element_name="verification"),),
                 time_granularity=TimeGranularity.DAY,
-                date_part=DatePart.DAYOFWEEK,
+                date_part=DatePart.DOW,
             ),
             TimeDimensionSpec(
                 element_name="ds_partitioned",
                 entity_links=(EntityReference(element_name="verification"),),
                 time_granularity=TimeGranularity.DAY,
-                date_part=DatePart.DAYOFYEAR,
+                date_part=DatePart.DOY,
             ),
         ),
     )

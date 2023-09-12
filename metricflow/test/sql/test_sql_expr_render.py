@@ -197,9 +197,9 @@ def test_date_trunc_expr(default_expr_renderer: DefaultSqlExpressionRenderer) ->
 
 def test_extract_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D
     actual = default_expr_renderer.render_sql_expr(
-        SqlExtractExpression(date_part=DatePart.DAYOFYEAR, arg=SqlStringExpression("ds"))
+        SqlExtractExpression(date_part=DatePart.DOY, arg=SqlStringExpression("ds"))
     ).sql
-    assert actual == "EXTRACT(DAYOFYEAR FROM ds)"
+    assert actual == "EXTRACT(doy FROM ds)"
 
 
 def test_ratio_computation_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D

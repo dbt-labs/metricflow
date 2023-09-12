@@ -10,8 +10,8 @@ SELECT
   , subq_0.ds__extract_month AS ds__extract_month
   , subq_0.ds__extract_week AS ds__extract_week
   , subq_0.ds__extract_day AS ds__extract_day
-  , subq_0.ds__extract_dayofweek AS ds__extract_dayofweek
-  , subq_0.ds__extract_dayofyear AS ds__extract_dayofyear
+  , subq_0.ds__extract_dow AS ds__extract_dow
+  , subq_0.ds__extract_doy AS ds__extract_doy
   , subq_0.account__ds__day AS account__ds__day
   , subq_0.account__ds__week AS account__ds__week
   , subq_0.account__ds__month AS account__ds__month
@@ -22,8 +22,8 @@ SELECT
   , subq_0.account__ds__extract_month AS account__ds__extract_month
   , subq_0.account__ds__extract_week AS account__ds__extract_week
   , subq_0.account__ds__extract_day AS account__ds__extract_day
-  , subq_0.account__ds__extract_dayofweek AS account__ds__extract_dayofweek
-  , subq_0.account__ds__extract_dayofyear AS account__ds__extract_dayofyear
+  , subq_0.account__ds__extract_dow AS account__ds__extract_dow
+  , subq_0.account__ds__extract_doy AS account__ds__extract_doy
   , subq_0.user AS user
   , subq_0.account__user AS account__user
   , subq_0.account_type AS account_type
@@ -42,26 +42,26 @@ FROM (
     , DATE_TRUNC('month', accounts_source_src_10000.ds) AS ds__month
     , DATE_TRUNC('quarter', accounts_source_src_10000.ds) AS ds__quarter
     , DATE_TRUNC('year', accounts_source_src_10000.ds) AS ds__year
-    , EXTRACT(YEAR FROM accounts_source_src_10000.ds) AS ds__extract_year
-    , EXTRACT(QUARTER FROM accounts_source_src_10000.ds) AS ds__extract_quarter
-    , EXTRACT(MONTH FROM accounts_source_src_10000.ds) AS ds__extract_month
-    , EXTRACT(WEEK FROM accounts_source_src_10000.ds) AS ds__extract_week
-    , EXTRACT(DAY FROM accounts_source_src_10000.ds) AS ds__extract_day
-    , EXTRACT(DAYOFWEEK FROM accounts_source_src_10000.ds) AS ds__extract_dayofweek
-    , EXTRACT(DAYOFYEAR FROM accounts_source_src_10000.ds) AS ds__extract_dayofyear
+    , EXTRACT(year FROM accounts_source_src_10000.ds) AS ds__extract_year
+    , EXTRACT(quarter FROM accounts_source_src_10000.ds) AS ds__extract_quarter
+    , EXTRACT(month FROM accounts_source_src_10000.ds) AS ds__extract_month
+    , EXTRACT(week FROM accounts_source_src_10000.ds) AS ds__extract_week
+    , EXTRACT(day FROM accounts_source_src_10000.ds) AS ds__extract_day
+    , EXTRACT(dow FROM accounts_source_src_10000.ds) AS ds__extract_dow
+    , EXTRACT(doy FROM accounts_source_src_10000.ds) AS ds__extract_doy
     , accounts_source_src_10000.account_type
     , accounts_source_src_10000.ds AS account__ds__day
     , DATE_TRUNC('week', accounts_source_src_10000.ds) AS account__ds__week
     , DATE_TRUNC('month', accounts_source_src_10000.ds) AS account__ds__month
     , DATE_TRUNC('quarter', accounts_source_src_10000.ds) AS account__ds__quarter
     , DATE_TRUNC('year', accounts_source_src_10000.ds) AS account__ds__year
-    , EXTRACT(YEAR FROM accounts_source_src_10000.ds) AS account__ds__extract_year
-    , EXTRACT(QUARTER FROM accounts_source_src_10000.ds) AS account__ds__extract_quarter
-    , EXTRACT(MONTH FROM accounts_source_src_10000.ds) AS account__ds__extract_month
-    , EXTRACT(WEEK FROM accounts_source_src_10000.ds) AS account__ds__extract_week
-    , EXTRACT(DAY FROM accounts_source_src_10000.ds) AS account__ds__extract_day
-    , EXTRACT(DAYOFWEEK FROM accounts_source_src_10000.ds) AS account__ds__extract_dayofweek
-    , EXTRACT(DAYOFYEAR FROM accounts_source_src_10000.ds) AS account__ds__extract_dayofyear
+    , EXTRACT(year FROM accounts_source_src_10000.ds) AS account__ds__extract_year
+    , EXTRACT(quarter FROM accounts_source_src_10000.ds) AS account__ds__extract_quarter
+    , EXTRACT(month FROM accounts_source_src_10000.ds) AS account__ds__extract_month
+    , EXTRACT(week FROM accounts_source_src_10000.ds) AS account__ds__extract_week
+    , EXTRACT(day FROM accounts_source_src_10000.ds) AS account__ds__extract_day
+    , EXTRACT(dow FROM accounts_source_src_10000.ds) AS account__ds__extract_dow
+    , EXTRACT(doy FROM accounts_source_src_10000.ds) AS account__ds__extract_doy
     , accounts_source_src_10000.account_type AS account__account_type
     , accounts_source_src_10000.user_id AS user
     , accounts_source_src_10000.user_id AS account__user
@@ -83,26 +83,26 @@ INNER JOIN (
       , DATE_TRUNC('month', accounts_source_src_10000.ds) AS ds__month
       , DATE_TRUNC('quarter', accounts_source_src_10000.ds) AS ds__quarter
       , DATE_TRUNC('year', accounts_source_src_10000.ds) AS ds__year
-      , EXTRACT(YEAR FROM accounts_source_src_10000.ds) AS ds__extract_year
-      , EXTRACT(QUARTER FROM accounts_source_src_10000.ds) AS ds__extract_quarter
-      , EXTRACT(MONTH FROM accounts_source_src_10000.ds) AS ds__extract_month
-      , EXTRACT(WEEK FROM accounts_source_src_10000.ds) AS ds__extract_week
-      , EXTRACT(DAY FROM accounts_source_src_10000.ds) AS ds__extract_day
-      , EXTRACT(DAYOFWEEK FROM accounts_source_src_10000.ds) AS ds__extract_dayofweek
-      , EXTRACT(DAYOFYEAR FROM accounts_source_src_10000.ds) AS ds__extract_dayofyear
+      , EXTRACT(year FROM accounts_source_src_10000.ds) AS ds__extract_year
+      , EXTRACT(quarter FROM accounts_source_src_10000.ds) AS ds__extract_quarter
+      , EXTRACT(month FROM accounts_source_src_10000.ds) AS ds__extract_month
+      , EXTRACT(week FROM accounts_source_src_10000.ds) AS ds__extract_week
+      , EXTRACT(day FROM accounts_source_src_10000.ds) AS ds__extract_day
+      , EXTRACT(dow FROM accounts_source_src_10000.ds) AS ds__extract_dow
+      , EXTRACT(doy FROM accounts_source_src_10000.ds) AS ds__extract_doy
       , accounts_source_src_10000.account_type
       , accounts_source_src_10000.ds AS account__ds__day
       , DATE_TRUNC('week', accounts_source_src_10000.ds) AS account__ds__week
       , DATE_TRUNC('month', accounts_source_src_10000.ds) AS account__ds__month
       , DATE_TRUNC('quarter', accounts_source_src_10000.ds) AS account__ds__quarter
       , DATE_TRUNC('year', accounts_source_src_10000.ds) AS account__ds__year
-      , EXTRACT(YEAR FROM accounts_source_src_10000.ds) AS account__ds__extract_year
-      , EXTRACT(QUARTER FROM accounts_source_src_10000.ds) AS account__ds__extract_quarter
-      , EXTRACT(MONTH FROM accounts_source_src_10000.ds) AS account__ds__extract_month
-      , EXTRACT(WEEK FROM accounts_source_src_10000.ds) AS account__ds__extract_week
-      , EXTRACT(DAY FROM accounts_source_src_10000.ds) AS account__ds__extract_day
-      , EXTRACT(DAYOFWEEK FROM accounts_source_src_10000.ds) AS account__ds__extract_dayofweek
-      , EXTRACT(DAYOFYEAR FROM accounts_source_src_10000.ds) AS account__ds__extract_dayofyear
+      , EXTRACT(year FROM accounts_source_src_10000.ds) AS account__ds__extract_year
+      , EXTRACT(quarter FROM accounts_source_src_10000.ds) AS account__ds__extract_quarter
+      , EXTRACT(month FROM accounts_source_src_10000.ds) AS account__ds__extract_month
+      , EXTRACT(week FROM accounts_source_src_10000.ds) AS account__ds__extract_week
+      , EXTRACT(day FROM accounts_source_src_10000.ds) AS account__ds__extract_day
+      , EXTRACT(dow FROM accounts_source_src_10000.ds) AS account__ds__extract_dow
+      , EXTRACT(doy FROM accounts_source_src_10000.ds) AS account__ds__extract_doy
       , accounts_source_src_10000.account_type AS account__account_type
       , accounts_source_src_10000.user_id AS user
       , accounts_source_src_10000.user_id AS account__user

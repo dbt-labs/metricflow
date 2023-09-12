@@ -26,8 +26,8 @@ FROM (
         , subq_1.ds__extract_month
         , subq_1.ds__extract_week
         , subq_1.ds__extract_day
-        , subq_1.ds__extract_dayofweek
-        , subq_1.ds__extract_dayofyear
+        , subq_1.ds__extract_dow
+        , subq_1.ds__extract_doy
         , subq_1.company__ds__day
         , subq_1.company__ds__week
         , subq_1.company__ds__month
@@ -38,8 +38,8 @@ FROM (
         , subq_1.company__ds__extract_month
         , subq_1.company__ds__extract_week
         , subq_1.company__ds__extract_day
-        , subq_1.company__ds__extract_dayofweek
-        , subq_1.company__ds__extract_dayofyear
+        , subq_1.company__ds__extract_dow
+        , subq_1.company__ds__extract_doy
         , subq_1.metric_time__day
         , subq_1.metric_time__week
         , subq_1.metric_time__month
@@ -50,8 +50,8 @@ FROM (
         , subq_1.metric_time__extract_month
         , subq_1.metric_time__extract_week
         , subq_1.metric_time__extract_day
-        , subq_1.metric_time__extract_dayofweek
-        , subq_1.metric_time__extract_dayofyear
+        , subq_1.metric_time__extract_dow
+        , subq_1.metric_time__extract_doy
         , subq_1.user
         , subq_1.company__user
         , subq_1.txn_revenue
@@ -68,8 +68,8 @@ FROM (
           , subq_0.ds__extract_month
           , subq_0.ds__extract_week
           , subq_0.ds__extract_day
-          , subq_0.ds__extract_dayofweek
-          , subq_0.ds__extract_dayofyear
+          , subq_0.ds__extract_dow
+          , subq_0.ds__extract_doy
           , subq_0.company__ds__day
           , subq_0.company__ds__week
           , subq_0.company__ds__month
@@ -80,8 +80,8 @@ FROM (
           , subq_0.company__ds__extract_month
           , subq_0.company__ds__extract_week
           , subq_0.company__ds__extract_day
-          , subq_0.company__ds__extract_dayofweek
-          , subq_0.company__ds__extract_dayofyear
+          , subq_0.company__ds__extract_dow
+          , subq_0.company__ds__extract_doy
           , subq_0.ds__day AS metric_time__day
           , subq_0.ds__week AS metric_time__week
           , subq_0.ds__month AS metric_time__month
@@ -92,8 +92,8 @@ FROM (
           , subq_0.ds__extract_month AS metric_time__extract_month
           , subq_0.ds__extract_week AS metric_time__extract_week
           , subq_0.ds__extract_day AS metric_time__extract_day
-          , subq_0.ds__extract_dayofweek AS metric_time__extract_dayofweek
-          , subq_0.ds__extract_dayofyear AS metric_time__extract_dayofyear
+          , subq_0.ds__extract_dow AS metric_time__extract_dow
+          , subq_0.ds__extract_doy AS metric_time__extract_doy
           , subq_0.user
           , subq_0.company__user
           , subq_0.txn_revenue
@@ -106,25 +106,25 @@ FROM (
             , DATE_TRUNC('month', revenue_src_10006.created_at) AS ds__month
             , DATE_TRUNC('quarter', revenue_src_10006.created_at) AS ds__quarter
             , DATE_TRUNC('year', revenue_src_10006.created_at) AS ds__year
-            , EXTRACT(YEAR FROM revenue_src_10006.created_at) AS ds__extract_year
-            , EXTRACT(QUARTER FROM revenue_src_10006.created_at) AS ds__extract_quarter
-            , EXTRACT(MONTH FROM revenue_src_10006.created_at) AS ds__extract_month
-            , EXTRACT(WEEK FROM revenue_src_10006.created_at) AS ds__extract_week
-            , EXTRACT(DAY FROM revenue_src_10006.created_at) AS ds__extract_day
-            , EXTRACT(DAYOFWEEK FROM revenue_src_10006.created_at) AS ds__extract_dayofweek
-            , EXTRACT(DAYOFYEAR FROM revenue_src_10006.created_at) AS ds__extract_dayofyear
+            , EXTRACT(year FROM revenue_src_10006.created_at) AS ds__extract_year
+            , EXTRACT(quarter FROM revenue_src_10006.created_at) AS ds__extract_quarter
+            , EXTRACT(month FROM revenue_src_10006.created_at) AS ds__extract_month
+            , EXTRACT(week FROM revenue_src_10006.created_at) AS ds__extract_week
+            , EXTRACT(day FROM revenue_src_10006.created_at) AS ds__extract_day
+            , EXTRACT(dow FROM revenue_src_10006.created_at) AS ds__extract_dow
+            , EXTRACT(doy FROM revenue_src_10006.created_at) AS ds__extract_doy
             , revenue_src_10006.created_at AS company__ds__day
             , DATE_TRUNC('week', revenue_src_10006.created_at) AS company__ds__week
             , DATE_TRUNC('month', revenue_src_10006.created_at) AS company__ds__month
             , DATE_TRUNC('quarter', revenue_src_10006.created_at) AS company__ds__quarter
             , DATE_TRUNC('year', revenue_src_10006.created_at) AS company__ds__year
-            , EXTRACT(YEAR FROM revenue_src_10006.created_at) AS company__ds__extract_year
-            , EXTRACT(QUARTER FROM revenue_src_10006.created_at) AS company__ds__extract_quarter
-            , EXTRACT(MONTH FROM revenue_src_10006.created_at) AS company__ds__extract_month
-            , EXTRACT(WEEK FROM revenue_src_10006.created_at) AS company__ds__extract_week
-            , EXTRACT(DAY FROM revenue_src_10006.created_at) AS company__ds__extract_day
-            , EXTRACT(DAYOFWEEK FROM revenue_src_10006.created_at) AS company__ds__extract_dayofweek
-            , EXTRACT(DAYOFYEAR FROM revenue_src_10006.created_at) AS company__ds__extract_dayofyear
+            , EXTRACT(year FROM revenue_src_10006.created_at) AS company__ds__extract_year
+            , EXTRACT(quarter FROM revenue_src_10006.created_at) AS company__ds__extract_quarter
+            , EXTRACT(month FROM revenue_src_10006.created_at) AS company__ds__extract_month
+            , EXTRACT(week FROM revenue_src_10006.created_at) AS company__ds__extract_week
+            , EXTRACT(day FROM revenue_src_10006.created_at) AS company__ds__extract_day
+            , EXTRACT(dow FROM revenue_src_10006.created_at) AS company__ds__extract_dow
+            , EXTRACT(doy FROM revenue_src_10006.created_at) AS company__ds__extract_doy
             , revenue_src_10006.user_id AS user
             , revenue_src_10006.user_id AS company__user
           FROM ***************************.fct_revenue revenue_src_10006
