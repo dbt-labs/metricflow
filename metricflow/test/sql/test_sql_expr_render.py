@@ -17,6 +17,7 @@ from metricflow.sql.sql_exprs import (
     SqlComparison,
     SqlComparisonExpression,
     SqlDateTruncExpression,
+    SqlExtractExpression,
     SqlFunction,
     SqlIsNullExpression,
     SqlLogicalExpression,
@@ -29,6 +30,7 @@ from metricflow.sql.sql_exprs import (
     SqlWindowFunctionExpression,
     SqlWindowOrderByArgument,
 )
+from metricflow.time.date_part import DatePart
 
 logger = logging.getLogger(__name__)
 
@@ -191,6 +193,13 @@ def test_date_trunc_expr(default_expr_renderer: DefaultSqlExpressionRenderer) ->
         SqlDateTruncExpression(time_granularity=TimeGranularity.MONTH, arg=SqlStringExpression("ds"))
     ).sql
     assert actual == "DATE_TRUNC('month', ds)"
+
+
+def test_extract_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D
+    actual = default_expr_renderer.render_sql_expr(
+        SqlExtractExpression(date_part=DatePart.DAYOFYEAR, arg=SqlStringExpression("ds"))
+    ).sql
+    assert actual == "EXTRACT(DAYOFYEAR FROM ds)"
 
 
 def test_ratio_computation_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D
