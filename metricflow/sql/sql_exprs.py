@@ -19,6 +19,7 @@ from metricflow.dag.id_generation import (
     SQL_EXPR_COLUMN_REFERENCE_ID_PREFIX,
     SQL_EXPR_COMPARISON_ID_PREFIX,
     SQL_EXPR_DATE_TRUNC,
+    SQL_EXPR_EXTRACT,
     SQL_EXPR_FUNCTION_ID_PREFIX,
     SQL_EXPR_GENERATE_UUID_PREFIX,
     SQL_EXPR_IS_NULL_PREFIX,
@@ -32,6 +33,7 @@ from metricflow.dag.id_generation import (
 )
 from metricflow.dag.mf_dag import DagNode, DisplayedProperty, NodeId
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from metricflow.time.date_part import DatePart
 from metricflow.visitor import Visitable, VisitorOutputT
 
 
@@ -216,6 +218,10 @@ class SqlExpressionNodeVisitor(Generic[VisitorOutputT], ABC):
 
     @abstractmethod
     def visit_date_trunc_expr(self, node: SqlDateTruncExpression) -> VisitorOutputT:  # noqa: D
+        pass
+
+    @abstractmethod
+    def visit_extract_expr(self, node: SqlExtractExpression) -> VisitorOutputT:  # noqa: D
         pass
 
     @abstractmethod
@@ -1414,6 +1420,64 @@ class SqlDateTruncExpression(SqlExpressionNode):
         if not isinstance(other, SqlDateTruncExpression):
             return False
         return self.time_granularity == other.time_granularity and self._parents_match(other)
+
+
+class SqlExtractExpression(SqlExpressionNode):
+    """Extract a date part from a time expression."""
+
+    def __init__(self, date_part: DatePart, arg: SqlExpressionNode) -> None:
+        """Constructor.
+
+        Args:
+            date_part: the date part to extract.
+            arg: the expression to extract from.
+        """
+        self._date_part = date_part
+        super().__init__(node_id=self.create_unique_id(), parent_nodes=[arg])
+
+    @classmethod
+    def id_prefix(cls) -> str:  # noqa: D
+        return SQL_EXPR_EXTRACT
+
+    @property
+    def requires_parenthesis(self) -> bool:  # noqa: D
+        return False
+
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+        return visitor.visit_extract_expr(self)
+
+    @property
+    def description(self) -> str:  # noqa: D
+        return f"Extract {self.date_part.name}"
+
+    @property
+    def date_part(self) -> DatePart:  # noqa: D
+        return self._date_part
+
+    @property
+    def arg(self) -> SqlExpressionNode:  # noqa: D
+        assert len(self.parent_nodes) == 1
+        return self.parent_nodes[0]
+
+    def rewrite(  # noqa: D
+        self,
+        column_replacements: Optional[SqlColumnReplacements] = None,
+        should_render_table_alias: Optional[bool] = None,
+    ) -> SqlExpressionNode:
+        return SqlExtractExpression(
+            date_part=self.date_part, arg=self.arg.rewrite(column_replacements, should_render_table_alias)
+        )
+
+    @property
+    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D
+        return SqlExpressionTreeLineage.combine(
+            tuple(x.lineage for x in self.parent_nodes) + (SqlExpressionTreeLineage(other_exprs=(self,)),)
+        )
+
+    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D
+        if not isinstance(other, SqlExtractExpression):
+            return False
+        return self.date_part == other.date_part and self._parents_match(other)
 
 
 class SqlRatioComputationExpression(SqlExpressionNode):
