@@ -75,8 +75,8 @@ class WhereFilterTimeDimensionFactory(ProtocolHint[QueryInterfaceTimeDimensionFa
 
         time_dimension_spec = self._convert_to_time_dimension_spec(call_parameter_set)
         self.time_dimension_specs.append(time_dimension_spec)
-        column_names = self._column_association_resolver.resolve_spec(time_dimension_spec).column_name
-        return WhereFilterTimeDimension(column_names)
+        column_name = self._column_association_resolver.resolve_spec(time_dimension_spec).column_name
+        return WhereFilterTimeDimension(column_name)
 
     def _convert_to_time_dimension_spec(
         self,

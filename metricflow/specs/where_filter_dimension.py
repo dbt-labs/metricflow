@@ -12,6 +12,8 @@ from dbt_semantic_interfaces.references import (
     DimensionReference,
     EntityReference,
 )
+from dbt_semantic_interfaces.type_enums import TimeGranularity
+
 from typing_extensions import override
 
 from metricflow.specs.column_assoc import ColumnAssociationResolver
@@ -29,12 +31,13 @@ class WhereFilterDimension(ProtocolHint[QueryInterfaceDimension]):
     def _implements_protocol(self) -> QueryInterfaceDimension:
         return self
 
-    def __init__(self, column_name: str) -> None:  # noqa
+    def __init__(self, column_name: str, dimension_spec: DimensionSpec) -> None:  # noqa
         self.column_name = column_name
+        self.dimension_spec = dimension_spec
 
     def grain(self, _grain: str) -> QueryInterfaceDimension:
         """The time granularity."""
-        raise NotImplementedError
+        self.dimension_spec.time_granularity = TimeGranularity.for_name(_grain)
 
     def alias(self, _alias: str) -> QueryInterfaceDimension:
         """Renaming the column."""
@@ -81,7 +84,7 @@ class WhereFilterDimensionFactory(ProtocolHint[QueryInterfaceDimensionFactory]):
         dimension_spec = self._convert_to_dimension_spec(call_parameter_set)
         self.dimension_specs.append(dimension_spec)
         column_name = self._column_association_resolver.resolve_spec(dimension_spec).column_name
-        return WhereFilterDimension(column_name)
+        return WhereFilterDimension(column_name, dimension_spec)
 
     def _convert_to_dimension_spec(
         self,
