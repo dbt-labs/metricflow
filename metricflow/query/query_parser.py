@@ -435,15 +435,6 @@ class MetricFlowQueryParser:
 
         self._time_granularity_solver.validate_time_granularity(metric_references, time_dimension_specs)
         self._validate_date_part(metric_references, time_dimension_specs)
-        for time_dimension_spec in time_dimension_specs:
-            if (
-                time_dimension_spec.date_part
-                and time_dimension_spec.date_part.to_int() < time_dimension_spec.time_granularity.to_int()
-            ):
-                raise RequestTimeGranularityException(
-                    f"Date part {time_dimension_spec.date_part.name} is not compatible with time granularity "
-                    f"{time_dimension_spec.time_granularity.name}."
-                )
 
         order_by_specs = self._parse_order_by(order or [], partial_time_dimension_spec_replacements)
 
@@ -558,7 +549,11 @@ class MetricFlowQueryParser:
         for time_dimension_spec in time_dimension_specs:
             if time_dimension_spec.date_part:
                 date_part_requested = True
-                break
+                if time_dimension_spec.date_part.to_int() < time_dimension_spec.time_granularity.to_int():
+                    raise RequestTimeGranularityException(
+                        f"Date part {time_dimension_spec.date_part.name} is not compatible with time granularity "
+                        f"{time_dimension_spec.time_granularity.name}."
+                    )
         if date_part_requested:
             for metric_reference in metric_references:
                 metric = self._metric_lookup.get_metric(metric_reference)
