@@ -433,7 +433,8 @@ class MetricFlowQueryParser:
         if len(time_dimension_specs) == 0:
             self._validate_no_time_dimension_query(metric_references=metric_references)
 
-        self._time_granularity_solver.validate_time_granularity_and_date_part(metric_references, time_dimension_specs)
+        self._time_granularity_solver.validate_time_granularity(metric_references, time_dimension_specs)
+        self._validate_date_part(metric_references, time_dimension_specs)
         for time_dimension_spec in time_dimension_specs:
             if (
                 time_dimension_spec.date_part
@@ -508,7 +509,7 @@ class MetricFlowQueryParser:
             raise InvalidQueryException(f"Limit was specified as {limit}, which is < 0.")
 
         if where_filter_spec:
-            self._time_granularity_solver.validate_time_granularity_and_date_part(
+            self._time_granularity_solver.validate_time_granularity(
                 metric_references=metric_references,
                 time_dimension_specs=where_filter_spec.linkable_spec_set.time_dimension_specs,
             )
@@ -546,6 +547,20 @@ class MetricFlowQueryParser:
             ):
                 raise InvalidQueryException(f"Order by item {order_by_spec} not in the query")
 
+    def _validate_date_part(
+        self, metric_references: Sequence[MetricReference], time_dimension_specs: Sequence[TimeDimensionSpec]
+    ) -> None:
+        """Validate that date parts can be used for metrics."""
+        date_part_requested = False
+        for time_dimension_spec in time_dimension_specs:
+            if time_dimension_spec.date_part:
+                date_part_requested = True
+                break
+
+        for metric_reference in metric_references:
+            if self._metric_lookup.get_metric(metric_reference).type == MetricType.CUMULATIVE and date_part_requested:
+                raise UnableToSatisfyQueryError("Cannot extract date part for cumulative metrics.")
+
     def _adjust_time_range_constraint(
         self,
         metric_references: Sequence[MetricReference],
@@ -553,7 +568,7 @@ class MetricFlowQueryParser:
         time_range_constraint: TimeRangeConstraint,
     ) -> TimeRangeConstraint:
         """Adjust the time range constraint so that it matches the boundaries of the granularity of the result."""
-        self._time_granularity_solver.validate_time_granularity_and_date_part(metric_references, time_dimension_specs)
+        self._time_granularity_solver.validate_time_granularity(metric_references, time_dimension_specs)
 
         smallest_primary_time_granularity_in_query = self._find_smallest_metric_time_dimension_spec_granularity(
             time_dimension_specs

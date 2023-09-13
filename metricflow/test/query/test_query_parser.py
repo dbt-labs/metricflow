@@ -399,17 +399,24 @@ def test_date_part_parsing() -> None:
     )
 
     # Date part is incompatible with metric's defined time granularity
-    with pytest.raises(RequestTimeGranularityException, match="is not valid for querying"):
+    with pytest.raises(RequestTimeGranularityException):
         query_parser.parse_and_validate_query(
             metric_names=["revenue"],
             group_by=[MockQueryParameter(name="metric_time", date_part=DatePart.DOW)],
         )
 
-    # Date part is compatible with the requested time granularity for the same time dimension
-    with pytest.raises(RequestTimeGranularityException, match="is not compatible with time granularity"):
+    # Date part is incompatible with the requested time granularity for the same time dimension
+    with pytest.raises(RequestTimeGranularityException):
         query_parser.parse_and_validate_query(
             metric_names=["revenue"],
             group_by=[MockQueryParameter(name="metric_time", grain=TimeGranularity.YEAR, date_part=DatePart.MONTH)],
+        )
+
+    # Can't query date part for cumulative metrics
+    with pytest.raises(UnableToSatisfyQueryError):
+        query_parser.parse_and_validate_query(
+            metric_names=["revenue_cumulative"],
+            group_by=[MockQueryParameter(name="metric_time", date_part=DatePart.DOY)],
         )
 
     # Date part is compatible
