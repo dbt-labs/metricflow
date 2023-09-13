@@ -550,16 +550,26 @@ class MetricFlowQueryParser:
     def _validate_date_part(
         self, metric_references: Sequence[MetricReference], time_dimension_specs: Sequence[TimeDimensionSpec]
     ) -> None:
-        """Validate that date parts can be used for metrics."""
+        """Validate that date parts can be used for metrics.
+
+        TODO: figure out expected behavior for date part with these types of metrics.
+        """
         date_part_requested = False
         for time_dimension_spec in time_dimension_specs:
             if time_dimension_spec.date_part:
                 date_part_requested = True
                 break
-
-        for metric_reference in metric_references:
-            if self._metric_lookup.get_metric(metric_reference).type == MetricType.CUMULATIVE and date_part_requested:
-                raise UnableToSatisfyQueryError("Cannot extract date part for cumulative metrics.")
+        if date_part_requested:
+            for metric_reference in metric_references:
+                metric = self._metric_lookup.get_metric(metric_reference)
+                if metric.type == MetricType.CUMULATIVE:
+                    raise UnableToSatisfyQueryError("Cannot extract date part for cumulative metrics.")
+                elif metric.type == MetricType.DERIVED:
+                    for input_metric in metric.type_params.metrics or []:
+                        if input_metric.offset_to_grain:
+                            raise UnableToSatisfyQueryError(
+                                "Cannot extract date part for metrics with offset_to_grain."
+                            )
 
     def _adjust_time_range_constraint(
         self,
