@@ -1376,7 +1376,6 @@ class DataflowToSqlQueryPlanConverter(Generic[SqlDataSetT], DataflowPlanNodeVisi
                     time_granularity=metric_time_dimension_spec.time_granularity, arg=time_spine_column_select_expr
                 )
                 if node.offset_to_grain:
-                    # TODO: allow offset_to_grain w/ granularity & datepart? what's the expected behavior?
                     # Filter down to one row per granularity period
                     new_filter = SqlComparisonExpression(
                         left_expr=select_expr, comparison=SqlComparison.EQUALS, right_expr=time_spine_column_select_expr
