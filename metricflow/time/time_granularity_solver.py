@@ -19,6 +19,7 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.specs.specs import (
     TimeDimensionSpec,
 )
+from metricflow.time.date_part import DatePart
 from metricflow.time.time_granularity import (
     adjust_to_end_of_period,
     adjust_to_start_of_period,
@@ -38,6 +39,7 @@ class PartialTimeDimensionSpec:
 
     element_name: str
     entity_links: Tuple[EntityReference, ...]
+    date_part: Optional[DatePart] = None
 
 
 @dataclass(frozen=True)
@@ -123,6 +125,7 @@ class TimeGranularitySolver:
                     element_name=partial_time_dimension_spec.element_name,
                     entity_links=partial_time_dimension_spec.entity_links,
                     time_granularity=minimum_time_granularity,
+                    date_part=partial_time_dimension_spec.date_part,
                 )
             else:
                 raise RequestTimeGranularityException(

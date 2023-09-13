@@ -47,6 +47,7 @@ from metricflow.sql.sql_exprs import (
     SqlFunctionExpression,
 )
 from metricflow.sql.sql_plan import SqlSelectColumn
+from metricflow.time.date_part import DatePart
 
 logger = logging.getLogger(__name__)
 
@@ -262,6 +263,7 @@ class _DimensionValidityParams:
 
     dimension_name: str
     time_granularity: TimeGranularity
+    date_part: Optional[DatePart] = None
 
 
 class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[ValidityWindowJoinDescription]]):
@@ -324,12 +326,16 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
             start_specs = [
                 spec
                 for spec in specs
-                if spec.element_name == start_dim.dimension_name and spec.time_granularity == start_dim.time_granularity
+                if spec.element_name == start_dim.dimension_name
+                and spec.time_granularity == start_dim.time_granularity
+                and spec.date_part == start_dim.date_part
             ]
             end_specs = [
                 spec
                 for spec in specs
-                if spec.element_name == end_dim.dimension_name and spec.time_granularity == end_dim.time_granularity
+                if spec.element_name == end_dim.dimension_name
+                and spec.time_granularity == end_dim.time_granularity
+                and spec.date_part == end_dim.date_part
             ]
             linkless_start_specs = {spec.without_entity_links for spec in start_specs}
             linkless_end_specs = {spec.without_entity_links for spec in end_specs}
@@ -401,6 +407,7 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
                     + time_dimension_instance.spec.entity_links
                 ),
                 time_granularity=time_dimension_instance.spec.time_granularity,
+                date_part=time_dimension_instance.spec.date_part,
             )
             time_dimension_instances_with_additional_link.append(
                 TimeDimensionInstance(

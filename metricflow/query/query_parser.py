@@ -298,7 +298,12 @@ class MetricFlowQueryParser:
         return (
             group_by_names
             if group_by_names
-            else [f"{g.name}__{g.grain}" if g.grain else g.name for g in group_by]
+            else [
+                StructuredLinkableSpecName(
+                    entity_link_names=(), element_name=g.name, time_granularity=g.grain, date_part=g.date_part
+                ).qualified_name
+                for g in group_by
+            ]
             if group_by
             else []
         )
@@ -343,7 +348,6 @@ class MetricFlowQueryParser:
         time_granularity: Optional[TimeGranularity] = None,
     ) -> MetricFlowQuerySpec:
         metric_names = self._get_metric_names(metric_names, metrics)
-        group_by_names = self._get_group_by_names(group_by_names, group_by)
         where_filter = self._get_where_filter(where_constraint, where_constraint_str)
         order = self._get_order(order, order_by)
 
@@ -393,7 +397,9 @@ class MetricFlowQueryParser:
             # If the time constraint is all time, just ignore and not render
             time_constraint = None
 
-        requested_linkable_specs = self._parse_linkable_element_names(group_by_names, metric_references)
+        requested_linkable_specs = self._parse_linkable_elements(
+            qualified_linkable_names=group_by_names, linkable_elements=group_by, metric_references=metric_references
+        )
         where_filter_spec: Optional[WhereFilterSpec] = None
         if where_filter is not None:
             try:
@@ -427,6 +433,7 @@ class MetricFlowQueryParser:
             self._validate_no_time_dimension_query(metric_references=metric_references)
 
         self._time_granularity_solver.validate_time_granularity(metric_references, time_dimension_specs)
+        self._validate_date_part(metric_references, time_dimension_specs)
 
         order_by_specs = self._parse_order_by(order or [], partial_time_dimension_spec_replacements)
 
@@ -436,8 +443,9 @@ class MetricFlowQueryParser:
         for metric_reference in metric_references:
             metric = self._metric_lookup.get_metric(metric_reference)
             if metric.filter is not None:
-                group_by_specs_for_one_metric = self._parse_linkable_element_names(
+                group_by_specs_for_one_metric = self._parse_linkable_elements(
                     qualified_linkable_names=group_by_names,
+                    linkable_elements=group_by,
                     metric_references=(metric_reference,),
                 )
 
@@ -528,6 +536,34 @@ class MetricFlowQueryParser:
                 or order_by_spec.item in linkable_specs.entity_specs
             ):
                 raise InvalidQueryException(f"Order by item {order_by_spec} not in the query")
+
+    def _validate_date_part(
+        self, metric_references: Sequence[MetricReference], time_dimension_specs: Sequence[TimeDimensionSpec]
+    ) -> None:
+        """Validate that date parts can be used for metrics.
+
+        TODO: figure out expected behavior for date part with these types of metrics.
+        """
+        date_part_requested = False
+        for time_dimension_spec in time_dimension_specs:
+            if time_dimension_spec.date_part:
+                date_part_requested = True
+                if time_dimension_spec.date_part.to_int() < time_dimension_spec.time_granularity.to_int():
+                    raise RequestTimeGranularityException(
+                        f"Date part {time_dimension_spec.date_part.name} is not compatible with time granularity "
+                        f"{time_dimension_spec.time_granularity.name}."
+                    )
+        if date_part_requested:
+            for metric_reference in metric_references:
+                metric = self._metric_lookup.get_metric(metric_reference)
+                if metric.type == MetricType.CUMULATIVE:
+                    raise UnableToSatisfyQueryError("Cannot extract date part for cumulative metrics.")
+                elif metric.type == MetricType.DERIVED:
+                    for input_metric in metric.type_params.metrics or []:
+                        if input_metric.offset_to_grain:
+                            raise UnableToSatisfyQueryError(
+                                "Cannot extract date part for metrics with offset_to_grain."
+                            )
 
     def _adjust_time_range_constraint(
         self,
@@ -643,26 +679,45 @@ class MetricFlowQueryParser:
                     metric_references.extend(list(input_metrics))
         return tuple(metric_references)
 
-    def _parse_linkable_element_names(
+    def _parse_linkable_elements(
         self,
-        qualified_linkable_names: Sequence[str],
         metric_references: Sequence[MetricReference],
+        qualified_linkable_names: Optional[Sequence[str]] = None,
+        linkable_elements: Optional[Sequence[QueryParameter]] = None,
     ) -> QueryTimeLinkableSpecSet:
         """Convert the linkable spec names into the respective specification objects."""
-        qualified_linkable_names = [x.lower() for x in qualified_linkable_names]
+        assert not (qualified_linkable_names and linkable_elements)
+
+        structured_names: List[StructuredLinkableSpecName] = []
+        if qualified_linkable_names:
+            qualified_linkable_names = [x.lower() for x in qualified_linkable_names]
+            structured_names = [StructuredLinkableSpecName.from_name(name) for name in qualified_linkable_names]
+        elif linkable_elements:
+            for linkable_element in linkable_elements:
+                parsed_name = StructuredLinkableSpecName.from_name(linkable_element.name)
+                if parsed_name.time_granularity:
+                    raise ValueError(
+                        "Time granularity must be passed in the `grain` attribute for `group_by` query param."
+                    )
+                structured_name = StructuredLinkableSpecName(
+                    entity_link_names=parsed_name.entity_link_names,
+                    element_name=parsed_name.element_name,
+                    time_granularity=linkable_element.grain,
+                    date_part=linkable_element.date_part,
+                )
+                structured_names.append(structured_name)
 
         dimension_specs = []
         time_dimension_specs = []
         partial_time_dimension_specs = []
         entity_specs = []
 
-        for qualified_name in qualified_linkable_names:
-            structured_name = StructuredLinkableSpecName.from_name(qualified_name)
+        for structured_name in structured_names:
             element_name = structured_name.element_name
             entity_links = tuple(EntityReference(element_name=x) for x in structured_name.entity_link_names)
             # Create the spec based on the type of element referenced.
             if TimeDimensionReference(element_name=element_name) in self._known_time_dimension_element_references:
-                if structured_name.time_granularity:
+                if structured_name.time_granularity and not structured_name.date_part:
                     time_dimension_specs.append(
                         TimeDimensionSpec(
                             element_name=element_name,
@@ -670,11 +725,13 @@ class MetricFlowQueryParser:
                             time_granularity=structured_name.time_granularity,
                         )
                     )
+                # If date part is passed, remove requested granularity (to be overridden with default).
                 else:
                     partial_time_dimension_specs.append(
                         PartialTimeDimensionSpec(
                             element_name=element_name,
                             entity_links=entity_links,
+                            date_part=structured_name.date_part,
                         )
                     )
             elif DimensionReference(element_name=element_name) in self._known_dimension_element_references:
@@ -682,20 +739,30 @@ class MetricFlowQueryParser:
             elif EntityReference(element_name=element_name) in self._known_entity_element_references:
                 entity_specs.append(EntitySpec(element_name=element_name, entity_links=entity_links))
             else:
+                valid_group_bys_for_metrics = self._metric_lookup.element_specs_for_metrics(list(metric_references))
                 valid_group_by_names_for_metrics = sorted(
-                    x.qualified_name for x in self._metric_lookup.element_specs_for_metrics(list(metric_references))
+                    list(
+                        set(
+                            x.qualified_name if qualified_linkable_names else x.element_name
+                            for x in valid_group_bys_for_metrics
+                        )
+                    )
                 )
 
+                # If requested by name, show qualified name. If requested as object, show element name.
+                display_name = structured_name.qualified_name if qualified_linkable_names else element_name
                 suggestions = {
-                    f"Suggestions for '{qualified_name}'": pformat_big_objects(
+                    f"Suggestions for '{display_name}'": pformat_big_objects(
                         MetricFlowQueryParser._top_fuzzy_matches(
-                            item=qualified_name,
+                            item=display_name,
                             candidate_items=valid_group_by_names_for_metrics,
                         )
                     )
                 }
                 raise UnableToSatisfyQueryError(
-                    f"Unknown element name '{element_name}' in dimension name '{qualified_name}'",
+                    f"Unknown element name '{element_name}' in dimension name '{display_name}'"
+                    if qualified_linkable_names
+                    else f"Unknown dimension {element_name}",
                     context=suggestions,
                 )
 
@@ -795,6 +862,7 @@ class MetricFlowQueryParser:
                                 element_name=parsed_name.element_name,
                                 entity_links=entity_links,
                                 time_granularity=parsed_name.time_granularity,
+                                date_part=parsed_name.date_part,
                             ),
                             descending=descending,
                         )
