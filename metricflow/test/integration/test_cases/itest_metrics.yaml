@@ -1043,3 +1043,77 @@ integration_test:
     ) b
     ON a.metric_time__week = b.metric_time__week
       AND a.metric_time__month = b.metric_time__month
+---
+integration_test:
+  name: simple_query_with_date_part
+  description: Test query using date_part
+  model: SIMPLE_MODEL
+  metrics: ["bookings"]
+  group_by_objs: [{"name": "metric_time", "date_part": "year"}]
+  check_query: |
+    SELECT
+      SUM(1) AS bookings
+      , {{ render_extract("ds", DatePart.YEAR) }} AS metric_time__extract_year
+    FROM {{ source_schema }}.fct_bookings
+    GROUP BY {{ render_extract("ds", DatePart.YEAR) }};
+---
+integration_test:
+  name: simple_query_with_multiple_date_parts
+  description: Test query using multiple date_parts
+  model: SIMPLE_MODEL
+  metrics: ["bookings"]
+  group_by_objs: [
+    {"name": "metric_time", "date_part": "quarter"},
+    {"name": "metric_time", "date_part": "dow"},
+    {"name": "metric_time", "date_part": "doy"},
+    {"name": "metric_time", "date_part": "day"},
+    {"name": "metric_time", "date_part": "week"},
+  ]
+  check_query: |
+    SELECT
+      SUM(1) AS bookings
+      , {{ render_extract("ds", DatePart.QUARTER) }} AS metric_time__extract_quarter
+      , {{ render_extract("ds", DatePart.DOW) }} AS metric_time__extract_dow
+      , {{ render_extract("ds", DatePart.DOY) }} AS metric_time__extract_doy
+      , {{ render_extract("ds", DatePart.DAY) }} AS metric_time__extract_day
+      , {{ render_extract("ds", DatePart.WEEK) }} AS metric_time__extract_week
+    FROM {{ source_schema }}.fct_bookings
+    GROUP BY
+      {{ render_extract("ds", DatePart.QUARTER) }}
+      , {{ render_extract("ds", DatePart.DOW) }}
+      , {{ render_extract("ds", DatePart.DOY) }}
+      , {{ render_extract("ds", DatePart.DAY) }}
+      , {{ render_extract("ds", DatePart.WEEK) }};
+---
+integration_test:
+  name: derived_metric_offset_window_and_date_part
+  description: Tests a derived metric offset query with window and date_part
+  model: SIMPLE_MODEL
+  metrics: ["bookings_5_day_lag"]
+  group_by_objs: [{"name": "metric_time", "date_part": "month"}]
+  check_query: |
+    SELECT
+      {{ render_extract("a.ds", DatePart.MONTH) }} AS metric_time__extract_month
+      , SUM(b.bookings_5_day_lag) AS bookings_5_day_lag
+    FROM {{ mf_time_spine_source }} a
+    INNER JOIN (
+      SELECT
+        ds AS metric_time__day
+        , 1 AS bookings_5_day_lag
+      FROM {{ source_schema }}.fct_bookings
+    ) b
+    ON {{ render_date_sub("a", "ds", 5, TimeGranularity.DAY) }} = b.metric_time__day
+    GROUP BY metric_time__extract_month
+---
+integration_test:
+  name: date_part_overrides_granularity
+  description: Test query using date_part with incompatible granularity; should override granularity
+  model: SIMPLE_MODEL
+  metrics: ["bookings"]
+  group_by_objs: [{"name": "metric_time", "grain": "month", "date_part": "dow"}]
+  check_query: |
+    SELECT
+      SUM(1) AS bookings
+      , {{ render_extract("ds", DatePart.DOW) }} AS metric_time__extract_dow
+    FROM {{ source_schema }}.fct_bookings
+    GROUP BY {{ render_extract("ds", DatePart.DOW) }};
