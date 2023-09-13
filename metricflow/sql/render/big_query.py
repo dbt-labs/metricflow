@@ -133,11 +133,11 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
     @override
     def render_date_part(self, date_part: DatePart) -> str:
         if date_part == DatePart.DOY:
-            return "DAYOFYEAR"
+            return "dayofyear"
         if date_part == DatePart.DOW:
-            return "DAYOFWEEK"
+            return "dayofweek"
         if date_part == DatePart.WEEK:
-            return "ISOWEEK"
+            return "isoweek"
 
         return super().render_date_part(date_part)
 

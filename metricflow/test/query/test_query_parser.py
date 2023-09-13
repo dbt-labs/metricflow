@@ -136,6 +136,18 @@ METRICS_YAML = textwrap.dedent(
           - name: revenue
             offset_window: 14 days
             alias: revenue_2_weeks_ago
+    ---
+    metric:
+      name: revenue_since_start_of_year
+      description: Revenue since start of year
+      type: derived
+      type_params:
+        expr: revenue - revenue_start_of_year
+        metrics:
+          - name: revenue
+          - name: revenue
+            offset_to_grain: year
+            alias: revenue_start_of_year
     """
 )
 
@@ -405,13 +417,6 @@ def test_date_part_parsing() -> None:
             group_by=[MockQueryParameter(name="metric_time", date_part=DatePart.DOW)],
         )
 
-    # Date part is incompatible with the requested time granularity for the same time dimension
-    with pytest.raises(RequestTimeGranularityException):
-        query_parser.parse_and_validate_query(
-            metric_names=["revenue"],
-            group_by=[MockQueryParameter(name="metric_time", grain=TimeGranularity.YEAR, date_part=DatePart.MONTH)],
-        )
-
     # Can't query date part for cumulative metrics
     with pytest.raises(UnableToSatisfyQueryError):
         query_parser.parse_and_validate_query(
@@ -419,8 +424,21 @@ def test_date_part_parsing() -> None:
             group_by=[MockQueryParameter(name="metric_time", date_part=DatePart.DOY)],
         )
 
+    # Can't query date part for metrics with offset to grain
+    with pytest.raises(UnableToSatisfyQueryError):
+        query_parser.parse_and_validate_query(
+            metric_names=["revenue_since_start_of_year"],
+            group_by=[MockQueryParameter(name="metric_time", date_part=DatePart.DAY)],
+        )
+
     # Date part is compatible
     query_parser.parse_and_validate_query(
         metric_names=["revenue"],
         group_by=[MockQueryParameter(name="metric_time", date_part=DatePart.MONTH)],
+    )
+
+    # Incompatible granularity gets overriden
+    query_parser.parse_and_validate_query(
+        metric_names=["revenue"],
+        group_by=[MockQueryParameter(name="metric_time", grain=TimeGranularity.YEAR, date_part=DatePart.MONTH)],
     )

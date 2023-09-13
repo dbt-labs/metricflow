@@ -327,6 +327,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
             entity_link_names=tuple(x.element_name for x in self.entity_links),
             element_name=self.element_name,
             time_granularity=self.time_granularity,
+            date_part=self.date_part,
         ).qualified_name
 
     @property

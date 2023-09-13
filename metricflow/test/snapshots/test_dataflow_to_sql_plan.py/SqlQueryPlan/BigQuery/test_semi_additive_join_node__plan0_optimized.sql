@@ -45,10 +45,10 @@ FROM (
     , EXTRACT(year FROM ds) AS ds__extract_year
     , EXTRACT(quarter FROM ds) AS ds__extract_quarter
     , EXTRACT(month FROM ds) AS ds__extract_month
-    , EXTRACT(ISOWEEK FROM ds) AS ds__extract_week
+    , EXTRACT(isoweek FROM ds) AS ds__extract_week
     , EXTRACT(day FROM ds) AS ds__extract_day
-    , EXTRACT(DAYOFWEEK FROM ds) AS ds__extract_dow
-    , EXTRACT(DAYOFYEAR FROM ds) AS ds__extract_doy
+    , EXTRACT(dayofweek FROM ds) AS ds__extract_dow
+    , EXTRACT(dayofyear FROM ds) AS ds__extract_doy
     , account_type
     , ds AS account__ds__day
     , DATE_TRUNC(ds, isoweek) AS account__ds__week
@@ -58,10 +58,10 @@ FROM (
     , EXTRACT(year FROM ds) AS account__ds__extract_year
     , EXTRACT(quarter FROM ds) AS account__ds__extract_quarter
     , EXTRACT(month FROM ds) AS account__ds__extract_month
-    , EXTRACT(ISOWEEK FROM ds) AS account__ds__extract_week
+    , EXTRACT(isoweek FROM ds) AS account__ds__extract_week
     , EXTRACT(day FROM ds) AS account__ds__extract_day
-    , EXTRACT(DAYOFWEEK FROM ds) AS account__ds__extract_dow
-    , EXTRACT(DAYOFYEAR FROM ds) AS account__ds__extract_doy
+    , EXTRACT(dayofweek FROM ds) AS account__ds__extract_dow
+    , EXTRACT(dayofyear FROM ds) AS account__ds__extract_doy
     , account_type AS account__account_type
     , user_id AS user
     , user_id AS account__user

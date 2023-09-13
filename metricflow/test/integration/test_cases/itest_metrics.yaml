@@ -1104,3 +1104,16 @@ integration_test:
     ) b
     ON {{ render_date_sub("a", "ds", 5, TimeGranularity.DAY) }} = b.metric_time__day
     GROUP BY metric_time__extract_month
+---
+integration_test:
+  name: date_part_overrides_granularity
+  description: Test query using date_part with incompatible granularity; should override granularity
+  model: SIMPLE_MODEL
+  metrics: ["bookings"]
+  group_by_objs: [{"name": "metric_time", "grain": "month", "date_part": "dow"}]
+  check_query: |
+    SELECT
+      SUM(1) AS bookings
+      , {{ render_extract("ds", DatePart.DOW) }} AS metric_time__extract_dow
+    FROM {{ source_schema }}.fct_bookings
+    GROUP BY {{ render_extract("ds", DatePart.DOW) }};

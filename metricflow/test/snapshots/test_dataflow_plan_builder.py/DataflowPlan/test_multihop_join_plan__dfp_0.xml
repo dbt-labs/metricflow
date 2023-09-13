@@ -138,37 +138,37 @@
                                     <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='bridge_table'))  -->
                                 </ReadSqlSourceNode>
                                 <FilterElementsNode>
-                                    <!-- description =                                 -->
-                                    <!--   Pass Only Elements:                         -->
-                                    <!--     ['customer_name',                         -->
-                                    <!--      'customer_atomic_weight',                -->
-                                    <!--      'customer_id__customer_name',            -->
-                                    <!--      'customer_id__customer_atomic_weight',   -->
-                                    <!--      'ds_partitioned__day',                   -->
-                                    <!--      'ds_partitioned__week',                  -->
-                                    <!--      'ds_partitioned__month',                 -->
-                                    <!--      'ds_partitioned__quarter',               -->
-                                    <!--      'ds_partitioned__year',                  -->
-                                    <!--      'ds_partitioned__day',                   -->
-                                    <!--      'ds_partitioned__day',                   -->
-                                    <!--      'ds_partitioned__day',                   -->
-                                    <!--      'ds_partitioned__day',                   -->
-                                    <!--      'ds_partitioned__day',                   -->
-                                    <!--      'ds_partitioned__day',                   -->
-                                    <!--      'ds_partitioned__day',                   -->
-                                    <!--      'customer_id__ds_partitioned__day',      -->
-                                    <!--      'customer_id__ds_partitioned__week',     -->
-                                    <!--      'customer_id__ds_partitioned__month',    -->
-                                    <!--      'customer_id__ds_partitioned__quarter',  -->
-                                    <!--      'customer_id__ds_partitioned__year',     -->
-                                    <!--      'customer_id__ds_partitioned__day',      -->
-                                    <!--      'customer_id__ds_partitioned__day',      -->
-                                    <!--      'customer_id__ds_partitioned__day',      -->
-                                    <!--      'customer_id__ds_partitioned__day',      -->
-                                    <!--      'customer_id__ds_partitioned__day',      -->
-                                    <!--      'customer_id__ds_partitioned__day',      -->
-                                    <!--      'customer_id__ds_partitioned__day',      -->
-                                    <!--      'customer_id']                           -->
+                                    <!-- description =                                         -->
+                                    <!--   Pass Only Elements:                                 -->
+                                    <!--     ['customer_name',                                 -->
+                                    <!--      'customer_atomic_weight',                        -->
+                                    <!--      'customer_id__customer_name',                    -->
+                                    <!--      'customer_id__customer_atomic_weight',           -->
+                                    <!--      'ds_partitioned__day',                           -->
+                                    <!--      'ds_partitioned__week',                          -->
+                                    <!--      'ds_partitioned__month',                         -->
+                                    <!--      'ds_partitioned__quarter',                       -->
+                                    <!--      'ds_partitioned__year',                          -->
+                                    <!--      'ds_partitioned__extract_year',                  -->
+                                    <!--      'ds_partitioned__extract_quarter',               -->
+                                    <!--      'ds_partitioned__extract_month',                 -->
+                                    <!--      'ds_partitioned__extract_week',                  -->
+                                    <!--      'ds_partitioned__extract_day',                   -->
+                                    <!--      'ds_partitioned__extract_dow',                   -->
+                                    <!--      'ds_partitioned__extract_doy',                   -->
+                                    <!--      'customer_id__ds_partitioned__day',              -->
+                                    <!--      'customer_id__ds_partitioned__week',             -->
+                                    <!--      'customer_id__ds_partitioned__month',            -->
+                                    <!--      'customer_id__ds_partitioned__quarter',          -->
+                                    <!--      'customer_id__ds_partitioned__year',             -->
+                                    <!--      'customer_id__ds_partitioned__extract_year',     -->
+                                    <!--      'customer_id__ds_partitioned__extract_quarter',  -->
+                                    <!--      'customer_id__ds_partitioned__extract_month',    -->
+                                    <!--      'customer_id__ds_partitioned__extract_week',     -->
+                                    <!--      'customer_id__ds_partitioned__extract_day',      -->
+                                    <!--      'customer_id__ds_partitioned__extract_dow',      -->
+                                    <!--      'customer_id__ds_partitioned__extract_doy',      -->
+                                    <!--      'customer_id']                                   -->
                                     <!-- node_id = pfe_0 -->
                                     <!-- include_spec = DimensionSpec(element_name='customer_name', entity_links=()) -->
                                     <!-- include_spec =                                -->

@@ -63,7 +63,10 @@ class StructuredLinkableSpecName:
 
     @property
     def qualified_name(self) -> str:
-        """Return the full name form. e.g. ds or listing__ds__month."""
+        """Return the full name form. e.g. ds or listing__ds__month.
+
+        If date_part is specified, don't include granularity in qualified_name since it will not impact the result.
+        """
         items = list(self.entity_link_names) + [self.element_name]
         if self.date_part:
             items.append(self.date_part_suffix(date_part=self.date_part))

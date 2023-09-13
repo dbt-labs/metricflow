@@ -57,6 +57,7 @@ from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.snapshot_utils import assert_plan_snapshot_text_equal
 from metricflow.test.sql.compare_sql_plan import assert_rendered_sql_from_plan_equal, assert_sql_plan_text_equal
 from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_QUARTER, MTD_SPEC_WEEK, MTD_SPEC_YEAR
+from metricflow.time.date_part import DatePart
 
 
 @pytest.fixture(scope="session")
@@ -1848,6 +1849,87 @@ def test_derived_offset_cumulative_metric(  # noqa: D
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="every_2_days_bookers_2_days_ago"),),
             time_dimension_specs=(MTD_SPEC_DAY,),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+def test_simple_query_with_date_part(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    sql_client: SqlClient,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings"),),
+            time_dimension_specs=(
+                DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.DAY, date_part=DatePart.DOW),
+            ),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+def test_simple_query_with_multiple_date_parts(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    sql_client: SqlClient,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings"),),
+            time_dimension_specs=(
+                DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.DAY, date_part=DatePart.DAY),
+                DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.DAY, date_part=DatePart.DOW),
+                DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.DAY, date_part=DatePart.DOY),
+                DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.DAY, date_part=DatePart.WEEK),
+                DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.DAY, date_part=DatePart.MONTH),
+                DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.DAY, date_part=DatePart.QUARTER),
+                DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.DAY, date_part=DatePart.YEAR),
+            ),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+def test_offset_window_with_date_part(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder[SemanticModelDataSet],
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter[SemanticModelDataSet],
+    sql_client: SqlClient,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings_growth_2_weeks"),),
+            time_dimension_specs=(
+                DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.DAY, date_part=DatePart.DOW),
+            ),
         )
     )
 

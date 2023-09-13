@@ -1434,35 +1434,35 @@
                                 </SqlTableFromClauseNode>
                             </SqlSelectStatementNode>
                             <SqlSelectStatementNode>
-                                <!-- description =                    -->
-                                <!--   Pass Only Elements:            -->
-                                <!--     ['home_state_latest',        -->
-                                <!--      'user__home_state_latest',  -->
-                                <!--      'ds__day',                  -->
-                                <!--      'ds__week',                 -->
-                                <!--      'ds__month',                -->
-                                <!--      'ds__quarter',              -->
-                                <!--      'ds__year',                 -->
-                                <!--      'ds__day',                  -->
-                                <!--      'ds__day',                  -->
-                                <!--      'ds__day',                  -->
-                                <!--      'ds__day',                  -->
-                                <!--      'ds__day',                  -->
-                                <!--      'ds__day',                  -->
-                                <!--      'ds__day',                  -->
-                                <!--      'user__ds__day',            -->
-                                <!--      'user__ds__week',           -->
-                                <!--      'user__ds__month',          -->
-                                <!--      'user__ds__quarter',        -->
-                                <!--      'user__ds__year',           -->
-                                <!--      'user__ds__day',            -->
-                                <!--      'user__ds__day',            -->
-                                <!--      'user__ds__day',            -->
-                                <!--      'user__ds__day',            -->
-                                <!--      'user__ds__day',            -->
-                                <!--      'user__ds__day',            -->
-                                <!--      'user__ds__day',            -->
-                                <!--      'user']                     -->
+                                <!-- description =                      -->
+                                <!--   Pass Only Elements:              -->
+                                <!--     ['home_state_latest',          -->
+                                <!--      'user__home_state_latest',    -->
+                                <!--      'ds__day',                    -->
+                                <!--      'ds__week',                   -->
+                                <!--      'ds__month',                  -->
+                                <!--      'ds__quarter',                -->
+                                <!--      'ds__year',                   -->
+                                <!--      'ds__extract_year',           -->
+                                <!--      'ds__extract_quarter',        -->
+                                <!--      'ds__extract_month',          -->
+                                <!--      'ds__extract_week',           -->
+                                <!--      'ds__extract_day',            -->
+                                <!--      'ds__extract_dow',            -->
+                                <!--      'ds__extract_doy',            -->
+                                <!--      'user__ds__day',              -->
+                                <!--      'user__ds__week',             -->
+                                <!--      'user__ds__month',            -->
+                                <!--      'user__ds__quarter',          -->
+                                <!--      'user__ds__year',             -->
+                                <!--      'user__ds__extract_year',     -->
+                                <!--      'user__ds__extract_quarter',  -->
+                                <!--      'user__ds__extract_month',    -->
+                                <!--      'user__ds__extract_week',     -->
+                                <!--      'user__ds__extract_day',      -->
+                                <!--      'user__ds__extract_dow',      -->
+                                <!--      'user__ds__extract_doy',      -->
+                                <!--      'user']                       -->
                                 <!-- node_id = ss_12 -->
                                 <!-- col0 =                                                    -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->

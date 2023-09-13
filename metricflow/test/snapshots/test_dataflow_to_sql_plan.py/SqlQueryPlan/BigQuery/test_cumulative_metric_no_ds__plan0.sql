@@ -64,10 +64,10 @@ FROM (
           , EXTRACT(year FROM revenue_src_10006.created_at) AS ds__extract_year
           , EXTRACT(quarter FROM revenue_src_10006.created_at) AS ds__extract_quarter
           , EXTRACT(month FROM revenue_src_10006.created_at) AS ds__extract_month
-          , EXTRACT(ISOWEEK FROM revenue_src_10006.created_at) AS ds__extract_week
+          , EXTRACT(isoweek FROM revenue_src_10006.created_at) AS ds__extract_week
           , EXTRACT(day FROM revenue_src_10006.created_at) AS ds__extract_day
-          , EXTRACT(DAYOFWEEK FROM revenue_src_10006.created_at) AS ds__extract_dow
-          , EXTRACT(DAYOFYEAR FROM revenue_src_10006.created_at) AS ds__extract_doy
+          , EXTRACT(dayofweek FROM revenue_src_10006.created_at) AS ds__extract_dow
+          , EXTRACT(dayofyear FROM revenue_src_10006.created_at) AS ds__extract_doy
           , revenue_src_10006.created_at AS company__ds__day
           , DATE_TRUNC(revenue_src_10006.created_at, isoweek) AS company__ds__week
           , DATE_TRUNC(revenue_src_10006.created_at, month) AS company__ds__month
@@ -76,10 +76,10 @@ FROM (
           , EXTRACT(year FROM revenue_src_10006.created_at) AS company__ds__extract_year
           , EXTRACT(quarter FROM revenue_src_10006.created_at) AS company__ds__extract_quarter
           , EXTRACT(month FROM revenue_src_10006.created_at) AS company__ds__extract_month
-          , EXTRACT(ISOWEEK FROM revenue_src_10006.created_at) AS company__ds__extract_week
+          , EXTRACT(isoweek FROM revenue_src_10006.created_at) AS company__ds__extract_week
           , EXTRACT(day FROM revenue_src_10006.created_at) AS company__ds__extract_day
-          , EXTRACT(DAYOFWEEK FROM revenue_src_10006.created_at) AS company__ds__extract_dow
-          , EXTRACT(DAYOFYEAR FROM revenue_src_10006.created_at) AS company__ds__extract_doy
+          , EXTRACT(dayofweek FROM revenue_src_10006.created_at) AS company__ds__extract_dow
+          , EXTRACT(dayofyear FROM revenue_src_10006.created_at) AS company__ds__extract_doy
           , revenue_src_10006.user_id AS user
           , revenue_src_10006.user_id AS company__user
         FROM ***************************.fct_revenue revenue_src_10006

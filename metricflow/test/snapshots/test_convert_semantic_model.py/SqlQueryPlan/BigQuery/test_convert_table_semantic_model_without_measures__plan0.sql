@@ -8,10 +8,10 @@ SELECT
   , EXTRACT(year FROM users_latest_src_10008.ds) AS ds__extract_year
   , EXTRACT(quarter FROM users_latest_src_10008.ds) AS ds__extract_quarter
   , EXTRACT(month FROM users_latest_src_10008.ds) AS ds__extract_month
-  , EXTRACT(ISOWEEK FROM users_latest_src_10008.ds) AS ds__extract_week
+  , EXTRACT(isoweek FROM users_latest_src_10008.ds) AS ds__extract_week
   , EXTRACT(day FROM users_latest_src_10008.ds) AS ds__extract_day
-  , EXTRACT(DAYOFWEEK FROM users_latest_src_10008.ds) AS ds__extract_dow
-  , EXTRACT(DAYOFYEAR FROM users_latest_src_10008.ds) AS ds__extract_doy
+  , EXTRACT(dayofweek FROM users_latest_src_10008.ds) AS ds__extract_dow
+  , EXTRACT(dayofyear FROM users_latest_src_10008.ds) AS ds__extract_doy
   , users_latest_src_10008.home_state_latest
   , users_latest_src_10008.ds AS user__ds__day
   , DATE_TRUNC(users_latest_src_10008.ds, isoweek) AS user__ds__week
@@ -21,10 +21,10 @@ SELECT
   , EXTRACT(year FROM users_latest_src_10008.ds) AS user__ds__extract_year
   , EXTRACT(quarter FROM users_latest_src_10008.ds) AS user__ds__extract_quarter
   , EXTRACT(month FROM users_latest_src_10008.ds) AS user__ds__extract_month
-  , EXTRACT(ISOWEEK FROM users_latest_src_10008.ds) AS user__ds__extract_week
+  , EXTRACT(isoweek FROM users_latest_src_10008.ds) AS user__ds__extract_week
   , EXTRACT(day FROM users_latest_src_10008.ds) AS user__ds__extract_day
-  , EXTRACT(DAYOFWEEK FROM users_latest_src_10008.ds) AS user__ds__extract_dow
-  , EXTRACT(DAYOFYEAR FROM users_latest_src_10008.ds) AS user__ds__extract_doy
+  , EXTRACT(dayofweek FROM users_latest_src_10008.ds) AS user__ds__extract_dow
+  , EXTRACT(dayofyear FROM users_latest_src_10008.ds) AS user__ds__extract_doy
   , users_latest_src_10008.home_state_latest AS user__home_state_latest
   , users_latest_src_10008.user_id AS user
 FROM ***************************.dim_users_latest users_latest_src_10008

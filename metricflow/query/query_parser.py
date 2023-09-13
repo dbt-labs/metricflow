@@ -702,7 +702,9 @@ class MetricFlowQueryParser:
             for linkable_element in linkable_elements:
                 parsed_name = StructuredLinkableSpecName.from_name(linkable_element.name)
                 if parsed_name.time_granularity:
-                    raise ValueError("Time granularity must be passed in the grain attribute for group_by query param.")
+                    raise ValueError(
+                        "Time granularity must be passed in the `grain` attribute for `group_by` query param."
+                    )
                 structured_name = StructuredLinkableSpecName(
                     entity_link_names=parsed_name.entity_link_names,
                     element_name=parsed_name.element_name,
@@ -721,15 +723,15 @@ class MetricFlowQueryParser:
             entity_links = tuple(EntityReference(element_name=x) for x in structured_name.entity_link_names)
             # Create the spec based on the type of element referenced.
             if TimeDimensionReference(element_name=element_name) in self._known_time_dimension_element_references:
-                if structured_name.time_granularity:
+                if structured_name.time_granularity and not structured_name.date_part:
                     time_dimension_specs.append(
                         TimeDimensionSpec(
                             element_name=element_name,
                             entity_links=entity_links,
                             time_granularity=structured_name.time_granularity,
-                            date_part=structured_name.date_part,
                         )
                     )
+                # If date part is passed, remove requested granularity (to be overridden with default).
                 else:
                     partial_time_dimension_specs.append(
                         PartialTimeDimensionSpec(

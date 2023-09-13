@@ -259,8 +259,11 @@ def test_case(
     for group_by_kwargs in case.group_by_objs:
         kwargs = copy(group_by_kwargs)
         date_part = kwargs.get("date_part")
+        grain = kwargs.get("grain")
         if date_part:
             kwargs["date_part"] = DatePart(date_part)
+        if grain:
+            kwargs["grain"] = TimeGranularity(grain)
         group_by.append(MockQueryParameter(**kwargs))
     query_result = engine.query(
         MetricFlowQueryRequest.create_with_random_request_id(
