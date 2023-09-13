@@ -421,14 +421,14 @@ def test_date_part_parsing() -> None:
     with pytest.raises(UnableToSatisfyQueryError):
         query_parser.parse_and_validate_query(
             metric_names=["revenue_cumulative"],
-            group_by=[MockQueryParameter(name="metric_time", date_part=DatePart.DOY)],
+            group_by=[MockQueryParameter(name="metric_time", date_part=DatePart.YEAR)],
         )
 
     # Can't query date part for metrics with offset to grain
     with pytest.raises(UnableToSatisfyQueryError):
         query_parser.parse_and_validate_query(
             metric_names=["revenue_since_start_of_year"],
-            group_by=[MockQueryParameter(name="metric_time", date_part=DatePart.DAY)],
+            group_by=[MockQueryParameter(name="metric_time", date_part=DatePart.MONTH)],
         )
 
     # Date part is compatible
