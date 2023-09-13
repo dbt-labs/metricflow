@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import logging
+from copy import copy
 from typing import List, Optional, Sequence, Tuple
 
 import jinja2
@@ -31,6 +32,7 @@ from metricflow.sql.sql_exprs import (
     SqlTimeDeltaExpression,
 )
 from metricflow.test.compare_df import assert_dataframes_equal
+from metricflow.test.conftest import MockQueryParameter
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.integration.configured_test_case import (
     CONFIGURED_INTEGRATION_TESTS_REPOSITORY,
@@ -253,10 +255,18 @@ def test_case(
 
     check_query_helpers = CheckQueryHelpers(sql_client)
 
+    group_by: List[MockQueryParameter] = []
+    for group_by_kwargs in case.group_by_objs:
+        kwargs = copy(group_by_kwargs)
+        date_part = kwargs.get("date_part")
+        if date_part:
+            kwargs["date_part"] = DatePart(date_part)
+        group_by.append(MockQueryParameter(**kwargs))
     query_result = engine.query(
         MetricFlowQueryRequest.create_with_random_request_id(
             metric_names=case.metrics,
             group_by_names=case.group_bys,
+            group_by=tuple(group_by),
             limit=case.limit,
             time_constraint_start=parser.parse(case.time_constraint[0]) if case.time_constraint else None,
             time_constraint_end=parser.parse(case.time_constraint[1]) if case.time_constraint else None,

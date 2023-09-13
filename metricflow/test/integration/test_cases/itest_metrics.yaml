@@ -1049,7 +1049,7 @@ integration_test:
   description: Test query using date_part
   model: SIMPLE_MODEL
   metrics: ["bookings"]
-  group_bys: ["metric_time__extract_year"]
+  group_by_objs: [{"name": "metric_time", "date_part": "year"}]
   check_query: |
     SELECT
       SUM(1) AS bookings
@@ -1062,7 +1062,13 @@ integration_test:
   description: Test query using multiple date_parts
   model: SIMPLE_MODEL
   metrics: ["bookings"]
-  group_bys: ["metric_time__extract_quarter", "metric_time__extract_dow", "metric_time__extract_doy", "metric_time__extract_day", "metric_time__extract_week"]
+  group_by_objs: [
+    {"name": "metric_time", "date_part": "quarter"},
+    {"name": "metric_time", "date_part": "dow"},
+    {"name": "metric_time", "date_part": "doy"},
+    {"name": "metric_time", "date_part": "day"},
+    {"name": "metric_time", "date_part": "week"},
+  ]
   check_query: |
     SELECT
       SUM(1) AS bookings
@@ -1084,7 +1090,7 @@ integration_test:
   description: Tests a derived metric offset query with window and date_part
   model: SIMPLE_MODEL
   metrics: ["bookings_5_day_lag"]
-  group_bys: ["metric_time__extract_month"]
+  group_by_objs: [{"name": "metric_time", "date_part": "month"}]
   check_query: |
     SELECT
       {{ render_extract("a.ds", DatePart.MONTH) }} AS metric_time__extract_month

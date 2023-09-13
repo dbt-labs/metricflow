@@ -19,6 +19,7 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.specs.specs import (
     TimeDimensionSpec,
 )
+from metricflow.time.date_part import DatePart
 from metricflow.time.time_granularity import (
     adjust_to_end_of_period,
     adjust_to_start_of_period,
@@ -38,6 +39,7 @@ class PartialTimeDimensionSpec:
 
     element_name: str
     entity_links: Tuple[EntityReference, ...]
+    date_part: Optional[DatePart] = None
 
 
 @dataclass(frozen=True)
@@ -65,28 +67,34 @@ class TimeGranularitySolver:
     ) -> None:
         self._semantic_manifest_lookup = semantic_manifest_lookup
 
-    def validate_time_granularity(
+    def validate_time_granularity_and_date_part(
         self, metric_references: Sequence[MetricReference], time_dimension_specs: Sequence[TimeDimensionSpec]
     ) -> None:
-        """Check that the granularity specified for time dimensions is valid with respect to the metrics.
+        """Check that the granularity & date_part specified for time dimensions is valid with respect to the metrics.
 
-        e.g. throw an error if "ds__week" is specified for a metric with a time granularity of MONTH.
+        e.g. throw an error if "ds__week" or "extract week" is specified for a metric with a time granularity of MONTH.
         """
         valid_group_by_elements = self._semantic_manifest_lookup.metric_lookup.linkable_set_for_metrics(
             metric_references=metric_references,
         )
 
         for time_dimension_spec in time_dimension_specs:
-            match_found = False
+            match_found_with_granularity = False
+            match_found_for_date_part = False
             for path_key in valid_group_by_elements.path_key_to_linkable_dimensions:
-                if (
-                    path_key.element_name == time_dimension_spec.element_name
-                    and (path_key.entity_links == time_dimension_spec.entity_links)
-                    and path_key.time_granularity == time_dimension_spec.time_granularity
+                if path_key.element_name == time_dimension_spec.element_name and (
+                    path_key.entity_links == time_dimension_spec.entity_links
                 ):
-                    match_found = True
-                    break
-            if not match_found:
+                    if path_key.time_granularity == time_dimension_spec.time_granularity:
+                        match_found_with_granularity = True
+                    if not time_dimension_spec.date_part or (
+                        path_key.time_granularity
+                        and path_key.time_granularity.to_int() <= time_dimension_spec.date_part.to_int()
+                    ):
+                        match_found_for_date_part = True
+                    if match_found_with_granularity and match_found_for_date_part:
+                        break
+            if not (match_found_with_granularity and match_found_for_date_part):
                 raise RequestTimeGranularityException(
                     f"{time_dimension_spec} is not valid for querying {metric_references}"
                 )
@@ -123,6 +131,7 @@ class TimeGranularitySolver:
                     element_name=partial_time_dimension_spec.element_name,
                     entity_links=partial_time_dimension_spec.entity_links,
                     time_granularity=minimum_time_granularity,
+                    date_part=partial_time_dimension_spec.date_part,
                 )
             else:
                 raise RequestTimeGranularityException(

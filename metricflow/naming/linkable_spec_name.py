@@ -37,31 +37,6 @@ class StructuredLinkableSpecName:
         if len(name_parts) == 1:
             return StructuredLinkableSpecName(entity_link_names=(), element_name=name_parts[0])
 
-        associated_date_part: Optional[DatePart] = None
-        for date_part in DatePart:
-            if name_parts[-1] == StructuredLinkableSpecName.date_part_suffix(date_part):
-                associated_date_part = date_part
-
-        # Has a date_part
-        if associated_date_part:
-            #  e.g. "ds__extract_month"
-            if len(name_parts) == 2:
-                # Since DAY works with all currently supported DateParts & changing the granularity will not change the
-                # extracted date part, assume day granularity here.
-                time_granularity = TimeGranularity.DAY
-                return StructuredLinkableSpecName(
-                    entity_link_names=(),
-                    element_name=name_parts[0],
-                    time_granularity=time_granularity,
-                    date_part=associated_date_part,
-                )
-            # e.g. "messages__ds__extract_month"
-            return StructuredLinkableSpecName(
-                entity_link_names=tuple(name_parts[:-2]),
-                element_name=name_parts[-2],
-                date_part=associated_date_part,
-            )
-
         associated_granularity = None
         granularity: TimeGranularity
         for granularity in TimeGranularity:
@@ -94,7 +69,6 @@ class StructuredLinkableSpecName:
             items.append(self.date_part_suffix(date_part=self.date_part))
         elif self.time_granularity:
             items.append(self.time_granularity.value)
-
         return DUNDER.join(items)
 
     @property
