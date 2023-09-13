@@ -28,7 +28,6 @@ class QueryParameter(Protocol):
         raise NotImplementedError
 
 
-
 class QueryInterfaceDimension(Protocol):
     """Represents the interface for Dimension in the query interface."""
 
