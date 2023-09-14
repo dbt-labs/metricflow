@@ -13,7 +13,6 @@ from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.references import EntityReference, MeasureReference, MetricReference
 from dbt_semantic_interfaces.type_enums import DimensionType
 
-from metricflow.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.builder.node_data_set import (
     DataflowPlanNodeOutputDataSetResolver,
@@ -97,6 +96,7 @@ class MetricFlowQueryRequest:
     """
 
     request_id: MetricFlowRequestId
+    saved_query_name: Optional[str] = None
     metric_names: Optional[Sequence[str]] = None
     metrics: Optional[Sequence[QueryInterfaceMetric]] = None
     group_by_names: Optional[Sequence[str]] = None
@@ -113,6 +113,7 @@ class MetricFlowQueryRequest:
 
     @staticmethod
     def create_with_random_request_id(  # noqa: D
+        saved_query_name: Optional[str] = None,
         metric_names: Optional[Sequence[str]] = None,
         metrics: Optional[Sequence[QueryInterfaceMetric]] = None,
         group_by_names: Optional[Sequence[str]] = None,
@@ -127,15 +128,9 @@ class MetricFlowQueryRequest:
         sql_optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O4,
         query_type: MetricFlowQueryType = MetricFlowQueryType.METRIC,
     ) -> MetricFlowQueryRequest:
-        assert_exactly_one_arg_set(metric_names=metric_names, metrics=metrics)
-        assert not (
-            group_by_names and group_by
-        ), "Both group_by_names and group_by were set, but if a group by is specified you should only use one of these!"
-        assert not (
-            order_by_names and order_by
-        ), "Both order_by_names and order_by were set, but if an order by is specified you should only use one of these!"
         return MetricFlowQueryRequest(
             request_id=MetricFlowRequestId(mf_rid=f"{random_id()}"),
+            saved_query_name=saved_query_name,
             metric_names=metric_names,
             metrics=metrics,
             group_by_names=group_by_names,
@@ -413,6 +408,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
     def _create_execution_plan(self, mf_query_request: MetricFlowQueryRequest) -> MetricFlowExplainResult:
         query_spec = self._query_parser.parse_and_validate_query(
+            saved_query_name=mf_query_request.saved_query_name,
             metric_names=mf_query_request.metric_names,
             metrics=mf_query_request.metrics,
             group_by_names=mf_query_request.group_by_names,
