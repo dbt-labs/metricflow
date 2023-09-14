@@ -52,11 +52,19 @@ class WhereSpecFactory:
                 f"Error while rendering Jinja template:\n{where_filter.where_sql_template}"
             ) from e
 
+        dimension_specs = []
+        for dimension in dimension_factory.created:
+            if dimension.time_granularity:
+                # TODO: does order matter?
+                time_dimension_factory.time_dimension_specs.append(dimension.spec)
+            else:
+                dimension_specs.append(dimension.spec)
+
         return WhereFilterSpec(
             where_sql=rendered_sql_template,
             bind_parameters=self._bind_parameters,
             linkable_spec_set=LinkableSpecSet(
-                dimension_specs=tuple(dimension_factory.dimension_specs),
+                dimension_specs=tuple(dimension_specs),
                 time_dimension_specs=tuple(time_dimension_factory.time_dimension_specs),
                 entity_specs=tuple(entity_factory.entity_specs),
             ),

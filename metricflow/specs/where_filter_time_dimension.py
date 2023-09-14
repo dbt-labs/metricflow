@@ -10,6 +10,7 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
 
 from metricflow.specs.column_assoc import ColumnAssociationResolver
+from metricflow.specs.dimension_spec_resolver import DimensionSpecResolver
 from metricflow.specs.query_interface import QueryInterfaceDimension, QueryInterfaceTimeDimensionFactory
 from metricflow.specs.specs import TimeDimensionSpec
 
@@ -57,23 +58,16 @@ class WhereFilterTimeDimensionFactory(ProtocolHint[QueryInterfaceTimeDimensionFa
     ):
         self._call_parameter_sets = call_parameter_sets
         self._column_association_resolver = column_association_resolver
+        self._dimension_spec_resolver = DimensionSpecResolver(call_parameter_sets)
         self.time_dimension_specs: List[TimeDimensionSpec] = []
 
     def create(
         self, time_dimension_name: str, time_granularity_name: str, entity_path: Sequence[str] = ()
     ) -> WhereFilterTimeDimension:
         """Create a WhereFilterTimeDimension."""
-        structured_name = DunderedNameFormatter.parse_name(time_dimension_name)
-        call_parameter_set = TimeDimensionCallParameterSet(
-            time_dimension_reference=TimeDimensionReference(element_name=structured_name.element_name),
-            time_granularity=TimeGranularity(time_granularity_name),
-            entity_path=(
-                tuple(EntityReference(element_name=arg) for arg in entity_path) + structured_name.entity_links
-            ),
+        time_dimension_spec = self._dimension_spec_resolver.resolve_time_dimension_spec(
+            time_dimension_name, time_granularity_name, entity_path
         )
-        assert call_parameter_set in self._call_parameter_sets.time_dimension_call_parameter_sets
-
-        time_dimension_spec = self._convert_to_time_dimension_spec(call_parameter_set)
         self.time_dimension_specs.append(time_dimension_spec)
         column_name = self._column_association_resolver.resolve_spec(time_dimension_spec).column_name
         return WhereFilterTimeDimension(column_name)

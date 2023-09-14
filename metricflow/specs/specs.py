@@ -246,22 +246,19 @@ DEFAULT_TIME_GRANULARITY = TimeGranularity.DAY
 class DimensionSpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
     element_name: str
     entity_links: Tuple[EntityReference, ...]
-    time_granularity: TimeGranularity = DEFAULT_TIME_GRANULARITY
 
     @property
     def without_first_entity_link(self) -> DimensionSpec:  # noqa: D
         assert len(self.entity_links) > 0, f"Spec does not have any entity links: {self}"
-        return DimensionSpec(
-            element_name=self.element_name, entity_links=self.entity_links[1:], time_granularity=self.time_granularity
-        )
+        return DimensionSpec(element_name=self.element_name, entity_links=self.entity_links[1:])
 
     @property
     def without_entity_links(self) -> DimensionSpec:  # noqa: D
-        return DimensionSpec(element_name=self.element_name, entity_links=(), time_granularity=self.time_granularity)
+        return DimensionSpec(element_name=self.element_name, entity_links=())
 
     @staticmethod
     def from_linkable(spec: LinkableInstanceSpec) -> DimensionSpec:  # noqa: D
-        return DimensionSpec(element_name=spec.element_name, entity_links=spec.entity_links)  # TODO: time_granularity?
+        return DimensionSpec(element_name=spec.element_name, entity_links=spec.entity_links)
 
     @staticmethod
     def from_name(name: str) -> DimensionSpec:
@@ -270,7 +267,6 @@ class DimensionSpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
         return DimensionSpec(
             entity_links=tuple([EntityReference(idl) for idl in parsed_name.entity_link_names]),
             element_name=parsed_name.element_name,
-            time_granularity=parsed_name.time_granularity or DEFAULT_TIME_GRANULARITY,
         )
 
     @property
