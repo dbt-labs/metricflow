@@ -3,10 +3,13 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional
 
+from dbt_semantic_interfaces.protocols import ProtocolHint
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from typing_extensions import override
 
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.protocols.query_parameter import InputOrderByParameter
+from metricflow.protocols.query_parameter import SavedQueryParameter as SavedQueryParameterProtocol
 from metricflow.time.date_part import DatePart
 
 
@@ -47,3 +50,14 @@ class OrderByParameter:
 
     order_by: InputOrderByParameter
     descending: bool = False
+
+
+@dataclass(frozen=True)
+class SavedQueryParameter(ProtocolHint[SavedQueryParameterProtocol]):
+    """Dataclass implementation of SavedQueryParameterProtocol."""
+
+    name: str
+
+    @override
+    def _implements_protocol(self) -> SavedQueryParameterProtocol:
+        return self
