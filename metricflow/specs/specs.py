@@ -239,9 +239,6 @@ class LinklessEntitySpec(EntitySpec, SerializableDataclass):
         return LinklessEntitySpec(element_name=entity_reference.element_name, entity_links=())
 
 
-DEFAULT_TIME_GRANULARITY = TimeGranularity.DAY
-
-
 @dataclass(frozen=True)
 class DimensionSpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
     element_name: str
@@ -279,6 +276,9 @@ class DimensionSpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_dimension_spec(self)
+
+
+DEFAULT_TIME_GRANULARITY = TimeGranularity.DAY
 
 
 @dataclass(frozen=True)

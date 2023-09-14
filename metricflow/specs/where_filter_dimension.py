@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from typing import List, Optional, Sequence
+from typing import List, Sequence
 
 from dbt_semantic_interfaces.call_parameter_sets import (
     FilterCallParameterSets,
 )
 from dbt_semantic_interfaces.protocols.protocol_hint import ProtocolHint
 from dbt_semantic_interfaces.type_enums import TimeGranularity
-
 from typing_extensions import override
 
 from metricflow.specs.column_assoc import ColumnAssociationResolver
@@ -36,15 +35,14 @@ class WhereFilterDimension(ProtocolHint[QueryInterfaceDimension]):
         self.name = name
         self.spec = self._dimension_spec_resolver.resolve_dimension_spec(name, entity_path)
         self._column_association_resolver = column_association_resolver
-        self.time_granularity: Optional[TimeGranularity] = None
         self.entity_path = entity_path
 
     def grain(self, time_granularity_name: str) -> QueryInterfaceDimension:
         """The time granularity."""
-        self.time_granularity = TimeGranularity(time_granularity_name)
         self.spec = self._dimension_spec_resolver.resolve_time_dimension_spec(
-            self.name, self.time_granularity, self.entity_path
+            self.name, TimeGranularity(time_granularity_name), self.entity_path
         )
+        return self
 
     def alias(self, _alias: str) -> QueryInterfaceDimension:
         """Renaming the column."""

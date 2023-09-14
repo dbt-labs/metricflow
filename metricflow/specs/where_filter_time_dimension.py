@@ -3,10 +3,8 @@ from __future__ import annotations
 from typing import List, Sequence
 
 from dbt_semantic_interfaces.call_parameter_sets import FilterCallParameterSets, TimeDimensionCallParameterSet
-from dbt_semantic_interfaces.naming.dundered import DunderedNameFormatter
 from dbt_semantic_interfaces.protocols.protocol_hint import ProtocolHint
-from dbt_semantic_interfaces.references import EntityReference, TimeDimensionReference
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.type_enums import TimeGranularity
 from typing_extensions import override
 
 from metricflow.specs.column_assoc import ColumnAssociationResolver
@@ -66,7 +64,7 @@ class WhereFilterTimeDimensionFactory(ProtocolHint[QueryInterfaceTimeDimensionFa
     ) -> WhereFilterTimeDimension:
         """Create a WhereFilterTimeDimension."""
         time_dimension_spec = self._dimension_spec_resolver.resolve_time_dimension_spec(
-            time_dimension_name, time_granularity_name, entity_path
+            time_dimension_name, TimeGranularity(time_granularity_name), entity_path
         )
         self.time_dimension_specs.append(time_dimension_spec)
         column_name = self._column_association_resolver.resolve_spec(time_dimension_spec).column_name

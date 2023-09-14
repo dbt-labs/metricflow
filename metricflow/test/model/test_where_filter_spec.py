@@ -30,11 +30,7 @@ def test_dimension_in_filter(  # noqa: D
     assert where_filter_spec.where_sql == "listing__country_latest = 'US'"
     assert where_filter_spec.linkable_spec_set == LinkableSpecSet(
         dimension_specs=(
-            DimensionSpec(
-                element_name="country_latest",
-                entity_links=(EntityReference(element_name="listing"),),
-                time_granularity=TimeGranularity.DAY,
-            ),
+            DimensionSpec(element_name="country_latest", entity_links=(EntityReference(element_name="listing"),)),
         ),
         time_dimension_specs=(),
         entity_specs=(),
@@ -54,14 +50,14 @@ def test_dimension_in_filter_with_grain(  # noqa: D
 
     assert where_filter_spec.where_sql == "listing__country_latest = 'US'"
     assert where_filter_spec.linkable_spec_set == LinkableSpecSet(
-        dimension_specs=(
-            DimensionSpec(
+        dimension_specs=(),
+        time_dimension_specs=(
+            TimeDimensionSpec(
                 element_name="country_latest",
                 entity_links=(EntityReference(element_name="listing"),),
-                time_granularity=TimeGranularity.DAY,
+                time_granularity=TimeGranularity.WEEK,
             ),
         ),
-        time_dimension_specs=(),
         entity_specs=(),
     )
 

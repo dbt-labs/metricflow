@@ -6,7 +6,7 @@ import jinja2
 from dbt_semantic_interfaces.protocols.where_filter import WhereFilter
 
 from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.specs.specs import LinkableSpecSet, WhereFilterSpec
+from metricflow.specs.specs import LinkableSpecSet, TimeDimensionSpec, WhereFilterSpec
 from metricflow.specs.where_filter_dimension import WhereFilterDimensionFactory
 from metricflow.specs.where_filter_entity import WhereFilterEntityFactory
 from metricflow.specs.where_filter_time_dimension import WhereFilterTimeDimensionFactory
@@ -54,7 +54,7 @@ class WhereSpecFactory:
 
         dimension_specs = []
         for dimension in dimension_factory.created:
-            if dimension.time_granularity:
+            if isinstance(dimension.spec, TimeDimensionSpec):
                 # TODO: does order matter?
                 time_dimension_factory.time_dimension_specs.append(dimension.spec)
             else:
