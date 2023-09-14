@@ -9,11 +9,11 @@ from typing import List, Optional, Sequence, Tuple
 
 import pandas as pd
 from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimensionTypeParams
+from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.references import EntityReference, MeasureReference, MetricReference
 from dbt_semantic_interfaces.type_enums import DimensionType
 
-from metricflow.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.builder.node_data_set import (
     DataflowPlanNodeOutputDataSetResolver,
@@ -53,6 +53,7 @@ from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.random_id import random_id
 from metricflow.specs.column_assoc import ColumnAssociationResolver
+from metricflow.specs.query_param_implementations import SavedQueryParameter
 from metricflow.specs.specs import InstanceSpecSet, MetricFlowQuerySpec
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.telemetry.models import TelemetryLevel
@@ -84,6 +85,8 @@ class MetricFlowQueryType(Enum):
 class MetricFlowQueryRequest:
     """Encapsulates the parameters for a metric query.
 
+    TODO: This has turned into a bag of parameters that make it difficult to use without a bunch of conditionals.
+
     metric_names: Names of the metrics to query.
     metrics: Metric objects to query.
     group_by_names: Names of the dimensions and entities to query.
@@ -100,6 +103,7 @@ class MetricFlowQueryRequest:
     """
 
     request_id: MetricFlowRequestId
+    saved_query_name: Optional[str] = None
     metric_names: Optional[Sequence[str]] = None
     metrics: Optional[Sequence[MetricQueryParameter]] = None
     group_by_names: Optional[Sequence[str]] = None
@@ -116,6 +120,7 @@ class MetricFlowQueryRequest:
 
     @staticmethod
     def create_with_random_request_id(  # noqa: D
+        saved_query_name: Optional[str] = None,
         metric_names: Optional[Sequence[str]] = None,
         metrics: Optional[Sequence[MetricQueryParameter]] = None,
         group_by_names: Optional[Sequence[str]] = None,
@@ -130,15 +135,9 @@ class MetricFlowQueryRequest:
         sql_optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O4,
         query_type: MetricFlowQueryType = MetricFlowQueryType.METRIC,
     ) -> MetricFlowQueryRequest:
-        assert_exactly_one_arg_set(metric_names=metric_names, metrics=metrics)
-        assert not (
-            group_by_names and group_by
-        ), "Both group_by_names and group_by were set, but if a group by is specified you should only use one of these!"
-        assert not (
-            order_by_names and order_by
-        ), "Both order_by_names and order_by were set, but if an order by is specified you should only use one of these!"
         return MetricFlowQueryRequest(
             request_id=MetricFlowRequestId(mf_rid=f"{random_id()}"),
+            saved_query_name=saved_query_name,
             metric_names=metric_names,
             metrics=metrics,
             group_by_names=group_by_names,
@@ -417,18 +416,34 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         return TimeRangeConstraint.all_time()
 
     def _create_execution_plan(self, mf_query_request: MetricFlowQueryRequest) -> MetricFlowExplainResult:
-        query_spec = self._query_parser.parse_and_validate_query(
-            metric_names=mf_query_request.metric_names,
-            metrics=mf_query_request.metrics,
-            group_by_names=mf_query_request.group_by_names,
-            group_by=mf_query_request.group_by,
-            limit=mf_query_request.limit,
-            time_constraint_start=mf_query_request.time_constraint_start,
-            time_constraint_end=mf_query_request.time_constraint_end,
-            where_constraint_str=mf_query_request.where_constraint,
-            order_by_names=mf_query_request.order_by_names,
-            order_by=mf_query_request.order_by,
-        )
+        if mf_query_request.saved_query_name is not None:
+            if mf_query_request.metrics or mf_query_request.metric_names:
+                raise InvalidQueryException("Metrics can't be specified with a saved query.")
+            if mf_query_request.group_by or mf_query_request.group_by_names:
+                raise InvalidQueryException("Group by items can't be specified with a saved query.")
+            query_spec = self._query_parser.parse_and_validate_saved_query(
+                saved_query_parameter=SavedQueryParameter(mf_query_request.saved_query_name),
+                where_filter=(
+                    PydanticWhereFilter(where_sql_template=mf_query_request.where_constraint)
+                    if mf_query_request.where_constraint is not None
+                    else None
+                ),
+                limit=mf_query_request.limit,
+                order_by_parameters=mf_query_request.order_by,
+            )
+        else:
+            query_spec = self._query_parser.parse_and_validate_query(
+                metric_names=mf_query_request.metric_names,
+                metrics=mf_query_request.metrics,
+                group_by_names=mf_query_request.group_by_names,
+                group_by=mf_query_request.group_by,
+                limit=mf_query_request.limit,
+                time_constraint_start=mf_query_request.time_constraint_start,
+                time_constraint_end=mf_query_request.time_constraint_end,
+                where_constraint_str=mf_query_request.where_constraint,
+                order_by_names=mf_query_request.order_by_names,
+                order_by=mf_query_request.order_by,
+            )
         logger.info(f"Query spec is:\n{pformat_big_objects(query_spec)}")
 
         if self._semantic_manifest_lookup.metric_lookup.contains_cumulative_or_time_offset_metric(

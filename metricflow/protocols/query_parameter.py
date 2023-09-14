@@ -61,3 +61,11 @@ class OrderByQueryParameter(Protocol):
     def descending(self) -> bool:
         """Indicates if the order should be ascending or descending."""
         raise NotImplementedError
+
+
+class SavedQueryParameter(Protocol):
+    """Name of the saved query to execute."""
+
+    @property
+    def name(self) -> str:  # noqa: D
+        raise NotImplementedError
