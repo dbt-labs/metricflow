@@ -172,9 +172,10 @@ def assert_snapshot_text_equal(
         # Create parent directory for the plan text files.
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         with open(file_path, "w") as snapshot_text_file:
-            snapshot_text_file.write(snapshot_text)
             # Add a new line at the end of the file so that PRSs don't show the "no newline" symbol on Github.
-            snapshot_text_file.write("\n")
+            if len(snapshot_text) > 1 and snapshot_text[-1] != "\n":
+                snapshot_text = snapshot_text + "\n"
+            snapshot_text_file.write(snapshot_text)
 
     # Throw an exception if the plan is not there.
     if not os.path.exists(file_path):
@@ -198,8 +199,7 @@ def assert_snapshot_text_equal(
 
     # Read the existing plan from the file and compare with the actual plan
     with open(file_path, "r") as snapshot_text_file:
-        # Remove the newline that was added from above.
-        expected_snapshot_text = snapshot_text_file.read().rstrip()
+        expected_snapshot_text = snapshot_text_file.read()
 
         if exclude_line_regex:
             # Filter out lines that should be ignored.

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import shutil
 import textwrap
 from contextlib import contextmanager
@@ -7,6 +8,7 @@ from pathlib import Path
 from typing import Iterator
 
 import pytest
+from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.parsing.dir_to_model import (
     parse_yaml_files_to_validation_ready_semantic_manifest,
 )
@@ -25,7 +27,14 @@ from metricflow.cli.main import (
 )
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.test.fixtures.cli_fixtures import MetricFlowCliRunner
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.model.example_project_configuration import EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE
+from metricflow.test.snapshot_utils import assert_object_snapshot_equal
+
+logger = logging.getLogger(__name__)
+
+
+# TODO: Use snapshots to compare CLI output for all tests here.
 
 
 def test_query(capsys: pytest.CaptureFixture, cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
@@ -144,3 +153,38 @@ def test_list_entities(capsys: pytest.CaptureFixture, cli_runner: MetricFlowCliR
 
     assert "guest" in resp.output
     assert "host" in resp.output
+
+
+def test_saved_query(  # noqa: D
+    request: FixtureRequest,
+    capsys: pytest.CaptureFixture,
+    mf_test_session_state: MetricFlowTestSessionState,
+    cli_runner: MetricFlowCliRunner,
+) -> None:
+    # Disabling capsys to resolve error "ValueError: I/O operation on closed file". Better solution TBD.
+    with capsys.disabled():
+        resp = cli_runner.run(
+            query, args=["--saved-query", "p0_booking", "--order", "metric_time__day,listing__capacity_latest"]
+        )
+
+    assert resp.exit_code == 0
+
+    assert_object_snapshot_equal(
+        request=request, mf_test_session_state=mf_test_session_state, obj_id="cli_output", obj=resp.output
+    )
+
+
+def test_saved_query_explain(  # noqa: D
+    capsys: pytest.CaptureFixture,
+    mf_test_session_state: MetricFlowTestSessionState,
+    cli_runner: MetricFlowCliRunner,
+) -> None:
+    # Disabling capsys to resolve error "ValueError: I/O operation on closed file". Better solution TBD.
+    with capsys.disabled():
+        resp = cli_runner.run(
+            query,
+            args=["--explain", "--saved-query", "p0_booking", "--order", "metric_time__day,listing__capacity_latest"],
+        )
+
+    # Currently difficult to compare explain output due to randomly generated IDs.
+    assert resp.exit_code == 0
