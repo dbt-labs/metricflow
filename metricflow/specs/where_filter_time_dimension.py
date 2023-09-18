@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import List, Sequence
 
-from dbt_semantic_interfaces.call_parameter_sets import FilterCallParameterSets, TimeDimensionCallParameterSet
+from dbt_semantic_interfaces.call_parameter_sets import FilterCallParameterSets
 from dbt_semantic_interfaces.protocols.protocol_hint import ProtocolHint
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from typing_extensions import override
@@ -69,13 +69,3 @@ class WhereFilterTimeDimensionFactory(ProtocolHint[QueryInterfaceTimeDimensionFa
         self.time_dimension_specs.append(time_dimension_spec)
         column_name = self._column_association_resolver.resolve_spec(time_dimension_spec).column_name
         return WhereFilterTimeDimension(column_name)
-
-    def _convert_to_time_dimension_spec(
-        self,
-        parameter_set: TimeDimensionCallParameterSet,
-    ) -> TimeDimensionSpec:  # noqa: D
-        return TimeDimensionSpec(
-            element_name=parameter_set.time_dimension_reference.element_name,
-            entity_links=parameter_set.entity_path,
-            time_granularity=parameter_set.time_granularity,
-        )
