@@ -34,6 +34,7 @@ def cyclic_join_manifest_dataflow_plan_builder(  # noqa: D
 
     return DataflowPlanBuilder(
         source_nodes=consistent_id_object_repository.cyclic_join_source_nodes,
+        source_nodes_without_measures=consistent_id_object_repository.simple_model_source_nodes_without_measures,
         semantic_manifest_lookup=cyclic_join_semantic_manifest_lookup,
         cost_function=DefaultCostFunction(),
     )

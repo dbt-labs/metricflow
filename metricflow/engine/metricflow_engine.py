@@ -347,6 +347,9 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
         source_node_builder = SourceNodeBuilder(self._semantic_manifest_lookup)
         source_nodes = source_node_builder.create_from_data_sets(self._source_data_sets)
+        source_nodes_without_measures = source_node_builder.create_from_data_sets(
+            self._source_data_sets, with_measures=False
+        )
 
         node_output_resolver = DataflowPlanNodeOutputDataSetResolver(
             column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup),
@@ -355,6 +358,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
         self._dataflow_plan_builder = DataflowPlanBuilder(
             source_nodes=source_nodes,
+            source_nodes_without_measures=source_nodes_without_measures,
             semantic_manifest_lookup=self._semantic_manifest_lookup,
         )
         self._to_sql_query_plan_converter = DataflowToSqlQueryPlanConverter(
@@ -478,12 +482,15 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 time_dimension_specs=query_spec.time_dimension_specs,
             )
 
-        dataflow_plan = self._dataflow_plan_builder.build_plan(
-            query_spec=query_spec,
-            output_sql_table=output_table,
-            output_selection_specs=output_selection_specs,
-            optimizers=(SourceScanOptimizer(),),
-        )
+        if query_spec.metric_specs:
+            dataflow_plan = self._dataflow_plan_builder.build_plan(
+                query_spec=query_spec,
+                output_sql_table=output_table,
+                output_selection_specs=output_selection_specs,
+                optimizers=(SourceScanOptimizer(),),
+            )
+        else:
+            dataflow_plan = self._dataflow_plan_builder.build_plan_for_distinct_values(query_spec=query_spec)
 
         if len(dataflow_plan.sink_output_nodes) > 1:
             raise NotImplementedError(

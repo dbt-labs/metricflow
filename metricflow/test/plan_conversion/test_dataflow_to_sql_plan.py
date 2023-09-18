@@ -1252,12 +1252,12 @@ def test_distinct_values(  # noqa: D
 ) -> None:
     """Tests a plan to get distinct values for a dimension."""
     dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
-        metric_specs=(MetricSpec(element_name="bookings"),),
-        dimension_spec=DimensionSpec(
-            element_name="country_latest",
-            entity_links=(EntityReference(element_name="listing"),),
-        ),
-        limit=100,
+        query_spec=MetricFlowQuerySpec(
+            dimension_specs=(
+                DimensionSpec(element_name="country_latest", entity_links=(EntityReference(element_name="listing"),)),
+            ),
+            limit=100,
+        )
     )
 
     convert_and_check(
