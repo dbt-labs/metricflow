@@ -289,25 +289,6 @@ class MetricFlowQueryParser:
             )
         return tuple(metric_specs)
 
-    def _get_group_by_names(
-        self, group_by_names: Optional[Sequence[str]], group_by: Optional[Sequence[QueryParameter]]
-    ) -> Sequence[str]:
-        assert not (
-            group_by_names and group_by
-        ), "Both group_by_names and group_by were set, but if a group by is specified you should only use one of these!"
-        return (
-            group_by_names
-            if group_by_names
-            else [
-                StructuredLinkableSpecName(
-                    entity_link_names=(), element_name=g.name, time_granularity=g.grain, date_part=g.date_part
-                ).qualified_name
-                for g in group_by
-            ]
-            if group_by
-            else []
-        )
-
     def _get_metric_names(
         self, metric_names: Optional[Sequence[str]], metrics: Optional[Sequence[QueryInterfaceMetric]]
     ) -> Sequence[str]:
@@ -551,7 +532,8 @@ class MetricFlowQueryParser:
                 if time_dimension_spec.date_part.to_int() < time_dimension_spec.time_granularity.to_int():
                     raise RequestTimeGranularityException(
                         f"Date part {time_dimension_spec.date_part.name} is not compatible with time granularity "
-                        f"{time_dimension_spec.time_granularity.name}."
+                        f"{time_dimension_spec.time_granularity.name}. Compatible granularities include: "
+                        f"{[granularity.name for granularity in time_dimension_spec.date_part.compatible_granularities]}"
                     )
         if date_part_requested:
             for metric_reference in metric_references:
@@ -686,7 +668,9 @@ class MetricFlowQueryParser:
         linkable_elements: Optional[Sequence[QueryParameter]] = None,
     ) -> QueryTimeLinkableSpecSet:
         """Convert the linkable spec names into the respective specification objects."""
-        assert not (qualified_linkable_names and linkable_elements)
+        assert not (
+            qualified_linkable_names and linkable_elements
+        ), "Both group_by_names and group_by were set, but if a group by is specified you should only use one of these!"
 
         structured_names: List[StructuredLinkableSpecName] = []
         if qualified_linkable_names:

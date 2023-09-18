@@ -37,8 +37,13 @@ class StructuredLinkableSpecName:
         if len(name_parts) == 1:
             return StructuredLinkableSpecName(entity_link_names=(), element_name=name_parts[0])
 
+        for date_part in DatePart:
+            if name_parts[-1] == StructuredLinkableSpecName.date_part_suffix(date_part=date_part):
+                raise ValueError(
+                    "Dunder syntax not supported for querying date_part. Use `group_by` object syntax instead."
+                )
+
         associated_granularity = None
-        granularity: TimeGranularity
         for granularity in TimeGranularity:
             if name_parts[-1] == granularity.value:
                 associated_granularity = granularity

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum
+from typing import List
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
@@ -38,3 +39,8 @@ class DatePart(Enum):
             return TimeGranularity.YEAR.to_int()
         else:
             assert_values_exhausted(self)
+
+    @property
+    def compatible_granularities(self) -> List[TimeGranularity]:
+        """Granularities that can be queried with this date part."""
+        return [granularity for granularity in TimeGranularity if granularity.to_int() >= self.to_int()]
