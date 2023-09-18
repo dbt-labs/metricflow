@@ -8,6 +8,7 @@ from dbt_semantic_interfaces.protocols.protocol_hint import ProtocolHint
 from dbt_semantic_interfaces.references import EntityReference, TimeDimensionReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
+from metricflow.errors.errors import InvalidQuerySyntax
 
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.query_interface import QueryInterfaceTimeDimension, QueryInterfaceTimeDimensionFactory
@@ -52,9 +53,17 @@ class WhereFilterTimeDimensionFactory(ProtocolHint[QueryInterfaceTimeDimensionFa
         self.time_dimension_specs: List[TimeDimensionSpec] = []
 
     def create(
-        self, time_dimension_name: str, time_granularity_name: str, entity_path: Sequence[str] = ()
+        self,
+        time_dimension_name: str,
+        time_granularity_name: str,
+        descending: bool = False,
+        entity_path: Sequence[str] = (),
     ) -> WhereFilterTimeDimension:
         """Create a WhereFilterTimeDimension."""
+        if descending:
+            raise InvalidQuerySyntax(
+                "Can't set descending in the where clause. Try setting descending in the order_by clause instead"
+            )
         structured_name = DunderedNameFormatter.parse_name(time_dimension_name)
         call_parameter_set = TimeDimensionCallParameterSet(
             time_dimension_reference=TimeDimensionReference(element_name=structured_name.element_name),

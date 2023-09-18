@@ -10,6 +10,7 @@ from dbt_semantic_interfaces.naming.dundered import DunderedNameFormatter
 from dbt_semantic_interfaces.protocols.protocol_hint import ProtocolHint
 from dbt_semantic_interfaces.references import EntityReference
 from typing_extensions import override
+from metricflow.errors.errors import InvalidQuerySyntax
 
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.query_interface import QueryInterfaceEntity, QueryInterfaceEntityFactory
@@ -25,6 +26,12 @@ class WhereFilterEntity(ProtocolHint[QueryInterfaceEntity]):
 
     def __init__(self, column_name: str):  # noqa
         self.column_name = column_name
+
+    def descending(self, _is_descending: bool) -> QueryInterfaceEntity:
+        """Set the sort order for order-by."""
+        raise InvalidQuerySyntax(
+            "Can't set descending in the where clause. Try setting descending in the order_by clause instead"
+        )
 
     def __str__(self) -> str:
         """Returns the column name.
