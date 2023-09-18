@@ -13,8 +13,8 @@ from dbt_semantic_interfaces.references import (
     EntityReference,
 )
 from typing_extensions import override
-from metricflow.errors.errors import InvalidQuerySyntax
 
+from metricflow.errors.errors import InvalidQuerySyntax
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.query_interface import (
     QueryInterfaceDimension,

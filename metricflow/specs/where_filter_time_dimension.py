@@ -8,8 +8,8 @@ from dbt_semantic_interfaces.protocols.protocol_hint import ProtocolHint
 from dbt_semantic_interfaces.references import EntityReference, TimeDimensionReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
-from metricflow.errors.errors import InvalidQuerySyntax
 
+from metricflow.errors.errors import InvalidQuerySyntax
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.query_interface import QueryInterfaceTimeDimension, QueryInterfaceTimeDimensionFactory
 from metricflow.specs.specs import TimeDimensionSpec

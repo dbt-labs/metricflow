@@ -175,14 +175,15 @@ class MockQueryParameter:
     """This is a mock that is just used to test the query parser."""
 
     grain = None
+    descending = False
 
     def __init__(self, name: str):  # noqa: D
         self.name = name
 
 
 def test_query_parser_with_object_params(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D
-    Metric = namedtuple("Metric", ["name"])
-    metric = Metric("bookings")
+    Metric = namedtuple("Metric", ["name", "descending"])
+    metric = Metric("bookings", False)
     group_by = [
         MockQueryParameter("booking__is_instant"),
         MockQueryParameter("listing"),

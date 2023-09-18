@@ -6,7 +6,7 @@ from typing import Protocol, Sequence
 class QueryInterfaceMetric(Protocol):
     """Represents the interface for Metric in the query interface."""
 
-    def descending(self, _is_descending: bool) -> QueryInterfaceDimension:
+    def descending(self, _is_descending: bool) -> QueryInterfaceMetric:
         """Set the sort order for order-by."""
         raise NotImplementedError
 
@@ -64,7 +64,7 @@ class QueryInterfaceTimeDimensionFactory(Protocol):
 class QueryInterfaceEntity(Protocol):
     """Represents the interface for Entity in the query interface."""
 
-    def descending(self, _is_descending: bool) -> QueryInterfaceDimension:
+    def descending(self, _is_descending: bool) -> QueryInterfaceEntity:
         """Set the sort order for order-by."""
         raise NotImplementedError
 
