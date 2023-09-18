@@ -10,31 +10,19 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
 
 from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.specs.query_interface import QueryInterfaceDimension, QueryInterfaceTimeDimensionFactory
+from metricflow.specs.query_interface import QueryInterfaceTimeDimension, QueryInterfaceTimeDimensionFactory
 from metricflow.specs.specs import TimeDimensionSpec
 
 
-class WhereFilterTimeDimension(ProtocolHint[QueryInterfaceDimension]):
+class WhereFilterTimeDimension(ProtocolHint[QueryInterfaceTimeDimension]):
     """A time dimension that is passed in through the where filter parameter."""
 
     @override
-    def _implements_protocol(self) -> QueryInterfaceDimension:
+    def _implements_protocol(self) -> QueryInterfaceTimeDimension:
         return self
 
     def __init__(self, column_name: str):  # noqa
         self.column_name = column_name
-
-    def grain(self, _grain: str) -> WhereFilterTimeDimension:
-        """The time granularity."""
-        raise NotImplementedError
-
-    def date_part(self, _date_part: str) -> WhereFilterTimeDimension:
-        """Requested date_part to extract."""
-        raise NotImplementedError
-
-    def alias(self, _alias: str) -> WhereFilterTimeDimension:
-        """Renaming the column."""
-        raise NotImplementedError
 
     def __str__(self) -> str:
         """Returns the column name.

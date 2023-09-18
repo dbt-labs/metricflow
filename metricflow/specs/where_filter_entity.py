@@ -26,14 +26,6 @@ class WhereFilterEntity(ProtocolHint[QueryInterfaceEntity]):
     def __init__(self, column_name: str):  # noqa
         self.column_name = column_name
 
-    def grain(self, _grain: str) -> WhereFilterEntity:
-        """The time granularity."""
-        raise NotImplementedError
-
-    def alias(self, _alias: str) -> WhereFilterEntity:
-        """Renaming the column."""
-        raise NotImplementedError
-
     def __str__(self) -> str:
         """Returns the column name.
 
