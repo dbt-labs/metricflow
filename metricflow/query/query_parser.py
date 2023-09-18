@@ -679,8 +679,6 @@ class MetricFlowQueryParser:
         elif linkable_elements:
             for linkable_element in linkable_elements:
                 parsed_name = StructuredLinkableSpecName.from_name(linkable_element.name)
-                if parsed_name.time_granularity:
-                    raise ValueError("Must use object syntax for `grain` parameter if `date_part` is requested.")
                 structured_name = StructuredLinkableSpecName(
                     entity_link_names=parsed_name.entity_link_names,
                     element_name=parsed_name.element_name,

@@ -19,6 +19,7 @@ from metricflow.plan_conversion.column_resolver import (
     DunderColumnAssociationResolver,
 )
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.specs.query_param_implementations import DimensionQueryParameter
 from metricflow.sql.sql_exprs import (
     SqlCastToTimestampExpression,
     SqlColumnReference,
@@ -32,7 +33,6 @@ from metricflow.sql.sql_exprs import (
     SqlTimeDeltaExpression,
 )
 from metricflow.test.compare_df import assert_dataframes_equal
-from metricflow.test.conftest import MockQueryParameter
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.integration.configured_test_case import (
     CONFIGURED_INTEGRATION_TESTS_REPOSITORY,
@@ -255,7 +255,7 @@ def test_case(
 
     check_query_helpers = CheckQueryHelpers(sql_client)
 
-    group_by: List[MockQueryParameter] = []
+    group_by: List[DimensionQueryParameter] = []
     for group_by_kwargs in case.group_by_objs:
         kwargs = copy(group_by_kwargs)
         date_part = kwargs.get("date_part")
@@ -264,7 +264,7 @@ def test_case(
             kwargs["date_part"] = DatePart(date_part)
         if grain:
             kwargs["grain"] = TimeGranularity(grain)
-        group_by.append(MockQueryParameter(**kwargs))
+        group_by.append(DimensionQueryParameter(**kwargs))
     query_result = engine.query(
         MetricFlowQueryRequest.create_with_random_request_id(
             metric_names=case.metrics,
