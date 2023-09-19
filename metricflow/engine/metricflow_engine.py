@@ -456,6 +456,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 query_spec = self._query_parser.parse_and_validate_query(
                     metric_names=mf_query_request.metric_names,
                     group_by_names=mf_query_request.group_by_names,
+                    group_by=mf_query_request.group_by,
                     limit=mf_query_request.limit,
                     time_constraint_start=mf_query_request.time_constraint_start,
                     time_constraint_end=mf_query_request.time_constraint_end,

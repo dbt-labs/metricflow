@@ -41,6 +41,7 @@
                         <!--    'element_name': 'metric_time',            -->
                         <!--    'entity_links': (),                       -->
                         <!--    'time_granularity': TimeGranularity.DAY,  -->
+                        <!--    'date_part': None,                        -->
                         <!--    'aggregation_state': None}                -->
                         <JoinToTimeSpineNode>
                             <!-- description = Join to Time Spine Dataset -->

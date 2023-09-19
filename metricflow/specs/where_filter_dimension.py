@@ -36,6 +36,10 @@ class WhereFilterDimension(ProtocolHint[QueryInterfaceDimension]):
         """The time granularity."""
         raise NotImplementedError
 
+    def date_part(self, _date_part: str) -> QueryInterfaceDimension:
+        """The date_part requested to extract."""
+        raise NotImplementedError
+
     def alias(self, _alias: str) -> QueryInterfaceDimension:
         """Renaming the column."""
         raise NotImplementedError
