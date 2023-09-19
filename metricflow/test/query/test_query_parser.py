@@ -431,14 +431,15 @@ def test_date_part_parsing() -> None:
             group_by=[MockQueryParameter(name="metric_time", date_part=DatePart.MONTH)],
         )
 
+    # Requested granularity doesn't match resolved granularity
+    with pytest.raises(RequestTimeGranularityException):
+        query_parser.parse_and_validate_query(
+            metric_names=["revenue"],
+            group_by=[MockQueryParameter(name="metric_time", grain=TimeGranularity.YEAR, date_part=DatePart.MONTH)],
+        )
+
     # Date part is compatible
     query_parser.parse_and_validate_query(
         metric_names=["revenue"],
         group_by=[MockQueryParameter(name="metric_time", date_part=DatePart.MONTH)],
-    )
-
-    # Incompatible granularity gets overriden
-    query_parser.parse_and_validate_query(
-        metric_names=["revenue"],
-        group_by=[MockQueryParameter(name="metric_time", grain=TimeGranularity.YEAR, date_part=DatePart.MONTH)],
     )

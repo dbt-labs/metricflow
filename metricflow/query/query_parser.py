@@ -706,15 +706,19 @@ class MetricFlowQueryParser:
                             time_granularity=structured_name.time_granularity,
                         )
                     )
-                # If date part is passed, remove requested granularity (to be overridden with default).
                 else:
-                    partial_time_dimension_specs.append(
-                        PartialTimeDimensionSpec(
-                            element_name=element_name,
-                            entity_links=entity_links,
-                            date_part=structured_name.date_part,
-                        )
+                    partial_time_dimension_spec = PartialTimeDimensionSpec(
+                        element_name=element_name, entity_links=entity_links, date_part=structured_name.date_part
                     )
+                    # If both granularity & date_part are requested, verify requested & resolved granularities match.
+                    if structured_name.time_granularity and structured_name.date_part:
+                        self._verify_resolved_granularity_for_date_part(
+                            requested_dimension_structured_name=structured_name,
+                            partial_time_dimension_spec=partial_time_dimension_spec,
+                            metric_references=metric_references,
+                        )
+                    partial_time_dimension_specs.append(partial_time_dimension_spec)
+
             elif DimensionReference(element_name=element_name) in self._known_dimension_element_references:
                 dimension_specs.append(DimensionSpec(element_name=element_name, entity_links=entity_links))
             elif EntityReference(element_name=element_name) in self._known_entity_element_references:
@@ -753,6 +757,25 @@ class MetricFlowQueryParser:
             partial_time_dimension_specs=tuple(partial_time_dimension_specs),
             entity_specs=tuple(entity_specs),
         )
+
+    def _verify_resolved_granularity_for_date_part(
+        self,
+        requested_dimension_structured_name: StructuredLinkableSpecName,
+        partial_time_dimension_spec: PartialTimeDimensionSpec,
+        metric_references: Sequence[MetricReference],
+    ) -> None:
+        resolved_granularity = list(
+            self._time_granularity_solver.resolve_granularity_for_partial_time_dimension_specs(
+                metric_references=metric_references,
+                partial_time_dimension_specs=(partial_time_dimension_spec,),
+            ).values()
+        )[0].time_granularity
+        if resolved_granularity != requested_dimension_structured_name.time_granularity:
+            raise RequestTimeGranularityException(
+                f"When applying a date part to dimension '{requested_dimension_structured_name.qualified_name}' with "
+                f"metrics {[metric.element_name for metric in metric_references]}, only {resolved_granularity.name} "
+                "granularity can be used."
+            )
 
     def _get_invalid_linkable_specs(
         self,
