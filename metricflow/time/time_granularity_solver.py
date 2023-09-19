@@ -102,38 +102,48 @@ class TimeGranularitySolver:
 
         Returns a dictionary that maps how the partial time dimension spec should be turned into a time dimension spec.
         """
+        result: Dict[PartialTimeDimensionSpec, TimeDimensionSpec] = {}
+        for partial_time_dimension_spec in partial_time_dimension_specs:
+            minimum_time_granularity = self.find_minimum_granularity_for_partial_time_dimension_spec(
+                partial_time_dimension_spec=partial_time_dimension_spec, metric_references=metric_references
+            )
+            result[partial_time_dimension_spec] = TimeDimensionSpec(
+                element_name=partial_time_dimension_spec.element_name,
+                entity_links=partial_time_dimension_spec.entity_links,
+                time_granularity=minimum_time_granularity,
+                date_part=partial_time_dimension_spec.date_part,
+            )
+        return result
+
+    def find_minimum_granularity_for_partial_time_dimension_spec(
+        self, partial_time_dimension_spec: PartialTimeDimensionSpec, metric_references: Sequence[MetricReference]
+    ) -> TimeGranularity:
+        """Find minimum granularity allowed for time dimension when queried with given metrics."""
         valid_group_by_elements = self._semantic_manifest_lookup.metric_lookup.linkable_set_for_metrics(
             metric_references=metric_references,
         )
-        result: Dict[PartialTimeDimensionSpec, TimeDimensionSpec] = {}
-        for partial_time_dimension_spec in partial_time_dimension_specs:
-            minimum_time_granularity: Optional[TimeGranularity] = None
-            for path_key in valid_group_by_elements.path_key_to_linkable_dimensions:
-                if (
-                    path_key.element_name == partial_time_dimension_spec.element_name
-                    and path_key.entity_links == partial_time_dimension_spec.entity_links
-                    and path_key.time_granularity is not None
-                ):
-                    minimum_time_granularity = (
-                        path_key.time_granularity
-                        if minimum_time_granularity is None
-                        else min(minimum_time_granularity, path_key.time_granularity)
-                    )
 
-            if minimum_time_granularity is not None:
-                result[partial_time_dimension_spec] = TimeDimensionSpec(
-                    element_name=partial_time_dimension_spec.element_name,
-                    entity_links=partial_time_dimension_spec.entity_links,
-                    time_granularity=minimum_time_granularity,
-                    date_part=partial_time_dimension_spec.date_part,
+        minimum_time_granularity: Optional[TimeGranularity] = None
+        for path_key in valid_group_by_elements.path_key_to_linkable_dimensions:
+            if (
+                path_key.element_name == partial_time_dimension_spec.element_name
+                and path_key.entity_links == partial_time_dimension_spec.entity_links
+                and path_key.time_granularity is not None
+            ):
+                minimum_time_granularity = (
+                    path_key.time_granularity
+                    if minimum_time_granularity is None
+                    else min(minimum_time_granularity, path_key.time_granularity)
                 )
-            else:
-                raise RequestTimeGranularityException(
-                    f"Unable to resolve the time dimension spec for {partial_time_dimension_spec}. "
-                    f"Valid group by elements are:\n"
-                    f"{pformat_big_objects([spec.qualified_name for spec in valid_group_by_elements.as_spec_set.as_tuple])}"
-                )
-        return result
+
+        if not minimum_time_granularity:
+            raise RequestTimeGranularityException(
+                f"Unable to resolve the time dimension spec for {partial_time_dimension_spec}. "
+                f"Valid group by elements are:\n"
+                f"{pformat_big_objects([spec.qualified_name for spec in valid_group_by_elements.as_spec_set.as_tuple])}"
+            )
+
+        return minimum_time_granularity
 
     def adjust_time_range_to_granularity(
         self, time_range_constraint: TimeRangeConstraint, time_granularity: TimeGranularity

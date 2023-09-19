@@ -764,12 +764,15 @@ class MetricFlowQueryParser:
         partial_time_dimension_spec: PartialTimeDimensionSpec,
         metric_references: Sequence[MetricReference],
     ) -> None:
-        resolved_granularity = list(
-            self._time_granularity_solver.resolve_granularity_for_partial_time_dimension_specs(
-                metric_references=metric_references,
-                partial_time_dimension_specs=(partial_time_dimension_spec,),
-            ).values()
-        )[0].time_granularity
+        """Enforce that any granularity value associated with a date part query is the minimum.
+
+        By default, we will always ensure that a date_part query request uses the minimum granularity.
+        However, there are some interfaces where the user must pass in a granularity, so we need a check to
+        ensure that the correct value was passed in.
+        """
+        resolved_granularity = self._time_granularity_solver.find_minimum_granularity_for_partial_time_dimension_spec(
+            partial_time_dimension_spec=partial_time_dimension_spec, metric_references=metric_references
+        )
         if resolved_granularity != requested_dimension_structured_name.time_granularity:
             raise RequestTimeGranularityException(
                 f"When applying a date part to dimension '{requested_dimension_structured_name.qualified_name}' with "

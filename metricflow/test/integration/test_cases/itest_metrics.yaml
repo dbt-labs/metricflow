@@ -1104,3 +1104,16 @@ integration_test:
     ) b
     ON {{ render_date_sub("a", "ds", 5, TimeGranularity.DAY) }} = b.metric_time__day
     GROUP BY metric_time__extract_month
+---
+integration_test:
+  name: simple_distinct_query_with_date_part
+  description: Test count distinct query using date_part
+  model: SIMPLE_MODEL
+  metrics: ["bookers"]
+  group_by_objs: [{"name": "metric_time", "date_part": "dow"}]
+  check_query: |
+    SELECT
+      COUNT(DISTINCT guest_id) AS bookers
+      , {{ render_extract("ds", DatePart.DOW) }} AS metric_time__extract_dow
+    FROM {{ source_schema }}.fct_bookings
+    GROUP BY {{ render_extract("ds", DatePart.DOW) }};
