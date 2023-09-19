@@ -4,7 +4,7 @@ import logging
 import os
 from collections import OrderedDict
 from enum import Enum
-from typing import Optional, Sequence, Tuple
+from typing import Dict, Optional, Sequence, Tuple
 
 import yaml
 from dbt_semantic_interfaces.implementations.base import FrozenBaseModel
@@ -53,6 +53,7 @@ class ConfiguredIntegrationTestCase(FrozenBaseModel):
     check_query: str
     file_path: str
     group_bys: Tuple[str, ...] = ()
+    group_by_objs: Tuple[Dict, ...] = ()
     order_bys: Tuple[str, ...] = ()
     # The required features in the DW engine for the test to complete.
     required_features: Tuple[RequiredDwEngineFeatures, ...] = ()

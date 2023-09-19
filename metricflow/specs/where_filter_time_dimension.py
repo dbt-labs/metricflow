@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List, Sequence
+from typing import List, Optional, Sequence
 
 from dbt_semantic_interfaces.call_parameter_sets import FilterCallParameterSets, TimeDimensionCallParameterSet
 from dbt_semantic_interfaces.naming.dundered import DunderedNameFormatter
@@ -57,6 +57,7 @@ class WhereFilterTimeDimensionFactory(ProtocolHint[QueryInterfaceTimeDimensionFa
         time_dimension_name: str,
         time_granularity_name: str,
         descending: bool = False,
+        date_part_name: Optional[str] = None,
         entity_path: Sequence[str] = (),
     ) -> WhereFilterTimeDimension:
         """Create a WhereFilterTimeDimension."""

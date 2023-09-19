@@ -21,9 +21,11 @@ from metricflow.specs.specs import (
     OrderBySpec,
     TimeDimensionSpec,
 )
+from metricflow.test.conftest import MockQueryParameter
 from metricflow.test.fixtures.model_fixtures import query_parser_from_yaml
 from metricflow.test.model.example_project_configuration import EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE
 from metricflow.test.time.metric_time_dimension import MTD
+from metricflow.time.date_part import DatePart
 from metricflow.time.time_granularity_solver import RequestTimeGranularityException
 
 logger = logging.getLogger(__name__)
@@ -134,6 +136,18 @@ METRICS_YAML = textwrap.dedent(
           - name: revenue
             offset_window: 14 days
             alias: revenue_2_weeks_ago
+    ---
+    metric:
+      name: revenue_since_start_of_year
+      description: Revenue since start of year
+      type: derived
+      type_params:
+        expr: revenue - revenue_start_of_year
+        metrics:
+          - name: revenue
+          - name: revenue
+            offset_to_grain: year
+            alias: revenue_start_of_year
     """
 )
 
@@ -169,16 +183,6 @@ def test_query_parser(bookings_query_parser: MetricFlowQueryParser) -> None:  # 
             descending=True,
         ),
     )
-
-
-class MockQueryParameter:
-    """This is a mock that is just used to test the query parser."""
-
-    grain = None
-    descending = False
-
-    def __init__(self, name: str):  # noqa: D
-        self.name = name
 
 
 def test_query_parser_with_object_params(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D
@@ -372,11 +376,10 @@ def test_derived_metric_query_parsing() -> None:
 
 def test_derived_metric_with_offset_parsing() -> None:
     """Test that querying derived metrics with a time offset requires a time dimension."""
-    bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=BOOKINGS_YAML)
-    bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=REVENUE_YAML)
+    revenue_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=REVENUE_YAML)
     metrics_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=METRICS_YAML)
     query_parser = query_parser_from_yaml(
-        [EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, bookings_yaml_file, metrics_yaml_file]
+        [EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, revenue_yaml_file, metrics_yaml_file]
     )
     # Attempt to query with no dimension
     with pytest.raises(UnableToSatisfyQueryError):
@@ -396,4 +399,47 @@ def test_derived_metric_with_offset_parsing() -> None:
     query_parser.parse_and_validate_query(
         metric_names=["revenue_growth_2_weeks"],
         group_by_names=[MTD],
+    )
+
+
+def test_date_part_parsing() -> None:
+    """Test that querying with a date_part verifies compatibility with time_granularity."""
+    revenue_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=REVENUE_YAML)
+    metrics_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=METRICS_YAML)
+    query_parser = query_parser_from_yaml(
+        [EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, revenue_yaml_file, metrics_yaml_file]
+    )
+
+    # Date part is incompatible with metric's defined time granularity
+    with pytest.raises(RequestTimeGranularityException):
+        query_parser.parse_and_validate_query(
+            metric_names=["revenue"],
+            group_by=[MockQueryParameter(name="metric_time", date_part=DatePart.DOW)],
+        )
+
+    # Can't query date part for cumulative metrics
+    with pytest.raises(UnableToSatisfyQueryError):
+        query_parser.parse_and_validate_query(
+            metric_names=["revenue_cumulative"],
+            group_by=[MockQueryParameter(name="metric_time", date_part=DatePart.YEAR)],
+        )
+
+    # Can't query date part for metrics with offset to grain
+    with pytest.raises(UnableToSatisfyQueryError):
+        query_parser.parse_and_validate_query(
+            metric_names=["revenue_since_start_of_year"],
+            group_by=[MockQueryParameter(name="metric_time", date_part=DatePart.MONTH)],
+        )
+
+    # Requested granularity doesn't match resolved granularity
+    with pytest.raises(RequestTimeGranularityException):
+        query_parser.parse_and_validate_query(
+            metric_names=["revenue"],
+            group_by=[MockQueryParameter(name="metric_time", grain=TimeGranularity.YEAR, date_part=DatePart.MONTH)],
+        )
+
+    # Date part is compatible
+    query_parser.parse_and_validate_query(
+        metric_names=["revenue"],
+        group_by=[MockQueryParameter(name="metric_time", date_part=DatePart.MONTH)],
     )

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Protocol, Sequence
+from typing import Optional, Protocol, Sequence
 
 
 class QueryInterfaceMetric(Protocol):
@@ -24,6 +24,9 @@ class QueryInterfaceDimension(Protocol):
 
     def descending(self, _is_descending: bool) -> QueryInterfaceDimension:
         """Set the sort order for order-by."""
+
+    def date_part(self, _date_part: str) -> QueryInterfaceDimension:
+        """Date part to extract from the dimension."""
         raise NotImplementedError
 
 
@@ -55,6 +58,7 @@ class QueryInterfaceTimeDimensionFactory(Protocol):
         time_dimension_name: str,
         time_granularity_name: str,
         descending: bool = False,
+        date_part_name: Optional[str] = None,
         entity_path: Sequence[str] = (),
     ) -> QueryInterfaceTimeDimension:
         """Create a TimeDimension."""

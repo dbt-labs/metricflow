@@ -29,6 +29,7 @@
                     <!--    'element_name': 'metric_time',              -->
                     <!--    'entity_links': (),                         -->
                     <!--    'time_granularity': TimeGranularity.MONTH,  -->
+                    <!--    'date_part': None,                          -->
                     <!--    'aggregation_state': None}                  -->
                     <JoinOverTimeRangeNode>
                         <!-- description = Join Self Over Time Range -->

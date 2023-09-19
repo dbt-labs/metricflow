@@ -7,6 +7,10 @@ PARALLELISM = "auto"
 # Additional command line options to pass to pytest.
 ADDITIONAL_PYTEST_OPTIONS = ""
 
+# Pytest that can populate the persistent source schema
+USE_PERSISTENT_SOURCE_SCHEMA = "--use-persistent-source-schema"
+POPULATE_PERSISTENT_SOURCE_SCHEMA = "metricflow/test/source_schema_tools.py::populate_source_schema"
+
 # Install Hatch package / project manager
 .PHONY: install-hatch
 install-hatch:
@@ -21,23 +25,40 @@ test:
 test-postgresql:
 	hatch -v run postgres-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) metricflow/test/
 
-# Engine-specific test environments. In most cases you should run these with
-# `make -e ADDITIONAL_PYTEST_OPTIONS="--use-persistent-source-schema" test-<engine_type>`
+# Engine-specific test environments.
 .PHONY: test-bigquery
 test-bigquery:
 	hatch -v run bigquery-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) metricflow/test/
+
+.PHONY: populate-persistent-source-schema-bigquery
+populate-persistent-source-schema-bigquery:
+	hatch -v run bigquery-env:pytest -vv $(ADDITIONAL_PYTEST_OPTIONS) $(USE_PERSISTENT_SOURCE_SCHEMA) $(POPULATE_PERSISTENT_SOURCE_SCHEMA)
 
 .PHONY: test-databricks
 test-databricks:
 	hatch -v run databricks-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) metricflow/test/
 
+.PHONY: populate-persistent-source-schema-databricks
+populate-persistent-source-schema-databricks:
+	hatch -v run databricks-env:pytest -vv $(ADDITIONAL_PYTEST_OPTIONS) $(USE_PERSISTENT_SOURCE_SCHEMA) $(POPULATE_PERSISTENT_SOURCE_SCHEMA)
+
 .PHONY: test-redshift
 test-redshift:
 	hatch -v run redshift-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) metricflow/test/
 
+.PHONY: populate-persistent-source-schema-redshift
+populate-persistent-source-schema-redshift:
+	hatch -v run redshift-env:pytest -vv $(ADDITIONAL_PYTEST_OPTIONS) $(USE_PERSISTENT_SOURCE_SCHEMA) $(POPULATE_PERSISTENT_SOURCE_SCHEMA)
+
+
 .PHONY: test-snowflake
 test-snowflake:
 	hatch -v run snowflake-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) metricflow/test/
+
+.PHONY: populate-persistent-source-schema-snowflake
+populate-persistent-source-schema-snowflake:
+	hatch -v run snowflake-env:pytest -vv $(ADDITIONAL_PYTEST_OPTIONS) $(USE_PERSISTENT_SOURCE_SCHEMA) $(POPULATE_PERSISTENT_SOURCE_SCHEMA)
+
 
 .PHONY: lint
 lint:
