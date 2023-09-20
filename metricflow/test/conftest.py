@@ -18,9 +18,10 @@ from metricflow.time.date_part import DatePart
 
 
 @dataclass
-class MockQueryParameter:
+class MockQueryParameterDimension:
     """This is a mock that is just used to test the query parser."""
 
     name: str
     grain: Optional[TimeGranularity] = None
+    descending: bool = False
     date_part: Optional[DatePart] = None
