@@ -2,36 +2,12 @@ from __future__ import annotations
 
 from typing import Optional, Protocol, Sequence
 
-from dbt_semantic_interfaces.type_enums import TimeGranularity
-
-from metricflow.time.date_part import DatePart
-
 
 class QueryInterfaceMetric(Protocol):
-    """Metric in the query interface."""
+    """Represents the interface for Metric in the query interface."""
 
-    @property
-    def name(self) -> str:
-        """The name of the metric."""
-        raise NotImplementedError
-
-
-class QueryParameter(Protocol):
-    """A query parameter with a grain."""
-
-    @property
-    def name(self) -> str:
-        """The name of the item."""
-        raise NotImplementedError
-
-    @property
-    def grain(self) -> Optional[TimeGranularity]:
-        """The time granularity."""
-        raise NotImplementedError
-
-    @property
-    def date_part(self) -> Optional[DatePart]:
-        """Date part to extract from the dimension."""
+    def descending(self, _is_descending: bool) -> QueryInterfaceMetric:
+        """Set the sort order for order-by."""
         raise NotImplementedError
 
 
@@ -45,6 +21,9 @@ class QueryInterfaceDimension(Protocol):
     def alias(self, _alias: str) -> QueryInterfaceDimension:
         """Renaming the column."""
         raise NotImplementedError
+
+    def descending(self, _is_descending: bool) -> QueryInterfaceDimension:
+        """Set the sort order for order-by."""
 
     def date_part(self, _date_part: str) -> QueryInterfaceDimension:
         """Date part to extract from the dimension."""
@@ -78,6 +57,7 @@ class QueryInterfaceTimeDimensionFactory(Protocol):
         self,
         time_dimension_name: str,
         time_granularity_name: str,
+        descending: bool = False,
         date_part_name: Optional[str] = None,
         entity_path: Sequence[str] = (),
     ) -> QueryInterfaceTimeDimension:
@@ -88,7 +68,9 @@ class QueryInterfaceTimeDimensionFactory(Protocol):
 class QueryInterfaceEntity(Protocol):
     """Represents the interface for Entity in the query interface."""
 
-    pass
+    def descending(self, _is_descending: bool) -> QueryInterfaceEntity:
+        """Set the sort order for order-by."""
+        raise NotImplementedError
 
 
 class QueryInterfaceEntityFactory(Protocol):

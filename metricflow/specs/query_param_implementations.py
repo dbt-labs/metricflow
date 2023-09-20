@@ -15,6 +15,7 @@ class DimensionQueryParameter:
 
     name: str
     grain: Optional[TimeGranularity] = None
+    descending: bool = False
     date_part: Optional[DatePart] = None
 
     def __post_init__(self) -> None:  # noqa: D
