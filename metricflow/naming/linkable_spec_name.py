@@ -91,3 +91,18 @@ class StructuredLinkableSpecName:
     def date_part_suffix(date_part: DatePart) -> str:
         """Suffix used for names with a date_part."""
         return f"extract_{date_part.value}"
+
+    @property
+    def granularity_free_qualified_name(self) -> str:
+        """Renders the qualified name without the granularity suffix.
+
+        In the list metrics and list dimensions outputs we want to render the qualified name of the dimension, but
+        without including the base granularity for time dimensions. This method is useful in those contexts.
+
+        Note: in most cases you should be using the qualified_name - this is only useful in cases where the
+        Dimension set has de-duplicated TimeDimensions such that you never have more than one granularity
+        in your set for each TimeDimension.
+        """
+        return StructuredLinkableSpecName(
+            entity_link_names=self.entity_link_names, element_name=self.element_name
+        ).qualified_name
