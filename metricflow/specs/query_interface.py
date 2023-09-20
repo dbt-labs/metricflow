@@ -17,7 +17,7 @@ class QueryInterfaceMetric(Protocol):
 
 
 class QueryParameter(Protocol):
-    """A query parameter with a grain."""
+    """A query parameter that might specify a grain and/or a date part."""
 
     @property
     def name(self) -> str:
@@ -32,6 +32,20 @@ class QueryParameter(Protocol):
     @property
     def date_part(self) -> Optional[DatePart]:
         """Date part to extract from the dimension."""
+        raise NotImplementedError
+
+
+class OrderByQueryParameter(Protocol):
+    """An order by query parameter."""
+
+    @property
+    def order_by(self) -> QueryParameter:
+        """Parameter to order results by."""
+        raise NotImplementedError
+
+    @property
+    def descending(self) -> bool:
+        """The time granularity."""
         raise NotImplementedError
 
 

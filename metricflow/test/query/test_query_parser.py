@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import textwrap
 from collections import namedtuple
+from typing import List
 
 import pytest
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
@@ -14,6 +15,14 @@ from metricflow.errors.errors import UnableToSatisfyQueryError
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.query.query_parser import MetricFlowQueryParser
+from metricflow.specs.query_interface import QueryParameter
+from metricflow.specs.query_param_implementations import (
+    DimensionParameter,
+    EntityParameter,
+    MetricParameter,
+    OrderByParameter,
+    TimeDimensionParameter,
+)
 from metricflow.specs.specs import (
     DimensionSpec,
     EntitySpec,
@@ -21,7 +30,6 @@ from metricflow.specs.specs import (
     OrderBySpec,
     TimeDimensionSpec,
 )
-from metricflow.test.conftest import MockQueryParameter
 from metricflow.test.fixtures.model_fixtures import query_parser_from_yaml
 from metricflow.test.model.example_project_configuration import EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE
 from metricflow.test.time.metric_time_dimension import MTD
@@ -160,7 +168,9 @@ def bookings_query_parser() -> MetricFlowQueryParser:  # noqa
 
 def test_query_parser(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D
     query_spec = bookings_query_parser.parse_and_validate_query(
-        metric_names=["bookings"], group_by_names=["booking__is_instant", "listing", MTD], order=[MTD, "-bookings"]
+        metric_names=["bookings"],
+        group_by_names=["booking__is_instant", "listing", MTD],
+        order_by_names=[MTD, "-bookings"],
     )
 
     assert query_spec.metric_specs == (MetricSpec(element_name="bookings"),)
@@ -188,12 +198,15 @@ def test_query_parser(bookings_query_parser: MetricFlowQueryParser) -> None:  # 
 def test_query_parser_with_object_params(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D
     Metric = namedtuple("Metric", ["name"])
     metric = Metric("bookings")
-    group_by = [
-        MockQueryParameter("booking__is_instant"),
-        MockQueryParameter("listing"),
-        MockQueryParameter(MTD),
+    group_by: List[QueryParameter] = [
+        DimensionParameter("booking__is_instant"),
+        EntityParameter("listing"),
+        TimeDimensionParameter(MTD),
     ]
-    order_by = [MockQueryParameter(MTD), MockQueryParameter("-bookings")]
+    order_by = [
+        OrderByParameter(order_by=TimeDimensionParameter(MTD)),
+        OrderByParameter(order_by=MetricParameter("bookings"), descending=True),
+    ]
     query_spec = bookings_query_parser.parse_and_validate_query(metrics=[metric], group_by=group_by, order_by=order_by)
     assert query_spec.metric_specs == (MetricSpec(element_name="bookings"),)
     assert query_spec.dimension_specs == (
@@ -231,7 +244,7 @@ def test_order_by_granularity_conversion() -> None:
         [EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, bookings_yaml_file, revenue_yaml_file]
     )
     query_spec = query_parser.parse_and_validate_query(
-        metric_names=["bookings", "revenue"], group_by_names=[MTD], order=[f"-{MTD}"]
+        metric_names=["bookings", "revenue"], group_by_names=[MTD], order_by_names=[f"-{MTD}"]
     )
 
     # The lowest common granularity is MONTH, so we expect the PTD in the order by to have that granularity.
@@ -247,7 +260,7 @@ def test_order_by_granularity_conversion() -> None:
 
 def test_order_by_granularity_no_conversion(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D
     query_spec = bookings_query_parser.parse_and_validate_query(
-        metric_names=["bookings"], group_by_names=[MTD], order=[MTD]
+        metric_names=["bookings"], group_by_names=[MTD], order_by_names=[MTD]
     )
 
     # The only granularity is DAY, so we expect the PTD in the order by to have that granularity.
@@ -414,32 +427,34 @@ def test_date_part_parsing() -> None:
     with pytest.raises(RequestTimeGranularityException):
         query_parser.parse_and_validate_query(
             metric_names=["revenue"],
-            group_by=[MockQueryParameter(name="metric_time", date_part=DatePart.DOW)],
+            group_by=[TimeDimensionParameter(name="metric_time", date_part=DatePart.DOW)],
         )
 
     # Can't query date part for cumulative metrics
     with pytest.raises(UnableToSatisfyQueryError):
         query_parser.parse_and_validate_query(
             metric_names=["revenue_cumulative"],
-            group_by=[MockQueryParameter(name="metric_time", date_part=DatePart.YEAR)],
+            group_by=[TimeDimensionParameter(name="metric_time", date_part=DatePart.YEAR)],
         )
 
     # Can't query date part for metrics with offset to grain
     with pytest.raises(UnableToSatisfyQueryError):
         query_parser.parse_and_validate_query(
             metric_names=["revenue_since_start_of_year"],
-            group_by=[MockQueryParameter(name="metric_time", date_part=DatePart.MONTH)],
+            group_by=[TimeDimensionParameter(name="metric_time", date_part=DatePart.MONTH)],
         )
 
     # Requested granularity doesn't match resolved granularity
     with pytest.raises(RequestTimeGranularityException):
         query_parser.parse_and_validate_query(
             metric_names=["revenue"],
-            group_by=[MockQueryParameter(name="metric_time", grain=TimeGranularity.YEAR, date_part=DatePart.MONTH)],
+            group_by=[TimeDimensionParameter(name="metric_time", grain=TimeGranularity.YEAR, date_part=DatePart.MONTH)],
         )
 
     # Date part is compatible
+    group_by = TimeDimensionParameter(name="metric_time", date_part=DatePart.MONTH)
     query_parser.parse_and_validate_query(
         metric_names=["revenue"],
-        group_by=[MockQueryParameter(name="metric_time", date_part=DatePart.MONTH)],
+        group_by=[group_by],
+        order_by=[OrderByParameter(order_by=group_by, descending=True)],
     )
