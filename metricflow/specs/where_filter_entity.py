@@ -13,7 +13,7 @@ from typing_extensions import override
 
 from metricflow.errors.errors import InvalidQuerySyntax
 from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.specs.query_interface import QueryInterfaceEntity, QueryInterfaceEntityFactory
+from metricflow.protocols.query_interface import QueryInterfaceEntity, QueryInterfaceEntityFactory
 from metricflow.specs.specs import EntitySpec
 
 
