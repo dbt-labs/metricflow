@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Optional, Protocol
 
 from dbt_semantic_interfaces.type_enums import TimeGranularity
+
 from metricflow.time.date_part import DatePart
 
 

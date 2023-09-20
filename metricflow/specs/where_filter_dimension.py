@@ -15,11 +15,11 @@ from dbt_semantic_interfaces.references import (
 from typing_extensions import override
 
 from metricflow.errors.errors import InvalidQuerySyntax
-from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.protocols.query_interface import (
     QueryInterfaceDimension,
     QueryInterfaceDimensionFactory,
 )
+from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import DimensionSpec
 
 

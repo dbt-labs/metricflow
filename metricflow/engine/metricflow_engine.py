@@ -47,12 +47,12 @@ from metricflow.plan_conversion.dataflow_to_execution import (
     DataflowToExecutionPlanConverter,
 )
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
+from metricflow.protocols.query_parameter import QueryParameterDimension, QueryParameterMetric
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.random_id import random_id
 from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.protocols.query_parameter import QueryParameterDimension, QueryParameterMetric
 from metricflow.specs.specs import InstanceSpecSet, MetricFlowQuerySpec
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.telemetry.models import TelemetryLevel

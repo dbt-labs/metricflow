@@ -28,9 +28,9 @@ from metricflow.errors.errors import UnableToSatisfyQueryError
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
+from metricflow.protocols.query_parameter import QueryParameterDimension, QueryParameterMetric
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.protocols.query_parameter import QueryParameterDimension, QueryParameterMetric
 from metricflow.specs.specs import (
     DimensionSpec,
     EntitySpec,
@@ -667,7 +667,7 @@ class MetricFlowQueryParser:
         self,
         metric_references: Sequence[MetricReference],
         qualified_linkable_names: Optional[Sequence[str]] = None,
-        linkable_elements: Optional[Sequence[QueryParameter]] = None,
+        linkable_elements: Optional[Sequence[QueryParameterDimension]] = None,
     ) -> QueryTimeLinkableSpecSet:
         """Convert the linkable spec names into the respective specification objects."""
         # TODO: refactor to only support group_by object inputs (removing group_by_names param)

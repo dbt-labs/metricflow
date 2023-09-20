@@ -10,8 +10,8 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
 
 from metricflow.errors.errors import InvalidQuerySyntax
-from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.protocols.query_interface import QueryInterfaceTimeDimension, QueryInterfaceTimeDimensionFactory
+from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import TimeDimensionSpec
 
 
