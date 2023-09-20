@@ -52,7 +52,7 @@ from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.random_id import random_id
 from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.specs.query_interface import QueryInterfaceMetric, QueryParameter
+from metricflow.specs.query_interface import OrderByQueryParameter, QueryInterfaceMetric, QueryParameter
 from metricflow.specs.specs import InstanceSpecSet, MetricFlowQuerySpec
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.telemetry.models import TelemetryLevel
@@ -106,7 +106,7 @@ class MetricFlowQueryRequest:
     time_constraint_end: Optional[datetime.datetime] = None
     where_constraint: Optional[str] = None
     order_by_names: Optional[Sequence[str]] = None
-    order_by: Optional[Sequence[QueryParameter]] = None
+    order_by: Optional[Sequence[OrderByQueryParameter]] = None
     output_table: Optional[str] = None
     sql_optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O4
     query_type: MetricFlowQueryType = MetricFlowQueryType.METRIC
@@ -122,7 +122,7 @@ class MetricFlowQueryRequest:
         time_constraint_end: Optional[datetime.datetime] = None,
         where_constraint: Optional[str] = None,
         order_by_names: Optional[Sequence[str]] = None,
-        order_by: Optional[Sequence[QueryParameter]] = None,
+        order_by: Optional[Sequence[OrderByQueryParameter]] = None,
         output_table: Optional[str] = None,
         sql_optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O4,
         query_type: MetricFlowQueryType = MetricFlowQueryType.METRIC,
@@ -421,7 +421,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             time_constraint_start=mf_query_request.time_constraint_start,
             time_constraint_end=mf_query_request.time_constraint_end,
             where_constraint_str=mf_query_request.where_constraint,
-            order=mf_query_request.order_by_names,
+            order_by_names=mf_query_request.order_by_names,
             order_by=mf_query_request.order_by,
         )
         logger.info(f"Query spec is:\n{pformat_big_objects(query_spec)}")
@@ -461,7 +461,8 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                     time_constraint_start=mf_query_request.time_constraint_start,
                     time_constraint_end=mf_query_request.time_constraint_end,
                     where_constraint_str=mf_query_request.where_constraint,
-                    order=mf_query_request.order_by_names,
+                    order_by_names=mf_query_request.order_by_names,
+                    order_by=mf_query_request.order_by,
                 )
                 logger.warning(f"Query spec updated to:\n{pformat_big_objects(query_spec)}")
 
