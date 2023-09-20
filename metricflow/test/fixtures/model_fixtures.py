@@ -4,10 +4,12 @@ import logging
 import os
 from collections import OrderedDict
 from dataclasses import dataclass
-from typing import Dict, List, Sequence
+from typing import Dict, List, Optional, Sequence
 
 import pytest
+from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from dbt_semantic_interfaces.parsing.dir_to_model import (
+    SemanticManifestBuildResult,
     parse_directory_of_yaml_files_to_semantic_manifest,
     parse_yaml_files_to_validation_ready_semantic_manifest,
 )
@@ -148,6 +150,20 @@ def create_data_sets(
     return data_sets
 
 
+def load_semantic_manifest(
+    relative_manifest_path: str,
+    template_mapping: Optional[Dict[str, str]] = None,
+) -> SemanticManifestBuildResult:
+    """Reads the manifest YAMLs from the standard location, applies transformations, runs validations."""
+    yaml_file_directory = os.path.join(os.path.dirname(__file__), f"semantic_manifest_yamls/{relative_manifest_path}")
+    build_result = parse_directory_of_yaml_files_to_semantic_manifest(
+        yaml_file_directory, template_mapping=template_mapping
+    )
+    validator = SemanticManifestValidator[PydanticSemanticManifest]()
+    validator.checked_validations(build_result.semantic_manifest)
+    return build_result
+
+
 @pytest.fixture(scope="session")
 def template_mapping(mf_test_session_state: MetricFlowTestSessionState) -> Dict[str, str]:
     """Mapping for template variables in the model YAML files."""
@@ -156,30 +172,19 @@ def template_mapping(mf_test_session_state: MetricFlowTestSessionState) -> Dict[
 
 @pytest.fixture(scope="session")
 def simple_semantic_manifest_lookup_non_ds(template_mapping: Dict[str, str]) -> SemanticManifestLookup:  # noqa: D
-    build_result = parse_directory_of_yaml_files_to_semantic_manifest(
-        os.path.join(os.path.dirname(__file__), "semantic_manifest_yamls/non_sm_manifest"),
-        template_mapping=template_mapping,
-    )
+    build_result = load_semantic_manifest("non_sm_manifest", template_mapping)
     return SemanticManifestLookup(build_result.semantic_manifest)
 
 
 @pytest.fixture(scope="session")
 def simple_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> SemanticManifestLookup:  # noqa: D
-    build_result = parse_directory_of_yaml_files_to_semantic_manifest(
-        os.path.join(os.path.dirname(__file__), "semantic_manifest_yamls/simple_manifest"),
-        template_mapping=template_mapping,
-    )
+    build_result = load_semantic_manifest("simple_manifest", template_mapping)
     return SemanticManifestLookup(build_result.semantic_manifest)
 
 
 @pytest.fixture(scope="session")
 def multi_hop_join_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> SemanticManifestLookup:  # noqa: D
-    build_result = parse_directory_of_yaml_files_to_semantic_manifest(
-        os.path.join(
-            os.path.dirname(__file__), "semantic_manifest_yamls/multi_hop_join_manifest/partitioned_semantic_models"
-        ),
-        template_mapping=template_mapping,
-    )
+    build_result = load_semantic_manifest("multi_hop_join_manifest/partitioned_semantic_models", template_mapping)
     return SemanticManifestLookup(build_result.semantic_manifest)
 
 
@@ -187,33 +192,21 @@ def multi_hop_join_semantic_manifest_lookup(template_mapping: Dict[str, str]) ->
 def unpartitioned_multi_hop_join_semantic_manifest_lookup(  # noqa: D
     template_mapping: Dict[str, str]
 ) -> SemanticManifestLookup:
-    build_result = parse_directory_of_yaml_files_to_semantic_manifest(
-        os.path.join(
-            os.path.dirname(__file__), "semantic_manifest_yamls/multi_hop_join_manifest/unpartitioned_semantic_models"
-        ),
-        template_mapping=template_mapping,
-    )
+    build_result = load_semantic_manifest("multi_hop_join_manifest/unpartitioned_semantic_models", template_mapping)
     return SemanticManifestLookup(build_result.semantic_manifest)
 
 
 @pytest.fixture(scope="session")
 def simple_semantic_manifest(template_mapping: Dict[str, str]) -> SemanticManifest:
     """Model used for many tests."""
-    build_result = parse_directory_of_yaml_files_to_semantic_manifest(
-        os.path.join(os.path.dirname(__file__), "semantic_manifest_yamls/simple_manifest"),
-        template_mapping=template_mapping,
-    )
+    build_result = load_semantic_manifest("simple_manifest", template_mapping)
     return build_result.semantic_manifest
 
 
 @pytest.fixture(scope="session")
 def simple_model__with_primary_transforms(template_mapping: Dict[str, str]) -> SemanticManifest:
     """Model used for tests pre-transformations."""
-    build_result = parse_directory_of_yaml_files_to_semantic_manifest(
-        os.path.join(os.path.dirname(__file__), "semantic_manifest_yamls/simple_manifest"),
-        template_mapping=template_mapping,
-        apply_transformations=False,
-    )
+    build_result = load_semantic_manifest("simple_manifest", template_mapping)
     transformed_model = PydanticSemanticManifestTransformer().transform(
         model=build_result.semantic_manifest,
         ordered_rule_sequences=(PydanticSemanticManifestTransformRuleSet().primary_rules,),
@@ -223,38 +216,26 @@ def simple_model__with_primary_transforms(template_mapping: Dict[str, str]) -> S
 
 @pytest.fixture(scope="session")
 def extended_date_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> SemanticManifestLookup:  # noqa: D
-    build_result = parse_directory_of_yaml_files_to_semantic_manifest(
-        os.path.join(os.path.dirname(__file__), "semantic_manifest_yamls/extended_date_manifest"),
-        template_mapping=template_mapping,
-    )
+    build_result = load_semantic_manifest("extended_date_manifest", template_mapping)
     return SemanticManifestLookup(build_result.semantic_manifest)
 
 
 @pytest.fixture(scope="session")
 def scd_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> SemanticManifestLookup:
     """Initialize semantic model for SCD tests."""
-    build_result = parse_directory_of_yaml_files_to_semantic_manifest(
-        os.path.join(os.path.dirname(__file__), "semantic_manifest_yamls/scd_manifest"),
-        template_mapping=template_mapping,
-    )
+    build_result = load_semantic_manifest("scd_manifest", template_mapping)
     return SemanticManifestLookup(build_result.semantic_manifest)
 
 
 @pytest.fixture(scope="session")
 def data_warehouse_validation_model(template_mapping: Dict[str, str]) -> SemanticManifest:
     """Model used for data warehouse validation tests."""
-    build_result = parse_directory_of_yaml_files_to_semantic_manifest(
-        os.path.join(os.path.dirname(__file__), "semantic_manifest_yamls/data_warehouse_validation_manifest"),
-        template_mapping=template_mapping,
-    )
+    build_result = load_semantic_manifest("data_warehouse_validation_manifest", template_mapping)
     return build_result.semantic_manifest
 
 
 @pytest.fixture(scope="session")
 def cyclic_join_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> SemanticManifestLookup:
     """Manifest that contains a potential cycle in the join graph (if not handled properly)."""
-    build_result = parse_directory_of_yaml_files_to_semantic_manifest(
-        os.path.join(os.path.dirname(__file__), "semantic_manifest_yamls/cyclic_join_manifest"),
-        template_mapping=template_mapping,
-    )
+    build_result = load_semantic_manifest("cyclic_join_manifest", template_mapping)
     return SemanticManifestLookup(build_result.semantic_manifest)
