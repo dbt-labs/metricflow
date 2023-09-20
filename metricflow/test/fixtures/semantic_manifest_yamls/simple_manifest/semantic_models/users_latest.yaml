@@ -8,8 +8,9 @@ semantic_model:
     alias: dim_users_latest
 
   dimensions:
-    - name: ds
+    - name: ds_latest
       type: time
+      expr: ds
       type_params:
         time_granularity: day
     - name: home_state_latest
