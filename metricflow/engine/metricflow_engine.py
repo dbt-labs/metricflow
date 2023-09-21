@@ -96,6 +96,7 @@ class MetricFlowQueryRequest:
     time_constraint_end: Get data for the end of this time range.
     where_constraint: A SQL string using group by names that can be used like a where clause on the output data.
     order_by_names: metric and group by names to order by. A "-" can be used to specify reverse order e.g. "-ds"
+    order_by: metric and group by objects to order by
     output_table: If specified, output the result data to this table instead of a result dataframe.
     sql_optimization_level: The level of optimization for the generated SQL.
     query_type: Type of MetricFlow query.
@@ -426,7 +427,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             time_constraint_start=mf_query_request.time_constraint_start,
             time_constraint_end=mf_query_request.time_constraint_end,
             where_constraint_str=mf_query_request.where_constraint,
-            order=mf_query_request.order_by_names,
+            order_by_names=mf_query_request.order_by_names,
             order_by=mf_query_request.order_by,
         )
         logger.info(f"Query spec is:\n{pformat_big_objects(query_spec)}")
@@ -466,7 +467,8 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                     time_constraint_start=mf_query_request.time_constraint_start,
                     time_constraint_end=mf_query_request.time_constraint_end,
                     where_constraint_str=mf_query_request.where_constraint,
-                    order=mf_query_request.order_by_names,
+                    order_by_names=mf_query_request.order_by_names,
+                    order_by=mf_query_request.order_by,
                 )
                 logger.warning(f"Query spec updated to:\n{pformat_big_objects(query_spec)}")
 

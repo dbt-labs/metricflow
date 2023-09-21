@@ -165,7 +165,9 @@ def bookings_query_parser() -> MetricFlowQueryParser:  # noqa
 
 def test_query_parser(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D
     query_spec = bookings_query_parser.parse_and_validate_query(
-        metric_names=["bookings"], group_by_names=["booking__is_instant", "listing", MTD], order=[MTD, "-bookings"]
+        metric_names=["bookings"],
+        group_by_names=["booking__is_instant", "listing", MTD],
+        order_by_names=[MTD, "-bookings"],
     )
 
     assert query_spec.metric_specs == (MetricSpec(element_name="bookings"),)
@@ -239,7 +241,7 @@ def test_order_by_granularity_conversion() -> None:
         [EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, bookings_yaml_file, revenue_yaml_file]
     )
     query_spec = query_parser.parse_and_validate_query(
-        metric_names=["bookings", "revenue"], group_by_names=[MTD], order=[f"-{MTD}"]
+        metric_names=["bookings", "revenue"], group_by_names=[MTD], order_by_names=[f"-{MTD}"]
     )
 
     # The lowest common granularity is MONTH, so we expect the PTD in the order by to have that granularity.
@@ -255,7 +257,7 @@ def test_order_by_granularity_conversion() -> None:
 
 def test_order_by_granularity_no_conversion(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D
     query_spec = bookings_query_parser.parse_and_validate_query(
-        metric_names=["bookings"], group_by_names=[MTD], order=[MTD]
+        metric_names=["bookings"], group_by_names=[MTD], order_by_names=[MTD]
     )
 
     # The only granularity is DAY, so we expect the PTD in the order by to have that granularity.

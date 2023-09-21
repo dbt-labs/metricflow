@@ -51,7 +51,3 @@ class OrderByParameter:
 
     order_by: Union[MetricQueryParameter, GroupByQueryParameter, TimeDimensionQueryParameter]
     descending: bool = False
-
-
-# Do we want one generic type for QueryParameter which includes grain & date_part?
-# The main question: do we need to know what type we're passing into MF? Or are we ok with MF just figuring it out?
