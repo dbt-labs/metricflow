@@ -119,11 +119,11 @@ integration_test:
   name: query_dimensions_only
   description: Query multiple dimensions without metrics
   model: SIMPLE_MODEL
-  group_bys: ["ds", "user__home_state"]
+  group_bys: ["ds__day", "user__home_state"]
   check_query: |
     SELECT
       u.home_state AS user__home_state
-      , v.ds
+      , v.ds AS ds__day
     FROM {{ source_schema }}.fct_id_verifications v
     LEFT OUTER JOIN {{ source_schema }}.dim_users u
       ON u.user_id = v.user_id
@@ -142,6 +142,6 @@ integration_test:
     SELECT
       u.home_state AS user__home_state
     FROM {{ source_schema }}.dim_users u
+    WHERE user__home_state = 'CA'
     GROUP BY
       u.home_state
-    WHERE user__home_state = 'CA'
