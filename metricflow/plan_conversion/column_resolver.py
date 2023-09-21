@@ -55,6 +55,7 @@ class DunderColumnAssociationResolverVisitor(InstanceSpecVisitor[ColumnAssociati
             entity_link_names=tuple(x.element_name for x in time_dimension_spec.entity_links),
             element_name=time_dimension_spec.element_name,
             time_granularity=time_dimension_spec.time_granularity,
+            date_part=time_dimension_spec.date_part,
         ).qualified_name
 
         return ColumnAssociation(

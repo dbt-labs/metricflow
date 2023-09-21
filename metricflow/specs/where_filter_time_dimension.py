@@ -1,35 +1,27 @@
 from __future__ import annotations
 
-from typing import List, Sequence
+from typing import List, Optional, Sequence
 
 from dbt_semantic_interfaces.call_parameter_sets import FilterCallParameterSets
 from dbt_semantic_interfaces.protocols.protocol_hint import ProtocolHint
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from typing_extensions import override
 
+from metricflow.protocols.query_interface import QueryInterfaceTimeDimension, QueryInterfaceTimeDimensionFactory
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.dimension_spec_resolver import DimensionSpecResolver
-from metricflow.specs.query_interface import QueryInterfaceDimension, QueryInterfaceTimeDimensionFactory
 from metricflow.specs.specs import TimeDimensionSpec
 
 
-class WhereFilterTimeDimension(ProtocolHint[QueryInterfaceDimension]):
+class WhereFilterTimeDimension(ProtocolHint[QueryInterfaceTimeDimension]):
     """A time dimension that is passed in through the where filter parameter."""
 
     @override
-    def _implements_protocol(self) -> QueryInterfaceDimension:
+    def _implements_protocol(self) -> QueryInterfaceTimeDimension:
         return self
 
     def __init__(self, column_name: str):  # noqa
         self.column_name = column_name
-
-    def grain(self, _grain: str) -> WhereFilterTimeDimension:
-        """The time granularity."""
-        raise NotImplementedError
-
-    def alias(self, _alias: str) -> WhereFilterTimeDimension:
-        """Renaming the column."""
-        raise NotImplementedError
 
     def __str__(self) -> str:
         """Returns the column name.
@@ -60,7 +52,12 @@ class WhereFilterTimeDimensionFactory(ProtocolHint[QueryInterfaceTimeDimensionFa
         self.time_dimension_specs: List[TimeDimensionSpec] = []
 
     def create(
-        self, time_dimension_name: str, time_granularity_name: str, entity_path: Sequence[str] = ()
+        self,
+        time_dimension_name: str,
+        time_granularity_name: str,
+        descending: bool = False,
+        date_part_name: Optional[str] = None,
+        entity_path: Sequence[str] = (),
     ) -> WhereFilterTimeDimension:
         """Create a WhereFilterTimeDimension."""
         time_dimension_spec = self._dimension_spec_resolver.resolve_time_dimension_spec(

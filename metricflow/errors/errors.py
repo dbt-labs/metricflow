@@ -75,3 +75,10 @@ class SqlBindParametersNotSupportedError(Exception):
 
 class UnknownMetricLinkingError(ValueError):
     """Raised during linking when a user attempts to use a metric that isn't specified."""
+
+
+class InvalidQuerySyntax(Exception):
+    """Raised when query syntax is invalid. Primarily used in the where clause."""
+
+    def __init__(self, msg: str) -> None:  # noqa: D
+        super().__init__(msg)

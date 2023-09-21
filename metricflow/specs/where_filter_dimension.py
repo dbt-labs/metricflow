@@ -9,12 +9,13 @@ from dbt_semantic_interfaces.protocols.protocol_hint import ProtocolHint
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from typing_extensions import override
 
-from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.specs.dimension_spec_resolver import DimensionSpecResolver
-from metricflow.specs.query_interface import (
+from metricflow.errors.errors import InvalidQuerySyntax
+from metricflow.protocols.query_interface import (
     QueryInterfaceDimension,
     QueryInterfaceDimensionFactory,
 )
+from metricflow.specs.column_assoc import ColumnAssociationResolver
+from metricflow.specs.dimension_spec_resolver import DimensionSpecResolver
 from metricflow.specs.specs import TimeDimensionSpec
 
 
@@ -50,9 +51,19 @@ class WhereFilterDimension(ProtocolHint[QueryInterfaceDimension]):
         self._time_dimension_specs.append(self.spec)
         return self
 
+    def date_part(self, _date_part: str) -> QueryInterfaceDimension:
+        """The date_part requested to extract."""
+        raise NotImplementedError
+
     def alias(self, _alias: str) -> QueryInterfaceDimension:
         """Renaming the column."""
         raise NotImplementedError
+
+    def descending(self, _is_descending: bool) -> QueryInterfaceDimension:
+        """Set the sort order for order-by."""
+        raise InvalidQuerySyntax(
+            "Can't set descending in the where clause. Try setting descending in the order_by clause instead"
+        )
 
     def __str__(self) -> str:
         """Returns the column name.

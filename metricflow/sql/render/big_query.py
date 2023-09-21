@@ -24,6 +24,7 @@ from metricflow.sql.sql_exprs import (
     SqlTimeDeltaExpression,
 )
 from metricflow.sql.sql_plan import SqlSelectColumn
+from metricflow.time.date_part import DatePart
 
 
 class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
@@ -128,6 +129,17 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
             sql=f"DATE_TRUNC({arg_rendered.sql}, {prefix}{node.time_granularity.value})",
             bind_parameters=arg_rendered.bind_parameters,
         )
+
+    @override
+    def render_date_part(self, date_part: DatePart) -> str:
+        if date_part == DatePart.DOY:
+            return "dayofyear"
+        if date_part == DatePart.DOW:
+            return "dayofweek"
+        if date_part == DatePart.WEEK:
+            return "isoweek"
+
+        return super().render_date_part(date_part)
 
     @override
     def visit_time_delta_expr(self, node: SqlTimeDeltaExpression) -> SqlExpressionRenderResult:
