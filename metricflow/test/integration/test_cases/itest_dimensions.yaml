@@ -102,3 +102,46 @@ integration_test:
     GROUP BY
       v.ds
       , u.home_state
+---
+integration_test:
+  name: query_dimension_only
+  description: Query dimenension only
+  model: SIMPLE_MODEL
+  group_bys: ["user__home_state"]
+  check_query: |
+    SELECT
+      u.home_state AS user__home_state
+    FROM {{ source_schema }}.dim_users u
+    GROUP BY
+      u.home_state
+---
+integration_test:
+  name: query_dimensions_only
+  description: Query multiple dimensions without metrics
+  model: SIMPLE_MODEL
+  group_bys: ["ds", "user__home_state"]
+  check_query: |
+    SELECT
+      u.home_state AS user__home_state
+      , v.ds
+    FROM {{ source_schema }}.fct_id_verifications v
+    LEFT OUTER JOIN {{ source_schema }}.dim_users u
+      ON u.user_id = v.user_id
+      AND u.ds = v.ds
+    GROUP BY
+      v.ds
+      , u.home_state
+---
+integration_test:
+  name: query_dimension_only_with_constraint
+  description: Query dimenension only
+  model: SIMPLE_MODEL
+  group_bys: ["user__home_state"]
+  where_filter: "{{ render_dimension_template('user__home_state') }} = 'CA'"
+  check_query: |
+    SELECT
+      u.home_state AS user__home_state
+    FROM {{ source_schema }}.dim_users u
+    GROUP BY
+      u.home_state
+    WHERE user__home_state = 'CA'

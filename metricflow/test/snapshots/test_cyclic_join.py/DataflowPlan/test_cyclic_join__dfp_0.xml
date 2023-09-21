@@ -29,6 +29,7 @@
                     <!--    'element_name': 'capacity_latest',                     -->
                     <!--    'entity_links': ({'class': 'EntityReference',          -->
                     <!--                      'element_name': 'cyclic_entity'},)}  -->
+                    <!-- distinct_values = False -->
                     <JoinToBaseOutputNode>
                         <!-- description = Join Standard Outputs -->
                         <!-- node_id = jso_0 -->
@@ -54,6 +55,7 @@
                             <!--   {'class': 'LinklessEntitySpec',    -->
                             <!--    'element_name': 'cyclic_entity',  -->
                             <!--    'entity_links': ()}               -->
+                            <!-- distinct_values = False -->
                             <MetricTimeDimensionTransformNode>
                                 <!-- description = Metric Time Dimension 'ds' -->
                                 <!-- node_id = sma_10010 -->
@@ -80,6 +82,7 @@
                             <!--   {'class': 'LinklessEntitySpec',    -->
                             <!--    'element_name': 'cyclic_entity',  -->
                             <!--    'entity_links': ()}               -->
+                            <!-- distinct_values = False -->
                             <ReadSqlSourceNode>
                                 <!-- description =                                                                                           -->
                                 <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest_cyclic'))  -->

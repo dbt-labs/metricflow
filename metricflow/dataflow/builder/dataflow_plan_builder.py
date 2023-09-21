@@ -78,7 +78,7 @@ class DataflowRecipe:
     required_local_linkable_specs: Tuple[LinkableInstanceSpec, ...]
     join_linkable_instances_recipes: Tuple[JoinLinkableInstancesRecipe, ...]
 
-    def to_measure_recipe(self) -> MeasureRecipe:
+    def to_measure_recipe(self) -> MeasureRecipe:  # noqa: D
         return MeasureRecipe(
             source_node=self.source_node,
             required_local_linkable_specs=self.required_local_linkable_specs,
@@ -96,7 +96,7 @@ class MeasureRecipe(DataflowRecipe):
     """
 
     @property
-    def measure_node(self) -> BaseOutput:
+    def measure_node(self) -> BaseOutput:  # noqa: D
         return self.source_node
 
 
@@ -288,12 +288,22 @@ class DataflowPlanBuilder:
 
         source_node = dataflow_recipe.source_node
         distinct_values_node = FilterElementsNode(
-            parent_node=source_node, include_specs=InstanceSpecSet.create_from_linkable_specs(linkable_specs.as_tuple)
+            parent_node=source_node,
+            include_specs=InstanceSpecSet.create_from_linkable_specs(linkable_specs.as_tuple),
+            distinct_values=True,
         )
 
-        # Need to apply group by since that normally gets applied in aggregate measures node?
+        where_constraint_node: Optional[WhereConstraintNode] = None
+        if query_spec.where_constraint:
+            where_constraint_node = WhereConstraintNode(
+                parent_node=distinct_values_node,
+                where_constraint=query_spec.where_constraint,
+            )
+
         sink_node = self.build_sink_node(
-            parent_node=distinct_values_node, order_by_specs=query_spec.order_by_specs, limit=query_spec.limit
+            parent_node=where_constraint_node or distinct_values_node,
+            order_by_specs=query_spec.order_by_specs,
+            limit=query_spec.limit,
         )
 
         plan_id = IdGeneratorRegistry.for_class(DataflowPlanBuilder).create_id(DATAFLOW_PLAN_PREFIX)
@@ -382,11 +392,10 @@ class DataflowPlanBuilder:
         linkable_specs_set = set(linkable_specs.as_tuple)
         for source_node in source_nodes:
             output_spec_set = self._node_data_set_resolver.get_output_data_set(source_node).instance_set.spec_set
-            if output_spec_set.measure_specs:
-                continue
             linkable_specs_in_node = output_spec_set.linkable_specs
             if linkable_specs_set.intersection(set(linkable_specs_in_node)) == linkable_specs_set:
                 nodes.append(source_node)
+
         return nodes
 
     def _find_non_additive_dimension_in_linkable_specs(

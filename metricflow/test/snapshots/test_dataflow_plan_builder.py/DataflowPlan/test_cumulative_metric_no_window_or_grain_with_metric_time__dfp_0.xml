@@ -30,6 +30,7 @@
                     <!--    'entity_links': (),                           -->
                     <!--    'time_granularity': TimeGranularity.QUARTER,  -->
                     <!--    'aggregation_state': None}                    -->
+                    <!-- distinct_values = False -->
                     <JoinOverTimeRangeNode>
                         <!-- description = Join Self Over Time Range -->
                         <!-- node_id = jotr_0 -->

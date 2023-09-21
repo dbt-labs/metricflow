@@ -76,6 +76,7 @@
                         <!--    'entity_links': (),                       -->
                         <!--    'time_granularity': TimeGranularity.DAY,  -->
                         <!--    'aggregation_state': None}                -->
+                        <!-- distinct_values = False -->
                         <MetricTimeDimensionTransformNode>
                             <!-- description = Metric Time Dimension 'ds' -->
                             <!-- node_id = sma_6 -->

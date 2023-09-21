@@ -48,10 +48,10 @@ class ConfiguredIntegrationTestCase(FrozenBaseModel):
     name: str
     # Name of the semantic model to use.
     model: IntegrationTestModel
-    metrics: Tuple[str, ...]
     # The SQL query that can be run to obtain the expected results.
     check_query: str
     file_path: str
+    metrics: Tuple[str, ...] = ()
     group_bys: Tuple[str, ...] = ()
     order_bys: Tuple[str, ...] = ()
     # The required features in the DW engine for the test to complete.

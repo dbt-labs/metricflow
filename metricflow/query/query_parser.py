@@ -461,11 +461,12 @@ class MetricFlowQueryParser:
                 )
 
         # Validate all of them together.
-        self._validate_linkable_specs(
-            metric_references=metric_references,
-            all_linkable_specs=requested_linkable_specs_with_requested_filter_specs,
-            time_dimension_specs=time_dimension_specs,
-        )
+        if metric_references:
+            self._validate_linkable_specs(
+                metric_references=metric_references,
+                all_linkable_specs=requested_linkable_specs_with_requested_filter_specs,
+                time_dimension_specs=time_dimension_specs,
+            )
 
         self._validate_order_by_specs(
             order_by_specs=order_by_specs,

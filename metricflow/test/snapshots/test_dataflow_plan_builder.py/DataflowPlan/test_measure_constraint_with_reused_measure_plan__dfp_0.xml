@@ -54,6 +54,7 @@
                             <!--    'entity_links': (),                       -->
                             <!--    'time_granularity': TimeGranularity.DAY,  -->
                             <!--    'aggregation_state': None}                -->
+                            <!-- distinct_values = False -->
                             <WhereConstraintNode>
                                 <!-- description = Constrain Output with WHERE -->
                                 <!-- node_id = wcc_0 -->
@@ -87,6 +88,7 @@
                                     <!--    'entity_links': (),                       -->
                                     <!--    'time_granularity': TimeGranularity.DAY,  -->
                                     <!--    'aggregation_state': None}                -->
+                                    <!-- distinct_values = False -->
                                     <MetricTimeDimensionTransformNode>
                                         <!-- description = Metric Time Dimension 'ds' -->
                                         <!-- node_id = sma_10001 -->
@@ -132,6 +134,7 @@
                             <!--    'entity_links': (),                       -->
                             <!--    'time_granularity': TimeGranularity.DAY,  -->
                             <!--    'aggregation_state': None}                -->
+                            <!-- distinct_values = False -->
                             <MetricTimeDimensionTransformNode>
                                 <!-- description = Metric Time Dimension 'ds' -->
                                 <!-- node_id = sma_10001 -->

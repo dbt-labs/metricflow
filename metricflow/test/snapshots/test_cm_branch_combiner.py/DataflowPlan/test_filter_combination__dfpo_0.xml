@@ -15,6 +15,7 @@
             <!--   {'class': 'MeasureSpec',               -->
             <!--    'element_name': 'booking_value',      -->
             <!--    'non_additive_dimension_spec': None}  -->
+            <!-- distinct_values = False -->
             <ReadSqlSourceNode>
                 <!-- description =                                                                                    -->
                 <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))  -->

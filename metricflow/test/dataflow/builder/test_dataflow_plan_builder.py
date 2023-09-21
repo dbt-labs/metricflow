@@ -562,12 +562,30 @@ def test_distinct_values_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder,
+    column_association_resolver: ColumnAssociationResolver,
 ) -> None:
     """Tests a plan to get distinct values of a dimension."""
     dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
         query_spec=MetricFlowQuerySpec(
             dimension_specs=(
                 DimensionSpec(element_name="country_latest", entity_links=(EntityReference(element_name="listing"),)),
+            ),
+            where_constraint=(
+                WhereSpecFactory(
+                    column_association_resolver=column_association_resolver,
+                ).create_from_where_filter(
+                    PydanticWhereFilter(
+                        where_sql_template="{{ Dimension('listing__country_latest') }} = 'us'",
+                    )
+                )
+            ),
+            order_by_specs=(
+                OrderBySpec(
+                    dimension_spec=DimensionSpec(
+                        element_name="country_latest", entity_links=(EntityReference(element_name="listing"),)
+                    ),
+                    descending=True,
+                ),
             ),
             limit=100,
         )
