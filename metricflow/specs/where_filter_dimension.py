@@ -32,45 +32,37 @@ class WhereFilterDimension(ProtocolHint[QueryInterfaceDimension]):
         entity_path: Sequence[str],
         call_parameter_sets: FilterCallParameterSets,
         column_association_resolver: ColumnAssociationResolver,
-        time_dimension_specs: List[TimeDimensionSpec],
     ) -> None:
         self._dimension_spec_resolver = DimensionSpecResolver(call_parameter_sets)
-        self.name = name
-        self.spec = self._dimension_spec_resolver.resolve_dimension_spec(name, entity_path)
         self._column_association_resolver = column_association_resolver
-        self.entity_path = entity_path
-        self.time_granularity: Optional[TimeGranularity] = None
-        self._time_dimension_specs = time_dimension_specs
+        self._name = name
+        self._entity_path = entity_path
+        self.dimension_spec = self._dimension_spec_resolver.resolve_dimension_spec(name, entity_path)
+        self.time_dimension_spec: Optional[TimeDimensionSpec] = None
 
     def grain(self, time_granularity_name: str) -> QueryInterfaceDimension:
         """The time granularity."""
-        self.time_granularity = TimeGranularity(time_granularity_name)
-        self.spec = self._dimension_spec_resolver.resolve_time_dimension_spec(
-            self.name, self.time_granularity, self.entity_path
+        self.time_dimension_spec = self._dimension_spec_resolver.resolve_time_dimension_spec(
+            self._name, TimeGranularity(time_granularity_name), self._entity_path
         )
-        self._time_dimension_specs.append(self.spec)
         return self
 
     def date_part(self, _date_part: str) -> QueryInterfaceDimension:
         """The date_part requested to extract."""
-        raise NotImplementedError
-
-    def alias(self, _alias: str) -> QueryInterfaceDimension:
-        """Renaming the column."""
-        raise NotImplementedError
+        raise InvalidQuerySyntax("date_part isn't currently supported in the where parameter and filter spec")
 
     def descending(self, _is_descending: bool) -> QueryInterfaceDimension:
         """Set the sort order for order-by."""
-        raise InvalidQuerySyntax(
-            "Can't set descending in the where clause. Try setting descending in the order_by clause instead"
-        )
+        raise InvalidQuerySyntax("descending is invalid in the where parameter and filter spec")
 
     def __str__(self) -> str:
         """Returns the column name.
 
         Important in the Jinja sandbox.
         """
-        return self._column_association_resolver.resolve_spec(self.spec).column_name
+        return self._column_association_resolver.resolve_spec(
+            self.time_dimension_spec or self.dimension_spec
+        ).column_name
 
 
 class WhereFilterDimensionFactory(ProtocolHint[QueryInterfaceDimensionFactory]):
@@ -87,17 +79,15 @@ class WhereFilterDimensionFactory(ProtocolHint[QueryInterfaceDimensionFactory]):
         self,
         call_parameter_sets: FilterCallParameterSets,
         column_association_resolver: ColumnAssociationResolver,
-        time_dimension_specs: List[TimeDimensionSpec],
     ):
         self._call_parameter_sets = call_parameter_sets
         self._column_association_resolver = column_association_resolver
-        self._time_dimension_specs = time_dimension_specs
         self.created: List[WhereFilterDimension] = []
 
     def create(self, name: str, entity_path: Sequence[str] = ()) -> WhereFilterDimension:
         """Create a WhereFilterDimension."""
         dimension = WhereFilterDimension(
-            name, entity_path, self._call_parameter_sets, self._column_association_resolver, self._time_dimension_specs
+            name, entity_path, self._call_parameter_sets, self._column_association_resolver
         )
         self.created.append(dimension)
         return dimension

@@ -6,7 +6,7 @@ import jinja2
 from dbt_semantic_interfaces.protocols.where_filter import WhereFilter
 
 from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.specs.specs import LinkableSpecSet, TimeDimensionSpec, WhereFilterSpec
+from metricflow.specs.specs import LinkableSpecSet, WhereFilterSpec
 from metricflow.specs.where_filter_dimension import WhereFilterDimensionFactory
 from metricflow.specs.where_filter_entity import WhereFilterEntityFactory
 from metricflow.specs.where_filter_time_dimension import WhereFilterTimeDimensionFactory
@@ -35,9 +35,7 @@ class WhereSpecFactory:
         call_parameter_sets = where_filter.call_parameter_sets
 
         time_dimension_factory = WhereFilterTimeDimensionFactory(call_parameter_sets, self._column_association_resolver)
-        dimension_factory = WhereFilterDimensionFactory(
-            call_parameter_sets, self._column_association_resolver, time_dimension_factory.time_dimension_specs
-        )
+        dimension_factory = WhereFilterDimensionFactory(call_parameter_sets, self._column_association_resolver)
         entity_factory = WhereFilterEntityFactory(call_parameter_sets, self._column_association_resolver)
         try:
             rendered_sql_template = jinja2.Template(
@@ -56,8 +54,10 @@ class WhereSpecFactory:
 
         dimension_specs = []
         for dimension in dimension_factory.created:
-            if not dimension.time_granularity:
-                dimension_specs.append(dimension.spec)
+            if dimension.time_dimension_spec:
+                time_dimension_factory.time_dimension_specs.append(dimension.time_dimension_spec)
+            else:
+                dimension_specs.append(dimension.dimension_spec)
 
         return WhereFilterSpec(
             where_sql=rendered_sql_template,

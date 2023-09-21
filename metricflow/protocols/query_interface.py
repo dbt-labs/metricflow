@@ -18,10 +18,6 @@ class QueryInterfaceDimension(Protocol):
         """The time granularity."""
         raise NotImplementedError
 
-    def alias(self, _alias: str) -> QueryInterfaceDimension:
-        """Renaming the column."""
-        raise NotImplementedError
-
     def descending(self, _is_descending: bool) -> QueryInterfaceDimension:
         """Set the sort order for order-by."""
 
