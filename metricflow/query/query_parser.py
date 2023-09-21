@@ -4,7 +4,7 @@ import datetime
 import logging
 import time
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 from dbt_semantic_interfaces.call_parameter_sets import ParseWhereFilterException
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
@@ -28,7 +28,12 @@ from metricflow.errors.errors import UnableToSatisfyQueryError
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
-from metricflow.protocols.query_parameter import QueryParameterDimension, QueryParameterMetric
+from metricflow.protocols.query_parameter import (
+    GroupByQueryParameter,
+    MetricQueryParameter,
+    OrderByQueryParameter,
+    TimeDimensionQueryParameter,
+)
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
@@ -169,16 +174,16 @@ class MetricFlowQueryParser:
     def parse_and_validate_query(
         self,
         metric_names: Optional[Sequence[str]] = None,
-        metrics: Optional[Sequence[QueryParameterMetric]] = None,
+        metrics: Optional[Sequence[MetricQueryParameter]] = None,
         group_by_names: Optional[Sequence[str]] = None,
-        group_by: Optional[Sequence[QueryParameterDimension]] = None,
+        group_by: Optional[Tuple[Union[GroupByQueryParameter, TimeDimensionQueryParameter], ...]] = None,
         limit: Optional[int] = None,
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
         where_constraint: Optional[WhereFilter] = None,
         where_constraint_str: Optional[str] = None,
         order: Optional[Sequence[str]] = None,
-        order_by: Optional[Sequence[QueryParameterDimension]] = None,
+        order_by: Optional[Sequence[OrderByQueryParameter]] = None,
         time_granularity: Optional[TimeGranularity] = None,
     ) -> MetricFlowQuerySpec:
         """Parse the query into spec objects, validating them in the process.
@@ -290,7 +295,7 @@ class MetricFlowQueryParser:
         return tuple(metric_specs)
 
     def _get_metric_names(
-        self, metric_names: Optional[Sequence[str]], metrics: Optional[Sequence[QueryParameterMetric]]
+        self, metric_names: Optional[Sequence[str]], metrics: Optional[Sequence[MetricQueryParameter]]
     ) -> Sequence[str]:
         assert_exactly_one_arg_set(metric_names=metric_names, metrics=metrics)
         return metric_names if metric_names else [m.name for m in metrics] if metrics else []
@@ -308,7 +313,7 @@ class MetricFlowQueryParser:
         )
 
     def _get_order(
-        self, order: Optional[Sequence[str]], order_by: Optional[Sequence[QueryParameterDimension]]
+        self, order: Optional[Sequence[str]], order_by: Optional[Sequence[OrderByQueryParameter]]
     ) -> Sequence[str]:
         assert not (
             order and order_by
@@ -318,16 +323,16 @@ class MetricFlowQueryParser:
     def _parse_and_validate_query(
         self,
         metric_names: Optional[Sequence[str]] = None,
-        metrics: Optional[Sequence[QueryParameterMetric]] = None,
+        metrics: Optional[Sequence[MetricQueryParameter]] = None,
         group_by_names: Optional[Sequence[str]] = None,
-        group_by: Optional[Sequence[QueryParameterDimension]] = None,
+        group_by: Optional[Tuple[Union[GroupByQueryParameter, TimeDimensionQueryParameter], ...]] = None,
         limit: Optional[int] = None,
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
         where_constraint: Optional[WhereFilter] = None,
         where_constraint_str: Optional[str] = None,
         order: Optional[Sequence[str]] = None,
-        order_by: Optional[Sequence[QueryParameterDimension]] = None,
+        order_by: Optional[Sequence[OrderByQueryParameter]] = None,
         time_granularity: Optional[TimeGranularity] = None,
     ) -> MetricFlowQuerySpec:
         metric_names = self._get_metric_names(metric_names, metrics)
@@ -380,8 +385,8 @@ class MetricFlowQueryParser:
             # If the time constraint is all time, just ignore and not render
             time_constraint = None
 
-        requested_linkable_specs = self._parse_linkable_elements(
-            qualified_linkable_names=group_by_names, linkable_elements=group_by, metric_references=metric_references
+        requested_linkable_specs = self._parse_group_by(
+            group_by_names=group_by_names, group_by=group_by, metric_references=metric_references
         )
         where_filter_spec: Optional[WhereFilterSpec] = None
         if where_filter is not None:
@@ -426,9 +431,9 @@ class MetricFlowQueryParser:
         for metric_reference in metric_references:
             metric = self._metric_lookup.get_metric(metric_reference)
             if metric.filter is not None:
-                group_by_specs_for_one_metric = self._parse_linkable_elements(
-                    qualified_linkable_names=group_by_names,
-                    linkable_elements=group_by,
+                group_by_specs_for_one_metric = self._parse_group_by(
+                    group_by_names=group_by_names,
+                    group_by=group_by,
                     metric_references=(metric_reference,),
                 )
 
@@ -663,30 +668,32 @@ class MetricFlowQueryParser:
                     metric_references.extend(list(input_metrics))
         return tuple(metric_references)
 
-    def _parse_linkable_elements(
+    def _parse_group_by(
         self,
         metric_references: Sequence[MetricReference],
-        qualified_linkable_names: Optional[Sequence[str]] = None,
-        linkable_elements: Optional[Sequence[QueryParameterDimension]] = None,
+        group_by_names: Optional[Sequence[str]] = None,
+        group_by: Optional[Tuple[Union[GroupByQueryParameter, TimeDimensionQueryParameter], ...]] = None,
     ) -> QueryTimeLinkableSpecSet:
         """Convert the linkable spec names into the respective specification objects."""
         # TODO: refactor to only support group_by object inputs (removing group_by_names param)
         assert not (
-            qualified_linkable_names and linkable_elements
+            group_by_names and group_by
         ), "Both group_by_names and group_by were set, but if a group by is specified you should only use one of these!"
 
         structured_names: List[StructuredLinkableSpecName] = []
-        if qualified_linkable_names:
-            qualified_linkable_names = [x.lower() for x in qualified_linkable_names]
-            structured_names = [StructuredLinkableSpecName.from_name(name) for name in qualified_linkable_names]
-        elif linkable_elements:
-            for linkable_element in linkable_elements:
-                parsed_name = StructuredLinkableSpecName.from_name(linkable_element.name)
+        if group_by_names:
+            group_by_names = [x.lower() for x in group_by_names]
+            structured_names = [StructuredLinkableSpecName.from_name(name) for name in group_by_names]
+        elif group_by:
+            for group_by_obj in group_by:
+                parsed_name = StructuredLinkableSpecName.from_name(group_by_obj.name)
                 structured_name = StructuredLinkableSpecName(
                     entity_link_names=parsed_name.entity_link_names,
                     element_name=parsed_name.element_name,
-                    time_granularity=linkable_element.grain,
-                    date_part=linkable_element.date_part,
+                    time_granularity=group_by_obj.grain
+                    if isinstance(group_by_obj, TimeDimensionQueryParameter)
+                    else None,
+                    date_part=group_by_obj.date_part if isinstance(group_by_obj, TimeDimensionQueryParameter) else None,
                 )
                 structured_names.append(structured_name)
 
@@ -729,15 +736,12 @@ class MetricFlowQueryParser:
                 valid_group_bys_for_metrics = self._metric_lookup.element_specs_for_metrics(list(metric_references))
                 valid_group_by_names_for_metrics = sorted(
                     list(
-                        set(
-                            x.qualified_name if qualified_linkable_names else x.element_name
-                            for x in valid_group_bys_for_metrics
-                        )
+                        set(x.qualified_name if group_by_names else x.element_name for x in valid_group_bys_for_metrics)
                     )
                 )
 
                 # If requested by name, show qualified name. If requested as object, show element name.
-                display_name = structured_name.qualified_name if qualified_linkable_names else element_name
+                display_name = structured_name.qualified_name if group_by_names else element_name
                 suggestions = {
                     f"Suggestions for '{display_name}'": pformat_big_objects(
                         MetricFlowQueryParser._top_fuzzy_matches(
@@ -748,7 +752,7 @@ class MetricFlowQueryParser:
                 }
                 raise UnableToSatisfyQueryError(
                     f"Unknown element name '{element_name}' in dimension name '{display_name}'"
-                    if qualified_linkable_names
+                    if group_by_names
                     else f"Unknown dimension {element_name}",
                     context=suggestions,
                 )
