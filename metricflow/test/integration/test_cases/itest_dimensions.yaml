@@ -123,14 +123,39 @@ integration_test:
   check_query: |
     SELECT
       u.home_state AS user__home_state
-      , v.ds AS ds__day
+      , u.ds AS ds__day
+    FROM {{ source_schema }}.dim_users u
+    GROUP BY
+      u.ds
+      , u.home_state
+---
+integration_test:
+  name: query_dimensions_from_different_tables
+  description: Query multiple dimensions without metrics, requiring a join
+  model: SIMPLE_MODEL
+  group_bys: ["user__home_state", "verification__ds__day"]
+  check_query: |
+    SELECT
+      u.home_state AS user__home_state
+    , v.ds AS verification__ds__day
     FROM {{ source_schema }}.fct_id_verifications v
     LEFT OUTER JOIN {{ source_schema }}.dim_users u
       ON u.user_id = v.user_id
-      AND u.ds = v.ds
+    GROUP BY
+      u.home_state
+      , v.ds
+---
+integration_test:
+  name: query_time_dimension_without_granularity
+  description: Query just a time dimension, no granularity specified
+  model: SIMPLE_MODEL
+  group_bys: [ "verification__ds"]
+  check_query: |
+    SELECT
+      v.ds
+    FROM {{ source_schema }}.fct_id_verifications v
     GROUP BY
       v.ds
-      , u.home_state
 ---
 integration_test:
   name: query_dimension_only_with_constraint

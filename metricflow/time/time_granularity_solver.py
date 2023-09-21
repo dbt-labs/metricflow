@@ -72,6 +72,9 @@ class TimeGranularitySolver:
 
         e.g. throw an error if "ds__week" is specified for a metric with a time granularity of MONTH.
         """
+        if not metric_references:
+            return None
+
         valid_group_by_elements = self._semantic_manifest_lookup.metric_lookup.linkable_set_for_metrics(
             metric_references=metric_references,
         )
@@ -100,36 +103,39 @@ class TimeGranularitySolver:
 
         Returns a dictionary that maps how the partial time dimension spec should be turned into a time dimension spec.
         """
-        valid_group_by_elements = self._semantic_manifest_lookup.metric_lookup.linkable_set_for_metrics(
-            metric_references=metric_references,
-        )
-        result: Dict[PartialTimeDimensionSpec, TimeDimensionSpec] = {}
-        for partial_time_dimension_spec in partial_time_dimension_specs:
-            minimum_time_granularity: Optional[TimeGranularity] = None
-            for path_key in valid_group_by_elements.path_key_to_linkable_dimensions:
-                if (
-                    path_key.element_name == partial_time_dimension_spec.element_name
-                    and path_key.entity_links == partial_time_dimension_spec.entity_links
-                    and path_key.time_granularity is not None
-                ):
-                    minimum_time_granularity = (
-                        path_key.time_granularity
-                        if minimum_time_granularity is None
-                        else min(minimum_time_granularity, path_key.time_granularity)
-                    )
+        if metric_references:
+            valid_group_by_elements = self._semantic_manifest_lookup.metric_lookup.linkable_set_for_metrics(
+                metric_references=metric_references,
+            )
+            result: Dict[PartialTimeDimensionSpec, TimeDimensionSpec] = {}
+            for partial_time_dimension_spec in partial_time_dimension_specs:
+                minimum_time_granularity: Optional[TimeGranularity] = None
+                for path_key in valid_group_by_elements.path_key_to_linkable_dimensions:
+                    if (
+                        path_key.element_name == partial_time_dimension_spec.element_name
+                        and path_key.entity_links == partial_time_dimension_spec.entity_links
+                        and path_key.time_granularity is not None
+                    ):
+                        minimum_time_granularity = (
+                            path_key.time_granularity
+                            if minimum_time_granularity is None
+                            else min(minimum_time_granularity, path_key.time_granularity)
+                        )
 
-            if minimum_time_granularity is not None:
-                result[partial_time_dimension_spec] = TimeDimensionSpec(
-                    element_name=partial_time_dimension_spec.element_name,
-                    entity_links=partial_time_dimension_spec.entity_links,
-                    time_granularity=minimum_time_granularity,
-                )
-            else:
-                raise RequestTimeGranularityException(
-                    f"Unable to resolve the time dimension spec for {partial_time_dimension_spec}. "
-                    f"Valid group by elements are:\n"
-                    f"{pformat_big_objects([spec.qualified_name for spec in valid_group_by_elements.as_spec_set.as_tuple])}"
-                )
+                if minimum_time_granularity is not None:
+                    result[partial_time_dimension_spec] = TimeDimensionSpec(
+                        element_name=partial_time_dimension_spec.element_name,
+                        entity_links=partial_time_dimension_spec.entity_links,
+                        time_granularity=minimum_time_granularity,
+                    )
+                else:
+                    raise RequestTimeGranularityException(
+                        f"Unable to resolve the time dimension spec for {partial_time_dimension_spec}. "
+                        f"Valid group by elements are:\n"
+                        f"{pformat_big_objects([spec.qualified_name for spec in valid_group_by_elements.as_spec_set.as_tuple])}"
+                    )
+        else:
+            raise NotImplementedError  # find minimum granularity for time dimension
         return result
 
     def adjust_time_range_to_granularity(
