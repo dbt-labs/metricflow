@@ -116,7 +116,6 @@ class DataflowPlanBuilder:
     def __init__(  # noqa: D
         self,
         source_nodes: Sequence[BaseOutput],
-        source_nodes_without_measures: Sequence[BaseOutput],
         semantic_manifest_lookup: SemanticManifestLookup,
         cost_function: DataflowPlanNodeCostFunction = DefaultCostFunction(),
         node_output_resolver: Optional[DataflowPlanNodeOutputDataSetResolver] = None,
@@ -127,7 +126,6 @@ class DataflowPlanBuilder:
         self._metric_time_dimension_reference = DataSet.metric_time_dimension_reference()
         self._cost_function = cost_function
         self._source_nodes = source_nodes
-        self._source_nodes_without_measures = source_nodes_without_measures
         self._column_association_resolver = (
             DunderColumnAssociationResolver(semantic_manifest_lookup)
             if not column_association_resolver
@@ -457,13 +455,12 @@ class DataflowPlanBuilder:
         time_range_constraint: Optional[TimeRangeConstraint] = None,
     ) -> Optional[DataflowRecipe]:
         linkable_specs = linkable_spec_set.as_tuple
+        source_nodes = self._source_nodes
         if measure_spec_properties:
-            source_nodes = self._source_nodes
             potential_source_nodes: Sequence[BaseOutput] = self._select_source_nodes_with_measures(
                 measure_specs=set(measure_spec_properties.measure_specs), source_nodes=source_nodes
             )
         else:
-            source_nodes = self._source_nodes_without_measures
             potential_source_nodes = self._select_source_nodes_with_linkable_specs(
                 linkable_specs=linkable_spec_set, source_nodes=source_nodes
             )

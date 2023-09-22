@@ -82,7 +82,6 @@ class ConsistentIdObjectRepository:
     simple_model_data_sets: OrderedDict[str, SemanticModelDataSet]
     simple_model_read_nodes: OrderedDict[str, ReadSqlSourceNode]
     simple_model_source_nodes: Sequence[BaseOutput]
-    simple_model_source_nodes_without_measures: Sequence[BaseOutput]
 
     multihop_model_read_nodes: OrderedDict[str, ReadSqlSourceNode]
     multihop_model_source_nodes: Sequence[BaseOutput]
@@ -116,9 +115,6 @@ def consistent_id_object_repository(
             simple_model_data_sets=sm_data_sets,
             simple_model_read_nodes=_data_set_to_read_nodes(sm_data_sets),
             simple_model_source_nodes=_data_set_to_source_nodes(simple_semantic_manifest_lookup, sm_data_sets),
-            simple_model_source_nodes_without_measures=_data_set_to_source_nodes(
-                simple_semantic_manifest_lookup, sm_data_sets, with_measures=False
-            ),
             multihop_model_read_nodes=_data_set_to_read_nodes(multihop_data_sets),
             multihop_model_source_nodes=_data_set_to_source_nodes(
                 multi_hop_join_semantic_manifest_lookup, multihop_data_sets
