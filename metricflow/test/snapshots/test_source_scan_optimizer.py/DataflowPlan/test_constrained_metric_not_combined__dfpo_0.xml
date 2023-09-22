@@ -34,6 +34,7 @@
                         <!--    'element_name': 'metric_time',            -->
                         <!--    'entity_links': (),                       -->
                         <!--    'time_granularity': TimeGranularity.DAY,  -->
+                        <!--    'date_part': None,                        -->
                         <!--    'aggregation_state': None}                -->
                         <!-- distinct_values = False -->
                         <MetricTimeDimensionTransformNode>
@@ -88,6 +89,7 @@
                         <!--    'element_name': 'metric_time',            -->
                         <!--    'entity_links': (),                       -->
                         <!--    'time_granularity': TimeGranularity.DAY,  -->
+                        <!--    'date_part': None,                        -->
                         <!--    'aggregation_state': None}                -->
                         <!-- distinct_values = False -->
                         <WhereConstraintNode>
@@ -122,6 +124,7 @@
                                 <!--    'element_name': 'metric_time',            -->
                                 <!--    'entity_links': (),                       -->
                                 <!--    'time_granularity': TimeGranularity.DAY,  -->
+                                <!--    'date_part': None,                        -->
                                 <!--    'aggregation_state': None}                -->
                                 <!-- distinct_values = False -->
                                 <MetricTimeDimensionTransformNode>

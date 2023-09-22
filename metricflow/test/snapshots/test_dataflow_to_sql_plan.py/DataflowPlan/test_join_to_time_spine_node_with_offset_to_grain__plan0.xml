@@ -35,6 +35,7 @@
                         <!--    'element_name': 'metric_time',            -->
                         <!--    'entity_links': (),                       -->
                         <!--    'time_granularity': TimeGranularity.DAY,  -->
+                        <!--    'date_part': None,                        -->
                         <!--    'aggregation_state': None}                -->
                         <!-- include_spec = LinklessEntitySpec(element_name='listing', entity_links=()) -->
                         <!-- distinct_values = False -->

@@ -11,28 +11,27 @@ from dbt_semantic_interfaces.protocols.protocol_hint import ProtocolHint
 from dbt_semantic_interfaces.references import EntityReference
 from typing_extensions import override
 
+from metricflow.errors.errors import InvalidQuerySyntax
+from metricflow.protocols.query_interface import QueryInterfaceEntity, QueryInterfaceEntityFactory
 from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.specs.query_interface import QueryInterfaceDimension, QueryInterfaceEntityFactory
 from metricflow.specs.specs import EntitySpec
 
 
-class WhereFilterEntity(ProtocolHint[QueryInterfaceDimension]):
+class WhereFilterEntity(ProtocolHint[QueryInterfaceEntity]):
     """An entity that is passed in through the where filter parameter."""
 
     @override
-    def _implements_protocol(self) -> QueryInterfaceDimension:
+    def _implements_protocol(self) -> QueryInterfaceEntity:
         return self
 
     def __init__(self, column_name: str):  # noqa
         self.column_name = column_name
 
-    def grain(self, _grain: str) -> WhereFilterEntity:
-        """The time granularity."""
-        raise NotImplementedError
-
-    def alias(self, _alias: str) -> WhereFilterEntity:
-        """Renaming the column."""
-        raise NotImplementedError
+    def descending(self, _is_descending: bool) -> QueryInterfaceEntity:
+        """Set the sort order for order-by."""
+        raise InvalidQuerySyntax(
+            "Can't set descending in the where clause. Try setting descending in the order_by clause instead"
+        )
 
     def __str__(self) -> str:
         """Returns the column name.

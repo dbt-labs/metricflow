@@ -16,8 +16,10 @@ semantic_model:
         time_granularity: day
       is_partition: true
 
+  primary_entity: bridge_account
+
   entities:
     - name: account_id
-      type: primary
+      type: unique
     - name: customer_id
       type: foreign

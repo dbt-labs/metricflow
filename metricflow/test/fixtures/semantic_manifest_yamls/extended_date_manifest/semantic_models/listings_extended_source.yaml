@@ -8,11 +8,13 @@ semantic_model:
     alias: dim_listings_extended
 
   dimensions:
-    - name: listing_creation_ds
+    - name: ds
+      expr: listing_creation_ds
       type: time
       type_params:
         time_granularity: day
 
   entities:
-    - name: listing_id
+    - name: listing
+      expr: listing_id
       type: primary
