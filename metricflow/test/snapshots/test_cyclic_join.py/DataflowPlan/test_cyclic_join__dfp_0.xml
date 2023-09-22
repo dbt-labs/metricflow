@@ -58,7 +58,7 @@
                             <!-- distinct_values = False -->
                             <MetricTimeDimensionTransformNode>
                                 <!-- description = Metric Time Dimension 'ds' -->
-                                <!-- node_id = sma_10010 -->
+                                <!-- node_id = sma_10017 -->
                                 <!-- aggregation_time_dimension = ds -->
                                 <ReadSqlSourceNode>
                                     <!-- description =                                                                                    -->

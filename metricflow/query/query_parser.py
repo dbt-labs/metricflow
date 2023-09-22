@@ -230,6 +230,9 @@ class MetricFlowQueryParser:
         all_linkable_specs: QueryTimeLinkableSpecSet,
         time_dimension_specs: Tuple[TimeDimensionSpec, ...],
     ) -> None:
+        if not metric_references:
+            return None
+
         invalid_group_bys = self._get_invalid_linkable_specs(
             metric_references=metric_references,
             dimension_specs=all_linkable_specs.dimension_specs,

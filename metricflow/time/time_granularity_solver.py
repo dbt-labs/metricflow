@@ -105,6 +105,9 @@ class TimeGranularitySolver:
 
         Returns a dictionary that maps how the partial time dimension spec should be turned into a time dimension spec.
         """
+        if not partial_time_dimension_specs:
+            return {}
+
         if metric_references:
             result: Dict[PartialTimeDimensionSpec, TimeDimensionSpec] = {}
             for partial_time_dimension_spec in partial_time_dimension_specs:

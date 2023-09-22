@@ -40,13 +40,18 @@
                     <!--    'element_name': 'country_latest',                                            -->
                     <!--    'entity_links': ({'class': 'EntityReference', 'element_name': 'listing'},)}  -->
                     <!-- distinct_values = True -->
-                    <ReadSqlSourceNode>
-                        <!-- description =                                                                                    -->
-                        <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))  -->
-                        <!-- node_id = rss_10024 -->
-                        <!-- data_set =                                                                             -->
-                        <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))  -->
-                    </ReadSqlSourceNode>
+                    <MetricTimeDimensionTransformNode>
+                        <!-- description = Metric Time Dimension 'ds' -->
+                        <!-- node_id = sma_10011 -->
+                        <!-- aggregation_time_dimension = ds -->
+                        <ReadSqlSourceNode>
+                            <!-- description =                                                                                    -->
+                            <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))  -->
+                            <!-- node_id = rss_10024 -->
+                            <!-- data_set =                                                                             -->
+                            <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))  -->
+                        </ReadSqlSourceNode>
+                    </MetricTimeDimensionTransformNode>
                 </FilterElementsNode>
             </WhereConstraintNode>
         </OrderByLimitNode>
