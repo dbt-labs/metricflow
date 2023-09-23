@@ -9,7 +9,12 @@ from typing import DefaultDict, Dict, List, Optional, Sequence, Set, Tuple, Unio
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.protocols.metric import MetricTimeWindow, MetricType
-from dbt_semantic_interfaces.references import TimeDimensionReference
+from dbt_semantic_interfaces.protocols.semantic_model import SemanticModel
+from dbt_semantic_interfaces.references import (
+    DimensionReference,
+    EntityReference,
+    TimeDimensionReference,
+)
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.dag.id_generation import DATAFLOW_PLAN_PREFIX, IdGeneratorRegistry
@@ -272,24 +277,82 @@ class DataflowPlanBuilder:
             join_type=combine_metrics_join_type,
         )
 
+    def __get_semantic_models_for_linkable_specs(
+        self, linkable_specs: LinkableSpecSet
+    ) -> Dict[SemanticModel, LinkableSpecSet]:
+        """Build dict of semantic models to associated linkable specs."""
+        semantic_models_to_linkable_specs: Dict[SemanticModel, LinkableSpecSet] = {}
+
+        # Dimensions
+        for dimension_spec in linkable_specs.dimension_specs:
+            semantic_models = self._semantic_model_lookup.get_semantic_models_for_linkable_element(
+                linkable_element=DimensionReference(element_name=dimension_spec.element_name)
+            )
+            for semantic_model in semantic_models:
+                new_linkable_spec_set = LinkableSpecSet(dimension_specs=(dimension_spec,))
+                linkable_specs_for_semantic_model = semantic_models_to_linkable_specs.get(semantic_model)
+                semantic_models_to_linkable_specs[semantic_model] = (
+                    LinkableSpecSet.merge([linkable_specs_for_semantic_model, new_linkable_spec_set])
+                    if linkable_specs_for_semantic_model
+                    else new_linkable_spec_set
+                )
+        # Time dimensions
+        for time_dimension_spec in linkable_specs.time_dimension_specs:
+            semantic_models = self._semantic_model_lookup.get_semantic_models_for_linkable_element(
+                linkable_element=TimeDimensionReference(element_name=time_dimension_spec.element_name)
+            )
+            for semantic_model in semantic_models:
+                new_linkable_spec_set = LinkableSpecSet(time_dimension_specs=(time_dimension_spec,))
+                semantic_models_to_linkable_specs[semantic_model] = (
+                    LinkableSpecSet.merge([linkable_specs_for_semantic_model, new_linkable_spec_set])
+                    if linkable_specs_for_semantic_model
+                    else new_linkable_spec_set
+                )
+        # Entities
+        for entity_spec in linkable_specs.entity_specs:
+            semantic_models = self._semantic_model_lookup.get_semantic_models_for_linkable_element(
+                linkable_element=EntityReference(element_name=entity_spec.element_name)
+            )
+            for semantic_model in semantic_models:
+                new_linkable_spec_set = LinkableSpecSet(entity_specs=(entity_spec,))
+                semantic_models_to_linkable_specs[semantic_model] = (
+                    LinkableSpecSet.merge([linkable_specs_for_semantic_model, new_linkable_spec_set])
+                    if linkable_specs_for_semantic_model
+                    else new_linkable_spec_set
+                )
+
+        return semantic_models_to_linkable_specs
+
     def build_plan_for_distinct_values(self, query_spec: MetricFlowQuerySpec) -> DataflowPlan:
         """Generate a plan that would get the distinct values of a linkable instance.
 
         e.g. distinct listing__country_latest for bookings by listing__country_latest
         """
         assert not query_spec.metric_specs, "Can't build distinct values plan with metrics."
+        output_nodes = []
+        for linkable_specs in self.__get_semantic_models_for_linkable_specs(
+            linkable_specs=query_spec.linkable_specs
+        ).values():
+            dataflow_recipe = self._find_dataflow_recipe(linkable_spec_set=linkable_specs)
+            if not dataflow_recipe:
+                raise UnableToSatisfyQueryError(f"Recipe not found for linkable specs: {linkable_specs}.")
+            output_nodes.append(dataflow_recipe.source_node)
 
-        linkable_specs = query_spec.linkable_specs
-        dataflow_recipe = self._find_dataflow_recipe(linkable_spec_set=linkable_specs)
-        if not dataflow_recipe:
-            raise UnableToSatisfyQueryError(f"Recipe not found for linkable specs: {linkable_specs}.")
+        if not output_nodes:
+            raise UnableToSatisfyQueryError(f"Recipe not found for linkable specs: {query_spec.linkable_specs}")
 
-        source_node = dataflow_recipe.source_node
-        distinct_values_node = FilterElementsNode(
-            parent_node=source_node,
-            include_specs=InstanceSpecSet.create_from_linkable_specs(linkable_specs.as_tuple),
-            distinct_values=True,
-        )
+        if len(output_nodes) == 1:
+            distinct_values_node = FilterElementsNode(
+                parent_node=output_nodes[0],
+                include_specs=InstanceSpecSet.create_from_linkable_specs(query_spec.linkable_specs.as_tuple),
+                distinct_values=True,
+            )
+        else:
+            distinct_values_node = FilterElementsNode(
+                parent_node=JoinAggregatedMeasuresByGroupByColumnsNode(parent_nodes=output_nodes),
+                include_specs=query_spec.linkable_specs.as_spec_set,
+                distinct_values=True,
+            )
 
         where_constraint_node: Optional[WhereConstraintNode] = None
         if query_spec.where_constraint:
