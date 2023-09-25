@@ -18,9 +18,9 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import (
     DunderColumnAssociationResolver,
 )
-from metricflow.protocols.query_parameter import GroupByQueryParameter
+from metricflow.protocols.query_parameter import DimensionOrEntityQueryParameter
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.specs.query_param_implementations import GroupByParameter, TimeDimensionParameter
+from metricflow.specs.query_param_implementations import DimensionOrEntityParameter, TimeDimensionParameter
 from metricflow.sql.sql_exprs import (
     SqlCastToTimestampExpression,
     SqlColumnReference,
@@ -256,7 +256,7 @@ def test_case(
 
     check_query_helpers = CheckQueryHelpers(sql_client)
 
-    group_by: List[GroupByQueryParameter] = []
+    group_by: List[DimensionOrEntityQueryParameter] = []
     for group_by_kwargs in case.group_by_objs:
         kwargs = copy(group_by_kwargs)
         date_part = kwargs.get("date_part")
@@ -268,7 +268,7 @@ def test_case(
                 kwargs["grain"] = TimeGranularity(grain)
             group_by.append(TimeDimensionParameter(**kwargs))
         else:
-            group_by.append(GroupByParameter(**kwargs))
+            group_by.append(DimensionOrEntityParameter(**kwargs))
     query_result = engine.query(
         MetricFlowQueryRequest.create_with_random_request_id(
             metric_names=case.metrics,

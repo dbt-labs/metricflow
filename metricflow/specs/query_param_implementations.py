@@ -1,16 +1,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional, Union
+from typing import Optional
 
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
-from metricflow.protocols.query_parameter import (
-    GroupByQueryParameter,
-    MetricQueryParameter,
-    TimeDimensionQueryParameter,
-)
+from metricflow.protocols.query_parameter import InputOrderByParameter
 from metricflow.time.date_part import DatePart
 
 
@@ -29,7 +25,7 @@ class TimeDimensionParameter:
 
 
 @dataclass(frozen=True)
-class GroupByParameter:
+class DimensionOrEntityParameter:
     """Group by parameter requested in a query.
 
     Might represent an entity or a dimension.
@@ -49,5 +45,5 @@ class MetricParameter:
 class OrderByParameter:
     """Order by requested in a query."""
 
-    order_by: Union[MetricQueryParameter, GroupByQueryParameter, TimeDimensionQueryParameter]
+    order_by: InputOrderByParameter
     descending: bool = False

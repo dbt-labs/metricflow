@@ -18,7 +18,7 @@ class MetricQueryParameter(Protocol):
 
 
 @runtime_checkable
-class GroupByQueryParameter(Protocol):
+class DimensionOrEntityQueryParameter(Protocol):
     """Generic group by parameter for queries. Might be an entity or a dimension."""
 
     @property
@@ -45,11 +45,15 @@ class TimeDimensionQueryParameter(Protocol):  # noqa: D
         raise NotImplementedError
 
 
+GroupByParameter = Union[DimensionOrEntityQueryParameter, TimeDimensionQueryParameter]
+InputOrderByParameter = Union[MetricQueryParameter, GroupByParameter]
+
+
 class OrderByQueryParameter(Protocol):
     """Parameter to order by, specifying ascending or descending."""
 
     @property
-    def order_by(self) -> Union[MetricQueryParameter, GroupByQueryParameter, TimeDimensionQueryParameter]:
+    def order_by(self) -> InputOrderByParameter:
         """Parameter to order results by."""
         raise NotImplementedError
 

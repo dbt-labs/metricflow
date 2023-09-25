@@ -15,7 +15,7 @@ from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.specs.query_param_implementations import (
-    GroupByParameter,
+    DimensionOrEntityParameter,
     MetricParameter,
     OrderByParameter,
     TimeDimensionParameter,
@@ -196,8 +196,8 @@ def test_query_parser_with_object_params(bookings_query_parser: MetricFlowQueryP
     Metric = namedtuple("Metric", ["name", "descending"])
     metric = Metric("bookings", False)
     group_by = (
-        GroupByParameter("booking__is_instant"),
-        GroupByParameter("listing"),
+        DimensionOrEntityParameter("booking__is_instant"),
+        DimensionOrEntityParameter("listing"),
         TimeDimensionParameter(MTD),
     )
     order_by = (

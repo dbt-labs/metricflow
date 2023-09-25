@@ -4,7 +4,7 @@ import datetime
 import logging
 import time
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Sequence, Tuple, Union
+from typing import Dict, List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.call_parameter_sets import ParseWhereFilterException
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
@@ -29,7 +29,7 @@ from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.protocols.query_parameter import (
-    GroupByQueryParameter,
+    GroupByParameter,
     MetricQueryParameter,
     OrderByQueryParameter,
     TimeDimensionQueryParameter,
@@ -177,7 +177,7 @@ class MetricFlowQueryParser:
         metric_names: Optional[Sequence[str]] = None,
         metrics: Optional[Sequence[MetricQueryParameter]] = None,
         group_by_names: Optional[Sequence[str]] = None,
-        group_by: Optional[Tuple[Union[GroupByQueryParameter, TimeDimensionQueryParameter], ...]] = None,
+        group_by: Optional[Tuple[GroupByParameter, ...]] = None,
         limit: Optional[int] = None,
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
@@ -316,7 +316,7 @@ class MetricFlowQueryParser:
         metric_names: Optional[Sequence[str]] = None,
         metrics: Optional[Sequence[MetricQueryParameter]] = None,
         group_by_names: Optional[Sequence[str]] = None,
-        group_by: Optional[Tuple[Union[GroupByQueryParameter, TimeDimensionQueryParameter], ...]] = None,
+        group_by: Optional[Tuple[GroupByParameter, ...]] = None,
         limit: Optional[int] = None,
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
@@ -665,7 +665,7 @@ class MetricFlowQueryParser:
         self,
         metric_references: Sequence[MetricReference],
         group_by_names: Optional[Sequence[str]] = None,
-        group_by: Optional[Tuple[Union[GroupByQueryParameter, TimeDimensionQueryParameter], ...]] = None,
+        group_by: Optional[Tuple[GroupByParameter, ...]] = None,
     ) -> QueryTimeLinkableSpecSet:
         """Convert the linkable spec names into the respective specification objects."""
         # TODO: refactor to only support group_by object inputs (removing group_by_names param)
