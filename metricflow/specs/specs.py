@@ -105,6 +105,12 @@ class InstanceSpec(SerializableDataclass):
         """See Visitable."""
         raise NotImplementedError()
 
+    @property
+    @abstractmethod
+    def as_spec_set(self) -> InstanceSpecSet:
+        """Return this as the one item in a InstanceSpecSet."""
+        raise NotImplementedError
+
 
 SelfTypeT = TypeVar("SelfTypeT", bound="LinkableInstanceSpec")
 
@@ -125,6 +131,11 @@ class MetadataSpec(InstanceSpec):
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_metadata_spec(self)
+
+    @property
+    @override
+    def as_spec_set(self) -> InstanceSpecSet:
+        return InstanceSpecSet(metadata_specs=(self,))
 
 
 @dataclass(frozen=True)
@@ -163,10 +174,6 @@ class LinkableInstanceSpec(InstanceSpec, ABC):
         return StructuredLinkableSpecName(
             entity_link_names=tuple(x.element_name for x in self.entity_links), element_name=self.element_name
         ).qualified_name
-
-    @property
-    def as_linkable_spec_set(self) -> LinkableSpecSet:  # noqa: D
-        raise NotImplementedError
 
 
 @dataclass(frozen=True)
@@ -209,8 +216,9 @@ class EntitySpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
         return EntityReference(element_name=self.element_name)
 
     @property
-    def as_linkable_spec_set(self) -> LinkableSpecSet:  # noqa: D
-        return LinkableSpecSet(entity_specs=(self,))
+    @override
+    def as_spec_set(self) -> InstanceSpecSet:
+        return InstanceSpecSet(entity_specs=(self,))
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_entity_spec(self)
@@ -273,8 +281,9 @@ class DimensionSpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
         return DimensionReference(element_name=self.element_name)
 
     @property
-    def as_linkable_spec_set(self) -> LinkableSpecSet:  # noqa: D
-        return LinkableSpecSet(dimension_specs=(self,))
+    @override
+    def as_spec_set(self) -> InstanceSpecSet:
+        return InstanceSpecSet(dimension_specs=(self,))
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_dimension_spec(self)
@@ -332,8 +341,9 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
         ).qualified_name
 
     @property
-    def as_linkable_spec_set(self) -> LinkableSpecSet:  # noqa: D
-        return LinkableSpecSet(time_dimension_specs=(self,))
+    @override
+    def as_spec_set(self) -> InstanceSpecSet:
+        return InstanceSpecSet(time_dimension_specs=(self,))
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_time_dimension_spec(self)
@@ -409,6 +419,11 @@ class MeasureSpec(InstanceSpec):  # noqa: D
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_measure_spec(self)
 
+    @property
+    @override
+    def as_spec_set(self) -> InstanceSpecSet:
+        return InstanceSpecSet(measure_specs=(self,))
+
 
 @dataclass(frozen=True)
 class MetricSpec(InstanceSpec):  # noqa: D
@@ -446,6 +461,11 @@ class MetricSpec(InstanceSpec):  # noqa: D
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_metric_spec(self)
+
+    @property
+    @override
+    def as_spec_set(self) -> InstanceSpecSet:
+        return InstanceSpecSet(metric_specs=(self,))
 
 
 @dataclass(frozen=True)
@@ -681,9 +701,7 @@ class InstanceSpecSet(Mergeable, SerializableDataclass):
 
     @staticmethod
     def create_from_linkable_specs(linkable_specs: Sequence[LinkableInstanceSpec]) -> InstanceSpecSet:  # noqa: D
-        return InstanceSpecSet.merge_iterable(
-            tuple(linkable_spec.as_linkable_spec_set.as_spec_set for linkable_spec in linkable_specs)
-        )
+        return InstanceSpecSet.merge_iterable(x.as_spec_set for x in linkable_specs)
 
 
 @dataclass(frozen=True)
