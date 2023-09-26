@@ -687,13 +687,8 @@ class DataflowPlanBuilder:
         else:
             return FilterElementsNode(
                 parent_node=JoinAggregatedMeasuresByGroupByColumnsNode(parent_nodes=output_nodes),
-                include_specs=InstanceSpecSet.merge(
-                    (
-                        queried_linkable_specs.as_spec_set,
-                        InstanceSpecSet(
-                            measure_specs=tuple(x.post_aggregation_spec for x in metric_input_measure_specs)
-                        ),
-                    )
+                include_specs=queried_linkable_specs.as_spec_set.merge(
+                    InstanceSpecSet(measure_specs=tuple(x.post_aggregation_spec for x in metric_input_measure_specs)),
                 ),
             )
 
@@ -798,11 +793,8 @@ class DataflowPlanBuilder:
         # Only get the required measure and the local linkable instances so that aggregations work correctly.
         filtered_measure_source_node = FilterElementsNode(
             parent_node=join_to_time_spine_node or time_range_node or measure_recipe.measure_node,
-            include_specs=InstanceSpecSet.merge(
-                (
-                    InstanceSpecSet(measure_specs=measure_specs),
-                    InstanceSpecSet.create_from_linkable_specs(measure_recipe.required_local_linkable_specs),
-                )
+            include_specs=InstanceSpecSet(measure_specs=measure_specs).merge(
+                InstanceSpecSet.create_from_linkable_specs(measure_recipe.required_local_linkable_specs),
             ),
         )
 
@@ -856,11 +848,8 @@ class DataflowPlanBuilder:
                 join_targets=join_targets,
             )
 
-            specs_to_keep_after_join = InstanceSpecSet.merge(
-                (
-                    InstanceSpecSet(measure_specs=measure_specs),
-                    required_linkable_specs.as_spec_set,
-                )
+            specs_to_keep_after_join = InstanceSpecSet(measure_specs=measure_specs).merge(
+                required_linkable_specs.as_spec_set,
             )
 
             after_join_filtered_node = FilterElementsNode(
@@ -918,9 +907,7 @@ class DataflowPlanBuilder:
             # e.g. for "bookings" by "ds" where "is_instant", "is_instant" should not be in the results.
             pre_aggregate_node = FilterElementsNode(
                 parent_node=pre_aggregate_node,
-                include_specs=InstanceSpecSet.merge(
-                    (InstanceSpecSet(measure_specs=measure_specs), queried_linkable_specs.as_spec_set)
-                ),
+                include_specs=InstanceSpecSet(measure_specs=measure_specs).merge(queried_linkable_specs.as_spec_set),
             )
         return AggregateMeasuresNode(
             parent_node=pre_aggregate_node,
