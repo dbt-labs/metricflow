@@ -467,6 +467,10 @@ class MetricSpec(InstanceSpec):  # noqa: D
     def as_spec_set(self) -> InstanceSpecSet:
         return InstanceSpecSet(metric_specs=(self,))
 
+    @property
+    def reference(self) -> MetricReference:  # noqa: D
+        return MetricReference(element_name=self.element_name)
+
 
 @dataclass(frozen=True)
 class MetricInputMeasureSpec(SerializableDataclass):
