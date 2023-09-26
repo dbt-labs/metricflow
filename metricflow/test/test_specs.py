@@ -111,7 +111,7 @@ def test_merge_spec_set() -> None:  # noqa: D
         dimension_specs=(DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),)
     )
 
-    assert InstanceSpecSet.merge((spec_set1, spec_set2)) == InstanceSpecSet(
+    assert spec_set1.merge(spec_set2) == InstanceSpecSet(
         metric_specs=(MetricSpec(element_name="bookings"),),
         dimension_specs=(DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),),
     )
