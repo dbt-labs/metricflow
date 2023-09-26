@@ -52,6 +52,7 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.node_processor import PreDimensionJoinNodeProcessor
 from metricflow.specs.column_assoc import ColumnAssociationResolver
+from metricflow.specs.merge_builder import MergeBuilder
 from metricflow.specs.specs import (
     DimensionSpec,
     EntitySpec,
@@ -732,17 +733,15 @@ class DataflowPlanBuilder:
 
         # Extraneous linkable specs are specs that are used in this phase that should not show up in the final result
         # unless it was already a requested spec in the query
-        extraneous_linkable_specs = LinkableSpecSet()
+        extraneous_linkable_specs_builder = MergeBuilder[LinkableSpecSet](LinkableSpecSet())
         if where_constraint:
-            extraneous_linkable_specs = LinkableSpecSet.merge(
-                (extraneous_linkable_specs, where_constraint.linkable_spec_set)
-            )
+            extraneous_linkable_specs_builder.add(where_constraint.linkable_spec_set)
         if non_additive_dimension_spec:
-            extraneous_linkable_specs = LinkableSpecSet.merge(
-                (extraneous_linkable_specs, non_additive_dimension_spec.linkable_specs)
-            )
+            extraneous_linkable_specs_builder.add(non_additive_dimension_spec.linkable_specs)
 
-        required_linkable_specs = LinkableSpecSet.merge((queried_linkable_specs, extraneous_linkable_specs))
+        extraneous_linkable_specs = extraneous_linkable_specs_builder.build_result.dedupe()
+        required_linkable_specs = queried_linkable_specs.merge(extraneous_linkable_specs).dedupe()
+
         logger.info(
             f"Looking for a recipe to get:\n"
             f"{pformat_big_objects(measure_specs=measure_specs, required_linkable_set=required_linkable_specs)}"
