@@ -28,8 +28,10 @@ from dbt_semantic_interfaces.references import (
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from typing_extensions import override
 
 from metricflow.aggregation_properties import AggregationState
+from metricflow.collections.merger import Mergeable
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
@@ -582,7 +584,7 @@ class InstanceSpecSetTransform(Generic[TransformOutputT], ABC):
 
 
 @dataclass(frozen=True)
-class InstanceSpecSet(SerializableDataclass):
+class InstanceSpecSet(Mergeable, SerializableDataclass):
     """Consolidates all specs used in an instance set."""
 
     metric_specs: Tuple[MetricSpec, ...] = ()
@@ -592,17 +594,21 @@ class InstanceSpecSet(SerializableDataclass):
     time_dimension_specs: Tuple[TimeDimensionSpec, ...] = ()
     metadata_specs: Tuple[MetadataSpec, ...] = ()
 
-    @staticmethod
-    def merge(others: Sequence[InstanceSpecSet]) -> InstanceSpecSet:
-        """Merge all sets into one set, without de-duplication."""
+    @override
+    def merge(self, other: InstanceSpecSet) -> InstanceSpecSet:
         return InstanceSpecSet(
-            metric_specs=tuple(itertools.chain.from_iterable([x.metric_specs for x in others])),
-            measure_specs=tuple(itertools.chain.from_iterable([x.measure_specs for x in others])),
-            dimension_specs=tuple(itertools.chain.from_iterable([x.dimension_specs for x in others])),
-            entity_specs=tuple(itertools.chain.from_iterable([x.entity_specs for x in others])),
-            time_dimension_specs=tuple(itertools.chain.from_iterable([x.time_dimension_specs for x in others])),
-            metadata_specs=tuple(itertools.chain.from_iterable([x.metadata_specs for x in others])),
+            metric_specs=self.metric_specs + other.metric_specs,
+            measure_specs=self.measure_specs + other.measure_specs,
+            dimension_specs=self.dimension_specs + other.dimension_specs,
+            entity_specs=self.entity_specs + other.entity_specs,
+            time_dimension_specs=self.time_dimension_specs + other.time_dimension_specs,
+            metadata_specs=self.metadata_specs + other.metadata_specs,
         )
+
+    @override
+    @classmethod
+    def empty_instance(cls) -> InstanceSpecSet:
+        return InstanceSpecSet()
 
     def dedupe(self) -> InstanceSpecSet:
         """De-duplicates repeated elements.
@@ -665,7 +671,9 @@ class InstanceSpecSet(SerializableDataclass):
 
     @staticmethod
     def create_from_linkable_specs(linkable_specs: Sequence[LinkableInstanceSpec]) -> InstanceSpecSet:  # noqa: D
-        return InstanceSpecSet.merge(tuple(x.as_linkable_spec_set.as_spec_set for x in linkable_specs))
+        return InstanceSpecSet.merge_iterable(
+            tuple(linkable_spec.as_linkable_spec_set.as_spec_set for linkable_spec in linkable_specs)
+        )
 
 
 @dataclass(frozen=True)
