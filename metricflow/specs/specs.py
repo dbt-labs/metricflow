@@ -14,7 +14,7 @@ import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from hashlib import sha1
-from typing import Any, Generic, List, Optional, Sequence, Tuple, TypeVar
+from typing import Any, Dict, Generic, List, Optional, Sequence, Tuple, TypeVar
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
@@ -511,7 +511,7 @@ class FilterSpec(SerializableDataclass):  # noqa: D
 
 
 @dataclass(frozen=True)
-class LinkableSpecSet(SerializableDataclass):
+class LinkableSpecSet(Mergeable, SerializableDataclass):
     """Groups linkable specs."""
 
     dimension_specs: Tuple[DimensionSpec, ...] = ()
@@ -522,28 +522,33 @@ class LinkableSpecSet(SerializableDataclass):
     def as_tuple(self) -> Tuple[LinkableInstanceSpec, ...]:  # noqa: D
         return tuple(itertools.chain(self.dimension_specs, self.time_dimension_specs, self.entity_specs))
 
-    @staticmethod
-    def merge(spec_sets: Sequence[LinkableSpecSet]) -> LinkableSpecSet:
-        """Merges and dedupes the linkable specs."""
-        dimension_specs: List[DimensionSpec] = []
-        time_dimension_specs: List[TimeDimensionSpec] = []
-        entity_specs: List[EntitySpec] = []
+    @override
+    def merge(self, other: LinkableSpecSet) -> LinkableSpecSet:
+        return LinkableSpecSet(
+            dimension_specs=self.dimension_specs + other.dimension_specs,
+            time_dimension_specs=self.time_dimension_specs + other.time_dimension_specs,
+            entity_specs=self.entity_specs + other.entity_specs,
+        )
 
-        for spec_set in spec_sets:
-            for dimension_spec in spec_set.dimension_specs:
-                if dimension_spec not in dimension_specs:
-                    dimension_specs.append(dimension_spec)
-            for time_dimension_spec in spec_set.time_dimension_specs:
-                if time_dimension_spec not in time_dimension_specs:
-                    time_dimension_specs.append(time_dimension_spec)
-            for entity_spec in spec_set.entity_specs:
-                if entity_spec not in entity_specs:
-                    entity_specs.append(entity_spec)
+    def dedupe(self) -> LinkableSpecSet:  # noqa: D
+        # Use dictionaries to dedupe as it preserves insertion order.
+
+        dimension_spec_dict: Dict[DimensionSpec, None] = {}
+        for dimension_spec in self.dimension_specs:
+            dimension_spec_dict[dimension_spec] = None
+
+        time_dimension_spec_dict: Dict[TimeDimensionSpec, None] = {}
+        for time_dimension_spec in self.time_dimension_specs:
+            time_dimension_spec_dict[time_dimension_spec] = None
+
+        entity_spec_dict: Dict[EntitySpec, None] = {}
+        for entity_spec in self.entity_specs:
+            entity_spec_dict[entity_spec] = None
 
         return LinkableSpecSet(
-            dimension_specs=tuple(dimension_specs),
-            time_dimension_specs=tuple(time_dimension_specs),
-            entity_specs=tuple(entity_specs),
+            dimension_specs=tuple(dimension_spec_dict.keys()),
+            time_dimension_specs=tuple(time_dimension_spec_dict.keys()),
+            entity_specs=tuple(entity_spec_dict.keys()),
         )
 
     def is_subset_of(self, other_set: LinkableSpecSet) -> bool:  # noqa: D
@@ -737,5 +742,5 @@ class WhereFilterSpec(SerializableDataclass):
         return WhereFilterSpec(
             where_sql=f"({self.where_sql}) AND ({other.where_sql})",
             bind_parameters=self.bind_parameters.combine(other.bind_parameters),
-            linkable_spec_set=LinkableSpecSet.merge([self.linkable_spec_set, other.linkable_spec_set]),
+            linkable_spec_set=self.linkable_spec_set.merge(other.linkable_spec_set),
         )
