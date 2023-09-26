@@ -241,65 +241,15 @@ class SemanticModelToDataSetConverter:
                         column_alias=dimension_instance.associated_column.column_name,
                     )
                 )
-
             elif dimension.type == DimensionType.TIME:
-                defined_time_granularity = TimeGranularity.DAY
-                if dimension.type_params and dimension.type_params.time_granularity:
-                    defined_time_granularity = dimension.type_params.time_granularity
-
-                time_dimension_instance = self._create_time_dimension_instance(
+                derived_time_dimension_instances, time_select_columns = self._convert_time_dimension(
+                    dimension_select_expr=dimension_select_expr,
+                    dimension=dimension,
                     semantic_model_name=semantic_model_name,
-                    time_dimension=dimension,
                     entity_links=entity_links,
-                    time_granularity=defined_time_granularity,
                 )
-                time_dimension_instances.append(time_dimension_instance)
-                select_columns.append(
-                    SqlSelectColumn(
-                        expr=dimension_select_expr,
-                        column_alias=time_dimension_instance.associated_column.column_name,
-                    )
-                )
-
-                # Add time dimensions with a smaller granularity for ease in query resolution
-                for time_granularity in TimeGranularity:
-                    if time_granularity.to_int() > defined_time_granularity.to_int():
-                        time_dimension_instance = self._create_time_dimension_instance(
-                            semantic_model_name=semantic_model_name,
-                            time_dimension=dimension,
-                            entity_links=entity_links,
-                            time_granularity=time_granularity,
-                        )
-                        time_dimension_instances.append(time_dimension_instance)
-
-                        select_columns.append(
-                            SqlSelectColumn(
-                                expr=SqlDateTruncExpression(
-                                    time_granularity=time_granularity, arg=dimension_select_expr
-                                ),
-                                column_alias=time_dimension_instance.associated_column.column_name,
-                            )
-                        )
-
-                # Add all date part options for easy query resolution
-                for date_part in DatePart:
-                    if date_part.to_int() >= defined_time_granularity.to_int():
-                        time_dimension_instance = self._create_time_dimension_instance(
-                            semantic_model_name=semantic_model_name,
-                            time_dimension=dimension,
-                            entity_links=entity_links,
-                            time_granularity=defined_time_granularity,
-                            date_part=date_part,
-                        )
-                        time_dimension_instances.append(time_dimension_instance)
-
-                        select_columns.append(
-                            SqlSelectColumn(
-                                expr=SqlExtractExpression(date_part=date_part, arg=dimension_select_expr),
-                                column_alias=time_dimension_instance.associated_column.column_name,
-                            )
-                        )
-
+                time_dimension_instances += derived_time_dimension_instances
+                select_columns += time_select_columns
             else:
                 assert False, f"Unhandled dimension type: {dimension.type}"
 
@@ -308,6 +258,78 @@ class SemanticModelToDataSetConverter:
             time_dimension_instances=time_dimension_instances,
             select_columns=select_columns,
         )
+
+    def _convert_time_dimension(
+        self,
+        dimension_select_expr: SqlExpressionNode,
+        dimension: Dimension,
+        semantic_model_name: str,
+        entity_links: Tuple[EntityReference, ...],
+    ) -> Tuple[List[TimeDimensionInstance], List[SqlSelectColumn]]:
+        """Converts Dimension objects with type TIME into the relevant DataSet columns.
+
+        Time dimensions require special handling that includes adding additional instances
+        and select column statements for each granularity and date part
+        """
+        time_dimension_instances: List[TimeDimensionInstance] = []
+        select_columns: List[SqlSelectColumn] = []
+
+        defined_time_granularity = TimeGranularity.DAY
+        if dimension.type_params and dimension.type_params.time_granularity:
+            defined_time_granularity = dimension.type_params.time_granularity
+
+        time_dimension_instance = self._create_time_dimension_instance(
+            semantic_model_name=semantic_model_name,
+            time_dimension=dimension,
+            entity_links=entity_links,
+            time_granularity=defined_time_granularity,
+        )
+        time_dimension_instances.append(time_dimension_instance)
+        select_columns.append(
+            SqlSelectColumn(
+                expr=dimension_select_expr,
+                column_alias=time_dimension_instance.associated_column.column_name,
+            )
+        )
+
+        # Add time dimensions with a smaller granularity for ease in query resolution
+        for time_granularity in TimeGranularity:
+            if time_granularity.to_int() > defined_time_granularity.to_int():
+                time_dimension_instance = self._create_time_dimension_instance(
+                    semantic_model_name=semantic_model_name,
+                    time_dimension=dimension,
+                    entity_links=entity_links,
+                    time_granularity=time_granularity,
+                )
+                time_dimension_instances.append(time_dimension_instance)
+
+                select_columns.append(
+                    SqlSelectColumn(
+                        expr=SqlDateTruncExpression(time_granularity=time_granularity, arg=dimension_select_expr),
+                        column_alias=time_dimension_instance.associated_column.column_name,
+                    )
+                )
+
+        # Add all date part options for easy query resolution
+        for date_part in DatePart:
+            if date_part.to_int() >= defined_time_granularity.to_int():
+                time_dimension_instance = self._create_time_dimension_instance(
+                    semantic_model_name=semantic_model_name,
+                    time_dimension=dimension,
+                    entity_links=entity_links,
+                    time_granularity=defined_time_granularity,
+                    date_part=date_part,
+                )
+                time_dimension_instances.append(time_dimension_instance)
+
+                select_columns.append(
+                    SqlSelectColumn(
+                        expr=SqlExtractExpression(date_part=date_part, arg=dimension_select_expr),
+                        column_alias=time_dimension_instance.associated_column.column_name,
+                    )
+                )
+
+        return (time_dimension_instances, select_columns)
 
     def _create_entity_instances(
         self,
