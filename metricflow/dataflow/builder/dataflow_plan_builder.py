@@ -674,17 +674,15 @@ class DataflowPlanBuilder:
 
         # Extraneous linkable specs are specs that are used in this phase that should not show up in the final result
         # unless it was already a requested spec in the query
-        extraneous_linkable_specs = LinkableSpecSet()
+        linkable_spec_sets_to_merge: List[LinkableSpecSet] = []
         if where_constraint:
-            extraneous_linkable_specs = LinkableSpecSet.merge(
-                (extraneous_linkable_specs, where_constraint.linkable_spec_set)
-            )
+            linkable_spec_sets_to_merge.append(where_constraint.linkable_spec_set)
         if non_additive_dimension_spec:
-            extraneous_linkable_specs = LinkableSpecSet.merge(
-                (extraneous_linkable_specs, non_additive_dimension_spec.linkable_specs)
-            )
+            linkable_spec_sets_to_merge.append(non_additive_dimension_spec.linkable_specs)
 
-        required_linkable_specs = LinkableSpecSet.merge((queried_linkable_specs, extraneous_linkable_specs))
+        extraneous_linkable_specs = LinkableSpecSet.merge_iterable(linkable_spec_sets_to_merge).dedupe()
+        required_linkable_specs = queried_linkable_specs.merge(extraneous_linkable_specs).dedupe()
+
         logger.info(
             f"Looking for a recipe to get:\n"
             f"{pformat_big_objects(measure_specs=[measure_spec], required_linkable_set=required_linkable_specs)}"
