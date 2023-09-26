@@ -574,7 +574,7 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
 
 
 @dataclass(frozen=True)
-class MetricFlowQuerySpec(SerializableDataclass):
+class MetricFlowQuerySpec(Mergeable, SerializableDataclass):
     """Specs needed for running a query."""
 
     metric_specs: Tuple[MetricSpec, ...] = ()
@@ -592,6 +592,37 @@ class MetricFlowQuerySpec(SerializableDataclass):
             dimension_specs=self.dimension_specs,
             time_dimension_specs=self.time_dimension_specs,
             entity_specs=self.entity_specs,
+        )
+
+    @override
+    def merge(self, other: MetricFlowQuerySpec) -> MetricFlowQuerySpec:  # noqa: D
+        # Can't merge if both properties are set.
+        assert not (self.where_constraint is not None and other.where_constraint is not None)
+        assert not (self.limit is not None and other.limit is not None)
+        assert not (self.time_range_constraint is not None and other.time_range_constraint is not None)
+
+        return MetricFlowQuerySpec(
+            metric_specs=self.metric_specs + other.metric_specs,
+            dimension_specs=self.dimension_specs + other.dimension_specs,
+            entity_specs=self.entity_specs + other.entity_specs,
+            time_dimension_specs=self.time_dimension_specs + other.time_dimension_specs,
+            order_by_specs=self.order_by_specs + other.order_by_specs,
+            time_range_constraint=self.time_range_constraint or other.time_range_constraint,
+            where_constraint=self.where_constraint or other.where_constraint,
+            limit=self.limit or other.limit,
+        )
+
+    @staticmethod
+    def from_spec_set(spec_set: InstanceSpecSet) -> MetricFlowQuerySpec:  # noqa: D
+        assert (
+            len(spec_set.metadata_specs) == 0
+        ), f"There should be no metadata specs, but got: {spec_set.metadata_specs}"
+
+        return MetricFlowQuerySpec(
+            metric_specs=spec_set.metric_specs,
+            dimension_specs=spec_set.dimension_specs,
+            entity_specs=spec_set.entity_specs,
+            time_dimension_specs=spec_set.time_dimension_specs,
         )
 
 
