@@ -551,7 +551,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         metric_select_columns = []
         metric_instances = []
         for metric_spec in node.metric_specs:
-            metric = self._metric_lookup.get_metric(metric_spec.as_reference)
+            metric = self._metric_lookup.get_metric(metric_spec.reference)
 
             metric_expr: Optional[SqlExpressionNode] = None
             input_measure: Optional[MetricInputMeasure] = None

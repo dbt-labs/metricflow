@@ -182,7 +182,7 @@ class DataflowPlanBuilder:
 
         for metric_spec in metric_specs:
             logger.info(f"Generating compute metrics node for {metric_spec}")
-            metric_reference = metric_spec.as_reference
+            metric_reference = metric_spec.reference
             metric = self._metric_lookup.get_metric(metric_reference)
 
             if metric.type is MetricType.DERIVED or metric.type is MetricType.RATIO:

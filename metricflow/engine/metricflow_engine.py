@@ -447,7 +447,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         logger.info(f"Query spec is:\n{pformat_big_objects(query_spec)}")
 
         if self._semantic_manifest_lookup.metric_lookup.contains_cumulative_or_time_offset_metric(
-            tuple(m.as_reference for m in query_spec.metric_specs)
+            tuple(metric_spec.reference for metric_spec in query_spec.metric_specs)
         ):
             if self._time_spine_source.time_column_granularity != TimeGranularity.DAY:
                 raise RuntimeError(
