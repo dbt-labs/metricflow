@@ -29,7 +29,7 @@
                     <!--    'element_name': 'customer_name',                                                -->
                     <!--    'entity_links': ({'class': 'EntityReference', 'element_name': 'account_id'},    -->
                     <!--                     {'class': 'EntityReference', 'element_name': 'customer_id'})}  -->
-                    <!-- distinct_values = False -->
+                    <!-- distinct = False -->
                     <JoinToBaseOutputNode>
                         <!-- description = Join Standard Outputs -->
                         <!-- node_id = jso_1 -->
@@ -74,7 +74,7 @@
                             <!--   {'class': 'LinklessEntitySpec',  -->
                             <!--    'element_name': 'account_id',   -->
                             <!--    'entity_links': ()}             -->
-                            <!-- distinct_values = False -->
+                            <!-- distinct = False -->
                             <MetricTimeDimensionTransformNode>
                                 <!-- description = Metric Time Dimension 'ds' -->
                                 <!-- node_id = sma_10007 -->
@@ -108,7 +108,7 @@
                             <!--   {'class': 'LinklessEntitySpec',  -->
                             <!--    'element_name': 'account_id',   -->
                             <!--    'entity_links': ()}             -->
-                            <!-- distinct_values = False -->
+                            <!-- distinct = False -->
                             <JoinToBaseOutputNode>
                                 <!-- description = Join Standard Outputs -->
                                 <!-- node_id = jso_0 -->
@@ -355,7 +355,7 @@
                                     <!--    'date_part': <DatePart.DOY: 'doy'>,                                              -->
                                     <!--    'aggregation_state': None}                                                       -->
                                     <!-- include_spec = EntitySpec(element_name='customer_id', entity_links=()) -->
-                                    <!-- distinct_values = False -->
+                                    <!-- distinct = False -->
                                     <ReadSqlSourceNode>
                                         <!-- description =                                                                                   -->
                                         <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='customer_table'))  -->

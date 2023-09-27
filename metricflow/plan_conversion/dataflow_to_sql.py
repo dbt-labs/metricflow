@@ -801,7 +801,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         ).as_tuple()
 
         # If no measures are passed, group by all columns.
-        group_bys = select_columns if node.distinct_values else ()
+        group_bys = select_columns if node.distinct else ()
         return SqlDataSet(
             instance_set=output_instance_set,
             sql_select_node=SqlSelectStatementNode(

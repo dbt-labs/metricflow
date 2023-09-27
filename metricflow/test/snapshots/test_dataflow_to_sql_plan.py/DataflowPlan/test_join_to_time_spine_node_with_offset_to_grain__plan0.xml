@@ -38,7 +38,7 @@
                         <!--    'date_part': None,                        -->
                         <!--    'aggregation_state': None}                -->
                         <!-- include_spec = LinklessEntitySpec(element_name='listing', entity_links=()) -->
-                        <!-- distinct_values = False -->
+                        <!-- distinct = False -->
                         <MetricTimeDimensionTransformNode>
                             <!-- description = Metric Time Dimension 'ds' -->
                             <!-- node_id = sma_0 -->

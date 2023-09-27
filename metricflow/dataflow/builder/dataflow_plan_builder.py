@@ -341,18 +341,13 @@ class DataflowPlanBuilder:
         if not output_nodes:
             raise UnableToSatisfyQueryError(f"Recipe not found for linkable specs: {query_spec.linkable_specs}")
 
-        if len(output_nodes) == 1:
-            distinct_values_node = FilterElementsNode(
-                parent_node=output_nodes[0],
-                include_specs=InstanceSpecSet.create_from_linkable_specs(query_spec.linkable_specs.as_tuple),
-                distinct_values=True,
-            )
-        else:
-            distinct_values_node = FilterElementsNode(
-                parent_node=JoinAggregatedMeasuresByGroupByColumnsNode(parent_nodes=output_nodes),
-                include_specs=query_spec.linkable_specs.as_spec_set,
-                distinct_values=True,
-            )
+        distinct_values_node = FilterElementsNode(
+            parent_node=output_nodes[0]
+            if len(output_nodes) == 1
+            else JoinAggregatedMeasuresByGroupByColumnsNode(parent_nodes=output_nodes),
+            include_specs=query_spec.linkable_specs.as_spec_set,
+            distinct=True,
+        )
 
         where_constraint_node: Optional[WhereConstraintNode] = None
         if query_spec.where_constraint:

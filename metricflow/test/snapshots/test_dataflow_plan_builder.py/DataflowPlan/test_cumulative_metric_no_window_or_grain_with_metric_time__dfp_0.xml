@@ -31,7 +31,7 @@
                     <!--    'time_granularity': TimeGranularity.QUARTER,  -->
                     <!--    'date_part': None,                            -->
                     <!--    'aggregation_state': None}                    -->
-                    <!-- distinct_values = False -->
+                    <!-- distinct = False -->
                     <JoinOverTimeRangeNode>
                         <!-- description = Join Self Over Time Range -->
                         <!-- node_id = jotr_0 -->
