@@ -109,10 +109,7 @@ class Dimension:
         Dimension set has de-duplicated TimeDimensions such that you never have more than one granularity
         in your set for each TimeDimension.
         """
-        parsed_name = StructuredLinkableSpecName.from_name(qualified_name=self.qualified_name)
-        return StructuredLinkableSpecName(
-            entity_link_names=parsed_name.entity_link_names, element_name=self.name
-        ).qualified_name
+        return StructuredLinkableSpecName.from_name(qualified_name=self.qualified_name).granularity_free_qualified_name
 
 
 @dataclass(frozen=True)

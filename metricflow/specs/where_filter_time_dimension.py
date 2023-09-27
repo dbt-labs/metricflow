@@ -56,15 +56,17 @@ class WhereFilterTimeDimensionFactory(ProtocolHint[QueryInterfaceTimeDimensionFa
         self,
         time_dimension_name: str,
         time_granularity_name: str,
-        descending: bool = False,
-        date_part_name: Optional[str] = None,
         entity_path: Sequence[str] = (),
+        descending: Optional[bool] = None,
+        date_part_name: Optional[str] = None,
     ) -> WhereFilterTimeDimension:
         """Create a WhereFilterTimeDimension."""
         if descending:
             raise InvalidQuerySyntax(
                 "Can't set descending in the where clause. Try setting descending in the order_by clause instead"
             )
+        if date_part_name:
+            raise InvalidQuerySyntax("date_part_name isn't currently supported in the where parameter")
         structured_name = DunderedNameFormatter.parse_name(time_dimension_name)
         call_parameter_set = TimeDimensionCallParameterSet(
             time_dimension_reference=TimeDimensionReference(element_name=structured_name.element_name),
