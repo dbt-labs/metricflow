@@ -671,7 +671,6 @@ class MetricFlowQueryParser:
         group_by: Optional[Tuple[GroupByParameter, ...]] = None,
     ) -> QueryTimeLinkableSpecSet:
         """Convert the linkable spec names into the respective specification objects."""
-        # TODO: refactor to only support group_by object inputs (removing group_by_names param)
         assert not (
             group_by_names and group_by
         ), "Both group_by_names and group_by were set, but if a group by is specified you should only use one of these!"
