@@ -335,7 +335,7 @@ class DataflowPlanBuilder:
         semantic_model_names: Set[str] = set()
         for measure_name in measure_names:
             semantic_model_names = semantic_model_names.union(
-                {d.name for d in self._semantic_model_lookup.get_semantic_models_for_measure(measure_name.as_reference)}
+                {d.name for d in self._semantic_model_lookup.get_semantic_models_for_measure(measure_name.reference)}
             )
         return semantic_model_names
 
@@ -413,14 +413,14 @@ class DataflowPlanBuilder:
             )
 
         agg_time_dimension = agg_time_dimension = self._semantic_model_lookup.get_agg_time_dimension_for_measure(
-            measure_specs[0].as_reference
+            measure_specs[0].reference
         )
         non_additive_dimension_spec = measure_specs[0].non_additive_dimension_spec
         for measure_spec in measure_specs:
             if non_additive_dimension_spec != measure_spec.non_additive_dimension_spec:
                 raise ValueError(f"measure_specs {measure_specs} do not have the same non_additive_dimension_spec.")
             measure_agg_time_dimension = self._semantic_model_lookup.get_agg_time_dimension_for_measure(
-                measure_spec.as_reference
+                measure_spec.reference
             )
             if measure_agg_time_dimension != agg_time_dimension:
                 raise ValueError(f"measure_specs {measure_specs} do not have the same agg_time_dimension.")

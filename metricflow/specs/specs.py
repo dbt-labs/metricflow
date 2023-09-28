@@ -413,7 +413,7 @@ class MeasureSpec(InstanceSpec):  # noqa: D
         return self.element_name
 
     @property
-    def as_reference(self) -> MeasureReference:  # noqa: D
+    def reference(self) -> MeasureReference:  # noqa: D
         return MeasureReference(element_name=self.element_name)
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D

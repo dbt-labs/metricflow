@@ -206,7 +206,7 @@ class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances)
 
         # Create an expression that will aggregate the given measure.
         # Figure out the aggregation function for the measure.
-        measure = self._semantic_model_lookup.get_measure(measure_instance.spec.as_reference)
+        measure = self._semantic_model_lookup.get_measure(measure_instance.spec.reference)
         aggregation_type = measure.agg
 
         expression_to_get_measure = SqlColumnReferenceExpression(
