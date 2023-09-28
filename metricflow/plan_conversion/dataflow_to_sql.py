@@ -1044,7 +1044,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 f"{measure_instance.origin_semantic_model_reference.semantic_model_reference}, but that can't be found"
             )
             aggregation_time_dimension_for_measure = semantic_model.checked_agg_time_dimension_for_measure(
-                measure_reference=measure_instance.spec.as_reference
+                measure_reference=measure_instance.spec.reference
             )
             if aggregation_time_dimension_for_measure == node.aggregation_time_dimension_reference:
                 output_measure_instances.append(measure_instance)
