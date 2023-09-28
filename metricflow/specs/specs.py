@@ -442,10 +442,6 @@ class MetricSpec(InstanceSpec):  # noqa: D
     def qualified_name(self) -> str:  # noqa: D
         return self.element_name
 
-    @property
-    def as_reference(self) -> MetricReference:  # noqa: D
-        return MetricReference(element_name=self.element_name)
-
     @staticmethod
     def from_reference(reference: MetricReference) -> MetricSpec:
         """Initialize from a metric reference instance."""
