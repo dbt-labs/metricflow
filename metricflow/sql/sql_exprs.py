@@ -1251,13 +1251,11 @@ class SqlTimeDeltaExpression(SqlExpressionNode):
         arg: SqlExpressionNode,
         count: int,
         granularity: TimeGranularity,
-        grain_to_date: Optional[TimeGranularity] = None,
     ) -> None:
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[arg])
         self._count = count
         self._time_granularity = granularity
         self._arg = arg
-        self._grain_to_date = grain_to_date
 
     @classmethod
     def id_prefix(cls) -> str:  # noqa: D
@@ -1279,10 +1277,6 @@ class SqlTimeDeltaExpression(SqlExpressionNode):
         return self._arg
 
     @property
-    def grain_to_date(self) -> Optional[TimeGranularity]:  # noqa: D
-        return self._grain_to_date
-
-    @property
     def count(self) -> int:  # noqa: D
         return self._count
 
@@ -1299,7 +1293,6 @@ class SqlTimeDeltaExpression(SqlExpressionNode):
             arg=self.arg.rewrite(column_replacements, should_render_table_alias),
             count=self.count,
             granularity=self.granularity,
-            grain_to_date=self.grain_to_date,
         )
 
     @property
@@ -1311,12 +1304,7 @@ class SqlTimeDeltaExpression(SqlExpressionNode):
     def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D
         if not isinstance(other, SqlTimeDeltaExpression):
             return False
-        return (
-            self.count == other.count
-            and self.granularity == other.granularity
-            and self.grain_to_date == other.grain_to_date
-            and self._parents_match(other)
-        )
+        return self.count == other.count and self.granularity == other.granularity and self._parents_match(other)
 
 
 class SqlCastToTimestampExpression(SqlExpressionNode):

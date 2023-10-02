@@ -283,11 +283,6 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
 
     def visit_time_delta_expr(self, node: SqlTimeDeltaExpression) -> SqlExpressionRenderResult:  # noqa: D
         arg_rendered = node.arg.accept(self)
-        if node.grain_to_date:
-            return SqlExpressionRenderResult(
-                sql=f"DATE_TRUNC('{node.granularity.value}', {arg_rendered.sql}::timestamp)",
-                bind_parameters=arg_rendered.bind_parameters,
-            )
 
         count = node.count
         granularity = node.granularity
