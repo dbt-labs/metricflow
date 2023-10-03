@@ -16,6 +16,7 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.dag.id_generation import (
     SQL_EXPR_BETWEEN_PREFIX,
+    SQL_EXPR_CAST_TO_TIMESTAMP_PREFIX,
     SQL_EXPR_COLUMN_REFERENCE_ID_PREFIX,
     SQL_EXPR_COMPARISON_ID_PREFIX,
     SQL_EXPR_DATE_TRUNC,
@@ -29,6 +30,7 @@ from metricflow.dag.id_generation import (
     SQL_EXPR_RATIO_COMPUTATION,
     SQL_EXPR_STRING_ID_PREFIX,
     SQL_EXPR_STRING_LITERAL_PREFIX,
+    SQL_EXPR_SUBTRACT_TIME_INTERVAL_PREFIX,
     SQL_EXPR_WINDOW_FUNCTION_ID_PREFIX,
 )
 from metricflow.dag.mf_dag import DagNode, DisplayedProperty, NodeId
@@ -1265,7 +1267,7 @@ class SqlSubtractTimeIntervalExpression(SqlExpressionNode):
 
     @classmethod
     def id_prefix(cls) -> str:  # noqa: D
-        return SQL_EXPR_IS_NULL_PREFIX
+        return SQL_EXPR_SUBTRACT_TIME_INTERVAL_PREFIX
 
     @property
     def requires_parenthesis(self) -> bool:  # noqa: D
@@ -1321,7 +1323,7 @@ class SqlCastToTimestampExpression(SqlExpressionNode):
 
     @classmethod
     def id_prefix(cls) -> str:  # noqa: D
-        return SQL_EXPR_IS_NULL_PREFIX
+        return SQL_EXPR_CAST_TO_TIMESTAMP_PREFIX
 
     @property
     def requires_parenthesis(self) -> bool:  # noqa: D
