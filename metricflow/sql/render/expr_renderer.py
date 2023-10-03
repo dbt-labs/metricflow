@@ -33,7 +33,7 @@ from metricflow.sql.sql_exprs import (
     SqlRatioComputationExpression,
     SqlStringExpression,
     SqlStringLiteralExpression,
-    SqlTimeDeltaExpression,
+    SqlSubtractTimeIntervalExpression,
     SqlWindowFunctionExpression,
 )
 from metricflow.sql.sql_plan import SqlSelectColumn
@@ -281,7 +281,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         """Render DATE PART for an EXTRACT expression."""
         return date_part.value
 
-    def visit_time_delta_expr(self, node: SqlTimeDeltaExpression) -> SqlExpressionRenderResult:  # noqa: D
+    def visit_time_delta_expr(self, node: SqlSubtractTimeIntervalExpression) -> SqlExpressionRenderResult:  # noqa: D
         arg_rendered = node.arg.accept(self)
 
         count = node.count

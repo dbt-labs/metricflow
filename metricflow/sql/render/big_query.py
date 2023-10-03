@@ -21,7 +21,7 @@ from metricflow.sql.sql_exprs import (
     SqlGenerateUuidExpression,
     SqlPercentileExpression,
     SqlPercentileFunctionType,
-    SqlTimeDeltaExpression,
+    SqlSubtractTimeIntervalExpression,
 )
 from metricflow.sql.sql_plan import SqlSelectColumn
 from metricflow.time.date_part import DatePart
@@ -142,7 +142,7 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
         return super().render_date_part(date_part)
 
     @override
-    def visit_time_delta_expr(self, node: SqlTimeDeltaExpression) -> SqlExpressionRenderResult:
+    def visit_time_delta_expr(self, node: SqlSubtractTimeIntervalExpression) -> SqlExpressionRenderResult:
         """Render time delta for BigQuery, which requires ISO prefixing for the WEEK granularity value."""
         column = node.arg.accept(self)
 

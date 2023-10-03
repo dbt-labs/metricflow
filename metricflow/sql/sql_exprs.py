@@ -225,7 +225,7 @@ class SqlExpressionNodeVisitor(Generic[VisitorOutputT], ABC):
         pass
 
     @abstractmethod
-    def visit_time_delta_expr(self, node: SqlTimeDeltaExpression) -> VisitorOutputT:  # noqa: D
+    def visit_time_delta_expr(self, node: SqlSubtractTimeIntervalExpression) -> VisitorOutputT:  # noqa: D
         pass
 
     @abstractmethod
@@ -1243,8 +1243,14 @@ class SqlIsNullExpression(SqlExpressionNode):
         return self._parents_match(other)
 
 
-class SqlTimeDeltaExpression(SqlExpressionNode):
-    """create time delta between eg `DATE_SUB(ds, 2, month)`."""
+class SqlSubtractTimeIntervalExpression(SqlExpressionNode):
+    """Represents an interval subtraction from a given timestamp.
+
+    This node contains the information required to produce a SQL statement which subtracts an interval with the given
+    count and granularity (which together define the interval duration) from the input timestamp expression. The return
+    value from the SQL rendering for this expression should be a timestamp expression offset from the initial input
+    value.
+    """
 
     def __init__(  # noqa: D
         self,
@@ -1289,7 +1295,7 @@ class SqlTimeDeltaExpression(SqlExpressionNode):
         column_replacements: Optional[SqlColumnReplacements] = None,
         should_render_table_alias: Optional[bool] = None,
     ) -> SqlExpressionNode:
-        return SqlTimeDeltaExpression(
+        return SqlSubtractTimeIntervalExpression(
             arg=self.arg.rewrite(column_replacements, should_render_table_alias),
             count=self.count,
             granularity=self.granularity,
@@ -1302,7 +1308,7 @@ class SqlTimeDeltaExpression(SqlExpressionNode):
         )
 
     def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D
-        if not isinstance(other, SqlTimeDeltaExpression):
+        if not isinstance(other, SqlSubtractTimeIntervalExpression):
             return False
         return self.count == other.count and self.granularity == other.granularity and self._parents_match(other)
 
