@@ -6,6 +6,7 @@ from dbt_semantic_interfaces.call_parameter_sets import FilterCallParameterSets
 from dbt_semantic_interfaces.protocols.protocol_hint import ProtocolHint
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from typing_extensions import override
+from metricflow.errors.errors import InvalidQuerySyntax
 
 from metricflow.protocols.query_interface import QueryInterfaceTimeDimension, QueryInterfaceTimeDimensionFactory
 from metricflow.specs.column_assoc import ColumnAssociationResolver
@@ -55,11 +56,17 @@ class WhereFilterTimeDimensionFactory(ProtocolHint[QueryInterfaceTimeDimensionFa
         self,
         time_dimension_name: str,
         time_granularity_name: str,
-        descending: bool = False,
-        date_part_name: Optional[str] = None,
         entity_path: Sequence[str] = (),
+        descending: Optional[bool] = None,
+        date_part_name: Optional[str] = None,
     ) -> WhereFilterTimeDimension:
         """Create a WhereFilterTimeDimension."""
+        if descending:
+            raise InvalidQuerySyntax(
+                "Can't set descending in the where clause. Try setting descending in the order_by clause instead"
+            )
+        if date_part_name:
+            raise InvalidQuerySyntax("date_part_name isn't currently supported in the where parameter")
         time_dimension_spec = self._dimension_spec_resolver.resolve_time_dimension_spec(
             time_dimension_name, TimeGranularity(time_granularity_name), entity_path
         )

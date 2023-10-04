@@ -1,29 +1,35 @@
 from __future__ import annotations
 
+from abc import abstractmethod
 from typing import Optional, Protocol, Sequence
 
 
 class QueryInterfaceMetric(Protocol):
     """Represents the interface for Metric in the query interface."""
 
+    @abstractmethod
     def descending(self, _is_descending: bool) -> QueryInterfaceMetric:
         """Set the sort order for order-by."""
-        raise NotImplementedError
+        pass
 
 
 class QueryInterfaceDimension(Protocol):
     """Represents the interface for Dimension in the query interface."""
 
+    @abstractmethod
     def grain(self, _grain: str) -> QueryInterfaceDimension:
         """The time granularity."""
-        raise NotImplementedError
+        pass
 
+    @abstractmethod
     def descending(self, _is_descending: bool) -> QueryInterfaceDimension:
         """Set the sort order for order-by."""
+        pass
 
+    @abstractmethod
     def date_part(self, _date_part: str) -> QueryInterfaceDimension:
         """Date part to extract from the dimension."""
-        raise NotImplementedError
+        pass
 
 
 class QueryInterfaceDimensionFactory(Protocol):
@@ -32,9 +38,10 @@ class QueryInterfaceDimensionFactory(Protocol):
     Represented as the Dimension constructor in the Jinja sandbox.
     """
 
+    @abstractmethod
     def create(self, name: str, entity_path: Sequence[str] = ()) -> QueryInterfaceDimension:
         """Create a QueryInterfaceDimension."""
-        raise NotImplementedError
+        pass
 
 
 class QueryInterfaceTimeDimension(Protocol):
@@ -49,24 +56,23 @@ class QueryInterfaceTimeDimensionFactory(Protocol):
     Represented as the TimeDimension constructor in the Jinja sandbox.
     """
 
+    @abstractmethod
     def create(
         self,
         time_dimension_name: str,
         time_granularity_name: str,
-        descending: bool = False,
-        date_part_name: Optional[str] = None,
         entity_path: Sequence[str] = (),
+        descending: Optional[bool] = None,
+        date_part_name: Optional[str] = None,
     ) -> QueryInterfaceTimeDimension:
         """Create a TimeDimension."""
-        raise NotImplementedError
+        pass
 
 
 class QueryInterfaceEntity(Protocol):
     """Represents the interface for Entity in the query interface."""
 
-    def descending(self, _is_descending: bool) -> QueryInterfaceEntity:
-        """Set the sort order for order-by."""
-        raise NotImplementedError
+    pass
 
 
 class QueryInterfaceEntityFactory(Protocol):
@@ -75,6 +81,7 @@ class QueryInterfaceEntityFactory(Protocol):
     Represented as the Entity constructor in the Jinja sandbox.
     """
 
+    @abstractmethod
     def create(self, entity_name: str, entity_path: Sequence[str] = ()) -> QueryInterfaceEntity:
         """Create an Entity."""
-        raise NotImplementedError
+        pass
