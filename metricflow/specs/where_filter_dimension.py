@@ -49,11 +49,11 @@ class WhereFilterDimension(ProtocolHint[QueryInterfaceDimension]):
 
     def date_part(self, _date_part: str) -> QueryInterfaceDimension:
         """The date_part requested to extract."""
-        raise InvalidQuerySyntax("date_part isn't currently supported in the where parameter and filter spec")
+        raise InvalidQuerySyntax("date_part isn't currently supported in the where parameter")
 
     def descending(self, _is_descending: bool) -> QueryInterfaceDimension:
         """Set the sort order for order-by."""
-        raise InvalidQuerySyntax("descending is invalid in the where parameter and filter spec")
+        raise InvalidQuerySyntax("descending is invalid in the where parameter")
 
     def __str__(self) -> str:
         """Returns the column name.
