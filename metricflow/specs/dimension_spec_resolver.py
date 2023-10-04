@@ -29,16 +29,9 @@ class DimensionSpecResolver:
                 tuple(EntityReference(element_name=arg) for arg in entity_path) + structured_name.entity_links
             ),
         )
-        assert call_parameter_set in self._call_parameter_sets.dimension_call_parameter_sets
-        return self._convert_to_dimension_spec(call_parameter_set)
-
-    def _convert_to_dimension_spec(
-        self,
-        parameter_set: DimensionCallParameterSet,
-    ) -> DimensionSpec:  # noqa: D
         return DimensionSpec(
-            element_name=parameter_set.dimension_reference.element_name,
-            entity_links=parameter_set.entity_path,
+            element_name=call_parameter_set.dimension_reference.element_name,
+            entity_links=call_parameter_set.entity_path,
         )
 
     def resolve_time_dimension_spec(
@@ -54,14 +47,8 @@ class DimensionSpecResolver:
             ),
         )
         assert call_parameter_set in self._call_parameter_sets.time_dimension_call_parameter_sets
-        return self._convert_to_time_dimension_spec(call_parameter_set)
-
-    def _convert_to_time_dimension_spec(
-        self,
-        parameter_set: TimeDimensionCallParameterSet,
-    ) -> TimeDimensionSpec:  # noqa: D
         return TimeDimensionSpec(
-            element_name=parameter_set.time_dimension_reference.element_name,
-            entity_links=parameter_set.entity_path,
-            time_granularity=parameter_set.time_granularity,
+            element_name=call_parameter_set.time_dimension_reference.element_name,
+            entity_links=call_parameter_set.entity_path,
+            time_granularity=call_parameter_set.time_granularity,
         )
