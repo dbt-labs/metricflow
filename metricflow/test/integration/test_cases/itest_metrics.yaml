@@ -489,7 +489,7 @@ integration_test:
   group_bys: ["metric_time"]
   check_query: |
     SELECT
-      (bookings - ref_bookings) / CAST(bookings AS {{ double_data_type_name }}) AS non_referred_bookings_pct
+      (bookings - ref_bookings) * 1.0 / bookings AS non_referred_bookings_pct
       , metric_time__day
     FROM (
       SELECT
@@ -688,7 +688,7 @@ integration_test:
         , SUM(1) AS bookings
       FROM {{ source_schema }}.fct_bookings
       GROUP BY
-        metric_time__day
+        ds
     ) a
     FULL OUTER JOIN (
       SELECT
@@ -701,7 +701,7 @@ integration_test:
           , SUM(1) AS bookings_2_weeks_ago
         FROM {{ source_schema }}.fct_bookings
         GROUP BY
-          metric_time__day
+          ds
       ) d
       ON {{ render_date_sub("C", "ds", 14, TimeGranularity.DAY) }} = d.metric_time__day
     ) b
@@ -723,7 +723,7 @@ integration_test:
         , SUM(1) AS bookings
       FROM {{ source_schema }}.fct_bookings
       GROUP BY
-        metric_time__day
+        ds
     ) a
     FULL OUTER JOIN (
       SELECT
@@ -736,7 +736,7 @@ integration_test:
           , SUM(1) AS bookings_at_start_of_month
         FROM {{ source_schema }}.fct_bookings
         GROUP BY
-          metric_time__day
+          ds
       ) d
       ON {{ render_date_trunc("c.ds", TimeGranularity.MONTH) }} = d.metric_time__day
     ) b
@@ -763,7 +763,7 @@ integration_test:
           , SUM(1) AS bookings
         FROM {{ source_schema }}.fct_bookings
         GROUP BY
-          metric_time__day
+          ds
       ) f
       ON {{ render_date_sub("g", "ds", 1, TimeGranularity.MONTH) }} = f.metric_time__day
     ) a
@@ -778,7 +778,7 @@ integration_test:
           , SUM(1) AS bookings
         FROM {{ source_schema }}.fct_bookings
         GROUP BY
-          metric_time__day
+          ds
       ) d
       ON {{ render_date_trunc("c.ds", TimeGranularity.MONTH) }} = d.metric_time__day
     ) b
@@ -801,7 +801,7 @@ integration_test:
         , SUM(1) AS bookings_5_day_lag
       FROM {{ source_schema }}.fct_bookings
       GROUP BY
-        metric_time__day
+        ds
     ) b
     ON {{ render_date_sub("a", "ds", 5, TimeGranularity.DAY) }} = b.metric_time__day
 ---
@@ -889,7 +889,7 @@ integration_test:
       FROM {{ source_schema }}.fct_bookings
     ) b
     ON {{ render_date_sub("a", "ds", 5, TimeGranularity.DAY) }} = b.metric_time__day
-    GROUP BY metric_time__month
+    GROUP BY {{ render_date_trunc("a.ds", TimeGranularity.MONTH) }}
 ---
 integration_test:
   name: derived_metric_with_offset_to_grain_and_granularity
@@ -906,7 +906,7 @@ integration_test:
         {{ render_date_trunc("ds", TimeGranularity.WEEK) }} AS metric_time__week
         , SUM(1) AS bookings
       FROM {{ source_schema }}.fct_bookings
-      GROUP BY metric_time__week
+      GROUP BY {{ render_date_trunc("ds", TimeGranularity.WEEK) }}
     ) a
     FULL OUTER JOIN (
       SELECT
@@ -921,7 +921,7 @@ integration_test:
       ) d
       ON {{ render_date_trunc("c.ds", TimeGranularity.MONTH) }} = d.metric_time__day
       WHERE {{ render_date_trunc("c.ds", TimeGranularity.WEEK) }} = c.ds
-      GROUP BY metric_time__week
+      GROUP BY {{ render_date_trunc("c.ds", TimeGranularity.WEEK) }}
     ) b
     ON a.metric_time__week = b.metric_time__week
 ---
@@ -949,7 +949,7 @@ integration_test:
         FROM {{ source_schema }}.fct_bookings
       ) f
       ON {{ render_date_sub("g", "ds", 1, TimeGranularity.MONTH) }} = f.metric_time__day
-      GROUP BY metric_time__year
+      GROUP BY {{ render_date_trunc("g.ds", TimeGranularity.YEAR) }}
     ) a
     FULL OUTER JOIN (
       SELECT
@@ -964,7 +964,7 @@ integration_test:
       ) d
       ON {{ render_date_trunc("c.ds", TimeGranularity.MONTH) }} = d.metric_time__day
       WHERE {{ render_date_trunc("c.ds", TimeGranularity.YEAR) }} = c.ds
-      GROUP BY metric_time__year
+      GROUP BY {{ render_date_trunc("c.ds", TimeGranularity.YEAR) }}
     ) b
     ON a.metric_time__year = b.metric_time__year
 ---
@@ -987,7 +987,7 @@ integration_test:
       FROM {{ mf_time_spine_source }} a
       INNER JOIN {{ source_schema }}.fct_bookings b
         ON (b.ds <= a.ds) AND (b.ds > {{ render_date_sub("a", "ds", 2, TimeGranularity.DAY) }})
-      GROUP BY metric_time__day
+      GROUP BY a.ds
     ) c
     ON {{ render_date_sub("d", "ds", 2, TimeGranularity.DAY) }} = c.metric_time__day
 ---
@@ -1010,7 +1010,7 @@ integration_test:
       FROM {{ source_schema }}.fct_bookings
     ) b
     ON {{ render_date_sub("a", "ds", 5, TimeGranularity.DAY) }} = b.metric_time__day
-    GROUP BY metric_time__month, metric_time__week
+    GROUP BY {{ render_date_trunc("a.ds", TimeGranularity.MONTH) }}, {{ render_date_trunc("a.ds", TimeGranularity.WEEK) }}
 ---
 integration_test:
   name: derived_metric_with_offset_to_grain_and_multiple_granularities
@@ -1029,7 +1029,7 @@ integration_test:
         , {{ render_date_trunc("ds", TimeGranularity.MONTH) }} AS metric_time__month
         , SUM(1) AS bookings
       FROM {{ source_schema }}.fct_bookings
-      GROUP BY metric_time__week, metric_time__month
+      GROUP BY {{ render_date_trunc("ds", TimeGranularity.WEEK) }}, {{ render_date_trunc("ds", TimeGranularity.MONTH) }}
     ) a
     FULL OUTER JOIN (
       SELECT
@@ -1046,7 +1046,7 @@ integration_test:
       ON {{ render_date_trunc("c.ds", TimeGranularity.MONTH) }} = d.metric_time__day
       WHERE {{ render_date_trunc("c.ds", TimeGranularity.WEEK) }} = c.ds
         OR {{ render_date_trunc("c.ds", TimeGranularity.MONTH) }} = c.ds
-      GROUP BY metric_time__week, metric_time__month
+      GROUP BY {{ render_date_trunc("c.ds", TimeGranularity.WEEK) }}, {{ render_date_trunc("c.ds", TimeGranularity.MONTH) }}
     ) b
     ON a.metric_time__week = b.metric_time__week
       AND a.metric_time__month = b.metric_time__month
@@ -1120,7 +1120,7 @@ integration_test:
       FROM {{ source_schema }}.fct_bookings
     ) b
     ON {{ render_date_sub("a", "ds", 5, TimeGranularity.DAY) }} = b.metric_time__day
-    GROUP BY metric_time__extract_month
+    GROUP BY {{ render_extract("a.ds", DatePart.MONTH) }}
 ---
 integration_test:
   name: simple_distinct_query_with_date_part
@@ -1151,7 +1151,7 @@ integration_test:
         {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
         , SUM(1) AS bookings
       FROM {{ source_schema }}.fct_bookings bookings_source_src_1
-      GROUP BY metric_time__day
+      GROUP BY 1
     ) subq_3
     ON subq_5.ds = subq_3.metric_time__day
 ---
@@ -1169,14 +1169,14 @@ integration_test:
       SELECT
         {{ render_date_trunc("ds", TimeGranularity.MONTH) }} AS metric_time__month
       FROM {{ source_schema }}.mf_time_spine subq_5
-      GROUP BY metric_time__month
+      GROUP BY 1
     ) subq_4
     LEFT OUTER JOIN (
       SELECT
         {{ render_date_trunc("ds", TimeGranularity.MONTH) }} AS metric_time__month
         , SUM(1) AS bookings
       FROM {{ source_schema }}.fct_bookings bookings_source_src_1
-      GROUP BY metric_time__month
+      GROUP BY 1
     ) subq_3
     ON subq_4.metric_time__month = subq_3.metric_time__month
 ---
@@ -1192,7 +1192,7 @@ integration_test:
       , COALESCE(SUM(1), 0) AS bookings_fill_nulls_with_0
     FROM {{ source_schema }}.fct_bookings bookings_source_src_1
     GROUP BY
-      booking__paid_at__day
+      1
 ---
 integration_test:
   name: simple_fill_nulls_with_0_with_categorical_dimension
@@ -1205,7 +1205,7 @@ integration_test:
       is_instant AS booking__is_instant
       , COALESCE(SUM(1), 0) AS bookings_fill_nulls_with_0
     FROM {{ source_schema }}.fct_bookings bookings_source_src_1
-    GROUP BY booking__is_instant
+    GROUP BY 1
 ---
 integration_test:
   name: simple_join_to_time_spine
@@ -1224,7 +1224,7 @@ integration_test:
         , SUM(1) AS bookings
       FROM {{ source_schema }}.fct_bookings bookings_source_src_1
       GROUP BY
-        metric_time__day
+        1
     ) subq_3
     ON
       subq_5.ds = subq_3.metric_time__day
@@ -1240,7 +1240,7 @@ integration_test:
       {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
       , COALESCE(SUM(1), 0) AS bookings_fill_nulls_with_0_without_time_spine
     FROM {{ source_schema }}.fct_bookings bookings_source_src_1
-    GROUP BY metric_time__day
+    GROUP BY 1
 ---
 integration_test:
   name: cumulative_fill_nulls
@@ -1293,7 +1293,7 @@ integration_test:
             , SUM(1) AS bookings
           FROM {{ source_schema }}.fct_bookings bookings_source_src_1
           GROUP BY
-            metric_time__day
+            1
         ) subq_3
         ON subq_5.ds = subq_3.metric_time__day
       ) subq_7
@@ -1336,7 +1336,7 @@ integration_test:
           {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
           , SUM(1) AS bookings
         FROM {{ source_schema }}.fct_bookings bookings_source_src_1
-        GROUP BY metric_time__day
+        GROUP BY 1
       ) subq_3
       ON subq_5.ds = subq_3.metric_time__day
     ) subq_7
@@ -1345,7 +1345,7 @@ integration_test:
         {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
         , SUM(1) AS views
       FROM {{ source_schema }}.fct_views views_source_src_9
-      GROUP BY metric_time__day
+      GROUP BY 1
     ) subq_12
     ON subq_7.metric_time__day = subq_12.metric_time__day
     GROUP BY COALESCE(subq_7.metric_time__day, subq_12.metric_time__day)
@@ -1384,7 +1384,7 @@ integration_test:
                 {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
                 , SUM(1) AS bookings
               FROM {{ source_schema }}.fct_bookings bookings_source_src_1
-              GROUP BY metric_time__day
+              GROUP BY 1
             ) subq_3
             ON subq_5.ds = subq_3.metric_time__day
           ) subq_6

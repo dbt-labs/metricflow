@@ -15,14 +15,14 @@ authors = [
 ]
 
 classifiers = [
-  "Development Status :: 4 - Beta",
-  "Programming Language :: Python",
-  "Programming Language :: Python :: 3.8",
-  "Programming Language :: Python :: 3.9",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: Implementation :: CPython",
-  "Programming Language :: Python :: Implementation :: PyPy",
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
   "Jinja2>=2.11.3",
@@ -69,8 +69,11 @@ dev-packages = [
 # These are currently separate for ease of removal, but due to the way Python
 # handles import statements they are required in all test environments
 sql-client-packages = [
-  "SQLAlchemy~=1.4.42",
-  "sqlalchemy2-stubs~=0.0.2a21",
+    "SQLAlchemy~=1.4.42",
+    "sqlalchemy2-stubs~=0.0.2a21",
+]
+trino-sql-client-packages = [
+    "trino~=0.327.0",
 ]
 
 dbt-postgres = [
@@ -97,16 +100,20 @@ dbt-duckdb = [
   "dbt-duckdb~=1.7.0",
 ]
 
+dbt-trino = [
+    "dbt-trino~=1.7.0",
+]
+
 [tool.hatch.build.targets.sdist]
 exclude = [
-  "/.github",
-  "/.changes",
-  ".changie.yaml",
-  ".gitignore",
-  ".pre-commit-config.yaml",
-  "CONTRIBUTING.md",
-  "MAKEFILE",
-  "/tests",
+    "/.github",
+    "/.changes",
+    ".changie.yaml",
+    ".gitignore",
+    ".pre-commit-config.yaml",
+    "CONTRIBUTING.md",
+    "MAKEFILE",
+    "/tests",
 ]
 
 [tool.hatch.envs.dev-env]
@@ -117,68 +124,87 @@ features = [
   "dbt-duckdb",
 ]
 
+# Temporary workaround for installing the dbt-duckdb adapter until it's updated to support dbt-core~=1.7.0rc1.
+post-install-commands = [
+    "pip install duckdb>=0.7.0",
+    "pip install --no-deps dbt-duckdb~=1.6.0",
+]
+
 [tool.hatch.envs.dev-env.env-vars]
-	MF_TEST_ADAPTER_TYPE="duckdb"
-  MF_SQL_ENGINE_URL="duckdb://"
+MF_TEST_ADAPTER_TYPE="duckdb"
+MF_SQL_ENGINE_URL="duckdb://"
 
 [tool.hatch.envs.postgres-env.env-vars]
-	MF_SQL_ENGINE_URL="postgresql://metricflow@localhost:5432/metricflow"
-	MF_SQL_ENGINE_PASSWORD="metricflowing"
-	MF_TEST_ADAPTER_TYPE="postgres"
+MF_SQL_ENGINE_URL="postgresql://metricflow@localhost:5432/metricflow"
+MF_SQL_ENGINE_PASSWORD="metricflowing"
+MF_TEST_ADAPTER_TYPE="postgres"
 
 [tool.hatch.envs.postgres-env]
 description = "Dev environment for working with Postgres adapter"
 features = [
-  "dev-packages",
-  "dbt-postgres",
-  "sql-client-packages",
+    "dev-packages",
+    "dbt-postgres",
+    "sql-client-packages",
 ]
 
 # NOTE: All of the below should have their authentication credentials
 # configured independently of the hatch env construction
 
 [tool.hatch.envs.bigquery-env.env-vars]
-	MF_TEST_ADAPTER_TYPE="bigquery"
+MF_TEST_ADAPTER_TYPE="bigquery"
 
 [tool.hatch.envs.bigquery-env]
 description = "Dev environment for working with the BigQuery adapter"
 features = [
-  "dev-packages",
-  "dbt-bigquery",
-  "sql-client-packages",
+    "dev-packages",
+    "dbt-bigquery",
+    "sql-client-packages",
 ]
 
 [tool.hatch.envs.databricks-env.env-vars]
-	MF_TEST_ADAPTER_TYPE="databricks"
+MF_TEST_ADAPTER_TYPE="databricks"
 
 [tool.hatch.envs.databricks-env]
 description = "Dev environment for working with the Databricks adapter"
 features = [
-  "dev-packages",
-  "dbt-databricks",
-  "sql-client-packages",
+    "dev-packages",
+    "dbt-databricks",
+    "sql-client-packages",
 ]
 
 [tool.hatch.envs.redshift-env.env-vars]
-	MF_TEST_ADAPTER_TYPE="redshift"
+MF_TEST_ADAPTER_TYPE="redshift"
 
 [tool.hatch.envs.redshift-env]
 description = "Dev environment for working with the Redshift adapter"
 features = [
-  "dev-packages",
-  "dbt-redshift",
-  "sql-client-packages",
+    "dev-packages",
+    "dbt-redshift",
+    "sql-client-packages",
 ]
 
 [tool.hatch.envs.snowflake-env.env-vars]
-	MF_TEST_ADAPTER_TYPE="snowflake"
+MF_TEST_ADAPTER_TYPE="snowflake"
 
 [tool.hatch.envs.snowflake-env]
 description = "Dev environment for working with Snowflake adapter"
 features = [
-  "dev-packages",
-  "dbt-snowflake",
-  "sql-client-packages",
+    "dev-packages",
+    "dbt-snowflake",
+    "sql-client-packages",
+]
+
+[tool.hatch.envs.trino-env.env-vars]
+MF_TEST_ADAPTER_TYPE = "trino"
+MF_SQL_ENGINE_URL = "trino://trino@localhost:8080/"
+DBT_ENV_SECRET_CATALOG="memory"
+
+[tool.hatch.envs.trino-env]
+description = "Dev environment for working with the Trino adapter"
+features = [
+    "dev-packages",
+    "dbt-trino",
+    "trino-sql-client-packages",
 ]
 
 [tool.black]

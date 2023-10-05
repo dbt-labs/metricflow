@@ -1,0 +1,34 @@
+<ExecutionPlan>
+    <SelectSqlQueryToDataFrameTask>
+        <!-- description = Run a query and write the results to a data frame -->
+        <!-- node_id = rsq_0 -->
+        <!-- sql_query =                                                                    -->
+        <!--   -- Join Standard Outputs                                                     -->
+        <!--   -- Pass Only Elements:                                                       -->
+        <!--   --   ['bookings', 'is_instant', 'listing__country_latest']                   -->
+        <!--   -- Aggregate Measures                                                        -->
+        <!--   -- Compute Metrics via Expressions                                           -->
+        <!--   SELECT                                                                       -->
+        <!--     subq_2.is_instant AS is_instant                                            -->
+        <!--     , listings_latest_src_10004.country AS listing__country_latest             -->
+        <!--     , SUM(subq_2.bookings) AS bookings                                         -->
+        <!--   FROM (                                                                       -->
+        <!--     -- Read Elements From Semantic Model 'bookings_source'                     -->
+        <!--     -- Metric Time Dimension 'ds'                                              -->
+        <!--     -- Pass Only Elements:                                                     -->
+        <!--     --   ['bookings', 'is_instant', 'listing']                                 -->
+        <!--     SELECT                                                                     -->
+        <!--       listing_id AS listing                                                    -->
+        <!--       , is_instant                                                             -->
+        <!--       , 1 AS bookings                                                          -->
+        <!--     FROM ***************************.fct_bookings bookings_source_src_10001    -->
+        <!--   ) subq_2                                                                     -->
+        <!--   LEFT OUTER JOIN                                                              -->
+        <!--     ***************************.dim_listings_latest listings_latest_src_10004  -->
+        <!--   ON                                                                           -->
+        <!--     subq_2.listing = listings_latest_src_10004.listing_id                      -->
+        <!--   GROUP BY                                                                     -->
+        <!--     subq_2.is_instant                                                          -->
+        <!--     , listings_latest_src_10004.country                                        -->
+    </SelectSqlQueryToDataFrameTask>
+</ExecutionPlan>

@@ -15,7 +15,7 @@ integration_test:
     ON a.listing_id = b.listing_id
       AND a.ds >= b.active_from AND (a.ds < b.active_to OR b.active_to is NULL)
     GROUP BY
-      listing__capacity, metric_time__day
+      capacity, ds
 ---
 integration_test:
   name: basic_scd_constrained_metric
@@ -35,7 +35,7 @@ integration_test:
     WHERE b.capacity >= 3
     GROUP BY
       is_instant
-      , metric_time__day
+      , ds
 ---
 integration_test:
   name: scd_constrained_metric_with_nulls
@@ -61,8 +61,8 @@ integration_test:
     WHERE b.is_lux OR b.is_lux IS NULL
     GROUP BY
       is_instant
-      , metric_time__day
-      , listing__is_lux
+      , ds
+      , is_lux
 ---
 integration_test:
   name: scd_grouped_metric_with_second_dim
@@ -87,9 +87,9 @@ integration_test:
     LEFT OUTER JOIN {{ source_schema }}.dim_users_latest c
     ON b.user_id = c.user_id
     GROUP BY
-      metric_time__day
-      , listing__is_lux
-      , listing__user__home_state_latest
+      a.ds
+      , b.is_lux
+      , c.home_state_latest
 ---
 integration_test:
   name: scd_multi_hop_groupby_through_scd
@@ -112,8 +112,8 @@ integration_test:
     LEFT OUTER JOIN {{ source_schema }}.dim_users_latest c
     ON b.user_id = c.user_id
     GROUP BY
-      metric_time__day
-      , listing__user__home_state_latest
+      a.ds
+      , c.home_state_latest
 ---
 integration_test:
   name: scd_multi_hop_groupby_to_scd
@@ -136,5 +136,5 @@ integration_test:
     ON b.lux_listing_id = c.lux_listing_id
         AND a.ds >= c.valid_from AND (a.ds < c.valid_to OR c.valid_to is NULL)
     GROUP BY
-      metric_time__day
-      , listing__lux_listing__is_confirmed_lux
+      a.ds
+      , c.is_confirmed_lux

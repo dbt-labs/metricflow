@@ -1,0 +1,89 @@
+<ExecutionPlan>
+    <SelectSqlQueryToDataFrameTask>
+        <!-- description = Run a query and write the results to a data frame -->
+        <!-- node_id = rsq_0 -->
+        <!-- sql_query =                                                                             -->
+        <!--   -- Combine Metrics                                                                    -->
+        <!--   SELECT                                                                                -->
+        <!--     COALESCE(subq_4.ds__day, subq_9.ds__day, subq_14.ds__day) AS ds__day                -->
+        <!--     , COALESCE(subq_4.is_instant, subq_9.is_instant, subq_14.is_instant) AS is_instant  -->
+        <!--     , MAX(subq_4.bookings) AS bookings                                                  -->
+        <!--     , MAX(subq_9.instant_bookings) AS instant_bookings                                  -->
+        <!--     , MAX(subq_14.booking_value) AS booking_value                                       -->
+        <!--   FROM (                                                                                -->
+        <!--     -- Aggregate Measures                                                               -->
+        <!--     -- Compute Metrics via Expressions                                                  -->
+        <!--     SELECT                                                                              -->
+        <!--       ds__day                                                                           -->
+        <!--       , is_instant                                                                      -->
+        <!--       , SUM(bookings) AS bookings                                                       -->
+        <!--     FROM (                                                                              -->
+        <!--       -- Read Elements From Semantic Model 'bookings_source'                            -->
+        <!--       -- Metric Time Dimension 'ds'                                                     -->
+        <!--       -- Pass Only Elements:                                                            -->
+        <!--       --   ['bookings', 'is_instant', 'ds__day']                                        -->
+        <!--       SELECT                                                                            -->
+        <!--         DATE_TRUNC('day', ds) AS ds__day                                                -->
+        <!--         , is_instant                                                                    -->
+        <!--         , 1 AS bookings                                                                 -->
+        <!--       FROM ***************************.fct_bookings bookings_source_src_10001           -->
+        <!--     ) subq_2                                                                            -->
+        <!--     GROUP BY                                                                            -->
+        <!--       ds__day                                                                           -->
+        <!--       , is_instant                                                                      -->
+        <!--   ) subq_4                                                                              -->
+        <!--   FULL OUTER JOIN (                                                                     -->
+        <!--     -- Aggregate Measures                                                               -->
+        <!--     -- Compute Metrics via Expressions                                                  -->
+        <!--     SELECT                                                                              -->
+        <!--       ds__day                                                                           -->
+        <!--       , is_instant                                                                      -->
+        <!--       , SUM(instant_bookings) AS instant_bookings                                       -->
+        <!--     FROM (                                                                              -->
+        <!--       -- Read Elements From Semantic Model 'bookings_source'                            -->
+        <!--       -- Metric Time Dimension 'ds'                                                     -->
+        <!--       -- Pass Only Elements:                                                            -->
+        <!--       --   ['instant_bookings', 'is_instant', 'ds__day']                                -->
+        <!--       SELECT                                                                            -->
+        <!--         DATE_TRUNC('day', ds) AS ds__day                                                -->
+        <!--         , is_instant                                                                    -->
+        <!--         , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings                    -->
+        <!--       FROM ***************************.fct_bookings bookings_source_src_10001           -->
+        <!--     ) subq_7                                                                            -->
+        <!--     GROUP BY                                                                            -->
+        <!--       ds__day                                                                           -->
+        <!--       , is_instant                                                                      -->
+        <!--   ) subq_9                                                                              -->
+        <!--   ON                                                                                    -->
+        <!--     (                                                                                   -->
+        <!--       subq_4.is_instant = subq_9.is_instant                                             -->
+        <!--     ) AND (                                                                             -->
+        <!--       subq_4.ds__day = subq_9.ds__day                                                   -->
+        <!--     )                                                                                   -->
+        <!--   FULL OUTER JOIN (                                                                     -->
+        <!--     -- Read Elements From Semantic Model 'bookings_source'                              -->
+        <!--     -- Metric Time Dimension 'ds'                                                       -->
+        <!--     -- Pass Only Elements:                                                              -->
+        <!--     --   ['booking_value', 'is_instant', 'ds__day']                                     -->
+        <!--     -- Aggregate Measures                                                               -->
+        <!--     -- Compute Metrics via Expressions                                                  -->
+        <!--     SELECT                                                                              -->
+        <!--       DATE_TRUNC('day', ds) AS ds__day                                                  -->
+        <!--       , is_instant                                                                      -->
+        <!--       , SUM(booking_value) AS booking_value                                             -->
+        <!--     FROM ***************************.fct_bookings bookings_source_src_10001             -->
+        <!--     GROUP BY                                                                            -->
+        <!--       DATE_TRUNC('day', ds)                                                             -->
+        <!--       , is_instant                                                                      -->
+        <!--   ) subq_14                                                                             -->
+        <!--   ON                                                                                    -->
+        <!--     (                                                                                   -->
+        <!--       COALESCE(subq_4.is_instant, subq_9.is_instant) = subq_14.is_instant               -->
+        <!--     ) AND (                                                                             -->
+        <!--       COALESCE(subq_4.ds__day, subq_9.ds__day) = subq_14.ds__day                        -->
+        <!--     )                                                                                   -->
+        <!--   GROUP BY                                                                              -->
+        <!--     COALESCE(subq_4.ds__day, subq_9.ds__day, subq_14.ds__day)                           -->
+        <!--     , COALESCE(subq_4.is_instant, subq_9.is_instant, subq_14.is_instant)                -->
+    </SelectSqlQueryToDataFrameTask>
+</ExecutionPlan>

@@ -56,7 +56,7 @@ integration_test:
     SELECT  SUM(booking_value) AS booking_value
       , ds AS metric_time__day
     FROM  {{ source_schema }}.fct_bookings b
-    WHERE ds = '2020-01-01'
+    WHERE {{ render_time_constraint("ds", "2020-01-01", "2020-01-01") }}
     GROUP BY
       ds
 ---
@@ -73,7 +73,7 @@ integration_test:
       , ds AS metric_time__day
     FROM  {{ source_schema }}.fct_bookings b
     WHERE is_instant
-      and ds = '2020-01-01'
+      and {{ render_time_constraint("ds", "2020-01-01", "2020-01-01") }}
     GROUP BY ds
 ---
 integration_test:
