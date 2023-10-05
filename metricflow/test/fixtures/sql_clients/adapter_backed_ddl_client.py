@@ -93,6 +93,8 @@ class AdapterBackedDDLSqlClient(AdapterBackedSqlClient):
         if dtype == "string" or dtype == "object":
             if self.sql_engine_type is SqlEngine.DATABRICKS or self.sql_engine_type is SqlEngine.BIGQUERY:
                 return "string"
+            if self.sql_engine_type is SqlEngine.TRINO:
+                return "varchar(100)"
             return "text"
         elif dtype == "boolean" or dtype == "bool":
             return "boolean"
@@ -101,6 +103,8 @@ class AdapterBackedDDLSqlClient(AdapterBackedSqlClient):
         elif dtype == "float64":
             return self._sql_query_plan_renderer.expr_renderer.double_data_type
         elif dtype == "datetime64[ns]":
+            if self.sql_engine_type is SqlEngine.TRINO: # mptrino does implicitly cast datetime to timesta
+                return "varchar"
             return self._sql_query_plan_renderer.expr_renderer.timestamp_data_type
         else:
             raise ValueError(f"Encountered unexpected Pandas dtype ({dtype})!")

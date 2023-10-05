@@ -72,6 +72,11 @@ sql-client-packages = [
   "SQLAlchemy~=1.4.42",
   "sqlalchemy2-stubs~=0.0.2a21",
 ]
+trino-sql-client-packages = [
+  "SQLAlchemy~=1.4.42",
+  "sqlalchemy2-stubs~=0.0.2a21",
+  "trino~=0.327.0",
+]
 
 dbt-postgres = [
   "dbt-postgres~=1.7.0",
@@ -95,6 +100,10 @@ dbt-snowflake = [
 
 dbt-duckdb = [
   "dbt-duckdb~=1.7.0",
+]
+
+dbt-trino = [
+  "dbt-trino~=1.6.0",
 ]
 
 [tool.hatch.build.targets.sdist]
@@ -179,6 +188,18 @@ features = [
   "dev-packages",
   "dbt-snowflake",
   "sql-client-packages",
+]
+
+[tool.hatch.envs.trino-env.env-vars]
+	MF_TEST_ADAPTER_TYPE="trino"
+	MF_SQL_ENGINE_URL="trino://trino@localhost:8080/memory"
+
+[tool.hatch.envs.trino-env]
+description = "Dev environment for working with the Trino adapter"
+features = [
+  "dev-packages",
+  "dbt-trino",
+  "trino-sql-client-packages",
 ]
 
 [tool.black]

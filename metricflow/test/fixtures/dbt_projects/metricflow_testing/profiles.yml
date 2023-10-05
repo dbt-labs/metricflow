@@ -67,3 +67,14 @@ duckdb:
     dev:
       type: duckdb
       schema: "{{ env_var('DBT_ENV_SECRET_SCHEMA') }}"
+trino:
+  target: dev
+  outputs:
+    dev:
+      type: trino
+      host: "{{ env_var('DBT_ENV_SECRET_HOST') }}"
+      port: "{{ env_var('DBT_PROFILE_PORT') | int }}"
+      user: "{{ env_var('DBT_ENV_SECRET_USER') }}"
+      password: "{{ env_var('DBT_ENV_SECRET_PASSWORD') }}"
+      catalog: "{{ env_var('DBT_ENV_SECRET_CATALOG') }}"
+      schema: "{{ env_var('DBT_ENV_SECRET_SCHEMA') }}"
