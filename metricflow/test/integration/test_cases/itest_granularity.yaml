@@ -25,7 +25,7 @@ integration_test:
       , {{ render_date_trunc("ds", TimeGranularity.WEEK) }} AS metric_time__week
     FROM {{ source_schema }}.fct_bookings_extended
     GROUP BY
-      metric_time__week
+      {{ render_date_trunc("ds", TimeGranularity.WEEK) }}
 ---
 integration_test:
   name: query_granularity_for_sum_month
@@ -39,7 +39,7 @@ integration_test:
       , {{ render_date_trunc("ds", TimeGranularity.MONTH) }} AS metric_time__month
     FROM {{ source_schema }}.fct_bookings_extended
     GROUP BY
-      metric_time__month
+      {{ render_date_trunc("ds", TimeGranularity.MONTH) }}
 ---
 integration_test:
   name: query_granularity_for_sum_quarter
@@ -53,7 +53,7 @@ integration_test:
       , {{ render_date_trunc("ds", TimeGranularity.QUARTER) }} AS metric_time__quarter
     FROM {{ source_schema }}.fct_bookings_extended
     GROUP BY
-      metric_time__quarter
+      {{ render_date_trunc("ds", TimeGranularity.QUARTER) }}
 ---
 integration_test:
   name: query_granularity_for_sum_year
@@ -67,7 +67,7 @@ integration_test:
       , {{ render_date_trunc("ds", TimeGranularity.YEAR) }} AS metric_time__year
     FROM {{ source_schema }}.fct_bookings_extended
     GROUP BY
-      metric_time__year
+      {{ render_date_trunc("ds", TimeGranularity.YEAR) }}
 ---
 integration_test:
   name: query_granularity_for_count_distinct_day
@@ -95,7 +95,7 @@ integration_test:
       , {{ render_date_trunc("ds", TimeGranularity.WEEK) }} AS metric_time__week
     FROM {{ source_schema }}.fct_bookings_extended
     GROUP BY
-      metric_time__week
+      {{ render_date_trunc("ds", TimeGranularity.WEEK) }}
 ---
 integration_test:
   name: query_granularity_for_count_distinct_month
@@ -109,7 +109,7 @@ integration_test:
       , {{ render_date_trunc("ds", TimeGranularity.MONTH) }} AS metric_time__month
     FROM {{ source_schema }}.fct_bookings_extended
     GROUP BY
-      metric_time__month
+      {{ render_date_trunc("ds", TimeGranularity.MONTH) }}
 ---
 integration_test:
   name: query_granularity_for_count_distinct_quarter
@@ -123,7 +123,7 @@ integration_test:
       , {{ render_date_trunc("ds", TimeGranularity.QUARTER) }} AS metric_time__quarter
     FROM {{ source_schema }}.fct_bookings_extended
     GROUP BY
-      metric_time__quarter
+      {{ render_date_trunc("ds", TimeGranularity.QUARTER) }}
 ---
 integration_test:
   name: query_granularity_for_count_distinct_year
@@ -137,7 +137,7 @@ integration_test:
       , {{ render_date_trunc("ds", TimeGranularity.YEAR) }} AS metric_time__year
     FROM {{ source_schema }}.fct_bookings_extended
     GROUP BY
-      metric_time__year
+      {{ render_date_trunc("ds", TimeGranularity.YEAR) }}
 ---
 integration_test:
   name: query_granularity_for_joined_dundered_dimension_day
@@ -185,7 +185,7 @@ integration_test:
     FROM {{ source_schema }}.fct_bookings_extended_monthly
     WHERE {{ render_time_constraint("ds", "2020-01-01", "2020-02-29") }}
     GROUP BY
-      metric_time__month
+      ds
 ---
 integration_test:
   name: metric_with_non_day_granularity_on_non_boundaries
@@ -201,7 +201,7 @@ integration_test:
     FROM {{ source_schema }}.fct_bookings_extended_monthly
     WHERE {{ render_time_constraint("ds", "2020-01-01", "2020-02-29") }}
     GROUP BY
-      metric_time__month
+      ds
 ---
 integration_test:
   name: weekly_metric_on_non_boundaries
@@ -217,7 +217,7 @@ integration_test:
     FROM {{ source_schema }}.fct_bookings_extended
     WHERE {{ render_time_constraint("ds", "2020-01-13", "2020-01-26") }}
     GROUP BY
-      metric_time__week
+      {{ render_date_trunc("ds", TimeGranularity.WEEK) }}
 ---
 integration_test:
   name: daily_metric_with_monthly_time_dimension
@@ -233,7 +233,7 @@ integration_test:
     FROM {{ source_schema }}.fct_bookings_extended
     WHERE {{ render_time_constraint("ds", "2020-01-01", "2020-01-31") }}
     GROUP BY
-      metric_time__month
+      {{ render_date_trunc("ds", TimeGranularity.MONTH) }}
 ---
 integration_test:
   name: metrics_with_different_time_granularities
@@ -273,7 +273,7 @@ integration_test:
       ON a.ds = b.ds
       ) c
     GROUP BY
-      metric_time__month
+      ds
 ---
 integration_test:
   name: metrics_with_different_time_granularities_and_no_metric_time

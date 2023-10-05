@@ -28,6 +28,10 @@ export MF_TEST_ENGINE_CREDENTIALS=$(cat <<EOF
         "engine_url": postgres://...",
         "engine_password": "..."
     },
+    "trino": {
+        "engine_url": trino://...",
+        "engine_password": "..."
+    },
 }
 EOF
 )
@@ -69,6 +73,7 @@ class MetricFlowTestCredentialSetForAllEngines(FrozenBaseModel):  # noqa: D
     big_query: MetricFlowTestCredentialSet
     databricks: MetricFlowTestCredentialSet
     postgres: MetricFlowTestCredentialSet
+    trino: MetricFlowTestCredentialSet
 
     @property
     def as_configurations(self) -> Sequence[MetricFlowTestConfiguration]:  # noqa: D
@@ -96,6 +101,10 @@ class MetricFlowTestCredentialSetForAllEngines(FrozenBaseModel):  # noqa: D
             MetricFlowTestConfiguration(
                 engine=SqlEngine.POSTGRES,
                 credential_set=self.postgres,
+            ),
+            MetricFlowTestConfiguration(
+                engine=SqlEngine.TRINO,
+                credential_set=self.trino,
             ),
         )
 
@@ -137,6 +146,7 @@ def run_tests(test_configuration: MetricFlowTestConfiguration) -> None:  # noqa:
         or test_configuration.engine is SqlEngine.BIGQUERY
         or test_configuration.engine is SqlEngine.DATABRICKS
         or test_configuration.engine is SqlEngine.POSTGRES
+        or test_configuration.engine is SqlEngine.TRINO
     ):
         engine_name = test_configuration.engine.value.lower()
         os.environ["MF_TEST_ADAPTER_TYPE"] = engine_name

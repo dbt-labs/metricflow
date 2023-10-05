@@ -42,6 +42,9 @@ DBT_ENV_SECRET_PRIVATE_KEY_ID = "DBT_ENV_SECRET_PRIVATE_KEY_ID"
 DBT_ENV_SECRET_PROJECT_ID = "DBT_ENV_SECRET_PROJECT_ID"
 DBT_ENV_SECRET_TOKEN_URI = "DBT_ENV_SECRET_TOKEN_URI"
 
+# Trino is special, so it gets its own set of env vars. Keeping them split out here for consistency.
+DBT_ENV_SECRET_CATALOG = "DBT_ENV_SECRET_CATALOG"
+
 
 def __configure_test_env_from_url(url: str, password: str, schema: str) -> sqlalchemy.engine.URL:
     """Populates default env var mapping from a sqlalchemy URL string.
@@ -163,6 +166,10 @@ def make_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithD
         __configure_databricks_env_from_url(url, password=password, schema=schema)
         __initialize_dbt()
         return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("databricks"))
+    elif dialect == SqlDialect.TRINO:
+        __configure_test_env_from_url(url, password=password, schema=schema)
+        __initialize_dbt()
+        return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("trino"))
     else:
         raise ValueError(f"Unknown dialect: `{dialect}` in URL {url}")
 

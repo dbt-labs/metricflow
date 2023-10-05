@@ -67,8 +67,25 @@ class CheckQueryHelpers:
         stop_time_plus_one_day = (
             datetime.datetime.strptime(stop_time, time_format) + datetime.timedelta(days=1)
         ).strftime(time_format)
+
         stop_expr = self.cast_to_ts(f"{stop_time_plus_one_day}")
-        return f"{expr} >= {start_expr} AND {expr} < {stop_expr}"
+        return f"{self.cast_expr_to_ts(expr)} >= {start_expr} AND {self.cast_expr_to_ts(expr)} < {stop_expr}"
+
+    def render_between_time_constraint(
+        self,
+        expr: str,
+        start_time: str,
+        stop_time: str,
+    ) -> str:
+        """Render an expression like "ds between timestamp '2020-01-01' AND timestamp '2020-01-02'".
+
+        This will cast the literals as needed for each engine, and provide an alternative to incrementing
+        the date as we do in render_time_constraint. Using BETWEEN is more robust for cases involving potentially
+        mixed granularities.
+        """
+        start_expr = self.cast_to_ts(f"{start_time}")
+        stop_expr = self.cast_to_ts(f"{stop_time}")
+        return f"{expr} BETWEEN {start_expr} AND {stop_expr}"
 
     def cast_expr_to_ts(self, expr: str) -> str:
         """Returns the expression as a new expression cast to the timestamp type, if applicable for the DB."""
@@ -290,6 +307,7 @@ def test_case(
             ).render(
                 source_schema=mf_test_session_state.mf_source_schema,
                 render_time_constraint=check_query_helpers.render_time_constraint,
+                render_between_time_constraint=check_query_helpers.render_between_time_constraint,
                 TimeGranularity=TimeGranularity,
                 DatePart=DatePart,
                 render_date_sub=check_query_helpers.render_date_sub,
@@ -302,6 +320,7 @@ def test_case(
                 render_entity_template=check_query_helpers.render_entity_template,
                 render_time_dimension_template=check_query_helpers.render_time_dimension_template,
                 generate_random_uuid=check_query_helpers.generate_random_uuid,
+                cast_to_ts=check_query_helpers.cast_to_ts,
             )
             if case.where_filter
             else None,
@@ -318,6 +337,7 @@ def test_case(
         ).render(
             source_schema=mf_test_session_state.mf_source_schema,
             render_time_constraint=check_query_helpers.render_time_constraint,
+            render_between_time_constraint=check_query_helpers.render_between_time_constraint,
             TimeGranularity=TimeGranularity,
             DatePart=DatePart,
             render_date_sub=check_query_helpers.render_date_sub,
@@ -327,6 +347,7 @@ def test_case(
             mf_time_spine_source=semantic_manifest_lookup.time_spine_source.spine_table.sql,
             double_data_type_name=check_query_helpers.double_data_type_name,
             generate_random_uuid=check_query_helpers.generate_random_uuid,
+            cast_to_ts=check_query_helpers.cast_to_ts,
         )
     )
     # If we sort, it's effectively not checking the order whatever order that the output was would be overwritten.
