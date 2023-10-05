@@ -31,7 +31,7 @@ from metricflow.sql.sql_exprs import (
     SqlPercentileExpressionArgument,
     SqlPercentileFunctionType,
     SqlStringExpression,
-    SqlTimeDeltaExpression,
+    SqlSubtractTimeIntervalExpression,
 )
 from metricflow.test.compare_df import assert_dataframes_equal
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
@@ -85,7 +85,7 @@ class CheckQueryHelpers:
         granularity: TimeGranularity,
     ) -> str:
         """Renders a date subtract expression."""
-        expr = SqlTimeDeltaExpression(
+        expr = SqlSubtractTimeIntervalExpression(
             arg=SqlColumnReferenceExpression(SqlColumnReference(table_alias, column_alias)),
             count=count,
             granularity=granularity,

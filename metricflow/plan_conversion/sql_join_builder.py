@@ -15,7 +15,7 @@ from metricflow.sql.sql_exprs import (
     SqlIsNullExpression,
     SqlLogicalExpression,
     SqlLogicalOperator,
-    SqlTimeDeltaExpression,
+    SqlSubtractTimeIntervalExpression,
 )
 from metricflow.sql.sql_plan import SqlExpressionNode, SqlJoinDescription, SqlJoinType, SqlSelectStatementNode
 
@@ -441,7 +441,7 @@ class SqlQueryPlanJoinBuilder:
             start_of_range_comparison_expr = SqlComparisonExpression(
                 left_expr=metric_time_column_expr,
                 comparison=SqlComparison.GREATER_THAN,
-                right_expr=SqlTimeDeltaExpression(
+                right_expr=SqlSubtractTimeIntervalExpression(
                     arg=time_spine_column_expr,
                     count=node.window.count,
                     granularity=node.window.granularity,
@@ -481,7 +481,7 @@ class SqlQueryPlanJoinBuilder:
             col_ref=SqlColumnReference(table_alias=time_spine_alias, column_name=metric_time_dimension_column_name)
         )
         if node.offset_window:
-            left_expr = SqlTimeDeltaExpression(
+            left_expr = SqlSubtractTimeIntervalExpression(
                 arg=left_expr, count=node.offset_window.count, granularity=node.offset_window.granularity
             )
         elif node.offset_to_grain:
