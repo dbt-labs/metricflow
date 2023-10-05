@@ -21,6 +21,7 @@ from metricflow.sql.sql_exprs import (
     SqlTimeDeltaExpression,
 )
 
+
 class TrinoSqlExpressionRenderer(DefaultSqlExpressionRenderer):
     """Expression renderer for the Trino engine."""
 

@@ -20,7 +20,6 @@ from metricflow.test.table_snapshot.table_snapshots import SqlTableSnapshotHash,
 logger = logging.getLogger(__name__)
 
 
-
 @dataclass
 class MetricFlowTestSessionState:
     """State that is shared between tests during a testing session."""
