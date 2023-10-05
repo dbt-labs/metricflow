@@ -20,7 +20,7 @@ FROM (
     -- Pass Only Elements:
     --   ['bookings', 'ds__day', 'listing']
     SELECT
-      ds AS ds__day
+      DATE_TRUNC(ds, day) AS ds__day
       , listing_id AS listing
       , 1 AS bookings
     FROM ***************************.fct_bookings bookings_source_src_10001
@@ -49,7 +49,7 @@ INNER JOIN (
     -- Pass Only Elements:
     --   ['views', 'ds__day', 'listing']
     SELECT
-      ds AS ds__day
+      DATE_TRUNC(ds, day) AS ds__day
       , listing_id AS listing
       , 1 AS views
     FROM ***************************.fct_views views_source_src_10009

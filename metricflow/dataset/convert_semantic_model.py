@@ -285,12 +285,24 @@ class SemanticModelToDataSetConverter:
             time_granularity=defined_time_granularity,
         )
         time_dimension_instances.append(time_dimension_instance)
-        select_columns.append(
-            SqlSelectColumn(
-                expr=dimension_select_expr,
-                column_alias=time_dimension_instance.associated_column.column_name,
+
+        # Until we support minimal granularities, we cannot truncate for
+        # any time dimension used as part of a validity window, since a validity window might
+        # be stored in seconds while we would truncate to daily.
+        if dimension.validity_params:
+            select_columns.append(
+                SqlSelectColumn(
+                    expr=dimension_select_expr,
+                    column_alias=time_dimension_instance.associated_column.column_name,
+                )
             )
-        )
+        else:
+            select_columns.append(
+                SqlSelectColumn(
+                    expr=SqlDateTruncExpression(time_granularity=defined_time_granularity, arg=dimension_select_expr),
+                    column_alias=time_dimension_instance.associated_column.column_name,
+                )
+            )
 
         # Add time dimensions with a smaller granularity for ease in query resolution
         for time_granularity in TimeGranularity:

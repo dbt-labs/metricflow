@@ -73,25 +73,25 @@
             <!--   {'class': 'SqlSelectColumn',                              -->
             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10020),  -->
             <!--    'column_alias': 'is_instant'}                            -->
-            <!-- col15 =                                                     -->
-            <!--   {'class': 'SqlSelectColumn',                              -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10021),  -->
-            <!--    'column_alias': 'ds__day'}                               -->
+            <!-- col15 =                                               -->
+            <!--   {'class': 'SqlSelectColumn',                        -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10010),  -->
+            <!--    'column_alias': 'ds__day'}                         -->
             <!-- col16 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                        -->
-            <!--    'expr': SqlDateTruncExpression(node_id=dt_10008),  -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10011),  -->
             <!--    'column_alias': 'ds__week'}                        -->
             <!-- col17 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                        -->
-            <!--    'expr': SqlDateTruncExpression(node_id=dt_10009),  -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10012),  -->
             <!--    'column_alias': 'ds__month'}                       -->
             <!-- col18 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                        -->
-            <!--    'expr': SqlDateTruncExpression(node_id=dt_10010),  -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10013),  -->
             <!--    'column_alias': 'ds__quarter'}                     -->
             <!-- col19 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                        -->
-            <!--    'expr': SqlDateTruncExpression(node_id=dt_10011),  -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10014),  -->
             <!--    'column_alias': 'ds__year'}                        -->
             <!-- col20 =                                             -->
             <!--   {'class': 'SqlSelectColumn',                      -->
@@ -121,25 +121,25 @@
             <!--   {'class': 'SqlSelectColumn',                      -->
             <!--    'expr': SqlExtractExpression(node_id=ex_10020),  -->
             <!--    'column_alias': 'ds__extract_doy'}               -->
-            <!-- col27 =                                                     -->
-            <!--   {'class': 'SqlSelectColumn',                              -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10022),  -->
-            <!--    'column_alias': 'ds_partitioned__day'}                   -->
+            <!-- col27 =                                               -->
+            <!--   {'class': 'SqlSelectColumn',                        -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10015),  -->
+            <!--    'column_alias': 'ds_partitioned__day'}             -->
             <!-- col28 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                        -->
-            <!--    'expr': SqlDateTruncExpression(node_id=dt_10012),  -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10016),  -->
             <!--    'column_alias': 'ds_partitioned__week'}            -->
             <!-- col29 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                        -->
-            <!--    'expr': SqlDateTruncExpression(node_id=dt_10013),  -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10017),  -->
             <!--    'column_alias': 'ds_partitioned__month'}           -->
             <!-- col30 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                        -->
-            <!--    'expr': SqlDateTruncExpression(node_id=dt_10014),  -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10018),  -->
             <!--    'column_alias': 'ds_partitioned__quarter'}         -->
             <!-- col31 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                        -->
-            <!--    'expr': SqlDateTruncExpression(node_id=dt_10015),  -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10019),  -->
             <!--    'column_alias': 'ds_partitioned__year'}            -->
             <!-- col32 =                                             -->
             <!--   {'class': 'SqlSelectColumn',                      -->
@@ -169,25 +169,25 @@
             <!--   {'class': 'SqlSelectColumn',                      -->
             <!--    'expr': SqlExtractExpression(node_id=ex_10027),  -->
             <!--    'column_alias': 'ds_partitioned__extract_doy'}   -->
-            <!-- col39 =                                                     -->
-            <!--   {'class': 'SqlSelectColumn',                              -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10023),  -->
-            <!--    'column_alias': 'paid_at__day'}                          -->
+            <!-- col39 =                                               -->
+            <!--   {'class': 'SqlSelectColumn',                        -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10020),  -->
+            <!--    'column_alias': 'paid_at__day'}                    -->
             <!-- col40 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                        -->
-            <!--    'expr': SqlDateTruncExpression(node_id=dt_10016),  -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10021),  -->
             <!--    'column_alias': 'paid_at__week'}                   -->
             <!-- col41 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                        -->
-            <!--    'expr': SqlDateTruncExpression(node_id=dt_10017),  -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10022),  -->
             <!--    'column_alias': 'paid_at__month'}                  -->
             <!-- col42 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                        -->
-            <!--    'expr': SqlDateTruncExpression(node_id=dt_10018),  -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10023),  -->
             <!--    'column_alias': 'paid_at__quarter'}                -->
             <!-- col43 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                        -->
-            <!--    'expr': SqlDateTruncExpression(node_id=dt_10019),  -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10024),  -->
             <!--    'column_alias': 'paid_at__year'}                   -->
             <!-- col44 =                                             -->
             <!--   {'class': 'SqlSelectColumn',                      -->
@@ -221,25 +221,25 @@
             <!--   {'class': 'SqlSelectColumn',                              -->
             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10024),  -->
             <!--    'column_alias': 'booking__is_instant'}                   -->
-            <!-- col52 =                                                     -->
-            <!--   {'class': 'SqlSelectColumn',                              -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10025),  -->
-            <!--    'column_alias': 'booking__ds__day'}                      -->
+            <!-- col52 =                                               -->
+            <!--   {'class': 'SqlSelectColumn',                        -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10025),  -->
+            <!--    'column_alias': 'booking__ds__day'}                -->
             <!-- col53 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                        -->
-            <!--    'expr': SqlDateTruncExpression(node_id=dt_10020),  -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10026),  -->
             <!--    'column_alias': 'booking__ds__week'}               -->
             <!-- col54 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                        -->
-            <!--    'expr': SqlDateTruncExpression(node_id=dt_10021),  -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10027),  -->
             <!--    'column_alias': 'booking__ds__month'}              -->
             <!-- col55 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                        -->
-            <!--    'expr': SqlDateTruncExpression(node_id=dt_10022),  -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10028),  -->
             <!--    'column_alias': 'booking__ds__quarter'}            -->
             <!-- col56 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                        -->
-            <!--    'expr': SqlDateTruncExpression(node_id=dt_10023),  -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10029),  -->
             <!--    'column_alias': 'booking__ds__year'}               -->
             <!-- col57 =                                             -->
             <!--   {'class': 'SqlSelectColumn',                      -->
@@ -269,25 +269,25 @@
             <!--   {'class': 'SqlSelectColumn',                      -->
             <!--    'expr': SqlExtractExpression(node_id=ex_10041),  -->
             <!--    'column_alias': 'booking__ds__extract_doy'}      -->
-            <!-- col64 =                                                     -->
-            <!--   {'class': 'SqlSelectColumn',                              -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10026),  -->
-            <!--    'column_alias': 'booking__ds_partitioned__day'}          -->
+            <!-- col64 =                                               -->
+            <!--   {'class': 'SqlSelectColumn',                        -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10030),  -->
+            <!--    'column_alias': 'booking__ds_partitioned__day'}    -->
             <!-- col65 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                        -->
-            <!--    'expr': SqlDateTruncExpression(node_id=dt_10024),  -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10031),  -->
             <!--    'column_alias': 'booking__ds_partitioned__week'}   -->
             <!-- col66 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                        -->
-            <!--    'expr': SqlDateTruncExpression(node_id=dt_10025),  -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10032),  -->
             <!--    'column_alias': 'booking__ds_partitioned__month'}  -->
             <!-- col67 =                                                 -->
             <!--   {'class': 'SqlSelectColumn',                          -->
-            <!--    'expr': SqlDateTruncExpression(node_id=dt_10026),    -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10033),    -->
             <!--    'column_alias': 'booking__ds_partitioned__quarter'}  -->
             <!-- col68 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                        -->
-            <!--    'expr': SqlDateTruncExpression(node_id=dt_10027),  -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10034),  -->
             <!--    'column_alias': 'booking__ds_partitioned__year'}   -->
             <!-- col69 =                                                      -->
             <!--   {'class': 'SqlSelectColumn',                               -->
@@ -317,25 +317,25 @@
             <!--   {'class': 'SqlSelectColumn',                              -->
             <!--    'expr': SqlExtractExpression(node_id=ex_10048),          -->
             <!--    'column_alias': 'booking__ds_partitioned__extract_doy'}  -->
-            <!-- col76 =                                                     -->
-            <!--   {'class': 'SqlSelectColumn',                              -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10027),  -->
-            <!--    'column_alias': 'booking__paid_at__day'}                 -->
+            <!-- col76 =                                               -->
+            <!--   {'class': 'SqlSelectColumn',                        -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10035),  -->
+            <!--    'column_alias': 'booking__paid_at__day'}           -->
             <!-- col77 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                        -->
-            <!--    'expr': SqlDateTruncExpression(node_id=dt_10028),  -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10036),  -->
             <!--    'column_alias': 'booking__paid_at__week'}          -->
             <!-- col78 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                        -->
-            <!--    'expr': SqlDateTruncExpression(node_id=dt_10029),  -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10037),  -->
             <!--    'column_alias': 'booking__paid_at__month'}         -->
             <!-- col79 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                        -->
-            <!--    'expr': SqlDateTruncExpression(node_id=dt_10030),  -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10038),  -->
             <!--    'column_alias': 'booking__paid_at__quarter'}       -->
             <!-- col80 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                        -->
-            <!--    'expr': SqlDateTruncExpression(node_id=dt_10031),  -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10039),  -->
             <!--    'column_alias': 'booking__paid_at__year'}          -->
             <!-- col81 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                        -->
