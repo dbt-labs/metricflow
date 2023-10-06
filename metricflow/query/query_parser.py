@@ -384,7 +384,9 @@ class MetricFlowQueryParser:
                     column_association_resolver=self._column_association_resolver,
                 ).create_from_where_filter(where_filter)
             except ParseWhereFilterException as e:
-                raise InvalidQueryException(f"Error parsing the where filter: {where_filter.where_sql_template}") from e
+                raise InvalidQueryException(
+                    f"Error parsing the where filter: {where_filter.where_sql_template}. {e}"
+                ) from e
 
             where_spec_set = QueryTimeLinkableSpecSet.create_from_linkable_spec_set(where_filter_spec.linkable_spec_set)
             requested_linkable_specs_with_requested_filter_specs = QueryTimeLinkableSpecSet.combine(
