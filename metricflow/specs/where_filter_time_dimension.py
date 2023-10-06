@@ -2,16 +2,15 @@ from __future__ import annotations
 
 from typing import List, Optional, Sequence
 
-from dbt_semantic_interfaces.call_parameter_sets import FilterCallParameterSets, TimeDimensionCallParameterSet
-from dbt_semantic_interfaces.naming.dundered import DunderedNameFormatter
+from dbt_semantic_interfaces.call_parameter_sets import FilterCallParameterSets
 from dbt_semantic_interfaces.protocols.protocol_hint import ProtocolHint
-from dbt_semantic_interfaces.references import EntityReference, TimeDimensionReference
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.type_enums import TimeGranularity
 from typing_extensions import override
 
 from metricflow.errors.errors import InvalidQuerySyntax
 from metricflow.protocols.query_interface import QueryInterfaceTimeDimension, QueryInterfaceTimeDimensionFactory
 from metricflow.specs.column_assoc import ColumnAssociationResolver
+from metricflow.specs.dimension_spec_resolver import DimensionSpecResolver
 from metricflow.specs.specs import TimeDimensionSpec
 
 
@@ -50,6 +49,7 @@ class WhereFilterTimeDimensionFactory(ProtocolHint[QueryInterfaceTimeDimensionFa
     ):
         self._call_parameter_sets = call_parameter_sets
         self._column_association_resolver = column_association_resolver
+        self._dimension_spec_resolver = DimensionSpecResolver(call_parameter_sets)
         self.time_dimension_specs: List[TimeDimensionSpec] = []
 
     def create(
@@ -67,27 +67,9 @@ class WhereFilterTimeDimensionFactory(ProtocolHint[QueryInterfaceTimeDimensionFa
             )
         if date_part_name:
             raise InvalidQuerySyntax("date_part_name isn't currently supported in the where parameter")
-        structured_name = DunderedNameFormatter.parse_name(time_dimension_name)
-        call_parameter_set = TimeDimensionCallParameterSet(
-            time_dimension_reference=TimeDimensionReference(element_name=structured_name.element_name),
-            time_granularity=TimeGranularity(time_granularity_name),
-            entity_path=(
-                tuple(EntityReference(element_name=arg) for arg in entity_path) + structured_name.entity_links
-            ),
+        time_dimension_spec = self._dimension_spec_resolver.resolve_time_dimension_spec(
+            time_dimension_name, TimeGranularity(time_granularity_name), entity_path
         )
-        assert call_parameter_set in self._call_parameter_sets.time_dimension_call_parameter_sets
-
-        time_dimension_spec = self._convert_to_time_dimension_spec(call_parameter_set)
         self.time_dimension_specs.append(time_dimension_spec)
-        column_names = self._column_association_resolver.resolve_spec(time_dimension_spec).column_name
-        return WhereFilterTimeDimension(column_names)
-
-    def _convert_to_time_dimension_spec(
-        self,
-        parameter_set: TimeDimensionCallParameterSet,
-    ) -> TimeDimensionSpec:  # noqa: D
-        return TimeDimensionSpec(
-            element_name=parameter_set.time_dimension_reference.element_name,
-            entity_links=parameter_set.entity_path,
-            time_granularity=parameter_set.time_granularity,
-        )
+        column_name = self._column_association_resolver.resolve_spec(time_dimension_spec).column_name
+        return WhereFilterTimeDimension(column_name)
