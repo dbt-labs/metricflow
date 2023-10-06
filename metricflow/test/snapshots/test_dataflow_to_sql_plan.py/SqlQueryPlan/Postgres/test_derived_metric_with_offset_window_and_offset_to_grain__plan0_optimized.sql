@@ -22,7 +22,7 @@ FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
       SELECT
-        ds AS metric_time__day
+        DATE_TRUNC('day', ds) AS metric_time__day
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_10001
     ) subq_18
@@ -45,7 +45,7 @@ FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
       SELECT
-        ds AS metric_time__day
+        DATE_TRUNC('day', ds) AS metric_time__day
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_10001
     ) subq_26

@@ -23,7 +23,7 @@
         <!--       -- Pass Only Elements:                                                            -->
         <!--       --   ['bookings', 'is_instant', 'ds__day']                                        -->
         <!--       SELECT                                                                            -->
-        <!--         ds AS ds__day                                                                   -->
+        <!--         DATE_TRUNC('day', ds) AS ds__day                                                -->
         <!--         , is_instant                                                                    -->
         <!--         , 1 AS bookings                                                                 -->
         <!--       FROM ***************************.fct_bookings bookings_source_src_10001           -->
@@ -45,7 +45,7 @@
         <!--       -- Pass Only Elements:                                                            -->
         <!--       --   ['instant_bookings', 'is_instant', 'ds__day']                                -->
         <!--       SELECT                                                                            -->
-        <!--         ds AS ds__day                                                                   -->
+        <!--         DATE_TRUNC('day', ds) AS ds__day                                                -->
         <!--         , is_instant                                                                    -->
         <!--         , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings                    -->
         <!--       FROM ***************************.fct_bookings bookings_source_src_10001           -->
@@ -68,7 +68,7 @@
         <!--     -- Aggregate Measures                                                               -->
         <!--     -- Compute Metrics via Expressions                                                  -->
         <!--     SELECT                                                                              -->
-        <!--       ds AS ds__day                                                                     -->
+        <!--       DATE_TRUNC('day', ds) AS ds__day                                                  -->
         <!--       , is_instant                                                                      -->
         <!--       , SUM(booking_value) AS booking_value                                             -->
         <!--     FROM ***************************.fct_bookings bookings_source_src_10001             -->

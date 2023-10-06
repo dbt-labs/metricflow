@@ -22,9 +22,9 @@ FROM (
       ***************************.fct_bookings bookings_source_src_10001
     ON
       (
-        bookings_source_src_10001.ds <= subq_14.ds
+        DATE_TRUNC('day', bookings_source_src_10001.ds) <= subq_14.ds
       ) AND (
-        bookings_source_src_10001.ds > DATEADD(day, -2, subq_14.ds)
+        DATE_TRUNC('day', bookings_source_src_10001.ds) > DATEADD(day, -2, subq_14.ds)
       )
   ) subq_15
   ON

@@ -101,7 +101,7 @@ FROM (
             -- Read Elements From Semantic Model 'id_verifications'
             SELECT
               1 AS identity_verifications
-              , id_verifications_src_10003.ds AS ds__day
+              , DATE_TRUNC('day', id_verifications_src_10003.ds) AS ds__day
               , DATE_TRUNC('week', id_verifications_src_10003.ds) AS ds__week
               , DATE_TRUNC('month', id_verifications_src_10003.ds) AS ds__month
               , DATE_TRUNC('quarter', id_verifications_src_10003.ds) AS ds__quarter
@@ -113,7 +113,7 @@ FROM (
               , EXTRACT(day FROM id_verifications_src_10003.ds) AS ds__extract_day
               , EXTRACT(dow FROM id_verifications_src_10003.ds) AS ds__extract_dow
               , EXTRACT(doy FROM id_verifications_src_10003.ds) AS ds__extract_doy
-              , id_verifications_src_10003.ds_partitioned AS ds_partitioned__day
+              , DATE_TRUNC('day', id_verifications_src_10003.ds_partitioned) AS ds_partitioned__day
               , DATE_TRUNC('week', id_verifications_src_10003.ds_partitioned) AS ds_partitioned__week
               , DATE_TRUNC('month', id_verifications_src_10003.ds_partitioned) AS ds_partitioned__month
               , DATE_TRUNC('quarter', id_verifications_src_10003.ds_partitioned) AS ds_partitioned__quarter
@@ -126,7 +126,7 @@ FROM (
               , EXTRACT(dow FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_dow
               , EXTRACT(doy FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_doy
               , id_verifications_src_10003.verification_type
-              , id_verifications_src_10003.ds AS verification__ds__day
+              , DATE_TRUNC('day', id_verifications_src_10003.ds) AS verification__ds__day
               , DATE_TRUNC('week', id_verifications_src_10003.ds) AS verification__ds__week
               , DATE_TRUNC('month', id_verifications_src_10003.ds) AS verification__ds__month
               , DATE_TRUNC('quarter', id_verifications_src_10003.ds) AS verification__ds__quarter
@@ -138,7 +138,7 @@ FROM (
               , EXTRACT(day FROM id_verifications_src_10003.ds) AS verification__ds__extract_day
               , EXTRACT(dow FROM id_verifications_src_10003.ds) AS verification__ds__extract_dow
               , EXTRACT(doy FROM id_verifications_src_10003.ds) AS verification__ds__extract_doy
-              , id_verifications_src_10003.ds_partitioned AS verification__ds_partitioned__day
+              , DATE_TRUNC('day', id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__day
               , DATE_TRUNC('week', id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__week
               , DATE_TRUNC('month', id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__month
               , DATE_TRUNC('quarter', id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__quarter
@@ -168,7 +168,7 @@ FROM (
         FROM (
           -- Read Elements From Semantic Model 'users_ds_source'
           SELECT
-            users_ds_source_src_10007.ds AS ds__day
+            DATE_TRUNC('day', users_ds_source_src_10007.ds) AS ds__day
             , DATE_TRUNC('week', users_ds_source_src_10007.ds) AS ds__week
             , DATE_TRUNC('month', users_ds_source_src_10007.ds) AS ds__month
             , DATE_TRUNC('quarter', users_ds_source_src_10007.ds) AS ds__quarter
@@ -180,7 +180,7 @@ FROM (
             , EXTRACT(day FROM users_ds_source_src_10007.ds) AS ds__extract_day
             , EXTRACT(dow FROM users_ds_source_src_10007.ds) AS ds__extract_dow
             , EXTRACT(doy FROM users_ds_source_src_10007.ds) AS ds__extract_doy
-            , users_ds_source_src_10007.created_at AS created_at__day
+            , DATE_TRUNC('day', users_ds_source_src_10007.created_at) AS created_at__day
             , DATE_TRUNC('week', users_ds_source_src_10007.created_at) AS created_at__week
             , DATE_TRUNC('month', users_ds_source_src_10007.created_at) AS created_at__month
             , DATE_TRUNC('quarter', users_ds_source_src_10007.created_at) AS created_at__quarter
@@ -192,7 +192,7 @@ FROM (
             , EXTRACT(day FROM users_ds_source_src_10007.created_at) AS created_at__extract_day
             , EXTRACT(dow FROM users_ds_source_src_10007.created_at) AS created_at__extract_dow
             , EXTRACT(doy FROM users_ds_source_src_10007.created_at) AS created_at__extract_doy
-            , users_ds_source_src_10007.ds_partitioned AS ds_partitioned__day
+            , DATE_TRUNC('day', users_ds_source_src_10007.ds_partitioned) AS ds_partitioned__day
             , DATE_TRUNC('week', users_ds_source_src_10007.ds_partitioned) AS ds_partitioned__week
             , DATE_TRUNC('month', users_ds_source_src_10007.ds_partitioned) AS ds_partitioned__month
             , DATE_TRUNC('quarter', users_ds_source_src_10007.ds_partitioned) AS ds_partitioned__quarter
@@ -205,7 +205,7 @@ FROM (
             , EXTRACT(dow FROM users_ds_source_src_10007.ds_partitioned) AS ds_partitioned__extract_dow
             , EXTRACT(doy FROM users_ds_source_src_10007.ds_partitioned) AS ds_partitioned__extract_doy
             , users_ds_source_src_10007.home_state
-            , users_ds_source_src_10007.ds AS user__ds__day
+            , DATE_TRUNC('day', users_ds_source_src_10007.ds) AS user__ds__day
             , DATE_TRUNC('week', users_ds_source_src_10007.ds) AS user__ds__week
             , DATE_TRUNC('month', users_ds_source_src_10007.ds) AS user__ds__month
             , DATE_TRUNC('quarter', users_ds_source_src_10007.ds) AS user__ds__quarter
@@ -217,7 +217,7 @@ FROM (
             , EXTRACT(day FROM users_ds_source_src_10007.ds) AS user__ds__extract_day
             , EXTRACT(dow FROM users_ds_source_src_10007.ds) AS user__ds__extract_dow
             , EXTRACT(doy FROM users_ds_source_src_10007.ds) AS user__ds__extract_doy
-            , users_ds_source_src_10007.created_at AS user__created_at__day
+            , DATE_TRUNC('day', users_ds_source_src_10007.created_at) AS user__created_at__day
             , DATE_TRUNC('week', users_ds_source_src_10007.created_at) AS user__created_at__week
             , DATE_TRUNC('month', users_ds_source_src_10007.created_at) AS user__created_at__month
             , DATE_TRUNC('quarter', users_ds_source_src_10007.created_at) AS user__created_at__quarter
@@ -229,7 +229,7 @@ FROM (
             , EXTRACT(day FROM users_ds_source_src_10007.created_at) AS user__created_at__extract_day
             , EXTRACT(dow FROM users_ds_source_src_10007.created_at) AS user__created_at__extract_dow
             , EXTRACT(doy FROM users_ds_source_src_10007.created_at) AS user__created_at__extract_doy
-            , users_ds_source_src_10007.ds_partitioned AS user__ds_partitioned__day
+            , DATE_TRUNC('day', users_ds_source_src_10007.ds_partitioned) AS user__ds_partitioned__day
             , DATE_TRUNC('week', users_ds_source_src_10007.ds_partitioned) AS user__ds_partitioned__week
             , DATE_TRUNC('month', users_ds_source_src_10007.ds_partitioned) AS user__ds_partitioned__month
             , DATE_TRUNC('quarter', users_ds_source_src_10007.ds_partitioned) AS user__ds_partitioned__quarter

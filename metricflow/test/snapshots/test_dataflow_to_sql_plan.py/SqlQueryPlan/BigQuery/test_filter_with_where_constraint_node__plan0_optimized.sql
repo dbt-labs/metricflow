@@ -7,7 +7,7 @@ FROM (
   -- Pass Only Elements:
   --   ['bookings', 'ds__day']
   SELECT
-    ds AS ds__day
+    DATE_TRUNC(ds, day) AS ds__day
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_10001
 ) subq_3

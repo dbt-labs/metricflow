@@ -1,0 +1,7 @@
+kind: Fixes
+body: Coerce time granularity to configured value to prevent finer-grained timestamps
+  from causing unexpected query behavior
+time: 2023-10-05T12:47:22.662371-07:00
+custom:
+  Author: tlento
+  Issue: "714"

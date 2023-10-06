@@ -37,7 +37,7 @@ FROM (
     accounts_source_src_10000.account_balance
     , accounts_source_src_10000.account_balance AS total_account_balance_first_day
     , accounts_source_src_10000.account_balance AS current_account_balance_by_user
-    , accounts_source_src_10000.ds AS ds__day
+    , DATE_TRUNC('day', accounts_source_src_10000.ds) AS ds__day
     , DATE_TRUNC('week', accounts_source_src_10000.ds) AS ds__week
     , DATE_TRUNC('month', accounts_source_src_10000.ds) AS ds__month
     , DATE_TRUNC('quarter', accounts_source_src_10000.ds) AS ds__quarter
@@ -50,7 +50,7 @@ FROM (
     , EXTRACT(dow FROM accounts_source_src_10000.ds) AS ds__extract_dow
     , EXTRACT(doy FROM accounts_source_src_10000.ds) AS ds__extract_doy
     , accounts_source_src_10000.account_type
-    , accounts_source_src_10000.ds AS account__ds__day
+    , DATE_TRUNC('day', accounts_source_src_10000.ds) AS account__ds__day
     , DATE_TRUNC('week', accounts_source_src_10000.ds) AS account__ds__week
     , DATE_TRUNC('month', accounts_source_src_10000.ds) AS account__ds__month
     , DATE_TRUNC('quarter', accounts_source_src_10000.ds) AS account__ds__quarter
@@ -77,7 +77,7 @@ INNER JOIN (
       accounts_source_src_10000.account_balance
       , accounts_source_src_10000.account_balance AS total_account_balance_first_day
       , accounts_source_src_10000.account_balance AS current_account_balance_by_user
-      , accounts_source_src_10000.ds AS ds__day
+      , DATE_TRUNC('day', accounts_source_src_10000.ds) AS ds__day
       , DATE_TRUNC('week', accounts_source_src_10000.ds) AS ds__week
       , DATE_TRUNC('month', accounts_source_src_10000.ds) AS ds__month
       , DATE_TRUNC('quarter', accounts_source_src_10000.ds) AS ds__quarter
@@ -90,7 +90,7 @@ INNER JOIN (
       , EXTRACT(dow FROM accounts_source_src_10000.ds) AS ds__extract_dow
       , EXTRACT(doy FROM accounts_source_src_10000.ds) AS ds__extract_doy
       , accounts_source_src_10000.account_type
-      , accounts_source_src_10000.ds AS account__ds__day
+      , DATE_TRUNC('day', accounts_source_src_10000.ds) AS account__ds__day
       , DATE_TRUNC('week', accounts_source_src_10000.ds) AS account__ds__week
       , DATE_TRUNC('month', accounts_source_src_10000.ds) AS account__ds__month
       , DATE_TRUNC('quarter', accounts_source_src_10000.ds) AS account__ds__quarter

@@ -9,6 +9,6 @@ SELECT
   DATE_TRUNC(created_at, month) AS ds__month
   , SUM(revenue) AS revenue_all_time
 FROM ***************************.fct_revenue revenue_src_10006
-WHERE created_at BETWEEN '2000-01-01' AND '2020-01-01'
+WHERE DATE_TRUNC(created_at, day) BETWEEN '2000-01-01' AND '2020-01-01'
 GROUP BY
   ds__month
