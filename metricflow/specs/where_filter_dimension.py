@@ -68,7 +68,7 @@ class WhereFilterDimension(ProtocolHint[QueryInterfaceDimension]):
 class WhereFilterDimensionFactory(ProtocolHint[QueryInterfaceDimensionFactory]):
     """Creates a WhereFilterDimension.
 
-    Each call to `create` adds a DimensionSpec to created.
+    Each call to `create` adds a WhereFilterDimension to created.
     """
 
     @override
