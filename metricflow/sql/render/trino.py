@@ -15,14 +15,11 @@ from metricflow.sql.render.expr_renderer import (
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_exprs import (
-    SqlCastToTimestampExpression,
     SqlGenerateUuidExpression,
     SqlPercentileExpression,
     SqlPercentileFunctionType,
     SqlTimeDeltaExpression,
-    SqlStringExpression,
-    SqlBetweenExpression,
-    SqlExtractExpression
+    SqlBetweenExpression
 )
 
 
@@ -35,21 +32,6 @@ class TrinoSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         return {
             SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS,
         }
-
-    # @override
-    # def visit_cast_to_timestamp_expr(self, node: SqlCastToTimestampExpression) -> SqlExpressionRenderResult:
-    #     """Casts the time value expression to timestamp.
-    #
-    #     Trino's TIMESTAMP type requires timezone inputs to convert to and from different formats, whereas its
-    #     DATETIME data type does not. This is different from Databricks, which simply returns and renders inUTC by
-    #     default, or Snowflake which does something user-configurable but defaults to TIMESTAMP_NTZ, or PostgreSQL,
-    #     which adheres to the SQL standard of TIMESTAMP_NTZ.
-    #     """
-    #     arg_rendered = self.render_sql_expr(node.arg)
-    #     return SqlExpressionRenderResult(
-    #         sql=f"CAST({arg_rendered.sql} AS {self.timestamp_data_type})",
-    #         bind_parameters=arg_rendered.bind_parameters,
-    #     )
 
     @override
     def visit_time_delta_expr(self, node: SqlTimeDeltaExpression) -> SqlExpressionRenderResult:
