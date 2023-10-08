@@ -124,15 +124,6 @@ def __configure_databricks_env_from_url(url: str, password: str, schema: str) ->
     __configure_test_env_from_url(url_pieces[0], password=password, schema=schema)
 
 
-def __configure_trino_env_from_url(url: str, password: str, schema: str) -> None:
-    """Databricks has a custom http path attribute, which we have encoded into a SqlAlchemy-like URL appendage.
-
-    This custom parsing was ported from our original client implementation for backwards compatibility with the
-    existing CI job configurations.
-    """
-    pass
-
-
 def __initialize_dbt() -> None:
     """Invoke the dbt runner from the appropriate directory so we can fetch the relevant adapter.
 

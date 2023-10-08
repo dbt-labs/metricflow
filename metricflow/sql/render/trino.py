@@ -5,6 +5,7 @@ from typing import Collection
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
+from dateutil.parser import parse
 
 from metricflow.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,
@@ -19,6 +20,9 @@ from metricflow.sql.sql_exprs import (
     SqlPercentileExpression,
     SqlPercentileFunctionType,
     SqlTimeDeltaExpression,
+    SqlStringExpression,
+    SqlBetweenExpression,
+    SqlExtractExpression
 )
 
 
@@ -32,20 +36,20 @@ class TrinoSqlExpressionRenderer(DefaultSqlExpressionRenderer):
             SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS,
         }
 
-    @override
-    def visit_cast_to_timestamp_expr(self, node: SqlCastToTimestampExpression) -> SqlExpressionRenderResult:
-        """Casts the time value expression to timestamp.
-
-        Trino's TIMESTAMP type requires timezone inputs to convert to and from different formats, whereas its
-        DATETIME data type does not. This is different from Databricks, which simply returns and renders inUTC by
-        default, or Snowflake which does something user-configurable but defaults to TIMESTAMP_NTZ, or PostgreSQL,
-        which adheres to the SQL standard of TIMESTAMP_NTZ.
-        """
-        arg_rendered = self.render_sql_expr(node.arg)
-        return SqlExpressionRenderResult(
-            sql=f"CAST({arg_rendered.sql} AS {self.timestamp_data_type})",
-            bind_parameters=arg_rendered.bind_parameters,
-        )
+    # @override
+    # def visit_cast_to_timestamp_expr(self, node: SqlCastToTimestampExpression) -> SqlExpressionRenderResult:
+    #     """Casts the time value expression to timestamp.
+    #
+    #     Trino's TIMESTAMP type requires timezone inputs to convert to and from different formats, whereas its
+    #     DATETIME data type does not. This is different from Databricks, which simply returns and renders inUTC by
+    #     default, or Snowflake which does something user-configurable but defaults to TIMESTAMP_NTZ, or PostgreSQL,
+    #     which adheres to the SQL standard of TIMESTAMP_NTZ.
+    #     """
+    #     arg_rendered = self.render_sql_expr(node.arg)
+    #     return SqlExpressionRenderResult(
+    #         sql=f"CAST({arg_rendered.sql} AS {self.timestamp_data_type})",
+    #         bind_parameters=arg_rendered.bind_parameters,
+    #     )
 
     @override
     def visit_time_delta_expr(self, node: SqlTimeDeltaExpression) -> SqlExpressionRenderResult:
@@ -53,7 +57,7 @@ class TrinoSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         arg_rendered = node.arg.accept(self)
         if node.grain_to_date:
             return SqlExpressionRenderResult(
-                sql=f"DATE_TRUNC('{node.granularity.value}', {arg_rendered.sql}::timestamp)",
+                sql=f"DATE_TRUNC('{node.granularity.value}', TIMESTAMP {arg_rendered.sql})",
                 bind_parameters=arg_rendered.bind_parameters,
             )
 
@@ -63,8 +67,9 @@ class TrinoSqlExpressionRenderer(DefaultSqlExpressionRenderer):
             granularity = TimeGranularity.MONTH
             count *= 3
 
+        # Trino interval needs to be in quotes.
         return SqlExpressionRenderResult(
-            sql=f"{arg_rendered.sql} - INTERVAL {count} {granularity.value}",
+            sql=f"CAST({arg_rendered.sql} AS {self.timestamp_data_type}) - INTERVAL '{count}' {granularity.value}",
             bind_parameters=arg_rendered.bind_parameters,
         )
 
@@ -102,6 +107,27 @@ class TrinoSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         return SqlExpressionRenderResult(
             sql=f"{function_str}({percentile}) WITHIN GROUP (ORDER BY ({arg_rendered.sql}))",
             bind_parameters=params,
+        )
+
+    @override
+    def visit_between_expr(self, node: SqlBetweenExpression) -> SqlExpressionRenderResult:  # noqa: D
+        rendered_column_arg = self.render_sql_expr(node.column_arg)
+        rendered_start_expr = self.render_sql_expr(node.start_expr)
+        rendered_end_expr = self.render_sql_expr(node.end_expr)
+
+        bind_parameters = SqlBindParameters()
+        bind_parameters = bind_parameters.combine(rendered_column_arg.bind_parameters)
+        bind_parameters = bind_parameters.combine(rendered_start_expr.bind_parameters)
+
+        # Handle timestamp literals differently.
+        if parse(rendered_start_expr.sql):
+            sql = f"{rendered_column_arg.sql} BETWEEN timestamp {rendered_start_expr.sql} AND timestamp {rendered_end_expr.sql}"
+        else:
+            sql = f"{rendered_column_arg.sql} BETWEEN {rendered_start_expr.sql} AND {rendered_end_expr.sql}"
+
+        return SqlExpressionRenderResult(
+            sql=sql,
+            bind_parameters=bind_parameters,
         )
 
 

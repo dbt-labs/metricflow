@@ -73,8 +73,6 @@ sql-client-packages = [
   "sqlalchemy2-stubs~=0.0.2a21",
 ]
 trino-sql-client-packages = [
-  "SQLAlchemy~=1.4.42",
-  "sqlalchemy2-stubs~=0.0.2a21",
   "trino~=0.327.0",
 ]
 
@@ -192,7 +190,7 @@ features = [
 
 [tool.hatch.envs.trino-env.env-vars]
 	MF_TEST_ADAPTER_TYPE="trino"
-	MF_SQL_ENGINE_URL="trino://trino@localhost:8080/memory"
+	MF_SQL_ENGINE_URL="trino://trino@localhost:8080/"
 
 [tool.hatch.envs.trino-env]
 description = "Dev environment for working with the Trino adapter"

@@ -39,6 +39,7 @@ class AdapterBackedDDLSqlClient(AdapterBackedSqlClient):
             # This mirrors the SQLAlchemy schema detection logic in pandas.io.sql
             df = df.convert_dtypes()
             columns = df.columns
+
             columns_to_insert = []
             for i in range(len(df.columns)):
                 # Format as "column_name column_type"
@@ -63,7 +64,12 @@ class AdapterBackedDDLSqlClient(AdapterBackedSqlClient):
                     elif type(cell) in [str, pd.Timestamp]:
                         # Wrap cell in quotes & escape existing single quotes
                         escaped_cell = self._quote_escape_value(str(cell))
-                        cells.append(f"'{escaped_cell}'")
+                        # Trino requires timestamp literals to be wrapped in a timestamp() function.
+                        # There is probably a better way to handle this.
+                        if self.sql_engine_type is SqlEngine.TRINO and type(cell) is pd.Timestamp:
+                            cells.append(f"timestamp '{escaped_cell}'")
+                        else:
+                            cells.append(f"'{escaped_cell}'")
                     else:
                         cells.append(str(cell))
 
@@ -94,7 +100,7 @@ class AdapterBackedDDLSqlClient(AdapterBackedSqlClient):
             if self.sql_engine_type is SqlEngine.DATABRICKS or self.sql_engine_type is SqlEngine.BIGQUERY:
                 return "string"
             if self.sql_engine_type is SqlEngine.TRINO:
-                return "varchar(100)"
+                return "varchar"
             return "text"
         elif dtype == "boolean" or dtype == "bool":
             return "boolean"
@@ -103,8 +109,6 @@ class AdapterBackedDDLSqlClient(AdapterBackedSqlClient):
         elif dtype == "float64":
             return self._sql_query_plan_renderer.expr_renderer.double_data_type
         elif dtype == "datetime64[ns]":
-            if self.sql_engine_type is SqlEngine.TRINO:  # mptrino does implicitly cast datetime to timesta
-                return "varchar"
             return self._sql_query_plan_renderer.expr_renderer.timestamp_data_type
         else:
             raise ValueError(f"Encountered unexpected Pandas dtype ({dtype})!")
