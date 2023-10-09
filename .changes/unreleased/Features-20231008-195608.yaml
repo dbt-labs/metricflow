@@ -1,0 +1,6 @@
+kind: Features
+body: Add Trino support to the MetricFlow.
+time: 2023-10-08T19:56:08.427006-06:00
+custom:
+  Author: sarbmeetka
+  Issue: "207"
