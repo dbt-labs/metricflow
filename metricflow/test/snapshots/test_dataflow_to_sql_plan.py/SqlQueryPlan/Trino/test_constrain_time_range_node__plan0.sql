@@ -116,4 +116,4 @@ FROM (
     ) subq_0
   ) subq_1
 ) subq_2
-WHERE subq_2.metric_time__day BETWEEN '2020-01-01' AND '2020-01-02'
+WHERE subq_2.metric_time__day BETWEEN timestamp '2020-01-01' AND timestamp '2020-01-02'

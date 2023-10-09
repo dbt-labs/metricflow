@@ -51,7 +51,7 @@ FROM (
       FROM ***************************.fct_bookings bookings_source_src_10001
     ) subq_26
     ON
-      subq_28.ds - INTERVAL 1 month = subq_26.metric_time__day
+      CAST(subq_28.ds AS TIMESTAMP) - INTERVAL '1' month = subq_26.metric_time__day
     GROUP BY
       DATE_TRUNC('year', subq_28.ds)
   ) subq_32

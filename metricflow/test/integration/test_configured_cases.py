@@ -77,9 +77,7 @@ class CheckQueryHelpers:
         start_time: str,
         stop_time: str,
     ) -> str:
-        """ Render an expression like "ds between timestamp '2020-01-01' AND timestamp '2020-01-02'"
-            since Trino require timestamp literals to be wrapped in a timestamp() function.
-        """
+        """Render an expression like "ds between timestamp '2020-01-01' AND timestamp '2020-01-02'" since Trino require timestamp literals to be wrapped in a timestamp() function."""
         start_expr = self.cast_to_ts(f"{start_time}")
         stop_expr = self.cast_to_ts(f"{stop_time}")
         return f"{expr} BETWEEN {start_expr} AND {stop_expr}"
@@ -317,6 +315,7 @@ def test_case(
                 render_entity_template=check_query_helpers.render_entity_template,
                 render_time_dimension_template=check_query_helpers.render_time_dimension_template,
                 generate_random_uuid=check_query_helpers.generate_random_uuid,
+                cast_to_ts=check_query_helpers.cast_to_ts,
             )
             if case.where_filter
             else None,
@@ -343,6 +342,7 @@ def test_case(
             mf_time_spine_source=semantic_manifest_lookup.time_spine_source.spine_table.sql,
             double_data_type_name=check_query_helpers.double_data_type_name,
             generate_random_uuid=check_query_helpers.generate_random_uuid,
+            cast_to_ts=check_query_helpers.cast_to_ts,
         )
     )
     # If we sort, it's effectively not checking the order whatever order that the output was would be overwritten.

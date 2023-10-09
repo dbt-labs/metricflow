@@ -9,6 +9,6 @@ SELECT
   DATE_TRUNC('month', created_at) AS ds__month
   , SUM(revenue) AS trailing_2_months_revenue
 FROM ***************************.fct_revenue revenue_src_10006
-WHERE created_at BETWEEN '2019-12-01' AND '2020-01-01'
+WHERE created_at BETWEEN timestamp '2019-12-01' AND timestamp '2020-01-01'
 GROUP BY
   DATE_TRUNC('month', created_at)

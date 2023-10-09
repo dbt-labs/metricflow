@@ -8,7 +8,7 @@ FROM (
   SELECT
     subq_6.ds AS metric_time__day
   FROM ***************************.mf_time_spine subq_6
-  WHERE subq_6.ds BETWEEN '2020-01-01' AND '2021-01-01'
+  WHERE subq_6.ds BETWEEN timestamp '2020-01-01' AND timestamp '2021-01-01'
 ) subq_5
 INNER JOIN (
   -- Compute Metrics via Expressions

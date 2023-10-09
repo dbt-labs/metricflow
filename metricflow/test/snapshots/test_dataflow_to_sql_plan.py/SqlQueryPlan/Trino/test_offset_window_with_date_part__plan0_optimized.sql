@@ -46,7 +46,7 @@ FROM (
       FROM ***************************.fct_bookings bookings_source_src_10001
     ) subq_20
     ON
-      subq_22.ds - INTERVAL 14 day = subq_20.metric_time__day
+      CAST(subq_22.ds AS TIMESTAMP) - INTERVAL '14' day = subq_20.metric_time__day
     GROUP BY
       EXTRACT(dow FROM subq_22.ds)
   ) subq_26

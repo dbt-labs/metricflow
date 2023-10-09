@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from typing import Collection
 
+from dateutil.parser import parse
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
-from dateutil.parser import parse
 
 from metricflow.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,
@@ -15,11 +15,11 @@ from metricflow.sql.render.expr_renderer import (
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_exprs import (
+    SqlBetweenExpression,
     SqlGenerateUuidExpression,
     SqlPercentileExpression,
     SqlPercentileFunctionType,
     SqlTimeDeltaExpression,
-    SqlBetweenExpression
 )
 
 
@@ -75,7 +75,7 @@ class TrinoSqlExpressionRenderer(DefaultSqlExpressionRenderer):
             function_str = "PERCENTILE_DISC"
         elif node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS:
             return SqlExpressionRenderResult(
-                sql=f"approx_quantile({arg_rendered.sql}, {percentile})",
+                sql=f"approx_percentile({arg_rendered.sql}, {percentile})",
                 bind_parameters=params,
             )
         elif node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_DISCRETE:

@@ -447,11 +447,11 @@ FROM (
             (
               subq_1.metric_time__day <= subq_2.metric_time__day
             ) AND (
-              subq_1.metric_time__day > subq_2.metric_time__day - INTERVAL 2 day
+              subq_1.metric_time__day > CAST(subq_2.metric_time__day AS TIMESTAMP) - INTERVAL '2' day
             )
         ) subq_4
         ON
-          subq_5.metric_time__day - INTERVAL 2 day = subq_4.metric_time__day
+          CAST(subq_5.metric_time__day AS TIMESTAMP) - INTERVAL '2' day = subq_4.metric_time__day
       ) subq_7
     ) subq_8
     GROUP BY

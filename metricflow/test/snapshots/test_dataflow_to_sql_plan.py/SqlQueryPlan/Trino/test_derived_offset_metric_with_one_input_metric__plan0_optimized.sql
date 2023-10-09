@@ -21,7 +21,7 @@ FROM (
     FROM ***************************.fct_bookings bookings_source_src_10001
   ) subq_9
   ON
-    subq_11.ds - INTERVAL 5 day = subq_9.metric_time__day
+    CAST(subq_11.ds AS TIMESTAMP) - INTERVAL '5' day = subq_9.metric_time__day
   GROUP BY
     subq_11.ds
 ) subq_15

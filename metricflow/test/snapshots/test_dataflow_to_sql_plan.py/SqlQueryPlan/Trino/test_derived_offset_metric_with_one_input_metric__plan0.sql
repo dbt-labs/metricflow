@@ -330,7 +330,7 @@ FROM (
           ) subq_0
         ) subq_1
         ON
-          subq_2.metric_time__day - INTERVAL 5 day = subq_1.metric_time__day
+          CAST(subq_2.metric_time__day AS TIMESTAMP) - INTERVAL '5' day = subq_1.metric_time__day
       ) subq_4
     ) subq_5
     GROUP BY

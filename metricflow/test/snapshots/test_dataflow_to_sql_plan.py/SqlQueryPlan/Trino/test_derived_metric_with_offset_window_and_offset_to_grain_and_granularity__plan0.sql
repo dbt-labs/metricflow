@@ -672,7 +672,7 @@ FROM (
             ) subq_8
           ) subq_9
           ON
-            subq_10.metric_time__day - INTERVAL 1 month = subq_9.metric_time__day
+            CAST(subq_10.metric_time__day AS TIMESTAMP) - INTERVAL '1' month = subq_9.metric_time__day
         ) subq_12
       ) subq_13
       GROUP BY

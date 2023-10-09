@@ -565,7 +565,7 @@ FROM (
             ) subq_5
           ) subq_6
           ON
-            subq_7.metric_time__day - INTERVAL 14 day = subq_6.metric_time__day
+            CAST(subq_7.metric_time__day AS TIMESTAMP) - INTERVAL '14' day = subq_6.metric_time__day
         ) subq_9
       ) subq_10
       GROUP BY

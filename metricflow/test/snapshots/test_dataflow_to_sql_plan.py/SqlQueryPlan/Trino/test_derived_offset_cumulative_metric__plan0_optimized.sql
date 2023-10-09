@@ -24,11 +24,11 @@ FROM (
       (
         bookings_source_src_10001.ds <= subq_14.ds
       ) AND (
-        bookings_source_src_10001.ds > subq_14.ds - INTERVAL 2 day
+        bookings_source_src_10001.ds > CAST(subq_14.ds AS TIMESTAMP) - INTERVAL '2' day
       )
   ) subq_15
   ON
-    subq_17.ds - INTERVAL 2 day = subq_15.metric_time__day
+    CAST(subq_17.ds AS TIMESTAMP) - INTERVAL '2' day = subq_15.metric_time__day
   GROUP BY
     subq_17.ds
 ) subq_21
