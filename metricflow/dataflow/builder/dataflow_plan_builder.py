@@ -18,7 +18,7 @@ from dbt_semantic_interfaces.references import (
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.dag.id_generation import DATAFLOW_PLAN_PREFIX, IdGeneratorRegistry
-from metricflow.dataflow.builder.costing import DataflowPlanNodeCostFunction, DefaultCost, DefaultCostFunction
+from metricflow.dataflow.builder.costing import DataflowPlanNodeCostFunction, DefaultCostFunction
 from metricflow.dataflow.builder.measure_additiveness import group_measure_specs_by_additiveness
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.node_evaluator import (
@@ -629,22 +629,23 @@ class DataflowPlanBuilder:
             # this is going to be the lowest cost solution.
             if len(evaluation.join_recipes) == 0:
                 logger.info("Not evaluating other nodes since we found one that doesn't require joins")
-                # But we don't break the loop here? why not?
+                break
 
         logger.info(f"Found {len(node_to_evaluation)} candidate source nodes.")
 
         if len(node_to_evaluation) > 0:
             cost_function = DefaultCostFunction()
-            for node in node_to_evaluation:
-                assert cost_function.calculate_cost(node) == DefaultCost(num_joins=0, num_aggregations=0)
-            node_with_lowest_cost = min(node_to_evaluation, key=cost_function.calculate_cost)
-            evaluation = node_to_evaluation[node_with_lowest_cost]
+            # All source nodes cost 0. Get evaluation with lowest cost.
+            node_with_lowest_evaluation_cost = min(
+                node_to_evaluation, key=lambda x: len(node_to_evaluation[x].join_recipes)
+            )
+            evaluation = node_to_evaluation[node_with_lowest_evaluation_cost]
             logger.info(
                 "Lowest cost node is:\n"
                 + pformat_big_objects(
-                    lowest_cost_node=dataflow_dag_as_text(node_with_lowest_cost),
+                    lowest_cost_node=dataflow_dag_as_text(node_with_lowest_evaluation_cost),
                     evaluation=evaluation,
-                    cost=cost_function.calculate_cost(node_with_lowest_cost),
+                    cost=cost_function.calculate_cost(node_with_lowest_evaluation_cost),
                 )
             )
 
@@ -662,14 +663,14 @@ class DataflowPlanBuilder:
             )
 
             return DataflowRecipe(
-                source_node=node_with_lowest_cost,
+                source_node=node_with_lowest_evaluation_cost,
                 required_local_linkable_specs=(
                     evaluation.local_linkable_specs
                     + required_local_entity_specs
                     + required_local_dimension_specs
                     + required_local_time_dimension_specs
                 ),
-                join_linkable_instances_recipes=node_to_evaluation[node_with_lowest_cost].join_recipes,
+                join_linkable_instances_recipes=node_to_evaluation[node_with_lowest_evaluation_cost].join_recipes,
             )
 
         logger.error("No recipe could be constructed.")
