@@ -4,7 +4,6 @@ SELECT
   listing__country_latest
 FROM (
   -- Read Elements From Semantic Model 'listings_latest'
-  -- Metric Time Dimension 'ds'
   -- Pass Only Elements:
   --   ['listing__country_latest']
   SELECT
@@ -12,7 +11,7 @@ FROM (
   FROM ***************************.dim_listings_latest listings_latest_src_10004
   GROUP BY
     country
-) subq_6
+) subq_4
 WHERE listing__country_latest = 'us'
 ORDER BY listing__country_latest DESC
 LIMIT 100

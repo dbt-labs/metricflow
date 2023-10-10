@@ -204,7 +204,7 @@ class DataflowPlanBuilder:
 
         plan = DataflowPlan(plan_id=plan_id, sink_output_nodes=[sink_node])
         for optimizer in optimizers:
-            print(f"Applying {optimizer.__class__.__name__}")
+            logger.info(f"Applying {optimizer.__class__.__name__}")
             try:
                 plan = optimizer.optimize(plan)
             except Exception:
@@ -233,7 +233,7 @@ class DataflowPlanBuilder:
         compute_metrics_node: Optional[ComputeMetricsNode] = None
 
         for metric_spec in metric_specs:
-            print(f"Generating compute metrics node for {metric_spec}")
+            logger.info(f"Generating compute metrics node for {metric_spec}")
             metric_reference = metric_spec.as_reference
             metric = self._metric_lookup.get_metric(metric_reference)
 
@@ -242,7 +242,7 @@ class DataflowPlanBuilder:
                     metric_reference=metric_reference,
                     column_association_resolver=self._column_association_resolver,
                 )
-                print(
+                logger.info(
                     f"For {metric.type} metric: {metric_spec}, needed metrics are:\n"
                     f"{pformat_big_objects(metric_input_specs=metric_input_specs)}"
                 )
@@ -263,7 +263,7 @@ class DataflowPlanBuilder:
                     column_association_resolver=self._column_association_resolver,
                 )
 
-                print(
+                logger.info(
                     f"For {metric_spec}, needed measures are:\n"
                     f"{pformat_big_objects(metric_input_measure_specs=metric_input_measure_specs)}"
                 )
@@ -560,9 +560,9 @@ class DataflowPlanBuilder:
             )
             potential_source_nodes = list(source_nodes_to_linkable_specs.keys())
         # issue: getting ds__day from the wrong table
-        print(f"There are {len(potential_source_nodes)} potential source nodes")
+        logger.info(f"There are {len(potential_source_nodes)} potential source nodes")
 
-        print(f"Starting search with {len(source_nodes)} source nodes")
+        logger.info(f"Starting search with {len(source_nodes)} source nodes")
         start_time = time.time()
 
         node_processor = PreJoinNodeProcessor(
@@ -581,14 +581,16 @@ class DataflowPlanBuilder:
             nodes=source_nodes,
             metric_time_dimension_reference=self._metric_time_dimension_reference,
         )
-        print(f"After removing unnecessary nodes, there are {len(nodes_available_for_joins)} nodes available for joins")
+        logger.info(
+            f"After removing unnecessary nodes, there are {len(nodes_available_for_joins)} nodes available for joins"
+        )
         if DataflowPlanBuilder._contains_multihop_linkables(linkable_specs):
             nodes_available_for_joins = node_processor.add_multi_hop_joins(linkable_specs, source_nodes)
-            print(
+            logger.info(
                 f"After adding multi-hop nodes, there are {len(nodes_available_for_joins)} nodes available for joins:\n"
                 f"{pformat_big_objects(nodes_available_for_joins)}"
             )
-        print(f"Processing nodes took: {time.time()-start_time:.2f}s")
+        logger.info(f"Processing nodes took: {time.time()-start_time:.2f}s")
 
         node_evaluator = NodeEvaluatorForLinkableInstances(
             semantic_model_lookup=self._semantic_model_lookup,
@@ -600,36 +602,36 @@ class DataflowPlanBuilder:
         node_to_evaluation: Dict[BaseOutput, LinkableInstanceSatisfiabilityEvaluation] = {}
 
         for node in self._sort_by_suitability(potential_source_nodes):
-            print(f"\n\n\nEvaluating source node:\n{pformat_big_objects(source_node=dataflow_dag_as_text(node))}")
+            logger.debug(f"Evaluating source node:\n{pformat_big_objects(source_node=dataflow_dag_as_text(node))}")
 
             start_time = time.time()
             evaluation = node_evaluator.evaluate_node(start_node=node, required_linkable_specs=list(linkable_specs))
-            print(f"Evaluation of {node} took {time.time() - start_time:.2f}s")
+            logger.info(f"Evaluation of {node} took {time.time() - start_time:.2f}s")
 
-            print(
+            logger.debug(
                 f"Evaluation for source node is:\n"
                 f"{pformat_big_objects(node=dataflow_dag_as_text(node), evaluation=evaluation)}"
             )
 
             if len(evaluation.unjoinable_linkable_specs) > 0:
-                print(
+                logger.info(
                     f"Skipping {node.node_id} since it contains un-joinable specs: "
                     f"{evaluation.unjoinable_linkable_specs}"
                 )
                 continue
 
             num_joins_required = len(evaluation.join_recipes)
-            print(f"Found candidate with node ID '{node.node_id}' with {num_joins_required} joins required.")
+            logger.info(f"Found candidate with node ID '{node.node_id}' with {num_joins_required} joins required.")
 
             node_to_evaluation[node] = evaluation
 
             # Since are evaluating nodes with the lowest cost first, if we find one without requiring any joins, then
             # this is going to be the lowest cost solution.
             if len(evaluation.join_recipes) == 0:
-                print("Not evaluating other nodes since we found one that doesn't require joins")
+                logger.info("Not evaluating other nodes since we found one that doesn't require joins")
                 # But we don't break the loop here? why not?
 
-        print(f"Found {len(node_to_evaluation)} candidate source nodes.")
+        logger.info(f"Found {len(node_to_evaluation)} candidate source nodes.")
 
         if len(node_to_evaluation) > 0:
             cost_function = DefaultCostFunction()
@@ -637,7 +639,7 @@ class DataflowPlanBuilder:
                 assert cost_function.calculate_cost(node) == DefaultCost(num_joins=0, num_aggregations=0)
             node_with_lowest_cost = min(node_to_evaluation, key=cost_function.calculate_cost)
             evaluation = node_to_evaluation[node_with_lowest_cost]
-            print(
+            logger.info(
                 "Lowest cost node is:\n"
                 + pformat_big_objects(
                     lowest_cost_node=dataflow_dag_as_text(node_with_lowest_cost),
@@ -720,7 +722,7 @@ class DataflowPlanBuilder:
             )
 
         for (semantic_model, measure_constraint), measures in semantic_models_and_constraints_to_measures.items():
-            print(
+            logger.info(
                 f"Building aggregated measures for {semantic_model}. "
                 f" Input measures: {measures} with constraints: {measure_constraint}"
             )
@@ -743,7 +745,7 @@ class DataflowPlanBuilder:
                 if non_additive_spec is not None:
                     non_additive_message = f" with non-additive dimension spec: {non_additive_spec}"
 
-                print(f"Building aggregated measures for {semantic_model}{non_additive_message}")
+                logger.info(f"Building aggregated measures for {semantic_model}{non_additive_message}")
                 input_specs = tuple(input_specs_by_measure_spec[measure_spec] for measure_spec in measure_specs)
                 output_nodes.append(
                     self._build_aggregated_measures_from_measure_source_node(
@@ -796,7 +798,7 @@ class DataflowPlanBuilder:
 
         cumulative_metric_adjusted_time_constraint: Optional[TimeRangeConstraint] = None
         if cumulative and time_range_constraint is not None:
-            print(f"Time range constraint before adjustment is {time_range_constraint}")
+            logger.info(f"Time range constraint before adjustment is {time_range_constraint}")
             granularity: Optional[TimeGranularity] = None
             count = 0
             if cumulative_window is not None:
@@ -809,7 +811,7 @@ class DataflowPlanBuilder:
             cumulative_metric_adjusted_time_constraint = (
                 time_range_constraint.adjust_time_constraint_for_cumulative_metric(granularity, count)
             )
-            print(f"Adjusted time range constraint {cumulative_metric_adjusted_time_constraint}")
+            logger.info(f"Adjusted time range constraint {cumulative_metric_adjusted_time_constraint}")
 
         # Extraneous linkable specs are specs that are used in this phase that should not show up in the final result
         # unless it was already a requested spec in the query
@@ -824,7 +826,7 @@ class DataflowPlanBuilder:
             )
 
         required_linkable_specs = LinkableSpecSet.merge((queried_linkable_specs, extraneous_linkable_specs))
-        print(
+        logger.info(
             f"Looking for a recipe to get:\n"
             f"{pformat_big_objects(measure_specs=measure_specs, required_linkable_set=required_linkable_specs)}"
         )
@@ -835,12 +837,12 @@ class DataflowPlanBuilder:
             time_range_constraint=cumulative_metric_adjusted_time_constraint or time_range_constraint,
             linkable_spec_set=required_linkable_specs,
         )
-        print(
+        logger.info(
             f"With {len(self._source_nodes)} source nodes, finding a recipe took "
             f"{time.time() - find_recipe_start_time:.2f}s"
         )
 
-        print(f"Using recipe:\n{pformat_big_objects(measure_recipe=measure_recipe)}")
+        logger.info(f"Using recipe:\n{pformat_big_objects(measure_recipe=measure_recipe)}")
 
         if not measure_recipe:
             # TODO: Improve for better user understandability.

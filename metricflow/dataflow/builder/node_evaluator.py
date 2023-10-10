@@ -349,18 +349,18 @@ class NodeEvaluatorForLinkableInstances:
         )
         join_candidates: List[JoinLinkableInstancesRecipe] = []
 
-        print("Looping over nodes that can be joined to get the required linkable specs")
+        logger.info("Looping over nodes that can be joined to get the required linkable specs")
 
         # Using a greedy approach, try to get the "possibly_joinable_linkable_specs" by iteratively joining nodes with
         # the most matching linkable specs. We try to join nodes with the most matching specs to minimize the number of
         # joins that we have to do to. A knapsack solution is ideal, but punting on that for simplicity.
         while len(possibly_joinable_linkable_specs) > 0:
-            print(f"Looking for linkable specs:\n{pformat_big_objects(possibly_joinable_linkable_specs)}")
+            logger.info(f"Looking for linkable specs:\n{pformat_big_objects(possibly_joinable_linkable_specs)}")
 
             # We've run out of candidate data sets, but there are more linkable specs that we need. That means the
             # rest of the linkable specs can't be joined in, and we're left with unjoinable specs remaining.
             if len(candidates_for_join) == 0:
-                print(
+                logger.info(
                     "There are no more candidate nodes that can be joined, but not all linkable specs have "
                     "been acquired."
                 )
@@ -369,7 +369,7 @@ class NodeEvaluatorForLinkableInstances:
 
             # Join the best candidate to realize the linkable specs
             next_candidate = candidates_for_join.pop(0)
-            print(f"The next candidate node to be joined is:\n{pformat_big_objects(next_candidate)}")
+            logger.info(f"The next candidate node to be joined is:\n{pformat_big_objects(next_candidate)}")
             join_candidates.append(next_candidate)
 
             # Update the candidates. Since we'll be joined/ing the previously selected candidate, we no longer need
@@ -386,7 +386,7 @@ class NodeEvaluatorForLinkableInstances:
                 x for x in possibly_joinable_linkable_specs if x not in next_candidate.satisfiable_linkable_specs
             ]
 
-        print("Done evaluating possible joins")
+        logger.info("Done evaluating possible joins")
         return LinkableInstanceSatisfiabilityEvaluation(
             local_linkable_specs=tuple(local_linkable_specs),
             joinable_linkable_specs=tuple(
