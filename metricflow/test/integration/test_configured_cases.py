@@ -320,6 +320,5 @@ def test_case(
             double_data_type_name=check_query_helpers.double_data_type_name,
         )
     )
-
     # If we sort, it's effectively not checking the order whatever order that the output was would be overwritten.
     assert_dataframes_equal(actual, expected, sort_columns=not case.check_order, allow_empty=case.allow_empty)

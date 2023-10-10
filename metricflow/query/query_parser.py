@@ -228,7 +228,8 @@ class MetricFlowQueryParser:
                             "dimension 'metric_time'."
                         )
 
-    def _validate_linkable_specs(
+    # TODO: write tests for invalid linkable specs - should error
+    def _validate_linkable_specs_for_metrics(
         self,
         metric_references: Tuple[MetricReference, ...],
         all_linkable_specs: QueryTimeLinkableSpecSet,
@@ -423,7 +424,7 @@ class MetricFlowQueryParser:
 
         # For each metric, verify that it's possible to retrieve all group by elements, including the ones as required
         # by the filters.
-        # TODO: Consider moving this logic into _validate_linkable_specs().
+        # TODO: Consider moving this logic into _validate_linkable_specs_for_metrics().
         for metric_reference in metric_references:
             metric = self._metric_lookup.get_metric(metric_reference)
             if metric.filter is not None:
@@ -435,7 +436,7 @@ class MetricFlowQueryParser:
 
                 # Combine the group by elements from the query with the group by elements that are required by the
                 # metric filter to see if that's a valid set that could be queried.
-                self._validate_linkable_specs(
+                self._validate_linkable_specs_for_metrics(
                     metric_references=(metric_reference,),
                     all_linkable_specs=QueryTimeLinkableSpecSet.combine(
                         (
@@ -453,7 +454,7 @@ class MetricFlowQueryParser:
                 )
 
         # Validate all of them together.
-        self._validate_linkable_specs(
+        self._validate_linkable_specs_for_metrics(
             metric_references=metric_references,
             all_linkable_specs=requested_linkable_specs_with_requested_filter_specs,
             time_dimension_specs=time_dimension_specs,

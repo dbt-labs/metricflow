@@ -605,6 +605,54 @@ def test_distinct_values_plan(  # noqa: D
     )
 
 
+def test_distinct_values_plan_with_join(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    column_association_resolver: ColumnAssociationResolver,
+) -> None:
+    """Tests a plan to get distinct values of 2 dimensions, where a join is required."""
+    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
+        query_spec=MetricFlowQuerySpec(
+            dimension_specs=(
+                DimensionSpec(element_name="home_state_latest", entity_links=(EntityReference(element_name="user"),)),
+                DimensionSpec(element_name="is_lux_latest", entity_links=(EntityReference(element_name="listing"),)),
+            ),
+            where_constraint=(
+                WhereSpecFactory(
+                    column_association_resolver=column_association_resolver,
+                ).create_from_where_filter(
+                    PydanticWhereFilter(
+                        where_sql_template="{{ Dimension('listing__country_latest') }} = 'us'",
+                    )
+                )
+            ),
+            order_by_specs=(
+                OrderBySpec(
+                    dimension_spec=DimensionSpec(
+                        element_name="country_latest", entity_links=(EntityReference(element_name="listing"),)
+                    ),
+                    descending=True,
+                ),
+            ),
+            limit=100,
+        )
+    )
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dag_graph=dataflow_plan,
+    )
+
+
 def test_measure_constraint_plan(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,

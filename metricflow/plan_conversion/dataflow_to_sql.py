@@ -800,7 +800,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             CreateSelectColumnsForInstances(from_data_set_alias, self._column_association_resolver)
         ).as_tuple()
 
-        # If no measures are passed, group by all columns.
+        # If distinct values requested, group by all select columns.
         group_bys = select_columns if node.distinct else ()
         return SqlDataSet(
             instance_set=output_instance_set,

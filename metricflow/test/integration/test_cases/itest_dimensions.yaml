@@ -145,17 +145,18 @@ integration_test:
       u.home_state_latest
       , l.is_lux
 ---
+# TODO: test for dimension with non-day granularity
 integration_test:
   name: query_time_dimension_without_granularity
-  description: Query just a time dimension, no granularity specified
+  description: Query just a time dimension, no granularity specified. Should assume default granularity for dimension.
   model: SIMPLE_MODEL
   group_bys: [ "verification__ds"]
   check_query: |
     SELECT
-      v.ds
+      v.ds__day
     FROM {{ source_schema }}.fct_id_verifications v
     GROUP BY
-      v.ds
+      v.ds__day
 ---
 integration_test:
   name: query_dimension_only_with_constraint
