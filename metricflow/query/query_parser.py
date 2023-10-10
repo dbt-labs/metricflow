@@ -230,7 +230,6 @@ class MetricFlowQueryParser:
                             "dimension 'metric_time'."
                         )
 
-    # TODO: write tests for invalid linkable specs - should error
     def _validate_linkable_specs_for_metrics(
         self,
         metric_references: Tuple[MetricReference, ...],
@@ -302,6 +301,9 @@ class MetricFlowQueryParser:
     def _get_metric_names(
         self, metric_names: Optional[Sequence[str]], metrics: Optional[Sequence[MetricQueryParameter]]
     ) -> Sequence[str]:
+        if not (metric_names or metrics):
+            return []
+
         assert_exactly_one_arg_set(metric_names=metric_names, metrics=metrics)
         return metric_names if metric_names else [m.name for m in metrics] if metrics else []
 

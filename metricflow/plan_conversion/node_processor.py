@@ -85,7 +85,6 @@ class PreJoinNodeProcessor:
         self._semantic_model_lookup = semantic_model_lookup
         self._join_evaluator = SemanticModelJoinEvaluator(semantic_model_lookup)
 
-    # TODO: add test with time constraint
     def add_time_range_constraint(
         self,
         source_nodes: Sequence[BaseOutput],

@@ -191,6 +191,9 @@ def test_query_parser(bookings_query_parser: MetricFlowQueryParser) -> None:  # 
         ),
     )
 
+    with pytest.raises(UnableToSatisfyQueryError):
+        bookings_query_parser.parse_and_validate_query(group_by_names=["random_stuff"])
+
 
 def test_query_parser_with_object_params(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D
     Metric = namedtuple("Metric", ["name", "descending"])
