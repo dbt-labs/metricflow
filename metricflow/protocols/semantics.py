@@ -19,7 +19,6 @@ from dbt_semantic_interfaces.protocols.semantic_model import SemanticModel
 from dbt_semantic_interfaces.references import (
     DimensionReference,
     EntityReference,
-    LinkableElementReference,
     MeasureReference,
     MetricReference,
     SemanticModelElementReference,
@@ -100,12 +99,6 @@ class SemanticModelAccessor(ABC):
     @abstractmethod
     def get_entity_in_semantic_model(self, ref: SemanticModelElementReference) -> Optional[Entity]:
         """Retrieve the entity matching the element -> semantic model mapping, if any."""
-        raise NotImplementedError
-
-    def get_semantic_models_for_linkable_element(
-        self, linkable_element: LinkableElementReference
-    ) -> Set[SemanticModel]:
-        """Return all semantic models associated with a linkable element reference."""
         raise NotImplementedError
 
     @abstractmethod

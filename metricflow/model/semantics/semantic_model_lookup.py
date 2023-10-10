@@ -268,12 +268,6 @@ class SemanticModelLookup(SemanticModelAccessor):
         entity = self._entity_ref_to_entity[entity_reference]
         return set(self._entity_index[entity])
 
-    def get_semantic_models_for_linkable_element(
-        self, linkable_element: LinkableElementReference
-    ) -> Set[SemanticModel]:
-        """Return all semantic models associated with a linkable element reference."""
-        return set(self._linkable_reference_index[linkable_element])
-
     @staticmethod
     def get_entity_from_semantic_model(
         semantic_model: SemanticModel, entity_reference: LinkableElementReference
