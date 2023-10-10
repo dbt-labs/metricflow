@@ -557,16 +557,17 @@ class DataflowPlanBuilder:
         logger.info(f"Found {len(node_to_evaluation)} candidate measure nodes.")
 
         if len(node_to_evaluation) > 0:
-            cost_function = DefaultCostFunction()
-
-            node_with_lowest_cost = min(node_to_evaluation, key=cost_function.calculate_cost)
-            evaluation = node_to_evaluation[node_with_lowest_cost]
+            # All source nodes cost the same. Find evaluation with lowest number of joins.
+            node_with_lowest_cost_plan = min(
+                node_to_evaluation, key=lambda node: len(node_to_evaluation[node].join_recipes)
+            )
+            evaluation = node_to_evaluation[node_with_lowest_cost_plan]
             logger.info(
-                "Lowest cost node is:\n"
+                "Lowest cost plan is:\n"
                 + pformat_big_objects(
-                    lowest_cost_node=dataflow_dag_as_text(node_with_lowest_cost),
+                    node=dataflow_dag_as_text(node_with_lowest_cost_plan),
                     evaluation=evaluation,
-                    cost=cost_function.calculate_cost(node_with_lowest_cost),
+                    joins=len(node_to_evaluation[node_with_lowest_cost_plan].join_recipes),
                 )
             )
 
@@ -584,14 +585,14 @@ class DataflowPlanBuilder:
             )
 
             return MeasureRecipe(
-                measure_node=node_with_lowest_cost,
+                measure_node=node_with_lowest_cost_plan,
                 required_local_linkable_specs=(
                     evaluation.local_linkable_specs
                     + required_local_entity_specs
                     + required_local_dimension_specs
                     + required_local_time_dimension_specs
                 ),
-                join_linkable_instances_recipes=node_to_evaluation[node_with_lowest_cost].join_recipes,
+                join_linkable_instances_recipes=node_to_evaluation[node_with_lowest_cost_plan].join_recipes,
             )
 
         logger.error("No recipe could be constructed.")
