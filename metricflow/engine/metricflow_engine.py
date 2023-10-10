@@ -350,6 +350,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
         source_node_builder = SourceNodeBuilder(self._semantic_manifest_lookup)
         source_nodes = source_node_builder.create_from_data_sets(self._source_data_sets)
+        read_nodes = source_node_builder.create_read_nodes_from_data_sets(self._source_data_sets)
 
         node_output_resolver = DataflowPlanNodeOutputDataSetResolver(
             column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup),
@@ -358,6 +359,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
         self._dataflow_plan_builder = DataflowPlanBuilder(
             source_nodes=source_nodes,
+            read_nodes=read_nodes,
             semantic_manifest_lookup=self._semantic_manifest_lookup,
         )
         self._to_sql_query_plan_converter = DataflowToSqlQueryPlanConverter(

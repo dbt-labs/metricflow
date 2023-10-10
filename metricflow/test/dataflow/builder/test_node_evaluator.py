@@ -18,7 +18,7 @@ from metricflow.dataflow.dataflow_plan import BaseOutput, ValidityWindowJoinDesc
 from metricflow.dataset.dataset import DataSet
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
-from metricflow.plan_conversion.node_processor import PreDimensionJoinNodeProcessor
+from metricflow.plan_conversion.node_processor import PreJoinNodeProcessor
 from metricflow.specs.specs import (
     DimensionSpec,
     EntityReference,
@@ -65,7 +65,7 @@ def make_multihop_node_evaluator(
         semantic_manifest_lookup=semantic_manifest_lookup_with_multihop_links,
     )
 
-    node_processor = PreDimensionJoinNodeProcessor(
+    node_processor = PreJoinNodeProcessor(
         semantic_model_lookup=semantic_manifest_lookup_with_multihop_links.semantic_model_lookup,
         node_data_set_resolver=node_data_set_resolver,
     )

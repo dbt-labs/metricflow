@@ -47,12 +47,10 @@ def _data_set_to_read_nodes(data_sets: OrderedDict[str, SemanticModelDataSet]) -
 
 
 def _data_set_to_source_nodes(
-    semantic_manifest_lookup: SemanticManifestLookup,
-    data_sets: OrderedDict[str, SemanticModelDataSet],
-    with_measures: bool = True,
+    semantic_manifest_lookup: SemanticManifestLookup, data_sets: OrderedDict[str, SemanticModelDataSet]
 ) -> Sequence[BaseOutput]:
     source_node_builder = SourceNodeBuilder(semantic_manifest_lookup)
-    return source_node_builder.create_from_data_sets(list(data_sets.values()), with_measures=with_measures)
+    return source_node_builder.create_from_data_sets(list(data_sets.values()))
 
 
 def query_parser_from_yaml(yaml_contents: List[YamlConfigFile]) -> MetricFlowQueryParser:
@@ -90,6 +88,7 @@ class ConsistentIdObjectRepository:
     scd_model_read_nodes: OrderedDict[str, ReadSqlSourceNode]
     scd_model_source_nodes: Sequence[BaseOutput]
 
+    cyclic_join_read_nodes: OrderedDict[str, ReadSqlSourceNode]
     cyclic_join_source_nodes: Sequence[BaseOutput]
 
 
@@ -124,6 +123,7 @@ def consistent_id_object_repository(
             scd_model_source_nodes=_data_set_to_source_nodes(
                 semantic_manifest_lookup=scd_semantic_manifest_lookup, data_sets=scd_data_sets
             ),
+            cyclic_join_read_nodes=_data_set_to_read_nodes(cyclic_join_data_sets),
             cyclic_join_source_nodes=_data_set_to_source_nodes(
                 semantic_manifest_lookup=cyclic_join_semantic_manifest_lookup, data_sets=cyclic_join_data_sets
             ),

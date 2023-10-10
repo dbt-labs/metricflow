@@ -56,8 +56,8 @@ class MultiHopJoinCandidate:
     lineage: MultiHopJoinCandidateLineage
 
 
-class PreDimensionJoinNodeProcessor:
-    """Processes source nodes before measures are joined to dimensions.
+class PreJoinNodeProcessor:
+    """Processes source nodes before other nodes are joined.
 
     Generally, the source nodes will be combined with other dataflow plan nodes to produce a new set of nodes to realize
     a condition of the query. For example, to realize a time range constraint, a ConstrainTimeRangeNode will be added
@@ -85,6 +85,7 @@ class PreDimensionJoinNodeProcessor:
         self._semantic_model_lookup = semantic_model_lookup
         self._join_evaluator = SemanticModelJoinEvaluator(semantic_model_lookup)
 
+    # TODO: add test with time constraint
     def add_time_range_constraint(
         self,
         source_nodes: Sequence[BaseOutput],

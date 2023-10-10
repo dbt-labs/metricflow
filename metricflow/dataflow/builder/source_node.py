@@ -21,9 +21,7 @@ class SourceNodeBuilder:
     def __init__(self, semantic_manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D
         self._semantic_manifest_lookup = semantic_manifest_lookup
 
-    def create_from_data_sets(
-        self, data_sets: Sequence[SemanticModelDataSet], with_measures: bool = True
-    ) -> Sequence[BaseOutput]:
+    def create_from_data_sets(self, data_sets: Sequence[SemanticModelDataSet]) -> Sequence[BaseOutput]:
         """Creates source nodes from SemanticModelDataSets."""
         source_nodes: List[BaseOutput] = []
         for data_set in data_sets:
@@ -48,3 +46,7 @@ class SourceNodeBuilder:
                         )
                     )
         return source_nodes
+
+    def create_read_nodes_from_data_sets(self, data_sets: Sequence[SemanticModelDataSet]) -> Sequence[BaseOutput]:
+        """Creates read nodes from SemanticModelDataSets."""
+        return [ReadSqlSourceNode(data_set) for data_set in data_sets]
