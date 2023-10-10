@@ -681,7 +681,7 @@ class MetricFlowQueryParser:
             structured_names = [StructuredLinkableSpecName.from_name(name) for name in group_by_names]
         elif group_by:
             for group_by_obj in group_by:
-                parsed_name = StructuredLinkableSpecName.from_name(group_by_obj.name)
+                parsed_name = StructuredLinkableSpecName.from_name(group_by_obj.name.lower())
                 structured_name = StructuredLinkableSpecName(
                     entity_link_names=parsed_name.entity_link_names,
                     element_name=parsed_name.element_name,
@@ -832,6 +832,7 @@ class MetricFlowQueryParser:
             time_granularity: Optional[TimeGranularity] = None
             date_part: Optional[DatePart] = None
             if isinstance(order, str):
+                order = order.lower()
                 # Note: date part cannot be requested via string parameter.
                 descending = False
                 if order.startswith("-"):
@@ -841,7 +842,7 @@ class MetricFlowQueryParser:
                 time_granularity = parsed_name.time_granularity
             else:
                 descending = order.descending
-                parsed_name = StructuredLinkableSpecName.from_name(order.order_by.name)
+                parsed_name = StructuredLinkableSpecName.from_name(order.order_by.name.lower())
                 if isinstance(order.order_by, TimeDimensionQueryParameter):
                     time_granularity = order.order_by.grain
                     date_part = order.order_by.date_part
