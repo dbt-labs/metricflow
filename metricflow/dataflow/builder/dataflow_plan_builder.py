@@ -634,7 +634,6 @@ class DataflowPlanBuilder:
         logger.info(f"Found {len(node_to_evaluation)} candidate source nodes.")
 
         if len(node_to_evaluation) > 0:
-            cost_function = DefaultCostFunction()
             # All source nodes cost 0. Get evaluation with lowest cost.
             node_with_lowest_evaluation_cost = min(
                 node_to_evaluation, key=lambda x: len(node_to_evaluation[x].join_recipes)
@@ -645,7 +644,7 @@ class DataflowPlanBuilder:
                 + pformat_big_objects(
                     lowest_cost_node=dataflow_dag_as_text(node_with_lowest_evaluation_cost),
                     evaluation=evaluation,
-                    cost=cost_function.calculate_cost(node_with_lowest_evaluation_cost),
+                    joins=len(node_to_evaluation[node_with_lowest_evaluation_cost].join_recipes),
                 )
             )
 
