@@ -553,6 +553,7 @@ class DataflowPlanBuilder:
             # this is going to be the lowest cost solution.
             if len(evaluation.join_recipes) == 0:
                 logger.info("Not evaluating other nodes since we found one that doesn't require joins")
+                break
 
         logger.info(f"Found {len(node_to_evaluation)} candidate measure nodes.")
 
