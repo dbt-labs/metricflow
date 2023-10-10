@@ -145,7 +145,6 @@ integration_test:
       u.home_state_latest
       , l.is_lux
 ---
-# TODO: test for dimension with non-day granularity
 integration_test:
   name: query_time_dimension_without_granularity
   description: Query just a time dimension, no granularity specified. Should assume default granularity for dimension.
@@ -153,10 +152,22 @@ integration_test:
   group_bys: [ "verification__ds"]
   check_query: |
     SELECT
-      v.ds__day
+      v.ds as verification__ds__day
     FROM {{ source_schema }}.fct_id_verifications v
     GROUP BY
-      v.ds__day
+      v.ds
+---
+integration_test:
+  name: query_non_default_time_dimension_without_granularity
+  description: Query just a time dimension, no granularity specified. Should assume default granularity for dimension.
+  model: EXTENDED_DATE_MODEL
+  group_bys: [ "monthly_ds"]
+  check_query: |
+    SELECT
+      ds AS monthly_ds__month
+    FROM {{ source_schema }}.fct_bookings_extended_monthly
+    GROUP BY
+      ds
 ---
 integration_test:
   name: query_dimension_only_with_constraint

@@ -118,13 +118,15 @@ class MetricFlowQueryParser:
         self,
         column_association_resolver: ColumnAssociationResolver,
         model: SemanticManifestLookup,
-        source_nodes: Sequence[BaseOutput],
+        read_nodes: Sequence[BaseOutput],
         node_output_resolver: DataflowPlanNodeOutputDataSetResolver,
     ) -> None:
         self._column_association_resolver = column_association_resolver
         self._model = model
         self._metric_lookup = model.metric_lookup
         self._semantic_model_lookup = model.semantic_model_lookup
+        self._node_output_resolver = node_output_resolver
+        self._read_nodes = read_nodes
 
         # Set up containers for known element names
         self._known_entity_element_references = self._semantic_model_lookup.get_entity_references()
@@ -404,6 +406,8 @@ class MetricFlowQueryParser:
             self._time_granularity_solver.resolve_granularity_for_partial_time_dimension_specs(
                 metric_references=metric_references,
                 partial_time_dimension_specs=requested_linkable_specs.partial_time_dimension_specs,
+                read_nodes=self._read_nodes,
+                node_output_resolver=self._node_output_resolver,
             )
         )
 
@@ -575,6 +579,8 @@ class MetricFlowQueryParser:
                 self._time_granularity_solver.resolve_granularity_for_partial_time_dimension_specs(
                     metric_references=metric_references,
                     partial_time_dimension_specs=(partial_metric_time_spec,),
+                    read_nodes=self._read_nodes,
+                    node_output_resolver=self._node_output_resolver,
                 )
             )
             adjust_to_granularity = partial_time_dimension_spec_to_time_dimension_spec[
@@ -773,7 +779,10 @@ class MetricFlowQueryParser:
         ensure that the correct value was passed in.
         """
         resolved_granularity = self._time_granularity_solver.find_minimum_granularity_for_partial_time_dimension_spec(
-            partial_time_dimension_spec=partial_time_dimension_spec, metric_references=metric_references
+            partial_time_dimension_spec=partial_time_dimension_spec,
+            metric_references=metric_references,
+            read_nodes=self._read_nodes,
+            node_output_resolver=self._node_output_resolver,
         )
         if resolved_granularity != requested_dimension_structured_name.time_granularity:
             raise RequestTimeGranularityException(

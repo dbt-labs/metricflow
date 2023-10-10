@@ -14,8 +14,11 @@ from dbt_semantic_interfaces.references import (
 )
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
+from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
+from metricflow.dataflow.dataflow_plan import BaseOutput
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.specs.specs import (
     TimeDimensionSpec,
 )
@@ -100,59 +103,99 @@ class TimeGranularitySolver:
         self,
         metric_references: Sequence[MetricReference],
         partial_time_dimension_specs: Sequence[PartialTimeDimensionSpec],
+        read_nodes: Sequence[BaseOutput],
+        node_output_resolver: DataflowPlanNodeOutputDataSetResolver,
     ) -> Dict[PartialTimeDimensionSpec, TimeDimensionSpec]:
         """Figure out the lowest granularity possible for the partially specified time dimension specs.
 
         Returns a dictionary that maps how the partial time dimension spec should be turned into a time dimension spec.
         """
-        if not partial_time_dimension_specs:
-            return {}
+        result: Dict[PartialTimeDimensionSpec, TimeDimensionSpec] = {}
 
-        if metric_references:
-            result: Dict[PartialTimeDimensionSpec, TimeDimensionSpec] = {}
-            for partial_time_dimension_spec in partial_time_dimension_specs:
-                minimum_time_granularity = self.find_minimum_granularity_for_partial_time_dimension_spec(
-                    partial_time_dimension_spec=partial_time_dimension_spec, metric_references=metric_references
-                )
-                result[partial_time_dimension_spec] = TimeDimensionSpec(
-                    element_name=partial_time_dimension_spec.element_name,
-                    entity_links=partial_time_dimension_spec.entity_links,
-                    time_granularity=minimum_time_granularity,
-                    date_part=partial_time_dimension_spec.date_part,
-                )
-            return result
-        else:
-            raise NotImplementedError  # find minimum granularity for time dimension
+        for partial_time_dimension_spec in partial_time_dimension_specs:
+            minimum_time_granularity = self.find_minimum_granularity_for_partial_time_dimension_spec(
+                partial_time_dimension_spec=partial_time_dimension_spec,
+                metric_references=metric_references,
+                read_nodes=read_nodes,
+                node_output_resolver=node_output_resolver,
+            )
+            result[partial_time_dimension_spec] = TimeDimensionSpec(
+                element_name=partial_time_dimension_spec.element_name,
+                entity_links=partial_time_dimension_spec.entity_links,
+                time_granularity=minimum_time_granularity,
+                date_part=partial_time_dimension_spec.date_part,
+            )
+        return result
 
     def find_minimum_granularity_for_partial_time_dimension_spec(
-        self, partial_time_dimension_spec: PartialTimeDimensionSpec, metric_references: Sequence[MetricReference]
+        self,
+        partial_time_dimension_spec: PartialTimeDimensionSpec,
+        metric_references: Sequence[MetricReference],
+        read_nodes: Sequence[BaseOutput],
+        node_output_resolver: DataflowPlanNodeOutputDataSetResolver,
     ) -> TimeGranularity:
         """Find minimum granularity allowed for time dimension when queried with given metrics."""
-        valid_group_by_elements = self._semantic_manifest_lookup.metric_lookup.linkable_set_for_metrics(
-            metric_references=metric_references,
-        )
-
         minimum_time_granularity: Optional[TimeGranularity] = None
-        for path_key in valid_group_by_elements.path_key_to_linkable_dimensions:
-            if (
-                path_key.element_name == partial_time_dimension_spec.element_name
-                and path_key.entity_links == partial_time_dimension_spec.entity_links
-                and path_key.time_granularity is not None
-            ):
-                minimum_time_granularity = (
-                    path_key.time_granularity
-                    if minimum_time_granularity is None
-                    else min(minimum_time_granularity, path_key.time_granularity)
+
+        if metric_references:
+            valid_group_by_elements = self._semantic_manifest_lookup.metric_lookup.linkable_set_for_metrics(
+                metric_references=metric_references,
+            )
+            for path_key in valid_group_by_elements.path_key_to_linkable_dimensions:
+                if (
+                    path_key.element_name == partial_time_dimension_spec.element_name
+                    and path_key.entity_links == partial_time_dimension_spec.entity_links
+                    and path_key.time_granularity is not None
+                ):
+                    minimum_time_granularity = (
+                        path_key.time_granularity
+                        if minimum_time_granularity is None
+                        else min(minimum_time_granularity, path_key.time_granularity)
+                    )
+            if not minimum_time_granularity:
+                raise RequestTimeGranularityException(
+                    f"Unable to resolve the time dimension spec for {partial_time_dimension_spec}. "
+                    f"Valid group by elements are:\n"
+                    f"{pformat_big_objects([spec.qualified_name for spec in valid_group_by_elements.as_spec_set.as_tuple])}"
+                )
+        else:
+            minimum_time_granularity = self.get_min_granularity_for_partial_time_dimension_without_metrics(
+                read_nodes=read_nodes,
+                node_output_resolver=node_output_resolver,
+                partial_time_dimension_spec=partial_time_dimension_spec,
+            )
+            if not minimum_time_granularity:
+                raise RequestTimeGranularityException(
+                    f"Unable to resolve the time dimension spec for {partial_time_dimension_spec}. "
                 )
 
-        if not minimum_time_granularity:
-            raise RequestTimeGranularityException(
-                f"Unable to resolve the time dimension spec for {partial_time_dimension_spec}. "
-                f"Valid group by elements are:\n"
-                f"{pformat_big_objects([spec.qualified_name for spec in valid_group_by_elements.as_spec_set.as_tuple])}"
-            )
-
         return minimum_time_granularity
+
+    def get_min_granularity_for_partial_time_dimension_without_metrics(
+        self,
+        read_nodes: Sequence[BaseOutput],
+        node_output_resolver: DataflowPlanNodeOutputDataSetResolver,
+        partial_time_dimension_spec: PartialTimeDimensionSpec,
+    ) -> Optional[TimeGranularity]:
+        """Find the minimum."""
+        granularity_free_qualified_name = StructuredLinkableSpecName(
+            entity_link_names=tuple(
+                [entity_link.element_name for entity_link in partial_time_dimension_spec.entity_links]
+            ),
+            element_name=partial_time_dimension_spec.element_name,
+        ).granularity_free_qualified_name
+        for read_node in read_nodes:
+            output_data_set = node_output_resolver.get_output_data_set(read_node)
+            for time_dimension_instance in output_data_set.instance_set.time_dimension_instances:
+                if time_dimension_instance.spec.date_part:
+                    continue
+                time_dim_name_without_granularity = StructuredLinkableSpecName.from_name(
+                    time_dimension_instance.spec.qualified_name
+                ).granularity_free_qualified_name
+                if time_dim_name_without_granularity == granularity_free_qualified_name:
+                    return time_dimension_instance.spec.time_granularity
+
+        return None
 
     def adjust_time_range_to_granularity(
         self, time_range_constraint: TimeRangeConstraint, time_granularity: TimeGranularity

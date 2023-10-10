@@ -6,9 +6,11 @@ import pytest
 from dbt_semantic_interfaces.references import MetricReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
+from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataset.dataset import DataSet
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_MONTH
 from metricflow.time.time_granularity_solver import (
     PartialTimeDimensionSpec,
@@ -89,19 +91,31 @@ def test_validate_day_granularity_for_day_and_month_metric(  # noqa: D
 PARTIAL_PTD_SPEC = PartialTimeDimensionSpec(element_name=DataSet.metric_time_dimension_name(), entity_links=())
 
 
-def test_granularity_solution_for_day_metric(time_granularity_solver: TimeGranularitySolver) -> None:  # noqa: D
+def test_granularity_solution_for_day_metric(  # noqa: D
+    time_granularity_solver: TimeGranularitySolver,
+    node_output_resolver: DataflowPlanNodeOutputDataSetResolver,
+    consistent_id_object_repository: ConsistentIdObjectRepository,
+) -> None:
     assert time_granularity_solver.resolve_granularity_for_partial_time_dimension_specs(
         metric_references=[MetricReference(element_name="bookings")],
         partial_time_dimension_specs=[PARTIAL_PTD_SPEC],
+        node_output_resolver=node_output_resolver,
+        read_nodes=list(consistent_id_object_repository.simple_model_read_nodes.values()),
     ) == {
         PARTIAL_PTD_SPEC: MTD_SPEC_DAY,
     }
 
 
-def test_granularity_solution_for_month_metric(time_granularity_solver: TimeGranularitySolver) -> None:  # noqa: D
+def test_granularity_solution_for_month_metric(  # noqa: D
+    time_granularity_solver: TimeGranularitySolver,
+    node_output_resolver: DataflowPlanNodeOutputDataSetResolver,
+    consistent_id_object_repository: ConsistentIdObjectRepository,
+) -> None:
     assert time_granularity_solver.resolve_granularity_for_partial_time_dimension_specs(
         metric_references=[MetricReference(element_name="bookings_monthly")],
         partial_time_dimension_specs=[PARTIAL_PTD_SPEC],
+        node_output_resolver=node_output_resolver,
+        read_nodes=list(consistent_id_object_repository.simple_model_read_nodes.values()),
     ) == {
         PARTIAL_PTD_SPEC: MTD_SPEC_MONTH,
     }
@@ -109,10 +123,14 @@ def test_granularity_solution_for_month_metric(time_granularity_solver: TimeGran
 
 def test_granularity_solution_for_day_and_month_metrics(  # noqa: D
     time_granularity_solver: TimeGranularitySolver,
+    node_output_resolver: DataflowPlanNodeOutputDataSetResolver,
+    consistent_id_object_repository: ConsistentIdObjectRepository,
 ) -> None:
     assert time_granularity_solver.resolve_granularity_for_partial_time_dimension_specs(
         metric_references=[MetricReference(element_name="bookings"), MetricReference(element_name="bookings_monthly")],
         partial_time_dimension_specs=[PARTIAL_PTD_SPEC],
+        node_output_resolver=node_output_resolver,
+        read_nodes=list(consistent_id_object_repository.simple_model_read_nodes.values()),
     ) == {PARTIAL_PTD_SPEC: MTD_SPEC_MONTH}
 
 

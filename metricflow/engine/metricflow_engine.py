@@ -376,7 +376,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         self._query_parser = MetricFlowQueryParser(
             column_association_resolver=self._column_association_resolver,
             model=self._semantic_manifest_lookup,
-            source_nodes=source_nodes,
+            read_nodes=read_nodes,
             node_output_resolver=node_output_resolver,
         )
 
