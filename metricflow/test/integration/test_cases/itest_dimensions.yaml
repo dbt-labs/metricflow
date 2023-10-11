@@ -179,6 +179,6 @@ integration_test:
     SELECT
       u.home_state AS user__home_state
     FROM {{ source_schema }}.dim_users u
-    WHERE user__home_state = 'CA'
+    WHERE u.home_state = 'CA'
     GROUP BY
       u.home_state
