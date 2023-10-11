@@ -503,7 +503,7 @@ class DataflowPlanBuilder:
                 linkable_specs=linkable_spec_set, read_nodes=source_nodes
             )
             potential_source_nodes = list(source_nodes_to_linkable_specs.keys())
-        # issue: getting ds__day from the wrong table
+
         logger.info(f"There are {len(potential_source_nodes)} potential source nodes")
 
         logger.info(f"Starting search with {len(source_nodes)} source nodes")
