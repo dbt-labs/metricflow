@@ -119,11 +119,11 @@ integration_test:
   name: query_dimensions_only
   description: Query multiple dimensions without metrics
   model: SIMPLE_MODEL
-  group_bys: ["ds__day", "user__home_state"]
+  group_bys: ["user__ds__day", "user__home_state"]
   check_query: |
     SELECT
       u.home_state AS user__home_state
-      , u.ds AS ds__day
+      , u.ds AS user__ds__day
     FROM {{ source_schema }}.dim_users u
     GROUP BY
       u.ds
