@@ -24,6 +24,7 @@
                     <!--   {'class': 'MeasureSpec',               -->
                     <!--    'element_name': 'txn_revenue',        -->
                     <!--    'non_additive_dimension_spec': None}  -->
+                    <!-- distinct = False -->
                     <MetricTimeDimensionTransformNode>
                         <!-- description = Metric Time Dimension 'ds' -->
                         <!-- node_id = sma_10005 -->
