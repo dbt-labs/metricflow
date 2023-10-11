@@ -9,10 +9,11 @@ from typing import DefaultDict, Dict, List, Optional, Sequence, Set, Tuple, Unio
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.protocols.metric import MetricTimeWindow, MetricType
-from dbt_semantic_interfaces.references import TimeDimensionReference
+from dbt_semantic_interfaces.references import (
+    TimeDimensionReference,
+)
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
-from metricflow.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.dag.id_generation import DATAFLOW_PLAN_PREFIX, IdGeneratorRegistry
 from metricflow.dataflow.builder.costing import DataflowPlanNodeCostFunction, DefaultCostFunction
 from metricflow.dataflow.builder.measure_additiveness import group_measure_specs_by_additiveness
@@ -50,11 +51,9 @@ from metricflow.errors.errors import UnableToSatisfyQueryError
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
-from metricflow.plan_conversion.node_processor import PreDimensionJoinNodeProcessor
+from metricflow.plan_conversion.node_processor import PreJoinNodeProcessor
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
-    DimensionSpec,
-    EntitySpec,
     InstanceSpecSet,
     LinkableInstanceSpec,
     LinkableSpecSet,
@@ -74,17 +73,59 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
-class MeasureRecipe:
-    """Get a recipe for how to build a dataflow plan node that outputs measures and the needed linkable instances.
+class DataflowRecipe:
+    """Get a recipe for how to build a dataflow plan node that outputs measures and linkable instances as needed."""
 
-    The recipe involves filtering the measure node so that it only outputs the measures and the instances associated with
-    required_local_linkable_specs, then joining the nodes containing the linkable instances according to the recipes
-    in join_linkable_instances_recipes.
-    """
-
-    measure_node: BaseOutput
+    source_node: BaseOutput
     required_local_linkable_specs: Tuple[LinkableInstanceSpec, ...]
     join_linkable_instances_recipes: Tuple[JoinLinkableInstancesRecipe, ...]
+
+    @property
+    def join_targets(self) -> List[JoinDescription]:
+        """Joins to be made to source node."""
+        join_targets = []
+        for join_recipe in self.join_linkable_instances_recipes:
+            # Figure out what elements to filter from the joined node.
+
+            # Sanity check - all linkable specs should have a link, or else why would we be joining them.
+            assert all([len(x.entity_links) > 0 for x in join_recipe.satisfiable_linkable_specs])
+
+            # If we're joining something in, then we need the associated entity, partitions, and time dimension
+            # specs defining the validity window (if necessary)
+            include_specs: List[LinkableInstanceSpec] = [
+                LinklessEntitySpec.from_reference(x.entity_links[0]) for x in join_recipe.satisfiable_linkable_specs
+            ]
+            include_specs.extend([x.node_to_join_dimension_spec for x in join_recipe.join_on_partition_dimensions])
+            include_specs.extend(
+                [x.node_to_join_time_dimension_spec for x in join_recipe.join_on_partition_time_dimensions]
+            )
+            if join_recipe.validity_window:
+                include_specs.extend(
+                    [
+                        join_recipe.validity_window.window_start_dimension,
+                        join_recipe.validity_window.window_end_dimension,
+                    ]
+                )
+
+            # satisfiable_linkable_specs describes what can be satisfied after the join, so remove the entity
+            # link when filtering before the join.
+            # e.g. if the node is used to satisfy "user_id__country", then the node must have the entity
+            # "user_id" and the "country" dimension so that it can be joined to the measure node.
+            include_specs.extend([x.without_first_entity_link for x in join_recipe.satisfiable_linkable_specs])
+            filtered_node_to_join = FilterElementsNode(
+                parent_node=join_recipe.node_to_join,
+                include_specs=InstanceSpecSet.create_from_linkable_specs(include_specs),
+            )
+            join_targets.append(
+                JoinDescription(
+                    join_node=filtered_node_to_join,
+                    join_on_entity=join_recipe.join_on_entity,
+                    join_on_partition_dimensions=join_recipe.join_on_partition_dimensions,
+                    join_on_partition_time_dimensions=join_recipe.join_on_partition_time_dimensions,
+                    validity_window=join_recipe.validity_window,
+                )
+            )
+        return join_targets
 
 
 @dataclass(frozen=True)
@@ -103,6 +144,7 @@ class DataflowPlanBuilder:
     def __init__(  # noqa: D
         self,
         source_nodes: Sequence[BaseOutput],
+        read_nodes: Sequence[BaseOutput],
         semantic_manifest_lookup: SemanticManifestLookup,
         cost_function: DataflowPlanNodeCostFunction = DefaultCostFunction(),
         node_output_resolver: Optional[DataflowPlanNodeOutputDataSetResolver] = None,
@@ -113,6 +155,7 @@ class DataflowPlanBuilder:
         self._metric_time_dimension_reference = DataSet.metric_time_dimension_reference()
         self._cost_function = cost_function
         self._source_nodes = source_nodes
+        self._read_nodes = read_nodes
         self._column_association_resolver = (
             DunderColumnAssociationResolver(semantic_manifest_lookup)
             if not column_association_resolver
@@ -146,8 +189,8 @@ class DataflowPlanBuilder:
             time_range_constraint=query_spec.time_range_constraint,
         )
 
-        sink_node = DataflowPlanBuilder.build_sink_node_from_metrics_output_node(
-            computed_metrics_output=metrics_output_node,
+        sink_node = DataflowPlanBuilder.build_sink_node(
+            parent_node=metrics_output_node,
             order_by_specs=query_spec.order_by_specs,
             output_sql_table=output_sql_table,
             limit=query_spec.limit,
@@ -259,67 +302,50 @@ class DataflowPlanBuilder:
             join_type=combine_metrics_join_type,
         )
 
-    def build_plan_for_distinct_values(
-        self,
-        metric_specs: Sequence[MetricSpec],
-        dimension_spec: Optional[DimensionSpec] = None,
-        time_dimension_spec: Optional[TimeDimensionSpec] = None,
-        entity_spec: Optional[EntitySpec] = None,
-        time_range_constraint: Optional[TimeRangeConstraint] = None,
-        limit: Optional[int] = None,
-    ) -> DataflowPlan:
+    def build_plan_for_distinct_values(self, query_spec: MetricFlowQuerySpec) -> DataflowPlan:
         """Generate a plan that would get the distinct values of a linkable instance.
 
         e.g. distinct listing__country_latest for bookings by listing__country_latest
         """
-        assert_exactly_one_arg_set(
-            dimension_spec=dimension_spec, time_dimension_spec=time_dimension_spec, entity_spec=entity_spec
-        )
+        assert not query_spec.metric_specs, "Can't build distinct values plan with metrics."
 
-        # Doing this to keep the type checker happy, but assert_exactly_one_arg_set should ensure this.
-        linkable_spec: Optional[LinkableInstanceSpec] = dimension_spec or time_dimension_spec or entity_spec
-        assert linkable_spec
+        dataflow_recipe = self._find_dataflow_recipe(linkable_spec_set=query_spec.linkable_specs)
+        if not dataflow_recipe:
+            raise UnableToSatisfyQueryError(f"Recipe not found for linkable specs: {query_spec.linkable_specs}")
 
-        query_spec = MetricFlowQuerySpec(
-            metric_specs=tuple(metric_specs),
-            dimension_specs=(dimension_spec,) if dimension_spec else (),
-            time_dimension_specs=(time_dimension_spec,) if time_dimension_spec else (),
-            entity_specs=(entity_spec,) if entity_spec else (),
-            time_range_constraint=time_range_constraint,
-        )
-        metrics_output_node = self._build_metrics_output_node(
-            metric_specs=query_spec.metric_specs,
-            queried_linkable_specs=query_spec.linkable_specs,
-            where_constraint=query_spec.where_constraint,
-            time_range_constraint=query_spec.time_range_constraint,
-        )
+        join_targets = dataflow_recipe.join_targets
+        if join_targets:
+            joined_node = JoinToBaseOutputNode(left_node=dataflow_recipe.source_node, join_targets=join_targets)
+            distinct_values_node = FilterElementsNode(
+                parent_node=joined_node, include_specs=query_spec.linkable_specs.as_spec_set, distinct=True
+            )
+        else:
+            distinct_values_node = FilterElementsNode(
+                parent_node=dataflow_recipe.source_node,
+                include_specs=query_spec.linkable_specs.as_spec_set,
+                distinct=True,
+            )
 
-        distinct_values_node = FilterElementsNode(
-            parent_node=metrics_output_node,
-            include_specs=InstanceSpecSet.create_from_linkable_specs((linkable_spec,)),
-        )
+        where_constraint_node: Optional[WhereConstraintNode] = None
+        if query_spec.where_constraint:
+            where_constraint_node = WhereConstraintNode(
+                parent_node=distinct_values_node,
+                where_constraint=query_spec.where_constraint,
+            )
 
-        sink_node = self.build_sink_node_from_metrics_output_node(
-            computed_metrics_output=distinct_values_node,
-            order_by_specs=(
-                OrderBySpec(
-                    instance_spec=linkable_spec,
-                    descending=False,
-                ),
-            ),
-            limit=limit,
+        sink_node = self.build_sink_node(
+            parent_node=where_constraint_node or distinct_values_node,
+            order_by_specs=query_spec.order_by_specs,
+            limit=query_spec.limit,
         )
 
         plan_id = IdGeneratorRegistry.for_class(DataflowPlanBuilder).create_id(DATAFLOW_PLAN_PREFIX)
 
-        return DataflowPlan(
-            plan_id=plan_id,
-            sink_output_nodes=[sink_node],
-        )
+        return DataflowPlan(plan_id=plan_id, sink_output_nodes=[sink_node])
 
     @staticmethod
-    def build_sink_node_from_metrics_output_node(
-        computed_metrics_output: BaseOutput,
+    def build_sink_node(
+        parent_node: BaseOutput,
         order_by_specs: Sequence[OrderBySpec],
         output_sql_table: Optional[SqlTable] = None,
         limit: Optional[int] = None,
@@ -330,26 +356,20 @@ class DataflowPlanBuilder:
 
         if order_by_specs or limit:
             pre_result_node = OrderByLimitNode(
-                order_by_specs=list(order_by_specs),
-                limit=limit,
-                parent_node=computed_metrics_output,
+                order_by_specs=list(order_by_specs), limit=limit, parent_node=parent_node
             )
 
         if output_selection_specs:
             pre_result_node = FilterElementsNode(
-                parent_node=pre_result_node or computed_metrics_output,
-                include_specs=output_selection_specs,
+                parent_node=pre_result_node or parent_node, include_specs=output_selection_specs
             )
 
         write_result_node: SinkOutput
         if not output_sql_table:
-            write_result_node = WriteToResultDataframeNode(
-                parent_node=pre_result_node or computed_metrics_output,
-            )
+            write_result_node = WriteToResultDataframeNode(parent_node=pre_result_node or parent_node)
         else:
             write_result_node = WriteToResultTableNode(
-                parent_node=pre_result_node or computed_metrics_output,
-                output_sql_table=output_sql_table,
+                parent_node=pre_result_node or parent_node, output_sql_table=output_sql_table
             )
 
         return write_result_node
@@ -396,6 +416,21 @@ class DataflowPlanBuilder:
             if measure_specs_set.intersection(set(measure_specs_in_node)) == measure_specs_set:
                 nodes.append(source_node)
         return nodes
+
+    def _select_read_nodes_with_linkable_specs(
+        self, linkable_specs: LinkableSpecSet, read_nodes: Sequence[BaseOutput]
+    ) -> Dict[BaseOutput, Set[LinkableInstanceSpec]]:
+        """Find source nodes with requested linkable specs and no measures."""
+        nodes_to_linkable_specs: Dict[BaseOutput, Set[LinkableInstanceSpec]] = {}
+        linkable_specs_set = set(linkable_specs.as_tuple)
+        for read_node in read_nodes:
+            output_spec_set = self._node_data_set_resolver.get_output_data_set(read_node).instance_set.spec_set
+            linkable_specs_in_node = set(output_spec_set.linkable_specs)
+            requested_linkable_specs_in_node = linkable_specs_set.intersection(linkable_specs_in_node)
+            if requested_linkable_specs_in_node:
+                nodes_to_linkable_specs[read_node] = requested_linkable_specs_in_node
+
+        return nodes_to_linkable_specs
 
     def _find_non_additive_dimension_in_linkable_specs(
         self,
@@ -449,39 +484,38 @@ class DataflowPlanBuilder:
             non_additive_dimension_spec=non_additive_dimension_spec,
         )
 
-    def _find_measure_recipe(
+    def _find_dataflow_recipe(
         self,
-        measure_spec_properties: MeasureSpecProperties,
-        linkable_specs: Sequence[LinkableInstanceSpec],
+        linkable_spec_set: LinkableSpecSet,
+        measure_spec_properties: Optional[MeasureSpecProperties] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
-    ) -> Optional[MeasureRecipe]:
-        """Find a recipe for getting measure_specs along with the linkable specs.
-
-        Prior to calling this method we should always be checking that all input measure specs come from
-        the same base semantic model, otherwise the internal conditions here will be impossible to satisfy
-        """
-        measure_specs = measure_spec_properties.measure_specs
-        node_processor = PreDimensionJoinNodeProcessor(
-            semantic_model_lookup=self._semantic_model_lookup,
-            node_data_set_resolver=self._node_data_set_resolver,
-        )
-
-        source_nodes: Sequence[BaseOutput] = self._source_nodes
-
-        # We only care about nodes that have all required measures
-        potential_measure_nodes: Sequence[BaseOutput] = self._select_source_nodes_with_measures(
-            measure_specs=set(measure_specs), source_nodes=source_nodes
-        )
-
-        logger.info(f"There are {len(potential_measure_nodes)} potential measure source nodes")
+    ) -> Optional[DataflowRecipe]:
+        linkable_specs = linkable_spec_set.as_tuple
+        if measure_spec_properties:
+            source_nodes = self._source_nodes
+            potential_source_nodes: Sequence[BaseOutput] = self._select_source_nodes_with_measures(
+                measure_specs=set(measure_spec_properties.measure_specs), source_nodes=source_nodes
+            )
+        else:
+            # Only read nodes can be source nodes for queries without measures
+            source_nodes = self._read_nodes
+            source_nodes_to_linkable_specs = self._select_read_nodes_with_linkable_specs(
+                linkable_specs=linkable_spec_set, read_nodes=source_nodes
+            )
+            potential_source_nodes = list(source_nodes_to_linkable_specs.keys())
+        # issue: getting ds__day from the wrong table
+        logger.info(f"There are {len(potential_source_nodes)} potential source nodes")
 
         logger.info(f"Starting search with {len(source_nodes)} source nodes")
         start_time = time.time()
-        # Only apply the time constraint to nodes that will be used for measures because some dimensional sources have
-        # measures in them, and time constraining those would result in incomplete joins.
+
+        node_processor = PreJoinNodeProcessor(
+            semantic_model_lookup=self._semantic_model_lookup,
+            node_data_set_resolver=self._node_data_set_resolver,
+        )
         if time_range_constraint:
-            potential_measure_nodes = node_processor.add_time_range_constraint(
-                source_nodes=potential_measure_nodes,
+            potential_source_nodes = node_processor.add_time_range_constraint(
+                source_nodes=potential_source_nodes,
                 metric_time_dimension_reference=self._metric_time_dimension_reference,
                 time_range_constraint=time_range_constraint,
             )
@@ -500,7 +534,6 @@ class DataflowPlanBuilder:
                 f"After adding multi-hop nodes, there are {len(nodes_available_for_joins)} nodes available for joins:\n"
                 f"{pformat_big_objects(nodes_available_for_joins)}"
             )
-
         logger.info(f"Processing nodes took: {time.time()-start_time:.2f}s")
 
         node_evaluator = NodeEvaluatorForLinkableInstances(
@@ -509,36 +542,23 @@ class DataflowPlanBuilder:
             node_data_set_resolver=self._node_data_set_resolver,
         )
 
-        # Dict from the node that contains the measure spec to the evaluation results.
+        # Dict from the node that contains the source node to the evaluation results.
         node_to_evaluation: Dict[BaseOutput, LinkableInstanceSatisfiabilityEvaluation] = {}
 
-        for node in self._sort_by_suitability(potential_measure_nodes):
-            data_set = self._node_data_set_resolver.get_output_data_set(node)
-
-            missing_specs = [spec for spec in measure_specs if spec not in data_set.instance_set.spec_set.measure_specs]
-            if missing_specs:
-                logger.debug(
-                    f"Skipping evaluation for node since it does not have all of the measure specs {missing_specs}:"
-                    f"\n\n{dataflow_dag_as_text(node)}"
-                )
-                continue
-
-            logger.debug(f"Evaluating measure node:\n{pformat_big_objects(measure_node=dataflow_dag_as_text(node))}")
+        for node in self._sort_by_suitability(potential_source_nodes):
+            logger.debug(f"Evaluating source node:\n{pformat_big_objects(source_node=dataflow_dag_as_text(node))}")
 
             start_time = time.time()
-            evaluation = node_evaluator.evaluate_node(
-                start_node=node,
-                required_linkable_specs=list(linkable_specs),
-            )
+            evaluation = node_evaluator.evaluate_node(start_node=node, required_linkable_specs=list(linkable_specs))
             logger.info(f"Evaluation of {node} took {time.time() - start_time:.2f}s")
 
             logger.debug(
-                f"Evaluation for measure node is:\n"
+                f"Evaluation for source node is:\n"
                 f"{pformat_big_objects(node=dataflow_dag_as_text(node), evaluation=evaluation)}"
             )
 
             if len(evaluation.unjoinable_linkable_specs) > 0:
-                logger.debug(
+                logger.info(
                     f"Skipping {node.node_id} since it contains un-joinable specs: "
                     f"{evaluation.unjoinable_linkable_specs}"
                 )
@@ -555,7 +575,7 @@ class DataflowPlanBuilder:
                 logger.info("Not evaluating other nodes since we found one that doesn't require joins")
                 break
 
-        logger.info(f"Found {len(node_to_evaluation)} candidate measure nodes.")
+        logger.info(f"Found {len(node_to_evaluation)} candidate source nodes.")
 
         if len(node_to_evaluation) > 0:
             # All source nodes cost the same. Find evaluation with lowest number of joins.
@@ -572,8 +592,8 @@ class DataflowPlanBuilder:
                 )
             )
 
-            # Nodes containing the linkable instances will be joined to the node containing the measure, so these
-            # entities will need to be present in the measure node.
+            # Nodes containing the linkable instances will be joined to the source node, so these
+            # entities will need to be present in the source node.
             required_local_entity_specs = tuple(x.join_on_entity for x in evaluation.join_recipes)
             # Same thing with partitions.
             required_local_dimension_specs = tuple(
@@ -585,8 +605,8 @@ class DataflowPlanBuilder:
                 for y in x.join_on_partition_time_dimensions
             )
 
-            return MeasureRecipe(
-                measure_node=node_with_lowest_cost_plan,
+            return DataflowRecipe(
+                source_node=node_with_lowest_cost_plan,
                 required_local_linkable_specs=(
                     evaluation.local_linkable_specs
                     + required_local_entity_specs
@@ -756,10 +776,10 @@ class DataflowPlanBuilder:
         )
 
         find_recipe_start_time = time.time()
-        measure_recipe = self._find_measure_recipe(
+        measure_recipe = self._find_dataflow_recipe(
             measure_spec_properties=measure_properties,
             time_range_constraint=cumulative_metric_adjusted_time_constraint or time_range_constraint,
-            linkable_specs=required_linkable_specs.as_tuple,
+            linkable_spec_set=required_linkable_specs,
         )
         logger.info(
             f"With {len(self._source_nodes)} source nodes, finding a recipe took "
@@ -779,7 +799,7 @@ class DataflowPlanBuilder:
         time_range_node: Optional[JoinOverTimeRangeNode] = None
         if cumulative and metric_time_dimension_requested:
             time_range_node = JoinOverTimeRangeNode(
-                parent_node=measure_recipe.measure_node,
+                parent_node=measure_recipe.source_node,
                 window=cumulative_window,
                 grain_to_date=cumulative_grain_to_date,
                 time_range_constraint=time_range_constraint,
@@ -790,7 +810,7 @@ class DataflowPlanBuilder:
         if metric_spec.offset_window or metric_spec.offset_to_grain:
             assert metric_time_dimension_specs, "Joining to time spine requires querying with metric time."
             join_to_time_spine_node = JoinToTimeSpineNode(
-                parent_node=time_range_node or measure_recipe.measure_node,
+                parent_node=time_range_node or measure_recipe.source_node,
                 metric_time_dimension_specs=metric_time_dimension_specs,
                 time_range_constraint=time_range_constraint,
                 offset_window=metric_spec.offset_window,
@@ -799,7 +819,7 @@ class DataflowPlanBuilder:
 
         # Only get the required measure and the local linkable instances so that aggregations work correctly.
         filtered_measure_source_node = FilterElementsNode(
-            parent_node=join_to_time_spine_node or time_range_node or measure_recipe.measure_node,
+            parent_node=join_to_time_spine_node or time_range_node or measure_recipe.source_node,
             include_specs=InstanceSpecSet.merge(
                 (
                     InstanceSpecSet(measure_specs=measure_specs),
@@ -808,49 +828,7 @@ class DataflowPlanBuilder:
             ),
         )
 
-        join_targets = []
-        for join_recipe in measure_recipe.join_linkable_instances_recipes:
-            # Figure out what elements to filter from the joined node.
-
-            # Sanity check - all linkable specs should have a link, or else why would we be joining them.
-            assert all([len(x.entity_links) > 0 for x in join_recipe.satisfiable_linkable_specs])
-
-            # If we're joining something in, then we need the associated entity, partitions, and time dimension
-            # specs defining the validity window (if necessary)
-            include_specs: List[LinkableInstanceSpec] = [
-                LinklessEntitySpec.from_reference(x.entity_links[0]) for x in join_recipe.satisfiable_linkable_specs
-            ]
-            include_specs.extend([x.node_to_join_dimension_spec for x in join_recipe.join_on_partition_dimensions])
-            include_specs.extend(
-                [x.node_to_join_time_dimension_spec for x in join_recipe.join_on_partition_time_dimensions]
-            )
-            if join_recipe.validity_window:
-                include_specs.extend(
-                    [
-                        join_recipe.validity_window.window_start_dimension,
-                        join_recipe.validity_window.window_end_dimension,
-                    ]
-                )
-
-            # satisfiable_linkable_specs describes what can be satisfied after the join, so remove the entity
-            # link when filtering before the join.
-            # e.g. if the node is used to satisfy "user_id__country", then the node must have the entity
-            # "user_id" and the "country" dimension so that it can be joined to the measure node.
-            include_specs.extend([x.without_first_entity_link for x in join_recipe.satisfiable_linkable_specs])
-            filtered_node_to_join = FilterElementsNode(
-                parent_node=join_recipe.node_to_join,
-                include_specs=InstanceSpecSet.create_from_linkable_specs(include_specs),
-            )
-            join_targets.append(
-                JoinDescription(
-                    join_node=filtered_node_to_join,
-                    join_on_entity=join_recipe.join_on_entity,
-                    join_on_partition_dimensions=join_recipe.join_on_partition_dimensions,
-                    join_on_partition_time_dimensions=join_recipe.join_on_partition_time_dimensions,
-                    validity_window=join_recipe.validity_window,
-                )
-            )
-
+        join_targets = measure_recipe.join_targets
         unaggregated_measure_node: BaseOutput
         if len(join_targets) > 0:
             filtered_measures_with_joined_elements = JoinToBaseOutputNode(
