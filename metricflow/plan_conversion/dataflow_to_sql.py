@@ -749,7 +749,9 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                     expr=SqlColumnReferenceExpression(
                         col_ref=SqlColumnReference(
                             table_alias=from_data_set_alias,
-                            column_name=self._column_association_resolver.resolve_spec(order_by_spec.item).column_name,
+                            column_name=self._column_association_resolver.resolve_spec(
+                                order_by_spec.instance_spec
+                            ).column_name,
                         )
                     ),
                     desc=order_by_spec.descending,

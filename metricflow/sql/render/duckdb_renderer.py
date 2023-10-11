@@ -17,7 +17,7 @@ from metricflow.sql.sql_exprs import (
     SqlGenerateUuidExpression,
     SqlPercentileExpression,
     SqlPercentileFunctionType,
-    SqlTimeDeltaExpression,
+    SqlSubtractTimeIntervalExpression,
 )
 
 
@@ -34,14 +34,9 @@ class DuckDbSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         }
 
     @override
-    def visit_time_delta_expr(self, node: SqlTimeDeltaExpression) -> SqlExpressionRenderResult:
+    def visit_time_delta_expr(self, node: SqlSubtractTimeIntervalExpression) -> SqlExpressionRenderResult:
         """Render time delta expression for DuckDB, which requires slightly different syntax from other engines."""
         arg_rendered = node.arg.accept(self)
-        if node.grain_to_date:
-            return SqlExpressionRenderResult(
-                sql=f"DATE_TRUNC('{node.granularity.value}', {arg_rendered.sql}::timestamp)",
-                bind_parameters=arg_rendered.bind_parameters,
-            )
 
         count = node.count
         granularity = node.granularity

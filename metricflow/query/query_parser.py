@@ -392,7 +392,9 @@ class MetricFlowQueryParser:
                     column_association_resolver=self._column_association_resolver,
                 ).create_from_where_filter(where_filter)
             except ParseWhereFilterException as e:
-                raise InvalidQueryException(f"Error parsing the where filter: {where_filter.where_sql_template}") from e
+                raise InvalidQueryException(
+                    f"Error parsing the where filter: {where_filter.where_sql_template}. {e}"
+                ) from e
 
             where_spec_set = QueryTimeLinkableSpecSet.create_from_linkable_spec_set(where_filter_spec.linkable_spec_set)
             requested_linkable_specs_with_requested_filter_specs = QueryTimeLinkableSpecSet.combine(
@@ -521,10 +523,10 @@ class MetricFlowQueryParser:
         metric_specs = [MetricSpec.from_reference(metric_reference) for metric_reference in metric_references]
         for order_by_spec in order_by_specs:
             if not (
-                order_by_spec.item in metric_specs
-                or order_by_spec.item in linkable_specs.dimension_specs
-                or order_by_spec.item in linkable_specs.time_dimension_specs
-                or order_by_spec.item in linkable_specs.entity_specs
+                order_by_spec.instance_spec in metric_specs
+                or order_by_spec.instance_spec in linkable_specs.dimension_specs
+                or order_by_spec.instance_spec in linkable_specs.time_dimension_specs
+                or order_by_spec.instance_spec in linkable_specs.entity_specs
             ):
                 raise InvalidQueryException(f"Order by item {order_by_spec} not in the query")
 
@@ -690,7 +692,7 @@ class MetricFlowQueryParser:
             structured_names = [StructuredLinkableSpecName.from_name(name) for name in group_by_names]
         elif group_by:
             for group_by_obj in group_by:
-                parsed_name = StructuredLinkableSpecName.from_name(group_by_obj.name)
+                parsed_name = StructuredLinkableSpecName.from_name(group_by_obj.name.lower())
                 structured_name = StructuredLinkableSpecName(
                     entity_link_names=parsed_name.entity_link_names,
                     element_name=parsed_name.element_name,
@@ -844,6 +846,7 @@ class MetricFlowQueryParser:
             time_granularity: Optional[TimeGranularity] = None
             date_part: Optional[DatePart] = None
             if isinstance(order, str):
+                order = order.lower()
                 # Note: date part cannot be requested via string parameter.
                 descending = False
                 if order.startswith("-"):
@@ -853,7 +856,7 @@ class MetricFlowQueryParser:
                 time_granularity = parsed_name.time_granularity
             else:
                 descending = order.descending
-                parsed_name = StructuredLinkableSpecName.from_name(order.order_by.name)
+                parsed_name = StructuredLinkableSpecName.from_name(order.order_by.name.lower())
                 if isinstance(order.order_by, TimeDimensionQueryParameter):
                     time_granularity = order.order_by.grain
                     date_part = order.order_by.date_part
@@ -869,7 +872,7 @@ class MetricFlowQueryParser:
                     raise InvalidQueryException(f"Order by item '{order}' references a metric but has entity links")
                 order_by_specs.append(
                     OrderBySpec(
-                        metric_spec=MetricSpec(element_name=parsed_name.element_name),
+                        instance_spec=MetricSpec(element_name=parsed_name.element_name),
                         descending=descending,
                     )
                 )
@@ -880,7 +883,7 @@ class MetricFlowQueryParser:
                     )
                 order_by_specs.append(
                     OrderBySpec(
-                        dimension_spec=DimensionSpec(
+                        instance_spec=DimensionSpec(
                             element_name=parsed_name.element_name,
                             entity_links=tuple(EntityReference(element_name=x) for x in parsed_name.entity_link_names),
                         ),
@@ -895,7 +898,7 @@ class MetricFlowQueryParser:
                 if time_granularity:
                     order_by_specs.append(
                         OrderBySpec(
-                            time_dimension_spec=TimeDimensionSpec(
+                            instance_spec=TimeDimensionSpec(
                                 element_name=parsed_name.element_name,
                                 entity_links=entity_links,
                                 time_granularity=time_granularity,
@@ -916,7 +919,7 @@ class MetricFlowQueryParser:
                     if partial_time_dimension_spec in time_dimension_spec_replacements:
                         order_by_specs.append(
                             OrderBySpec(
-                                time_dimension_spec=time_dimension_spec_replacements[partial_time_dimension_spec],
+                                instance_spec=time_dimension_spec_replacements[partial_time_dimension_spec],
                                 descending=descending,
                             )
                         )
@@ -933,7 +936,7 @@ class MetricFlowQueryParser:
                     )
                 order_by_specs.append(
                     OrderBySpec(
-                        entity_spec=EntitySpec(
+                        instance_spec=EntitySpec(
                             element_name=parsed_name.element_name,
                             entity_links=tuple(EntityReference(element_name=x) for x in parsed_name.entity_link_names),
                         ),

@@ -1,0 +1,6 @@
+kind: Fixes
+body: Prioritize source nodes based on correct cost
+time: 2023-10-09T19:53:12.491719-07:00
+custom:
+  Author: courtneyholcomb
+  Issue: "801"

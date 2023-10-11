@@ -374,25 +374,25 @@
                             <!--   {'class': 'SqlSelectColumn',                              -->
                             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10068),  -->
                             <!--    'column_alias': 'txn_revenue'}                           -->
-                            <!-- col1 =                                                      -->
-                            <!--   {'class': 'SqlSelectColumn',                              -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10069),  -->
-                            <!--    'column_alias': 'ds__day'}                               -->
+                            <!-- col1 =                                                -->
+                            <!--   {'class': 'SqlSelectColumn',                        -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10080),  -->
+                            <!--    'column_alias': 'ds__day'}                         -->
                             <!-- col2 =                                                -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10064),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10081),  -->
                             <!--    'column_alias': 'ds__week'}                        -->
                             <!-- col3 =                                                -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10065),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10082),  -->
                             <!--    'column_alias': 'ds__month'}                       -->
                             <!-- col4 =                                                -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10066),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10083),  -->
                             <!--    'column_alias': 'ds__quarter'}                     -->
                             <!-- col5 =                                                -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10067),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10084),  -->
                             <!--    'column_alias': 'ds__year'}                        -->
                             <!-- col6 =                                              -->
                             <!--   {'class': 'SqlSelectColumn',                      -->
@@ -422,25 +422,25 @@
                             <!--   {'class': 'SqlSelectColumn',                      -->
                             <!--    'expr': SqlExtractExpression(node_id=ex_10118),  -->
                             <!--    'column_alias': 'ds__extract_doy'}               -->
-                            <!-- col13 =                                                     -->
-                            <!--   {'class': 'SqlSelectColumn',                              -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10070),  -->
-                            <!--    'column_alias': 'company__ds__day'}                      -->
+                            <!-- col13 =                                               -->
+                            <!--   {'class': 'SqlSelectColumn',                        -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10085),  -->
+                            <!--    'column_alias': 'company__ds__day'}                -->
                             <!-- col14 =                                               -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10068),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10086),  -->
                             <!--    'column_alias': 'company__ds__week'}               -->
                             <!-- col15 =                                               -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10069),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10087),  -->
                             <!--    'column_alias': 'company__ds__month'}              -->
                             <!-- col16 =                                               -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10070),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10088),  -->
                             <!--    'column_alias': 'company__ds__quarter'}            -->
                             <!-- col17 =                                               -->
                             <!--   {'class': 'SqlSelectColumn',                        -->
-                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10071),  -->
+                            <!--    'expr': SqlDateTruncExpression(node_id=dt_10089),  -->
                             <!--    'column_alias': 'company__ds__year'}               -->
                             <!-- col18 =                                             -->
                             <!--   {'class': 'SqlSelectColumn',                      -->

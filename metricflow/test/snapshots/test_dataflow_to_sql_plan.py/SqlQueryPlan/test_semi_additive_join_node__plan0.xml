@@ -149,25 +149,25 @@
             <!--   {'class': 'SqlSelectColumn',                              -->
             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10002),  -->
             <!--    'column_alias': 'current_account_balance_by_user'}       -->
-            <!-- col3 =                                                      -->
-            <!--   {'class': 'SqlSelectColumn',                              -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10003),  -->
-            <!--    'column_alias': 'ds__day'}                               -->
-            <!-- col4 =                                                -->
+            <!-- col3 =                                                -->
             <!--   {'class': 'SqlSelectColumn',                        -->
             <!--    'expr': SqlDateTruncExpression(node_id=dt_10000),  -->
+            <!--    'column_alias': 'ds__day'}                         -->
+            <!-- col4 =                                                -->
+            <!--   {'class': 'SqlSelectColumn',                        -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10001),  -->
             <!--    'column_alias': 'ds__week'}                        -->
             <!-- col5 =                                                -->
             <!--   {'class': 'SqlSelectColumn',                        -->
-            <!--    'expr': SqlDateTruncExpression(node_id=dt_10001),  -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10002),  -->
             <!--    'column_alias': 'ds__month'}                       -->
             <!-- col6 =                                                -->
             <!--   {'class': 'SqlSelectColumn',                        -->
-            <!--    'expr': SqlDateTruncExpression(node_id=dt_10002),  -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10003),  -->
             <!--    'column_alias': 'ds__quarter'}                     -->
             <!-- col7 =                                                -->
             <!--   {'class': 'SqlSelectColumn',                        -->
-            <!--    'expr': SqlDateTruncExpression(node_id=dt_10003),  -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10004),  -->
             <!--    'column_alias': 'ds__year'}                        -->
             <!-- col8 =                                              -->
             <!--   {'class': 'SqlSelectColumn',                      -->
@@ -201,25 +201,25 @@
             <!--   {'class': 'SqlSelectColumn',                              -->
             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10004),  -->
             <!--    'column_alias': 'account_type'}                          -->
-            <!-- col16 =                                                     -->
-            <!--   {'class': 'SqlSelectColumn',                              -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10005),  -->
-            <!--    'column_alias': 'account__ds__day'}                      -->
+            <!-- col16 =                                               -->
+            <!--   {'class': 'SqlSelectColumn',                        -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10005),  -->
+            <!--    'column_alias': 'account__ds__day'}                -->
             <!-- col17 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                        -->
-            <!--    'expr': SqlDateTruncExpression(node_id=dt_10004),  -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10006),  -->
             <!--    'column_alias': 'account__ds__week'}               -->
             <!-- col18 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                        -->
-            <!--    'expr': SqlDateTruncExpression(node_id=dt_10005),  -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10007),  -->
             <!--    'column_alias': 'account__ds__month'}              -->
             <!-- col19 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                        -->
-            <!--    'expr': SqlDateTruncExpression(node_id=dt_10006),  -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10008),  -->
             <!--    'column_alias': 'account__ds__quarter'}            -->
             <!-- col20 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                        -->
-            <!--    'expr': SqlDateTruncExpression(node_id=dt_10007),  -->
+            <!--    'expr': SqlDateTruncExpression(node_id=dt_10009),  -->
             <!--    'column_alias': 'account__ds__year'}               -->
             <!-- col21 =                                             -->
             <!--   {'class': 'SqlSelectColumn',                      -->
@@ -293,25 +293,25 @@
                 <!--   {'class': 'SqlSelectColumn',                              -->
                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10002),  -->
                 <!--    'column_alias': 'current_account_balance_by_user'}       -->
-                <!-- col3 =                                                      -->
-                <!--   {'class': 'SqlSelectColumn',                              -->
-                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10003),  -->
-                <!--    'column_alias': 'ds__day'}                               -->
-                <!-- col4 =                                                -->
+                <!-- col3 =                                                -->
                 <!--   {'class': 'SqlSelectColumn',                        -->
                 <!--    'expr': SqlDateTruncExpression(node_id=dt_10000),  -->
+                <!--    'column_alias': 'ds__day'}                         -->
+                <!-- col4 =                                                -->
+                <!--   {'class': 'SqlSelectColumn',                        -->
+                <!--    'expr': SqlDateTruncExpression(node_id=dt_10001),  -->
                 <!--    'column_alias': 'ds__week'}                        -->
                 <!-- col5 =                                                -->
                 <!--   {'class': 'SqlSelectColumn',                        -->
-                <!--    'expr': SqlDateTruncExpression(node_id=dt_10001),  -->
+                <!--    'expr': SqlDateTruncExpression(node_id=dt_10002),  -->
                 <!--    'column_alias': 'ds__month'}                       -->
                 <!-- col6 =                                                -->
                 <!--   {'class': 'SqlSelectColumn',                        -->
-                <!--    'expr': SqlDateTruncExpression(node_id=dt_10002),  -->
+                <!--    'expr': SqlDateTruncExpression(node_id=dt_10003),  -->
                 <!--    'column_alias': 'ds__quarter'}                     -->
                 <!-- col7 =                                                -->
                 <!--   {'class': 'SqlSelectColumn',                        -->
-                <!--    'expr': SqlDateTruncExpression(node_id=dt_10003),  -->
+                <!--    'expr': SqlDateTruncExpression(node_id=dt_10004),  -->
                 <!--    'column_alias': 'ds__year'}                        -->
                 <!-- col8 =                                              -->
                 <!--   {'class': 'SqlSelectColumn',                      -->
@@ -345,25 +345,25 @@
                 <!--   {'class': 'SqlSelectColumn',                              -->
                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10004),  -->
                 <!--    'column_alias': 'account_type'}                          -->
-                <!-- col16 =                                                     -->
-                <!--   {'class': 'SqlSelectColumn',                              -->
-                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10005),  -->
-                <!--    'column_alias': 'account__ds__day'}                      -->
+                <!-- col16 =                                               -->
+                <!--   {'class': 'SqlSelectColumn',                        -->
+                <!--    'expr': SqlDateTruncExpression(node_id=dt_10005),  -->
+                <!--    'column_alias': 'account__ds__day'}                -->
                 <!-- col17 =                                               -->
                 <!--   {'class': 'SqlSelectColumn',                        -->
-                <!--    'expr': SqlDateTruncExpression(node_id=dt_10004),  -->
+                <!--    'expr': SqlDateTruncExpression(node_id=dt_10006),  -->
                 <!--    'column_alias': 'account__ds__week'}               -->
                 <!-- col18 =                                               -->
                 <!--   {'class': 'SqlSelectColumn',                        -->
-                <!--    'expr': SqlDateTruncExpression(node_id=dt_10005),  -->
+                <!--    'expr': SqlDateTruncExpression(node_id=dt_10007),  -->
                 <!--    'column_alias': 'account__ds__month'}              -->
                 <!-- col19 =                                               -->
                 <!--   {'class': 'SqlSelectColumn',                        -->
-                <!--    'expr': SqlDateTruncExpression(node_id=dt_10006),  -->
+                <!--    'expr': SqlDateTruncExpression(node_id=dt_10008),  -->
                 <!--    'column_alias': 'account__ds__quarter'}            -->
                 <!-- col20 =                                               -->
                 <!--   {'class': 'SqlSelectColumn',                        -->
-                <!--    'expr': SqlDateTruncExpression(node_id=dt_10007),  -->
+                <!--    'expr': SqlDateTruncExpression(node_id=dt_10009),  -->
                 <!--    'column_alias': 'account__ds__year'}               -->
                 <!-- col21 =                                             -->
                 <!--   {'class': 'SqlSelectColumn',                      -->

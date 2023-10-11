@@ -8,11 +8,11 @@ from dbt_semantic_interfaces.call_parameter_sets import (
 )
 from dbt_semantic_interfaces.naming.dundered import DunderedNameFormatter
 from dbt_semantic_interfaces.protocols.protocol_hint import ProtocolHint
+from dbt_semantic_interfaces.protocols.query_interface import QueryInterfaceEntity, QueryInterfaceEntityFactory
 from dbt_semantic_interfaces.references import EntityReference
 from typing_extensions import override
 
 from metricflow.errors.errors import InvalidQuerySyntax
-from metricflow.protocols.query_interface import QueryInterfaceEntity, QueryInterfaceEntityFactory
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import EntitySpec
 

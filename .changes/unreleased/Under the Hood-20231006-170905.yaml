@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Remove query interface and depend on DSI protocol instead
+time: 2023-10-06T17:09:05.593372-05:00
+custom:
+  Author: DevonFulcher
+  Issue: None

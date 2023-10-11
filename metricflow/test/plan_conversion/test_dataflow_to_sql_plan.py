@@ -856,11 +856,11 @@ def test_order_by_node(
     order_by_node = OrderByLimitNode(
         order_by_specs=[
             OrderBySpec(
-                time_dimension_spec=time_dimension_spec,
+                instance_spec=time_dimension_spec,
                 descending=False,
             ),
             OrderBySpec(
-                metric_spec=metric_spec,
+                instance_spec=metric_spec,
                 descending=True,
             ),
         ],
@@ -1269,7 +1269,7 @@ def test_distinct_values(  # noqa: D
             ),
             order_by_specs=(
                 OrderBySpec(
-                    dimension_spec=DimensionSpec(
+                    instance_spec=DimensionSpec(
                         element_name="country_latest", entity_links=(EntityReference(element_name="listing"),)
                     ),
                     descending=True,

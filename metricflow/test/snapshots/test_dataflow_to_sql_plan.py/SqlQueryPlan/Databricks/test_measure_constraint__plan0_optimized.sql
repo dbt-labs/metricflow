@@ -23,7 +23,7 @@ FROM (
       -- Pass Only Elements:
       --   ['average_booking_value', 'listing__is_lux_latest', 'metric_time__day']
       SELECT
-        bookings_source_src_10001.ds AS metric_time__day
+        DATE_TRUNC('day', bookings_source_src_10001.ds) AS metric_time__day
         , listings_latest_src_10004.is_lux AS listing__is_lux_latest
         , bookings_source_src_10001.booking_value AS average_booking_value
       FROM ***************************.fct_bookings bookings_source_src_10001
@@ -59,7 +59,7 @@ FROM (
         -- Pass Only Elements:
         --   ['bookings', 'metric_time__day', 'listing']
         SELECT
-          ds AS metric_time__day
+          DATE_TRUNC('day', ds) AS metric_time__day
           , listing_id AS listing
           , 1 AS bookings
         FROM ***************************.fct_bookings bookings_source_src_10001
@@ -91,11 +91,11 @@ FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      ds AS metric_time__day
+      DATE_TRUNC('day', ds) AS metric_time__day
       , SUM(booking_value) AS booking_value
     FROM ***************************.fct_bookings bookings_source_src_10001
     GROUP BY
-      ds
+      DATE_TRUNC('day', ds)
   ) subq_58
   ON
     (

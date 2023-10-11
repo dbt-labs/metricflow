@@ -20,7 +20,7 @@ FROM (
     -- Pass Only Elements:
     --   ['bookings', 'metric_time__day', 'listing']
     SELECT
-      ds AS metric_time__day
+      DATE_TRUNC(ds, day) AS metric_time__day
       , listing_id AS listing
       , 1 AS bookings
     FROM ***************************.fct_bookings bookings_source_src_10015

@@ -144,7 +144,7 @@ FROM (
               , bookings_source_src_10015.booking_value AS average_booking_value
               , bookings_source_src_10015.booking_value AS booking_payments
               , bookings_source_src_10015.is_instant
-              , bookings_source_src_10015.ds AS ds__day
+              , DATE_TRUNC('day', bookings_source_src_10015.ds) AS ds__day
               , DATE_TRUNC('week', bookings_source_src_10015.ds) AS ds__week
               , DATE_TRUNC('month', bookings_source_src_10015.ds) AS ds__month
               , DATE_TRUNC('quarter', bookings_source_src_10015.ds) AS ds__quarter
@@ -156,7 +156,7 @@ FROM (
               , EXTRACT(day FROM bookings_source_src_10015.ds) AS ds__extract_day
               , EXTRACT(dow FROM bookings_source_src_10015.ds) AS ds__extract_dow
               , EXTRACT(doy FROM bookings_source_src_10015.ds) AS ds__extract_doy
-              , bookings_source_src_10015.ds_partitioned AS ds_partitioned__day
+              , DATE_TRUNC('day', bookings_source_src_10015.ds_partitioned) AS ds_partitioned__day
               , DATE_TRUNC('week', bookings_source_src_10015.ds_partitioned) AS ds_partitioned__week
               , DATE_TRUNC('month', bookings_source_src_10015.ds_partitioned) AS ds_partitioned__month
               , DATE_TRUNC('quarter', bookings_source_src_10015.ds_partitioned) AS ds_partitioned__quarter
@@ -168,7 +168,7 @@ FROM (
               , EXTRACT(day FROM bookings_source_src_10015.ds_partitioned) AS ds_partitioned__extract_day
               , EXTRACT(dow FROM bookings_source_src_10015.ds_partitioned) AS ds_partitioned__extract_dow
               , EXTRACT(doy FROM bookings_source_src_10015.ds_partitioned) AS ds_partitioned__extract_doy
-              , bookings_source_src_10015.paid_at AS paid_at__day
+              , DATE_TRUNC('day', bookings_source_src_10015.paid_at) AS paid_at__day
               , DATE_TRUNC('week', bookings_source_src_10015.paid_at) AS paid_at__week
               , DATE_TRUNC('month', bookings_source_src_10015.paid_at) AS paid_at__month
               , DATE_TRUNC('quarter', bookings_source_src_10015.paid_at) AS paid_at__quarter
@@ -181,7 +181,7 @@ FROM (
               , EXTRACT(dow FROM bookings_source_src_10015.paid_at) AS paid_at__extract_dow
               , EXTRACT(doy FROM bookings_source_src_10015.paid_at) AS paid_at__extract_doy
               , bookings_source_src_10015.is_instant AS booking__is_instant
-              , bookings_source_src_10015.ds AS booking__ds__day
+              , DATE_TRUNC('day', bookings_source_src_10015.ds) AS booking__ds__day
               , DATE_TRUNC('week', bookings_source_src_10015.ds) AS booking__ds__week
               , DATE_TRUNC('month', bookings_source_src_10015.ds) AS booking__ds__month
               , DATE_TRUNC('quarter', bookings_source_src_10015.ds) AS booking__ds__quarter
@@ -193,7 +193,7 @@ FROM (
               , EXTRACT(day FROM bookings_source_src_10015.ds) AS booking__ds__extract_day
               , EXTRACT(dow FROM bookings_source_src_10015.ds) AS booking__ds__extract_dow
               , EXTRACT(doy FROM bookings_source_src_10015.ds) AS booking__ds__extract_doy
-              , bookings_source_src_10015.ds_partitioned AS booking__ds_partitioned__day
+              , DATE_TRUNC('day', bookings_source_src_10015.ds_partitioned) AS booking__ds_partitioned__day
               , DATE_TRUNC('week', bookings_source_src_10015.ds_partitioned) AS booking__ds_partitioned__week
               , DATE_TRUNC('month', bookings_source_src_10015.ds_partitioned) AS booking__ds_partitioned__month
               , DATE_TRUNC('quarter', bookings_source_src_10015.ds_partitioned) AS booking__ds_partitioned__quarter
@@ -205,7 +205,7 @@ FROM (
               , EXTRACT(day FROM bookings_source_src_10015.ds_partitioned) AS booking__ds_partitioned__extract_day
               , EXTRACT(dow FROM bookings_source_src_10015.ds_partitioned) AS booking__ds_partitioned__extract_dow
               , EXTRACT(doy FROM bookings_source_src_10015.ds_partitioned) AS booking__ds_partitioned__extract_doy
-              , bookings_source_src_10015.paid_at AS booking__paid_at__day
+              , DATE_TRUNC('day', bookings_source_src_10015.paid_at) AS booking__paid_at__day
               , DATE_TRUNC('week', bookings_source_src_10015.paid_at) AS booking__paid_at__week
               , DATE_TRUNC('month', bookings_source_src_10015.paid_at) AS booking__paid_at__month
               , DATE_TRUNC('quarter', bookings_source_src_10015.paid_at) AS booking__paid_at__quarter

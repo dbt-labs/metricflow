@@ -180,13 +180,71 @@ def test_query_parser(bookings_query_parser: MetricFlowQueryParser) -> None:  # 
     assert query_spec.entity_specs == (EntitySpec(element_name="listing", entity_links=()),)
     assert query_spec.order_by_specs == (
         OrderBySpec(
-            time_dimension_spec=TimeDimensionSpec(
-                element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY
-            ),
+            instance_spec=TimeDimensionSpec(element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY),
             descending=False,
         ),
         OrderBySpec(
-            metric_spec=MetricSpec(element_name="bookings"),
+            instance_spec=MetricSpec(element_name="bookings"),
+            descending=True,
+        ),
+    )
+
+
+def test_query_parser_case_insensitivity(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D
+    # String params
+    query_spec = bookings_query_parser.parse_and_validate_query(
+        metric_names=["BOOKINGS"],
+        group_by_names=["BOOKING__IS_INSTANT", "LISTING", MTD.upper()],
+        order_by_names=[MTD.upper(), "-BOOKINGS"],
+    )
+
+    assert query_spec.metric_specs == (MetricSpec(element_name="bookings"),)
+    assert query_spec.dimension_specs == (
+        DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),
+    )
+    assert query_spec.time_dimension_specs == (
+        TimeDimensionSpec(element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY),
+    )
+    assert query_spec.entity_specs == (EntitySpec(element_name="listing", entity_links=()),)
+    assert query_spec.order_by_specs == (
+        OrderBySpec(
+            instance_spec=TimeDimensionSpec(element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY),
+            descending=False,
+        ),
+        OrderBySpec(
+            instance_spec=MetricSpec(element_name="bookings"),
+            descending=True,
+        ),
+    )
+
+    # Object params
+    Metric = namedtuple("Metric", ["name", "descending"])
+    metric = Metric("BOOKINGS", False)
+    group_by = (
+        DimensionOrEntityParameter("BOOKING__IS_INSTANT"),
+        DimensionOrEntityParameter("LISTING"),
+        TimeDimensionParameter(MTD.upper()),
+    )
+    order_by = (
+        OrderByParameter(order_by=TimeDimensionParameter(MTD.upper())),
+        OrderByParameter(order_by=MetricParameter("BOOKINGS"), descending=True),
+    )
+    query_spec = bookings_query_parser.parse_and_validate_query(metrics=[metric], group_by=group_by, order_by=order_by)
+    assert query_spec.metric_specs == (MetricSpec(element_name="bookings"),)
+    assert query_spec.dimension_specs == (
+        DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),
+    )
+    assert query_spec.time_dimension_specs == (
+        TimeDimensionSpec(element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY),
+    )
+    assert query_spec.entity_specs == (EntitySpec(element_name="listing", entity_links=()),)
+    assert query_spec.order_by_specs == (
+        OrderBySpec(
+            instance_spec=TimeDimensionSpec(element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY),
+            descending=False,
+        ),
+        OrderBySpec(
+            instance_spec=MetricSpec(element_name="bookings"),
             descending=True,
         ),
     )
@@ -218,13 +276,11 @@ def test_query_parser_with_object_params(bookings_query_parser: MetricFlowQueryP
     assert query_spec.entity_specs == (EntitySpec(element_name="listing", entity_links=()),)
     assert query_spec.order_by_specs == (
         OrderBySpec(
-            time_dimension_spec=TimeDimensionSpec(
-                element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY
-            ),
+            instance_spec=TimeDimensionSpec(element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY),
             descending=False,
         ),
         OrderBySpec(
-            metric_spec=MetricSpec(element_name="bookings"),
+            instance_spec=MetricSpec(element_name="bookings"),
             descending=True,
         ),
     )
@@ -250,9 +306,7 @@ def test_order_by_granularity_conversion() -> None:
     # The lowest common granularity is MONTH, so we expect the PTD in the order by to have that granularity.
     assert (
         OrderBySpec(
-            time_dimension_spec=TimeDimensionSpec(
-                element_name=MTD, entity_links=(), time_granularity=TimeGranularity.MONTH
-            ),
+            instance_spec=TimeDimensionSpec(element_name=MTD, entity_links=(), time_granularity=TimeGranularity.MONTH),
             descending=True,
         ),
     ) == query_spec.order_by_specs
@@ -266,9 +320,7 @@ def test_order_by_granularity_no_conversion(bookings_query_parser: MetricFlowQue
     # The only granularity is DAY, so we expect the PTD in the order by to have that granularity.
     assert (
         OrderBySpec(
-            time_dimension_spec=TimeDimensionSpec(
-                element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY
-            ),
+            instance_spec=TimeDimensionSpec(element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY),
             descending=False,
         ),
     ) == query_spec.order_by_specs

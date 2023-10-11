@@ -23,7 +23,7 @@ INNER JOIN (
     --   ['booking_value', 'metric_time__day', 'listing']
     -- Aggregate Measures
     SELECT
-      ds AS metric_time__day
+      DATE_TRUNC(ds, day) AS metric_time__day
       , listing_id AS listing
       , SUM(booking_value) AS booking_value
     FROM ***************************.fct_bookings bookings_source_src_10001

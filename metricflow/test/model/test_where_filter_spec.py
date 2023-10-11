@@ -37,6 +37,31 @@ def test_dimension_in_filter(  # noqa: D
     )
 
 
+def test_dimension_in_filter_with_grain(  # noqa: D
+    column_association_resolver: ColumnAssociationResolver,
+) -> None:
+    where_filter = PydanticWhereFilter(
+        where_sql_template="{{ Dimension('listing__country_latest').grain('WEEK') }} = 'US'"
+    )
+
+    where_filter_spec = WhereSpecFactory(
+        column_association_resolver=column_association_resolver,
+    ).create_from_where_filter(where_filter)
+
+    assert where_filter_spec.where_sql == "listing__country_latest__week = 'US'"
+    assert where_filter_spec.linkable_spec_set == LinkableSpecSet(
+        dimension_specs=(),
+        time_dimension_specs=(
+            TimeDimensionSpec(
+                element_name="country_latest",
+                entity_links=(EntityReference(element_name="listing"),),
+                time_granularity=TimeGranularity.WEEK,
+            ),
+        ),
+        entity_specs=(),
+    )
+
+
 def test_time_dimension_in_filter(  # noqa: D
     column_association_resolver: ColumnAssociationResolver,
 ) -> None:

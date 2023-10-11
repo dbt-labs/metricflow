@@ -141,11 +141,11 @@ def test_order_by_plan(  # noqa: D
             time_dimension_specs=(MTD_SPEC_DAY,),
             order_by_specs=(
                 OrderBySpec(
-                    time_dimension_spec=MTD_SPEC_DAY,
+                    instance_spec=MTD_SPEC_DAY,
                     descending=False,
                 ),
                 OrderBySpec(
-                    metric_spec=MetricSpec(element_name="bookings"),
+                    instance_spec=MetricSpec(element_name="bookings"),
                     descending=True,
                 ),
             ),
@@ -581,7 +581,7 @@ def test_distinct_values_plan(  # noqa: D
             ),
             order_by_specs=(
                 OrderBySpec(
-                    dimension_spec=DimensionSpec(
+                    instance_spec=DimensionSpec(
                         element_name="country_latest", entity_links=(EntityReference(element_name="listing"),)
                     ),
                     descending=True,
@@ -629,7 +629,7 @@ def test_distinct_values_plan_with_join(  # noqa: D
             ),
             order_by_specs=(
                 OrderBySpec(
-                    dimension_spec=DimensionSpec(
+                    instance_spec=DimensionSpec(
                         element_name="country_latest", entity_links=(EntityReference(element_name="listing"),)
                     ),
                     descending=True,

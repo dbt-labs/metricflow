@@ -5,30 +5,24 @@
         <OrderByLimitNode>
             <!-- description = Order By ['metric_time__day', 'bookings'] -->
             <!-- node_id = obl_0 -->
-            <!-- order_by_spec =                                                      -->
-            <!--   {'class': 'OrderBySpec',                                           -->
-            <!--    'descending': False,                                              -->
-            <!--    'metric_spec': None,                                              -->
-            <!--    'dimension_spec': None,                                           -->
-            <!--    'time_dimension_spec': {'class': 'TimeDimensionSpec',             -->
-            <!--                            'element_name': 'metric_time',            -->
-            <!--                            'entity_links': (),                       -->
-            <!--                            'time_granularity': TimeGranularity.DAY,  -->
-            <!--                            'date_part': None,                        -->
-            <!--                            'aggregation_state': None},               -->
-            <!--    'entity_spec': None}                                              -->
-            <!-- order_by_spec =                                 -->
-            <!--   {'class': 'OrderBySpec',                      -->
-            <!--    'descending': True,                          -->
-            <!--    'metric_spec': {'class': 'MetricSpec',       -->
-            <!--                    'element_name': 'bookings',  -->
-            <!--                    'constraint': None,          -->
-            <!--                    'alias': None,               -->
-            <!--                    'offset_window': None,       -->
-            <!--                    'offset_to_grain': None},    -->
-            <!--    'dimension_spec': None,                      -->
-            <!--    'time_dimension_spec': None,                 -->
-            <!--    'entity_spec': None}                         -->
+            <!-- order_by_spec =                                                -->
+            <!--   {'class': 'OrderBySpec',                                     -->
+            <!--    'instance_spec': {'class': 'TimeDimensionSpec',             -->
+            <!--                      'element_name': 'metric_time',            -->
+            <!--                      'entity_links': (),                       -->
+            <!--                      'time_granularity': TimeGranularity.DAY,  -->
+            <!--                      'date_part': None,                        -->
+            <!--                      'aggregation_state': None},               -->
+            <!--    'descending': False}                                        -->
+            <!-- order_by_spec =                                   -->
+            <!--   {'class': 'OrderBySpec',                        -->
+            <!--    'instance_spec': {'class': 'MetricSpec',       -->
+            <!--                      'element_name': 'bookings',  -->
+            <!--                      'constraint': None,          -->
+            <!--                      'alias': None,               -->
+            <!--                      'offset_window': None,       -->
+            <!--                      'offset_to_grain': None},    -->
+            <!--    'descending': True}                            -->
             <!-- limit = None -->
             <ComputeMetricsNode>
                 <!-- description = Compute Metrics via Expressions -->

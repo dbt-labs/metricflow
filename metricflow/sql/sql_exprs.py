@@ -16,6 +16,7 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.dag.id_generation import (
     SQL_EXPR_BETWEEN_PREFIX,
+    SQL_EXPR_CAST_TO_TIMESTAMP_PREFIX,
     SQL_EXPR_COLUMN_REFERENCE_ID_PREFIX,
     SQL_EXPR_COMPARISON_ID_PREFIX,
     SQL_EXPR_DATE_TRUNC,
@@ -29,6 +30,7 @@ from metricflow.dag.id_generation import (
     SQL_EXPR_RATIO_COMPUTATION,
     SQL_EXPR_STRING_ID_PREFIX,
     SQL_EXPR_STRING_LITERAL_PREFIX,
+    SQL_EXPR_SUBTRACT_TIME_INTERVAL_PREFIX,
     SQL_EXPR_WINDOW_FUNCTION_ID_PREFIX,
 )
 from metricflow.dag.mf_dag import DagNode, DisplayedProperty, NodeId
@@ -225,7 +227,7 @@ class SqlExpressionNodeVisitor(Generic[VisitorOutputT], ABC):
         pass
 
     @abstractmethod
-    def visit_time_delta_expr(self, node: SqlTimeDeltaExpression) -> VisitorOutputT:  # noqa: D
+    def visit_time_delta_expr(self, node: SqlSubtractTimeIntervalExpression) -> VisitorOutputT:  # noqa: D
         pass
 
     @abstractmethod
@@ -1243,25 +1245,29 @@ class SqlIsNullExpression(SqlExpressionNode):
         return self._parents_match(other)
 
 
-class SqlTimeDeltaExpression(SqlExpressionNode):
-    """create time delta between eg `DATE_SUB(ds, 2, month)`."""
+class SqlSubtractTimeIntervalExpression(SqlExpressionNode):
+    """Represents an interval subtraction from a given timestamp.
+
+    This node contains the information required to produce a SQL statement which subtracts an interval with the given
+    count and granularity (which together define the interval duration) from the input timestamp expression. The return
+    value from the SQL rendering for this expression should be a timestamp expression offset from the initial input
+    value.
+    """
 
     def __init__(  # noqa: D
         self,
         arg: SqlExpressionNode,
         count: int,
         granularity: TimeGranularity,
-        grain_to_date: Optional[TimeGranularity] = None,
     ) -> None:
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[arg])
         self._count = count
         self._time_granularity = granularity
         self._arg = arg
-        self._grain_to_date = grain_to_date
 
     @classmethod
     def id_prefix(cls) -> str:  # noqa: D
-        return SQL_EXPR_IS_NULL_PREFIX
+        return SQL_EXPR_SUBTRACT_TIME_INTERVAL_PREFIX
 
     @property
     def requires_parenthesis(self) -> bool:  # noqa: D
@@ -1279,10 +1285,6 @@ class SqlTimeDeltaExpression(SqlExpressionNode):
         return self._arg
 
     @property
-    def grain_to_date(self) -> Optional[TimeGranularity]:  # noqa: D
-        return self._grain_to_date
-
-    @property
     def count(self) -> int:  # noqa: D
         return self._count
 
@@ -1295,11 +1297,10 @@ class SqlTimeDeltaExpression(SqlExpressionNode):
         column_replacements: Optional[SqlColumnReplacements] = None,
         should_render_table_alias: Optional[bool] = None,
     ) -> SqlExpressionNode:
-        return SqlTimeDeltaExpression(
+        return SqlSubtractTimeIntervalExpression(
             arg=self.arg.rewrite(column_replacements, should_render_table_alias),
             count=self.count,
             granularity=self.granularity,
-            grain_to_date=self.grain_to_date,
         )
 
     @property
@@ -1309,14 +1310,9 @@ class SqlTimeDeltaExpression(SqlExpressionNode):
         )
 
     def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D
-        if not isinstance(other, SqlTimeDeltaExpression):
+        if not isinstance(other, SqlSubtractTimeIntervalExpression):
             return False
-        return (
-            self.count == other.count
-            and self.granularity == other.granularity
-            and self.grain_to_date == other.grain_to_date
-            and self._parents_match(other)
-        )
+        return self.count == other.count and self.granularity == other.granularity and self._parents_match(other)
 
 
 class SqlCastToTimestampExpression(SqlExpressionNode):
@@ -1327,7 +1323,7 @@ class SqlCastToTimestampExpression(SqlExpressionNode):
 
     @classmethod
     def id_prefix(cls) -> str:  # noqa: D
-        return SQL_EXPR_IS_NULL_PREFIX
+        return SQL_EXPR_CAST_TO_TIMESTAMP_PREFIX
 
     @property
     def requires_parenthesis(self) -> bool:  # noqa: D

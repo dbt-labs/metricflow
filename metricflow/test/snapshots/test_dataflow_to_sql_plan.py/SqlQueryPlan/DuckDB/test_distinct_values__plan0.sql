@@ -16,7 +16,7 @@ FROM (
         1 AS listings
         , listings_latest_src_10004.capacity AS largest_listing
         , listings_latest_src_10004.capacity AS smallest_listing
-        , listings_latest_src_10004.created_at AS ds__day
+        , DATE_TRUNC('day', listings_latest_src_10004.created_at) AS ds__day
         , DATE_TRUNC('week', listings_latest_src_10004.created_at) AS ds__week
         , DATE_TRUNC('month', listings_latest_src_10004.created_at) AS ds__month
         , DATE_TRUNC('quarter', listings_latest_src_10004.created_at) AS ds__quarter
@@ -28,7 +28,7 @@ FROM (
         , EXTRACT(day FROM listings_latest_src_10004.created_at) AS ds__extract_day
         , EXTRACT(dow FROM listings_latest_src_10004.created_at) AS ds__extract_dow
         , EXTRACT(doy FROM listings_latest_src_10004.created_at) AS ds__extract_doy
-        , listings_latest_src_10004.created_at AS created_at__day
+        , DATE_TRUNC('day', listings_latest_src_10004.created_at) AS created_at__day
         , DATE_TRUNC('week', listings_latest_src_10004.created_at) AS created_at__week
         , DATE_TRUNC('month', listings_latest_src_10004.created_at) AS created_at__month
         , DATE_TRUNC('quarter', listings_latest_src_10004.created_at) AS created_at__quarter
@@ -43,7 +43,7 @@ FROM (
         , listings_latest_src_10004.country AS country_latest
         , listings_latest_src_10004.is_lux AS is_lux_latest
         , listings_latest_src_10004.capacity AS capacity_latest
-        , listings_latest_src_10004.created_at AS listing__ds__day
+        , DATE_TRUNC('day', listings_latest_src_10004.created_at) AS listing__ds__day
         , DATE_TRUNC('week', listings_latest_src_10004.created_at) AS listing__ds__week
         , DATE_TRUNC('month', listings_latest_src_10004.created_at) AS listing__ds__month
         , DATE_TRUNC('quarter', listings_latest_src_10004.created_at) AS listing__ds__quarter
@@ -55,7 +55,7 @@ FROM (
         , EXTRACT(day FROM listings_latest_src_10004.created_at) AS listing__ds__extract_day
         , EXTRACT(dow FROM listings_latest_src_10004.created_at) AS listing__ds__extract_dow
         , EXTRACT(doy FROM listings_latest_src_10004.created_at) AS listing__ds__extract_doy
-        , listings_latest_src_10004.created_at AS listing__created_at__day
+        , DATE_TRUNC('day', listings_latest_src_10004.created_at) AS listing__created_at__day
         , DATE_TRUNC('week', listings_latest_src_10004.created_at) AS listing__created_at__week
         , DATE_TRUNC('month', listings_latest_src_10004.created_at) AS listing__created_at__month
         , DATE_TRUNC('quarter', listings_latest_src_10004.created_at) AS listing__created_at__quarter

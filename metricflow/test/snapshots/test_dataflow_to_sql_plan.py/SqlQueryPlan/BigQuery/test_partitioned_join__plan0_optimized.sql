@@ -12,7 +12,7 @@ FROM (
   -- Pass Only Elements:
   --   ['identity_verifications', 'ds_partitioned__day', 'user']
   SELECT
-    ds_partitioned AS ds_partitioned__day
+    DATE_TRUNC(ds_partitioned, day) AS ds_partitioned__day
     , user_id AS user
     , 1 AS identity_verifications
   FROM ***************************.fct_id_verifications id_verifications_src_10003
@@ -23,7 +23,7 @@ ON
   (
     subq_10.user = users_ds_source_src_10007.user_id
   ) AND (
-    subq_10.ds_partitioned__day = users_ds_source_src_10007.ds_partitioned
+    subq_10.ds_partitioned__day = DATE_TRUNC(users_ds_source_src_10007.ds_partitioned, day)
   )
 GROUP BY
   user__home_state
