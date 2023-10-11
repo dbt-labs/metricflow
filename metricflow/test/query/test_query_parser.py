@@ -29,7 +29,7 @@ from metricflow.specs.specs import (
 )
 from metricflow.test.fixtures.model_fixtures import query_parser_from_yaml
 from metricflow.test.model.example_project_configuration import EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE
-from metricflow.test.time.metric_time_dimension import MTD
+from metricflow.test.time.metric_time_dimension import MTD, MTD_SPEC_MONTH
 from metricflow.time.date_part import DatePart
 from metricflow.time.time_granularity_solver import RequestTimeGranularityException
 
@@ -256,11 +256,13 @@ def test_query_parser_with_object_params(bookings_query_parser: MetricFlowQueryP
     group_by = (
         DimensionOrEntityParameter("booking__is_instant"),
         DimensionOrEntityParameter("listing"),
-        TimeDimensionParameter(MTD),
+        TimeDimensionParameter(MTD, date_part=DatePart.DOW),
+        TimeDimensionParameter(MTD_SPEC_MONTH.qualified_name),
     )
     order_by = (
-        OrderByParameter(order_by=TimeDimensionParameter(MTD)),
+        OrderByParameter(order_by=TimeDimensionParameter(MTD, date_part=DatePart.DOW)),
         OrderByParameter(order_by=MetricParameter("bookings"), descending=True),
+        OrderByParameter(order_by=TimeDimensionParameter(MTD_SPEC_MONTH.qualified_name), descending=True),
     )
     query_spec = bookings_query_parser.parse_and_validate_query(metrics=[metric], group_by=group_by, order_by=order_by)
     assert query_spec.metric_specs == (MetricSpec(element_name="bookings"),)
@@ -268,16 +270,25 @@ def test_query_parser_with_object_params(bookings_query_parser: MetricFlowQueryP
         DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),
     )
     assert query_spec.time_dimension_specs == (
-        TimeDimensionSpec(element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY),
+        TimeDimensionSpec(element_name=MTD, entity_links=(), time_granularity=TimeGranularity.MONTH),
+        TimeDimensionSpec(
+            element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY, date_part=DatePart.DOW
+        ),
     )
     assert query_spec.entity_specs == (EntitySpec(element_name="listing", entity_links=()),)
     assert query_spec.order_by_specs == (
         OrderBySpec(
-            instance_spec=TimeDimensionSpec(element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY),
+            instance_spec=TimeDimensionSpec(
+                element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY, date_part=DatePart.DOW
+            ),
             descending=False,
         ),
         OrderBySpec(
             instance_spec=MetricSpec(element_name="bookings"),
+            descending=True,
+        ),
+        OrderBySpec(
+            instance_spec=TimeDimensionSpec(element_name=MTD, entity_links=(), time_granularity=TimeGranularity.MONTH),
             descending=True,
         ),
     )

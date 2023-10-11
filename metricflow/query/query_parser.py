@@ -518,7 +518,7 @@ class MetricFlowQueryParser:
                 or order_by_spec.instance_spec in linkable_specs.time_dimension_specs
                 or order_by_spec.instance_spec in linkable_specs.entity_specs
             ):
-                raise InvalidQueryException(f"Order by item {order_by_spec} not in the query")
+                raise InvalidQueryException(f"Order by item {order_by_spec.instance_spec} not in the query")
 
     def _validate_date_part(
         self, metric_references: Sequence[MetricReference], time_dimension_specs: Sequence[TimeDimensionSpec]
@@ -686,8 +686,8 @@ class MetricFlowQueryParser:
                     entity_link_names=parsed_name.entity_link_names,
                     element_name=parsed_name.element_name,
                     time_granularity=group_by_obj.grain
-                    if isinstance(group_by_obj, TimeDimensionQueryParameter)
-                    else None,
+                    if isinstance(group_by_obj, TimeDimensionQueryParameter) and group_by_obj.grain
+                    else parsed_name.time_granularity,
                     date_part=group_by_obj.date_part if isinstance(group_by_obj, TimeDimensionQueryParameter) else None,
                 )
                 structured_names.append(structured_name)
@@ -844,10 +844,8 @@ class MetricFlowQueryParser:
                 descending = order.descending
                 parsed_name = StructuredLinkableSpecName.from_name(order.order_by.name.lower())
                 if isinstance(order.order_by, TimeDimensionQueryParameter):
-                    time_granularity = order.order_by.grain
+                    time_granularity = order.order_by.grain or parsed_name.time_granularity
                     date_part = order.order_by.date_part
-                if parsed_name.time_granularity and parsed_name.time_granularity != time_granularity:
-                    raise InvalidQueryException("Must use object syntax to request a time granularity.")
 
             if MetricReference(element_name=parsed_name.element_name) in self._known_metric_names:
                 if time_granularity:
