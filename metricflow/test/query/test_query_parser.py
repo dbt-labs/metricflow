@@ -249,6 +249,9 @@ def test_query_parser_case_insensitivity(bookings_query_parser: MetricFlowQueryP
         ),
     )
 
+    with pytest.raises(UnableToSatisfyQueryError):
+        bookings_query_parser.parse_and_validate_query(group_by_names=["random_stuff"])
+
 
 def test_query_parser_with_object_params(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D
     Metric = namedtuple("Metric", ["name", "descending"])

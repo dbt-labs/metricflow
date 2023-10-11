@@ -102,3 +102,83 @@ integration_test:
     GROUP BY
       v.ds
       , u.home_state
+---
+integration_test:
+  name: query_dimension_only
+  description: Query dimenension only
+  model: SIMPLE_MODEL
+  group_bys: ["user__home_state"]
+  check_query: |
+    SELECT
+      u.home_state AS user__home_state
+    FROM {{ source_schema }}.dim_users u
+    GROUP BY
+      u.home_state
+---
+integration_test:
+  name: query_dimensions_only
+  description: Query multiple dimensions without metrics
+  model: SIMPLE_MODEL
+  group_bys: ["ds__day", "user__home_state"]
+  check_query: |
+    SELECT
+      u.home_state AS user__home_state
+      , u.ds AS ds__day
+    FROM {{ source_schema }}.dim_users u
+    GROUP BY
+      u.ds
+      , u.home_state
+---
+integration_test:
+  name: query_dimensions_from_different_tables
+  description: Query multiple dimensions without metrics, requiring a join
+  model: SIMPLE_MODEL
+  group_bys: ["user__home_state_latest", "listing__is_lux_latest"]
+  check_query: |
+    SELECT
+      u.home_state_latest AS user__home_state_latest
+    , l.is_lux AS listing__is_lux_latest
+    FROM {{ source_schema }}.dim_listings_latest l
+    LEFT OUTER JOIN {{ source_schema }}.dim_users_latest u
+      ON u.user_id = l.user_id
+    GROUP BY
+      u.home_state_latest
+      , l.is_lux
+---
+integration_test:
+  name: query_time_dimension_without_granularity
+  description: Query just a time dimension, no granularity specified. Should assume default granularity for dimension.
+  model: SIMPLE_MODEL
+  group_bys: [ "verification__ds"]
+  check_query: |
+    SELECT
+      v.ds as verification__ds__day
+    FROM {{ source_schema }}.fct_id_verifications v
+    GROUP BY
+      v.ds
+---
+integration_test:
+  name: query_non_default_time_dimension_without_granularity
+  description: Query just a time dimension, no granularity specified. Should assume default granularity for dimension.
+  model: EXTENDED_DATE_MODEL
+  group_bys: [ "monthly_ds"]
+  check_query: |
+    SELECT
+      ds AS monthly_ds__month
+    FROM {{ source_schema }}.fct_bookings_extended_monthly
+    GROUP BY
+      ds
+---
+integration_test:
+  name: query_dimension_only_with_constraint
+  description: Query dimenension only
+  model: SIMPLE_MODEL
+  group_bys: ["user__home_state"]
+  where_filter: "{{ render_dimension_template('user__home_state') }} = 'CA'"
+  check_query: |
+    SELECT
+      u.home_state AS user__home_state
+    FROM {{ source_schema }}.dim_users u
+    WHERE user__home_state = 'CA'
+    GROUP BY
+      u.home_state
