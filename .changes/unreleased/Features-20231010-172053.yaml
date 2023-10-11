@@ -1,0 +1,6 @@
+kind: Features
+body: Enable dundered granularity in object parameters.
+time: 2023-10-10T17:20:53.123738-07:00
+custom:
+  Author: courtneyholcomb
+  Issue: "803"
