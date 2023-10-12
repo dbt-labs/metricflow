@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from collections import defaultdict
 from dataclasses import dataclass
 from typing import Dict, Optional, Sequence, Set, Tuple
 
@@ -67,8 +68,22 @@ class TimeGranularitySolver:
     def __init__(  # noqa: D
         self,
         semantic_manifest_lookup: SemanticManifestLookup,
+        node_output_resolver: DataflowPlanNodeOutputDataSetResolver,
+        read_nodes: Sequence[ReadSqlSourceNode],
     ) -> None:
         self._semantic_manifest_lookup = semantic_manifest_lookup
+        self._time_dimension_names_to_supported_granularities: Dict[str, Set[TimeGranularity]] = defaultdict(set)
+        for read_node in read_nodes:
+            output_data_set = node_output_resolver.get_output_data_set(read_node)
+            for time_dimension_instance in output_data_set.instance_set.time_dimension_instances:
+                if time_dimension_instance.spec.date_part:
+                    continue
+                granularity_free_qualified_name = StructuredLinkableSpecName.from_name(
+                    time_dimension_instance.spec.qualified_name
+                ).granularity_free_qualified_name
+                self._time_dimension_names_to_supported_granularities[granularity_free_qualified_name].add(
+                    time_dimension_instance.spec.time_granularity
+                )
 
     def validate_time_granularity(
         self, metric_references: Sequence[MetricReference], time_dimension_specs: Sequence[TimeDimensionSpec]
@@ -103,8 +118,6 @@ class TimeGranularitySolver:
         self,
         metric_references: Sequence[MetricReference],
         partial_time_dimension_specs: Sequence[PartialTimeDimensionSpec],
-        read_nodes: Sequence[ReadSqlSourceNode],
-        node_output_resolver: DataflowPlanNodeOutputDataSetResolver,
     ) -> Dict[PartialTimeDimensionSpec, TimeDimensionSpec]:
         """Figure out the lowest granularity possible for the partially specified time dimension specs.
 
@@ -114,10 +127,7 @@ class TimeGranularitySolver:
 
         for partial_time_dimension_spec in partial_time_dimension_specs:
             minimum_time_granularity = self.find_minimum_granularity_for_partial_time_dimension_spec(
-                partial_time_dimension_spec=partial_time_dimension_spec,
-                metric_references=metric_references,
-                read_nodes=read_nodes,
-                node_output_resolver=node_output_resolver,
+                partial_time_dimension_spec=partial_time_dimension_spec, metric_references=metric_references
             )
             result[partial_time_dimension_spec] = TimeDimensionSpec(
                 element_name=partial_time_dimension_spec.element_name,
@@ -128,11 +138,7 @@ class TimeGranularitySolver:
         return result
 
     def find_minimum_granularity_for_partial_time_dimension_spec(
-        self,
-        partial_time_dimension_spec: PartialTimeDimensionSpec,
-        metric_references: Sequence[MetricReference],
-        read_nodes: Sequence[ReadSqlSourceNode],
-        node_output_resolver: DataflowPlanNodeOutputDataSetResolver,
+        self, partial_time_dimension_spec: PartialTimeDimensionSpec, metric_references: Sequence[MetricReference]
     ) -> TimeGranularity:
         """Find minimum granularity allowed for time dimension when queried with given metrics."""
         minimum_time_granularity: Optional[TimeGranularity] = None
@@ -159,45 +165,25 @@ class TimeGranularitySolver:
                     f"{pformat_big_objects([spec.qualified_name for spec in valid_group_by_elements.as_spec_set.as_tuple])}"
                 )
         else:
-            minimum_time_granularity = self.get_min_granularity_for_partial_time_dimension_without_metrics(
-                read_nodes=read_nodes,
-                node_output_resolver=node_output_resolver,
-                partial_time_dimension_spec=partial_time_dimension_spec,
+            granularity_free_qualified_name = StructuredLinkableSpecName(
+                entity_link_names=tuple(
+                    [entity_link.element_name for entity_link in partial_time_dimension_spec.entity_links]
+                ),
+                element_name=partial_time_dimension_spec.element_name,
+            ).granularity_free_qualified_name
+
+            supported_granularities = self._time_dimension_names_to_supported_granularities.get(
+                granularity_free_qualified_name
             )
-            if not minimum_time_granularity:
+            if not supported_granularities:
                 raise RequestTimeGranularityException(
                     f"Unable to resolve the time dimension spec for {partial_time_dimension_spec}. "
                 )
+            minimum_time_granularity = min(
+                self._time_dimension_names_to_supported_granularities[granularity_free_qualified_name]
+            )
 
         return minimum_time_granularity
-
-    def get_min_granularity_for_partial_time_dimension_without_metrics(
-        self,
-        read_nodes: Sequence[ReadSqlSourceNode],
-        node_output_resolver: DataflowPlanNodeOutputDataSetResolver,
-        partial_time_dimension_spec: PartialTimeDimensionSpec,
-    ) -> Optional[TimeGranularity]:
-        """Find the minimum."""
-        granularity_free_qualified_name = StructuredLinkableSpecName(
-            entity_link_names=tuple(
-                [entity_link.element_name for entity_link in partial_time_dimension_spec.entity_links]
-            ),
-            element_name=partial_time_dimension_spec.element_name,
-        ).granularity_free_qualified_name
-
-        supported_granularities: Set[TimeGranularity] = set()
-        for read_node in read_nodes:
-            output_data_set = node_output_resolver.get_output_data_set(read_node)
-            for time_dimension_instance in output_data_set.instance_set.time_dimension_instances:
-                if time_dimension_instance.spec.date_part:
-                    continue
-                time_dim_name_without_granularity = StructuredLinkableSpecName.from_name(
-                    time_dimension_instance.spec.qualified_name
-                ).granularity_free_qualified_name
-                if time_dim_name_without_granularity == granularity_free_qualified_name:
-                    supported_granularities.add(time_dimension_instance.spec.time_granularity)
-
-        return min(supported_granularities) if supported_granularities else None
 
     def adjust_time_range_to_granularity(
         self, time_range_constraint: TimeRangeConstraint, time_granularity: TimeGranularity
