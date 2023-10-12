@@ -37,6 +37,7 @@ from metricflow.dataflow.dataflow_plan import (
     JoinToBaseOutputNode,
     JoinToTimeSpineNode,
     OrderByLimitNode,
+    ReadSqlSourceNode,
     SemiAdditiveJoinNode,
     SinkOutput,
     WhereConstraintNode,
@@ -144,7 +145,7 @@ class DataflowPlanBuilder:
     def __init__(  # noqa: D
         self,
         source_nodes: Sequence[BaseOutput],
-        read_nodes: Sequence[BaseOutput],
+        read_nodes: Sequence[ReadSqlSourceNode],
         semantic_manifest_lookup: SemanticManifestLookup,
         cost_function: DataflowPlanNodeCostFunction = DefaultCostFunction(),
         node_output_resolver: Optional[DataflowPlanNodeOutputDataSetResolver] = None,
@@ -418,7 +419,7 @@ class DataflowPlanBuilder:
         return nodes
 
     def _select_read_nodes_with_linkable_specs(
-        self, linkable_specs: LinkableSpecSet, read_nodes: Sequence[BaseOutput]
+        self, linkable_specs: LinkableSpecSet, read_nodes: Sequence[ReadSqlSourceNode]
     ) -> Dict[BaseOutput, Set[LinkableInstanceSpec]]:
         """Find source nodes with requested linkable specs and no measures."""
         nodes_to_linkable_specs: Dict[BaseOutput, Set[LinkableInstanceSpec]] = {}

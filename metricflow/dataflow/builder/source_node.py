@@ -47,6 +47,8 @@ class SourceNodeBuilder:
                     )
         return source_nodes
 
-    def create_read_nodes_from_data_sets(self, data_sets: Sequence[SemanticModelDataSet]) -> Sequence[BaseOutput]:
+    def create_read_nodes_from_data_sets(
+        self, data_sets: Sequence[SemanticModelDataSet]
+    ) -> Sequence[ReadSqlSourceNode]:
         """Creates read nodes from SemanticModelDataSets."""
         return [ReadSqlSourceNode(data_set) for data_set in data_sets]

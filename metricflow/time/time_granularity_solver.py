@@ -15,7 +15,7 @@ from dbt_semantic_interfaces.references import (
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
-from metricflow.dataflow.dataflow_plan import BaseOutput
+from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
@@ -103,7 +103,7 @@ class TimeGranularitySolver:
         self,
         metric_references: Sequence[MetricReference],
         partial_time_dimension_specs: Sequence[PartialTimeDimensionSpec],
-        read_nodes: Sequence[BaseOutput],
+        read_nodes: Sequence[ReadSqlSourceNode],
         node_output_resolver: DataflowPlanNodeOutputDataSetResolver,
     ) -> Dict[PartialTimeDimensionSpec, TimeDimensionSpec]:
         """Figure out the lowest granularity possible for the partially specified time dimension specs.
@@ -131,7 +131,7 @@ class TimeGranularitySolver:
         self,
         partial_time_dimension_spec: PartialTimeDimensionSpec,
         metric_references: Sequence[MetricReference],
-        read_nodes: Sequence[BaseOutput],
+        read_nodes: Sequence[ReadSqlSourceNode],
         node_output_resolver: DataflowPlanNodeOutputDataSetResolver,
     ) -> TimeGranularity:
         """Find minimum granularity allowed for time dimension when queried with given metrics."""
@@ -173,7 +173,7 @@ class TimeGranularitySolver:
 
     def get_min_granularity_for_partial_time_dimension_without_metrics(
         self,
-        read_nodes: Sequence[BaseOutput],
+        read_nodes: Sequence[ReadSqlSourceNode],
         node_output_resolver: DataflowPlanNodeOutputDataSetResolver,
         partial_time_dimension_spec: PartialTimeDimensionSpec,
     ) -> Optional[TimeGranularity]:
