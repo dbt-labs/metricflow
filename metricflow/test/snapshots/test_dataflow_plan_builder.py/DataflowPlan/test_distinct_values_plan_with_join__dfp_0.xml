@@ -13,40 +13,40 @@
             <!--                                        'element_name': 'listing'},)},  -->
             <!--    'descending': True}                                                 -->
             <!-- limit = 100 -->
-            <WhereConstraintNode>
-                <!-- description = Constrain Output with WHERE -->
-                <!-- node_id = wcc_0 -->
-                <!-- where_condition =                                                                                 -->
-                <!--   {'class': 'WhereFilterSpec',                                                                    -->
-                <!--    'where_sql': "listing__country_latest = 'us'",                                                 -->
-                <!--    'bind_parameters': {'class': 'SqlBindParameters', 'param_items': ()},                          -->
-                <!--    'linkable_spec_set': {'class': 'LinkableSpecSet',                                              -->
-                <!--                          'dimension_specs': ({'class': 'DimensionSpec',                           -->
-                <!--                                               'element_name': 'country_latest',                   -->
-                <!--                                               'entity_links': ({'class': 'EntityReference',       -->
-                <!--                                                                 'element_name': 'listing'},)},),  -->
-                <!--                          'time_dimension_specs': (),                                              -->
-                <!--                          'entity_specs': ()}}                                                     -->
-                <FilterElementsNode>
-                    <!-- description =                                              -->
-                    <!--   Pass Only Elements:                                      -->
-                    <!--     ['user__home_state_latest', 'listing__is_lux_latest']  -->
-                    <!-- node_id = pfe_1 -->
-                    <!-- include_spec =                                                               -->
-                    <!--   {'class': 'DimensionSpec',                                                 -->
-                    <!--    'element_name': 'home_state_latest',                                      -->
-                    <!--    'entity_links': ({'class': 'EntityReference', 'element_name': 'user'},)}  -->
-                    <!-- include_spec =                                                                  -->
-                    <!--   {'class': 'DimensionSpec',                                                    -->
-                    <!--    'element_name': 'is_lux_latest',                                             -->
-                    <!--    'entity_links': ({'class': 'EntityReference', 'element_name': 'listing'},)}  -->
-                    <!-- distinct = True -->
+            <FilterElementsNode>
+                <!-- description =                                              -->
+                <!--   Pass Only Elements:                                      -->
+                <!--     ['user__home_state_latest', 'listing__is_lux_latest']  -->
+                <!-- node_id = pfe_2 -->
+                <!-- include_spec =                                                               -->
+                <!--   {'class': 'DimensionSpec',                                                 -->
+                <!--    'element_name': 'home_state_latest',                                      -->
+                <!--    'entity_links': ({'class': 'EntityReference', 'element_name': 'user'},)}  -->
+                <!-- include_spec =                                                                  -->
+                <!--   {'class': 'DimensionSpec',                                                    -->
+                <!--    'element_name': 'is_lux_latest',                                             -->
+                <!--    'entity_links': ({'class': 'EntityReference', 'element_name': 'listing'},)}  -->
+                <!-- distinct = True -->
+                <WhereConstraintNode>
+                    <!-- description = Constrain Output with WHERE -->
+                    <!-- node_id = wcc_0 -->
+                    <!-- where_condition =                                                                                 -->
+                    <!--   {'class': 'WhereFilterSpec',                                                                    -->
+                    <!--    'where_sql': "listing__country_latest = 'us'",                                                 -->
+                    <!--    'bind_parameters': {'class': 'SqlBindParameters', 'param_items': ()},                          -->
+                    <!--    'linkable_spec_set': {'class': 'LinkableSpecSet',                                              -->
+                    <!--                          'dimension_specs': ({'class': 'DimensionSpec',                           -->
+                    <!--                                               'element_name': 'country_latest',                   -->
+                    <!--                                               'entity_links': ({'class': 'EntityReference',       -->
+                    <!--                                                                 'element_name': 'listing'},)},),  -->
+                    <!--                          'time_dimension_specs': (),                                              -->
+                    <!--                          'entity_specs': ()}}                                                     -->
                     <JoinToBaseOutputNode>
                         <!-- description = Join Standard Outputs -->
                         <!-- node_id = jso_0 -->
-                        <!-- join0_for_node_id_pfe_0 =                             -->
+                        <!-- join0_for_node_id_pfe_1 =                             -->
                         <!--   {'class': 'JoinDescription',                        -->
-                        <!--    'join_node': FilterElementsNode(node_id=pfe_0),    -->
+                        <!--    'join_node': FilterElementsNode(node_id=pfe_1),    -->
                         <!--    'join_on_entity': {'class': 'LinklessEntitySpec',  -->
                         <!--                       'element_name': 'user',         -->
                         <!--                       'entity_links': ()},            -->
@@ -64,7 +64,7 @@
                             <!-- description =                      -->
                             <!--   Pass Only Elements:              -->
                             <!--     ['home_state_latest', 'user']  -->
-                            <!-- node_id = pfe_0 -->
+                            <!-- node_id = pfe_1 -->
                             <!-- include_spec =                           -->
                             <!--   {'class': 'DimensionSpec',             -->
                             <!--    'element_name': 'home_state_latest',  -->
@@ -80,8 +80,8 @@
                             </ReadSqlSourceNode>
                         </FilterElementsNode>
                     </JoinToBaseOutputNode>
-                </FilterElementsNode>
-            </WhereConstraintNode>
+                </WhereConstraintNode>
+            </FilterElementsNode>
         </OrderByLimitNode>
     </WriteToResultDataframeNode>
 </DataflowPlan>

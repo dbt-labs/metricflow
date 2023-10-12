@@ -314,28 +314,26 @@ class DataflowPlanBuilder:
         if not dataflow_recipe:
             raise UnableToSatisfyQueryError(f"Recipe not found for linkable specs: {query_spec.linkable_specs}")
 
-        join_targets = dataflow_recipe.join_targets
-        if join_targets:
-            joined_node = JoinToBaseOutputNode(left_node=dataflow_recipe.source_node, join_targets=join_targets)
-            distinct_values_node = FilterElementsNode(
-                parent_node=joined_node, include_specs=query_spec.linkable_specs.as_spec_set, distinct=True
-            )
-        else:
-            distinct_values_node = FilterElementsNode(
-                parent_node=dataflow_recipe.source_node,
-                include_specs=query_spec.linkable_specs.as_spec_set,
-                distinct=True,
+        joined_node: Optional[JoinToBaseOutputNode] = None
+        if dataflow_recipe.join_targets:
+            joined_node = JoinToBaseOutputNode(
+                left_node=dataflow_recipe.source_node, join_targets=dataflow_recipe.join_targets
             )
 
         where_constraint_node: Optional[WhereConstraintNode] = None
         if query_spec.where_constraint:
             where_constraint_node = WhereConstraintNode(
-                parent_node=distinct_values_node,
-                where_constraint=query_spec.where_constraint,
+                parent_node=joined_node or dataflow_recipe.source_node, where_constraint=query_spec.where_constraint
             )
 
+        distinct_values_node = FilterElementsNode(
+            parent_node=where_constraint_node or joined_node or dataflow_recipe.source_node,
+            include_specs=query_spec.linkable_specs.as_spec_set,
+            distinct=True,
+        )
+
         sink_node = self.build_sink_node(
-            parent_node=where_constraint_node or distinct_values_node,
+            parent_node=distinct_values_node,
             order_by_specs=query_spec.order_by_specs,
             limit=query_spec.limit,
         )

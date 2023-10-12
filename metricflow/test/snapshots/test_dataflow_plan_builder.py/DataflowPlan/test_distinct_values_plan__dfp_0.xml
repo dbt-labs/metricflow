@@ -13,30 +13,30 @@
             <!--                                        'element_name': 'listing'},)},  -->
             <!--    'descending': True}                                                 -->
             <!-- limit = 100 -->
-            <WhereConstraintNode>
-                <!-- description = Constrain Output with WHERE -->
-                <!-- node_id = wcc_0 -->
-                <!-- where_condition =                                                                                 -->
-                <!--   {'class': 'WhereFilterSpec',                                                                    -->
-                <!--    'where_sql': "listing__country_latest = 'us'",                                                 -->
-                <!--    'bind_parameters': {'class': 'SqlBindParameters', 'param_items': ()},                          -->
-                <!--    'linkable_spec_set': {'class': 'LinkableSpecSet',                                              -->
-                <!--                          'dimension_specs': ({'class': 'DimensionSpec',                           -->
-                <!--                                               'element_name': 'country_latest',                   -->
-                <!--                                               'entity_links': ({'class': 'EntityReference',       -->
-                <!--                                                                 'element_name': 'listing'},)},),  -->
-                <!--                          'time_dimension_specs': (),                                              -->
-                <!--                          'entity_specs': ()}}                                                     -->
-                <FilterElementsNode>
-                    <!-- description =                    -->
-                    <!--   Pass Only Elements:            -->
-                    <!--     ['listing__country_latest']  -->
-                    <!-- node_id = pfe_0 -->
-                    <!-- include_spec =                                                                  -->
-                    <!--   {'class': 'DimensionSpec',                                                    -->
-                    <!--    'element_name': 'country_latest',                                            -->
-                    <!--    'entity_links': ({'class': 'EntityReference', 'element_name': 'listing'},)}  -->
-                    <!-- distinct = True -->
+            <FilterElementsNode>
+                <!-- description =                    -->
+                <!--   Pass Only Elements:            -->
+                <!--     ['listing__country_latest']  -->
+                <!-- node_id = pfe_0 -->
+                <!-- include_spec =                                                                  -->
+                <!--   {'class': 'DimensionSpec',                                                    -->
+                <!--    'element_name': 'country_latest',                                            -->
+                <!--    'entity_links': ({'class': 'EntityReference', 'element_name': 'listing'},)}  -->
+                <!-- distinct = True -->
+                <WhereConstraintNode>
+                    <!-- description = Constrain Output with WHERE -->
+                    <!-- node_id = wcc_0 -->
+                    <!-- where_condition =                                                                                 -->
+                    <!--   {'class': 'WhereFilterSpec',                                                                    -->
+                    <!--    'where_sql': "listing__country_latest = 'us'",                                                 -->
+                    <!--    'bind_parameters': {'class': 'SqlBindParameters', 'param_items': ()},                          -->
+                    <!--    'linkable_spec_set': {'class': 'LinkableSpecSet',                                              -->
+                    <!--                          'dimension_specs': ({'class': 'DimensionSpec',                           -->
+                    <!--                                               'element_name': 'country_latest',                   -->
+                    <!--                                               'entity_links': ({'class': 'EntityReference',       -->
+                    <!--                                                                 'element_name': 'listing'},)},),  -->
+                    <!--                          'time_dimension_specs': (),                                              -->
+                    <!--                          'entity_specs': ()}}                                                     -->
                     <ReadSqlSourceNode>
                         <!-- description =                                                                                    -->
                         <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))  -->
@@ -44,8 +44,8 @@
                         <!-- data_set =                                                                             -->
                         <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))  -->
                     </ReadSqlSourceNode>
-                </FilterElementsNode>
-            </WhereConstraintNode>
+                </WhereConstraintNode>
+            </FilterElementsNode>
         </OrderByLimitNode>
     </WriteToResultDataframeNode>
 </DataflowPlan>
