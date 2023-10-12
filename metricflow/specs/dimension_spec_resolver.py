@@ -11,7 +11,7 @@ from dbt_semantic_interfaces.naming.dundered import DunderedNameFormatter
 from dbt_semantic_interfaces.references import DimensionReference, EntityReference, TimeDimensionReference
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 
-from metricflow.specs.specs import DimensionSpec, TimeDimensionSpec
+from metricflow.specs.specs import DEFAULT_TIME_GRANULARITY, DimensionSpec, TimeDimensionSpec
 
 
 class DimensionSpecResolver:
@@ -50,5 +50,10 @@ class DimensionSpecResolver:
         return TimeDimensionSpec(
             element_name=call_parameter_set.time_dimension_reference.element_name,
             entity_links=call_parameter_set.entity_path,
-            time_granularity=call_parameter_set.time_granularity,
+            time_granularity=(
+                call_parameter_set.time_granularity
+                # TODO: This should be updated once resolution of unspecified grain is supported.
+                if call_parameter_set.time_granularity is not None
+                else DEFAULT_TIME_GRANULARITY
+            ),
         )

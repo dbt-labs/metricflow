@@ -16,7 +16,7 @@ from dbt_semantic_interfaces.protocols.measure import MeasureAggregationParamete
 from dbt_semantic_interfaces.protocols.metadata import Metadata
 from dbt_semantic_interfaces.protocols.metric import Metric as SemanticManifestMetric
 from dbt_semantic_interfaces.protocols.metric import MetricInputMeasure, MetricType, MetricTypeParams
-from dbt_semantic_interfaces.protocols.where_filter import WhereFilter
+from dbt_semantic_interfaces.protocols.where_filter import WhereFilterIntersection
 from dbt_semantic_interfaces.transformations.add_input_metric_measures import AddInputMetricMeasuresRule
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.entity_type import EntityType
@@ -34,7 +34,7 @@ class Metric:
     description: Optional[str]
     type: MetricType
     type_params: MetricTypeParams
-    filter: Optional[WhereFilter]
+    filter: Optional[WhereFilterIntersection]
     metadata: Optional[Metadata]
     dimensions: List[Dimension]
 
