@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Dict, Optional, Sequence, Tuple
+from typing import Dict, Optional, Sequence, Set, Tuple
 
 import pandas as pd
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
@@ -184,6 +184,8 @@ class TimeGranularitySolver:
             ),
             element_name=partial_time_dimension_spec.element_name,
         ).granularity_free_qualified_name
+
+        supported_granularities: Set[TimeGranularity] = set()
         for read_node in read_nodes:
             output_data_set = node_output_resolver.get_output_data_set(read_node)
             for time_dimension_instance in output_data_set.instance_set.time_dimension_instances:
@@ -193,9 +195,9 @@ class TimeGranularitySolver:
                     time_dimension_instance.spec.qualified_name
                 ).granularity_free_qualified_name
                 if time_dim_name_without_granularity == granularity_free_qualified_name:
-                    return time_dimension_instance.spec.time_granularity
+                    supported_granularities.add(time_dimension_instance.spec.time_granularity)
 
-        return None
+        return min(supported_granularities) if supported_granularities else None
 
     def adjust_time_range_to_granularity(
         self, time_range_constraint: TimeRangeConstraint, time_granularity: TimeGranularity
