@@ -29,8 +29,8 @@ dependencies = [
   "MarkupSafe==2.0.1", # pandas implicitly requires this version
   "PyYAML~=6.0",
   "click>=7.1.2",
-  "dbt-core~=1.6.0",
-  "dbt-semantic-interfaces~=0.2.0",
+  "dbt-core~=1.7.0rc1",
+  "dbt-semantic-interfaces~=0.3.0",
   "graphviz>=0.18.2, <0.21",
   "halo~=0.0.31",
   "more-itertools>=8.10.0, <10.2.0",
@@ -75,7 +75,7 @@ sql-client-packages = [
 ]
 
 dbt-postgres = [
-  "dbt-postgres~=1.6.0",
+  "dbt-postgres~=1.7.0rc1",
 ]
 
 dbt-bigquery = [
@@ -114,8 +114,12 @@ exclude = [
 description = "Environment for development. Includes a DuckDB-backed client."
 features = [
   "dev-packages",
-  "dbt-duckdb",
   "sql-client-packages",
+]
+# Temporary workaround for installing the dbt-duckdb adapter until it's updated to support dbt-core~=1.7.0rc1.
+post-install-commands = [
+  "pip install duckdb>=0.7.0",
+  "pip install --no-deps dbt-duckdb~=1.6.0",
 ]
 
 [tool.hatch.envs.dev-env.env-vars]
