@@ -22,7 +22,7 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
-from metricflow.dataflow.dataflow_plan import BaseOutput
+from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
 from metricflow.filters.time_constraint import TimeRangeConstraint
@@ -118,13 +118,15 @@ class MetricFlowQueryParser:
         self,
         column_association_resolver: ColumnAssociationResolver,
         model: SemanticManifestLookup,
-        source_nodes: Sequence[BaseOutput],
+        read_nodes: Sequence[ReadSqlSourceNode],
         node_output_resolver: DataflowPlanNodeOutputDataSetResolver,
     ) -> None:
         self._column_association_resolver = column_association_resolver
         self._model = model
         self._metric_lookup = model.metric_lookup
         self._semantic_model_lookup = model.semantic_model_lookup
+        self._node_output_resolver = node_output_resolver
+        self._read_nodes = read_nodes
 
         # Set up containers for known element names
         self._known_entity_element_references = self._semantic_model_lookup.get_entity_references()
@@ -144,6 +146,8 @@ class MetricFlowQueryParser:
         self._metric_time_dimension_reference = DataSet.metric_time_dimension_reference()
         self._time_granularity_solver = TimeGranularitySolver(
             semantic_manifest_lookup=self._model,
+            read_nodes=self._read_nodes,
+            node_output_resolver=self._node_output_resolver,
         )
 
     @staticmethod
@@ -228,12 +232,15 @@ class MetricFlowQueryParser:
                             "dimension 'metric_time'."
                         )
 
-    def _validate_linkable_specs(
+    def _validate_linkable_specs_for_metrics(
         self,
         metric_references: Tuple[MetricReference, ...],
         all_linkable_specs: QueryTimeLinkableSpecSet,
         time_dimension_specs: Tuple[TimeDimensionSpec, ...],
     ) -> None:
+        if not metric_references:
+            return None
+
         invalid_group_bys = self._get_invalid_linkable_specs(
             metric_references=metric_references,
             dimension_specs=all_linkable_specs.dimension_specs,
@@ -296,6 +303,9 @@ class MetricFlowQueryParser:
     def _get_metric_names(
         self, metric_names: Optional[Sequence[str]], metrics: Optional[Sequence[MetricQueryParameter]]
     ) -> Sequence[str]:
+        if not (metric_names or metrics):
+            return []
+
         assert_exactly_one_arg_set(metric_names=metric_names, metrics=metrics)
         return metric_names if metric_names else [m.name for m in metrics] if metrics else []
 
@@ -422,7 +432,7 @@ class MetricFlowQueryParser:
 
         # For each metric, verify that it's possible to retrieve all group by elements, including the ones as required
         # by the filters.
-        # TODO: Consider moving this logic into _validate_linkable_specs().
+        # TODO: Consider moving this logic into _validate_linkable_specs_for_metrics().
         for metric_reference in metric_references:
             metric = self._metric_lookup.get_metric(metric_reference)
             if metric.filter is not None:
@@ -434,7 +444,7 @@ class MetricFlowQueryParser:
 
                 # Combine the group by elements from the query with the group by elements that are required by the
                 # metric filter to see if that's a valid set that could be queried.
-                self._validate_linkable_specs(
+                self._validate_linkable_specs_for_metrics(
                     metric_references=(metric_reference,),
                     all_linkable_specs=QueryTimeLinkableSpecSet.combine(
                         (
@@ -452,7 +462,7 @@ class MetricFlowQueryParser:
                 )
 
         # Validate all of them together.
-        self._validate_linkable_specs(
+        self._validate_linkable_specs_for_metrics(
             metric_references=metric_references,
             all_linkable_specs=requested_linkable_specs_with_requested_filter_specs,
             time_dimension_specs=time_dimension_specs,
@@ -571,8 +581,7 @@ class MetricFlowQueryParser:
             )
             partial_time_dimension_spec_to_time_dimension_spec = (
                 self._time_granularity_solver.resolve_granularity_for_partial_time_dimension_specs(
-                    metric_references=metric_references,
-                    partial_time_dimension_specs=(partial_metric_time_spec,),
+                    metric_references=metric_references, partial_time_dimension_specs=(partial_metric_time_spec,)
                 )
             )
             adjust_to_granularity = partial_time_dimension_spec_to_time_dimension_spec[
@@ -670,7 +679,6 @@ class MetricFlowQueryParser:
         group_by: Optional[Tuple[GroupByParameter, ...]] = None,
     ) -> QueryTimeLinkableSpecSet:
         """Convert the linkable spec names into the respective specification objects."""
-        # TODO: refactor to only support group_by object inputs (removing group_by_names param)
         assert not (
             group_by_names and group_by
         ), "Both group_by_names and group_by were set, but if a group by is specified you should only use one of these!"

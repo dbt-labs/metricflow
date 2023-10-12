@@ -6,9 +6,11 @@ import pytest
 from dbt_semantic_interfaces.references import MetricReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
+from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataset.dataset import DataSet
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_MONTH
 from metricflow.time.time_granularity_solver import (
     PartialTimeDimensionSpec,
@@ -20,9 +22,13 @@ from metricflow.time.time_granularity_solver import (
 @pytest.fixture(scope="session")
 def time_granularity_solver(  # noqa: D
     extended_date_semantic_manifest_lookup: SemanticManifestLookup,
+    consistent_id_object_repository: ConsistentIdObjectRepository,
+    node_output_resolver: DataflowPlanNodeOutputDataSetResolver,
 ) -> TimeGranularitySolver:
     return TimeGranularitySolver(
         semantic_manifest_lookup=extended_date_semantic_manifest_lookup,
+        read_nodes=list(consistent_id_object_repository.extended_date_model_read_nodes.values()),
+        node_output_resolver=node_output_resolver,
     )
 
 
@@ -91,8 +97,7 @@ PARTIAL_PTD_SPEC = PartialTimeDimensionSpec(element_name=DataSet.metric_time_dim
 
 def test_granularity_solution_for_day_metric(time_granularity_solver: TimeGranularitySolver) -> None:  # noqa: D
     assert time_granularity_solver.resolve_granularity_for_partial_time_dimension_specs(
-        metric_references=[MetricReference(element_name="bookings")],
-        partial_time_dimension_specs=[PARTIAL_PTD_SPEC],
+        metric_references=[MetricReference(element_name="bookings")], partial_time_dimension_specs=[PARTIAL_PTD_SPEC]
     ) == {
         PARTIAL_PTD_SPEC: MTD_SPEC_DAY,
     }

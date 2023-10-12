@@ -797,18 +797,22 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         # Also, the output columns should always follow the resolver format.
         output_instance_set = output_instance_set.transform(ChangeAssociatedColumns(self._column_association_resolver))
 
+        # This creates select expressions for all columns referenced in the instance set.
+        select_columns = output_instance_set.transform(
+            CreateSelectColumnsForInstances(from_data_set_alias, self._column_association_resolver)
+        ).as_tuple()
+
+        # If distinct values requested, group by all select columns.
+        group_bys = select_columns if node.distinct else ()
         return SqlDataSet(
             instance_set=output_instance_set,
             sql_select_node=SqlSelectStatementNode(
                 description=node.description,
-                # This creates select expressions for all columns referenced in the instance set.
-                select_columns=output_instance_set.transform(
-                    CreateSelectColumnsForInstances(from_data_set_alias, self._column_association_resolver)
-                ).as_tuple(),
+                select_columns=select_columns,
                 from_source=from_data_set.sql_select_node,
                 from_source_alias=from_data_set_alias,
                 joins_descs=(),
-                group_bys=(),
+                group_bys=group_bys,
                 where=None,
                 order_bys=(),
             ),

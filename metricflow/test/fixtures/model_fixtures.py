@@ -61,11 +61,10 @@ def query_parser_from_yaml(yaml_contents: List[YamlConfigFile]) -> MetricFlowQue
         ).semantic_manifest
     )
     SemanticManifestValidator[SemanticManifest]().checked_validations(semantic_manifest_lookup.semantic_manifest)
-    source_nodes = _data_set_to_source_nodes(semantic_manifest_lookup, create_data_sets(semantic_manifest_lookup))
     return MetricFlowQueryParser(
         model=semantic_manifest_lookup,
         column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup),
-        source_nodes=source_nodes,
+        read_nodes=list(_data_set_to_read_nodes(create_data_sets(semantic_manifest_lookup)).values()),
         node_output_resolver=DataflowPlanNodeOutputDataSetResolver(
             column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup),
             semantic_manifest_lookup=semantic_manifest_lookup,
@@ -88,7 +87,11 @@ class ConsistentIdObjectRepository:
     scd_model_read_nodes: OrderedDict[str, ReadSqlSourceNode]
     scd_model_source_nodes: Sequence[BaseOutput]
 
+    cyclic_join_read_nodes: OrderedDict[str, ReadSqlSourceNode]
     cyclic_join_source_nodes: Sequence[BaseOutput]
+
+    extended_date_model_read_nodes: OrderedDict[str, ReadSqlSourceNode]
+    extended_date_model_source_nodes: Sequence[BaseOutput]
 
 
 @pytest.fixture(scope="session")
@@ -97,6 +100,7 @@ def consistent_id_object_repository(
     multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
     scd_semantic_manifest_lookup: SemanticManifestLookup,
     cyclic_join_semantic_manifest_lookup: SemanticManifestLookup,
+    extended_date_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> ConsistentIdObjectRepository:  # noqa: D
     """Create objects that have incremental numeric IDs with a consistent value.
 
@@ -108,6 +112,7 @@ def consistent_id_object_repository(
         multihop_data_sets = create_data_sets(multi_hop_join_semantic_manifest_lookup)
         scd_data_sets = create_data_sets(scd_semantic_manifest_lookup)
         cyclic_join_data_sets = create_data_sets(cyclic_join_semantic_manifest_lookup)
+        extended_date_data_sets = create_data_sets(extended_date_semantic_manifest_lookup)
 
         return ConsistentIdObjectRepository(
             simple_model_data_sets=sm_data_sets,
@@ -122,8 +127,13 @@ def consistent_id_object_repository(
             scd_model_source_nodes=_data_set_to_source_nodes(
                 semantic_manifest_lookup=scd_semantic_manifest_lookup, data_sets=scd_data_sets
             ),
+            cyclic_join_read_nodes=_data_set_to_read_nodes(cyclic_join_data_sets),
             cyclic_join_source_nodes=_data_set_to_source_nodes(
                 semantic_manifest_lookup=cyclic_join_semantic_manifest_lookup, data_sets=cyclic_join_data_sets
+            ),
+            extended_date_model_read_nodes=_data_set_to_read_nodes(extended_date_data_sets),
+            extended_date_model_source_nodes=_data_set_to_source_nodes(
+                semantic_manifest_lookup=extended_date_semantic_manifest_lookup, data_sets=extended_date_data_sets
             ),
         )
 
@@ -239,3 +249,13 @@ def cyclic_join_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> Se
     """Manifest that contains a potential cycle in the join graph (if not handled properly)."""
     build_result = load_semantic_manifest("cyclic_join_manifest", template_mapping)
     return SemanticManifestLookup(build_result.semantic_manifest)
+
+
+@pytest.fixture(scope="session")
+def node_output_resolver(  # noqa:D
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
+) -> DataflowPlanNodeOutputDataSetResolver:
+    return DataflowPlanNodeOutputDataSetResolver(
+        column_association_resolver=DunderColumnAssociationResolver(simple_semantic_manifest_lookup),
+        semantic_manifest_lookup=simple_semantic_manifest_lookup,
+    )

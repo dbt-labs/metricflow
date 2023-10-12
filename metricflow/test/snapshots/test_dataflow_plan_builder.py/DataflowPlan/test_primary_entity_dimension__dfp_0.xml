@@ -28,6 +28,7 @@
                     <!--   {'class': 'DimensionSpec',                                                    -->
                     <!--    'element_name': 'is_instant',                                                -->
                     <!--    'entity_links': ({'class': 'EntityReference', 'element_name': 'booking'},)}  -->
+                    <!-- distinct = False -->
                     <MetricTimeDimensionTransformNode>
                         <!-- description = Metric Time Dimension 'ds' -->
                         <!-- node_id = sma_10001 -->

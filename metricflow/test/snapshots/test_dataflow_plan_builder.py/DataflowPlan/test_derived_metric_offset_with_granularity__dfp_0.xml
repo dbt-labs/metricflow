@@ -43,6 +43,7 @@
                         <!--    'time_granularity': TimeGranularity.MONTH,  -->
                         <!--    'date_part': None,                          -->
                         <!--    'aggregation_state': None}                  -->
+                        <!-- distinct = False -->
                         <JoinToTimeSpineNode>
                             <!-- description = Join to Time Spine Dataset -->
                             <!-- node_id = jts_0 -->

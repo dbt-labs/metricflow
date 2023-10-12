@@ -49,6 +49,7 @@
                             <!--    'time_granularity': TimeGranularity.DAY,  -->
                             <!--    'date_part': None,                        -->
                             <!--    'aggregation_state': None}                -->
+                            <!-- distinct = False -->
                             <JoinToBaseOutputNode>
                                 <!-- description = Join Standard Outputs -->
                                 <!-- node_id = jso_0 -->
@@ -78,6 +79,7 @@
                                     <!--    'date_part': None,                        -->
                                     <!--    'aggregation_state': None}                -->
                                     <!-- include_spec = LinklessEntitySpec(element_name='listing', entity_links=()) -->
+                                    <!-- distinct = False -->
                                     <MetricTimeDimensionTransformNode>
                                         <!-- description = Metric Time Dimension 'ds' -->
                                         <!-- node_id = sma_10001 -->
@@ -99,6 +101,7 @@
                                     <!-- include_spec =                                                                      -->
                                     <!--   {'class': 'DimensionSpec', 'element_name': 'country_latest', 'entity_links': ()}  -->
                                     <!-- include_spec = LinklessEntitySpec(element_name='listing', entity_links=()) -->
+                                    <!-- distinct = False -->
                                     <MetricTimeDimensionTransformNode>
                                         <!-- description = Metric Time Dimension 'ds' -->
                                         <!-- node_id = sma_10004 -->
@@ -149,6 +152,7 @@
                             <!--    'time_granularity': TimeGranularity.DAY,  -->
                             <!--    'date_part': None,                        -->
                             <!--    'aggregation_state': None}                -->
+                            <!-- distinct = False -->
                             <JoinToBaseOutputNode>
                                 <!-- description = Join Standard Outputs -->
                                 <!-- node_id = jso_1 -->
@@ -178,6 +182,7 @@
                                     <!--    'date_part': None,                        -->
                                     <!--    'aggregation_state': None}                -->
                                     <!-- include_spec = LinklessEntitySpec(element_name='listing', entity_links=()) -->
+                                    <!-- distinct = False -->
                                     <MetricTimeDimensionTransformNode>
                                         <!-- description = Metric Time Dimension 'ds' -->
                                         <!-- node_id = sma_10006 -->
@@ -199,6 +204,7 @@
                                     <!-- include_spec =                                                                      -->
                                     <!--   {'class': 'DimensionSpec', 'element_name': 'country_latest', 'entity_links': ()}  -->
                                     <!-- include_spec = LinklessEntitySpec(element_name='listing', entity_links=()) -->
+                                    <!-- distinct = False -->
                                     <MetricTimeDimensionTransformNode>
                                         <!-- description = Metric Time Dimension 'ds' -->
                                         <!-- node_id = sma_10004 -->

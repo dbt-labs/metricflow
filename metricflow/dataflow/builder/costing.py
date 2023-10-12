@@ -132,7 +132,11 @@ class DefaultCostFunction(
         return DefaultCost.sum([x.accept(self) for x in node.parent_nodes])
 
     def visit_pass_elements_filter_node(self, node: FilterElementsNode) -> DefaultCost:  # noqa: D
-        return DefaultCost.sum([x.accept(self) for x in node.parent_nodes])
+        parent_costs = [x.accept(self) for x in node.parent_nodes]
+
+        # 1 aggregation if grouping by distinct values
+        node_cost = DefaultCost(num_aggregations=1 if node.distinct else 0)
+        return DefaultCost.sum(parent_costs + [node_cost])
 
     def visit_combine_metrics_node(self, node: CombineMetricsNode) -> DefaultCost:  # noqa: D
         return DefaultCost.sum([x.accept(self) for x in node.parent_nodes])

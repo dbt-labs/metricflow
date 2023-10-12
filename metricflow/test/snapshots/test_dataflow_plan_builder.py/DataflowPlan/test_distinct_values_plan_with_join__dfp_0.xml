@@ -1,0 +1,87 @@
+<DataflowPlan>
+    <WriteToResultDataframeNode>
+        <!-- description = Write to Dataframe -->
+        <!-- node_id = wrd_0 -->
+        <OrderByLimitNode>
+            <!-- description = Order By ['listing__country_latest'] Limit 100 -->
+            <!-- node_id = obl_0 -->
+            <!-- order_by_spec =                                                        -->
+            <!--   {'class': 'OrderBySpec',                                             -->
+            <!--    'instance_spec': {'class': 'DimensionSpec',                         -->
+            <!--                      'element_name': 'country_latest',                 -->
+            <!--                      'entity_links': ({'class': 'EntityReference',     -->
+            <!--                                        'element_name': 'listing'},)},  -->
+            <!--    'descending': True}                                                 -->
+            <!-- limit = 100 -->
+            <FilterElementsNode>
+                <!-- description =                                              -->
+                <!--   Pass Only Elements:                                      -->
+                <!--     ['user__home_state_latest', 'listing__is_lux_latest']  -->
+                <!-- node_id = pfe_2 -->
+                <!-- include_spec =                                                               -->
+                <!--   {'class': 'DimensionSpec',                                                 -->
+                <!--    'element_name': 'home_state_latest',                                      -->
+                <!--    'entity_links': ({'class': 'EntityReference', 'element_name': 'user'},)}  -->
+                <!-- include_spec =                                                                  -->
+                <!--   {'class': 'DimensionSpec',                                                    -->
+                <!--    'element_name': 'is_lux_latest',                                             -->
+                <!--    'entity_links': ({'class': 'EntityReference', 'element_name': 'listing'},)}  -->
+                <!-- distinct = True -->
+                <WhereConstraintNode>
+                    <!-- description = Constrain Output with WHERE -->
+                    <!-- node_id = wcc_0 -->
+                    <!-- where_condition =                                                                                 -->
+                    <!--   {'class': 'WhereFilterSpec',                                                                    -->
+                    <!--    'where_sql': "listing__country_latest = 'us'",                                                 -->
+                    <!--    'bind_parameters': {'class': 'SqlBindParameters', 'param_items': ()},                          -->
+                    <!--    'linkable_spec_set': {'class': 'LinkableSpecSet',                                              -->
+                    <!--                          'dimension_specs': ({'class': 'DimensionSpec',                           -->
+                    <!--                                               'element_name': 'country_latest',                   -->
+                    <!--                                               'entity_links': ({'class': 'EntityReference',       -->
+                    <!--                                                                 'element_name': 'listing'},)},),  -->
+                    <!--                          'time_dimension_specs': (),                                              -->
+                    <!--                          'entity_specs': ()}}                                                     -->
+                    <JoinToBaseOutputNode>
+                        <!-- description = Join Standard Outputs -->
+                        <!-- node_id = jso_0 -->
+                        <!-- join0_for_node_id_pfe_1 =                             -->
+                        <!--   {'class': 'JoinDescription',                        -->
+                        <!--    'join_node': FilterElementsNode(node_id=pfe_1),    -->
+                        <!--    'join_on_entity': {'class': 'LinklessEntitySpec',  -->
+                        <!--                       'element_name': 'user',         -->
+                        <!--                       'entity_links': ()},            -->
+                        <!--    'join_on_partition_dimensions': (),                -->
+                        <!--    'join_on_partition_time_dimensions': (),           -->
+                        <!--    'validity_window': None}                           -->
+                        <ReadSqlSourceNode>
+                            <!-- description =                                                                                    -->
+                            <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))  -->
+                            <!-- node_id = rss_10004 -->
+                            <!-- data_set =                                                                             -->
+                            <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))  -->
+                        </ReadSqlSourceNode>
+                        <FilterElementsNode>
+                            <!-- description =                      -->
+                            <!--   Pass Only Elements:              -->
+                            <!--     ['home_state_latest', 'user']  -->
+                            <!-- node_id = pfe_1 -->
+                            <!-- include_spec =                           -->
+                            <!--   {'class': 'DimensionSpec',             -->
+                            <!--    'element_name': 'home_state_latest',  -->
+                            <!--    'entity_links': ()}                   -->
+                            <!-- include_spec = LinklessEntitySpec(element_name='user', entity_links=()) -->
+                            <!-- distinct = False -->
+                            <ReadSqlSourceNode>
+                                <!-- description =                                                                                 -->
+                                <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='users_latest'))  -->
+                                <!-- node_id = rss_10008 -->
+                                <!-- data_set =                                                                          -->
+                                <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='users_latest'))  -->
+                            </ReadSqlSourceNode>
+                        </FilterElementsNode>
+                    </JoinToBaseOutputNode>
+                </WhereConstraintNode>
+            </FilterElementsNode>
+        </OrderByLimitNode>
+    </WriteToResultDataframeNode>
+</DataflowPlan>

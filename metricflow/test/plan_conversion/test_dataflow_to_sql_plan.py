@@ -1249,16 +1249,34 @@ def test_distinct_values(  # noqa: D
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    column_association_resolver: ColumnAssociationResolver,
     sql_client: SqlClient,
 ) -> None:
     """Tests a plan to get distinct values for a dimension."""
     dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
-        metric_specs=(MetricSpec(element_name="bookings"),),
-        dimension_spec=DimensionSpec(
-            element_name="country_latest",
-            entity_links=(EntityReference(element_name="listing"),),
-        ),
-        limit=100,
+        query_spec=MetricFlowQuerySpec(
+            dimension_specs=(
+                DimensionSpec(element_name="country_latest", entity_links=(EntityReference(element_name="listing"),)),
+            ),
+            where_constraint=(
+                WhereSpecFactory(
+                    column_association_resolver=column_association_resolver,
+                ).create_from_where_filter(
+                    PydanticWhereFilter(
+                        where_sql_template="{{ Dimension('listing__country_latest') }} = 'us'",
+                    )
+                )
+            ),
+            order_by_specs=(
+                OrderBySpec(
+                    instance_spec=DimensionSpec(
+                        element_name="country_latest", entity_links=(EntityReference(element_name="listing"),)
+                    ),
+                    descending=True,
+                ),
+            ),
+            limit=100,
+        )
     )
 
     convert_and_check(
