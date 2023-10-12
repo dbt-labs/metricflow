@@ -547,6 +547,20 @@ class DataflowPlanBuilder:
         node_to_evaluation: Dict[BaseOutput, LinkableInstanceSatisfiabilityEvaluation] = {}
 
         for node in self._sort_by_suitability(potential_source_nodes):
+            data_set = self._node_data_set_resolver.get_output_data_set(node)
+
+            if measure_spec_properties:
+                measure_specs = measure_spec_properties.measure_specs
+                missing_specs = [
+                    spec for spec in measure_specs if spec not in data_set.instance_set.spec_set.measure_specs
+                ]
+                if missing_specs:
+                    logger.debug(
+                        f"Skipping evaluation for node since it does not have all of the measure specs {missing_specs}:"
+                        f"\n\n{dataflow_dag_as_text(node)}"
+                    )
+                    continue
+
             logger.debug(f"Evaluating source node:\n{pformat_big_objects(source_node=dataflow_dag_as_text(node))}")
 
             start_time = time.time()
