@@ -3,7 +3,9 @@ from __future__ import annotations
 import logging
 from typing import Dict, FrozenSet, List, Sequence
 
+from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
 from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
+from dbt_semantic_interfaces.protocols import WhereFilter
 from dbt_semantic_interfaces.protocols.metric import Metric, MetricType
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import MetricReference
@@ -123,9 +125,7 @@ class MetricLookup(MetricAccessor):  # noqa: D
                 measure_spec=measure_spec,
                 constraint=WhereSpecFactory(
                     column_association_resolver=column_association_resolver,
-                ).create_from_where_filter(input_measure.filter)
-                if input_measure.filter is not None
-                else None,
+                ).create_from_where_filter_intersection(input_measure.filter),
                 alias=input_measure.alias,
             )
             input_measure_specs.append(spec)
@@ -156,27 +156,21 @@ class MetricLookup(MetricAccessor):  # noqa: D
         for input_metric in metric.input_metrics:
             original_metric_obj = self.get_metric(input_metric.as_reference)
 
+            where_filters: List[WhereFilter] = []
+
             # This is the constraint parameter added to the input metric in the derived metric definition
-            combined_filter = (
-                WhereSpecFactory(
-                    column_association_resolver=column_association_resolver,
-                ).create_from_where_filter(input_metric.filter)
-                if input_metric.filter is not None
-                else None
-            )
+            if input_metric.filter:
+                where_filters.extend(input_metric.filter.where_filters)
 
             # This is the constraint parameter included in the original input metric definition
             if original_metric_obj.filter:
-                original_metric_filter = WhereSpecFactory(
-                    column_association_resolver=column_association_resolver,
-                ).create_from_where_filter(original_metric_obj.filter)
-                combined_filter = (
-                    combined_filter.combine(original_metric_filter) if combined_filter else original_metric_filter
-                )
+                where_filters.extend(original_metric_obj.filter.where_filters)
 
             spec = MetricSpec(
                 element_name=input_metric.name,
-                constraint=combined_filter,
+                constraint=WhereSpecFactory(column_association_resolver).create_from_where_filter_intersection(
+                    PydanticWhereFilterIntersection(where_filters=where_filters)
+                ),
                 alias=input_metric.alias,
                 offset_window=PydanticMetricTimeWindow(
                     count=input_metric.offset_window.count,

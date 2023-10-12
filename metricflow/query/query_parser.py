@@ -289,7 +289,7 @@ class MetricFlowQueryParser:
                 # add constraint to MetricSpec
                 metric_where_constraint = WhereSpecFactory(
                     column_association_resolver=self._column_association_resolver,
-                ).create_from_where_filter(metric.filter)
+                ).create_from_where_filter_intersection(metric.filter)
             # TODO: Directly initializing Spec object instead of using a factory method since
             #       importing WhereConstraintConverter is a problem in specs.py
             metric_specs.append(
@@ -444,19 +444,20 @@ class MetricFlowQueryParser:
 
                 # Combine the group by elements from the query with the group by elements that are required by the
                 # metric filter to see if that's a valid set that could be queried.
+                where_spec = WhereSpecFactory(
+                    column_association_resolver=self._column_association_resolver
+                ).create_from_where_filter_intersection(metric.filter)
                 self._validate_linkable_specs_for_metrics(
                     metric_references=(metric_reference,),
-                    all_linkable_specs=QueryTimeLinkableSpecSet.combine(
-                        (
-                            group_by_specs_for_one_metric,
-                            QueryTimeLinkableSpecSet.create_from_linkable_spec_set(
-                                (
-                                    WhereSpecFactory(
-                                        column_association_resolver=self._column_association_resolver
-                                    ).create_from_where_filter(metric.filter)
-                                ).linkable_spec_set
-                            ),
-                        ),
+                    all_linkable_specs=(
+                        QueryTimeLinkableSpecSet.combine(
+                            (
+                                group_by_specs_for_one_metric,
+                                QueryTimeLinkableSpecSet.create_from_linkable_spec_set(where_spec.linkable_spec_set),
+                            )
+                        )
+                        if where_spec is not None
+                        else group_by_specs_for_one_metric
                     ),
                     time_dimension_specs=time_dimension_specs,
                 )
