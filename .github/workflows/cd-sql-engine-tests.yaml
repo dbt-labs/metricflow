@@ -72,28 +72,9 @@ jobs:
           additional-pytest-options: ${{ env.ADDITIONAL_PYTEST_OPTIONS }}
           make-target: "test-bigquery"
 
-  databricks-cluster-tests:
+  databricks-tests:
     environment: DW_INTEGRATION_TESTS
-    name: Databricks Cluster Tests
-    if: ${{ github.event.action != 'labeled' || github.event.label.name == 'run_mf_sql_engine_tests' }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check-out the repo
-        uses: actions/checkout@v3
-
-      - name: Test w/ Python Python ${{ env.PYTHON_VERSION }}
-        uses: ./.github/actions/run-mf-tests
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-          mf_sql_engine_url: ${{ secrets.MF_DATABRICKS_CLUSTER_URL }}
-          mf_sql_engine_password: ${{ secrets.MF_DATABRICKS_PWD }}
-          parallelism: ${{ env.EXTERNAL_ENGINE_TEST_PARALLELISM }}
-          additional-pytest-options: ${{ env.ADDITIONAL_PYTEST_OPTIONS }}
-          make-target: "test-databricks"
-
-  databricks-sql-warehouse-tests:
-    environment: DW_INTEGRATION_TESTS
-    name: Databricks SQL Warehouse Tests
+    name: Databricks Tests
     if: ${{ github.event.action != 'labeled' || github.event.label.name == 'run_mf_sql_engine_tests' }}
     runs-on: ubuntu-latest
     steps:
@@ -104,7 +85,7 @@ jobs:
         uses: ./.github/actions/run-mf-tests
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-          mf_sql_engine_url: ${{ secrets.MF_DATABRICKS_SQL_WAREHOUSE_URL }}
+          mf_sql_engine_url: ${{ secrets.MF_DATABRICKS_URL }}
           mf_sql_engine_password: ${{ secrets.MF_DATABRICKS_PWD }}
           parallelism: ${{ env.EXTERNAL_ENGINE_TEST_PARALLELISM }}
           additional-pytest-options: ${{ env.ADDITIONAL_PYTEST_OPTIONS }}
