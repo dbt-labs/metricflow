@@ -93,7 +93,7 @@ jobs:
         uses: ./.github/actions/run-mf-tests
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-          mf_sql_engine_url: ${{ secrets.MF_DATABRICKS_SQL_WAREHOUSE_URL }}
+          mf_sql_engine_url: ${{ secrets.MF_DATABRICKS_URL }}
           mf_sql_engine_password: ${{ secrets.MF_DATABRICKS_PWD }}
           parallelism: 1
           make-target: "populate-persistent-source-schema-databricks"
