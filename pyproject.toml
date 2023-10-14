@@ -79,19 +79,19 @@ dbt-postgres = [
 ]
 
 dbt-bigquery = [
-  "dbt-bigquery~=1.6.0",
+  "dbt-bigquery~=1.7.0rc1",
 ]
 
 dbt-databricks = [
-  "dbt-databricks==1.6.0",
+  "dbt-databricks~=1.7.0rc1",
 ]
 
 dbt-redshift = [
-  "dbt-redshift~=1.6.0",
+  "dbt-redshift~=1.7.0rc1",
 ]
 
 dbt-snowflake = [
-  "dbt-snowflake~=1.6.0",
+  "dbt-snowflake~=1.7.0rc1",
 ]
 
 dbt-duckdb = [
