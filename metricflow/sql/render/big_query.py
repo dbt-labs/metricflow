@@ -136,8 +136,6 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
             return "dayofyear"
         if date_part == DatePart.DOW:
             return "dayofweek"
-        if date_part == DatePart.WEEK:
-            return "isoweek"
 
         return super().render_date_part(date_part)
 

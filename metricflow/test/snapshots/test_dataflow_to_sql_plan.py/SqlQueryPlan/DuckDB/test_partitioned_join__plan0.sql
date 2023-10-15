@@ -39,7 +39,6 @@ FROM (
             , subq_0.ds__extract_year
             , subq_0.ds__extract_quarter
             , subq_0.ds__extract_month
-            , subq_0.ds__extract_week
             , subq_0.ds__extract_day
             , subq_0.ds__extract_dow
             , subq_0.ds__extract_doy
@@ -51,7 +50,6 @@ FROM (
             , subq_0.ds_partitioned__extract_year
             , subq_0.ds_partitioned__extract_quarter
             , subq_0.ds_partitioned__extract_month
-            , subq_0.ds_partitioned__extract_week
             , subq_0.ds_partitioned__extract_day
             , subq_0.ds_partitioned__extract_dow
             , subq_0.ds_partitioned__extract_doy
@@ -63,7 +61,6 @@ FROM (
             , subq_0.verification__ds__extract_year
             , subq_0.verification__ds__extract_quarter
             , subq_0.verification__ds__extract_month
-            , subq_0.verification__ds__extract_week
             , subq_0.verification__ds__extract_day
             , subq_0.verification__ds__extract_dow
             , subq_0.verification__ds__extract_doy
@@ -75,7 +72,6 @@ FROM (
             , subq_0.verification__ds_partitioned__extract_year
             , subq_0.verification__ds_partitioned__extract_quarter
             , subq_0.verification__ds_partitioned__extract_month
-            , subq_0.verification__ds_partitioned__extract_week
             , subq_0.verification__ds_partitioned__extract_day
             , subq_0.verification__ds_partitioned__extract_dow
             , subq_0.verification__ds_partitioned__extract_doy
@@ -87,7 +83,6 @@ FROM (
             , subq_0.ds__extract_year AS metric_time__extract_year
             , subq_0.ds__extract_quarter AS metric_time__extract_quarter
             , subq_0.ds__extract_month AS metric_time__extract_month
-            , subq_0.ds__extract_week AS metric_time__extract_week
             , subq_0.ds__extract_day AS metric_time__extract_day
             , subq_0.ds__extract_dow AS metric_time__extract_dow
             , subq_0.ds__extract_doy AS metric_time__extract_doy
@@ -109,7 +104,6 @@ FROM (
               , EXTRACT(year FROM id_verifications_src_10003.ds) AS ds__extract_year
               , EXTRACT(quarter FROM id_verifications_src_10003.ds) AS ds__extract_quarter
               , EXTRACT(month FROM id_verifications_src_10003.ds) AS ds__extract_month
-              , EXTRACT(week FROM id_verifications_src_10003.ds) AS ds__extract_week
               , EXTRACT(day FROM id_verifications_src_10003.ds) AS ds__extract_day
               , EXTRACT(dow FROM id_verifications_src_10003.ds) AS ds__extract_dow
               , EXTRACT(doy FROM id_verifications_src_10003.ds) AS ds__extract_doy
@@ -121,7 +115,6 @@ FROM (
               , EXTRACT(year FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_year
               , EXTRACT(quarter FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_quarter
               , EXTRACT(month FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_month
-              , EXTRACT(week FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_week
               , EXTRACT(day FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_day
               , EXTRACT(dow FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_dow
               , EXTRACT(doy FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_doy
@@ -134,7 +127,6 @@ FROM (
               , EXTRACT(year FROM id_verifications_src_10003.ds) AS verification__ds__extract_year
               , EXTRACT(quarter FROM id_verifications_src_10003.ds) AS verification__ds__extract_quarter
               , EXTRACT(month FROM id_verifications_src_10003.ds) AS verification__ds__extract_month
-              , EXTRACT(week FROM id_verifications_src_10003.ds) AS verification__ds__extract_week
               , EXTRACT(day FROM id_verifications_src_10003.ds) AS verification__ds__extract_day
               , EXTRACT(dow FROM id_verifications_src_10003.ds) AS verification__ds__extract_dow
               , EXTRACT(doy FROM id_verifications_src_10003.ds) AS verification__ds__extract_doy
@@ -146,7 +138,6 @@ FROM (
               , EXTRACT(year FROM id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__extract_year
               , EXTRACT(quarter FROM id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__extract_quarter
               , EXTRACT(month FROM id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__extract_month
-              , EXTRACT(week FROM id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__extract_week
               , EXTRACT(day FROM id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__extract_day
               , EXTRACT(dow FROM id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__extract_dow
               , EXTRACT(doy FROM id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__extract_doy
@@ -176,7 +167,6 @@ FROM (
             , EXTRACT(year FROM users_ds_source_src_10007.ds) AS ds__extract_year
             , EXTRACT(quarter FROM users_ds_source_src_10007.ds) AS ds__extract_quarter
             , EXTRACT(month FROM users_ds_source_src_10007.ds) AS ds__extract_month
-            , EXTRACT(week FROM users_ds_source_src_10007.ds) AS ds__extract_week
             , EXTRACT(day FROM users_ds_source_src_10007.ds) AS ds__extract_day
             , EXTRACT(dow FROM users_ds_source_src_10007.ds) AS ds__extract_dow
             , EXTRACT(doy FROM users_ds_source_src_10007.ds) AS ds__extract_doy
@@ -188,7 +178,6 @@ FROM (
             , EXTRACT(year FROM users_ds_source_src_10007.created_at) AS created_at__extract_year
             , EXTRACT(quarter FROM users_ds_source_src_10007.created_at) AS created_at__extract_quarter
             , EXTRACT(month FROM users_ds_source_src_10007.created_at) AS created_at__extract_month
-            , EXTRACT(week FROM users_ds_source_src_10007.created_at) AS created_at__extract_week
             , EXTRACT(day FROM users_ds_source_src_10007.created_at) AS created_at__extract_day
             , EXTRACT(dow FROM users_ds_source_src_10007.created_at) AS created_at__extract_dow
             , EXTRACT(doy FROM users_ds_source_src_10007.created_at) AS created_at__extract_doy
@@ -200,7 +189,6 @@ FROM (
             , EXTRACT(year FROM users_ds_source_src_10007.ds_partitioned) AS ds_partitioned__extract_year
             , EXTRACT(quarter FROM users_ds_source_src_10007.ds_partitioned) AS ds_partitioned__extract_quarter
             , EXTRACT(month FROM users_ds_source_src_10007.ds_partitioned) AS ds_partitioned__extract_month
-            , EXTRACT(week FROM users_ds_source_src_10007.ds_partitioned) AS ds_partitioned__extract_week
             , EXTRACT(day FROM users_ds_source_src_10007.ds_partitioned) AS ds_partitioned__extract_day
             , EXTRACT(dow FROM users_ds_source_src_10007.ds_partitioned) AS ds_partitioned__extract_dow
             , EXTRACT(doy FROM users_ds_source_src_10007.ds_partitioned) AS ds_partitioned__extract_doy
@@ -213,7 +201,6 @@ FROM (
             , EXTRACT(year FROM users_ds_source_src_10007.ds) AS user__ds__extract_year
             , EXTRACT(quarter FROM users_ds_source_src_10007.ds) AS user__ds__extract_quarter
             , EXTRACT(month FROM users_ds_source_src_10007.ds) AS user__ds__extract_month
-            , EXTRACT(week FROM users_ds_source_src_10007.ds) AS user__ds__extract_week
             , EXTRACT(day FROM users_ds_source_src_10007.ds) AS user__ds__extract_day
             , EXTRACT(dow FROM users_ds_source_src_10007.ds) AS user__ds__extract_dow
             , EXTRACT(doy FROM users_ds_source_src_10007.ds) AS user__ds__extract_doy
@@ -225,7 +212,6 @@ FROM (
             , EXTRACT(year FROM users_ds_source_src_10007.created_at) AS user__created_at__extract_year
             , EXTRACT(quarter FROM users_ds_source_src_10007.created_at) AS user__created_at__extract_quarter
             , EXTRACT(month FROM users_ds_source_src_10007.created_at) AS user__created_at__extract_month
-            , EXTRACT(week FROM users_ds_source_src_10007.created_at) AS user__created_at__extract_week
             , EXTRACT(day FROM users_ds_source_src_10007.created_at) AS user__created_at__extract_day
             , EXTRACT(dow FROM users_ds_source_src_10007.created_at) AS user__created_at__extract_dow
             , EXTRACT(doy FROM users_ds_source_src_10007.created_at) AS user__created_at__extract_doy
@@ -237,7 +223,6 @@ FROM (
             , EXTRACT(year FROM users_ds_source_src_10007.ds_partitioned) AS user__ds_partitioned__extract_year
             , EXTRACT(quarter FROM users_ds_source_src_10007.ds_partitioned) AS user__ds_partitioned__extract_quarter
             , EXTRACT(month FROM users_ds_source_src_10007.ds_partitioned) AS user__ds_partitioned__extract_month
-            , EXTRACT(week FROM users_ds_source_src_10007.ds_partitioned) AS user__ds_partitioned__extract_week
             , EXTRACT(day FROM users_ds_source_src_10007.ds_partitioned) AS user__ds_partitioned__extract_day
             , EXTRACT(dow FROM users_ds_source_src_10007.ds_partitioned) AS user__ds_partitioned__extract_dow
             , EXTRACT(doy FROM users_ds_source_src_10007.ds_partitioned) AS user__ds_partitioned__extract_doy

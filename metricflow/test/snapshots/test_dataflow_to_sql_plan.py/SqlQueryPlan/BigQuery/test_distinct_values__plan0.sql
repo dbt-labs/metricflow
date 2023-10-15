@@ -17,7 +17,6 @@ FROM (
       , subq_0.ds__extract_year
       , subq_0.ds__extract_quarter
       , subq_0.ds__extract_month
-      , subq_0.ds__extract_week
       , subq_0.ds__extract_day
       , subq_0.ds__extract_dow
       , subq_0.ds__extract_doy
@@ -29,7 +28,6 @@ FROM (
       , subq_0.created_at__extract_year
       , subq_0.created_at__extract_quarter
       , subq_0.created_at__extract_month
-      , subq_0.created_at__extract_week
       , subq_0.created_at__extract_day
       , subq_0.created_at__extract_dow
       , subq_0.created_at__extract_doy
@@ -41,7 +39,6 @@ FROM (
       , subq_0.listing__ds__extract_year
       , subq_0.listing__ds__extract_quarter
       , subq_0.listing__ds__extract_month
-      , subq_0.listing__ds__extract_week
       , subq_0.listing__ds__extract_day
       , subq_0.listing__ds__extract_dow
       , subq_0.listing__ds__extract_doy
@@ -53,7 +50,6 @@ FROM (
       , subq_0.listing__created_at__extract_year
       , subq_0.listing__created_at__extract_quarter
       , subq_0.listing__created_at__extract_month
-      , subq_0.listing__created_at__extract_week
       , subq_0.listing__created_at__extract_day
       , subq_0.listing__created_at__extract_dow
       , subq_0.listing__created_at__extract_doy
@@ -83,7 +79,6 @@ FROM (
         , EXTRACT(year FROM listings_latest_src_10004.created_at) AS ds__extract_year
         , EXTRACT(quarter FROM listings_latest_src_10004.created_at) AS ds__extract_quarter
         , EXTRACT(month FROM listings_latest_src_10004.created_at) AS ds__extract_month
-        , EXTRACT(isoweek FROM listings_latest_src_10004.created_at) AS ds__extract_week
         , EXTRACT(day FROM listings_latest_src_10004.created_at) AS ds__extract_day
         , EXTRACT(dayofweek FROM listings_latest_src_10004.created_at) AS ds__extract_dow
         , EXTRACT(dayofyear FROM listings_latest_src_10004.created_at) AS ds__extract_doy
@@ -95,7 +90,6 @@ FROM (
         , EXTRACT(year FROM listings_latest_src_10004.created_at) AS created_at__extract_year
         , EXTRACT(quarter FROM listings_latest_src_10004.created_at) AS created_at__extract_quarter
         , EXTRACT(month FROM listings_latest_src_10004.created_at) AS created_at__extract_month
-        , EXTRACT(isoweek FROM listings_latest_src_10004.created_at) AS created_at__extract_week
         , EXTRACT(day FROM listings_latest_src_10004.created_at) AS created_at__extract_day
         , EXTRACT(dayofweek FROM listings_latest_src_10004.created_at) AS created_at__extract_dow
         , EXTRACT(dayofyear FROM listings_latest_src_10004.created_at) AS created_at__extract_doy
@@ -110,7 +104,6 @@ FROM (
         , EXTRACT(year FROM listings_latest_src_10004.created_at) AS listing__ds__extract_year
         , EXTRACT(quarter FROM listings_latest_src_10004.created_at) AS listing__ds__extract_quarter
         , EXTRACT(month FROM listings_latest_src_10004.created_at) AS listing__ds__extract_month
-        , EXTRACT(isoweek FROM listings_latest_src_10004.created_at) AS listing__ds__extract_week
         , EXTRACT(day FROM listings_latest_src_10004.created_at) AS listing__ds__extract_day
         , EXTRACT(dayofweek FROM listings_latest_src_10004.created_at) AS listing__ds__extract_dow
         , EXTRACT(dayofyear FROM listings_latest_src_10004.created_at) AS listing__ds__extract_doy
@@ -122,7 +115,6 @@ FROM (
         , EXTRACT(year FROM listings_latest_src_10004.created_at) AS listing__created_at__extract_year
         , EXTRACT(quarter FROM listings_latest_src_10004.created_at) AS listing__created_at__extract_quarter
         , EXTRACT(month FROM listings_latest_src_10004.created_at) AS listing__created_at__extract_month
-        , EXTRACT(isoweek FROM listings_latest_src_10004.created_at) AS listing__created_at__extract_week
         , EXTRACT(day FROM listings_latest_src_10004.created_at) AS listing__created_at__extract_day
         , EXTRACT(dayofweek FROM listings_latest_src_10004.created_at) AS listing__created_at__extract_dow
         , EXTRACT(dayofyear FROM listings_latest_src_10004.created_at) AS listing__created_at__extract_doy

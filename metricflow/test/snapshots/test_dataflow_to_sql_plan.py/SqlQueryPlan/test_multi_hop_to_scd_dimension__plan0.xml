@@ -4,15 +4,15 @@
         <!-- node_id = ss_12 -->
         <!-- col0 =                                                    -->
         <!--   {'class': 'SqlSelectColumn',                            -->
-        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_480),  -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_447),  -->
         <!--    'column_alias': 'metric_time__day'}                    -->
         <!-- col1 =                                                        -->
         <!--   {'class': 'SqlSelectColumn',                                -->
-        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_479),      -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_446),      -->
         <!--    'column_alias': 'listing__lux_listing__is_confirmed_lux'}  -->
         <!-- col2 =                                                    -->
         <!--   {'class': 'SqlSelectColumn',                            -->
-        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_481),  -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_448),  -->
         <!--    'column_alias': 'bookings'}                            -->
         <!-- from_source = SqlSelectStatementNode(node_id=ss_11) -->
         <!-- where = None -->
@@ -21,11 +21,11 @@
             <!-- node_id = ss_11 -->
             <!-- col0 =                                                    -->
             <!--   {'class': 'SqlSelectColumn',                            -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_478),  -->
+            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_445),  -->
             <!--    'column_alias': 'metric_time__day'}                    -->
             <!-- col1 =                                                        -->
             <!--   {'class': 'SqlSelectColumn',                                -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_477),      -->
+            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_444),      -->
             <!--    'column_alias': 'listing__lux_listing__is_confirmed_lux'}  -->
             <!-- col2 =                                                                       -->
             <!--   {'class': 'SqlSelectColumn',                                               -->
@@ -34,11 +34,11 @@
             <!-- from_source = SqlSelectStatementNode(node_id=ss_10) -->
             <!-- group_by0 =                                               -->
             <!--   {'class': 'SqlSelectColumn',                            -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_478),  -->
+            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_445),  -->
             <!--    'column_alias': 'metric_time__day'}                    -->
             <!-- group_by1 =                                                   -->
             <!--   {'class': 'SqlSelectColumn',                                -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_477),      -->
+            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_444),      -->
             <!--    'column_alias': 'listing__lux_listing__is_confirmed_lux'}  -->
             <!-- where = None -->
             <SqlSelectStatementNode>
@@ -48,15 +48,15 @@
                 <!-- node_id = ss_10 -->
                 <!-- col0 =                                                    -->
                 <!--   {'class': 'SqlSelectColumn',                            -->
-                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_475),  -->
+                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_442),  -->
                 <!--    'column_alias': 'metric_time__day'}                    -->
                 <!-- col1 =                                                        -->
                 <!--   {'class': 'SqlSelectColumn',                                -->
-                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_474),      -->
+                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_441),      -->
                 <!--    'column_alias': 'listing__lux_listing__is_confirmed_lux'}  -->
                 <!-- col2 =                                                    -->
                 <!--   {'class': 'SqlSelectColumn',                            -->
-                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_473),  -->
+                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_440),  -->
                 <!--    'column_alias': 'bookings'}                            -->
                 <!-- from_source = SqlSelectStatementNode(node_id=ss_9) -->
                 <!-- where = None -->
@@ -65,27 +65,27 @@
                     <!-- node_id = ss_9 -->
                     <!-- col0 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_468),  -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_435),  -->
                     <!--    'column_alias': 'metric_time__day'}                    -->
                     <!-- col1 =                                                         -->
                     <!--   {'class': 'SqlSelectColumn',                                 -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_471),       -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_438),       -->
                     <!--    'column_alias': 'listing__lux_listing__window_start__day'}  -->
                     <!-- col2 =                                                       -->
                     <!--   {'class': 'SqlSelectColumn',                               -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_472),     -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_439),     -->
                     <!--    'column_alias': 'listing__lux_listing__window_end__day'}  -->
                     <!-- col3 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_469),  -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_436),  -->
                     <!--    'column_alias': 'listing'}                             -->
                     <!-- col4 =                                                        -->
                     <!--   {'class': 'SqlSelectColumn',                                -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_470),      -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_437),      -->
                     <!--    'column_alias': 'listing__lux_listing__is_confirmed_lux'}  -->
                     <!-- col5 =                                                    -->
                     <!--   {'class': 'SqlSelectColumn',                            -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_467),  -->
+                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_434),  -->
                     <!--    'column_alias': 'bookings'}                            -->
                     <!-- from_source = SqlSelectStatementNode(node_id=ss_5) -->
                     <!-- join_0 =                                                  -->
@@ -102,15 +102,15 @@
                         <!-- node_id = ss_5 -->
                         <!-- col0 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
-                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_375),  -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_348),  -->
                         <!--    'column_alias': 'metric_time__day'}                    -->
                         <!-- col1 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
-                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_376),  -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_349),  -->
                         <!--    'column_alias': 'listing'}                             -->
                         <!-- col2 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
-                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_374),  -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_347),  -->
                         <!--    'column_alias': 'bookings'}                            -->
                         <!-- from_source = SqlSelectStatementNode(node_id=ss_4) -->
                         <!-- where = None -->
@@ -119,399 +119,371 @@
                             <!-- node_id = ss_4 -->
                             <!-- col0 =                                                    -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_282),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_262),  -->
                             <!--    'column_alias': 'ds__day'}                             -->
                             <!-- col1 =                                                    -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_283),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_263),  -->
                             <!--    'column_alias': 'ds__week'}                            -->
                             <!-- col2 =                                                    -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_284),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_264),  -->
                             <!--    'column_alias': 'ds__month'}                           -->
                             <!-- col3 =                                                    -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_285),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_265),  -->
                             <!--    'column_alias': 'ds__quarter'}                         -->
                             <!-- col4 =                                                    -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_286),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_266),  -->
                             <!--    'column_alias': 'ds__year'}                            -->
                             <!-- col5 =                                                    -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_287),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_267),  -->
                             <!--    'column_alias': 'ds__extract_year'}                    -->
                             <!-- col6 =                                                    -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_288),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_268),  -->
                             <!--    'column_alias': 'ds__extract_quarter'}                 -->
                             <!-- col7 =                                                    -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_289),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_269),  -->
                             <!--    'column_alias': 'ds__extract_month'}                   -->
                             <!-- col8 =                                                    -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_290),  -->
-                            <!--    'column_alias': 'ds__extract_week'}                    -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_270),  -->
+                            <!--    'column_alias': 'ds__extract_day'}                     -->
                             <!-- col9 =                                                    -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_291),  -->
-                            <!--    'column_alias': 'ds__extract_day'}                     -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_271),  -->
+                            <!--    'column_alias': 'ds__extract_dow'}                     -->
                             <!-- col10 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_292),  -->
-                            <!--    'column_alias': 'ds__extract_dow'}                     -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_272),  -->
+                            <!--    'column_alias': 'ds__extract_doy'}                     -->
                             <!-- col11 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_293),  -->
-                            <!--    'column_alias': 'ds__extract_doy'}                     -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_273),  -->
+                            <!--    'column_alias': 'ds_partitioned__day'}                 -->
                             <!-- col12 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_294),  -->
-                            <!--    'column_alias': 'ds_partitioned__day'}                 -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_274),  -->
+                            <!--    'column_alias': 'ds_partitioned__week'}                -->
                             <!-- col13 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_295),  -->
-                            <!--    'column_alias': 'ds_partitioned__week'}                -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_275),  -->
+                            <!--    'column_alias': 'ds_partitioned__month'}               -->
                             <!-- col14 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_296),  -->
-                            <!--    'column_alias': 'ds_partitioned__month'}               -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_276),  -->
+                            <!--    'column_alias': 'ds_partitioned__quarter'}             -->
                             <!-- col15 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_297),  -->
-                            <!--    'column_alias': 'ds_partitioned__quarter'}             -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_277),  -->
+                            <!--    'column_alias': 'ds_partitioned__year'}                -->
                             <!-- col16 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_298),  -->
-                            <!--    'column_alias': 'ds_partitioned__year'}                -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_278),  -->
+                            <!--    'column_alias': 'ds_partitioned__extract_year'}        -->
                             <!-- col17 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_299),  -->
-                            <!--    'column_alias': 'ds_partitioned__extract_year'}        -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_279),  -->
+                            <!--    'column_alias': 'ds_partitioned__extract_quarter'}     -->
                             <!-- col18 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_300),  -->
-                            <!--    'column_alias': 'ds_partitioned__extract_quarter'}     -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_280),  -->
+                            <!--    'column_alias': 'ds_partitioned__extract_month'}       -->
                             <!-- col19 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_301),  -->
-                            <!--    'column_alias': 'ds_partitioned__extract_month'}       -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_281),  -->
+                            <!--    'column_alias': 'ds_partitioned__extract_day'}         -->
                             <!-- col20 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_302),  -->
-                            <!--    'column_alias': 'ds_partitioned__extract_week'}        -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_282),  -->
+                            <!--    'column_alias': 'ds_partitioned__extract_dow'}         -->
                             <!-- col21 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_303),  -->
-                            <!--    'column_alias': 'ds_partitioned__extract_day'}         -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_283),  -->
+                            <!--    'column_alias': 'ds_partitioned__extract_doy'}         -->
                             <!-- col22 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_304),  -->
-                            <!--    'column_alias': 'ds_partitioned__extract_dow'}         -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_284),  -->
+                            <!--    'column_alias': 'paid_at__day'}                        -->
                             <!-- col23 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_305),  -->
-                            <!--    'column_alias': 'ds_partitioned__extract_doy'}         -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_285),  -->
+                            <!--    'column_alias': 'paid_at__week'}                       -->
                             <!-- col24 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_306),  -->
-                            <!--    'column_alias': 'paid_at__day'}                        -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_286),  -->
+                            <!--    'column_alias': 'paid_at__month'}                      -->
                             <!-- col25 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_307),  -->
-                            <!--    'column_alias': 'paid_at__week'}                       -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_287),  -->
+                            <!--    'column_alias': 'paid_at__quarter'}                    -->
                             <!-- col26 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_308),  -->
-                            <!--    'column_alias': 'paid_at__month'}                      -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_288),  -->
+                            <!--    'column_alias': 'paid_at__year'}                       -->
                             <!-- col27 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_309),  -->
-                            <!--    'column_alias': 'paid_at__quarter'}                    -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_289),  -->
+                            <!--    'column_alias': 'paid_at__extract_year'}               -->
                             <!-- col28 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_310),  -->
-                            <!--    'column_alias': 'paid_at__year'}                       -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_290),  -->
+                            <!--    'column_alias': 'paid_at__extract_quarter'}            -->
                             <!-- col29 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_311),  -->
-                            <!--    'column_alias': 'paid_at__extract_year'}               -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_291),  -->
+                            <!--    'column_alias': 'paid_at__extract_month'}              -->
                             <!-- col30 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_312),  -->
-                            <!--    'column_alias': 'paid_at__extract_quarter'}            -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_292),  -->
+                            <!--    'column_alias': 'paid_at__extract_day'}                -->
                             <!-- col31 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_313),  -->
-                            <!--    'column_alias': 'paid_at__extract_month'}              -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_293),  -->
+                            <!--    'column_alias': 'paid_at__extract_dow'}                -->
                             <!-- col32 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_314),  -->
-                            <!--    'column_alias': 'paid_at__extract_week'}               -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_294),  -->
+                            <!--    'column_alias': 'paid_at__extract_doy'}                -->
                             <!-- col33 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_315),  -->
-                            <!--    'column_alias': 'paid_at__extract_day'}                -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_295),  -->
+                            <!--    'column_alias': 'booking__ds__day'}                    -->
                             <!-- col34 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_316),  -->
-                            <!--    'column_alias': 'paid_at__extract_dow'}                -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_296),  -->
+                            <!--    'column_alias': 'booking__ds__week'}                   -->
                             <!-- col35 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_317),  -->
-                            <!--    'column_alias': 'paid_at__extract_doy'}                -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_297),  -->
+                            <!--    'column_alias': 'booking__ds__month'}                  -->
                             <!-- col36 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_318),  -->
-                            <!--    'column_alias': 'booking__ds__day'}                    -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_298),  -->
+                            <!--    'column_alias': 'booking__ds__quarter'}                -->
                             <!-- col37 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_319),  -->
-                            <!--    'column_alias': 'booking__ds__week'}                   -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_299),  -->
+                            <!--    'column_alias': 'booking__ds__year'}                   -->
                             <!-- col38 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_320),  -->
-                            <!--    'column_alias': 'booking__ds__month'}                  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_300),  -->
+                            <!--    'column_alias': 'booking__ds__extract_year'}           -->
                             <!-- col39 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_321),  -->
-                            <!--    'column_alias': 'booking__ds__quarter'}                -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_301),  -->
+                            <!--    'column_alias': 'booking__ds__extract_quarter'}        -->
                             <!-- col40 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_322),  -->
-                            <!--    'column_alias': 'booking__ds__year'}                   -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_302),  -->
+                            <!--    'column_alias': 'booking__ds__extract_month'}          -->
                             <!-- col41 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_323),  -->
-                            <!--    'column_alias': 'booking__ds__extract_year'}           -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_303),  -->
+                            <!--    'column_alias': 'booking__ds__extract_day'}            -->
                             <!-- col42 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_324),  -->
-                            <!--    'column_alias': 'booking__ds__extract_quarter'}        -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_304),  -->
+                            <!--    'column_alias': 'booking__ds__extract_dow'}            -->
                             <!-- col43 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_325),  -->
-                            <!--    'column_alias': 'booking__ds__extract_month'}          -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_305),  -->
+                            <!--    'column_alias': 'booking__ds__extract_doy'}            -->
                             <!-- col44 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_326),  -->
-                            <!--    'column_alias': 'booking__ds__extract_week'}           -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_306),  -->
+                            <!--    'column_alias': 'booking__ds_partitioned__day'}        -->
                             <!-- col45 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_327),  -->
-                            <!--    'column_alias': 'booking__ds__extract_day'}            -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_307),  -->
+                            <!--    'column_alias': 'booking__ds_partitioned__week'}       -->
                             <!-- col46 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_328),  -->
-                            <!--    'column_alias': 'booking__ds__extract_dow'}            -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_308),  -->
+                            <!--    'column_alias': 'booking__ds_partitioned__month'}      -->
                             <!-- col47 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_329),  -->
-                            <!--    'column_alias': 'booking__ds__extract_doy'}            -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_309),  -->
+                            <!--    'column_alias': 'booking__ds_partitioned__quarter'}    -->
                             <!-- col48 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_330),  -->
-                            <!--    'column_alias': 'booking__ds_partitioned__day'}        -->
-                            <!-- col49 =                                                   -->
-                            <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_331),  -->
-                            <!--    'column_alias': 'booking__ds_partitioned__week'}       -->
-                            <!-- col50 =                                                   -->
-                            <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_332),  -->
-                            <!--    'column_alias': 'booking__ds_partitioned__month'}      -->
-                            <!-- col51 =                                                   -->
-                            <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_333),  -->
-                            <!--    'column_alias': 'booking__ds_partitioned__quarter'}    -->
-                            <!-- col52 =                                                   -->
-                            <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_334),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_310),  -->
                             <!--    'column_alias': 'booking__ds_partitioned__year'}       -->
-                            <!-- col53 =                                                      -->
+                            <!-- col49 =                                                      -->
                             <!--   {'class': 'SqlSelectColumn',                               -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_335),     -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_311),     -->
                             <!--    'column_alias': 'booking__ds_partitioned__extract_year'}  -->
-                            <!-- col54 =                                                         -->
+                            <!-- col50 =                                                         -->
                             <!--   {'class': 'SqlSelectColumn',                                  -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_336),        -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_312),        -->
                             <!--    'column_alias': 'booking__ds_partitioned__extract_quarter'}  -->
-                            <!-- col55 =                                                       -->
+                            <!-- col51 =                                                       -->
                             <!--   {'class': 'SqlSelectColumn',                                -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_337),      -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_313),      -->
                             <!--    'column_alias': 'booking__ds_partitioned__extract_month'}  -->
-                            <!-- col56 =                                                      -->
-                            <!--   {'class': 'SqlSelectColumn',                               -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_338),     -->
-                            <!--    'column_alias': 'booking__ds_partitioned__extract_week'}  -->
-                            <!-- col57 =                                                     -->
+                            <!-- col52 =                                                     -->
                             <!--   {'class': 'SqlSelectColumn',                              -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_339),    -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_314),    -->
                             <!--    'column_alias': 'booking__ds_partitioned__extract_day'}  -->
-                            <!-- col58 =                                                     -->
+                            <!-- col53 =                                                     -->
                             <!--   {'class': 'SqlSelectColumn',                              -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_340),    -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_315),    -->
                             <!--    'column_alias': 'booking__ds_partitioned__extract_dow'}  -->
-                            <!-- col59 =                                                     -->
+                            <!-- col54 =                                                     -->
                             <!--   {'class': 'SqlSelectColumn',                              -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_341),    -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_316),    -->
                             <!--    'column_alias': 'booking__ds_partitioned__extract_doy'}  -->
+                            <!-- col55 =                                                   -->
+                            <!--   {'class': 'SqlSelectColumn',                            -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_317),  -->
+                            <!--    'column_alias': 'booking__paid_at__day'}               -->
+                            <!-- col56 =                                                   -->
+                            <!--   {'class': 'SqlSelectColumn',                            -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_318),  -->
+                            <!--    'column_alias': 'booking__paid_at__week'}              -->
+                            <!-- col57 =                                                   -->
+                            <!--   {'class': 'SqlSelectColumn',                            -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_319),  -->
+                            <!--    'column_alias': 'booking__paid_at__month'}             -->
+                            <!-- col58 =                                                   -->
+                            <!--   {'class': 'SqlSelectColumn',                            -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_320),  -->
+                            <!--    'column_alias': 'booking__paid_at__quarter'}           -->
+                            <!-- col59 =                                                   -->
+                            <!--   {'class': 'SqlSelectColumn',                            -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_321),  -->
+                            <!--    'column_alias': 'booking__paid_at__year'}              -->
                             <!-- col60 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_342),  -->
-                            <!--    'column_alias': 'booking__paid_at__day'}               -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_322),  -->
+                            <!--    'column_alias': 'booking__paid_at__extract_year'}      -->
                             <!-- col61 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_343),  -->
-                            <!--    'column_alias': 'booking__paid_at__week'}              -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_323),  -->
+                            <!--    'column_alias': 'booking__paid_at__extract_quarter'}   -->
                             <!-- col62 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_344),  -->
-                            <!--    'column_alias': 'booking__paid_at__month'}             -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_324),  -->
+                            <!--    'column_alias': 'booking__paid_at__extract_month'}     -->
                             <!-- col63 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_345),  -->
-                            <!--    'column_alias': 'booking__paid_at__quarter'}           -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_325),  -->
+                            <!--    'column_alias': 'booking__paid_at__extract_day'}       -->
                             <!-- col64 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_346),  -->
-                            <!--    'column_alias': 'booking__paid_at__year'}              -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_326),  -->
+                            <!--    'column_alias': 'booking__paid_at__extract_dow'}       -->
                             <!-- col65 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_347),  -->
-                            <!--    'column_alias': 'booking__paid_at__extract_year'}      -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_327),  -->
+                            <!--    'column_alias': 'booking__paid_at__extract_doy'}       -->
                             <!-- col66 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_348),  -->
-                            <!--    'column_alias': 'booking__paid_at__extract_quarter'}   -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_328),  -->
+                            <!--    'column_alias': 'metric_time__day'}                    -->
                             <!-- col67 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_349),  -->
-                            <!--    'column_alias': 'booking__paid_at__extract_month'}     -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_329),  -->
+                            <!--    'column_alias': 'metric_time__week'}                   -->
                             <!-- col68 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_350),  -->
-                            <!--    'column_alias': 'booking__paid_at__extract_week'}      -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_330),  -->
+                            <!--    'column_alias': 'metric_time__month'}                  -->
                             <!-- col69 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_351),  -->
-                            <!--    'column_alias': 'booking__paid_at__extract_day'}       -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_331),  -->
+                            <!--    'column_alias': 'metric_time__quarter'}                -->
                             <!-- col70 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_352),  -->
-                            <!--    'column_alias': 'booking__paid_at__extract_dow'}       -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_332),  -->
+                            <!--    'column_alias': 'metric_time__year'}                   -->
                             <!-- col71 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_353),  -->
-                            <!--    'column_alias': 'booking__paid_at__extract_doy'}       -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_333),  -->
+                            <!--    'column_alias': 'metric_time__extract_year'}           -->
                             <!-- col72 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_354),  -->
-                            <!--    'column_alias': 'metric_time__day'}                    -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_334),  -->
+                            <!--    'column_alias': 'metric_time__extract_quarter'}        -->
                             <!-- col73 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_355),  -->
-                            <!--    'column_alias': 'metric_time__week'}                   -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_335),  -->
+                            <!--    'column_alias': 'metric_time__extract_month'}          -->
                             <!-- col74 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_356),  -->
-                            <!--    'column_alias': 'metric_time__month'}                  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_336),  -->
+                            <!--    'column_alias': 'metric_time__extract_day'}            -->
                             <!-- col75 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_357),  -->
-                            <!--    'column_alias': 'metric_time__quarter'}                -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_337),  -->
+                            <!--    'column_alias': 'metric_time__extract_dow'}            -->
                             <!-- col76 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_358),  -->
-                            <!--    'column_alias': 'metric_time__year'}                   -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_338),  -->
+                            <!--    'column_alias': 'metric_time__extract_doy'}            -->
                             <!-- col77 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_359),  -->
-                            <!--    'column_alias': 'metric_time__extract_year'}           -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_339),  -->
+                            <!--    'column_alias': 'listing'}                             -->
                             <!-- col78 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_360),  -->
-                            <!--    'column_alias': 'metric_time__extract_quarter'}        -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_340),  -->
+                            <!--    'column_alias': 'guest'}                               -->
                             <!-- col79 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_361),  -->
-                            <!--    'column_alias': 'metric_time__extract_month'}          -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_341),  -->
+                            <!--    'column_alias': 'host'}                                -->
                             <!-- col80 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_362),  -->
-                            <!--    'column_alias': 'metric_time__extract_week'}           -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_342),  -->
+                            <!--    'column_alias': 'user'}                                -->
                             <!-- col81 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_363),  -->
-                            <!--    'column_alias': 'metric_time__extract_day'}            -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_343),  -->
+                            <!--    'column_alias': 'booking__listing'}                    -->
                             <!-- col82 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_364),  -->
-                            <!--    'column_alias': 'metric_time__extract_dow'}            -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_344),  -->
+                            <!--    'column_alias': 'booking__guest'}                      -->
                             <!-- col83 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_365),  -->
-                            <!--    'column_alias': 'metric_time__extract_doy'}            -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_345),  -->
+                            <!--    'column_alias': 'booking__host'}                       -->
                             <!-- col84 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_366),  -->
-                            <!--    'column_alias': 'listing'}                             -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_346),  -->
+                            <!--    'column_alias': 'booking__user'}                       -->
                             <!-- col85 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_367),  -->
-                            <!--    'column_alias': 'guest'}                               -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_260),  -->
+                            <!--    'column_alias': 'is_instant'}                          -->
                             <!-- col86 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_368),  -->
-                            <!--    'column_alias': 'host'}                                -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_261),  -->
+                            <!--    'column_alias': 'booking__is_instant'}                 -->
                             <!-- col87 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_369),  -->
-                            <!--    'column_alias': 'user'}                                -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_255),  -->
+                            <!--    'column_alias': 'bookings'}                            -->
                             <!-- col88 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_370),  -->
-                            <!--    'column_alias': 'booking__listing'}                    -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_256),  -->
+                            <!--    'column_alias': 'instant_bookings'}                    -->
                             <!-- col89 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_371),  -->
-                            <!--    'column_alias': 'booking__guest'}                      -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_257),  -->
+                            <!--    'column_alias': 'booking_value'}                       -->
                             <!-- col90 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_372),  -->
-                            <!--    'column_alias': 'booking__host'}                       -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_258),  -->
+                            <!--    'column_alias': 'bookers'}                             -->
                             <!-- col91 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_373),  -->
-                            <!--    'column_alias': 'booking__user'}                       -->
-                            <!-- col92 =                                                   -->
-                            <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_280),  -->
-                            <!--    'column_alias': 'is_instant'}                          -->
-                            <!-- col93 =                                                   -->
-                            <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_281),  -->
-                            <!--    'column_alias': 'booking__is_instant'}                 -->
-                            <!-- col94 =                                                   -->
-                            <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_275),  -->
-                            <!--    'column_alias': 'bookings'}                            -->
-                            <!-- col95 =                                                   -->
-                            <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_276),  -->
-                            <!--    'column_alias': 'instant_bookings'}                    -->
-                            <!-- col96 =                                                   -->
-                            <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_277),  -->
-                            <!--    'column_alias': 'booking_value'}                       -->
-                            <!-- col97 =                                                   -->
-                            <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_278),  -->
-                            <!--    'column_alias': 'bookers'}                             -->
-                            <!-- col98 =                                                   -->
-                            <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_279),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_259),  -->
                             <!--    'column_alias': 'average_booking_value'}               -->
                             <!-- from_source = SqlSelectStatementNode(node_id=ss_10015) -->
                             <!-- where = None -->
@@ -568,305 +540,281 @@
                                 <!--    'column_alias': 'ds__year'}                        -->
                                 <!-- col12 =                                             -->
                                 <!--   {'class': 'SqlSelectColumn',                      -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10273),  -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10234),  -->
                                 <!--    'column_alias': 'ds__extract_year'}              -->
                                 <!-- col13 =                                             -->
                                 <!--   {'class': 'SqlSelectColumn',                      -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10274),  -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10235),  -->
                                 <!--    'column_alias': 'ds__extract_quarter'}           -->
                                 <!-- col14 =                                             -->
                                 <!--   {'class': 'SqlSelectColumn',                      -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10275),  -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10236),  -->
                                 <!--    'column_alias': 'ds__extract_month'}             -->
                                 <!-- col15 =                                             -->
                                 <!--   {'class': 'SqlSelectColumn',                      -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10276),  -->
-                                <!--    'column_alias': 'ds__extract_week'}              -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10237),  -->
+                                <!--    'column_alias': 'ds__extract_day'}               -->
                                 <!-- col16 =                                             -->
                                 <!--   {'class': 'SqlSelectColumn',                      -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10277),  -->
-                                <!--    'column_alias': 'ds__extract_day'}               -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10238),  -->
+                                <!--    'column_alias': 'ds__extract_dow'}               -->
                                 <!-- col17 =                                             -->
                                 <!--   {'class': 'SqlSelectColumn',                      -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10278),  -->
-                                <!--    'column_alias': 'ds__extract_dow'}               -->
-                                <!-- col18 =                                             -->
-                                <!--   {'class': 'SqlSelectColumn',                      -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10279),  -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10239),  -->
                                 <!--    'column_alias': 'ds__extract_doy'}               -->
-                                <!-- col19 =                                               -->
+                                <!-- col18 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
                                 <!--    'expr': SqlDateTruncExpression(node_id=dt_10200),  -->
                                 <!--    'column_alias': 'ds_partitioned__day'}             -->
-                                <!-- col20 =                                               -->
+                                <!-- col19 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
                                 <!--    'expr': SqlDateTruncExpression(node_id=dt_10201),  -->
                                 <!--    'column_alias': 'ds_partitioned__week'}            -->
-                                <!-- col21 =                                               -->
+                                <!-- col20 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
                                 <!--    'expr': SqlDateTruncExpression(node_id=dt_10202),  -->
                                 <!--    'column_alias': 'ds_partitioned__month'}           -->
-                                <!-- col22 =                                               -->
+                                <!-- col21 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
                                 <!--    'expr': SqlDateTruncExpression(node_id=dt_10203),  -->
                                 <!--    'column_alias': 'ds_partitioned__quarter'}         -->
-                                <!-- col23 =                                               -->
+                                <!-- col22 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
                                 <!--    'expr': SqlDateTruncExpression(node_id=dt_10204),  -->
                                 <!--    'column_alias': 'ds_partitioned__year'}            -->
-                                <!-- col24 =                                             -->
+                                <!-- col23 =                                             -->
                                 <!--   {'class': 'SqlSelectColumn',                      -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10280),  -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10240),  -->
                                 <!--    'column_alias': 'ds_partitioned__extract_year'}  -->
-                                <!-- col25 =                                                -->
+                                <!-- col24 =                                                -->
                                 <!--   {'class': 'SqlSelectColumn',                         -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10281),     -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10241),     -->
                                 <!--    'column_alias': 'ds_partitioned__extract_quarter'}  -->
-                                <!-- col26 =                                              -->
+                                <!-- col25 =                                              -->
                                 <!--   {'class': 'SqlSelectColumn',                       -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10282),   -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10242),   -->
                                 <!--    'column_alias': 'ds_partitioned__extract_month'}  -->
+                                <!-- col26 =                                             -->
+                                <!--   {'class': 'SqlSelectColumn',                      -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10243),  -->
+                                <!--    'column_alias': 'ds_partitioned__extract_day'}   -->
                                 <!-- col27 =                                             -->
                                 <!--   {'class': 'SqlSelectColumn',                      -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10283),  -->
-                                <!--    'column_alias': 'ds_partitioned__extract_week'}  -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10244),  -->
+                                <!--    'column_alias': 'ds_partitioned__extract_dow'}   -->
                                 <!-- col28 =                                             -->
                                 <!--   {'class': 'SqlSelectColumn',                      -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10284),  -->
-                                <!--    'column_alias': 'ds_partitioned__extract_day'}   -->
-                                <!-- col29 =                                             -->
-                                <!--   {'class': 'SqlSelectColumn',                      -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10285),  -->
-                                <!--    'column_alias': 'ds_partitioned__extract_dow'}   -->
-                                <!-- col30 =                                             -->
-                                <!--   {'class': 'SqlSelectColumn',                      -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10286),  -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10245),  -->
                                 <!--    'column_alias': 'ds_partitioned__extract_doy'}   -->
-                                <!-- col31 =                                               -->
+                                <!-- col29 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
                                 <!--    'expr': SqlDateTruncExpression(node_id=dt_10205),  -->
                                 <!--    'column_alias': 'paid_at__day'}                    -->
-                                <!-- col32 =                                               -->
+                                <!-- col30 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
                                 <!--    'expr': SqlDateTruncExpression(node_id=dt_10206),  -->
                                 <!--    'column_alias': 'paid_at__week'}                   -->
-                                <!-- col33 =                                               -->
+                                <!-- col31 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
                                 <!--    'expr': SqlDateTruncExpression(node_id=dt_10207),  -->
                                 <!--    'column_alias': 'paid_at__month'}                  -->
-                                <!-- col34 =                                               -->
+                                <!-- col32 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
                                 <!--    'expr': SqlDateTruncExpression(node_id=dt_10208),  -->
                                 <!--    'column_alias': 'paid_at__quarter'}                -->
-                                <!-- col35 =                                               -->
+                                <!-- col33 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
                                 <!--    'expr': SqlDateTruncExpression(node_id=dt_10209),  -->
                                 <!--    'column_alias': 'paid_at__year'}                   -->
+                                <!-- col34 =                                             -->
+                                <!--   {'class': 'SqlSelectColumn',                      -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10246),  -->
+                                <!--    'column_alias': 'paid_at__extract_year'}         -->
+                                <!-- col35 =                                             -->
+                                <!--   {'class': 'SqlSelectColumn',                      -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10247),  -->
+                                <!--    'column_alias': 'paid_at__extract_quarter'}      -->
                                 <!-- col36 =                                             -->
                                 <!--   {'class': 'SqlSelectColumn',                      -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10287),  -->
-                                <!--    'column_alias': 'paid_at__extract_year'}         -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10248),  -->
+                                <!--    'column_alias': 'paid_at__extract_month'}        -->
                                 <!-- col37 =                                             -->
                                 <!--   {'class': 'SqlSelectColumn',                      -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10288),  -->
-                                <!--    'column_alias': 'paid_at__extract_quarter'}      -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10249),  -->
+                                <!--    'column_alias': 'paid_at__extract_day'}          -->
                                 <!-- col38 =                                             -->
                                 <!--   {'class': 'SqlSelectColumn',                      -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10289),  -->
-                                <!--    'column_alias': 'paid_at__extract_month'}        -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10250),  -->
+                                <!--    'column_alias': 'paid_at__extract_dow'}          -->
                                 <!-- col39 =                                             -->
                                 <!--   {'class': 'SqlSelectColumn',                      -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10290),  -->
-                                <!--    'column_alias': 'paid_at__extract_week'}         -->
-                                <!-- col40 =                                             -->
-                                <!--   {'class': 'SqlSelectColumn',                      -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10291),  -->
-                                <!--    'column_alias': 'paid_at__extract_day'}          -->
-                                <!-- col41 =                                             -->
-                                <!--   {'class': 'SqlSelectColumn',                      -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10292),  -->
-                                <!--    'column_alias': 'paid_at__extract_dow'}          -->
-                                <!-- col42 =                                             -->
-                                <!--   {'class': 'SqlSelectColumn',                      -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10293),  -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10251),  -->
                                 <!--    'column_alias': 'paid_at__extract_doy'}          -->
-                                <!-- col43 =                                                     -->
+                                <!-- col40 =                                                     -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
                                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10139),  -->
                                 <!--    'column_alias': 'booking__is_instant'}                   -->
-                                <!-- col44 =                                               -->
+                                <!-- col41 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
                                 <!--    'expr': SqlDateTruncExpression(node_id=dt_10210),  -->
                                 <!--    'column_alias': 'booking__ds__day'}                -->
-                                <!-- col45 =                                               -->
+                                <!-- col42 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
                                 <!--    'expr': SqlDateTruncExpression(node_id=dt_10211),  -->
                                 <!--    'column_alias': 'booking__ds__week'}               -->
-                                <!-- col46 =                                               -->
+                                <!-- col43 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
                                 <!--    'expr': SqlDateTruncExpression(node_id=dt_10212),  -->
                                 <!--    'column_alias': 'booking__ds__month'}              -->
-                                <!-- col47 =                                               -->
+                                <!-- col44 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
                                 <!--    'expr': SqlDateTruncExpression(node_id=dt_10213),  -->
                                 <!--    'column_alias': 'booking__ds__quarter'}            -->
-                                <!-- col48 =                                               -->
+                                <!-- col45 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
                                 <!--    'expr': SqlDateTruncExpression(node_id=dt_10214),  -->
                                 <!--    'column_alias': 'booking__ds__year'}               -->
+                                <!-- col46 =                                             -->
+                                <!--   {'class': 'SqlSelectColumn',                      -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10252),  -->
+                                <!--    'column_alias': 'booking__ds__extract_year'}     -->
+                                <!-- col47 =                                             -->
+                                <!--   {'class': 'SqlSelectColumn',                      -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10253),  -->
+                                <!--    'column_alias': 'booking__ds__extract_quarter'}  -->
+                                <!-- col48 =                                             -->
+                                <!--   {'class': 'SqlSelectColumn',                      -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10254),  -->
+                                <!--    'column_alias': 'booking__ds__extract_month'}    -->
                                 <!-- col49 =                                             -->
                                 <!--   {'class': 'SqlSelectColumn',                      -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10294),  -->
-                                <!--    'column_alias': 'booking__ds__extract_year'}     -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10255),  -->
+                                <!--    'column_alias': 'booking__ds__extract_day'}      -->
                                 <!-- col50 =                                             -->
                                 <!--   {'class': 'SqlSelectColumn',                      -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10295),  -->
-                                <!--    'column_alias': 'booking__ds__extract_quarter'}  -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10256),  -->
+                                <!--    'column_alias': 'booking__ds__extract_dow'}      -->
                                 <!-- col51 =                                             -->
                                 <!--   {'class': 'SqlSelectColumn',                      -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10296),  -->
-                                <!--    'column_alias': 'booking__ds__extract_month'}    -->
-                                <!-- col52 =                                             -->
-                                <!--   {'class': 'SqlSelectColumn',                      -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10297),  -->
-                                <!--    'column_alias': 'booking__ds__extract_week'}     -->
-                                <!-- col53 =                                             -->
-                                <!--   {'class': 'SqlSelectColumn',                      -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10298),  -->
-                                <!--    'column_alias': 'booking__ds__extract_day'}      -->
-                                <!-- col54 =                                             -->
-                                <!--   {'class': 'SqlSelectColumn',                      -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10299),  -->
-                                <!--    'column_alias': 'booking__ds__extract_dow'}      -->
-                                <!-- col55 =                                             -->
-                                <!--   {'class': 'SqlSelectColumn',                      -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10300),  -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10257),  -->
                                 <!--    'column_alias': 'booking__ds__extract_doy'}      -->
-                                <!-- col56 =                                               -->
+                                <!-- col52 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
                                 <!--    'expr': SqlDateTruncExpression(node_id=dt_10215),  -->
                                 <!--    'column_alias': 'booking__ds_partitioned__day'}    -->
-                                <!-- col57 =                                               -->
+                                <!-- col53 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
                                 <!--    'expr': SqlDateTruncExpression(node_id=dt_10216),  -->
                                 <!--    'column_alias': 'booking__ds_partitioned__week'}   -->
-                                <!-- col58 =                                               -->
+                                <!-- col54 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
                                 <!--    'expr': SqlDateTruncExpression(node_id=dt_10217),  -->
                                 <!--    'column_alias': 'booking__ds_partitioned__month'}  -->
-                                <!-- col59 =                                                 -->
+                                <!-- col55 =                                                 -->
                                 <!--   {'class': 'SqlSelectColumn',                          -->
                                 <!--    'expr': SqlDateTruncExpression(node_id=dt_10218),    -->
                                 <!--    'column_alias': 'booking__ds_partitioned__quarter'}  -->
-                                <!-- col60 =                                               -->
+                                <!-- col56 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
                                 <!--    'expr': SqlDateTruncExpression(node_id=dt_10219),  -->
                                 <!--    'column_alias': 'booking__ds_partitioned__year'}   -->
-                                <!-- col61 =                                                      -->
+                                <!-- col57 =                                                      -->
                                 <!--   {'class': 'SqlSelectColumn',                               -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10301),           -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10258),           -->
                                 <!--    'column_alias': 'booking__ds_partitioned__extract_year'}  -->
-                                <!-- col62 =                                                         -->
+                                <!-- col58 =                                                         -->
                                 <!--   {'class': 'SqlSelectColumn',                                  -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10302),              -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10259),              -->
                                 <!--    'column_alias': 'booking__ds_partitioned__extract_quarter'}  -->
-                                <!-- col63 =                                                       -->
+                                <!-- col59 =                                                       -->
                                 <!--   {'class': 'SqlSelectColumn',                                -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10303),            -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10260),            -->
                                 <!--    'column_alias': 'booking__ds_partitioned__extract_month'}  -->
-                                <!-- col64 =                                                      -->
-                                <!--   {'class': 'SqlSelectColumn',                               -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10304),           -->
-                                <!--    'column_alias': 'booking__ds_partitioned__extract_week'}  -->
-                                <!-- col65 =                                                     -->
+                                <!-- col60 =                                                     -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10305),          -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10261),          -->
                                 <!--    'column_alias': 'booking__ds_partitioned__extract_day'}  -->
-                                <!-- col66 =                                                     -->
+                                <!-- col61 =                                                     -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10306),          -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10262),          -->
                                 <!--    'column_alias': 'booking__ds_partitioned__extract_dow'}  -->
-                                <!-- col67 =                                                     -->
+                                <!-- col62 =                                                     -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10307),          -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10263),          -->
                                 <!--    'column_alias': 'booking__ds_partitioned__extract_doy'}  -->
-                                <!-- col68 =                                               -->
+                                <!-- col63 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
                                 <!--    'expr': SqlDateTruncExpression(node_id=dt_10220),  -->
                                 <!--    'column_alias': 'booking__paid_at__day'}           -->
-                                <!-- col69 =                                               -->
+                                <!-- col64 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
                                 <!--    'expr': SqlDateTruncExpression(node_id=dt_10221),  -->
                                 <!--    'column_alias': 'booking__paid_at__week'}          -->
-                                <!-- col70 =                                               -->
+                                <!-- col65 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
                                 <!--    'expr': SqlDateTruncExpression(node_id=dt_10222),  -->
                                 <!--    'column_alias': 'booking__paid_at__month'}         -->
-                                <!-- col71 =                                               -->
+                                <!-- col66 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
                                 <!--    'expr': SqlDateTruncExpression(node_id=dt_10223),  -->
                                 <!--    'column_alias': 'booking__paid_at__quarter'}       -->
-                                <!-- col72 =                                               -->
+                                <!-- col67 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
                                 <!--    'expr': SqlDateTruncExpression(node_id=dt_10224),  -->
                                 <!--    'column_alias': 'booking__paid_at__year'}          -->
-                                <!-- col73 =                                               -->
+                                <!-- col68 =                                               -->
                                 <!--   {'class': 'SqlSelectColumn',                        -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10308),    -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10264),    -->
                                 <!--    'column_alias': 'booking__paid_at__extract_year'}  -->
-                                <!-- col74 =                                                  -->
+                                <!-- col69 =                                                  -->
                                 <!--   {'class': 'SqlSelectColumn',                           -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10309),       -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10265),       -->
                                 <!--    'column_alias': 'booking__paid_at__extract_quarter'}  -->
-                                <!-- col75 =                                                -->
+                                <!-- col70 =                                                -->
                                 <!--   {'class': 'SqlSelectColumn',                         -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10310),     -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10266),     -->
                                 <!--    'column_alias': 'booking__paid_at__extract_month'}  -->
-                                <!-- col76 =                                               -->
-                                <!--   {'class': 'SqlSelectColumn',                        -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10311),    -->
-                                <!--    'column_alias': 'booking__paid_at__extract_week'}  -->
-                                <!-- col77 =                                              -->
+                                <!-- col71 =                                              -->
                                 <!--   {'class': 'SqlSelectColumn',                       -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10312),   -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10267),   -->
                                 <!--    'column_alias': 'booking__paid_at__extract_day'}  -->
-                                <!-- col78 =                                              -->
+                                <!-- col72 =                                              -->
                                 <!--   {'class': 'SqlSelectColumn',                       -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10313),   -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10268),   -->
                                 <!--    'column_alias': 'booking__paid_at__extract_dow'}  -->
-                                <!-- col79 =                                              -->
+                                <!-- col73 =                                              -->
                                 <!--   {'class': 'SqlSelectColumn',                       -->
-                                <!--    'expr': SqlExtractExpression(node_id=ex_10314),   -->
+                                <!--    'expr': SqlExtractExpression(node_id=ex_10269),   -->
                                 <!--    'column_alias': 'booking__paid_at__extract_doy'}  -->
-                                <!-- col80 =                                                     -->
+                                <!-- col74 =                                                     -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
                                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10143),  -->
                                 <!--    'column_alias': 'listing'}                               -->
-                                <!-- col81 =                                                     -->
+                                <!-- col75 =                                                     -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
                                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10144),  -->
                                 <!--    'column_alias': 'guest'}                                 -->
-                                <!-- col82 =                                                     -->
+                                <!-- col76 =                                                     -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
                                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10145),  -->
                                 <!--    'column_alias': 'host'}                                  -->
-                                <!-- col83 =                                                     -->
+                                <!-- col77 =                                                     -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
                                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10146),  -->
                                 <!--    'column_alias': 'user'}                                  -->
-                                <!-- col84 =                                                     -->
+                                <!-- col78 =                                                     -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
                                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10147),  -->
                                 <!--    'column_alias': 'booking__listing'}                      -->
-                                <!-- col85 =                                                     -->
+                                <!-- col79 =                                                     -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
                                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10148),  -->
                                 <!--    'column_alias': 'booking__guest'}                        -->
-                                <!-- col86 =                                                     -->
+                                <!-- col80 =                                                     -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
                                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10149),  -->
                                 <!--    'column_alias': 'booking__host'}                         -->
-                                <!-- col87 =                                                     -->
+                                <!-- col81 =                                                     -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
                                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10150),  -->
                                 <!--    'column_alias': 'booking__user'}                         -->
@@ -890,19 +838,19 @@
                         <!-- node_id = ss_8 -->
                         <!-- col0 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
-                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_459),  -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_426),  -->
                         <!--    'column_alias': 'lux_listing__window_start__day'}      -->
                         <!-- col1 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
-                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_460),  -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_427),  -->
                         <!--    'column_alias': 'lux_listing__window_end__day'}        -->
                         <!-- col2 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
-                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_461),  -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_428),  -->
                         <!--    'column_alias': 'listing'}                             -->
                         <!-- col3 =                                                    -->
                         <!--   {'class': 'SqlSelectColumn',                            -->
-                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_458),  -->
+                        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_425),  -->
                         <!--    'column_alias': 'lux_listing__is_confirmed_lux'}       -->
                         <!-- from_source = SqlSelectStatementNode(node_id=ss_7) -->
                         <!-- where = None -->
@@ -911,115 +859,107 @@
                             <!-- node_id = ss_7 -->
                             <!-- col0 =                                                    -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_434),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_403),  -->
                             <!--    'column_alias': 'lux_listing__window_start__day'}      -->
                             <!-- col1 =                                                    -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_435),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_404),  -->
                             <!--    'column_alias': 'lux_listing__window_start__week'}     -->
                             <!-- col2 =                                                    -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_436),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_405),  -->
                             <!--    'column_alias': 'lux_listing__window_start__month'}    -->
                             <!-- col3 =                                                    -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_437),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_406),  -->
                             <!--    'column_alias': 'lux_listing__window_start__quarter'}  -->
                             <!-- col4 =                                                    -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_438),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_407),  -->
                             <!--    'column_alias': 'lux_listing__window_start__year'}     -->
                             <!-- col5 =                                                         -->
                             <!--   {'class': 'SqlSelectColumn',                                 -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_439),       -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_408),       -->
                             <!--    'column_alias': 'lux_listing__window_start__extract_year'}  -->
                             <!-- col6 =                                                            -->
                             <!--   {'class': 'SqlSelectColumn',                                    -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_440),          -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_409),          -->
                             <!--    'column_alias': 'lux_listing__window_start__extract_quarter'}  -->
                             <!-- col7 =                                                          -->
                             <!--   {'class': 'SqlSelectColumn',                                  -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_441),        -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_410),        -->
                             <!--    'column_alias': 'lux_listing__window_start__extract_month'}  -->
-                            <!-- col8 =                                                         -->
-                            <!--   {'class': 'SqlSelectColumn',                                 -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_442),       -->
-                            <!--    'column_alias': 'lux_listing__window_start__extract_week'}  -->
+                            <!-- col8 =                                                        -->
+                            <!--   {'class': 'SqlSelectColumn',                                -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_411),      -->
+                            <!--    'column_alias': 'lux_listing__window_start__extract_day'}  -->
                             <!-- col9 =                                                        -->
                             <!--   {'class': 'SqlSelectColumn',                                -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_443),      -->
-                            <!--    'column_alias': 'lux_listing__window_start__extract_day'}  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_412),      -->
+                            <!--    'column_alias': 'lux_listing__window_start__extract_dow'}  -->
                             <!-- col10 =                                                       -->
                             <!--   {'class': 'SqlSelectColumn',                                -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_444),      -->
-                            <!--    'column_alias': 'lux_listing__window_start__extract_dow'}  -->
-                            <!-- col11 =                                                       -->
-                            <!--   {'class': 'SqlSelectColumn',                                -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_445),      -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_413),      -->
                             <!--    'column_alias': 'lux_listing__window_start__extract_doy'}  -->
+                            <!-- col11 =                                                   -->
+                            <!--   {'class': 'SqlSelectColumn',                            -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_414),  -->
+                            <!--    'column_alias': 'lux_listing__window_end__day'}        -->
                             <!-- col12 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_446),  -->
-                            <!--    'column_alias': 'lux_listing__window_end__day'}        -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_415),  -->
+                            <!--    'column_alias': 'lux_listing__window_end__week'}       -->
                             <!-- col13 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_447),  -->
-                            <!--    'column_alias': 'lux_listing__window_end__week'}       -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_416),  -->
+                            <!--    'column_alias': 'lux_listing__window_end__month'}      -->
                             <!-- col14 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_448),  -->
-                            <!--    'column_alias': 'lux_listing__window_end__month'}      -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_417),  -->
+                            <!--    'column_alias': 'lux_listing__window_end__quarter'}    -->
                             <!-- col15 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_449),  -->
-                            <!--    'column_alias': 'lux_listing__window_end__quarter'}    -->
-                            <!-- col16 =                                                   -->
-                            <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_450),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_418),  -->
                             <!--    'column_alias': 'lux_listing__window_end__year'}       -->
-                            <!-- col17 =                                                      -->
+                            <!-- col16 =                                                      -->
                             <!--   {'class': 'SqlSelectColumn',                               -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_451),     -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_419),     -->
                             <!--    'column_alias': 'lux_listing__window_end__extract_year'}  -->
-                            <!-- col18 =                                                         -->
+                            <!-- col17 =                                                         -->
                             <!--   {'class': 'SqlSelectColumn',                                  -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_452),        -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_420),        -->
                             <!--    'column_alias': 'lux_listing__window_end__extract_quarter'}  -->
-                            <!-- col19 =                                                       -->
+                            <!-- col18 =                                                       -->
                             <!--   {'class': 'SqlSelectColumn',                                -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_453),      -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_421),      -->
                             <!--    'column_alias': 'lux_listing__window_end__extract_month'}  -->
-                            <!-- col20 =                                                      -->
-                            <!--   {'class': 'SqlSelectColumn',                               -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_454),     -->
-                            <!--    'column_alias': 'lux_listing__window_end__extract_week'}  -->
+                            <!-- col19 =                                                     -->
+                            <!--   {'class': 'SqlSelectColumn',                              -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_422),    -->
+                            <!--    'column_alias': 'lux_listing__window_end__extract_day'}  -->
+                            <!-- col20 =                                                     -->
+                            <!--   {'class': 'SqlSelectColumn',                              -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_423),    -->
+                            <!--    'column_alias': 'lux_listing__window_end__extract_dow'}  -->
                             <!-- col21 =                                                     -->
                             <!--   {'class': 'SqlSelectColumn',                              -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_455),    -->
-                            <!--    'column_alias': 'lux_listing__window_end__extract_day'}  -->
-                            <!-- col22 =                                                     -->
-                            <!--   {'class': 'SqlSelectColumn',                              -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_456),    -->
-                            <!--    'column_alias': 'lux_listing__window_end__extract_dow'}  -->
-                            <!-- col23 =                                                     -->
-                            <!--   {'class': 'SqlSelectColumn',                              -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_457),    -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_424),    -->
                             <!--    'column_alias': 'lux_listing__window_end__extract_doy'}  -->
+                            <!-- col22 =                                                   -->
+                            <!--   {'class': 'SqlSelectColumn',                            -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_399),  -->
+                            <!--    'column_alias': 'listing'}                             -->
+                            <!-- col23 =                                                   -->
+                            <!--   {'class': 'SqlSelectColumn',                            -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_400),  -->
+                            <!--    'column_alias': 'lux_listing'}                         -->
                             <!-- col24 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_430),  -->
-                            <!--    'column_alias': 'listing'}                             -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_401),  -->
+                            <!--    'column_alias': 'listing__lux_listing'}                -->
                             <!-- col25 =                                                   -->
                             <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_431),  -->
-                            <!--    'column_alias': 'lux_listing'}                         -->
-                            <!-- col26 =                                                   -->
-                            <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_432),  -->
-                            <!--    'column_alias': 'listing__lux_listing'}                -->
-                            <!-- col27 =                                                   -->
-                            <!--   {'class': 'SqlSelectColumn',                            -->
-                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_433),  -->
+                            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_402),  -->
                             <!--    'column_alias': 'lux_listing__is_confirmed_lux'}       -->
                             <!-- from_source = SqlSelectStatementNode(node_id=ss_10018) -->
                             <!-- join_0 =                                                    -->
@@ -1066,7 +1006,6 @@
                                 <!--      'window_start__extract_year',                  -->
                                 <!--      'window_start__extract_quarter',               -->
                                 <!--      'window_start__extract_month',                 -->
-                                <!--      'window_start__extract_week',                  -->
                                 <!--      'window_start__extract_day',                   -->
                                 <!--      'window_start__extract_dow',                   -->
                                 <!--      'window_start__extract_doy',                   -->
@@ -1078,7 +1017,6 @@
                                 <!--      'window_end__extract_year',                    -->
                                 <!--      'window_end__extract_quarter',                 -->
                                 <!--      'window_end__extract_month',                   -->
-                                <!--      'window_end__extract_week',                    -->
                                 <!--      'window_end__extract_day',                     -->
                                 <!--      'window_end__extract_dow',                     -->
                                 <!--      'window_end__extract_doy',                     -->
@@ -1090,7 +1028,6 @@
                                 <!--      'lux_listing__window_start__extract_year',     -->
                                 <!--      'lux_listing__window_start__extract_quarter',  -->
                                 <!--      'lux_listing__window_start__extract_month',    -->
-                                <!--      'lux_listing__window_start__extract_week',     -->
                                 <!--      'lux_listing__window_start__extract_day',      -->
                                 <!--      'lux_listing__window_start__extract_dow',      -->
                                 <!--      'lux_listing__window_start__extract_doy',      -->
@@ -1102,7 +1039,6 @@
                                 <!--      'lux_listing__window_end__extract_year',       -->
                                 <!--      'lux_listing__window_end__extract_quarter',    -->
                                 <!--      'lux_listing__window_end__extract_month',      -->
-                                <!--      'lux_listing__window_end__extract_week',       -->
                                 <!--      'lux_listing__window_end__extract_day',        -->
                                 <!--      'lux_listing__window_end__extract_dow',        -->
                                 <!--      'lux_listing__window_end__extract_doy',        -->
@@ -1110,207 +1046,191 @@
                                 <!-- node_id = ss_6 -->
                                 <!-- col0 =                                                    -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_379),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_352),  -->
                                 <!--    'column_alias': 'window_start__day'}                   -->
                                 <!-- col1 =                                                    -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_380),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_353),  -->
                                 <!--    'column_alias': 'window_start__week'}                  -->
                                 <!-- col2 =                                                    -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_381),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_354),  -->
                                 <!--    'column_alias': 'window_start__month'}                 -->
                                 <!-- col3 =                                                    -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_382),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_355),  -->
                                 <!--    'column_alias': 'window_start__quarter'}               -->
                                 <!-- col4 =                                                    -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_383),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_356),  -->
                                 <!--    'column_alias': 'window_start__year'}                  -->
                                 <!-- col5 =                                                    -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_384),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_357),  -->
                                 <!--    'column_alias': 'window_start__extract_year'}          -->
                                 <!-- col6 =                                                    -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_385),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_358),  -->
                                 <!--    'column_alias': 'window_start__extract_quarter'}       -->
                                 <!-- col7 =                                                    -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_386),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_359),  -->
                                 <!--    'column_alias': 'window_start__extract_month'}         -->
                                 <!-- col8 =                                                    -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_387),  -->
-                                <!--    'column_alias': 'window_start__extract_week'}          -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_360),  -->
+                                <!--    'column_alias': 'window_start__extract_day'}           -->
                                 <!-- col9 =                                                    -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_388),  -->
-                                <!--    'column_alias': 'window_start__extract_day'}           -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_361),  -->
+                                <!--    'column_alias': 'window_start__extract_dow'}           -->
                                 <!-- col10 =                                                   -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_389),  -->
-                                <!--    'column_alias': 'window_start__extract_dow'}           -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_362),  -->
+                                <!--    'column_alias': 'window_start__extract_doy'}           -->
                                 <!-- col11 =                                                   -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_390),  -->
-                                <!--    'column_alias': 'window_start__extract_doy'}           -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_363),  -->
+                                <!--    'column_alias': 'window_end__day'}                     -->
                                 <!-- col12 =                                                   -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_391),  -->
-                                <!--    'column_alias': 'window_end__day'}                     -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_364),  -->
+                                <!--    'column_alias': 'window_end__week'}                    -->
                                 <!-- col13 =                                                   -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_392),  -->
-                                <!--    'column_alias': 'window_end__week'}                    -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_365),  -->
+                                <!--    'column_alias': 'window_end__month'}                   -->
                                 <!-- col14 =                                                   -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_393),  -->
-                                <!--    'column_alias': 'window_end__month'}                   -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_366),  -->
+                                <!--    'column_alias': 'window_end__quarter'}                 -->
                                 <!-- col15 =                                                   -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_394),  -->
-                                <!--    'column_alias': 'window_end__quarter'}                 -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_367),  -->
+                                <!--    'column_alias': 'window_end__year'}                    -->
                                 <!-- col16 =                                                   -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_395),  -->
-                                <!--    'column_alias': 'window_end__year'}                    -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_368),  -->
+                                <!--    'column_alias': 'window_end__extract_year'}            -->
                                 <!-- col17 =                                                   -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_396),  -->
-                                <!--    'column_alias': 'window_end__extract_year'}            -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_369),  -->
+                                <!--    'column_alias': 'window_end__extract_quarter'}         -->
                                 <!-- col18 =                                                   -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_397),  -->
-                                <!--    'column_alias': 'window_end__extract_quarter'}         -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_370),  -->
+                                <!--    'column_alias': 'window_end__extract_month'}           -->
                                 <!-- col19 =                                                   -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_398),  -->
-                                <!--    'column_alias': 'window_end__extract_month'}           -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_371),  -->
+                                <!--    'column_alias': 'window_end__extract_day'}             -->
                                 <!-- col20 =                                                   -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_399),  -->
-                                <!--    'column_alias': 'window_end__extract_week'}            -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_372),  -->
+                                <!--    'column_alias': 'window_end__extract_dow'}             -->
                                 <!-- col21 =                                                   -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_400),  -->
-                                <!--    'column_alias': 'window_end__extract_day'}             -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_373),  -->
+                                <!--    'column_alias': 'window_end__extract_doy'}             -->
                                 <!-- col22 =                                                   -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_401),  -->
-                                <!--    'column_alias': 'window_end__extract_dow'}             -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_374),  -->
+                                <!--    'column_alias': 'lux_listing__window_start__day'}      -->
                                 <!-- col23 =                                                   -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_402),  -->
-                                <!--    'column_alias': 'window_end__extract_doy'}             -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_375),  -->
+                                <!--    'column_alias': 'lux_listing__window_start__week'}     -->
                                 <!-- col24 =                                                   -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_403),  -->
-                                <!--    'column_alias': 'lux_listing__window_start__day'}      -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_376),  -->
+                                <!--    'column_alias': 'lux_listing__window_start__month'}    -->
                                 <!-- col25 =                                                   -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_404),  -->
-                                <!--    'column_alias': 'lux_listing__window_start__week'}     -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_377),  -->
+                                <!--    'column_alias': 'lux_listing__window_start__quarter'}  -->
                                 <!-- col26 =                                                   -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_405),  -->
-                                <!--    'column_alias': 'lux_listing__window_start__month'}    -->
-                                <!-- col27 =                                                   -->
-                                <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_406),  -->
-                                <!--    'column_alias': 'lux_listing__window_start__quarter'}  -->
-                                <!-- col28 =                                                   -->
-                                <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_407),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_378),  -->
                                 <!--    'column_alias': 'lux_listing__window_start__year'}     -->
-                                <!-- col29 =                                                        -->
+                                <!-- col27 =                                                        -->
                                 <!--   {'class': 'SqlSelectColumn',                                 -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_408),       -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_379),       -->
                                 <!--    'column_alias': 'lux_listing__window_start__extract_year'}  -->
-                                <!-- col30 =                                                           -->
+                                <!-- col28 =                                                           -->
                                 <!--   {'class': 'SqlSelectColumn',                                    -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_409),          -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_380),          -->
                                 <!--    'column_alias': 'lux_listing__window_start__extract_quarter'}  -->
-                                <!-- col31 =                                                         -->
+                                <!-- col29 =                                                         -->
                                 <!--   {'class': 'SqlSelectColumn',                                  -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_410),        -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_381),        -->
                                 <!--    'column_alias': 'lux_listing__window_start__extract_month'}  -->
-                                <!-- col32 =                                                        -->
-                                <!--   {'class': 'SqlSelectColumn',                                 -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_411),       -->
-                                <!--    'column_alias': 'lux_listing__window_start__extract_week'}  -->
-                                <!-- col33 =                                                       -->
+                                <!-- col30 =                                                       -->
                                 <!--   {'class': 'SqlSelectColumn',                                -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_412),      -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_382),      -->
                                 <!--    'column_alias': 'lux_listing__window_start__extract_day'}  -->
-                                <!-- col34 =                                                       -->
+                                <!-- col31 =                                                       -->
                                 <!--   {'class': 'SqlSelectColumn',                                -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_413),      -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_383),      -->
                                 <!--    'column_alias': 'lux_listing__window_start__extract_dow'}  -->
-                                <!-- col35 =                                                       -->
+                                <!-- col32 =                                                       -->
                                 <!--   {'class': 'SqlSelectColumn',                                -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_414),      -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_384),      -->
                                 <!--    'column_alias': 'lux_listing__window_start__extract_doy'}  -->
+                                <!-- col33 =                                                   -->
+                                <!--   {'class': 'SqlSelectColumn',                            -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_385),  -->
+                                <!--    'column_alias': 'lux_listing__window_end__day'}        -->
+                                <!-- col34 =                                                   -->
+                                <!--   {'class': 'SqlSelectColumn',                            -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_386),  -->
+                                <!--    'column_alias': 'lux_listing__window_end__week'}       -->
+                                <!-- col35 =                                                   -->
+                                <!--   {'class': 'SqlSelectColumn',                            -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_387),  -->
+                                <!--    'column_alias': 'lux_listing__window_end__month'}      -->
                                 <!-- col36 =                                                   -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_415),  -->
-                                <!--    'column_alias': 'lux_listing__window_end__day'}        -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_388),  -->
+                                <!--    'column_alias': 'lux_listing__window_end__quarter'}    -->
                                 <!-- col37 =                                                   -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_416),  -->
-                                <!--    'column_alias': 'lux_listing__window_end__week'}       -->
-                                <!-- col38 =                                                   -->
-                                <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_417),  -->
-                                <!--    'column_alias': 'lux_listing__window_end__month'}      -->
-                                <!-- col39 =                                                   -->
-                                <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_418),  -->
-                                <!--    'column_alias': 'lux_listing__window_end__quarter'}    -->
-                                <!-- col40 =                                                   -->
-                                <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_419),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_389),  -->
                                 <!--    'column_alias': 'lux_listing__window_end__year'}       -->
-                                <!-- col41 =                                                      -->
+                                <!-- col38 =                                                      -->
                                 <!--   {'class': 'SqlSelectColumn',                               -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_420),     -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_390),     -->
                                 <!--    'column_alias': 'lux_listing__window_end__extract_year'}  -->
-                                <!-- col42 =                                                         -->
+                                <!-- col39 =                                                         -->
                                 <!--   {'class': 'SqlSelectColumn',                                  -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_421),        -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_391),        -->
                                 <!--    'column_alias': 'lux_listing__window_end__extract_quarter'}  -->
-                                <!-- col43 =                                                       -->
+                                <!-- col40 =                                                       -->
                                 <!--   {'class': 'SqlSelectColumn',                                -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_422),      -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_392),      -->
                                 <!--    'column_alias': 'lux_listing__window_end__extract_month'}  -->
-                                <!-- col44 =                                                      -->
-                                <!--   {'class': 'SqlSelectColumn',                               -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_423),     -->
-                                <!--    'column_alias': 'lux_listing__window_end__extract_week'}  -->
-                                <!-- col45 =                                                     -->
+                                <!-- col41 =                                                     -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_424),    -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_393),    -->
                                 <!--    'column_alias': 'lux_listing__window_end__extract_day'}  -->
-                                <!-- col46 =                                                     -->
+                                <!-- col42 =                                                     -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_425),    -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_394),    -->
                                 <!--    'column_alias': 'lux_listing__window_end__extract_dow'}  -->
-                                <!-- col47 =                                                     -->
+                                <!-- col43 =                                                     -->
                                 <!--   {'class': 'SqlSelectColumn',                              -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_426),    -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_395),    -->
                                 <!--    'column_alias': 'lux_listing__window_end__extract_doy'}  -->
-                                <!-- col48 =                                                   -->
+                                <!-- col44 =                                                   -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_427),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_396),  -->
                                 <!--    'column_alias': 'lux_listing'}                         -->
-                                <!-- col49 =                                                   -->
+                                <!-- col45 =                                                   -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_377),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_350),  -->
                                 <!--    'column_alias': 'is_confirmed_lux'}                    -->
-                                <!-- col50 =                                                   -->
+                                <!-- col46 =                                                   -->
                                 <!--   {'class': 'SqlSelectColumn',                            -->
-                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_378),  -->
+                                <!--    'expr': SqlColumnReferenceExpression(node_id=cr_351),  -->
                                 <!--    'column_alias': 'lux_listing__is_confirmed_lux'}       -->
                                 <!-- from_source = SqlSelectStatementNode(node_id=ss_10019) -->
                                 <!-- where = None -->
@@ -1339,185 +1259,169 @@
                                     <!--    'column_alias': 'window_start__year'}              -->
                                     <!-- col5 =                                              -->
                                     <!--   {'class': 'SqlSelectColumn',                      -->
-                                    <!--    'expr': SqlExtractExpression(node_id=ex_10343),  -->
+                                    <!--    'expr': SqlExtractExpression(node_id=ex_10294),  -->
                                     <!--    'column_alias': 'window_start__extract_year'}    -->
                                     <!-- col6 =                                               -->
                                     <!--   {'class': 'SqlSelectColumn',                       -->
-                                    <!--    'expr': SqlExtractExpression(node_id=ex_10344),   -->
+                                    <!--    'expr': SqlExtractExpression(node_id=ex_10295),   -->
                                     <!--    'column_alias': 'window_start__extract_quarter'}  -->
                                     <!-- col7 =                                              -->
                                     <!--   {'class': 'SqlSelectColumn',                      -->
-                                    <!--    'expr': SqlExtractExpression(node_id=ex_10345),  -->
+                                    <!--    'expr': SqlExtractExpression(node_id=ex_10296),  -->
                                     <!--    'column_alias': 'window_start__extract_month'}   -->
                                     <!-- col8 =                                              -->
                                     <!--   {'class': 'SqlSelectColumn',                      -->
-                                    <!--    'expr': SqlExtractExpression(node_id=ex_10346),  -->
-                                    <!--    'column_alias': 'window_start__extract_week'}    -->
+                                    <!--    'expr': SqlExtractExpression(node_id=ex_10297),  -->
+                                    <!--    'column_alias': 'window_start__extract_day'}     -->
                                     <!-- col9 =                                              -->
                                     <!--   {'class': 'SqlSelectColumn',                      -->
-                                    <!--    'expr': SqlExtractExpression(node_id=ex_10347),  -->
-                                    <!--    'column_alias': 'window_start__extract_day'}     -->
+                                    <!--    'expr': SqlExtractExpression(node_id=ex_10298),  -->
+                                    <!--    'column_alias': 'window_start__extract_dow'}     -->
                                     <!-- col10 =                                             -->
                                     <!--   {'class': 'SqlSelectColumn',                      -->
-                                    <!--    'expr': SqlExtractExpression(node_id=ex_10348),  -->
-                                    <!--    'column_alias': 'window_start__extract_dow'}     -->
-                                    <!-- col11 =                                             -->
-                                    <!--   {'class': 'SqlSelectColumn',                      -->
-                                    <!--    'expr': SqlExtractExpression(node_id=ex_10349),  -->
+                                    <!--    'expr': SqlExtractExpression(node_id=ex_10299),  -->
                                     <!--    'column_alias': 'window_start__extract_doy'}     -->
-                                    <!-- col12 =                                                     -->
+                                    <!-- col11 =                                                     -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
                                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10175),  -->
                                     <!--    'column_alias': 'window_end__day'}                       -->
-                                    <!-- col13 =                                               -->
+                                    <!-- col12 =                                               -->
                                     <!--   {'class': 'SqlSelectColumn',                        -->
                                     <!--    'expr': SqlDateTruncExpression(node_id=dt_10245),  -->
                                     <!--    'column_alias': 'window_end__week'}                -->
-                                    <!-- col14 =                                               -->
+                                    <!-- col13 =                                               -->
                                     <!--   {'class': 'SqlSelectColumn',                        -->
                                     <!--    'expr': SqlDateTruncExpression(node_id=dt_10246),  -->
                                     <!--    'column_alias': 'window_end__month'}               -->
-                                    <!-- col15 =                                               -->
+                                    <!-- col14 =                                               -->
                                     <!--   {'class': 'SqlSelectColumn',                        -->
                                     <!--    'expr': SqlDateTruncExpression(node_id=dt_10247),  -->
                                     <!--    'column_alias': 'window_end__quarter'}             -->
-                                    <!-- col16 =                                               -->
+                                    <!-- col15 =                                               -->
                                     <!--   {'class': 'SqlSelectColumn',                        -->
                                     <!--    'expr': SqlDateTruncExpression(node_id=dt_10248),  -->
                                     <!--    'column_alias': 'window_end__year'}                -->
+                                    <!-- col16 =                                             -->
+                                    <!--   {'class': 'SqlSelectColumn',                      -->
+                                    <!--    'expr': SqlExtractExpression(node_id=ex_10300),  -->
+                                    <!--    'column_alias': 'window_end__extract_year'}      -->
                                     <!-- col17 =                                             -->
                                     <!--   {'class': 'SqlSelectColumn',                      -->
-                                    <!--    'expr': SqlExtractExpression(node_id=ex_10350),  -->
-                                    <!--    'column_alias': 'window_end__extract_year'}      -->
+                                    <!--    'expr': SqlExtractExpression(node_id=ex_10301),  -->
+                                    <!--    'column_alias': 'window_end__extract_quarter'}   -->
                                     <!-- col18 =                                             -->
                                     <!--   {'class': 'SqlSelectColumn',                      -->
-                                    <!--    'expr': SqlExtractExpression(node_id=ex_10351),  -->
-                                    <!--    'column_alias': 'window_end__extract_quarter'}   -->
+                                    <!--    'expr': SqlExtractExpression(node_id=ex_10302),  -->
+                                    <!--    'column_alias': 'window_end__extract_month'}     -->
                                     <!-- col19 =                                             -->
                                     <!--   {'class': 'SqlSelectColumn',                      -->
-                                    <!--    'expr': SqlExtractExpression(node_id=ex_10352),  -->
-                                    <!--    'column_alias': 'window_end__extract_month'}     -->
+                                    <!--    'expr': SqlExtractExpression(node_id=ex_10303),  -->
+                                    <!--    'column_alias': 'window_end__extract_day'}       -->
                                     <!-- col20 =                                             -->
                                     <!--   {'class': 'SqlSelectColumn',                      -->
-                                    <!--    'expr': SqlExtractExpression(node_id=ex_10353),  -->
-                                    <!--    'column_alias': 'window_end__extract_week'}      -->
+                                    <!--    'expr': SqlExtractExpression(node_id=ex_10304),  -->
+                                    <!--    'column_alias': 'window_end__extract_dow'}       -->
                                     <!-- col21 =                                             -->
                                     <!--   {'class': 'SqlSelectColumn',                      -->
-                                    <!--    'expr': SqlExtractExpression(node_id=ex_10354),  -->
-                                    <!--    'column_alias': 'window_end__extract_day'}       -->
-                                    <!-- col22 =                                             -->
-                                    <!--   {'class': 'SqlSelectColumn',                      -->
-                                    <!--    'expr': SqlExtractExpression(node_id=ex_10355),  -->
-                                    <!--    'column_alias': 'window_end__extract_dow'}       -->
-                                    <!-- col23 =                                             -->
-                                    <!--   {'class': 'SqlSelectColumn',                      -->
-                                    <!--    'expr': SqlExtractExpression(node_id=ex_10356),  -->
+                                    <!--    'expr': SqlExtractExpression(node_id=ex_10305),  -->
                                     <!--    'column_alias': 'window_end__extract_doy'}       -->
-                                    <!-- col24 =                                                     -->
+                                    <!-- col22 =                                                     -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
                                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10176),  -->
                                     <!--    'column_alias': 'is_confirmed_lux'}                      -->
-                                    <!-- col25 =                                                     -->
+                                    <!-- col23 =                                                     -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
                                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10177),  -->
                                     <!--    'column_alias': 'lux_listing__window_start__day'}        -->
-                                    <!-- col26 =                                                -->
+                                    <!-- col24 =                                                -->
                                     <!--   {'class': 'SqlSelectColumn',                         -->
                                     <!--    'expr': SqlDateTruncExpression(node_id=dt_10249),   -->
                                     <!--    'column_alias': 'lux_listing__window_start__week'}  -->
-                                    <!-- col27 =                                                 -->
+                                    <!-- col25 =                                                 -->
                                     <!--   {'class': 'SqlSelectColumn',                          -->
                                     <!--    'expr': SqlDateTruncExpression(node_id=dt_10250),    -->
                                     <!--    'column_alias': 'lux_listing__window_start__month'}  -->
-                                    <!-- col28 =                                                   -->
+                                    <!-- col26 =                                                   -->
                                     <!--   {'class': 'SqlSelectColumn',                            -->
                                     <!--    'expr': SqlDateTruncExpression(node_id=dt_10251),      -->
                                     <!--    'column_alias': 'lux_listing__window_start__quarter'}  -->
-                                    <!-- col29 =                                                -->
+                                    <!-- col27 =                                                -->
                                     <!--   {'class': 'SqlSelectColumn',                         -->
                                     <!--    'expr': SqlDateTruncExpression(node_id=dt_10252),   -->
                                     <!--    'column_alias': 'lux_listing__window_start__year'}  -->
-                                    <!-- col30 =                                                        -->
+                                    <!-- col28 =                                                        -->
                                     <!--   {'class': 'SqlSelectColumn',                                 -->
-                                    <!--    'expr': SqlExtractExpression(node_id=ex_10357),             -->
+                                    <!--    'expr': SqlExtractExpression(node_id=ex_10306),             -->
                                     <!--    'column_alias': 'lux_listing__window_start__extract_year'}  -->
-                                    <!-- col31 =                                                           -->
+                                    <!-- col29 =                                                           -->
                                     <!--   {'class': 'SqlSelectColumn',                                    -->
-                                    <!--    'expr': SqlExtractExpression(node_id=ex_10358),                -->
+                                    <!--    'expr': SqlExtractExpression(node_id=ex_10307),                -->
                                     <!--    'column_alias': 'lux_listing__window_start__extract_quarter'}  -->
-                                    <!-- col32 =                                                         -->
+                                    <!-- col30 =                                                         -->
                                     <!--   {'class': 'SqlSelectColumn',                                  -->
-                                    <!--    'expr': SqlExtractExpression(node_id=ex_10359),              -->
+                                    <!--    'expr': SqlExtractExpression(node_id=ex_10308),              -->
                                     <!--    'column_alias': 'lux_listing__window_start__extract_month'}  -->
-                                    <!-- col33 =                                                        -->
-                                    <!--   {'class': 'SqlSelectColumn',                                 -->
-                                    <!--    'expr': SqlExtractExpression(node_id=ex_10360),             -->
-                                    <!--    'column_alias': 'lux_listing__window_start__extract_week'}  -->
-                                    <!-- col34 =                                                       -->
+                                    <!-- col31 =                                                       -->
                                     <!--   {'class': 'SqlSelectColumn',                                -->
-                                    <!--    'expr': SqlExtractExpression(node_id=ex_10361),            -->
+                                    <!--    'expr': SqlExtractExpression(node_id=ex_10309),            -->
                                     <!--    'column_alias': 'lux_listing__window_start__extract_day'}  -->
-                                    <!-- col35 =                                                       -->
+                                    <!-- col32 =                                                       -->
                                     <!--   {'class': 'SqlSelectColumn',                                -->
-                                    <!--    'expr': SqlExtractExpression(node_id=ex_10362),            -->
+                                    <!--    'expr': SqlExtractExpression(node_id=ex_10310),            -->
                                     <!--    'column_alias': 'lux_listing__window_start__extract_dow'}  -->
-                                    <!-- col36 =                                                       -->
+                                    <!-- col33 =                                                       -->
                                     <!--   {'class': 'SqlSelectColumn',                                -->
-                                    <!--    'expr': SqlExtractExpression(node_id=ex_10363),            -->
+                                    <!--    'expr': SqlExtractExpression(node_id=ex_10311),            -->
                                     <!--    'column_alias': 'lux_listing__window_start__extract_doy'}  -->
-                                    <!-- col37 =                                                     -->
+                                    <!-- col34 =                                                     -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
                                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10178),  -->
                                     <!--    'column_alias': 'lux_listing__window_end__day'}          -->
-                                    <!-- col38 =                                               -->
+                                    <!-- col35 =                                               -->
                                     <!--   {'class': 'SqlSelectColumn',                        -->
                                     <!--    'expr': SqlDateTruncExpression(node_id=dt_10253),  -->
                                     <!--    'column_alias': 'lux_listing__window_end__week'}   -->
-                                    <!-- col39 =                                               -->
+                                    <!-- col36 =                                               -->
                                     <!--   {'class': 'SqlSelectColumn',                        -->
                                     <!--    'expr': SqlDateTruncExpression(node_id=dt_10254),  -->
                                     <!--    'column_alias': 'lux_listing__window_end__month'}  -->
-                                    <!-- col40 =                                                 -->
+                                    <!-- col37 =                                                 -->
                                     <!--   {'class': 'SqlSelectColumn',                          -->
                                     <!--    'expr': SqlDateTruncExpression(node_id=dt_10255),    -->
                                     <!--    'column_alias': 'lux_listing__window_end__quarter'}  -->
-                                    <!-- col41 =                                               -->
+                                    <!-- col38 =                                               -->
                                     <!--   {'class': 'SqlSelectColumn',                        -->
                                     <!--    'expr': SqlDateTruncExpression(node_id=dt_10256),  -->
                                     <!--    'column_alias': 'lux_listing__window_end__year'}   -->
-                                    <!-- col42 =                                                      -->
+                                    <!-- col39 =                                                      -->
                                     <!--   {'class': 'SqlSelectColumn',                               -->
-                                    <!--    'expr': SqlExtractExpression(node_id=ex_10364),           -->
+                                    <!--    'expr': SqlExtractExpression(node_id=ex_10312),           -->
                                     <!--    'column_alias': 'lux_listing__window_end__extract_year'}  -->
-                                    <!-- col43 =                                                         -->
+                                    <!-- col40 =                                                         -->
                                     <!--   {'class': 'SqlSelectColumn',                                  -->
-                                    <!--    'expr': SqlExtractExpression(node_id=ex_10365),              -->
+                                    <!--    'expr': SqlExtractExpression(node_id=ex_10313),              -->
                                     <!--    'column_alias': 'lux_listing__window_end__extract_quarter'}  -->
-                                    <!-- col44 =                                                       -->
+                                    <!-- col41 =                                                       -->
                                     <!--   {'class': 'SqlSelectColumn',                                -->
-                                    <!--    'expr': SqlExtractExpression(node_id=ex_10366),            -->
+                                    <!--    'expr': SqlExtractExpression(node_id=ex_10314),            -->
                                     <!--    'column_alias': 'lux_listing__window_end__extract_month'}  -->
-                                    <!-- col45 =                                                      -->
-                                    <!--   {'class': 'SqlSelectColumn',                               -->
-                                    <!--    'expr': SqlExtractExpression(node_id=ex_10367),           -->
-                                    <!--    'column_alias': 'lux_listing__window_end__extract_week'}  -->
-                                    <!-- col46 =                                                     -->
+                                    <!-- col42 =                                                     -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlExtractExpression(node_id=ex_10368),          -->
+                                    <!--    'expr': SqlExtractExpression(node_id=ex_10315),          -->
                                     <!--    'column_alias': 'lux_listing__window_end__extract_day'}  -->
-                                    <!-- col47 =                                                     -->
+                                    <!-- col43 =                                                     -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlExtractExpression(node_id=ex_10369),          -->
+                                    <!--    'expr': SqlExtractExpression(node_id=ex_10316),          -->
                                     <!--    'column_alias': 'lux_listing__window_end__extract_dow'}  -->
-                                    <!-- col48 =                                                     -->
+                                    <!-- col44 =                                                     -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
-                                    <!--    'expr': SqlExtractExpression(node_id=ex_10370),          -->
+                                    <!--    'expr': SqlExtractExpression(node_id=ex_10317),          -->
                                     <!--    'column_alias': 'lux_listing__window_end__extract_doy'}  -->
-                                    <!-- col49 =                                                     -->
+                                    <!-- col45 =                                                     -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
                                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10179),  -->
                                     <!--    'column_alias': 'lux_listing__is_confirmed_lux'}         -->
-                                    <!-- col50 =                                                     -->
+                                    <!-- col46 =                                                     -->
                                     <!--   {'class': 'SqlSelectColumn',                              -->
                                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_10180),  -->
                                     <!--    'column_alias': 'lux_listing'}                           -->

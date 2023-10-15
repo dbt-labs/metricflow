@@ -9,7 +9,6 @@ SELECT
   , EXTRACT(year FROM id_verifications_src_10003.ds) AS ds__extract_year
   , EXTRACT(quarter FROM id_verifications_src_10003.ds) AS ds__extract_quarter
   , EXTRACT(month FROM id_verifications_src_10003.ds) AS ds__extract_month
-  , EXTRACT(isoweek FROM id_verifications_src_10003.ds) AS ds__extract_week
   , EXTRACT(day FROM id_verifications_src_10003.ds) AS ds__extract_day
   , EXTRACT(dayofweek FROM id_verifications_src_10003.ds) AS ds__extract_dow
   , EXTRACT(dayofyear FROM id_verifications_src_10003.ds) AS ds__extract_doy
@@ -21,7 +20,6 @@ SELECT
   , EXTRACT(year FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_year
   , EXTRACT(quarter FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_quarter
   , EXTRACT(month FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_month
-  , EXTRACT(isoweek FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_week
   , EXTRACT(day FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_day
   , EXTRACT(dayofweek FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_dow
   , EXTRACT(dayofyear FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_doy
@@ -34,7 +32,6 @@ SELECT
   , EXTRACT(year FROM id_verifications_src_10003.ds) AS verification__ds__extract_year
   , EXTRACT(quarter FROM id_verifications_src_10003.ds) AS verification__ds__extract_quarter
   , EXTRACT(month FROM id_verifications_src_10003.ds) AS verification__ds__extract_month
-  , EXTRACT(isoweek FROM id_verifications_src_10003.ds) AS verification__ds__extract_week
   , EXTRACT(day FROM id_verifications_src_10003.ds) AS verification__ds__extract_day
   , EXTRACT(dayofweek FROM id_verifications_src_10003.ds) AS verification__ds__extract_dow
   , EXTRACT(dayofyear FROM id_verifications_src_10003.ds) AS verification__ds__extract_doy
@@ -46,7 +43,6 @@ SELECT
   , EXTRACT(year FROM id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__extract_year
   , EXTRACT(quarter FROM id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__extract_quarter
   , EXTRACT(month FROM id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__extract_month
-  , EXTRACT(isoweek FROM id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__extract_week
   , EXTRACT(day FROM id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__extract_day
   , EXTRACT(dayofweek FROM id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__extract_dow
   , EXTRACT(dayofyear FROM id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__extract_doy

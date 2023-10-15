@@ -9,7 +9,6 @@ SELECT
   , EXTRACT(year FROM revenue_src_10006.created_at) AS ds__extract_year
   , EXTRACT(quarter FROM revenue_src_10006.created_at) AS ds__extract_quarter
   , EXTRACT(month FROM revenue_src_10006.created_at) AS ds__extract_month
-  , EXTRACT(isoweek FROM revenue_src_10006.created_at) AS ds__extract_week
   , EXTRACT(day FROM revenue_src_10006.created_at) AS ds__extract_day
   , EXTRACT(dayofweek FROM revenue_src_10006.created_at) AS ds__extract_dow
   , EXTRACT(dayofyear FROM revenue_src_10006.created_at) AS ds__extract_doy
@@ -21,7 +20,6 @@ SELECT
   , EXTRACT(year FROM revenue_src_10006.created_at) AS company__ds__extract_year
   , EXTRACT(quarter FROM revenue_src_10006.created_at) AS company__ds__extract_quarter
   , EXTRACT(month FROM revenue_src_10006.created_at) AS company__ds__extract_month
-  , EXTRACT(isoweek FROM revenue_src_10006.created_at) AS company__ds__extract_week
   , EXTRACT(day FROM revenue_src_10006.created_at) AS company__ds__extract_day
   , EXTRACT(dayofweek FROM revenue_src_10006.created_at) AS company__ds__extract_dow
   , EXTRACT(dayofyear FROM revenue_src_10006.created_at) AS company__ds__extract_doy

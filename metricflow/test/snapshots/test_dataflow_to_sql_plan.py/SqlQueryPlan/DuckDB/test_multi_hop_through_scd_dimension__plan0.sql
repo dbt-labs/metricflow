@@ -43,7 +43,6 @@ FROM (
             , subq_0.ds__extract_year
             , subq_0.ds__extract_quarter
             , subq_0.ds__extract_month
-            , subq_0.ds__extract_week
             , subq_0.ds__extract_day
             , subq_0.ds__extract_dow
             , subq_0.ds__extract_doy
@@ -55,7 +54,6 @@ FROM (
             , subq_0.ds_partitioned__extract_year
             , subq_0.ds_partitioned__extract_quarter
             , subq_0.ds_partitioned__extract_month
-            , subq_0.ds_partitioned__extract_week
             , subq_0.ds_partitioned__extract_day
             , subq_0.ds_partitioned__extract_dow
             , subq_0.ds_partitioned__extract_doy
@@ -67,7 +65,6 @@ FROM (
             , subq_0.paid_at__extract_year
             , subq_0.paid_at__extract_quarter
             , subq_0.paid_at__extract_month
-            , subq_0.paid_at__extract_week
             , subq_0.paid_at__extract_day
             , subq_0.paid_at__extract_dow
             , subq_0.paid_at__extract_doy
@@ -79,7 +76,6 @@ FROM (
             , subq_0.booking__ds__extract_year
             , subq_0.booking__ds__extract_quarter
             , subq_0.booking__ds__extract_month
-            , subq_0.booking__ds__extract_week
             , subq_0.booking__ds__extract_day
             , subq_0.booking__ds__extract_dow
             , subq_0.booking__ds__extract_doy
@@ -91,7 +87,6 @@ FROM (
             , subq_0.booking__ds_partitioned__extract_year
             , subq_0.booking__ds_partitioned__extract_quarter
             , subq_0.booking__ds_partitioned__extract_month
-            , subq_0.booking__ds_partitioned__extract_week
             , subq_0.booking__ds_partitioned__extract_day
             , subq_0.booking__ds_partitioned__extract_dow
             , subq_0.booking__ds_partitioned__extract_doy
@@ -103,7 +98,6 @@ FROM (
             , subq_0.booking__paid_at__extract_year
             , subq_0.booking__paid_at__extract_quarter
             , subq_0.booking__paid_at__extract_month
-            , subq_0.booking__paid_at__extract_week
             , subq_0.booking__paid_at__extract_day
             , subq_0.booking__paid_at__extract_dow
             , subq_0.booking__paid_at__extract_doy
@@ -115,7 +109,6 @@ FROM (
             , subq_0.ds__extract_year AS metric_time__extract_year
             , subq_0.ds__extract_quarter AS metric_time__extract_quarter
             , subq_0.ds__extract_month AS metric_time__extract_month
-            , subq_0.ds__extract_week AS metric_time__extract_week
             , subq_0.ds__extract_day AS metric_time__extract_day
             , subq_0.ds__extract_dow AS metric_time__extract_dow
             , subq_0.ds__extract_doy AS metric_time__extract_doy
@@ -152,7 +145,6 @@ FROM (
               , EXTRACT(year FROM bookings_source_src_10015.ds) AS ds__extract_year
               , EXTRACT(quarter FROM bookings_source_src_10015.ds) AS ds__extract_quarter
               , EXTRACT(month FROM bookings_source_src_10015.ds) AS ds__extract_month
-              , EXTRACT(week FROM bookings_source_src_10015.ds) AS ds__extract_week
               , EXTRACT(day FROM bookings_source_src_10015.ds) AS ds__extract_day
               , EXTRACT(dow FROM bookings_source_src_10015.ds) AS ds__extract_dow
               , EXTRACT(doy FROM bookings_source_src_10015.ds) AS ds__extract_doy
@@ -164,7 +156,6 @@ FROM (
               , EXTRACT(year FROM bookings_source_src_10015.ds_partitioned) AS ds_partitioned__extract_year
               , EXTRACT(quarter FROM bookings_source_src_10015.ds_partitioned) AS ds_partitioned__extract_quarter
               , EXTRACT(month FROM bookings_source_src_10015.ds_partitioned) AS ds_partitioned__extract_month
-              , EXTRACT(week FROM bookings_source_src_10015.ds_partitioned) AS ds_partitioned__extract_week
               , EXTRACT(day FROM bookings_source_src_10015.ds_partitioned) AS ds_partitioned__extract_day
               , EXTRACT(dow FROM bookings_source_src_10015.ds_partitioned) AS ds_partitioned__extract_dow
               , EXTRACT(doy FROM bookings_source_src_10015.ds_partitioned) AS ds_partitioned__extract_doy
@@ -176,7 +167,6 @@ FROM (
               , EXTRACT(year FROM bookings_source_src_10015.paid_at) AS paid_at__extract_year
               , EXTRACT(quarter FROM bookings_source_src_10015.paid_at) AS paid_at__extract_quarter
               , EXTRACT(month FROM bookings_source_src_10015.paid_at) AS paid_at__extract_month
-              , EXTRACT(week FROM bookings_source_src_10015.paid_at) AS paid_at__extract_week
               , EXTRACT(day FROM bookings_source_src_10015.paid_at) AS paid_at__extract_day
               , EXTRACT(dow FROM bookings_source_src_10015.paid_at) AS paid_at__extract_dow
               , EXTRACT(doy FROM bookings_source_src_10015.paid_at) AS paid_at__extract_doy
@@ -189,7 +179,6 @@ FROM (
               , EXTRACT(year FROM bookings_source_src_10015.ds) AS booking__ds__extract_year
               , EXTRACT(quarter FROM bookings_source_src_10015.ds) AS booking__ds__extract_quarter
               , EXTRACT(month FROM bookings_source_src_10015.ds) AS booking__ds__extract_month
-              , EXTRACT(week FROM bookings_source_src_10015.ds) AS booking__ds__extract_week
               , EXTRACT(day FROM bookings_source_src_10015.ds) AS booking__ds__extract_day
               , EXTRACT(dow FROM bookings_source_src_10015.ds) AS booking__ds__extract_dow
               , EXTRACT(doy FROM bookings_source_src_10015.ds) AS booking__ds__extract_doy
@@ -201,7 +190,6 @@ FROM (
               , EXTRACT(year FROM bookings_source_src_10015.ds_partitioned) AS booking__ds_partitioned__extract_year
               , EXTRACT(quarter FROM bookings_source_src_10015.ds_partitioned) AS booking__ds_partitioned__extract_quarter
               , EXTRACT(month FROM bookings_source_src_10015.ds_partitioned) AS booking__ds_partitioned__extract_month
-              , EXTRACT(week FROM bookings_source_src_10015.ds_partitioned) AS booking__ds_partitioned__extract_week
               , EXTRACT(day FROM bookings_source_src_10015.ds_partitioned) AS booking__ds_partitioned__extract_day
               , EXTRACT(dow FROM bookings_source_src_10015.ds_partitioned) AS booking__ds_partitioned__extract_dow
               , EXTRACT(doy FROM bookings_source_src_10015.ds_partitioned) AS booking__ds_partitioned__extract_doy
@@ -213,7 +201,6 @@ FROM (
               , EXTRACT(year FROM bookings_source_src_10015.paid_at) AS booking__paid_at__extract_year
               , EXTRACT(quarter FROM bookings_source_src_10015.paid_at) AS booking__paid_at__extract_quarter
               , EXTRACT(month FROM bookings_source_src_10015.paid_at) AS booking__paid_at__extract_month
-              , EXTRACT(week FROM bookings_source_src_10015.paid_at) AS booking__paid_at__extract_week
               , EXTRACT(day FROM bookings_source_src_10015.paid_at) AS booking__paid_at__extract_day
               , EXTRACT(dow FROM bookings_source_src_10015.paid_at) AS booking__paid_at__extract_dow
               , EXTRACT(doy FROM bookings_source_src_10015.paid_at) AS booking__paid_at__extract_doy
@@ -248,7 +235,6 @@ FROM (
             , subq_3.window_start__extract_year AS window_start__extract_year
             , subq_3.window_start__extract_quarter AS window_start__extract_quarter
             , subq_3.window_start__extract_month AS window_start__extract_month
-            , subq_3.window_start__extract_week AS window_start__extract_week
             , subq_3.window_start__extract_day AS window_start__extract_day
             , subq_3.window_start__extract_dow AS window_start__extract_dow
             , subq_3.window_start__extract_doy AS window_start__extract_doy
@@ -260,7 +246,6 @@ FROM (
             , subq_3.window_end__extract_year AS window_end__extract_year
             , subq_3.window_end__extract_quarter AS window_end__extract_quarter
             , subq_3.window_end__extract_month AS window_end__extract_month
-            , subq_3.window_end__extract_week AS window_end__extract_week
             , subq_3.window_end__extract_day AS window_end__extract_day
             , subq_3.window_end__extract_dow AS window_end__extract_dow
             , subq_3.window_end__extract_doy AS window_end__extract_doy
@@ -272,7 +257,6 @@ FROM (
             , subq_3.listing__window_start__extract_year AS listing__window_start__extract_year
             , subq_3.listing__window_start__extract_quarter AS listing__window_start__extract_quarter
             , subq_3.listing__window_start__extract_month AS listing__window_start__extract_month
-            , subq_3.listing__window_start__extract_week AS listing__window_start__extract_week
             , subq_3.listing__window_start__extract_day AS listing__window_start__extract_day
             , subq_3.listing__window_start__extract_dow AS listing__window_start__extract_dow
             , subq_3.listing__window_start__extract_doy AS listing__window_start__extract_doy
@@ -284,7 +268,6 @@ FROM (
             , subq_3.listing__window_end__extract_year AS listing__window_end__extract_year
             , subq_3.listing__window_end__extract_quarter AS listing__window_end__extract_quarter
             , subq_3.listing__window_end__extract_month AS listing__window_end__extract_month
-            , subq_3.listing__window_end__extract_week AS listing__window_end__extract_week
             , subq_3.listing__window_end__extract_day AS listing__window_end__extract_day
             , subq_3.listing__window_end__extract_dow AS listing__window_end__extract_dow
             , subq_3.listing__window_end__extract_doy AS listing__window_end__extract_doy
@@ -296,7 +279,6 @@ FROM (
             , subq_5.ds__extract_year AS user__ds__extract_year
             , subq_5.ds__extract_quarter AS user__ds__extract_quarter
             , subq_5.ds__extract_month AS user__ds__extract_month
-            , subq_5.ds__extract_week AS user__ds__extract_week
             , subq_5.ds__extract_day AS user__ds__extract_day
             , subq_5.ds__extract_dow AS user__ds__extract_dow
             , subq_5.ds__extract_doy AS user__ds__extract_doy
@@ -321,7 +303,6 @@ FROM (
               , EXTRACT(year FROM listings_src_10017.active_from) AS window_start__extract_year
               , EXTRACT(quarter FROM listings_src_10017.active_from) AS window_start__extract_quarter
               , EXTRACT(month FROM listings_src_10017.active_from) AS window_start__extract_month
-              , EXTRACT(week FROM listings_src_10017.active_from) AS window_start__extract_week
               , EXTRACT(day FROM listings_src_10017.active_from) AS window_start__extract_day
               , EXTRACT(dow FROM listings_src_10017.active_from) AS window_start__extract_dow
               , EXTRACT(doy FROM listings_src_10017.active_from) AS window_start__extract_doy
@@ -333,7 +314,6 @@ FROM (
               , EXTRACT(year FROM listings_src_10017.active_to) AS window_end__extract_year
               , EXTRACT(quarter FROM listings_src_10017.active_to) AS window_end__extract_quarter
               , EXTRACT(month FROM listings_src_10017.active_to) AS window_end__extract_month
-              , EXTRACT(week FROM listings_src_10017.active_to) AS window_end__extract_week
               , EXTRACT(day FROM listings_src_10017.active_to) AS window_end__extract_day
               , EXTRACT(dow FROM listings_src_10017.active_to) AS window_end__extract_dow
               , EXTRACT(doy FROM listings_src_10017.active_to) AS window_end__extract_doy
@@ -348,7 +328,6 @@ FROM (
               , EXTRACT(year FROM listings_src_10017.active_from) AS listing__window_start__extract_year
               , EXTRACT(quarter FROM listings_src_10017.active_from) AS listing__window_start__extract_quarter
               , EXTRACT(month FROM listings_src_10017.active_from) AS listing__window_start__extract_month
-              , EXTRACT(week FROM listings_src_10017.active_from) AS listing__window_start__extract_week
               , EXTRACT(day FROM listings_src_10017.active_from) AS listing__window_start__extract_day
               , EXTRACT(dow FROM listings_src_10017.active_from) AS listing__window_start__extract_dow
               , EXTRACT(doy FROM listings_src_10017.active_from) AS listing__window_start__extract_doy
@@ -360,7 +339,6 @@ FROM (
               , EXTRACT(year FROM listings_src_10017.active_to) AS listing__window_end__extract_year
               , EXTRACT(quarter FROM listings_src_10017.active_to) AS listing__window_end__extract_quarter
               , EXTRACT(month FROM listings_src_10017.active_to) AS listing__window_end__extract_month
-              , EXTRACT(week FROM listings_src_10017.active_to) AS listing__window_end__extract_week
               , EXTRACT(day FROM listings_src_10017.active_to) AS listing__window_end__extract_day
               , EXTRACT(dow FROM listings_src_10017.active_to) AS listing__window_end__extract_dow
               , EXTRACT(doy FROM listings_src_10017.active_to) AS listing__window_end__extract_doy
@@ -384,7 +362,6 @@ FROM (
             --    'ds__extract_year',
             --    'ds__extract_quarter',
             --    'ds__extract_month',
-            --    'ds__extract_week',
             --    'ds__extract_day',
             --    'ds__extract_dow',
             --    'ds__extract_doy',
@@ -396,7 +373,6 @@ FROM (
             --    'user__ds__extract_year',
             --    'user__ds__extract_quarter',
             --    'user__ds__extract_month',
-            --    'user__ds__extract_week',
             --    'user__ds__extract_day',
             --    'user__ds__extract_dow',
             --    'user__ds__extract_doy',
@@ -410,7 +386,6 @@ FROM (
               , subq_4.ds__extract_year
               , subq_4.ds__extract_quarter
               , subq_4.ds__extract_month
-              , subq_4.ds__extract_week
               , subq_4.ds__extract_day
               , subq_4.ds__extract_dow
               , subq_4.ds__extract_doy
@@ -422,7 +397,6 @@ FROM (
               , subq_4.user__ds__extract_year
               , subq_4.user__ds__extract_quarter
               , subq_4.user__ds__extract_month
-              , subq_4.user__ds__extract_week
               , subq_4.user__ds__extract_day
               , subq_4.user__ds__extract_dow
               , subq_4.user__ds__extract_doy
@@ -440,7 +414,6 @@ FROM (
                 , EXTRACT(year FROM users_latest_src_10021.ds) AS ds__extract_year
                 , EXTRACT(quarter FROM users_latest_src_10021.ds) AS ds__extract_quarter
                 , EXTRACT(month FROM users_latest_src_10021.ds) AS ds__extract_month
-                , EXTRACT(week FROM users_latest_src_10021.ds) AS ds__extract_week
                 , EXTRACT(day FROM users_latest_src_10021.ds) AS ds__extract_day
                 , EXTRACT(dow FROM users_latest_src_10021.ds) AS ds__extract_dow
                 , EXTRACT(doy FROM users_latest_src_10021.ds) AS ds__extract_doy
@@ -453,7 +426,6 @@ FROM (
                 , EXTRACT(year FROM users_latest_src_10021.ds) AS user__ds__extract_year
                 , EXTRACT(quarter FROM users_latest_src_10021.ds) AS user__ds__extract_quarter
                 , EXTRACT(month FROM users_latest_src_10021.ds) AS user__ds__extract_month
-                , EXTRACT(week FROM users_latest_src_10021.ds) AS user__ds__extract_week
                 , EXTRACT(day FROM users_latest_src_10021.ds) AS user__ds__extract_day
                 , EXTRACT(dow FROM users_latest_src_10021.ds) AS user__ds__extract_dow
                 , EXTRACT(doy FROM users_latest_src_10021.ds) AS user__ds__extract_doy

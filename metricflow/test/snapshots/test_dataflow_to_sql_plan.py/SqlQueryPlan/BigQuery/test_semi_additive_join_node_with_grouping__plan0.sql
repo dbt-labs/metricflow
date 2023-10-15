@@ -8,7 +8,6 @@ SELECT
   , subq_0.ds__extract_year AS ds__extract_year
   , subq_0.ds__extract_quarter AS ds__extract_quarter
   , subq_0.ds__extract_month AS ds__extract_month
-  , subq_0.ds__extract_week AS ds__extract_week
   , subq_0.ds__extract_day AS ds__extract_day
   , subq_0.ds__extract_dow AS ds__extract_dow
   , subq_0.ds__extract_doy AS ds__extract_doy
@@ -20,7 +19,6 @@ SELECT
   , subq_0.account__ds__extract_year AS account__ds__extract_year
   , subq_0.account__ds__extract_quarter AS account__ds__extract_quarter
   , subq_0.account__ds__extract_month AS account__ds__extract_month
-  , subq_0.account__ds__extract_week AS account__ds__extract_week
   , subq_0.account__ds__extract_day AS account__ds__extract_day
   , subq_0.account__ds__extract_dow AS account__ds__extract_dow
   , subq_0.account__ds__extract_doy AS account__ds__extract_doy
@@ -45,7 +43,6 @@ FROM (
     , EXTRACT(year FROM accounts_source_src_10000.ds) AS ds__extract_year
     , EXTRACT(quarter FROM accounts_source_src_10000.ds) AS ds__extract_quarter
     , EXTRACT(month FROM accounts_source_src_10000.ds) AS ds__extract_month
-    , EXTRACT(isoweek FROM accounts_source_src_10000.ds) AS ds__extract_week
     , EXTRACT(day FROM accounts_source_src_10000.ds) AS ds__extract_day
     , EXTRACT(dayofweek FROM accounts_source_src_10000.ds) AS ds__extract_dow
     , EXTRACT(dayofyear FROM accounts_source_src_10000.ds) AS ds__extract_doy
@@ -58,7 +55,6 @@ FROM (
     , EXTRACT(year FROM accounts_source_src_10000.ds) AS account__ds__extract_year
     , EXTRACT(quarter FROM accounts_source_src_10000.ds) AS account__ds__extract_quarter
     , EXTRACT(month FROM accounts_source_src_10000.ds) AS account__ds__extract_month
-    , EXTRACT(isoweek FROM accounts_source_src_10000.ds) AS account__ds__extract_week
     , EXTRACT(day FROM accounts_source_src_10000.ds) AS account__ds__extract_day
     , EXTRACT(dayofweek FROM accounts_source_src_10000.ds) AS account__ds__extract_dow
     , EXTRACT(dayofyear FROM accounts_source_src_10000.ds) AS account__ds__extract_doy
@@ -86,7 +82,6 @@ INNER JOIN (
       , EXTRACT(year FROM accounts_source_src_10000.ds) AS ds__extract_year
       , EXTRACT(quarter FROM accounts_source_src_10000.ds) AS ds__extract_quarter
       , EXTRACT(month FROM accounts_source_src_10000.ds) AS ds__extract_month
-      , EXTRACT(isoweek FROM accounts_source_src_10000.ds) AS ds__extract_week
       , EXTRACT(day FROM accounts_source_src_10000.ds) AS ds__extract_day
       , EXTRACT(dayofweek FROM accounts_source_src_10000.ds) AS ds__extract_dow
       , EXTRACT(dayofyear FROM accounts_source_src_10000.ds) AS ds__extract_doy
@@ -99,7 +94,6 @@ INNER JOIN (
       , EXTRACT(year FROM accounts_source_src_10000.ds) AS account__ds__extract_year
       , EXTRACT(quarter FROM accounts_source_src_10000.ds) AS account__ds__extract_quarter
       , EXTRACT(month FROM accounts_source_src_10000.ds) AS account__ds__extract_month
-      , EXTRACT(isoweek FROM accounts_source_src_10000.ds) AS account__ds__extract_week
       , EXTRACT(day FROM accounts_source_src_10000.ds) AS account__ds__extract_day
       , EXTRACT(dayofweek FROM accounts_source_src_10000.ds) AS account__ds__extract_dow
       , EXTRACT(dayofyear FROM accounts_source_src_10000.ds) AS account__ds__extract_doy

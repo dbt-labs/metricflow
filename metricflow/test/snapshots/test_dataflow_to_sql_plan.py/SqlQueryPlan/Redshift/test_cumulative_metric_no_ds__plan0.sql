@@ -21,7 +21,6 @@ FROM (
         , subq_0.ds__extract_year
         , subq_0.ds__extract_quarter
         , subq_0.ds__extract_month
-        , subq_0.ds__extract_week
         , subq_0.ds__extract_day
         , subq_0.ds__extract_dow
         , subq_0.ds__extract_doy
@@ -33,7 +32,6 @@ FROM (
         , subq_0.company__ds__extract_year
         , subq_0.company__ds__extract_quarter
         , subq_0.company__ds__extract_month
-        , subq_0.company__ds__extract_week
         , subq_0.company__ds__extract_day
         , subq_0.company__ds__extract_dow
         , subq_0.company__ds__extract_doy
@@ -45,7 +43,6 @@ FROM (
         , subq_0.ds__extract_year AS metric_time__extract_year
         , subq_0.ds__extract_quarter AS metric_time__extract_quarter
         , subq_0.ds__extract_month AS metric_time__extract_month
-        , subq_0.ds__extract_week AS metric_time__extract_week
         , subq_0.ds__extract_day AS metric_time__extract_day
         , subq_0.ds__extract_dow AS metric_time__extract_dow
         , subq_0.ds__extract_doy AS metric_time__extract_doy
@@ -64,7 +61,6 @@ FROM (
           , EXTRACT(year FROM revenue_src_10006.created_at) AS ds__extract_year
           , EXTRACT(quarter FROM revenue_src_10006.created_at) AS ds__extract_quarter
           , EXTRACT(month FROM revenue_src_10006.created_at) AS ds__extract_month
-          , EXTRACT(week FROM revenue_src_10006.created_at) AS ds__extract_week
           , EXTRACT(day FROM revenue_src_10006.created_at) AS ds__extract_day
           , EXTRACT(dow FROM revenue_src_10006.created_at) AS ds__extract_dow
           , EXTRACT(doy FROM revenue_src_10006.created_at) AS ds__extract_doy
@@ -76,7 +72,6 @@ FROM (
           , EXTRACT(year FROM revenue_src_10006.created_at) AS company__ds__extract_year
           , EXTRACT(quarter FROM revenue_src_10006.created_at) AS company__ds__extract_quarter
           , EXTRACT(month FROM revenue_src_10006.created_at) AS company__ds__extract_month
-          , EXTRACT(week FROM revenue_src_10006.created_at) AS company__ds__extract_week
           , EXTRACT(day FROM revenue_src_10006.created_at) AS company__ds__extract_day
           , EXTRACT(dow FROM revenue_src_10006.created_at) AS company__ds__extract_dow
           , EXTRACT(doy FROM revenue_src_10006.created_at) AS company__ds__extract_doy

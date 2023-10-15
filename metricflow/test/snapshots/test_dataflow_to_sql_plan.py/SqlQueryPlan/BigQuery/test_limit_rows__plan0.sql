@@ -29,7 +29,6 @@ FROM (
           , subq_0.ds__extract_year
           , subq_0.ds__extract_quarter
           , subq_0.ds__extract_month
-          , subq_0.ds__extract_week
           , subq_0.ds__extract_day
           , subq_0.ds__extract_dow
           , subq_0.ds__extract_doy
@@ -41,7 +40,6 @@ FROM (
           , subq_0.ds_partitioned__extract_year
           , subq_0.ds_partitioned__extract_quarter
           , subq_0.ds_partitioned__extract_month
-          , subq_0.ds_partitioned__extract_week
           , subq_0.ds_partitioned__extract_day
           , subq_0.ds_partitioned__extract_dow
           , subq_0.ds_partitioned__extract_doy
@@ -53,7 +51,6 @@ FROM (
           , subq_0.paid_at__extract_year
           , subq_0.paid_at__extract_quarter
           , subq_0.paid_at__extract_month
-          , subq_0.paid_at__extract_week
           , subq_0.paid_at__extract_day
           , subq_0.paid_at__extract_dow
           , subq_0.paid_at__extract_doy
@@ -65,7 +62,6 @@ FROM (
           , subq_0.booking__ds__extract_year
           , subq_0.booking__ds__extract_quarter
           , subq_0.booking__ds__extract_month
-          , subq_0.booking__ds__extract_week
           , subq_0.booking__ds__extract_day
           , subq_0.booking__ds__extract_dow
           , subq_0.booking__ds__extract_doy
@@ -77,7 +73,6 @@ FROM (
           , subq_0.booking__ds_partitioned__extract_year
           , subq_0.booking__ds_partitioned__extract_quarter
           , subq_0.booking__ds_partitioned__extract_month
-          , subq_0.booking__ds_partitioned__extract_week
           , subq_0.booking__ds_partitioned__extract_day
           , subq_0.booking__ds_partitioned__extract_dow
           , subq_0.booking__ds_partitioned__extract_doy
@@ -89,7 +84,6 @@ FROM (
           , subq_0.booking__paid_at__extract_year
           , subq_0.booking__paid_at__extract_quarter
           , subq_0.booking__paid_at__extract_month
-          , subq_0.booking__paid_at__extract_week
           , subq_0.booking__paid_at__extract_day
           , subq_0.booking__paid_at__extract_dow
           , subq_0.booking__paid_at__extract_doy
@@ -101,7 +95,6 @@ FROM (
           , subq_0.ds__extract_year AS metric_time__extract_year
           , subq_0.ds__extract_quarter AS metric_time__extract_quarter
           , subq_0.ds__extract_month AS metric_time__extract_month
-          , subq_0.ds__extract_week AS metric_time__extract_week
           , subq_0.ds__extract_day AS metric_time__extract_day
           , subq_0.ds__extract_dow AS metric_time__extract_dow
           , subq_0.ds__extract_doy AS metric_time__extract_doy
@@ -152,7 +145,6 @@ FROM (
             , EXTRACT(year FROM bookings_source_src_10001.ds) AS ds__extract_year
             , EXTRACT(quarter FROM bookings_source_src_10001.ds) AS ds__extract_quarter
             , EXTRACT(month FROM bookings_source_src_10001.ds) AS ds__extract_month
-            , EXTRACT(isoweek FROM bookings_source_src_10001.ds) AS ds__extract_week
             , EXTRACT(day FROM bookings_source_src_10001.ds) AS ds__extract_day
             , EXTRACT(dayofweek FROM bookings_source_src_10001.ds) AS ds__extract_dow
             , EXTRACT(dayofyear FROM bookings_source_src_10001.ds) AS ds__extract_doy
@@ -164,7 +156,6 @@ FROM (
             , EXTRACT(year FROM bookings_source_src_10001.ds_partitioned) AS ds_partitioned__extract_year
             , EXTRACT(quarter FROM bookings_source_src_10001.ds_partitioned) AS ds_partitioned__extract_quarter
             , EXTRACT(month FROM bookings_source_src_10001.ds_partitioned) AS ds_partitioned__extract_month
-            , EXTRACT(isoweek FROM bookings_source_src_10001.ds_partitioned) AS ds_partitioned__extract_week
             , EXTRACT(day FROM bookings_source_src_10001.ds_partitioned) AS ds_partitioned__extract_day
             , EXTRACT(dayofweek FROM bookings_source_src_10001.ds_partitioned) AS ds_partitioned__extract_dow
             , EXTRACT(dayofyear FROM bookings_source_src_10001.ds_partitioned) AS ds_partitioned__extract_doy
@@ -176,7 +167,6 @@ FROM (
             , EXTRACT(year FROM bookings_source_src_10001.paid_at) AS paid_at__extract_year
             , EXTRACT(quarter FROM bookings_source_src_10001.paid_at) AS paid_at__extract_quarter
             , EXTRACT(month FROM bookings_source_src_10001.paid_at) AS paid_at__extract_month
-            , EXTRACT(isoweek FROM bookings_source_src_10001.paid_at) AS paid_at__extract_week
             , EXTRACT(day FROM bookings_source_src_10001.paid_at) AS paid_at__extract_day
             , EXTRACT(dayofweek FROM bookings_source_src_10001.paid_at) AS paid_at__extract_dow
             , EXTRACT(dayofyear FROM bookings_source_src_10001.paid_at) AS paid_at__extract_doy
@@ -189,7 +179,6 @@ FROM (
             , EXTRACT(year FROM bookings_source_src_10001.ds) AS booking__ds__extract_year
             , EXTRACT(quarter FROM bookings_source_src_10001.ds) AS booking__ds__extract_quarter
             , EXTRACT(month FROM bookings_source_src_10001.ds) AS booking__ds__extract_month
-            , EXTRACT(isoweek FROM bookings_source_src_10001.ds) AS booking__ds__extract_week
             , EXTRACT(day FROM bookings_source_src_10001.ds) AS booking__ds__extract_day
             , EXTRACT(dayofweek FROM bookings_source_src_10001.ds) AS booking__ds__extract_dow
             , EXTRACT(dayofyear FROM bookings_source_src_10001.ds) AS booking__ds__extract_doy
@@ -201,7 +190,6 @@ FROM (
             , EXTRACT(year FROM bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__extract_year
             , EXTRACT(quarter FROM bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__extract_quarter
             , EXTRACT(month FROM bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__extract_month
-            , EXTRACT(isoweek FROM bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__extract_week
             , EXTRACT(day FROM bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__extract_day
             , EXTRACT(dayofweek FROM bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__extract_dow
             , EXTRACT(dayofyear FROM bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__extract_doy
@@ -213,7 +201,6 @@ FROM (
             , EXTRACT(year FROM bookings_source_src_10001.paid_at) AS booking__paid_at__extract_year
             , EXTRACT(quarter FROM bookings_source_src_10001.paid_at) AS booking__paid_at__extract_quarter
             , EXTRACT(month FROM bookings_source_src_10001.paid_at) AS booking__paid_at__extract_month
-            , EXTRACT(isoweek FROM bookings_source_src_10001.paid_at) AS booking__paid_at__extract_week
             , EXTRACT(day FROM bookings_source_src_10001.paid_at) AS booking__paid_at__extract_day
             , EXTRACT(dayofweek FROM bookings_source_src_10001.paid_at) AS booking__paid_at__extract_dow
             , EXTRACT(dayofyear FROM bookings_source_src_10001.paid_at) AS booking__paid_at__extract_doy

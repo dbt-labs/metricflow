@@ -8,7 +8,6 @@ SELECT
   , EXTRACT(year FROM users_latest_src_10008.ds) AS ds_latest__extract_year
   , EXTRACT(quarter FROM users_latest_src_10008.ds) AS ds_latest__extract_quarter
   , EXTRACT(month FROM users_latest_src_10008.ds) AS ds_latest__extract_month
-  , EXTRACT(isoweek FROM users_latest_src_10008.ds) AS ds_latest__extract_week
   , EXTRACT(day FROM users_latest_src_10008.ds) AS ds_latest__extract_day
   , EXTRACT(dayofweek FROM users_latest_src_10008.ds) AS ds_latest__extract_dow
   , EXTRACT(dayofyear FROM users_latest_src_10008.ds) AS ds_latest__extract_doy
@@ -21,7 +20,6 @@ SELECT
   , EXTRACT(year FROM users_latest_src_10008.ds) AS user__ds_latest__extract_year
   , EXTRACT(quarter FROM users_latest_src_10008.ds) AS user__ds_latest__extract_quarter
   , EXTRACT(month FROM users_latest_src_10008.ds) AS user__ds_latest__extract_month
-  , EXTRACT(isoweek FROM users_latest_src_10008.ds) AS user__ds_latest__extract_week
   , EXTRACT(day FROM users_latest_src_10008.ds) AS user__ds_latest__extract_day
   , EXTRACT(dayofweek FROM users_latest_src_10008.ds) AS user__ds_latest__extract_dow
   , EXTRACT(dayofyear FROM users_latest_src_10008.ds) AS user__ds_latest__extract_doy

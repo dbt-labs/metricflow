@@ -155,7 +155,6 @@
                                     <!--      'ds_partitioned__extract_year',                  -->
                                     <!--      'ds_partitioned__extract_quarter',               -->
                                     <!--      'ds_partitioned__extract_month',                 -->
-                                    <!--      'ds_partitioned__extract_week',                  -->
                                     <!--      'ds_partitioned__extract_day',                   -->
                                     <!--      'ds_partitioned__extract_dow',                   -->
                                     <!--      'ds_partitioned__extract_doy',                   -->
@@ -167,7 +166,6 @@
                                     <!--      'customer_id__ds_partitioned__extract_year',     -->
                                     <!--      'customer_id__ds_partitioned__extract_quarter',  -->
                                     <!--      'customer_id__ds_partitioned__extract_month',    -->
-                                    <!--      'customer_id__ds_partitioned__extract_week',     -->
                                     <!--      'customer_id__ds_partitioned__extract_day',      -->
                                     <!--      'customer_id__ds_partitioned__extract_dow',      -->
                                     <!--      'customer_id__ds_partitioned__extract_doy',      -->
@@ -247,13 +245,6 @@
                                     <!--    'element_name': 'ds_partitioned',         -->
                                     <!--    'entity_links': (),                       -->
                                     <!--    'time_granularity': TimeGranularity.DAY,  -->
-                                    <!--    'date_part': <DatePart.WEEK: 'week'>,     -->
-                                    <!--    'aggregation_state': None}                -->
-                                    <!-- include_spec =                               -->
-                                    <!--   {'class': 'TimeDimensionSpec',             -->
-                                    <!--    'element_name': 'ds_partitioned',         -->
-                                    <!--    'entity_links': (),                       -->
-                                    <!--    'time_granularity': TimeGranularity.DAY,  -->
                                     <!--    'date_part': <DatePart.DAY: 'day'>,       -->
                                     <!--    'aggregation_state': None}                -->
                                     <!-- include_spec =                               -->
@@ -325,13 +316,6 @@
                                     <!--    'entity_links': ({'class': 'EntityReference', 'element_name': 'customer_id'},),  -->
                                     <!--    'time_granularity': TimeGranularity.DAY,                                         -->
                                     <!--    'date_part': <DatePart.MONTH: 'month'>,                                          -->
-                                    <!--    'aggregation_state': None}                                                       -->
-                                    <!-- include_spec =                                                                      -->
-                                    <!--   {'class': 'TimeDimensionSpec',                                                    -->
-                                    <!--    'element_name': 'ds_partitioned',                                                -->
-                                    <!--    'entity_links': ({'class': 'EntityReference', 'element_name': 'customer_id'},),  -->
-                                    <!--    'time_granularity': TimeGranularity.DAY,                                         -->
-                                    <!--    'date_part': <DatePart.WEEK: 'week'>,                                            -->
                                     <!--    'aggregation_state': None}                                                       -->
                                     <!-- include_spec =                                                                      -->
                                     <!--   {'class': 'TimeDimensionSpec',                                                    -->
