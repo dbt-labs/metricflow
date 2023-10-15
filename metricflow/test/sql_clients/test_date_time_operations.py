@@ -59,9 +59,6 @@ def test_date_trunc_to_year(sql_client: SqlClient) -> None:
     the first Thursday of that year, which might, in fact, be in the previous calendar year. Therefore, we coerce
     to the more general calendar year standard of the first of January.
     """
-    if sql_client.sql_engine_type is SqlEngine.SNOWFLAKE:
-        pass
-
     # The ISO year start for 2015 is 2014-12-29, but we should always get 2015-01-01
     ISO_DATE_STRING = "2015-06-15"
     expected = pd.Timestamp(year=2015, month=1, day=1)
@@ -193,7 +190,6 @@ def test_date_part_day_of_year(sql_client: SqlClient) -> None:
     assert expected == actual
 
 
-@pytest.mark.skip("Date Part handling is currently inconsistent")
 @pytest.mark.parametrize(
     ("input", "expected"),
     (
@@ -208,6 +204,9 @@ def test_date_part_day_of_year(sql_client: SqlClient) -> None:
 )
 def test_date_part_day_of_week(sql_client: SqlClient, input: str, expected: int) -> None:
     """Tests date_part or extract behavior for day of week."""
+    if sql_client.sql_engine_type is SqlEngine.BIGQUERY or SqlEngine.REDSHIFT:
+        pytest.skip(reason="bigquery and redshift do not have native support for ISO day of week")
+
     extract_stmt = sql_client.sql_query_plan_renderer.expr_renderer.render_sql_expr(
         _build_extract_expression(date_string=input, date_part=DatePart.DOW)
     ).sql

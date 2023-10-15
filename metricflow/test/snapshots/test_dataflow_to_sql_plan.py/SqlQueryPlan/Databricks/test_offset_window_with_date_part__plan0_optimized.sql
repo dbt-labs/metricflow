@@ -20,7 +20,7 @@ FROM (
       -- Pass Only Elements:
       --   ['bookings', 'metric_time__extract_dow']
       SELECT
-        EXTRACT(dow FROM ds) AS metric_time__extract_dow
+        EXTRACT(DAYOFWEEK_ISO FROM ds) AS metric_time__extract_dow
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_10001
     ) subq_16
@@ -34,7 +34,7 @@ FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      EXTRACT(dow FROM subq_22.ds) AS metric_time__extract_dow
+      EXTRACT(DAYOFWEEK_ISO FROM subq_22.ds) AS metric_time__extract_dow
       , SUM(subq_20.bookings) AS bookings_2_weeks_ago
     FROM ***************************.mf_time_spine subq_22
     INNER JOIN (
@@ -48,7 +48,7 @@ FROM (
     ON
       DATEADD(day, -14, subq_22.ds) = subq_20.metric_time__day
     GROUP BY
-      EXTRACT(dow FROM subq_22.ds)
+      EXTRACT(DAYOFWEEK_ISO FROM subq_22.ds)
   ) subq_26
   ON
     (

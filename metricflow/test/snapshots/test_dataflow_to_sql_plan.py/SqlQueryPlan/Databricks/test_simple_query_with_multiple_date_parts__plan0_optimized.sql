@@ -24,7 +24,7 @@ FROM (
     , EXTRACT(quarter FROM ds) AS metric_time__extract_quarter
     , EXTRACT(month FROM ds) AS metric_time__extract_month
     , EXTRACT(day FROM ds) AS metric_time__extract_day
-    , EXTRACT(dow FROM ds) AS metric_time__extract_dow
+    , EXTRACT(DAYOFWEEK_ISO FROM ds) AS metric_time__extract_dow
     , EXTRACT(doy FROM ds) AS metric_time__extract_doy
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_10001

@@ -65,7 +65,7 @@ FROM (
           , EXTRACT(quarter FROM revenue_src_10006.created_at) AS ds__extract_quarter
           , EXTRACT(month FROM revenue_src_10006.created_at) AS ds__extract_month
           , EXTRACT(day FROM revenue_src_10006.created_at) AS ds__extract_day
-          , EXTRACT(dow FROM revenue_src_10006.created_at) AS ds__extract_dow
+          , EXTRACT(isodow FROM revenue_src_10006.created_at) AS ds__extract_dow
           , EXTRACT(doy FROM revenue_src_10006.created_at) AS ds__extract_doy
           , DATE_TRUNC('day', revenue_src_10006.created_at) AS company__ds__day
           , DATE_TRUNC('week', revenue_src_10006.created_at) AS company__ds__week
@@ -76,7 +76,7 @@ FROM (
           , EXTRACT(quarter FROM revenue_src_10006.created_at) AS company__ds__extract_quarter
           , EXTRACT(month FROM revenue_src_10006.created_at) AS company__ds__extract_month
           , EXTRACT(day FROM revenue_src_10006.created_at) AS company__ds__extract_day
-          , EXTRACT(dow FROM revenue_src_10006.created_at) AS company__ds__extract_dow
+          , EXTRACT(isodow FROM revenue_src_10006.created_at) AS company__ds__extract_dow
           , EXTRACT(doy FROM revenue_src_10006.created_at) AS company__ds__extract_doy
           , revenue_src_10006.user_id AS user
           , revenue_src_10006.user_id AS company__user

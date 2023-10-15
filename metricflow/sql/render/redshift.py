@@ -14,6 +14,7 @@ from metricflow.sql.render.expr_renderer import (
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_exprs import SqlGenerateUuidExpression, SqlPercentileExpression, SqlPercentileFunctionType
+from metricflow.time.date_part import DatePart
 
 
 class RedshiftSqlExpressionRenderer(DefaultSqlExpressionRenderer):
@@ -24,6 +25,10 @@ class RedshiftSqlExpressionRenderer(DefaultSqlExpressionRenderer):
     def double_data_type(self) -> str:
         """Custom double data type for the Redshift engine."""
         return "DOUBLE PRECISION"
+
+    @override
+    def render_date_part(self, date_part: DatePart) -> str:
+        return date_part.value
 
     @property
     @override

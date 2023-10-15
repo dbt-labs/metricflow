@@ -13,6 +13,7 @@ from metricflow.sql.render.expr_renderer import (
 )
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from metricflow.sql.sql_exprs import SqlPercentileExpression, SqlPercentileFunctionType
+from metricflow.time.date_part import DatePart
 
 
 class DatabricksSqlExpressionRenderer(DefaultSqlExpressionRenderer):
@@ -22,6 +23,13 @@ class DatabricksSqlExpressionRenderer(DefaultSqlExpressionRenderer):
     @override
     def supported_percentile_function_types(self) -> Collection[SqlPercentileFunctionType]:
         return {SqlPercentileFunctionType.CONTINUOUS, SqlPercentileFunctionType.APPROXIMATE_DISCRETE}
+
+    @override
+    def render_date_part(self, date_part: DatePart) -> str:
+        if date_part is DatePart.DOW:
+            return "DAYOFWEEK_ISO"
+
+        return super().render_date_part(date_part)
 
     @override
     def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:

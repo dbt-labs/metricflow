@@ -44,7 +44,7 @@ FROM (
     , EXTRACT(quarter FROM accounts_source_src_10000.ds) AS ds__extract_quarter
     , EXTRACT(month FROM accounts_source_src_10000.ds) AS ds__extract_month
     , EXTRACT(day FROM accounts_source_src_10000.ds) AS ds__extract_day
-    , EXTRACT(dow FROM accounts_source_src_10000.ds) AS ds__extract_dow
+    , EXTRACT(isodow FROM accounts_source_src_10000.ds) AS ds__extract_dow
     , EXTRACT(doy FROM accounts_source_src_10000.ds) AS ds__extract_doy
     , accounts_source_src_10000.account_type
     , DATE_TRUNC('day', accounts_source_src_10000.ds) AS account__ds__day
@@ -56,7 +56,7 @@ FROM (
     , EXTRACT(quarter FROM accounts_source_src_10000.ds) AS account__ds__extract_quarter
     , EXTRACT(month FROM accounts_source_src_10000.ds) AS account__ds__extract_month
     , EXTRACT(day FROM accounts_source_src_10000.ds) AS account__ds__extract_day
-    , EXTRACT(dow FROM accounts_source_src_10000.ds) AS account__ds__extract_dow
+    , EXTRACT(isodow FROM accounts_source_src_10000.ds) AS account__ds__extract_dow
     , EXTRACT(doy FROM accounts_source_src_10000.ds) AS account__ds__extract_doy
     , accounts_source_src_10000.account_type AS account__account_type
     , accounts_source_src_10000.user_id AS user
@@ -82,7 +82,7 @@ INNER JOIN (
       , EXTRACT(quarter FROM accounts_source_src_10000.ds) AS ds__extract_quarter
       , EXTRACT(month FROM accounts_source_src_10000.ds) AS ds__extract_month
       , EXTRACT(day FROM accounts_source_src_10000.ds) AS ds__extract_day
-      , EXTRACT(dow FROM accounts_source_src_10000.ds) AS ds__extract_dow
+      , EXTRACT(isodow FROM accounts_source_src_10000.ds) AS ds__extract_dow
       , EXTRACT(doy FROM accounts_source_src_10000.ds) AS ds__extract_doy
       , accounts_source_src_10000.account_type
       , DATE_TRUNC('day', accounts_source_src_10000.ds) AS account__ds__day
@@ -94,7 +94,7 @@ INNER JOIN (
       , EXTRACT(quarter FROM accounts_source_src_10000.ds) AS account__ds__extract_quarter
       , EXTRACT(month FROM accounts_source_src_10000.ds) AS account__ds__extract_month
       , EXTRACT(day FROM accounts_source_src_10000.ds) AS account__ds__extract_day
-      , EXTRACT(dow FROM accounts_source_src_10000.ds) AS account__ds__extract_dow
+      , EXTRACT(isodow FROM accounts_source_src_10000.ds) AS account__ds__extract_dow
       , EXTRACT(doy FROM accounts_source_src_10000.ds) AS account__ds__extract_doy
       , accounts_source_src_10000.account_type AS account__account_type
       , accounts_source_src_10000.user_id AS user
