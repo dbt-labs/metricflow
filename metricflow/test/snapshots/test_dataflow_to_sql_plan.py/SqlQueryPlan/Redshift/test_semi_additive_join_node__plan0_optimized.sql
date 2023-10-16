@@ -44,7 +44,7 @@ FROM (
     , EXTRACT(quarter FROM ds) AS ds__extract_quarter
     , EXTRACT(month FROM ds) AS ds__extract_month
     , EXTRACT(day FROM ds) AS ds__extract_day
-    , EXTRACT(dow FROM ds) AS ds__extract_dow
+    , CASE WHEN EXTRACT(dow FROM ds) = 0 THEN EXTRACT(dow FROM ds) + 7 ELSE EXTRACT(dow FROM ds) END AS ds__extract_dow
     , EXTRACT(doy FROM ds) AS ds__extract_doy
     , account_type
     , DATE_TRUNC('day', ds) AS account__ds__day
@@ -56,7 +56,7 @@ FROM (
     , EXTRACT(quarter FROM ds) AS account__ds__extract_quarter
     , EXTRACT(month FROM ds) AS account__ds__extract_month
     , EXTRACT(day FROM ds) AS account__ds__extract_day
-    , EXTRACT(dow FROM ds) AS account__ds__extract_dow
+    , CASE WHEN EXTRACT(dow FROM ds) = 0 THEN EXTRACT(dow FROM ds) + 7 ELSE EXTRACT(dow FROM ds) END AS account__ds__extract_dow
     , EXTRACT(doy FROM ds) AS account__ds__extract_doy
     , account_type AS account__account_type
     , user_id AS user

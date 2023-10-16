@@ -10,7 +10,7 @@ SELECT
   , EXTRACT(quarter FROM ds) AS ds__extract_quarter
   , EXTRACT(month FROM ds) AS ds__extract_month
   , EXTRACT(day FROM ds) AS ds__extract_day
-  , EXTRACT(dow FROM ds) AS ds__extract_dow
+  , CASE WHEN EXTRACT(dow FROM ds) = 0 THEN EXTRACT(dow FROM ds) + 7 ELSE EXTRACT(dow FROM ds) END AS ds__extract_dow
   , EXTRACT(doy FROM ds) AS ds__extract_doy
   , DATE_TRUNC('day', ds_partitioned) AS ds_partitioned__day
   , DATE_TRUNC('week', ds_partitioned) AS ds_partitioned__week
@@ -21,7 +21,7 @@ SELECT
   , EXTRACT(quarter FROM ds_partitioned) AS ds_partitioned__extract_quarter
   , EXTRACT(month FROM ds_partitioned) AS ds_partitioned__extract_month
   , EXTRACT(day FROM ds_partitioned) AS ds_partitioned__extract_day
-  , EXTRACT(dow FROM ds_partitioned) AS ds_partitioned__extract_dow
+  , CASE WHEN EXTRACT(dow FROM ds_partitioned) = 0 THEN EXTRACT(dow FROM ds_partitioned) + 7 ELSE EXTRACT(dow FROM ds_partitioned) END AS ds_partitioned__extract_dow
   , EXTRACT(doy FROM ds_partitioned) AS ds_partitioned__extract_doy
   , DATE_TRUNC('day', paid_at) AS paid_at__day
   , DATE_TRUNC('week', paid_at) AS paid_at__week
@@ -32,7 +32,7 @@ SELECT
   , EXTRACT(quarter FROM paid_at) AS paid_at__extract_quarter
   , EXTRACT(month FROM paid_at) AS paid_at__extract_month
   , EXTRACT(day FROM paid_at) AS paid_at__extract_day
-  , EXTRACT(dow FROM paid_at) AS paid_at__extract_dow
+  , CASE WHEN EXTRACT(dow FROM paid_at) = 0 THEN EXTRACT(dow FROM paid_at) + 7 ELSE EXTRACT(dow FROM paid_at) END AS paid_at__extract_dow
   , EXTRACT(doy FROM paid_at) AS paid_at__extract_doy
   , DATE_TRUNC('day', ds) AS booking__ds__day
   , DATE_TRUNC('week', ds) AS booking__ds__week
@@ -43,7 +43,7 @@ SELECT
   , EXTRACT(quarter FROM ds) AS booking__ds__extract_quarter
   , EXTRACT(month FROM ds) AS booking__ds__extract_month
   , EXTRACT(day FROM ds) AS booking__ds__extract_day
-  , EXTRACT(dow FROM ds) AS booking__ds__extract_dow
+  , CASE WHEN EXTRACT(dow FROM ds) = 0 THEN EXTRACT(dow FROM ds) + 7 ELSE EXTRACT(dow FROM ds) END AS booking__ds__extract_dow
   , EXTRACT(doy FROM ds) AS booking__ds__extract_doy
   , DATE_TRUNC('day', ds_partitioned) AS booking__ds_partitioned__day
   , DATE_TRUNC('week', ds_partitioned) AS booking__ds_partitioned__week
@@ -54,7 +54,7 @@ SELECT
   , EXTRACT(quarter FROM ds_partitioned) AS booking__ds_partitioned__extract_quarter
   , EXTRACT(month FROM ds_partitioned) AS booking__ds_partitioned__extract_month
   , EXTRACT(day FROM ds_partitioned) AS booking__ds_partitioned__extract_day
-  , EXTRACT(dow FROM ds_partitioned) AS booking__ds_partitioned__extract_dow
+  , CASE WHEN EXTRACT(dow FROM ds_partitioned) = 0 THEN EXTRACT(dow FROM ds_partitioned) + 7 ELSE EXTRACT(dow FROM ds_partitioned) END AS booking__ds_partitioned__extract_dow
   , EXTRACT(doy FROM ds_partitioned) AS booking__ds_partitioned__extract_doy
   , DATE_TRUNC('day', paid_at) AS booking__paid_at__day
   , DATE_TRUNC('week', paid_at) AS booking__paid_at__week
@@ -65,7 +65,7 @@ SELECT
   , EXTRACT(quarter FROM paid_at) AS booking__paid_at__extract_quarter
   , EXTRACT(month FROM paid_at) AS booking__paid_at__extract_month
   , EXTRACT(day FROM paid_at) AS booking__paid_at__extract_day
-  , EXTRACT(dow FROM paid_at) AS booking__paid_at__extract_dow
+  , CASE WHEN EXTRACT(dow FROM paid_at) = 0 THEN EXTRACT(dow FROM paid_at) + 7 ELSE EXTRACT(dow FROM paid_at) END AS booking__paid_at__extract_dow
   , EXTRACT(doy FROM paid_at) AS booking__paid_at__extract_doy
   , DATE_TRUNC('day', paid_at) AS metric_time__day
   , DATE_TRUNC('week', paid_at) AS metric_time__week
@@ -76,7 +76,7 @@ SELECT
   , EXTRACT(quarter FROM paid_at) AS metric_time__extract_quarter
   , EXTRACT(month FROM paid_at) AS metric_time__extract_month
   , EXTRACT(day FROM paid_at) AS metric_time__extract_day
-  , EXTRACT(dow FROM paid_at) AS metric_time__extract_dow
+  , CASE WHEN EXTRACT(dow FROM paid_at) = 0 THEN EXTRACT(dow FROM paid_at) + 7 ELSE EXTRACT(dow FROM paid_at) END AS metric_time__extract_dow
   , EXTRACT(doy FROM paid_at) AS metric_time__extract_doy
   , listing_id AS listing
   , guest_id AS guest

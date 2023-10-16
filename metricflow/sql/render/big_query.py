@@ -18,6 +18,7 @@ from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_exprs import (
     SqlCastToTimestampExpression,
     SqlDateTruncExpression,
+    SqlExtractExpression,
     SqlGenerateUuidExpression,
     SqlPercentileExpression,
     SqlPercentileFunctionType,
@@ -138,6 +139,27 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
             return "dayofweek"
 
         return super().render_date_part(date_part)
+
+    @override
+    def visit_extract_expr(self, node: SqlExtractExpression) -> SqlExpressionRenderResult:
+        """Renders extract expressions with required output conversions for BigQuery.
+
+        BigQuery does not have native support for the ISO standard day of week output of 1 (Monday) - 7 (Sunday).
+        Instead, BigQuery returns 1 (Sunday) - 7 (Monday). Therefore, we need custom rendering logic to normalize
+        the return values to the ISO standard.
+        """
+        extract_rendering_result = super().visit_extract_expr(node)
+
+        if node.date_part is not DatePart.DOW:
+            return extract_rendering_result
+
+        extract_stmt = extract_rendering_result.sql
+        case_expr = f"IF({extract_stmt} = 1, 7, {extract_stmt} - 1)"
+
+        return SqlExpressionRenderResult(
+            sql=case_expr,
+            bind_parameters=extract_rendering_result.bind_parameters,
+        )
 
     @override
     def visit_time_delta_expr(self, node: SqlSubtractTimeIntervalExpression) -> SqlExpressionRenderResult:

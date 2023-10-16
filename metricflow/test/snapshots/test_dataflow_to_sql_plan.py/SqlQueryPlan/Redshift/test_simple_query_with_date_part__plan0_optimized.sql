@@ -9,7 +9,7 @@ FROM (
   -- Pass Only Elements:
   --   ['bookings', 'metric_time__extract_dow']
   SELECT
-    EXTRACT(dow FROM ds) AS metric_time__extract_dow
+    CASE WHEN EXTRACT(dow FROM ds) = 0 THEN EXTRACT(dow FROM ds) + 7 ELSE EXTRACT(dow FROM ds) END AS metric_time__extract_dow
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_10001
 ) subq_6

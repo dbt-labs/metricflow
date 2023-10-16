@@ -10,7 +10,7 @@ SELECT
   , EXTRACT(quarter FROM id_verifications_src_10003.ds) AS ds__extract_quarter
   , EXTRACT(month FROM id_verifications_src_10003.ds) AS ds__extract_month
   , EXTRACT(day FROM id_verifications_src_10003.ds) AS ds__extract_day
-  , EXTRACT(dow FROM id_verifications_src_10003.ds) AS ds__extract_dow
+  , CASE WHEN EXTRACT(dow FROM id_verifications_src_10003.ds) = 0 THEN EXTRACT(dow FROM id_verifications_src_10003.ds) + 7 ELSE EXTRACT(dow FROM id_verifications_src_10003.ds) END AS ds__extract_dow
   , EXTRACT(doy FROM id_verifications_src_10003.ds) AS ds__extract_doy
   , DATE_TRUNC('day', id_verifications_src_10003.ds_partitioned) AS ds_partitioned__day
   , DATE_TRUNC('week', id_verifications_src_10003.ds_partitioned) AS ds_partitioned__week
@@ -21,7 +21,7 @@ SELECT
   , EXTRACT(quarter FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_quarter
   , EXTRACT(month FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_month
   , EXTRACT(day FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_day
-  , EXTRACT(dow FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_dow
+  , CASE WHEN EXTRACT(dow FROM id_verifications_src_10003.ds_partitioned) = 0 THEN EXTRACT(dow FROM id_verifications_src_10003.ds_partitioned) + 7 ELSE EXTRACT(dow FROM id_verifications_src_10003.ds_partitioned) END AS ds_partitioned__extract_dow
   , EXTRACT(doy FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_doy
   , id_verifications_src_10003.verification_type
   , DATE_TRUNC('day', id_verifications_src_10003.ds) AS verification__ds__day
@@ -33,7 +33,7 @@ SELECT
   , EXTRACT(quarter FROM id_verifications_src_10003.ds) AS verification__ds__extract_quarter
   , EXTRACT(month FROM id_verifications_src_10003.ds) AS verification__ds__extract_month
   , EXTRACT(day FROM id_verifications_src_10003.ds) AS verification__ds__extract_day
-  , EXTRACT(dow FROM id_verifications_src_10003.ds) AS verification__ds__extract_dow
+  , CASE WHEN EXTRACT(dow FROM id_verifications_src_10003.ds) = 0 THEN EXTRACT(dow FROM id_verifications_src_10003.ds) + 7 ELSE EXTRACT(dow FROM id_verifications_src_10003.ds) END AS verification__ds__extract_dow
   , EXTRACT(doy FROM id_verifications_src_10003.ds) AS verification__ds__extract_doy
   , DATE_TRUNC('day', id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__day
   , DATE_TRUNC('week', id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__week
@@ -44,7 +44,7 @@ SELECT
   , EXTRACT(quarter FROM id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__extract_quarter
   , EXTRACT(month FROM id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__extract_month
   , EXTRACT(day FROM id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__extract_day
-  , EXTRACT(dow FROM id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__extract_dow
+  , CASE WHEN EXTRACT(dow FROM id_verifications_src_10003.ds_partitioned) = 0 THEN EXTRACT(dow FROM id_verifications_src_10003.ds_partitioned) + 7 ELSE EXTRACT(dow FROM id_verifications_src_10003.ds_partitioned) END AS verification__ds_partitioned__extract_dow
   , EXTRACT(doy FROM id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__extract_doy
   , id_verifications_src_10003.verification_type AS verification__verification_type
   , id_verifications_src_10003.verification_id AS verification

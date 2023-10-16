@@ -65,7 +65,7 @@ FROM (
           , EXTRACT(quarter FROM revenue_src_10006.created_at) AS ds__extract_quarter
           , EXTRACT(month FROM revenue_src_10006.created_at) AS ds__extract_month
           , EXTRACT(day FROM revenue_src_10006.created_at) AS ds__extract_day
-          , EXTRACT(dayofweek FROM revenue_src_10006.created_at) AS ds__extract_dow
+          , IF(EXTRACT(dayofweek FROM revenue_src_10006.created_at) = 1, 7, EXTRACT(dayofweek FROM revenue_src_10006.created_at) - 1) AS ds__extract_dow
           , EXTRACT(dayofyear FROM revenue_src_10006.created_at) AS ds__extract_doy
           , DATE_TRUNC(revenue_src_10006.created_at, day) AS company__ds__day
           , DATE_TRUNC(revenue_src_10006.created_at, isoweek) AS company__ds__week
@@ -76,7 +76,7 @@ FROM (
           , EXTRACT(quarter FROM revenue_src_10006.created_at) AS company__ds__extract_quarter
           , EXTRACT(month FROM revenue_src_10006.created_at) AS company__ds__extract_month
           , EXTRACT(day FROM revenue_src_10006.created_at) AS company__ds__extract_day
-          , EXTRACT(dayofweek FROM revenue_src_10006.created_at) AS company__ds__extract_dow
+          , IF(EXTRACT(dayofweek FROM revenue_src_10006.created_at) = 1, 7, EXTRACT(dayofweek FROM revenue_src_10006.created_at) - 1) AS company__ds__extract_dow
           , EXTRACT(dayofyear FROM revenue_src_10006.created_at) AS company__ds__extract_doy
           , revenue_src_10006.user_id AS user
           , revenue_src_10006.user_id AS company__user

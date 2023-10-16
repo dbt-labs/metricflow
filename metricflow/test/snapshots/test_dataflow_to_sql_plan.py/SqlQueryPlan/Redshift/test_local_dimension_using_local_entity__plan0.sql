@@ -98,7 +98,7 @@ FROM (
           , EXTRACT(quarter FROM listings_latest_src_10004.created_at) AS ds__extract_quarter
           , EXTRACT(month FROM listings_latest_src_10004.created_at) AS ds__extract_month
           , EXTRACT(day FROM listings_latest_src_10004.created_at) AS ds__extract_day
-          , EXTRACT(dow FROM listings_latest_src_10004.created_at) AS ds__extract_dow
+          , CASE WHEN EXTRACT(dow FROM listings_latest_src_10004.created_at) = 0 THEN EXTRACT(dow FROM listings_latest_src_10004.created_at) + 7 ELSE EXTRACT(dow FROM listings_latest_src_10004.created_at) END AS ds__extract_dow
           , EXTRACT(doy FROM listings_latest_src_10004.created_at) AS ds__extract_doy
           , DATE_TRUNC('day', listings_latest_src_10004.created_at) AS created_at__day
           , DATE_TRUNC('week', listings_latest_src_10004.created_at) AS created_at__week
@@ -109,7 +109,7 @@ FROM (
           , EXTRACT(quarter FROM listings_latest_src_10004.created_at) AS created_at__extract_quarter
           , EXTRACT(month FROM listings_latest_src_10004.created_at) AS created_at__extract_month
           , EXTRACT(day FROM listings_latest_src_10004.created_at) AS created_at__extract_day
-          , EXTRACT(dow FROM listings_latest_src_10004.created_at) AS created_at__extract_dow
+          , CASE WHEN EXTRACT(dow FROM listings_latest_src_10004.created_at) = 0 THEN EXTRACT(dow FROM listings_latest_src_10004.created_at) + 7 ELSE EXTRACT(dow FROM listings_latest_src_10004.created_at) END AS created_at__extract_dow
           , EXTRACT(doy FROM listings_latest_src_10004.created_at) AS created_at__extract_doy
           , listings_latest_src_10004.country AS country_latest
           , listings_latest_src_10004.is_lux AS is_lux_latest
@@ -123,7 +123,7 @@ FROM (
           , EXTRACT(quarter FROM listings_latest_src_10004.created_at) AS listing__ds__extract_quarter
           , EXTRACT(month FROM listings_latest_src_10004.created_at) AS listing__ds__extract_month
           , EXTRACT(day FROM listings_latest_src_10004.created_at) AS listing__ds__extract_day
-          , EXTRACT(dow FROM listings_latest_src_10004.created_at) AS listing__ds__extract_dow
+          , CASE WHEN EXTRACT(dow FROM listings_latest_src_10004.created_at) = 0 THEN EXTRACT(dow FROM listings_latest_src_10004.created_at) + 7 ELSE EXTRACT(dow FROM listings_latest_src_10004.created_at) END AS listing__ds__extract_dow
           , EXTRACT(doy FROM listings_latest_src_10004.created_at) AS listing__ds__extract_doy
           , DATE_TRUNC('day', listings_latest_src_10004.created_at) AS listing__created_at__day
           , DATE_TRUNC('week', listings_latest_src_10004.created_at) AS listing__created_at__week
@@ -134,7 +134,7 @@ FROM (
           , EXTRACT(quarter FROM listings_latest_src_10004.created_at) AS listing__created_at__extract_quarter
           , EXTRACT(month FROM listings_latest_src_10004.created_at) AS listing__created_at__extract_month
           , EXTRACT(day FROM listings_latest_src_10004.created_at) AS listing__created_at__extract_day
-          , EXTRACT(dow FROM listings_latest_src_10004.created_at) AS listing__created_at__extract_dow
+          , CASE WHEN EXTRACT(dow FROM listings_latest_src_10004.created_at) = 0 THEN EXTRACT(dow FROM listings_latest_src_10004.created_at) + 7 ELSE EXTRACT(dow FROM listings_latest_src_10004.created_at) END AS listing__created_at__extract_dow
           , EXTRACT(doy FROM listings_latest_src_10004.created_at) AS listing__created_at__extract_doy
           , listings_latest_src_10004.country AS listing__country_latest
           , listings_latest_src_10004.is_lux AS listing__is_lux_latest

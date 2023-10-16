@@ -146,7 +146,7 @@ FROM (
               , EXTRACT(quarter FROM bookings_source_src_10015.ds) AS ds__extract_quarter
               , EXTRACT(month FROM bookings_source_src_10015.ds) AS ds__extract_month
               , EXTRACT(day FROM bookings_source_src_10015.ds) AS ds__extract_day
-              , EXTRACT(dayofweek FROM bookings_source_src_10015.ds) AS ds__extract_dow
+              , IF(EXTRACT(dayofweek FROM bookings_source_src_10015.ds) = 1, 7, EXTRACT(dayofweek FROM bookings_source_src_10015.ds) - 1) AS ds__extract_dow
               , EXTRACT(dayofyear FROM bookings_source_src_10015.ds) AS ds__extract_doy
               , DATE_TRUNC(bookings_source_src_10015.ds_partitioned, day) AS ds_partitioned__day
               , DATE_TRUNC(bookings_source_src_10015.ds_partitioned, isoweek) AS ds_partitioned__week
@@ -157,7 +157,7 @@ FROM (
               , EXTRACT(quarter FROM bookings_source_src_10015.ds_partitioned) AS ds_partitioned__extract_quarter
               , EXTRACT(month FROM bookings_source_src_10015.ds_partitioned) AS ds_partitioned__extract_month
               , EXTRACT(day FROM bookings_source_src_10015.ds_partitioned) AS ds_partitioned__extract_day
-              , EXTRACT(dayofweek FROM bookings_source_src_10015.ds_partitioned) AS ds_partitioned__extract_dow
+              , IF(EXTRACT(dayofweek FROM bookings_source_src_10015.ds_partitioned) = 1, 7, EXTRACT(dayofweek FROM bookings_source_src_10015.ds_partitioned) - 1) AS ds_partitioned__extract_dow
               , EXTRACT(dayofyear FROM bookings_source_src_10015.ds_partitioned) AS ds_partitioned__extract_doy
               , DATE_TRUNC(bookings_source_src_10015.paid_at, day) AS paid_at__day
               , DATE_TRUNC(bookings_source_src_10015.paid_at, isoweek) AS paid_at__week
@@ -168,7 +168,7 @@ FROM (
               , EXTRACT(quarter FROM bookings_source_src_10015.paid_at) AS paid_at__extract_quarter
               , EXTRACT(month FROM bookings_source_src_10015.paid_at) AS paid_at__extract_month
               , EXTRACT(day FROM bookings_source_src_10015.paid_at) AS paid_at__extract_day
-              , EXTRACT(dayofweek FROM bookings_source_src_10015.paid_at) AS paid_at__extract_dow
+              , IF(EXTRACT(dayofweek FROM bookings_source_src_10015.paid_at) = 1, 7, EXTRACT(dayofweek FROM bookings_source_src_10015.paid_at) - 1) AS paid_at__extract_dow
               , EXTRACT(dayofyear FROM bookings_source_src_10015.paid_at) AS paid_at__extract_doy
               , bookings_source_src_10015.is_instant AS booking__is_instant
               , DATE_TRUNC(bookings_source_src_10015.ds, day) AS booking__ds__day
@@ -180,7 +180,7 @@ FROM (
               , EXTRACT(quarter FROM bookings_source_src_10015.ds) AS booking__ds__extract_quarter
               , EXTRACT(month FROM bookings_source_src_10015.ds) AS booking__ds__extract_month
               , EXTRACT(day FROM bookings_source_src_10015.ds) AS booking__ds__extract_day
-              , EXTRACT(dayofweek FROM bookings_source_src_10015.ds) AS booking__ds__extract_dow
+              , IF(EXTRACT(dayofweek FROM bookings_source_src_10015.ds) = 1, 7, EXTRACT(dayofweek FROM bookings_source_src_10015.ds) - 1) AS booking__ds__extract_dow
               , EXTRACT(dayofyear FROM bookings_source_src_10015.ds) AS booking__ds__extract_doy
               , DATE_TRUNC(bookings_source_src_10015.ds_partitioned, day) AS booking__ds_partitioned__day
               , DATE_TRUNC(bookings_source_src_10015.ds_partitioned, isoweek) AS booking__ds_partitioned__week
@@ -191,7 +191,7 @@ FROM (
               , EXTRACT(quarter FROM bookings_source_src_10015.ds_partitioned) AS booking__ds_partitioned__extract_quarter
               , EXTRACT(month FROM bookings_source_src_10015.ds_partitioned) AS booking__ds_partitioned__extract_month
               , EXTRACT(day FROM bookings_source_src_10015.ds_partitioned) AS booking__ds_partitioned__extract_day
-              , EXTRACT(dayofweek FROM bookings_source_src_10015.ds_partitioned) AS booking__ds_partitioned__extract_dow
+              , IF(EXTRACT(dayofweek FROM bookings_source_src_10015.ds_partitioned) = 1, 7, EXTRACT(dayofweek FROM bookings_source_src_10015.ds_partitioned) - 1) AS booking__ds_partitioned__extract_dow
               , EXTRACT(dayofyear FROM bookings_source_src_10015.ds_partitioned) AS booking__ds_partitioned__extract_doy
               , DATE_TRUNC(bookings_source_src_10015.paid_at, day) AS booking__paid_at__day
               , DATE_TRUNC(bookings_source_src_10015.paid_at, isoweek) AS booking__paid_at__week
@@ -202,7 +202,7 @@ FROM (
               , EXTRACT(quarter FROM bookings_source_src_10015.paid_at) AS booking__paid_at__extract_quarter
               , EXTRACT(month FROM bookings_source_src_10015.paid_at) AS booking__paid_at__extract_month
               , EXTRACT(day FROM bookings_source_src_10015.paid_at) AS booking__paid_at__extract_day
-              , EXTRACT(dayofweek FROM bookings_source_src_10015.paid_at) AS booking__paid_at__extract_dow
+              , IF(EXTRACT(dayofweek FROM bookings_source_src_10015.paid_at) = 1, 7, EXTRACT(dayofweek FROM bookings_source_src_10015.paid_at) - 1) AS booking__paid_at__extract_dow
               , EXTRACT(dayofyear FROM bookings_source_src_10015.paid_at) AS booking__paid_at__extract_doy
               , bookings_source_src_10015.listing_id AS listing
               , bookings_source_src_10015.guest_id AS guest
@@ -373,7 +373,7 @@ FROM (
                 , EXTRACT(quarter FROM lux_listings_src_10019.valid_from) AS window_start__extract_quarter
                 , EXTRACT(month FROM lux_listings_src_10019.valid_from) AS window_start__extract_month
                 , EXTRACT(day FROM lux_listings_src_10019.valid_from) AS window_start__extract_day
-                , EXTRACT(dayofweek FROM lux_listings_src_10019.valid_from) AS window_start__extract_dow
+                , IF(EXTRACT(dayofweek FROM lux_listings_src_10019.valid_from) = 1, 7, EXTRACT(dayofweek FROM lux_listings_src_10019.valid_from) - 1) AS window_start__extract_dow
                 , EXTRACT(dayofyear FROM lux_listings_src_10019.valid_from) AS window_start__extract_doy
                 , lux_listings_src_10019.valid_to AS window_end__day
                 , DATE_TRUNC(lux_listings_src_10019.valid_to, isoweek) AS window_end__week
@@ -384,7 +384,7 @@ FROM (
                 , EXTRACT(quarter FROM lux_listings_src_10019.valid_to) AS window_end__extract_quarter
                 , EXTRACT(month FROM lux_listings_src_10019.valid_to) AS window_end__extract_month
                 , EXTRACT(day FROM lux_listings_src_10019.valid_to) AS window_end__extract_day
-                , EXTRACT(dayofweek FROM lux_listings_src_10019.valid_to) AS window_end__extract_dow
+                , IF(EXTRACT(dayofweek FROM lux_listings_src_10019.valid_to) = 1, 7, EXTRACT(dayofweek FROM lux_listings_src_10019.valid_to) - 1) AS window_end__extract_dow
                 , EXTRACT(dayofyear FROM lux_listings_src_10019.valid_to) AS window_end__extract_doy
                 , lux_listings_src_10019.is_confirmed_lux
                 , lux_listings_src_10019.valid_from AS lux_listing__window_start__day
@@ -396,7 +396,7 @@ FROM (
                 , EXTRACT(quarter FROM lux_listings_src_10019.valid_from) AS lux_listing__window_start__extract_quarter
                 , EXTRACT(month FROM lux_listings_src_10019.valid_from) AS lux_listing__window_start__extract_month
                 , EXTRACT(day FROM lux_listings_src_10019.valid_from) AS lux_listing__window_start__extract_day
-                , EXTRACT(dayofweek FROM lux_listings_src_10019.valid_from) AS lux_listing__window_start__extract_dow
+                , IF(EXTRACT(dayofweek FROM lux_listings_src_10019.valid_from) = 1, 7, EXTRACT(dayofweek FROM lux_listings_src_10019.valid_from) - 1) AS lux_listing__window_start__extract_dow
                 , EXTRACT(dayofyear FROM lux_listings_src_10019.valid_from) AS lux_listing__window_start__extract_doy
                 , lux_listings_src_10019.valid_to AS lux_listing__window_end__day
                 , DATE_TRUNC(lux_listings_src_10019.valid_to, isoweek) AS lux_listing__window_end__week
@@ -407,7 +407,7 @@ FROM (
                 , EXTRACT(quarter FROM lux_listings_src_10019.valid_to) AS lux_listing__window_end__extract_quarter
                 , EXTRACT(month FROM lux_listings_src_10019.valid_to) AS lux_listing__window_end__extract_month
                 , EXTRACT(day FROM lux_listings_src_10019.valid_to) AS lux_listing__window_end__extract_day
-                , EXTRACT(dayofweek FROM lux_listings_src_10019.valid_to) AS lux_listing__window_end__extract_dow
+                , IF(EXTRACT(dayofweek FROM lux_listings_src_10019.valid_to) = 1, 7, EXTRACT(dayofweek FROM lux_listings_src_10019.valid_to) - 1) AS lux_listing__window_end__extract_dow
                 , EXTRACT(dayofyear FROM lux_listings_src_10019.valid_to) AS lux_listing__window_end__extract_doy
                 , lux_listings_src_10019.is_confirmed_lux AS lux_listing__is_confirmed_lux
                 , lux_listings_src_10019.lux_listing_id AS lux_listing
