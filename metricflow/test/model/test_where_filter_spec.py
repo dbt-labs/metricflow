@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import logging
 
+import pytest
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
+from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
     DimensionSpec,
@@ -60,6 +62,15 @@ def test_dimension_in_filter_with_grain(  # noqa: D
         ),
         entity_specs=(),
     )
+
+
+def test_time_dimension_without_grain(column_association_resolver: ColumnAssociationResolver) -> None:  # noqa
+    where_filter = PydanticWhereFilter(where_sql_template="{{ TimeDimension('metric_time') }} > '2023-10-17'")
+
+    with pytest.raises(InvalidQueryException):
+        WhereSpecFactory(
+            column_association_resolver=column_association_resolver,
+        ).create_from_where_filter(where_filter)
 
 
 def test_time_dimension_in_filter(  # noqa: D
