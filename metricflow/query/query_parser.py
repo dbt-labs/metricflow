@@ -816,6 +816,8 @@ class MetricFlowQueryParser:
                 # Because the metric time dimension is a virtual dimension that's not in the model, it won't be included
                 # in valid_linkable_specs.
                 and time_dimension_spec.reference != DataSet.metric_time_dimension_reference()
+                # TODO: remove line below & add date_part specs to validation paths.
+                and not time_dimension_spec.date_part
             ):
                 invalid_linkable_specs.append(time_dimension_spec)
 
