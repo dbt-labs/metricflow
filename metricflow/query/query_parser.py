@@ -813,7 +813,7 @@ class MetricFlowQueryParser:
         for time_dimension_spec in time_dimension_specs:
             time_dimension_spec_without_date_part = time_dimension_spec
             if time_dimension_spec.date_part:
-                # TODO: remove line below & add date_part specs to validation paths.
+                # TODO: remove this workaround & add date_part specs to validation paths.
                 time_dimension_spec_without_date_part = TimeDimensionSpec(
                     element_name=time_dimension_spec.element_name,
                     entity_links=time_dimension_spec.entity_links,
