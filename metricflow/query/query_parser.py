@@ -802,8 +802,17 @@ class MetricFlowQueryParser:
                 invalid_linkable_specs.append(entity_spec)
 
         for time_dimension_spec in time_dimension_specs:
+            time_dimension_spec_without_date_part = time_dimension_spec
+            if time_dimension_spec.date_part:
+                # TODO: remove this workaround & add date_part specs to validation paths.
+                time_dimension_spec_without_date_part = TimeDimensionSpec(
+                    element_name=time_dimension_spec.element_name,
+                    entity_links=time_dimension_spec.entity_links,
+                    time_granularity=time_dimension_spec.time_granularity,
+                    aggregation_state=time_dimension_spec.aggregation_state,
+                )
             if (
-                time_dimension_spec not in valid_linkable_specs
+                time_dimension_spec_without_date_part not in valid_linkable_specs
                 # Because the metric time dimension is a virtual dimension that's not in the model, it won't be included
                 # in valid_linkable_specs.
                 and time_dimension_spec.reference != DataSet.metric_time_dimension_reference()
