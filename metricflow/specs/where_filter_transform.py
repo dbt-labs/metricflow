@@ -73,7 +73,7 @@ class WhereSpecFactory:
         """
         dimension_specs = []
         for dimension in dimension_factory.created:
-            if dimension.time_dimension_spec:
+            if dimension.is_time_dimension:
                 time_dimension_factory.time_dimension_specs.append(dimension.time_dimension_spec)
             else:
                 dimension_specs.append(dimension.dimension_spec)

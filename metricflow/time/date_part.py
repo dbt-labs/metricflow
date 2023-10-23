@@ -7,6 +7,7 @@ from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 
+# TODO: import from DSI instead
 class DatePart(Enum):
     """Date parts able to be extracted from a time dimension.
 

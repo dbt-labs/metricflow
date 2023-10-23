@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List, Optional, Sequence
+from typing import List, Optional, Sequence, Union
 
 from dbt_semantic_interfaces.call_parameter_sets import (
     FilterCallParameterSets,
@@ -16,7 +16,7 @@ from typing_extensions import override
 from metricflow.errors.errors import InvalidQuerySyntax
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.dimension_spec_resolver import DimensionSpecResolver
-from metricflow.specs.specs import TimeDimensionSpec
+from metricflow.specs.specs import DimensionSpec, TimeDimensionSpec
 
 
 class WhereFilterDimension(ProtocolHint[QueryInterfaceDimension]):
@@ -37,23 +37,36 @@ class WhereFilterDimension(ProtocolHint[QueryInterfaceDimension]):
         self._column_association_resolver = column_association_resolver
         self._name = name
         self._entity_path = entity_path
-        self.dimension_spec = self._dimension_spec_resolver.resolve_dimension_spec(name, entity_path)
-        self.time_dimension_spec: Optional[TimeDimensionSpec] = None
+        self._time_granularity_name: Optional[str] = None
+        self._date_part_name: Optional[str] = None
 
     def grain(self, time_granularity_name: str) -> QueryInterfaceDimension:
         """The time granularity."""
-        self.time_dimension_spec = self._dimension_spec_resolver.resolve_time_dimension_spec(
-            self._name, TimeGranularity(time_granularity_name), self._entity_path
-        )
+        self._time_granularity_name = time_granularity_name
         return self
 
-    def date_part(self, _date_part: str) -> QueryInterfaceDimension:
+    def date_part(self, date_part_name: str) -> QueryInterfaceDimension:
         """The date_part requested to extract."""
-        raise InvalidQuerySyntax("date_part isn't currently supported in the where parameter")
+        self._date_part_name = date_part_name
+        return self
 
     def descending(self, _is_descending: bool) -> QueryInterfaceDimension:
         """Set the sort order for order-by."""
         raise InvalidQuerySyntax("descending is invalid in the where parameter")
+
+    @property
+    def is_time_dimension(self) -> bool:
+        return bool(self._time_granularity_name or self._date_part_name)
+
+    @property
+    def time_dimension_spec(self) -> TimeDimensionSpec:
+        return self._dimension_spec_resolver.resolve_time_dimension_spec(
+            self._name, self._time_granularity_name, self._entity_path, self._date_part_name
+        )
+
+    @property
+    def dimension_spec(self) -> DimensionSpec:
+        return self._dimension_spec_resolver.resolve_dimension_spec(self._name, self._entity_path)
 
     def __str__(self) -> str:
         """Returns the column name.
@@ -61,7 +74,7 @@ class WhereFilterDimension(ProtocolHint[QueryInterfaceDimension]):
         Important in the Jinja sandbox.
         """
         return self._column_association_resolver.resolve_spec(
-            self.time_dimension_spec or self.dimension_spec
+            self.time_dimension_spec if self.is_time_dimension else self.dimension_spec
         ).column_name
 
 
