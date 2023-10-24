@@ -7,7 +7,12 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
+from dbt_semantic_interfaces.implementations.filters.where_filter import (
+    PydanticWhereFilter,
+    PydanticWhereFilterIntersection,
+)
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
+from dbt_semantic_interfaces.protocols import SavedQuery
 from dbt_semantic_interfaces.protocols.dimension import DimensionType
 from dbt_semantic_interfaces.protocols.metric import MetricType
 from dbt_semantic_interfaces.protocols.where_filter import WhereFilter
@@ -24,6 +29,7 @@ from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputData
 from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
+from metricflow.filters.merge_where import merge_to_single_where_filter
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
@@ -31,10 +37,13 @@ from metricflow.protocols.query_parameter import (
     GroupByParameter,
     MetricQueryParameter,
     OrderByQueryParameter,
+    SavedQueryParameter,
     TimeDimensionQueryParameter,
 )
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.specs.column_assoc import ColumnAssociationResolver
+from metricflow.specs.python_object import parse_object_builder_naming_scheme
+from metricflow.specs.query_param_implementations import MetricParameter
 from metricflow.specs.specs import (
     DimensionSpec,
     EntitySpec,
@@ -174,6 +183,54 @@ class MetricFlowQueryParser:
         # If the scores are too low, then it looks nonsensical, so remove those.
         top_ranked_suggestions = [x for x in top_ranked_suggestions if x[1] > min_score]
         return [x[0] for x in top_ranked_suggestions]
+
+    def parse_and_validate_saved_query(
+        self,
+        saved_query_parameter: SavedQueryParameter,
+        where_filter: Optional[WhereFilter],
+        limit: Optional[int],
+        order_by_parameters: Optional[Sequence[OrderByQueryParameter]],
+    ) -> MetricFlowQuerySpec:
+        """Parse and validate a query using parameters from a pre-defined / saved query.
+
+        Additional parameters act in conjunction with the parameters in the saved query.
+        """
+        saved_query = self._get_saved_query(saved_query_parameter)
+
+        # Merge interface could streamline this.
+        where_filters: List[WhereFilter] = []
+        if saved_query.where is not None:
+            where_filters.extend(saved_query.where.where_filters)
+        if where_filter is not None:
+            where_filters.append(where_filter)
+
+        return self.parse_and_validate_query(
+            metrics=tuple(MetricParameter(name=metric_name) for metric_name in saved_query.metrics),
+            group_by=tuple(
+                parse_object_builder_naming_scheme(group_by_item_name) for group_by_item_name in saved_query.group_bys
+            ),
+            where_constraint=merge_to_single_where_filter(PydanticWhereFilterIntersection(where_filters=where_filters)),
+            limit=limit,
+            order_by=order_by_parameters,
+        )
+
+    def _get_saved_query(self, saved_query_parameter: SavedQueryParameter) -> SavedQuery:
+        matching_saved_queries = [
+            saved_query
+            for saved_query in self._model.semantic_manifest.saved_queries
+            if saved_query.name == saved_query_parameter.name
+        ]
+
+        if len(matching_saved_queries) != 1:
+            known_saved_query_names = sorted(
+                saved_query.name for saved_query in self._model.semantic_manifest.saved_queries
+            )
+            raise InvalidQueryException(
+                f"Did not find saved query `{saved_query_parameter.name}` in known saved queries:\n"
+                f"{pformat_big_objects(known_saved_query_names)}"
+            )
+
+        return matching_saved_queries[0]
 
     def parse_and_validate_query(
         self,

@@ -1,0 +1,12 @@
+---
+saved_query:
+  name: p0_booking
+  description: Booking-related metrics that are of the highest priority.
+  metrics:
+    - bookings
+    - instant_bookings
+  group_bys:
+    - TimeDimension('metric_time', 'day')
+    - Dimension('listing__capacity_latest')
+  where:
+    - "{{ Dimension('listing__capacity_latest') }} > 3"

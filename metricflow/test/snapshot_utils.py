@@ -167,14 +167,16 @@ def assert_snapshot_text_equal(
     if incomparable_strings_replacement_function is not None:
         snapshot_text = incomparable_strings_replacement_function(snapshot_text)
 
+    # Add a new line at the end of the file so that PRs don't show the "no newline" symbol on Github.
+    if len(snapshot_text) > 1 and snapshot_text[-1] != "\n":
+        snapshot_text = snapshot_text + "\n"
+
     # If we are in overwrite mode, make a new plan:
     if mf_test_session_state.overwrite_snapshots:
         # Create parent directory for the plan text files.
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         with open(file_path, "w") as snapshot_text_file:
             snapshot_text_file.write(snapshot_text)
-            # Add a new line at the end of the file so that PRSs don't show the "no newline" symbol on Github.
-            snapshot_text_file.write("\n")
 
     # Throw an exception if the plan is not there.
     if not os.path.exists(file_path):
@@ -198,8 +200,7 @@ def assert_snapshot_text_equal(
 
     # Read the existing plan from the file and compare with the actual plan
     with open(file_path, "r") as snapshot_text_file:
-        # Remove the newline that was added from above.
-        expected_snapshot_text = snapshot_text_file.read().rstrip()
+        expected_snapshot_text = snapshot_text_file.read()
 
         if exclude_line_regex:
             # Filter out lines that should be ignored.
@@ -257,6 +258,7 @@ def assert_object_snapshot_equal(  # type: ignore[misc]
     mf_test_session_state: MetricFlowTestSessionState,
     obj_id: str,
     obj: Any,
+    sql_client: Optional[SqlClient] = None,
 ) -> None:
     """For tests to compare large objects, this can be used to snapshot a text representation of the object."""
     assert_snapshot_text_equal(
@@ -266,6 +268,7 @@ def assert_object_snapshot_equal(  # type: ignore[misc]
         snapshot_id=obj_id,
         snapshot_text=pformat_big_objects(obj),
         snapshot_file_extension=".txt",
+        additional_sub_directories_for_snapshots=(sql_client.sql_engine_type.value,) if sql_client else (),
     )
 
 

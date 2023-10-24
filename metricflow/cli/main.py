@@ -10,7 +10,7 @@ import textwrap
 import time
 import warnings
 from importlib.metadata import version as pkg_version
-from typing import Callable, List, Optional
+from typing import Callable, List, Optional, Sequence
 
 import click
 import jinja2
@@ -248,13 +248,18 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, clean: bool) -
     default=False,
     help="Shows inline descriptions of nodes in displayed SQL",
 )
+@click.option(
+    "--saved-query",
+    required=False,
+    help="Specify the name of the saved query to use for applicable parameters",
+)
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 def query(
     cfg: CLIContext,
-    metrics: List[str],
-    group_by: List[str] = [],
+    metrics: Optional[Sequence[str]] = None,
+    group_by: Optional[Sequence[str]] = None,
     where: Optional[str] = None,
     start_time: Optional[dt.datetime] = None,
     end_time: Optional[dt.datetime] = None,
@@ -266,12 +271,14 @@ def query(
     display_plans: bool = False,
     decimals: int = DEFAULT_RESULT_DECIMAL_PLACES,
     show_sql_descriptions: bool = False,
+    saved_query: Optional[str] = None,
 ) -> None:
     """Create a new query with MetricFlow and assembles a MetricFlowQueryResult."""
     start = time.time()
     spinner = Halo(text="Initiating query…", spinner="dots")
     spinner.start()
     mf_request = MetricFlowQueryRequest.create_with_random_request_id(
+        saved_query_name=saved_query,
         metric_names=metrics,
         group_by_names=group_by,
         limit=limit,

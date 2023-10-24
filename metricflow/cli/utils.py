@@ -46,7 +46,7 @@ def query_options(function: Callable) -> Callable:
     )(function)
     function = click.option(
         "--metrics",
-        type=click_custom.SequenceParamType(min_length=1),
+        type=click_custom.SequenceParamType(min_length=0),
         default="",
         help="Metrics to query for: syntax is --metrics bookings or for multiple metrics --metrics bookings,messages",
     )(function)
