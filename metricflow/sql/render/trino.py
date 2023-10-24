@@ -4,6 +4,7 @@ from typing import Collection
 
 from dateutil.parser import parse
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
+from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
 
@@ -19,7 +20,7 @@ from metricflow.sql.sql_exprs import (
     SqlGenerateUuidExpression,
     SqlPercentileExpression,
     SqlPercentileFunctionType,
-    SqlTimeDeltaExpression,
+    SqlSubtractTimeIntervalExpression,
 )
 
 
@@ -34,32 +35,25 @@ class TrinoSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         }
 
     @override
-    def visit_time_delta_expr(self, node: SqlTimeDeltaExpression) -> SqlExpressionRenderResult:
-        """Render time delta expression for Trino, which requires slightly different syntax from other engines."""
+    def visit_generate_uuid_expr(self, node: SqlGenerateUuidExpression) -> SqlExpressionRenderResult:
+        return SqlExpressionRenderResult(
+            sql="uuid()",
+            bind_parameters=SqlBindParameters(),
+        )
+
+    @override
+    def visit_time_delta_expr(self, node: SqlSubtractTimeIntervalExpression) -> SqlExpressionRenderResult:
+        """Render time delta for Trino, require granularity in quotes and function name change."""
         arg_rendered = node.arg.accept(self)
-        if node.grain_to_date:
-            return SqlExpressionRenderResult(
-                sql=f"DATE_TRUNC('{node.granularity.value}', TIMESTAMP {arg_rendered.sql})",
-                bind_parameters=arg_rendered.bind_parameters,
-            )
 
         count = node.count
         granularity = node.granularity
         if granularity == TimeGranularity.QUARTER:
             granularity = TimeGranularity.MONTH
             count *= 3
-
-        # Trino interval needs to be in quotes.
         return SqlExpressionRenderResult(
-            sql=f"CAST({arg_rendered.sql} AS {self.timestamp_data_type}) - INTERVAL '{count}' {granularity.value}",
+            sql=f"DATE_ADD('{granularity.value}', -{count}, {arg_rendered.sql})",
             bind_parameters=arg_rendered.bind_parameters,
-        )
-
-    @override
-    def visit_generate_uuid_expr(self, node: SqlGenerateUuidExpression) -> SqlExpressionRenderResult:
-        return SqlExpressionRenderResult(
-            sql="uuid()",
-            bind_parameters=SqlBindParameters(),
         )
 
     @override
@@ -69,30 +63,26 @@ class TrinoSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         params = arg_rendered.bind_parameters
         percentile = node.percentile_args.percentile
 
-        if node.percentile_args.function_type is SqlPercentileFunctionType.CONTINUOUS:
-            function_str = "PERCENTILE_CONT"
-        elif node.percentile_args.function_type is SqlPercentileFunctionType.DISCRETE:
-            function_str = "PERCENTILE_DISC"
-        elif node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS:
+        if node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS:
             return SqlExpressionRenderResult(
                 sql=f"approx_percentile({arg_rendered.sql}, {percentile})",
                 bind_parameters=params,
             )
-        elif node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_DISCRETE:
+        elif (
+            node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_DISCRETE
+            or node.percentile_args.function_type is SqlPercentileFunctionType.DISCRETE
+            or node.percentile_args.function_type is SqlPercentileFunctionType.CONTINUOUS
+        ):
             raise RuntimeError(
-                "Approximate discrete percentile aggregatew not supported for Trino. Set "
-                + "use_discrete_percentile and/or use_approximate_percentile to false in all percentile measures."
+                "Discrete, Continuous and Approximate discrete percentile aggregates are not supported for Trino. Set "
+                + "use_approximate_percentile and disable use_discrete_percentile in all percentile measures."
             )
         else:
             assert_values_exhausted(node.percentile_args.function_type)
 
-        return SqlExpressionRenderResult(
-            sql=f"{function_str}({percentile}) WITHIN GROUP (ORDER BY ({arg_rendered.sql}))",
-            bind_parameters=params,
-        )
-
     @override
-    def visit_between_expr(self, node: SqlBetweenExpression) -> SqlExpressionRenderResult:  # noqa: D
+    def visit_between_expr(self, node: SqlBetweenExpression) -> SqlExpressionRenderResult:
+        """Render a between expression for Trino. If the expression is a timestamp literal then wrap literals with timestamp."""
         rendered_column_arg = self.render_sql_expr(node.column_arg)
         rendered_start_expr = self.render_sql_expr(node.start_expr)
         rendered_end_expr = self.render_sql_expr(node.end_expr)
@@ -100,6 +90,7 @@ class TrinoSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         bind_parameters = SqlBindParameters()
         bind_parameters = bind_parameters.combine(rendered_column_arg.bind_parameters)
         bind_parameters = bind_parameters.combine(rendered_start_expr.bind_parameters)
+        bind_parameters = bind_parameters.combine(rendered_end_expr.bind_parameters)
 
         # Handle timestamp literals differently.
         if parse(rendered_start_expr.sql):
@@ -111,6 +102,16 @@ class TrinoSqlExpressionRenderer(DefaultSqlExpressionRenderer):
             sql=sql,
             bind_parameters=bind_parameters,
         )
+
+    @override
+    def render_date_part(self, date_part: DatePart) -> str:
+        """Render DATE PART for an EXTRACT expression.
+        Override DAY_OF_WEEK in Trino to ISO date part to ensure all engines return consistent results.
+        """
+        if date_part is DatePart.DOW:
+            return "DAY_OF_WEEK"
+
+        return date_part.value
 
 
 class TrinoSqlQueryPlanRenderer(DefaultSqlQueryPlanRenderer):
