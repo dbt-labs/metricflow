@@ -4,7 +4,6 @@ SELECT
   metric_time__extract_year
   , metric_time__extract_quarter
   , metric_time__extract_month
-  , metric_time__extract_week
   , metric_time__extract_day
   , metric_time__extract_dow
   , metric_time__extract_doy
@@ -17,7 +16,6 @@ FROM (
   --    'metric_time__extract_day',
   --    'metric_time__extract_dow',
   --    'metric_time__extract_doy',
-  --    'metric_time__extract_week',
   --    'metric_time__extract_month',
   --    'metric_time__extract_quarter',
   --    'metric_time__extract_year']
@@ -25,9 +23,8 @@ FROM (
     EXTRACT(year FROM ds) AS metric_time__extract_year
     , EXTRACT(quarter FROM ds) AS metric_time__extract_quarter
     , EXTRACT(month FROM ds) AS metric_time__extract_month
-    , EXTRACT(isoweek FROM ds) AS metric_time__extract_week
     , EXTRACT(day FROM ds) AS metric_time__extract_day
-    , EXTRACT(dayofweek FROM ds) AS metric_time__extract_dow
+    , IF(EXTRACT(dayofweek FROM ds) = 1, 7, EXTRACT(dayofweek FROM ds) - 1) AS metric_time__extract_dow
     , EXTRACT(dayofyear FROM ds) AS metric_time__extract_doy
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_10001
@@ -36,7 +33,6 @@ GROUP BY
   metric_time__extract_year
   , metric_time__extract_quarter
   , metric_time__extract_month
-  , metric_time__extract_week
   , metric_time__extract_day
   , metric_time__extract_dow
   , metric_time__extract_doy

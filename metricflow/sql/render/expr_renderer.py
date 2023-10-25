@@ -278,7 +278,13 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         )
 
     def render_date_part(self, date_part: DatePart) -> str:
-        """Render DATE PART for an EXTRACT expression."""
+        """Render DATE PART for an EXTRACT expression.
+
+        For DatePart.DOW (day of week) we use the ISO date part to ensure all engines return consistent results.
+        """
+        if date_part is DatePart.DOW:
+            return "isodow"
+
         return date_part.value
 
     def visit_time_delta_expr(self, node: SqlSubtractTimeIntervalExpression) -> SqlExpressionRenderResult:  # noqa: D

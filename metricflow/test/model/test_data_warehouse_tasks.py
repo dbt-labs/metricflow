@@ -110,8 +110,8 @@ def test_build_dimension_tasks(  # noqa: D
     )
     # on semantic model query with all dimensions
     assert len(tasks) == 1
-    # 1 categorical dimension task, 1 time dimension task, 4 granularity based time dimension tasks, 7 date_part tasks
-    assert len(tasks[0].on_fail_subtasks) == 13
+    # 1 categorical dimension task, 1 time dimension task, 4 granularity based time dimension tasks, 6 date_part tasks
+    assert len(tasks[0].on_fail_subtasks) == 12
 
 
 def test_validate_dimensions(  # noqa: D

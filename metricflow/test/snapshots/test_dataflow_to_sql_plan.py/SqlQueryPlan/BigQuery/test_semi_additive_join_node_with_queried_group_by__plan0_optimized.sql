@@ -8,7 +8,6 @@ SELECT
   , subq_3.ds__extract_year AS ds__extract_year
   , subq_3.ds__extract_quarter AS ds__extract_quarter
   , subq_3.ds__extract_month AS ds__extract_month
-  , subq_3.ds__extract_week AS ds__extract_week
   , subq_3.ds__extract_day AS ds__extract_day
   , subq_3.ds__extract_dow AS ds__extract_dow
   , subq_3.ds__extract_doy AS ds__extract_doy
@@ -20,7 +19,6 @@ SELECT
   , subq_3.account__ds__extract_year AS account__ds__extract_year
   , subq_3.account__ds__extract_quarter AS account__ds__extract_quarter
   , subq_3.account__ds__extract_month AS account__ds__extract_month
-  , subq_3.account__ds__extract_week AS account__ds__extract_week
   , subq_3.account__ds__extract_day AS account__ds__extract_day
   , subq_3.account__ds__extract_dow AS account__ds__extract_dow
   , subq_3.account__ds__extract_doy AS account__ds__extract_doy
@@ -45,9 +43,8 @@ FROM (
     , EXTRACT(year FROM ds) AS ds__extract_year
     , EXTRACT(quarter FROM ds) AS ds__extract_quarter
     , EXTRACT(month FROM ds) AS ds__extract_month
-    , EXTRACT(isoweek FROM ds) AS ds__extract_week
     , EXTRACT(day FROM ds) AS ds__extract_day
-    , EXTRACT(dayofweek FROM ds) AS ds__extract_dow
+    , IF(EXTRACT(dayofweek FROM ds) = 1, 7, EXTRACT(dayofweek FROM ds) - 1) AS ds__extract_dow
     , EXTRACT(dayofyear FROM ds) AS ds__extract_doy
     , account_type
     , DATE_TRUNC(ds, day) AS account__ds__day
@@ -58,9 +55,8 @@ FROM (
     , EXTRACT(year FROM ds) AS account__ds__extract_year
     , EXTRACT(quarter FROM ds) AS account__ds__extract_quarter
     , EXTRACT(month FROM ds) AS account__ds__extract_month
-    , EXTRACT(isoweek FROM ds) AS account__ds__extract_week
     , EXTRACT(day FROM ds) AS account__ds__extract_day
-    , EXTRACT(dayofweek FROM ds) AS account__ds__extract_dow
+    , IF(EXTRACT(dayofweek FROM ds) = 1, 7, EXTRACT(dayofweek FROM ds) - 1) AS account__ds__extract_dow
     , EXTRACT(dayofyear FROM ds) AS account__ds__extract_doy
     , account_type AS account__account_type
     , user_id AS user

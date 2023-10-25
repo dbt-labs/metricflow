@@ -20,7 +20,7 @@ FROM (
       -- Pass Only Elements:
       --   ['bookings', 'metric_time__extract_dow']
       SELECT
-        EXTRACT(dayofweek FROM ds) AS metric_time__extract_dow
+        IF(EXTRACT(dayofweek FROM ds) = 1, 7, EXTRACT(dayofweek FROM ds) - 1) AS metric_time__extract_dow
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_10001
     ) subq_16
@@ -34,7 +34,7 @@ FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      EXTRACT(dayofweek FROM subq_22.ds) AS metric_time__extract_dow
+      IF(EXTRACT(dayofweek FROM subq_22.ds) = 1, 7, EXTRACT(dayofweek FROM subq_22.ds) - 1) AS metric_time__extract_dow
       , SUM(subq_20.bookings) AS bookings_2_weeks_ago
     FROM ***************************.mf_time_spine subq_22
     INNER JOIN (

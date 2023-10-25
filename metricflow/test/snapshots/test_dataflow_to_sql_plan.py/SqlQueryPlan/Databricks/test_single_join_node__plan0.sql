@@ -34,9 +34,8 @@ FROM (
       , EXTRACT(year FROM bookings_source_src_10001.ds) AS ds__extract_year
       , EXTRACT(quarter FROM bookings_source_src_10001.ds) AS ds__extract_quarter
       , EXTRACT(month FROM bookings_source_src_10001.ds) AS ds__extract_month
-      , EXTRACT(week FROM bookings_source_src_10001.ds) AS ds__extract_week
       , EXTRACT(day FROM bookings_source_src_10001.ds) AS ds__extract_day
-      , EXTRACT(dow FROM bookings_source_src_10001.ds) AS ds__extract_dow
+      , EXTRACT(DAYOFWEEK_ISO FROM bookings_source_src_10001.ds) AS ds__extract_dow
       , EXTRACT(doy FROM bookings_source_src_10001.ds) AS ds__extract_doy
       , DATE_TRUNC('day', bookings_source_src_10001.ds_partitioned) AS ds_partitioned__day
       , DATE_TRUNC('week', bookings_source_src_10001.ds_partitioned) AS ds_partitioned__week
@@ -46,9 +45,8 @@ FROM (
       , EXTRACT(year FROM bookings_source_src_10001.ds_partitioned) AS ds_partitioned__extract_year
       , EXTRACT(quarter FROM bookings_source_src_10001.ds_partitioned) AS ds_partitioned__extract_quarter
       , EXTRACT(month FROM bookings_source_src_10001.ds_partitioned) AS ds_partitioned__extract_month
-      , EXTRACT(week FROM bookings_source_src_10001.ds_partitioned) AS ds_partitioned__extract_week
       , EXTRACT(day FROM bookings_source_src_10001.ds_partitioned) AS ds_partitioned__extract_day
-      , EXTRACT(dow FROM bookings_source_src_10001.ds_partitioned) AS ds_partitioned__extract_dow
+      , EXTRACT(DAYOFWEEK_ISO FROM bookings_source_src_10001.ds_partitioned) AS ds_partitioned__extract_dow
       , EXTRACT(doy FROM bookings_source_src_10001.ds_partitioned) AS ds_partitioned__extract_doy
       , DATE_TRUNC('day', bookings_source_src_10001.paid_at) AS paid_at__day
       , DATE_TRUNC('week', bookings_source_src_10001.paid_at) AS paid_at__week
@@ -58,9 +56,8 @@ FROM (
       , EXTRACT(year FROM bookings_source_src_10001.paid_at) AS paid_at__extract_year
       , EXTRACT(quarter FROM bookings_source_src_10001.paid_at) AS paid_at__extract_quarter
       , EXTRACT(month FROM bookings_source_src_10001.paid_at) AS paid_at__extract_month
-      , EXTRACT(week FROM bookings_source_src_10001.paid_at) AS paid_at__extract_week
       , EXTRACT(day FROM bookings_source_src_10001.paid_at) AS paid_at__extract_day
-      , EXTRACT(dow FROM bookings_source_src_10001.paid_at) AS paid_at__extract_dow
+      , EXTRACT(DAYOFWEEK_ISO FROM bookings_source_src_10001.paid_at) AS paid_at__extract_dow
       , EXTRACT(doy FROM bookings_source_src_10001.paid_at) AS paid_at__extract_doy
       , bookings_source_src_10001.is_instant AS booking__is_instant
       , DATE_TRUNC('day', bookings_source_src_10001.ds) AS booking__ds__day
@@ -71,9 +68,8 @@ FROM (
       , EXTRACT(year FROM bookings_source_src_10001.ds) AS booking__ds__extract_year
       , EXTRACT(quarter FROM bookings_source_src_10001.ds) AS booking__ds__extract_quarter
       , EXTRACT(month FROM bookings_source_src_10001.ds) AS booking__ds__extract_month
-      , EXTRACT(week FROM bookings_source_src_10001.ds) AS booking__ds__extract_week
       , EXTRACT(day FROM bookings_source_src_10001.ds) AS booking__ds__extract_day
-      , EXTRACT(dow FROM bookings_source_src_10001.ds) AS booking__ds__extract_dow
+      , EXTRACT(DAYOFWEEK_ISO FROM bookings_source_src_10001.ds) AS booking__ds__extract_dow
       , EXTRACT(doy FROM bookings_source_src_10001.ds) AS booking__ds__extract_doy
       , DATE_TRUNC('day', bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__day
       , DATE_TRUNC('week', bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__week
@@ -83,9 +79,8 @@ FROM (
       , EXTRACT(year FROM bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__extract_year
       , EXTRACT(quarter FROM bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__extract_quarter
       , EXTRACT(month FROM bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__extract_month
-      , EXTRACT(week FROM bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__extract_week
       , EXTRACT(day FROM bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__extract_day
-      , EXTRACT(dow FROM bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__extract_dow
+      , EXTRACT(DAYOFWEEK_ISO FROM bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__extract_dow
       , EXTRACT(doy FROM bookings_source_src_10001.ds_partitioned) AS booking__ds_partitioned__extract_doy
       , DATE_TRUNC('day', bookings_source_src_10001.paid_at) AS booking__paid_at__day
       , DATE_TRUNC('week', bookings_source_src_10001.paid_at) AS booking__paid_at__week
@@ -95,9 +90,8 @@ FROM (
       , EXTRACT(year FROM bookings_source_src_10001.paid_at) AS booking__paid_at__extract_year
       , EXTRACT(quarter FROM bookings_source_src_10001.paid_at) AS booking__paid_at__extract_quarter
       , EXTRACT(month FROM bookings_source_src_10001.paid_at) AS booking__paid_at__extract_month
-      , EXTRACT(week FROM bookings_source_src_10001.paid_at) AS booking__paid_at__extract_week
       , EXTRACT(day FROM bookings_source_src_10001.paid_at) AS booking__paid_at__extract_day
-      , EXTRACT(dow FROM bookings_source_src_10001.paid_at) AS booking__paid_at__extract_dow
+      , EXTRACT(DAYOFWEEK_ISO FROM bookings_source_src_10001.paid_at) AS booking__paid_at__extract_dow
       , EXTRACT(doy FROM bookings_source_src_10001.paid_at) AS booking__paid_at__extract_doy
       , bookings_source_src_10001.listing_id AS listing
       , bookings_source_src_10001.guest_id AS guest
@@ -128,9 +122,8 @@ LEFT OUTER JOIN (
       , EXTRACT(year FROM listings_latest_src_10004.created_at) AS ds__extract_year
       , EXTRACT(quarter FROM listings_latest_src_10004.created_at) AS ds__extract_quarter
       , EXTRACT(month FROM listings_latest_src_10004.created_at) AS ds__extract_month
-      , EXTRACT(week FROM listings_latest_src_10004.created_at) AS ds__extract_week
       , EXTRACT(day FROM listings_latest_src_10004.created_at) AS ds__extract_day
-      , EXTRACT(dow FROM listings_latest_src_10004.created_at) AS ds__extract_dow
+      , EXTRACT(DAYOFWEEK_ISO FROM listings_latest_src_10004.created_at) AS ds__extract_dow
       , EXTRACT(doy FROM listings_latest_src_10004.created_at) AS ds__extract_doy
       , DATE_TRUNC('day', listings_latest_src_10004.created_at) AS created_at__day
       , DATE_TRUNC('week', listings_latest_src_10004.created_at) AS created_at__week
@@ -140,9 +133,8 @@ LEFT OUTER JOIN (
       , EXTRACT(year FROM listings_latest_src_10004.created_at) AS created_at__extract_year
       , EXTRACT(quarter FROM listings_latest_src_10004.created_at) AS created_at__extract_quarter
       , EXTRACT(month FROM listings_latest_src_10004.created_at) AS created_at__extract_month
-      , EXTRACT(week FROM listings_latest_src_10004.created_at) AS created_at__extract_week
       , EXTRACT(day FROM listings_latest_src_10004.created_at) AS created_at__extract_day
-      , EXTRACT(dow FROM listings_latest_src_10004.created_at) AS created_at__extract_dow
+      , EXTRACT(DAYOFWEEK_ISO FROM listings_latest_src_10004.created_at) AS created_at__extract_dow
       , EXTRACT(doy FROM listings_latest_src_10004.created_at) AS created_at__extract_doy
       , listings_latest_src_10004.country AS country_latest
       , listings_latest_src_10004.is_lux AS is_lux_latest
@@ -155,9 +147,8 @@ LEFT OUTER JOIN (
       , EXTRACT(year FROM listings_latest_src_10004.created_at) AS listing__ds__extract_year
       , EXTRACT(quarter FROM listings_latest_src_10004.created_at) AS listing__ds__extract_quarter
       , EXTRACT(month FROM listings_latest_src_10004.created_at) AS listing__ds__extract_month
-      , EXTRACT(week FROM listings_latest_src_10004.created_at) AS listing__ds__extract_week
       , EXTRACT(day FROM listings_latest_src_10004.created_at) AS listing__ds__extract_day
-      , EXTRACT(dow FROM listings_latest_src_10004.created_at) AS listing__ds__extract_dow
+      , EXTRACT(DAYOFWEEK_ISO FROM listings_latest_src_10004.created_at) AS listing__ds__extract_dow
       , EXTRACT(doy FROM listings_latest_src_10004.created_at) AS listing__ds__extract_doy
       , DATE_TRUNC('day', listings_latest_src_10004.created_at) AS listing__created_at__day
       , DATE_TRUNC('week', listings_latest_src_10004.created_at) AS listing__created_at__week
@@ -167,9 +158,8 @@ LEFT OUTER JOIN (
       , EXTRACT(year FROM listings_latest_src_10004.created_at) AS listing__created_at__extract_year
       , EXTRACT(quarter FROM listings_latest_src_10004.created_at) AS listing__created_at__extract_quarter
       , EXTRACT(month FROM listings_latest_src_10004.created_at) AS listing__created_at__extract_month
-      , EXTRACT(week FROM listings_latest_src_10004.created_at) AS listing__created_at__extract_week
       , EXTRACT(day FROM listings_latest_src_10004.created_at) AS listing__created_at__extract_day
-      , EXTRACT(dow FROM listings_latest_src_10004.created_at) AS listing__created_at__extract_dow
+      , EXTRACT(DAYOFWEEK_ISO FROM listings_latest_src_10004.created_at) AS listing__created_at__extract_dow
       , EXTRACT(doy FROM listings_latest_src_10004.created_at) AS listing__created_at__extract_doy
       , listings_latest_src_10004.country AS listing__country_latest
       , listings_latest_src_10004.is_lux AS listing__is_lux_latest

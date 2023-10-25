@@ -9,9 +9,8 @@ SELECT
   , EXTRACT(year FROM id_verifications_src_10003.ds) AS ds__extract_year
   , EXTRACT(quarter FROM id_verifications_src_10003.ds) AS ds__extract_quarter
   , EXTRACT(month FROM id_verifications_src_10003.ds) AS ds__extract_month
-  , EXTRACT(isoweek FROM id_verifications_src_10003.ds) AS ds__extract_week
   , EXTRACT(day FROM id_verifications_src_10003.ds) AS ds__extract_day
-  , EXTRACT(dayofweek FROM id_verifications_src_10003.ds) AS ds__extract_dow
+  , IF(EXTRACT(dayofweek FROM id_verifications_src_10003.ds) = 1, 7, EXTRACT(dayofweek FROM id_verifications_src_10003.ds) - 1) AS ds__extract_dow
   , EXTRACT(dayofyear FROM id_verifications_src_10003.ds) AS ds__extract_doy
   , DATE_TRUNC(id_verifications_src_10003.ds_partitioned, day) AS ds_partitioned__day
   , DATE_TRUNC(id_verifications_src_10003.ds_partitioned, isoweek) AS ds_partitioned__week
@@ -21,9 +20,8 @@ SELECT
   , EXTRACT(year FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_year
   , EXTRACT(quarter FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_quarter
   , EXTRACT(month FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_month
-  , EXTRACT(isoweek FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_week
   , EXTRACT(day FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_day
-  , EXTRACT(dayofweek FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_dow
+  , IF(EXTRACT(dayofweek FROM id_verifications_src_10003.ds_partitioned) = 1, 7, EXTRACT(dayofweek FROM id_verifications_src_10003.ds_partitioned) - 1) AS ds_partitioned__extract_dow
   , EXTRACT(dayofyear FROM id_verifications_src_10003.ds_partitioned) AS ds_partitioned__extract_doy
   , id_verifications_src_10003.verification_type
   , DATE_TRUNC(id_verifications_src_10003.ds, day) AS verification__ds__day
@@ -34,9 +32,8 @@ SELECT
   , EXTRACT(year FROM id_verifications_src_10003.ds) AS verification__ds__extract_year
   , EXTRACT(quarter FROM id_verifications_src_10003.ds) AS verification__ds__extract_quarter
   , EXTRACT(month FROM id_verifications_src_10003.ds) AS verification__ds__extract_month
-  , EXTRACT(isoweek FROM id_verifications_src_10003.ds) AS verification__ds__extract_week
   , EXTRACT(day FROM id_verifications_src_10003.ds) AS verification__ds__extract_day
-  , EXTRACT(dayofweek FROM id_verifications_src_10003.ds) AS verification__ds__extract_dow
+  , IF(EXTRACT(dayofweek FROM id_verifications_src_10003.ds) = 1, 7, EXTRACT(dayofweek FROM id_verifications_src_10003.ds) - 1) AS verification__ds__extract_dow
   , EXTRACT(dayofyear FROM id_verifications_src_10003.ds) AS verification__ds__extract_doy
   , DATE_TRUNC(id_verifications_src_10003.ds_partitioned, day) AS verification__ds_partitioned__day
   , DATE_TRUNC(id_verifications_src_10003.ds_partitioned, isoweek) AS verification__ds_partitioned__week
@@ -46,9 +43,8 @@ SELECT
   , EXTRACT(year FROM id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__extract_year
   , EXTRACT(quarter FROM id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__extract_quarter
   , EXTRACT(month FROM id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__extract_month
-  , EXTRACT(isoweek FROM id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__extract_week
   , EXTRACT(day FROM id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__extract_day
-  , EXTRACT(dayofweek FROM id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__extract_dow
+  , IF(EXTRACT(dayofweek FROM id_verifications_src_10003.ds_partitioned) = 1, 7, EXTRACT(dayofweek FROM id_verifications_src_10003.ds_partitioned) - 1) AS verification__ds_partitioned__extract_dow
   , EXTRACT(dayofyear FROM id_verifications_src_10003.ds_partitioned) AS verification__ds_partitioned__extract_doy
   , id_verifications_src_10003.verification_type AS verification__verification_type
   , id_verifications_src_10003.verification_id AS verification

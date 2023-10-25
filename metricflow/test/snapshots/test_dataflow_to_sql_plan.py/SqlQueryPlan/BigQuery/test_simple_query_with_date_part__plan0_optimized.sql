@@ -9,7 +9,7 @@ FROM (
   -- Pass Only Elements:
   --   ['bookings', 'metric_time__extract_dow']
   SELECT
-    EXTRACT(dayofweek FROM ds) AS metric_time__extract_dow
+    IF(EXTRACT(dayofweek FROM ds) = 1, 7, EXTRACT(dayofweek FROM ds) - 1) AS metric_time__extract_dow
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_10001
 ) subq_6

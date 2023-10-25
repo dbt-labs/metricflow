@@ -14,6 +14,7 @@ from metricflow.sql.render.expr_renderer import (
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_exprs import SqlGenerateUuidExpression, SqlPercentileExpression, SqlPercentileFunctionType
+from metricflow.time.date_part import DatePart
 
 
 class SnowflakeSqlExpressionRenderer(DefaultSqlExpressionRenderer):
@@ -27,6 +28,13 @@ class SnowflakeSqlExpressionRenderer(DefaultSqlExpressionRenderer):
             SqlPercentileFunctionType.DISCRETE,
             SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS,
         }
+
+    @override
+    def render_date_part(self, date_part: DatePart) -> str:
+        if date_part is DatePart.DOW:
+            return "dayofweekiso"
+
+        return super().render_date_part(date_part)
 
     @override
     def visit_generate_uuid_expr(self, node: SqlGenerateUuidExpression) -> SqlExpressionRenderResult:

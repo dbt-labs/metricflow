@@ -1080,7 +1080,6 @@ integration_test:
     {"name": "metric_time", "date_part": "dow"},
     {"name": "metric_time", "date_part": "doy"},
     {"name": "metric_time", "date_part": "day"},
-    {"name": "metric_time", "date_part": "week"},
   ]
   check_query: |
     SELECT
@@ -1089,14 +1088,12 @@ integration_test:
       , {{ render_extract("ds", DatePart.DOW) }} AS metric_time__extract_dow
       , {{ render_extract("ds", DatePart.DOY) }} AS metric_time__extract_doy
       , {{ render_extract("ds", DatePart.DAY) }} AS metric_time__extract_day
-      , {{ render_extract("ds", DatePart.WEEK) }} AS metric_time__extract_week
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
       {{ render_extract("ds", DatePart.QUARTER) }}
       , {{ render_extract("ds", DatePart.DOW) }}
       , {{ render_extract("ds", DatePart.DOY) }}
       , {{ render_extract("ds", DatePart.DAY) }}
-      , {{ render_extract("ds", DatePart.WEEK) }};
 ---
 integration_test:
   name: derived_metric_offset_window_and_date_part
