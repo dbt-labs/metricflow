@@ -97,7 +97,11 @@ class MetricFlowTestCredentialSetForAllEngines(FrozenBaseModel):  # noqa: D
         )
 
 
-SNAPSHOT_GENERATING_TEST_FILES = (
+SNAPSHOT_GENERATING_TESTS = (
+    "metricflow/test/cli/test_cli.py::test_saved_query",
+    "metricflow/test/cli/test_cli.py::test_saved_query_with_where",
+    "metricflow/test/cli/test_cli.py::test_saved_query_with_limit",
+    "metricflow/test/cli/test_cli.py::test_saved_query_explain",
     "metricflow/test/dataflow/builder/test_dataflow_plan_builder.py",
     "metricflow/test/dataflow/optimizer/source_scan/test_cm_branch_combiner.py",
     "metricflow/test/dataflow/optimizer/source_scan/test_source_scan_optimizer.py",
@@ -178,15 +182,13 @@ def run_cli() -> None:  # noqa: D
 
     credential_sets = MetricFlowTestCredentialSetForAllEngines.parse_raw(credential_sets_json_str)
 
-    logger.info(
-        f"Running the following tests to generate snapshots:\n{pformat_big_objects(SNAPSHOT_GENERATING_TEST_FILES)}"
-    )
+    logger.info(f"Running the following tests to generate snapshots:\n{pformat_big_objects(SNAPSHOT_GENERATING_TESTS)}")
 
     for test_configuration in credential_sets.as_configurations:
         logger.info(
             f"Running tests for {test_configuration.engine} with URL: {test_configuration.credential_set.engine_url}"
         )
-        run_tests(test_configuration, SNAPSHOT_GENERATING_TEST_FILES)
+        run_tests(test_configuration, SNAPSHOT_GENERATING_TESTS)
 
 
 if __name__ == "__main__":
