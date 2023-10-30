@@ -97,25 +97,29 @@ class MetricFlowTestCredentialSetForAllEngines(FrozenBaseModel):  # noqa: D
         )
 
 
-SNAPSHOT_GENERATING_TEST_FILES = (
-    "metricflow/test/dataflow/optimizer/source_scan/test_cm_branch_combiner.py",
-    "metricflow/test/sql/optimizer/test_column_pruner.py",
-    "metricflow/test/dataset/test_convert_semantic_model.py",
-    "metricflow/test/model/test_data_warehouse_tasks.py",
+SNAPSHOT_GENERATING_TESTS = (
+    "metricflow/test/cli/test_cli.py::test_saved_query",
+    "metricflow/test/cli/test_cli.py::test_saved_query_with_where",
+    "metricflow/test/cli/test_cli.py::test_saved_query_with_limit",
+    "metricflow/test/cli/test_cli.py::test_saved_query_explain",
     "metricflow/test/dataflow/builder/test_dataflow_plan_builder.py",
+    "metricflow/test/dataflow/optimizer/source_scan/test_cm_branch_combiner.py",
+    "metricflow/test/dataflow/optimizer/source_scan/test_source_scan_optimizer.py",
+    "metricflow/test/dataset/test_convert_semantic_model.py",
+    "metricflow/test/integration/test_rendered_query.py",
+    "metricflow/test/integration/test_rendered_query.py",
+    "metricflow/test/model/test_data_warehouse_tasks.py",
+    "metricflow/test/plan_conversion/dataflow_to_sql/test_metric_time_dimension_to_sql.py",
     "metricflow/test/plan_conversion/test_dataflow_to_execution.py",
     "metricflow/test/plan_conversion/test_dataflow_to_sql_plan.py",
-    "metricflow/test/sql/test_engine_specific_rendering.py",
-    "metricflow/test/plan_conversion/dataflow_to_sql/test_metric_time_dimension_to_sql.py",
-    "metricflow/test/integration/test_rendered_query.py",
+    "metricflow/test/sql/optimizer/test_column_pruner.py",
     "metricflow/test/sql/optimizer/test_rewriting_sub_query_reducer.py",
-    "metricflow/test/sql/test_sql_plan_render.py",
-    "metricflow/test/integration/test_rendered_query.py",
     "metricflow/test/sql/optimizer/test_sub_query_reducer.py",
-    "metricflow/test/dataflow/optimizer/source_scan/test_source_scan_optimizer.py",
-    "metricflow/test/sql/test_sql_plan_render.py",
     "metricflow/test/sql/optimizer/test_sub_query_reducer.py",
     "metricflow/test/sql/optimizer/test_table_alias_simplifier.py",
+    "metricflow/test/sql/test_engine_specific_rendering.py",
+    "metricflow/test/sql/test_sql_plan_render.py",
+    "metricflow/test/sql/test_sql_plan_render.py",
 )
 
 
@@ -178,15 +182,13 @@ def run_cli() -> None:  # noqa: D
 
     credential_sets = MetricFlowTestCredentialSetForAllEngines.parse_raw(credential_sets_json_str)
 
-    logger.info(
-        f"Running the following tests to generate snapshots:\n{pformat_big_objects(SNAPSHOT_GENERATING_TEST_FILES)}"
-    )
+    logger.info(f"Running the following tests to generate snapshots:\n{pformat_big_objects(SNAPSHOT_GENERATING_TESTS)}")
 
     for test_configuration in credential_sets.as_configurations:
         logger.info(
             f"Running tests for {test_configuration.engine} with URL: {test_configuration.credential_set.engine_url}"
         )
-        run_tests(test_configuration, SNAPSHOT_GENERATING_TEST_FILES)
+        run_tests(test_configuration, SNAPSHOT_GENERATING_TESTS)
 
 
 if __name__ == "__main__":
