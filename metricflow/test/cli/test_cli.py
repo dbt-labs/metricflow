@@ -155,6 +155,7 @@ def test_list_entities(capsys: pytest.CaptureFixture, cli_runner: MetricFlowCliR
     assert "host" in resp.output
 
 
+@pytest.mark.sql_engine_snapshot
 def test_saved_query(  # noqa: D
     request: FixtureRequest,
     capsys: pytest.CaptureFixture,
@@ -179,6 +180,7 @@ def test_saved_query(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_saved_query_with_where(  # noqa: D
     request: FixtureRequest,
     capsys: pytest.CaptureFixture,
@@ -211,6 +213,7 @@ def test_saved_query_with_where(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_saved_query_with_limit(  # noqa: D
     request: FixtureRequest,
     capsys: pytest.CaptureFixture,

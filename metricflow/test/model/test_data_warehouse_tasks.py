@@ -204,6 +204,7 @@ def test_validate_measures(  # noqa: D
     assert len(issues.all_issues) == 2
 
 
+@pytest.mark.sql_engine_snapshot
 def test_build_metric_tasks(  # noqa: D
     request: FixtureRequest,
     data_warehouse_validation_model: PydanticSemanticManifest,

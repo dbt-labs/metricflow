@@ -28,6 +28,7 @@ from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.sql.compare_sql_plan import assert_rendered_sql_equal
 
 
+@pytest.mark.sql_engine_snapshot
 def test_cast_to_timestamp(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -70,6 +71,7 @@ def test_cast_to_timestamp(
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_generate_uuid(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -103,6 +105,7 @@ def test_generate_uuid(
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_continuous_percentile_expr(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -151,6 +154,7 @@ def test_continuous_percentile_expr(
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_discrete_percentile_expr(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -199,6 +203,7 @@ def test_discrete_percentile_expr(
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_approximate_continuous_percentile_expr(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -247,6 +252,7 @@ def test_approximate_continuous_percentile_expr(
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_approximate_discrete_percentile_expr(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,

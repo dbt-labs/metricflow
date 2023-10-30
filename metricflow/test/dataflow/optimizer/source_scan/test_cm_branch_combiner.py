@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import pytest
 from _pytest.fixtures import FixtureRequest
 
 from metricflow.dag.id_generation import OPTIMIZED_DATAFLOW_PLAN_PREFIX, IdGeneratorRegistry
@@ -28,6 +29,7 @@ def make_dataflow_plan(node: BaseOutput) -> DataflowPlan:  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_read_sql_source_combination(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -56,6 +58,7 @@ def test_read_sql_source_combination(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_filter_combination(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import pytest
 from _pytest.fixtures import FixtureRequest
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
@@ -34,6 +35,7 @@ def make_execution_plan_converter(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_joined_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -72,6 +74,7 @@ def test_joined_plan(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_small_combined_metrics_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -108,6 +111,7 @@ def test_small_combined_metrics_plan(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_combined_metrics_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -146,6 +150,7 @@ def test_combined_metrics_plan(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_multihop_joined_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
