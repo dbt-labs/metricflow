@@ -6,7 +6,7 @@ from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from metricflow.sql.sql_plan import SqlQueryPlan, SqlQueryPlanNode, SqlSelectStatementNode
 from metricflow.sql.sql_plan_to_text import sql_query_plan_as_text
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState, check_sql_engine_snapshot_marker
 from metricflow.test.snapshot_utils import (
     assert_plan_snapshot_text_equal,
     make_schema_replacement_function,
@@ -58,6 +58,8 @@ def assert_rendered_sql_from_plan_equal(
     sql_client: SqlClient,
 ) -> None:
     """Similar to assert_rendered_sql_equal, but takes in a SQL query plan."""
+    check_sql_engine_snapshot_marker(request)
+
     rendered_sql = sql_client.sql_query_plan_renderer.render_sql_query_plan(sql_query_plan).sql
 
     assert_plan_snapshot_text_equal(

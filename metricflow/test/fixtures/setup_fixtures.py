@@ -80,6 +80,16 @@ def pytest_configure(config: _pytest.config.Config) -> None:
     )
 
 
+def check_sql_engine_snapshot_marker(request: FixtureRequest) -> None:
+    """Raises an error if the given test request does not have the sql-engine-test marker set."""
+    mark_names = set(mark.name for mark in request.node.iter_markers(name=SQL_ENGINE_SNAPSHOT_MARKER_NAME))
+    if SQL_ENGINE_SNAPSHOT_MARKER_NAME not in mark_names:
+        raise ValueError(
+            f"This test needs to be marked with '{SQL_ENGINE_SNAPSHOT_MARKER_NAME}' to keep track of all tests that "
+            f"generate SQL-engine specific snapshots."
+        )
+
+
 @pytest.fixture(scope="session")
 def mf_test_session_state(  # noqa: D
     request: FixtureRequest,
