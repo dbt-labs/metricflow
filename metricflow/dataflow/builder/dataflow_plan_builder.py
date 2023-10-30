@@ -15,7 +15,6 @@ from dbt_semantic_interfaces.references import (
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.dag.id_generation import DATAFLOW_PLAN_PREFIX, IdGeneratorRegistry
-from metricflow.dataflow.builder.costing import DataflowPlanNodeCostFunction, DefaultCostFunction
 from metricflow.dataflow.builder.measure_additiveness import group_measure_specs_by_additiveness
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.node_evaluator import (
@@ -147,14 +146,12 @@ class DataflowPlanBuilder:
         source_nodes: Sequence[BaseOutput],
         read_nodes: Sequence[ReadSqlSourceNode],
         semantic_manifest_lookup: SemanticManifestLookup,
-        cost_function: DataflowPlanNodeCostFunction = DefaultCostFunction(),
         node_output_resolver: Optional[DataflowPlanNodeOutputDataSetResolver] = None,
         column_association_resolver: Optional[ColumnAssociationResolver] = None,
     ) -> None:
         self._semantic_model_lookup = semantic_manifest_lookup.semantic_model_lookup
         self._metric_lookup = semantic_manifest_lookup.metric_lookup
         self._metric_time_dimension_reference = DataSet.metric_time_dimension_reference()
-        self._cost_function = cost_function
         self._source_nodes = source_nodes
         self._read_nodes = read_nodes
         self._column_association_resolver = (
@@ -391,15 +388,14 @@ class DataflowPlanBuilder:
         return semantic_model_names
 
     def _sort_by_suitability(self, nodes: Sequence[BaseOutput]) -> Sequence[BaseOutput]:
-        """Sort nodes by the cost, then by the number of linkable specs.
+        """Sort nodes by the number of linkable specs.
 
-        Lower cost nodes will result in faster queries, and the lower the number of linkable specs means less
-        aggregation required.
+        The lower the number of linkable specs means less aggregation required.
         """
 
-        def sort_function(node: BaseOutput) -> Tuple[int, int]:
+        def sort_function(node: BaseOutput) -> int:
             data_set = self._node_data_set_resolver.get_output_data_set(node)
-            return self._cost_function.calculate_cost(node).as_int, len(data_set.instance_set.spec_set.linkable_specs)
+            return len(data_set.instance_set.spec_set.linkable_specs)
 
         return sorted(nodes, key=sort_function)
 
@@ -591,7 +587,7 @@ class DataflowPlanBuilder:
         logger.info(f"Found {len(node_to_evaluation)} candidate source nodes.")
 
         if len(node_to_evaluation) > 0:
-            # All source nodes cost the same. Find evaluation with lowest number of joins.
+            # Find evaluation with lowest number of joins.
             node_with_lowest_cost_plan = min(
                 node_to_evaluation, key=lambda node: len(node_to_evaluation[node].join_recipes)
             )
