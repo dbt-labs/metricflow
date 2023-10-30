@@ -68,6 +68,18 @@ def pytest_addoption(parser: _pytest.config.argparsing.Parser) -> None:
     )
 
 
+# Name of the pytest marker for tests that generate SQL-engine specific snapshots.
+SQL_ENGINE_SNAPSHOT_MARKER_NAME = "sql_engine_snapshot"
+
+
+def pytest_configure(config: _pytest.config.Config) -> None:
+    """Hook as specified by the pytest API for configuration."""
+    config.addinivalue_line(
+        name="markers",
+        line=f"{SQL_ENGINE_SNAPSHOT_MARKER_NAME}: mark tests as generating a snapshot specific to a SQL engine",
+    )
+
+
 @pytest.fixture(scope="session")
 def mf_test_session_state(  # noqa: D
     request: FixtureRequest,
