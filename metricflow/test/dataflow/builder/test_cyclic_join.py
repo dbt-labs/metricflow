@@ -6,7 +6,6 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.references import EntityReference
 
-from metricflow.dataflow.builder.costing import DefaultCostFunction
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
@@ -36,7 +35,6 @@ def cyclic_join_manifest_dataflow_plan_builder(  # noqa: D
         source_nodes=consistent_id_object_repository.cyclic_join_source_nodes,
         read_nodes=list(consistent_id_object_repository.cyclic_join_read_nodes.values()),
         semantic_manifest_lookup=cyclic_join_semantic_manifest_lookup,
-        cost_function=DefaultCostFunction(),
     )
 
 

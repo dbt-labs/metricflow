@@ -673,6 +673,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 else:
                     expr = metric.name
                 # Use a column reference to improve query optimization.
+                # Update metric expr to use coalesce; when to join to time spine??
                 metric_expr = SqlColumnReferenceExpression(
                     SqlColumnReference(
                         table_alias=from_data_set_alias,
