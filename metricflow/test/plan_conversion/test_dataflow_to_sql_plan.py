@@ -136,6 +136,7 @@ def convert_and_check(
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_source_node(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -155,6 +156,7 @@ def test_source_node(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_filter_node(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -180,6 +182,7 @@ def test_filter_node(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_filter_with_where_constraint_node(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -221,6 +224,7 @@ def test_filter_with_where_constraint_node(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_measure_aggregation_node(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -266,6 +270,7 @@ def test_measure_aggregation_node(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_single_join_node(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -321,6 +326,7 @@ def test_single_join_node(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_multi_join_node(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -379,6 +385,7 @@ def test_multi_join_node(
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_compute_metrics_node(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -442,6 +449,7 @@ def test_compute_metrics_node(
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_compute_metrics_node_simple_expr(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -517,6 +525,7 @@ def test_compute_metrics_node_simple_expr(
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_join_to_time_spine_node_without_offset(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -580,6 +589,7 @@ def test_join_to_time_spine_node_without_offset(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_join_to_time_spine_node_with_offset_window(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -644,6 +654,7 @@ def test_join_to_time_spine_node_with_offset_window(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_join_to_time_spine_node_with_offset_to_grain(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -709,6 +720,7 @@ def test_join_to_time_spine_node_with_offset_to_grain(
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_compute_metrics_node_ratio_from_single_semantic_model(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -774,6 +786,7 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_compute_metrics_node_ratio_from_multiple_semantic_models(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -813,6 +826,7 @@ def test_compute_metrics_node_ratio_from_multiple_semantic_models(
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_order_by_node(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -876,6 +890,7 @@ def test_order_by_node(
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_multihop_node(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -908,6 +923,7 @@ def test_multihop_node(
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_filter_with_where_constraint_on_join_dim(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -948,6 +964,7 @@ def test_filter_with_where_constraint_on_join_dim(
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_constrain_time_range_node(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -992,6 +1009,7 @@ def test_constrain_time_range_node(
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_cumulative_metric(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1024,6 +1042,7 @@ def test_cumulative_metric(
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_cumulative_metric_with_time_constraint(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1059,6 +1078,7 @@ def test_cumulative_metric_with_time_constraint(
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_cumulative_metric_no_ds(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1085,6 +1105,7 @@ def test_cumulative_metric_no_ds(
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_cumulative_metric_no_window(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1117,6 +1138,7 @@ def test_cumulative_metric_no_window(
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_cumulative_metric_no_window_with_time_constraint(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1152,6 +1174,7 @@ def test_cumulative_metric_no_window_with_time_constraint(
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_cumulative_metric_grain_to_date(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1184,6 +1207,7 @@ def test_cumulative_metric_grain_to_date(
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_partitioned_join(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1214,6 +1238,7 @@ def test_partitioned_join(
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_limit_rows(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1244,6 +1269,7 @@ def test_limit_rows(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_distinct_values(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1288,6 +1314,7 @@ def test_distinct_values(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_local_dimension_using_local_entity(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1316,6 +1343,7 @@ def test_local_dimension_using_local_entity(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_semi_additive_join_node(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1344,6 +1372,7 @@ def test_semi_additive_join_node(
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_semi_additive_join_node_with_queried_group_by(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1375,6 +1404,7 @@ def test_semi_additive_join_node_with_queried_group_by(
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_semi_additive_join_node_with_grouping(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1407,6 +1437,7 @@ def test_semi_additive_join_node_with_grouping(
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_measure_constraint(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1430,6 +1461,7 @@ def test_measure_constraint(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_measure_constraint_with_reused_measure(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1453,6 +1485,7 @@ def test_measure_constraint_with_reused_measure(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_measure_constraint_with_single_expr_and_alias(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1476,6 +1509,7 @@ def test_measure_constraint_with_single_expr_and_alias(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_derived_metric(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1499,6 +1533,7 @@ def test_derived_metric(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_nested_derived_metric(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1522,6 +1557,7 @@ def test_nested_derived_metric(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_join_to_scd_dimension(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1560,6 +1596,7 @@ def test_join_to_scd_dimension(
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_multi_hop_through_scd_dimension(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1585,6 +1622,7 @@ def test_multi_hop_through_scd_dimension(
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_multi_hop_to_scd_dimension(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1610,6 +1648,7 @@ def test_multi_hop_to_scd_dimension(
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_multiple_metrics_no_dimensions(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1635,6 +1674,7 @@ def test_multiple_metrics_no_dimensions(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_metric_with_measures_from_multiple_sources_no_dimensions(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1657,6 +1697,7 @@ def test_metric_with_measures_from_multiple_sources_no_dimensions(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_common_semantic_model(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1680,6 +1721,7 @@ def test_common_semantic_model(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_derived_metric_with_offset_window(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1703,6 +1745,7 @@ def test_derived_metric_with_offset_window(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_derived_metric_with_offset_to_grain(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1726,6 +1769,7 @@ def test_derived_metric_with_offset_to_grain(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_derived_metric_with_offset_window_and_offset_to_grain(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1749,6 +1793,7 @@ def test_derived_metric_with_offset_window_and_offset_to_grain(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_derived_offset_metric_with_one_input_metric(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1772,6 +1817,7 @@ def test_derived_offset_metric_with_one_input_metric(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_derived_metric_with_offset_window_and_granularity(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1795,6 +1841,7 @@ def test_derived_metric_with_offset_window_and_granularity(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_derived_metric_with_offset_to_grain_and_granularity(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1818,6 +1865,7 @@ def test_derived_metric_with_offset_to_grain_and_granularity(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_derived_metric_with_offset_window_and_offset_to_grain_and_granularity(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1841,6 +1889,7 @@ def test_derived_metric_with_offset_window_and_offset_to_grain_and_granularity( 
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_derived_offset_cumulative_metric(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1864,6 +1913,7 @@ def test_derived_offset_cumulative_metric(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_simple_query_with_date_part(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1889,6 +1939,7 @@ def test_simple_query_with_date_part(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_simple_query_with_multiple_date_parts(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1919,6 +1970,7 @@ def test_simple_query_with_multiple_date_parts(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_offset_window_with_date_part(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,

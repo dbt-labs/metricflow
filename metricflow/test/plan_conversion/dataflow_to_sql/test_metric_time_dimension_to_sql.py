@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.references import TimeDimensionReference
 
@@ -14,6 +15,7 @@ from metricflow.test.plan_conversion.test_dataflow_to_sql_plan import convert_an
 from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY
 
 
+@pytest.mark.sql_engine_snapshot
 def test_metric_time_dimension_transform_node_using_primary_time(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -35,6 +37,7 @@ def test_metric_time_dimension_transform_node_using_primary_time(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_metric_time_dimension_transform_node_using_non_primary_time(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -57,6 +60,7 @@ def test_metric_time_dimension_transform_node_using_non_primary_time(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_simple_query_with_metric_time_dimension(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,

@@ -8,7 +8,6 @@ from _pytest.fixtures import FixtureRequest
 
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer, SqlQueryPlanRenderer
 from metricflow.sql.sql_exprs import (
     SqlAggregateFunctionExpression,
     SqlColumnReference,
@@ -32,11 +31,7 @@ from metricflow.test.sql.compare_sql_plan import assert_rendered_sql_equal
 logger = logging.getLogger(__name__)
 
 
-@pytest.fixture
-def default_sql_plan_renderer() -> SqlQueryPlanRenderer:  # noqa: D
-    return DefaultSqlQueryPlanRenderer()
-
-
+@pytest.mark.sql_engine_snapshot
 def test_component_rendering(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -223,6 +218,7 @@ def test_component_rendering(
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_render_where(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -263,6 +259,7 @@ def test_render_where(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_render_order_by(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -312,6 +309,7 @@ def test_render_order_by(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_render_limit(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,

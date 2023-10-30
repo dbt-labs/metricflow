@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 
+import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
@@ -150,6 +151,7 @@ def check_optimization(  # noqa: D
     assert source_counter.count_source_nodes(optimized_dataflow_plan) == expected_num_sources_in_optimized
 
 
+@pytest.mark.sql_engine_snapshot
 def test_2_metrics_from_1_semantic_model(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -175,6 +177,7 @@ def test_2_metrics_from_1_semantic_model(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_2_metrics_from_2_semantic_models(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -194,6 +197,7 @@ def test_2_metrics_from_2_semantic_models(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_3_metrics_from_2_semantic_models(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -217,6 +221,7 @@ def test_3_metrics_from_2_semantic_models(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_constrained_metric_not_combined(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -252,6 +257,7 @@ def test_constrained_metric_not_combined(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_derived_metric(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -274,6 +280,7 @@ def test_derived_metric(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_nested_derived_metric(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -297,6 +304,7 @@ def test_nested_derived_metric(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_derived_metric_with_non_derived_metric(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -328,6 +336,7 @@ def test_derived_metric_with_non_derived_metric(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_2_ratio_metrics_from_1_semantic_model(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,

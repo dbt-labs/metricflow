@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import pytest
 from _pytest.fixtures import FixtureRequest
 
 from metricflow.dataflow.sql_table import SqlTable
@@ -12,6 +13,7 @@ from metricflow.test.snapshot_utils import assert_snapshot_text_equal, make_sche
 _EXCLUDE_TABLE_ALIAS_REGEX = "^.*_src.*$"
 
 
+@pytest.mark.sql_engine_snapshot
 def test_render_query(  # noqa: D
     request: FixtureRequest, mf_test_session_state: MetricFlowTestSessionState, it_helpers: IntegrationTestHelpers
 ) -> None:
@@ -37,6 +39,7 @@ def test_render_query(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_render_write_to_table_query(  # noqa: D
     request: FixtureRequest, mf_test_session_state: MetricFlowTestSessionState, it_helpers: IntegrationTestHelpers
 ) -> None:

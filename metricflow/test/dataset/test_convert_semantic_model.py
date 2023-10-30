@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import logging
 
+import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.references import SemanticModelReference
 
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.snapshot_utils import assert_spec_set_snapshot_equal
@@ -15,6 +15,7 @@ from metricflow.test.sql.compare_sql_plan import assert_rendered_sql_equal
 logger = logging.getLogger(__name__)
 
 
+@pytest.mark.sql_engine_snapshot
 def test_convert_table_semantic_model_without_measures(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -40,6 +41,7 @@ def test_convert_table_semantic_model_without_measures(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_convert_table_semantic_model_with_measures(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -72,11 +74,11 @@ def test_convert_table_semantic_model_with_measures(  # noqa: D
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_convert_query_semantic_model(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     sql_client: SqlClient,
-    default_sql_plan_renderer: SqlQueryPlanRenderer,
     consistent_id_object_repository: ConsistentIdObjectRepository,
 ) -> None:
     bookings_data_set = consistent_id_object_repository.simple_model_data_sets["revenue"]
