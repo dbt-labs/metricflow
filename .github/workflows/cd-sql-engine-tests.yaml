@@ -18,7 +18,7 @@ env:
 jobs:
   snowflake-tests:
     environment: DW_INTEGRATION_TESTS
-    if: ${{ github.event.action != 'labeled' || github.event.label.name == 'run_mf_sql_engine_tests' }}
+    if: ${{ github.event.action != 'labeled' || github.event.label.name == 'Run Tests With Other SQL Engines' }}
     name: Snowflake Tests
     runs-on: ubuntu-latest
     steps:
@@ -38,7 +38,7 @@ jobs:
   redshift-tests:
     environment: DW_INTEGRATION_TESTS
     name: Redshift Tests
-    if: ${{ github.event.action != 'labeled' || github.event.label.name == 'run_mf_sql_engine_tests' }}
+    if: ${{ github.event.action != 'labeled' || github.event.label.name == 'Run Tests With Other SQL Engines' }}
     runs-on: ubuntu-latest
     steps:
       - name: Check-out the repo
@@ -56,7 +56,7 @@ jobs:
   bigquery-tests:
     environment: DW_INTEGRATION_TESTS
     name: BigQuery Tests
-    if: ${{ github.event.action != 'labeled' || github.event.label.name == 'run_mf_sql_engine_tests' }}
+    if: ${{ github.event.action != 'labeled' || github.event.label.name == 'Run Tests With Other SQL Engines' }}
     runs-on: ubuntu-latest
     steps:
       - name: Check-out the repo
@@ -75,7 +75,7 @@ jobs:
   databricks-tests:
     environment: DW_INTEGRATION_TESTS
     name: Databricks Tests
-    if: ${{ github.event.action != 'labeled' || github.event.label.name == 'run_mf_sql_engine_tests' }}
+    if: ${{ github.event.action != 'labeled' || github.event.label.name == 'Run Tests With Other SQL Engines' }}
     runs-on: ubuntu-latest
     steps:
       - name: Check-out the repo
@@ -90,3 +90,14 @@ jobs:
           parallelism: ${{ env.EXTERNAL_ENGINE_TEST_PARALLELISM }}
           additional-pytest-options: ${{ env.ADDITIONAL_PYTEST_OPTIONS }}
           make-target: "test-databricks"
+
+  remove-label:
+    name: Remove Label After Running Tests
+    runs-on: ubuntu-latest
+    needs: [ snowflake-tests, redshift-tests, bigquery-tests, databricks-tests ]
+    if: github.event.action == 'labeled' && github.event.label.name == 'Run Tests With Other SQL Engines'
+    steps:
+      - name: Remove Label
+        uses: actions-ecosystem/action-remove-labels@v1
+        with:
+          labels: 'Run Tests With Other SQL Engines'
