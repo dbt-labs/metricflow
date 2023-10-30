@@ -19,7 +19,7 @@ from metricflow.execution.execution_plan_to_text import execution_plan_to_text
 from metricflow.model.semantics.linkable_spec_resolver import LinkableElementSet
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.specs.specs import InstanceSpecSet
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState, check_sql_engine_snapshot_marker
 
 logger = logging.getLogger(__name__)
 
@@ -261,6 +261,9 @@ def assert_object_snapshot_equal(  # type: ignore[misc]
     sql_client: Optional[SqlClient] = None,
 ) -> None:
     """For tests to compare large objects, this can be used to snapshot a text representation of the object."""
+    if sql_client is not None:
+        check_sql_engine_snapshot_marker(request)
+
     assert_snapshot_text_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
