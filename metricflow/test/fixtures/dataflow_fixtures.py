@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import pytest
 
-from metricflow.dataflow.builder.costing import DefaultCostFunction
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
@@ -36,7 +35,6 @@ def dataflow_plan_builder(  # noqa: D
         source_nodes=consistent_id_object_repository.simple_model_source_nodes,
         read_nodes=list(consistent_id_object_repository.simple_model_read_nodes.values()),
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
-        cost_function=DefaultCostFunction(),
     )
 
 
@@ -50,7 +48,6 @@ def multihop_dataflow_plan_builder(  # noqa: D
         source_nodes=consistent_id_object_repository.multihop_model_source_nodes,
         read_nodes=list(consistent_id_object_repository.multihop_model_read_nodes.values()),
         semantic_manifest_lookup=multi_hop_join_semantic_manifest_lookup,
-        cost_function=DefaultCostFunction(),
     )
 
 
@@ -72,7 +69,6 @@ def scd_dataflow_plan_builder(  # noqa: D
         source_nodes=consistent_id_object_repository.scd_model_source_nodes,
         read_nodes=list(consistent_id_object_repository.scd_model_read_nodes.values()),
         semantic_manifest_lookup=scd_semantic_manifest_lookup,
-        cost_function=DefaultCostFunction(),
         column_association_resolver=scd_column_association_resolver,
     )
 
