@@ -219,7 +219,7 @@ def test_case(
     extended_date_semantic_manifest_lookup: SemanticManifestLookup,
     scd_semantic_manifest_lookup: SemanticManifestLookup,
     sql_client: SqlClient,
-    create_source_tables: bool,
+    create_source_tables: bool,  # Param not used in funciton, but needed for test data to exist
 ) -> None:
     """Runs all integration tests configured in the test case YAML directory."""
     case = CONFIGURED_INTEGRATION_TESTS_REPOSITORY.get_test_case(name)

@@ -745,7 +745,6 @@ class DataflowPlanBuilder:
             if time_dimension_spec.element_name == self._metric_time_dimension_reference.element_name
         ]
         metric_time_dimension_requested = len(metric_time_dimension_specs) > 0
-        time_dimension_requested = len(queried_linkable_specs.time_dimension_specs) > 0
         measure_specs = tuple(x.measure_spec for x in metric_input_measure_specs)
         measure_properties = self._build_measure_spec_properties(measure_specs)
         non_additive_dimension_spec = measure_properties.non_additive_dimension_spec
@@ -818,11 +817,10 @@ class DataflowPlanBuilder:
         # If querying an offset metric, join to time spine.
         join_to_time_spine_node: Optional[JoinToTimeSpineNode] = None
         if metric_spec.offset_window or metric_spec.offset_to_grain:
-            # TODO: update to accept any time dimensions
             assert metric_time_dimension_specs, "Joining to time spine requires querying with metric time."
             join_to_time_spine_node = JoinToTimeSpineNode(
                 parent_node=time_range_node or measure_recipe.source_node,
-                time_dimension_specs=metric_time_dimension_specs,
+                metric_time_dimension_specs=metric_time_dimension_specs,
                 time_range_constraint=time_range_constraint,
                 offset_window=metric_spec.offset_window,
                 offset_to_grain=metric_spec.offset_to_grain,
@@ -925,12 +923,13 @@ class DataflowPlanBuilder:
                 join_aggregated_measure_to_time_spine = True
                 break
 
-        # Only join to time spine if a time dimension was requested in the query.
         # TODO: if multiple measures and only some join to time spine, should we aggregate separately?
-        if join_aggregated_measure_to_time_spine and time_dimension_requested:
+        # TODO: what is time range constraint here? does it need to be smaller?
+        # Only join to time spine if metric time was requested in the query.
+        if join_aggregated_measure_to_time_spine and metric_time_dimension_requested:
             return JoinToTimeSpineNode(
                 parent_node=aggregate_measures_node,
-                time_dimension_specs=list(queried_linkable_specs.time_dimension_specs),
+                metric_time_dimension_specs=metric_time_dimension_specs,
                 time_range_constraint=time_range_constraint,
                 join_type=SqlJoinType.LEFT_OUTER,
             )

@@ -15,7 +15,7 @@
             <JoinToTimeSpineNode>
                 <!-- description = Join to Time Spine Dataset -->
                 <!-- node_id = jts_0 -->
-                <!-- time_dimension_specs =                        -->
+                <!-- metric_time_dimension_specs =                 -->
                 <!--   [{'class': 'TimeDimensionSpec',             -->
                 <!--     'element_name': 'metric_time',            -->
                 <!--     'entity_links': (),                       -->

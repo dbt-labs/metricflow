@@ -1147,7 +1147,7 @@ integration_test:
     SELECT 1
 ---
 integration_test:
-  name: simple_fill_nulls_with_0_non_metric_time
+  name: dont_join_or_fill_nulls_for_non_metric_time
   description: Test a simple metric that joins to time spine with time dim that's not metric time
   model: SIMPLE_MODEL
   metrics: ["bookings_fill_0"]
