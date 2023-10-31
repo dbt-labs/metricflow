@@ -18,6 +18,7 @@ from metricflow.specs.specs import (
     MetricFlowQuerySpec,
     MetricSpec,
     OrderBySpec,
+    TimeDimensionSpec,
 )
 from metricflow.specs.where_filter_transform import WhereSpecFactory
 from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
@@ -854,6 +855,109 @@ def test_derived_offset_cumulative_metric(  # noqa: D
             metric_specs=(MetricSpec(element_name="every_2_days_bookers_2_days_ago"),),
             time_dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
         )
+    )
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dag_graph=dataflow_plan,
+    )
+
+
+def test_join_to_time_spine_with_metric_time(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings_fill_0"),),
+            time_dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
+        )
+    )
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dag_graph=dataflow_plan,
+    )
+
+
+def test_join_to_time_spine_derived_metric(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings_growth_2_weeks_fill_0"),),
+            time_dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
+        )
+    )
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dag_graph=dataflow_plan,
+    )
+
+
+def test_join_to_time_spine_with_non_metric_time(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings_fill_0"),),
+            time_dimension_specs=(
+                TimeDimensionSpec(element_name="paid_at", entity_links=(EntityReference("booking"),)),
+            ),
+        )
+    )
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dag_graph=dataflow_plan,
+    )
+
+
+def test_dont_join_to_time_spine_if_no_time_dimension_requested(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(metric_specs=(MetricSpec(element_name="bookings_fill_0"),))
     )
 
     assert_plan_snapshot_text_equal(

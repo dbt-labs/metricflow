@@ -475,6 +475,7 @@ class SqlQueryPlanJoinBuilder:
         metric_time_dimension_column_name: str,
         parent_sql_select_node: SqlSelectStatementNode,
         parent_alias: str,
+        join_type: SqlJoinType,
     ) -> SqlJoinDescription:
         """Build join expression used to join a metric to a time spine dataset."""
         left_expr: SqlExpressionNode = SqlColumnReferenceExpression(
@@ -497,5 +498,5 @@ class SqlQueryPlanJoinBuilder:
                     col_ref=SqlColumnReference(table_alias=parent_alias, column_name=metric_time_dimension_column_name)
                 ),
             ),
-            join_type=SqlJoinType.INNER,
+            join_type=join_type,
         )
