@@ -791,46 +791,6 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
 
 
 @pytest.mark.sql_engine_snapshot
-def test_compute_metrics_node_ratio_from_multiple_semantic_models(
-    request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    sql_client: SqlClient,
-) -> None:
-    """Tests the compute metrics node for ratio type metrics.
-
-    This test exercises the functionality provided in JoinAggregatedMeasuresByGroupByColumnsNode for
-    merging multiple measures into a single input source for final metrics computation.
-    """
-    dimension_spec = DimensionSpec(
-        element_name="country_latest",
-        entity_links=(EntityReference(element_name="listing"),),
-    )
-    time_dimension_spec = TimeDimensionSpec(
-        element_name="ds",
-        entity_links=(),
-    )
-    metric_spec = MetricSpec(element_name="bookings_per_view")
-
-    dataflow_plan = dataflow_plan_builder.build_plan(
-        query_spec=MetricFlowQuerySpec(
-            metric_specs=(metric_spec,),
-            dimension_specs=(dimension_spec,),
-            time_dimension_specs=(time_dimension_spec,),
-        ),
-    )
-
-    convert_and_check(
-        request=request,
-        mf_test_session_state=mf_test_session_state,
-        dataflow_to_sql_converter=dataflow_to_sql_converter,
-        sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
-    )
-
-
-@pytest.mark.sql_engine_snapshot
 def test_order_by_node(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -891,6 +851,185 @@ def test_order_by_node(
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=order_by_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_semi_additive_join_node(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    consistent_id_object_repository: ConsistentIdObjectRepository,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    """Tests converting a dataflow plan to a SQL query plan using a SemiAdditiveJoinNode."""
+    non_additive_dimension_spec = NonAdditiveDimensionSpec(name="ds", window_choice=AggregationType.MIN)
+    time_dimension_spec = TimeDimensionSpec(element_name="ds", entity_links=())
+
+    measure_source_node = consistent_id_object_repository.simple_model_read_nodes["accounts_source"]
+    semi_additive_join_node = SemiAdditiveJoinNode(
+        parent_node=measure_source_node,
+        entity_specs=tuple(),
+        time_dimension_spec=time_dimension_spec,
+        agg_by_function=non_additive_dimension_spec.window_choice,
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=semi_additive_join_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_semi_additive_join_node_with_queried_group_by(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    consistent_id_object_repository: ConsistentIdObjectRepository,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    """Tests converting a dataflow plan to a SQL query plan using a SemiAdditiveJoinNode."""
+    non_additive_dimension_spec = NonAdditiveDimensionSpec(name="ds", window_choice=AggregationType.MIN)
+    time_dimension_spec = TimeDimensionSpec(element_name="ds", entity_links=())
+    queried_time_dimension_spec = TimeDimensionSpec(
+        element_name="ds", entity_links=(), time_granularity=TimeGranularity.WEEK
+    )
+
+    measure_source_node = consistent_id_object_repository.simple_model_read_nodes["accounts_source"]
+    semi_additive_join_node = SemiAdditiveJoinNode(
+        parent_node=measure_source_node,
+        entity_specs=tuple(),
+        time_dimension_spec=time_dimension_spec,
+        agg_by_function=non_additive_dimension_spec.window_choice,
+        queried_time_dimension_spec=queried_time_dimension_spec,
+    )
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=semi_additive_join_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_semi_additive_join_node_with_grouping(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    consistent_id_object_repository: ConsistentIdObjectRepository,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    """Tests converting a dataflow plan to a SQL query plan using a SemiAdditiveJoinNode with a window_grouping."""
+    non_additive_dimension_spec = NonAdditiveDimensionSpec(
+        name="ds",
+        window_choice=AggregationType.MAX,
+        window_groupings=("user",),
+    )
+    entity_spec = LinklessEntitySpec(element_name="user", entity_links=())
+    time_dimension_spec = TimeDimensionSpec(element_name="ds", entity_links=())
+
+    measure_source_node = consistent_id_object_repository.simple_model_read_nodes["accounts_source"]
+    semi_additive_join_node = SemiAdditiveJoinNode(
+        parent_node=measure_source_node,
+        entity_specs=(entity_spec,),
+        time_dimension_spec=time_dimension_spec,
+        agg_by_function=non_additive_dimension_spec.window_choice,
+    )
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=semi_additive_join_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_constrain_time_range_node(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    consistent_id_object_repository: ConsistentIdObjectRepository,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    """Tests converting the ConstrainTimeRangeNode to SQL."""
+    measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
+    filtered_measure_node = FilterElementsNode(
+        parent_node=measure_source_node,
+        include_specs=InstanceSpecSet(
+            measure_specs=(
+                MeasureSpec(
+                    element_name="bookings",
+                ),
+            ),
+            time_dimension_specs=(
+                TimeDimensionSpec(element_name="ds", entity_links=(), time_granularity=TimeGranularity.DAY),
+            ),
+        ),
+    )
+    metric_time_node = MetricTimeDimensionTransformNode(
+        parent_node=filtered_measure_node,
+        aggregation_time_dimension_reference=TimeDimensionReference(element_name="ds"),
+    )
+
+    constrain_time_node = ConstrainTimeRangeNode(
+        parent_node=metric_time_node,
+        time_range_constraint=TimeRangeConstraint(
+            start_time=as_datetime("2020-01-01"),
+            end_time=as_datetime("2020-01-02"),
+        ),
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=constrain_time_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_compute_metrics_node_ratio_from_multiple_semantic_models(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    """Tests the compute metrics node for ratio type metrics.
+
+    This test exercises the functionality provided in JoinAggregatedMeasuresByGroupByColumnsNode for
+    merging multiple measures into a single input source for final metrics computation.
+    """
+    dimension_spec = DimensionSpec(
+        element_name="country_latest",
+        entity_links=(EntityReference(element_name="listing"),),
+    )
+    time_dimension_spec = TimeDimensionSpec(
+        element_name="ds",
+        entity_links=(),
+    )
+    metric_spec = MetricSpec(element_name="bookings_per_view")
+
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        query_spec=MetricFlowQuerySpec(
+            metric_specs=(metric_spec,),
+            dimension_specs=(dimension_spec,),
+            time_dimension_specs=(time_dimension_spec,),
+        ),
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
     )
 
 
@@ -965,51 +1104,6 @@ def test_filter_with_where_constraint_on_join_dim(
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
-    )
-
-
-@pytest.mark.sql_engine_snapshot
-def test_constrain_time_range_node(
-    request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
-    consistent_id_object_repository: ConsistentIdObjectRepository,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    sql_client: SqlClient,
-) -> None:
-    """Tests converting the ConstrainTimeRangeNode to SQL."""
-    measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
-    filtered_measure_node = FilterElementsNode(
-        parent_node=measure_source_node,
-        include_specs=InstanceSpecSet(
-            measure_specs=(
-                MeasureSpec(
-                    element_name="bookings",
-                ),
-            ),
-            time_dimension_specs=(
-                TimeDimensionSpec(element_name="ds", entity_links=(), time_granularity=TimeGranularity.DAY),
-            ),
-        ),
-    )
-    metric_time_node = MetricTimeDimensionTransformNode(
-        parent_node=filtered_measure_node,
-        aggregation_time_dimension_reference=TimeDimensionReference(element_name="ds"),
-    )
-
-    constrain_time_node = ConstrainTimeRangeNode(
-        parent_node=metric_time_node,
-        time_range_constraint=TimeRangeConstraint(
-            start_time=as_datetime("2020-01-01"),
-            end_time=as_datetime("2020-01-02"),
-        ),
-    )
-
-    convert_and_check(
-        request=request,
-        mf_test_session_state=mf_test_session_state,
-        dataflow_to_sql_converter=dataflow_to_sql_converter,
-        sql_client=sql_client,
-        node=constrain_time_node,
     )
 
 
@@ -1344,100 +1438,6 @@ def test_local_dimension_using_local_entity(  # noqa: D
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
-    )
-
-
-@pytest.mark.sql_engine_snapshot
-def test_semi_additive_join_node(
-    request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
-    consistent_id_object_repository: ConsistentIdObjectRepository,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    sql_client: SqlClient,
-) -> None:
-    """Tests converting a dataflow plan to a SQL query plan using a SemiAdditiveJoinNode."""
-    non_additive_dimension_spec = NonAdditiveDimensionSpec(name="ds", window_choice=AggregationType.MIN)
-    time_dimension_spec = TimeDimensionSpec(element_name="ds", entity_links=())
-
-    measure_source_node = consistent_id_object_repository.simple_model_read_nodes["accounts_source"]
-    semi_additive_join_node = SemiAdditiveJoinNode(
-        parent_node=measure_source_node,
-        entity_specs=tuple(),
-        time_dimension_spec=time_dimension_spec,
-        agg_by_function=non_additive_dimension_spec.window_choice,
-    )
-
-    convert_and_check(
-        request=request,
-        mf_test_session_state=mf_test_session_state,
-        dataflow_to_sql_converter=dataflow_to_sql_converter,
-        sql_client=sql_client,
-        node=semi_additive_join_node,
-    )
-
-
-@pytest.mark.sql_engine_snapshot
-def test_semi_additive_join_node_with_queried_group_by(
-    request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
-    consistent_id_object_repository: ConsistentIdObjectRepository,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    sql_client: SqlClient,
-) -> None:
-    """Tests converting a dataflow plan to a SQL query plan using a SemiAdditiveJoinNode."""
-    non_additive_dimension_spec = NonAdditiveDimensionSpec(name="ds", window_choice=AggregationType.MIN)
-    time_dimension_spec = TimeDimensionSpec(element_name="ds", entity_links=())
-    queried_time_dimension_spec = TimeDimensionSpec(
-        element_name="ds", entity_links=(), time_granularity=TimeGranularity.WEEK
-    )
-
-    measure_source_node = consistent_id_object_repository.simple_model_read_nodes["accounts_source"]
-    semi_additive_join_node = SemiAdditiveJoinNode(
-        parent_node=measure_source_node,
-        entity_specs=tuple(),
-        time_dimension_spec=time_dimension_spec,
-        agg_by_function=non_additive_dimension_spec.window_choice,
-        queried_time_dimension_spec=queried_time_dimension_spec,
-    )
-    convert_and_check(
-        request=request,
-        mf_test_session_state=mf_test_session_state,
-        dataflow_to_sql_converter=dataflow_to_sql_converter,
-        sql_client=sql_client,
-        node=semi_additive_join_node,
-    )
-
-
-@pytest.mark.sql_engine_snapshot
-def test_semi_additive_join_node_with_grouping(
-    request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
-    consistent_id_object_repository: ConsistentIdObjectRepository,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    sql_client: SqlClient,
-) -> None:
-    """Tests converting a dataflow plan to a SQL query plan using a SemiAdditiveJoinNode with a window_grouping."""
-    non_additive_dimension_spec = NonAdditiveDimensionSpec(
-        name="ds",
-        window_choice=AggregationType.MAX,
-        window_groupings=("user",),
-    )
-    entity_spec = LinklessEntitySpec(element_name="user", entity_links=())
-    time_dimension_spec = TimeDimensionSpec(element_name="ds", entity_links=())
-
-    measure_source_node = consistent_id_object_repository.simple_model_read_nodes["accounts_source"]
-    semi_additive_join_node = SemiAdditiveJoinNode(
-        parent_node=measure_source_node,
-        entity_specs=(entity_spec,),
-        time_dimension_spec=time_dimension_spec,
-        agg_by_function=non_additive_dimension_spec.window_choice,
-    )
-    convert_and_check(
-        request=request,
-        mf_test_session_state=mf_test_session_state,
-        dataflow_to_sql_converter=dataflow_to_sql_converter,
-        sql_client=sql_client,
-        node=semi_additive_join_node,
     )
 
 
