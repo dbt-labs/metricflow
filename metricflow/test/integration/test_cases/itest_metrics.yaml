@@ -1127,3 +1127,167 @@ integration_test:
       , {{ render_extract("ds", DatePart.DOW) }} AS metric_time__extract_dow
     FROM {{ source_schema }}.fct_bookings
     GROUP BY {{ render_extract("ds", DatePart.DOW) }};
+---
+integration_test:
+  name: simple_fill_nulls_with_0_metric_time
+  description: Test a simple metric that joins to time spine with metric time
+  model: SIMPLE_MODEL
+  metrics: ["bookings_fill_0"]
+  group_by_objs: [{"name": "metric_time"}]
+  check_query: |
+    SELECT 1
+---
+integration_test:
+  name: simple_fill_nulls_with_0_month
+  description: Test a simple metric that joins to time spine with metric time
+  model: SIMPLE_MODEL
+  metrics: ["bookings_fill_0"]
+  group_by_objs: [{"name": "metric_time", "grain": "month"}]
+  check_query: |
+    SELECT 1
+---
+integration_test:
+  name: simple_fill_nulls_with_0_non_metric_time
+  description: Test a simple metric that joins to time spine with time dim that's not metric time
+  model: SIMPLE_MODEL
+  metrics: ["bookings_fill_0"]
+  group_by_objs: [{"name": "booking__paid_at"}]
+  check_query: |
+    SELECT 1
+---
+integration_test:
+  name: simple_should_not_join_to_time_spine
+  description: Test a simple metric that normally joins to time spine, but shouldn't if no time dim is requested
+  model: SIMPLE_MODEL
+  metrics: ["bookings_fill_0"]
+  group_by_objs: [{"name": "booking__is_instant"}]
+  check_query: |
+    SELECT
+      booking__is_instant
+      , COALESCE(bookings, 0) AS bookings_fill_0
+    FROM (
+      SELECT
+        is_instant AS booking__is_instant
+        , SUM(1) AS bookings
+      FROM {{ source_schema }}.fct_bookings bookings_source_src_1
+      GROUP BY
+        booking__is_instant
+    )
+---
+integration_test:
+  name: simple_join_to_time_spine
+  description: Test a simple metric that joins to time spine, but doesn't fill nulls
+  model: SIMPLE_MODEL
+  metrics: ["bookings_join_to_time_spine"]
+  group_by_objs: [{"name": "metric_time"}]
+  check_query: |
+    SELECT
+      subq_5.ds AS metric_time__day
+      , subq_3.bookings AS bookings_join_to_time_spine
+    FROM {{ source_schema }}.mf_time_spine subq_5
+    LEFT JOIN (
+      SELECT
+        DATE_TRUNC('day', ds) AS metric_time__day
+        , SUM(1) AS bookings
+      FROM {{ source_schema }}.fct_bookings bookings_source_src_1
+      GROUP BY
+        metric_time__day
+    ) subq_3
+    ON
+      subq_5.ds = subq_3.metric_time__day
+---
+integration_test:
+  name: simple_fill_nulls_without_time_spine
+  description: Test a simple metric that fills nulls, but doesn't join to time spine
+  model: SIMPLE_MODEL
+  metrics: ["bookings_fill_0_without_time_spine"]
+  group_by_objs: [{"name": "metric_time"}]
+  check_query: |
+    SELECT
+      metric_time__day
+      , COALESCE(bookings, 0) AS bookings_fill_0_without_time_spine
+    FROM (
+      SELECT
+        DATE_TRUNC('day', ds) AS metric_time__day
+        , SUM(1) AS bookings
+      FROM {{ source_schema }}.fct_bookings bookings_source_src_1
+      GROUP BY
+        metric_time__day
+    )
+---
+integration_test:
+  name: cumulative_fill_nulls
+  description: Test a cumulative metric that fills nulls
+  model: SIMPLE_MODEL
+  metrics: ["every_two_days_bookers_fill_0"]
+  group_by_objs: [{"name": "metric_time"}]
+  check_query: |
+    SELECT
+      metric_time__day
+      , COALESCE(bookers, 0) AS every_two_days_bookers_fill_0
+    FROM (
+      SELECT
+        subq_8.ds AS metric_time__day
+        , subq_6.bookers AS bookers
+      FROM {{ source_schema }}.mf_time_spine subq_8
+      LEFT JOIN (
+        SELECT
+          subq_3.ds AS metric_time__day
+          , COUNT(DISTINCT bookings_source_src_1.guest_id) AS bookers
+        FROM {{ source_schema }}.mf_time_spine subq_3
+        INNER JOIN
+          {{ source_schema }}.fct_bookings bookings_source_src_1
+        ON (DATE_TRUNC('day', bookings_source_src_1.ds) <= subq_3.ds)
+          AND (DATE_TRUNC('day', bookings_source_src_1.ds) > subq_3.ds - INTERVAL 2 day)
+        GROUP BY
+          subq_3.ds
+      ) subq_6
+      ON subq_8.ds = subq_6.metric_time__day
+    ) subq_9
+---
+integration_test:
+  name: derived_fill_nulls_one_input_metric
+  description: Test a derived metric that fills nulls on one input metric but not the other
+  model: SIMPLE_MODEL
+  metrics: ["bookings_growth_2_weeks_fill_0_for_non_offset"]
+  group_by_objs: [{"name": "metric_time"}]
+  check_query: |
+    SELECT
+      metric_time__day
+      , bookings_fill_0 - bookings_2_weeks_ago AS bookings_growth_2_weeks_fill_0_for_non_offset
+    FROM (
+      SELECT
+        subq_7.metric_time__day
+        , subq_7.bookings_fill_0 AS bookings_fill_0
+        , subq_15.bookings_2_weeks_ago AS bookings_2_weeks_ago
+      FROM (
+        SELECT
+          subq_5.ds AS metric_time__day
+          , COALESCE(subq_3.bookings, 0) AS bookings_fill_0
+        FROM {{ source_schema }}.mf_time_spine subq_5
+        LEFT JOIN (
+          SELECT
+            DATE_TRUNC('day', ds) AS metric_time__day
+            , SUM(1) AS bookings
+          FROM {{ source_schema }}.fct_bookings bookings_source_src_1
+          GROUP BY
+            metric_time__day
+        ) subq_3
+        ON subq_5.ds = subq_3.metric_time__day
+      ) subq_7
+      INNER JOIN (
+        SELECT
+          subq_11.ds AS metric_time__day
+          , SUM(subq_9.bookings) AS bookings_2_weeks_ago
+        FROM {{ source_schema }}.mf_time_spine subq_11
+        INNER JOIN (
+          SELECT
+            DATE_TRUNC('day', ds) AS metric_time__day
+            , 1 AS bookings
+          FROM {{ source_schema }}.fct_bookings bookings_source_src_1
+        ) subq_9
+        ON subq_11.ds - INTERVAL 14 day = subq_9.metric_time__day
+        GROUP BY subq_11.ds
+      ) subq_15
+      ON subq_7.metric_time__day = subq_15.metric_time__day
+    ) subq_16
