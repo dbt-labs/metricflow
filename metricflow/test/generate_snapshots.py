@@ -138,7 +138,7 @@ def run_tests(test_configuration: MetricFlowTestConfiguration) -> None:  # noqa:
             f"hatch -v run {hatch_env}:pytest -x -vv -n 4 "
             f"--overwrite-snapshots"
             f"{' --use-persistent-source-schema' if use_persistent_source_schema else ''}"
-            f"-m '{SQL_ENGINE_SNAPSHOT_MARKER_NAME}' "
+            f" -m '{SQL_ENGINE_SNAPSHOT_MARKER_NAME}' "
             f"{TEST_DIRECTORY}"
         )
     else:
