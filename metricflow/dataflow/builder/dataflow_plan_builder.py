@@ -820,7 +820,7 @@ class DataflowPlanBuilder:
             assert metric_time_dimension_specs, "Joining to time spine requires querying with metric time."
             join_to_time_spine_node = JoinToTimeSpineNode(
                 parent_node=time_range_node or measure_recipe.source_node,
-                metric_time_dimension_specs=metric_time_dimension_specs,
+                requested_metric_time_dimension_specs=metric_time_dimension_specs,
                 time_range_constraint=time_range_constraint,
                 offset_window=metric_spec.offset_window,
                 offset_to_grain=metric_spec.offset_to_grain,
@@ -929,7 +929,7 @@ class DataflowPlanBuilder:
         if join_aggregated_measure_to_time_spine and metric_time_dimension_requested:
             return JoinToTimeSpineNode(
                 parent_node=aggregate_measures_node,
-                metric_time_dimension_specs=metric_time_dimension_specs,
+                requested_metric_time_dimension_specs=metric_time_dimension_specs,
                 time_range_constraint=time_range_constraint,
                 join_type=SqlJoinType.LEFT_OUTER,
             )
