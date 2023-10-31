@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import pathlib
 import tempfile
 from typing import Generator, Optional, Sequence
@@ -17,6 +18,7 @@ from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.test.fixtures.setup_fixtures import dbt_project_dir
 from metricflow.test.time.configurable_time_source import ConfigurableTimeSource
 
 
@@ -99,19 +101,19 @@ def cli_context(  # noqa: D
 class MetricFlowCliRunner(CliRunner):
     """Custom CliRunner class to handle passing context."""
 
-    def __init__(self, cli_context: CLIContext) -> None:  # noqa: D
+    def __init__(self, cli_context: CLIContext, project_path: str) -> None:  # noqa: D
         self.cli_context = cli_context
+        self.project_path = project_path
         super().__init__()
 
     def run(self, cli: click.BaseCommand, args: Optional[Sequence[str]] = None) -> Result:  # noqa: D
-        # TODO: configure CLI to use a dbt_project fixture
-        dummy_dbt_project = pathlib.Path("dbt_project.yml")
-        dummy_dbt_project.touch()
+        current_dir = os.getcwd()
+        os.chdir(self.project_path)
         result = super().invoke(cli, args, obj=self.cli_context)
-        dummy_dbt_project.unlink()
+        os.chdir(current_dir)
         return result
 
 
 @pytest.fixture
 def cli_runner(cli_context: CLIContext) -> MetricFlowCliRunner:  # noqa: D
-    return MetricFlowCliRunner(cli_context=cli_context)
+    return MetricFlowCliRunner(cli_context=cli_context, project_path=dbt_project_dir())
