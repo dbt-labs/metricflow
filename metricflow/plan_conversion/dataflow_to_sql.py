@@ -5,7 +5,7 @@ from collections import OrderedDict
 from typing import List, Optional, Sequence, Union
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.protocols.metric import MetricType
+from dbt_semantic_interfaces.protocols.metric import MetricInputMeasure, MetricType
 from dbt_semantic_interfaces.references import MetricModelReference
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 
@@ -81,6 +81,7 @@ from metricflow.sql.optimizer.optimization_levels import (
     SqlQueryOptimizerConfiguration,
 )
 from metricflow.sql.sql_exprs import (
+    SqlAggregateFunctionExpression,
     SqlBetweenExpression,
     SqlColumnReference,
     SqlColumnReferenceExpression,
@@ -89,6 +90,7 @@ from metricflow.sql.sql_exprs import (
     SqlDateTruncExpression,
     SqlExpressionNode,
     SqlExtractExpression,
+    SqlFunction,
     SqlFunctionExpression,
     SqlLogicalExpression,
     SqlLogicalOperator,
@@ -633,6 +635,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             metric = self._metric_lookup.get_metric(metric_spec.as_reference)
 
             metric_expr: Optional[SqlExpressionNode] = None
+            input_measure: Optional[MetricInputMeasure] = None
             if metric.type is MetricType.RATIO:
                 numerator = metric.type_params.numerator
                 denominator = metric.type_params.denominator
@@ -664,33 +667,26 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 if len(metric.input_measures) > 0:
                     assert (
                         len(metric.input_measures) == 1
-                    ), "Measure proxy metrics should always source from exactly 1 measure."
+                    ), "Simple metrics should always source from exactly 1 measure."
+                    input_measure = metric.input_measures[0]
                     expr = self._column_association_resolver.resolve_spec(
-                        MeasureSpec(
-                            element_name=metric.input_measures[0].post_aggregation_measure_reference.element_name
-                        )
+                        MeasureSpec(element_name=input_measure.post_aggregation_measure_reference.element_name)
                     ).column_name
                 else:
                     expr = metric.name
-                # Use a column reference to improve query optimization.
-                metric_expr = SqlColumnReferenceExpression(
-                    SqlColumnReference(
-                        table_alias=from_data_set_alias,
-                        column_name=expr,
-                    )
+                metric_expr = self.__make_col_reference_or_coalesce_expr(
+                    column_name=expr, input_measure=input_measure, from_data_set_alias=from_data_set_alias
                 )
             elif metric.type is MetricType.CUMULATIVE:
                 assert (
                     len(metric.measure_references) == 1
                 ), "Cumulative metrics should always source from exactly 1 measure."
+                input_measure = metric.input_measures[0]
                 expr = self._column_association_resolver.resolve_spec(
-                    MeasureSpec(element_name=metric.input_measures[0].post_aggregation_measure_reference.element_name)
+                    MeasureSpec(element_name=input_measure.post_aggregation_measure_reference.element_name)
                 ).column_name
-                metric_expr = SqlColumnReferenceExpression(
-                    SqlColumnReference(
-                        table_alias=from_data_set_alias,
-                        column_name=expr,
-                    )
+                metric_expr = self.__make_col_reference_or_coalesce_expr(
+                    column_name=expr, input_measure=input_measure, from_data_set_alias=from_data_set_alias
                 )
             elif metric.type is MetricType.DERIVED:
                 assert metric.type_params.expr
@@ -733,6 +729,21 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 order_bys=(),
             ),
         )
+
+    def __make_col_reference_or_coalesce_expr(
+        self, column_name: str, input_measure: Optional[MetricInputMeasure], from_data_set_alias: str
+    ) -> SqlExpressionNode:
+        # Use a column reference to improve query optimization.
+        metric_expr: SqlExpressionNode = SqlColumnReferenceExpression(
+            SqlColumnReference(table_alias=from_data_set_alias, column_name=column_name)
+        )
+        # Coalesce nulls to requested integer value, if requested.
+        if input_measure and input_measure.fill_nulls_with is not None:
+            metric_expr = SqlAggregateFunctionExpression(
+                sql_function=SqlFunction.COALESCE,
+                sql_function_args=[metric_expr, SqlStringExpression(str(input_measure.fill_nulls_with))],
+            )
+        return metric_expr
 
     def visit_order_by_limit_node(self, node: OrderByLimitNode) -> SqlDataSet:  # noqa: D
         from_data_set: SqlDataSet = node.parent_node.accept(self)
@@ -1331,6 +1342,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             metric_time_dimension_column_name=metric_time_dimension_column_name,
             parent_sql_select_node=parent_data_set.sql_select_node,
             parent_alias=parent_alias,
+            join_type=node.join_type,
         )
 
         # Use all instances EXCEPT metric_time from parent data set.
@@ -1366,13 +1378,13 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         metric_time_select_columns = []
         metric_time_dimension_instances = []
         where: Optional[SqlExpressionNode] = None
-        for metric_time_dimension_spec in node.metric_time_dimension_specs:
+        for time_dimension_spec in node.time_dimension_specs:
             # Apply granularity to SQL.
-            if metric_time_dimension_spec.time_granularity == self._time_spine_source.time_column_granularity:
+            if time_dimension_spec.time_granularity == self._time_spine_source.time_column_granularity:
                 select_expr: SqlExpressionNode = time_spine_column_select_expr
             else:
                 select_expr = SqlDateTruncExpression(
-                    time_granularity=metric_time_dimension_spec.time_granularity, arg=time_spine_column_select_expr
+                    time_granularity=time_dimension_spec.time_granularity, arg=time_spine_column_select_expr
                 )
                 if node.offset_to_grain:
                     # Filter down to one row per granularity period
@@ -1384,13 +1396,13 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                     else:
                         where = SqlLogicalExpression(operator=SqlLogicalOperator.OR, args=(where, new_filter))
             # Apply date_part to SQL.
-            if metric_time_dimension_spec.date_part:
-                select_expr = SqlExtractExpression(date_part=metric_time_dimension_spec.date_part, arg=select_expr)
+            if time_dimension_spec.date_part:
+                select_expr = SqlExtractExpression(date_part=time_dimension_spec.date_part, arg=select_expr)
             time_dim_spec = TimeDimensionSpec(
                 element_name=time_dim_instance.spec.element_name,
                 entity_links=time_dim_instance.spec.entity_links,
-                time_granularity=metric_time_dimension_spec.time_granularity,
-                date_part=metric_time_dimension_spec.date_part,
+                time_granularity=time_dimension_spec.time_granularity,
+                date_part=time_dimension_spec.date_part,
                 aggregation_state=time_dim_instance.spec.aggregation_state,
             )
             time_dim_instance = TimeDimensionInstance(
