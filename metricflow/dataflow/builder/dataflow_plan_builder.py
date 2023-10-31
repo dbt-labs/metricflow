@@ -912,7 +912,26 @@ class DataflowPlanBuilder:
                     (InstanceSpecSet(measure_specs=measure_specs), queried_linkable_specs.as_spec_set)
                 ),
             )
-        return AggregateMeasuresNode(
+        aggregate_measures_node = AggregateMeasuresNode(
             parent_node=pre_aggregate_node,
             metric_input_measure_specs=tuple(metric_input_measure_specs),
         )
+
+        join_aggregated_measure_to_time_spine = False
+        for metric_input_measure in metric_input_measure_specs:
+            if metric_input_measure.join_to_timespine:
+                join_aggregated_measure_to_time_spine = True
+                break
+
+        # Only join to time spine if metric time was requested in the query.
+        if join_aggregated_measure_to_time_spine and metric_time_dimension_requested:
+            # TODO: if multiple measures in same node and only some join to time spine, should we split them into
+            # separate AggregateMeasuresNodes?
+            return JoinToTimeSpineNode(
+                parent_node=aggregate_measures_node,
+                requested_metric_time_dimension_specs=metric_time_dimension_specs,
+                time_range_constraint=time_range_constraint,
+                join_type=SqlJoinType.LEFT_OUTER,
+            )
+        else:
+            return aggregate_measures_node
