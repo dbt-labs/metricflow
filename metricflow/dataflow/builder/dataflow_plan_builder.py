@@ -820,10 +820,11 @@ class DataflowPlanBuilder:
             assert metric_time_dimension_specs, "Joining to time spine requires querying with metric time."
             join_to_time_spine_node = JoinToTimeSpineNode(
                 parent_node=time_range_node or measure_recipe.source_node,
-                metric_time_dimension_specs=metric_time_dimension_specs,
+                requested_metric_time_dimension_specs=metric_time_dimension_specs,
                 time_range_constraint=time_range_constraint,
                 offset_window=metric_spec.offset_window,
                 offset_to_grain=metric_spec.offset_to_grain,
+                join_type=SqlJoinType.INNER,
             )
 
         # Only get the required measure and the local linkable instances so that aggregations work correctly.

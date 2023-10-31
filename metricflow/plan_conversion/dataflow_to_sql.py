@@ -1366,7 +1366,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         metric_time_select_columns = []
         metric_time_dimension_instances = []
         where: Optional[SqlExpressionNode] = None
-        for metric_time_dimension_spec in node.metric_time_dimension_specs:
+        for metric_time_dimension_spec in node.requested_metric_time_dimension_specs:
             # Apply granularity to SQL.
             if metric_time_dimension_spec.time_granularity == self._time_spine_source.time_column_granularity:
                 select_expr: SqlExpressionNode = time_spine_column_select_expr

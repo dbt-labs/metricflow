@@ -47,9 +47,17 @@
                         <JoinToTimeSpineNode>
                             <!-- description = Join to Time Spine Dataset -->
                             <!-- node_id = jts_0 -->
+                            <!-- requested_metric_time_dimension_specs =       -->
+                            <!--   [{'class': 'TimeDimensionSpec',             -->
+                            <!--     'element_name': 'metric_time',            -->
+                            <!--     'entity_links': (),                       -->
+                            <!--     'time_granularity': TimeGranularity.DAY,  -->
+                            <!--     'date_part': None,                        -->
+                            <!--     'aggregation_state': None}]               -->
                             <!-- time_range_constraint = None -->
                             <!-- offset_window = count=5 granularity=TimeGranularity.DAY -->
                             <!-- offset_to_grain = None -->
+                            <!-- join_type = SqlJoinType.INNER -->
                             <MetricTimeDimensionTransformNode>
                                 <!-- description = Metric Time Dimension 'ds' -->
                                 <!-- node_id = sma_10001 -->

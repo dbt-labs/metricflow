@@ -50,6 +50,7 @@ from metricflow.specs.specs import (
 )
 from metricflow.specs.where_filter_transform import WhereSpecFactory
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
+from metricflow.sql.sql_plan import SqlJoinType
 from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
@@ -559,10 +560,11 @@ def test_join_to_time_spine_node_without_offset(  # noqa: D
     compute_metrics_node = ComputeMetricsNode(parent_node=aggregated_measures_node, metric_specs=[metric_spec])
     join_to_time_spine_node = JoinToTimeSpineNode(
         parent_node=compute_metrics_node,
-        metric_time_dimension_specs=[MTD_SPEC_DAY],
+        requested_metric_time_dimension_specs=[MTD_SPEC_DAY],
         time_range_constraint=TimeRangeConstraint(
             start_time=as_datetime("2020-01-01"), end_time=as_datetime("2021-01-01")
         ),
+        join_type=SqlJoinType.INNER,
     )
     sink_node = WriteToResultDataframeNode(join_to_time_spine_node)
     dataflow_plan = DataflowPlan("plan0", sink_output_nodes=[sink_node])
@@ -622,11 +624,12 @@ def test_join_to_time_spine_node_with_offset_window(  # noqa: D
     compute_metrics_node = ComputeMetricsNode(parent_node=aggregated_measures_node, metric_specs=[metric_spec])
     join_to_time_spine_node = JoinToTimeSpineNode(
         parent_node=compute_metrics_node,
-        metric_time_dimension_specs=[MTD_SPEC_DAY],
+        requested_metric_time_dimension_specs=[MTD_SPEC_DAY],
         time_range_constraint=TimeRangeConstraint(
             start_time=as_datetime("2020-01-01"), end_time=as_datetime("2021-01-01")
         ),
         offset_window=PydanticMetricTimeWindow(count=10, granularity=TimeGranularity.DAY),
+        join_type=SqlJoinType.INNER,
     )
 
     sink_node = WriteToResultDataframeNode(join_to_time_spine_node)
@@ -687,12 +690,13 @@ def test_join_to_time_spine_node_with_offset_to_grain(
     compute_metrics_node = ComputeMetricsNode(parent_node=aggregated_measures_node, metric_specs=[metric_spec])
     join_to_time_spine_node = JoinToTimeSpineNode(
         parent_node=compute_metrics_node,
-        metric_time_dimension_specs=[MTD_SPEC_DAY],
+        requested_metric_time_dimension_specs=[MTD_SPEC_DAY],
         time_range_constraint=TimeRangeConstraint(
             start_time=as_datetime("2020-01-01"), end_time=as_datetime("2021-01-01")
         ),
         offset_window=None,
         offset_to_grain=TimeGranularity.MONTH,
+        join_type=SqlJoinType.INNER,
     )
 
     sink_node = WriteToResultDataframeNode(join_to_time_spine_node)
