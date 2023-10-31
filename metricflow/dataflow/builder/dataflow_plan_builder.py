@@ -924,7 +924,6 @@ class DataflowPlanBuilder:
                 break
 
         # TODO: if multiple measures and only some join to time spine, should we aggregate separately?
-        # TODO: what is time range constraint here? does it need to be smaller?
         # Only join to time spine if metric time was requested in the query.
         if join_aggregated_measure_to_time_spine and metric_time_dimension_requested:
             return JoinToTimeSpineNode(
