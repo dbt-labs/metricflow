@@ -5,6 +5,7 @@ import logging
 import os
 import warnings
 from dataclasses import dataclass
+from pathlib import Path
 
 import _pytest.config
 import pytest
@@ -168,6 +169,14 @@ def dialect_from_url(url: str) -> SqlDialect:
     if len(dialect_protocol) > 2:
         raise ValueError(f"Invalid # of +'s in {url}")
     return SqlDialect(dialect_protocol[0])
+
+
+def dbt_project_dir() -> str:
+    """Return the canonical path string for the dbt project dir in the test package.
+
+    This is necessary for configuring both the dbt adapter for integration tests and the project location for CLI tests.
+    """
+    return os.path.join(os.path.dirname(__file__), Path("dbt_projects", "metricflow_testing"))
 
 
 @pytest.fixture(scope="session", autouse=True)

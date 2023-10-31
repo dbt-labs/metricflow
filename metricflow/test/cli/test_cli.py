@@ -15,6 +15,7 @@ from dbt_semantic_interfaces.parsing.dir_to_model import (
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from dbt_semantic_interfaces.test_utils import base_semantic_manifest_file
 
+from metricflow.cli.cli_context import CLIContext
 from metricflow.cli.main import (
     dimension_values,
     dimensions,
@@ -37,38 +38,30 @@ logger = logging.getLogger(__name__)
 # TODO: Use snapshots to compare CLI output for all tests here.
 
 
-def test_query(capsys: pytest.CaptureFixture, cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    # Disabling capsys to resolve error "ValueError: I/O operation on closed file". Better solution TBD.
-    with capsys.disabled():
-        resp = cli_runner.run(query, args=["--metrics", "bookings", "--group-by", "metric_time"])
+def test_query(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
+    resp = cli_runner.run(query, args=["--metrics", "bookings", "--group-by", "metric_time"])
     # case insensitive matches are needed for snowflake due to the capitalization thing
     engine_is_snowflake = cli_runner.cli_context.sql_client.sql_engine_type is SqlEngine.SNOWFLAKE
     assert "bookings" in resp.output or ("bookings" in resp.output.lower() and engine_is_snowflake)
     assert resp.exit_code == 0
 
 
-def test_list_dimensions(capsys: pytest.CaptureFixture, cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    # Disabling capsys to resolve error "ValueError: I/O operation on closed file". Better solution TBD.
-    with capsys.disabled():
-        resp = cli_runner.run(dimensions, args=["--metrics", "bookings"])
+def test_list_dimensions(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
+    resp = cli_runner.run(dimensions, args=["--metrics", "bookings"])
 
     assert "ds" in resp.output
     assert resp.exit_code == 0
 
 
-def test_list_metrics(capsys: pytest.CaptureFixture, cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    # Disabling capsys to resolve error "ValueError: I/O operation on closed file". Better solution TBD.
-    with capsys.disabled():
-        resp = cli_runner.run(metrics)
+def test_list_metrics(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
+    resp = cli_runner.run(metrics)
 
     assert "bookings_per_listing: listing__capacity_latest" in resp.output
     assert resp.exit_code == 0
 
 
-def test_get_dimension_values(capsys: pytest.CaptureFixture, cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    # Disabling capsys to resolve error "ValueError: I/O operation on closed file". Better solution TBD.
-    with capsys.disabled():
-        resp = cli_runner.run(dimension_values, args=["--metrics", "bookings", "--dimension", "booking__is_instant"])
+def test_get_dimension_values(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
+    resp = cli_runner.run(dimension_values, args=["--metrics", "bookings", "--dimension", "booking__is_instant"])
 
     actual_output_lines = sorted(resp.output.split("\n"))
     assert ["", "• False", "• True"] == actual_output_lines
@@ -84,7 +77,19 @@ def create_directory(directory_path: str) -> Iterator[None]:
     shutil.rmtree(path)
 
 
-def test_validate_configs(capsys: pytest.CaptureFixture, cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
+def test_validate_configs(cli_context: CLIContext) -> None:
+    """Tests config validation from a manifest stored on the filesystem.
+
+    This test is special, because the CLI bypasses the semantic manifest read into the CLIContext and
+    validates the config files on disk. It's not entirely clear why we do this, so we should probably
+    figure that out and, if possible, stop doing it so we can have this test depend on an injectable
+    in-memory semantic manifest instead of whatever is stored in the filesystem.
+
+    At any rate, due to the direct read from disk, we have to store a serialized semantic manifest
+    in a temporary location. In order to spin up the CLI this requires us to ALSO have a dbt_project.yml
+    on the filesystem in the project path. Since we don't want to clobber whatever semantic_manifest.json is
+    in the real filesystem location we do all of this stuff here.
+    """
     yaml_contents = textwrap.dedent(
         """\
         semantic_model:
@@ -106,29 +111,35 @@ def test_validate_configs(capsys: pytest.CaptureFixture, cli_runner: MetricFlowC
         apply_transformations=False,
     ).semantic_manifest
 
-    target_directory = Path().absolute() / "target"
-    with create_directory(target_directory.as_posix()):
-        manifest_file = target_directory / "semantic_manifest.json"
-        manifest_file.write_text(manifest.json())
+    project_directory = Path().absolute()
+    # If the dbt_project.yml doesn't exist in this path location the CLI will throw an exception.
+    dummy_project = Path(project_directory, "dbt_project.yml")
+    dummy_project.touch()
 
-        # Disabling capsys to resolve error "ValueError: I/O operation on closed file". Better solution TBD.
-        with capsys.disabled():
+    try:
+        cli_runner = MetricFlowCliRunner(cli_context=cli_context, project_path=str(project_directory))
+        target_directory = Path(project_directory, "target")
+        with create_directory(target_directory.as_posix()):
+            manifest_file = Path(target_directory, "semantic_manifest.json")
+            manifest_file.write_text(manifest.json())
+
             resp = cli_runner.run(validate_configs)
 
         assert "ERROR" in resp.output
         assert resp.exit_code == 0
 
+    finally:
+        dummy_project.unlink()
 
-def test_health_checks(capsys: pytest.CaptureFixture, cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
-    # Disabling capsys to resolve error "ValueError: I/O operation on closed file". Better solution TBD.
-    with capsys.disabled():
-        resp = cli_runner.run(health_checks)
+
+def test_health_checks(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
+    resp = cli_runner.run(health_checks)
 
     assert "SELECT 1: Success!" in resp.output
     assert resp.exit_code == 0
 
 
-def test_tutorial_message(capsys: pytest.CaptureFixture, cli_runner: MetricFlowCliRunner) -> None:
+def test_tutorial_message(cli_runner: MetricFlowCliRunner) -> None:
     """Tests the message output of the tutorial.
 
     The tutorial now essentially compiles a semantic manifest and then asks the user to run dbt seed,
@@ -139,17 +150,14 @@ def test_tutorial_message(capsys: pytest.CaptureFixture, cli_runner: MetricFlowC
     project path overrides it might warrant a more complete test of the semantic manifest building steps in the
     tutorial flow.
     """
-    # Disabling capsys to resolve error "ValueError: I/O operation on closed file". Better solution TBD.
-    with capsys.disabled():
-        resp = cli_runner.run(tutorial, args=["-m"])
+    resp = cli_runner.run(tutorial, args=["-m"])
     assert "Please run the following steps" in resp.output
     assert "dbt seed" in resp.output
 
 
-def test_list_entities(capsys: pytest.CaptureFixture, cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
+def test_list_entities(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
     # Disabling capsys to resolve error "ValueError: I/O operation on closed file". Better solution TBD.
-    with capsys.disabled():
-        resp = cli_runner.run(entities, args=["--metrics", "bookings"])
+    resp = cli_runner.run(entities, args=["--metrics", "bookings"])
 
     assert "guest" in resp.output
     assert "host" in resp.output
@@ -163,11 +171,9 @@ def test_saved_query(  # noqa: D
     cli_runner: MetricFlowCliRunner,
     sql_client: SqlClient,
 ) -> None:
-    # Disabling capsys to resolve error "ValueError: I/O operation on closed file". Better solution TBD.
-    with capsys.disabled():
-        resp = cli_runner.run(
-            query, args=["--saved-query", "p0_booking", "--order", "metric_time__day,listing__capacity_latest"]
-        )
+    resp = cli_runner.run(
+        query, args=["--saved-query", "p0_booking", "--order", "metric_time__day,listing__capacity_latest"]
+    )
 
     assert resp.exit_code == 0
 
@@ -188,19 +194,17 @@ def test_saved_query_with_where(  # noqa: D
     cli_runner: MetricFlowCliRunner,
     sql_client: SqlClient,
 ) -> None:
-    # Disabling capsys to resolve error "ValueError: I/O operation on closed file". Better solution TBD.
-    with capsys.disabled():
-        resp = cli_runner.run(
-            query,
-            args=[
-                "--saved-query",
-                "p0_booking",
-                "--order",
-                "metric_time__day,listing__capacity_latest",
-                "--where",
-                "{{ Dimension('listing__capacity_latest') }} > 4",
-            ],
-        )
+    resp = cli_runner.run(
+        query,
+        args=[
+            "--saved-query",
+            "p0_booking",
+            "--order",
+            "metric_time__day,listing__capacity_latest",
+            "--where",
+            "{{ Dimension('listing__capacity_latest') }} > 4",
+        ],
+    )
 
     assert resp.exit_code == 0
 
@@ -221,19 +225,17 @@ def test_saved_query_with_limit(  # noqa: D
     cli_runner: MetricFlowCliRunner,
     sql_client: SqlClient,
 ) -> None:
-    # Disabling capsys to resolve error "ValueError: I/O operation on closed file". Better solution TBD.
-    with capsys.disabled():
-        resp = cli_runner.run(
-            query,
-            args=[
-                "--saved-query",
-                "p0_booking",
-                "--order",
-                "metric_time__day,listing__capacity_latest",
-                "--limit",
-                "3",
-            ],
-        )
+    resp = cli_runner.run(
+        query,
+        args=[
+            "--saved-query",
+            "p0_booking",
+            "--order",
+            "metric_time__day,listing__capacity_latest",
+            "--limit",
+            "3",
+        ],
+    )
 
     assert resp.exit_code == 0
 
@@ -251,12 +253,10 @@ def test_saved_query_explain(  # noqa: D
     mf_test_session_state: MetricFlowTestSessionState,
     cli_runner: MetricFlowCliRunner,
 ) -> None:
-    # Disabling capsys to resolve error "ValueError: I/O operation on closed file". Better solution TBD.
-    with capsys.disabled():
-        resp = cli_runner.run(
-            query,
-            args=["--explain", "--saved-query", "p0_booking", "--order", "metric_time__day,listing__capacity_latest"],
-        )
+    resp = cli_runner.run(
+        query,
+        args=["--explain", "--saved-query", "p0_booking", "--order", "metric_time__day,listing__capacity_latest"],
+    )
 
     # Currently difficult to compare explain output due to randomly generated IDs.
     assert resp.exit_code == 0

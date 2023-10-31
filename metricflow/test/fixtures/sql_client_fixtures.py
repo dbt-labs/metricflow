@@ -11,7 +11,7 @@ from dbt.adapters.factory import get_adapter_by_type
 from dbt.cli.main import dbtRunner
 
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState, dialect_from_url
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState, dbt_project_dir, dialect_from_url
 from metricflow.test.fixtures.sql_clients.adapter_backed_ddl_client import AdapterBackedDDLSqlClient
 from metricflow.test.fixtures.sql_clients.common_client import SqlDialect
 from metricflow.test.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
@@ -127,8 +127,7 @@ def __initialize_dbt() -> None:
     We use the debug command to initialize the profile and make it accessible. This has the nice property of
     triggering a failure with reasonable error messages in the event the dbt configs are not set up correctly.
     """
-    dbt_dir = os.path.join(os.path.dirname(__file__), "dbt_projects/metricflow_testing/")
-    dbtRunner().invoke(["debug"], project_dir=dbt_dir, PROFILES_DIR=dbt_dir)
+    dbtRunner().invoke(["debug"], project_dir=dbt_project_dir(), PROFILES_DIR=dbt_project_dir())
 
 
 def make_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithDDLMethods:
