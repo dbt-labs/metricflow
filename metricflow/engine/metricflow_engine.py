@@ -429,6 +429,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                     else None
                 ),
                 limit=mf_query_request.limit,
+                order_by_names=mf_query_request.order_by_names,
                 order_by_parameters=mf_query_request.order_by,
             )
         else:
