@@ -925,8 +925,6 @@ class DataflowPlanBuilder:
 
         # Only join to time spine if metric time was requested in the query.
         if join_aggregated_measure_to_time_spine and metric_time_dimension_requested:
-            # TODO: if multiple measures in same node and only some join to time spine, should we split them into
-            # separate AggregateMeasuresNodes?
             return JoinToTimeSpineNode(
                 parent_node=aggregate_measures_node,
                 requested_metric_time_dimension_specs=metric_time_dimension_specs,
