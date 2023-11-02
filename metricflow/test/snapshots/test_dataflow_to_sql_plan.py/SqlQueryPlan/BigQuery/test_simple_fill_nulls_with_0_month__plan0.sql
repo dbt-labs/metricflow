@@ -1,7 +1,7 @@
 -- Compute Metrics via Expressions
 SELECT
   subq_6.metric_time__month
-  , COALESCE(subq_6.bookings, 0) AS bookings_fill_0
+  , COALESCE(subq_6.bookings, 0) AS bookings_fill_nulls_with_0
 FROM (
   -- Join to Time Spine Dataset
   SELECT

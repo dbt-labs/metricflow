@@ -1,7 +1,7 @@
 -- Compute Metrics via Expressions
 SELECT
   booking__paid_at__day
-  , COALESCE(bookings, 0) AS bookings_fill_0
+  , COALESCE(bookings, 0) AS bookings_fill_nulls_with_0
 FROM (
   -- Aggregate Measures
   SELECT

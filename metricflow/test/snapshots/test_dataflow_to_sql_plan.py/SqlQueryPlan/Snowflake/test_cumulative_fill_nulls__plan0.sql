@@ -1,7 +1,7 @@
 -- Compute Metrics via Expressions
 SELECT
   subq_9.metric_time__day
-  , COALESCE(subq_9.bookers, 0) AS every_two_days_bookers_fill_0
+  , COALESCE(subq_9.bookers, 0) AS every_two_days_bookers_fill_nulls_with_0
 FROM (
   -- Join to Time Spine Dataset
   SELECT

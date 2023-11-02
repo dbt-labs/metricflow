@@ -1,18 +1,18 @@
 -- Compute Metrics via Expressions
 SELECT
   subq_16.metric_time__day
-  , bookings_fill_0 - bookings_2_weeks_ago AS bookings_growth_2_weeks_fill_0_for_non_offset
+  , bookings_fill_nulls_with_0 - bookings_2_weeks_ago AS bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset
 FROM (
   -- Combine Metrics
   SELECT
     COALESCE(subq_7.metric_time__day, subq_15.metric_time__day) AS metric_time__day
-    , subq_7.bookings_fill_0 AS bookings_fill_0
+    , subq_7.bookings_fill_nulls_with_0 AS bookings_fill_nulls_with_0
     , subq_15.bookings_2_weeks_ago AS bookings_2_weeks_ago
   FROM (
     -- Compute Metrics via Expressions
     SELECT
       subq_6.metric_time__day
-      , COALESCE(subq_6.bookings, 0) AS bookings_fill_0
+      , COALESCE(subq_6.bookings, 0) AS bookings_fill_nulls_with_0
     FROM (
       -- Join to Time Spine Dataset
       SELECT
