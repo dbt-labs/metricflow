@@ -1141,7 +1141,7 @@ integration_test:
     FROM {{ source_schema }}.mf_time_spine subq_5
     LEFT OUTER JOIN (
       SELECT
-        DATE_TRUNC('day', ds) AS metric_time__day
+        {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
         , SUM(1) AS bookings
       FROM {{ source_schema }}.fct_bookings bookings_source_src_1
       GROUP BY metric_time__day
@@ -1160,13 +1160,13 @@ integration_test:
       , COALESCE(subq_3.bookings, 0) AS bookings_fill_0
     FROM (
       SELECT
-        DATE_TRUNC('month', ds) AS metric_time__month
+        {{ render_date_trunc("ds", TimeGranularity.MONTH) }} AS metric_time__month
       FROM {{ source_schema }}.mf_time_spine subq_5
       GROUP BY metric_time__month
     ) subq_4
     LEFT OUTER JOIN (
       SELECT
-        DATE_TRUNC('month', ds) AS metric_time__month
+        {{ render_date_trunc("ds", TimeGranularity.MONTH) }} AS metric_time__month
         , SUM(1) AS bookings
       FROM {{ source_schema }}.fct_bookings bookings_source_src_1
       GROUP BY metric_time__month
@@ -1181,7 +1181,7 @@ integration_test:
   group_by_objs: [{"name": "booking__paid_at"}]
   check_query: |
     SELECT
-      DATE_TRUNC('day', paid_at) AS booking__paid_at__day
+      {{ render_date_trunc("paid_at", TimeGranularity.DAY) }} AS booking__paid_at__day
       , COALESCE(SUM(1), 0) AS bookings_fill_0
     FROM {{ source_schema }}.fct_bookings bookings_source_src_1
     GROUP BY
@@ -1213,7 +1213,7 @@ integration_test:
     FROM {{ source_schema }}.mf_time_spine subq_5
     LEFT JOIN (
       SELECT
-        DATE_TRUNC('day', ds) AS metric_time__day
+        {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
         , SUM(1) AS bookings
       FROM {{ source_schema }}.fct_bookings bookings_source_src_1
       GROUP BY
@@ -1230,7 +1230,7 @@ integration_test:
   group_by_objs: [{"name": "metric_time"}]
   check_query: |
     SELECT
-      DATE_TRUNC('day', ds) AS metric_time__day
+      {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
       , COALESCE(SUM(1), 0) AS bookings_fill_0_without_time_spine
     FROM {{ source_schema }}.fct_bookings bookings_source_src_1
     GROUP BY metric_time__day
@@ -1253,8 +1253,8 @@ integration_test:
       FROM {{ source_schema }}.mf_time_spine subq_3
       INNER JOIN
         {{ source_schema }}.fct_bookings bookings_source_src_1
-      ON (DATE_TRUNC('day', bookings_source_src_1.ds) <= subq_3.ds)
-        AND (DATE_TRUNC('day', bookings_source_src_1.ds) > {{ render_date_sub("subq_3", "ds", 2, TimeGranularity.DAY) }})
+      ON ({{ render_date_trunc("bookings_source_src_1.ds", TimeGranularity.DAY) }} <= subq_3.ds)
+        AND ({{ render_date_trunc("bookings_source_src_1.ds", TimeGranularity.DAY) }} > {{ render_date_sub("subq_3", "ds", 2, TimeGranularity.DAY) }})
       GROUP BY
         subq_3.ds
     ) subq_6
@@ -1282,7 +1282,7 @@ integration_test:
         FROM {{ source_schema }}.mf_time_spine subq_5
         LEFT JOIN (
           SELECT
-            DATE_TRUNC('day', ds) AS metric_time__day
+            {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
             , SUM(1) AS bookings
           FROM {{ source_schema }}.fct_bookings bookings_source_src_1
           GROUP BY
@@ -1297,7 +1297,7 @@ integration_test:
         FROM {{ source_schema }}.mf_time_spine subq_11
         INNER JOIN (
           SELECT
-            DATE_TRUNC('day', ds) AS metric_time__day
+            {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
             , 1 AS bookings
           FROM {{ source_schema }}.fct_bookings bookings_source_src_1
         ) subq_9
