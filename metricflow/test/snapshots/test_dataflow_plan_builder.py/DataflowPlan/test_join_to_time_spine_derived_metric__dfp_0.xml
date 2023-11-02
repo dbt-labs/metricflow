@@ -5,13 +5,13 @@
         <ComputeMetricsNode>
             <!-- description = Compute Metrics via Expressions -->
             <!-- node_id = cm_2 -->
-            <!-- metric_spec =                                         -->
-            <!--   {'class': 'MetricSpec',                             -->
-            <!--    'element_name': 'bookings_growth_2_weeks_fill_0',  -->
-            <!--    'constraint': None,                                -->
-            <!--    'alias': None,                                     -->
-            <!--    'offset_window': None,                             -->
-            <!--    'offset_to_grain': None}                           -->
+            <!-- metric_spec =                                                    -->
+            <!--   {'class': 'MetricSpec',                                        -->
+            <!--    'element_name': 'bookings_growth_2_weeks_fill_nulls_with_0',  -->
+            <!--    'constraint': None,                                           -->
+            <!--    'alias': None,                                                -->
+            <!--    'offset_window': None,                                        -->
+            <!--    'offset_to_grain': None}                                      -->
             <CombineMetricsNode>
                 <!-- description = Combine Metrics -->
                 <!-- node_id = cbm_0 -->
@@ -19,13 +19,13 @@
                 <ComputeMetricsNode>
                     <!-- description = Compute Metrics via Expressions -->
                     <!-- node_id = cm_0 -->
-                    <!-- metric_spec =                          -->
-                    <!--   {'class': 'MetricSpec',              -->
-                    <!--    'element_name': 'bookings_fill_0',  -->
-                    <!--    'constraint': None,                 -->
-                    <!--    'alias': None,                      -->
-                    <!--    'offset_window': None,              -->
-                    <!--    'offset_to_grain': None}            -->
+                    <!-- metric_spec =                                     -->
+                    <!--   {'class': 'MetricSpec',                         -->
+                    <!--    'element_name': 'bookings_fill_nulls_with_0',  -->
+                    <!--    'constraint': None,                            -->
+                    <!--    'alias': None,                                 -->
+                    <!--    'offset_window': None,                         -->
+                    <!--    'offset_to_grain': None}                       -->
                     <JoinToTimeSpineNode>
                         <!-- description = Join to Time Spine Dataset -->
                         <!-- node_id = jts_0 -->
@@ -81,7 +81,7 @@
                     <!-- node_id = cm_1 -->
                     <!-- metric_spec =                                              -->
                     <!--   {'class': 'MetricSpec',                                  -->
-                    <!--    'element_name': 'bookings_fill_0',                      -->
+                    <!--    'element_name': 'bookings_fill_nulls_with_0',           -->
                     <!--    'constraint': None,                                     -->
                     <!--    'alias': 'bookings_2_weeks_ago',                        -->
                     <!--    'offset_window': {'class': 'PydanticMetricTimeWindow',  -->

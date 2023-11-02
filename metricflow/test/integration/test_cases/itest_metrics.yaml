@@ -1132,12 +1132,12 @@ integration_test:
   name: simple_fill_nulls_with_0_metric_time
   description: Test a simple query that joins to time spine and fills nulls
   model: SIMPLE_MODEL
-  metrics: ["bookings_fill_0"]
+  metrics: ["bookings_fill_nulls_with_0"]
   group_by_objs: [{"name": "metric_time"}]
   check_query: |
     SELECT
       subq_5.ds AS metric_time__day
-      , COALESCE(subq_3.bookings, 0) AS bookings_fill_0
+      , COALESCE(subq_3.bookings, 0) AS bookings_fill_nulls_with_0
     FROM {{ source_schema }}.mf_time_spine subq_5
     LEFT OUTER JOIN (
       SELECT
@@ -1152,12 +1152,12 @@ integration_test:
   name: simple_fill_nulls_with_0_month
   description: Test a simple query that joins to time spine and fills nulls, with non-default granularity
   model: SIMPLE_MODEL
-  metrics: ["bookings_fill_0"]
+  metrics: ["bookings_fill_nulls_with_0"]
   group_by_objs: [{"name": "metric_time", "grain": "month"}]
   check_query: |
     SELECT
       subq_4.metric_time__month AS metric_time__month
-      , COALESCE(subq_3.bookings, 0) AS bookings_fill_0
+      , COALESCE(subq_3.bookings, 0) AS bookings_fill_nulls_with_0
     FROM (
       SELECT
         {{ render_date_trunc("ds", TimeGranularity.MONTH) }} AS metric_time__month
@@ -1174,29 +1174,29 @@ integration_test:
     ON subq_4.metric_time__month = subq_3.metric_time__month
 ---
 integration_test:
-  name: simple_fill_0_with_non_metric_time
+  name: simple_fill_nulls_with_0_with_non_metric_time
   description: Test simple query that fills nulls but doesn't join to time spine (non-metric time dimension)
   model: SIMPLE_MODEL
-  metrics: ["bookings_fill_0"]
+  metrics: ["bookings_fill_nulls_with_0"]
   group_by_objs: [{"name": "booking__paid_at"}]
   check_query: |
     SELECT
       {{ render_date_trunc("paid_at", TimeGranularity.DAY) }} AS booking__paid_at__day
-      , COALESCE(SUM(1), 0) AS bookings_fill_0
+      , COALESCE(SUM(1), 0) AS bookings_fill_nulls_with_0
     FROM {{ source_schema }}.fct_bookings bookings_source_src_1
     GROUP BY
       booking__paid_at__day
 ---
 integration_test:
-  name: simple_fill_0_with_categorical_dimension
+  name: simple_fill_nulls_with_0_with_categorical_dimension
   description: Test simple query that fills nulls but doesn't join to time spine (categorical dimension)
   model: SIMPLE_MODEL
-  metrics: ["bookings_fill_0"]
+  metrics: ["bookings_fill_nulls_with_0"]
   group_by_objs: [{"name": "booking__is_instant"}]
   check_query: |
     SELECT
       is_instant AS booking__is_instant
-      , COALESCE(SUM(1), 0) AS bookings_fill_0
+      , COALESCE(SUM(1), 0) AS bookings_fill_nulls_with_0
     FROM {{ source_schema }}.fct_bookings bookings_source_src_1
     GROUP BY booking__is_instant
 ---
@@ -1226,12 +1226,12 @@ integration_test:
   name: simple_fill_nulls_without_time_spine
   description: Test a simple query that fills nulls, but doesn't join to time spine (even for metric time)
   model: SIMPLE_MODEL
-  metrics: ["bookings_fill_0_without_time_spine"]
+  metrics: ["bookings_fill_nulls_with_0_without_time_spine"]
   group_by_objs: [{"name": "metric_time"}]
   check_query: |
     SELECT
       {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
-      , COALESCE(SUM(1), 0) AS bookings_fill_0_without_time_spine
+      , COALESCE(SUM(1), 0) AS bookings_fill_nulls_with_0_without_time_spine
     FROM {{ source_schema }}.fct_bookings bookings_source_src_1
     GROUP BY metric_time__day
 ---
@@ -1239,12 +1239,12 @@ integration_test:
   name: cumulative_fill_nulls
   description: Test a cumulative metric that fills nulls
   model: SIMPLE_MODEL
-  metrics: ["every_two_days_bookers_fill_0"]
+  metrics: ["every_two_days_bookers_fill_nulls_with_0"]
   group_by_objs: [{"name": "metric_time"}]
   check_query: |
     SELECT
       subq_8.ds AS metric_time__day
-      , COALESCE(subq_6.bookers, 0) AS every_two_days_bookers_fill_0
+      , COALESCE(subq_6.bookers, 0) AS every_two_days_bookers_fill_nulls_with_0
     FROM {{ source_schema }}.mf_time_spine subq_8
     LEFT JOIN (
       SELECT
@@ -1264,21 +1264,21 @@ integration_test:
   name: derived_fill_nulls_for_one_input_metric
   description: Test a derived metric that fills nulls on one input metric but not the other
   model: SIMPLE_MODEL
-  metrics: ["bookings_growth_2_weeks_fill_0_for_non_offset"]
+  metrics: ["bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset"]
   group_by_objs: [{"name": "metric_time"}]
   check_query: |
     SELECT
       metric_time__day
-      , bookings_fill_0 - bookings_2_weeks_ago AS bookings_growth_2_weeks_fill_0_for_non_offset
+      , bookings_fill_nulls_with_0 - bookings_2_weeks_ago AS bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset
     FROM (
       SELECT
         subq_7.metric_time__day
-        , subq_7.bookings_fill_0 AS bookings_fill_0
+        , subq_7.bookings_fill_nulls_with_0 AS bookings_fill_nulls_with_0
         , subq_15.bookings_2_weeks_ago AS bookings_2_weeks_ago
       FROM (
         SELECT
           subq_5.ds AS metric_time__day
-          , COALESCE(subq_3.bookings, 0) AS bookings_fill_0
+          , COALESCE(subq_3.bookings, 0) AS bookings_fill_nulls_with_0
         FROM {{ source_schema }}.mf_time_spine subq_5
         LEFT JOIN (
           SELECT

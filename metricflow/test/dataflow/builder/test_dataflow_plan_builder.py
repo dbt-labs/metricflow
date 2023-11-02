@@ -878,7 +878,7 @@ def test_join_to_time_spine_with_metric_time(  # noqa: D
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings_fill_0"),),
+            metric_specs=(MetricSpec(element_name="bookings_fill_nulls_with_0"),),
             time_dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
         )
     )
@@ -904,7 +904,7 @@ def test_join_to_time_spine_derived_metric(  # noqa: D
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings_growth_2_weeks_fill_0"),),
+            metric_specs=(MetricSpec(element_name="bookings_growth_2_weeks_fill_nulls_with_0"),),
             time_dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
         )
     )
@@ -930,7 +930,7 @@ def test_join_to_time_spine_with_non_metric_time(  # noqa: D
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings_fill_0"),),
+            metric_specs=(MetricSpec(element_name="bookings_fill_nulls_with_0"),),
             time_dimension_specs=(
                 TimeDimensionSpec(element_name="paid_at", entity_links=(EntityReference("booking"),)),
             ),
@@ -957,7 +957,7 @@ def test_dont_join_to_time_spine_if_no_time_dimension_requested(  # noqa: D
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
-        MetricFlowQuerySpec(metric_specs=(MetricSpec(element_name="bookings_fill_0"),))
+        MetricFlowQuerySpec(metric_specs=(MetricSpec(element_name="bookings_fill_nulls_with_0"),))
     )
 
     assert_plan_snapshot_text_equal(

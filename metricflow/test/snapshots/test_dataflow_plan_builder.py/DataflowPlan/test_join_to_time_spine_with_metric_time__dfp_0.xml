@@ -5,13 +5,13 @@
         <ComputeMetricsNode>
             <!-- description = Compute Metrics via Expressions -->
             <!-- node_id = cm_0 -->
-            <!-- metric_spec =                          -->
-            <!--   {'class': 'MetricSpec',              -->
-            <!--    'element_name': 'bookings_fill_0',  -->
-            <!--    'constraint': None,                 -->
-            <!--    'alias': None,                      -->
-            <!--    'offset_window': None,              -->
-            <!--    'offset_to_grain': None}            -->
+            <!-- metric_spec =                                     -->
+            <!--   {'class': 'MetricSpec',                         -->
+            <!--    'element_name': 'bookings_fill_nulls_with_0',  -->
+            <!--    'constraint': None,                            -->
+            <!--    'alias': None,                                 -->
+            <!--    'offset_window': None,                         -->
+            <!--    'offset_to_grain': None}                       -->
             <JoinToTimeSpineNode>
                 <!-- description = Join to Time Spine Dataset -->
                 <!-- node_id = jts_0 -->

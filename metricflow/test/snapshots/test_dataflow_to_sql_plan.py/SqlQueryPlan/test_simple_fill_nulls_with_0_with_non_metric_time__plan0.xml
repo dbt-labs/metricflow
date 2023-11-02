@@ -9,7 +9,7 @@
         <!-- col1 =                                                                            -->
         <!--   {'class': 'SqlSelectColumn',                                                    -->
         <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_1, sql_function=COALESCE),  -->
-        <!--    'column_alias': 'bookings_fill_0'}                                             -->
+        <!--    'column_alias': 'bookings_fill_nulls_with_0'}                                  -->
         <!-- from_source = SqlSelectStatementNode(node_id=ss_9) -->
         <!-- where = None -->
         <SqlSelectStatementNode>

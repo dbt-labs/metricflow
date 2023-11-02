@@ -526,7 +526,7 @@ metric:
       join_to_timespine: true
 ---
 metric:
-  name: bookings_fill_0_without_time_spine
+  name: bookings_fill_nulls_with_0_without_time_spine
   description: Simple metric filling 0 without time spine. Not a commonly expected scenario.
   type: simple
   type_params:
@@ -535,7 +535,7 @@ metric:
       fill_nulls_with: 0
 ---
 metric:
-  name: bookings_fill_0
+  name: bookings_fill_nulls_with_0
   description: simple metric filling nulls with 0 and joining to time spine
   type: simple
   type_params:
@@ -545,7 +545,7 @@ metric:
       fill_nulls_with: 0
 ---
 metric:
-  name: every_two_days_bookers_fill_0
+  name: every_two_days_bookers_fill_nulls_with_0
   description: cumulative metric filling 0
   type: cumulative
   type_params:
@@ -556,25 +556,25 @@ metric:
     window: 2 days
 ---
 metric:
-  name: bookings_growth_2_weeks_fill_0
+  name: bookings_growth_2_weeks_fill_nulls_with_0
   description: offset derived metric filling 0 for both input metrics
   type: derived
   type_params:
-    expr: bookings_fill_0 - bookings_2_weeks_ago
+    expr: bookings_fill_nulls_with_0 - bookings_2_weeks_ago
     metrics:
-      - name: bookings_fill_0
-      - name: bookings_fill_0
+      - name: bookings_fill_nulls_with_0
+      - name: bookings_fill_nulls_with_0
         offset_window: 14 days
         alias: bookings_2_weeks_ago
 ---
 metric:
-  name: bookings_growth_2_weeks_fill_0_for_non_offset
+  name: bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset
   description: offset derived metric filling 0 for one input metric, but not the other
   type: derived
   type_params:
-    expr: bookings_fill_0 - bookings_2_weeks_ago
+    expr: bookings_fill_nulls_with_0 - bookings_2_weeks_ago
     metrics:
-      - name: bookings_fill_0
+      - name: bookings_fill_nulls_with_0
       - name: bookings
         offset_window: 14 days
         alias: bookings_2_weeks_ago
