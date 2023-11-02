@@ -188,6 +188,7 @@ class MetricFlowQueryParser:
         saved_query_parameter: SavedQueryParameter,
         where_filter: Optional[WhereFilter],
         limit: Optional[int],
+        order_by_names: Optional[Sequence[str]],
         order_by_parameters: Optional[Sequence[OrderByQueryParameter]],
     ) -> MetricFlowQuerySpec:
         """Parse and validate a query using parameters from a pre-defined / saved query.
@@ -210,6 +211,7 @@ class MetricFlowQueryParser:
             ),
             where_constraint=merge_to_single_where_filter(PydanticWhereFilterIntersection(where_filters=where_filters)),
             limit=limit,
+            order_by_names=order_by_names,
             order_by=order_by_parameters,
         )
 
