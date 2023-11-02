@@ -108,6 +108,7 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
             order_bys=node.order_bys,
             where=node.where,
             limit=node.limit,
+            distinct=node.distinct,
         )
 
     @staticmethod
@@ -218,6 +219,10 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
 
         # Re-writing string expressions / column alias expressions not yet supported, so don't reduce in those cases.
         if SqlRewritingSubQueryReducerVisitor._statement_contains_difficult_expressions(node):
+            return False
+
+        # Don't reduce distinct selects
+        if parent_select_node.distinct:
             return False
 
         # Skip this case for simplicity of reasoning.
@@ -523,6 +528,7 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
             order_bys=tuple(clauses_to_rewrite.order_bys),
             where=clauses_to_rewrite.combine_wheres(additional_where_clauses),
             limit=node.limit,
+            distinct=node.distinct,
         )
 
     def visit_select_statement_node(self, node: SqlSelectStatementNode) -> SqlQueryPlanNode:  # noqa: D
@@ -641,6 +647,7 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
                 parent_node_where=parent_select_node.where,
             ),
             limit=new_limit,
+            distinct=parent_select_node.distinct,
         )
 
     def visit_table_from_clause_node(self, node: SqlTableFromClauseNode) -> SqlQueryPlanNode:  # noqa: D
@@ -698,6 +705,7 @@ class SqlGroupByRewritingVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
             order_bys=node.order_bys,
             where=node.where,
             limit=node.limit,
+            distinct=node.distinct,
         )
 
     def visit_table_from_clause_node(self, node: SqlTableFromClauseNode) -> SqlQueryPlanNode:  # noqa: D

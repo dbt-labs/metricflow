@@ -44,6 +44,7 @@ class SqlTableAliasSimplifierVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
                 ),
                 where=node.where.rewrite(should_render_table_alias=False) if node.where else None,
                 limit=node.limit,
+                distinct=node.distinct,
             )
 
         return SqlSelectStatementNode(
@@ -64,6 +65,7 @@ class SqlTableAliasSimplifierVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
             order_bys=node.order_bys,
             where=node.where,
             limit=node.limit,
+            distinct=node.distinct,
         )
 
     def visit_table_from_clause_node(self, node: SqlTableFromClauseNode) -> SqlQueryPlanNode:  # noqa: D
