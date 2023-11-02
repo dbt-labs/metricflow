@@ -700,7 +700,8 @@ class JoinToTimeSpineNode(BaseOutput, ABC):
     def __init__(
         self,
         parent_node: BaseOutput,
-        metric_time_dimension_specs: List[TimeDimensionSpec],
+        requested_metric_time_dimension_specs: List[TimeDimensionSpec],
+        join_type: SqlJoinType,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         offset_window: Optional[MetricTimeWindow] = None,
         offset_to_grain: Optional[TimeGranularity] = None,
@@ -709,7 +710,7 @@ class JoinToTimeSpineNode(BaseOutput, ABC):
 
         Args:
             parent_node: Node that returns desired dataset to join to time spine.
-            metric_time_dimension_specs: Metric time dimensions requested in query. Used to determine granularities.
+            requested_metric_time_dimension_specs: Time dimensions requested in query. Used to determine granularities.
             time_range_constraint: Time range to constrain the time spine to.
             offset_window: Time window to offset the parent dataset by when joining to time spine.
             offset_to_grain: Granularity period to offset the parent dataset to when joining to time spine.
@@ -720,10 +721,11 @@ class JoinToTimeSpineNode(BaseOutput, ABC):
             offset_window and offset_to_grain
         ), "Can't set both offset_window and offset_to_grain when joining to time spine. Choose one or the other."
         self._parent_node = parent_node
-        self._metric_time_dimension_specs = metric_time_dimension_specs
+        self._requested_metric_time_dimension_specs = requested_metric_time_dimension_specs
         self._offset_window = offset_window
         self._offset_to_grain = offset_to_grain
         self._time_range_constraint = time_range_constraint
+        self._join_type = join_type
 
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[self._parent_node])
 
@@ -732,9 +734,9 @@ class JoinToTimeSpineNode(BaseOutput, ABC):
         return DATAFLOW_NODE_JOIN_TO_TIME_SPINE_ID_PREFIX
 
     @property
-    def metric_time_dimension_specs(self) -> List[TimeDimensionSpec]:  # noqa: D
+    def requested_metric_time_dimension_specs(self) -> List[TimeDimensionSpec]:  # noqa: D
         """Time dimension specs to use when creating time spine table."""
-        return self._metric_time_dimension_specs
+        return self._requested_metric_time_dimension_specs
 
     @property
     def time_range_constraint(self) -> Optional[TimeRangeConstraint]:  # noqa: D
@@ -751,6 +753,11 @@ class JoinToTimeSpineNode(BaseOutput, ABC):
         """Time range constraint to apply when querying time spine table."""
         return self._offset_to_grain
 
+    @property
+    def join_type(self) -> SqlJoinType:  # noqa: D
+        """Join type to use when joining to time spine."""
+        return self._join_type
+
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_join_to_time_spine_node(self)
 
@@ -761,9 +768,11 @@ class JoinToTimeSpineNode(BaseOutput, ABC):
     @property
     def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
         return super().displayed_properties + [
+            DisplayedProperty("requested_metric_time_dimension_specs", self._requested_metric_time_dimension_specs),
             DisplayedProperty("time_range_constraint", self._time_range_constraint),
             DisplayedProperty("offset_window", self._offset_window),
             DisplayedProperty("offset_to_grain", self._offset_to_grain),
+            DisplayedProperty("join_type", self._join_type),
         ]
 
     @property
@@ -776,17 +785,19 @@ class JoinToTimeSpineNode(BaseOutput, ABC):
             and other_node.time_range_constraint == self.time_range_constraint
             and other_node.offset_window == self.offset_window
             and other_node.offset_to_grain == self.offset_to_grain
-            and other_node.metric_time_dimension_specs == self.metric_time_dimension_specs
+            and other_node.requested_metric_time_dimension_specs == self.requested_metric_time_dimension_specs
+            and other_node.join_type == self.join_type
         )
 
     def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> JoinToTimeSpineNode:  # noqa: D
         assert len(new_parent_nodes) == 1
         return JoinToTimeSpineNode(
             parent_node=new_parent_nodes[0],
-            metric_time_dimension_specs=self.metric_time_dimension_specs,
+            requested_metric_time_dimension_specs=self.requested_metric_time_dimension_specs,
             time_range_constraint=self.time_range_constraint,
             offset_window=self.offset_window,
             offset_to_grain=self.offset_to_grain,
+            join_type=self.join_type,
         )
 
 

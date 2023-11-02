@@ -497,5 +497,5 @@ class SqlQueryPlanJoinBuilder:
                     col_ref=SqlColumnReference(table_alias=parent_alias, column_name=metric_time_dimension_column_name)
                 ),
             ),
-            join_type=SqlJoinType.INNER,
+            join_type=node.join_type,
         )

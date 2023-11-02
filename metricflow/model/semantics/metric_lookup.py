@@ -127,6 +127,8 @@ class MetricLookup(MetricAccessor):  # noqa: D
                     column_association_resolver=column_association_resolver,
                 ).create_from_where_filter_intersection(input_measure.filter),
                 alias=input_measure.alias,
+                join_to_timespine=input_measure.join_to_timespine,
+                fill_nulls_with=input_measure.fill_nulls_with,
             )
             input_measure_specs.append(spec)
 

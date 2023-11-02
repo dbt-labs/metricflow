@@ -463,6 +463,8 @@ class MetricInputMeasureSpec(SerializableDataclass):
     measure_spec: MeasureSpec
     constraint: Optional[WhereFilterSpec] = None
     alias: Optional[str] = None
+    join_to_timespine: bool = False
+    fill_nulls_with: Optional[int] = None
 
     @property
     def post_aggregation_spec(self) -> MeasureSpec:
