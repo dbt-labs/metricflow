@@ -4,18 +4,22 @@ from __future__ import annotations
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
 from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
+from metricflow.dataset.dataset import DataSet
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
     MetricFlowQuerySpec,
     MetricSpec,
     TimeDimensionSpec,
 )
+from metricflow.specs.where_filter_transform import WhereSpecFactory
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.query_rendering.compare_rendered_query import convert_and_check
@@ -75,7 +79,7 @@ def test_cumulative_metric_with_time_constraint(
             dimension_specs=(),
             time_dimension_specs=(
                 TimeDimensionSpec(
-                    element_name="ds",
+                    element_name="metric_time",
                     entity_links=(),
                     time_granularity=TimeGranularity.MONTH,
                 ),
@@ -84,6 +88,48 @@ def test_cumulative_metric_with_time_constraint(
                 start_time=as_datetime("2020-01-01"), end_time=as_datetime("2020-01-01")
             ),
         )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_cumulative_metric_with_non_adjustable_time_filter(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    column_association_resolver: ColumnAssociationResolver,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    consistent_id_object_repository: ConsistentIdObjectRepository,
+    sql_client: SqlClient,
+) -> None:
+    """Tests rendering a cumulative metric query with a time filter that cannot be automatically adjusted.
+
+    Not all query inputs with time constraint filters allow us to adjust the time constraint to include the full
+    span of input data for a cumulative metric. When we do not have an adjustable time filter we must include all
+    input data in order to ensure the cumulative metric is correct.
+    """
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="every_two_days_bookers"),),
+            time_dimension_specs=(DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.DAY),),
+            where_constraint=WhereSpecFactory(
+                column_association_resolver=column_association_resolver,
+            ).create_from_where_filter(
+                PydanticWhereFilter(
+                    where_sql_template=(
+                        "{{ TimeDimension('metric_time', 'day') }} = '2020-01-03' "
+                        "or {{ TimeDimension('metric_time', 'day') }} = '2020-01-07'"
+                    )
+                ),
+            ),
+        ),
     )
 
     convert_and_check(
