@@ -20,6 +20,7 @@
         <!--    'column_alias': 'average_booking_value'}                                      -->
         <!-- from_source = SqlSelectStatementNode(node_id=ss_0) -->
         <!-- where = None -->
+        <!-- distinct = False -->
         <SqlSelectStatementNode>
             <!-- description =                                                             -->
             <!--   Pass Only Elements:                                                     -->
@@ -43,6 +44,7 @@
             <!--    'column_alias': 'average_booking_value'}             -->
             <!-- from_source = SqlSelectStatementNode(node_id=ss_10001) -->
             <!-- where = None -->
+            <!-- distinct = False -->
             <SqlSelectStatementNode>
                 <!-- description = Read Elements From Semantic Model 'bookings_source' -->
                 <!-- node_id = ss_10001 -->
@@ -400,6 +402,7 @@
                 <!--    'column_alias': 'booking__host'}                         -->
                 <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10001) -->
                 <!-- where = None -->
+                <!-- distinct = False -->
                 <SqlTableFromClauseNode>
                     <!-- description = Read from ***************************.fct_bookings -->
                     <!-- node_id = tfc_10001 -->

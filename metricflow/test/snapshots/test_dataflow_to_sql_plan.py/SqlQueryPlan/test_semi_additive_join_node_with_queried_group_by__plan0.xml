@@ -126,6 +126,7 @@
         <!--    'join_type': SqlJoinType.INNER,                          -->
         <!--    'on_condition': SqlComparisonExpression(node_id=cmp_0)}  -->
         <!-- where = None -->
+        <!-- distinct = False -->
         <SqlSelectStatementNode>
             <!-- description = Read Elements From Semantic Model 'accounts_source' -->
             <!-- node_id = ss_10000 -->
@@ -247,6 +248,7 @@
             <!--    'column_alias': 'account__user'}                         -->
             <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10000) -->
             <!-- where = None -->
+            <!-- distinct = False -->
             <SqlTableFromClauseNode>
                 <!-- description = Read from ***************************.fct_accounts -->
                 <!-- node_id = tfc_10000 -->
@@ -270,6 +272,7 @@
             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_1),  -->
             <!--    'column_alias': 'ds__week'}                          -->
             <!-- where = None -->
+            <!-- distinct = False -->
             <SqlSelectStatementNode>
                 <!-- description = Read Elements From Semantic Model 'accounts_source' -->
                 <!-- node_id = ss_10000 -->
@@ -391,6 +394,7 @@
                 <!--    'column_alias': 'account__user'}                         -->
                 <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10000) -->
                 <!-- where = None -->
+                <!-- distinct = False -->
                 <SqlTableFromClauseNode>
                     <!-- description = Read from ***************************.fct_accounts -->
                     <!-- node_id = tfc_10000 -->
