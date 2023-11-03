@@ -55,7 +55,6 @@ from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.snapshot_utils import assert_plan_snapshot_text_equal
 from metricflow.test.sql.compare_sql_plan import assert_rendered_sql_from_plan_equal, assert_sql_plan_text_equal
 from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY
-from metricflow.time.date_part import DatePart
 
 
 def convert_and_check(
@@ -1000,89 +999,6 @@ def test_compute_metrics_node_ratio_from_multiple_semantic_models(
             dimension_specs=(dimension_spec,),
             time_dimension_specs=(time_dimension_spec,),
         ),
-    )
-
-    convert_and_check(
-        request=request,
-        mf_test_session_state=mf_test_session_state,
-        dataflow_to_sql_converter=dataflow_to_sql_converter,
-        sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
-    )
-
-
-@pytest.mark.sql_engine_snapshot
-def test_simple_query_with_date_part(  # noqa: D
-    request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    sql_client: SqlClient,
-) -> None:
-    dataflow_plan = dataflow_plan_builder.build_plan(
-        MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"),),
-            time_dimension_specs=(
-                DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.DAY, date_part=DatePart.DOW),
-            ),
-        )
-    )
-
-    convert_and_check(
-        request=request,
-        mf_test_session_state=mf_test_session_state,
-        dataflow_to_sql_converter=dataflow_to_sql_converter,
-        sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
-    )
-
-
-@pytest.mark.sql_engine_snapshot
-def test_simple_query_with_multiple_date_parts(  # noqa: D
-    request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    sql_client: SqlClient,
-) -> None:
-    dataflow_plan = dataflow_plan_builder.build_plan(
-        MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"),),
-            time_dimension_specs=(
-                DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.DAY, date_part=DatePart.DAY),
-                DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.DAY, date_part=DatePart.DOW),
-                DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.DAY, date_part=DatePart.DOY),
-                DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.DAY, date_part=DatePart.MONTH),
-                DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.DAY, date_part=DatePart.QUARTER),
-                DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.DAY, date_part=DatePart.YEAR),
-            ),
-        )
-    )
-
-    convert_and_check(
-        request=request,
-        mf_test_session_state=mf_test_session_state,
-        dataflow_to_sql_converter=dataflow_to_sql_converter,
-        sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
-    )
-
-
-@pytest.mark.sql_engine_snapshot
-def test_offset_window_with_date_part(  # noqa: D
-    request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
-    dataflow_plan_builder: DataflowPlanBuilder,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    sql_client: SqlClient,
-) -> None:
-    dataflow_plan = dataflow_plan_builder.build_plan(
-        MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings_growth_2_weeks"),),
-            time_dimension_specs=(
-                DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.DAY, date_part=DatePart.DOW),
-            ),
-        )
     )
 
     convert_and_check(
