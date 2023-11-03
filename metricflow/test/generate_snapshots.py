@@ -121,8 +121,8 @@ def run_tests(test_configuration: MetricFlowTestConfiguration) -> None:  # noqa:
         os.environ["MF_SQL_ENGINE_PASSWORD"] = test_configuration.credential_set.engine_password
 
     if test_configuration.engine is SqlEngine.DUCKDB:
-        # Can't use --use-persistent-source-schema with duckdb since it's in memory.
-        run_command(f"pytest -x -vv -n 4 --overwrite-snapshots -m '{SQL_ENGINE_SNAPSHOT_MARKER_NAME}' {TEST_DIRECTORY}")
+        # DuckDB is fast, so generate all snapshots, including the engine-agnostic ones
+        run_command(f"pytest -x -vv -n 4 --overwrite-snapshots -k 'not itest' {TEST_DIRECTORY}")
     elif (
         test_configuration.engine is SqlEngine.REDSHIFT
         or test_configuration.engine is SqlEngine.SNOWFLAKE
