@@ -18,7 +18,7 @@ integration_test:
       WHERE is_instant
       GROUP BY ds
     ) a
-    JOIN (
+    FULL OUTER JOIN (
       SELECT
         CAST(NULLIF(MAX(booking_value), 0) AS {{ double_data_type_name }} ) AS max_booking_value
         , ds
@@ -48,7 +48,7 @@ integration_test:
       WHERE listings_latest.is_lux
       GROUP BY fct_bookings.ds
     ) a
-    JOIN (
+    FULL OUTER JOIN (
       SELECT
         CAST(NULLIF(MAX(booking_value), 0) AS {{ double_data_type_name }} ) AS max_booking_value
         , ds
@@ -79,7 +79,7 @@ integration_test:
       WHERE listings_latest.is_lux
       GROUP BY fct_bookings.ds
     ) a
-    JOIN (
+    FULL OUTER JOIN (
       SELECT
         CAST(NULLIF(SUM(booking_value), 0) AS {{ double_data_type_name }} ) AS booking_value
         , ds
@@ -107,7 +107,7 @@ integration_test:
       WHERE is_instant
       GROUP BY ds
     ) a
-    JOIN (
+    FULL OUTER JOIN (
       SELECT
         CAST(NULLIF(SUM(booking_value), 0) AS {{ double_data_type_name }} ) AS booking_value
         , ds
@@ -153,7 +153,7 @@ integration_test:
       WHERE dul_west.home_state_latest IN ('CA', 'HI', 'WA')
       GROUP BY fa_west_filtered.ds
     ) a
-    JOIN (
+    FULL OUTER JOIN (
       SELECT
         CAST(SUM(account_balance) AS {{ double_data_type_name }}) AS total_account_balance_first_day
         , fa_east_filtered.ds

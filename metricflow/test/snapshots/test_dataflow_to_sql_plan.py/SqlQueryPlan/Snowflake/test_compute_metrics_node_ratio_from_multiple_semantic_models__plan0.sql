@@ -8,8 +8,8 @@ FROM (
   SELECT
     COALESCE(subq_9.ds__day, subq_19.ds__day) AS ds__day
     , COALESCE(subq_9.listing__country_latest, subq_19.listing__country_latest) AS listing__country_latest
-    , subq_9.bookings AS bookings
-    , subq_19.views AS views
+    , MAX(subq_9.bookings) AS bookings
+    , MAX(subq_19.views) AS views
   FROM (
     -- Compute Metrics via Expressions
     SELECT
@@ -387,7 +387,7 @@ FROM (
         , subq_7.listing__country_latest
     ) subq_8
   ) subq_9
-  INNER JOIN (
+  FULL OUTER JOIN (
     -- Compute Metrics via Expressions
     SELECT
       subq_18.ds__day
@@ -689,20 +689,11 @@ FROM (
   ) subq_19
   ON
     (
-      (
-        subq_9.listing__country_latest = subq_19.listing__country_latest
-      ) OR (
-        (
-          subq_9.listing__country_latest IS NULL
-        ) AND (
-          subq_19.listing__country_latest IS NULL
-        )
-      )
+      subq_9.listing__country_latest = subq_19.listing__country_latest
     ) AND (
-      (
-        subq_9.ds__day = subq_19.ds__day
-      ) OR (
-        (subq_9.ds__day IS NULL) AND (subq_19.ds__day IS NULL)
-      )
+      subq_9.ds__day = subq_19.ds__day
     )
+  GROUP BY
+    COALESCE(subq_9.ds__day, subq_19.ds__day)
+    , COALESCE(subq_9.listing__country_latest, subq_19.listing__country_latest)
 ) subq_20

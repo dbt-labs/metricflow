@@ -6,8 +6,8 @@ FROM (
   -- Combine Metrics
   SELECT
     COALESCE(subq_6.metric_time__day, subq_11.metric_time__day) AS metric_time__day
-    , subq_6.booking_value_with_is_instant_constraint AS booking_value_with_is_instant_constraint
-    , subq_11.booking_value AS booking_value
+    , MAX(subq_6.booking_value_with_is_instant_constraint) AS booking_value_with_is_instant_constraint
+    , MAX(subq_11.booking_value) AS booking_value
   FROM (
     -- Compute Metrics via Expressions
     SELECT
@@ -240,7 +240,7 @@ FROM (
         subq_4.metric_time__day
     ) subq_5
   ) subq_6
-  INNER JOIN (
+  FULL OUTER JOIN (
     -- Compute Metrics via Expressions
     SELECT
       subq_10.metric_time__day
@@ -457,13 +457,7 @@ FROM (
     ) subq_10
   ) subq_11
   ON
-    (
-      subq_6.metric_time__day = subq_11.metric_time__day
-    ) OR (
-      (
-        subq_6.metric_time__day IS NULL
-      ) AND (
-        subq_11.metric_time__day IS NULL
-      )
-    )
+    subq_6.metric_time__day = subq_11.metric_time__day
+  GROUP BY
+    COALESCE(subq_6.metric_time__day, subq_11.metric_time__day)
 ) subq_12

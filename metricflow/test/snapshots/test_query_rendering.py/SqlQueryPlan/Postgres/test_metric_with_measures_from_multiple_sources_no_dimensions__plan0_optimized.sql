@@ -1,7 +1,7 @@
 -- Combine Metrics
 -- Compute Metrics via Expressions
 SELECT
-  CAST(subq_15.bookings AS DOUBLE PRECISION) / CAST(NULLIF(subq_20.listings, 0) AS DOUBLE PRECISION) AS bookings_per_listing
+  CAST(MAX(subq_15.bookings) AS DOUBLE PRECISION) / CAST(NULLIF(MAX(subq_20.listings), 0) AS DOUBLE PRECISION) AS bookings_per_listing
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'

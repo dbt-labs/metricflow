@@ -284,7 +284,7 @@ integration_test:
       GROUP BY
         ds
     ) groupby_8cbdaa28
-    JOIN (
+    FULL OUTER JOIN (
       SELECT
         SUM(1) AS views
         , ds
@@ -350,7 +350,7 @@ integration_test:
       GROUP BY
         ds
     ) groupby_8cbdaa28
-    JOIN (
+    FULL OUTER JOIN (
       SELECT
         SUM(1) AS listings
         , created_at AS ds
