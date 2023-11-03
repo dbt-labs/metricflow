@@ -643,27 +643,34 @@ integration_test:
   group_bys: [listing__is_lux_latest]
   check_query: |
     SELECT
-      bk.booking_value / NULLIF(vw.views, 0) AS booking_value_per_view
-      , bk.is_lux AS listing__is_lux_latest
+      booking_value / NULLIF(views, 0) AS booking_value_per_view
+      , listing__is_lux_latest
     FROM (
       SELECT
-        SUM(a.booking_value) AS booking_value
-        ,b.is_lux
-      FROM {{ source_schema }}.fct_bookings a
-      LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest b
-      ON a.listing_id = b.listing_id
-      GROUP BY 2
-    ) bk
-    FULL OUTER JOIN (
-      SELECT
-        SUM(1) AS views
-        ,d.is_lux
-      FROM {{ source_schema }}.fct_views c
-      LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest d
-      ON c.listing_id = d.listing_id
-      GROUP BY 2
-    ) vw
-    ON bk.is_lux = vw.is_lux OR (bk.is_lux IS NULL AND vw.is_lux IS NULL)
+        MAX(bk.booking_value) AS booking_value
+        , MAX(vw.views) AS views
+        , COALESCE(bk.is_lux, vw.is_lux) AS listing__is_lux_latest
+      FROM (
+        SELECT
+          SUM(a.booking_value) AS booking_value
+          ,b.is_lux
+        FROM {{ source_schema }}.fct_bookings a
+        LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest b
+        ON a.listing_id = b.listing_id
+        GROUP BY 2
+      ) bk
+      FULL OUTER JOIN (
+        SELECT
+          SUM(1) AS views
+          ,d.is_lux
+        FROM {{ source_schema }}.fct_views c
+        LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest d
+        ON c.listing_id = d.listing_id
+        GROUP BY 2
+      ) vw
+      ON bk.is_lux = vw.is_lux
+      GROUP BY 3
+    ) x
 ---
 integration_test:
   name: derived_metric_with_offset_window
