@@ -16,6 +16,7 @@
         <!--    'column_alias': 'bookings_per_view'}                  -->
         <!-- from_source = SqlSelectStatementNode(node_id=ss_23) -->
         <!-- where = None -->
+        <!-- distinct = False -->
         <SqlSelectStatementNode>
             <!-- description = Combine Metrics -->
             <!-- node_id = ss_23 -->
@@ -43,6 +44,7 @@
             <!--    'join_type': SqlJoinType.INNER,                         -->
             <!--    'on_condition': SqlLogicalExpression(node_id=lo_4)}     -->
             <!-- where = None -->
+            <!-- distinct = False -->
             <SqlSelectStatementNode>
                 <!-- description = Compute Metrics via Expressions -->
                 <!-- node_id = ss_14 -->
@@ -60,6 +62,7 @@
                 <!--    'column_alias': 'bookings'}                            -->
                 <!-- from_source = SqlSelectStatementNode(node_id=ss_13) -->
                 <!-- where = None -->
+                <!-- distinct = False -->
                 <SqlSelectStatementNode>
                     <!-- description = Aggregate Measures -->
                     <!-- node_id = ss_13 -->
@@ -85,6 +88,7 @@
                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_628),  -->
                     <!--    'column_alias': 'listing__country_latest'}             -->
                     <!-- where = None -->
+                    <!-- distinct = False -->
                     <SqlSelectStatementNode>
                         <!-- description =                                           -->
                         <!--   Pass Only Elements:                                   -->
@@ -104,6 +108,7 @@
                         <!--    'column_alias': 'bookings'}                            -->
                         <!-- from_source = SqlSelectStatementNode(node_id=ss_11) -->
                         <!-- where = None -->
+                        <!-- distinct = False -->
                         <SqlSelectStatementNode>
                             <!-- description = Join Standard Outputs -->
                             <!-- node_id = ss_11 -->
@@ -131,6 +136,7 @@
                             <!--    'join_type': SqlJoinType.LEFT_OUTER,                     -->
                             <!--    'on_condition': SqlComparisonExpression(node_id=cmp_0)}  -->
                             <!-- where = None -->
+                            <!-- distinct = False -->
                             <SqlSelectStatementNode>
                                 <!-- description =                           -->
                                 <!--   Pass Only Elements:                   -->
@@ -150,6 +156,7 @@
                                 <!--    'column_alias': 'bookings'}                            -->
                                 <!-- from_source = SqlSelectStatementNode(node_id=ss_7) -->
                                 <!-- where = None -->
+                                <!-- distinct = False -->
                                 <SqlSelectStatementNode>
                                     <!-- description = Metric Time Dimension 'ds' -->
                                     <!-- node_id = ss_7 -->
@@ -547,6 +554,7 @@
                                     <!--    'column_alias': 'approximate_discrete_booking_value_p99'}  -->
                                     <!-- from_source = SqlSelectStatementNode(node_id=ss_10001) -->
                                     <!-- where = None -->
+                                    <!-- distinct = False -->
                                     <SqlSelectStatementNode>
                                         <!-- description = Read Elements From Semantic Model 'bookings_source' -->
                                         <!-- node_id = ss_10001 -->
@@ -904,6 +912,7 @@
                                         <!--    'column_alias': 'booking__host'}                         -->
                                         <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10001) -->
                                         <!-- where = None -->
+                                        <!-- distinct = False -->
                                         <SqlTableFromClauseNode>
                                             <!-- description = Read from ***************************.fct_bookings -->
                                             <!-- node_id = tfc_10001 -->
@@ -927,6 +936,7 @@
                                 <!--    'column_alias': 'country_latest'}                      -->
                                 <!-- from_source = SqlSelectStatementNode(node_id=ss_9) -->
                                 <!-- where = None -->
+                                <!-- distinct = False -->
                                 <SqlSelectStatementNode>
                                     <!-- description = Metric Time Dimension 'ds' -->
                                     <!-- node_id = ss_9 -->
@@ -1200,6 +1210,7 @@
                                     <!--    'column_alias': 'smallest_listing'}                    -->
                                     <!-- from_source = SqlSelectStatementNode(node_id=ss_10004) -->
                                     <!-- where = None -->
+                                    <!-- distinct = False -->
                                     <SqlSelectStatementNode>
                                         <!-- description = Read Elements From Semantic Model 'listings_latest' -->
                                         <!-- node_id = ss_10004 -->
@@ -1429,6 +1440,7 @@
                                         <!--    'column_alias': 'listing__user'}                         -->
                                         <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10004) -->
                                         <!-- where = None -->
+                                        <!-- distinct = False -->
                                         <SqlTableFromClauseNode>
                                             <!-- description = Read from ***************************.dim_listings_latest -->
                                             <!-- node_id = tfc_10004 -->
@@ -1458,6 +1470,7 @@
                 <!--    'column_alias': 'views'}                               -->
                 <!-- from_source = SqlSelectStatementNode(node_id=ss_21) -->
                 <!-- where = None -->
+                <!-- distinct = False -->
                 <SqlSelectStatementNode>
                     <!-- description = Aggregate Measures -->
                     <!-- node_id = ss_21 -->
@@ -1483,6 +1496,7 @@
                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_775),  -->
                     <!--    'column_alias': 'listing__country_latest'}             -->
                     <!-- where = None -->
+                    <!-- distinct = False -->
                     <SqlSelectStatementNode>
                         <!-- description =                                        -->
                         <!--   Pass Only Elements:                                -->
@@ -1502,6 +1516,7 @@
                         <!--    'column_alias': 'views'}                               -->
                         <!-- from_source = SqlSelectStatementNode(node_id=ss_19) -->
                         <!-- where = None -->
+                        <!-- distinct = False -->
                         <SqlSelectStatementNode>
                             <!-- description = Join Standard Outputs -->
                             <!-- node_id = ss_19 -->
@@ -1529,6 +1544,7 @@
                             <!--    'join_type': SqlJoinType.LEFT_OUTER,                     -->
                             <!--    'on_condition': SqlComparisonExpression(node_id=cmp_1)}  -->
                             <!-- where = None -->
+                            <!-- distinct = False -->
                             <SqlSelectStatementNode>
                                 <!-- description =                        -->
                                 <!--   Pass Only Elements:                -->
@@ -1548,6 +1564,7 @@
                                 <!--    'column_alias': 'views'}                               -->
                                 <!-- from_source = SqlSelectStatementNode(node_id=ss_15) -->
                                 <!-- where = None -->
+                                <!-- distinct = False -->
                                 <SqlSelectStatementNode>
                                     <!-- description = Metric Time Dimension 'ds' -->
                                     <!-- node_id = ss_15 -->
@@ -1793,6 +1810,7 @@
                                     <!--    'column_alias': 'views'}                               -->
                                     <!-- from_source = SqlSelectStatementNode(node_id=ss_10009) -->
                                     <!-- where = None -->
+                                    <!-- distinct = False -->
                                     <SqlSelectStatementNode>
                                         <!-- description = Read Elements From Semantic Model 'views_source' -->
                                         <!-- node_id = ss_10009 -->
@@ -1994,6 +2012,7 @@
                                         <!--    'column_alias': 'view__user'}                            -->
                                         <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10009) -->
                                         <!-- where = None -->
+                                        <!-- distinct = False -->
                                         <SqlTableFromClauseNode>
                                             <!-- description = Read from ***************************.fct_views -->
                                             <!-- node_id = tfc_10009 -->
@@ -2017,6 +2036,7 @@
                                 <!--    'column_alias': 'country_latest'}                      -->
                                 <!-- from_source = SqlSelectStatementNode(node_id=ss_17) -->
                                 <!-- where = None -->
+                                <!-- distinct = False -->
                                 <SqlSelectStatementNode>
                                     <!-- description = Metric Time Dimension 'ds' -->
                                     <!-- node_id = ss_17 -->
@@ -2290,6 +2310,7 @@
                                     <!--    'column_alias': 'smallest_listing'}                    -->
                                     <!-- from_source = SqlSelectStatementNode(node_id=ss_10004) -->
                                     <!-- where = None -->
+                                    <!-- distinct = False -->
                                     <SqlSelectStatementNode>
                                         <!-- description = Read Elements From Semantic Model 'listings_latest' -->
                                         <!-- node_id = ss_10004 -->
@@ -2519,6 +2540,7 @@
                                         <!--    'column_alias': 'listing__user'}                         -->
                                         <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10004) -->
                                         <!-- where = None -->
+                                        <!-- distinct = False -->
                                         <SqlTableFromClauseNode>
                                             <!-- description = Read from ***************************.dim_listings_latest -->
                                             <!-- node_id = tfc_10004 -->

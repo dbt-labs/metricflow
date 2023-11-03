@@ -356,6 +356,7 @@
         <!--    'column_alias': 'booking__host'}                         -->
         <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10001) -->
         <!-- where = None -->
+        <!-- distinct = False -->
         <SqlTableFromClauseNode>
             <!-- description = Read from ***************************.fct_bookings -->
             <!-- node_id = tfc_10001 -->

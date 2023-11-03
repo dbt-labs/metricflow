@@ -266,3 +266,65 @@ def test_rewrite_order_by_with_a_join_in_parent(
         sql_plan_node=sub_query_reducer.optimize(rewrite_order_by_statement),
         plan_id="after_reducing",
     )
+
+
+def test_distinct_select_node_is_not_reduced(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+) -> None:
+    """Tests to ensure distinct select node doesn't get overwritten."""
+    select_node = SqlSelectStatementNode(
+        description="test0",
+        select_columns=(
+            SqlSelectColumn(
+                expr=SqlColumnReferenceExpression(
+                    col_ref=SqlColumnReference(table_alias="a", column_name="booking_value")
+                ),
+                column_alias="booking_value",
+            ),
+        ),
+        from_source=SqlSelectStatementNode(
+            description="test1",
+            select_columns=(
+                SqlSelectColumn(
+                    expr=SqlColumnReferenceExpression(
+                        col_ref=SqlColumnReference(table_alias="a", column_name="booking_value")
+                    ),
+                    column_alias="booking_value",
+                ),
+                SqlSelectColumn(
+                    expr=SqlColumnReferenceExpression(
+                        col_ref=SqlColumnReference(table_alias="a", column_name="bookings")
+                    ),
+                    column_alias="bookings",
+                ),
+            ),
+            from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
+            from_source_alias="a",
+            joins_descs=(),
+            where=None,
+            group_bys=(),
+            order_bys=(),
+            distinct=True,
+        ),
+        from_source_alias="b",
+        joins_descs=(),
+        where=None,
+        group_bys=(),
+        order_bys=(),
+    )
+    assert_default_rendered_sql_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        sql_plan_node=select_node,
+        plan_id="before_reducing",
+    )
+
+    sub_query_reducer = SqlSubQueryReducer()
+
+    assert_default_rendered_sql_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        sql_plan_node=sub_query_reducer.optimize(select_node),
+        plan_id="after_reducing",
+    )

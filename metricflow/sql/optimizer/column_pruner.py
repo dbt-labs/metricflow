@@ -107,15 +107,19 @@ class SqlColumnPrunerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
             order_bys=node.order_bys,
             where=node.where,
             limit=node.limit,
+            distinct=node.distinct,
         )
 
     def visit_select_statement_node(self, node: SqlSelectStatementNode) -> SqlQueryPlanNode:  # noqa: D
         # Remove columns that are not needed from this SELECT statement because the parent SELECT statement doesn't
         # need them. However, keep columns that are in group bys because that changes the meaning of the query.
+        # Similarly, if this node is a distinct select node, keep all columns as it may return a different result set.
         pruned_select_columns = tuple(
             select_column
             for select_column in node.select_columns
-            if select_column.column_alias in self._required_column_aliases or select_column in node.group_bys
+            if select_column.column_alias in self._required_column_aliases
+            or select_column in node.group_bys
+            or node.distinct
         )
 
         if len(pruned_select_columns) == 0:
@@ -183,6 +187,7 @@ class SqlColumnPrunerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
             order_bys=node.order_bys,
             where=node.where,
             limit=node.limit,
+            distinct=node.distinct,
         )
 
     def visit_table_from_clause_node(self, node: SqlTableFromClauseNode) -> SqlQueryPlanNode:  # noqa: D

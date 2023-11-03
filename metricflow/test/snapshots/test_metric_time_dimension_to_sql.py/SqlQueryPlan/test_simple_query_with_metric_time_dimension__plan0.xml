@@ -26,6 +26,7 @@
         <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_4, sql_function=COALESCE),  -->
         <!--    'column_alias': 'metric_time__day'}                                            -->
         <!-- where = None -->
+        <!-- distinct = False -->
         <SqlSelectStatementNode>
             <!-- description = Compute Metrics via Expressions -->
             <!-- node_id = ss_10 -->
@@ -39,6 +40,7 @@
             <!--    'column_alias': 'bookings'}                            -->
             <!-- from_source = SqlSelectStatementNode(node_id=ss_9) -->
             <!-- where = None -->
+            <!-- distinct = False -->
             <SqlSelectStatementNode>
                 <!-- description = Aggregate Measures -->
                 <!-- node_id = ss_9 -->
@@ -56,6 +58,7 @@
                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_549),  -->
                 <!--    'column_alias': 'metric_time__day'}                    -->
                 <!-- where = None -->
+                <!-- distinct = False -->
                 <SqlSelectStatementNode>
                     <!-- description =                         -->
                     <!--   Pass Only Elements:                 -->
@@ -71,6 +74,7 @@
                     <!--    'column_alias': 'bookings'}                            -->
                     <!-- from_source = SqlSelectStatementNode(node_id=ss_7) -->
                     <!-- where = None -->
+                    <!-- distinct = False -->
                     <SqlSelectStatementNode>
                         <!-- description = Metric Time Dimension 'ds' -->
                         <!-- node_id = ss_7 -->
@@ -468,6 +472,7 @@
                         <!--    'column_alias': 'approximate_discrete_booking_value_p99'}  -->
                         <!-- from_source = SqlSelectStatementNode(node_id=ss_10001) -->
                         <!-- where = None -->
+                        <!-- distinct = False -->
                         <SqlSelectStatementNode>
                             <!-- description = Read Elements From Semantic Model 'bookings_source' -->
                             <!-- node_id = ss_10001 -->
@@ -825,6 +830,7 @@
                             <!--    'column_alias': 'booking__host'}                         -->
                             <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10001) -->
                             <!-- where = None -->
+                            <!-- distinct = False -->
                             <SqlTableFromClauseNode>
                                 <!-- description = Read from ***************************.fct_bookings -->
                                 <!-- node_id = tfc_10001 -->
@@ -848,6 +854,7 @@
             <!--    'column_alias': 'booking_payments'}                    -->
             <!-- from_source = SqlSelectStatementNode(node_id=ss_13) -->
             <!-- where = None -->
+            <!-- distinct = False -->
             <SqlSelectStatementNode>
                 <!-- description = Aggregate Measures -->
                 <!-- node_id = ss_13 -->
@@ -865,6 +872,7 @@
                 <!--    'expr': SqlColumnReferenceExpression(node_id=cr_641),  -->
                 <!--    'column_alias': 'metric_time__day'}                    -->
                 <!-- where = None -->
+                <!-- distinct = False -->
                 <SqlSelectStatementNode>
                     <!-- description =                                 -->
                     <!--   Pass Only Elements:                         -->
@@ -880,6 +888,7 @@
                     <!--    'column_alias': 'booking_payments'}                    -->
                     <!-- from_source = SqlSelectStatementNode(node_id=ss_11) -->
                     <!-- where = None -->
+                    <!-- distinct = False -->
                     <SqlSelectStatementNode>
                         <!-- description = Metric Time Dimension 'paid_at' -->
                         <!-- node_id = ss_11 -->
@@ -1229,6 +1238,7 @@
                         <!--    'column_alias': 'booking_payments'}                    -->
                         <!-- from_source = SqlSelectStatementNode(node_id=ss_10001) -->
                         <!-- where = None -->
+                        <!-- distinct = False -->
                         <SqlSelectStatementNode>
                             <!-- description = Read Elements From Semantic Model 'bookings_source' -->
                             <!-- node_id = ss_10001 -->
@@ -1586,6 +1596,7 @@
                             <!--    'column_alias': 'booking__host'}                         -->
                             <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10001) -->
                             <!-- where = None -->
+                            <!-- distinct = False -->
                             <SqlTableFromClauseNode>
                                 <!-- description = Read from ***************************.fct_bookings -->
                                 <!-- node_id = tfc_10001 -->

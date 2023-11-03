@@ -44,6 +44,7 @@ class SqlSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
             order_bys=node.order_bys,
             where=node.where,
             limit=node.limit,
+            distinct=node.distinct,
         )
 
     def _reduce_is_possible(self, node: SqlSelectStatementNode) -> bool:  # noqa: D
@@ -70,6 +71,10 @@ class SqlSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
 
         # More conditions where we don't want to collapse. It's not impossible with these cases, but not reducing in
         # these cases for simplicity.
+
+        # Don't reduce distinct selects
+        if parent_select_node.distinct:
+            return False
 
         # Reducing a where is tricky as it requires the expressions to be re-written.
         if node.where:
@@ -179,6 +184,7 @@ class SqlSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
             order_bys=tuple(new_order_by),
             where=parent_select_node.where,
             limit=new_limit,
+            distinct=parent_select_node.distinct,
         )
 
     def visit_table_from_clause_node(self, node: SqlTableFromClauseNode) -> SqlQueryPlanNode:  # noqa: D

@@ -72,6 +72,7 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
         self,
         select_columns: Sequence[SqlSelectColumn],
         num_parents: int,
+        distinct: bool,
     ) -> Tuple[str, SqlBindParameters]:
         """Convert the select columns into a "SELECT" section.
 
@@ -84,7 +85,7 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
         Returns a tuple of the "SELECT" section as a string and the associated execution parameters.
         """
         params = SqlBindParameters()
-        select_section_lines = ["SELECT"]
+        select_section_lines = ["SELECT DISTINCT" if distinct else "SELECT"]
         first_column = True
         for select_column in select_columns:
             expr_rendered = self.EXPR_RENDERER.render_sql_expr(select_column.expr)
@@ -217,7 +218,9 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
         description_section = "\n".join([f"-- {x}" for x in node.description.split("\n")])
 
         # Render "SELECT" column section
-        select_section, select_params = self._render_select_columns_section(node.select_columns, len(node.parent_nodes))
+        select_section, select_params = self._render_select_columns_section(
+            node.select_columns, len(node.parent_nodes), node.distinct
+        )
         combined_params = combined_params.combine(select_params)
 
         # Render "FROM" section
