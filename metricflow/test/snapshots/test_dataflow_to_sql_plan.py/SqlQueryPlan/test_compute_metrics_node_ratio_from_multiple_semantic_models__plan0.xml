@@ -21,27 +21,35 @@
             <!-- node_id = ss_23 -->
             <!-- col0 =                                                                            -->
             <!--   {'class': 'SqlSelectColumn',                                                    -->
-            <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_3, sql_function=COALESCE),  -->
+            <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_5, sql_function=COALESCE),  -->
             <!--    'column_alias': 'ds__day'}                                                     -->
             <!-- col1 =                                                                            -->
             <!--   {'class': 'SqlSelectColumn',                                                    -->
-            <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_2, sql_function=COALESCE),  -->
+            <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_4, sql_function=COALESCE),  -->
             <!--    'column_alias': 'listing__country_latest'}                                     -->
-            <!-- col2 =                                                    -->
-            <!--   {'class': 'SqlSelectColumn',                            -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_784),  -->
-            <!--    'column_alias': 'bookings'}                            -->
-            <!-- col3 =                                                    -->
-            <!--   {'class': 'SqlSelectColumn',                            -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_785),  -->
-            <!--    'column_alias': 'views'}                               -->
+            <!-- col2 =                                                                       -->
+            <!--   {'class': 'SqlSelectColumn',                                               -->
+            <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_2, sql_function=MAX),  -->
+            <!--    'column_alias': 'bookings'}                                               -->
+            <!-- col3 =                                                                       -->
+            <!--   {'class': 'SqlSelectColumn',                                               -->
+            <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_3, sql_function=MAX),  -->
+            <!--    'column_alias': 'views'}                                                  -->
             <!-- from_source = SqlSelectStatementNode(node_id=ss_14) -->
             <!-- join_0 =                                                   -->
             <!--   {'class': 'SqlJoinDescription',                          -->
             <!--    'right_source': SqlSelectStatementNode(node_id=ss_22),  -->
             <!--    'right_source_alias': 'subq_19',                        -->
-            <!--    'join_type': SqlJoinType.INNER,                         -->
-            <!--    'on_condition': SqlLogicalExpression(node_id=lo_4)}     -->
+            <!--    'join_type': SqlJoinType.FULL_OUTER,                    -->
+            <!--    'on_condition': SqlLogicalExpression(node_id=lo_0)}     -->
+            <!-- group_by0 =                                                                       -->
+            <!--   {'class': 'SqlSelectColumn',                                                    -->
+            <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_5, sql_function=COALESCE),  -->
+            <!--    'column_alias': 'ds__day'}                                                     -->
+            <!-- group_by1 =                                                                       -->
+            <!--   {'class': 'SqlSelectColumn',                                                    -->
+            <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_4, sql_function=COALESCE),  -->
+            <!--    'column_alias': 'listing__country_latest'}                                     -->
             <!-- where = None -->
             <SqlSelectStatementNode>
                 <!-- description = Compute Metrics via Expressions -->

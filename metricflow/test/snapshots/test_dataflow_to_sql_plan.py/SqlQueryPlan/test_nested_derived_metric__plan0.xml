@@ -4,7 +4,7 @@
         <!-- node_id = ss_26 -->
         <!-- col0 =                                                    -->
         <!--   {'class': 'SqlSelectColumn',                            -->
-        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_881),  -->
+        <!--    'expr': SqlColumnReferenceExpression(node_id=cr_882),  -->
         <!--    'column_alias': 'metric_time__day'}                    -->
         <!-- col1 =                                                                                             -->
         <!--   {'class': 'SqlSelectColumn',                                                                     -->
@@ -15,35 +15,39 @@
         <SqlSelectStatementNode>
             <!-- description = Combine Metrics -->
             <!-- node_id = ss_25 -->
-            <!-- col0 =                                                                            -->
-            <!--   {'class': 'SqlSelectColumn',                                                    -->
-            <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_5, sql_function=COALESCE),  -->
-            <!--    'column_alias': 'metric_time__day'}                                            -->
-            <!-- col1 =                                                    -->
-            <!--   {'class': 'SqlSelectColumn',                            -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_875),  -->
-            <!--    'column_alias': 'non_referred'}                        -->
-            <!-- col2 =                                                    -->
-            <!--   {'class': 'SqlSelectColumn',                            -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_876),  -->
-            <!--    'column_alias': 'instant'}                             -->
-            <!-- col3 =                                                    -->
-            <!--   {'class': 'SqlSelectColumn',                            -->
-            <!--    'expr': SqlColumnReferenceExpression(node_id=cr_877),  -->
-            <!--    'column_alias': 'bookings'}                            -->
+            <!-- col0 =                                                                             -->
+            <!--   {'class': 'SqlSelectColumn',                                                     -->
+            <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_11, sql_function=COALESCE),  -->
+            <!--    'column_alias': 'metric_time__day'}                                             -->
+            <!-- col1 =                                                                       -->
+            <!--   {'class': 'SqlSelectColumn',                                               -->
+            <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_8, sql_function=MAX),  -->
+            <!--    'column_alias': 'non_referred'}                                           -->
+            <!-- col2 =                                                                       -->
+            <!--   {'class': 'SqlSelectColumn',                                               -->
+            <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_9, sql_function=MAX),  -->
+            <!--    'column_alias': 'instant'}                                                -->
+            <!-- col3 =                                                                        -->
+            <!--   {'class': 'SqlSelectColumn',                                                -->
+            <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_10, sql_function=MAX),  -->
+            <!--    'column_alias': 'bookings'}                                                -->
             <!-- from_source = SqlSelectStatementNode(node_id=ss_16) -->
-            <!-- join_0 =                                                   -->
-            <!--   {'class': 'SqlJoinDescription',                          -->
-            <!--    'right_source': SqlSelectStatementNode(node_id=ss_20),  -->
-            <!--    'right_source_alias': 'subq_16',                        -->
-            <!--    'join_type': SqlJoinType.INNER,                         -->
-            <!--    'on_condition': SqlLogicalExpression(node_id=lo_3)}     -->
-            <!-- join_1 =                                                   -->
-            <!--   {'class': 'SqlJoinDescription',                          -->
-            <!--    'right_source': SqlSelectStatementNode(node_id=ss_24),  -->
-            <!--    'right_source_alias': 'subq_21',                        -->
-            <!--    'join_type': SqlJoinType.INNER,                         -->
-            <!--    'on_condition': SqlLogicalExpression(node_id=lo_5)}     -->
+            <!-- join_0 =                                                    -->
+            <!--   {'class': 'SqlJoinDescription',                           -->
+            <!--    'right_source': SqlSelectStatementNode(node_id=ss_20),   -->
+            <!--    'right_source_alias': 'subq_16',                         -->
+            <!--    'join_type': SqlJoinType.FULL_OUTER,                     -->
+            <!--    'on_condition': SqlComparisonExpression(node_id=cmp_1)}  -->
+            <!-- join_1 =                                                    -->
+            <!--   {'class': 'SqlJoinDescription',                           -->
+            <!--    'right_source': SqlSelectStatementNode(node_id=ss_24),   -->
+            <!--    'right_source_alias': 'subq_21',                         -->
+            <!--    'join_type': SqlJoinType.FULL_OUTER,                     -->
+            <!--    'on_condition': SqlComparisonExpression(node_id=cmp_2)}  -->
+            <!-- group_by0 =                                                                        -->
+            <!--   {'class': 'SqlSelectColumn',                                                     -->
+            <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_11, sql_function=COALESCE),  -->
+            <!--    'column_alias': 'metric_time__day'}                                             -->
             <!-- where = None -->
             <SqlSelectStatementNode>
                 <!-- description = Compute Metrics via Expressions -->
@@ -63,23 +67,27 @@
                     <!-- node_id = ss_15 -->
                     <!-- col0 =                                                                            -->
                     <!--   {'class': 'SqlSelectColumn',                                                    -->
-                    <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_2, sql_function=COALESCE),  -->
+                    <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_4, sql_function=COALESCE),  -->
                     <!--    'column_alias': 'metric_time__day'}                                            -->
-                    <!-- col1 =                                                    -->
-                    <!--   {'class': 'SqlSelectColumn',                            -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_658),  -->
-                    <!--    'column_alias': 'ref_bookings'}                        -->
-                    <!-- col2 =                                                    -->
-                    <!--   {'class': 'SqlSelectColumn',                            -->
-                    <!--    'expr': SqlColumnReferenceExpression(node_id=cr_659),  -->
-                    <!--    'column_alias': 'bookings'}                            -->
+                    <!-- col1 =                                                                       -->
+                    <!--   {'class': 'SqlSelectColumn',                                               -->
+                    <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_2, sql_function=MAX),  -->
+                    <!--    'column_alias': 'ref_bookings'}                                           -->
+                    <!-- col2 =                                                                       -->
+                    <!--   {'class': 'SqlSelectColumn',                                               -->
+                    <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_3, sql_function=MAX),  -->
+                    <!--    'column_alias': 'bookings'}                                               -->
                     <!-- from_source = SqlSelectStatementNode(node_id=ss_10) -->
-                    <!-- join_0 =                                                   -->
-                    <!--   {'class': 'SqlJoinDescription',                          -->
-                    <!--    'right_source': SqlSelectStatementNode(node_id=ss_14),  -->
-                    <!--    'right_source_alias': 'subq_9',                         -->
-                    <!--    'join_type': SqlJoinType.INNER,                         -->
-                    <!--    'on_condition': SqlLogicalExpression(node_id=lo_1)}     -->
+                    <!-- join_0 =                                                    -->
+                    <!--   {'class': 'SqlJoinDescription',                           -->
+                    <!--    'right_source': SqlSelectStatementNode(node_id=ss_14),   -->
+                    <!--    'right_source_alias': 'subq_9',                          -->
+                    <!--    'join_type': SqlJoinType.FULL_OUTER,                     -->
+                    <!--    'on_condition': SqlComparisonExpression(node_id=cmp_0)}  -->
+                    <!-- group_by0 =                                                                       -->
+                    <!--   {'class': 'SqlSelectColumn',                                                    -->
+                    <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_4, sql_function=COALESCE),  -->
+                    <!--    'column_alias': 'metric_time__day'}                                            -->
                     <!-- where = None -->
                     <SqlSelectStatementNode>
                         <!-- description = Compute Metrics via Expressions -->
@@ -1723,7 +1731,7 @@
                     <!--    'column_alias': 'metric_time__day'}                    -->
                     <!-- col1 =                                                                       -->
                     <!--   {'class': 'SqlSelectColumn',                                               -->
-                    <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_3, sql_function=SUM),  -->
+                    <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_5, sql_function=SUM),  -->
                     <!--    'column_alias': 'instant_bookings'}                                       -->
                     <!-- from_source = SqlSelectStatementNode(node_id=ss_18) -->
                     <!-- group_by0 =                                               -->
@@ -2532,7 +2540,7 @@
                     <!--    'column_alias': 'metric_time__day'}                    -->
                     <!-- col1 =                                                                       -->
                     <!--   {'class': 'SqlSelectColumn',                                               -->
-                    <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_4, sql_function=SUM),  -->
+                    <!--    'expr': SqlAggregateFunctionExpression(node_id=fnc_6, sql_function=SUM),  -->
                     <!--    'column_alias': 'bookings'}                                               -->
                     <!-- from_source = SqlSelectStatementNode(node_id=ss_22) -->
                     <!-- group_by0 =                                               -->
