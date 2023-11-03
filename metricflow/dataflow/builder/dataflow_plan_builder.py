@@ -248,7 +248,7 @@ class DataflowPlanBuilder:
                         queried_linkable_specs=queried_linkable_specs,
                         where_constraint=where_constraint,
                         time_range_constraint=time_range_constraint,
-                        combine_metrics_join_type=SqlJoinType.INNER,
+                        combine_metrics_join_type=SqlJoinType.FULL_OUTER if MetricType.DERIVED else SqlJoinType.INNER,
                     ),
                     metric_specs=[metric_spec],
                 )
