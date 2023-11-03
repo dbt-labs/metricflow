@@ -6,8 +6,8 @@ FROM (
   -- Combine Metrics
   SELECT
     COALESCE(subq_18.metric_time__extract_dow, subq_26.metric_time__extract_dow) AS metric_time__extract_dow
-    , subq_18.bookings AS bookings
-    , subq_26.bookings_2_weeks_ago AS bookings_2_weeks_ago
+    , MAX(subq_18.bookings) AS bookings
+    , MAX(subq_26.bookings_2_weeks_ago) AS bookings_2_weeks_ago
   FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
@@ -27,7 +27,7 @@ FROM (
     GROUP BY
       metric_time__extract_dow
   ) subq_18
-  INNER JOIN (
+  FULL OUTER JOIN (
     -- Join to Time Spine Dataset
     -- Pass Only Elements:
     --   ['bookings', 'metric_time__extract_dow']
@@ -51,13 +51,7 @@ FROM (
       CASE WHEN EXTRACT(dow FROM subq_22.ds) = 0 THEN EXTRACT(dow FROM subq_22.ds) + 7 ELSE EXTRACT(dow FROM subq_22.ds) END
   ) subq_26
   ON
-    (
-      subq_18.metric_time__extract_dow = subq_26.metric_time__extract_dow
-    ) OR (
-      (
-        subq_18.metric_time__extract_dow IS NULL
-      ) AND (
-        subq_26.metric_time__extract_dow IS NULL
-      )
-    )
+    subq_18.metric_time__extract_dow = subq_26.metric_time__extract_dow
+  GROUP BY
+    COALESCE(subq_18.metric_time__extract_dow, subq_26.metric_time__extract_dow)
 ) subq_27

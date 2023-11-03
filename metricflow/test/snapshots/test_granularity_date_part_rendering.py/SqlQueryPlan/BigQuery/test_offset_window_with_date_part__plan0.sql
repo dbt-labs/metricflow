@@ -6,8 +6,8 @@ FROM (
   -- Combine Metrics
   SELECT
     COALESCE(subq_4.metric_time__extract_dow, subq_12.metric_time__extract_dow) AS metric_time__extract_dow
-    , subq_4.bookings AS bookings
-    , subq_12.bookings_2_weeks_ago AS bookings_2_weeks_ago
+    , MAX(subq_4.bookings) AS bookings
+    , MAX(subq_12.bookings_2_weeks_ago) AS bookings_2_weeks_ago
   FROM (
     -- Compute Metrics via Expressions
     SELECT
@@ -224,7 +224,7 @@ FROM (
         metric_time__extract_dow
     ) subq_3
   ) subq_4
-  INNER JOIN (
+  FULL OUTER JOIN (
     -- Compute Metrics via Expressions
     SELECT
       subq_11.metric_time__extract_dow
@@ -541,13 +541,7 @@ FROM (
     ) subq_11
   ) subq_12
   ON
-    (
-      subq_4.metric_time__extract_dow = subq_12.metric_time__extract_dow
-    ) OR (
-      (
-        subq_4.metric_time__extract_dow IS NULL
-      ) AND (
-        subq_12.metric_time__extract_dow IS NULL
-      )
-    )
+    subq_4.metric_time__extract_dow = subq_12.metric_time__extract_dow
+  GROUP BY
+    metric_time__extract_dow
 ) subq_13
