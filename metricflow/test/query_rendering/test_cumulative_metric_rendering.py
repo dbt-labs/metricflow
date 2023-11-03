@@ -30,7 +30,7 @@ def test_cumulative_metric(
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
-    """Tests converting a dataflow plan to a SQL query plan where there is a cumulative metric to compute."""
+    """Tests rendering a basic cumulative metric query."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="trailing_2_months_revenue"),),
@@ -63,7 +63,12 @@ def test_cumulative_metric_with_time_constraint(
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
-    """Tests converting a dataflow plan to a SQL query plan where there is a cumulative metric to compute."""
+    """Tests rendering a cumulative metric query with an adjustable time constraint.
+
+    Not all query inputs with time constraint filters allow us to adjust the time constraint to include the full
+    span of input data for a cumulative metric, but when we receive a time constraint filter expression we can
+    automatically adjust it should render a query similar to this one.
+    """
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="trailing_2_months_revenue"),),
@@ -99,7 +104,7 @@ def test_cumulative_metric_no_ds(
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
-    """Tests converting a dataflow plan to a SQL query plan where there is a cumulative metric to compute."""
+    """Tests rendering a cumulative metric with no time dimension specified."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="trailing_2_months_revenue"),),
@@ -126,7 +131,7 @@ def test_cumulative_metric_no_window(
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
-    """Tests converting a dataflow plan to a SQL query plan where there is a windowless cumulative metric to compute."""
+    """Tests rendering a query where there is a windowless cumulative metric to compute."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="revenue_all_time"),),
@@ -159,7 +164,7 @@ def test_cumulative_metric_no_window_with_time_constraint(
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
-    """Tests converting a dataflow plan to a SQL query plan where there is a windowless cumulative metric to compute."""
+    """Tests rendering a query for a windowless cumulative metric query with an adjustable time constraint."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="revenue_all_time"),),
@@ -195,7 +200,7 @@ def test_cumulative_metric_grain_to_date(
     consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
-    """Tests converting a dataflow plan to a SQL query plan where grain_to_date cumulative metric to compute."""
+    """Tests rendering a query against a grain_to_date cumulative metric."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="revenue_mtd"),),
