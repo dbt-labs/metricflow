@@ -241,14 +241,14 @@ class DataflowPlanBuilder:
                     f"For {metric.type} metric: {metric_spec}, needed metrics are:\n"
                     f"{pformat_big_objects(metric_input_specs=metric_input_specs)}"
                 )
-
+                join_type = SqlJoinType.FULL_OUTER if metric.type is MetricType.DERIVED else SqlJoinType.INNER
                 compute_metrics_node = ComputeMetricsNode(
                     parent_node=self._build_metrics_output_node(
                         metric_specs=metric_input_specs,
                         queried_linkable_specs=queried_linkable_specs,
                         where_constraint=where_constraint,
                         time_range_constraint=time_range_constraint,
-                        combine_metrics_join_type=SqlJoinType.FULL_OUTER if MetricType.DERIVED else SqlJoinType.INNER,
+                        combine_metrics_join_type=join_type,
                     ),
                     metric_specs=[metric_spec],
                 )
