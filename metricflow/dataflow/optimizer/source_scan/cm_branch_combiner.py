@@ -13,7 +13,6 @@ from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,
     DataflowPlanNodeVisitor,
     FilterElementsNode,
-    JoinAggregatedMeasuresByGroupByColumnsNode,
     JoinOverTimeRangeNode,
     JoinToBaseOutputNode,
     JoinToTimeSpineNode,
@@ -212,12 +211,6 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
 
     def visit_join_to_base_output_node(  # noqa: D
         self, node: JoinToBaseOutputNode
-    ) -> ComputeMetricsBranchCombinerResult:
-        self._log_visit_node_type(node)
-        return self._default_handler(node)
-
-    def visit_join_aggregated_measures_by_groupby_columns_node(  # noqa: D
-        self, node: JoinAggregatedMeasuresByGroupByColumnsNode
     ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._default_handler(node)

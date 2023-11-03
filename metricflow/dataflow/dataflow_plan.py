@@ -20,7 +20,6 @@ from metricflow.dag.id_generation import (
     DATAFLOW_NODE_COMBINE_METRICS_ID_PREFIX,
     DATAFLOW_NODE_COMPUTE_METRICS_ID_PREFIX,
     DATAFLOW_NODE_CONSTRAIN_TIME_RANGE_ID_PREFIX,
-    DATAFLOW_NODE_JOIN_AGGREGATED_MEASURES_BY_GROUPBY_COLUMNS_PREFIX,
     DATAFLOW_NODE_JOIN_SELF_OVER_TIME_RANGE_ID_PREFIX,
     DATAFLOW_NODE_JOIN_TO_STANDARD_OUTPUT_ID_PREFIX,
     DATAFLOW_NODE_JOIN_TO_TIME_SPINE_ID_PREFIX,
@@ -120,12 +119,6 @@ class DataflowPlanNodeVisitor(Generic[VisitorOutputT], ABC):
 
     @abstractmethod
     def visit_join_to_base_output_node(self, node: JoinToBaseOutputNode) -> VisitorOutputT:  # noqa: D
-        pass
-
-    @abstractmethod
-    def visit_join_aggregated_measures_by_groupby_columns_node(  # noqa: D
-        self, node: JoinAggregatedMeasuresByGroupByColumnsNode
-    ) -> VisitorOutputT:
         pass
 
     @abstractmethod
@@ -496,60 +489,6 @@ class AggregateMeasuresNode(AggregatedMeasuresOutput):
         return AggregateMeasuresNode(
             parent_node=new_parent_nodes[0],
             metric_input_measure_specs=self.metric_input_measure_specs,
-        )
-
-
-class JoinAggregatedMeasuresByGroupByColumnsNode(AggregatedMeasuresOutput):
-    """A node that joins aggregated measures with group by elements.
-
-    This is designed to link two separate semantic models with measures aggregated by the complete set of group by
-    elements shared across both measures. Due to the way the DataflowPlan currently processes joins, this means
-    each separate semantic model will be pre-aggregated, and this final join will be run across fully aggregated
-    sets of input data. As such, all this requires is the list of aggregated measure outputs, since they can be
-    transformed into a SqlDataSet containing the complete list of non-measure specs for joining.
-    """
-
-    def __init__(
-        self,
-        parent_nodes: Sequence[BaseOutput],
-    ):
-        """Constructor.
-
-        Args:
-            parent_nodes: sequence of nodes that output aggregated measures
-        """
-        if len(parent_nodes) < 2:
-            raise ValueError(
-                "This node is designed for joining 2 or more aggregated nodes together, but "
-                f"we got {len(parent_nodes)}"
-            )
-        super().__init__(node_id=self.create_unique_id(), parent_nodes=list(parent_nodes))
-
-    @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
-        return DATAFLOW_NODE_JOIN_AGGREGATED_MEASURES_BY_GROUPBY_COLUMNS_PREFIX
-
-    def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
-        return visitor.visit_join_aggregated_measures_by_groupby_columns_node(self)
-
-    @property
-    def description(self) -> str:  # noqa: D
-        return """Join Aggregated Measures with Standard Outputs"""
-
-    @property
-    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
-        return super().displayed_properties + [
-            DisplayedProperty("Join aggregated measure nodes: ", f"{[node.node_id for node in self.parent_nodes]}")
-        ]
-
-    def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D
-        return isinstance(other_node, self.__class__)
-
-    def with_new_parents(  # noqa: D
-        self, new_parent_nodes: Sequence[BaseOutput]
-    ) -> JoinAggregatedMeasuresByGroupByColumnsNode:
-        return JoinAggregatedMeasuresByGroupByColumnsNode(
-            parent_nodes=new_parent_nodes,
         )
 
 
