@@ -894,6 +894,23 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 else:
                     select_expression = column_reference_expression
 
+                input_measures = self._metric_lookup.measures_for_metric(
+                    # Using alias instead of element name in reference, where did we lose the name?
+                    metric_reference=metric_spec.as_reference,
+                    column_association_resolver=self._column_association_resolver,
+                )
+                if input_measures:
+                    # TODO: update type after other PR merges
+                    input_measure = input_measures[0]
+                    if input_measure.fill_nulls_with is not None:
+                        select_expression = SqlAggregateFunctionExpression(
+                            sql_function=SqlFunction.COALESCE,
+                            sql_function_args=[
+                                select_expression,
+                                SqlStringExpression(str(input_measure.fill_nulls_with)),
+                            ],
+                        )
+
                 select_columns.append(
                     SqlSelectColumn(
                         expr=select_expression,
