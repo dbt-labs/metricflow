@@ -6,9 +6,9 @@ FROM (
   -- Combine Metrics
   SELECT
     COALESCE(subq_34.metric_time__day, subq_39.metric_time__day, subq_44.metric_time__day) AS metric_time__day
-    , subq_34.non_referred AS non_referred
-    , subq_39.instant AS instant
-    , subq_44.bookings AS bookings
+    , MAX(subq_34.non_referred) AS non_referred
+    , MAX(subq_39.instant) AS instant
+    , MAX(subq_44.bookings) AS bookings
   FROM (
     -- Compute Metrics via Expressions
     SELECT
@@ -18,8 +18,8 @@ FROM (
       -- Combine Metrics
       SELECT
         COALESCE(subq_27.metric_time__day, subq_32.metric_time__day) AS metric_time__day
-        , subq_27.ref_bookings AS ref_bookings
-        , subq_32.bookings AS bookings
+        , MAX(subq_27.ref_bookings) AS ref_bookings
+        , MAX(subq_32.bookings) AS bookings
       FROM (
         -- Aggregate Measures
         -- Compute Metrics via Expressions
@@ -39,7 +39,7 @@ FROM (
         GROUP BY
           metric_time__day
       ) subq_27
-      INNER JOIN (
+      FULL OUTER JOIN (
         -- Aggregate Measures
         -- Compute Metrics via Expressions
         SELECT
@@ -59,18 +59,12 @@ FROM (
           metric_time__day
       ) subq_32
       ON
-        (
-          subq_27.metric_time__day = subq_32.metric_time__day
-        ) OR (
-          (
-            subq_27.metric_time__day IS NULL
-          ) AND (
-            subq_32.metric_time__day IS NULL
-          )
-        )
+        subq_27.metric_time__day = subq_32.metric_time__day
+      GROUP BY
+        COALESCE(subq_27.metric_time__day, subq_32.metric_time__day)
     ) subq_33
   ) subq_34
-  INNER JOIN (
+  FULL OUTER JOIN (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
@@ -90,16 +84,8 @@ FROM (
       metric_time__day
   ) subq_39
   ON
-    (
-      subq_34.metric_time__day = subq_39.metric_time__day
-    ) OR (
-      (
-        subq_34.metric_time__day IS NULL
-      ) AND (
-        subq_39.metric_time__day IS NULL
-      )
-    )
-  INNER JOIN (
+    subq_34.metric_time__day = subq_39.metric_time__day
+  FULL OUTER JOIN (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
@@ -119,13 +105,7 @@ FROM (
       metric_time__day
   ) subq_44
   ON
-    (
-      subq_34.metric_time__day = subq_44.metric_time__day
-    ) OR (
-      (
-        subq_34.metric_time__day IS NULL
-      ) AND (
-        subq_44.metric_time__day IS NULL
-      )
-    )
+    COALESCE(subq_34.metric_time__day, subq_39.metric_time__day) = subq_44.metric_time__day
+  GROUP BY
+    COALESCE(subq_34.metric_time__day, subq_39.metric_time__day, subq_44.metric_time__day)
 ) subq_45

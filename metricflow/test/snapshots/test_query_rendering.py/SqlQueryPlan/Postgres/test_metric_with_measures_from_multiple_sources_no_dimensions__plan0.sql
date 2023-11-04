@@ -4,8 +4,8 @@ SELECT
 FROM (
   -- Combine Metrics
   SELECT
-    subq_4.bookings AS bookings
-    , subq_9.listings AS listings
+    MAX(subq_4.bookings) AS bookings
+    , MAX(subq_9.listings) AS listings
   FROM (
     -- Compute Metrics via Expressions
     SELECT

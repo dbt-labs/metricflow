@@ -6,8 +6,8 @@ FROM (
   -- Combine Metrics
   SELECT
     COALESCE(subq_18.metric_time__week, subq_26.metric_time__week) AS metric_time__week
-    , subq_18.bookings AS bookings
-    , subq_26.bookings_at_start_of_month AS bookings_at_start_of_month
+    , MAX(subq_18.bookings) AS bookings
+    , MAX(subq_26.bookings_at_start_of_month) AS bookings_at_start_of_month
   FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
@@ -27,7 +27,7 @@ FROM (
     GROUP BY
       metric_time__week
   ) subq_18
-  INNER JOIN (
+  FULL OUTER JOIN (
     -- Join to Time Spine Dataset
     -- Pass Only Elements:
     --   ['bookings', 'metric_time__week']
@@ -52,13 +52,7 @@ FROM (
       DATE_TRUNC('week', subq_22.ds)
   ) subq_26
   ON
-    (
-      subq_18.metric_time__week = subq_26.metric_time__week
-    ) OR (
-      (
-        subq_18.metric_time__week IS NULL
-      ) AND (
-        subq_26.metric_time__week IS NULL
-      )
-    )
+    subq_18.metric_time__week = subq_26.metric_time__week
+  GROUP BY
+    COALESCE(subq_18.metric_time__week, subq_26.metric_time__week)
 ) subq_27

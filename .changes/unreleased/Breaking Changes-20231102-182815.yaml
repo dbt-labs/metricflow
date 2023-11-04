@@ -1,0 +1,6 @@
+kind: Breaking Changes
+body: Use FULL OUTER JOIN to combine input metrics for derived metrics. This is a change from using INNER JOIN and may result in changes in output.
+time: 2023-11-02T18:28:15.181064-07:00
+custom:
+  Author: courtneyholcomb
+  Issue: "842"

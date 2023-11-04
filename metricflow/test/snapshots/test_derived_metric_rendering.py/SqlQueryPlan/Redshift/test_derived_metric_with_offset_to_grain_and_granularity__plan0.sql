@@ -6,8 +6,8 @@ FROM (
   -- Combine Metrics
   SELECT
     COALESCE(subq_4.metric_time__week, subq_12.metric_time__week) AS metric_time__week
-    , subq_4.bookings AS bookings
-    , subq_12.bookings_at_start_of_month AS bookings_at_start_of_month
+    , MAX(subq_4.bookings) AS bookings
+    , MAX(subq_12.bookings_at_start_of_month) AS bookings_at_start_of_month
   FROM (
     -- Compute Metrics via Expressions
     SELECT
@@ -224,7 +224,7 @@ FROM (
         subq_2.metric_time__week
     ) subq_3
   ) subq_4
-  INNER JOIN (
+  FULL OUTER JOIN (
     -- Compute Metrics via Expressions
     SELECT
       subq_11.metric_time__week
@@ -542,13 +542,7 @@ FROM (
     ) subq_11
   ) subq_12
   ON
-    (
-      subq_4.metric_time__week = subq_12.metric_time__week
-    ) OR (
-      (
-        subq_4.metric_time__week IS NULL
-      ) AND (
-        subq_12.metric_time__week IS NULL
-      )
-    )
+    subq_4.metric_time__week = subq_12.metric_time__week
+  GROUP BY
+    COALESCE(subq_4.metric_time__week, subq_12.metric_time__week)
 ) subq_13

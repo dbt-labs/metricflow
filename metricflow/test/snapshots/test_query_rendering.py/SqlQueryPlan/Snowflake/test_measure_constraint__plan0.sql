@@ -6,9 +6,9 @@ FROM (
   -- Combine Metrics
   SELECT
     COALESCE(subq_11.metric_time__day, subq_23.metric_time__day, subq_28.metric_time__day) AS metric_time__day
-    , subq_11.average_booking_value AS average_booking_value
-    , subq_23.bookings AS bookings
-    , subq_28.booking_value AS booking_value
+    , MAX(subq_11.average_booking_value) AS average_booking_value
+    , MAX(subq_23.bookings) AS bookings
+    , MAX(subq_28.booking_value) AS booking_value
   FROM (
     -- Compute Metrics via Expressions
     SELECT
@@ -398,7 +398,7 @@ FROM (
         subq_9.metric_time__day
     ) subq_10
   ) subq_11
-  INNER JOIN (
+  FULL OUTER JOIN (
     -- Compute Metrics via Expressions
     SELECT
       subq_22.metric_time__day
@@ -788,16 +788,8 @@ FROM (
     ) subq_22
   ) subq_23
   ON
-    (
-      subq_11.metric_time__day = subq_23.metric_time__day
-    ) OR (
-      (
-        subq_11.metric_time__day IS NULL
-      ) AND (
-        subq_23.metric_time__day IS NULL
-      )
-    )
-  INNER JOIN (
+    subq_11.metric_time__day = subq_23.metric_time__day
+  FULL OUTER JOIN (
     -- Compute Metrics via Expressions
     SELECT
       subq_27.metric_time__day
@@ -1014,13 +1006,7 @@ FROM (
     ) subq_27
   ) subq_28
   ON
-    (
-      subq_11.metric_time__day = subq_28.metric_time__day
-    ) OR (
-      (
-        subq_11.metric_time__day IS NULL
-      ) AND (
-        subq_28.metric_time__day IS NULL
-      )
-    )
+    COALESCE(subq_11.metric_time__day, subq_23.metric_time__day) = subq_28.metric_time__day
+  GROUP BY
+    COALESCE(subq_11.metric_time__day, subq_23.metric_time__day, subq_28.metric_time__day)
 ) subq_29

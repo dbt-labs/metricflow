@@ -42,7 +42,7 @@ integration_test:
       FROM {{source_schema}}.fct_bookings
       GROUP BY ds
     ) b
-    JOIN (
+    FULL OUTER JOIN (
       SELECT
         SUM(1) AS views
         , ds
@@ -284,7 +284,7 @@ integration_test:
       GROUP BY
         ds
     ) groupby_8cbdaa28
-    JOIN (
+    FULL OUTER JOIN (
       SELECT
         SUM(1) AS views
         , ds
@@ -350,7 +350,7 @@ integration_test:
       GROUP BY
         ds
     ) groupby_8cbdaa28
-    JOIN (
+    FULL OUTER JOIN (
       SELECT
         SUM(1) AS listings
         , created_at AS ds
@@ -519,7 +519,7 @@ integration_test:
       GROUP BY
         ds
     ) a
-    INNER JOIN (
+    FULL OUTER JOIN (
       SELECT
         SUM(1) AS lux_listings
         , created_at AS metric_time__day
@@ -643,27 +643,34 @@ integration_test:
   group_bys: [listing__is_lux_latest]
   check_query: |
     SELECT
-      bk.booking_value / NULLIF(vw.views, 0) AS booking_value_per_view
-      , bk.is_lux AS listing__is_lux_latest
+      booking_value / NULLIF(views, 0) AS booking_value_per_view
+      , listing__is_lux_latest
     FROM (
       SELECT
-        SUM(a.booking_value) AS booking_value
-        ,b.is_lux
-      FROM {{ source_schema }}.fct_bookings a
-      LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest b
-      ON a.listing_id = b.listing_id
-      GROUP BY 2
-    ) bk
-    INNER JOIN (
-      SELECT
-        SUM(1) AS views
-        ,d.is_lux
-      FROM {{ source_schema }}.fct_views c
-      LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest d
-      ON c.listing_id = d.listing_id
-      GROUP BY 2
-    ) vw
-    ON bk.is_lux = vw.is_lux OR (bk.is_lux IS NULL AND vw.is_lux IS NULL)
+        MAX(bk.booking_value) AS booking_value
+        , MAX(vw.views) AS views
+        , COALESCE(bk.is_lux, vw.is_lux) AS listing__is_lux_latest
+      FROM (
+        SELECT
+          SUM(a.booking_value) AS booking_value
+          ,b.is_lux
+        FROM {{ source_schema }}.fct_bookings a
+        LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest b
+        ON a.listing_id = b.listing_id
+        GROUP BY 2
+      ) bk
+      FULL OUTER JOIN (
+        SELECT
+          SUM(1) AS views
+          ,d.is_lux
+        FROM {{ source_schema }}.fct_views c
+        LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest d
+        ON c.listing_id = d.listing_id
+        GROUP BY 2
+      ) vw
+      ON bk.is_lux = vw.is_lux
+      GROUP BY 3
+    ) x
 ---
 integration_test:
   name: derived_metric_with_offset_window
@@ -683,7 +690,7 @@ integration_test:
       GROUP BY
         metric_time__day
     ) a
-    INNER JOIN (
+    FULL OUTER JOIN (
       SELECT
         c.ds AS metric_time__day
         , d.bookings_2_weeks_ago AS bookings_2_weeks_ago
@@ -718,7 +725,7 @@ integration_test:
       GROUP BY
         metric_time__day
     ) a
-    INNER JOIN (
+    FULL OUTER JOIN (
       SELECT
         c.ds AS metric_time__day
         , d.bookings_at_start_of_month AS bookings_at_start_of_month
@@ -760,7 +767,7 @@ integration_test:
       ) f
       ON {{ render_date_sub("g", "ds", 1, TimeGranularity.MONTH) }} = f.metric_time__day
     ) a
-    INNER JOIN (
+    FULL OUTER JOIN (
       SELECT
         c.ds AS metric_time__day
         , d.bookings AS month_start_bookings
@@ -808,7 +815,7 @@ integration_test:
   check_query: |
     SELECT
       booking_value - instant_booking_value AS booking_value_sub_instant
-      , a.metric_time__day
+      , COALESCE(a.metric_time__day, b.metric_time__day) AS metric_time__day
     FROM (
       SELECT
         SUM(booking_value) AS instant_booking_value
@@ -818,7 +825,7 @@ integration_test:
       GROUP BY
         ds
     ) a
-    INNER JOIN (
+    FULL OUTER JOIN (
       SELECT
         SUM(booking_value) AS booking_value
         , ds AS metric_time__day
@@ -843,7 +850,7 @@ integration_test:
     FROM (
       SELECT
         booking_value - instant_booking_value AS booking_value_sub_instant
-        , a.metric_time__day AS metric_time__day
+        , COALESCE(a.metric_time__day, b.metric_time__day) AS metric_time__day
       FROM (
         SELECT
           SUM(booking_value) AS instant_booking_value
@@ -853,7 +860,7 @@ integration_test:
         GROUP BY
           ds
       ) a
-      INNER JOIN (
+      FULL OUTER JOIN (
         SELECT
           SUM(booking_value) AS booking_value
           , ds AS metric_time__day
@@ -901,7 +908,7 @@ integration_test:
       FROM {{ source_schema }}.fct_bookings
       GROUP BY metric_time__week
     ) a
-    INNER JOIN (
+    FULL OUTER JOIN (
       SELECT
         {{ render_date_trunc("c.ds", TimeGranularity.WEEK) }} AS metric_time__week
         , SUM(d.bookings_at_start_of_month) AS bookings_at_start_of_month
@@ -944,7 +951,7 @@ integration_test:
       ON {{ render_date_sub("g", "ds", 1, TimeGranularity.MONTH) }} = f.metric_time__day
       GROUP BY metric_time__year
     ) a
-    INNER JOIN (
+    FULL OUTER JOIN (
       SELECT
         {{ render_date_trunc("c.ds", TimeGranularity.YEAR) }} AS metric_time__year
         , SUM(d.bookings) AS month_start_bookings
@@ -1024,7 +1031,7 @@ integration_test:
       FROM {{ source_schema }}.fct_bookings
       GROUP BY metric_time__week, metric_time__month
     ) a
-    INNER JOIN (
+    FULL OUTER JOIN (
       SELECT
         {{ render_date_trunc("c.ds", TimeGranularity.WEEK) }} AS metric_time__week
         , {{ render_date_trunc("c.ds", TimeGranularity.MONTH) }} AS metric_time__month
@@ -1290,7 +1297,7 @@ integration_test:
         ) subq_3
         ON subq_5.ds = subq_3.metric_time__day
       ) subq_7
-      INNER JOIN (
+      FULL OUTER JOIN (
         SELECT
           subq_11.ds AS metric_time__day
           , SUM(subq_9.bookings) AS bookings_2_weeks_ago

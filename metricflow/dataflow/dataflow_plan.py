@@ -1225,9 +1225,7 @@ class CombineMetricsNode(ComputedMetricsOutput):
     def __init__(  # noqa: D
         self,
         parent_nodes: Sequence[Union[BaseOutput, ComputedMetricsOutput]],
-        join_type: SqlJoinType = SqlJoinType.FULL_OUTER,
     ) -> None:
-        self._join_type = join_type
         super().__init__(node_id=self.create_unique_id(), parent_nodes=list(parent_nodes))
 
     @classmethod
@@ -1241,31 +1239,12 @@ class CombineMetricsNode(ComputedMetricsOutput):
     def description(self) -> str:  # noqa: D
         return "Combine Metrics"
 
-    @property
-    def displayed_properties(self) -> List[DisplayedProperty]:
-        """Prints details about the join types and how the node will behave."""
-        custom_properties = [DisplayedProperty("join type", self.join_type)]
-        if self.join_type is SqlJoinType.FULL_OUTER:
-            custom_properties.append(
-                DisplayedProperty("de-duplication method", "post-join aggregation across all dimensions")
-            )
-
-        return super().displayed_properties + custom_properties
-
-    @property
-    def join_type(self) -> SqlJoinType:
-        """The type of join used for combining metrics."""
-        return self._join_type
-
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D
-        return isinstance(other_node, self.__class__) and other_node.join_type == self.join_type
+        return isinstance(other_node, self.__class__)
 
     def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> CombineMetricsNode:  # noqa: D
         assert len(new_parent_nodes) == 1
-        return CombineMetricsNode(
-            parent_nodes=new_parent_nodes,
-            join_type=self.join_type,
-        )
+        return CombineMetricsNode(parent_nodes=new_parent_nodes)
 
 
 class ConstrainTimeRangeNode(AggregatedMeasuresOutput, BaseOutput):

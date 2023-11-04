@@ -6,9 +6,9 @@ FROM (
   -- Combine Metrics
   SELECT
     COALESCE(subq_41.metric_time__day, subq_53.metric_time__day, subq_58.metric_time__day) AS metric_time__day
-    , subq_41.average_booking_value AS average_booking_value
-    , subq_53.bookings AS bookings
-    , subq_58.booking_value AS booking_value
+    , MAX(subq_41.average_booking_value) AS average_booking_value
+    , MAX(subq_53.bookings) AS bookings
+    , MAX(subq_58.booking_value) AS booking_value
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements:
@@ -36,7 +36,7 @@ FROM (
     GROUP BY
       metric_time__day
   ) subq_41
-  INNER JOIN (
+  FULL OUTER JOIN (
     -- Constrain Output with WHERE
     -- Pass Only Elements:
     --   ['bookings', 'metric_time__day']
@@ -74,16 +74,8 @@ FROM (
       metric_time__day
   ) subq_53
   ON
-    (
-      subq_41.metric_time__day = subq_53.metric_time__day
-    ) OR (
-      (
-        subq_41.metric_time__day IS NULL
-      ) AND (
-        subq_53.metric_time__day IS NULL
-      )
-    )
-  INNER JOIN (
+    subq_41.metric_time__day = subq_53.metric_time__day
+  FULL OUTER JOIN (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
     -- Pass Only Elements:
@@ -98,13 +90,7 @@ FROM (
       DATE_TRUNC('day', ds)
   ) subq_58
   ON
-    (
-      subq_41.metric_time__day = subq_58.metric_time__day
-    ) OR (
-      (
-        subq_41.metric_time__day IS NULL
-      ) AND (
-        subq_58.metric_time__day IS NULL
-      )
-    )
+    COALESCE(subq_41.metric_time__day, subq_53.metric_time__day) = subq_58.metric_time__day
+  GROUP BY
+    COALESCE(subq_41.metric_time__day, subq_53.metric_time__day, subq_58.metric_time__day)
 ) subq_59
