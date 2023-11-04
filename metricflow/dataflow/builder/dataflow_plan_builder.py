@@ -213,7 +213,6 @@ class DataflowPlanBuilder:
         queried_linkable_specs: LinkableSpecSet,
         where_constraint: Optional[WhereFilterSpec] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
-        combine_metrics_join_type: SqlJoinType = SqlJoinType.FULL_OUTER,
     ) -> BaseOutput:
         """Builds a computed metrics output node.
 
@@ -222,7 +221,6 @@ class DataflowPlanBuilder:
             queried_linkable_specs: Dimensions/entities that were queried for.
             where_constraint: Where constraint used to compute the metric.
             time_range_constraint: Time range constraint used to compute the metric.
-            combine_metrics_join_type: The join used when combining the computed metrics.
         """
         output_nodes: List[BaseOutput] = []
         compute_metrics_node: Optional[ComputeMetricsNode] = None
@@ -247,7 +245,6 @@ class DataflowPlanBuilder:
                         queried_linkable_specs=queried_linkable_specs,
                         where_constraint=where_constraint,
                         time_range_constraint=time_range_constraint,
-                        combine_metrics_join_type=SqlJoinType.FULL_OUTER,
                     ),
                     metric_specs=[metric_spec],
                 )
@@ -294,10 +291,7 @@ class DataflowPlanBuilder:
         if len(output_nodes) == 1:
             return output_nodes[0]
 
-        return CombineMetricsNode(
-            parent_nodes=output_nodes,
-            join_type=combine_metrics_join_type,
-        )
+        return CombineMetricsNode(parent_nodes=output_nodes)
 
     def build_plan_for_distinct_values(self, query_spec: MetricFlowQuerySpec) -> DataflowPlan:
         """Generate a plan that would get the distinct values of a linkable instance.

@@ -287,9 +287,7 @@ class SourceScanOptimizer(
         if len(combined_parent_branches) == 1:
             return OptimizeBranchResult(base_output_node=combined_parent_branches[0])
 
-        return OptimizeBranchResult(
-            base_output_node=CombineMetricsNode(parent_nodes=combined_parent_branches, join_type=node.join_type)
-        )
+        return OptimizeBranchResult(base_output_node=CombineMetricsNode(parent_nodes=combined_parent_branches))
 
     def visit_constrain_time_range_node(self, node: ConstrainTimeRangeNode) -> OptimizeBranchResult:  # noqa: D
         self._log_visit_node_type(node)

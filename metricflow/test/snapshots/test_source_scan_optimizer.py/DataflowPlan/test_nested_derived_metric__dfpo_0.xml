@@ -15,8 +15,6 @@
             <CombineMetricsNode>
                 <!-- description = Combine Metrics -->
                 <!-- node_id = cbm_2 -->
-                <!-- join type = SqlJoinType.FULL_OUTER -->
-                <!-- de-duplication method = post-join aggregation across all dimensions -->
                 <ComputeMetricsNode>
                     <!-- description = Compute Metrics via Expressions -->
                     <!-- node_id = cm_9 -->

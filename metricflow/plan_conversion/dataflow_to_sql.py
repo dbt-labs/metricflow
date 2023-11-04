@@ -959,7 +959,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         ), "All parent nodes should have the same set of linkable instances since all values are coalesced."
 
         linkable_spec_set = from_data_set.data_set.instance_set.spec_set.transform(SelectOnlyLinkableSpecs())
-        join_type = SqlJoinType.CROSS_JOIN if len(linkable_spec_set.all_specs) == 0 else node.join_type
+        join_type = SqlJoinType.CROSS_JOIN if len(linkable_spec_set.all_specs) == 0 else SqlJoinType.FULL_OUTER
 
         joins_descriptions: List[SqlJoinDescription] = []
         # TODO: refactor this loop into SqlQueryPlanJoinBuilder
@@ -984,7 +984,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         output_instance_set = InstanceSet.merge([x.data_set.instance_set for x in parent_data_sets])
         output_instance_set = output_instance_set.transform(ChangeAssociatedColumns(self._column_association_resolver))
 
-        metric_aggregation_type = AggregationType.MAX if node.join_type is SqlJoinType.FULL_OUTER else None
+        metric_aggregation_type = AggregationType.MAX
         metric_select_column_set = SelectColumnSet(
             metric_columns=self._make_select_columns_for_metrics(
                 table_alias_to_metric_specs, aggregation_type=metric_aggregation_type
@@ -1006,7 +1006,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 from_source=from_data_set.data_set.sql_select_node,
                 from_source_alias=from_data_set.alias,
                 joins_descs=tuple(joins_descriptions),
-                group_bys=linkable_select_column_set.as_tuple() if node.join_type is SqlJoinType.FULL_OUTER else (),
+                group_bys=linkable_select_column_set.as_tuple(),
                 where=None,
                 order_bys=(),
             ),
