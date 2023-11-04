@@ -906,12 +906,10 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         """Join computed metric datasets together to return a single dataset containing all metrics.
 
         This node may exist in one of two situations: when metrics need to be combined in order to produce a single
-        dataset with all required inputs for a derived metric (in which case the join type is INNER), or when
-        metrics need to be combined in order to produce a single dataset of output for downstream consumption by
-        the end user, in which case we will use FULL OUTER JOIN.
+        dataset with all required inputs for a derived metric, or when metrics need to be combined in order to produce
+        a single dataset of output for downstream consumption by the end user.
 
-        In the case of a multi-data-source FULL OUTER JOIN the join key will be a coalesced set of all previously
-        seen dimension values. For example:
+        The join key will be a coalesced set of all previously seen dimension values. For example:
             FROM (
               ...
             ) subq_9
