@@ -106,7 +106,7 @@ class EntityInstance(MdoInstance[EntitySpec], SemanticModelElementInstance):  # 
 class MetricInstance(MdoInstance[MetricSpec], SerializableDataclass):  # noqa: D
     associated_columns: Tuple[ColumnAssociation, ...]
     spec: MetricSpec
-    defined_from: Tuple[MetricModelReference, ...]
+    defined_from: MetricModelReference
 
 
 @dataclass(frozen=True)
