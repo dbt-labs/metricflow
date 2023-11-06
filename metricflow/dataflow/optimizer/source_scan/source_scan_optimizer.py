@@ -15,7 +15,6 @@ from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,
     DataflowPlanNodeVisitor,
     FilterElementsNode,
-    JoinAggregatedMeasuresByGroupByColumnsNode,
     JoinOverTimeRangeNode,
     JoinToBaseOutputNode,
     JoinToTimeSpineNode,
@@ -152,12 +151,6 @@ class SourceScanOptimizer(
         return self._default_base_output_handler(node)
 
     def visit_join_to_base_output_node(self, node: JoinToBaseOutputNode) -> OptimizeBranchResult:  # noqa: D
-        self._log_visit_node_type(node)
-        return self._default_base_output_handler(node)
-
-    def visit_join_aggregated_measures_by_groupby_columns_node(  # noqa: D
-        self, node: JoinAggregatedMeasuresByGroupByColumnsNode
-    ) -> OptimizeBranchResult:
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)
 

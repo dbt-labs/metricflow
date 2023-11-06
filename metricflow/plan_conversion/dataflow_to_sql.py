@@ -20,7 +20,6 @@ from metricflow.dataflow.dataflow_plan import (
     ConstrainTimeRangeNode,
     DataflowPlanNodeVisitor,
     FilterElementsNode,
-    JoinAggregatedMeasuresByGroupByColumnsNode,
     JoinOverTimeRangeNode,
     JoinToBaseOutputNode,
     JoinToTimeSpineNode,
@@ -441,83 +440,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
         # Construct the data set that contains the updated instances and the SQL nodes that should go in the various
         # clauses.
-        return SqlDataSet(
-            instance_set=InstanceSet.merge(list(table_alias_to_instance_set.values())),
-            sql_select_node=SqlSelectStatementNode(
-                description=node.description,
-                select_columns=create_select_columns_for_instance_sets(
-                    self._column_association_resolver, table_alias_to_instance_set
-                ),
-                from_source=from_data_set.sql_select_node,
-                from_source_alias=from_data_set_alias,
-                joins_descs=tuple(sql_join_descs),
-                group_bys=(),
-                where=None,
-                order_bys=(),
-            ),
-        )
-
-    def visit_join_aggregated_measures_by_groupby_columns_node(  # noqa: D
-        self, node: JoinAggregatedMeasuresByGroupByColumnsNode
-    ) -> SqlDataSet:
-        """Generates the query that realizes the behavior of the JoinAggregatedMeasuresByGroupByColumnsNode.
-
-        This node is a straight inner join against all of the columns used for grouping in the input
-        aggregation steps. Every column should be used, and at this point all inputs are fully aggregated,
-        meaning we can make assumptions about things like NULL handling and there being one row per value
-        set in each semantic model.
-
-        In addition, this is used in cases where we expect a final metric to be computed using these
-        measures as input. Therefore, we make the assumption that any mismatch should be discarded, as
-        the behavior of the metric will be undefined in that case. This is why the INNER JOIN type is
-        appropriate - if a dimension value set exists in one aggregated set but not the other, there is
-        no sensible metric value for that dimension set.
-        """
-        assert len(node.parent_nodes) > 1, "This cannot happen, the node initializer would have failed"
-
-        table_alias_to_instance_set: OrderedDict[str, InstanceSet] = OrderedDict()
-
-        from_data_set: SqlDataSet = node.parent_nodes[0].accept(self)
-        from_data_set_alias = self._next_unique_table_alias()
-        table_alias_to_instance_set[from_data_set_alias] = from_data_set.instance_set
-        join_aliases = [column.column_name for column in from_data_set.groupable_column_associations]
-        use_cross_join = len(join_aliases) == 0
-
-        sql_join_descs: List[SqlJoinDescription] = []
-        for aggregated_node in node.parent_nodes[1:]:
-            right_data_set: SqlDataSet = aggregated_node.accept(self)
-            right_data_set_alias = self._next_unique_table_alias()
-            right_column_names = {column.column_name for column in right_data_set.groupable_column_associations}
-            if right_column_names != set(join_aliases):
-                # TODO test multi-hop dimensions and address any issues. For now, let's raise an exception.
-                raise ValueError(
-                    f"We only support joins where all dimensions have the same name, but we got {right_column_names} "
-                    f"and {join_aliases}, which differ by {right_column_names.difference(set(join_aliases))}!"
-                )
-            # sort column names to ensure consistent join ordering for ease of debugging and testing
-            ordered_right_column_names = sorted(right_column_names)
-            column_equality_descriptions = [
-                ColumnEqualityDescription(
-                    left_column_alias=colname, right_column_alias=colname, treat_nulls_as_equal=True
-                )
-                for colname in ordered_right_column_names
-            ]
-            sql_join_descs.append(
-                SqlQueryPlanJoinBuilder.make_column_equality_sql_join_description(
-                    right_source_node=right_data_set.sql_select_node,
-                    right_source_alias=right_data_set_alias,
-                    left_source_alias=from_data_set_alias,
-                    column_equality_descriptions=column_equality_descriptions,
-                    join_type=SqlJoinType.INNER if not use_cross_join else SqlJoinType.CROSS_JOIN,
-                )
-            )
-            # All groupby columns are shared by all inputs, so we only want the measure/metric columns
-            # from the semantic models on the right side of the join
-            table_alias_to_instance_set[right_data_set_alias] = InstanceSet(
-                measure_instances=right_data_set.instance_set.measure_instances,
-                metric_instances=right_data_set.instance_set.metric_instances,
-            )
-
         return SqlDataSet(
             instance_set=InstanceSet.merge(list(table_alias_to_instance_set.values())),
             sql_select_node=SqlSelectStatementNode(

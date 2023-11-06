@@ -17,7 +17,6 @@ from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,
     DataflowPlanNodeVisitor,
     FilterElementsNode,
-    JoinAggregatedMeasuresByGroupByColumnsNode,
     JoinOverTimeRangeNode,
     JoinToBaseOutputNode,
     JoinToTimeSpineNode,
@@ -57,11 +56,6 @@ class ReadSqlSourceNodeCounter(DataflowPlanNodeVisitor[int]):
         return 1
 
     def visit_join_to_base_output_node(self, node: JoinToBaseOutputNode) -> int:  # noqa: D
-        return self._sum_parents(node)
-
-    def visit_join_aggregated_measures_by_groupby_columns_node(  # noqa: D
-        self, node: JoinAggregatedMeasuresByGroupByColumnsNode
-    ) -> int:
         return self._sum_parents(node)
 
     def visit_aggregate_measures_node(self, node: AggregateMeasuresNode) -> int:  # noqa: D

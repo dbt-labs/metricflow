@@ -977,11 +977,7 @@ def test_compute_metrics_node_ratio_from_multiple_semantic_models(
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
-    """Tests the compute metrics node for ratio type metrics.
-
-    This test exercises the functionality provided in JoinAggregatedMeasuresByGroupByColumnsNode for
-    merging multiple measures into a single input source for final metrics computation.
-    """
+    """Tests the combine metrics node for ratio type metrics."""
     dimension_spec = DimensionSpec(
         element_name="country_latest",
         entity_links=(EntityReference(element_name="listing"),),
