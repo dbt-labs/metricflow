@@ -118,7 +118,7 @@ features = [
 ]
 # Temporary workaround for installing the dbt-duckdb adapter until it's updated to support dbt-core~=1.7.0rc1.
 post-install-commands = [
-  "pip install duckdb>=0.7.0",
+  "pip install \"duckdb>=0.7.0\"",
   "pip install --no-deps dbt-duckdb~=1.6.0",
 ]
 
