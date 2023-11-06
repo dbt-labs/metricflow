@@ -1,0 +1,6 @@
+kind: Breaking Changes
+body: Update Dependencies to Use `dbt-semantic-interfaces~=0.4.0`
+time: 2023-11-06T09:03:01.474125-08:00
+custom:
+  Author: plypaul
+  Issue: "846"
