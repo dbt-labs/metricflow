@@ -21,6 +21,11 @@ install-hatch:
 test:
 	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) metricflow/test/
 
+# Run tests until first failure
+.PHONY: testx
+testx:
+	make test ADDITIONAL_PYTEST_OPTIONS=-x
+
 .PHONY: test-postgresql
 test-postgresql:
 	hatch -v run postgres-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) metricflow/test/

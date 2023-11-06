@@ -707,6 +707,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 MetricInstance(
                     associated_columns=(output_column_association,),
                     defined_from=(MetricModelReference(metric_name=metric_spec.element_name),),
+                    # Here we remove element name in favor of alias
                     spec=metric_spec.alias_spec,
                 )
             )
@@ -893,6 +894,23 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                     )
                 else:
                     select_expression = column_reference_expression
+
+                input_measures = self._metric_lookup.measures_for_metric(
+                    # Using alias instead of element name in reference, where did we lose the name?
+                    metric_reference=metric_spec.as_reference,
+                    column_association_resolver=self._column_association_resolver,
+                )
+                # TODO: update to singular after other PR merges
+                if input_measures:
+                    input_measure = input_measures[0]
+                    if input_measure.fill_nulls_with is not None:
+                        select_expression = SqlAggregateFunctionExpression(
+                            sql_function=SqlFunction.COALESCE,
+                            sql_function_args=[
+                                select_expression,
+                                SqlStringExpression(str(input_measure.fill_nulls_with)),
+                            ],
+                        )
 
                 select_columns.append(
                     SqlSelectColumn(
