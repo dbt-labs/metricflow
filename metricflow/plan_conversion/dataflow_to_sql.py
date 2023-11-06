@@ -707,7 +707,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 MetricInstance(
                     associated_columns=(output_column_association,),
                     defined_from=MetricModelReference(metric_name=metric_spec.element_name),
-                    # Here we remove element name in favor of alias
                     spec=metric_spec.alias_spec,
                 )
             )
