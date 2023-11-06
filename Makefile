@@ -3,13 +3,13 @@
 #
 
 # Controls the number of parallel workers running tests. Try "make -e PARALLELISM=4 test".
-PARALLELISM = "auto"
+PARALLELISM = auto
 # Additional command line options to pass to pytest.
-ADDITIONAL_PYTEST_OPTIONS = ""
+ADDITIONAL_PYTEST_OPTIONS =
 
 # Pytest that can populate the persistent source schema
-USE_PERSISTENT_SOURCE_SCHEMA = "--use-persistent-source-schema"
-POPULATE_PERSISTENT_SOURCE_SCHEMA = "metricflow/test/source_schema_tools.py::populate_source_schema"
+USE_PERSISTENT_SOURCE_SCHEMA = --use-persistent-source-schema
+POPULATE_PERSISTENT_SOURCE_SCHEMA = metricflow/test/source_schema_tools.py::populate_source_schema
 
 # Install Hatch package / project manager
 .PHONY: install-hatch
@@ -73,3 +73,8 @@ postgresql postgres:
 .PHONY: regenerate-test-snapshots
 regenerate-test-snapshots:
 	hatch -v run dev-env:python metricflow/test/generate_snapshots.py
+
+# Re-generate snapshots for the default SQL engine.
+.PHONY: test-snap
+test-snap:
+	make test ADDITIONAL_PYTEST_OPTIONS=--overwrite-snapshots
