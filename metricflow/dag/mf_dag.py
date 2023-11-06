@@ -12,6 +12,8 @@ from typing import Any, Generic, List, Sequence, TypeVar
 import jinja2
 
 from metricflow.dag.id_generation import IdGeneratorRegistry
+from metricflow.dag.id_prefix import IdPrefix
+from metricflow.dag.prefix_id import PrefixIdGenerator
 from metricflow.visitor import VisitorOutputT
 
 logger = logging.getLogger(__name__)
@@ -36,6 +38,10 @@ class NodeId:
 
     def __repr__(self) -> str:  # noqa: D
         return self.id_str
+
+    @staticmethod
+    def create_unique(id_prefix: IdPrefix) -> NodeId:  # noqa: D
+        return NodeId(str(PrefixIdGenerator.create_next_id(id_prefix)))
 
 
 class DagNodeVisitor(Generic[VisitorOutputT], ABC):
