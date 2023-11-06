@@ -199,15 +199,16 @@ class MetricFlowQueryParser:
 
         # Merge interface could streamline this.
         where_filters: List[WhereFilter] = []
-        if saved_query.where is not None:
-            where_filters.extend(saved_query.where.where_filters)
+        if saved_query.query_params.where is not None:
+            where_filters.extend(saved_query.query_params.where.where_filters)
         if where_filter is not None:
             where_filters.append(where_filter)
 
         return self.parse_and_validate_query(
-            metrics=tuple(MetricParameter(name=metric_name) for metric_name in saved_query.metrics),
+            metrics=tuple(MetricParameter(name=metric_name) for metric_name in saved_query.query_params.metrics),
             group_by=tuple(
-                parse_object_builder_naming_scheme(group_by_item_name) for group_by_item_name in saved_query.group_bys
+                parse_object_builder_naming_scheme(group_by_item_name)
+                for group_by_item_name in saved_query.query_params.group_by
             ),
             where_constraint=merge_to_single_where_filter(PydanticWhereFilterIntersection(where_filters=where_filters)),
             limit=limit,
