@@ -268,7 +268,7 @@ class DataflowPlanBuilder:
                     combined_where = (
                         combined_where.combine(metric_spec.constraint) if combined_where else metric_spec.constraint
                     )
-                aggregated_measures_node = self.build_aggregated_measures(
+                aggregated_measures_node = self.build_aggregated_measure(
                     metric_input_measure_spec=metric_input_measure_spec,
                     metric_spec=metric_spec,
                     queried_linkable_specs=queried_linkable_specs,
@@ -640,7 +640,7 @@ class DataflowPlanBuilder:
             metric_specs=[metric_spec],
         )
 
-    def build_aggregated_measures(
+    def build_aggregated_measure(
         self,
         metric_input_measure_spec: MetricInputMeasureSpec,
         metric_spec: MetricSpec,
@@ -666,7 +666,7 @@ class DataflowPlanBuilder:
         else:
             node_where_constraint = where_constraint.combine(measure_constraint)
 
-        return self._build_aggregated_measures_from_measure_source_node(
+        return self._build_aggregated_measure_from_measure_source_node(
             metric_input_measure_spec=metric_input_measure_spec,
             metric_spec=metric_spec,
             queried_linkable_specs=queried_linkable_specs,
@@ -677,7 +677,7 @@ class DataflowPlanBuilder:
             cumulative_grain_to_date=cumulative_grain_to_date,
         )
 
-    def _build_aggregated_measures_from_measure_source_node(
+    def _build_aggregated_measure_from_measure_source_node(
         self,
         metric_input_measure_spec: MetricInputMeasureSpec,
         metric_spec: MetricSpec,
