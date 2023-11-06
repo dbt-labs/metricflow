@@ -134,6 +134,3 @@ dmypy.json
 # IDE
 .idea/
 .vscode/
-
-# Hatch
-=0.7.0
