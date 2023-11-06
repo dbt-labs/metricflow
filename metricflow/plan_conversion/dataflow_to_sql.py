@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import logging
 from collections import OrderedDict
-from typing import List, Optional, Sequence, Union
+from typing import List, Optional, Sequence, Tuple, Union
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols.metric import MetricInputMeasure, MetricType
-from dbt_semantic_interfaces.references import MetricModelReference
+from dbt_semantic_interfaces.references import MetricModelReference, MetricReference
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 
 from metricflow.aggregation_properties import AggregationState
@@ -862,24 +862,25 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             ),
         )
 
-    def _make_select_columns_for_metrics(
+    def _make_select_columns_for_multiple_metrics(
         self,
-        table_alias_to_metric_specs: OrderedDict[str, Sequence[MetricSpec]],
+        table_alias_to_metric_instances: OrderedDict[str, Tuple[MetricInstance, ...]],
         aggregation_type: Optional[AggregationType],
     ) -> List[SqlSelectColumn]:
         """Creates select columns that get the given metric using the given table alias.
 
         e.g.
 
-        with table_alias_to_metric_specs = {"a": MetricSpec(element_name="bookings")}
+        with table_alias_to_metric_instances = {"a": MetricSpec(element_name="bookings")}
 
         ->
 
         a.bookings AS bookings
         """
         select_columns = []
-        for table_alias, metric_specs in table_alias_to_metric_specs.items():
-            for metric_spec in metric_specs:
+        for table_alias, metric_instances in table_alias_to_metric_instances.items():
+            for metric_instance in metric_instances:
+                metric_spec = metric_instance.spec
                 metric_column_name = self._column_association_resolver.resolve_spec(metric_spec).column_name
                 column_reference_expression = SqlColumnReferenceExpression(
                     col_ref=SqlColumnReference(
@@ -893,6 +894,27 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                     )
                 else:
                     select_expression = column_reference_expression
+
+                # At this point, the MetricSpec might have the alias in place of the element name, so we need to look
+                # back at where it was defined from to get the metric element name.
+                metric_name = metric_instance.defined_from.metric_name
+                input_measures = self._metric_lookup.measures_for_metric(
+                    metric_reference=MetricReference(metric_name),
+                    column_association_resolver=self._column_association_resolver,
+                )
+                # If multiple input measures, this is a query with a nested derived/ratio metric. In that case, we can
+                # skip this step because it has already occurred when rendering the nested metric.
+                # TODO: this logic might need updating for conversion metrics, which will allow multiple input measures
+                if len(input_measures) == 1:
+                    input_measure = input_measures[0]
+                    if input_measure.fill_nulls_with is not None:
+                        select_expression = SqlAggregateFunctionExpression(
+                            sql_function=SqlFunction.COALESCE,
+                            sql_function_args=[
+                                select_expression,
+                                SqlStringExpression(str(input_measure.fill_nulls_with)),
+                            ],
+                        )
 
                 select_columns.append(
                     SqlSelectColumn(
@@ -938,13 +960,13 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         ), "Shouldn't have a CombineMetricsNode in the dataflow plan if there's only 1 parent."
 
         parent_data_sets: List[AnnotatedSqlDataSet] = []
-        table_alias_to_metric_specs: OrderedDict[str, Sequence[MetricSpec]] = OrderedDict()
+        table_alias_to_metric_instances: OrderedDict[str, Tuple[MetricInstance, ...]] = OrderedDict()
 
         for parent_node in node.parent_nodes:
             parent_sql_data_set = parent_node.accept(self)
             table_alias = self._next_unique_table_alias()
             parent_data_sets.append(AnnotatedSqlDataSet(data_set=parent_sql_data_set, alias=table_alias))
-            table_alias_to_metric_specs[table_alias] = parent_sql_data_set.instance_set.spec_set.metric_specs
+            table_alias_to_metric_instances[table_alias] = parent_sql_data_set.instance_set.metric_instances
 
         # When we create the components of the join that combines metrics it will be one of INNER, FULL OUTER,
         # or CROSS JOIN. Order doesn't matter for these join types, so we will use the first element in the FROM
@@ -986,8 +1008,9 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
         metric_aggregation_type = AggregationType.MAX
         metric_select_column_set = SelectColumnSet(
-            metric_columns=self._make_select_columns_for_metrics(
-                table_alias_to_metric_specs, aggregation_type=metric_aggregation_type
+            metric_columns=self._make_select_columns_for_multiple_metrics(
+                table_alias_to_metric_instances=table_alias_to_metric_instances,
+                aggregation_type=metric_aggregation_type,
             )
         )
         linkable_select_column_set = linkable_spec_set.transform(
