@@ -31,7 +31,7 @@ from metricflow.dag.id_generation import (
     DATAFLOW_NODE_WHERE_CONSTRAINT_ID_PREFIX,
     DATAFLOW_NODE_WRITE_TO_RESULT_DATAFRAME_ID_PREFIX,
 )
-from metricflow.dag.mf_dag import DagNode, DisplayedProperty, MetricFlowDag, NodeId
+from metricflow.dag.mf_dag import DagId, DagNode, DisplayedProperty, MetricFlowDag, NodeId
 from metricflow.dataflow.builder.partitions import (
     PartitionDimensionJoinDescription,
     PartitionTimeDimensionJoinDescription,
@@ -1255,7 +1255,7 @@ class DataflowPlan(MetricFlowDag[SinkOutput]):
         if len(sink_output_nodes) == 0:
             raise RuntimeError("Can't create a dataflow plan without sink node(s).")
         self._sink_output_nodes = sink_output_nodes
-        super().__init__(dag_id=plan_id, sink_nodes=sink_output_nodes)
+        super().__init__(dag_id=DagId.from_str(plan_id), sink_nodes=sink_output_nodes)
 
     @property
     def sink_output_nodes(self) -> List[SinkOutput]:  # noqa: D

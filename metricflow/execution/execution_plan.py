@@ -11,7 +11,7 @@ import jinja2
 import pandas as pd
 
 from metricflow.dag.id_generation import EXEC_NODE_READ_SQL_QUERY, EXEC_NODE_WRITE_TO_TABLE
-from metricflow.dag.mf_dag import DagNode, DisplayedProperty, MetricFlowDag, NodeId
+from metricflow.dag.mf_dag import DagId, DagNode, DisplayedProperty, MetricFlowDag, NodeId
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
@@ -230,7 +230,7 @@ class ExecutionPlan(MetricFlowDag[ExecutionPlanTask]):
             plan_id: A string to uniquely identify this plan.
             leaf_tasks: The final set of tasks that will run, after task dependencies are finished.
         """
-        super().__init__(dag_id=plan_id, sink_nodes=leaf_tasks)
+        super().__init__(dag_id=DagId.from_str(plan_id), sink_nodes=leaf_tasks)
 
     @property
     def tasks(self) -> Sequence[ExecutionPlanTask]:
