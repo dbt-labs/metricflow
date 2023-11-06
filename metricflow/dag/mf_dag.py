@@ -146,18 +146,33 @@ def make_graphviz_label(
     )
 
 
+@dataclass(frozen=True)
+class DagId:
+    """Unique identifier for DAGs."""
+
+    id_str: str
+
+    def __str__(self) -> str:  # noqa: D
+        return self.id_str
+
+    @staticmethod
+    def from_str(id_str: str) -> DagId:
+        """Migration helper to create DAG IDs."""
+        return DagId(id_str)
+
+
 DagNodeT = TypeVar("DagNodeT", bound=DagNode)
 
 
 class MetricFlowDag(Generic[DagNodeT]):  # noqa: D
     """Represents a directed acyclic graph. The sink nodes will have the connected components."""
 
-    def __init__(self, dag_id: str, sink_nodes: List[DagNodeT]):  # noqa: D
+    def __init__(self, dag_id: DagId, sink_nodes: List[DagNodeT]):  # noqa: D
         self._dag_id = dag_id
         self._sink_nodes = sink_nodes
 
     @property
-    def dag_id(self) -> str:  # noqa: D
+    def dag_id(self) -> DagId:  # noqa: D
         return self._dag_id
 
     @property

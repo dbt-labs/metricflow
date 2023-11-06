@@ -133,7 +133,7 @@ def assert_plan_snapshot_text_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
         group_id=plan.__class__.__name__,
-        snapshot_id=plan.dag_id,
+        snapshot_id=str(plan.dag_id),
         snapshot_text=plan_snapshot_text,
         snapshot_file_extension=plan_snapshot_file_extension,
         exclude_line_regex=exclude_line_regex,

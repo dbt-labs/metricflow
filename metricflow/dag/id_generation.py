@@ -54,6 +54,7 @@ OPTIMIZED_DATAFLOW_PLAN_PREFIX = "dfpo"
 SQL_QUERY_PLAN_PREFIX = "sqp"
 EXEC_PLAN_PREFIX = "ep"
 
+MF_DAG = "mfd"
 
 logger = logging.getLogger(__name__)
 
