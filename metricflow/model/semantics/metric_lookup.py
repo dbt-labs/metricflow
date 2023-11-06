@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Dict, FrozenSet, List, Optional, Sequence
+from typing import Dict, FrozenSet, List, Sequence
 
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
 from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
@@ -105,33 +105,34 @@ class MetricLookup(MetricAccessor):  # noqa: D
                 )
         self._metrics[metric_reference] = metric
 
-    def measure_for_metric(
+    def measures_for_metric(
         self,
         metric_reference: MetricReference,
         column_association_resolver: ColumnAssociationResolver,
-    ) -> Optional[MetricInputMeasureSpec]:
+    ) -> Sequence[MetricInputMeasureSpec]:
         """Return the measure specs required to compute the metric."""
         metric = self.get_metric(metric_reference)
-        if not metric.input_measures:
-            return None
+        input_measure_specs: List[MetricInputMeasureSpec] = []
 
-        assert len(metric.input_measures) == 1, "There should not be more than one input measure per metric."
-        input_measure = metric.input_measures[0]
-        measure_spec = MeasureSpec(
-            element_name=input_measure.name,
-            non_additive_dimension_spec=self._semantic_model_lookup.non_additive_dimension_specs_by_measure.get(
-                input_measure.measure_reference
-            ),
-        )
-        return MetricInputMeasureSpec(
-            measure_spec=measure_spec,
-            constraint=WhereSpecFactory(
-                column_association_resolver=column_association_resolver,
-            ).create_from_where_filter_intersection(input_measure.filter),
-            alias=input_measure.alias,
-            join_to_timespine=input_measure.join_to_timespine,
-            fill_nulls_with=input_measure.fill_nulls_with,
-        )
+        for input_measure in metric.input_measures:
+            measure_spec = MeasureSpec(
+                element_name=input_measure.name,
+                non_additive_dimension_spec=self._semantic_model_lookup.non_additive_dimension_specs_by_measure.get(
+                    input_measure.measure_reference
+                ),
+            )
+            spec = MetricInputMeasureSpec(
+                measure_spec=measure_spec,
+                constraint=WhereSpecFactory(
+                    column_association_resolver=column_association_resolver,
+                ).create_from_where_filter_intersection(input_measure.filter),
+                alias=input_measure.alias,
+                join_to_timespine=input_measure.join_to_timespine,
+                fill_nulls_with=input_measure.fill_nulls_with,
+            )
+            input_measure_specs.append(spec)
+
+        return tuple(input_measure_specs)
 
     def contains_cumulative_or_time_offset_metric(self, metric_references: Sequence[MetricReference]) -> bool:
         """Returns true if any of the specs correspond to a cumulative metric or a derived metric with time offset."""

@@ -250,11 +250,14 @@ class DataflowPlanBuilder:
                     metric_specs=[metric_spec],
                 )
             elif metric.type is MetricType.SIMPLE or MetricType.CUMULATIVE:
-                metric_input_measure_spec = self._metric_lookup.measure_for_metric(
+                metric_input_measure_specs = self._metric_lookup.measures_for_metric(
                     metric_reference=metric_reference,
                     column_association_resolver=self._column_association_resolver,
                 )
-                assert metric_input_measure_spec, "Simple and cumulative metrics must have one input measure."
+                assert (
+                    len(metric_input_measure_specs) == 1
+                ), "Simple and cumulative metrics must have one input measure."
+                metric_input_measure_spec = metric_input_measure_specs[0]
 
                 logger.info(
                     f"For {metric_spec}, needed measure is:\n"
