@@ -34,7 +34,7 @@ integration_test:
   check_query: |
     SELECT
       booking_value * views AS views_times_booking_value
-      , b.ds AS metric_time__day
+      , COALESCE(b.ds, v.ds) AS metric_time__day
     FROM (
       SELECT
         SUM(booking_value) AS booking_value
@@ -101,7 +101,7 @@ integration_test:
   metrics: ["instant_booking_value", "views"]
   group_bys: ["metric_time"]
   check_query: |
-    SELECT instant_booking_value, views, a.ds AS metric_time__day
+    SELECT instant_booking_value, views, COALESCE(a.ds, b.ds) AS metric_time__day
     FROM (
       SELECT
         SUM(booking_value) AS instant_booking_value
@@ -275,7 +275,7 @@ integration_test:
   check_query: |
     SELECT
       CAST(bookings AS {{ double_data_type_name }}) / NULLIF(views, 0) AS bookings_per_view
-      , groupby_8cbdaa28.ds AS metric_time__day
+      , COALESCE(groupby_8cbdaa28.ds, groupby_68058b0b.ds) AS metric_time__day
     FROM (
       SELECT
         COUNT(*) AS bookings
@@ -1416,3 +1416,55 @@ integration_test:
     ) subq_22
     ON subq_17.metric_time__day = subq_22.metric_time__day
     GROUP BY COALESCE(subq_17.metric_time__day, subq_22.metric_time__day)
+---
+integration_test:
+  name: fill_nulls_with_0_multi_metric_query_with_categorical_dimension
+  description: Test a multi-metric query that fills nulls
+  model: SIMPLE_MODEL
+  metrics: ["bookings_fill_nulls_with_0_without_time_spine", "views"]
+  group_by_objs: [{"name": "metric_time"}, {"name": "listing__is_lux_latest"}]
+  check_query: |
+    SELECT
+      COALESCE(subq_9.metric_time__day, subq_19.metric_time__day) AS metric_time__day
+      , COALESCE(subq_9.listing__is_lux_latest, subq_19.listing__is_lux_latest) AS listing__is_lux_latest
+      , COALESCE(MAX(subq_9.bookings_fill_nulls_with_0_without_time_spine), 0) AS bookings_fill_nulls_with_0_without_time_spine
+      , MAX(subq_19.views) AS views
+    FROM (
+      SELECT
+        subq_2.metric_time__day AS metric_time__day
+        , listings_latest_src_4.is_lux AS listing__is_lux_latest
+        , COALESCE(SUM(subq_2.bookings), 0) AS bookings_fill_nulls_with_0_without_time_spine
+      FROM (
+        SELECT
+          {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
+          , listing_id AS listing
+          , 1 AS bookings
+        FROM {{ source_schema }}.fct_bookings bookings_source_src_1
+      ) subq_2
+      LEFT OUTER JOIN
+        {{ source_schema }}.dim_listings_latest listings_latest_src_4
+      ON subq_2.listing = listings_latest_src_4.listing_id
+      GROUP BY subq_2.metric_time__day, listings_latest_src_4.is_lux
+    ) subq_9
+    FULL OUTER JOIN (
+      SELECT
+        subq_12.metric_time__day AS metric_time__day
+        , listings_latest_src_4.is_lux AS listing__is_lux_latest
+        , SUM(subq_12.views) AS views
+      FROM (
+        SELECT
+          {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
+          , listing_id AS listing
+          , 1 AS views
+        FROM {{ source_schema }}.fct_views views_source_src_9
+      ) subq_12
+      LEFT OUTER JOIN
+        {{ source_schema }}.dim_listings_latest listings_latest_src_4
+      ON subq_12.listing = listings_latest_src_4.listing_id
+      GROUP BY subq_12.metric_time__day, listings_latest_src_4.is_lux
+    ) subq_19
+    ON (subq_9.listing__is_lux_latest = subq_19.listing__is_lux_latest)
+      AND (subq_9.metric_time__day = subq_19.metric_time__day)
+    GROUP BY
+      COALESCE(subq_9.metric_time__day, subq_19.metric_time__day)
+      , COALESCE(subq_9.listing__is_lux_latest, subq_19.listing__is_lux_latest)
