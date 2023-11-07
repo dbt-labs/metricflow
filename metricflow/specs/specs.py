@@ -5,6 +5,8 @@
   to another spec or relevant object.
 * The match() method will enable sub-classes (may require some restructuring) to use specs to request things like,
   metrics named "sales*".
+
+TODO: Split this file into separate files.
 """
 
 from __future__ import annotations
@@ -13,8 +15,9 @@ import itertools
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from enum import Enum
 from hashlib import sha1
-from typing import Any, Dict, Generic, List, Optional, Sequence, Tuple, TypeVar
+from typing import Any, Dict, Generic, List, Optional, Sequence, Tuple, TypeVar, Union
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
@@ -292,6 +295,67 @@ class DimensionSpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
         return visitor.visit_dimension_spec(self)
 
 
+class TimeDimensionSpecField(Enum):
+    """Fields of the time dimension spec.
+
+    The value corresponds to the name of the field in the dataclass. This should contain all fields, but implementation
+    is pending.
+    """
+
+    TIME_GRANULARITY = "time_granularity"
+
+
+class TimeDimensionSpecComparisonKey:
+    """A key that can be used for comparing / grouping time dimension specs.
+
+    Useful for assessing if two time dimension specs are equal while ignoring specific attributes. Keys must have the
+    same set of excluded attributes to be valid for comparison.
+
+    This is useful for ambiguous group-by-item resolution where we want to select a time dimension regardless of the
+    grain.
+    """
+
+    def __init__(self, source_spec: TimeDimensionSpec, exclude_fields: Sequence[TimeDimensionSpecField]) -> None:
+        """Initializer.
+
+        Args:
+            source_spec: The spec that this key is based on.
+            exclude_fields: The fields to ignore when determining equality.
+        """
+        self._excluded_fields = frozenset(exclude_fields)
+        self._source_spec = source_spec
+
+        # This is a list of field values of TimeDimensionSpec that we should use for comparison.
+        spec_field_values_for_comparison: List[
+            Union[str, Tuple[EntityReference, ...], TimeGranularity, Optional[DatePart]]
+        ] = [self._source_spec.element_name, self._source_spec.entity_links]
+
+        if TimeDimensionSpecField.TIME_GRANULARITY not in self._excluded_fields:
+            spec_field_values_for_comparison.append(self._source_spec.time_granularity)
+
+        spec_field_values_for_comparison.append(self._source_spec.date_part)
+
+        self._spec_field_values_for_comparison = tuple(spec_field_values_for_comparison)
+
+    @property
+    def source_spec(self) -> TimeDimensionSpec:  # noqa: D
+        return self._source_spec
+
+    @override
+    def __eq__(self, other: Any) -> bool:  # type: ignore[misc]
+        if not isinstance(other, TimeDimensionSpecComparisonKey):
+            return False
+
+        if self._excluded_fields != other._excluded_fields:
+            return False
+
+        return self._spec_field_values_for_comparison == other._spec_field_values_for_comparison
+
+    @override
+    def __hash__(self) -> int:
+        return hash((self._excluded_fields, self._spec_field_values_for_comparison))
+
+
 DEFAULT_TIME_GRANULARITY = TimeGranularity.DAY
 
 
@@ -351,6 +415,15 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_time_dimension_spec(self)
 
+    def with_grain(self, time_granularity: TimeGranularity) -> TimeDimensionSpec:  # noqa: D
+        return TimeDimensionSpec(
+            element_name=self.element_name,
+            entity_links=self.entity_links,
+            time_granularity=time_granularity,
+            date_part=self.date_part,
+            aggregation_state=self.aggregation_state,
+        )
+
     def with_aggregation_state(self, aggregation_state: AggregationState) -> TimeDimensionSpec:  # noqa: D
         return TimeDimensionSpec(
             element_name=self.element_name,
@@ -358,6 +431,13 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
             time_granularity=self.time_granularity,
             date_part=self.date_part,
             aggregation_state=aggregation_state,
+        )
+
+    def comparison_key(self, exclude_fields: Sequence[TimeDimensionSpecField] = ()) -> TimeDimensionSpecComparisonKey:
+        """See TimeDimensionComparisonKey."""
+        return TimeDimensionSpecComparisonKey(
+            source_spec=self,
+            exclude_fields=exclude_fields,
         )
 
 
