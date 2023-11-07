@@ -897,24 +897,16 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
                 # At this point, the MetricSpec might have the alias in place of the element name, so we need to look
                 # back at where it was defined from to get the metric element name.
-                metric_name = metric_instance.defined_from.metric_name
-                input_measures = self._metric_lookup.measures_for_metric(
-                    metric_reference=MetricReference(metric_name),
-                    column_association_resolver=self._column_association_resolver,
-                )
-                # If multiple input measures, this is a query with a nested derived/ratio metric. In that case, we can
-                # skip this step because it has already occurred when rendering the nested metric.
-                # TODO: this logic might need updating for conversion metrics, which will allow multiple input measures
-                if len(input_measures) == 1:
-                    input_measure = input_measures[0]
-                    if input_measure.fill_nulls_with is not None:
-                        select_expression = SqlAggregateFunctionExpression(
-                            sql_function=SqlFunction.COALESCE,
-                            sql_function_args=[
-                                select_expression,
-                                SqlStringExpression(str(input_measure.fill_nulls_with)),
-                            ],
-                        )
+                metric_reference = MetricReference(element_name=metric_instance.defined_from.metric_name)
+                input_measure = self._metric_lookup.yaml_input_measure_for_metric(metric_reference=metric_reference)
+                if input_measure and input_measure.fill_nulls_with is not None:
+                    select_expression = SqlAggregateFunctionExpression(
+                        sql_function=SqlFunction.COALESCE,
+                        sql_function_args=[
+                            select_expression,
+                            SqlStringExpression(str(input_measure.fill_nulls_with)),
+                        ],
+                    )
 
                 select_columns.append(
                     SqlSelectColumn(
