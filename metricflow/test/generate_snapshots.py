@@ -37,7 +37,7 @@ from __future__ import annotations
 import logging
 import os
 from dataclasses import dataclass
-from typing import Optional, Sequence
+from typing import Callable, Optional, Sequence
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.implementations.base import FrozenBaseModel
@@ -107,7 +107,11 @@ def run_command(command: str) -> None:  # noqa: D
         raise RuntimeError(f"Error running command: {command}")
 
 
-def run_tests(test_configuration: MetricFlowTestConfiguration) -> None:  # noqa: D
+def set_engine_env_variables(test_configuration: MetricFlowTestConfiguration) -> None:
+    """Set connection env variables dynamically for the engine being used.
+
+    Requires MF_TEST_ENGINE_CREDENTIALS env variable to be set with creds for all engines.
+    """
     if test_configuration.credential_set.engine_url is None:
         if "MF_SQL_ENGINE_URL" in os.environ:
             del os.environ["MF_SQL_ENGINE_URL"]
@@ -119,6 +123,10 @@ def run_tests(test_configuration: MetricFlowTestConfiguration) -> None:  # noqa:
             del os.environ["MF_SQL_ENGINE_PASSWORD"]
     else:
         os.environ["MF_SQL_ENGINE_PASSWORD"] = test_configuration.credential_set.engine_password
+
+
+def run_tests(test_configuration: MetricFlowTestConfiguration) -> None:  # noqa: D
+    set_engine_env_variables(test_configuration)
 
     if test_configuration.engine is SqlEngine.DUCKDB:
         # DuckDB is fast, so generate all snapshots, including the engine-agnostic ones
@@ -145,7 +153,7 @@ def run_tests(test_configuration: MetricFlowTestConfiguration) -> None:  # noqa:
         assert_values_exhausted(test_configuration.engine)
 
 
-def run_cli() -> None:  # noqa: D
+def run_cli(function_to_run: Callable) -> None:  # noqa: D
     # Setup logging.
     dev_format = "%(asctime)s %(levelname)s %(filename)s:%(lineno)d [%(threadName)s] - %(message)s"
     logging.basicConfig(level=logging.INFO, format=dev_format)
@@ -165,8 +173,8 @@ def run_cli() -> None:  # noqa: D
         logger.info(
             f"Running tests for {test_configuration.engine} with URL: {test_configuration.credential_set.engine_url}"
         )
-        run_tests(test_configuration)
+        function_to_run(test_configuration)
 
 
 if __name__ == "__main__":
-    run_cli()
+    run_cli(run_tests)

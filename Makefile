@@ -74,6 +74,11 @@ postgresql postgres:
 regenerate-test-snapshots:
 	hatch -v run dev-env:python metricflow/test/generate_snapshots.py
 
+# Populate persistent source schemas for all relevant SQL engines.
+.PHONY: populate-persistent-source-schemas
+populate-persistent-source-schemas:
+	hatch -v run dev-env:python metricflow/test/populate_persistent_source_schemas.py
+
 # Re-generate snapshots for the default SQL engine.
 .PHONY: test-snap
 test-snap:
