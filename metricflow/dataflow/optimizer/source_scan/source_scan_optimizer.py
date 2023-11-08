@@ -16,6 +16,7 @@ from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,
     DataflowPlanNodeVisitor,
     FilterElementsNode,
+    JoinConversionEventsNode,
     JoinOverTimeRangeNode,
     JoinToBaseOutputNode,
     JoinToTimeSpineNode,
@@ -334,5 +335,9 @@ class SourceScanOptimizer(
         return self._default_base_output_handler(node)
 
     def visit_add_generated_uuid_column_node(self, node: AddGeneratedUuidColumnNode) -> OptimizeBranchResult:  # noqa: D
+        self._log_visit_node_type(node)
+        return self._default_base_output_handler(node)
+
+    def visit_join_conversion_events_node(self, node: JoinConversionEventsNode) -> OptimizeBranchResult:  # noqa: D
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)

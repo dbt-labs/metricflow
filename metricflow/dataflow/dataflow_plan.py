@@ -21,6 +21,7 @@ from metricflow.dag.id_generation import (
     DATAFLOW_NODE_COMBINE_AGGREGATED_OUTPUTS_ID_PREFIX,
     DATAFLOW_NODE_COMPUTE_METRICS_ID_PREFIX,
     DATAFLOW_NODE_CONSTRAIN_TIME_RANGE_ID_PREFIX,
+    DATAFLOW_NODE_JOIN_CONVERSION_EVENTS_PREFIX,
     DATAFLOW_NODE_JOIN_SELF_OVER_TIME_RANGE_ID_PREFIX,
     DATAFLOW_NODE_JOIN_TO_STANDARD_OUTPUT_ID_PREFIX,
     DATAFLOW_NODE_JOIN_TO_TIME_SPINE_ID_PREFIX,
@@ -41,8 +42,11 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.specs.specs import (
+    EntitySpec,
+    InstanceSpec,
     InstanceSpecSet,
     LinklessEntitySpec,
+    MeasureSpec,
     MetricInputMeasureSpec,
     MetricSpec,
     OrderBySpec,
@@ -178,6 +182,10 @@ class DataflowPlanNodeVisitor(Generic[VisitorOutputT], ABC):
 
     @abstractmethod
     def visit_add_generated_uuid_column_node(self, node: AddGeneratedUuidColumnNode) -> VisitorOutputT:  # noqa: D
+        pass
+
+    @abstractmethod
+    def visit_join_conversion_events_node(self, node: JoinConversionEventsNode) -> VisitorOutputT:  # noqa: D
         pass
 
 
@@ -1285,6 +1293,127 @@ class AddGeneratedUuidColumnNode(BaseOutput):
     def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> AddGeneratedUuidColumnNode:  # noqa: D
         assert len(new_parent_nodes) == 1
         return AddGeneratedUuidColumnNode(parent_node=new_parent_nodes[0])
+
+
+class JoinConversionEventsNode(BaseOutput):
+    """Builds a data set containing successful conversion events."""
+
+    def __init__(
+        self,
+        base_node: BaseOutput,
+        base_time_dimension_spec: TimeDimensionSpec,
+        conversion_node: BaseOutput,
+        conversion_measure_spec: MeasureSpec,
+        conversion_time_dimension_spec: TimeDimensionSpec,
+        unique_identifier_keys: Sequence[InstanceSpec],
+        entity_spec: EntitySpec,
+        window: Optional[MetricTimeWindow] = None,
+    ) -> None:
+        """Constructor.
+
+        Args:
+            base_node: node containing dataset for computing base events.
+            base_time_dimension_spec: time dimension for the base events to compute against.
+            conversion_node: node containing dataset to join base node for computing conversion events.
+            conversion_measure_spec: expose this measure in the resulting dataset for aggregation.
+            conversion_time_dimension_spec: time dimension for the conversion events to compute against.
+            unique_identifier_keys: columns to uniquely identify each conversion event.
+            entity_spec: the specific entity in which the conversion is happening for.
+            window: time range bound for when a conversion is still considered valid (default: INF).
+        """
+        self._base_node = base_node
+        self._conversion_node = conversion_node
+        self._base_time_dimension_spec = base_time_dimension_spec
+        self._conversion_measure_spec = conversion_measure_spec
+        self._conversion_time_dimension_spec = conversion_time_dimension_spec
+        self._unique_identifier_keys = unique_identifier_keys
+        self._entity_spec = entity_spec
+        self._window = window
+        super().__init__(node_id=self.create_unique_id(), parent_nodes=[base_node, conversion_node])
+
+    @classmethod
+    def id_prefix(cls) -> str:  # noqa: D
+        return DATAFLOW_NODE_JOIN_CONVERSION_EVENTS_PREFIX
+
+    def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+        return visitor.visit_join_conversion_events_node(self)
+
+    @property
+    def base_node(self) -> DataflowPlanNode:  # noqa: D
+        return self._base_node
+
+    @property
+    def conversion_node(self) -> DataflowPlanNode:  # noqa: D
+        return self._conversion_node
+
+    @property
+    def conversion_measure_spec(self) -> MeasureSpec:  # noqa: D
+        return self._conversion_measure_spec
+
+    @property
+    def base_time_dimension_spec(self) -> TimeDimensionSpec:  # noqa: D
+        return self._base_time_dimension_spec
+
+    @property
+    def conversion_time_dimension_spec(self) -> TimeDimensionSpec:  # noqa: D
+        return self._conversion_time_dimension_spec
+
+    @property
+    def unique_identifier_keys(self) -> Sequence[InstanceSpec]:  # noqa: D
+        return self._unique_identifier_keys
+
+    @property
+    def entity_spec(self) -> EntitySpec:  # noqa: D
+        return self._entity_spec
+
+    @property
+    def window(self) -> Optional[MetricTimeWindow]:  # noqa: D
+        return self._window
+
+    @property
+    def description(self) -> str:  # noqa: D
+        return f"Find conversions for {self.entity_spec.qualified_name} within the range of {f'{self.window.count} {self.window.granularity.value}' if self.window else 'INF'}"
+
+    @property
+    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
+        return (
+            super().displayed_properties
+            + [
+                DisplayedProperty("base_time_dimension_spec", self.base_time_dimension_spec),
+                DisplayedProperty("conversion_time_dimension_spec", self.conversion_time_dimension_spec),
+                DisplayedProperty("entity_spec", self.entity_spec),
+                DisplayedProperty("window", self.window),
+            ]
+            + [DisplayedProperty("unique_key_specs", unique_spec) for unique_spec in self.unique_identifier_keys]
+            + [
+                DisplayedProperty("constant_property", constant_property)
+                for constant_property in self.constant_properties or []
+            ]
+        )
+
+    def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D
+        return (
+            isinstance(other_node, self.__class__)
+            and other_node.base_time_dimension_spec == self.base_time_dimension_spec
+            and other_node.conversion_time_dimension_spec == self.conversion_time_dimension_spec
+            and other_node.conversion_measure_spec == self.conversion_measure_spec
+            and other_node.unique_identifier_keys == self.unique_identifier_keys
+            and other_node.entity_spec == self.entity_spec
+            and other_node.window == self.window
+        )
+
+    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> JoinConversionEventsNode:  # noqa: D
+        assert len(new_parent_nodes) == 2
+        return JoinConversionEventsNode(
+            base_node=new_parent_nodes[0],
+            base_time_dimension_spec=self.base_time_dimension_spec,
+            conversion_node=new_parent_nodes[1],
+            conversion_measure_spec=self.conversion_measure_spec,
+            conversion_time_dimension_spec=self.conversion_time_dimension_spec,
+            unique_identifier_keys=self.unique_identifier_keys,
+            entity_spec=self.entity_spec,
+            window=self.window,
+        )
 
 
 class DataflowPlan(MetricFlowDag[SinkOutput]):
