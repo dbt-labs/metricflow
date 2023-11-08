@@ -21,6 +21,7 @@ from typing import Any
 
 import pandas as pd
 import pytest
+from dbt_semantic_interfaces.type_enums.date_part import DatePart
 
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_exprs import (
@@ -29,7 +30,6 @@ from metricflow.sql.sql_exprs import (
     SqlExtractExpression,
     SqlStringLiteralExpression,
 )
-from metricflow.time.date_part import DatePart
 from metricflow.time.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)

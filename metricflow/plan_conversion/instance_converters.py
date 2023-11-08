@@ -9,6 +9,7 @@ from itertools import chain
 from typing import Dict, List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.references import SemanticModelReference
+from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from more_itertools import bucket
 
@@ -47,7 +48,6 @@ from metricflow.sql.sql_exprs import (
     SqlFunctionExpression,
 )
 from metricflow.sql.sql_plan import SqlSelectColumn
-from metricflow.time.date_part import DatePart
 
 logger = logging.getLogger(__name__)
 

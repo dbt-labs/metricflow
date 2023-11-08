@@ -26,6 +26,7 @@ from dbt_semantic_interfaces.references import (
     TimeDimensionReference,
 )
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
+from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.aggregation_properties import AggregationState
@@ -33,7 +34,6 @@ from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_column_type import SqlColumnType
-from metricflow.time.date_part import DatePart
 from metricflow.visitor import VisitorOutputT
 
 

@@ -3,8 +3,7 @@ from __future__ import annotations
 from typing import Optional, Protocol, Union, runtime_checkable
 
 from dbt_semantic_interfaces.type_enums import TimeGranularity
-
-from metricflow.time.date_part import DatePart
+from dbt_semantic_interfaces.type_enums.date_part import DatePart
 
 
 @runtime_checkable

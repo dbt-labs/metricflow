@@ -4,9 +4,8 @@ import logging
 from dataclasses import dataclass
 from typing import Optional, Tuple
 
+from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-
-from metricflow.time.date_part import DatePart
 
 DUNDER = "__"
 
