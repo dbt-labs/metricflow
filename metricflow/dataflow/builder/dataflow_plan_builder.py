@@ -487,10 +487,12 @@ class DataflowPlanBuilder:
             )
         else:
             # Only read nodes can be source nodes for queries without measures
-            source_nodes = self._read_nodes
+            source_nodes = list(self._read_nodes)
             source_nodes_to_linkable_specs = self._select_read_nodes_with_linkable_specs(
                 linkable_specs=linkable_spec_set, read_nodes=source_nodes
             )
+            # Add time_spine to potential source nodes w/ metric_time as linkable spec
+            # Maybe only do this if requested
             potential_source_nodes = list(source_nodes_to_linkable_specs.keys())
 
         logger.info(f"There are {len(potential_source_nodes)} potential source nodes")

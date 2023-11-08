@@ -182,3 +182,27 @@ integration_test:
     WHERE u.home_state = 'CA'
     GROUP BY
       u.home_state
+---
+integration_test:
+  name: metric_time_only
+  description: Query metric_time alone
+  model: SIMPLE_MODEL
+  group_bys: ["metric_time"]
+  check_query: |
+    SELECT 1
+---
+integration_test:
+  name: metric_time_week
+  description: Query metric_time alone with non-default granularity
+  model: SIMPLE_MODEL
+  group_bys: ["metric_time__week"]
+  check_query: |
+    SELECT 1
+---
+integration_test:
+  name: multiple_dimensions_with_metric_time
+  description: Query metric_time along with a different dimension
+  model: SIMPLE_MODEL
+  group_bys: ["metric_time", "booking__monthly_ds"]
+  check_query: |
+    SELECT 1
