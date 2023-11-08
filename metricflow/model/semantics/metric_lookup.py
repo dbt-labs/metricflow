@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import logging
-from typing import Dict, FrozenSet, List, Sequence
+from typing import Dict, FrozenSet, List, Optional, Sequence
 
+from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
 from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
 from dbt_semantic_interfaces.protocols import WhereFilter
-from dbt_semantic_interfaces.protocols.metric import Metric, MetricType
+from dbt_semantic_interfaces.protocols.metric import Metric, MetricInputMeasure, MetricType
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import MetricReference
 
@@ -104,6 +105,23 @@ class MetricLookup(MetricAccessor):  # noqa: D
                     f"Metric `{metric.name}` references measure `{measure_reference}` which has not been registered"
                 )
         self._metrics[metric_reference] = metric
+
+    def configured_input_measure_for_metric(self, metric_reference: MetricReference) -> Optional[MetricInputMeasure]:
+        """Get input measure defined in the original metric config, if exists.
+
+        When SemanticModel is constructed, input measures from input metrics are added to the list of input measures
+        for a metric. Here, use rules about metric types to determine which input measures were defined in the config:
+        - Simple & cumulative metrics require one input measure, and can't take any input metrics.
+        - Derived & ratio metrics take no input measures, only input metrics.
+        """
+        metric = self.get_metric(metric_reference=metric_reference)
+        if metric.type is MetricType.CUMULATIVE or metric.type is MetricType.SIMPLE:
+            assert len(metric.input_measures) == 1, "Simple and cumulative metrics should have one input measure."
+            return metric.input_measures[0]
+        elif metric.type is MetricType.RATIO or metric.type is MetricType.DERIVED:
+            return None
+        else:
+            assert_values_exhausted(metric.type)
 
     def measures_for_metric(
         self,

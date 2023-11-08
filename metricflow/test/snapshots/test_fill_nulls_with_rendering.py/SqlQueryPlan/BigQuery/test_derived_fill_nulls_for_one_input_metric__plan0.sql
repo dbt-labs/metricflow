@@ -6,7 +6,7 @@ FROM (
   -- Combine Metrics
   SELECT
     COALESCE(subq_7.metric_time__day, subq_15.metric_time__day) AS metric_time__day
-    , MAX(subq_7.bookings_fill_nulls_with_0) AS bookings_fill_nulls_with_0
+    , COALESCE(MAX(subq_7.bookings_fill_nulls_with_0), 0) AS bookings_fill_nulls_with_0
     , MAX(subq_15.bookings_2_weeks_ago) AS bookings_2_weeks_ago
   FROM (
     -- Compute Metrics via Expressions

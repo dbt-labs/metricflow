@@ -436,7 +436,7 @@ class MetricSpec(InstanceSpec):  # noqa: D
 
     @property
     def alias_spec(self) -> MetricSpec:
-        """Returns a MetricSpec represneting the alias state."""
+        """Returns a MetricSpec representing the alias state."""
         return MetricSpec(
             element_name=self.alias or self.element_name,
             constraint=self.constraint,
