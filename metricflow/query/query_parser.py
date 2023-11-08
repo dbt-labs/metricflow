@@ -247,6 +247,7 @@ class MetricFlowQueryParser:
         where_constraint_str: Optional[str] = None,
         order_by_names: Optional[Sequence[str]] = None,
         order_by: Optional[Sequence[OrderByQueryParameter]] = None,
+        min_max_only: bool = False,
     ) -> MetricFlowQuerySpec:
         """Parse the query into spec objects, validating them in the process.
 
@@ -266,6 +267,7 @@ class MetricFlowQueryParser:
                 where_constraint_str=where_constraint_str,
                 order_by_names=order_by_names,
                 order_by=order_by,
+                min_max_only=min_max_only,
             )
         finally:
             logger.info(f"Parsing the query took: {time.time() - start_time:.2f}s")
@@ -392,7 +394,17 @@ class MetricFlowQueryParser:
         where_constraint_str: Optional[str] = None,
         order_by_names: Optional[Sequence[str]] = None,
         order_by: Optional[Sequence[OrderByQueryParameter]] = None,
+        min_max_only: bool = False,
     ) -> MetricFlowQuerySpec:
+        if min_max_only:
+            assert not (
+                metrics or metric_names or order_by or order_by_names or limit
+            ), "`min_max_only` can't be used with `metrics`, `order_by` or `limit`."
+            requested_group_by = group_by or group_by_names
+            assert (
+                requested_group_by and len(requested_group_by) == 1
+            ), "`min_max_only` supports exactly group by input."
+
         metric_names = self._get_metric_names(metric_names, metrics)
         where_filter = self._get_where_filter(where_constraint, where_constraint_str)
 
@@ -563,6 +575,7 @@ class MetricFlowQueryParser:
             time_range_constraint=time_constraint,
             where_constraint=where_filter_spec,
             limit=limit,
+            min_max_only=min_max_only,
         )
 
     def _validate_order_by_specs(

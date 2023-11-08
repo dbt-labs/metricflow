@@ -114,6 +114,7 @@ class MetricFlowQueryRequest:
     where_constraint: Optional[str] = None
     order_by_names: Optional[Sequence[str]] = None
     order_by: Optional[Sequence[OrderByQueryParameter]] = None
+    min_max_only: bool = False
     output_table: Optional[str] = None
     sql_optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O4
     query_type: MetricFlowQueryType = MetricFlowQueryType.METRIC
@@ -134,6 +135,7 @@ class MetricFlowQueryRequest:
         output_table: Optional[str] = None,
         sql_optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O4,
         query_type: MetricFlowQueryType = MetricFlowQueryType.METRIC,
+        min_max_only: bool = False,
     ) -> MetricFlowQueryRequest:
         return MetricFlowQueryRequest(
             request_id=MetricFlowRequestId(mf_rid=f"{random_id()}"),
@@ -151,6 +153,7 @@ class MetricFlowQueryRequest:
             output_table=output_table,
             sql_optimization_level=sql_optimization_level,
             query_type=query_type,
+            min_max_only=min_max_only,
         )
 
 
@@ -444,6 +447,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 where_constraint_str=mf_query_request.where_constraint,
                 order_by_names=mf_query_request.order_by_names,
                 order_by=mf_query_request.order_by,
+                min_max_only=mf_query_request.min_max_only,
             )
         logger.info(f"Query spec is:\n{pformat_big_objects(query_spec)}")
 
