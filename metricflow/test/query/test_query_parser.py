@@ -97,6 +97,11 @@ REVENUE_YAML = textwrap.dedent(
           expr: created_at
           type_params:
             time_granularity: month
+        - name: loaded_at
+          type: time
+          expr: created_at
+          type_params:
+            time_granularity: day
         - name: country
           type: categorical
           expr: country
@@ -409,6 +414,75 @@ def test_parse_and_validate_metric_constraint_dims() -> None:
             group_by_names=[MTD],
             time_constraint_start=as_datetime("2020-01-15"),
             time_constraint_end=as_datetime("2020-02-15"),
+        )
+
+
+def test_cumulative_metric_no_time_dimension_validation() -> None:
+    """Test that queries for cumulative metrics fail if no time dimensions are selected.
+
+    This is a test of validation enforcement to ensure users don't get incorrect results due to current
+    limitations, and should be deleted or updated when this restriction is lifted.
+    """
+    bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=BOOKINGS_YAML)
+    metrics_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=METRICS_YAML)
+    revenue_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=REVENUE_YAML)
+    query_parser = query_parser_from_yaml(
+        [EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, bookings_yaml_file, revenue_yaml_file, metrics_yaml_file]
+    )
+
+    with pytest.raises(UnableToSatisfyQueryError, match="must be queried with the dimension 'metric_time'"):
+        query_parser.parse_and_validate_query(
+            metric_names=["revenue_cumulative"],
+        )
+
+
+def test_cumulative_metric_wrong_time_dimension_validation() -> None:
+    """Test that queries for cumulative metrics fail if the agg_time_dimension is not selected.
+
+    Our current behavior for cases where a different time dimension is selected by the agg_time_dimension is
+    not is undefined. Until we add support for grouping by a different time dimension for a cumulative metric
+    computed against metric_time, overriding the agg_time_dimension at query time, or both, this query is
+    restricted.
+
+    This is a test of validation enforcement to ensure users don't get incorrect results due to current
+    limitations, and should be deleted or updated when this restriction is lifted.
+    """
+    bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=BOOKINGS_YAML)
+    metrics_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=METRICS_YAML)
+    revenue_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=REVENUE_YAML)
+    query_parser = query_parser_from_yaml(
+        [EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, bookings_yaml_file, revenue_yaml_file, metrics_yaml_file]
+    )
+
+    with pytest.raises(UnableToSatisfyQueryError, match="must be queried with the dimension 'metric_time'"):
+        query_parser.parse_and_validate_query(
+            metric_names=["revenue_cumulative"],
+            group_by_names=["company__loaded_at"],
+        )
+
+
+def test_cumulative_metric_agg_time_dimension_name_validation() -> None:
+    """Test that queries for cumulative metrics fail if the agg_time_dimension is selected by name.
+
+    Currently, cumulative metrics only return correct results if the query includes the `metric_time` virtual
+    dimension. In many cases the underlying agg_time_dimension is a single column and users will use it
+    directly instead of requesting metric_time. While shis should be fine, we cannot allow it until we fix
+    the query rendering issues that prevent this from working correctly.
+
+    This is a test of validation enforcement to ensure users don't get incorrect results due to current
+    limitations, and should be deleted or updated when this restriction is lifted.
+    """
+    bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=BOOKINGS_YAML)
+    metrics_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=METRICS_YAML)
+    revenue_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=REVENUE_YAML)
+    query_parser = query_parser_from_yaml(
+        [EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, bookings_yaml_file, revenue_yaml_file, metrics_yaml_file]
+    )
+
+    with pytest.raises(UnableToSatisfyQueryError, match="must be queried with the dimension 'metric_time'"):
+        query_parser.parse_and_validate_query(
+            metric_names=["revenue_cumulative"],
+            group_by_names=["company__ds"],
         )
 
 
