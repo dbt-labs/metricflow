@@ -7,10 +7,12 @@ from typing import List, Optional, Sequence, Union
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols.metric import MetricInputMeasure, MetricType
 from dbt_semantic_interfaces.references import MetricModelReference
+from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 
 from metricflow.aggregation_properties import AggregationState
 from metricflow.dag.id_generation import IdGeneratorRegistry
 from metricflow.dataflow.dataflow_plan import (
+    AddGeneratedUuidColumnNode,
     AggregateMeasuresNode,
     BaseOutput,
     CombineAggregatedOutputsNode,
@@ -35,12 +37,14 @@ from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.instances import (
     InstanceSet,
+    MetadataInstance,
     MetricInstance,
     TimeDimensionInstance,
 )
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.instance_converters import (
     AddLinkToLinkableElements,
+    AddMetadata,
     AddMetrics,
     AliasAggregatedMeasures,
     ChangeAssociatedColumns,
@@ -73,6 +77,7 @@ from metricflow.protocols.sql_client import SqlEngine
 from metricflow.specs.column_assoc import ColumnAssociation, ColumnAssociationResolver, SingleColumnCorrelationKey
 from metricflow.specs.specs import (
     MeasureSpec,
+    MetadataSpec,
     MetricSpec,
     TimeDimensionSpec,
 )
@@ -92,6 +97,7 @@ from metricflow.sql.sql_exprs import (
     SqlExtractExpression,
     SqlFunction,
     SqlFunctionExpression,
+    SqlGenerateUuidExpression,
     SqlLogicalExpression,
     SqlLogicalOperator,
     SqlRatioComputationExpression,
@@ -1317,5 +1323,47 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 group_bys=(),
                 order_bys=(),
                 where=where,
+            ),
+        )
+
+    def visit_add_generated_uuid_column_node(self, node: AddGeneratedUuidColumnNode) -> SqlDataSet:
+        """Implements the behaviour of AddGeneratedUuidColumnNode.
+
+        Builds a new dataset that is the same as the output dataset, but with an additional column
+        that contains a randomly generated UUID.
+        """
+        input_data_set: SqlDataSet = node.parent_node.accept(self)
+        input_data_set_alias = self._next_unique_table_alias()
+
+        gen_uuid_spec = MetadataSpec.from_name(MetricFlowReservedKeywords.MF_INTERNAL_UUID.value)
+        output_column_association = self._column_association_resolver.resolve_spec(gen_uuid_spec)
+        output_instance_set = input_data_set.instance_set.transform(
+            AddMetadata(
+                (
+                    MetadataInstance(
+                        associated_columns=(output_column_association,),
+                        spec=gen_uuid_spec,
+                    ),
+                )
+            )
+        )
+        gen_uuid_sql_select_column = SqlSelectColumn(
+            expr=SqlGenerateUuidExpression(), column_alias=output_column_association.column_name
+        )
+
+        return SqlDataSet(
+            instance_set=output_instance_set,
+            sql_select_node=SqlSelectStatementNode(
+                description="Add column with generated UUID",
+                select_columns=input_data_set.instance_set.transform(
+                    CreateSelectColumnsForInstances(input_data_set_alias, self._column_association_resolver)
+                ).as_tuple()
+                + (gen_uuid_sql_select_column,),
+                from_source=input_data_set.sql_select_node,
+                from_source_alias=input_data_set_alias,
+                joins_descs=(),
+                group_bys=(),
+                where=None,
+                order_bys=(),
             ),
         )

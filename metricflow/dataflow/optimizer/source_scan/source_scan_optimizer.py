@@ -6,6 +6,7 @@ from typing import List, Optional, Sequence
 
 from metricflow.dag.id_generation import OPTIMIZED_DATAFLOW_PLAN_PREFIX, IdGeneratorRegistry
 from metricflow.dataflow.dataflow_plan import (
+    AddGeneratedUuidColumnNode,
     AggregateMeasuresNode,
     BaseOutput,
     CombineAggregatedOutputsNode,
@@ -329,5 +330,9 @@ class SourceScanOptimizer(
         )
 
     def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode) -> OptimizeBranchResult:  # noqa: D
+        self._log_visit_node_type(node)
+        return self._default_base_output_handler(node)
+
+    def visit_add_generated_uuid_column_node(self, node: AddGeneratedUuidColumnNode) -> OptimizeBranchResult:  # noqa: D
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)
