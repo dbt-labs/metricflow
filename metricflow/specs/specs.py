@@ -560,6 +560,7 @@ class MetricFlowQuerySpec(SerializableDataclass):
     time_range_constraint: Optional[TimeRangeConstraint] = None
     where_constraint: Optional[WhereFilterSpec] = None
     limit: Optional[int] = None
+    min_max_only: bool = False
 
     @property
     def linkable_specs(self) -> LinkableSpecSet:  # noqa: D

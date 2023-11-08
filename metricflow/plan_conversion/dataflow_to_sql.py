@@ -24,6 +24,7 @@ from metricflow.dataflow.dataflow_plan import (
     JoinToBaseOutputNode,
     JoinToTimeSpineNode,
     MetricTimeDimensionTransformNode,
+    MinMaxNode,
     OrderByLimitNode,
     ReadSqlSourceNode,
     SemiAdditiveJoinNode,
@@ -1346,5 +1347,38 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 group_bys=(),
                 order_bys=(),
                 where=where,
+            ),
+        )
+
+    def visit_min_max_node(self, node: MinMaxNode) -> SqlDataSet:  # noqa: D
+        parent_data_set = node.parent_node.accept(self)
+        parent_alias = self._next_unique_table_alias()
+
+        assert (
+            len(parent_data_set.sql_select_node.select_columns) == 1
+        ), "MinMaxNode supports exactly one parent select column."
+        parent_column_alias_expr = SqlStringExpression(parent_data_set.sql_select_node.select_columns[0].column_alias)
+
+        # Build aggregate columns, labeled "min" & "max"
+        select_columns = [
+            SqlSelectColumn(
+                expr=SqlAggregateFunctionExpression(
+                    sql_function=SqlFunction.from_aggregation_type(aggregation_type=agg_type),
+                    sql_function_args=[parent_column_alias_expr],
+                ),
+                column_alias=agg_type.value,
+            )
+            for agg_type in (AggregationType.MIN, AggregationType.MAX)
+        ]
+        return SqlDataSet(
+            instance_set=parent_data_set.instance_set,
+            sql_select_node=SqlSelectStatementNode(
+                description=node.description,
+                select_columns=tuple(select_columns),
+                from_source=parent_data_set.sql_select_node,
+                from_source_alias=parent_alias,
+                joins_descs=(),
+                group_bys=(),
+                order_bys=(),
             ),
         )

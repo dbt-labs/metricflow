@@ -32,6 +32,7 @@ from metricflow.dataflow.dataflow_plan import (
     JoinOverTimeRangeNode,
     JoinToBaseOutputNode,
     JoinToTimeSpineNode,
+    MinMaxNode,
     OrderByLimitNode,
     ReadSqlSourceNode,
     SemiAdditiveJoinNode,
@@ -177,6 +178,8 @@ class DataflowPlanBuilder:
         optimizers: Sequence[DataflowPlanOptimizer] = (),
     ) -> DataflowPlan:
         """Generate a plan for reading the results of a query with the given spec into a dataframe or table."""
+        assert not query_spec.min_max_only, "`min_max_only` is not supported for metric queries."
+
         metrics_output_node = self._build_metrics_output_node(
             metric_specs=query_spec.metric_specs,
             queried_linkable_specs=query_spec.linkable_specs,
@@ -323,8 +326,12 @@ class DataflowPlanBuilder:
             distinct=True,
         )
 
+        min_max_node: Optional[MinMaxNode] = None
+        if query_spec.min_max_only:
+            min_max_node = MinMaxNode(parent_node=distinct_values_node)
+
         sink_node = self.build_sink_node(
-            parent_node=distinct_values_node,
+            parent_node=min_max_node or distinct_values_node,
             order_by_specs=query_spec.order_by_specs,
             limit=query_spec.limit,
         )
