@@ -21,6 +21,7 @@ from dbt_semantic_interfaces.references import (
     MetricReference,
     TimeDimensionReference,
 )
+from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.assert_one_arg import assert_exactly_one_arg_set
@@ -55,7 +56,6 @@ from metricflow.specs.specs import (
     WhereFilterSpec,
 )
 from metricflow.specs.where_filter_transform import WhereSpecFactory
-from metricflow.time.date_part import DatePart
 from metricflow.time.time_granularity_solver import (
     PartialTimeDimensionSpec,
     RequestTimeGranularityException,

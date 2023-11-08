@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from typing import Collection, List
 
 import jinja2
+from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
 
@@ -37,7 +38,6 @@ from metricflow.sql.sql_exprs import (
     SqlWindowFunctionExpression,
 )
 from metricflow.sql.sql_plan import SqlSelectColumn
-from metricflow.time.date_part import DatePart
 
 logger = logging.getLogger(__name__)
 

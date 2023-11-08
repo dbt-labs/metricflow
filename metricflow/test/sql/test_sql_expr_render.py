@@ -4,6 +4,7 @@ import logging
 import textwrap
 
 import pytest
+from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.sql.render.expr_renderer import DefaultSqlExpressionRenderer
@@ -30,7 +31,6 @@ from metricflow.sql.sql_exprs import (
     SqlWindowFunctionExpression,
     SqlWindowOrderByArgument,
 )
-from metricflow.time.date_part import DatePart
 
 logger = logging.getLogger(__name__)
 

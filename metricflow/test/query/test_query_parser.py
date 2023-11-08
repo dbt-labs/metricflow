@@ -8,6 +8,7 @@ import pytest
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.test_utils import as_datetime
+from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.errors.errors import UnableToSatisfyQueryError
@@ -30,7 +31,6 @@ from metricflow.specs.specs import (
 from metricflow.test.fixtures.model_fixtures import query_parser_from_yaml
 from metricflow.test.model.example_project_configuration import EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE
 from metricflow.test.time.metric_time_dimension import MTD
-from metricflow.time.date_part import DatePart
 from metricflow.time.time_granularity_solver import RequestTimeGranularityException
 
 logger = logging.getLogger(__name__)

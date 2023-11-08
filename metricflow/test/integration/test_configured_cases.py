@@ -11,6 +11,7 @@ from dateutil import parser
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.implementations.elements.measure import PydanticMeasureAggregationParameters
 from dbt_semantic_interfaces.test_utils import as_datetime
+from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowQueryRequest
@@ -43,7 +44,6 @@ from metricflow.test.integration.configured_test_case import (
 from metricflow.test.time.configurable_time_source import (
     ConfigurableTimeSource,
 )
-from metricflow.time.date_part import DatePart
 
 logger = logging.getLogger(__name__)
 

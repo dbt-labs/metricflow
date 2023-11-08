@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Collection
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
+from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from typing_extensions import override
 
 from metricflow.errors.errors import UnsupportedEngineFeatureError
@@ -14,7 +15,6 @@ from metricflow.sql.render.expr_renderer import (
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_exprs import SqlGenerateUuidExpression, SqlPercentileExpression, SqlPercentileFunctionType
-from metricflow.time.date_part import DatePart
 
 
 class SnowflakeSqlExpressionRenderer(DefaultSqlExpressionRenderer):

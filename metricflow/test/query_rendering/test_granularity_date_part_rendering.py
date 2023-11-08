@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
@@ -20,7 +21,6 @@ from metricflow.specs.specs import (
 )
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.query_rendering.compare_rendered_query import convert_and_check
-from metricflow.time.date_part import DatePart
 
 
 @pytest.mark.sql_engine_snapshot
