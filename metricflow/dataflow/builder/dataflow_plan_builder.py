@@ -178,8 +178,6 @@ class DataflowPlanBuilder:
         optimizers: Sequence[DataflowPlanOptimizer] = (),
     ) -> DataflowPlan:
         """Generate a plan for reading the results of a query with the given spec into a dataframe or table."""
-        assert not query_spec.min_max_only, "`min_max_only` is not supported for metric queries."
-
         metrics_output_node = self._build_metrics_output_node(
             metric_specs=query_spec.metric_specs,
             queried_linkable_specs=query_spec.linkable_specs,
