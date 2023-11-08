@@ -13,6 +13,7 @@ from dbt_semantic_interfaces.references import (
     MetricReference,
     TimeDimensionReference,
 )
+from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
@@ -23,7 +24,6 @@ from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.specs.specs import (
     TimeDimensionSpec,
 )
-from metricflow.time.date_part import DatePart
 from metricflow.time.time_granularity import (
     adjust_to_end_of_period,
     adjust_to_start_of_period,

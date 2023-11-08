@@ -10,6 +10,7 @@ from dbt_semantic_interfaces.protocols.entity import Entity
 from dbt_semantic_interfaces.protocols.measure import Measure
 from dbt_semantic_interfaces.protocols.semantic_model import SemanticModel
 from dbt_semantic_interfaces.references import SemanticModelElementReference, SemanticModelReference
+from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.aggregation_properties import AggregationState
@@ -47,7 +48,6 @@ from metricflow.sql.sql_plan import (
     SqlSelectStatementNode,
     SqlTableFromClauseNode,
 )
-from metricflow.time.date_part import DatePart
 
 logger = logging.getLogger(__name__)
 
