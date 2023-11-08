@@ -898,7 +898,9 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 # At this point, the MetricSpec might have the alias in place of the element name, so we need to look
                 # back at where it was defined from to get the metric element name.
                 metric_reference = MetricReference(element_name=metric_instance.defined_from.metric_name)
-                input_measure = self._metric_lookup.yaml_input_measure_for_metric(metric_reference=metric_reference)
+                input_measure = self._metric_lookup.configured_input_measure_for_metric(
+                    metric_reference=metric_reference
+                )
                 if input_measure and input_measure.fill_nulls_with is not None:
                     select_expression = SqlAggregateFunctionExpression(
                         sql_function=SqlFunction.COALESCE,
