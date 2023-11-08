@@ -1007,7 +1007,7 @@ def test_min_max_only_time(
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
-    """Tests a plan to get the min & max distinct values of a categorical dimension."""
+    """Tests a plan to get the min & max distinct values of a time dimension."""
     dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
         query_spec=MetricFlowQuerySpec(
             time_dimension_specs=(
@@ -1036,7 +1036,7 @@ def test_min_max_only_time_year(
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
-    """Tests a plan to get the min & max distinct values of a categorical dimension."""
+    """Tests a plan to get the min & max distinct values of a time dimension with year granularity."""
     dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
         query_spec=MetricFlowQuerySpec(
             time_dimension_specs=(
