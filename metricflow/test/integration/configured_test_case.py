@@ -64,6 +64,7 @@ class ConfiguredIntegrationTestCase(FrozenBaseModel):
     where_filter: Optional[str] = None
     limit: Optional[int] = None
     description: Optional[str] = None
+    min_max_only: bool = False
 
 
 class TestCaseParseException(Exception):
