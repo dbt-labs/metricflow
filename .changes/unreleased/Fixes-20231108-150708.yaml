@@ -1,0 +1,6 @@
+kind: Fixes
+body: Fix query validation for metric_time requirements
+time: 2023-11-08T15:07:08.681102-08:00
+custom:
+  Author: tlento
+  Issue: "825"
