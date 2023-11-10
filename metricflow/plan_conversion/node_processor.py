@@ -222,7 +222,7 @@ class PreJoinNodeProcessor:
                 specs = data_set_of_second_node_that_can_be_joined.instance_set.spec_set
                 filtered_joinable_node = FilterElementsNode(
                     parent_node=second_node_that_could_be_joined,
-                    include_specs=InstanceSpecSet.create_from_linkable_specs(
+                    include_specs=InstanceSpecSet.from_specs(
                         specs.dimension_specs + specs.entity_specs + specs.time_dimension_specs
                     ),
                 )
