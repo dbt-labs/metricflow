@@ -381,6 +381,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
         # The dataflow plan describes how the data sets coming from the parent nodes should be joined together. Use
         # those descriptions to convert them to join descriptions for the SQL query plan.
+        # Should there be a different join type for each join description?
         for join_description in node.join_targets:
             join_on_entity = join_description.join_on_entity
 
@@ -393,6 +394,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                     left_data_set=AnnotatedSqlDataSet(data_set=from_data_set, alias=from_data_set_alias),
                     right_data_set=AnnotatedSqlDataSet(data_set=right_data_set, alias=right_data_set_alias),
                     join_description=join_description,
+                    join_type=node.join_type,
                 )
             )
 

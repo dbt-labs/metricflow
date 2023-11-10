@@ -292,6 +292,7 @@ def test_single_join_node(  # noqa: D
                 join_on_partition_time_dimensions=(),
             )
         ],
+        join_type=SqlJoinType.LEFT_OUTER,
     )
 
     convert_and_check(
@@ -351,6 +352,7 @@ def test_multi_join_node(
                 join_on_partition_time_dimensions=(),
             ),
         ],
+        join_type=SqlJoinType.LEFT_OUTER,
     )
 
     convert_and_check(
@@ -408,6 +410,7 @@ def test_compute_metrics_node(
                 join_on_partition_time_dimensions=(),
             )
         ],
+        join_type=SqlJoinType.LEFT_OUTER,
     )
 
     aggregated_measure_node = AggregateMeasuresNode(
@@ -469,6 +472,7 @@ def test_compute_metrics_node_simple_expr(
                 join_on_partition_time_dimensions=(),
             )
         ],
+        join_type=SqlJoinType.LEFT_OUTER,
     )
 
     aggregated_measures_node = AggregateMeasuresNode(
@@ -749,6 +753,7 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
                 join_on_partition_time_dimensions=(),
             )
         ],
+        join_type=SqlJoinType.LEFT_OUTER,
     )
 
     aggregated_measures_node = AggregateMeasuresNode(

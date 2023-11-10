@@ -308,7 +308,9 @@ class DataflowPlanBuilder:
         joined_node: Optional[JoinToBaseOutputNode] = None
         if dataflow_recipe.join_targets:
             joined_node = JoinToBaseOutputNode(
-                left_node=dataflow_recipe.source_node, join_targets=dataflow_recipe.join_targets
+                left_node=dataflow_recipe.source_node,
+                join_targets=dataflow_recipe.join_targets,
+                join_type=SqlJoinType.FULL_OUTER,
             )
 
         where_constraint_node: Optional[WhereConstraintNode] = None
@@ -509,6 +511,7 @@ class DataflowPlanBuilder:
                 time_range_constraint=time_range_constraint,
             )
 
+        join_type = SqlJoinType.LEFT_OUTER if measure_spec_properties else SqlJoinType.FULL_OUTER
         nodes_available_for_joins = node_processor.remove_unnecessary_nodes(
             desired_linkable_specs=linkable_specs,
             nodes=source_nodes,
@@ -518,7 +521,9 @@ class DataflowPlanBuilder:
             f"After removing unnecessary nodes, there are {len(nodes_available_for_joins)} nodes available for joins"
         )
         if DataflowPlanBuilder._contains_multihop_linkables(linkable_specs):
-            nodes_available_for_joins = node_processor.add_multi_hop_joins(linkable_specs, source_nodes)
+            nodes_available_for_joins = node_processor.add_multi_hop_joins(
+                desired_linkable_specs=linkable_specs, nodes=source_nodes, join_type=join_type
+            )
             logger.info(
                 f"After adding multi-hop nodes, there are {len(nodes_available_for_joins)} nodes available for joins:\n"
                 f"{pformat_big_objects(nodes_available_for_joins)}"
@@ -784,8 +789,7 @@ class DataflowPlanBuilder:
         unaggregated_measure_node: BaseOutput
         if len(join_targets) > 0:
             filtered_measures_with_joined_elements = JoinToBaseOutputNode(
-                left_node=filtered_measure_source_node,
-                join_targets=join_targets,
+                left_node=filtered_measure_source_node, join_targets=join_targets, join_type=SqlJoinType.LEFT_OUTER
             )
 
             specs_to_keep_after_join = InstanceSpecSet.merge(

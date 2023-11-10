@@ -45,6 +45,7 @@
                         <!--    'join_on_partition_dimensions': (),                -->
                         <!--    'join_on_partition_time_dimensions': (),           -->
                         <!--    'validity_window': None}                           -->
+                        <!-- join_type = SqlJoinType.LEFT_OUTER -->
                         <FilterElementsNode>
                             <!-- description =                                       -->
                             <!--   Pass Only Elements:                               -->

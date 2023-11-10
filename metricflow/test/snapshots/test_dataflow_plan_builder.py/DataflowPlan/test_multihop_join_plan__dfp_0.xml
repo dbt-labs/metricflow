@@ -54,6 +54,7 @@
                         <!--                                                                                'date_part': None,                        -->
                         <!--                                                                                'aggregation_state': None}},),            -->
                         <!--    'validity_window': None}                                                                                              -->
+                        <!-- join_type = SqlJoinType.LEFT_OUTER -->
                         <FilterElementsNode>
                             <!-- description =                                           -->
                             <!--   Pass Only Elements:                                   -->
@@ -133,6 +134,7 @@
                                 <!--                                                                                'date_part': None,                        -->
                                 <!--                                                                                'aggregation_state': None}},),            -->
                                 <!--    'validity_window': None}                                                                                              -->
+                                <!-- join_type = SqlJoinType.LEFT_OUTER -->
                                 <ReadSqlSourceNode>
                                     <!-- description =                                                                                 -->
                                     <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='bridge_table'))  -->

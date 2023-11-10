@@ -53,6 +53,7 @@
                         <!--    'join_on_partition_dimensions': (),                -->
                         <!--    'join_on_partition_time_dimensions': (),           -->
                         <!--    'validity_window': None}                           -->
+                        <!-- join_type = SqlJoinType.FULL_OUTER -->
                         <ReadSqlSourceNode>
                             <!-- description =                                                                                    -->
                             <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))  -->

@@ -141,6 +141,7 @@ class SqlQueryPlanJoinBuilder:
         left_data_set: AnnotatedSqlDataSet,
         right_data_set: AnnotatedSqlDataSet,
         join_description: JoinDescription,
+        join_type: SqlJoinType,
     ) -> SqlJoinDescription:
         """Make a join description to link two base output DataSets by matching entities.
 
@@ -207,7 +208,7 @@ class SqlQueryPlanJoinBuilder:
             left_source_alias=left_data_set.alias,
             right_source_alias=right_data_set.alias,
             column_equality_descriptions=column_equality_descriptions,
-            join_type=SqlJoinType.LEFT_OUTER,
+            join_type=join_type,
             additional_on_conditions=validity_conditions,
         )
 

@@ -27,6 +27,7 @@ from metricflow.specs.specs import (
     LinklessEntitySpec,
     TimeDimensionSpec,
 )
+from metricflow.sql.sql_plan import SqlJoinType
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 
 logger = logging.getLogger(__name__)
@@ -77,7 +78,7 @@ def make_multihop_node_evaluator(
     )
 
     nodes_available_for_joins = node_processor.add_multi_hop_joins(
-        desired_linkable_specs=desired_linkable_specs, nodes=nodes_available_for_joins
+        desired_linkable_specs=desired_linkable_specs, nodes=nodes_available_for_joins, join_type=SqlJoinType.LEFT_OUTER
     )
 
     return NodeEvaluatorForLinkableInstances(

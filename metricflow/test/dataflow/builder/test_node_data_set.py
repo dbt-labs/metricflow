@@ -23,7 +23,7 @@ from metricflow.specs.specs import (
     MeasureSpec,
 )
 from metricflow.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpression
-from metricflow.sql.sql_plan import SqlSelectColumn, SqlSelectStatementNode, SqlTableFromClauseNode
+from metricflow.sql.sql_plan import SqlJoinType, SqlSelectColumn, SqlSelectStatementNode, SqlTableFromClauseNode
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.snapshot_utils import assert_spec_set_snapshot_equal
@@ -113,6 +113,7 @@ def test_joined_node_data_set(  # noqa: D
                 join_on_partition_time_dimensions=(),
             )
         ],
+        join_type=SqlJoinType.LEFT_OUTER,
     )
 
     join_node_output_data_set = resolver.get_output_data_set(join_node)

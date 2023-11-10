@@ -264,6 +264,7 @@ class JoinToBaseOutputNode(BaseOutput):
         self,
         left_node: BaseOutput,
         join_targets: List[JoinDescription],
+        join_type: SqlJoinType,
         node_id: Optional[NodeId] = None,
     ) -> None:
         """Constructor.
@@ -275,6 +276,7 @@ class JoinToBaseOutputNode(BaseOutput):
         """
         self._left_node = left_node
         self._join_targets = join_targets
+        self._join_type = join_type
 
         # Doing a list comprehension throws a type error, so doing it this way.
         parent_nodes: List[DataflowPlanNode] = [self._left_node]
@@ -302,11 +304,19 @@ class JoinToBaseOutputNode(BaseOutput):
         return self._join_targets
 
     @property
+    def join_type(self) -> SqlJoinType:  # noqa: D
+        return self._join_type
+
+    @property
     def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
-        return super().displayed_properties + [
-            DisplayedProperty(f"join{i}_for_node_id_{join_description.join_node.node_id}", join_description)
-            for i, join_description in enumerate(self._join_targets)
-        ]
+        return (
+            super().displayed_properties
+            + [
+                DisplayedProperty(f"join{i}_for_node_id_{join_description.join_node.node_id}", join_description)
+                for i, join_description in enumerate(self._join_targets)
+            ]
+            + [DisplayedProperty("join_type", self.join_type)]
+        )
 
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D
         if not isinstance(other_node, self.__class__) or len(self.join_targets) != len(other_node.join_targets):
@@ -322,7 +332,7 @@ class JoinToBaseOutputNode(BaseOutput):
                 or self.join_targets[i].validity_window != other_node.join_targets[i].validity_window
             ):
                 return False
-        return True
+        return self.join_type == other_node.join_type
 
     def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> JoinToBaseOutputNode:  # noqa: D
         assert len(new_parent_nodes) > 1
@@ -342,6 +352,7 @@ class JoinToBaseOutputNode(BaseOutput):
                 )
                 for i, old_join_target in enumerate(self._join_targets)
             ],
+            join_type=self.join_type,
         )
 
 

@@ -93,6 +93,7 @@ class LinkableInstanceSatisfiabilityEvaluation:
     joinable_linkable_specs: Tuple[LinkableInstanceSpec, ...]
     join_recipes: Tuple[JoinLinkableInstancesRecipe, ...]
     unjoinable_linkable_specs: Tuple[LinkableInstanceSpec, ...]
+    # cross_joinable_linkable_specs: Tuple[LinkableInstanceSpec, ...]
 
 
 class NodeEvaluatorForLinkableInstances:
