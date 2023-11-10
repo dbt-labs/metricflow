@@ -735,7 +735,7 @@ class DataflowPlanBuilder:
         filtered_measure_source_node = FilterElementsNode(
             parent_node=join_to_time_spine_node or time_range_node or measure_recipe.source_node,
             include_specs=InstanceSpecSet(measure_specs=(measure_spec,)).merge(
-                InstanceSpecSet.create_from_linkable_specs(measure_recipe.required_local_linkable_specs),
+                InstanceSpecSet.from_specs(measure_recipe.required_local_linkable_specs),
             ),
         )
 

@@ -701,8 +701,8 @@ class InstanceSpecSet(Mergeable, SerializableDataclass):
         return transform_function.transform(self)
 
     @staticmethod
-    def create_from_linkable_specs(linkable_specs: Sequence[LinkableInstanceSpec]) -> InstanceSpecSet:  # noqa: D
-        return InstanceSpecSet.merge_iterable(x.as_spec_set for x in linkable_specs)
+    def from_specs(specs: Sequence[InstanceSpec]) -> InstanceSpecSet:  # noqa: D
+        return InstanceSpecSet.merge_iterable(spec.as_spec_set for spec in specs)
 
 
 @dataclass(frozen=True)

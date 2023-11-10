@@ -92,7 +92,7 @@ class JoinLinkableInstancesRecipe:
         # "user_id" and the "country" dimension so that it can be joined to the source node.
         include_specs.extend([spec.without_first_entity_link for spec in self.satisfiable_linkable_specs])
         filtered_node_to_join = FilterElementsNode(
-            parent_node=self.node_to_join, include_specs=InstanceSpecSet.create_from_linkable_specs(include_specs)
+            parent_node=self.node_to_join, include_specs=InstanceSpecSet.from_specs(include_specs)
         )
 
         return JoinDescription(
