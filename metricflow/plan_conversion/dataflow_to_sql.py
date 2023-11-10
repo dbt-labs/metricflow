@@ -67,7 +67,7 @@ from metricflow.plan_conversion.sql_join_builder import (
     ColumnEqualityDescription,
     SqlQueryPlanJoinBuilder,
 )
-from metricflow.plan_conversion.time_spine import TimeSpineSource
+from metricflow.plan_conversion.time_spine import TIME_SPINE_DATA_SET_DESCRIPTION, TimeSpineSource
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.specs.column_assoc import ColumnAssociation, ColumnAssociationResolver, SingleColumnCorrelationKey
 from metricflow.specs.specs import (
@@ -185,10 +185,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 spec=metric_time_dimension_instance.spec,
             ),
         )
-        time_spine_instance_set = InstanceSet(
-            time_dimension_instances=time_spine_instance,
-        )
-        description = "Date Spine"
+        time_spine_instance_set = InstanceSet(time_dimension_instances=time_spine_instance)
         time_spine_table_alias = self._next_unique_table_alias()
 
         # If the requested granularity is the same as the granularity of the spine, do a direct select.
@@ -196,8 +193,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             return SqlDataSet(
                 instance_set=time_spine_instance_set,
                 sql_select_node=SqlSelectStatementNode(
-                    description=description,
-                    # This creates select expressions for all columns referenced in the instance set.
+                    description=TIME_SPINE_DATA_SET_DESCRIPTION,
                     select_columns=(
                         SqlSelectColumn(
                             expr=SqlColumnReferenceExpression(
@@ -242,8 +238,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             return SqlDataSet(
                 instance_set=time_spine_instance_set,
                 sql_select_node=SqlSelectStatementNode(
-                    description=description,
-                    # This creates select expressions for all columns referenced in the instance set.
+                    description=TIME_SPINE_DATA_SET_DESCRIPTION,
                     select_columns=select_columns,
                     from_source=SqlTableFromClauseNode(sql_table=time_spine_source.spine_table),
                     from_source_alias=time_spine_table_alias,
@@ -1035,11 +1030,11 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             if aggregation_time_dimension_for_measure == node.aggregation_time_dimension_reference:
                 output_measure_instances.append(measure_instance)
 
-        if len(output_measure_instances) == 0:
-            raise RuntimeError(
-                f"No measure instances in the input source match the aggregation time dimension "
-                f"{node.aggregation_time_dimension_reference}. Check if the dataflow plan was constructed correctly."
-            )
+        # if len(output_measure_instances) == 0:
+        #     raise RuntimeError(
+        #         f"No measure instances in the input source match the aggregation time dimension "
+        #         f"{node.aggregation_time_dimension_reference}. Check if the dataflow plan was constructed correctly."
+        #     )
 
         # Find time dimension instances that refer to the same dimension as the one specified in the node.
         matching_time_dimension_instances = []

@@ -24,6 +24,7 @@ from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.specs.specs import (
     TimeDimensionSpec,
 )
+from metricflow.test.time.metric_time_dimension import MTD
 from metricflow.time.time_granularity import (
     adjust_to_end_of_period,
     adjust_to_start_of_period,
@@ -84,6 +85,11 @@ class TimeGranularitySolver:
                 self._time_dimension_names_to_supported_granularities[granularity_free_qualified_name].add(
                     time_dimension_instance.spec.time_granularity
                 )
+        self._time_dimension_names_to_supported_granularities[MTD] = {
+            granularity
+            for granularity in TimeGranularity
+            if granularity.to_int() >= semantic_manifest_lookup.time_spine_source.time_column_granularity.to_int()
+        }
 
     def validate_time_granularity(
         self, metric_references: Sequence[MetricReference], time_dimension_specs: Sequence[TimeDimensionSpec]

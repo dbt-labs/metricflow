@@ -32,6 +32,7 @@ from metricflow.dataflow.dataflow_plan import (
     JoinOverTimeRangeNode,
     JoinToBaseOutputNode,
     JoinToTimeSpineNode,
+    MetricTimeDimensionTransformNode,
     OrderByLimitNode,
     ReadSqlSourceNode,
     SemiAdditiveJoinNode,
@@ -44,12 +45,16 @@ from metricflow.dataflow.dataflow_plan_to_text import dataflow_dag_as_text
 from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOptimizer
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.dataset import DataSet
+from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
 from metricflow.filters.time_constraint import TimeRangeConstraint
+from metricflow.instances import InstanceSet, TimeDimensionInstance
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.node_processor import PreJoinNodeProcessor
-from metricflow.specs.column_assoc import ColumnAssociationResolver
+from metricflow.plan_conversion.time_spine import TIME_SPINE_DATA_SET_DESCRIPTION
+from metricflow.specs.column_assoc import ColumnAssociation, ColumnAssociationResolver, SingleColumnCorrelationKey
 from metricflow.specs.specs import (
     InstanceSpecSet,
     LinkableInstanceSpec,
@@ -64,7 +69,8 @@ from metricflow.specs.specs import (
     TimeDimensionSpec,
     WhereFilterSpec,
 )
-from metricflow.sql.sql_plan import SqlJoinType
+from metricflow.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpression, SqlDateTruncExpression
+from metricflow.sql.sql_plan import SqlJoinType, SqlSelectColumn, SqlSelectStatementNode, SqlTableFromClauseNode
 
 logger = logging.getLogger(__name__)
 
@@ -148,6 +154,7 @@ class DataflowPlanBuilder:
     ) -> None:
         self._semantic_model_lookup = semantic_manifest_lookup.semantic_model_lookup
         self._metric_lookup = semantic_manifest_lookup.metric_lookup
+        self._time_spine_source = semantic_manifest_lookup.time_spine_source
         self._metric_time_dimension_reference = DataSet.metric_time_dimension_reference()
         self._source_nodes = source_nodes
         self._read_nodes = read_nodes
@@ -408,18 +415,18 @@ class DataflowPlanBuilder:
 
     def _select_read_nodes_with_linkable_specs(
         self, linkable_specs: LinkableSpecSet, read_nodes: Sequence[ReadSqlSourceNode]
-    ) -> Dict[BaseOutput, Set[LinkableInstanceSpec]]:
+    ) -> List[ReadSqlSourceNode]:
         """Find source nodes with requested linkable specs and no measures."""
-        nodes_to_linkable_specs: Dict[BaseOutput, Set[LinkableInstanceSpec]] = {}
-        linkable_specs_set = set(linkable_specs.as_tuple)
+        selected_nodes: List[ReadSqlSourceNode] = []
+        requested_linkable_specs_set = set(linkable_specs.as_tuple)
         for read_node in read_nodes:
             output_spec_set = self._node_data_set_resolver.get_output_data_set(read_node).instance_set.spec_set
-            linkable_specs_in_node = set(output_spec_set.linkable_specs)
-            requested_linkable_specs_in_node = linkable_specs_set.intersection(linkable_specs_in_node)
+            all_linkable_specs_in_node = set(output_spec_set.linkable_specs)
+            requested_linkable_specs_in_node = requested_linkable_specs_set.intersection(all_linkable_specs_in_node)
             if requested_linkable_specs_in_node:
-                nodes_to_linkable_specs[read_node] = requested_linkable_specs_in_node
+                selected_nodes.append(read_node)
 
-        return nodes_to_linkable_specs
+        return selected_nodes
 
     def _find_non_additive_dimension_in_linkable_specs(
         self,
@@ -473,6 +480,70 @@ class DataflowPlanBuilder:
             non_additive_dimension_spec=non_additive_dimension_spec,
         )
 
+    # TODO: this should live somewhere else. Figure out where makes sense
+    def _create_metric_time_node_from_time_spine(self) -> MetricTimeDimensionTransformNode:
+        """Build a ReadSqlSourceNode that represents reading from the time spine table."""
+        time_spine_source = self._time_spine_source
+        from_source_alias = IdGeneratorRegistry.for_class(self.__class__).create_id("time_spine_src")
+
+        # TODO: add date part to instances & select columns. Can we use the same logic as elsewhere??
+        time_spine_instances: List[TimeDimensionInstance] = []
+        select_columns: List[SqlSelectColumn] = []
+        for granularity in TimeGranularity:
+            if granularity.to_int() >= time_spine_source.time_column_granularity.to_int():
+                column_alias = StructuredLinkableSpecName(
+                    entity_link_names=(),
+                    element_name=time_spine_source.time_column_name,
+                    time_granularity=granularity,
+                ).qualified_name
+                time_spine_instance = TimeDimensionInstance(
+                    defined_from=(),
+                    associated_columns=(
+                        ColumnAssociation(
+                            column_name=column_alias,
+                            single_column_correlation_key=SingleColumnCorrelationKey(),
+                        ),
+                    ),
+                    spec=TimeDimensionSpec(
+                        element_name=time_spine_source.time_column_name, entity_links=(), time_granularity=granularity
+                    ),
+                )
+                time_spine_instances.append(time_spine_instance)
+                select_column = SqlSelectColumn(
+                    SqlDateTruncExpression(
+                        time_granularity=granularity,
+                        arg=SqlColumnReferenceExpression(
+                            SqlColumnReference(
+                                table_alias=from_source_alias,
+                                column_name=time_spine_source.time_column_name,
+                            ),
+                        ),
+                    ),
+                    column_alias=column_alias,
+                )
+                select_columns.append(select_column)
+
+        time_spine_instance_set = InstanceSet(time_dimension_instances=tuple(time_spine_instances))
+        time_spine_data_set = SqlDataSet(
+            instance_set=time_spine_instance_set,
+            sql_select_node=SqlSelectStatementNode(
+                description=TIME_SPINE_DATA_SET_DESCRIPTION,
+                select_columns=tuple(select_columns),
+                from_source=SqlTableFromClauseNode(sql_table=time_spine_source.spine_table),
+                from_source_alias=from_source_alias,
+                joins_descs=(),
+                group_bys=(),
+                order_bys=(),
+            ),
+        )
+        # need this if we have above??
+        return MetricTimeDimensionTransformNode(
+            parent_node=ReadSqlSourceNode(data_set=time_spine_data_set),
+            aggregation_time_dimension_reference=TimeDimensionReference(
+                element_name=time_spine_source.time_column_name
+            ),
+        )
+
     def _find_dataflow_recipe(
         self,
         linkable_spec_set: LinkableSpecSet,
@@ -480,24 +551,32 @@ class DataflowPlanBuilder:
         time_range_constraint: Optional[TimeRangeConstraint] = None,
     ) -> Optional[DataflowRecipe]:
         linkable_specs = linkable_spec_set.as_tuple
+        potential_source_nodes: Sequence[BaseOutput]
         if measure_spec_properties:
             source_nodes = self._source_nodes
-            potential_source_nodes: Sequence[BaseOutput] = self._select_source_nodes_with_measures(
+            potential_source_nodes = self._select_source_nodes_with_measures(
                 measure_specs=set(measure_spec_properties.measure_specs), source_nodes=source_nodes
             )
         else:
             # Only read nodes can be source nodes for queries without measures
             source_nodes = list(self._read_nodes)
-            source_nodes_to_linkable_specs = self._select_read_nodes_with_linkable_specs(
-                linkable_specs=linkable_spec_set, read_nodes=source_nodes
+            potential_source_nodes = self._select_read_nodes_with_linkable_specs(
+                linkable_specs=linkable_spec_set, read_nodes=self._read_nodes
             )
-            # Add time_spine to potential source nodes w/ metric_time as linkable spec
-            # Maybe only do this if requested
-            potential_source_nodes = list(source_nodes_to_linkable_specs.keys())
+            # `metric_time` does not exist if there is no metric in the query.
+            # In that case, we'll use the time spine table to represent `metric_time` values.
+            requested_metric_time_specs = [
+                time_dimension_spec
+                for time_dimension_spec in linkable_spec_set.time_dimension_specs
+                if time_dimension_spec.element_name == self._metric_time_dimension_reference.element_name
+            ]
+            if requested_metric_time_specs:
+                # Add time_spine to potential source nodes for requested metric_time specs
+                time_spine_node = self._create_metric_time_node_from_time_spine()
+                potential_source_nodes = list(potential_source_nodes) + [time_spine_node]
 
         logger.info(f"There are {len(potential_source_nodes)} potential source nodes")
 
-        logger.info(f"Starting search with {len(source_nodes)} source nodes")
         start_time = time.time()
 
         node_processor = PreJoinNodeProcessor(

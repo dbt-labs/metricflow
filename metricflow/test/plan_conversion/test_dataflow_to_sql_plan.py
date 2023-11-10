@@ -1003,3 +1003,80 @@ def test_compute_metrics_node_ratio_from_multiple_semantic_models(
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_metric_time_only(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    """Tests querying only metric time."""
+    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
+        query_spec=MetricFlowQuerySpec(
+            time_dimension_specs=(TimeDimensionSpec(element_name="metric_time", entity_links=()),),
+        ),
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_metric_time_quarter(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    """Tests querying only metric time."""
+    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
+        query_spec=MetricFlowQuerySpec(
+            time_dimension_specs=(
+                TimeDimensionSpec(element_name="metric_time", entity_links=(), time_granularity=TimeGranularity.YEAR),
+            ),
+        ),
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_metric_time_with_another_dimension(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    """Tests querying only metric time."""
+    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
+        query_spec=MetricFlowQuerySpec(
+            time_dimension_specs=(
+                TimeDimensionSpec(element_name="metric_time", entity_links=(), time_granularity=TimeGranularity.YEAR),
+            ),
+            dimension_specs=(DimensionSpec(element_name="country_latest", entity_links=(EntityReference("listing"),)),),
+        ),
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )

@@ -28,6 +28,8 @@ class SqlDataSet(DataSet):
         self._sql_select_node = sql_select_node
         super().__init__(instance_set=instance_set)
 
+    # TODO: add optional __repr__ to display the table name or pass in custom name (time spine)
+
     @property
     def sql_select_node(self) -> SqlSelectStatementNode:
         """Return a SELECT node that can be used to read data from the given SQL table or SQL query."""

@@ -139,7 +139,7 @@ integration_test:
       u.home_state_latest AS user__home_state_latest
     , l.is_lux AS listing__is_lux_latest
     FROM {{ source_schema }}.dim_listings_latest l
-    LEFT OUTER JOIN {{ source_schema }}.dim_users_latest u
+    FULL OUTER JOIN {{ source_schema }}.dim_users_latest u
       ON u.user_id = l.user_id
     GROUP BY
       u.home_state_latest
@@ -189,7 +189,10 @@ integration_test:
   model: SIMPLE_MODEL
   group_bys: ["metric_time"]
   check_query: |
-    SELECT 1
+    SELECT
+      {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
+    FROM {{ source_schema }}.mf_time_spine
+    GROUP BY metric_time__day
 ---
 integration_test:
   name: metric_time_week
@@ -197,12 +200,15 @@ integration_test:
   model: SIMPLE_MODEL
   group_bys: ["metric_time__week"]
   check_query: |
-    SELECT 1
+    SELECT
+      {{ render_date_trunc("ds", TimeGranularity.WEEK) }} AS metric_time__week
+    FROM {{ source_schema }}.mf_time_spine
+    GROUP BY metric_time__week
 ---
 integration_test:
   name: multiple_dimensions_with_metric_time
   description: Query metric_time along with a different dimension
-  model: SIMPLE_MODEL
-  group_bys: ["metric_time", "booking__monthly_ds"]
+  model: EXTENDED_DATE_MODEL
+  group_bys: ["metric_time__year", "booking__monthly_ds"]
   check_query: |
     SELECT 1

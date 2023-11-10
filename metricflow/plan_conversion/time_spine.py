@@ -9,6 +9,8 @@ from metricflow.dataflow.sql_table import SqlTable
 
 logger = logging.getLogger(__name__)
 
+TIME_SPINE_DATA_SET_DESCRIPTION = "Date Spine"
+
 
 @dataclass(frozen=True)
 class TimeSpineSource:

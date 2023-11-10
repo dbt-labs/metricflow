@@ -41,6 +41,7 @@ from metricflow.specs.specs import (
     LinkableInstanceSpec,
     LinklessEntitySpec,
 )
+from metricflow.test.time.metric_time_dimension import MTD
 
 logger = logging.getLogger(__name__)
 
@@ -322,11 +323,11 @@ class NodeEvaluatorForLinkableInstances:
 
         data_set_linkable_specs = candidate_spec_set.linkable_specs
 
-        # These are linkable specs in the same data set as the measure. Those are considered "local".
-        local_linkable_specs = []
+        # These are linkable specs in the start node data set. Those are considered "local".
+        local_linkable_specs: List[LinkableInstanceSpec] = []
 
         # These are linkable specs that aren't in the data set, but they might be able to be joined in.
-        possibly_joinable_linkable_specs = []
+        possibly_joinable_linkable_specs: List[LinkableInstanceSpec] = []
 
         # Group required_linkable_specs into local / un-joinable / or possibly joinable.
         unjoinable_linkable_specs = []
@@ -364,7 +365,10 @@ class NodeEvaluatorForLinkableInstances:
                     "There are no more candidate nodes that can be joined, but not all linkable specs have "
                     "been acquired."
                 )
-                unjoinable_linkable_specs.extend(possibly_joinable_linkable_specs)
+                if all(spec.element_name == MTD for spec in possibly_joinable_linkable_specs):
+                    pass
+                else:
+                    unjoinable_linkable_specs.extend(possibly_joinable_linkable_specs)
                 break
 
             # Join the best candidate to realize the linkable specs

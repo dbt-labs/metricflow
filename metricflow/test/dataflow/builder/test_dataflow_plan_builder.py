@@ -99,7 +99,6 @@ def test_primary_entity_dimension(  # noqa: D
 def test_joined_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    column_association_resolver: ColumnAssociationResolver,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a plan getting a measure and a joined dimension."""
@@ -741,7 +740,7 @@ def test_common_semantic_model(  # noqa: D
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="bookings"), MetricSpec(element_name="booking_value")),
             dimension_specs=(
-                DataSet.metric_time_dimension_spec(TimeGranularity.DAY),
+                MTD_SPEC_DAY,
                 DimensionSpec(element_name="country_latest", entity_links=(EntityReference("listing"),)),
             ),
         )
@@ -771,7 +770,7 @@ def test_derived_metric_offset_window(  # noqa: D
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="bookings_5_day_lag"),),
-            time_dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
+            time_dimension_specs=(MTD_SPEC_DAY,),
         )
     )
 
@@ -799,7 +798,7 @@ def test_derived_metric_offset_to_grain(  # noqa: D
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="bookings_growth_since_start_of_month"),),
-            time_dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
+            time_dimension_specs=(MTD_SPEC_DAY,),
         )
     )
 
@@ -853,7 +852,7 @@ def test_derived_offset_cumulative_metric(  # noqa: D
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="every_2_days_bookers_2_days_ago"),),
-            time_dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
+            time_dimension_specs=(MTD_SPEC_DAY,),
         )
     )
 
@@ -879,7 +878,7 @@ def test_join_to_time_spine_with_metric_time(  # noqa: D
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="bookings_fill_nulls_with_0"),),
-            time_dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
+            time_dimension_specs=(MTD_SPEC_DAY,),
         )
     )
 
@@ -905,7 +904,7 @@ def test_join_to_time_spine_derived_metric(  # noqa: D
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="bookings_growth_2_weeks_fill_nulls_with_0"),),
-            time_dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
+            time_dimension_specs=(MTD_SPEC_DAY,),
         )
     )
 
@@ -959,6 +958,53 @@ def test_dont_join_to_time_spine_if_no_time_dimension_requested(  # noqa: D
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(metric_specs=(MetricSpec(element_name="bookings_fill_nulls_with_0"),))
     )
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dag_graph=dataflow_plan,
+    )
+
+
+def test_metric_time_only(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
+        MetricFlowQuerySpec(time_dimension_specs=(MTD_SPEC_DAY,))
+    )
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dag_graph=dataflow_plan,
+    )
+
+
+def test_metric_time_with_another_dimension(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
+        MetricFlowQuerySpec(time_dimension_specs=(MTD_SPEC_DAY,))
+    )
+    assert 0, "add another dimension to this test"
 
     assert_plan_snapshot_text_equal(
         request=request,

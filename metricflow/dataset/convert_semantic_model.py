@@ -16,7 +16,7 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow.aggregation_properties import AggregationState
 from metricflow.dag.id_generation import IdGeneratorRegistry
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
+from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet, SqlDataSet
 from metricflow.instances import (
     DimensionInstance,
     EntityInstance,
@@ -26,6 +26,7 @@ from metricflow.instances import (
 )
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.model.spec_converters import MeasureConverter
+from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
     DEFAULT_TIME_GRANULARITY,
@@ -478,3 +479,8 @@ class SemanticModelToDataSetConverter:
             ),
             sql_select_node=select_statement_node,
         )
+
+    # move logic here?
+    def create_data_set_from_time_spine(self, time_spine_source: TimeSpineSource) -> SqlDataSet:
+        """Create a SQL source data set from time spine table."""
+        pass
