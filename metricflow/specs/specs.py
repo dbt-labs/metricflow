@@ -580,6 +580,15 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
     def __len__(self) -> int:  # noqa: D
         return len(self.dimension_specs) + len(self.time_dimension_specs) + len(self.entity_specs)
 
+    @staticmethod
+    def from_specs(specs: Sequence[LinkableInstanceSpec]) -> LinkableSpecSet:  # noqa: D
+        instance_spec_set = InstanceSpecSet.from_specs(specs)
+        return LinkableSpecSet(
+            dimension_specs=instance_spec_set.dimension_specs,
+            time_dimension_specs=instance_spec_set.time_dimension_specs,
+            entity_specs=instance_spec_set.entity_specs,
+        )
+
 
 @dataclass(frozen=True)
 class MetricFlowQuerySpec(SerializableDataclass):
