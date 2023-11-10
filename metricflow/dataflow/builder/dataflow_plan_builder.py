@@ -614,7 +614,8 @@ class DataflowPlanBuilder:
 
         # Dict from the node that contains the source node to the evaluation results.
         node_to_evaluation: Dict[BaseOutput, LinkableInstanceSatisfiabilityEvaluation] = {}
-
+        # If only dimensions, and one is metric_time, will require cross-join!
+        # If only dimensions, will require full outer join!
         for node in self._sort_by_suitability(potential_source_nodes):
             data_set = self._node_data_set_resolver.get_output_data_set(node)
 
