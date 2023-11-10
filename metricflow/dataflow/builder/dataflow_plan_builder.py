@@ -556,7 +556,7 @@ class DataflowPlanBuilder:
 
             # Nodes containing the linkable instances will be joined to the source node, so these
             # entities will need to be present in the source node.
-            required_local_entity_specs = tuple(x.join_on_entity for x in evaluation.join_recipes if x.join_on_entity)
+            required_local_entity_specs = tuple(x.join_on_entity for x in evaluation.join_recipes)
             # Same thing with partitions.
             required_local_dimension_specs = tuple(
                 y.start_node_dimension_spec for x in evaluation.join_recipes for y in x.join_on_partition_dimensions

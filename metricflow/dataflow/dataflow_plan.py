@@ -249,7 +249,7 @@ class JoinDescription:
     """Describes how data from a node should be joined to data from another node."""
 
     join_node: BaseOutput
-    join_on_entity: Optional[LinklessEntitySpec]
+    join_on_entity: LinklessEntitySpec
     join_type: SqlJoinType
 
     join_on_partition_dimensions: Tuple[PartitionDimensionJoinDescription, ...]

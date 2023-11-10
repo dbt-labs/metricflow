@@ -54,8 +54,8 @@ class JoinLinkableInstancesRecipe:
     """
 
     node_to_join: BaseOutput
-    # The entity to join "node_to_join" on. Not needed for cross-joins.
-    join_on_entity: Optional[LinklessEntitySpec]
+    # The entity to join "node_to_join" on.
+    join_on_entity: LinklessEntitySpec
     # The linkable instances from the query that can be satisfied if we join this node. Note that this is different from
     # the linkable specs in the node that can help to satisfy the query. e.g. "user_id__country" might be one of the
     # "satisfiable_linkable_specs", but "country" is the linkable spec in the node.
@@ -74,11 +74,10 @@ class JoinLinkableInstancesRecipe:
         """The recipe as a join description to use in the dataflow plan node."""
         # Figure out what elements to filter from the joined node.
         include_specs: List[LinkableInstanceSpec] = []
-        if not self.join_type == SqlJoinType.CROSS_JOIN:
-            assert all([len(spec.entity_links) > 0 for spec in self.satisfiable_linkable_specs])
-            include_specs.extend(
-                [LinklessEntitySpec.from_reference(spec.entity_links[0]) for spec in self.satisfiable_linkable_specs]
-            )
+        assert all([len(spec.entity_links) > 0 for spec in self.satisfiable_linkable_specs])
+        include_specs.extend(
+            [LinklessEntitySpec.from_reference(spec.entity_links[0]) for spec in self.satisfiable_linkable_specs]
+        )
 
         include_specs.extend([join.node_to_join_dimension_spec for join in self.join_on_partition_dimensions])
         include_specs.extend([join.node_to_join_time_dimension_spec for join in self.join_on_partition_time_dimensions])

@@ -396,29 +396,25 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 )
             )
 
-            if join_description.join_type == SqlJoinType.CROSS_JOIN:
-                table_alias_to_instance_set[right_data_set_alias] = right_data_set.instance_set
-            else:
-                # Remove the linkable instances with the join_on_entity as the leading link as the next step adds the
-                # link. This is to avoid cases where there is a primary entity and a dimension in the data set, and we
-                # create an instance in the next step that has the same entity link.
-                # e.g. a data set has the dimension "listing__country_latest" and "listing" is a primary entity in the
-                # data set. The next step would create an instance like "listing__listing__country_latest" without this
-                # filter.
-                assert join_on_entity
-                right_data_set_instance_set_filtered = FilterLinkableInstancesWithLeadingLink(
-                    entity_link=join_on_entity
-                ).transform(right_data_set.instance_set)
+            # Remove the linkable instances with the join_on_entity as the leading link as the next step adds the
+            # link. This is to avoid cases where there is a primary entity and a dimension in the data set, and we
+            # create an instance in the next step that has the same entity link.
+            # e.g. a data set has the dimension "listing__country_latest" and "listing" is a primary entity in the
+            # data set. The next step would create an instance like "listing__listing__country_latest" without this
+            # filter.
+            right_data_set_instance_set_filtered = FilterLinkableInstancesWithLeadingLink(
+                entity_link=join_on_entity
+            ).transform(right_data_set.instance_set)
 
-                # After the right data set is joined to the "from" data set, we need to change the links for some of the
-                # instances that represent the right data set. For example, if the "from" data set contains the "bookings"
-                # measure instance and the right dataset contains the "country" dimension instance, then after the join,
-                # the output data set should have the "country" dimension instance with the "user_id" entity link
-                # (if "user_id" equality was the join condition). "country" -> "user_id__country"
-                right_data_set_instance_set_after_join = right_data_set_instance_set_filtered.transform(
-                    AddLinkToLinkableElements(join_on_entity=join_on_entity)
-                )
-                table_alias_to_instance_set[right_data_set_alias] = right_data_set_instance_set_after_join
+            # After the right data set is joined to the "from" data set, we need to change the links for some of the
+            # instances that represent the right data set. For example, if the "from" data set contains the "bookings"
+            # measure instance and the right dataset contains the "country" dimension instance, then after the join,
+            # the output data set should have the "country" dimension instance with the "user_id" entity link
+            # (if "user_id" equality was the join condition). "country" -> "user_id__country"
+            right_data_set_instance_set_after_join = right_data_set_instance_set_filtered.transform(
+                AddLinkToLinkableElements(join_on_entity=join_on_entity)
+            )
+            table_alias_to_instance_set[right_data_set_alias] = right_data_set_instance_set_after_join
 
         from_data_set_output_instance_set = from_data_set.instance_set.transform(
             FilterElements(include_specs=from_data_set.instance_set.spec_set)
