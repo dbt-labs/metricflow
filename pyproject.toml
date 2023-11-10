@@ -29,7 +29,7 @@ dependencies = [
   "MarkupSafe==2.0.1", # pandas implicitly requires this version
   "PyYAML~=6.0",
   "click>=7.1.2",
-  "dbt-core~=1.7.0rc1",
+  "dbt-core~=1.7.0",
   "dbt-semantic-interfaces~=0.4.0",
   "graphviz>=0.18.2, <0.21",
   "halo~=0.0.31",
@@ -75,27 +75,27 @@ sql-client-packages = [
 ]
 
 dbt-postgres = [
-  "dbt-postgres~=1.7.0rc1",
+  "dbt-postgres~=1.7.0",
 ]
 
 dbt-bigquery = [
-  "dbt-bigquery~=1.7.0rc1",
+  "dbt-bigquery~=1.7.0",
 ]
 
 dbt-databricks = [
-  "dbt-databricks~=1.7.0rc1",
+  "dbt-databricks~=1.7.0",
 ]
 
 dbt-redshift = [
-  "dbt-redshift~=1.7.0rc1",
+  "dbt-redshift~=1.7.0",
 ]
 
 dbt-snowflake = [
-  "dbt-snowflake~=1.7.0rc1",
+  "dbt-snowflake~=1.7.0",
 ]
 
 dbt-duckdb = [
-  "dbt-duckdb~=1.6.0",
+  "dbt-duckdb~=1.7.0",
 ]
 
 [tool.hatch.build.targets.sdist]
@@ -115,11 +115,7 @@ description = "Environment for development. Includes a DuckDB-backed client."
 features = [
   "dev-packages",
   "sql-client-packages",
-]
-# Temporary workaround for installing the dbt-duckdb adapter until it's updated to support dbt-core~=1.7.0rc1.
-post-install-commands = [
-  "pip install \"duckdb>=0.7.0\"",
-  "pip install --no-deps dbt-duckdb~=1.6.0",
+  "dbt-duckdb",
 ]
 
 [tool.hatch.envs.dev-env.env-vars]
