@@ -290,6 +290,7 @@ def test_single_join_node(  # noqa: D
                 join_on_entity=entity_spec,
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
+                join_type=SqlJoinType.LEFT_OUTER,
             )
         ],
     )
@@ -343,12 +344,14 @@ def test_multi_join_node(
                 join_on_entity=LinklessEntitySpec.from_element_name(element_name="listing"),
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
+                join_type=SqlJoinType.LEFT_OUTER,
             ),
             JoinDescription(
                 join_node=filtered_dimension_node,
                 join_on_entity=LinklessEntitySpec.from_element_name(element_name="listing"),
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
+                join_type=SqlJoinType.LEFT_OUTER,
             ),
         ],
     )
@@ -406,6 +409,7 @@ def test_compute_metrics_node(
                 join_on_entity=entity_spec,
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
+                join_type=SqlJoinType.LEFT_OUTER,
             )
         ],
     )
@@ -467,6 +471,7 @@ def test_compute_metrics_node_simple_expr(
                 join_on_entity=entity_spec,
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
+                join_type=SqlJoinType.LEFT_OUTER,
             )
         ],
     )
@@ -747,6 +752,7 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
                 join_on_entity=entity_spec,
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
+                join_type=SqlJoinType.LEFT_OUTER,
             )
         ],
     )

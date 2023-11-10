@@ -39,6 +39,7 @@
                         <!--    'join_on_entity': {'class': 'LinklessEntitySpec',    -->
                         <!--                       'element_name': 'cyclic_entity',  -->
                         <!--                       'entity_links': ()},              -->
+                        <!--    'join_type': SqlJoinType.LEFT_OUTER,                 -->
                         <!--    'join_on_partition_dimensions': (),                  -->
                         <!--    'join_on_partition_time_dimensions': (),             -->
                         <!--    'validity_window': None}                             -->

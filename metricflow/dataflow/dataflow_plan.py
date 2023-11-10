@@ -249,7 +249,8 @@ class JoinDescription:
     """Describes how data from a node should be joined to data from another node."""
 
     join_node: BaseOutput
-    join_on_entity: LinklessEntitySpec
+    join_on_entity: Optional[LinklessEntitySpec]
+    join_type: SqlJoinType
 
     join_on_partition_dimensions: Tuple[PartitionDimensionJoinDescription, ...]
     join_on_partition_time_dimensions: Tuple[PartitionTimeDimensionJoinDescription, ...]
@@ -339,6 +340,7 @@ class JoinToBaseOutputNode(BaseOutput):
                     join_on_partition_dimensions=old_join_target.join_on_partition_dimensions,
                     join_on_partition_time_dimensions=old_join_target.join_on_partition_time_dimensions,
                     validity_window=old_join_target.validity_window,
+                    join_type=old_join_target.join_type,
                 )
                 for i, old_join_target in enumerate(self._join_targets)
             ],

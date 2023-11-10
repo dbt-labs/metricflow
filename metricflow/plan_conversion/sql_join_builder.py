@@ -147,8 +147,21 @@ class SqlQueryPlanJoinBuilder:
         In addition to the entity equality condition, this will ensure datasets are joined on all partition
         columns and account for validity windows, if those are defined in one of the datasets.
         """
-        join_on_entity = join_description.join_on_entity
+        validity_conditions = SqlQueryPlanJoinBuilder._make_validity_window_on_conditions(
+            left_data_set=left_data_set, right_data_set=right_data_set, join_description=join_description
+        )
+        if join_description.join_type == SqlJoinType.CROSS_JOIN:
+            return SqlQueryPlanJoinBuilder.make_column_equality_sql_join_description(
+                right_source_node=right_data_set.data_set.sql_select_node,
+                left_source_alias=left_data_set.alias,
+                right_source_alias=right_data_set.alias,
+                column_equality_descriptions=[],
+                join_type=join_description.join_type,
+                additional_on_conditions=validity_conditions,
+            )
 
+        join_on_entity = join_description.join_on_entity
+        assert join_on_entity, "Join on entity required unless using cross join."
         # Figure out which columns in the "left" data set correspond to the entity that we want to join on.
         # The column associations tell us which columns correspond to which instances in the data set.
         left_data_set_entity_column_associations = left_data_set.data_set.column_associations_for_entity(join_on_entity)
@@ -198,16 +211,12 @@ class SqlQueryPlanJoinBuilder:
                 )
             )
 
-        validity_conditions = SqlQueryPlanJoinBuilder._make_validity_window_on_conditions(
-            left_data_set=left_data_set, right_data_set=right_data_set, join_description=join_description
-        )
-
         return SqlQueryPlanJoinBuilder.make_column_equality_sql_join_description(
             right_source_node=right_data_set.data_set.sql_select_node,
             left_source_alias=left_data_set.alias,
             right_source_alias=right_data_set.alias,
             column_equality_descriptions=column_equality_descriptions,
-            join_type=SqlJoinType.LEFT_OUTER,
+            join_type=join_description.join_type,
             additional_on_conditions=validity_conditions,
         )
 
