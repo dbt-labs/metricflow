@@ -28,6 +28,7 @@ from metricflow.dataflow.dataflow_plan import (
     ConstrainTimeRangeNode,
     DataflowPlan,
     FilterElementsNode,
+    JoinDescription,
     JoinOverTimeRangeNode,
     JoinToBaseOutputNode,
     JoinToTimeSpineNode,
@@ -75,6 +76,11 @@ class DataflowRecipe:
     source_node: BaseOutput
     required_local_linkable_specs: Tuple[LinkableInstanceSpec, ...]
     join_linkable_instances_recipes: Tuple[JoinLinkableInstancesRecipe, ...]
+
+    @property
+    def join_targets(self) -> List[JoinDescription]:
+        """Joins to be made to source node."""
+        return [join_recipe.join_description for join_recipe in self.join_linkable_instances_recipes]
 
 
 @dataclass(frozen=True)
@@ -258,11 +264,10 @@ class DataflowPlanBuilder:
             raise UnableToSatisfyQueryError(f"Recipe not found for linkable specs: {query_spec.linkable_specs}")
 
         joined_node: Optional[JoinToBaseOutputNode] = None
-        if dataflow_recipe.join_linkable_instances_recipes:
-            join_targets = [
-                join_recipe.join_description for join_recipe in dataflow_recipe.join_linkable_instances_recipes
-            ]
-            joined_node = JoinToBaseOutputNode(left_node=dataflow_recipe.source_node, join_targets=join_targets)
+        if dataflow_recipe.join_targets:
+            joined_node = JoinToBaseOutputNode(
+                left_node=dataflow_recipe.source_node, join_targets=dataflow_recipe.join_targets
+            )
 
         where_constraint_node: Optional[WhereConstraintNode] = None
         if query_spec.where_constraint:
@@ -739,7 +744,7 @@ class DataflowPlanBuilder:
             ),
         )
 
-        join_targets = [join_recipe.join_description for join_recipe in measure_recipe.join_linkable_instances_recipes]
+        join_targets = measure_recipe.join_targets
         unaggregated_measure_node: BaseOutput
         if len(join_targets) > 0:
             filtered_measures_with_joined_elements = JoinToBaseOutputNode(
