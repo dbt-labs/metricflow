@@ -60,7 +60,7 @@ class JoinLinkableInstancesRecipe:
     # the linkable specs in the node that can help to satisfy the query. e.g. "user_id__country" might be one of the
     # "satisfiable_linkable_specs", but "country" is the linkable spec in the node.
     satisfiable_linkable_specs: List[LinkableInstanceSpec]
-    # Join type to use when joining node
+    # Join type to use when joining nodes
     join_type: SqlJoinType
 
     # The partitions to join on, if there are matching partitions between the start_node and node_to_join.

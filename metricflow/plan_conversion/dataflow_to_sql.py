@@ -403,7 +403,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             # data set. The next step would create an instance like "listing__listing__country_latest" without this
             # filter.
             right_data_set_instance_set_filtered = FilterLinkableInstancesWithLeadingLink(
-                entity_link=join_on_entity
+                entity_link=join_on_entity,
             ).transform(right_data_set.instance_set)
 
             # After the right data set is joined to the "from" data set, we need to change the links for some of the
