@@ -41,7 +41,6 @@ from metricflow.specs.specs import (
     LinkableInstanceSpec,
     LinklessEntitySpec,
 )
-from metricflow.test.time.metric_time_dimension import MTD
 
 logger = logging.getLogger(__name__)
 
@@ -365,10 +364,7 @@ class NodeEvaluatorForLinkableInstances:
                     "There are no more candidate nodes that can be joined, but not all linkable specs have "
                     "been acquired."
                 )
-                if all(spec.element_name == MTD for spec in possibly_joinable_linkable_specs):
-                    pass
-                else:
-                    unjoinable_linkable_specs.extend(possibly_joinable_linkable_specs)
+                unjoinable_linkable_specs.extend(possibly_joinable_linkable_specs)
                 break
 
             # Join the best candidate to realize the linkable specs

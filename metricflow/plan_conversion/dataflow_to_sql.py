@@ -1030,12 +1030,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             if aggregation_time_dimension_for_measure == node.aggregation_time_dimension_reference:
                 output_measure_instances.append(measure_instance)
 
-        # if len(output_measure_instances) == 0:
-        #     raise RuntimeError(
-        #         f"No measure instances in the input source match the aggregation time dimension "
-        #         f"{node.aggregation_time_dimension_reference}. Check if the dataflow plan was constructed correctly."
-        #     )
-
         # Find time dimension instances that refer to the same dimension as the one specified in the node.
         matching_time_dimension_instances = []
         for time_dimension_instance in input_data_set.instance_set.time_dimension_instances:
