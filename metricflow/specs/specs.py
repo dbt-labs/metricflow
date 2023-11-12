@@ -18,6 +18,8 @@ from typing import Any, Dict, Generic, List, Optional, Sequence, Tuple, TypeVar
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
+from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
+from dbt_semantic_interfaces.protocols import MetricTimeWindow
 from dbt_semantic_interfaces.references import (
     DimensionReference,
     EntityReference,
@@ -36,6 +38,7 @@ from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_column_type import SqlColumnType
+from metricflow.sql.sql_plan import SqlJoinType
 from metricflow.visitor import VisitorOutputT
 
 
@@ -471,24 +474,33 @@ class MetricSpec(InstanceSpec):  # noqa: D
 
 
 @dataclass(frozen=True)
+class CumulativeMeasureDescription:
+    """If a measure is a part of a cumulative metric, this represents the associated parameters."""
+
+    cumulative_window: Optional[MetricTimeWindow]
+    cumulative_grain_to_date: Optional[TimeGranularity]
+
+
+@dataclass(frozen=True)
 class MetricInputMeasureSpec(SerializableDataclass):
-    """The spec for a measure defined as a metric input.
+    """The spec for a measure defined as a base metric input.
 
     This is necessary because the MeasureSpec is used as a key linking the measures used in the query
     to the measures defined in the semantic models. Adding metric-specific information, like constraints,
     causes lookups connecting query -> semantic model to fail in strange ways. This spec, then, provides
     both the key (in the form of a MeasureSpec) along with whatever measure-specific attributes
     a user might specify in a metric definition or query accessing the metric itself.
-
-    Note - when specifying a metric comprised of two input instances of the same measure, at least one
-    must have a distinct alias, otherwise SQL exceptions may occur. This should be enforced via validation.
     """
 
     measure_spec: MeasureSpec
+    fill_nulls_with: Optional[int] = None
+    offset_window: Optional[MetricTimeWindow] = None
+    offset_to_grain: Optional[TimeGranularity] = None
+    culmination_description: Optional[CumulativeMeasureDescription] = None
     constraint: Optional[WhereFilterSpec] = None
     alias: Optional[str] = None
-    join_to_timespine: bool = False
-    fill_nulls_with: Optional[int] = None
+    before_aggregation_time_spine_join_description: Optional[JoinToTimeSpineDescription] = None
+    after_aggregation_time_spine_join_description: Optional[JoinToTimeSpineDescription] = None
 
     @property
     def post_aggregation_spec(self) -> MeasureSpec:
@@ -522,6 +534,20 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
     dimension_specs: Tuple[DimensionSpec, ...] = ()
     time_dimension_specs: Tuple[TimeDimensionSpec, ...] = ()
     entity_specs: Tuple[EntitySpec, ...] = ()
+
+    @property
+    def contains_metric_time(self) -> bool:
+        """Returns true if this set contains a spec referring to metric time at any grain."""
+        return len(self.metric_time_specs) > 0
+
+    @property
+    def metric_time_specs(self) -> Sequence[TimeDimensionSpec]:
+        """Returns any specs referring to metric time at any grain."""
+        return tuple(
+            time_dimension_spec
+            for time_dimension_spec in self.time_dimension_specs
+            if time_dimension_spec.element_name == METRIC_TIME_ELEMENT_NAME
+        )
 
     @property
     def as_tuple(self) -> Tuple[LinkableInstanceSpec, ...]:  # noqa: D
@@ -766,3 +792,12 @@ class WhereFilterSpec(SerializableDataclass):
             bind_parameters=self.bind_parameters.combine(other.bind_parameters),
             linkable_spec_set=self.linkable_spec_set.merge(other.linkable_spec_set),
         )
+
+
+@dataclass(frozen=True)
+class JoinToTimeSpineDescription:
+    """Describes how a time spine join should be performed."""
+
+    join_type: SqlJoinType
+    offset_window: Optional[MetricTimeWindow]
+    offset_to_grain: Optional[TimeGranularity]

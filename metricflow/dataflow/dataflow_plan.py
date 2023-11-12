@@ -445,7 +445,11 @@ class AggregateMeasuresNode(AggregatedMeasuresOutput):
     constraints applied to the measure.
     """
 
-    def __init__(self, parent_node: BaseOutput, metric_input_measure_specs: Tuple[MetricInputMeasureSpec, ...]) -> None:
+    def __init__(
+        self,
+        parent_node: BaseOutput,
+        metric_input_measure_specs: Tuple[MetricInputMeasureSpec, ...],
+    ) -> None:
         """Initializer for AggregateMeasuresNode.
 
         The input measure specs are required for downstream nodes to be aware of any input measures with
