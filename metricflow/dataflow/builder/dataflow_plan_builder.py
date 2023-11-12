@@ -58,6 +58,7 @@ from metricflow.specs.specs import (
     LinkableInstanceSpec,
     LinkableSpecSet,
     LinklessEntitySpec,
+    MeasureCulminationDescription,
     MeasureSpec,
     MetricFlowQuerySpec,
     MetricInputMeasureSpec,
