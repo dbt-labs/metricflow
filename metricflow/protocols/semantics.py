@@ -32,7 +32,6 @@ from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
     LinkableInstanceSpec,
     MeasureSpec,
-    MetricInputMeasureSpec,
     MetricSpec,
     NonAdditiveDimensionSpec,
 )
@@ -163,15 +162,6 @@ class MetricAccessor(ABC):
 
     @abstractmethod
     def get_metric(self, metric_reference: MetricReference) -> Metric:  # noqa:D
-        raise NotImplementedError
-
-    @abstractmethod
-    def measures_for_metric(
-        self,
-        metric_reference: MetricReference,
-        column_association_resolver: ColumnAssociationResolver,
-    ) -> Sequence[MetricInputMeasureSpec]:
-        """Return the measure specs required to compute the metric."""
         raise NotImplementedError
 
     @abstractmethod
