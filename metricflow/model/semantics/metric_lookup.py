@@ -20,8 +20,6 @@ from metricflow.protocols.semantics import MetricAccessor
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
     LinkableInstanceSpec,
-    MeasureSpec,
-    MetricInputMeasureSpec,
     MetricSpec,
 )
 from metricflow.specs.where_filter_transform import WhereSpecFactory
@@ -122,35 +120,6 @@ class MetricLookup(MetricAccessor):  # noqa: D
             return None
         else:
             assert_values_exhausted(metric.type)
-
-    def measures_for_metric(
-        self,
-        metric_reference: MetricReference,
-        column_association_resolver: ColumnAssociationResolver,
-    ) -> Sequence[MetricInputMeasureSpec]:
-        """Return the measure specs required to compute the metric."""
-        metric = self.get_metric(metric_reference)
-        input_measure_specs: List[MetricInputMeasureSpec] = []
-
-        for input_measure in metric.input_measures:
-            measure_spec = MeasureSpec(
-                element_name=input_measure.name,
-                non_additive_dimension_spec=self._semantic_model_lookup.non_additive_dimension_specs_by_measure.get(
-                    input_measure.measure_reference
-                ),
-            )
-            spec = MetricInputMeasureSpec(
-                measure_spec=measure_spec,
-                constraint=WhereSpecFactory(
-                    column_association_resolver=column_association_resolver,
-                ).create_from_where_filter_intersection(input_measure.filter),
-                alias=input_measure.alias,
-                join_to_timespine=input_measure.join_to_timespine,
-                fill_nulls_with=input_measure.fill_nulls_with,
-            )
-            input_measure_specs.append(spec)
-
-        return tuple(input_measure_specs)
 
     def contains_cumulative_or_time_offset_metric(self, metric_references: Sequence[MetricReference]) -> bool:
         """Returns true if any of the specs correspond to a cumulative metric or a derived metric with time offset."""
