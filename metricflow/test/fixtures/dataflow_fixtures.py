@@ -39,6 +39,18 @@ def dataflow_plan_builder(  # noqa: D
 
 
 @pytest.fixture
+def extended_date_dataflow_plan_builder(  # noqa: D
+    extended_date_semantic_manifest_lookup: SemanticManifestLookup,
+    consistent_id_object_repository: ConsistentIdObjectRepository,
+) -> DataflowPlanBuilder:
+    return DataflowPlanBuilder(
+        source_nodes=consistent_id_object_repository.extended_date_model_source_nodes,
+        read_nodes=list(consistent_id_object_repository.extended_date_model_read_nodes.values()),
+        semantic_manifest_lookup=extended_date_semantic_manifest_lookup,
+    )
+
+
+@pytest.fixture
 def multihop_dataflow_plan_builder(  # noqa: D
     multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
     consistent_id_object_repository: ConsistentIdObjectRepository,

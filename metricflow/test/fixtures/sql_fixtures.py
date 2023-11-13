@@ -21,3 +21,13 @@ def dataflow_to_sql_converter(  # noqa: D
         column_association_resolver=DunderColumnAssociationResolver(simple_semantic_manifest_lookup),
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
     )
+
+
+@pytest.fixture(scope="session")
+def extended_date_dataflow_to_sql_converter(  # noqa: D
+    extended_date_semantic_manifest_lookup: SemanticManifestLookup,
+) -> DataflowToSqlQueryPlanConverter:
+    return DataflowToSqlQueryPlanConverter(
+        column_association_resolver=DunderColumnAssociationResolver(extended_date_semantic_manifest_lookup),
+        semantic_manifest_lookup=extended_date_semantic_manifest_lookup,
+    )

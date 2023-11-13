@@ -1043,8 +1043,8 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 semantic_model_reference=measure_instance.origin_semantic_model_reference.semantic_model_reference
             )
             assert semantic_model is not None, (
-                f"{measure_instance} was defined from {measure_instance.origin_semantic_model_reference}, but that"
-                f"can't be found"
+                f"{measure_instance} was defined from "
+                f"{measure_instance.origin_semantic_model_reference.semantic_model_reference}, but that can't be found"
             )
             aggregation_time_dimension_for_measure = semantic_model.checked_agg_time_dimension_for_measure(
                 measure_reference=measure_instance.spec.as_reference
