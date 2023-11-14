@@ -1,6 +1,0 @@
-kind: Fixes
-body: Enables case insensitivity for various query params.
-time: 2023-10-10T14:41:37.181704-07:00
-custom:
-  Author: courtneyholcomb
-  Issue: "802"

@@ -1,6 +1,0 @@
-kind: Fixes
-body: The --order param was being dropped from CLI saved queries.
-time: 2023-11-02T14:10:10.028618-07:00
-custom:
-  Author: courtneyholcomb
-  Issue: "835"
