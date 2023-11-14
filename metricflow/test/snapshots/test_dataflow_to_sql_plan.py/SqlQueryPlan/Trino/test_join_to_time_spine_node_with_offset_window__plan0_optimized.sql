@@ -23,14 +23,14 @@ INNER JOIN (
     --   ['booking_value', 'metric_time__day', 'listing']
     -- Aggregate Measures
     SELECT
-      ds AS metric_time__day
+      DATE_TRUNC('day', ds) AS metric_time__day
       , listing_id AS listing
       , SUM(booking_value) AS booking_value
     FROM ***************************.fct_bookings bookings_source_src_10001
     GROUP BY
-      ds
+      DATE_TRUNC('day', ds)
       , listing_id
   ) subq_10
 ) subq_11
 ON
-  CAST(subq_12.metric_time__day AS TIMESTAMP) - INTERVAL '10' day = subq_11.metric_time__day
+  DATE_TRUNC('day', subq_12.metric_time__day) = subq_11.metric_time__day
