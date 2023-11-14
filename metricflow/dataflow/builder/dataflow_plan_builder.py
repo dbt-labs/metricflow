@@ -80,49 +80,7 @@ class DataflowRecipe:
     @property
     def join_targets(self) -> List[JoinDescription]:
         """Joins to be made to source node."""
-        join_targets = []
-        for join_recipe in self.join_linkable_instances_recipes:
-            # Figure out what elements to filter from the joined node.
-
-            # Sanity check - all linkable specs should have a link, or else why would we be joining them.
-            assert all([len(x.entity_links) > 0 for x in join_recipe.satisfiable_linkable_specs])
-
-            # If we're joining something in, then we need the associated entity, partitions, and time dimension
-            # specs defining the validity window (if necessary)
-            include_specs: List[LinkableInstanceSpec] = [
-                LinklessEntitySpec.from_reference(x.entity_links[0]) for x in join_recipe.satisfiable_linkable_specs
-            ]
-            include_specs.extend([x.node_to_join_dimension_spec for x in join_recipe.join_on_partition_dimensions])
-            include_specs.extend(
-                [x.node_to_join_time_dimension_spec for x in join_recipe.join_on_partition_time_dimensions]
-            )
-            if join_recipe.validity_window:
-                include_specs.extend(
-                    [
-                        join_recipe.validity_window.window_start_dimension,
-                        join_recipe.validity_window.window_end_dimension,
-                    ]
-                )
-
-            # satisfiable_linkable_specs describes what can be satisfied after the join, so remove the entity
-            # link when filtering before the join.
-            # e.g. if the node is used to satisfy "user_id__country", then the node must have the entity
-            # "user_id" and the "country" dimension so that it can be joined to the measure node.
-            include_specs.extend([x.without_first_entity_link for x in join_recipe.satisfiable_linkable_specs])
-            filtered_node_to_join = FilterElementsNode(
-                parent_node=join_recipe.node_to_join,
-                include_specs=InstanceSpecSet.create_from_linkable_specs(include_specs),
-            )
-            join_targets.append(
-                JoinDescription(
-                    join_node=filtered_node_to_join,
-                    join_on_entity=join_recipe.join_on_entity,
-                    join_on_partition_dimensions=join_recipe.join_on_partition_dimensions,
-                    join_on_partition_time_dimensions=join_recipe.join_on_partition_time_dimensions,
-                    validity_window=join_recipe.validity_window,
-                )
-            )
-        return join_targets
+        return [join_recipe.join_description for join_recipe in self.join_linkable_instances_recipes]
 
 
 @dataclass(frozen=True)
@@ -485,6 +443,7 @@ class DataflowPlanBuilder:
             potential_source_nodes: Sequence[BaseOutput] = self._select_source_nodes_with_measures(
                 measure_specs=set(measure_spec_properties.measure_specs), source_nodes=source_nodes
             )
+            default_join_type = SqlJoinType.LEFT_OUTER
         else:
             # Only read nodes can be source nodes for queries without measures
             source_nodes = self._read_nodes
@@ -492,6 +451,7 @@ class DataflowPlanBuilder:
                 linkable_specs=linkable_spec_set, read_nodes=source_nodes
             )
             potential_source_nodes = list(source_nodes_to_linkable_specs.keys())
+            default_join_type = SqlJoinType.FULL_OUTER
 
         logger.info(f"There are {len(potential_source_nodes)} potential source nodes")
 
@@ -518,7 +478,9 @@ class DataflowPlanBuilder:
             f"After removing unnecessary nodes, there are {len(nodes_available_for_joins)} nodes available for joins"
         )
         if DataflowPlanBuilder._contains_multihop_linkables(linkable_specs):
-            nodes_available_for_joins = node_processor.add_multi_hop_joins(linkable_specs, source_nodes)
+            nodes_available_for_joins = node_processor.add_multi_hop_joins(
+                desired_linkable_specs=linkable_specs, nodes=source_nodes, join_type=default_join_type
+            )
             logger.info(
                 f"After adding multi-hop nodes, there are {len(nodes_available_for_joins)} nodes available for joins:\n"
                 f"{pformat_big_objects(nodes_available_for_joins)}"
@@ -552,7 +514,9 @@ class DataflowPlanBuilder:
             logger.debug(f"Evaluating source node:\n{pformat_big_objects(source_node=dataflow_dag_as_text(node))}")
 
             start_time = time.time()
-            evaluation = node_evaluator.evaluate_node(start_node=node, required_linkable_specs=list(linkable_specs))
+            evaluation = node_evaluator.evaluate_node(
+                start_node=node, required_linkable_specs=list(linkable_specs), default_join_type=default_join_type
+            )
             logger.info(f"Evaluation of {node} took {time.time() - start_time:.2f}s")
 
             logger.debug(

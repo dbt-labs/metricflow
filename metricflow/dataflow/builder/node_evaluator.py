@@ -27,6 +27,7 @@ from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputData
 from metricflow.dataflow.builder.partitions import PartitionJoinResolver
 from metricflow.dataflow.dataflow_plan import (
     BaseOutput,
+    FilterElementsNode,
     JoinDescription,
     PartitionDimensionJoinDescription,
     PartitionTimeDimensionJoinDescription,
@@ -37,10 +38,8 @@ from metricflow.instances import InstanceSet
 from metricflow.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
 from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
 from metricflow.protocols.semantics import SemanticModelAccessor
-from metricflow.specs.specs import (
-    LinkableInstanceSpec,
-    LinklessEntitySpec,
-)
+from metricflow.specs.specs import InstanceSpecSet, LinkableInstanceSpec, LinklessEntitySpec
+from metricflow.sql.sql_plan import SqlJoinType
 
 logger = logging.getLogger(__name__)
 
@@ -61,6 +60,8 @@ class JoinLinkableInstancesRecipe:
     # the linkable specs in the node that can help to satisfy the query. e.g. "user_id__country" might be one of the
     # "satisfiable_linkable_specs", but "country" is the linkable spec in the node.
     satisfiable_linkable_specs: List[LinkableInstanceSpec]
+    # Join type to use when joining nodes
+    join_type: SqlJoinType
 
     # The partitions to join on, if there are matching partitions between the start_node and node_to_join.
     join_on_partition_dimensions: Tuple[PartitionDimensionJoinDescription, ...]
@@ -71,12 +72,36 @@ class JoinLinkableInstancesRecipe:
     @property
     def join_description(self) -> JoinDescription:
         """The recipe as a join description to use in the dataflow plan node."""
+        # Figure out what elements to filter from the joined node.
+        include_specs: List[LinkableInstanceSpec] = []
+        assert all([len(spec.entity_links) > 0 for spec in self.satisfiable_linkable_specs])
+        include_specs.extend(
+            [LinklessEntitySpec.from_reference(spec.entity_links[0]) for spec in self.satisfiable_linkable_specs]
+        )
+
+        include_specs.extend([join.node_to_join_dimension_spec for join in self.join_on_partition_dimensions])
+        include_specs.extend([join.node_to_join_time_dimension_spec for join in self.join_on_partition_time_dimensions])
+        if self.validity_window:
+            include_specs.extend(
+                [self.validity_window.window_start_dimension, self.validity_window.window_end_dimension]
+            )
+
+        # `satisfiable_linkable_specs` describes what can be satisfied after the join, so remove the entity
+        # link when filtering before the join.
+        # e.g. if the node is used to satisfy "user_id__country", then the node must have the entity
+        # "user_id" and the "country" dimension so that it can be joined to the source node.
+        include_specs.extend([spec.without_first_entity_link for spec in self.satisfiable_linkable_specs])
+        filtered_node_to_join = FilterElementsNode(
+            parent_node=self.node_to_join, include_specs=InstanceSpecSet.create_from_linkable_specs(include_specs)
+        )
+
         return JoinDescription(
-            join_node=self.node_to_join,
+            join_node=filtered_node_to_join,
             join_on_entity=self.join_on_entity,
             join_on_partition_dimensions=self.join_on_partition_dimensions,
             join_on_partition_time_dimensions=self.join_on_partition_time_dimensions,
             validity_window=self.validity_window,
+            join_type=self.join_type,
         )
 
 
@@ -133,6 +158,7 @@ class NodeEvaluatorForLinkableInstances:
         self,
         start_node_instance_set: InstanceSet,
         needed_linkable_specs: List[LinkableInstanceSpec],
+        join_type: SqlJoinType,
     ) -> List[JoinLinkableInstancesRecipe]:
         """Get nodes that can be joined to get 1 or more of the "needed_linkable_specs".
 
@@ -257,6 +283,7 @@ class NodeEvaluatorForLinkableInstances:
                             join_on_partition_dimensions=join_on_partition_dimensions,
                             join_on_partition_time_dimensions=join_on_partition_time_dimensions,
                             validity_window=validity_window_join_description,
+                            join_type=join_type,
                         )
                     )
 
@@ -271,6 +298,7 @@ class NodeEvaluatorForLinkableInstances:
     def _update_candidates_that_can_satisfy_linkable_specs(
         candidates_for_join: List[JoinLinkableInstancesRecipe],
         already_satisfisfied_linkable_specs: List[LinkableInstanceSpec],
+        join_type: SqlJoinType,
     ) -> List[JoinLinkableInstancesRecipe]:
         """Update / filter candidates_for_join based on linkable instance specs that we have already satisfied.
 
@@ -294,6 +322,7 @@ class NodeEvaluatorForLinkableInstances:
                         join_on_partition_dimensions=candidate_for_join.join_on_partition_dimensions,
                         join_on_partition_time_dimensions=candidate_for_join.join_on_partition_time_dimensions,
                         validity_window=candidate_for_join.validity_window,
+                        join_type=join_type,
                     )
                 )
         return sorted(
@@ -306,6 +335,7 @@ class NodeEvaluatorForLinkableInstances:
         self,
         start_node: BaseOutput,
         required_linkable_specs: Sequence[LinkableInstanceSpec],
+        default_join_type: SqlJoinType,
     ) -> LinkableInstanceSatisfiabilityEvaluation:
         """Evaluates if the "required_linkable_specs" can be realized by joining the "start_node" with other nodes.
 
@@ -345,7 +375,9 @@ class NodeEvaluatorForLinkableInstances:
                 possibly_joinable_linkable_specs.append(required_linkable_spec)
 
         candidates_for_join = self._find_joinable_candidate_nodes_that_can_satisfy_linkable_specs(
-            start_node_instance_set=candidate_instance_set, needed_linkable_specs=possibly_joinable_linkable_specs
+            start_node_instance_set=candidate_instance_set,
+            needed_linkable_specs=possibly_joinable_linkable_specs,
+            join_type=default_join_type,
         )
         join_candidates: List[JoinLinkableInstancesRecipe] = []
 
@@ -378,6 +410,7 @@ class NodeEvaluatorForLinkableInstances:
             candidates_for_join = self._update_candidates_that_can_satisfy_linkable_specs(
                 candidates_for_join=candidates_for_join,
                 already_satisfisfied_linkable_specs=next_candidate.satisfiable_linkable_specs,
+                join_type=default_join_type,
             )
 
             # The once possibly joinable specs are definitely joinable and no longer need to be searched for.

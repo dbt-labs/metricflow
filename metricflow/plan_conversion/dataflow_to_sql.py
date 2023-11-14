@@ -402,12 +402,9 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             # e.g. a data set has the dimension "listing__country_latest" and "listing" is a primary entity in the
             # data set. The next step would create an instance like "listing__listing__country_latest" without this
             # filter.
-
-            # logger.error(f"before filter is:\n{pformat_big_objects(right_data_set.instance_set.spec_set)}")
             right_data_set_instance_set_filtered = FilterLinkableInstancesWithLeadingLink(
                 entity_link=join_on_entity,
             ).transform(right_data_set.instance_set)
-            # logger.error(f"after filter is:\n{pformat_big_objects(right_data_set_instance_set_filtered.spec_set)}")
 
             # After the right data set is joined to the "from" data set, we need to change the links for some of the
             # instances that represent the right data set. For example, if the "from" data set contains the "bookings"

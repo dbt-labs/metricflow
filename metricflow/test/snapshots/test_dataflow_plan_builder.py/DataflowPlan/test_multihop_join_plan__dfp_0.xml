@@ -39,6 +39,7 @@
                         <!--    'join_on_entity': {'class': 'LinklessEntitySpec',                                                                     -->
                         <!--                       'element_name': 'account_id',                                                                      -->
                         <!--                       'entity_links': ()},                                                                               -->
+                        <!--    'join_type': SqlJoinType.LEFT_OUTER,                                                                                  -->
                         <!--    'join_on_partition_dimensions': (),                                                                                   -->
                         <!--    'join_on_partition_time_dimensions': ({'class': 'PartitionTimeDimensionJoinDescription',                              -->
                         <!--                                           'start_node_time_dimension_spec': {'class': 'TimeDimensionSpec',               -->
@@ -118,6 +119,7 @@
                                 <!--    'join_on_entity': {'class': 'LinklessEntitySpec',                                                                     -->
                                 <!--                       'element_name': 'customer_id',                                                                     -->
                                 <!--                       'entity_links': ()},                                                                               -->
+                                <!--    'join_type': SqlJoinType.LEFT_OUTER,                                                                                  -->
                                 <!--    'join_on_partition_dimensions': (),                                                                                   -->
                                 <!--    'join_on_partition_time_dimensions': ({'class': 'PartitionTimeDimensionJoinDescription',                              -->
                                 <!--                                           'start_node_time_dimension_spec': {'class': 'TimeDimensionSpec',               -->

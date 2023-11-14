@@ -290,6 +290,7 @@ def test_single_join_node(  # noqa: D
                 join_on_entity=entity_spec,
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
+                join_type=SqlJoinType.LEFT_OUTER,
             )
         ],
     )
@@ -343,12 +344,14 @@ def test_multi_join_node(
                 join_on_entity=LinklessEntitySpec.from_element_name(element_name="listing"),
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
+                join_type=SqlJoinType.LEFT_OUTER,
             ),
             JoinDescription(
                 join_node=filtered_dimension_node,
                 join_on_entity=LinklessEntitySpec.from_element_name(element_name="listing"),
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
+                join_type=SqlJoinType.LEFT_OUTER,
             ),
         ],
     )
@@ -406,6 +409,7 @@ def test_compute_metrics_node(
                 join_on_entity=entity_spec,
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
+                join_type=SqlJoinType.LEFT_OUTER,
             )
         ],
     )
@@ -467,6 +471,7 @@ def test_compute_metrics_node_simple_expr(
                 join_on_entity=entity_spec,
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
+                join_type=SqlJoinType.LEFT_OUTER,
             )
         ],
     )
@@ -747,6 +752,7 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
                 join_on_entity=entity_spec,
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
+                join_type=SqlJoinType.LEFT_OUTER,
             )
         ],
     )
@@ -994,6 +1000,32 @@ def test_compute_metrics_node_ratio_from_multiple_semantic_models(
             dimension_specs=(dimension_spec,),
             time_dimension_specs=(time_dimension_spec,),
         ),
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_dimensions_requiring_join(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    """Tests querying 2 dimensions that require a join."""
+    dimension_specs = (
+        DimensionSpec(element_name="home_state_latest", entity_links=(EntityReference(element_name="user"),)),
+        DimensionSpec(element_name="is_lux_latest", entity_links=(EntityReference(element_name="listing"),)),
+    )
+    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
+        query_spec=MetricFlowQuerySpec(dimension_specs=dimension_specs)
     )
 
     convert_and_check(
