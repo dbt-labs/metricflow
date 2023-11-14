@@ -1,6 +1,0 @@
-kind: Dependencies
-body: Update dbt dependencies to ~=1.7.0
-time: 2023-11-09T17:29:55.964376-08:00
-custom:
-  Author: tlento
-  PR: "860"

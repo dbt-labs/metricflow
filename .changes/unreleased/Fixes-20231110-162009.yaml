@@ -1,6 +1,0 @@
-kind: Fixes
-body: Use FULL OUTER JOIN for dimension-only queries.
-time: 2023-11-10T16:20:09.530487-08:00
-custom:
-  Author: courtneyholcomb
-  Issue: "863"

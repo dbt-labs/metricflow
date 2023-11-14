@@ -1,6 +1,0 @@
-kind: Dependencies
-body: Update typing-extensions minimum version to 4.4
-time: 2023-10-26T15:14:57.44532-07:00
-custom:
-  Author: tlento
-  PR: "823"
