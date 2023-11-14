@@ -16,7 +16,6 @@ from typing_extensions import ParamSpec
 
 from metricflow.random_id import random_id
 from metricflow.telemetry.handlers.handlers import (
-    RudderstackTelemetryHandler,
     TelemetryHandler,
     ToMemoryTelemetryHandler,
 )
@@ -64,9 +63,6 @@ class TelemetryReporter:
 
     def add_python_log_handler(self) -> None:  # noqa: D
         self._handlers.append(PythonLoggerTelemetryHandler(logger_level=logging.INFO))
-
-    def add_rudderstack_handler(self) -> None:  # noqa: D
-        self._handlers.append(RudderstackTelemetryHandler())
 
     def add_test_handler(self) -> None:
         """See test_handler."""

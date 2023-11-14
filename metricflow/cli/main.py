@@ -49,7 +49,6 @@ logger = logging.getLogger(__name__)
 pass_config = click.make_pass_decorator(CLIContext, ensure=True)
 _telemetry_reporter = TelemetryReporter(report_levels_higher_or_equal_to=TelemetryLevel.USAGE)
 _telemetry_reporter.add_python_log_handler()
-_telemetry_reporter.add_rudderstack_handler()
 
 
 @click.group()

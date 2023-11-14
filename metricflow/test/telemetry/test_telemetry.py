@@ -78,24 +78,3 @@ def test_telemetry_off() -> None:  # noqa: D
         test_exception_function()
 
     assert len(reporter.test_handler.payloads) == 0
-
-
-@pytest.mark.skip("Sends events to Rudderstack")
-def test_rudderstack_logging() -> None:  # noqa: D
-    reporter = TelemetryReporter(report_levels_higher_or_equal_to=TelemetryLevel.USAGE)
-    reporter.add_python_log_handler()
-    reporter.add_rudderstack_handler()
-
-    @log_call(telemetry_reporter=reporter, module_name=__name__)
-    def test_function() -> str:
-        return "foo"
-
-    test_function()
-
-    with pytest.raises(ValueError):
-
-        @log_call(telemetry_reporter=reporter, module_name=__name__)
-        def test_exception_function() -> str:
-            raise ValueError("foo")
-
-        test_exception_function()
