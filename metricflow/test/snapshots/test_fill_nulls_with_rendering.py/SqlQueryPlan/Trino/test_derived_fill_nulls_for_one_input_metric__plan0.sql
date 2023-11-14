@@ -547,7 +547,7 @@ FROM (
             ) subq_8
           ) subq_9
           ON
-            DATE_TRUNC('day', subq_10.metric_time__day) = subq_9.metric_time__day
+            DATE_ADD('day', -14, subq_10.metric_time__day) = subq_9.metric_time__day
         ) subq_12
       ) subq_13
       GROUP BY

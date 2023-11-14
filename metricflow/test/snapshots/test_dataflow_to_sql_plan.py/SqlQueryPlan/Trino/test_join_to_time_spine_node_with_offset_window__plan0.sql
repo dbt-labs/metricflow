@@ -231,4 +231,4 @@ INNER JOIN (
   ) subq_3
 ) subq_4
 ON
-  DATE_TRUNC('day', subq_5.metric_time__day) = subq_4.metric_time__day
+  DATE_ADD('day', -10, subq_5.metric_time__day) = subq_4.metric_time__day

@@ -46,7 +46,7 @@ FROM (
       FROM ***************************.fct_bookings bookings_source_src_10001
     ) subq_20
     ON
-      DATE_TRUNC('day', subq_22.ds) = subq_20.metric_time__day
+      DATE_ADD('day', -14, subq_22.ds) = subq_20.metric_time__day
     GROUP BY
       DATE_TRUNC('quarter', subq_22.ds)
   ) subq_26

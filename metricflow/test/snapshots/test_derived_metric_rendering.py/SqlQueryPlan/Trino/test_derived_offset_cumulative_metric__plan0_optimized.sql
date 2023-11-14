@@ -24,11 +24,11 @@ FROM (
       (
         DATE_TRUNC('day', bookings_source_src_10001.ds) <= subq_14.ds
       ) AND (
-        DATE_TRUNC('day', bookings_source_src_10001.ds) > DATE_TRUNC('day', subq_14.ds)
+        DATE_TRUNC('day', bookings_source_src_10001.ds) > DATE_ADD('day', -2, subq_14.ds)
       )
   ) subq_15
   ON
-    DATE_TRUNC('day', subq_17.ds) = subq_15.metric_time__day
+    DATE_ADD('day', -2, subq_17.ds) = subq_15.metric_time__day
   GROUP BY
     subq_17.ds
 ) subq_21

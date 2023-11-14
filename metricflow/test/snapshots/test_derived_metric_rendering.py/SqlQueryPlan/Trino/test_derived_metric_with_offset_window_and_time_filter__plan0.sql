@@ -545,7 +545,7 @@ FROM (
               ) subq_6
             ) subq_7
             ON
-              DATE_TRUNC('day', subq_8.metric_time__day) = subq_7.metric_time__day
+              DATE_ADD('day', -14, subq_8.metric_time__day) = subq_7.metric_time__day
           ) subq_10
         ) subq_11
         WHERE metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14'

@@ -60,7 +60,7 @@ FROM (
       FROM ***************************.fct_bookings bookings_source_src_10001
     ) subq_26
     ON
-      DATE_TRUNC('day', subq_28.ds) = subq_26.metric_time__day
+      DATE_ADD('day', -14, subq_28.ds) = subq_26.metric_time__day
     GROUP BY
       subq_28.ds
   ) subq_32

@@ -311,7 +311,7 @@ FROM (
           ) subq_0
         ) subq_1
         ON
-          DATE_TRUNC('day', subq_2.metric_time__day) = subq_1.metric_time__day
+          DATE_ADD('day', -5, subq_2.metric_time__day) = subq_1.metric_time__day
       ) subq_4
     ) subq_5
     GROUP BY

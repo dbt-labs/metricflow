@@ -23,7 +23,7 @@ FROM (
       (
         DATE_TRUNC('day', bookings_source_src_10001.ds) <= subq_13.ds
       ) AND (
-        DATE_TRUNC('day', bookings_source_src_10001.ds) > DATE_TRUNC('day', subq_13.ds)
+        DATE_TRUNC('day', bookings_source_src_10001.ds) > DATE_ADD('day', -2, subq_13.ds)
       )
     GROUP BY
       subq_13.ds

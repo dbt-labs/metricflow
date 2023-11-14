@@ -91,7 +91,7 @@ FROM (
           ) subq_0
         ) subq_1
         ON
-          DATE_TRUNC('month', subq_2.metric_time__month) = subq_1.metric_time__month
+          DATE_ADD('month', -1, subq_2.metric_time__month) = subq_1.metric_time__month
       ) subq_4
     ) subq_5
     GROUP BY

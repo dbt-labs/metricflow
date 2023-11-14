@@ -421,11 +421,11 @@ FROM (
             (
               subq_1.metric_time__day <= subq_2.metric_time__day
             ) AND (
-              subq_1.metric_time__day > DATE_TRUNC('day', subq_2.metric_time__day)
+              subq_1.metric_time__day > DATE_ADD('day', -2, subq_2.metric_time__day)
             )
         ) subq_4
         ON
-          DATE_TRUNC('day', subq_5.metric_time__day) = subq_4.metric_time__day
+          DATE_ADD('day', -2, subq_5.metric_time__day) = subq_4.metric_time__day
       ) subq_7
     ) subq_8
     GROUP BY

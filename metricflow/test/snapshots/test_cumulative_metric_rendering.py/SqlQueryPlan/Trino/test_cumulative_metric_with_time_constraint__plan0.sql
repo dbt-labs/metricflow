@@ -179,7 +179,7 @@ FROM (
           (
             subq_2.metric_time__day <= subq_3.metric_time__day
           ) AND (
-            subq_2.metric_time__day > DATE_TRUNC('month', subq_3.metric_time__day)
+            subq_2.metric_time__day > DATE_ADD('month', -2, subq_3.metric_time__day)
           )
       ) subq_5
     ) subq_6

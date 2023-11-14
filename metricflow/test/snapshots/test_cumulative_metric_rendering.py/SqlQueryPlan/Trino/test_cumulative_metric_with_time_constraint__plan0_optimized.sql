@@ -29,7 +29,7 @@ ON
   (
     subq_11.metric_time__day <= subq_12.metric_time__day
   ) AND (
-    subq_11.metric_time__day > DATE_TRUNC('month', subq_12.metric_time__day)
+    subq_11.metric_time__day > DATE_ADD('month', -2, subq_12.metric_time__day)
   )
 WHERE subq_11.metric_time__month BETWEEN timestamp '2020-01-01' AND timestamp '2020-01-01'
 GROUP BY

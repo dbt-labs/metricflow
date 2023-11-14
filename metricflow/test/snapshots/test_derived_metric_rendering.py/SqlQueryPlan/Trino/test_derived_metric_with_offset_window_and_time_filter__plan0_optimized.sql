@@ -53,7 +53,7 @@ FROM (
         FROM ***************************.fct_bookings bookings_source_src_10001
       ) subq_23
       ON
-        DATE_TRUNC('day', subq_25.ds) = subq_23.metric_time__day
+        DATE_ADD('day', -14, subq_25.ds) = subq_23.metric_time__day
     ) subq_27
     WHERE metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14'
     GROUP BY

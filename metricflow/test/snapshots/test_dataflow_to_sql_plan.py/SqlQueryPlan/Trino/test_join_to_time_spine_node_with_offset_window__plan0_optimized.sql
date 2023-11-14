@@ -33,4 +33,4 @@ INNER JOIN (
   ) subq_10
 ) subq_11
 ON
-  DATE_TRUNC('day', subq_12.metric_time__day) = subq_11.metric_time__day
+  DATE_ADD('day', -10, subq_12.metric_time__day) = subq_11.metric_time__day

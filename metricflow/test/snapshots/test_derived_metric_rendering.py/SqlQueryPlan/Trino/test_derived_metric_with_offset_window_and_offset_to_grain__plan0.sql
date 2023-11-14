@@ -633,7 +633,7 @@ FROM (
             ) subq_8
           ) subq_9
           ON
-            DATE_TRUNC('month', subq_10.metric_time__day) = subq_9.metric_time__day
+            DATE_ADD('month', -1, subq_10.metric_time__day) = subq_9.metric_time__day
         ) subq_12
       ) subq_13
       GROUP BY

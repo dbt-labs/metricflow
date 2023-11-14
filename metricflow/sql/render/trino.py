@@ -46,12 +46,6 @@ class TrinoSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         """Render time delta for Trino, require granularity in quotes and function name change."""
         arg_rendered = node.arg.accept(self)
 
-        if node.granularity:
-            return SqlExpressionRenderResult(
-                sql=f"DATE_TRUNC('{node.granularity.value}', {arg_rendered.sql})",
-                bind_parameters=arg_rendered.bind_parameters,
-            )
-
         count = node.count
         granularity = node.granularity
         if granularity == TimeGranularity.QUARTER:

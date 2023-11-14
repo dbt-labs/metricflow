@@ -22,7 +22,7 @@ FROM (
   INNER JOIN
     ***************************.fct_bookings_extended_monthly bookings_monthly_source_src_10024
   ON
-    DATE_TRUNC('month', subq_10.metric_time__month) = DATE_TRUNC('month', bookings_monthly_source_src_10024.ds)
+    DATE_ADD('month', -1, subq_10.metric_time__month) = DATE_TRUNC('month', bookings_monthly_source_src_10024.ds)
   GROUP BY
     subq_10.metric_time__month
 ) subq_15

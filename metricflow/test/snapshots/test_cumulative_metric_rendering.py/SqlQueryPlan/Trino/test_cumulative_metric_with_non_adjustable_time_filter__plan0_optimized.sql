@@ -18,7 +18,7 @@ FROM (
     (
       DATE_TRUNC('day', bookings_source_src_10001.ds) <= subq_11.ds
     ) AND (
-      DATE_TRUNC('day', bookings_source_src_10001.ds) > DATE_TRUNC('day', subq_11.ds)
+      DATE_TRUNC('day', bookings_source_src_10001.ds) > DATE_ADD('day', -2, subq_11.ds)
     )
 ) subq_13
 WHERE metric_time__day = '2020-01-03' or metric_time__day = '2020-01-07'
