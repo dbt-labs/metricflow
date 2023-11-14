@@ -1151,7 +1151,7 @@ integration_test:
         {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
         , SUM(1) AS bookings
       FROM {{ source_schema }}.fct_bookings bookings_source_src_1
-      GROUP BY metric_time__day
+      GROUP BY 1
     ) subq_3
     ON subq_5.ds = subq_3.metric_time__day
 ---
@@ -1169,14 +1169,14 @@ integration_test:
       SELECT
         {{ render_date_trunc("ds", TimeGranularity.MONTH) }} AS metric_time__month
       FROM {{ source_schema }}.mf_time_spine subq_5
-      GROUP BY metric_time__month
+      GROUP BY 1
     ) subq_4
     LEFT OUTER JOIN (
       SELECT
         {{ render_date_trunc("ds", TimeGranularity.MONTH) }} AS metric_time__month
         , SUM(1) AS bookings
       FROM {{ source_schema }}.fct_bookings bookings_source_src_1
-      GROUP BY metric_time__month
+      GROUP BY 1
     ) subq_3
     ON subq_4.metric_time__month = subq_3.metric_time__month
 ---
@@ -1192,7 +1192,7 @@ integration_test:
       , COALESCE(SUM(1), 0) AS bookings_fill_nulls_with_0
     FROM {{ source_schema }}.fct_bookings bookings_source_src_1
     GROUP BY
-      booking__paid_at__day
+      1
 ---
 integration_test:
   name: simple_fill_nulls_with_0_with_categorical_dimension
@@ -1205,7 +1205,7 @@ integration_test:
       is_instant AS booking__is_instant
       , COALESCE(SUM(1), 0) AS bookings_fill_nulls_with_0
     FROM {{ source_schema }}.fct_bookings bookings_source_src_1
-    GROUP BY booking__is_instant
+    GROUP BY 1
 ---
 integration_test:
   name: simple_join_to_time_spine
@@ -1224,7 +1224,7 @@ integration_test:
         , SUM(1) AS bookings
       FROM {{ source_schema }}.fct_bookings bookings_source_src_1
       GROUP BY
-        metric_time__day
+        1
     ) subq_3
     ON
       subq_5.ds = subq_3.metric_time__day
@@ -1240,7 +1240,7 @@ integration_test:
       {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
       , COALESCE(SUM(1), 0) AS bookings_fill_nulls_with_0_without_time_spine
     FROM {{ source_schema }}.fct_bookings bookings_source_src_1
-    GROUP BY metric_time__day
+    GROUP BY 1
 ---
 integration_test:
   name: cumulative_fill_nulls
@@ -1293,7 +1293,7 @@ integration_test:
             , SUM(1) AS bookings
           FROM {{ source_schema }}.fct_bookings bookings_source_src_1
           GROUP BY
-            metric_time__day
+            1
         ) subq_3
         ON subq_5.ds = subq_3.metric_time__day
       ) subq_7
@@ -1336,7 +1336,7 @@ integration_test:
           {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
           , SUM(1) AS bookings
         FROM {{ source_schema }}.fct_bookings bookings_source_src_1
-        GROUP BY metric_time__day
+        GROUP BY 1
       ) subq_3
       ON subq_5.ds = subq_3.metric_time__day
     ) subq_7
@@ -1345,7 +1345,7 @@ integration_test:
         {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
         , SUM(1) AS views
       FROM {{ source_schema }}.fct_views views_source_src_9
-      GROUP BY metric_time__day
+      GROUP BY 1
     ) subq_12
     ON subq_7.metric_time__day = subq_12.metric_time__day
     GROUP BY COALESCE(subq_7.metric_time__day, subq_12.metric_time__day)
@@ -1384,7 +1384,7 @@ integration_test:
                 {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
                 , SUM(1) AS bookings
               FROM {{ source_schema }}.fct_bookings bookings_source_src_1
-              GROUP BY metric_time__day
+              GROUP BY 1
             ) subq_3
             ON subq_5.ds = subq_3.metric_time__day
           ) subq_6
