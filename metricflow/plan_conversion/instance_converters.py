@@ -586,6 +586,47 @@ class ChangeMeasureAggregationState(InstanceSetTransform[InstanceSet]):
         )
 
 
+class UpdateMeasureFillNullsWith(InstanceSetTransform[InstanceSet]):
+    """Returns a new instance set where all measures have been assigned the fill nulls with property."""
+
+    def __init__(self, metric_input_measure_specs: Sequence[MetricInputMeasureSpec]):
+        """Initializer stores the input specs, which contain the fill_nulls_with for each measure."""
+        self.metric_input_measure_specs = metric_input_measure_specs
+
+    def _update_fill_nulls_with(self, measure_instances: Tuple[MeasureInstance, ...]) -> Tuple[MeasureInstance, ...]:
+        """Update all measure instances with the corresponding fill_nulls_with value."""
+        updated_instances: List[MeasureInstance] = []
+        for instance in measure_instances:
+            matches = [spec for spec in self.metric_input_measure_specs if spec.measure_spec == instance.spec]
+            assert len(matches) == 1, f"Matched with {matches} for measure instance {instance}. "
+            "We should always have 1 direct match for each measure instance and input measure."
+            measure_spec = MeasureSpec(
+                element_name=instance.spec.element_name,
+                fill_nulls_with=matches[0].fill_nulls_with,
+                non_additive_dimension_spec=instance.spec.non_additive_dimension_spec,
+            )
+            updated_instances.append(
+                MeasureInstance(
+                    associated_columns=instance.associated_columns,
+                    spec=measure_spec,
+                    aggregation_state=instance.aggregation_state,
+                    defined_from=instance.defined_from,
+                )
+            )
+
+        return tuple(updated_instances)
+
+    def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D
+        return InstanceSet(
+            measure_instances=self._update_fill_nulls_with(instance_set.measure_instances),
+            dimension_instances=instance_set.dimension_instances,
+            time_dimension_instances=instance_set.time_dimension_instances,
+            entity_instances=instance_set.entity_instances,
+            metric_instances=instance_set.metric_instances,
+            metadata_instances=instance_set.metadata_instances,
+        )
+
+
 class AliasAggregatedMeasures(InstanceSetTransform[InstanceSet]):
     """Returns a new instance set where all measures have been assigned an alias spec."""
 

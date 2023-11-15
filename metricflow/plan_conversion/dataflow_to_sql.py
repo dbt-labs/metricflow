@@ -52,6 +52,7 @@ from metricflow.plan_conversion.instance_converters import (
     FilterLinkableInstancesWithLeadingLink,
     RemoveMeasures,
     RemoveMetrics,
+    UpdateMeasureFillNullsWith,
     create_select_columns_for_instance_sets,
 )
 from metricflow.plan_conversion.select_column_gen import (
@@ -484,6 +485,10 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             ChangeAssociatedColumns(self._column_association_resolver)
         )
 
+        # Add fill null property to corresponding measure spec
+        aggregated_instance_set = aggregated_instance_set.transform(
+            UpdateMeasureFillNullsWith(metric_input_measure_specs=node.metric_input_measure_specs)
+        )
         from_data_set_alias = self._next_unique_table_alias()
 
         # Convert the instance set into a set of select column statements with updated aliases
