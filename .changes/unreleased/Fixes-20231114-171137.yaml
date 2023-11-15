@@ -1,0 +1,6 @@
+kind: Fixes
+body: Fix error in cumulative metric output when start-time and end-time are specified
+time: 2023-11-14T17:11:37.462241-08:00
+custom:
+  Author: tlento
+  Issue: "869"

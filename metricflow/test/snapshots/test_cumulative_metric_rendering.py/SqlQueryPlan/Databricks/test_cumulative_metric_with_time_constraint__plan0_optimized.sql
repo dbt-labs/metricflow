@@ -17,13 +17,13 @@ FROM (
 INNER JOIN (
   -- Read Elements From Semantic Model 'revenue'
   -- Metric Time Dimension 'ds'
-  -- Constrain Time Range to [2019-12-01T00:00:00, 2020-01-01T00:00:00]
+  -- Constrain Time Range to [2019-11-01T00:00:00, 2020-01-01T00:00:00]
   SELECT
     DATE_TRUNC('day', created_at) AS metric_time__day
     , DATE_TRUNC('month', created_at) AS metric_time__month
     , revenue AS txn_revenue
   FROM ***************************.fct_revenue revenue_src_10006
-  WHERE DATE_TRUNC('day', created_at) BETWEEN '2019-12-01' AND '2020-01-01'
+  WHERE DATE_TRUNC('day', created_at) BETWEEN '2019-11-01' AND '2020-01-01'
 ) subq_11
 ON
   (
