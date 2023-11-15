@@ -1,0 +1,6 @@
+kind: Dependencies
+body: Relax version pin on typing extensions to allow >=4.4, <5
+time: 2023-11-15T14:48:49.411998-08:00
+custom:
+  Author: tlento
+  PR: "875"
