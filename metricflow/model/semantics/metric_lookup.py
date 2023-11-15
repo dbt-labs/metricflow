@@ -104,14 +104,9 @@ class MetricLookup(MetricAccessor):  # noqa: D
                 )
         self._metrics[metric_reference] = metric
 
-    def configured_input_measure_for_metric(self, metric_reference: MetricReference) -> Optional[MetricInputMeasure]:
-        """Get input measure defined in the original metric config, if exists.
-
-        When SemanticModel is constructed, input measures from input metrics are added to the list of input measures
-        for a metric. Here, use rules about metric types to determine which input measures were defined in the config:
-        - Simple & cumulative metrics require one input measure, and can't take any input metrics.
-        - Derived & ratio metrics take no input measures, only input metrics.
-        """
+    def configured_input_measure_for_metric(  # noqa: D
+        self, metric_reference: MetricReference
+    ) -> Optional[MetricInputMeasure]:
         metric = self.get_metric(metric_reference=metric_reference)
         if metric.type is MetricType.CUMULATIVE or metric.type is MetricType.SIMPLE:
             assert len(metric.input_measures) == 1, "Simple and cumulative metrics should have one input measure."
