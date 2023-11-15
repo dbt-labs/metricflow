@@ -189,8 +189,9 @@ features = [
 ]
 
 [tool.hatch.envs.trino-env.env-vars]
-MF_TEST_ADAPTER_TYPE="trino"
-MF_SQL_ENGINE_URL="trino://trino@localhost:8080/"
+MF_TEST_ADAPTER_TYPE = "trino"
+MF_SQL_ENGINE_URL = "trino://trino@localhost:8080/"
+DBT_ENV_SECRET_CATALOG="memory"
 
 [tool.hatch.envs.trino-env]
 description = "Dev environment for working with the Trino adapter"
