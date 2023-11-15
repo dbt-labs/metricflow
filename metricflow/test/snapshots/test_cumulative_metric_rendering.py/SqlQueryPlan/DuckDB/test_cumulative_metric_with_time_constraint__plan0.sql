@@ -65,7 +65,7 @@ FROM (
           WHERE subq_4.ds BETWEEN '2020-01-01' AND '2020-01-01'
         ) subq_3
         INNER JOIN (
-          -- Constrain Time Range to [2019-12-01T00:00:00, 2020-01-01T00:00:00]
+          -- Constrain Time Range to [2019-11-01T00:00:00, 2020-01-01T00:00:00]
           SELECT
             subq_1.ds__day
             , subq_1.ds__week
@@ -173,7 +173,7 @@ FROM (
               FROM ***************************.fct_revenue revenue_src_10006
             ) subq_0
           ) subq_1
-          WHERE subq_1.metric_time__day BETWEEN '2019-12-01' AND '2020-01-01'
+          WHERE subq_1.metric_time__day BETWEEN '2019-11-01' AND '2020-01-01'
         ) subq_2
         ON
           (

@@ -63,7 +63,7 @@ class TimeRangeConstraint(SerializableDataclass):
         time_granularity: TimeGranularity,
         time_unit_count: int,
     ) -> TimeRangeConstraint:
-        """Moves the start of the time constraint back by 1 window.
+        """Moves the start of the time constraint back by <time_unit_count> windows.
 
         if the metric is weekly-active-users (ie window = 1 week) it moves time_constraint.start one week earlier
         """
@@ -80,7 +80,7 @@ class TimeRangeConstraint(SerializableDataclass):
     ) -> TimeRangeConstraint:
         """Given a time constraint for the overall query, adjust it to cover the time range for this metric."""
         if granularity is not None:
-            return self._adjust_time_constraint_start_by_window(granularity, count - 1)
+            return self._adjust_time_constraint_start_by_window(granularity, count)
 
         # if no window is specified we want to accumulate from the beginning of time
         return TimeRangeConstraint(
