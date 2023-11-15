@@ -2,12 +2,11 @@ from __future__ import annotations
 
 import logging
 from collections import OrderedDict
-from typing import List, Optional, Sequence, Tuple, Union
+from typing import List, Optional, Sequence, Union
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols.metric import MetricInputMeasure, MetricType
-from dbt_semantic_interfaces.references import MetricModelReference, MetricReference
-from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
+from dbt_semantic_interfaces.references import MetricModelReference
 
 from metricflow.aggregation_properties import AggregationState
 from metricflow.dag.id_generation import IdGeneratorRegistry
@@ -46,6 +45,7 @@ from metricflow.plan_conversion.instance_converters import (
     AliasAggregatedMeasures,
     ChangeAssociatedColumns,
     ChangeMeasureAggregationState,
+    CreateSelectColumnForCombineOutputNode,
     CreateSelectColumnsForInstances,
     CreateSelectColumnsWithMeasuresAggregated,
     FilterElements,
@@ -786,62 +786,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             ),
         )
 
-    def _make_select_columns_for_multiple_metrics(
-        self,
-        table_alias_to_metric_instances: OrderedDict[str, Tuple[MetricInstance, ...]],
-        aggregation_type: Optional[AggregationType],
-    ) -> List[SqlSelectColumn]:
-        """Creates select columns that get the given metric using the given table alias.
-
-        e.g.
-
-        with table_alias_to_metric_instances = {"a": MetricSpec(element_name="bookings")}
-
-        ->
-
-        a.bookings AS bookings
-        """
-        select_columns = []
-        for table_alias, metric_instances in table_alias_to_metric_instances.items():
-            for metric_instance in metric_instances:
-                metric_spec = metric_instance.spec
-                metric_column_name = self._column_association_resolver.resolve_spec(metric_spec).column_name
-                column_reference_expression = SqlColumnReferenceExpression(
-                    col_ref=SqlColumnReference(
-                        table_alias=table_alias,
-                        column_name=metric_column_name,
-                    )
-                )
-                if aggregation_type:
-                    select_expression: SqlExpressionNode = SqlFunctionExpression.build_expression_from_aggregation_type(
-                        aggregation_type=aggregation_type, sql_column_expression=column_reference_expression
-                    )
-                else:
-                    select_expression = column_reference_expression
-
-                # At this point, the MetricSpec might have the alias in place of the element name, so we need to look
-                # back at where it was defined from to get the metric element name.
-                metric_reference = MetricReference(element_name=metric_instance.defined_from.metric_name)
-                input_measure = self._metric_lookup.configured_input_measure_for_metric(
-                    metric_reference=metric_reference
-                )
-                if input_measure and input_measure.fill_nulls_with is not None:
-                    select_expression = SqlAggregateFunctionExpression(
-                        sql_function=SqlFunction.COALESCE,
-                        sql_function_args=[
-                            select_expression,
-                            SqlStringExpression(str(input_measure.fill_nulls_with)),
-                        ],
-                    )
-
-                select_columns.append(
-                    SqlSelectColumn(
-                        expr=select_expression,
-                        column_alias=metric_column_name,
-                    )
-                )
-        return select_columns
-
     def visit_combine_metrics_node(self, node: CombineMetricsNode) -> SqlDataSet:
         """Join computed metric datasets together to return a single dataset containing all metrics.
 
@@ -878,13 +822,13 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         ), "Shouldn't have a CombineMetricsNode in the dataflow plan if there's only 1 parent."
 
         parent_data_sets: List[AnnotatedSqlDataSet] = []
-        table_alias_to_metric_instances: OrderedDict[str, Tuple[MetricInstance, ...]] = OrderedDict()
+        table_alias_to_instance_set: OrderedDict[str, InstanceSet] = OrderedDict()
 
         for parent_node in node.parent_nodes:
             parent_sql_data_set = parent_node.accept(self)
             table_alias = self._next_unique_table_alias()
             parent_data_sets.append(AnnotatedSqlDataSet(data_set=parent_sql_data_set, alias=table_alias))
-            table_alias_to_metric_instances[table_alias] = parent_sql_data_set.instance_set.metric_instances
+            table_alias_to_instance_set[table_alias] = parent_sql_data_set.instance_set
 
         # When we create the components of the join that combines metrics it will be one of INNER, FULL OUTER,
         # or CROSS JOIN. Order doesn't matter for these join types, so we will use the first element in the FROM
@@ -924,20 +868,24 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         output_instance_set = InstanceSet.merge([x.data_set.instance_set for x in parent_data_sets])
         output_instance_set = output_instance_set.transform(ChangeAssociatedColumns(self._column_association_resolver))
 
-        metric_aggregation_type = AggregationType.MAX
-        metric_select_column_set = SelectColumnSet(
-            metric_columns=self._make_select_columns_for_multiple_metrics(
-                table_alias_to_metric_instances=table_alias_to_metric_instances,
-                aggregation_type=metric_aggregation_type,
+        aggregated_select_columns = SelectColumnSet()
+        for table_alias, instance_set in table_alias_to_instance_set.items():
+            aggregated_select_columns = aggregated_select_columns.merge(
+                instance_set.transform(
+                    CreateSelectColumnForCombineOutputNode(
+                        table_alias=table_alias,
+                        column_resolver=self._column_association_resolver,
+                        metric_lookup=self._metric_lookup,
+                    )
+                )
             )
-        )
         linkable_select_column_set = linkable_spec_set.transform(
             CreateSelectCoalescedColumnsForLinkableSpecs(
                 column_association_resolver=self._column_association_resolver,
                 table_aliases=[x.alias for x in parent_data_sets],
             )
         )
-        combined_select_column_set = linkable_select_column_set.merge(metric_select_column_set)
+        combined_select_column_set = linkable_select_column_set.merge(aggregated_select_columns)
 
         return SqlDataSet(
             instance_set=output_instance_set,

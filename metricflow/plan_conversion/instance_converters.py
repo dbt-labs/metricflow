@@ -8,7 +8,8 @@ from dataclasses import dataclass
 from itertools import chain
 from typing import Dict, List, Optional, Sequence, Tuple
 
-from dbt_semantic_interfaces.references import SemanticModelReference
+from dbt_semantic_interfaces.references import MetricReference, SemanticModelReference
+from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from more_itertools import bucket
@@ -28,7 +29,7 @@ from metricflow.instances import (
     TimeDimensionInstance,
 )
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
-from metricflow.protocols.semantics import SemanticModelAccessor
+from metricflow.protocols.semantics import MetricAccessor, SemanticModelAccessor
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
     DimensionSpec,
@@ -43,11 +44,17 @@ from metricflow.specs.specs import (
     TimeDimensionSpec,
 )
 from metricflow.sql.sql_exprs import (
+    SqlAggregateFunctionExpression,
     SqlColumnReference,
     SqlColumnReferenceExpression,
+    SqlExpressionNode,
+    SqlFunction,
     SqlFunctionExpression,
+    SqlStringExpression,
 )
-from metricflow.sql.sql_plan import SqlSelectColumn
+from metricflow.sql.sql_plan import (
+    SqlSelectColumn,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -759,6 +766,81 @@ class CreateSqlColumnReferencesForInstances(InstanceSetTransform[Tuple[SqlColumn
                 ),
             )
             for column_name in column_names
+        )
+
+
+class CreateSelectColumnForCombineOutputNode(InstanceSetTransform[SelectColumnSet]):
+    """Create select column expressions for the instance for joining outputs.
+
+    It assumes that the column names of the instances are represented by the supplied column association resolver and
+    come from the given table alias.
+    """
+
+    def __init__(  # noqa: D
+        self,
+        table_alias: str,
+        column_resolver: ColumnAssociationResolver,
+        metric_lookup: MetricAccessor,
+    ) -> None:
+        self._table_alias = table_alias
+        self._column_resolver = column_resolver
+        self._metric_lookup = metric_lookup
+
+    def _create_select_column(self, spec: InstanceSpec, fill_nulls_with: Optional[int] = None) -> SqlSelectColumn:
+        """Creates the select column for the given spec and the fill value."""
+        column_name = self._column_resolver.resolve_spec(spec).column_name
+        column_reference_expression = SqlColumnReferenceExpression(
+            col_ref=SqlColumnReference(
+                table_alias=self._table_alias,
+                column_name=column_name,
+            )
+        )
+        select_expression: SqlExpressionNode = SqlFunctionExpression.build_expression_from_aggregation_type(
+            aggregation_type=AggregationType.MAX, sql_column_expression=column_reference_expression
+        )
+        if fill_nulls_with is not None:
+            select_expression = SqlAggregateFunctionExpression(
+                sql_function=SqlFunction.COALESCE,
+                sql_function_args=[
+                    select_expression,
+                    SqlStringExpression(str(fill_nulls_with)),
+                ],
+            )
+        return SqlSelectColumn(
+            expr=select_expression,
+            column_alias=column_name,
+        )
+
+    def _create_select_columns_for_metrics(
+        self, metric_instances: Tuple[MetricInstance, ...]
+    ) -> List[SqlSelectColumn]:  # noqa: D
+        select_columns: List[SqlSelectColumn] = []
+        for metric_instance in metric_instances:
+            metric_reference = MetricReference(element_name=metric_instance.defined_from.metric_name)
+            input_measure = self._metric_lookup.configured_input_measure_for_metric(metric_reference=metric_reference)
+            fill_nulls_with: Optional[int] = None
+            if input_measure and input_measure.fill_nulls_with is not None:
+                fill_nulls_with = input_measure.fill_nulls_with
+            select_columns.append(
+                self._create_select_column(spec=metric_instance.spec, fill_nulls_with=fill_nulls_with)
+            )
+        return select_columns
+
+    def _create_select_columns_for_measures(  # noqa: D
+        self, measure_instances: Tuple[MeasureInstance, ...]
+    ) -> List[SqlSelectColumn]:
+        select_columns: List[SqlSelectColumn] = []
+        for measure_instance in measure_instances:
+            measure_spec = measure_instance.spec
+            select_columns.append(
+                self._create_select_column(spec=measure_spec, fill_nulls_with=measure_spec.fill_nulls_with)
+            )
+        return select_columns
+
+    def transform(self, instance_set: InstanceSet) -> SelectColumnSet:  # noqa: D
+        return SelectColumnSet(
+            metric_columns=self._create_select_columns_for_metrics(instance_set.metric_instances),
+            measure_columns=self._create_select_columns_for_measures(instance_set.measure_instances),
         )
 
 
