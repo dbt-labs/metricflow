@@ -1,4 +1,4 @@
--- Combine Metrics
+-- Combine Aggregated Outputs
 SELECT
   COALESCE(subq_14.metric_time__day, subq_19.metric_time__day) AS metric_time__day
   , MAX(subq_14.bookings) AS bookings

@@ -15,6 +15,7 @@ from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilde
 from metricflow.dataflow.dataflow_plan import (
     AggregateMeasuresNode,
     BaseOutput,
+    CombineAggregatedOutputsNode,
     ComputeMetricsNode,
     ConstrainTimeRangeNode,
     DataflowPlan,
@@ -1008,6 +1009,64 @@ def test_compute_metrics_node_ratio_from_multiple_semantic_models(
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_combine_output_node(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    consistent_id_object_repository: ConsistentIdObjectRepository,
+    sql_client: SqlClient,
+) -> None:
+    """Tests combining AggregateMeasuresNode."""
+    sum_spec = MeasureSpec(
+        element_name="bookings",
+    )
+    sum_boolean_spec = MeasureSpec(
+        element_name="instant_bookings",
+    )
+    count_distinct_spec = MeasureSpec(
+        element_name="bookers",
+    )
+    dimension_spec = DimensionSpec(
+        element_name="is_instant",
+        entity_links=(),
+    )
+    measure_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
+
+    # Build compute measures node
+    measure_specs: List[MeasureSpec] = [sum_spec]
+    filtered_measure_node = FilterElementsNode(
+        parent_node=measure_source_node,
+        include_specs=InstanceSpecSet(measure_specs=tuple(measure_specs), dimension_specs=(dimension_spec,)),
+    )
+    aggregated_measure_node = AggregateMeasuresNode(
+        parent_node=filtered_measure_node,
+        metric_input_measure_specs=tuple(MetricInputMeasureSpec(measure_spec=x) for x in measure_specs),
+    )
+
+    # Build agg measures node
+    measure_specs_2 = [sum_boolean_spec, count_distinct_spec]
+    filtered_measure_node_2 = FilterElementsNode(
+        parent_node=measure_source_node,
+        include_specs=InstanceSpecSet(measure_specs=tuple(measure_specs_2), dimension_specs=(dimension_spec,)),
+    )
+    aggregated_measure_node_2 = AggregateMeasuresNode(
+        parent_node=filtered_measure_node_2,
+        metric_input_measure_specs=tuple(
+            MetricInputMeasureSpec(measure_spec=x, fill_nulls_with=1) for x in measure_specs_2
+        ),
+    )
+
+    combine_output_node = CombineAggregatedOutputsNode([aggregated_measure_node, aggregated_measure_node_2])
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=combine_output_node,
     )
 
 

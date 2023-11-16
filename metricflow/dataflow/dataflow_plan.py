@@ -17,7 +17,7 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.dag.id_generation import (
     DATAFLOW_NODE_AGGREGATE_MEASURES_ID_PREFIX,
-    DATAFLOW_NODE_COMBINE_METRICS_ID_PREFIX,
+    DATAFLOW_NODE_COMBINE_AGGREGATED_OUTPUTS_ID_PREFIX,
     DATAFLOW_NODE_COMPUTE_METRICS_ID_PREFIX,
     DATAFLOW_NODE_CONSTRAIN_TIME_RANGE_ID_PREFIX,
     DATAFLOW_NODE_JOIN_SELF_OVER_TIME_RANGE_ID_PREFIX,
@@ -150,7 +150,7 @@ class DataflowPlanNodeVisitor(Generic[VisitorOutputT], ABC):
         pass
 
     @abstractmethod
-    def visit_combine_metrics_node(self, node: CombineMetricsNode) -> VisitorOutputT:  # noqa: D
+    def visit_combine_aggregated_outputs_node(self, node: CombineAggregatedOutputsNode) -> VisitorOutputT:  # noqa: D
         pass
 
     @abstractmethod
@@ -1160,7 +1160,7 @@ class WhereConstraintNode(AggregatedMeasuresOutput):
         )
 
 
-class CombineMetricsNode(ComputedMetricsOutput):
+class CombineAggregatedOutputsNode(ComputedMetricsOutput):
     """Combines metrics from different nodes into a single output."""
 
     def __init__(  # noqa: D
@@ -1171,21 +1171,21 @@ class CombineMetricsNode(ComputedMetricsOutput):
 
     @classmethod
     def id_prefix(cls) -> str:  # noqa: D
-        return DATAFLOW_NODE_COMBINE_METRICS_ID_PREFIX
+        return DATAFLOW_NODE_COMBINE_AGGREGATED_OUTPUTS_ID_PREFIX
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
-        return visitor.visit_combine_metrics_node(self)
+        return visitor.visit_combine_aggregated_outputs_node(self)
 
     @property
     def description(self) -> str:  # noqa: D
-        return "Combine Metrics"
+        return "Combine Aggregated Outputs"
 
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D
         return isinstance(other_node, self.__class__)
 
-    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> CombineMetricsNode:  # noqa: D
+    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> CombineAggregatedOutputsNode:  # noqa: D
         assert len(new_parent_nodes) == 1
-        return CombineMetricsNode(parent_nodes=new_parent_nodes)
+        return CombineAggregatedOutputsNode(parent_nodes=new_parent_nodes)
 
 
 class ConstrainTimeRangeNode(AggregatedMeasuresOutput, BaseOutput):

@@ -397,6 +397,7 @@ class NonAdditiveDimensionSpec(SerializableDataclass):
 class MeasureSpec(InstanceSpec):  # noqa: D
     element_name: str
     non_additive_dimension_spec: Optional[NonAdditiveDimensionSpec] = None
+    fill_nulls_with: Optional[int] = None
 
     @staticmethod
     def from_name(name: str) -> MeasureSpec:
@@ -496,6 +497,7 @@ class MetricInputMeasureSpec(SerializableDataclass):
             return MeasureSpec(
                 element_name=self.alias,
                 non_additive_dimension_spec=self.measure_spec.non_additive_dimension_spec,
+                fill_nulls_with=self.fill_nulls_with,
             )
         else:
             return self.measure_spec

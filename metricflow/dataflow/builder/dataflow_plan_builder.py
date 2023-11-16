@@ -24,7 +24,7 @@ from metricflow.dataflow.builder.node_evaluator import (
 from metricflow.dataflow.dataflow_plan import (
     AggregateMeasuresNode,
     BaseOutput,
-    CombineMetricsNode,
+    CombineAggregatedOutputsNode,
     ComputeMetricsNode,
     ConstrainTimeRangeNode,
     DataflowPlan,
@@ -298,7 +298,7 @@ class DataflowPlanBuilder:
         if len(output_nodes) == 1:
             return output_nodes[0]
 
-        return CombineMetricsNode(parent_nodes=output_nodes)
+        return CombineAggregatedOutputsNode(parent_nodes=output_nodes)
 
     def build_plan_for_distinct_values(self, query_spec: MetricFlowQuerySpec) -> DataflowPlan:
         """Generate a plan that would get the distinct values of a linkable instance.

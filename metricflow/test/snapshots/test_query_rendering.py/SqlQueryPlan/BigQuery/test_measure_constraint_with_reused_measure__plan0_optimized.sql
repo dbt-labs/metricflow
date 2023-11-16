@@ -3,7 +3,7 @@ SELECT
   metric_time__day
   , CAST(booking_value_with_is_instant_constraint AS FLOAT64) / CAST(NULLIF(booking_value, 0) AS FLOAT64) AS instant_booking_value_ratio
 FROM (
-  -- Combine Metrics
+  -- Combine Aggregated Outputs
   SELECT
     COALESCE(subq_19.metric_time__day, subq_24.metric_time__day) AS metric_time__day
     , MAX(subq_19.booking_value_with_is_instant_constraint) AS booking_value_with_is_instant_constraint
