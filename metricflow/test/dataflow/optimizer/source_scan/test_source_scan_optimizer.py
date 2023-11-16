@@ -10,7 +10,7 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan import (
     AggregateMeasuresNode,
-    CombineMetricsNode,
+    CombineAggregatedOutputsNode,
     ComputeMetricsNode,
     ConstrainTimeRangeNode,
     DataflowPlan,
@@ -79,7 +79,7 @@ class ReadSqlSourceNodeCounter(DataflowPlanNodeVisitor[int]):
     def visit_pass_elements_filter_node(self, node: FilterElementsNode) -> int:  # noqa: D
         return self._sum_parents(node)
 
-    def visit_combine_metrics_node(self, node: CombineMetricsNode) -> int:  # noqa: D
+    def visit_combine_aggregated_outputs_node(self, node: CombineAggregatedOutputsNode) -> int:  # noqa: D
         return self._sum_parents(node)
 
     def visit_constrain_time_range_node(self, node: ConstrainTimeRangeNode) -> int:  # noqa: D

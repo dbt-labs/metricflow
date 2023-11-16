@@ -13,7 +13,7 @@ from metricflow.dag.id_generation import IdGeneratorRegistry
 from metricflow.dataflow.dataflow_plan import (
     AggregateMeasuresNode,
     BaseOutput,
-    CombineMetricsNode,
+    CombineAggregatedOutputsNode,
     ComputedMetricsOutput,
     ComputeMetricsNode,
     ConstrainTimeRangeNode,
@@ -786,12 +786,12 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             ),
         )
 
-    def visit_combine_metrics_node(self, node: CombineMetricsNode) -> SqlDataSet:
-        """Join computed metric datasets together to return a single dataset containing all metrics.
+    def visit_combine_aggregated_outputs_node(self, node: CombineAggregatedOutputsNode) -> SqlDataSet:
+        """Join aggregated output datasets together to return a single dataset containing all metrics/measures.
 
-        This node may exist in one of two situations: when metrics need to be combined in order to produce a single
-        dataset with all required inputs for a derived metric, or when metrics need to be combined in order to produce
-        a single dataset of output for downstream consumption by the end user.
+        This node may exist in one of two situations: when metrics/measures need to be combined in order to produce a single
+        dataset with all required inputs for a metric (ie., derived metric), or when metrics need to be combined in order to
+        produce a single dataset of output for downstream consumption by the end user.
 
         The join key will be a coalesced set of all previously seen dimension values. For example:
             FROM (
@@ -819,7 +819,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         """
         assert (
             len(node.parent_nodes) > 1
-        ), "Shouldn't have a CombineMetricsNode in the dataflow plan if there's only 1 parent."
+        ), "Shouldn't have a CombineAggregatedOutputsNode in the dataflow plan if there's only 1 parent."
 
         parent_data_sets: List[AnnotatedSqlDataSet] = []
         table_alias_to_instance_set: OrderedDict[str, InstanceSet] = OrderedDict()
@@ -854,7 +854,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         aliases_seen = [from_data_set.alias]
         for join_data_set in join_data_sets:
             joins_descriptions.append(
-                SqlQueryPlanJoinBuilder.make_combine_metrics_join_description(
+                SqlQueryPlanJoinBuilder.make_join_description_for_combining_datasets(
                     from_data_set=from_data_set,
                     join_data_set=join_data_set,
                     join_type=join_type,

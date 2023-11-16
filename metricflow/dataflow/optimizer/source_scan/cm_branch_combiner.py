@@ -7,7 +7,7 @@ from typing import List, Optional, Sequence
 from metricflow.dataflow.dataflow_plan import (
     AggregateMeasuresNode,
     BaseOutput,
-    CombineMetricsNode,
+    CombineAggregatedOutputsNode,
     ComputeMetricsNode,
     ConstrainTimeRangeNode,
     DataflowPlanNode,
@@ -368,7 +368,9 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         )
         return ComputeMetricsBranchCombinerResult(combined_node)
 
-    def visit_combine_metrics_node(self, node: CombineMetricsNode) -> ComputeMetricsBranchCombinerResult:  # noqa: D
+    def visit_combine_aggregated_outputs_node(  # noqa: D
+        self, node: CombineAggregatedOutputsNode
+    ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._handle_unsupported_node(node)
 
