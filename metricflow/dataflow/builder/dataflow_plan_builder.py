@@ -214,7 +214,7 @@ class DataflowPlanBuilder:
         queried_linkable_specs: LinkableSpecSet,
         where_constraint: Optional[WhereFilterSpec] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
-    ) -> ComputeMetricsNode:
+    ) -> BaseOutput:
         """Builds a node to compute a metric defined from other metrics."""
         metric = self._metric_lookup.get_metric(metric_spec.reference)
         metric_input_specs = self._metric_lookup.metric_input_specs_for_metric(
@@ -225,7 +225,7 @@ class DataflowPlanBuilder:
             f"For {metric.type} metric: {metric_spec}, needed metrics are:\n"
             f"{pformat_big_objects(metric_input_specs=metric_input_specs)}"
         )
-        return ComputeMetricsNode(
+        compute_metrics_node = ComputeMetricsNode(
             parent_node=self._build_metrics_output_node(
                 metric_specs=metric_input_specs,
                 queried_linkable_specs=queried_linkable_specs,
@@ -234,6 +234,24 @@ class DataflowPlanBuilder:
             ),
             metric_specs=[metric_spec],
         )
+        # For nested ratio / derived metrics with time offset, apply offset after metric computation.
+        join_to_time_spine_node: Optional[JoinToTimeSpineNode] = None
+        if metric_spec.offset_window or metric_spec.offset_to_grain:
+            metric_time_dimension_specs = [
+                time_dimension_spec
+                for time_dimension_spec in queried_linkable_specs.time_dimension_specs
+                if time_dimension_spec.element_name == self._metric_time_dimension_reference.element_name
+            ]
+            assert metric_time_dimension_specs, "Joining to time spine requires querying with metric time."
+            join_to_time_spine_node = JoinToTimeSpineNode(
+                parent_node=compute_metrics_node,
+                requested_metric_time_dimension_specs=metric_time_dimension_specs,
+                time_range_constraint=time_range_constraint,
+                offset_window=metric_spec.offset_window,
+                offset_to_grain=metric_spec.offset_to_grain,
+                join_type=SqlJoinType.INNER,
+            )
+        return join_to_time_spine_node or compute_metrics_node
 
     def _build_any_metric_output_node(
         self,
@@ -241,7 +259,7 @@ class DataflowPlanBuilder:
         queried_linkable_specs: LinkableSpecSet,
         where_constraint: Optional[WhereFilterSpec] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
-    ) -> ComputeMetricsNode:
+    ) -> BaseOutput:
         """Builds a node to compute a metric of any type."""
         metric = self._metric_lookup.get_metric(metric_spec.reference)
 
