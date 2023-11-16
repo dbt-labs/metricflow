@@ -3,7 +3,7 @@ SELECT
   metric_time__day
   , (bookings - ref_bookings) * 1.0 / bookings AS non_referred_bookings_pct
 FROM (
-  -- Combine Metrics
+  -- Combine Aggregated Outputs
   SELECT
     COALESCE(subq_15.metric_time__day, subq_20.metric_time__day) AS metric_time__day
     , MAX(subq_15.ref_bookings) AS ref_bookings

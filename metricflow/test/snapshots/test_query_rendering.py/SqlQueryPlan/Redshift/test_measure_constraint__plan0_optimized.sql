@@ -3,7 +3,7 @@ SELECT
   metric_time__day
   , average_booking_value * bookings / NULLIF(booking_value, 0) AS lux_booking_value_rate_expr
 FROM (
-  -- Combine Metrics
+  -- Combine Aggregated Outputs
   SELECT
     COALESCE(subq_41.metric_time__day, subq_53.metric_time__day, subq_58.metric_time__day) AS metric_time__day
     , MAX(subq_41.average_booking_value) AS average_booking_value

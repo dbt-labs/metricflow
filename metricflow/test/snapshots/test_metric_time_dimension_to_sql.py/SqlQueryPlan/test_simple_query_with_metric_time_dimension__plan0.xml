@@ -1,6 +1,6 @@
 <SqlQueryPlan>
     <SqlSelectStatementNode>
-        <!-- description = Combine Metrics -->
+        <!-- description = Combine Aggregated Outputs -->
         <!-- node_id = ss_15 -->
         <!-- col0 =                                                                            -->
         <!--   {'class': 'SqlSelectColumn',                                                    -->

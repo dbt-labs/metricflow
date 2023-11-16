@@ -3,7 +3,7 @@ SELECT
   metric_time__day
   , bookings - bookings_2_weeks_ago AS bookings_growth_2_weeks
 FROM (
-  -- Combine Metrics
+  -- Combine Aggregated Outputs
   SELECT
     COALESCE(subq_21.metric_time__day, subq_30.metric_time__day) AS metric_time__day
     , MAX(subq_21.bookings) AS bookings

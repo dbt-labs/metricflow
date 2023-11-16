@@ -3,7 +3,7 @@ SELECT
   subq_12.metric_time__day
   , CAST(subq_12.booking_value_with_is_instant_constraint AS DOUBLE) / CAST(NULLIF(subq_12.booking_value, 0) AS DOUBLE) AS instant_booking_value_ratio
 FROM (
-  -- Combine Metrics
+  -- Combine Aggregated Outputs
   SELECT
     COALESCE(subq_6.metric_time__day, subq_11.metric_time__day) AS metric_time__day
     , MAX(subq_6.booking_value_with_is_instant_constraint) AS booking_value_with_is_instant_constraint

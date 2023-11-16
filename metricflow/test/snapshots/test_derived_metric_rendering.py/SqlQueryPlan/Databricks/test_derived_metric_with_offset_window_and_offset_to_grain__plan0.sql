@@ -3,7 +3,7 @@ SELECT
   subq_16.metric_time__day
   , month_start_bookings - bookings_1_month_ago AS bookings_month_start_compared_to_1_month_prior
 FROM (
-  -- Combine Metrics
+  -- Combine Aggregated Outputs
   SELECT
     COALESCE(subq_7.metric_time__day, subq_15.metric_time__day) AS metric_time__day
     , MAX(subq_7.month_start_bookings) AS month_start_bookings

@@ -3,7 +3,7 @@ SELECT
   metric_time__day
   , bookings - bookings_at_start_of_month AS bookings_growth_since_start_of_month
 FROM (
-  -- Combine Metrics
+  -- Combine Aggregated Outputs
   SELECT
     COALESCE(subq_18.metric_time__day, subq_26.metric_time__day) AS metric_time__day
     , MAX(subq_18.bookings) AS bookings
