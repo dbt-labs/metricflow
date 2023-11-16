@@ -578,3 +578,13 @@ metric:
       - name: bookings
         offset_window: 14 days
         alias: bookings_2_weeks_ago
+
+---
+metric:
+  name: twice_bookings_fill_nulls_with_0_without_time_spine
+  description: 2x twice_bookings_fill_nulls_with_0_without_time_spine
+  type: derived
+  type_params:
+    expr: 2 * bookings_fill_nulls_with_0_without_time_spine
+    metrics:
+      - name: bookings_fill_nulls_with_0_without_time_spine
