@@ -3,7 +3,7 @@ SELECT
   metric_time__day
   , booking_fees - booking_fees_start_of_month AS booking_fees_since_start_of_month
 FROM (
-  -- Combine Metrics
+  -- Combine Aggregated Outputs
   SELECT
     COALESCE(subq_24.metric_time__day, subq_30.metric_time__day) AS metric_time__day
     , MAX(subq_24.booking_fees_start_of_month) AS booking_fees_start_of_month
