@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from typing import List
 
 import pytest
@@ -111,6 +112,11 @@ def convert_and_check(
         sql_query_plan=sql_query_plan,
         sql_client=sql_client,
     )
+
+    rendered_sql = sql_client.sql_query_plan_renderer.render_sql_query_plan(sql_query_plan).sql
+    sql_result = sql_client.query(stmt=rendered_sql)
+
+    logger.error(f"SQL Result is:\n{sql_result.to_string(max_cols=200)}")
 
 
 @pytest.mark.sql_engine_snapshot
@@ -1026,6 +1032,36 @@ def test_dimensions_requiring_join(
     )
     dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
         query_spec=MetricFlowQuerySpec(dimension_specs=dimension_specs)
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+logger = logging.getLogger(__name__)
+
+
+@pytest.mark.sql_engine_snapshot
+def test_nested_offsets(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+    create_source_tables: bool,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        query_spec=MetricFlowQuerySpec(
+            metric_specs=(
+                MetricSpec(element_name="bookings_offset_twice"),
+            ),
+            time_dimension_specs=(MTD_SPEC_DAY,),
+        )
     )
 
     convert_and_check(

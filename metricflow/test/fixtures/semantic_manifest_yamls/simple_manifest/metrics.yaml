@@ -578,3 +578,23 @@ metric:
       - name: bookings
         offset_window: 14 days
         alias: bookings_2_weeks_ago
+---
+metric:
+  name: "bookings_offset_once"
+  description: bookings metric offset once.
+  type: derived
+  type_params:
+    expr: 2 * bookings
+    metrics:
+      - name: bookings
+        offset_window: 5 days
+---
+metric:
+  name: "bookings_offset_twice"
+  description: bookings metric offset twice.
+  type: derived
+  type_params:
+    expr: 2 * bookings_offset_once
+    metrics:
+      - name: bookings_offset_once
+        offset_window: 5 days
