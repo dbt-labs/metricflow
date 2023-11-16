@@ -3,7 +3,7 @@
         <!-- description = Run a query and write the results to a data frame -->
         <!-- node_id = rsq_0 -->
         <!-- sql_query =                                                                             -->
-        <!--   -- Combine Metrics                                                                    -->
+        <!--   -- Combine Aggregated Outputs                                                         -->
         <!--   SELECT                                                                                -->
         <!--     COALESCE(subq_4.ds__day, subq_9.ds__day, subq_14.ds__day) AS ds__day                -->
         <!--     , COALESCE(subq_4.is_instant, subq_9.is_instant, subq_14.is_instant) AS is_instant  -->

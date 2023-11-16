@@ -2,9 +2,9 @@
     <WriteToResultDataframeNode>
         <!-- description = Write to Dataframe -->
         <!-- node_id = wrd_1 -->
-        <CombineMetricsNode>
-            <!-- description = Combine Metrics -->
-            <!-- node_id = cbm_2 -->
+        <CombineAggregatedOutputsNode>
+            <!-- description = Combine Aggregated Outputs -->
+            <!-- node_id = cao_2 -->
             <ComputeMetricsNode>
                 <!-- description = Compute Metrics via Expressions -->
                 <!-- node_id = cm_4 -->
@@ -26,7 +26,8 @@
                         <!-- include_spec =                           -->
                         <!--   {'class': 'MeasureSpec',               -->
                         <!--    'element_name': 'booking_value',      -->
-                        <!--    'non_additive_dimension_spec': None}  -->
+                        <!--    'non_additive_dimension_spec': None,  -->
+                        <!--    'fill_nulls_with': None}              -->
                         <!-- include_spec =                               -->
                         <!--   {'class': 'TimeDimensionSpec',             -->
                         <!--    'element_name': 'metric_time',            -->
@@ -88,11 +89,13 @@
                             <!-- include_spec =                           -->
                             <!--   {'class': 'MeasureSpec',               -->
                             <!--    'element_name': 'referred_bookings',  -->
-                            <!--    'non_additive_dimension_spec': None}  -->
+                            <!--    'non_additive_dimension_spec': None,  -->
+                            <!--    'fill_nulls_with': None}              -->
                             <!-- include_spec =                           -->
                             <!--   {'class': 'MeasureSpec',               -->
                             <!--    'element_name': 'bookings',           -->
-                            <!--    'non_additive_dimension_spec': None}  -->
+                            <!--    'non_additive_dimension_spec': None,  -->
+                            <!--    'fill_nulls_with': None}              -->
                             <!-- include_spec =                               -->
                             <!--   {'class': 'TimeDimensionSpec',             -->
                             <!--    'element_name': 'metric_time',            -->
@@ -117,6 +120,6 @@
                     </AggregateMeasuresNode>
                 </ComputeMetricsNode>
             </ComputeMetricsNode>
-        </CombineMetricsNode>
+        </CombineAggregatedOutputsNode>
     </WriteToResultDataframeNode>
 </DataflowPlan>

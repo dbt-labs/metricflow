@@ -1,4 +1,4 @@
--- Combine Metrics
+-- Combine Aggregated Outputs
 -- Compute Metrics via Expressions
 SELECT
   CAST(MAX(subq_15.bookings) AS DOUBLE PRECISION) / CAST(NULLIF(MAX(subq_20.listings), 0) AS DOUBLE PRECISION) AS bookings_per_listing

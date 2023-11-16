@@ -23,7 +23,8 @@
                     <!-- include_spec =                           -->
                     <!--   {'class': 'MeasureSpec',               -->
                     <!--    'element_name': 'bookings',           -->
-                    <!--    'non_additive_dimension_spec': None}  -->
+                    <!--    'non_additive_dimension_spec': None,  -->
+                    <!--    'fill_nulls_with': None}              -->
                     <!-- include_spec =                                                                  -->
                     <!--   {'class': 'DimensionSpec',                                                    -->
                     <!--    'element_name': 'is_instant',                                                -->
@@ -54,7 +55,8 @@
                             <!-- include_spec =                           -->
                             <!--   {'class': 'MeasureSpec',               -->
                             <!--    'element_name': 'bookings',           -->
-                            <!--    'non_additive_dimension_spec': None}  -->
+                            <!--    'non_additive_dimension_spec': None,  -->
+                            <!--    'fill_nulls_with': None}              -->
                             <!-- include_spec =                                                                  -->
                             <!--   {'class': 'DimensionSpec',                                                    -->
                             <!--    'element_name': 'is_instant',                                                -->
