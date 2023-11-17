@@ -11,12 +11,13 @@ from dbt_semantic_interfaces.protocols.query_interface import (
     QueryInterfaceDimensionFactory,
 )
 from dbt_semantic_interfaces.type_enums import TimeGranularity
+from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from typing_extensions import override
 
 from metricflow.errors.errors import InvalidQuerySyntax
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.dimension_spec_resolver import DimensionSpecResolver
-from metricflow.specs.specs import TimeDimensionSpec
+from metricflow.specs.specs import DimensionSpec, InstanceSpec, TimeDimensionSpec
 
 
 class WhereFilterDimension(ProtocolHint[QueryInterfaceDimension]):
@@ -37,32 +38,48 @@ class WhereFilterDimension(ProtocolHint[QueryInterfaceDimension]):
         self._column_association_resolver = column_association_resolver
         self._name = name
         self._entity_path = entity_path
-        self.dimension_spec = self._dimension_spec_resolver.resolve_dimension_spec(name, entity_path)
-        self.time_dimension_spec: Optional[TimeDimensionSpec] = None
+        self.dimension_spec: DimensionSpec = self._dimension_spec_resolver.resolve_dimension_spec(
+            self._name, self._entity_path
+        )
+        self.date_part_name: Optional[str] = None
+        self.time_granularity_name: Optional[str] = None
+
+    @property
+    def time_dimension_spec(self) -> TimeDimensionSpec:
+        """TimeDimensionSpec that results from the builder-pattern configuration."""
+        return self._dimension_spec_resolver.resolve_time_dimension_spec(
+            self._name,
+            TimeGranularity(self.time_granularity_name) if self.time_granularity_name else None,
+            self._entity_path,
+            DatePart(self.date_part_name) if self.date_part_name else None,
+        )
 
     def grain(self, time_granularity_name: str) -> QueryInterfaceDimension:
         """The time granularity."""
-        self.time_dimension_spec = self._dimension_spec_resolver.resolve_time_dimension_spec(
-            self._name, TimeGranularity(time_granularity_name), self._entity_path
-        )
+        self.time_granularity_name = time_granularity_name
         return self
 
-    def date_part(self, _date_part: str) -> QueryInterfaceDimension:
+    def date_part(self, date_part_name: str) -> QueryInterfaceDimension:
         """The date_part requested to extract."""
-        raise InvalidQuerySyntax("date_part isn't currently supported in the where parameter")
+        self.date_part_name = date_part_name
+        return self
 
     def descending(self, _is_descending: bool) -> QueryInterfaceDimension:
         """Set the sort order for order-by."""
         raise InvalidQuerySyntax("descending is invalid in the where parameter")
+
+    def _get_spec(self) -> InstanceSpec:
+        """Get either the TimeDimensionSpec or DimensionSpec."""
+        if self.time_granularity_name or self.date_part_name:
+            return self.time_dimension_spec
+        return self.dimension_spec
 
     def __str__(self) -> str:
         """Returns the column name.
 
         Important in the Jinja sandbox.
         """
-        return self._column_association_resolver.resolve_spec(
-            self.time_dimension_spec or self.dimension_spec
-        ).column_name
+        return self._column_association_resolver.resolve_spec(self._get_spec()).column_name
 
 
 class WhereFilterDimensionFactory(ProtocolHint[QueryInterfaceDimensionFactory]):

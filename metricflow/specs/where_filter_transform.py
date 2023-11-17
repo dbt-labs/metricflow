@@ -82,12 +82,12 @@ class WhereSpecFactory:
             )
 
             """
-            Dimensions that are created with a grain parameter, Dimension(...).grain(...), are
-            added to dimension_specs otherwise they are add to time_dimension_factory.time_dimension_specs
+            Dimensions that are created with a grain or date_part parameter, Dimension(...).grain(...), are
+            added to time_dimension_factory.time_dimension_specs otherwise they are add to dimension_specs
             """
             dimension_specs = []
             for dimension in dimension_factory.created:
-                if dimension.time_dimension_spec:
+                if dimension.time_granularity_name or dimension.date_part_name:
                     time_dimension_factory.time_dimension_specs.append(dimension.time_dimension_spec)
                 else:
                     dimension_specs.append(dimension.dimension_spec)
