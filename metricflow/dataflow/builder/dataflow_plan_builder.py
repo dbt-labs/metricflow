@@ -218,7 +218,7 @@ class DataflowPlanBuilder:
         queried_linkable_specs: LinkableSpecSet,
         where_constraint: Optional[WhereFilterSpec] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
-    ) -> ComputeMetricsNode:
+    ) -> BaseOutput:
         """Builds a node to compute a metric defined from other metrics."""
         metric = self._metric_lookup.get_metric(metric_spec.reference)
         metric_input_specs = self._metric_lookup.metric_input_specs_for_metric(
@@ -233,15 +233,6 @@ class DataflowPlanBuilder:
         parent_nodes: List[BaseOutput] = []
 
         for metric_input_spec in metric_input_specs:
-            # TODO: See: https://github.com/dbt-labs/metricflow/issues/881
-            if (metric_spec.offset_window is not None or metric_spec.offset_to_grain is not None) and (
-                metric_input_spec.offset_window is not None or metric_input_spec.offset_to_grain is not None
-            ):
-                raise NotImplementedError(
-                    f"Multiple descendent metrics in a derived metric hierarchy are not yet supported. "
-                    f"For {metric_spec}, the parent metric input is {metric_input_spec}"
-                )
-
             parent_nodes.append(
                 self._build_any_metric_output_node(
                     metric_spec=MetricSpec(
@@ -257,16 +248,28 @@ class DataflowPlanBuilder:
                 )
             )
 
-        if len(parent_nodes) == 1:
-            return ComputeMetricsNode(
-                parent_node=parent_nodes[0],
-                metric_specs=[metric_spec],
-            )
-
-        return ComputeMetricsNode(
-            parent_node=CombineAggregatedOutputsNode(parent_nodes=parent_nodes),
+        compute_metrics_node = ComputeMetricsNode(
+            parent_node=parent_nodes[0]
+            if len(parent_nodes) == 1
+            else CombineAggregatedOutputsNode(parent_nodes=parent_nodes),
             metric_specs=[metric_spec],
         )
+
+        # For nested ratio / derived metrics with time offset, apply offset after metric computation.
+        join_to_time_spine_node: Optional[JoinToTimeSpineNode] = None
+        if metric_spec.offset_window or metric_spec.offset_to_grain:
+            assert (
+                queried_linkable_specs.contains_metric_time
+            ), "Joining to time spine requires querying with metric_time."
+            join_to_time_spine_node = JoinToTimeSpineNode(
+                parent_node=compute_metrics_node,
+                requested_metric_time_dimension_specs=list(queried_linkable_specs.metric_time_specs),
+                time_range_constraint=time_range_constraint,
+                offset_window=metric_spec.offset_window,
+                offset_to_grain=metric_spec.offset_to_grain,
+                join_type=SqlJoinType.INNER,
+            )
+        return join_to_time_spine_node or compute_metrics_node
 
     def _build_any_metric_output_node(
         self,
@@ -274,7 +277,7 @@ class DataflowPlanBuilder:
         queried_linkable_specs: LinkableSpecSet,
         where_constraint: Optional[WhereFilterSpec] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
-    ) -> ComputeMetricsNode:
+    ) -> BaseOutput:
         """Builds a node to compute a metric of any type."""
         metric = self._metric_lookup.get_metric(metric_spec.reference)
 

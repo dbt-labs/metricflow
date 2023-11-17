@@ -650,7 +650,7 @@ class JoinToTimeSpineNode(BaseOutput, ABC):
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         offset_window: Optional[MetricTimeWindow] = None,
         offset_to_grain: Optional[TimeGranularity] = None,
-    ) -> None:  # noqa: D
+    ) -> None:
         """Constructor.
 
         Args:
@@ -679,27 +679,27 @@ class JoinToTimeSpineNode(BaseOutput, ABC):
         return DATAFLOW_NODE_JOIN_TO_TIME_SPINE_ID_PREFIX
 
     @property
-    def requested_metric_time_dimension_specs(self) -> List[TimeDimensionSpec]:  # noqa: D
+    def requested_metric_time_dimension_specs(self) -> List[TimeDimensionSpec]:
         """Time dimension specs to use when creating time spine table."""
         return self._requested_metric_time_dimension_specs
 
     @property
-    def time_range_constraint(self) -> Optional[TimeRangeConstraint]:  # noqa: D
+    def time_range_constraint(self) -> Optional[TimeRangeConstraint]:
         """Time range constraint to apply when querying time spine table."""
         return self._time_range_constraint
 
     @property
-    def offset_window(self) -> Optional[MetricTimeWindow]:  # noqa: D
+    def offset_window(self) -> Optional[MetricTimeWindow]:
         """Time range constraint to apply when querying time spine table."""
         return self._offset_window
 
     @property
-    def offset_to_grain(self) -> Optional[TimeGranularity]:  # noqa: D
+    def offset_to_grain(self) -> Optional[TimeGranularity]:
         """Time range constraint to apply when querying time spine table."""
         return self._offset_to_grain
 
     @property
-    def join_type(self) -> SqlJoinType:  # noqa: D
+    def join_type(self) -> SqlJoinType:
         """Join type to use when joining to time spine."""
         return self._join_type
 

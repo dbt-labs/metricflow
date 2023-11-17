@@ -578,3 +578,35 @@ metric:
       - name: bookings
         offset_window: 14 days
         alias: bookings_2_weeks_ago
+---
+metric:
+  name: "bookings_offset_once"
+  description: bookings metric offset once.
+  type: derived
+  type_params:
+    expr: 2 * bookings
+    metrics:
+      - name: bookings
+        offset_window: 5 days
+---
+metric:
+  name: "bookings_offset_twice"
+  description: bookings metric offset twice.
+  type: derived
+  type_params:
+    expr: 2 * bookings_offset_once
+    metrics:
+      - name: bookings_offset_once
+        offset_window: 5 days
+---
+metric:
+  name: booking_fees_since_start_of_month
+  description: nested derived metric with offset and multiple input metrics
+  type: derived
+  type_params:
+    expr: booking_fees - booking_fees_start_of_month
+    metrics:
+      - name: booking_fees
+        offset_to_grain: month
+        alias: booking_fees_start_of_month
+      - name: booking_fees
