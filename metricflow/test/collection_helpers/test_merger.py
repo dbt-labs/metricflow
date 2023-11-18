@@ -5,7 +5,7 @@ from typing import List, Tuple
 
 from typing_extensions import override
 
-from metricflow.collections.merger import Mergeable
+from metricflow.collection_helpers.merger import Mergeable
 
 
 @dataclass(frozen=True)
