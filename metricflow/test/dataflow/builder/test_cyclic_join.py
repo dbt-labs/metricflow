@@ -35,6 +35,7 @@ def cyclic_join_manifest_dataflow_plan_builder(  # noqa: D
         source_nodes=consistent_id_object_repository.cyclic_join_source_nodes,
         read_nodes=list(consistent_id_object_repository.cyclic_join_read_nodes.values()),
         semantic_manifest_lookup=cyclic_join_semantic_manifest_lookup,
+        time_spine_source_node=consistent_id_object_repository.cyclic_join_time_spine_source_node,
     )
 
 

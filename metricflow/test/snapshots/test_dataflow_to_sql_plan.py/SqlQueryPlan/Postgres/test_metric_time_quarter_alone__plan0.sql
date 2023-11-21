@@ -1,7 +1,7 @@
 -- Pass Only Elements:
---   ['metric_time__day']
+--   ['metric_time__quarter']
 SELECT
-  subq_1.metric_time__day
+  subq_1.metric_time__quarter
 FROM (
   -- Metric Time Dimension 'ds'
   SELECT
@@ -45,4 +45,4 @@ FROM (
   ) subq_0
 ) subq_1
 GROUP BY
-  subq_1.metric_time__day
+  subq_1.metric_time__quarter

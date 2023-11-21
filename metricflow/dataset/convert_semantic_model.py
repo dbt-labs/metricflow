@@ -9,7 +9,10 @@ from dbt_semantic_interfaces.protocols.dimension import Dimension, DimensionType
 from dbt_semantic_interfaces.protocols.entity import Entity
 from dbt_semantic_interfaces.protocols.measure import Measure
 from dbt_semantic_interfaces.protocols.semantic_model import SemanticModel
-from dbt_semantic_interfaces.references import SemanticModelElementReference, SemanticModelReference
+from dbt_semantic_interfaces.references import (
+    SemanticModelElementReference,
+    SemanticModelReference,
+)
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
@@ -17,6 +20,7 @@ from metricflow.aggregation_properties import AggregationState
 from metricflow.dag.id_generation import IdGeneratorRegistry
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
+from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.instances import (
     DimensionInstance,
     EntityInstance,
@@ -26,6 +30,7 @@ from metricflow.instances import (
 )
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.model.spec_converters import MeasureConverter
+from metricflow.plan_conversion.time_spine import TIME_SPINE_DATA_SET_DESCRIPTION, TimeSpineSource
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
     DEFAULT_TIME_GRANULARITY,
@@ -100,15 +105,15 @@ class SemanticModelToDataSetConverter:
 
     def _create_time_dimension_instance(
         self,
-        semantic_model_name: str,
-        time_dimension: Dimension,
+        element_name: str,
         entity_links: Tuple[EntityReference, ...],
         time_granularity: TimeGranularity = DEFAULT_TIME_GRANULARITY,
         date_part: Optional[DatePart] = None,
+        semantic_model_name: Optional[str] = None,
     ) -> TimeDimensionInstance:
         """Create a time dimension instance from the dimension object from a semantic model in the model."""
         time_dimension_spec = TimeDimensionSpec(
-            element_name=time_dimension.reference.element_name,
+            element_name=element_name,
             entity_links=entity_links,
             time_granularity=time_granularity,
             date_part=date_part,
@@ -120,9 +125,11 @@ class SemanticModelToDataSetConverter:
             defined_from=(
                 SemanticModelElementReference(
                     semantic_model_name=semantic_model_name,
-                    element_name=time_dimension.reference.element_name,
+                    element_name=element_name,
                 ),
-            ),
+            )
+            if semantic_model_name
+            else (),
         )
 
     def _create_entity_instance(
@@ -280,7 +287,7 @@ class SemanticModelToDataSetConverter:
 
         time_dimension_instance = self._create_time_dimension_instance(
             semantic_model_name=semantic_model_name,
-            time_dimension=dimension,
+            element_name=dimension.reference.element_name,
             entity_links=entity_links,
             time_granularity=defined_time_granularity,
         )
@@ -298,26 +305,51 @@ class SemanticModelToDataSetConverter:
             )
         else:
             select_columns.append(
+                # TODO: use helper method here
                 SqlSelectColumn(
                     expr=SqlDateTruncExpression(time_granularity=defined_time_granularity, arg=dimension_select_expr),
                     column_alias=time_dimension_instance.associated_column.column_name,
                 )
             )
 
+        new_instances, new_columns = self._build_time_dimension_columns_with_time_granularity_and_date_part(
+            semantic_model_name=semantic_model_name,
+            defined_time_granularity=defined_time_granularity,
+            element_name=dimension.reference.element_name,
+            entity_links=entity_links,
+            dimension_select_expr=dimension_select_expr,
+        )
+        time_dimension_instances.extend(new_instances)
+        select_columns.extend(new_columns)
+
+        return (time_dimension_instances, select_columns)
+
+    def _build_time_dimension_columns_with_time_granularity_and_date_part(
+        self,
+        defined_time_granularity: TimeGranularity,
+        element_name: str,
+        entity_links: Tuple[EntityReference, ...],
+        dimension_select_expr: SqlExpressionNode,
+        semantic_model_name: Optional[str] = None,
+    ) -> Tuple[List[TimeDimensionInstance], List[SqlSelectColumn]]:
+        time_dimension_instances: List[TimeDimensionInstance] = []
+        select_columns: List[SqlSelectColumn] = []
+
         # Add time dimensions with a smaller granularity for ease in query resolution
         for time_granularity in TimeGranularity:
             if time_granularity.to_int() > defined_time_granularity.to_int():
                 time_dimension_instance = self._create_time_dimension_instance(
                     semantic_model_name=semantic_model_name,
-                    time_dimension=dimension,
+                    element_name=element_name,
                     entity_links=entity_links,
                     time_granularity=time_granularity,
                 )
                 time_dimension_instances.append(time_dimension_instance)
 
                 select_columns.append(
-                    SqlSelectColumn(
-                        expr=SqlDateTruncExpression(time_granularity=time_granularity, arg=dimension_select_expr),
+                    self._build_column_for_time_granularity(
+                        time_granularity=time_granularity,
+                        expr=dimension_select_expr,
                         column_alias=time_dimension_instance.associated_column.column_name,
                     )
                 )
@@ -327,7 +359,7 @@ class SemanticModelToDataSetConverter:
             if date_part.to_int() >= defined_time_granularity.to_int():
                 time_dimension_instance = self._create_time_dimension_instance(
                     semantic_model_name=semantic_model_name,
-                    time_dimension=dimension,
+                    element_name=element_name,
                     entity_links=entity_links,
                     time_granularity=defined_time_granularity,
                     date_part=date_part,
@@ -340,8 +372,14 @@ class SemanticModelToDataSetConverter:
                         column_alias=time_dimension_instance.associated_column.column_name,
                     )
                 )
-
         return (time_dimension_instances, select_columns)
+
+    def _build_column_for_time_granularity(
+        self, time_granularity: TimeGranularity, expr: SqlExpressionNode, column_alias: str
+    ) -> SqlSelectColumn:
+        return SqlSelectColumn(
+            expr=SqlDateTruncExpression(time_granularity=time_granularity, arg=expr), column_alias=column_alias
+        )
 
     def _create_entity_instances(
         self,
@@ -477,4 +515,51 @@ class SemanticModelToDataSetConverter:
                 metric_instances=(),
             ),
             sql_select_node=select_statement_node,
+        )
+
+    def build_time_spine_source_data_set(self, time_spine_source: TimeSpineSource) -> SqlDataSet:
+        """Build data set for time spine."""
+        from_source_alias = IdGeneratorRegistry.for_class(TimeSpineSource).create_id("time_spine_src")
+        defined_time_granularity = time_spine_source.time_column_granularity
+        time_column_name = time_spine_source.time_column_name
+
+        time_dimension_instances: List[TimeDimensionInstance] = []
+        select_columns: List[SqlSelectColumn] = []
+
+        time_dimension_instance = self._create_time_dimension_instance(
+            element_name=time_column_name, entity_links=(), time_granularity=defined_time_granularity
+        )
+        time_dimension_instances.append(time_dimension_instance)
+
+        dimension_select_expr = SemanticModelToDataSetConverter._make_element_sql_expr(
+            table_alias=from_source_alias, element_name=time_column_name
+        )
+        select_column = self._build_column_for_time_granularity(
+            time_granularity=defined_time_granularity,
+            expr=dimension_select_expr,
+            column_alias=time_dimension_instance.associated_column.column_name,
+        )
+        select_columns.append(select_column)
+
+        # TODO: add test cases for date part
+        new_instances, new_columns = self._build_time_dimension_columns_with_time_granularity_and_date_part(
+            defined_time_granularity=defined_time_granularity,
+            element_name=time_column_name,
+            entity_links=(),
+            dimension_select_expr=dimension_select_expr,
+        )
+        time_dimension_instances.extend(new_instances)
+        select_columns.extend(new_columns)
+
+        return SqlDataSet(
+            instance_set=InstanceSet(time_dimension_instances=tuple(time_dimension_instances)),
+            sql_select_node=SqlSelectStatementNode(
+                description=TIME_SPINE_DATA_SET_DESCRIPTION,
+                select_columns=tuple(select_columns),
+                from_source=SqlTableFromClauseNode(sql_table=time_spine_source.spine_table),
+                from_source_alias=from_source_alias,
+                joins_descs=(),
+                group_bys=(),
+                order_bys=(),
+            ),
         )

@@ -39,7 +39,7 @@ FROM (
       , EXTRACT(quarter FROM time_spine_src_10000.ds) AS ds__extract_quarter
       , EXTRACT(month FROM time_spine_src_10000.ds) AS ds__extract_month
       , EXTRACT(day FROM time_spine_src_10000.ds) AS ds__extract_day
-      , EXTRACT(isodow FROM time_spine_src_10000.ds) AS ds__extract_dow
+      , CASE WHEN EXTRACT(dow FROM time_spine_src_10000.ds) = 0 THEN EXTRACT(dow FROM time_spine_src_10000.ds) + 7 ELSE EXTRACT(dow FROM time_spine_src_10000.ds) END AS ds__extract_dow
       , EXTRACT(doy FROM time_spine_src_10000.ds) AS ds__extract_doy
     FROM ***************************.mf_time_spine time_spine_src_10000
   ) subq_0

@@ -1,18 +1,18 @@
 <SqlQueryPlan>
     <SqlSelectStatementNode>
-        <!-- description =             -->
-        <!--   Pass Only Elements:     -->
-        <!--     ['metric_time__day']  -->
+        <!-- description =                 -->
+        <!--   Pass Only Elements:         -->
+        <!--     ['metric_time__quarter']  -->
         <!-- node_id = ss_2 -->
         <!-- col0 =                                                   -->
         <!--   {'class': 'SqlSelectColumn',                           -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_44),  -->
-        <!--    'column_alias': 'metric_time__day'}                   -->
+        <!--    'column_alias': 'metric_time__quarter'}               -->
         <!-- from_source = SqlSelectStatementNode(node_id=ss_1) -->
         <!-- group_by0 =                                              -->
         <!--   {'class': 'SqlSelectColumn',                           -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_44),  -->
-        <!--    'column_alias': 'metric_time__day'}                   -->
+        <!--    'column_alias': 'metric_time__quarter'}               -->
         <!-- where = None -->
         <!-- distinct = False -->
         <SqlSelectStatementNode>

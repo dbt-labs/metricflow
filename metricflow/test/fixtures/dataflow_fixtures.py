@@ -35,6 +35,7 @@ def dataflow_plan_builder(  # noqa: D
         source_nodes=consistent_id_object_repository.simple_model_source_nodes,
         read_nodes=list(consistent_id_object_repository.simple_model_read_nodes.values()),
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
+        time_spine_source_node=consistent_id_object_repository.simple_model_time_spine_source_node,
     )
 
 
@@ -48,6 +49,7 @@ def multihop_dataflow_plan_builder(  # noqa: D
         source_nodes=consistent_id_object_repository.multihop_model_source_nodes,
         read_nodes=list(consistent_id_object_repository.multihop_model_read_nodes.values()),
         semantic_manifest_lookup=multi_hop_join_semantic_manifest_lookup,
+        time_spine_source_node=consistent_id_object_repository.multihop_model_time_spine_source_node,
     )
 
 
@@ -70,6 +72,7 @@ def scd_dataflow_plan_builder(  # noqa: D
         read_nodes=list(consistent_id_object_repository.scd_model_read_nodes.values()),
         semantic_manifest_lookup=scd_semantic_manifest_lookup,
         column_association_resolver=scd_column_association_resolver,
+        time_spine_source_node=consistent_id_object_repository.scd_model_time_spine_source_node,
     )
 
 

@@ -1030,7 +1030,7 @@ def test_metric_time_only(
 
 
 @pytest.mark.sql_engine_snapshot
-def test_metric_time_quarter(
+def test_metric_time_quarter_alone(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -1041,7 +1041,9 @@ def test_metric_time_quarter(
     dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
         query_spec=MetricFlowQuerySpec(
             time_dimension_specs=(
-                TimeDimensionSpec(element_name="metric_time", entity_links=(), time_granularity=TimeGranularity.YEAR),
+                TimeDimensionSpec(
+                    element_name="metric_time", entity_links=(), time_granularity=TimeGranularity.QUARTER
+                ),
             ),
         ),
     )

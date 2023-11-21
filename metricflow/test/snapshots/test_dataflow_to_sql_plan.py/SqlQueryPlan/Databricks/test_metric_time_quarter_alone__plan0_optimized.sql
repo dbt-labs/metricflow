@@ -1,9 +1,9 @@
 -- Date Spine
 -- Metric Time Dimension 'ds'
 -- Pass Only Elements:
---   ['metric_time__day']
+--   ['metric_time__quarter']
 SELECT
-  DATE_TRUNC('day', ds) AS metric_time__day
+  DATE_TRUNC('quarter', ds) AS metric_time__quarter
 FROM ***************************.mf_time_spine time_spine_src_10000
 GROUP BY
-  DATE_TRUNC('day', ds)
+  DATE_TRUNC('quarter', ds)

@@ -2,13 +2,17 @@ from __future__ import annotations
 
 from typing import List, Sequence
 
+from dbt_semantic_interfaces.references import TimeDimensionReference
+
 from metricflow.dataflow.dataflow_plan import (
     BaseOutput,
     MetricTimeDimensionTransformNode,
     ReadSqlSourceNode,
 )
+from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow.plan_conversion.time_spine import TimeSpineSource
 
 
 class SourceNodeBuilder:
@@ -52,3 +56,15 @@ class SourceNodeBuilder:
     ) -> Sequence[ReadSqlSourceNode]:
         """Creates read nodes from SemanticModelDataSets."""
         return [ReadSqlSourceNode(data_set) for data_set in data_sets]
+
+    @staticmethod
+    def build_time_spine_source_node(
+        time_spine_source: TimeSpineSource, data_set_converter: SemanticModelToDataSetConverter
+    ) -> MetricTimeDimensionTransformNode:
+        """Build a source node from the time spine source table."""
+        time_spine_data_set = data_set_converter.build_time_spine_source_data_set(time_spine_source)
+        time_dim_reference = TimeDimensionReference(element_name=time_spine_source.time_column_name)
+        return MetricTimeDimensionTransformNode(
+            parent_node=ReadSqlSourceNode(data_set=time_spine_data_set),
+            aggregation_time_dimension_reference=time_dim_reference,
+        )

@@ -32,6 +32,7 @@ from metricflow.dataflow.dataflow_plan import (
     JoinOverTimeRangeNode,
     JoinToBaseOutputNode,
     JoinToTimeSpineNode,
+    MetricTimeDimensionTransformNode,
     OrderByLimitNode,
     ReadSqlSourceNode,
     SemiAdditiveJoinNode,
@@ -142,6 +143,7 @@ class DataflowPlanBuilder:
         self,
         source_nodes: Sequence[BaseOutput],
         read_nodes: Sequence[ReadSqlSourceNode],
+        time_spine_source_node: MetricTimeDimensionTransformNode,
         semantic_manifest_lookup: SemanticManifestLookup,
         node_output_resolver: Optional[DataflowPlanNodeOutputDataSetResolver] = None,
         column_association_resolver: Optional[ColumnAssociationResolver] = None,
@@ -149,6 +151,7 @@ class DataflowPlanBuilder:
         self._semantic_model_lookup = semantic_manifest_lookup.semantic_model_lookup
         self._metric_lookup = semantic_manifest_lookup.metric_lookup
         self._time_spine_source = semantic_manifest_lookup.time_spine_source
+        self._time_spine_source_node = time_spine_source_node
         self._metric_time_dimension_reference = DataSet.metric_time_dimension_reference()
         self._source_nodes = source_nodes
         self._read_nodes = read_nodes
@@ -501,8 +504,8 @@ class DataflowPlanBuilder:
                 if time_dimension_spec.element_name == self._metric_time_dimension_reference.element_name
             ]
             if requested_metric_time_specs:
-                # Add time_spine to potential source nodes for requested metric_time specs
-                potential_source_nodes = list(potential_source_nodes) + [self._time_spine_source.build_source_node()]
+                # Add time_spine source node to potential source nodes
+                potential_source_nodes = list(potential_source_nodes) + [self._time_spine_source_node]
 
         logger.info(f"There are {len(potential_source_nodes)} potential source nodes")
 
