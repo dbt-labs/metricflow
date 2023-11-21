@@ -342,7 +342,7 @@ FROM (
       ) subq_7
     ) subq_8
     ON
-      DATEADD(day, -5, subq_9.metric_time__day) = subq_8.metric_time__day
+      DATEADD(day, -2, subq_9.metric_time__day) = subq_8.metric_time__day
   ) subq_11
   WHERE subq_11.metric_time__day BETWEEN '2020-01-12' AND '2020-01-13'
 ) subq_12

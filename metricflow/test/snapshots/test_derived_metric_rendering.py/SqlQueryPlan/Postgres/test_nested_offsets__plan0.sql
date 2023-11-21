@@ -336,5 +336,5 @@ FROM (
     ) subq_7
   ) subq_8
   ON
-    subq_9.metric_time__day - MAKE_INTERVAL(days => 5) = subq_8.metric_time__day
+    subq_9.metric_time__day - MAKE_INTERVAL(days => 2) = subq_8.metric_time__day
 ) subq_11

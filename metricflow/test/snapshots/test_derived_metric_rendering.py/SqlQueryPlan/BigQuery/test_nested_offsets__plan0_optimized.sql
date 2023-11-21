@@ -38,5 +38,5 @@ FROM (
     ) subq_19
   ) subq_20
   ON
-    DATE_SUB(CAST(subq_22.ds AS DATETIME), INTERVAL 5 day) = subq_20.metric_time__day
+    DATE_SUB(CAST(subq_22.ds AS DATETIME), INTERVAL 2 day) = subq_20.metric_time__day
 ) subq_23

@@ -45,6 +45,6 @@ FROM (
     ) subq_20
   ) subq_21
   ON
-    DATE_SUB(CAST(subq_22.metric_time__day AS DATETIME), INTERVAL 5 day) = subq_21.metric_time__day
+    DATE_SUB(CAST(subq_22.metric_time__day AS DATETIME), INTERVAL 2 day) = subq_21.metric_time__day
   WHERE subq_22.metric_time__day BETWEEN '2020-01-12' AND '2020-01-13'
 ) subq_25

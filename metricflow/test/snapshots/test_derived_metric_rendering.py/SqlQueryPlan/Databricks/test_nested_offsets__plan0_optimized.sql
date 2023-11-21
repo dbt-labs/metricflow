@@ -38,5 +38,5 @@ FROM (
     ) subq_19
   ) subq_20
   ON
-    DATEADD(day, -5, subq_22.ds) = subq_20.metric_time__day
+    DATEADD(day, -2, subq_22.ds) = subq_20.metric_time__day
 ) subq_23

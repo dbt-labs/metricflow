@@ -45,6 +45,6 @@ FROM (
     ) subq_20
   ) subq_21
   ON
-    subq_22.metric_time__day - MAKE_INTERVAL(days => 5) = subq_21.metric_time__day
+    subq_22.metric_time__day - MAKE_INTERVAL(days => 2) = subq_21.metric_time__day
   WHERE subq_22.metric_time__day BETWEEN '2020-01-12' AND '2020-01-13'
 ) subq_25

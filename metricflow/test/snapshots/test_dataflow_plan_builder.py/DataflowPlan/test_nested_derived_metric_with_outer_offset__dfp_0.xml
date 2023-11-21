@@ -23,7 +23,7 @@
                 <!--     'date_part': None,                        -->
                 <!--     'aggregation_state': None}]               -->
                 <!-- time_range_constraint = None -->
-                <!-- offset_window = count=5 granularity=TimeGranularity.DAY -->
+                <!-- offset_window = count=2 granularity=TimeGranularity.DAY -->
                 <!-- offset_to_grain = None -->
                 <!-- join_type = SqlJoinType.INNER -->
                 <ComputeMetricsNode>
@@ -35,7 +35,7 @@
                     <!--    'constraint': None,                                     -->
                     <!--    'alias': None,                                          -->
                     <!--    'offset_window': {'class': 'PydanticMetricTimeWindow',  -->
-                    <!--                      'count': 5,                           -->
+                    <!--                      'count': 2,                           -->
                     <!--                      'granularity': TimeGranularity.DAY},  -->
                     <!--    'offset_to_grain': None}                                -->
                     <ComputeMetricsNode>

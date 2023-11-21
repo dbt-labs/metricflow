@@ -1502,7 +1502,7 @@ integration_test:
       ) subq_7
     ) subq_8
     ON
-      {{ render_date_sub("subq_9", "ds", 5, TimeGranularity.DAY) }} = subq_8.metric_time__day
+      {{ render_date_sub("subq_9", "ds", 2, TimeGranularity.DAY) }} = subq_8.metric_time__day
 ---
 integration_test:
   name: nested_derived_metric_outer_offset_multiple_input_metrics
@@ -1565,7 +1565,7 @@ integration_test:
   model: SIMPLE_MODEL
   metrics: ["bookings_offset_twice"]
   group_by_objs: [{"name": "metric_time", "grain": "day"}]
-  where_filter: "{{ render_time_constraint('metric_time__day', '2020-01-12', '2020-01-13') }}"
+  where_filter: "{{ render_time_constraint('metric_time__day', '2020-01-08', '2020-01-09') }}"
   check_query: |
     SELECT
       subq_9.ds AS metric_time__day
@@ -1593,8 +1593,8 @@ integration_test:
       ) subq_7
     ) subq_8
     ON
-      {{ render_date_sub("subq_9", "ds", 5, TimeGranularity.DAY) }} = subq_8.metric_time__day
-    WHERE {{ render_time_constraint('subq_9.ds', '2020-01-12', '2020-01-13') }}
+      {{ render_date_sub("subq_9", "ds", 2, TimeGranularity.DAY) }} = subq_8.metric_time__day
+    WHERE {{ render_time_constraint('subq_9.ds', '2020-01-08', '2020-01-09') }}
 ---
 integration_test:
   name: nested_derived_metric_offset_with_time_constraint
@@ -1602,7 +1602,7 @@ integration_test:
   model: SIMPLE_MODEL
   metrics: ["bookings_offset_twice"]
   group_by_objs: [{"name": "metric_time", "grain": "day"}]
-  time_constraint: ["2020-01-12", "2020-01-13"]
+  time_constraint: ["2020-01-08", "2020-01-09"]
   check_query: |
     SELECT
       subq_9.ds AS metric_time__day
@@ -1630,5 +1630,5 @@ integration_test:
       ) subq_7
     ) subq_8
     ON
-      {{ render_date_sub("subq_9", "ds", 5, TimeGranularity.DAY) }} = subq_8.metric_time__day
-    WHERE {{ render_time_constraint('subq_9.ds', '2020-01-12', '2020-01-13') }}
+      {{ render_date_sub("subq_9", "ds", 2, TimeGranularity.DAY) }} = subq_8.metric_time__day
+    WHERE {{ render_time_constraint('subq_9.ds', '2020-01-08', '2020-01-09') }}

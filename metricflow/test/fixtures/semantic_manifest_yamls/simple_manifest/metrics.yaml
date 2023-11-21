@@ -597,7 +597,7 @@ metric:
     expr: 2 * bookings_offset_once
     metrics:
       - name: bookings_offset_once
-        offset_window: 5 days
+        offset_window: 2 days
 ---
 metric:
   name: booking_fees_since_start_of_month
