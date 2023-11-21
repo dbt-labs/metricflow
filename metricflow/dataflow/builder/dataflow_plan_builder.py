@@ -217,7 +217,7 @@ class DataflowPlanBuilder:
         queried_linkable_specs: LinkableSpecSet,
         where_constraint: Optional[WhereFilterSpec] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
-    ) -> ComputeMetricsNode:
+    ) -> BaseOutput:
         """Builds a node to compute a metric defined from other metrics."""
         metric = self._metric_lookup.get_metric(metric_spec.reference)
         metric_input_specs = self._metric_lookup.metric_input_specs_for_metric(
@@ -230,17 +230,8 @@ class DataflowPlanBuilder:
         )
 
         parent_nodes: List[BaseOutput] = []
-
+        metric_has_time_offset = bool(metric_spec.offset_window or metric_spec.offset_to_grain)
         for metric_input_spec in metric_input_specs:
-            # TODO: See: https://github.com/dbt-labs/metricflow/issues/881
-            if (metric_spec.offset_window is not None or metric_spec.offset_to_grain is not None) and (
-                metric_input_spec.offset_window is not None or metric_input_spec.offset_to_grain is not None
-            ):
-                raise NotImplementedError(
-                    f"Multiple descendent metrics in a derived metric hierarchy are not yet supported. "
-                    f"For {metric_spec}, the parent metric input is {metric_input_spec}"
-                )
-
             parent_nodes.append(
                 self._build_any_metric_output_node(
                     metric_spec=MetricSpec(
@@ -251,21 +242,37 @@ class DataflowPlanBuilder:
                         offset_to_grain=metric_input_spec.offset_to_grain,
                     ),
                     queried_linkable_specs=queried_linkable_specs,
-                    where_constraint=where_constraint,
-                    time_range_constraint=time_range_constraint,
+                    # If metric is offset, we'll apply constraint after offset to avoid removing values unexpectedly.
+                    where_constraint=where_constraint if not metric_has_time_offset else None,
+                    time_range_constraint=time_range_constraint if not metric_has_time_offset else None,
                 )
             )
 
-        if len(parent_nodes) == 1:
-            return ComputeMetricsNode(
-                parent_node=parent_nodes[0],
-                metric_specs=[metric_spec],
-            )
-
-        return ComputeMetricsNode(
-            parent_node=CombineAggregatedOutputsNode(parent_nodes=parent_nodes),
-            metric_specs=[metric_spec],
+        parent_node = (
+            parent_nodes[0] if len(parent_nodes) == 1 else CombineAggregatedOutputsNode(parent_nodes=parent_nodes)
         )
+        output_node: BaseOutput = ComputeMetricsNode(parent_node=parent_node, metric_specs=[metric_spec])
+
+        # For nested ratio / derived metrics with time offset, apply offset & where constraint after metric computation.
+        if metric_has_time_offset:
+            assert (
+                queried_linkable_specs.contains_metric_time
+            ), "Joining to time spine requires querying with metric_time."
+            output_node = JoinToTimeSpineNode(
+                parent_node=output_node,
+                requested_metric_time_dimension_specs=list(queried_linkable_specs.metric_time_specs),
+                time_range_constraint=time_range_constraint,
+                offset_window=metric_spec.offset_window,
+                offset_to_grain=metric_spec.offset_to_grain,
+                join_type=SqlJoinType.INNER,
+            )
+            if time_range_constraint:
+                output_node = ConstrainTimeRangeNode(
+                    parent_node=output_node, time_range_constraint=time_range_constraint
+                )
+            if where_constraint:
+                output_node = WhereConstraintNode(parent_node=output_node, where_constraint=where_constraint)
+        return output_node
 
     def _build_any_metric_output_node(
         self,
@@ -273,7 +280,7 @@ class DataflowPlanBuilder:
         queried_linkable_specs: LinkableSpecSet,
         where_constraint: Optional[WhereFilterSpec] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
-    ) -> ComputeMetricsNode:
+    ) -> BaseOutput:
         """Builds a node to compute a metric of any type."""
         metric = self._metric_lookup.get_metric(metric_spec.reference)
 

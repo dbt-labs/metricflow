@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import datetime
+
 import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
+from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.specs.column_assoc import ColumnAssociationResolver
@@ -313,6 +316,120 @@ def test_derived_offset_cumulative_metric(  # noqa: D
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="every_2_days_bookers_2_days_ago"),),
             time_dimension_specs=(MTD_SPEC_DAY,),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_nested_offsets(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+    create_source_tables: bool,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        query_spec=MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings_offset_twice"),),
+            time_dimension_specs=(MTD_SPEC_DAY,),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_nested_derived_metric_with_offset_multiple_input_metrics(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+    create_source_tables: bool,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        query_spec=MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="booking_fees_since_start_of_month"),),
+            time_dimension_specs=(MTD_SPEC_DAY,),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_nested_offsets_with_where_constraint(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+    column_association_resolver: ColumnAssociationResolver,
+    create_source_tables: bool,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        query_spec=MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings_offset_twice"),),
+            time_dimension_specs=(MTD_SPEC_DAY,),
+            where_constraint=WhereSpecFactory(
+                column_association_resolver=column_association_resolver,
+            ).create_from_where_filter(
+                PydanticWhereFilter(
+                    where_sql_template=(
+                        "{{ TimeDimension('metric_time', 'day') }} = '2020-01-12' "
+                        "or {{ TimeDimension('metric_time', 'day') }} = '2020-01-13'"
+                    )
+                ),
+            ),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_nested_offsets_with_time_constraint(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+    create_source_tables: bool,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        query_spec=MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings_offset_twice"),),
+            time_dimension_specs=(MTD_SPEC_DAY,),
+            time_range_constraint=TimeRangeConstraint(
+                start_time=datetime.datetime(2020, 1, 12), end_time=datetime.datetime(2020, 1, 13)
+            ),
         )
     )
 
