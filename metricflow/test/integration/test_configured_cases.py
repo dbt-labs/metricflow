@@ -77,7 +77,12 @@ class CheckQueryHelpers:
         start_time: str,
         stop_time: str,
     ) -> str:
-        """Render an expression like "ds between timestamp '2020-01-01' AND timestamp '2020-01-02'" since Trino require timestamp literals to be wrapped in a timestamp() function."""
+        """Render an expression like "ds between timestamp '2020-01-01' AND timestamp '2020-01-02'".
+
+        This will cast the literals as needed for each engine, and provide an alternative to incrementing
+        the date as we do in render_time_constraint. Using BETWEEN is more robust for cases involving potentially
+        mixed granularities.
+        """
         start_expr = self.cast_to_ts(f"{start_time}")
         stop_expr = self.cast_to_ts(f"{stop_time}")
         return f"{expr} BETWEEN {start_expr} AND {stop_expr}"
