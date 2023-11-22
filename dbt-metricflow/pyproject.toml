@@ -51,7 +51,7 @@ snowflake = [
   "dbt-snowflake~=1.7.0"
 ]
 trino = [
-  "dbt-trino~=1.6.0"
+  "dbt-trino~=1.7.0"
 ]
 
 [tool.hatch.build.targets.sdist]
