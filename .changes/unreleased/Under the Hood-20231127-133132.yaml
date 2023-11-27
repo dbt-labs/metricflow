@@ -1,0 +1,7 @@
+kind: Under the Hood
+body: Test to ensure Dimension and TimeDimension syntax are identical in the case
+  of time dimensions
+time: 2023-11-27T13:31:32.631027-06:00
+custom:
+  Author: DevonFulcher
+  Issue: None

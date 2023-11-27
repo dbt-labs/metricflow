@@ -15,6 +15,7 @@ from metricflow.specs.specs import (
     EntitySpec,
     LinkableSpecSet,
     TimeDimensionSpec,
+    WhereFilterSpec,
 )
 from metricflow.specs.where_filter_transform import WhereSpecFactory
 
@@ -204,3 +205,17 @@ def test_entity_in_filter(  # noqa: D
         time_dimension_specs=(),
         entity_specs=(EntitySpec(element_name="user", entity_links=(EntityReference(element_name="listing"),)),),
     )
+
+
+def test_dimension_time_dimension_parity(column_association_resolver: ColumnAssociationResolver) -> None:  # noqa
+    def get_spec(dimension: str) -> WhereFilterSpec:
+        where_filter = PydanticWhereFilter(where_sql_template="{{" + dimension + "}} = '2020'")
+
+        return WhereSpecFactory(
+            column_association_resolver=column_association_resolver,
+        ).create_from_where_filter(where_filter)
+
+    time_dimension_spec = get_spec("TimeDimension('metric_time', 'week', date_part_name='day')")
+    dimension_spec = get_spec("Dimension('metric_time').date_part('day').grain('week')")
+
+    assert time_dimension_spec == dimension_spec
