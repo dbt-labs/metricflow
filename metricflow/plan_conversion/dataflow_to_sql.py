@@ -755,8 +755,12 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
     def visit_where_constraint_node(self, node: WhereConstraintNode) -> SqlDataSet:
         """Adds where clause to SQL statement from parent node."""
-        from_data_set: SqlDataSet = node.parent_node.accept(self)
-        output_instance_set = from_data_set.instance_set
+        parent_data_set: SqlDataSet = node.parent_node.accept(self)
+        # Since we're copying the instance set from the parent to conveniently generate the output instance set for this
+        # node, we'll need to change the column names.
+        output_instance_set = parent_data_set.instance_set.transform(
+            ChangeAssociatedColumns(self._column_association_resolver)
+        )
         from_data_set_alias = self._next_unique_table_alias()
 
         column_associations_in_where_sql: Sequence[ColumnAssociation] = CreateColumnAssociations(
@@ -771,7 +775,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 select_columns=output_instance_set.transform(
                     CreateSelectColumnsForInstances(from_data_set_alias, self._column_association_resolver)
                 ).as_tuple(),
-                from_source=from_data_set.sql_select_node,
+                from_source=parent_data_set.sql_select_node,
                 from_source_alias=from_data_set_alias,
                 joins_descs=(),
                 group_bys=(),
