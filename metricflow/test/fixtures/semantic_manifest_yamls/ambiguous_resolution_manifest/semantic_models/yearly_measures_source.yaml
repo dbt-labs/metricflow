@@ -1,0 +1,23 @@
+---
+semantic_model:
+  name: yearly_measure_source
+  description: Contains measures with a year grain.
+
+  node_relation:
+    schema_name: $source_schema
+    alias: fct_yearly_measures
+
+  defaults:
+    agg_time_dimension: creation_time
+
+  measures:
+    - name: yearly_measure_0
+      agg: sum
+
+  dimensions:
+    - name: creation_time
+      type: time
+      type_params:
+        time_granularity: year
+
+  primary_entity: yearly_measure_entity
