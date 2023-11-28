@@ -69,8 +69,8 @@ class JoinLinkableInstancesRecipe:
 
     validity_window: Optional[ValidityWindowJoinDescription] = None
 
-    @property
-    def join_description(self) -> JoinDescription:
+    # TODO: better name for includes_measures
+    def join_description(self, includes_measures: bool) -> JoinDescription:
         """The recipe as a join description to use in the dataflow plan node."""
         # Figure out what elements to filter from the joined node.
         include_specs: List[LinkableInstanceSpec] = []
@@ -90,7 +90,11 @@ class JoinLinkableInstancesRecipe:
         # link when filtering before the join.
         # e.g. if the node is used to satisfy "user_id__country", then the node must have the entity
         # "user_id" and the "country" dimension so that it can be joined to the source node.
-        include_specs.extend([spec.without_first_entity_link for spec in self.satisfiable_linkable_specs])
+        if includes_measures:
+            include_specs.extend([spec.without_first_entity_link for spec in self.satisfiable_linkable_specs])
+        else:
+            include_specs.extend(self.satisfiable_linkable_specs)
+
         filtered_node_to_join = FilterElementsNode(
             parent_node=self.node_to_join, include_specs=InstanceSpecSet.from_specs(include_specs)
         )

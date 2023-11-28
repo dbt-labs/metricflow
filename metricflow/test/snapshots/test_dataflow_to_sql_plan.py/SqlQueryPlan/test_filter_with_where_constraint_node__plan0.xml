@@ -5,7 +5,7 @@
         <!-- col0 =                                                  -->
         <!--   {'class': 'SqlSelectColumn',                          -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_3),  -->
-        <!--    'column_alias': 'ds__day'}                           -->
+        <!--    'column_alias': 'booking__ds__day'}                  -->
         <!-- col1 =                                                  -->
         <!--   {'class': 'SqlSelectColumn',                          -->
         <!--    'expr': SqlColumnReferenceExpression(node_id=cr_2),  -->
@@ -15,14 +15,14 @@
         <!--   SqlStringExpression(node_id=str_0 sql_expr=booking__ds__day = '2020-01-01')  -->
         <!-- distinct = False -->
         <SqlSelectStatementNode>
-            <!-- description =                -->
-            <!--   Pass Only Elements:        -->
-            <!--     ['bookings', 'ds__day']  -->
+            <!-- description =                         -->
+            <!--   Pass Only Elements:                 -->
+            <!--     ['bookings', 'booking__ds__day']  -->
             <!-- node_id = ss_0 -->
             <!-- col0 =                                                  -->
             <!--   {'class': 'SqlSelectColumn',                          -->
             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_1),  -->
-            <!--    'column_alias': 'ds__day'}                           -->
+            <!--    'column_alias': 'booking__ds__day'}                  -->
             <!-- col1 =                                                  -->
             <!--   {'class': 'SqlSelectColumn',                          -->
             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_0),  -->

@@ -188,7 +188,7 @@ class SourceScanOptimizer(
         self._log_visit_node_type(node)
         return self._default_sink_node_handler(node)
 
-    def visit_pass_elements_filter_node(self, node: FilterElementsNode) -> OptimizeBranchResult:  # noqa: D
+    def visit_filter_elements_node(self, node: FilterElementsNode) -> OptimizeBranchResult:  # noqa: D
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)
 

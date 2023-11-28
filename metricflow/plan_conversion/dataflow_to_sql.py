@@ -435,7 +435,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         )
 
         table_alias_to_instance_set[from_data_set_alias] = from_data_set_output_instance_set
-
         # Construct the data set that contains the updated instances and the SQL nodes that should go in the various
         # clauses.
         return SqlDataSet(
@@ -723,7 +722,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         """Similar to visit_write_to_result_dataframe_node()."""
         raise RuntimeError("This node type is not supported.")
 
-    def visit_pass_elements_filter_node(self, node: FilterElementsNode) -> SqlDataSet:
+    def visit_filter_elements_node(self, node: FilterElementsNode) -> SqlDataSet:
         """Generates the query that realizes the behavior of FilterElementsNode."""
         from_data_set: SqlDataSet = node.parent_node.accept(self)
         output_instance_set = from_data_set.instance_set.transform(FilterElements(node.include_specs))

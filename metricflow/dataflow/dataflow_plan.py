@@ -146,7 +146,7 @@ class DataflowPlanNodeVisitor(Generic[VisitorOutputT], ABC):
         pass
 
     @abstractmethod
-    def visit_pass_elements_filter_node(self, node: FilterElementsNode) -> VisitorOutputT:  # noqa: D
+    def visit_filter_elements_node(self, node: FilterElementsNode) -> VisitorOutputT:  # noqa: D
         pass
 
     @abstractmethod
@@ -194,7 +194,7 @@ class ReadSqlSourceNode(BaseOutput):
         Args:
             data_set: dataset describing the SQL table / SQL query
         """
-        self._dataset = data_set
+        self._data_set = data_set
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[])
 
     @classmethod
@@ -207,7 +207,7 @@ class ReadSqlSourceNode(BaseOutput):
     @property
     def data_set(self) -> SqlDataSet:
         """Return the data set that this source represents and is passed to the child nodes."""
-        return self._dataset
+        return self._data_set
 
     def __str__(self) -> str:  # noqa: D
         return jinja2.Template(
@@ -1077,7 +1077,7 @@ class FilterElementsNode(BaseOutput):
         return self._distinct
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
-        return visitor.visit_pass_elements_filter_node(self)
+        return visitor.visit_filter_elements_node(self)
 
     @property
     def description(self) -> str:  # noqa: D

@@ -62,14 +62,14 @@
                             <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))  -->
                         </ReadSqlSourceNode>
                         <FilterElementsNode>
-                            <!-- description =                      -->
-                            <!--   Pass Only Elements:              -->
-                            <!--     ['home_state_latest', 'user']  -->
+                            <!-- description =                            -->
+                            <!--   Pass Only Elements:                    -->
+                            <!--     ['user__home_state_latest', 'user']  -->
                             <!-- node_id = pfe_1 -->
-                            <!-- include_spec =                           -->
-                            <!--   {'class': 'DimensionSpec',             -->
-                            <!--    'element_name': 'home_state_latest',  -->
-                            <!--    'entity_links': ()}                   -->
+                            <!-- include_spec =                                                               -->
+                            <!--   {'class': 'DimensionSpec',                                                 -->
+                            <!--    'element_name': 'home_state_latest',                                      -->
+                            <!--    'entity_links': ({'class': 'EntityReference', 'element_name': 'user'},)}  -->
                             <!-- include_spec = LinklessEntitySpec(element_name='user', entity_links=()) -->
                             <!-- distinct = False -->
                             <ReadSqlSourceNode>

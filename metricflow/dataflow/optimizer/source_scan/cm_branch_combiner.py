@@ -322,9 +322,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         self._log_visit_node_type(node)
         return self._handle_unsupported_node(node)
 
-    def visit_pass_elements_filter_node(  # noqa: D
-        self, node: FilterElementsNode
-    ) -> ComputeMetricsBranchCombinerResult:
+    def visit_filter_elements_node(self, node: FilterElementsNode) -> ComputeMetricsBranchCombinerResult:  # noqa: D
         self._log_visit_node_type(node)
 
         current_right_node = node

@@ -1,12 +1,12 @@
 -- Constrain Output with WHERE
 SELECT
-  subq_1.ds__day
+  subq_1.booking__ds__day
   , subq_1.bookings
 FROM (
   -- Pass Only Elements:
-  --   ['bookings', 'ds__day']
+  --   ['bookings', 'booking__ds__day']
   SELECT
-    subq_0.ds__day
+    subq_0.booking__ds__day
     , subq_0.bookings
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
