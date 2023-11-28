@@ -64,11 +64,6 @@ def query_parser_from_yaml(yaml_contents: List[YamlConfigFile]) -> MetricFlowQue
     return MetricFlowQueryParser(
         model=semantic_manifest_lookup,
         column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup),
-        read_nodes=list(_data_set_to_read_nodes(create_data_sets(semantic_manifest_lookup)).values()),
-        node_output_resolver=DataflowPlanNodeOutputDataSetResolver(
-            column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup),
-            semantic_manifest_lookup=semantic_manifest_lookup,
-        ),
     )
 
 
@@ -93,6 +88,9 @@ class ConsistentIdObjectRepository:
     extended_date_model_read_nodes: OrderedDict[str, ReadSqlSourceNode]
     extended_date_model_source_nodes: Sequence[BaseOutput]
 
+    ambiguous_resolution_read_nodes: OrderedDict[str, ReadSqlSourceNode]
+    ambiguous_resolution_source_nodes: Sequence[BaseOutput]
+
 
 @pytest.fixture(scope="session")
 def consistent_id_object_repository(
@@ -101,6 +99,7 @@ def consistent_id_object_repository(
     scd_semantic_manifest_lookup: SemanticManifestLookup,
     cyclic_join_semantic_manifest_lookup: SemanticManifestLookup,
     extended_date_semantic_manifest_lookup: SemanticManifestLookup,
+    ambiguous_resolution_manifest_lookup: SemanticManifestLookup,
 ) -> ConsistentIdObjectRepository:  # noqa: D
     """Create objects that have incremental numeric IDs with a consistent value.
 
@@ -113,6 +112,7 @@ def consistent_id_object_repository(
         scd_data_sets = create_data_sets(scd_semantic_manifest_lookup)
         cyclic_join_data_sets = create_data_sets(cyclic_join_semantic_manifest_lookup)
         extended_date_data_sets = create_data_sets(extended_date_semantic_manifest_lookup)
+        ambiguous_resolution_data_sets = create_data_sets(ambiguous_resolution_manifest_lookup)
 
         return ConsistentIdObjectRepository(
             simple_model_data_sets=sm_data_sets,
@@ -134,6 +134,10 @@ def consistent_id_object_repository(
             extended_date_model_read_nodes=_data_set_to_read_nodes(extended_date_data_sets),
             extended_date_model_source_nodes=_data_set_to_source_nodes(
                 semantic_manifest_lookup=extended_date_semantic_manifest_lookup, data_sets=extended_date_data_sets
+            ),
+            ambiguous_resolution_read_nodes=_data_set_to_read_nodes(ambiguous_resolution_data_sets),
+            ambiguous_resolution_source_nodes=_data_set_to_source_nodes(
+                semantic_manifest_lookup=ambiguous_resolution_manifest_lookup, data_sets=ambiguous_resolution_data_sets
             ),
         )
 
@@ -259,3 +263,17 @@ def node_output_resolver(  # noqa:D
         column_association_resolver=DunderColumnAssociationResolver(simple_semantic_manifest_lookup),
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
     )
+
+
+@pytest.fixture(scope="session")
+def ambiguous_resolution_manifest(template_mapping: Dict[str, str]) -> PydanticSemanticManifest:
+    """Manifest used to test ambiguous resolution of group-by-items."""
+    build_result = load_semantic_manifest("ambiguous_resolution_manifest", template_mapping)
+    return build_result.semantic_manifest
+
+
+@pytest.fixture(scope="session")
+def ambiguous_resolution_manifest_lookup(  # noqa: D
+    ambiguous_resolution_manifest: PydanticSemanticManifest,
+) -> SemanticManifestLookup:
+    return SemanticManifestLookup(ambiguous_resolution_manifest)

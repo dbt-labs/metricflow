@@ -1,0 +1,73 @@
+---
+metric:
+  name: monthly_metric_0
+  description: A metric with a month grain.
+  type: simple
+  type_params:
+    measure: monthly_measure_0
+---
+metric:
+  name: monthly_metric_1
+  description: A metric with a month grain.
+  type: simple
+  type_params:
+    measure: monthly_measure_1
+---
+metric:
+  name: yearly_metric_0
+  description: A metric with a year grain.
+  type: simple
+  type_params:
+    measure: yearly_measure_0
+---
+metric:
+  name: derived_metric_with_same_parent_time_grains
+  description: A derived metric based on metrics with a month grain.
+  type: derived
+  type_params:
+    expr: monthly_metric_0 + monthly_metric_1
+    metrics:
+      - name: monthly_metric_0
+      - name: monthly_metric_1
+---
+metric:
+  name: derived_metric_with_different_parent_time_grains
+  description: A derived metric based on metrics with month and year grains.
+  type: derived
+  type_params:
+    expr: monthly_metric_0 + yearly_metric_0
+    metrics:
+      - name: monthly_metric_0
+      - name: yearly_metric_0
+
+---
+metric:
+  name: metric_derived_from_heterogeneous_derived_metric
+  description: |
+    A derived metric based on another derived metric (derived_metric_with_different_parent_time_grains).
+    Used to test metric filters.
+  type: derived
+  type_params:
+    expr: derived_metric_with_different_parent_time_grains
+    metrics:
+      - name: derived_metric_with_different_parent_time_grains
+
+---
+metric:
+  name: metric_derived_from_homogeneous_derived_metric
+  description: |
+    A derived metric based on another derived metric (derived_metric_with_same_parent_time_grains).
+    Used to test metric filters.
+  type: derived
+  type_params:
+    expr: derived_metric_with_same_parent_time_grains
+    metrics:
+      - name: derived_metric_with_same_parent_time_grains
+---
+metric:
+  name: accumulate_last_2_months_metric
+  description: A cumulative metric is currently restricted to querying by the grain of the defining measure.
+  type: cumulative
+  type_params:
+    measure: monthly_measure_0
+    window: 2 months
