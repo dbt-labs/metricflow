@@ -3,7 +3,7 @@
 --   ['user__home_state_latest', 'listing__is_lux_latest']
 SELECT
   listing__is_lux_latest
-  , home_state_latest AS user__home_state_latest
+  , user__home_state_latest
 FROM (
   -- Join Standard Outputs
   SELECT
@@ -18,4 +18,4 @@ FROM (
 WHERE user__home_state_latest = 'us'
 GROUP BY
   listing__is_lux_latest
-  , home_state_latest
+  , user__home_state_latest
