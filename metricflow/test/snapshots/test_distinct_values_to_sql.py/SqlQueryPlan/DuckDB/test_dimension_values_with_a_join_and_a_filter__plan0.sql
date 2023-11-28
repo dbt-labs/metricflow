@@ -59,7 +59,7 @@ FROM (
     , subq_3.listing__country_latest
     , subq_3.listing__is_lux_latest
     , subq_3.listing__capacity_latest
-    , subq_3.home_state_latest AS user__home_state_latest
+    , subq_3.user__home_state_latest
     , subq_3.listings
     , subq_3.largest_listing
     , subq_3.smallest_listing
