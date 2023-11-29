@@ -779,8 +779,13 @@ class ValidLinkableSpecResolver:
 
         return LinkableElementSet.merge_by_path_key((single_hop_elements, multi_hop_elements))
 
-    def _get_linkable_element_set_for_measure(self, measure_reference: MeasureReference) -> LinkableElementSet:
-        """Get the valid linkable elements for the given measure."""
+    def _get_linkable_element_set_for_measure(
+        self,
+        measure_reference: MeasureReference,
+        with_any_of: FrozenSet[LinkableElementProperties] = LinkableElementProperties.all_properties(),
+        without_any_of: FrozenSet[LinkableElementProperties] = frozenset(),
+    ) -> LinkableElementSet:
+        """See get_linkable_element_set_for_measure()."""
         measure_semantic_model = self._get_semantic_model_for_measure(measure_reference)
 
         elements_in_semantic_model = self._get_elements_in_semantic_model(measure_semantic_model)
@@ -793,7 +798,34 @@ class ValidLinkableSpecResolver:
                 metric_time_elements,
                 joined_elements,
             )
+        ).filter(
+            with_any_of=with_any_of,
+            without_any_of=without_any_of,
         )
+
+    def get_linkable_element_set_for_measure(
+        self,
+        measure_reference: MeasureReference,
+        with_any_of: FrozenSet[LinkableElementProperties],
+        without_any_of: FrozenSet[LinkableElementProperties],
+    ) -> LinkableElementSet:
+        """Get the valid linkable elements for the given measure."""
+        return self._get_linkable_element_set_for_measure(
+            measure_reference=measure_reference,
+            with_any_of=with_any_of,
+            without_any_of=without_any_of,
+        )
+
+    def get_linkable_elements_for_distinct_values_query(
+        self,
+        with_any_of: FrozenSet[LinkableElementProperties],
+        without_any_of: FrozenSet[LinkableElementProperties],
+    ) -> LinkableElementSet:
+        """Returns queryable items for a distinct group-by-item values query.
+
+        A distinct group-by-item values query does not include any metrics.
+        """
+        return self._no_metric_linkable_element_set.filter(with_any_of=with_any_of, without_any_of=without_any_of)
 
     def get_linkable_elements_for_metrics(
         self,
