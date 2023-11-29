@@ -188,3 +188,22 @@ class MetricAccessor(ABC):
         - Derived & ratio metrics take no input measures, only input metrics.
         """
         raise NotImplementedError
+
+    @abstractmethod
+    def group_by_item_specs_for_measure(
+        self,
+        measure_reference: MeasureReference,
+        with_any_of: Optional[Set[LinkableElementProperties]] = None,
+        without_any_of: Optional[Set[LinkableElementProperties]] = None,
+    ) -> Sequence[LinkableInstanceSpec]:
+        """Return group-by-items that are possible for a measure."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def group_by_item_specs_for_no_metrics_query(
+        self,
+        with_any_of: Optional[Set[LinkableElementProperties]] = None,
+        without_any_of: Optional[Set[LinkableElementProperties]] = None,
+    ) -> Sequence[LinkableInstanceSpec]:
+        """Return the possible group-by-items for a dimension values query with no metrics."""
+        raise NotImplementedError
