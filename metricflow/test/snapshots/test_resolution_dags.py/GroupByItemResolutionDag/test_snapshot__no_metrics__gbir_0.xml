@@ -1,0 +1,12 @@
+<GroupByItemResolutionDag>
+    <QueryGroupByItemResolutionNode>
+        <!-- description = Output the group-by items for query. -->
+        <!-- node_id = qr_0 -->
+        <!-- metrics_in_query = [] -->
+        <NoMetricsGroupByItemSourceNode>
+            <!-- description =                                                           -->
+            <!--   Output the available group-by-items for a query without any metrics.  -->
+            <!-- node_id = vr_0 -->
+        </NoMetricsGroupByItemSourceNode>
+    </QueryGroupByItemResolutionNode>
+</GroupByItemResolutionDag>
