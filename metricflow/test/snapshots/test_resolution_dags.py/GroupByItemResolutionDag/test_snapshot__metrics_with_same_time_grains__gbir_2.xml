@@ -1,0 +1,31 @@
+<GroupByItemResolutionDag>
+    <QueryGroupByItemResolutionNode>
+        <!-- description = Output the group-by items for query. -->
+        <!-- node_id = qr_2 -->
+        <!-- metrics_in_query =                                      -->
+        <!--   ["MetricReference(element_name='monthly_metric_0')",  -->
+        <!--    "MetricReference(element_name='monthly_metric_1')"]  -->
+        <MetricGroupByItemResolutionNode>
+            <!-- description = Output group-by-items available for this metric. -->
+            <!-- node_id = mtr_1 -->
+            <!-- metric_reference = MetricReference(element_name='monthly_metric_0') -->
+            <MeasureGroupByItemSourceNode>
+                <!-- description = Output group-by-items available for this measure. -->
+                <!-- node_id = msr_1 -->
+                <!-- measure_reference = MeasureReference(element_name='monthly_measure_0') -->
+                <!-- child_metric_reference = MetricReference(element_name='monthly_metric_0') -->
+            </MeasureGroupByItemSourceNode>
+        </MetricGroupByItemResolutionNode>
+        <MetricGroupByItemResolutionNode>
+            <!-- description = Output group-by-items available for this metric. -->
+            <!-- node_id = mtr_2 -->
+            <!-- metric_reference = MetricReference(element_name='monthly_metric_1') -->
+            <MeasureGroupByItemSourceNode>
+                <!-- description = Output group-by-items available for this measure. -->
+                <!-- node_id = msr_2 -->
+                <!-- measure_reference = MeasureReference(element_name='monthly_measure_1') -->
+                <!-- child_metric_reference = MetricReference(element_name='monthly_metric_1') -->
+            </MeasureGroupByItemSourceNode>
+        </MetricGroupByItemResolutionNode>
+    </QueryGroupByItemResolutionNode>
+</GroupByItemResolutionDag>
