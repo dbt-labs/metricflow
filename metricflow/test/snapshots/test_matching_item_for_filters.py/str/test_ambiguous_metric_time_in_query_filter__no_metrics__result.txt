@@ -1,0 +1,15 @@
+GroupByItemResolution(
+  issue_set=MetricFlowQueryResolutionIssueSet(
+    issues=(
+      NoMatchingItemsForNoMetricsQuery(
+        issue_type=ERROR,
+        query_resolution_path=MetricFlowQueryResolutionPath(
+          resolution_path_nodes=(
+            QueryGroupByItemResolutionNode(node_id=qr_0),
+            NoMetricsGroupByItemSourceNode(node_id=vr_0),
+          ),
+        ),
+      ),
+    ),
+  ),
+)
