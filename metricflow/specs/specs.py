@@ -17,12 +17,12 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
 from hashlib import sha1
-from typing import Any, Dict, Generic, List, Optional, Sequence, Tuple, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Dict, Generic, List, Optional, Sequence, Tuple, TypeVar, Union
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
-from dbt_semantic_interfaces.protocols import MetricTimeWindow
+from dbt_semantic_interfaces.protocols import MetricTimeWindow, WhereFilterIntersection
 from dbt_semantic_interfaces.references import (
     DimensionReference,
     EntityReference,
@@ -43,6 +43,9 @@ from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_column_type import SqlColumnType
 from metricflow.sql.sql_plan import SqlJoinType
 from metricflow.visitor import VisitorOutputT
+
+if TYPE_CHECKING:
+    from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import FilterSpecResolutionLookUp
 
 
 def hash_items(items: Sequence[SqlColumnType]) -> str:
@@ -513,7 +516,7 @@ class MeasureSpec(InstanceSpec):  # noqa: D
 class MetricSpec(InstanceSpec):  # noqa: D
     # Time-over-time could go here
     element_name: str
-    constraint: Optional[WhereFilterSpec] = None
+    filter_specs: Tuple[WhereFilterSpec, ...] = ()
     alias: Optional[str] = None
     offset_window: Optional[PydanticMetricTimeWindow] = None
     offset_to_grain: Optional[TimeGranularity] = None
@@ -530,14 +533,6 @@ class MetricSpec(InstanceSpec):  # noqa: D
     def from_reference(reference: MetricReference) -> MetricSpec:
         """Initialize from a metric reference instance."""
         return MetricSpec(element_name=reference.element_name)
-
-    @property
-    def alias_spec(self) -> MetricSpec:
-        """Returns a MetricSpec representing the alias state."""
-        return MetricSpec(
-            element_name=self.alias or self.element_name,
-            constraint=self.constraint,
-        )
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_metric_spec(self)
@@ -558,7 +553,7 @@ class MetricSpec(InstanceSpec):  # noqa: D
 
     def without_offset(self) -> MetricSpec:
         """Represents the metric spec with any time offsets removed."""
-        return MetricSpec(element_name=self.element_name, constraint=self.constraint, alias=self.alias)
+        return MetricSpec(element_name=self.element_name, filter_specs=self.filter_specs, alias=self.alias)
 
 
 @dataclass(frozen=True)
@@ -585,7 +580,7 @@ class MetricInputMeasureSpec(SerializableDataclass):
     offset_window: Optional[MetricTimeWindow] = None
     offset_to_grain: Optional[TimeGranularity] = None
     culmination_description: Optional[CumulativeMeasureDescription] = None
-    constraint: Optional[WhereFilterSpec] = None
+    filter_specs: Tuple[WhereFilterSpec, ...] = ()
     alias: Optional[str] = None
     before_aggregation_time_spine_join_description: Optional[JoinToTimeSpineDescription] = None
     after_aggregation_time_spine_join_description: Optional[JoinToTimeSpineDescription] = None
@@ -716,8 +711,9 @@ class MetricFlowQuerySpec(SerializableDataclass):
     time_dimension_specs: Tuple[TimeDimensionSpec, ...] = ()
     order_by_specs: Tuple[OrderBySpec, ...] = ()
     time_range_constraint: Optional[TimeRangeConstraint] = None
-    where_constraint: Optional[WhereFilterSpec] = None
     limit: Optional[int] = None
+    filter_intersection: Optional[WhereFilterIntersection] = None
+    filter_spec_resolution_lookup: Optional[FilterSpecResolutionLookUp] = None
 
     @property
     def linkable_specs(self) -> LinkableSpecSet:  # noqa: D
@@ -736,8 +732,9 @@ class MetricFlowQuerySpec(SerializableDataclass):
             time_dimension_specs=self.time_dimension_specs,
             order_by_specs=self.order_by_specs,
             time_range_constraint=time_range_constraint,
-            where_constraint=self.where_constraint,
             limit=self.limit,
+            filter_intersection=self.filter_intersection,
+            filter_spec_resolution_lookup=self.filter_spec_resolution_lookup,
         )
 
 
@@ -859,7 +856,7 @@ class WhereFilterResolutionException(Exception):  # noqa: D
 
 
 @dataclass(frozen=True)
-class WhereFilterSpec(SerializableDataclass):
+class WhereFilterSpec(Mergeable, SerializableDataclass):
     """Similar to the WhereFilter, but with the where_sql_template rendered and used elements extracted.
 
     For example:
@@ -887,11 +884,30 @@ class WhereFilterSpec(SerializableDataclass):
     bind_parameters: SqlBindParameters
     linkable_spec_set: LinkableSpecSet
 
-    def combine(self, other: WhereFilterSpec) -> WhereFilterSpec:  # noqa: D
+    def merge(self, other: WhereFilterSpec) -> WhereFilterSpec:  # noqa: D
+        if self == WhereFilterSpec.empty_instance():
+            return other
+
+        if other == WhereFilterSpec.empty_instance():
+            return self
+
         return WhereFilterSpec(
             where_sql=f"({self.where_sql}) AND ({other.where_sql})",
             bind_parameters=self.bind_parameters.combine(other.bind_parameters),
-            linkable_spec_set=self.linkable_spec_set.merge(other.linkable_spec_set),
+            linkable_spec_set=self.linkable_spec_set.merge(other.linkable_spec_set).dedupe(),
+        )
+
+    @classmethod
+    @override
+    def empty_instance(cls) -> WhereFilterSpec:
+        # Need to revisit making WhereFilterSpec Mergeable as it's current not a collection, and it's odd to return this
+        # no-op filter. Use cases would need to check whether a WhereSpec is a no-op before rendering it to avoid an
+        # un-necessary WHERE clause. Making WhereFilterSpec map to a WhereFilterIntersection would make this more in
+        # line with other cases of Mergeable.
+        return WhereFilterSpec(
+            where_sql="TRUE",
+            bind_parameters=SqlBindParameters(),
+            linkable_spec_set=LinkableSpecSet(),
         )
 
 
