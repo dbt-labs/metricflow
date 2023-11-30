@@ -891,6 +891,9 @@ class WhereFilterSpec(Mergeable, SerializableDataclass):
         if other == WhereFilterSpec.empty_instance():
             return self
 
+        if self == other:
+            return self
+
         return WhereFilterSpec(
             where_sql=f"({self.where_sql}) AND ({other.where_sql})",
             bind_parameters=self.bind_parameters.combine(other.bind_parameters),
