@@ -7,17 +7,18 @@ import datetime
 import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
+from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
     MetricFlowQuerySpec,
     MetricSpec,
 )
-from metricflow.specs.where_filter_transform import WhereSpecFactory
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.query_rendering.compare_rendered_query import convert_and_check
 from metricflow.test.time.metric_time_dimension import (
@@ -106,26 +107,22 @@ def test_derived_metric_with_offset_window_and_time_filter(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     column_association_resolver: ColumnAssociationResolver,
+    query_parser: MetricFlowQueryParser,
     dataflow_plan_builder: DataflowPlanBuilder,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
-    dataflow_plan = dataflow_plan_builder.build_plan(
-        MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings_growth_2_weeks"),),
-            time_dimension_specs=(MTD_SPEC_DAY,),
-            where_constraint=WhereSpecFactory(
-                column_association_resolver=column_association_resolver,
-            ).create_from_where_filter(
-                PydanticWhereFilter(
-                    where_sql_template=(
-                        "{{ TimeDimension('metric_time', 'day') }} = '2020-01-01' "
-                        "or {{ TimeDimension('metric_time', 'day') }} = '2020-01-14'"
-                    )
-                ),
-            ),
-        )
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookings_growth_2_weeks",),
+        group_by_names=(METRIC_TIME_ELEMENT_NAME,),
+        where_constraint=PydanticWhereFilter(
+            where_sql_template=(
+                "{{ TimeDimension('metric_time', 'day') }} = '2020-01-01' "
+                "or {{ TimeDimension('metric_time', 'day') }} = '2020-01-14'"
+            )
+        ),
     )
+    dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
     convert_and_check(
         request=request,
@@ -382,28 +379,24 @@ def test_nested_derived_metric_with_offset_multiple_input_metrics(  # noqa: D
 def test_nested_offsets_with_where_constraint(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
+    query_parser: MetricFlowQueryParser,
     dataflow_plan_builder: DataflowPlanBuilder,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
     column_association_resolver: ColumnAssociationResolver,
     create_source_tables: bool,
 ) -> None:
-    dataflow_plan = dataflow_plan_builder.build_plan(
-        query_spec=MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings_offset_twice"),),
-            time_dimension_specs=(MTD_SPEC_DAY,),
-            where_constraint=WhereSpecFactory(
-                column_association_resolver=column_association_resolver,
-            ).create_from_where_filter(
-                PydanticWhereFilter(
-                    where_sql_template=(
-                        "{{ TimeDimension('metric_time', 'day') }} = '2020-01-12' "
-                        "or {{ TimeDimension('metric_time', 'day') }} = '2020-01-13'"
-                    )
-                ),
-            ),
-        )
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookings_offset_twice",),
+        group_by_names=(METRIC_TIME_ELEMENT_NAME,),
+        where_constraint=PydanticWhereFilter(
+            where_sql_template=(
+                "{{ TimeDimension('metric_time', 'day') }} = '2020-01-12' "
+                "or {{ TimeDimension('metric_time', 'day') }} = '2020-01-13'"
+            )
+        ),
     )
+    dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
     convert_and_check(
         request=request,

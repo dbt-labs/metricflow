@@ -64,11 +64,6 @@ def query_parser_from_yaml(yaml_contents: List[YamlConfigFile]) -> MetricFlowQue
     return MetricFlowQueryParser(
         model=semantic_manifest_lookup,
         column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup),
-        read_nodes=list(_data_set_to_read_nodes(create_data_sets(semantic_manifest_lookup)).values()),
-        node_output_resolver=DataflowPlanNodeOutputDataSetResolver(
-            column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup),
-            semantic_manifest_lookup=semantic_manifest_lookup,
-        ),
     )
 
 

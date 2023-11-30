@@ -4,7 +4,7 @@ import logging
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
+from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
@@ -31,6 +31,7 @@ from metricflow.dataflow.dataflow_plan import (
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import SourceScanOptimizer
 from metricflow.dataset.dataset import DataSet
+from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
     DimensionSpec,
@@ -38,7 +39,6 @@ from metricflow.specs.specs import (
     MetricFlowQuerySpec,
     MetricSpec,
 )
-from metricflow.specs.where_filter_transform import WhereSpecFactory
 from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.snapshot_utils import assert_plan_snapshot_text_equal
@@ -221,31 +221,22 @@ def test_constrained_metric_not_combined(  # noqa: D
     mf_test_session_state: MetricFlowTestSessionState,
     column_association_resolver: ColumnAssociationResolver,
     dataflow_plan_builder: DataflowPlanBuilder,
+    query_parser: MetricFlowQueryParser,
 ) -> None:
     """Tests that 2 metrics from the same semantic model but where 1 is constrained results in 2 scans.
 
-    If there is a constraint, need needs to be handled in a separate query because the constraint applies to all rows.
+    If there is a constraint for a metric, it needs to be handled in a separate query because the constraint applies to
+    all rows.
     """
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("booking_value", "instant_booking_value"),
+        group_by_names=(METRIC_TIME_ELEMENT_NAME,),
+    )
     check_optimization(
         request=request,
         mf_test_session_state=mf_test_session_state,
         dataflow_plan_builder=dataflow_plan_builder,
-        query_spec=MetricFlowQuerySpec(
-            metric_specs=(
-                MetricSpec(element_name="booking_value"),
-                MetricSpec(
-                    element_name="instant_booking_value",
-                    constraint=(
-                        WhereSpecFactory(
-                            column_association_resolver=column_association_resolver,
-                        ).create_from_where_filter(
-                            PydanticWhereFilter(where_sql_template="{{ Dimension('booking__is_instant') }} ")
-                        )
-                    ),
-                ),
-            ),
-            dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
-        ),
+        query_spec=query_spec,
         expected_num_sources_in_unoptimized=2,
         expected_num_sources_in_optimized=2,
     )

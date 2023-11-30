@@ -7,6 +7,7 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
@@ -35,6 +36,18 @@ def dataflow_plan_builder(  # noqa: D
         source_nodes=consistent_id_object_repository.simple_model_source_nodes,
         read_nodes=list(consistent_id_object_repository.simple_model_read_nodes.values()),
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
+    )
+
+
+@pytest.fixture
+def query_parser(  # noqa: D
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
+    column_association_resolver: ColumnAssociationResolver,
+    consistent_id_object_repository: ConsistentIdObjectRepository,
+) -> MetricFlowQueryParser:
+    return MetricFlowQueryParser(
+        column_association_resolver=column_association_resolver,
+        model=simple_semantic_manifest_lookup,
     )
 
 
@@ -82,6 +95,17 @@ def scd_dataflow_plan_builder(  # noqa: D
         read_nodes=list(consistent_id_object_repository.scd_model_read_nodes.values()),
         semantic_manifest_lookup=scd_semantic_manifest_lookup,
         column_association_resolver=scd_column_association_resolver,
+    )
+
+
+@pytest.fixture
+def scd_query_parser(  # noqa: D
+    scd_column_association_resolver: ColumnAssociationResolver,
+    scd_semantic_manifest_lookup: SemanticManifestLookup,
+) -> MetricFlowQueryParser:
+    return MetricFlowQueryParser(
+        column_association_resolver=scd_column_association_resolver,
+        model=scd_semantic_manifest_lookup,
     )
 
 
