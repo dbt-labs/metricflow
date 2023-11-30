@@ -620,7 +620,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
             assert metric_expr
 
-            output_column_association = self._column_association_resolver.resolve_spec(metric_spec.alias_spec)
+            output_column_association = self._column_association_resolver.resolve_spec(metric_spec)
             metric_select_columns.append(
                 SqlSelectColumn(
                     expr=metric_expr,
@@ -631,7 +631,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 MetricInstance(
                     associated_columns=(output_column_association,),
                     defined_from=MetricModelReference(metric_name=metric_spec.element_name),
-                    spec=metric_spec.alias_spec,
+                    spec=metric_spec,
                 )
             )
         output_instance_set = output_instance_set.transform(AddMetrics(metric_instances))
