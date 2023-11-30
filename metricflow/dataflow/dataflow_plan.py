@@ -17,7 +17,7 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.dag.id_generation import (
     DATAFLOW_NODE_AGGREGATE_MEASURES_ID_PREFIX,
-    DATAFLOW_NODE_COMBINE_METRICS_ID_PREFIX,
+    DATAFLOW_NODE_COMBINE_AGGREGATED_OUTPUTS_ID_PREFIX,
     DATAFLOW_NODE_COMPUTE_METRICS_ID_PREFIX,
     DATAFLOW_NODE_CONSTRAIN_TIME_RANGE_ID_PREFIX,
     DATAFLOW_NODE_JOIN_SELF_OVER_TIME_RANGE_ID_PREFIX,
@@ -151,7 +151,7 @@ class DataflowPlanNodeVisitor(Generic[VisitorOutputT], ABC):
         pass
 
     @abstractmethod
-    def visit_combine_metrics_node(self, node: CombineMetricsNode) -> VisitorOutputT:  # noqa: D
+    def visit_combine_aggregated_outputs_node(self, node: CombineAggregatedOutputsNode) -> VisitorOutputT:  # noqa: D
         pass
 
     @abstractmethod
@@ -255,6 +255,7 @@ class JoinDescription:
 
     join_node: BaseOutput
     join_on_entity: LinklessEntitySpec
+    join_type: SqlJoinType
 
     join_on_partition_dimensions: Tuple[PartitionDimensionJoinDescription, ...]
     join_on_partition_time_dimensions: Tuple[PartitionTimeDimensionJoinDescription, ...]
@@ -344,6 +345,7 @@ class JoinToBaseOutputNode(BaseOutput):
                     join_on_partition_dimensions=old_join_target.join_on_partition_dimensions,
                     join_on_partition_time_dimensions=old_join_target.join_on_partition_time_dimensions,
                     validity_window=old_join_target.validity_window,
+                    join_type=old_join_target.join_type,
                 )
                 for i, old_join_target in enumerate(self._join_targets)
             ],
@@ -448,7 +450,11 @@ class AggregateMeasuresNode(AggregatedMeasuresOutput):
     constraints applied to the measure.
     """
 
-    def __init__(self, parent_node: BaseOutput, metric_input_measure_specs: Tuple[MetricInputMeasureSpec, ...]) -> None:
+    def __init__(
+        self,
+        parent_node: BaseOutput,
+        metric_input_measure_specs: Tuple[MetricInputMeasureSpec, ...],
+    ) -> None:
         """Initializer for AggregateMeasuresNode.
 
         The input measure specs are required for downstream nodes to be aware of any input measures with
@@ -649,7 +655,7 @@ class JoinToTimeSpineNode(BaseOutput, ABC):
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         offset_window: Optional[MetricTimeWindow] = None,
         offset_to_grain: Optional[TimeGranularity] = None,
-    ) -> None:  # noqa: D
+    ) -> None:
         """Constructor.
 
         Args:
@@ -678,27 +684,27 @@ class JoinToTimeSpineNode(BaseOutput, ABC):
         return DATAFLOW_NODE_JOIN_TO_TIME_SPINE_ID_PREFIX
 
     @property
-    def requested_metric_time_dimension_specs(self) -> List[TimeDimensionSpec]:  # noqa: D
+    def requested_metric_time_dimension_specs(self) -> List[TimeDimensionSpec]:
         """Time dimension specs to use when creating time spine table."""
         return self._requested_metric_time_dimension_specs
 
     @property
-    def time_range_constraint(self) -> Optional[TimeRangeConstraint]:  # noqa: D
+    def time_range_constraint(self) -> Optional[TimeRangeConstraint]:
         """Time range constraint to apply when querying time spine table."""
         return self._time_range_constraint
 
     @property
-    def offset_window(self) -> Optional[MetricTimeWindow]:  # noqa: D
+    def offset_window(self) -> Optional[MetricTimeWindow]:
         """Time range constraint to apply when querying time spine table."""
         return self._offset_window
 
     @property
-    def offset_to_grain(self) -> Optional[TimeGranularity]:  # noqa: D
+    def offset_to_grain(self) -> Optional[TimeGranularity]:
         """Time range constraint to apply when querying time spine table."""
         return self._offset_to_grain
 
     @property
-    def join_type(self) -> SqlJoinType:  # noqa: D
+    def join_type(self) -> SqlJoinType:
         """Join type to use when joining to time spine."""
         return self._join_type
 
@@ -1163,7 +1169,7 @@ class WhereConstraintNode(AggregatedMeasuresOutput):
         )
 
 
-class CombineMetricsNode(ComputedMetricsOutput):
+class CombineAggregatedOutputsNode(ComputedMetricsOutput):
     """Combines metrics from different nodes into a single output."""
 
     def __init__(  # noqa: D
@@ -1174,21 +1180,21 @@ class CombineMetricsNode(ComputedMetricsOutput):
 
     @classmethod
     def id_prefix(cls) -> str:  # noqa: D
-        return DATAFLOW_NODE_COMBINE_METRICS_ID_PREFIX
+        return DATAFLOW_NODE_COMBINE_AGGREGATED_OUTPUTS_ID_PREFIX
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
-        return visitor.visit_combine_metrics_node(self)
+        return visitor.visit_combine_aggregated_outputs_node(self)
 
     @property
     def description(self) -> str:  # noqa: D
-        return "Combine Metrics"
+        return "Combine Aggregated Outputs"
 
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D
         return isinstance(other_node, self.__class__)
 
-    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> CombineMetricsNode:  # noqa: D
+    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> CombineAggregatedOutputsNode:  # noqa: D
         assert len(new_parent_nodes) == 1
-        return CombineMetricsNode(parent_nodes=new_parent_nodes)
+        return CombineAggregatedOutputsNode(parent_nodes=new_parent_nodes)
 
 
 class ConstrainTimeRangeNode(AggregatedMeasuresOutput, BaseOutput):

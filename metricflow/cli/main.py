@@ -49,7 +49,6 @@ logger = logging.getLogger(__name__)
 pass_config = click.make_pass_decorator(CLIContext, ensure=True)
 _telemetry_reporter = TelemetryReporter(report_levels_higher_or_equal_to=TelemetryLevel.USAGE)
 _telemetry_reporter.add_python_log_handler()
-_telemetry_reporter.add_rudderstack_handler()
 
 
 @click.group()
@@ -117,23 +116,22 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, clean: bool) -
         """\
         🤓 Please run the following steps,
             1.  Verify that your adapter credentials are correct in `profiles.yml`
-            2.  Run `dbt seed`, check to see that the steps related to countries, transactions, customers are passing.
-            3.  Try validating your data model: `mf validate-configs`
-            4.  Check out your metrics: `mf list metrics`
-            5.  Check out dimensions for your metric `mf list dimensions --metrics transactions`
-            6.  Query your first metric: `mf query --metrics transactions --group-bys metric_time --order metric_time`
-            7.  Show the SQL MetricFlow generates:
+            2.  Add time spine model to the models directory (https://docs.getdbt.com/docs/build/metricflow-time-spine)
+            3.  Run `dbt seed`, check to see that the steps related to countries, transactions, customers are passing.
+            4.  Try validating your data model: `mf validate-configs`
+            5.  Check out your metrics: `mf list metrics`
+            6.  Check out dimensions for your metric `mf list dimensions --metrics transactions`
+            7.  Query your first metric: `mf query --metrics transactions --group-bys metric_time --order metric_time`
+            8.  Show the SQL MetricFlow generates:
                 `mf query --metrics transactions --group-bys metric_time --order metric_time --explain`
-            8.  Visualize the plan:
+            9.  Visualize the plan:
                 `mf query --metrics transactions --group-bys metric_time --order metric_time --explain --display-plans`
                 * This only works if you have graphviz installed - see README.
-            9.  Add another dimension:
+            10.  Add another dimension:
                 `mf query --metrics transactions --group-bys metric_time,customer__customer_country --order metric_time`
-            10.  Add a coarser time granularity:
+            11.  Add a coarser time granularity:
                 `mf query --metrics transactions --group-bys metric_time__week --order metric_time__week`
-            11. Try a more complicated query: mf query --metrics transactions,transaction_usd_na --group-bys metric_time,is_large --order metric_time --start-time 2022-03-20 --end-time 2022-04-01.
-            12. For more ways to interact with the sample models, go to
-                ‘https://docs.transform.co/docs/metricflow/metricflow-tutorial’.
+            12. Try a more complicated query: mf query --metrics transactions,transaction_usd_na --group-bys metric_time,is_large --order metric_time --start-time 2022-03-20 --end-time 2022-04-01.
             13. When you're done with the tutorial, run mf tutorial --clean to delete sample models and seeds.
         """
     )

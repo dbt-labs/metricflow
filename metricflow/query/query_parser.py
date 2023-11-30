@@ -272,8 +272,13 @@ class MetricFlowQueryParser:
         finally:
             logger.info(f"Parsing the query took: {time.time() - start_time:.2f}s")
 
-    def _validate_no_time_dimension_query(self, metric_references: Sequence[MetricReference]) -> None:
-        """Validate if all requested metrics are queryable without a time dimension."""
+    def _validate_no_metric_time_dimension_query(
+        self, metric_references: Sequence[MetricReference], time_dimension_specs: Sequence[TimeDimensionSpec]
+    ) -> None:
+        """Validate if all requested metrics are queryable without grouping by metric_time."""
+        if any([spec.reference == DataSet.metric_time_dimension_reference() for spec in time_dimension_specs]):
+            return
+
         for metric_reference in metric_references:
             metric = self._metric_lookup.get_metric(metric_reference)
             if metric.type == MetricType.CUMULATIVE:
@@ -483,8 +488,9 @@ class MetricFlowQueryParser:
         time_dimension_specs = requested_linkable_specs.time_dimension_specs + tuple(
             time_dimension_spec for _, time_dimension_spec in partial_time_dimension_spec_replacements.items()
         )
-        if len(time_dimension_specs) == 0:
-            self._validate_no_time_dimension_query(metric_references=metric_references)
+        self._validate_no_metric_time_dimension_query(
+            metric_references=metric_references, time_dimension_specs=time_dimension_specs
+        )
 
         self._time_granularity_solver.validate_time_granularity(metric_references, time_dimension_specs)
         self._validate_date_part(metric_references, time_dimension_specs)

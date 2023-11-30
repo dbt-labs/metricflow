@@ -1,0 +1,16 @@
+   metric_time__day listing__is_lux_latest  bookings_fill_nulls_with_0_without_time_spine  views
+0        2019-12-01                   True                                              1    NaN
+1        2019-12-18                  False                                              4    NaN
+2        2019-12-18                   True                                              6    NaN
+3        2019-12-19                  False                                              6    NaN
+4        2019-12-19                   True                                              6    NaN
+5        2019-12-19                   None                                              6    NaN
+6        2019-12-20                   True                                              2    NaN
+7        2020-01-01                  False                                              2    NaN
+8        2020-01-01                   True                                              3    2.0
+9        2020-01-02                  False                                              3    3.0
+10       2020-01-02                   True                                              3    1.0
+11       2020-01-02                   None                                              3    1.0
+12       2020-01-03                   True                                              1    NaN
+13       2020-01-04                  False                                              0    1.0
+14       2020-01-05                   None                                              0    1.0

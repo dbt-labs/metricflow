@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "metricflow"
-version = "0.203.0.dev8"
+version = "0.204.0.dev0"
 description = "Translates a simple metric definition into reusable SQL and executes it against the SQL engine of your choice."
 readme = "README.md"
 requires-python = ">=3.8,<3.12"
@@ -29,7 +29,7 @@ dependencies = [
   "MarkupSafe==2.0.1", # pandas implicitly requires this version
   "PyYAML~=6.0",
   "click>=7.1.2",
-  "dbt-core~=1.7.0rc1",
+  "dbt-core~=1.7.0",
   "dbt-semantic-interfaces~=0.4.0",
   "graphviz>=0.18.2, <0.21",
   "halo~=0.0.31",
@@ -40,9 +40,8 @@ dependencies = [
   "python-dateutil~=2.8.2",
   "rapidfuzz~=3.0",
   "ruamel.yaml~=0.17.21",
-  "rudder-sdk-python~=1.0.3",
   "tabulate>=0.8.9",
-  "typing_extensions~=4.4.0",
+  "typing_extensions~=4.4",
   "update-checker~=0.18.0",
 ]
 
@@ -55,7 +54,7 @@ mf = 'metricflow.cli.main:cli'
 
 [project.optional-dependencies]
 dev-packages = [
-  "mypy~=1.3.0",
+  "mypy~=1.7.0",
   "pre-commit~=3.2.2",
   # Bug with mypy: https://github.com/pallets/click/issues/2558#issuecomment-1656546003
   "click>=8.1.6",
@@ -75,27 +74,27 @@ sql-client-packages = [
 ]
 
 dbt-postgres = [
-  "dbt-postgres~=1.7.0rc1",
+  "dbt-postgres~=1.7.0",
 ]
 
 dbt-bigquery = [
-  "dbt-bigquery~=1.7.0rc1",
+  "dbt-bigquery~=1.7.0",
 ]
 
 dbt-databricks = [
-  "dbt-databricks~=1.7.0rc1",
+  "dbt-databricks~=1.7.0",
 ]
 
 dbt-redshift = [
-  "dbt-redshift~=1.7.0rc1",
+  "dbt-redshift~=1.7.0",
 ]
 
 dbt-snowflake = [
-  "dbt-snowflake~=1.7.0rc1",
+  "dbt-snowflake~=1.7.0",
 ]
 
 dbt-duckdb = [
-  "dbt-duckdb~=1.6.0",
+  "dbt-duckdb~=1.7.0",
 ]
 
 [tool.hatch.build.targets.sdist]
@@ -115,11 +114,7 @@ description = "Environment for development. Includes a DuckDB-backed client."
 features = [
   "dev-packages",
   "sql-client-packages",
-]
-# Temporary workaround for installing the dbt-duckdb adapter until it's updated to support dbt-core~=1.7.0rc1.
-post-install-commands = [
-  "pip install \"duckdb>=0.7.0\"",
-  "pip install --no-deps dbt-duckdb~=1.6.0",
+  "dbt-duckdb",
 ]
 
 [tool.hatch.envs.dev-env.env-vars]

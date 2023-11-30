@@ -7,7 +7,7 @@ from typing import List, Optional, Sequence
 from metricflow.dataflow.dataflow_plan import (
     AggregateMeasuresNode,
     BaseOutput,
-    CombineMetricsNode,
+    CombineAggregatedOutputsNode,
     ComputeMetricsNode,
     ConstrainTimeRangeNode,
     DataflowPlanNode,
@@ -26,7 +26,6 @@ from metricflow.dataflow.dataflow_plan import (
     WriteToResultTableNode,
 )
 from metricflow.dataflow.optimizer.source_scan.matching_linkable_specs import MatchingLinkableSpecsTransform
-from metricflow.specs.specs import InstanceSpecSet
 
 logger = logging.getLogger(__name__)
 
@@ -361,9 +360,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         # specs since any branch that is merged together needs to output the same set of dimensions.
         combined_node = FilterElementsNode(
             parent_node=combined_parent_node,
-            include_specs=InstanceSpecSet.merge(
-                (self._current_left_node.include_specs, current_right_node.include_specs)
-            ).dedupe(),
+            include_specs=self._current_left_node.include_specs.merge(current_right_node.include_specs).dedupe(),
         )
         self._log_combine_success(
             left_node=self._current_left_node,
@@ -372,7 +369,9 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         )
         return ComputeMetricsBranchCombinerResult(combined_node)
 
-    def visit_combine_metrics_node(self, node: CombineMetricsNode) -> ComputeMetricsBranchCombinerResult:  # noqa: D
+    def visit_combine_aggregated_outputs_node(  # noqa: D
+        self, node: CombineAggregatedOutputsNode
+    ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._handle_unsupported_node(node)
 

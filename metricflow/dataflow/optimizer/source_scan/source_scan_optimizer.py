@@ -8,7 +8,7 @@ from metricflow.dag.id_generation import OPTIMIZED_DATAFLOW_PLAN_PREFIX, IdGener
 from metricflow.dataflow.dataflow_plan import (
     AggregateMeasuresNode,
     BaseOutput,
-    CombineMetricsNode,
+    CombineAggregatedOutputsNode,
     ComputeMetricsNode,
     ConstrainTimeRangeNode,
     DataflowPlan,
@@ -69,12 +69,12 @@ class SourceScanOptimizer(
 ):
     """Reduces the number of scans (ReadSqlSourceNodes) in a dataflow plan.
 
-    This attempts to reduce the number of scans by combining the parent nodes of CombineMetricsNode via the
+    This attempts to reduce the number of scans by combining the parent nodes of CombineAggregatedOutputsNode via the
     ComputeMetricsBranchCombiner.
 
     A plan with a structure similar to
         ...
-        <CombineMetricsNode>
+        <CombineAggregatedOutputsNode>
             <ComputeMetricsNode metrics="[metric0]">
                 <AggregateMeasuresNode>
                 ...
@@ -90,11 +90,11 @@ class SourceScanOptimizer(
                 ...
                 </AggregateMeasuresNode>
             </ComputeMetricsNode>
-        </CombineMetricsNode>
+        </CombineAggregatedOutputsNode>
         ...
     will be converted to
         ...
-        <CombineMetricsNode>
+        <CombineAggregatedOutputsNode>
             <ComputeMetricsNode metrics="[metric0, metric1]">
                 <AggregateMeasuresNode>
                 ...
@@ -105,11 +105,11 @@ class SourceScanOptimizer(
                 ...
                 </AggregateMeasuresNode>
             </ComputeMetricsNode>
-        </CombineMetricsNode>
+        </CombineAggregatedOutputsNode>
         ...
     when possible.
 
-    In cases where all ComputeMetricsNodes can be combined into a single one, the CombineMetricsNode may be removed as
+    In cases where all ComputeMetricsNodes can be combined into a single one, the CombineAggregatedOutputsNode may be removed as
     well.
 
     This traverses the dataflow plan using DFS. When visiting a node (current_node), it first runs the optimization
@@ -230,9 +230,11 @@ class SourceScanOptimizer(
             )
         return results
 
-    def visit_combine_metrics_node(self, node: CombineMetricsNode) -> OptimizeBranchResult:  # noqa: D
+    def visit_combine_aggregated_outputs_node(  # noqa: D
+        self, node: CombineAggregatedOutputsNode
+    ) -> OptimizeBranchResult:
         self._log_visit_node_type(node)
-        # The parent node of the CombineMetricsNode can be either ComputeMetricsNodes or CombineMetricsNodes
+        # The parent node of the CombineAggregatedOutputsNode can be either ComputeMetricsNodes or CombineAggregatedOutputsNodes
 
         # Stores the result of running this optimizer on each parent branch separately.
         optimized_parent_branches = []
@@ -249,7 +251,7 @@ class SourceScanOptimizer(
 
             assert (
                 result.base_output_node is not None
-            ), f"Traversing the parents of a CombineMetricsNode should always produce a BaseOutput. Got: {result}"
+            ), f"Traversing the parents of a CombineAggregatedOutputsNode should always produce a BaseOutput. Got: {result}"
             optimized_parent_branches.append(result.base_output_node)
 
         # Try to combine (using ComputeMetricsBranchCombiner) as many parent branches as possible in a
@@ -276,12 +278,14 @@ class SourceScanOptimizer(
         logger.log(level=self._log_level, msg=f"Got {len(combined_parent_branches)} branches after combination")
         assert len(combined_parent_branches) > 0
 
-        # If we were able to reduce the parent branches of the CombineMetricsNode into a single one, there's no need
-        # for a CombineMetricsNode.
+        # If we were able to reduce the parent branches of the CombineAggregatedOutputsNode into a single one, there's no need
+        # for a CombineAggregatedOutputsNode.
         if len(combined_parent_branches) == 1:
             return OptimizeBranchResult(base_output_node=combined_parent_branches[0])
 
-        return OptimizeBranchResult(base_output_node=CombineMetricsNode(parent_nodes=combined_parent_branches))
+        return OptimizeBranchResult(
+            base_output_node=CombineAggregatedOutputsNode(parent_nodes=combined_parent_branches)
+        )
 
     def visit_constrain_time_range_node(self, node: ConstrainTimeRangeNode) -> OptimizeBranchResult:  # noqa: D
         self._log_visit_node_type(node)

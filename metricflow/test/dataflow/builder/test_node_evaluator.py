@@ -27,6 +27,7 @@ from metricflow.specs.specs import (
     LinklessEntitySpec,
     TimeDimensionSpec,
 )
+from metricflow.sql.sql_plan import SqlJoinType
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 
 logger = logging.getLogger(__name__)
@@ -77,7 +78,9 @@ def make_multihop_node_evaluator(
     )
 
     nodes_available_for_joins = node_processor.add_multi_hop_joins(
-        desired_linkable_specs=desired_linkable_specs, nodes=nodes_available_for_joins
+        desired_linkable_specs=desired_linkable_specs,
+        nodes=nodes_available_for_joins,
+        join_type=SqlJoinType.LEFT_OUTER,
     )
 
     return NodeEvaluatorForLinkableInstances(
@@ -92,7 +95,9 @@ def test_node_evaluator_with_no_linkable_specs(  # noqa: D
     node_evaluator: NodeEvaluatorForLinkableInstances,
 ) -> None:
     bookings_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
-    evaluation = node_evaluator.evaluate_node(required_linkable_specs=[], start_node=bookings_source_node)
+    evaluation = node_evaluator.evaluate_node(
+        required_linkable_specs=[], start_node=bookings_source_node, default_join_type=SqlJoinType.LEFT_OUTER
+    )
     assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
         local_linkable_specs=(), joinable_linkable_specs=(), join_recipes=(), unjoinable_linkable_specs=()
     )
@@ -111,6 +116,7 @@ def test_node_evaluator_with_unjoinable_specs(  # noqa: D
             )
         ],
         start_node=bookings_source_node,
+        default_join_type=SqlJoinType.LEFT_OUTER,
     )
     assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
         local_linkable_specs=(),
@@ -134,6 +140,7 @@ def test_node_evaluator_with_local_spec(  # noqa: D
     evaluation = node_evaluator.evaluate_node(
         required_linkable_specs=[DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),))],
         start_node=bookings_source_node,
+        default_join_type=SqlJoinType.LEFT_OUTER,
     )
     assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
         local_linkable_specs=(DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),),
@@ -154,6 +161,7 @@ def test_node_evaluator_with_local_spec_using_primary_entity(  # noqa: D
             DimensionSpec(element_name="home_state_latest", entity_links=(EntityReference(element_name="user"),))
         ],
         start_node=bookings_source_node,
+        default_join_type=SqlJoinType.LEFT_OUTER,
     )
 
     assert evaluation == (
@@ -190,6 +198,7 @@ def test_node_evaluator_with_joined_spec(  # noqa: D
             ),
         ],
         start_node=bookings_source_node,
+        default_join_type=SqlJoinType.LEFT_OUTER,
     )
 
     assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
@@ -220,6 +229,7 @@ def test_node_evaluator_with_joined_spec(  # noqa: D
                 ],
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
+                join_type=SqlJoinType.LEFT_OUTER,
             ),
         ),
         unjoinable_linkable_specs=(),
@@ -240,6 +250,7 @@ def test_node_evaluator_with_joined_spec_on_unique_id(  # noqa: D
             ),
         ],
         start_node=listings_node,
+        default_join_type=SqlJoinType.LEFT_OUTER,
     )
 
     assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
@@ -262,6 +273,7 @@ def test_node_evaluator_with_joined_spec_on_unique_id(  # noqa: D
                 ],
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
+                join_type=SqlJoinType.LEFT_OUTER,
             ),
         ),
         unjoinable_linkable_specs=(),
@@ -286,6 +298,7 @@ def test_node_evaluator_with_multiple_joined_specs(  # noqa: D
             ),
         ],
         start_node=views_source,
+        default_join_type=SqlJoinType.LEFT_OUTER,
     )
 
     assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
@@ -312,6 +325,7 @@ def test_node_evaluator_with_multiple_joined_specs(  # noqa: D
                 ],
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
+                join_type=SqlJoinType.LEFT_OUTER,
             ),
             JoinLinkableInstancesRecipe(
                 node_to_join=consistent_id_object_repository.simple_model_read_nodes["users_latest"],
@@ -324,6 +338,7 @@ def test_node_evaluator_with_multiple_joined_specs(  # noqa: D
                 ],
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
+                join_type=SqlJoinType.LEFT_OUTER,
             ),
         ),
         unjoinable_linkable_specs=(),
@@ -354,8 +369,7 @@ def test_node_evaluator_with_multihop_joined_spec(  # noqa: D
     )
 
     evaluation = multihop_node_evaluator.evaluate_node(
-        required_linkable_specs=linkable_specs,
-        start_node=txn_source,
+        required_linkable_specs=linkable_specs, start_node=txn_source, default_join_type=SqlJoinType.LEFT_OUTER
     )
 
     assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
@@ -395,6 +409,7 @@ def test_node_evaluator_with_multihop_joined_spec(  # noqa: D
                         ),
                     ),
                 ),
+                join_type=SqlJoinType.LEFT_OUTER,
             ),
         ),
         unjoinable_linkable_specs=(),
@@ -414,6 +429,7 @@ def test_node_evaluator_with_partition_joined_spec(  # noqa: D
             ),
         ],
         start_node=consistent_id_object_repository.simple_model_read_nodes["id_verifications"],
+        default_join_type=SqlJoinType.LEFT_OUTER,
     )
 
     assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
@@ -447,6 +463,7 @@ def test_node_evaluator_with_partition_joined_spec(  # noqa: D
                         ),
                     ),
                 ),
+                join_type=SqlJoinType.LEFT_OUTER,
             ),
         ),
         unjoinable_linkable_specs=(),
@@ -480,6 +497,7 @@ def test_node_evaluator_with_scd_target(
             )
         ],
         start_node=consistent_id_object_repository.scd_model_read_nodes["bookings_source"],
+        default_join_type=SqlJoinType.LEFT_OUTER,
     )
 
     assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
@@ -506,6 +524,7 @@ def test_node_evaluator_with_scd_target(
                     window_start_dimension=TimeDimensionSpec(element_name="window_start", entity_links=()),
                     window_end_dimension=TimeDimensionSpec(element_name="window_end", entity_links=()),
                 ),
+                join_type=SqlJoinType.LEFT_OUTER,
             ),
         ),
         unjoinable_linkable_specs=(),
@@ -531,6 +550,7 @@ def test_node_evaluator_with_multi_hop_scd_target(
     evaluation = node_evaluator.evaluate_node(
         required_linkable_specs=linkable_specs,
         start_node=consistent_id_object_repository.scd_model_read_nodes["bookings_source"],
+        default_join_type=SqlJoinType.LEFT_OUTER,
     )
 
     assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
@@ -567,6 +587,7 @@ def test_node_evaluator_with_multi_hop_scd_target(
                         element_name="window_end", entity_links=(EntityReference(element_name="lux_listing"),)
                     ),
                 ),
+                join_type=SqlJoinType.LEFT_OUTER,
             ),
         ),
         unjoinable_linkable_specs=(),
@@ -592,6 +613,7 @@ def test_node_evaluator_with_multi_hop_through_scd(
     evaluation = node_evaluator.evaluate_node(
         required_linkable_specs=linkable_specs,
         start_node=consistent_id_object_repository.scd_model_read_nodes["bookings_source"],
+        default_join_type=SqlJoinType.LEFT_OUTER,
     )
 
     assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
@@ -624,6 +646,7 @@ def test_node_evaluator_with_multi_hop_through_scd(
                     window_start_dimension=TimeDimensionSpec(element_name="window_start", entity_links=()),
                     window_end_dimension=TimeDimensionSpec(element_name="window_end", entity_links=()),
                 ),
+                join_type=SqlJoinType.LEFT_OUTER,
             ),
         ),
         unjoinable_linkable_specs=(),
@@ -648,6 +671,7 @@ def test_node_evaluator_with_invalid_multi_hop_scd(
     evaluation = node_evaluator.evaluate_node(
         required_linkable_specs=linkable_specs,
         start_node=consistent_id_object_repository.scd_model_read_nodes["bookings_source"],
+        default_join_type=SqlJoinType.LEFT_OUTER,
     )
 
     assert evaluation == LinkableInstanceSatisfiabilityEvaluation(

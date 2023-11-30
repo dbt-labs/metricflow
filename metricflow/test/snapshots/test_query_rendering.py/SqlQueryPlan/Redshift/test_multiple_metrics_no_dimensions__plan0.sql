@@ -1,4 +1,4 @@
--- Combine Metrics
+-- Combine Aggregated Outputs
 SELECT
   MAX(subq_5.bookings) AS bookings
   , MAX(subq_11.listings) AS listings

@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import logging
-from typing import Dict, FrozenSet, List, Sequence
+from typing import Dict, FrozenSet, List, Optional, Sequence
 
+from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
 from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
 from dbt_semantic_interfaces.protocols import WhereFilter
-from dbt_semantic_interfaces.protocols.metric import Metric, MetricType
+from dbt_semantic_interfaces.protocols.metric import Metric, MetricInputMeasure, MetricType
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import MetricReference
 
@@ -19,8 +20,6 @@ from metricflow.protocols.semantics import MetricAccessor
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
     LinkableInstanceSpec,
-    MeasureSpec,
-    MetricInputMeasureSpec,
     MetricSpec,
 )
 from metricflow.specs.where_filter_transform import WhereSpecFactory
@@ -105,34 +104,17 @@ class MetricLookup(MetricAccessor):  # noqa: D
                 )
         self._metrics[metric_reference] = metric
 
-    def measures_for_metric(
-        self,
-        metric_reference: MetricReference,
-        column_association_resolver: ColumnAssociationResolver,
-    ) -> Sequence[MetricInputMeasureSpec]:
-        """Return the measure specs required to compute the metric."""
-        metric = self.get_metric(metric_reference)
-        input_measure_specs: List[MetricInputMeasureSpec] = []
-
-        for input_measure in metric.input_measures:
-            measure_spec = MeasureSpec(
-                element_name=input_measure.name,
-                non_additive_dimension_spec=self._semantic_model_lookup.non_additive_dimension_specs_by_measure.get(
-                    input_measure.measure_reference
-                ),
-            )
-            spec = MetricInputMeasureSpec(
-                measure_spec=measure_spec,
-                constraint=WhereSpecFactory(
-                    column_association_resolver=column_association_resolver,
-                ).create_from_where_filter_intersection(input_measure.filter),
-                alias=input_measure.alias,
-                join_to_timespine=input_measure.join_to_timespine,
-                fill_nulls_with=input_measure.fill_nulls_with,
-            )
-            input_measure_specs.append(spec)
-
-        return tuple(input_measure_specs)
+    def configured_input_measure_for_metric(  # noqa: D
+        self, metric_reference: MetricReference
+    ) -> Optional[MetricInputMeasure]:
+        metric = self.get_metric(metric_reference=metric_reference)
+        if metric.type is MetricType.CUMULATIVE or metric.type is MetricType.SIMPLE:
+            assert len(metric.input_measures) == 1, "Simple and cumulative metrics should have one input measure."
+            return metric.input_measures[0]
+        elif metric.type is MetricType.RATIO or metric.type is MetricType.DERIVED:
+            return None
+        else:
+            assert_values_exhausted(metric.type)
 
     def contains_cumulative_or_time_offset_metric(self, metric_references: Sequence[MetricReference]) -> bool:
         """Returns true if any of the specs correspond to a cumulative metric or a derived metric with time offset."""

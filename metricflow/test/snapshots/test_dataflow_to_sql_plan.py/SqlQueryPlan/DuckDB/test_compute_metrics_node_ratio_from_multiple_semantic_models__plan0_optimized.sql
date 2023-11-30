@@ -4,7 +4,7 @@ SELECT
   , listing__country_latest
   , CAST(bookings AS DOUBLE) / CAST(NULLIF(views, 0) AS DOUBLE) AS bookings_per_view
 FROM (
-  -- Combine Metrics
+  -- Combine Aggregated Outputs
   SELECT
     COALESCE(subq_30.ds__day, subq_40.ds__day) AS ds__day
     , COALESCE(subq_30.listing__country_latest, subq_40.listing__country_latest) AS listing__country_latest

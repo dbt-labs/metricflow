@@ -207,7 +207,7 @@ class SqlQueryPlanJoinBuilder:
             left_source_alias=left_data_set.alias,
             right_source_alias=right_data_set.alias,
             column_equality_descriptions=column_equality_descriptions,
-            join_type=SqlJoinType.LEFT_OUTER,
+            join_type=join_description.join_type,
             additional_on_conditions=validity_conditions,
         )
 
@@ -305,14 +305,14 @@ class SqlQueryPlanJoinBuilder:
         )
 
     @staticmethod
-    def make_combine_metrics_join_description(
+    def make_join_description_for_combining_datasets(
         from_data_set: AnnotatedSqlDataSet,
         join_data_set: AnnotatedSqlDataSet,
         join_type: SqlJoinType,
         column_names: Sequence[str],
         table_aliases_for_coalesce: Sequence[str],
     ) -> SqlJoinDescription:
-        """Creates the sql join description for combining two separate metrics output datasets.
+        """Creates the sql join description for combining two separate output datasets.
 
         These might be combined in service of producing complete output for end user consumption, in which
         case the join type will be FULL OUTER in order to ensure all rows are included. In this case, the

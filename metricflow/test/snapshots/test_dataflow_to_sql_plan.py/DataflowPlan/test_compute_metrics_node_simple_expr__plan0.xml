@@ -24,6 +24,7 @@
                     <!--    'join_on_entity': {'class': 'LinklessEntitySpec',  -->
                     <!--                       'element_name': 'listing',      -->
                     <!--                       'entity_links': ()},            -->
+                    <!--    'join_type': SqlJoinType.LEFT_OUTER,               -->
                     <!--    'join_on_partition_dimensions': (),                -->
                     <!--    'join_on_partition_time_dimensions': (),           -->
                     <!--    'validity_window': None}                           -->
@@ -35,7 +36,8 @@
                         <!-- include_spec =                           -->
                         <!--   {'class': 'MeasureSpec',               -->
                         <!--    'element_name': 'booking_value',      -->
-                        <!--    'non_additive_dimension_spec': None}  -->
+                        <!--    'non_additive_dimension_spec': None,  -->
+                        <!--    'fill_nulls_with': None}              -->
                         <!-- include_spec = LinklessEntitySpec(element_name='listing', entity_links=()) -->
                         <!-- distinct = False -->
                         <ReadSqlSourceNode>

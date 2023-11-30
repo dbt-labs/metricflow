@@ -12,9 +12,9 @@
             <!--    'alias': None,                                  -->
             <!--    'offset_window': None,                          -->
             <!--    'offset_to_grain': None}                        -->
-            <CombineMetricsNode>
-                <!-- description = Combine Metrics -->
-                <!-- node_id = cbm_0 -->
+            <CombineAggregatedOutputsNode>
+                <!-- description = Combine Aggregated Outputs -->
+                <!-- node_id = cao_0 -->
                 <ComputeMetricsNode>
                     <!-- description = Compute Metrics via Expressions -->
                     <!-- node_id = cm_0 -->
@@ -46,7 +46,8 @@
                             <!-- include_spec =                           -->
                             <!--   {'class': 'MeasureSpec',               -->
                             <!--    'element_name': 'booking_value',      -->
-                            <!--    'non_additive_dimension_spec': None}  -->
+                            <!--    'non_additive_dimension_spec': None,  -->
+                            <!--    'fill_nulls_with': None}              -->
                             <!-- include_spec =                               -->
                             <!--   {'class': 'TimeDimensionSpec',             -->
                             <!--    'element_name': 'metric_time',            -->
@@ -77,7 +78,8 @@
                                     <!-- include_spec =                           -->
                                     <!--   {'class': 'MeasureSpec',               -->
                                     <!--    'element_name': 'booking_value',      -->
-                                    <!--    'non_additive_dimension_spec': None}  -->
+                                    <!--    'non_additive_dimension_spec': None,  -->
+                                    <!--    'fill_nulls_with': None}              -->
                                     <!-- include_spec =                                                                  -->
                                     <!--   {'class': 'DimensionSpec',                                                    -->
                                     <!--    'element_name': 'is_instant',                                                -->
@@ -128,7 +130,8 @@
                             <!-- include_spec =                           -->
                             <!--   {'class': 'MeasureSpec',               -->
                             <!--    'element_name': 'booking_value',      -->
-                            <!--    'non_additive_dimension_spec': None}  -->
+                            <!--    'non_additive_dimension_spec': None,  -->
+                            <!--    'fill_nulls_with': None}              -->
                             <!-- include_spec =                               -->
                             <!--   {'class': 'TimeDimensionSpec',             -->
                             <!--    'element_name': 'metric_time',            -->
@@ -152,7 +155,7 @@
                         </FilterElementsNode>
                     </AggregateMeasuresNode>
                 </ComputeMetricsNode>
-            </CombineMetricsNode>
+            </CombineAggregatedOutputsNode>
         </ComputeMetricsNode>
     </WriteToResultDataframeNode>
 </DataflowPlan>

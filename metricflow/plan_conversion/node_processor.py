@@ -21,6 +21,7 @@ from metricflow.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HO
 from metricflow.protocols.semantics import SemanticModelAccessor
 from metricflow.specs.spec_set_transforms import ToElementNameSet
 from metricflow.specs.specs import InstanceSpecSet, LinkableInstanceSpec, LinklessEntitySpec
+from metricflow.sql.sql_plan import SqlJoinType
 
 logger = logging.getLogger(__name__)
 
@@ -149,9 +150,7 @@ class PreJoinNodeProcessor:
         return False
 
     def _get_candidates_nodes_for_multi_hop(
-        self,
-        desired_linkable_spec: LinkableInstanceSpec,
-        nodes: Sequence[BaseOutput],
+        self, desired_linkable_spec: LinkableInstanceSpec, nodes: Sequence[BaseOutput], join_type: SqlJoinType
     ) -> Sequence[MultiHopJoinCandidate]:
         """Assemble nodes representing all possible one-hop joins."""
         if len(desired_linkable_spec.entity_links) > MAX_JOIN_HOPS:
@@ -223,7 +222,7 @@ class PreJoinNodeProcessor:
                 specs = data_set_of_second_node_that_can_be_joined.instance_set.spec_set
                 filtered_joinable_node = FilterElementsNode(
                     parent_node=second_node_that_could_be_joined,
-                    include_specs=InstanceSpecSet.create_from_linkable_specs(
+                    include_specs=InstanceSpecSet.from_specs(
                         specs.dimension_specs + specs.entity_specs + specs.time_dimension_specs
                     ),
                 )
@@ -249,6 +248,7 @@ class PreJoinNodeProcessor:
                                     ),
                                     join_on_partition_dimensions=join_on_partition_dimensions,
                                     join_on_partition_time_dimensions=join_on_partition_time_dimensions,
+                                    join_type=join_type,
                                 )
                             ],
                         ),
@@ -276,7 +276,10 @@ class PreJoinNodeProcessor:
         return multi_hop_join_candidates
 
     def add_multi_hop_joins(
-        self, desired_linkable_specs: Sequence[LinkableInstanceSpec], nodes: Sequence[BaseOutput]
+        self,
+        desired_linkable_specs: Sequence[LinkableInstanceSpec],
+        nodes: Sequence[BaseOutput],
+        join_type: SqlJoinType,
     ) -> Sequence[BaseOutput]:
         """Assemble nodes representing all possible one-hop joins."""
         all_multi_hop_join_candidates: List[MultiHopJoinCandidate] = []
@@ -284,8 +287,7 @@ class PreJoinNodeProcessor:
 
         for desired_linkable_spec in desired_linkable_specs:
             for multi_hop_join_candidate in self._get_candidates_nodes_for_multi_hop(
-                desired_linkable_spec=desired_linkable_spec,
-                nodes=nodes,
+                desired_linkable_spec=desired_linkable_spec, nodes=nodes, join_type=join_type
             ):
                 # Dedupe candidates that are the same join.
                 if multi_hop_join_candidate.lineage not in lineage_for_all_multi_hop_join_candidates:

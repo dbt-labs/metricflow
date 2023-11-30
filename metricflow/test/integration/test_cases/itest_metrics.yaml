@@ -34,7 +34,7 @@ integration_test:
   check_query: |
     SELECT
       booking_value * views AS views_times_booking_value
-      , b.ds AS metric_time__day
+      , COALESCE(b.ds, v.ds) AS metric_time__day
     FROM (
       SELECT
         SUM(booking_value) AS booking_value
@@ -101,7 +101,7 @@ integration_test:
   metrics: ["instant_booking_value", "views"]
   group_bys: ["metric_time"]
   check_query: |
-    SELECT instant_booking_value, views, a.ds AS metric_time__day
+    SELECT instant_booking_value, views, COALESCE(a.ds, b.ds) AS metric_time__day
     FROM (
       SELECT
         SUM(booking_value) AS instant_booking_value
@@ -275,7 +275,7 @@ integration_test:
   check_query: |
     SELECT
       CAST(bookings AS {{ double_data_type_name }}) / NULLIF(views, 0) AS bookings_per_view
-      , groupby_8cbdaa28.ds AS metric_time__day
+      , COALESCE(groupby_8cbdaa28.ds, groupby_68058b0b.ds) AS metric_time__day
     FROM (
       SELECT
         COUNT(*) AS bookings
@@ -1280,7 +1280,7 @@ integration_test:
     FROM (
       SELECT
         subq_7.metric_time__day
-        , subq_7.bookings_fill_nulls_with_0 AS bookings_fill_nulls_with_0
+        , COALESCE(MAX(subq_7.bookings_fill_nulls_with_0), 0) AS bookings_fill_nulls_with_0
         , subq_15.bookings_2_weeks_ago AS bookings_2_weeks_ago
       FROM (
         SELECT
@@ -1312,4 +1312,323 @@ integration_test:
         GROUP BY subq_11.ds
       ) subq_15
       ON subq_7.metric_time__day = subq_15.metric_time__day
+      GROUP BY 1, 3
     ) subq_16
+---
+integration_test:
+  name: fill_nulls_with_0_multi_metric_query
+  description: Test a multi-metric query that fills nulls
+  model: SIMPLE_MODEL
+  metrics: ["bookings_fill_nulls_with_0", "views"]
+  group_by_objs: [{"name": "metric_time"}]
+  check_query: |
+    SELECT
+      COALESCE(subq_7.metric_time__day, subq_12.metric_time__day) AS metric_time__day
+      , COALESCE(MAX(subq_7.bookings_fill_nulls_with_0), 0) AS bookings_fill_nulls_with_0
+      , MAX(subq_12.views) AS views
+    FROM (
+      SELECT
+        subq_5.ds AS metric_time__day
+        , COALESCE(subq_3.bookings, 0) AS bookings_fill_nulls_with_0
+      FROM {{ source_schema }}.mf_time_spine subq_5
+      LEFT OUTER JOIN (
+        SELECT
+          {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
+          , SUM(1) AS bookings
+        FROM {{ source_schema }}.fct_bookings bookings_source_src_1
+        GROUP BY metric_time__day
+      ) subq_3
+      ON subq_5.ds = subq_3.metric_time__day
+    ) subq_7
+    FULL OUTER JOIN (
+      SELECT
+        {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
+        , SUM(1) AS views
+      FROM {{ source_schema }}.fct_views views_source_src_9
+      GROUP BY metric_time__day
+    ) subq_12
+    ON subq_7.metric_time__day = subq_12.metric_time__day
+    GROUP BY COALESCE(subq_7.metric_time__day, subq_12.metric_time__day)
+---
+integration_test:
+  name: fill_nulls_with_0_multi_metric_query_with_nesting
+  description: Test a multi-metric query with a nested join that fills nulls
+  model: SIMPLE_MODEL
+  metrics: ["bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset", "booking_value"]
+  group_by_objs: [{"name": "metric_time"}]
+  check_query: |
+    SELECT
+      COALESCE(subq_17.metric_time__day, subq_22.metric_time__day) AS metric_time__day
+      , MAX(subq_17.bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset) AS bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset
+      , MAX(subq_22.booking_value) AS booking_value
+    FROM (
+      SELECT
+        metric_time__day
+        , bookings_fill_nulls_with_0 - bookings_2_weeks_ago AS bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset
+      FROM (
+        SELECT
+          COALESCE(subq_7.metric_time__day, subq_15.metric_time__day) AS metric_time__day
+          , COALESCE(MAX(subq_7.bookings_fill_nulls_with_0), 0) AS bookings_fill_nulls_with_0
+          , MAX(subq_15.bookings_2_weeks_ago) AS bookings_2_weeks_ago
+        FROM (
+          SELECT
+            metric_time__day
+            , COALESCE(bookings, 0) AS bookings_fill_nulls_with_0
+          FROM (
+            SELECT
+              subq_5.ds AS metric_time__day
+              , subq_3.bookings AS bookings
+            FROM {{ source_schema }}.mf_time_spine subq_5
+            LEFT OUTER JOIN (
+              SELECT
+                {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
+                , SUM(1) AS bookings
+              FROM {{ source_schema }}.fct_bookings bookings_source_src_1
+              GROUP BY metric_time__day
+            ) subq_3
+            ON subq_5.ds = subq_3.metric_time__day
+          ) subq_6
+        ) subq_7
+        FULL OUTER JOIN (
+          SELECT
+            subq_11.ds AS metric_time__day
+            , SUM(subq_9.bookings) AS bookings_2_weeks_ago
+          FROM {{ source_schema }}.mf_time_spine subq_11
+          INNER JOIN (
+            SELECT
+              {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
+              , 1 AS bookings
+            FROM {{ source_schema }}.fct_bookings bookings_source_src_1
+          ) subq_9
+          ON {{ render_date_sub("subq_11", "ds", 14, TimeGranularity.DAY) }} = subq_9.metric_time__day
+          GROUP BY subq_11.ds
+        ) subq_15
+        ON subq_7.metric_time__day = subq_15.metric_time__day
+        GROUP BY COALESCE(subq_7.metric_time__day, subq_15.metric_time__day)
+      ) subq_16
+    ) subq_17
+    FULL OUTER JOIN (
+      SELECT
+        {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
+        , SUM(booking_value) AS booking_value
+      FROM {{ source_schema }}.fct_bookings bookings_source_src_1
+      GROUP BY {{ render_date_trunc("ds", TimeGranularity.DAY) }}
+    ) subq_22
+    ON subq_17.metric_time__day = subq_22.metric_time__day
+    GROUP BY COALESCE(subq_17.metric_time__day, subq_22.metric_time__day)
+---
+integration_test:
+  name: fill_nulls_with_0_multi_metric_query_with_categorical_dimension
+  description: Test a multi-metric query that fills nulls
+  model: SIMPLE_MODEL
+  metrics: ["bookings_fill_nulls_with_0_without_time_spine", "views"]
+  group_by_objs: [{"name": "metric_time"}, {"name": "listing__is_lux_latest"}]
+  check_query: |
+    SELECT
+      COALESCE(subq_9.metric_time__day, subq_19.metric_time__day) AS metric_time__day
+      , COALESCE(subq_9.listing__is_lux_latest, subq_19.listing__is_lux_latest) AS listing__is_lux_latest
+      , COALESCE(MAX(subq_9.bookings_fill_nulls_with_0_without_time_spine), 0) AS bookings_fill_nulls_with_0_without_time_spine
+      , MAX(subq_19.views) AS views
+    FROM (
+      SELECT
+        subq_2.metric_time__day AS metric_time__day
+        , listings_latest_src_4.is_lux AS listing__is_lux_latest
+        , COALESCE(SUM(subq_2.bookings), 0) AS bookings_fill_nulls_with_0_without_time_spine
+      FROM (
+        SELECT
+          {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
+          , listing_id AS listing
+          , 1 AS bookings
+        FROM {{ source_schema }}.fct_bookings bookings_source_src_1
+      ) subq_2
+      LEFT OUTER JOIN
+        {{ source_schema }}.dim_listings_latest listings_latest_src_4
+      ON subq_2.listing = listings_latest_src_4.listing_id
+      GROUP BY subq_2.metric_time__day, listings_latest_src_4.is_lux
+    ) subq_9
+    FULL OUTER JOIN (
+      SELECT
+        subq_12.metric_time__day AS metric_time__day
+        , listings_latest_src_4.is_lux AS listing__is_lux_latest
+        , SUM(subq_12.views) AS views
+      FROM (
+        SELECT
+          {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
+          , listing_id AS listing
+          , 1 AS views
+        FROM {{ source_schema }}.fct_views views_source_src_9
+      ) subq_12
+      LEFT OUTER JOIN
+        {{ source_schema }}.dim_listings_latest listings_latest_src_4
+      ON subq_12.listing = listings_latest_src_4.listing_id
+      GROUP BY subq_12.metric_time__day, listings_latest_src_4.is_lux
+    ) subq_19
+    ON (subq_9.listing__is_lux_latest = subq_19.listing__is_lux_latest)
+      AND (subq_9.metric_time__day = subq_19.metric_time__day)
+    GROUP BY
+      COALESCE(subq_9.metric_time__day, subq_19.metric_time__day)
+      , COALESCE(subq_9.listing__is_lux_latest, subq_19.listing__is_lux_latest)
+---
+integration_test:
+  name: nested_derived_metric_outer_offset
+  description: Tests a nested derived metric where the outer metric has an input metric with offset_window.
+  model: SIMPLE_MODEL
+  metrics: ["bookings_offset_twice"]
+  group_by_objs: [{"name": "metric_time"}]
+  check_query: |
+    SELECT
+      subq_9.ds AS metric_time__day
+      , 2 * bookings_offset_once AS bookings_offset_twice
+    FROM {{ source_schema }}.mf_time_spine subq_9
+    INNER JOIN (
+      SELECT
+        metric_time__day
+        , 2 * bookings AS bookings_offset_once
+      FROM (
+        SELECT
+          subq_3.ds AS metric_time__day
+          , SUM(subq_1.bookings) AS bookings
+        FROM {{ source_schema }}.mf_time_spine subq_3
+        INNER JOIN (
+          SELECT
+            {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
+            , 1 AS bookings
+          FROM {{ source_schema }}.fct_bookings bookings_source_src_1
+        ) subq_1
+        ON
+          {{ render_date_sub("subq_3", "ds", 5, TimeGranularity.DAY) }} = subq_1.metric_time__day
+        GROUP BY
+          subq_3.ds
+      ) subq_7
+    ) subq_8
+    ON
+      {{ render_date_sub("subq_9", "ds", 2, TimeGranularity.DAY) }} = subq_8.metric_time__day
+---
+integration_test:
+  name: nested_derived_metric_outer_offset_multiple_input_metrics
+  description: Tests a nested derived metric where the outer metric has one input metric with offset_to_grain and another with no offset.
+  model: SIMPLE_MODEL
+  metrics: ["booking_fees_since_start_of_month"]
+  group_by_objs: [{"name": "metric_time"}]
+  check_query: |
+    SELECT
+      metric_time__day
+      , booking_fees - booking_fees_start_of_month AS booking_fees_since_start_of_month
+    FROM (
+      SELECT
+        COALESCE(subq_8.metric_time__day, subq_14.metric_time__day) AS metric_time__day
+        , MAX(subq_8.booking_fees_start_of_month) AS booking_fees_start_of_month
+        , MAX(subq_14.booking_fees) AS booking_fees
+      FROM (
+        SELECT
+          subq_7.ds AS metric_time__day
+          , subq_5.booking_fees_start_of_month AS booking_fees_start_of_month
+        FROM {{ source_schema }}.mf_time_spine subq_7
+        INNER JOIN (
+          SELECT
+            metric_time__day
+            , booking_value * 0.05 AS booking_fees_start_of_month
+          FROM (
+            SELECT
+              {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
+              , SUM(booking_value) AS booking_value
+            FROM {{ source_schema }}.fct_bookings bookings_source_src_1
+            GROUP BY
+              {{ render_date_trunc("ds", TimeGranularity.DAY) }}
+          ) subq_4
+        ) subq_5
+        ON
+          {{ render_date_trunc("subq_7.ds", TimeGranularity.MONTH) }} = subq_5.metric_time__day
+      ) subq_8
+      FULL OUTER JOIN (
+        SELECT
+          metric_time__day
+          , booking_value * 0.05 AS booking_fees
+        FROM (
+          SELECT
+            {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
+            , SUM(booking_value) AS booking_value
+          FROM {{ source_schema }}.fct_bookings bookings_source_src_1
+          GROUP BY
+            {{ render_date_trunc("ds", TimeGranularity.DAY) }}
+        ) subq_13
+      ) subq_14
+      ON
+        subq_8.metric_time__day = subq_14.metric_time__day
+      GROUP BY
+        COALESCE(subq_8.metric_time__day, subq_14.metric_time__day)
+    ) subq_15
+---
+integration_test:
+  name: nested_derived_metric_offset_with_where_constraint
+  description: Tests a nested derived metric where the outer metric has an offset and a constraint is applied to metric_time via where clause.
+  model: SIMPLE_MODEL
+  metrics: ["bookings_offset_twice"]
+  group_by_objs: [{"name": "metric_time", "grain": "day"}]
+  where_filter: "{{ render_time_constraint('metric_time__day', '2020-01-08', '2020-01-09') }}"
+  check_query: |
+    SELECT
+      subq_9.ds AS metric_time__day
+      , 2 * bookings_offset_once AS bookings_offset_twice
+    FROM {{ source_schema }}.mf_time_spine subq_9
+    INNER JOIN (
+      SELECT
+        metric_time__day
+        , 2 * bookings AS bookings_offset_once
+      FROM (
+        SELECT
+          subq_3.ds AS metric_time__day
+          , SUM(subq_1.bookings) AS bookings
+        FROM {{ source_schema }}.mf_time_spine subq_3
+        INNER JOIN (
+          SELECT
+            {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
+            , 1 AS bookings
+          FROM {{ source_schema }}.fct_bookings bookings_source_src_1
+        ) subq_1
+        ON
+          {{ render_date_sub("subq_3", "ds", 5, TimeGranularity.DAY) }} = subq_1.metric_time__day
+        GROUP BY
+          subq_3.ds
+      ) subq_7
+    ) subq_8
+    ON
+      {{ render_date_sub("subq_9", "ds", 2, TimeGranularity.DAY) }} = subq_8.metric_time__day
+    WHERE {{ render_time_constraint('subq_9.ds', '2020-01-08', '2020-01-09') }}
+---
+integration_test:
+  name: nested_derived_metric_offset_with_time_constraint
+  description: Tests a nested derived metric where the outer metric has an offset and a constraint is applied to metric_time via time constraint params.
+  model: SIMPLE_MODEL
+  metrics: ["bookings_offset_twice"]
+  group_by_objs: [{"name": "metric_time", "grain": "day"}]
+  time_constraint: ["2020-01-08", "2020-01-09"]
+  check_query: |
+    SELECT
+      subq_9.ds AS metric_time__day
+      , 2 * bookings_offset_once AS bookings_offset_twice
+    FROM {{ source_schema }}.mf_time_spine subq_9
+    INNER JOIN (
+      SELECT
+        metric_time__day
+        , 2 * bookings AS bookings_offset_once
+      FROM (
+        SELECT
+          subq_3.ds AS metric_time__day
+          , SUM(subq_1.bookings) AS bookings
+        FROM {{ source_schema }}.mf_time_spine subq_3
+        INNER JOIN (
+          SELECT
+            {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
+            , 1 AS bookings
+          FROM {{ source_schema }}.fct_bookings bookings_source_src_1
+        ) subq_1
+        ON
+          {{ render_date_sub("subq_3", "ds", 5, TimeGranularity.DAY) }} = subq_1.metric_time__day
+        GROUP BY
+          subq_3.ds
+      ) subq_7
+    ) subq_8
+    ON
+      {{ render_date_sub("subq_9", "ds", 2, TimeGranularity.DAY) }} = subq_8.metric_time__day
+    WHERE {{ render_time_constraint('subq_9.ds', '2020-01-08', '2020-01-09') }}

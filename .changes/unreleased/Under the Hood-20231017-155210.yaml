@@ -1,6 +1,0 @@
-kind: Under the Hood
-body: re-categorize `TypeErrors` that arise from `create_from_where_filter` into `InvalidQueryException`
-time: 2023-10-17T15:52:10.948956-05:00
-custom:
-  Author: DevonFulcher
-  Issue: None

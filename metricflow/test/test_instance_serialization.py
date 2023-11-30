@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+import logging
+
 import pytest
 from dbt_semantic_interfaces.dataclass_serialization import DataClassDeserializer, DataclassSerializer
 
 from metricflow.instances import InstanceSet
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
+
+logger = logging.getLogger(__name__)
 
 
 @pytest.fixture

@@ -2,7 +2,7 @@
 SELECT
   CAST(subq_10.bookings AS FLOAT64) / CAST(NULLIF(subq_10.listings, 0) AS FLOAT64) AS bookings_per_listing
 FROM (
-  -- Combine Metrics
+  -- Combine Aggregated Outputs
   SELECT
     MAX(subq_4.bookings) AS bookings
     , MAX(subq_9.listings) AS listings

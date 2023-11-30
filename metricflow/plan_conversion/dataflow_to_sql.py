@@ -14,7 +14,7 @@ from metricflow.dag.id_generation import IdGeneratorRegistry
 from metricflow.dataflow.dataflow_plan import (
     AggregateMeasuresNode,
     BaseOutput,
-    CombineMetricsNode,
+    CombineAggregatedOutputsNode,
     ComputedMetricsOutput,
     ComputeMetricsNode,
     ConstrainTimeRangeNode,
@@ -47,12 +47,14 @@ from metricflow.plan_conversion.instance_converters import (
     AliasAggregatedMeasures,
     ChangeAssociatedColumns,
     ChangeMeasureAggregationState,
+    CreateSelectColumnForCombineOutputNode,
     CreateSelectColumnsForInstances,
     CreateSelectColumnsWithMeasuresAggregated,
     FilterElements,
     FilterLinkableInstancesWithLeadingLink,
     RemoveMeasures,
     RemoveMetrics,
+    UpdateMeasureFillNullsWith,
     create_select_columns_for_instance_sets,
 )
 from metricflow.plan_conversion.select_column_gen import (
@@ -403,12 +405,9 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             # e.g. a data set has the dimension "listing__country_latest" and "listing" is a primary entity in the
             # data set. The next step would create an instance like "listing__listing__country_latest" without this
             # filter.
-
-            # logger.error(f"before filter is:\n{pformat_big_objects(right_data_set.instance_set.spec_set)}")
             right_data_set_instance_set_filtered = FilterLinkableInstancesWithLeadingLink(
                 entity_link=join_on_entity,
             ).transform(right_data_set.instance_set)
-            # logger.error(f"after filter is:\n{pformat_big_objects(right_data_set_instance_set_filtered.spec_set)}")
 
             # After the right data set is joined to the "from" data set, we need to change the links for some of the
             # instances that represent the right data set. For example, if the "from" data set contains the "bookings"
@@ -488,6 +487,10 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             ChangeAssociatedColumns(self._column_association_resolver)
         )
 
+        # Add fill null property to corresponding measure spec
+        aggregated_instance_set = aggregated_instance_set.transform(
+            UpdateMeasureFillNullsWith(metric_input_measure_specs=node.metric_input_measure_specs)
+        )
         from_data_set_alias = self._next_unique_table_alias()
 
         # Convert the instance set into a set of select column statements with updated aliases
@@ -555,7 +558,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         metric_select_columns = []
         metric_instances = []
         for metric_spec in node.metric_specs:
-            metric = self._metric_lookup.get_metric(metric_spec.as_reference)
+            metric = self._metric_lookup.get_metric(metric_spec.reference)
 
             metric_expr: Optional[SqlExpressionNode] = None
             input_measure: Optional[MetricInputMeasure] = None
@@ -629,7 +632,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             metric_instances.append(
                 MetricInstance(
                     associated_columns=(output_column_association,),
-                    defined_from=(MetricModelReference(metric_name=metric_spec.element_name),),
+                    defined_from=MetricModelReference(metric_name=metric_spec.element_name),
                     spec=metric_spec.alias_spec,
                 )
             )
@@ -754,8 +757,12 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
     def visit_where_constraint_node(self, node: WhereConstraintNode) -> SqlDataSet:
         """Adds where clause to SQL statement from parent node."""
-        from_data_set: SqlDataSet = node.parent_node.accept(self)
-        output_instance_set = from_data_set.instance_set
+        parent_data_set: SqlDataSet = node.parent_node.accept(self)
+        # Since we're copying the instance set from the parent to conveniently generate the output instance set for this
+        # node, we'll need to change the column names.
+        output_instance_set = parent_data_set.instance_set.transform(
+            ChangeAssociatedColumns(self._column_association_resolver)
+        )
         from_data_set_alias = self._next_unique_table_alias()
 
         column_associations_in_where_sql: Sequence[ColumnAssociation] = CreateColumnAssociations(
@@ -770,7 +777,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 select_columns=output_instance_set.transform(
                     CreateSelectColumnsForInstances(from_data_set_alias, self._column_association_resolver)
                 ).as_tuple(),
-                from_source=from_data_set.sql_select_node,
+                from_source=parent_data_set.sql_select_node,
                 from_source_alias=from_data_set_alias,
                 joins_descs=(),
                 group_bys=(),
@@ -785,52 +792,12 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             ),
         )
 
-    def _make_select_columns_for_metrics(
-        self,
-        table_alias_to_metric_specs: OrderedDict[str, Sequence[MetricSpec]],
-        aggregation_type: Optional[AggregationType],
-    ) -> List[SqlSelectColumn]:
-        """Creates select columns that get the given metric using the given table alias.
+    def visit_combine_aggregated_outputs_node(self, node: CombineAggregatedOutputsNode) -> SqlDataSet:
+        """Join aggregated output datasets together to return a single dataset containing all metrics/measures.
 
-        e.g.
-
-        with table_alias_to_metric_specs = {"a": MetricSpec(element_name="bookings")}
-
-        ->
-
-        a.bookings AS bookings
-        """
-        select_columns = []
-        for table_alias, metric_specs in table_alias_to_metric_specs.items():
-            for metric_spec in metric_specs:
-                metric_column_name = self._column_association_resolver.resolve_spec(metric_spec).column_name
-                column_reference_expression = SqlColumnReferenceExpression(
-                    col_ref=SqlColumnReference(
-                        table_alias=table_alias,
-                        column_name=metric_column_name,
-                    )
-                )
-                if aggregation_type:
-                    select_expression: SqlExpressionNode = SqlFunctionExpression.build_expression_from_aggregation_type(
-                        aggregation_type=aggregation_type, sql_column_expression=column_reference_expression
-                    )
-                else:
-                    select_expression = column_reference_expression
-
-                select_columns.append(
-                    SqlSelectColumn(
-                        expr=select_expression,
-                        column_alias=metric_column_name,
-                    )
-                )
-        return select_columns
-
-    def visit_combine_metrics_node(self, node: CombineMetricsNode) -> SqlDataSet:
-        """Join computed metric datasets together to return a single dataset containing all metrics.
-
-        This node may exist in one of two situations: when metrics need to be combined in order to produce a single
-        dataset with all required inputs for a derived metric, or when metrics need to be combined in order to produce
-        a single dataset of output for downstream consumption by the end user.
+        This node may exist in one of two situations: when metrics/measures need to be combined in order to produce a single
+        dataset with all required inputs for a metric (ie., derived metric), or when metrics need to be combined in order to
+        produce a single dataset of output for downstream consumption by the end user.
 
         The join key will be a coalesced set of all previously seen dimension values. For example:
             FROM (
@@ -858,16 +825,16 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         """
         assert (
             len(node.parent_nodes) > 1
-        ), "Shouldn't have a CombineMetricsNode in the dataflow plan if there's only 1 parent."
+        ), "Shouldn't have a CombineAggregatedOutputsNode in the dataflow plan if there's only 1 parent."
 
         parent_data_sets: List[AnnotatedSqlDataSet] = []
-        table_alias_to_metric_specs: OrderedDict[str, Sequence[MetricSpec]] = OrderedDict()
+        table_alias_to_instance_set: OrderedDict[str, InstanceSet] = OrderedDict()
 
         for parent_node in node.parent_nodes:
             parent_sql_data_set = parent_node.accept(self)
             table_alias = self._next_unique_table_alias()
             parent_data_sets.append(AnnotatedSqlDataSet(data_set=parent_sql_data_set, alias=table_alias))
-            table_alias_to_metric_specs[table_alias] = parent_sql_data_set.instance_set.spec_set.metric_specs
+            table_alias_to_instance_set[table_alias] = parent_sql_data_set.instance_set
 
         # When we create the components of the join that combines metrics it will be one of INNER, FULL OUTER,
         # or CROSS JOIN. Order doesn't matter for these join types, so we will use the first element in the FROM
@@ -893,7 +860,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         aliases_seen = [from_data_set.alias]
         for join_data_set in join_data_sets:
             joins_descriptions.append(
-                SqlQueryPlanJoinBuilder.make_combine_metrics_join_description(
+                SqlQueryPlanJoinBuilder.make_join_description_for_combining_datasets(
                     from_data_set=from_data_set,
                     join_data_set=join_data_set,
                     join_type=join_type,
@@ -907,19 +874,24 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         output_instance_set = InstanceSet.merge([x.data_set.instance_set for x in parent_data_sets])
         output_instance_set = output_instance_set.transform(ChangeAssociatedColumns(self._column_association_resolver))
 
-        metric_aggregation_type = AggregationType.MAX
-        metric_select_column_set = SelectColumnSet(
-            metric_columns=self._make_select_columns_for_metrics(
-                table_alias_to_metric_specs, aggregation_type=metric_aggregation_type
+        aggregated_select_columns = SelectColumnSet()
+        for table_alias, instance_set in table_alias_to_instance_set.items():
+            aggregated_select_columns = aggregated_select_columns.merge(
+                instance_set.transform(
+                    CreateSelectColumnForCombineOutputNode(
+                        table_alias=table_alias,
+                        column_resolver=self._column_association_resolver,
+                        metric_lookup=self._metric_lookup,
+                    )
+                )
             )
-        )
         linkable_select_column_set = linkable_spec_set.transform(
             CreateSelectCoalescedColumnsForLinkableSpecs(
                 column_association_resolver=self._column_association_resolver,
                 table_aliases=[x.alias for x in parent_data_sets],
             )
         )
-        combined_select_column_set = linkable_select_column_set.merge(metric_select_column_set)
+        combined_select_column_set = linkable_select_column_set.merge(aggregated_select_columns)
 
         return SqlDataSet(
             instance_set=output_instance_set,
@@ -1027,11 +999,11 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 semantic_model_reference=measure_instance.origin_semantic_model_reference.semantic_model_reference
             )
             assert semantic_model is not None, (
-                f"{measure_instance} was defined from {measure_instance.origin_semantic_model_reference}, but that"
-                f"can't be found"
+                f"{measure_instance} was defined from "
+                f"{measure_instance.origin_semantic_model_reference.semantic_model_reference}, but that can't be found"
             )
             aggregation_time_dimension_for_measure = semantic_model.checked_agg_time_dimension_for_measure(
-                measure_reference=measure_instance.spec.as_reference
+                measure_reference=measure_instance.spec.reference
             )
             if aggregation_time_dimension_for_measure == node.aggregation_time_dimension_reference:
                 output_measure_instances.append(measure_instance)

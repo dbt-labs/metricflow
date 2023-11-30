@@ -14,7 +14,7 @@ from typing import Dict, FrozenSet, Optional, Sequence, Set
 from dbt_semantic_interfaces.protocols.dimension import Dimension
 from dbt_semantic_interfaces.protocols.entity import Entity
 from dbt_semantic_interfaces.protocols.measure import Measure
-from dbt_semantic_interfaces.protocols.metric import Metric
+from dbt_semantic_interfaces.protocols.metric import Metric, MetricInputMeasure
 from dbt_semantic_interfaces.protocols.semantic_model import SemanticModel
 from dbt_semantic_interfaces.references import (
     DimensionReference,
@@ -32,7 +32,6 @@ from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
     LinkableInstanceSpec,
     MeasureSpec,
-    MetricInputMeasureSpec,
     MetricSpec,
     NonAdditiveDimensionSpec,
 )
@@ -166,15 +165,6 @@ class MetricAccessor(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def measures_for_metric(
-        self,
-        metric_reference: MetricReference,
-        column_association_resolver: ColumnAssociationResolver,
-    ) -> Sequence[MetricInputMeasureSpec]:
-        """Return the measure specs required to compute the metric."""
-        raise NotImplementedError
-
-    @abstractmethod
     def contains_cumulative_or_time_offset_metric(self, metric_references: Sequence[MetricReference]) -> bool:
         """Returns true if any of the specs correspond to a cumulative metric or a derived metric with time offset."""
         raise NotImplementedError
@@ -186,4 +176,15 @@ class MetricAccessor(ABC):
         column_association_resolver: ColumnAssociationResolver,
     ) -> Sequence[MetricSpec]:
         """Returns the metric input specs required to compute the metric."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def configured_input_measure_for_metric(self, metric_reference: MetricReference) -> Optional[MetricInputMeasure]:
+        """Get input measure defined in the original metric config, if exists.
+
+        When SemanticModel is constructed, input measures from input metrics are added to the list of input measures
+        for a metric. Here, use rules about metric types to determine which input measures were defined in the config:
+        - Simple & cumulative metrics require one input measure, and can't take any input metrics.
+        - Derived & ratio metrics take no input measures, only input metrics.
+        """
         raise NotImplementedError

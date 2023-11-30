@@ -9,7 +9,7 @@ The following 3rd-party software packages may be used by or distributed with **g
 
 Date generated | Revision ID
 :------------: | :----------:
-09/06/23 | a26a4123af0b98d9f9d0ca4253f80681046db804
+11/15/23 | 9328fb5ba50f220c61965520c67e3f38aae68803
 
 ---
 
@@ -92,7 +92,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ---
 
-### [dbt-core (1.6.0)](https://github.com/dbt-labs/dbt-core)
+### [dbt-core (1.7.0)](https://github.com/dbt-labs/dbt-core)
 
 
 #### Declared Licenses
@@ -115,7 +115,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ---
 
-### [dbt-semantic-interfaces (0.2.0)](https://pypi.org/project/dbt-semantic-interfaces/0.2.0/)
+### [dbt-semantic-interfaces (0.4.0)](https://pypi.org/project/dbt-semantic-interfaces/0.4.1/)
 
 
 #### Declared Licenses
@@ -574,7 +574,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ---
 
-### [metricflow (0.201.0)](https://pypi.org/project/metricflow/0.202.0.dev3/)
+### [metricflow (0.203.0)](https://pypi.org/project/metricflow/0.203.0.dev8/)
 
 
 #### Declared Licenses
@@ -717,20 +717,7 @@ the Adopting and Developing Business Source License FAQ.
 
 
 #### Other Licenses
-Zlib, NCSA, Unlicense, Python-2.0, openssl-ssleay, OpenSSL, OLDAP-1.1, MPL-2.0, mit-old-style-no-advert, mit-nagy, MIT, LGPL-3.0-only, ISC, IPA, Info-ZIP, GPL-3.0-with-GCC-exception, GPL-3.0-or-later, GPL-3.0-only, GPL-2.0-or-later, GPL-2.0-only, GPL-1.0-or-later, GPL-1.0-only, CC0-1.0, CC-BY-SA-4.0, BSD-2-Clause, BSD-3-Clause, bsd-3-clause-open-mpi, BSL-1.0, bacula-exception, AAL, Artistic-1.0-Perl, Artistic-1.0, AGPL-3.0-only
-
-
-```
-This software is provided 'as-is', without any express or implied warranty. In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, including commercial applications, and to alter it and redistribute it freely, subject to the following restrictions:
-   1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
-   2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
-   3. This notice may not be removed or altered from any source distribution.
-```
-
-
-
-
+NCSA, Unlicense, Python-2.0, Zlib, openssl-ssleay, OpenSSL, OLDAP-1.1, MPL-2.0, mit-old-style-no-advert, mit-nagy, MIT, LGPL-3.0-only, ISC, IPA, Info-ZIP, GPL-3.0-with-GCC-exception, GPL-3.0-or-later, GPL-3.0-only, GPL-2.0-or-later, GPL-2.0-only, GPL-1.0-or-later, GPL-1.0-only, CC0-1.0, CC-BY-SA-4.0, BSD-2-Clause, BSD-3-Clause, bsd-3-clause-open-mpi, BSL-1.0, bacula-exception, AAL, Artistic-1.0-Perl, Artistic-1.0, AGPL-3.0-only
 
 
 ```
@@ -793,6 +780,19 @@ For more information, please refer to <http://unlicense.org/>
 Copyright (c) 1991 - 1995, Stichting Mathematisch Centrum Amsterdam, The Netherlands. All rights reserved.
 Permission to use, copy, modify, and distribute this software and its documentation for any purpose and without fee is hereby granted, provided that the above copyright notice appear in all copies and that both that copyright notice and this permission notice appear in supporting documentation, and that the name of Stichting Mathematisch Centrum or CWI not be used in advertising or publicity pertaining to distribution of the software without specific, written prior permission.
 STICHTING MATHEMATISCH CENTRUM DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT SHALL STICHTING MATHEMATISCH CENTRUM BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+```
+
+
+
+
+
+
+```
+This software is provided 'as-is', without any express or implied warranty. In no event will the authors be held liable for any damages arising from the use of this software.
+Permission is granted to anyone to use this software for any purpose, including commercial applications, and to alter it and redistribute it freely, subject to the following restrictions:
+   1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+   2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+   3. This notice may not be removed or altered from any source distribution.
 ```
 
 
@@ -1881,7 +1881,7 @@ SOFTWARE.
 
 ---
 
-### [numpy (1.22.2)](https://www.numpy.org)
+### [numpy (1.22.2)](https://numpy.org)
 
 
 #### Declared Licenses
@@ -3757,7 +3757,7 @@ Permission is granted to anyone to use this software for any purpose, including 
 
 ---
 
-### [pandas (1.5.0)](https://pypi.org/project/pandas/2.0.3/)
+### [pandas (1.5.0)](https://pandas.pydata.org)
 
 
 #### Declared Licenses
@@ -3944,7 +3944,7 @@ There is no warranty.
 
 ---
 
-### [pydantic (1.10.0)](https://pypi.org/project/pydantic/2.3.0/)
+### [pydantic (1.10.0)](https://pypi.org/project/pydantic/2.4.2/)
 
 
 #### Declared Licenses
@@ -4351,7 +4351,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 ---
 
-### [ruamel.yaml (0.17.21)](https://sourceforge.net/p/ruamel-yaml/code/ci/default/tree)
+### [ruamel.yaml (0.17.21)](https://pypi.org/project/ruamel.yaml/0.18.5/)
 
 
 #### Declared Licenses
@@ -4380,59 +4380,6 @@ MIT
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
-
-```
-
-
-
-
-
-
-#### Other Licenses
-
-
-
-
-
-
-
-
-
-
-
-
-
----
-
-### [rudder-sdk-python (1.0.3)](https://github.com/rudderlabs/rudder-sdk-python)
-
-
-#### Declared Licenses
-MIT
-
-
-```
-MIT License
-
-Copyright (c) 2021 RudderStack
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
 
 ```
 
@@ -4509,7 +4456,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ---
 
-### [typing-extensions (4.0.0)](https://pypi.org/project/typing-extensions/4.2.0/)
+### [typing-extensions (4.4.0)](https://pypi.org/project/typing-extensions/4.8.0/)
 
 
 #### Declared Licenses
@@ -7403,34 +7350,6 @@ SOFTWARE.
 ```
 
 
-### MIT
-
-```
-MIT License
-
-Copyright (c) 2021 RudderStack
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the &quot;Software&quot;), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-```
-
-
 ### MPL-2.0
 
 ```
@@ -8070,6 +7989,6 @@ copied and put under another distribution licence
 
 [FOSSA]: # (Do not touch the comments below)
 
-[FOSSA]: # (==depsig=17ac0399673c42f81e7a4c21cc956d7e5d359ff6c9eff280c2e02d483e949035==)
+[FOSSA]: # (==depsig=4e702ba50361a3b08a221b79e01666929773559a71c0e2ec8b5321baba54b9e6==)
 
 

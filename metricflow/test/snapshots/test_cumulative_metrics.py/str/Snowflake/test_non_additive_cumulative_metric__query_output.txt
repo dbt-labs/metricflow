@@ -1,0 +1,4 @@
+  METRIC_TIME__DAY  EVERY_TWO_DAYS_BOOKERS
+0       2020-01-01                       3
+1       2020-01-02                       6
+2       2020-01-03                       4

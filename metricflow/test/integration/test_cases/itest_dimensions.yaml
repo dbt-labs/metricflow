@@ -139,7 +139,7 @@ integration_test:
       u.home_state_latest AS user__home_state_latest
     , l.is_lux AS listing__is_lux_latest
     FROM {{ source_schema }}.dim_listings_latest l
-    LEFT OUTER JOIN {{ source_schema }}.dim_users_latest u
+    FULL OUTER JOIN {{ source_schema }}.dim_users_latest u
       ON u.user_id = l.user_id
     GROUP BY
       u.home_state_latest

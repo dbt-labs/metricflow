@@ -3,10 +3,10 @@ SELECT
   metric_time__day
   , bookings_fill_nulls_with_0 - bookings_2_weeks_ago AS bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset
 FROM (
-  -- Combine Metrics
+  -- Combine Aggregated Outputs
   SELECT
     COALESCE(subq_24.metric_time__day, subq_32.metric_time__day) AS metric_time__day
-    , MAX(subq_24.bookings_fill_nulls_with_0) AS bookings_fill_nulls_with_0
+    , COALESCE(MAX(subq_24.bookings_fill_nulls_with_0), 0) AS bookings_fill_nulls_with_0
     , MAX(subq_32.bookings_2_weeks_ago) AS bookings_2_weeks_ago
   FROM (
     -- Compute Metrics via Expressions

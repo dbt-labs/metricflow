@@ -64,7 +64,6 @@ from metricflow.time.time_source import TimeSource
 logger = logging.getLogger(__name__)
 _telemetry_reporter = TelemetryReporter(report_levels_higher_or_equal_to=TelemetryLevel.USAGE)
 _telemetry_reporter.add_python_log_handler()
-_telemetry_reporter.add_rudderstack_handler()
 
 
 @dataclass(frozen=True)
@@ -452,7 +451,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         logger.info(f"Query spec is:\n{pformat_big_objects(query_spec)}")
 
         if self._semantic_manifest_lookup.metric_lookup.contains_cumulative_or_time_offset_metric(
-            tuple(m.as_reference for m in query_spec.metric_specs)
+            tuple(metric_spec.reference for metric_spec in query_spec.metric_specs)
         ):
             if self._time_spine_source.time_column_granularity != TimeGranularity.DAY:
                 raise RuntimeError(

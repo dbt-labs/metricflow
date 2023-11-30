@@ -5,6 +5,8 @@
   to another spec or relevant object.
 * The match() method will enable sub-classes (may require some restructuring) to use specs to request things like,
   metrics named "sales*".
+
+TODO: Split this file into separate files.
 """
 
 from __future__ import annotations
@@ -13,11 +15,14 @@ import itertools
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from enum import Enum
 from hashlib import sha1
-from typing import Any, Generic, List, Optional, Sequence, Tuple, TypeVar
+from typing import Any, Dict, Generic, List, Optional, Sequence, Tuple, TypeVar, Union
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
+from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
+from dbt_semantic_interfaces.protocols import MetricTimeWindow
 from dbt_semantic_interfaces.references import (
     DimensionReference,
     EntityReference,
@@ -28,12 +33,15 @@ from dbt_semantic_interfaces.references import (
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from typing_extensions import override
 
 from metricflow.aggregation_properties import AggregationState
+from metricflow.collection_helpers.merger import Mergeable
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_column_type import SqlColumnType
+from metricflow.sql.sql_plan import SqlJoinType
 from metricflow.visitor import VisitorOutputT
 
 
@@ -103,6 +111,12 @@ class InstanceSpec(SerializableDataclass):
         """See Visitable."""
         raise NotImplementedError()
 
+    @property
+    @abstractmethod
+    def as_spec_set(self) -> InstanceSpecSet:
+        """Return this as the one item in a InstanceSpecSet."""
+        raise NotImplementedError
+
 
 SelfTypeT = TypeVar("SelfTypeT", bound="LinkableInstanceSpec")
 
@@ -123,6 +137,11 @@ class MetadataSpec(InstanceSpec):
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_metadata_spec(self)
+
+    @property
+    @override
+    def as_spec_set(self) -> InstanceSpecSet:
+        return InstanceSpecSet(metadata_specs=(self,))
 
 
 @dataclass(frozen=True)
@@ -161,10 +180,6 @@ class LinkableInstanceSpec(InstanceSpec, ABC):
         return StructuredLinkableSpecName(
             entity_link_names=tuple(x.element_name for x in self.entity_links), element_name=self.element_name
         ).qualified_name
-
-    @property
-    def as_linkable_spec_set(self) -> LinkableSpecSet:  # noqa: D
-        raise NotImplementedError
 
 
 @dataclass(frozen=True)
@@ -207,8 +222,9 @@ class EntitySpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
         return EntityReference(element_name=self.element_name)
 
     @property
-    def as_linkable_spec_set(self) -> LinkableSpecSet:  # noqa: D
-        return LinkableSpecSet(entity_specs=(self,))
+    @override
+    def as_spec_set(self) -> InstanceSpecSet:
+        return InstanceSpecSet(entity_specs=(self,))
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_entity_spec(self)
@@ -271,11 +287,73 @@ class DimensionSpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
         return DimensionReference(element_name=self.element_name)
 
     @property
-    def as_linkable_spec_set(self) -> LinkableSpecSet:  # noqa: D
-        return LinkableSpecSet(dimension_specs=(self,))
+    @override
+    def as_spec_set(self) -> InstanceSpecSet:
+        return InstanceSpecSet(dimension_specs=(self,))
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_dimension_spec(self)
+
+
+class TimeDimensionSpecField(Enum):
+    """Fields of the time dimension spec.
+
+    The value corresponds to the name of the field in the dataclass. This should contain all fields, but implementation
+    is pending.
+    """
+
+    TIME_GRANULARITY = "time_granularity"
+
+
+class TimeDimensionSpecComparisonKey:
+    """A key that can be used for comparing / grouping time dimension specs.
+
+    Useful for assessing if two time dimension specs are equal while ignoring specific attributes. Keys must have the
+    same set of excluded attributes to be valid for comparison.
+
+    This is useful for ambiguous group-by-item resolution where we want to select a time dimension regardless of the
+    grain.
+    """
+
+    def __init__(self, source_spec: TimeDimensionSpec, exclude_fields: Sequence[TimeDimensionSpecField]) -> None:
+        """Initializer.
+
+        Args:
+            source_spec: The spec that this key is based on.
+            exclude_fields: The fields to ignore when determining equality.
+        """
+        self._excluded_fields = frozenset(exclude_fields)
+        self._source_spec = source_spec
+
+        # This is a list of field values of TimeDimensionSpec that we should use for comparison.
+        spec_field_values_for_comparison: List[
+            Union[str, Tuple[EntityReference, ...], TimeGranularity, Optional[DatePart]]
+        ] = [self._source_spec.element_name, self._source_spec.entity_links]
+
+        if TimeDimensionSpecField.TIME_GRANULARITY not in self._excluded_fields:
+            spec_field_values_for_comparison.append(self._source_spec.time_granularity)
+
+        spec_field_values_for_comparison.append(self._source_spec.date_part)
+
+        self._spec_field_values_for_comparison = tuple(spec_field_values_for_comparison)
+
+    @property
+    def source_spec(self) -> TimeDimensionSpec:  # noqa: D
+        return self._source_spec
+
+    @override
+    def __eq__(self, other: Any) -> bool:  # type: ignore[misc]
+        if not isinstance(other, TimeDimensionSpecComparisonKey):
+            return False
+
+        if self._excluded_fields != other._excluded_fields:
+            return False
+
+        return self._spec_field_values_for_comparison == other._spec_field_values_for_comparison
+
+    @override
+    def __hash__(self) -> int:
+        return hash((self._excluded_fields, self._spec_field_values_for_comparison))
 
 
 DEFAULT_TIME_GRANULARITY = TimeGranularity.DAY
@@ -330,11 +408,21 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
         ).qualified_name
 
     @property
-    def as_linkable_spec_set(self) -> LinkableSpecSet:  # noqa: D
-        return LinkableSpecSet(time_dimension_specs=(self,))
+    @override
+    def as_spec_set(self) -> InstanceSpecSet:
+        return InstanceSpecSet(time_dimension_specs=(self,))
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_time_dimension_spec(self)
+
+    def with_grain(self, time_granularity: TimeGranularity) -> TimeDimensionSpec:  # noqa: D
+        return TimeDimensionSpec(
+            element_name=self.element_name,
+            entity_links=self.entity_links,
+            time_granularity=time_granularity,
+            date_part=self.date_part,
+            aggregation_state=self.aggregation_state,
+        )
 
     def with_aggregation_state(self, aggregation_state: AggregationState) -> TimeDimensionSpec:  # noqa: D
         return TimeDimensionSpec(
@@ -343,6 +431,13 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
             time_granularity=self.time_granularity,
             date_part=self.date_part,
             aggregation_state=aggregation_state,
+        )
+
+    def comparison_key(self, exclude_fields: Sequence[TimeDimensionSpecField] = ()) -> TimeDimensionSpecComparisonKey:
+        """See TimeDimensionComparisonKey."""
+        return TimeDimensionSpecComparisonKey(
+            source_spec=self,
+            exclude_fields=exclude_fields,
         )
 
 
@@ -385,6 +480,7 @@ class NonAdditiveDimensionSpec(SerializableDataclass):
 class MeasureSpec(InstanceSpec):  # noqa: D
     element_name: str
     non_additive_dimension_spec: Optional[NonAdditiveDimensionSpec] = None
+    fill_nulls_with: Optional[int] = None
 
     @staticmethod
     def from_name(name: str) -> MeasureSpec:
@@ -401,11 +497,16 @@ class MeasureSpec(InstanceSpec):  # noqa: D
         return self.element_name
 
     @property
-    def as_reference(self) -> MeasureReference:  # noqa: D
+    def reference(self) -> MeasureReference:  # noqa: D
         return MeasureReference(element_name=self.element_name)
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_measure_spec(self)
+
+    @property
+    @override
+    def as_spec_set(self) -> InstanceSpecSet:
+        return InstanceSpecSet(measure_specs=(self,))
 
 
 @dataclass(frozen=True)
@@ -425,10 +526,6 @@ class MetricSpec(InstanceSpec):  # noqa: D
     def qualified_name(self) -> str:  # noqa: D
         return self.element_name
 
-    @property
-    def as_reference(self) -> MetricReference:  # noqa: D
-        return MetricReference(element_name=self.element_name)
-
     @staticmethod
     def from_reference(reference: MetricReference) -> MetricSpec:
         """Initialize from a metric reference instance."""
@@ -436,7 +533,7 @@ class MetricSpec(InstanceSpec):  # noqa: D
 
     @property
     def alias_spec(self) -> MetricSpec:
-        """Returns a MetricSpec represneting the alias state."""
+        """Returns a MetricSpec representing the alias state."""
         return MetricSpec(
             element_name=self.alias or self.element_name,
             constraint=self.constraint,
@@ -445,26 +542,45 @@ class MetricSpec(InstanceSpec):  # noqa: D
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_metric_spec(self)
 
+    @property
+    @override
+    def as_spec_set(self) -> InstanceSpecSet:
+        return InstanceSpecSet(metric_specs=(self,))
+
+    @property
+    def reference(self) -> MetricReference:
+        """Return the reference object that is used for referencing the associated metric in the manifest."""
+        return MetricReference(element_name=self.element_name)
+
+
+@dataclass(frozen=True)
+class CumulativeMeasureDescription:
+    """If a measure is a part of a cumulative metric, this represents the associated parameters."""
+
+    cumulative_window: Optional[MetricTimeWindow]
+    cumulative_grain_to_date: Optional[TimeGranularity]
+
 
 @dataclass(frozen=True)
 class MetricInputMeasureSpec(SerializableDataclass):
-    """The spec for a measure defined as a metric input.
+    """The spec for a measure defined as a base metric input.
 
     This is necessary because the MeasureSpec is used as a key linking the measures used in the query
     to the measures defined in the semantic models. Adding metric-specific information, like constraints,
     causes lookups connecting query -> semantic model to fail in strange ways. This spec, then, provides
     both the key (in the form of a MeasureSpec) along with whatever measure-specific attributes
     a user might specify in a metric definition or query accessing the metric itself.
-
-    Note - when specifying a metric comprised of two input instances of the same measure, at least one
-    must have a distinct alias, otherwise SQL exceptions may occur. This should be enforced via validation.
     """
 
     measure_spec: MeasureSpec
+    fill_nulls_with: Optional[int] = None
+    offset_window: Optional[MetricTimeWindow] = None
+    offset_to_grain: Optional[TimeGranularity] = None
+    culmination_description: Optional[CumulativeMeasureDescription] = None
     constraint: Optional[WhereFilterSpec] = None
     alias: Optional[str] = None
-    join_to_timespine: bool = False
-    fill_nulls_with: Optional[int] = None
+    before_aggregation_time_spine_join_description: Optional[JoinToTimeSpineDescription] = None
+    after_aggregation_time_spine_join_description: Optional[JoinToTimeSpineDescription] = None
 
     @property
     def post_aggregation_spec(self) -> MeasureSpec:
@@ -473,6 +589,7 @@ class MetricInputMeasureSpec(SerializableDataclass):
             return MeasureSpec(
                 element_name=self.alias,
                 non_additive_dimension_spec=self.measure_spec.non_additive_dimension_spec,
+                fill_nulls_with=self.fill_nulls_with,
             )
         else:
             return self.measure_spec
@@ -491,7 +608,7 @@ class FilterSpec(SerializableDataclass):  # noqa: D
 
 
 @dataclass(frozen=True)
-class LinkableSpecSet(SerializableDataclass):
+class LinkableSpecSet(Mergeable, SerializableDataclass):
     """Groups linkable specs."""
 
     dimension_specs: Tuple[DimensionSpec, ...] = ()
@@ -499,31 +616,55 @@ class LinkableSpecSet(SerializableDataclass):
     entity_specs: Tuple[EntitySpec, ...] = ()
 
     @property
+    def contains_metric_time(self) -> bool:
+        """Returns true if this set contains a spec referring to metric time at any grain."""
+        return len(self.metric_time_specs) > 0
+
+    @property
+    def metric_time_specs(self) -> Sequence[TimeDimensionSpec]:
+        """Returns any specs referring to metric time at any grain."""
+        return tuple(
+            time_dimension_spec
+            for time_dimension_spec in self.time_dimension_specs
+            if time_dimension_spec.element_name == METRIC_TIME_ELEMENT_NAME
+        )
+
+    @property
     def as_tuple(self) -> Tuple[LinkableInstanceSpec, ...]:  # noqa: D
         return tuple(itertools.chain(self.dimension_specs, self.time_dimension_specs, self.entity_specs))
 
-    @staticmethod
-    def merge(spec_sets: Sequence[LinkableSpecSet]) -> LinkableSpecSet:
-        """Merges and dedupes the linkable specs."""
-        dimension_specs: List[DimensionSpec] = []
-        time_dimension_specs: List[TimeDimensionSpec] = []
-        entity_specs: List[EntitySpec] = []
+    @override
+    def merge(self, other: LinkableSpecSet) -> LinkableSpecSet:
+        return LinkableSpecSet(
+            dimension_specs=self.dimension_specs + other.dimension_specs,
+            time_dimension_specs=self.time_dimension_specs + other.time_dimension_specs,
+            entity_specs=self.entity_specs + other.entity_specs,
+        )
 
-        for spec_set in spec_sets:
-            for dimension_spec in spec_set.dimension_specs:
-                if dimension_spec not in dimension_specs:
-                    dimension_specs.append(dimension_spec)
-            for time_dimension_spec in spec_set.time_dimension_specs:
-                if time_dimension_spec not in time_dimension_specs:
-                    time_dimension_specs.append(time_dimension_spec)
-            for entity_spec in spec_set.entity_specs:
-                if entity_spec not in entity_specs:
-                    entity_specs.append(entity_spec)
+    @override
+    @classmethod
+    def empty_instance(cls) -> LinkableSpecSet:
+        return LinkableSpecSet()
+
+    def dedupe(self) -> LinkableSpecSet:  # noqa: D
+        # Use dictionaries to dedupe as it preserves insertion order.
+
+        dimension_spec_dict: Dict[DimensionSpec, None] = {}
+        for dimension_spec in self.dimension_specs:
+            dimension_spec_dict[dimension_spec] = None
+
+        time_dimension_spec_dict: Dict[TimeDimensionSpec, None] = {}
+        for time_dimension_spec in self.time_dimension_specs:
+            time_dimension_spec_dict[time_dimension_spec] = None
+
+        entity_spec_dict: Dict[EntitySpec, None] = {}
+        for entity_spec in self.entity_specs:
+            entity_spec_dict[entity_spec] = None
 
         return LinkableSpecSet(
-            dimension_specs=tuple(dimension_specs),
-            time_dimension_specs=tuple(time_dimension_specs),
-            entity_specs=tuple(entity_specs),
+            dimension_specs=tuple(dimension_spec_dict.keys()),
+            time_dimension_specs=tuple(time_dimension_spec_dict.keys()),
+            entity_specs=tuple(entity_spec_dict.keys()),
         )
 
     def is_subset_of(self, other_set: LinkableSpecSet) -> bool:  # noqa: D
@@ -546,6 +687,15 @@ class LinkableSpecSet(SerializableDataclass):
 
     def __len__(self) -> int:  # noqa: D
         return len(self.dimension_specs) + len(self.time_dimension_specs) + len(self.entity_specs)
+
+    @staticmethod
+    def from_specs(specs: Sequence[LinkableInstanceSpec]) -> LinkableSpecSet:  # noqa: D
+        instance_spec_set = InstanceSpecSet.from_specs(specs)
+        return LinkableSpecSet(
+            dimension_specs=instance_spec_set.dimension_specs,
+            time_dimension_specs=instance_spec_set.time_dimension_specs,
+            entity_specs=instance_spec_set.entity_specs,
+        )
 
 
 @dataclass(frozen=True)
@@ -583,7 +733,7 @@ class InstanceSpecSetTransform(Generic[TransformOutputT], ABC):
 
 
 @dataclass(frozen=True)
-class InstanceSpecSet(SerializableDataclass):
+class InstanceSpecSet(Mergeable, SerializableDataclass):
     """Consolidates all specs used in an instance set."""
 
     metric_specs: Tuple[MetricSpec, ...] = ()
@@ -593,17 +743,21 @@ class InstanceSpecSet(SerializableDataclass):
     time_dimension_specs: Tuple[TimeDimensionSpec, ...] = ()
     metadata_specs: Tuple[MetadataSpec, ...] = ()
 
-    @staticmethod
-    def merge(others: Sequence[InstanceSpecSet]) -> InstanceSpecSet:
-        """Merge all sets into one set, without de-duplication."""
+    @override
+    def merge(self, other: InstanceSpecSet) -> InstanceSpecSet:
         return InstanceSpecSet(
-            metric_specs=tuple(itertools.chain.from_iterable([x.metric_specs for x in others])),
-            measure_specs=tuple(itertools.chain.from_iterable([x.measure_specs for x in others])),
-            dimension_specs=tuple(itertools.chain.from_iterable([x.dimension_specs for x in others])),
-            entity_specs=tuple(itertools.chain.from_iterable([x.entity_specs for x in others])),
-            time_dimension_specs=tuple(itertools.chain.from_iterable([x.time_dimension_specs for x in others])),
-            metadata_specs=tuple(itertools.chain.from_iterable([x.metadata_specs for x in others])),
+            metric_specs=self.metric_specs + other.metric_specs,
+            measure_specs=self.measure_specs + other.measure_specs,
+            dimension_specs=self.dimension_specs + other.dimension_specs,
+            entity_specs=self.entity_specs + other.entity_specs,
+            time_dimension_specs=self.time_dimension_specs + other.time_dimension_specs,
+            metadata_specs=self.metadata_specs + other.metadata_specs,
         )
+
+    @override
+    @classmethod
+    def empty_instance(cls) -> InstanceSpecSet:
+        return InstanceSpecSet()
 
     def dedupe(self) -> InstanceSpecSet:
         """De-duplicates repeated elements.
@@ -665,8 +819,8 @@ class InstanceSpecSet(SerializableDataclass):
         return transform_function.transform(self)
 
     @staticmethod
-    def create_from_linkable_specs(linkable_specs: Sequence[LinkableInstanceSpec]) -> InstanceSpecSet:  # noqa: D
-        return InstanceSpecSet.merge(tuple(x.as_linkable_spec_set.as_spec_set for x in linkable_specs))
+    def from_specs(specs: Sequence[InstanceSpec]) -> InstanceSpecSet:  # noqa: D
+        return InstanceSpecSet.merge_iterable(spec.as_spec_set for spec in specs)
 
 
 @dataclass(frozen=True)
@@ -717,5 +871,14 @@ class WhereFilterSpec(SerializableDataclass):
         return WhereFilterSpec(
             where_sql=f"({self.where_sql}) AND ({other.where_sql})",
             bind_parameters=self.bind_parameters.combine(other.bind_parameters),
-            linkable_spec_set=LinkableSpecSet.merge([self.linkable_spec_set, other.linkable_spec_set]),
+            linkable_spec_set=self.linkable_spec_set.merge(other.linkable_spec_set),
         )
+
+
+@dataclass(frozen=True)
+class JoinToTimeSpineDescription:
+    """Describes how a time spine join should be performed."""
+
+    join_type: SqlJoinType
+    offset_window: Optional[MetricTimeWindow]
+    offset_to_grain: Optional[TimeGranularity]
