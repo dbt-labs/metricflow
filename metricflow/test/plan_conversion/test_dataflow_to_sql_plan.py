@@ -4,7 +4,6 @@ from typing import List
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
 from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
 from dbt_semantic_interfaces.references import EntityReference, TimeDimensionReference
 from dbt_semantic_interfaces.test_utils import as_datetime
@@ -37,6 +36,7 @@ from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
     DimensionSpec,
     InstanceSpecSet,
+    LinkableSpecSet,
     LinklessEntitySpec,
     MeasureSpec,
     MetricFlowQuerySpec,
@@ -45,9 +45,10 @@ from metricflow.specs.specs import (
     NonAdditiveDimensionSpec,
     OrderBySpec,
     TimeDimensionSpec,
+    WhereFilterSpec,
 )
-from metricflow.specs.where_filter_transform import WhereSpecFactory
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
+from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_plan import SqlJoinType
 from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
@@ -182,14 +183,18 @@ def test_filter_with_where_constraint_node(  # noqa: D
     )  # need to include ds_spec because where constraint operates on ds
     where_constraint_node = WhereConstraintNode(
         parent_node=filter_node,
-        where_constraint=(
-            WhereSpecFactory(
-                column_association_resolver=column_association_resolver,
-            ).create_from_where_filter(
-                PydanticWhereFilter(
-                    where_sql_template="{{ TimeDimension('booking__ds', 'day') }} = '2020-01-01'",
+        where_constraint=WhereFilterSpec(
+            where_sql="booking__ds__day = '2020-01-01'",
+            bind_parameters=SqlBindParameters(),
+            linkable_spec_set=LinkableSpecSet(
+                time_dimension_specs=(
+                    TimeDimensionSpec(
+                        element_name="ds",
+                        entity_links=(EntityReference(element_name="booking"),),
+                        time_granularity=TimeGranularity.DAY,
+                    ),
                 )
-            )
+            ),
         ),
     )
 

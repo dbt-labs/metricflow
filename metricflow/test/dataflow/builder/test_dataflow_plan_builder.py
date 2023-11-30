@@ -4,13 +4,14 @@ import logging
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
+from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
+from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
     DimensionSpec,
@@ -20,7 +21,6 @@ from metricflow.specs.specs import (
     OrderBySpec,
     TimeDimensionSpec,
 )
-from metricflow.specs.where_filter_transform import WhereSpecFactory
 from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.snapshot_utils import assert_plan_snapshot_text_equal
@@ -344,28 +344,15 @@ def test_where_constrained_plan(  # noqa: D
     mf_test_session_state: MetricFlowTestSessionState,
     column_association_resolver: ColumnAssociationResolver,
     dataflow_plan_builder: DataflowPlanBuilder,
+    query_parser: MetricFlowQueryParser,
 ) -> None:
     """Tests a simple plan getting a metric and a local dimension."""
-    dataflow_plan = dataflow_plan_builder.build_plan(
-        MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"),),
-            dimension_specs=(
-                DimensionSpec(
-                    element_name="is_instant",
-                    entity_links=(EntityReference("booking"),),
-                ),
-            ),
-            where_constraint=(
-                WhereSpecFactory(
-                    column_association_resolver=column_association_resolver,
-                ).create_from_where_filter(
-                    PydanticWhereFilter(
-                        where_sql_template="{{ Dimension('listing__country_latest') }} = 'us'",
-                    )
-                )
-            ),
-        )
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookings",),
+        group_by_names=("booking__is_instant",),
+        where_constraint_str="{{ Dimension('listing__country_latest') }} = 'us'",
     )
+    dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
     assert_plan_snapshot_text_equal(
         request=request,
@@ -386,29 +373,15 @@ def test_where_constrained_plan_time_dimension(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder,
-    column_association_resolver: ColumnAssociationResolver,
+    query_parser: MetricFlowQueryParser,
 ) -> None:
     """Tests a simple plan getting a metric and a local dimension."""
-    dataflow_plan = dataflow_plan_builder.build_plan(
-        MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"),),
-            dimension_specs=(
-                DimensionSpec(
-                    element_name="is_instant",
-                    entity_links=(EntityReference("booking"),),
-                ),
-            ),
-            where_constraint=(
-                WhereSpecFactory(
-                    column_association_resolver=column_association_resolver,
-                ).create_from_where_filter(
-                    PydanticWhereFilter(
-                        where_sql_template="{{ TimeDimension('metric_time', 'day') }} >= '2020-01-01'",
-                    )
-                )
-            ),
-        )
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookings",),
+        group_by_names=("booking__is_instant",),
+        where_constraint_str="{{ TimeDimension('metric_time', 'day') }} >= '2020-01-01'",
     )
+    dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
     assert_plan_snapshot_text_equal(
         request=request,
@@ -430,28 +403,15 @@ def test_where_constrained_with_common_linkable_plan(  # noqa: D
     mf_test_session_state: MetricFlowTestSessionState,
     column_association_resolver: ColumnAssociationResolver,
     dataflow_plan_builder: DataflowPlanBuilder,
+    query_parser: MetricFlowQueryParser,
 ) -> None:
     """Tests a dataflow plan where the where clause has a common linkable with the query."""
-    dataflow_plan = dataflow_plan_builder.build_plan(
-        MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"),),
-            dimension_specs=(
-                DimensionSpec(
-                    element_name="country_latest",
-                    entity_links=(EntityReference(element_name="listing"),),
-                ),
-            ),
-            where_constraint=(
-                WhereSpecFactory(
-                    column_association_resolver=column_association_resolver,
-                ).create_from_where_filter(
-                    PydanticWhereFilter(
-                        where_sql_template="{{ Dimension('listing__country_latest') }} = 'us'",
-                    )
-                )
-            ),
-        )
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookings",),
+        group_by_names=("listing__country_latest",),
+        where_constraint_str="{{ Dimension('listing__country_latest') }} = 'us'",
     )
+    dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
     assert_plan_snapshot_text_equal(
         request=request,
@@ -580,34 +540,17 @@ def test_distinct_values_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder,
-    column_association_resolver: ColumnAssociationResolver,
+    query_parser: MetricFlowQueryParser,
 ) -> None:
     """Tests a plan to get distinct values of a dimension."""
-    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
-        query_spec=MetricFlowQuerySpec(
-            dimension_specs=(
-                DimensionSpec(element_name="country_latest", entity_links=(EntityReference(element_name="listing"),)),
-            ),
-            where_constraint=(
-                WhereSpecFactory(
-                    column_association_resolver=column_association_resolver,
-                ).create_from_where_filter(
-                    PydanticWhereFilter(
-                        where_sql_template="{{ Dimension('listing__country_latest') }} = 'us'",
-                    )
-                )
-            ),
-            order_by_specs=(
-                OrderBySpec(
-                    instance_spec=DimensionSpec(
-                        element_name="country_latest", entity_links=(EntityReference(element_name="listing"),)
-                    ),
-                    descending=True,
-                ),
-            ),
-            limit=100,
-        )
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=(),
+        group_by_names=("listing__country_latest",),
+        where_constraint_str="{{ Dimension('listing__country_latest') }} = 'us'",
+        order_by_names=("-listing__country_latest",),
+        limit=100,
     )
+    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(query_spec)
 
     assert_plan_snapshot_text_equal(
         request=request,
@@ -628,35 +571,16 @@ def test_distinct_values_plan_with_join(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder,
-    column_association_resolver: ColumnAssociationResolver,
+    query_parser: MetricFlowQueryParser,
 ) -> None:
     """Tests a plan to get distinct values of 2 dimensions, where a join is required."""
-    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
-        query_spec=MetricFlowQuerySpec(
-            dimension_specs=(
-                DimensionSpec(element_name="home_state_latest", entity_links=(EntityReference(element_name="user"),)),
-                DimensionSpec(element_name="is_lux_latest", entity_links=(EntityReference(element_name="listing"),)),
-            ),
-            where_constraint=(
-                WhereSpecFactory(
-                    column_association_resolver=column_association_resolver,
-                ).create_from_where_filter(
-                    PydanticWhereFilter(
-                        where_sql_template="{{ Dimension('listing__country_latest') }} = 'us'",
-                    )
-                )
-            ),
-            order_by_specs=(
-                OrderBySpec(
-                    instance_spec=DimensionSpec(
-                        element_name="country_latest", entity_links=(EntityReference(element_name="listing"),)
-                    ),
-                    descending=True,
-                ),
-            ),
-            limit=100,
-        )
+    query_spec = query_parser.parse_and_validate_query(
+        group_by_names=("user__home_state_latest", "listing__is_lux_latest"),
+        where_constraint_str="{{ Dimension('listing__country_latest') }} = 'us'",
+        order_by_names=("-listing__is_lux_latest",),
+        limit=100,
     )
+    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(query_spec)
 
     assert_plan_snapshot_text_equal(
         request=request,
@@ -676,16 +600,15 @@ def test_distinct_values_plan_with_join(  # noqa: D
 def test_measure_constraint_plan(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
+    query_parser: MetricFlowQueryParser,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a plan for querying a metric with a constraint on one or more of its input measures."""
-    dataflow_plan = dataflow_plan_builder.build_plan(
-        MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="lux_booking_value_rate_expr"),),
-            dimension_specs=(),
-            time_dimension_specs=(MTD_SPEC_DAY,),
-        ),
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("lux_booking_value_rate_expr",),
+        group_by_names=(METRIC_TIME_ELEMENT_NAME,),
     )
+    dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
     assert_plan_snapshot_text_equal(
         request=request,
@@ -705,16 +628,15 @@ def test_measure_constraint_plan(
 def test_measure_constraint_with_reused_measure_plan(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
+    query_parser: MetricFlowQueryParser,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a plan for querying a metric with a constraint on one or more of its input measures."""
-    dataflow_plan = dataflow_plan_builder.build_plan(
-        MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="instant_booking_value_ratio"),),
-            dimension_specs=(),
-            time_dimension_specs=(MTD_SPEC_DAY,),
-        ),
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("instant_booking_value_ratio",),
+        group_by_names=(METRIC_TIME_ELEMENT_NAME,),
     )
+    dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
     assert_plan_snapshot_text_equal(
         request=request,
