@@ -870,7 +870,34 @@ class CreateSelectColumnForCombineOutputNode(InstanceSetTransform[SelectColumnSe
 
 
 class ChangeAssociatedColumns(InstanceSetTransform[InstanceSet]):
-    """Change the columns associated with instances to the one specified by the resolver."""
+    """Change the columns associated with instances to the one specified by the resolver.
+
+    This is useful for conveniently generating output instances for a node that serve as a "pass-through". The output
+    instances can be a copy of the parent's instances, except that the column names need to be changed.
+
+    e.g. the parent may have a data set:
+        sql:
+            SELECT
+                is_lux AS is_lux_latext
+            ...
+        instance:
+            DimensionInstance(column_name="is_lux", ...)
+
+    but for the current node, we want a data set like:
+
+        sql:
+            SELECT
+                is_lux_latest
+                ...
+            FROM (
+                -- SQL from parent
+                is_lux AS is_lux_latest
+                ...
+            )
+            ...
+        instance:
+            DimensionInstance(column_name="is_lux_latest")
+    """
 
     def __init__(self, column_association_resolver: ColumnAssociationResolver) -> None:  # noqa: D
         self._column_association_resolver = column_association_resolver
