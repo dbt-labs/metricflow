@@ -135,3 +135,18 @@ integration_test:
     FROM  {{ source_schema }}.fct_bookings
     WHERE {{ render_time_constraint("ds", "2020-01-01", "2021-01-02") }}
     GROUP BY ds
+---
+integration_test:
+  name: test_ambiguous_metric_time_in_query_filter
+  description: Tests having metric_time without a grain in the query filter.
+  model: SIMPLE_MODEL
+  metrics: ["bookings"]
+  group_bys: ["metric_time"]
+  where_filter: "{{ render_time_dimension_template('metric_time') }} = '2020-01-01'"
+  check_query: |
+    SELECT
+      SUM(1) AS bookings
+      , ds AS metric_time__day
+    FROM  {{ source_schema }}.fct_bookings
+    WHERE ds = '2020-01-01'
+    GROUP BY ds
