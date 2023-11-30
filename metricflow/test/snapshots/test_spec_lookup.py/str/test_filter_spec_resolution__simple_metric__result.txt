@@ -1,0 +1,24 @@
+FilterSpecResolutionLookUp(
+  spec_resolutions=(
+    FilterSpecResolution(
+      lookup_key=ResolvedSpecLookUpKey(
+        filter_location=WhereFilterLocation(
+          metric_references=(
+            MetricReference(
+              element_name='monthly_metric_0',
+            ),
+          ),
+        ),
+        call_parameter_set=TimeDimensionCallParameterSet(
+          time_dimension_reference=TimeDimensionReference(
+            element_name='metric_time',
+          ),
+        ),
+      ),
+      resolution_path=MetricFlowQueryResolutionPath(
+        resolution_path_nodes=(QueryGroupByItemResolutionNode(node_id=qr_1),),
+      ),
+      resolved_spec=TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH),
+    ),
+  ),
+)
