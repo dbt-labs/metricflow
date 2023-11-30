@@ -8,7 +8,7 @@
             <!-- metric_spec =                                               -->
             <!--   {'class': 'MetricSpec',                                   -->
             <!--    'element_name': 'bookings_growth_since_start_of_month',  -->
-            <!--    'constraint': None,                                      -->
+            <!--    'filter_specs': (),                                      -->
             <!--    'alias': None,                                           -->
             <!--    'offset_window': None,                                   -->
             <!--    'offset_to_grain': None}                                 -->
@@ -21,7 +21,7 @@
                     <!-- metric_spec =                   -->
                     <!--   {'class': 'MetricSpec',       -->
                     <!--    'element_name': 'bookings',  -->
-                    <!--    'constraint': None,          -->
+                    <!--    'filter_specs': (),          -->
                     <!--    'alias': None,               -->
                     <!--    'offset_window': None,       -->
                     <!--    'offset_to_grain': None}     -->
@@ -67,7 +67,7 @@
                     <!-- metric_spec =                                 -->
                     <!--   {'class': 'MetricSpec',                     -->
                     <!--    'element_name': 'bookings',                -->
-                    <!--    'constraint': None,                        -->
+                    <!--    'filter_specs': (),                        -->
                     <!--    'alias': 'bookings_at_start_of_month',     -->
                     <!--    'offset_window': None,                     -->
                     <!--    'offset_to_grain': TimeGranularity.MONTH}  -->

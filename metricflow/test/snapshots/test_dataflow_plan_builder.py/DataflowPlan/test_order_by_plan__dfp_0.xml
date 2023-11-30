@@ -18,7 +18,7 @@
             <!--   {'class': 'OrderBySpec',                        -->
             <!--    'instance_spec': {'class': 'MetricSpec',       -->
             <!--                      'element_name': 'bookings',  -->
-            <!--                      'constraint': None,          -->
+            <!--                      'filter_specs': (),          -->
             <!--                      'alias': None,               -->
             <!--                      'offset_window': None,       -->
             <!--                      'offset_to_grain': None},    -->
@@ -30,7 +30,7 @@
                 <!-- metric_spec =                   -->
                 <!--   {'class': 'MetricSpec',       -->
                 <!--    'element_name': 'bookings',  -->
-                <!--    'constraint': None,          -->
+                <!--    'filter_specs': (),          -->
                 <!--    'alias': None,               -->
                 <!--    'offset_window': None,       -->
                 <!--    'offset_to_grain': None}     -->

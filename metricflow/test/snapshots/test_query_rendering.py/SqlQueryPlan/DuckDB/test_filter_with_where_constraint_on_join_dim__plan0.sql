@@ -1,44 +1,44 @@
 -- Compute Metrics via Expressions
 SELECT
-  subq_10.is_instant
+  subq_10.booking__is_instant
   , subq_10.bookings
 FROM (
   -- Aggregate Measures
   SELECT
-    subq_9.is_instant
+    subq_9.booking__is_instant
     , SUM(subq_9.bookings) AS bookings
   FROM (
     -- Pass Only Elements:
-    --   ['bookings', 'is_instant']
+    --   ['bookings', 'booking__is_instant']
     SELECT
-      subq_8.is_instant
+      subq_8.booking__is_instant
       , subq_8.bookings
     FROM (
       -- Constrain Output with WHERE
       SELECT
-        subq_7.is_instant
+        subq_7.booking__is_instant
         , subq_7.listing__country_latest
         , subq_7.bookings
       FROM (
         -- Pass Only Elements:
-        --   ['bookings', 'is_instant', 'listing__country_latest']
+        --   ['bookings', 'booking__is_instant', 'listing__country_latest']
         SELECT
-          subq_6.is_instant
+          subq_6.booking__is_instant
           , subq_6.listing__country_latest
           , subq_6.bookings
         FROM (
           -- Join Standard Outputs
           SELECT
             subq_2.listing AS listing
-            , subq_2.is_instant AS is_instant
+            , subq_2.booking__is_instant AS booking__is_instant
             , subq_5.country_latest AS listing__country_latest
             , subq_2.bookings AS bookings
           FROM (
             -- Pass Only Elements:
-            --   ['bookings', 'is_instant', 'listing']
+            --   ['bookings', 'booking__is_instant', 'listing']
             SELECT
               subq_1.listing
-              , subq_1.is_instant
+              , subq_1.booking__is_instant
               , subq_1.bookings
             FROM (
               -- Metric Time Dimension 'ds'
@@ -383,5 +383,5 @@ FROM (
     ) subq_8
   ) subq_9
   GROUP BY
-    subq_9.is_instant
+    subq_9.booking__is_instant
 ) subq_10

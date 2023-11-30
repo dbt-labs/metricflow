@@ -5,13 +5,25 @@
         <ComputeMetricsNode>
             <!-- description = Compute Metrics via Expressions -->
             <!-- node_id = cm_0 -->
-            <!-- metric_spec =                   -->
-            <!--   {'class': 'MetricSpec',       -->
-            <!--    'element_name': 'bookings',  -->
-            <!--    'constraint': None,          -->
-            <!--    'alias': None,               -->
-            <!--    'offset_window': None,       -->
-            <!--    'offset_to_grain': None}     -->
+            <!-- metric_spec =                                                                                                  -->
+            <!--   {'class': 'MetricSpec',                                                                                      -->
+            <!--    'element_name': 'bookings',                                                                                 -->
+            <!--    'filter_specs': ({'class': 'WhereFilterSpec',                                                               -->
+            <!--                      'where_sql': "metric_time__day >= '2020-01-01'",                                          -->
+            <!--                      'bind_parameters': {'class': 'SqlBindParameters',                                         -->
+            <!--                                          'param_items': ()},                                                   -->
+            <!--                      'linkable_spec_set': {'class': 'LinkableSpecSet',                                         -->
+            <!--                                            'dimension_specs': (),                                              -->
+            <!--                                            'time_dimension_specs': ({'class': 'TimeDimensionSpec',             -->
+            <!--                                                                      'element_name': 'metric_time',            -->
+            <!--                                                                      'entity_links': (),                       -->
+            <!--                                                                      'time_granularity': TimeGranularity.DAY,  -->
+            <!--                                                                      'date_part': None,                        -->
+            <!--                                                                      'aggregation_state': None},),             -->
+            <!--                                            'entity_specs': ()}},),                                             -->
+            <!--    'alias': None,                                                                                              -->
+            <!--    'offset_window': None,                                                                                      -->
+            <!--    'offset_to_grain': None}                                                                                    -->
             <AggregateMeasuresNode>
                 <!-- description = Aggregate Measures -->
                 <!-- node_id = am_0 -->

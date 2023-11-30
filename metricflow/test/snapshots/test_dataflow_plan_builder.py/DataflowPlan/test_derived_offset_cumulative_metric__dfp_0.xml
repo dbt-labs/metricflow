@@ -8,7 +8,7 @@
             <!-- metric_spec =                                          -->
             <!--   {'class': 'MetricSpec',                              -->
             <!--    'element_name': 'every_2_days_bookers_2_days_ago',  -->
-            <!--    'constraint': None,                                 -->
+            <!--    'filter_specs': (),                                 -->
             <!--    'alias': None,                                      -->
             <!--    'offset_window': None,                              -->
             <!--    'offset_to_grain': None}                            -->
@@ -18,7 +18,7 @@
                 <!-- metric_spec =                                              -->
                 <!--   {'class': 'MetricSpec',                                  -->
                 <!--    'element_name': 'every_two_days_bookers',               -->
-                <!--    'constraint': None,                                     -->
+                <!--    'filter_specs': (),                                     -->
                 <!--    'alias': 'every_2_days_bookers_2_days_ago',             -->
                 <!--    'offset_window': {'class': 'PydanticMetricTimeWindow',  -->
                 <!--                      'count': 2,                           -->

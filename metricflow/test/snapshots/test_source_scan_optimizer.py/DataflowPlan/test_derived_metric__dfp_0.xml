@@ -8,7 +8,7 @@
             <!-- metric_spec =                                    -->
             <!--   {'class': 'MetricSpec',                        -->
             <!--    'element_name': 'non_referred_bookings_pct',  -->
-            <!--    'constraint': None,                           -->
+            <!--    'filter_specs': (),                           -->
             <!--    'alias': None,                                -->
             <!--    'offset_window': None,                        -->
             <!--    'offset_to_grain': None}                      -->
@@ -21,7 +21,7 @@
                     <!-- metric_spec =                            -->
                     <!--   {'class': 'MetricSpec',                -->
                     <!--    'element_name': 'referred_bookings',  -->
-                    <!--    'constraint': None,                   -->
+                    <!--    'filter_specs': (),                   -->
                     <!--    'alias': 'ref_bookings',              -->
                     <!--    'offset_window': None,                -->
                     <!--    'offset_to_grain': None}              -->
@@ -67,7 +67,7 @@
                     <!-- metric_spec =                   -->
                     <!--   {'class': 'MetricSpec',       -->
                     <!--    'element_name': 'bookings',  -->
-                    <!--    'constraint': None,          -->
+                    <!--    'filter_specs': (),          -->
                     <!--    'alias': None,               -->
                     <!--    'offset_window': None,       -->
                     <!--    'offset_to_grain': None}     -->

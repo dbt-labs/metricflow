@@ -5,13 +5,23 @@
         <ComputeMetricsNode>
             <!-- description = Compute Metrics via Expressions -->
             <!-- node_id = cm_0 -->
-            <!-- metric_spec =                   -->
-            <!--   {'class': 'MetricSpec',       -->
-            <!--    'element_name': 'bookings',  -->
-            <!--    'constraint': None,          -->
-            <!--    'alias': None,               -->
-            <!--    'offset_window': None,       -->
-            <!--    'offset_to_grain': None}     -->
+            <!-- metric_spec =                                                                                                       -->
+            <!--   {'class': 'MetricSpec',                                                                                           -->
+            <!--    'element_name': 'bookings',                                                                                      -->
+            <!--    'filter_specs': ({'class': 'WhereFilterSpec',                                                                    -->
+            <!--                      'where_sql': "listing__country_latest = 'us'",                                                 -->
+            <!--                      'bind_parameters': {'class': 'SqlBindParameters',                                              -->
+            <!--                                          'param_items': ()},                                                        -->
+            <!--                      'linkable_spec_set': {'class': 'LinkableSpecSet',                                              -->
+            <!--                                            'dimension_specs': ({'class': 'DimensionSpec',                           -->
+            <!--                                                                 'element_name': 'country_latest',                   -->
+            <!--                                                                 'entity_links': ({'class': 'EntityReference',       -->
+            <!--                                                                                   'element_name': 'listing'},)},),  -->
+            <!--                                            'time_dimension_specs': (),                                              -->
+            <!--                                            'entity_specs': ()}},),                                                  -->
+            <!--    'alias': None,                                                                                                   -->
+            <!--    'offset_window': None,                                                                                           -->
+            <!--    'offset_to_grain': None}                                                                                         -->
             <AggregateMeasuresNode>
                 <!-- description = Aggregate Measures -->
                 <!-- node_id = am_0 -->

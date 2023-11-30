@@ -8,14 +8,14 @@
             <!-- metric_spec =                              -->
             <!--   {'class': 'MetricSpec',                  -->
             <!--    'element_name': 'bookings_per_booker',  -->
-            <!--    'constraint': None,                     -->
+            <!--    'filter_specs': (),                     -->
             <!--    'alias': None,                          -->
             <!--    'offset_window': None,                  -->
             <!--    'offset_to_grain': None}                -->
             <!-- metric_spec =                              -->
             <!--   {'class': 'MetricSpec',                  -->
             <!--    'element_name': 'bookings_per_dollar',  -->
-            <!--    'constraint': None,                     -->
+            <!--    'filter_specs': (),                     -->
             <!--    'alias': None,                          -->
             <!--    'offset_window': None,                  -->
             <!--    'offset_to_grain': None}                -->
@@ -25,28 +25,28 @@
                 <!-- metric_spec =                   -->
                 <!--   {'class': 'MetricSpec',       -->
                 <!--    'element_name': 'bookings',  -->
-                <!--    'constraint': None,          -->
+                <!--    'filter_specs': (),          -->
                 <!--    'alias': None,               -->
                 <!--    'offset_window': None,       -->
                 <!--    'offset_to_grain': None}     -->
                 <!-- metric_spec =                  -->
                 <!--   {'class': 'MetricSpec',      -->
                 <!--    'element_name': 'bookers',  -->
-                <!--    'constraint': None,         -->
+                <!--    'filter_specs': (),         -->
                 <!--    'alias': None,              -->
                 <!--    'offset_window': None,      -->
                 <!--    'offset_to_grain': None}    -->
                 <!-- metric_spec =                   -->
                 <!--   {'class': 'MetricSpec',       -->
                 <!--    'element_name': 'bookings',  -->
-                <!--    'constraint': None,          -->
+                <!--    'filter_specs': (),          -->
                 <!--    'alias': None,               -->
                 <!--    'offset_window': None,       -->
                 <!--    'offset_to_grain': None}     -->
                 <!-- metric_spec =                        -->
                 <!--   {'class': 'MetricSpec',            -->
                 <!--    'element_name': 'booking_value',  -->
-                <!--    'constraint': None,               -->
+                <!--    'filter_specs': (),               -->
                 <!--    'alias': None,                    -->
                 <!--    'offset_window': None,            -->
                 <!--    'offset_to_grain': None}          -->
