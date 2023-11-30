@@ -1,7 +1,7 @@
 -- Calculate min and max
 SELECT
-  MIN(listing__country_latest) AS min
-  , MAX(listing__country_latest) AS max
+  MIN(subq_1.listing__country_latest) AS min_listing__country_latest
+  , MAX(subq_1.listing__country_latest) AS max_listing__country_latest
 FROM (
   -- Pass Only Elements:
   --   ['listing__country_latest']

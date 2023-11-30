@@ -1,7 +1,7 @@
 -- Calculate min and max
 SELECT
-  MIN(booking__paid_at__day) AS min
-  , MAX(booking__paid_at__day) AS max
+  MIN(booking__paid_at__day) AS min_booking__paid_at__day
+  , MAX(booking__paid_at__day) AS max_booking__paid_at__day
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Pass Only Elements:
