@@ -126,14 +126,15 @@ class MetadataSpec(InstanceSpec):
     """A specification for a specification that is built during the dataflow plan and not defined in config."""
 
     element_name: str
+    agg_type: Optional[AggregationType] = None
 
     @property
     def qualified_name(self) -> str:  # noqa: D
-        return self.element_name
+        return f"{self.agg_type.value}_{self.element_name}" if self.agg_type else self.element_name
 
     @staticmethod
-    def from_name(name: str) -> MetadataSpec:  # noqa: D
-        return MetadataSpec(element_name=name)
+    def from_name(name: str, agg_type: Optional[AggregationType] = None) -> MetadataSpec:  # noqa: D
+        return MetadataSpec(element_name=name, agg_type=agg_type)
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_metadata_spec(self)

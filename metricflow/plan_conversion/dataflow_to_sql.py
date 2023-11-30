@@ -35,11 +35,7 @@ from metricflow.dataflow.dataflow_plan import (
 from metricflow.dataset.dataset import DataSet
 from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.filters.time_constraint import TimeRangeConstraint
-from metricflow.instances import (
-    InstanceSet,
-    MetricInstance,
-    TimeDimensionInstance,
-)
+from metricflow.instances import InstanceSet, MetadataInstance, MetricInstance, TimeDimensionInstance
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.instance_converters import (
     AddLinkToLinkableElements,
@@ -47,6 +43,7 @@ from metricflow.plan_conversion.instance_converters import (
     AliasAggregatedMeasures,
     ChangeAssociatedColumns,
     ChangeMeasureAggregationState,
+    ConvertToMetadata,
     CreateSelectColumnForCombineOutputNode,
     CreateSelectColumnsForInstances,
     CreateSelectColumnsWithMeasuresAggregated,
@@ -75,6 +72,7 @@ from metricflow.protocols.sql_client import SqlEngine
 from metricflow.specs.column_assoc import ColumnAssociation, ColumnAssociationResolver, SingleColumnCorrelationKey
 from metricflow.specs.specs import (
     MeasureSpec,
+    MetadataSpec,
     MetricSpec,
     TimeDimensionSpec,
 )
@@ -1324,31 +1322,39 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
     def visit_min_max_node(self, node: MinMaxNode) -> SqlDataSet:  # noqa: D
         parent_data_set = node.parent_node.accept(self)
-        parent_alias = self._next_unique_table_alias()
-
+        parent_table_alias = self._next_unique_table_alias()
         assert (
             len(parent_data_set.sql_select_node.select_columns) == 1
         ), "MinMaxNode supports exactly one parent select column."
-        parent_column_alias_expr = SqlStringExpression(parent_data_set.sql_select_node.select_columns[0].column_alias)
+        parent_column_alias = parent_data_set.sql_select_node.select_columns[0].column_alias
 
-        # Build aggregate columns, labeled "min" & "max"
-        select_columns = [
-            SqlSelectColumn(
-                expr=SqlAggregateFunctionExpression(
-                    sql_function=SqlFunction.from_aggregation_type(aggregation_type=agg_type),
-                    sql_function_args=[parent_column_alias_expr],
-                ),
-                column_alias=agg_type.value,
+        select_columns: List[SqlSelectColumn] = []
+        metadata_instances: List[MetadataInstance] = []
+        for agg_type in (AggregationType.MIN, AggregationType.MAX):
+            metadata_spec = MetadataSpec.from_name(name=parent_column_alias, agg_type=agg_type)
+            output_column_association = self._column_association_resolver.resolve_spec(metadata_spec)
+            select_columns.append(
+                SqlSelectColumn(
+                    expr=SqlFunctionExpression.build_expression_from_aggregation_type(
+                        aggregation_type=agg_type,
+                        sql_column_expression=SqlColumnReferenceExpression(
+                            SqlColumnReference(table_alias=parent_table_alias, column_name=parent_column_alias)
+                        ),
+                    ),
+                    column_alias=output_column_association.column_name,
+                )
             )
-            for agg_type in (AggregationType.MIN, AggregationType.MAX)
-        ]
+            metadata_instances.append(
+                MetadataInstance(associated_columns=(output_column_association,), spec=metadata_spec)
+            )
+
         return SqlDataSet(
-            instance_set=parent_data_set.instance_set,
+            instance_set=parent_data_set.instance_set.transform(ConvertToMetadata(metadata_instances)),
             sql_select_node=SqlSelectStatementNode(
                 description=node.description,
                 select_columns=tuple(select_columns),
                 from_source=parent_data_set.sql_select_node,
-                from_source_alias=parent_alias,
+                from_source_alias=parent_table_alias,
                 joins_descs=(),
                 group_bys=(),
                 order_bys=(),
