@@ -15,9 +15,6 @@ from dbt_semantic_interfaces.references import EntityReference, MeasureReference
 from dbt_semantic_interfaces.type_enums import DimensionType
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from metricflow.dataflow.builder.node_data_set import (
-    DataflowPlanNodeOutputDataSetResolver,
-)
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import DataflowPlan
 from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import (
@@ -349,11 +346,6 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         source_nodes = source_node_builder.create_from_data_sets(self._source_data_sets)
         read_nodes = source_node_builder.create_read_nodes_from_data_sets(self._source_data_sets)
 
-        node_output_resolver = DataflowPlanNodeOutputDataSetResolver(
-            column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup),
-            semantic_manifest_lookup=semantic_manifest_lookup,
-        )
-
         self._dataflow_plan_builder = DataflowPlanBuilder(
             source_nodes=source_nodes,
             read_nodes=read_nodes,
@@ -373,8 +365,6 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         self._query_parser = MetricFlowQueryParser(
             column_association_resolver=self._column_association_resolver,
             model=self._semantic_manifest_lookup,
-            read_nodes=read_nodes,
-            node_output_resolver=node_output_resolver,
         )
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
