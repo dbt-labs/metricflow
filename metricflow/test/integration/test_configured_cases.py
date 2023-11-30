@@ -165,12 +165,13 @@ class CheckQueryHelpers:
         return f"{{{{ Entity('{entity_name}', entity_path={repr(entity_path)}) }}}}"
 
     def render_time_dimension_template(
-        self, time_dimension_name: str, time_granularity: str, entity_path: Sequence[str] = ()
+        self, time_dimension_name: str, time_granularity: Optional[str] = None, entity_path: Sequence[str] = ()
     ) -> str:
         """Similar to render_dimension_template() but for time dimensions."""
-        return (
-            f"{{{{ TimeDimension('{time_dimension_name}', '{time_granularity}', entity_path={repr(entity_path)}) }}}}"
-        )
+        if time_granularity is not None:
+            return f"{{{{ TimeDimension('{time_dimension_name}', '{time_granularity}', entity_path={repr(entity_path)}) }}}}"
+        else:
+            return f"{{{{ TimeDimension('{time_dimension_name}', entity_path={repr(entity_path)}) }}}}"
 
 
 def filter_not_supported_features(
@@ -272,8 +273,8 @@ def test_case(
     query_result = engine.query(
         MetricFlowQueryRequest.create_with_random_request_id(
             metric_names=case.metrics,
-            group_by_names=case.group_bys,
-            group_by=tuple(group_by),
+            group_by_names=case.group_bys if len(case.group_bys) > 0 else None,
+            group_by=tuple(group_by) if len(group_by) > 0 else None,
             limit=case.limit,
             time_constraint_start=parser.parse(case.time_constraint[0]) if case.time_constraint else None,
             time_constraint_end=parser.parse(case.time_constraint[1]) if case.time_constraint else None,
