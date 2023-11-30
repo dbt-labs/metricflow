@@ -3,12 +3,12 @@
         <!-- description = Write to Dataframe -->
         <!-- node_id = wrd_0 -->
         <OrderByLimitNode>
-            <!-- description = Order By ['listing__country_latest'] Limit 100 -->
+            <!-- description = Order By ['listing__is_lux_latest'] Limit 100 -->
             <!-- node_id = obl_0 -->
             <!-- order_by_spec =                                                        -->
             <!--   {'class': 'OrderBySpec',                                             -->
             <!--    'instance_spec': {'class': 'DimensionSpec',                         -->
-            <!--                      'element_name': 'country_latest',                 -->
+            <!--                      'element_name': 'is_lux_latest',                  -->
             <!--                      'entity_links': ({'class': 'EntityReference',     -->
             <!--                                        'element_name': 'listing'},)},  -->
             <!--    'descending': True}                                                 -->

@@ -8,7 +8,7 @@
             <!-- metric_spec =                    -->
             <!--   {'class': 'MetricSpec',        -->
             <!--    'element_name': 'txn_count',  -->
-            <!--    'constraint': None,           -->
+            <!--    'filter_specs': (),           -->
             <!--    'alias': None,                -->
             <!--    'offset_window': None,        -->
             <!--    'offset_to_grain': None}      -->

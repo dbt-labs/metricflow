@@ -11,7 +11,7 @@
                 <!-- metric_spec =                   -->
                 <!--   {'class': 'MetricSpec',       -->
                 <!--    'element_name': 'bookings',  -->
-                <!--    'constraint': None,          -->
+                <!--    'filter_specs': (),          -->
                 <!--    'alias': None,               -->
                 <!--    'offset_window': None,       -->
                 <!--    'offset_to_grain': None}     -->
@@ -57,7 +57,7 @@
                 <!-- metric_spec =                        -->
                 <!--   {'class': 'MetricSpec',            -->
                 <!--    'element_name': 'booking_value',  -->
-                <!--    'constraint': None,               -->
+                <!--    'filter_specs': (),               -->
                 <!--    'alias': None,                    -->
                 <!--    'offset_window': None,            -->
                 <!--    'offset_to_grain': None}          -->
@@ -103,7 +103,7 @@
                 <!-- metric_spec =                   -->
                 <!--   {'class': 'MetricSpec',       -->
                 <!--    'element_name': 'listings',  -->
-                <!--    'constraint': None,          -->
+                <!--    'filter_specs': (),          -->
                 <!--    'alias': None,               -->
                 <!--    'offset_window': None,       -->
                 <!--    'offset_to_grain': None}     -->

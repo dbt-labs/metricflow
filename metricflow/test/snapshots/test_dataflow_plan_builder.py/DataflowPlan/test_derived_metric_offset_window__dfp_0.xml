@@ -8,7 +8,7 @@
             <!-- metric_spec =                             -->
             <!--   {'class': 'MetricSpec',                 -->
             <!--    'element_name': 'bookings_5_day_lag',  -->
-            <!--    'constraint': None,                    -->
+            <!--    'filter_specs': (),                    -->
             <!--    'alias': None,                         -->
             <!--    'offset_window': None,                 -->
             <!--    'offset_to_grain': None}               -->
@@ -18,7 +18,7 @@
                 <!-- metric_spec =                                              -->
                 <!--   {'class': 'MetricSpec',                                  -->
                 <!--    'element_name': 'bookings',                             -->
-                <!--    'constraint': None,                                     -->
+                <!--    'filter_specs': (),                                     -->
                 <!--    'alias': 'bookings_5_days_ago',                         -->
                 <!--    'offset_window': {'class': 'PydanticMetricTimeWindow',  -->
                 <!--                      'count': 5,                           -->

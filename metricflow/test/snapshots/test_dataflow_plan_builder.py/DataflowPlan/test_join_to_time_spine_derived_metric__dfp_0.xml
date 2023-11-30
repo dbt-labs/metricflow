@@ -8,7 +8,7 @@
             <!-- metric_spec =                                                    -->
             <!--   {'class': 'MetricSpec',                                        -->
             <!--    'element_name': 'bookings_growth_2_weeks_fill_nulls_with_0',  -->
-            <!--    'constraint': None,                                           -->
+            <!--    'filter_specs': (),                                           -->
             <!--    'alias': None,                                                -->
             <!--    'offset_window': None,                                        -->
             <!--    'offset_to_grain': None}                                      -->
@@ -21,7 +21,7 @@
                     <!-- metric_spec =                                     -->
                     <!--   {'class': 'MetricSpec',                         -->
                     <!--    'element_name': 'bookings_fill_nulls_with_0',  -->
-                    <!--    'constraint': None,                            -->
+                    <!--    'filter_specs': (),                            -->
                     <!--    'alias': None,                                 -->
                     <!--    'offset_window': None,                         -->
                     <!--    'offset_to_grain': None}                       -->
@@ -82,7 +82,7 @@
                     <!-- metric_spec =                                              -->
                     <!--   {'class': 'MetricSpec',                                  -->
                     <!--    'element_name': 'bookings_fill_nulls_with_0',           -->
-                    <!--    'constraint': None,                                     -->
+                    <!--    'filter_specs': (),                                     -->
                     <!--    'alias': 'bookings_2_weeks_ago',                        -->
                     <!--    'offset_window': {'class': 'PydanticMetricTimeWindow',  -->
                     <!--                      'count': 14,                          -->
