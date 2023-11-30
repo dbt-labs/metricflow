@@ -28,11 +28,9 @@ from dbt_semantic_interfaces.references import (
 
 from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
-from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
     LinkableInstanceSpec,
     MeasureSpec,
-    MetricSpec,
     NonAdditiveDimensionSpec,
 )
 
@@ -167,15 +165,6 @@ class MetricAccessor(ABC):
     @abstractmethod
     def contains_cumulative_or_time_offset_metric(self, metric_references: Sequence[MetricReference]) -> bool:
         """Returns true if any of the specs correspond to a cumulative metric or a derived metric with time offset."""
-        raise NotImplementedError
-
-    @abstractmethod
-    def metric_input_specs_for_metric(
-        self,
-        metric_reference: MetricReference,
-        column_association_resolver: ColumnAssociationResolver,
-    ) -> Sequence[MetricSpec]:
-        """Returns the metric input specs required to compute the metric."""
         raise NotImplementedError
 
     @abstractmethod
