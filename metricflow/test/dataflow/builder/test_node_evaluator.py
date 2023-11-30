@@ -200,33 +200,25 @@ def test_node_evaluator_with_joined_spec(  # noqa: D
         start_node=bookings_source_node,
         default_join_type=SqlJoinType.LEFT_OUTER,
     )
-
+    linkable_specs = (
+        DimensionSpec(
+            element_name="country_latest",
+            entity_links=(EntityReference(element_name="listing"),),
+        ),
+        DimensionSpec(
+            element_name="capacity_latest",
+            entity_links=(EntityReference(element_name="listing"),),
+        ),
+    )
     assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
         local_linkable_specs=(DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),),
-        joinable_linkable_specs=(
-            DimensionSpec(
-                element_name="country_latest",
-                entity_links=(EntityReference(element_name="listing"),),
-            ),
-            DimensionSpec(
-                element_name="capacity_latest",
-                entity_links=(EntityReference(element_name="listing"),),
-            ),
-        ),
+        joinable_linkable_specs=linkable_specs,
         join_recipes=(
             JoinLinkableInstancesRecipe(
                 node_to_join=consistent_id_object_repository.simple_model_read_nodes["listings_latest"],
                 join_on_entity=LinklessEntitySpec.from_element_name("listing"),
-                satisfiable_linkable_specs=[
-                    DimensionSpec(
-                        element_name="country_latest",
-                        entity_links=(EntityReference(element_name="listing"),),
-                    ),
-                    DimensionSpec(
-                        element_name="capacity_latest",
-                        entity_links=(EntityReference(element_name="listing"),),
-                    ),
-                ],
+                join_on_linkable_elements=list(linkable_specs),
+                satisfiable_linkable_specs=list(linkable_specs),
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
                 join_type=SqlJoinType.LEFT_OUTER,
@@ -252,25 +244,21 @@ def test_node_evaluator_with_joined_spec_on_unique_id(  # noqa: D
         start_node=listings_node,
         default_join_type=SqlJoinType.LEFT_OUTER,
     )
-
+    linkable_specs = (
+        DimensionSpec(
+            element_name="company_name",
+            entity_links=(EntityReference(element_name="user"),),
+        ),
+    )
     assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
         local_linkable_specs=(),
-        joinable_linkable_specs=(
-            DimensionSpec(
-                element_name="company_name",
-                entity_links=(EntityReference(element_name="user"),),
-            ),
-        ),
+        joinable_linkable_specs=linkable_specs,
         join_recipes=(
             JoinLinkableInstancesRecipe(
                 node_to_join=consistent_id_object_repository.simple_model_read_nodes["companies"],
                 join_on_entity=LinklessEntitySpec.from_element_name("user"),
-                satisfiable_linkable_specs=[
-                    DimensionSpec(
-                        element_name="company_name",
-                        entity_links=(EntityReference(element_name="user"),),
-                    ),
-                ],
+                join_on_linkable_elements=list(linkable_specs),
+                satisfiable_linkable_specs=list(linkable_specs),
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
                 join_type=SqlJoinType.LEFT_OUTER,
@@ -301,28 +289,24 @@ def test_node_evaluator_with_multiple_joined_specs(  # noqa: D
         default_join_type=SqlJoinType.LEFT_OUTER,
     )
 
+    entity_spec = EntitySpec(
+        element_name="user",
+        entity_links=(EntityReference(element_name="listing"),),
+    )
+    dimension_spec = DimensionSpec(
+        element_name="home_state_latest",
+        entity_links=(EntityReference(element_name="user"),),
+    )
+    linkable_specs = (entity_spec, dimension_spec)
     assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
         local_linkable_specs=(),
-        joinable_linkable_specs=(
-            EntitySpec(
-                element_name="user",
-                entity_links=(EntityReference(element_name="listing"),),
-            ),
-            DimensionSpec(
-                element_name="home_state_latest",
-                entity_links=(EntityReference(element_name="user"),),
-            ),
-        ),
+        joinable_linkable_specs=linkable_specs,
         join_recipes=(
             JoinLinkableInstancesRecipe(
                 node_to_join=consistent_id_object_repository.simple_model_read_nodes["listings_latest"],
                 join_on_entity=LinklessEntitySpec.from_element_name("listing"),
-                satisfiable_linkable_specs=[
-                    EntitySpec(
-                        element_name="user",
-                        entity_links=(EntityReference(element_name="listing"),),
-                    )
-                ],
+                join_on_linkable_elements=[entity_spec],
+                satisfiable_linkable_specs=[entity_spec],
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
                 join_type=SqlJoinType.LEFT_OUTER,
@@ -330,12 +314,8 @@ def test_node_evaluator_with_multiple_joined_specs(  # noqa: D
             JoinLinkableInstancesRecipe(
                 node_to_join=consistent_id_object_repository.simple_model_read_nodes["users_latest"],
                 join_on_entity=LinklessEntitySpec.from_element_name("user"),
-                satisfiable_linkable_specs=[
-                    DimensionSpec(
-                        element_name="home_state_latest",
-                        entity_links=(EntityReference(element_name="user"),),
-                    )
-                ],
+                join_on_linkable_elements=[dimension_spec],
+                satisfiable_linkable_specs=[dimension_spec],
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
                 join_type=SqlJoinType.LEFT_OUTER,
@@ -372,30 +352,24 @@ def test_node_evaluator_with_multihop_joined_spec(  # noqa: D
         required_linkable_specs=linkable_specs, start_node=txn_source, default_join_type=SqlJoinType.LEFT_OUTER
     )
 
-    assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
-        local_linkable_specs=(),
-        joinable_linkable_specs=(
-            DimensionSpec(
-                element_name="customer_name",
-                entity_links=(
-                    EntityReference(element_name="account_id"),
-                    EntityReference(element_name="customer_id"),
-                ),
+    dimension_specs = (
+        DimensionSpec(
+            element_name="customer_name",
+            entity_links=(
+                EntityReference(element_name="account_id"),
+                EntityReference(element_name="customer_id"),
             ),
         ),
+    )
+    assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
+        local_linkable_specs=(),
+        joinable_linkable_specs=dimension_specs,
         join_recipes=(
             JoinLinkableInstancesRecipe(
                 node_to_join=evaluation.join_recipes[0].node_to_join,
                 join_on_entity=LinklessEntitySpec.from_element_name("account_id"),
-                satisfiable_linkable_specs=[
-                    DimensionSpec(
-                        element_name="customer_name",
-                        entity_links=(
-                            EntityReference(element_name="account_id"),
-                            EntityReference(element_name="customer_id"),
-                        ),
-                    ),
-                ],
+                join_on_linkable_elements=list(dimension_specs),
+                satisfiable_linkable_specs=list(dimension_specs),
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(
                     PartitionTimeDimensionJoinDescription(
@@ -432,24 +406,16 @@ def test_node_evaluator_with_partition_joined_spec(  # noqa: D
         default_join_type=SqlJoinType.LEFT_OUTER,
     )
 
+    dimension_specs = (DimensionSpec(element_name="home_state", entity_links=(EntityReference(element_name="user"),)),)
     assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
         local_linkable_specs=(),
-        joinable_linkable_specs=(
-            DimensionSpec(
-                element_name="home_state",
-                entity_links=(EntityReference(element_name="user"),),
-            ),
-        ),
+        joinable_linkable_specs=dimension_specs,
         join_recipes=(
             JoinLinkableInstancesRecipe(
                 node_to_join=consistent_id_object_repository.simple_model_read_nodes["users_ds_source"],
                 join_on_entity=LinklessEntitySpec.from_element_name("user"),
-                satisfiable_linkable_specs=[
-                    DimensionSpec(
-                        element_name="home_state",
-                        entity_links=(EntityReference(element_name="user"),),
-                    ),
-                ],
+                join_on_linkable_elements=list(dimension_specs),
+                satisfiable_linkable_specs=list(dimension_specs),
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(
                     PartitionTimeDimensionJoinDescription(
@@ -500,24 +466,21 @@ def test_node_evaluator_with_scd_target(
         default_join_type=SqlJoinType.LEFT_OUTER,
     )
 
+    dimension_specs = (
+        DimensionSpec(
+            element_name="is_lux",
+            entity_links=(EntityReference(element_name="listing"),),
+        ),
+    )
     assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
         local_linkable_specs=(),
-        joinable_linkable_specs=(
-            DimensionSpec(
-                element_name="is_lux",
-                entity_links=(EntityReference(element_name="listing"),),
-            ),
-        ),
+        joinable_linkable_specs=dimension_specs,
         join_recipes=(
             JoinLinkableInstancesRecipe(
                 node_to_join=consistent_id_object_repository.scd_model_read_nodes["listings"],
                 join_on_entity=LinklessEntitySpec.from_element_name("listing"),
-                satisfiable_linkable_specs=[
-                    DimensionSpec(
-                        element_name="is_lux",
-                        entity_links=(EntityReference(element_name="listing"),),
-                    ),
-                ],
+                join_on_linkable_elements=list(dimension_specs),
+                satisfiable_linkable_specs=list(dimension_specs),
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
                 validity_window=ValidityWindowJoinDescription(
@@ -553,30 +516,24 @@ def test_node_evaluator_with_multi_hop_scd_target(
         default_join_type=SqlJoinType.LEFT_OUTER,
     )
 
-    assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
-        local_linkable_specs=(),
-        joinable_linkable_specs=(
-            DimensionSpec(
-                element_name="is_confirmed_lux",
-                entity_links=(
-                    EntityReference(element_name="listing"),
-                    EntityReference(element_name="lux_listing"),
-                ),
+    dimension_specs = (
+        DimensionSpec(
+            element_name="is_confirmed_lux",
+            entity_links=(
+                EntityReference(element_name="listing"),
+                EntityReference(element_name="lux_listing"),
             ),
         ),
+    )
+    assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
+        local_linkable_specs=(),
+        joinable_linkable_specs=dimension_specs,
         join_recipes=(
             JoinLinkableInstancesRecipe(
                 node_to_join=evaluation.join_recipes[0].node_to_join,
                 join_on_entity=LinklessEntitySpec.from_element_name("listing"),
-                satisfiable_linkable_specs=[
-                    DimensionSpec(
-                        element_name="is_confirmed_lux",
-                        entity_links=(
-                            EntityReference(element_name="listing"),
-                            EntityReference(element_name="lux_listing"),
-                        ),
-                    ),
-                ],
+                join_on_linkable_elements=list(dimension_specs),
+                satisfiable_linkable_specs=list(dimension_specs),
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
                 validity_window=ValidityWindowJoinDescription(
@@ -616,30 +573,24 @@ def test_node_evaluator_with_multi_hop_through_scd(
         default_join_type=SqlJoinType.LEFT_OUTER,
     )
 
-    assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
-        local_linkable_specs=(),
-        joinable_linkable_specs=(
-            DimensionSpec(
-                element_name="home_state_latest",
-                entity_links=(
-                    EntityReference(element_name="listing"),
-                    EntityReference(element_name="user"),
-                ),
+    dimension_specs = (
+        DimensionSpec(
+            element_name="home_state_latest",
+            entity_links=(
+                EntityReference(element_name="listing"),
+                EntityReference(element_name="user"),
             ),
         ),
+    )
+    assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
+        local_linkable_specs=(),
+        joinable_linkable_specs=dimension_specs,
         join_recipes=(
             JoinLinkableInstancesRecipe(
                 node_to_join=evaluation.join_recipes[0].node_to_join,
                 join_on_entity=LinklessEntitySpec.from_element_name("listing"),
-                satisfiable_linkable_specs=[
-                    DimensionSpec(
-                        element_name="home_state_latest",
-                        entity_links=(
-                            EntityReference(element_name="listing"),
-                            EntityReference(element_name="user"),
-                        ),
-                    ),
-                ],
+                join_on_linkable_elements=list(dimension_specs),
+                satisfiable_linkable_specs=list(dimension_specs),
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
                 validity_window=ValidityWindowJoinDescription(

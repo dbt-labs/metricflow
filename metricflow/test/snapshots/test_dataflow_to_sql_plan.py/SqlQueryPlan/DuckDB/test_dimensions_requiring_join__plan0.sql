@@ -59,7 +59,7 @@ FROM (
     , subq_0.listing__country_latest AS listing__country_latest
     , subq_0.listing__is_lux_latest AS listing__is_lux_latest
     , subq_0.listing__capacity_latest AS listing__capacity_latest
-    , subq_2.user__home_state_latest AS user__home_state_latest
+    , subq_2.home_state_latest AS user__home_state_latest
     , subq_0.listings AS listings
     , subq_0.largest_listing AS largest_listing
     , subq_0.smallest_listing AS smallest_listing
@@ -126,10 +126,10 @@ FROM (
   ) subq_0
   FULL OUTER JOIN (
     -- Pass Only Elements:
-    --   ['user__home_state_latest', 'user']
+    --   ['home_state_latest', 'user']
     SELECT
       subq_1.user
-      , subq_1.user__home_state_latest
+      , subq_1.home_state_latest
     FROM (
       -- Read Elements From Semantic Model 'users_latest'
       SELECT

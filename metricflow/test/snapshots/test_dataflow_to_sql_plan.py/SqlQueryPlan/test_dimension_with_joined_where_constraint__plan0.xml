@@ -727,9 +727,9 @@
                     </SqlTableFromClauseNode>
                 </SqlSelectStatementNode>
                 <SqlSelectStatementNode>
-                    <!-- description =                            -->
-                    <!--   Pass Only Elements:                    -->
-                    <!--     ['user__home_state_latest', 'user']  -->
+                    <!-- description =                      -->
+                    <!--   Pass Only Elements:              -->
+                    <!--     ['home_state_latest', 'user']  -->
                     <!-- node_id = ss_0 -->
                     <!-- col0 =                                                  -->
                     <!--   {'class': 'SqlSelectColumn',                          -->
@@ -738,7 +738,7 @@
                     <!-- col1 =                                                  -->
                     <!--   {'class': 'SqlSelectColumn',                          -->
                     <!--    'expr': SqlColumnReferenceExpression(node_id=cr_0),  -->
-                    <!--    'column_alias': 'user__home_state_latest'}           -->
+                    <!--    'column_alias': 'home_state_latest'}                 -->
                     <!-- from_source = SqlSelectStatementNode(node_id=ss_10008) -->
                     <!-- where = None -->
                     <!-- distinct = False -->

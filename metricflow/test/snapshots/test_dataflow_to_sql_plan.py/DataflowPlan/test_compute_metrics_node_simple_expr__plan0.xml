@@ -18,16 +18,19 @@
                 <JoinToBaseOutputNode>
                     <!-- description = Join Standard Outputs -->
                     <!-- node_id = jso_0 -->
-                    <!-- join0_for_node_id_pfe_1 =                             -->
-                    <!--   {'class': 'JoinDescription',                        -->
-                    <!--    'join_node': FilterElementsNode(node_id=pfe_1),    -->
-                    <!--    'join_on_entity': {'class': 'LinklessEntitySpec',  -->
-                    <!--                       'element_name': 'listing',      -->
-                    <!--                       'entity_links': ()},            -->
-                    <!--    'join_type': SqlJoinType.LEFT_OUTER,               -->
-                    <!--    'join_on_partition_dimensions': (),                -->
-                    <!--    'join_on_partition_time_dimensions': (),           -->
-                    <!--    'validity_window': None}                           -->
+                    <!-- join0_for_node_id_pfe_1 =                                            -->
+                    <!--   {'class': 'JoinDescription',                                       -->
+                    <!--    'join_node': FilterElementsNode(node_id=pfe_1),                   -->
+                    <!--    'join_on_entity': {'class': 'LinklessEntitySpec',                 -->
+                    <!--                       'element_name': 'listing',                     -->
+                    <!--                       'entity_links': ()},                           -->
+                    <!--    'join_on_linkable_elements': ({'class': 'DimensionSpec',          -->
+                    <!--                                   'element_name': 'country_latest',  -->
+                    <!--                                   'entity_links': ()},),             -->
+                    <!--    'join_type': SqlJoinType.LEFT_OUTER,                              -->
+                    <!--    'join_on_partition_dimensions': (),                               -->
+                    <!--    'join_on_partition_time_dimensions': (),                          -->
+                    <!--    'validity_window': None}                                          -->
                     <FilterElementsNode>
                         <!-- description =                     -->
                         <!--   Pass Only Elements:             -->

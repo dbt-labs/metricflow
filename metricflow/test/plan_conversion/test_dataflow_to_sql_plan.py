@@ -277,13 +277,8 @@ def test_single_join_node(  # noqa: D
         entity_links=(EntityReference("listing"),),
     )
     dimension_source_node = consistent_id_object_repository.simple_model_read_nodes["listings_latest"]
-    filtered_dimension_node = FilterElementsNode(
-        parent_node=dimension_source_node,
-        include_specs=InstanceSpecSet(
-            entity_specs=(entity_spec,),
-            dimension_specs=(dimension_spec,),
-        ),
-    )
+    spec_set = InstanceSpecSet(entity_specs=(entity_spec,), dimension_specs=(dimension_spec,))
+    filtered_dimension_node = FilterElementsNode(parent_node=dimension_source_node, include_specs=spec_set)
 
     join_node = JoinToBaseOutputNode(
         left_node=filtered_measure_node,
@@ -291,6 +286,8 @@ def test_single_join_node(  # noqa: D
             JoinDescription(
                 join_node=filtered_dimension_node,
                 join_on_entity=entity_spec,
+                # TODO: migrate join_on_entity into join_on_linnkable_specs?
+                join_on_linkable_elements=(dimension_spec,),
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
                 join_type=SqlJoinType.LEFT_OUTER,
@@ -345,6 +342,7 @@ def test_multi_join_node(
             JoinDescription(
                 join_node=filtered_dimension_node,
                 join_on_entity=LinklessEntitySpec.from_element_name(element_name="listing"),
+                join_on_linkable_elements=(dimension_spec,),
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
                 join_type=SqlJoinType.LEFT_OUTER,
@@ -352,6 +350,7 @@ def test_multi_join_node(
             JoinDescription(
                 join_node=filtered_dimension_node,
                 join_on_entity=LinklessEntitySpec.from_element_name(element_name="listing"),
+                join_on_linkable_elements=(dimension_spec,),
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
                 join_type=SqlJoinType.LEFT_OUTER,
@@ -410,6 +409,7 @@ def test_compute_metrics_node(
             JoinDescription(
                 join_node=filtered_dimension_node,
                 join_on_entity=entity_spec,
+                join_on_linkable_elements=(dimension_spec,),
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
                 join_type=SqlJoinType.LEFT_OUTER,
@@ -472,6 +472,7 @@ def test_compute_metrics_node_simple_expr(
             JoinDescription(
                 join_node=filtered_dimension_node,
                 join_on_entity=entity_spec,
+                join_on_linkable_elements=(dimension_spec,),
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
                 join_type=SqlJoinType.LEFT_OUTER,
@@ -753,6 +754,7 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
             JoinDescription(
                 join_node=filtered_dimension_node,
                 join_on_entity=entity_spec,
+                join_on_linkable_elements=(dimension_spec,),
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
                 join_type=SqlJoinType.LEFT_OUTER,

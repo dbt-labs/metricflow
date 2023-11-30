@@ -56,6 +56,8 @@ class JoinLinkableInstancesRecipe:
     node_to_join: BaseOutput
     # The entity to join "node_to_join" on.
     join_on_entity: LinklessEntitySpec
+    # Linkable instances to join on.
+    join_on_linkable_elements: List[LinkableInstanceSpec]
     # The linkable instances from the query that can be satisfied if we join this node. Note that this is different from
     # the linkable specs in the node that can help to satisfy the query. e.g. "user_id__country" might be one of the
     # "satisfiable_linkable_specs", but "country" is the linkable spec in the node.
@@ -69,8 +71,8 @@ class JoinLinkableInstancesRecipe:
 
     validity_window: Optional[ValidityWindowJoinDescription] = None
 
-    # TODO: better name for includes_measures
-    def join_description(self, includes_measures: bool) -> JoinDescription:
+    @property
+    def join_description(self) -> JoinDescription:
         """The recipe as a join description to use in the dataflow plan node."""
         # Figure out what elements to filter from the joined node.
         include_specs: List[LinkableInstanceSpec] = []
@@ -86,11 +88,9 @@ class JoinLinkableInstancesRecipe:
                 [self.validity_window.window_start_dimension, self.validity_window.window_end_dimension]
             )
 
-        # `satisfiable_linkable_specs` describes what can be satisfied after the join, so remove the entity
-        # link when filtering before the join.
-        # e.g. if the node is used to satisfy "user_id__country", then the node must have the entity
-        # "user_id" and the "country" dimension so that it can be joined to the source node.
-        if includes_measures:
+        # If joining on all requested linkable elements, element names should match across nodes.
+        # Remove the first entity link so the element name will match the one in the node it's joining to.
+        if self.join_on_linkable_elements:
             include_specs.extend([spec.without_first_entity_link for spec in self.satisfiable_linkable_specs])
         else:
             include_specs.extend(self.satisfiable_linkable_specs)
@@ -102,6 +102,7 @@ class JoinLinkableInstancesRecipe:
         return JoinDescription(
             join_node=filtered_node_to_join,
             join_on_entity=self.join_on_entity,
+            join_on_linkable_elements=tuple(self.join_on_linkable_elements),
             join_on_partition_dimensions=self.join_on_partition_dimensions,
             join_on_partition_time_dimensions=self.join_on_partition_time_dimensions,
             validity_window=self.validity_window,
@@ -233,7 +234,7 @@ class NodeEvaluatorForLinkableInstances:
                     entity_spec_in_right_node.element_name
                 )
 
-                satisfiable_linkable_specs = []
+                satisfiable_linkable_specs: List[LinkableInstanceSpec] = []
                 for needed_linkable_spec in needed_linkable_specs:
                     assert (
                         len(needed_linkable_spec.entity_links) != 0
@@ -284,6 +285,7 @@ class NodeEvaluatorForLinkableInstances:
                             node_to_join=right_node,
                             join_on_entity=linkless_entity_spec_in_node,
                             satisfiable_linkable_specs=satisfiable_linkable_specs,
+                            join_on_linkable_elements=satisfiable_linkable_specs,
                             join_on_partition_dimensions=join_on_partition_dimensions,
                             join_on_partition_time_dimensions=join_on_partition_time_dimensions,
                             validity_window=validity_window_join_description,
@@ -322,6 +324,7 @@ class NodeEvaluatorForLinkableInstances:
                     JoinLinkableInstancesRecipe(
                         node_to_join=candidate_for_join.node_to_join,
                         join_on_entity=candidate_for_join.join_on_entity,
+                        join_on_linkable_elements=candidate_for_join.join_on_linkable_elements,
                         satisfiable_linkable_specs=updated_satisfiable_linkable_specs,
                         join_on_partition_dimensions=candidate_for_join.join_on_partition_dimensions,
                         join_on_partition_time_dimensions=candidate_for_join.join_on_partition_time_dimensions,

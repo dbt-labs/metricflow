@@ -80,15 +80,11 @@ class DataflowRecipe:
     source_node: BaseOutput
     required_local_linkable_specs: Tuple[LinkableInstanceSpec, ...]
     join_linkable_instances_recipes: Tuple[JoinLinkableInstancesRecipe, ...]
-    includes_measures: bool
 
     @property
     def join_targets(self) -> List[JoinDescription]:
         """Joins to be made to source node."""
-        return [
-            join_recipe.join_description(includes_measures=self.includes_measures)
-            for join_recipe in self.join_linkable_instances_recipes
-        ]
+        return [join_recipe.join_description for join_recipe in self.join_linkable_instances_recipes]
 
 
 @dataclass(frozen=True)
@@ -674,7 +670,6 @@ class DataflowPlanBuilder:
                     + required_local_time_dimension_specs
                 ),
                 join_linkable_instances_recipes=node_to_evaluation[node_with_lowest_cost_plan].join_recipes,
-                includes_measures=measure_spec_properties is not None,
             )
 
         logger.error("No recipe could be constructed.")

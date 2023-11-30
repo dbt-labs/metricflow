@@ -41,6 +41,7 @@ from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.specs.specs import (
     InstanceSpecSet,
+    LinkableInstanceSpec,
     LinklessEntitySpec,
     MetricInputMeasureSpec,
     MetricSpec,
@@ -250,6 +251,7 @@ class JoinDescription:
 
     join_node: BaseOutput
     join_on_entity: LinklessEntitySpec
+    join_on_linkable_elements: Tuple[LinkableInstanceSpec, ...]
     join_type: SqlJoinType
 
     join_on_partition_dimensions: Tuple[PartitionDimensionJoinDescription, ...]
@@ -337,6 +339,7 @@ class JoinToBaseOutputNode(BaseOutput):
                 JoinDescription(
                     join_node=new_join_nodes[i],
                     join_on_entity=old_join_target.join_on_entity,
+                    join_on_linkable_elements=old_join_target.join_on_linkable_elements,
                     join_on_partition_dimensions=old_join_target.join_on_partition_dimensions,
                     join_on_partition_time_dimensions=old_join_target.join_on_partition_time_dimensions,
                     validity_window=old_join_target.validity_window,

@@ -20,7 +20,7 @@ from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS, SemanticModelJoinEvaluator
 from metricflow.protocols.semantics import SemanticModelAccessor
 from metricflow.specs.spec_set_transforms import ToElementNameSet
-from metricflow.specs.specs import InstanceSpecSet, LinkableInstanceSpec, LinklessEntitySpec
+from metricflow.specs.specs import LinkableInstanceSpec, LinkableSpecSet, LinklessEntitySpec
 from metricflow.sql.sql_plan import SqlJoinType
 
 logger = logging.getLogger(__name__)
@@ -220,11 +220,11 @@ class PreJoinNodeProcessor:
 
                 # filter measures out of joinable_node
                 specs = data_set_of_second_node_that_can_be_joined.instance_set.spec_set
+                include_specs = LinkableSpecSet.from_specs(
+                    specs.dimension_specs + specs.entity_specs + specs.time_dimension_specs
+                )
                 filtered_joinable_node = FilterElementsNode(
-                    parent_node=second_node_that_could_be_joined,
-                    include_specs=InstanceSpecSet.from_specs(
-                        specs.dimension_specs + specs.entity_specs + specs.time_dimension_specs
-                    ),
+                    parent_node=second_node_that_could_be_joined, include_specs=include_specs.as_spec_set
                 )
 
                 join_on_partition_dimensions = self._partition_resolver.resolve_partition_dimension_joins(
@@ -246,6 +246,7 @@ class PreJoinNodeProcessor:
                                     join_on_entity=LinklessEntitySpec.from_reference(
                                         desired_linkable_spec.entity_links[1]
                                     ),
+                                    join_on_linkable_elements=include_specs.as_tuple,
                                     join_on_partition_dimensions=join_on_partition_dimensions,
                                     join_on_partition_time_dimensions=join_on_partition_time_dimensions,
                                     join_type=join_type,

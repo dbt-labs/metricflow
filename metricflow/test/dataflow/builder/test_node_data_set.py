@@ -109,6 +109,7 @@ def test_joined_node_data_set(  # noqa: D
             JoinDescription(
                 join_node=users_node,
                 join_on_entity=LinklessEntitySpec.from_element_name("user"),
+                join_on_linkable_elements=(),
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
                 join_type=SqlJoinType.LEFT_OUTER,

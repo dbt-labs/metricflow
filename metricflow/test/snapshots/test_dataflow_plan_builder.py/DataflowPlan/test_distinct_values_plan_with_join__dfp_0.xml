@@ -44,16 +44,20 @@
                     <JoinToBaseOutputNode>
                         <!-- description = Join Standard Outputs -->
                         <!-- node_id = jso_0 -->
-                        <!-- join0_for_node_id_pfe_1 =                             -->
-                        <!--   {'class': 'JoinDescription',                        -->
-                        <!--    'join_node': FilterElementsNode(node_id=pfe_1),    -->
-                        <!--    'join_on_entity': {'class': 'LinklessEntitySpec',  -->
-                        <!--                       'element_name': 'user',         -->
-                        <!--                       'entity_links': ()},            -->
-                        <!--    'join_type': SqlJoinType.FULL_OUTER,               -->
-                        <!--    'join_on_partition_dimensions': (),                -->
-                        <!--    'join_on_partition_time_dimensions': (),           -->
-                        <!--    'validity_window': None}                           -->
+                        <!-- join0_for_node_id_pfe_1 =                                                          -->
+                        <!--   {'class': 'JoinDescription',                                                     -->
+                        <!--    'join_node': FilterElementsNode(node_id=pfe_1),                                 -->
+                        <!--    'join_on_entity': {'class': 'LinklessEntitySpec',                               -->
+                        <!--                       'element_name': 'user',                                      -->
+                        <!--                       'entity_links': ()},                                         -->
+                        <!--    'join_on_linkable_elements': ({'class': 'DimensionSpec',                        -->
+                        <!--                                   'element_name': 'home_state_latest',             -->
+                        <!--                                   'entity_links': ({'class': 'EntityReference',    -->
+                        <!--                                                     'element_name': 'user'},)},),  -->
+                        <!--    'join_type': SqlJoinType.FULL_OUTER,                                            -->
+                        <!--    'join_on_partition_dimensions': (),                                             -->
+                        <!--    'join_on_partition_time_dimensions': (),                                        -->
+                        <!--    'validity_window': None}                                                        -->
                         <ReadSqlSourceNode>
                             <!-- description =                                                                                    -->
                             <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))  -->
@@ -62,14 +66,14 @@
                             <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))  -->
                         </ReadSqlSourceNode>
                         <FilterElementsNode>
-                            <!-- description =                            -->
-                            <!--   Pass Only Elements:                    -->
-                            <!--     ['user__home_state_latest', 'user']  -->
+                            <!-- description =                      -->
+                            <!--   Pass Only Elements:              -->
+                            <!--     ['home_state_latest', 'user']  -->
                             <!-- node_id = pfe_1 -->
-                            <!-- include_spec =                                                               -->
-                            <!--   {'class': 'DimensionSpec',                                                 -->
-                            <!--    'element_name': 'home_state_latest',                                      -->
-                            <!--    'entity_links': ({'class': 'EntityReference', 'element_name': 'user'},)}  -->
+                            <!-- include_spec =                           -->
+                            <!--   {'class': 'DimensionSpec',             -->
+                            <!--    'element_name': 'home_state_latest',  -->
+                            <!--    'entity_links': ()}                   -->
                             <!-- include_spec = LinklessEntitySpec(element_name='user', entity_links=()) -->
                             <!-- distinct = False -->
                             <ReadSqlSourceNode>
