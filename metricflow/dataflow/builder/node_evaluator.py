@@ -90,10 +90,7 @@ class JoinLinkableInstancesRecipe:
 
         # If joining on all requested linkable elements, element names should match across nodes.
         # Remove the first entity link so the element name will match the one in the node it's joining to.
-        if self.join_on_linkable_elements:
-            include_specs.extend([spec.without_first_entity_link for spec in self.satisfiable_linkable_specs])
-        else:
-            include_specs.extend(self.satisfiable_linkable_specs)
+        include_specs.extend([spec.without_first_entity_link for spec in self.satisfiable_linkable_specs])
 
         filtered_node_to_join = FilterElementsNode(
             parent_node=self.node_to_join, include_specs=InstanceSpecSet.from_specs(include_specs)
