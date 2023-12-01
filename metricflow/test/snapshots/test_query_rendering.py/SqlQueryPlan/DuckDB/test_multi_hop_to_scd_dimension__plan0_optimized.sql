@@ -26,8 +26,8 @@ LEFT OUTER JOIN (
   --    'lux_listing__window_end__day',
   --    'listing']
   SELECT
-    EXTRACT(doy FROM lux_listings_src_10019.valid_from) AS lux_listing__window_start__day
-    , EXTRACT(doy FROM lux_listings_src_10019.valid_to) AS lux_listing__window_end__day
+    lux_listings_src_10019.valid_from AS lux_listing__window_start__day
+    , lux_listings_src_10019.valid_to AS lux_listing__window_end__day
     , lux_listing_mapping_src_10018.listing_id AS listing
     , lux_listings_src_10019.is_confirmed_lux AS lux_listing__is_confirmed_lux
   FROM ***************************.dim_lux_listing_id_mapping lux_listing_mapping_src_10018

@@ -282,17 +282,6 @@ FROM (
             , subq_5.ds__extract_day AS user__ds__extract_day
             , subq_5.ds__extract_dow AS user__ds__extract_dow
             , subq_5.ds__extract_doy AS user__ds__extract_doy
-            , subq_5.user__ds__day AS user__ds__day
-            , subq_5.user__ds__week AS user__ds__day
-            , subq_5.user__ds__month AS user__ds__day
-            , subq_5.user__ds__quarter AS user__ds__day
-            , subq_5.user__ds__year AS user__ds__day
-            , subq_5.user__ds__extract_year AS user__ds__day
-            , subq_5.user__ds__extract_quarter AS user__ds__day
-            , subq_5.user__ds__extract_month AS user__ds__day
-            , subq_5.user__ds__extract_day AS user__ds__day
-            , subq_5.user__ds__extract_dow AS user__ds__day
-            , subq_5.user__ds__extract_doy AS user__ds__day
             , subq_3.listing AS listing
             , subq_3.user AS user
             , subq_3.listing__user AS listing__user
@@ -303,7 +292,6 @@ FROM (
             , subq_3.listing__is_lux AS listing__is_lux
             , subq_3.listing__capacity AS listing__capacity
             , subq_5.home_state_latest AS user__home_state_latest
-            , subq_5.user__home_state_latest AS user__home_state_latest
           FROM (
             -- Read Elements From Semantic Model 'listings'
             SELECT

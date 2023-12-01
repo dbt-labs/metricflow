@@ -479,36 +479,11 @@ class FilterLinkableInstancesWithLeadingLink(InstanceSetTransform[InstanceSet]):
 
     def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D
         # Normal to not filter anything if the instance set has no instances with links.
-        filtered_dimension_instances = tuple(
-            dimension_instance
-            if self._should_pass(dimension_instance.spec)
-            else DimensionInstance(
-                defined_from=dimension_instance.defined_from,
-                associated_columns=dimension_instance.associated_columns,
-                spec=dimension_instance.spec.without_entity_links,
-            )
-            for dimension_instance in instance_set.dimension_instances
-        )
+        filtered_dimension_instances = tuple(x for x in instance_set.dimension_instances if self._should_pass(x.spec))
         filtered_time_dimension_instances = tuple(
-            time_dimension_instance
-            if self._should_pass(time_dimension_instance.spec)
-            else TimeDimensionInstance(
-                defined_from=time_dimension_instance.defined_from,
-                associated_columns=time_dimension_instance.associated_columns,
-                spec=time_dimension_instance.spec.without_entity_links,
-            )
-            for time_dimension_instance in instance_set.time_dimension_instances
+            x for x in instance_set.time_dimension_instances if self._should_pass(x.spec)
         )
-        filtered_entity_instances = tuple(
-            entity_instance
-            if self._should_pass(entity_instance.spec)
-            else EntityInstance(
-                defined_from=entity_instance.defined_from,
-                associated_columns=entity_instance.associated_columns,
-                spec=entity_instance.spec.without_entity_links,
-            )
-            for entity_instance in instance_set.entity_instances
-        )
+        filtered_entity_instances = tuple(x for x in instance_set.entity_instances if self._should_pass(x.spec))
 
         output = InstanceSet(
             measure_instances=instance_set.measure_instances,

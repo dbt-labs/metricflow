@@ -252,33 +252,10 @@ FROM (
             , subq_5.window_end__extract_day AS lux_listing__window_end__extract_day
             , subq_5.window_end__extract_dow AS lux_listing__window_end__extract_dow
             , subq_5.window_end__extract_doy AS lux_listing__window_end__extract_doy
-            , subq_5.lux_listing__window_start__day AS lux_listing__window_start__day
-            , subq_5.lux_listing__window_start__week AS lux_listing__window_start__day
-            , subq_5.lux_listing__window_start__month AS lux_listing__window_start__day
-            , subq_5.lux_listing__window_start__quarter AS lux_listing__window_start__day
-            , subq_5.lux_listing__window_start__year AS lux_listing__window_start__day
-            , subq_5.lux_listing__window_start__extract_year AS lux_listing__window_start__day
-            , subq_5.lux_listing__window_start__extract_quarter AS lux_listing__window_start__day
-            , subq_5.lux_listing__window_start__extract_month AS lux_listing__window_start__day
-            , subq_5.lux_listing__window_start__extract_day AS lux_listing__window_start__day
-            , subq_5.lux_listing__window_start__extract_dow AS lux_listing__window_start__day
-            , subq_5.lux_listing__window_start__extract_doy AS lux_listing__window_start__day
-            , subq_5.lux_listing__window_end__day AS lux_listing__window_end__day
-            , subq_5.lux_listing__window_end__week AS lux_listing__window_end__day
-            , subq_5.lux_listing__window_end__month AS lux_listing__window_end__day
-            , subq_5.lux_listing__window_end__quarter AS lux_listing__window_end__day
-            , subq_5.lux_listing__window_end__year AS lux_listing__window_end__day
-            , subq_5.lux_listing__window_end__extract_year AS lux_listing__window_end__day
-            , subq_5.lux_listing__window_end__extract_quarter AS lux_listing__window_end__day
-            , subq_5.lux_listing__window_end__extract_month AS lux_listing__window_end__day
-            , subq_5.lux_listing__window_end__extract_day AS lux_listing__window_end__day
-            , subq_5.lux_listing__window_end__extract_dow AS lux_listing__window_end__day
-            , subq_5.lux_listing__window_end__extract_doy AS lux_listing__window_end__day
             , subq_3.listing AS listing
             , subq_3.lux_listing AS lux_listing
             , subq_3.listing__lux_listing AS listing__lux_listing
             , subq_5.is_confirmed_lux AS lux_listing__is_confirmed_lux
-            , subq_5.lux_listing__is_confirmed_lux AS lux_listing__is_confirmed_lux
           FROM (
             -- Read Elements From Semantic Model 'lux_listing_mapping'
             SELECT

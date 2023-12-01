@@ -1,7 +1,6 @@
 -- Join Standard Outputs
 SELECT
   subq_1.listing AS listing
-  , subq_3.listing__country_latest AS listing__country_latest
   , subq_1.bookings AS bookings
 FROM (
   -- Pass Only Elements:

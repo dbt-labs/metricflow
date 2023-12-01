@@ -47,7 +47,6 @@ class SqlColumnPrunerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
         i.e. this does not return expressions used in sub-queries. pruned_select_columns needs to be passed in since the
         node may have the select columns pruned.
         """
-        # Bug in here!! getting "user" instead of "home_state"
         all_expr_search_results: List[SqlExpressionTreeLineage] = []
 
         for select_column in pruned_select_columns:
@@ -183,6 +182,7 @@ class SqlColumnPrunerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
                     join_type=join_description.join_type,
                 )
             )
+
         return SqlSelectStatementNode(
             description=node.description,
             select_columns=tuple(pruned_select_columns),

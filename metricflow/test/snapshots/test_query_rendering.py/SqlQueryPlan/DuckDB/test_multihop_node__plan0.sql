@@ -199,17 +199,6 @@ FROM (
             , subq_5.ds_partitioned__extract_day AS customer_id__ds_partitioned__extract_day
             , subq_5.ds_partitioned__extract_dow AS customer_id__ds_partitioned__extract_dow
             , subq_5.ds_partitioned__extract_doy AS customer_id__ds_partitioned__extract_doy
-            , subq_5.customer_id__ds_partitioned__day AS customer_id__ds_partitioned__day
-            , subq_5.customer_id__ds_partitioned__week AS customer_id__ds_partitioned__day
-            , subq_5.customer_id__ds_partitioned__month AS customer_id__ds_partitioned__day
-            , subq_5.customer_id__ds_partitioned__quarter AS customer_id__ds_partitioned__day
-            , subq_5.customer_id__ds_partitioned__year AS customer_id__ds_partitioned__day
-            , subq_5.customer_id__ds_partitioned__extract_year AS customer_id__ds_partitioned__day
-            , subq_5.customer_id__ds_partitioned__extract_quarter AS customer_id__ds_partitioned__day
-            , subq_5.customer_id__ds_partitioned__extract_month AS customer_id__ds_partitioned__day
-            , subq_5.customer_id__ds_partitioned__extract_day AS customer_id__ds_partitioned__day
-            , subq_5.customer_id__ds_partitioned__extract_dow AS customer_id__ds_partitioned__day
-            , subq_5.customer_id__ds_partitioned__extract_doy AS customer_id__ds_partitioned__day
             , subq_3.account_id AS account_id
             , subq_3.customer_id AS customer_id
             , subq_3.account_id__customer_id AS account_id__customer_id
@@ -220,8 +209,6 @@ FROM (
             , subq_3.bridge_account__extra_dim AS bridge_account__extra_dim
             , subq_5.customer_name AS customer_id__customer_name
             , subq_5.customer_atomic_weight AS customer_id__customer_atomic_weight
-            , subq_5.customer_id__customer_name AS customer_id__customer_name
-            , subq_5.customer_id__customer_atomic_weight AS customer_id__customer_atomic_weight
           FROM (
             -- Read Elements From Semantic Model 'bridge_table'
             SELECT
