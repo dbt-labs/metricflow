@@ -410,6 +410,11 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
             date_part=self.date_part,
         ).qualified_name
 
+    @staticmethod
+    def from_reference(reference: TimeDimensionReference) -> TimeDimensionSpec:
+        """Initialize from a time dimension reference instance."""
+        return TimeDimensionSpec(entity_links=(), element_name=reference.element_name)
+
     @property
     @override
     def as_spec_set(self) -> InstanceSpecSet:

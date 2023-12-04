@@ -7,6 +7,7 @@ from typing import List, Optional, Sequence, Union
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols.metric import MetricInputMeasure, MetricType
 from dbt_semantic_interfaces.references import MetricModelReference
+from dbt_semantic_interfaces.type_enums.conversion_calculation_type import ConversionCalculationType
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 
 from metricflow.aggregation_properties import AggregationState
@@ -627,6 +628,40 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             elif metric.type is MetricType.DERIVED:
                 assert metric.type_params.expr
                 metric_expr = SqlStringExpression(sql_expr=metric.type_params.expr)
+            elif metric.type == MetricType.CONVERSION:
+                conversion_type_params = metric.type_params.conversion_type_params
+                assert (
+                    conversion_type_params
+                ), "A conversion metric should have type_params.conversion_type_params defined."
+                base_measure = conversion_type_params.base_measure
+                conversion_measure = conversion_type_params.conversion_measure
+                base_measure_column = self._column_association_resolver.resolve_spec(
+                    MeasureSpec(element_name=base_measure.post_aggregation_measure_reference.element_name)
+                ).column_name
+                conversion_measure_column = self._column_association_resolver.resolve_spec(
+                    MeasureSpec(element_name=conversion_measure.post_aggregation_measure_reference.element_name)
+                ).column_name
+
+                calculation_type = conversion_type_params.calculation
+                conversion_column_reference = SqlColumnReferenceExpression(
+                    SqlColumnReference(
+                        table_alias=from_data_set_alias,
+                        column_name=conversion_measure_column,
+                    )
+                )
+                base_column_reference = SqlColumnReferenceExpression(
+                    SqlColumnReference(
+                        table_alias=from_data_set_alias,
+                        column_name=base_measure_column,
+                    )
+                )
+                if calculation_type == ConversionCalculationType.CONVERSION_RATE:
+                    metric_expr = SqlRatioComputationExpression(
+                        numerator=conversion_column_reference,
+                        denominator=base_column_reference,
+                    )
+                elif calculation_type == ConversionCalculationType.CONVERSIONS:
+                    metric_expr = conversion_column_reference
             else:
                 assert_values_exhausted(metric.type)
 
