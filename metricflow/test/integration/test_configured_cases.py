@@ -28,6 +28,7 @@ from metricflow.sql.sql_exprs import (
     SqlColumnReferenceExpression,
     SqlDateTruncExpression,
     SqlExtractExpression,
+    SqlGenerateUuidExpression,
     SqlPercentileExpression,
     SqlPercentileExpressionArgument,
     SqlPercentileFunctionType,
@@ -173,6 +174,11 @@ class CheckQueryHelpers:
         else:
             return f"{{{{ TimeDimension('{time_dimension_name}', entity_path={repr(entity_path)}) }}}}"
 
+    def generate_random_uuid(self) -> str:
+        """Returns the generate random UUID SQL function."""
+        expr = SqlGenerateUuidExpression()
+        return self._sql_client.sql_query_plan_renderer.expr_renderer.render_sql_expr(expr).sql
+
 
 def filter_not_supported_features(
     sql_client: SqlClient, required_features: Tuple[RequiredDwEngineFeatures, ...]
@@ -295,6 +301,7 @@ def test_case(
                 render_dimension_template=check_query_helpers.render_dimension_template,
                 render_entity_template=check_query_helpers.render_entity_template,
                 render_time_dimension_template=check_query_helpers.render_time_dimension_template,
+                generate_random_uuid=check_query_helpers.generate_random_uuid,
             )
             if case.where_filter
             else None,
@@ -319,6 +326,7 @@ def test_case(
             render_percentile_expr=check_query_helpers.render_percentile_expr,
             mf_time_spine_source=semantic_manifest_lookup.time_spine_source.spine_table.sql,
             double_data_type_name=check_query_helpers.double_data_type_name,
+            generate_random_uuid=check_query_helpers.generate_random_uuid,
         )
     )
     # If we sort, it's effectively not checking the order whatever order that the output was would be overwritten.

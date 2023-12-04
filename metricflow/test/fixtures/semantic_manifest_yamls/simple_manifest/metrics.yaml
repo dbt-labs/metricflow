@@ -526,6 +526,58 @@ metric:
       join_to_timespine: true
 ---
 metric:
+  name: visit_buy_conversion_rate_7days
+  description: conversion rate on visits-buys on a 7 day window
+  type: conversion
+  type_params:
+    conversion_type_params:
+      base_measure: visits
+      conversion_measure: buys
+      window: 7 days
+      entity: user
+      calculation: conversion_rate
+---
+metric:
+  name: visit_buy_conversion_rate
+  description: conversion rate on visits-buys
+  type: conversion
+  type_params:
+    conversion_type_params:
+      base_measure: visits
+      conversion_measure: buys
+      entity: user
+      calculation: conversion_rate
+---
+metric:
+  name: visit_buy_conversions
+  description: conversion count on visits-buys on a 7 day window
+  type: conversion
+  type_params:
+    conversion_type_params:
+      base_measure: visits
+      conversion_measure:
+        name: buys
+        fill_nulls_with: 0
+      window: 7 days
+      entity: user
+      calculation: conversions
+---
+metric:
+  name: visit_buy_conversion_rate_by_session
+  description: conversion rate on visits-buys on a 7 day window held by a constant session_id
+  type: conversion
+  type_params:
+    conversion_type_params:
+      base_measure: visits
+      conversion_measure: buys
+      window: 7 days
+      entity: user
+      calculation: conversion_rate
+      constant_properties:
+        - base_property: session
+          conversion_property: session_id
+---
+metric:
   name: bookings_fill_nulls_with_0_without_time_spine
   description: Simple metric filling 0 without time spine. Not a commonly expected scenario.
   type: simple
