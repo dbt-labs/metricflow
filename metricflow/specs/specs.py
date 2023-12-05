@@ -719,6 +719,19 @@ class MetricFlowQuerySpec(SerializableDataclass):
             entity_specs=self.entity_specs,
         )
 
+    def with_time_range_constraint(self, time_range_constraint: Optional[TimeRangeConstraint]) -> MetricFlowQuerySpec:
+        """Return a query spec that's the same as self but with a different time_range_constraint."""
+        return MetricFlowQuerySpec(
+            metric_specs=self.metric_specs,
+            dimension_specs=self.dimension_specs,
+            entity_specs=self.entity_specs,
+            time_dimension_specs=self.time_dimension_specs,
+            order_by_specs=self.order_by_specs,
+            time_range_constraint=time_range_constraint,
+            where_constraint=self.where_constraint,
+            limit=self.limit,
+        )
+
 
 TransformOutputT = TypeVar("TransformOutputT")
 

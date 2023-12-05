@@ -260,3 +260,26 @@ def test_saved_query_explain(  # noqa: D
 
     # Currently difficult to compare explain output due to randomly generated IDs.
     assert resp.exit_code == 0
+
+
+@pytest.mark.sql_engine_snapshot
+def test_saved_query_with_cumulative_metric(  # noqa: D
+    request: FixtureRequest,
+    capsys: pytest.CaptureFixture,
+    mf_test_session_state: MetricFlowTestSessionState,
+    cli_runner: MetricFlowCliRunner,
+    sql_client: SqlClient,
+) -> None:
+    resp = cli_runner.run(
+        query, args=["--saved-query", "saved_query_with_cumulative_metric", "--order", "metric_time__day"]
+    )
+
+    assert_object_snapshot_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        obj_id="cli_output",
+        obj=resp.output,
+        sql_client=sql_client,
+    )
+
+    assert resp.exit_code == 0
