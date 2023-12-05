@@ -1,0 +1,6 @@
+kind: Fixes
+body: '`Unable To Satisfy Query Error` with Cumulative Metrics in Saved Queries'
+time: 2023-12-04T18:34:26.728915-08:00
+custom:
+  Author: plypaul
+  Issue: "917"

@@ -4,6 +4,7 @@ import datetime
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+from dbt_semantic_interfaces.test_utils import as_datetime
 
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest
 from metricflow.protocols.sql_client import SqlClient
@@ -141,6 +142,7 @@ def test_cumulative_metric_with_non_adjustable_filter(
                 "{{ TimeDimension('metric_time', 'day') }} = '2020-03-15' or "
                 "{{ TimeDimension('metric_time', 'day') }} = '2020-04-30'"
             ),
+            time_constraint_end=as_datetime("2020-12-31"),
         )
     )
     assert query_result.result_df is not None, "Unexpected empty result."

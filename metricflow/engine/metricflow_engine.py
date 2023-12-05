@@ -458,13 +458,17 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 f"Query spec requires a time spine dataset conforming to the following spec: {self._time_spine_source}. "
             )
             time_constraint_updated = False
-            if not mf_query_request.time_constraint_start:
+
+            if mf_query_request.time_constraint_start is None:
                 time_constraint_start = self._time_source.get_time() - datetime.timedelta(days=365)
                 logger.warning(
                     "A start time has not be supplied while querying for cumulative metrics. To avoid an excessive "
                     f"number of rows, the start time will be changed to {time_constraint_start.isoformat()}"
                 )
                 time_constraint_updated = True
+            else:
+                time_constraint_start = mf_query_request.time_constraint_start
+
             if not mf_query_request.time_constraint_end:
                 time_constraint_end = self._time_source.get_time()
                 logger.warning(
@@ -472,17 +476,15 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                     f"number of rows, the end time will be changed to {time_constraint_end.isoformat()}"
                 )
                 time_constraint_updated = True
+            else:
+                time_constraint_end = mf_query_request.time_constraint_end
+
             if time_constraint_updated:
-                query_spec = self._query_parser.parse_and_validate_query(
-                    metric_names=mf_query_request.metric_names,
-                    group_by_names=mf_query_request.group_by_names,
-                    group_by=mf_query_request.group_by,
-                    limit=mf_query_request.limit,
-                    time_constraint_start=mf_query_request.time_constraint_start,
-                    time_constraint_end=mf_query_request.time_constraint_end,
-                    where_constraint_str=mf_query_request.where_constraint,
-                    order_by_names=mf_query_request.order_by_names,
-                    order_by=mf_query_request.order_by,
+                query_spec = query_spec.with_time_range_constraint(
+                    TimeRangeConstraint(
+                        start_time=time_constraint_start,
+                        end_time=time_constraint_end,
+                    )
                 )
                 logger.warning(f"Query spec updated to:\n{pformat_big_objects(query_spec)}")
 
