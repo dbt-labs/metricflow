@@ -18,12 +18,11 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode
+from metricflow.dataset.dataset import DataSet
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
-from metricflow.specs.specs import (
-    TimeDimensionSpec,
-)
+from metricflow.specs.specs import TimeDimensionSpec
 from metricflow.time.time_granularity import (
     adjust_to_end_of_period,
     adjust_to_start_of_period,
@@ -84,6 +83,11 @@ class TimeGranularitySolver:
                 self._time_dimension_names_to_supported_granularities[granularity_free_qualified_name].add(
                     time_dimension_instance.spec.time_granularity
                 )
+        self._time_dimension_names_to_supported_granularities[DataSet.metric_time_dimension_name()] = {
+            granularity
+            for granularity in TimeGranularity
+            if granularity.to_int() >= semantic_manifest_lookup.time_spine_source.time_column_granularity.to_int()
+        }
 
     def validate_time_granularity(
         self, metric_references: Sequence[MetricReference], time_dimension_specs: Sequence[TimeDimensionSpec]

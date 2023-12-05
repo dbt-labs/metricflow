@@ -352,11 +352,11 @@ class NodeEvaluatorForLinkableInstances:
 
         data_set_linkable_specs = candidate_spec_set.linkable_specs
 
-        # These are linkable specs in the same data set as the measure. Those are considered "local".
-        local_linkable_specs = []
+        # These are linkable specs in the start node data set. Those are considered "local".
+        local_linkable_specs: List[LinkableInstanceSpec] = []
 
         # These are linkable specs that aren't in the data set, but they might be able to be joined in.
-        possibly_joinable_linkable_specs = []
+        possibly_joinable_linkable_specs: List[LinkableInstanceSpec] = []
 
         # Group required_linkable_specs into local / un-joinable / or possibly joinable.
         unjoinable_linkable_specs = []

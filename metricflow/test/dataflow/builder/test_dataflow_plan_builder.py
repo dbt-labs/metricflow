@@ -998,3 +998,26 @@ def test_nested_derived_metric_with_outer_offset(  # noqa: D
         mf_test_session_state=mf_test_session_state,
         dag_graph=dataflow_plan,
     )
+
+
+def test_metric_time_only(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
+        MetricFlowQuerySpec(time_dimension_specs=(MTD_SPEC_DAY,))
+    )
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dag_graph=dataflow_plan,
+    )

@@ -33,6 +33,7 @@ from metricflow.dataflow.dataflow_plan import (
     JoinOverTimeRangeNode,
     JoinToBaseOutputNode,
     JoinToTimeSpineNode,
+    MetricTimeDimensionTransformNode,
     OrderByLimitNode,
     ReadSqlSourceNode,
     SemiAdditiveJoinNode,
@@ -104,12 +105,15 @@ class DataflowPlanBuilder:
         self,
         source_nodes: Sequence[BaseOutput],
         read_nodes: Sequence[ReadSqlSourceNode],
+        time_spine_source_node: MetricTimeDimensionTransformNode,
         semantic_manifest_lookup: SemanticManifestLookup,
         node_output_resolver: Optional[DataflowPlanNodeOutputDataSetResolver] = None,
         column_association_resolver: Optional[ColumnAssociationResolver] = None,
     ) -> None:
         self._semantic_model_lookup = semantic_manifest_lookup.semantic_model_lookup
         self._metric_lookup = semantic_manifest_lookup.metric_lookup
+        self._time_spine_source = semantic_manifest_lookup.time_spine_source
+        self._time_spine_source_node = time_spine_source_node
         self._metric_time_dimension_reference = DataSet.metric_time_dimension_reference()
         self._source_nodes = source_nodes
         self._read_nodes = read_nodes
@@ -453,18 +457,18 @@ class DataflowPlanBuilder:
 
     def _select_read_nodes_with_linkable_specs(
         self, linkable_specs: LinkableSpecSet, read_nodes: Sequence[ReadSqlSourceNode]
-    ) -> Dict[BaseOutput, Set[LinkableInstanceSpec]]:
+    ) -> List[ReadSqlSourceNode]:
         """Find source nodes with requested linkable specs and no measures."""
-        nodes_to_linkable_specs: Dict[BaseOutput, Set[LinkableInstanceSpec]] = {}
-        linkable_specs_set = set(linkable_specs.as_tuple)
+        selected_nodes: List[ReadSqlSourceNode] = []
+        requested_linkable_specs_set = set(linkable_specs.as_tuple)
         for read_node in read_nodes:
             output_spec_set = self._node_data_set_resolver.get_output_data_set(read_node).instance_set.spec_set
-            linkable_specs_in_node = set(output_spec_set.linkable_specs)
-            requested_linkable_specs_in_node = linkable_specs_set.intersection(linkable_specs_in_node)
+            all_linkable_specs_in_node = set(output_spec_set.linkable_specs)
+            requested_linkable_specs_in_node = requested_linkable_specs_set.intersection(all_linkable_specs_in_node)
             if requested_linkable_specs_in_node:
-                nodes_to_linkable_specs[read_node] = requested_linkable_specs_in_node
+                selected_nodes.append(read_node)
 
-        return nodes_to_linkable_specs
+        return selected_nodes
 
     def _find_non_additive_dimension_in_linkable_specs(
         self,
@@ -525,24 +529,32 @@ class DataflowPlanBuilder:
         time_range_constraint: Optional[TimeRangeConstraint] = None,
     ) -> Optional[DataflowRecipe]:
         linkable_specs = linkable_spec_set.as_tuple
+        potential_source_nodes: Sequence[BaseOutput]
         if measure_spec_properties:
             source_nodes = self._source_nodes
-            potential_source_nodes: Sequence[BaseOutput] = self._select_source_nodes_with_measures(
+            potential_source_nodes = self._select_source_nodes_with_measures(
                 measure_specs=set(measure_spec_properties.measure_specs), source_nodes=source_nodes
             )
             default_join_type = SqlJoinType.LEFT_OUTER
         else:
             # Only read nodes can be source nodes for queries without measures
-            source_nodes = self._read_nodes
-            source_nodes_to_linkable_specs = self._select_read_nodes_with_linkable_specs(
-                linkable_specs=linkable_spec_set, read_nodes=source_nodes
+            source_nodes = list(self._read_nodes)
+            potential_source_nodes = self._select_read_nodes_with_linkable_specs(
+                linkable_specs=linkable_spec_set, read_nodes=self._read_nodes
             )
-            potential_source_nodes = list(source_nodes_to_linkable_specs.keys())
+            # `metric_time` does not exist if there is no metric in the query.
+            # In that case, we'll use the time spine table to represent `metric_time` values.
+            requested_metric_time_specs = [
+                time_dimension_spec
+                for time_dimension_spec in linkable_spec_set.time_dimension_specs
+                if time_dimension_spec.element_name == self._metric_time_dimension_reference.element_name
+            ]
+            if requested_metric_time_specs:
+                # Add time_spine source node to potential source nodes
+                potential_source_nodes = list(potential_source_nodes) + [self._time_spine_source_node]
             default_join_type = SqlJoinType.FULL_OUTER
 
-        logger.info(f"There are {len(potential_source_nodes)} potential source nodes")
-
-        logger.info(f"Starting search with {len(source_nodes)} source nodes")
+        logger.info(f"Starting search with {len(potential_source_nodes)} potential source nodes")
         start_time = time.time()
 
         node_processor = PreJoinNodeProcessor(

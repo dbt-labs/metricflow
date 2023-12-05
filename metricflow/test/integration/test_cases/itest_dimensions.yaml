@@ -182,3 +182,25 @@ integration_test:
     WHERE u.home_state = 'CA'
     GROUP BY
       u.home_state
+---
+integration_test:
+  name: metric_time_only
+  description: Query metric_time alone
+  model: SIMPLE_MODEL
+  group_bys: ["metric_time"]
+  check_query: |
+    SELECT
+      {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
+    FROM {{ source_schema }}.mf_time_spine
+    GROUP BY metric_time__day
+---
+integration_test:
+  name: metric_time_week
+  description: Query metric_time alone with non-default granularity
+  model: SIMPLE_MODEL
+  group_bys: ["metric_time__week"]
+  check_query: |
+    SELECT
+      {{ render_date_trunc("ds", TimeGranularity.WEEK) }} AS metric_time__week
+    FROM {{ source_schema }}.mf_time_spine
+    GROUP BY metric_time__week
