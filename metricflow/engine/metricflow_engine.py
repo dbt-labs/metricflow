@@ -320,6 +320,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         sql_client: SqlClient,
         time_source: TimeSource = ServerTimeSource(),
         column_association_resolver: Optional[ColumnAssociationResolver] = None,
+        enable_default_time_constraint: bool = True,
     ) -> None:
         """Initializer for MetricFlowEngine.
 
@@ -327,6 +328,12 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         - time_source
         - column_association_resolver
         - time_spine_source
+        - enable_default_time_constraint: In cases where the time constraint is not specified for cumulative
+        metrics, the time constraint is adjusted to reduce the number of rows produced as cumulative metrics can
+        produce rows for all time values in the time spine. This was added to avoid adding time constraints
+        automatically for tests. This could be removed if automatic adjustment is removed, or when the tests are
+        updated.
+
         These parameters are mainly there to be overridden during tests.
         """
         self._semantic_manifest_lookup = semantic_manifest_lookup
@@ -336,7 +343,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         )
         self._time_source = time_source
         self._time_spine_source = semantic_manifest_lookup.time_spine_source
-
+        self._enable_default_time_constraint = enable_default_time_constraint
         self._source_data_sets: List[SemanticModelDataSet] = []
         converter = SemanticModelToDataSetConverter(column_association_resolver=self._column_association_resolver)
         for semantic_model in sorted(
@@ -446,8 +453,11 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             )
         logger.info(f"Query spec is:\n{pformat_big_objects(query_spec)}")
 
-        if self._semantic_manifest_lookup.metric_lookup.contains_cumulative_or_time_offset_metric(
-            tuple(metric_spec.reference for metric_spec in query_spec.metric_specs)
+        if (
+            self._semantic_manifest_lookup.metric_lookup.contains_cumulative_or_time_offset_metric(
+                tuple(metric_spec.reference for metric_spec in query_spec.metric_specs)
+            )
+            and self._enable_default_time_constraint
         ):
             if self._time_spine_source.time_column_granularity != TimeGranularity.DAY:
                 raise RuntimeError(
