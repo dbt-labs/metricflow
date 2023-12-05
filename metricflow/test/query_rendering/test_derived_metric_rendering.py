@@ -454,6 +454,28 @@ def test_time_offset_metric_with_time_constraint(  # noqa: D
             ),
         )
     )
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_nested_filters(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    query_parser: MetricFlowQueryParser,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+    create_source_tables: bool,
+) -> None:
+    """Tests derived metric rendering for a nested derived metric with filters on the outer metric spec."""
+    query_spec = query_parser.parse_and_validate_query(metric_names=("instant_lux_booking_value_rate",))
+    dataflow_plan = dataflow_plan_builder.build_plan(query_spec=query_spec)
 
     convert_and_check(
         request=request,

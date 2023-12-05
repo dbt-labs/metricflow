@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Add test for nested derived metric filter rendering bug fixed in 0.204.0
+time: 2024-01-25T17:17:47.589492-08:00
+custom:
+  Author: tlento
+  Issue: "920"

@@ -299,6 +299,19 @@ metric:
       name: booking_value
 ---
 metric:
+  name: instant_lux_booking_value_rate
+  description: |
+    Instant booking value for lux bookings defined as a filtered metric on lux_booking_value_rate_expr
+    Tests constraint application for nested derived metrics.
+  type: derived
+  type_params:
+    expr: instant_lux_booking_value_rate
+    metrics:
+      - name: lux_booking_value_rate_expr
+        filter: "{{ Dimension('booking__is_instant') }}"
+        alias: instant_lux_booking_value_rate
+---
+metric:
   name: regional_starting_balance_ratios
   description: |
     First day account balance ratio of western vs eastern region starting balance ratios,
