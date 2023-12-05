@@ -312,7 +312,7 @@ class SemanticModelToDataSetConverter:
                 )
             )
 
-        new_instances, new_columns = self._build_time_dimension_columns_with_time_granularity_and_date_part(
+        new_instances, new_columns = self._build_time_dimension_instances_and_columns(
             semantic_model_name=semantic_model_name,
             defined_time_granularity=defined_time_granularity,
             element_name=dimension.reference.element_name,
@@ -321,10 +321,9 @@ class SemanticModelToDataSetConverter:
         )
         time_dimension_instances.extend(new_instances)
         select_columns.extend(new_columns)
-
         return (time_dimension_instances, select_columns)
 
-    def _build_time_dimension_columns_with_time_granularity_and_date_part(
+    def _build_time_dimension_instances_and_columns(
         self,
         defined_time_granularity: TimeGranularity,
         element_name: str,
@@ -542,7 +541,7 @@ class SemanticModelToDataSetConverter:
         select_columns.append(select_column)
 
         # TODO: add test cases for date part
-        new_instances, new_columns = self._build_time_dimension_columns_with_time_granularity_and_date_part(
+        new_instances, new_columns = self._build_time_dimension_instances_and_columns(
             defined_time_granularity=defined_time_granularity,
             element_name=time_column_name,
             entity_links=(),

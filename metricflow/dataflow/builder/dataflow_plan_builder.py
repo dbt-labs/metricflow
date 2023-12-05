@@ -507,8 +507,7 @@ class DataflowPlanBuilder:
                 # Add time_spine source node to potential source nodes
                 potential_source_nodes = list(potential_source_nodes) + [self._time_spine_source_node]
 
-        logger.info(f"There are {len(potential_source_nodes)} potential source nodes")
-
+        logger.info(f"Starting search with {len(potential_source_nodes)} potential source nodes")
         start_time = time.time()
 
         node_processor = PreJoinNodeProcessor(
@@ -546,6 +545,7 @@ class DataflowPlanBuilder:
 
         # Dict from the node that contains the source node to the evaluation results.
         node_to_evaluation: Dict[BaseOutput, LinkableInstanceSatisfiabilityEvaluation] = {}
+
         for node in self._sort_by_suitability(potential_source_nodes):
             data_set = self._node_data_set_resolver.get_output_data_set(node)
 
