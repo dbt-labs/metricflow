@@ -346,9 +346,12 @@ class DataflowPlanBuilder:
         """
         assert not query_spec.metric_specs, "Can't build distinct values plan with metrics."
 
-        dataflow_recipe = self._find_dataflow_recipe(linkable_spec_set=query_spec.linkable_specs)
+        required_linkable_specs, _ = self.__get_required_and_extraneous_linkable_specs(
+            queried_linkable_specs=query_spec.linkable_specs, where_constraint=query_spec.where_constraint
+        )
+        dataflow_recipe = self._find_dataflow_recipe(linkable_spec_set=required_linkable_specs)
         if not dataflow_recipe:
-            raise UnableToSatisfyQueryError(f"Recipe not found for linkable specs: {query_spec.linkable_specs}")
+            raise UnableToSatisfyQueryError(f"Recipe not found for linkable specs: {required_linkable_specs}")
 
         joined_node: Optional[JoinToBaseOutputNode] = None
         if dataflow_recipe.join_targets:
@@ -658,7 +661,6 @@ class DataflowPlanBuilder:
                 for x in evaluation.join_recipes
                 for y in x.join_on_partition_time_dimensions
             )
-
             return DataflowRecipe(
                 source_node=node_with_lowest_cost_plan,
                 required_local_linkable_specs=(
@@ -780,6 +782,28 @@ class DataflowPlanBuilder:
             time_range_constraint=time_range_constraint,
         )
 
+    def __get_required_and_extraneous_linkable_specs(
+        self,
+        queried_linkable_specs: LinkableSpecSet,
+        where_constraint: Optional[WhereFilterSpec] = None,
+        non_additive_dimension_spec: Optional[NonAdditiveDimensionSpec] = None,
+    ) -> Tuple[LinkableSpecSet, LinkableSpecSet]:
+        """Get the required and extraneous linkable specs for this query.
+
+        Extraneous linkable specs are specs that are used in this phase that should not show up in the final result
+        unless it was already a requested spec in the query (e.g., linkable spec used in where constraint)
+        """
+        linkable_spec_sets_to_merge: List[LinkableSpecSet] = []
+        if where_constraint:
+            linkable_spec_sets_to_merge.append(where_constraint.linkable_spec_set)
+        if non_additive_dimension_spec:
+            linkable_spec_sets_to_merge.append(non_additive_dimension_spec.linkable_specs)
+
+        extraneous_linkable_specs = LinkableSpecSet.merge_iterable(linkable_spec_sets_to_merge).dedupe()
+        required_linkable_specs = queried_linkable_specs.merge(extraneous_linkable_specs).dedupe()
+
+        return required_linkable_specs, extraneous_linkable_specs
+
     def _build_aggregated_measure_from_measure_source_node(
         self,
         metric_input_measure_spec: MetricInputMeasureSpec,
@@ -819,16 +843,11 @@ class DataflowPlanBuilder:
             )
             logger.info(f"Adjusted time range constraint {cumulative_metric_adjusted_time_constraint}")
 
-        # Extraneous linkable specs are specs that are used in this phase that should not show up in the final result
-        # unless it was already a requested spec in the query
-        linkable_spec_sets_to_merge: List[LinkableSpecSet] = []
-        if where_constraint:
-            linkable_spec_sets_to_merge.append(where_constraint.linkable_spec_set)
-        if non_additive_dimension_spec:
-            linkable_spec_sets_to_merge.append(non_additive_dimension_spec.linkable_specs)
-
-        extraneous_linkable_specs = LinkableSpecSet.merge_iterable(linkable_spec_sets_to_merge).dedupe()
-        required_linkable_specs = queried_linkable_specs.merge(extraneous_linkable_specs).dedupe()
+        required_linkable_specs, extraneous_linkable_specs = self.__get_required_and_extraneous_linkable_specs(
+            queried_linkable_specs=queried_linkable_specs,
+            where_constraint=where_constraint,
+            non_additive_dimension_spec=non_additive_dimension_spec,
+        )
 
         logger.info(
             f"Looking for a recipe to get:\n"
