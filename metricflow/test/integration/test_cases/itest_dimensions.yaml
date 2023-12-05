@@ -171,7 +171,7 @@ integration_test:
 ---
 integration_test:
   name: query_dimension_only_with_constraint
-  description: Query dimenension only
+  description: Query dimenension only with where constraint
   model: SIMPLE_MODEL
   group_bys: ["user__home_state"]
   where_filter: "{{ render_dimension_template('user__home_state') }} = 'CA'"
@@ -182,3 +182,23 @@ integration_test:
     WHERE u.home_state = 'CA'
     GROUP BY
       u.home_state
+---
+integration_test:
+  name: query_dimension_with_constraint_from_diff_source
+  description: Query dimenension only with where constraint, where constraint requires a join
+  model: SIMPLE_MODEL
+  group_bys: ["user__home_state_latest"]
+  where_filter: "{{ render_dimension_template('listing__country_latest') }} = 'us'"
+  check_query: |
+    SELECT
+      user__home_state_latest
+    FROM (
+      SELECT
+        l.country AS listing__country_latest
+        , u.home_state_latest AS user__home_state_latest
+      FROM {{ source_schema }}.dim_listings_latest l
+      FULL OUTER JOIN {{ source_schema }}.dim_users_latest u ON l.user_id = u.user_id
+    )
+    WHERE listing__country_latest = 'us'
+    GROUP BY user__home_state_latest
+# case where where filter not in selections, for derived metric plan that doesn't use normal one
