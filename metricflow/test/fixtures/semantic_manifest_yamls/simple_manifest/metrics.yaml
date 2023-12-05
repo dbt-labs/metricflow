@@ -447,6 +447,18 @@ metric:
     measure: approximate_discrete_booking_value_p99
 ---
 metric:
+  name: "bookings_2_weeks_ago"
+  description: |
+    Same as bookings, but with the time offset to 2 weeks ago for comparison.
+  type: derived
+  type_params:
+    expr: bookings_2_weeks_ago
+    metrics:
+      - name: bookings
+        offset_window: 14 days
+        alias: bookings_2_weeks_ago
+---
+metric:
   name: "bookings_growth_2_weeks"
   description: |
     percentage growth of bookings compared to bookings 2 weeks prior,
@@ -456,9 +468,7 @@ metric:
     expr: bookings - bookings_2_weeks_ago
     metrics:
       - name: bookings
-      - name: bookings
-        offset_window: 14 days
-        alias: bookings_2_weeks_ago
+      - name: bookings_2_weeks_ago
 ---
 metric:
   name: "bookings_growth_since_start_of_month"
