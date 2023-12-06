@@ -1,0 +1,14 @@
+---
+semantic_model:
+  name: entity_2_to_entity_0_mapping_source
+  description: Maps "entity_2" to "entity_0"
+
+  node_relation:
+    schema_name: $source_schema
+    alias: entity_2_to_entity_0_mapping_table
+
+  entities:
+    - name: entity_2
+      type: primary
+    - name: entity_0
+      type: foreign

@@ -1,0 +1,14 @@
+---
+metric:
+  name: entity_1_metric
+  description: Metric based on a measure defined with "entity_1"
+  type: simple
+  type_params:
+    measure: entity_1_measure
+---
+metric:
+  name: entity_1_and_entity_2_metric
+  description: Metric based on a measure defined with "entity_1" and "entity_2"
+  type: simple
+  type_params:
+    measure: entity_1_and_entity_2_measure

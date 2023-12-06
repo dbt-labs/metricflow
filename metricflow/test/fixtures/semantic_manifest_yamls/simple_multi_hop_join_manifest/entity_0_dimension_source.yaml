@@ -1,0 +1,16 @@
+---
+semantic_model:
+  name: entity_0_dimension_source
+  description: Contains dimensions for "entity_0"
+
+  node_relation:
+    schema_name: $source_schema
+    alias: entity_0_dimension_table
+
+  dimensions:
+    - name: country
+      type: categorical
+
+  entities:
+    - name: entity_0
+      type: primary
