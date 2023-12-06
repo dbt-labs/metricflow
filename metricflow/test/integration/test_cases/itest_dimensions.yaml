@@ -225,6 +225,17 @@ integration_test:
     GROUP BY metric_time__week
 ---
 integration_test:
+  name: metric_time_date_part
+  description: Query metric_time alone with date part
+  model: SIMPLE_MODEL
+  group_by_objs: [{"name": "metric_time", "date_part": "dow"}]
+  check_query: |
+    SELECT
+      {{ render_extract("ds", DatePart.DOW) }} AS metric_time__extract_dow
+    FROM {{ source_schema }}.mf_time_spine
+    GROUP BY metric_time__extract_dow
+---
+integration_test:
   name: metric_time_with_other_dimensions
   description: Query metric_time with other dimensions and filters
   model: SIMPLE_MODEL
@@ -250,7 +261,7 @@ integration_test:
 ---
 integration_test:
   name: query_dimensions_with_time_constraint
-  description: Query multiple dimensions without metrics
+  description: Query dimensions with time constraint
   model: SIMPLE_MODEL
   group_bys: ["user__home_state_latest", "listing__country_latest", "metric_time__day"]
   time_constraint: ["2020-01-03", "2020-01-03"]
@@ -267,7 +278,3 @@ integration_test:
       {{ render_date_trunc("t.ds", TimeGranularity.DAY) }}
       , l.country
       , u.home_state_latest
-
-# case where where filter not in selections, for derived metric plan that doesn't use normal one
-# TODO: add test with date part
-# test with where filter

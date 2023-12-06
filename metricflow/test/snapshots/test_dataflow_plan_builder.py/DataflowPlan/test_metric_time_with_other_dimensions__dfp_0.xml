@@ -1,0 +1,117 @@
+<DataflowPlan>
+    <WriteToResultDataframeNode>
+        <!-- description = Write to Dataframe -->
+        <!-- node_id = wrd_0 -->
+        <FilterElementsNode>
+            <!-- description =                    -->
+            <!--   Pass Only Elements:            -->
+            <!--     ['user__home_state_latest',  -->
+            <!--      'listing__is_lux_latest',   -->
+            <!--      'metric_time__day',         -->
+            <!--      'metric_time__month']       -->
+            <!-- node_id = pfe_4 -->
+            <!-- include_spec =                                                               -->
+            <!--   {'class': 'DimensionSpec',                                                 -->
+            <!--    'element_name': 'home_state_latest',                                      -->
+            <!--    'entity_links': ({'class': 'EntityReference', 'element_name': 'user'},)}  -->
+            <!-- include_spec =                                                                  -->
+            <!--   {'class': 'DimensionSpec',                                                    -->
+            <!--    'element_name': 'is_lux_latest',                                             -->
+            <!--    'entity_links': ({'class': 'EntityReference', 'element_name': 'listing'},)}  -->
+            <!-- include_spec =                               -->
+            <!--   {'class': 'TimeDimensionSpec',             -->
+            <!--    'element_name': 'metric_time',            -->
+            <!--    'entity_links': (),                       -->
+            <!--    'time_granularity': TimeGranularity.DAY,  -->
+            <!--    'date_part': None,                        -->
+            <!--    'aggregation_state': None}                -->
+            <!-- include_spec =                                 -->
+            <!--   {'class': 'TimeDimensionSpec',               -->
+            <!--    'element_name': 'metric_time',              -->
+            <!--    'entity_links': (),                         -->
+            <!--    'time_granularity': TimeGranularity.MONTH,  -->
+            <!--    'date_part': None,                          -->
+            <!--    'aggregation_state': None}                  -->
+            <!-- distinct = True -->
+            <JoinToBaseOutputNode>
+                <!-- description = Join Standard Outputs -->
+                <!-- node_id = jso_0 -->
+                <!-- join0_for_node_id_pfe_2 =                           -->
+                <!--   {'class': 'JoinDescription',                      -->
+                <!--    'join_node': FilterElementsNode(node_id=pfe_2),  -->
+                <!--    'join_on_entity': None,                          -->
+                <!--    'join_type': SqlJoinType.CROSS_JOIN,             -->
+                <!--    'join_on_partition_dimensions': (),              -->
+                <!--    'join_on_partition_time_dimensions': (),         -->
+                <!--    'validity_window': None}                         -->
+                <!-- join1_for_node_id_pfe_3 =                             -->
+                <!--   {'class': 'JoinDescription',                        -->
+                <!--    'join_node': FilterElementsNode(node_id=pfe_3),    -->
+                <!--    'join_on_entity': {'class': 'LinklessEntitySpec',  -->
+                <!--                       'element_name': 'user',         -->
+                <!--                       'entity_links': ()},            -->
+                <!--    'join_type': SqlJoinType.FULL_OUTER,               -->
+                <!--    'join_on_partition_dimensions': (),                -->
+                <!--    'join_on_partition_time_dimensions': (),           -->
+                <!--    'validity_window': None}                           -->
+                <ReadSqlSourceNode>
+                    <!-- description =                                                                                    -->
+                    <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))  -->
+                    <!-- node_id = rss_10004 -->
+                    <!-- data_set =                                                                             -->
+                    <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))  -->
+                </ReadSqlSourceNode>
+                <FilterElementsNode>
+                    <!-- description =                                   -->
+                    <!--   Pass Only Elements:                           -->
+                    <!--     ['metric_time__day', 'metric_time__month']  -->
+                    <!-- node_id = pfe_2 -->
+                    <!-- include_spec =                               -->
+                    <!--   {'class': 'TimeDimensionSpec',             -->
+                    <!--    'element_name': 'metric_time',            -->
+                    <!--    'entity_links': (),                       -->
+                    <!--    'time_granularity': TimeGranularity.DAY,  -->
+                    <!--    'date_part': None,                        -->
+                    <!--    'aggregation_state': None}                -->
+                    <!-- include_spec =                                 -->
+                    <!--   {'class': 'TimeDimensionSpec',               -->
+                    <!--    'element_name': 'metric_time',              -->
+                    <!--    'entity_links': (),                         -->
+                    <!--    'time_granularity': TimeGranularity.MONTH,  -->
+                    <!--    'date_part': None,                          -->
+                    <!--    'aggregation_state': None}                  -->
+                    <!-- distinct = False -->
+                    <MetricTimeDimensionTransformNode>
+                        <!-- description = Metric Time Dimension 'ds' -->
+                        <!-- node_id = sma_10007 -->
+                        <!-- aggregation_time_dimension = ds -->
+                        <ReadSqlSourceNode>
+                            <!-- description = Read From SqlDataSet() -->
+                            <!-- node_id = rss_10020 -->
+                            <!-- data_set = SqlDataSet() -->
+                        </ReadSqlSourceNode>
+                    </MetricTimeDimensionTransformNode>
+                </FilterElementsNode>
+                <FilterElementsNode>
+                    <!-- description =                      -->
+                    <!--   Pass Only Elements:              -->
+                    <!--     ['home_state_latest', 'user']  -->
+                    <!-- node_id = pfe_3 -->
+                    <!-- include_spec =                           -->
+                    <!--   {'class': 'DimensionSpec',             -->
+                    <!--    'element_name': 'home_state_latest',  -->
+                    <!--    'entity_links': ()}                   -->
+                    <!-- include_spec = LinklessEntitySpec(element_name='user', entity_links=()) -->
+                    <!-- distinct = False -->
+                    <ReadSqlSourceNode>
+                        <!-- description =                                                                                 -->
+                        <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='users_latest'))  -->
+                        <!-- node_id = rss_10008 -->
+                        <!-- data_set =                                                                          -->
+                        <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='users_latest'))  -->
+                    </ReadSqlSourceNode>
+                </FilterElementsNode>
+            </JoinToBaseOutputNode>
+        </FilterElementsNode>
+    </WriteToResultDataframeNode>
+</DataflowPlan>
