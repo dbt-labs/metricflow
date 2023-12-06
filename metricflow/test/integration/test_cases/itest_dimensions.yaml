@@ -278,3 +278,5 @@ integration_test:
       {{ render_date_trunc("t.ds", TimeGranularity.DAY) }}
       , l.country
       , u.home_state_latest
+
+# TODO: add test case for range of metric time values
