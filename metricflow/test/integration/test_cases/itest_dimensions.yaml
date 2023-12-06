@@ -229,7 +229,6 @@ integration_test:
   description: Query metric_time with other dimensions and filters
   model: SIMPLE_MODEL
   group_bys: ["metric_time", "metric_time__month", "user__home_state_latest", "listing__is_lux_latest"]
-  time_constraint: ["2020-01-03", "2020-01-03"]
   check_query: |
     SELECT
       {{ render_date_trunc("ts.ds", TimeGranularity.DAY) }} AS metric_time__day
@@ -247,6 +246,26 @@ integration_test:
       {{ render_date_trunc("ts.ds", TimeGranularity.DAY) }}
       , {{ render_date_trunc("ts.ds", TimeGranularity.MONTH) }}
       , l.is_lux
+      , u.home_state_latest
+---
+integration_test:
+  name: query_dimensions_with_time_constraint
+  description: Query multiple dimensions without metrics
+  model: SIMPLE_MODEL
+  group_bys: ["user__home_state_latest", "listing__country_latest", "metric_time__day"]
+  time_constraint: ["2020-01-03", "2020-01-03"]
+  check_query: |
+    SELECT
+      {{ render_date_trunc("t.ds", TimeGranularity.DAY) }} AS metric_time__day
+      , l.country AS listing__country_latest
+      , u.home_state_latest AS user__home_state_latest
+    FROM {{ source_schema }}.dim_listings_latest l
+    CROSS JOIN {{ source_schema }}.mf_time_spine t
+    FULL OUTER JOIN {{ source_schema }}.dim_users_latest u ON l.user_id = u.user_id
+    WHERE {{ render_date_trunc("t.ds", TimeGranularity.DAY) }} BETWEEN '2020-01-03' AND '2020-01-03'
+    GROUP BY
+      {{ render_date_trunc("t.ds", TimeGranularity.DAY) }}
+      , l.country
       , u.home_state_latest
 
 # case where where filter not in selections, for derived metric plan that doesn't use normal one

@@ -207,7 +207,6 @@ def filter_not_supported_features(
 @pytest.mark.parametrize(
     "name",
     CONFIGURED_INTEGRATION_TESTS_REPOSITORY.all_test_case_names,
-    # ["itest_dimensions.yaml/metric_time_with_other_dimensions"],
     ids=lambda name: f"name={name}",
 )
 def test_case(
@@ -302,7 +301,6 @@ def test_case(
         )
     )
 
-    # assert 0, query_result.sql
     actual = query_result.result_df
 
     expected = sql_client.query(

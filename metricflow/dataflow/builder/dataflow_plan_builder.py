@@ -353,32 +353,29 @@ class DataflowPlanBuilder:
         required_linkable_specs, _ = self.__get_required_and_extraneous_linkable_specs(
             queried_linkable_specs=query_spec.linkable_specs, where_constraint=query_spec.where_constraint
         )
-        dataflow_recipe = self._find_dataflow_recipe(linkable_spec_set=required_linkable_specs)
+        dataflow_recipe = self._find_dataflow_recipe(
+            linkable_spec_set=required_linkable_specs, time_range_constraint=query_spec.time_range_constraint
+        )
         if not dataflow_recipe:
             raise UnableToSatisfyQueryError(f"Recipe not found for linkable specs: {required_linkable_specs}")
 
-        joined_node: Optional[JoinToBaseOutputNode] = None
+        output_node = dataflow_recipe.source_node
         if dataflow_recipe.join_targets:
-            joined_node = JoinToBaseOutputNode(
-                left_node=dataflow_recipe.source_node, join_targets=dataflow_recipe.join_targets
-            )
+            output_node = JoinToBaseOutputNode(left_node=output_node, join_targets=dataflow_recipe.join_targets)
 
-        where_constraint_node: Optional[WhereConstraintNode] = None
         if query_spec.where_constraint:
-            where_constraint_node = WhereConstraintNode(
-                parent_node=joined_node or dataflow_recipe.source_node, where_constraint=query_spec.where_constraint
+            output_node = WhereConstraintNode(parent_node=output_node, where_constraint=query_spec.where_constraint)
+        if query_spec.time_range_constraint:
+            output_node = ConstrainTimeRangeNode(
+                parent_node=output_node, time_range_constraint=query_spec.time_range_constraint
             )
 
-        distinct_values_node = FilterElementsNode(
-            parent_node=where_constraint_node or joined_node or dataflow_recipe.source_node,
-            include_specs=query_spec.linkable_specs.as_spec_set,
-            distinct=True,
+        output_node = FilterElementsNode(
+            parent_node=output_node, include_specs=query_spec.linkable_specs.as_spec_set, distinct=True
         )
 
         sink_node = self.build_sink_node(
-            parent_node=distinct_values_node,
-            order_by_specs=query_spec.order_by_specs,
-            limit=query_spec.limit,
+            parent_node=output_node, order_by_specs=query_spec.order_by_specs, limit=query_spec.limit
         )
 
         plan_id = IdGeneratorRegistry.for_class(DataflowPlanBuilder).create_id(DATAFLOW_PLAN_PREFIX)
