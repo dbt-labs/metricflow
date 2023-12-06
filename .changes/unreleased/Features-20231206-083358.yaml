@@ -1,0 +1,6 @@
+kind: Features
+body: Enable querying metric_time without metrics.
+time: 2023-12-06T08:33:58.932533-08:00
+custom:
+  Author: courtneyholcomb
+  Issue: "928"
