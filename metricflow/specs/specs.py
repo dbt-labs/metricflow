@@ -552,6 +552,10 @@ class MetricSpec(InstanceSpec):  # noqa: D
         """Return the reference object that is used for referencing the associated metric in the manifest."""
         return MetricReference(element_name=self.element_name)
 
+    def without_offset(self) -> MetricSpec:
+        """Represents the metric spec with any time offsets removed."""
+        return MetricSpec(element_name=self.element_name, constraint=self.constraint, alias=self.alias)
+
 
 @dataclass(frozen=True)
 class CumulativeMeasureDescription:
