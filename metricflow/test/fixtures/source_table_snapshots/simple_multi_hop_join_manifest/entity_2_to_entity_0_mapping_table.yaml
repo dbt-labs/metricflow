@@ -1,0 +1,10 @@
+---
+table_snapshot:
+  table_name: entity_2_to_entity_0_mapping_table
+  column_definitions:
+    - name: entity_2
+      type: STRING
+    - name: entity_0
+      type: STRING
+  rows:
+    - ["E2_0", "E0_1"]

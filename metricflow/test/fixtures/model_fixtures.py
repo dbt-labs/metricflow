@@ -303,3 +303,17 @@ def ambiguous_resolution_manifest_lookup(  # noqa: D
     ambiguous_resolution_manifest: PydanticSemanticManifest,
 ) -> SemanticManifestLookup:
     return SemanticManifestLookup(ambiguous_resolution_manifest)
+
+
+@pytest.fixture(scope="session")
+def simple_multi_hop_join_manifest(template_mapping: Dict[str, str]) -> PydanticSemanticManifest:  # noqa: D
+    build_result = load_semantic_manifest("simple_multi_hop_join_manifest", template_mapping)
+    return build_result.semantic_manifest
+
+
+@pytest.fixture(scope="session")
+def simple_multi_hop_join_manifest_lookup(  # noqa: D
+    simple_multi_hop_join_manifest: PydanticSemanticManifest,
+) -> SemanticManifestLookup:
+    """Manifest used to test ambiguous resolution of group-by-items."""
+    return SemanticManifestLookup(simple_multi_hop_join_manifest)
