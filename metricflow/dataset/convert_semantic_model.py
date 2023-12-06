@@ -540,7 +540,6 @@ class SemanticModelToDataSetConverter:
         )
         select_columns.append(select_column)
 
-        # TODO: add test cases for date part
         new_instances, new_columns = self._build_time_dimension_instances_and_columns(
             defined_time_granularity=defined_time_granularity,
             element_name=time_column_name,

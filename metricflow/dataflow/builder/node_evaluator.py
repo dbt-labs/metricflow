@@ -193,7 +193,6 @@ class NodeEvaluatorForLinkableInstances:
             # then produce the linkable spec. See comments further below for more details.
 
             for entity_spec_in_right_node in entity_specs_in_right_node:
-                # assert 0, entity_spec_in_right_node
                 # If an entity has links, what that means and whether it can be used is unclear at the moment,
                 # so skip it.
                 if len(entity_spec_in_right_node.entity_links) > 0:
