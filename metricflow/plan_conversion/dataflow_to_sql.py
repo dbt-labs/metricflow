@@ -384,32 +384,43 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             right_data_set: SqlDataSet = right_node_to_join.accept(self)
             right_data_set_alias = self._next_unique_table_alias()
 
-            sql_join_descs.append(
-                SqlQueryPlanJoinBuilder.make_base_output_join_description(
+            if join_description.join_type == SqlJoinType.CROSS_JOIN:
+                sql_join_desc = SqlQueryPlanJoinBuilder.make_column_equality_sql_join_description(
+                    right_source_node=right_data_set.sql_select_node,
+                    left_source_alias=from_data_set_alias,
+                    right_source_alias=right_data_set_alias,
+                    column_equality_descriptions=(),
+                    join_type=join_description.join_type,
+                )
+            else:
+                sql_join_desc = SqlQueryPlanJoinBuilder.make_base_output_join_description(
                     left_data_set=AnnotatedSqlDataSet(data_set=from_data_set, alias=from_data_set_alias),
                     right_data_set=AnnotatedSqlDataSet(data_set=right_data_set, alias=right_data_set_alias),
                     join_description=join_description,
                 )
-            )
+            sql_join_descs.append(sql_join_desc)
 
-            # Remove the linkable instances with the join_on_entity as the leading link as the next step adds the
-            # link. This is to avoid cases where there is a primary entity and a dimension in the data set, and we
-            # create an instance in the next step that has the same entity link.
-            # e.g. a data set has the dimension "listing__country_latest" and "listing" is a primary entity in the
-            # data set. The next step would create an instance like "listing__listing__country_latest" without this
-            # filter.
-            right_data_set_instance_set_filtered = FilterLinkableInstancesWithLeadingLink(
-                entity_link=join_on_entity,
-            ).transform(right_data_set.instance_set)
+            if join_on_entity:
+                # Remove the linkable instances with the join_on_entity as the leading link as the next step adds the
+                # link. This is to avoid cases where there is a primary entity and a dimension in the data set, and we
+                # create an instance in the next step that has the same entity link.
+                # e.g. a data set has the dimension "listing__country_latest" and "listing" is a primary entity in the
+                # data set. The next step would create an instance like "listing__listing__country_latest" without this
+                # filter.
+                right_data_set_instance_set_filtered = FilterLinkableInstancesWithLeadingLink(
+                    entity_link=join_on_entity,
+                ).transform(right_data_set.instance_set)
 
-            # After the right data set is joined to the "from" data set, we need to change the links for some of the
-            # instances that represent the right data set. For example, if the "from" data set contains the "bookings"
-            # measure instance and the right dataset contains the "country" dimension instance, then after the join,
-            # the output data set should have the "country" dimension instance with the "user_id" entity link
-            # (if "user_id" equality was the join condition). "country" -> "user_id__country"
-            right_data_set_instance_set_after_join = right_data_set_instance_set_filtered.transform(
-                AddLinkToLinkableElements(join_on_entity=join_on_entity)
-            )
+                # After the right data set is joined to the "from" data set, we need to change the links for some of the
+                # instances that represent the right data set. For example, if the "from" data set contains the "bookings"
+                # measure instance and the right dataset contains the "country" dimension instance, then after the join,
+                # the output data set should have the "country" dimension instance with the "user_id" entity link
+                # (if "user_id" equality was the join condition). "country" -> "user_id__country"
+                right_data_set_instance_set_after_join = right_data_set_instance_set_filtered.transform(
+                    AddLinkToLinkableElements(join_on_entity=join_on_entity)
+                )
+            else:
+                right_data_set_instance_set_after_join = right_data_set.instance_set
             table_alias_to_instance_set[right_data_set_alias] = right_data_set_instance_set_after_join
 
         from_data_set_output_instance_set = from_data_set.instance_set.transform(

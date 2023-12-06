@@ -148,6 +148,7 @@ class SqlQueryPlanJoinBuilder:
         columns and account for validity windows, if those are defined in one of the datasets.
         """
         join_on_entity = join_description.join_on_entity
+        assert join_on_entity, "`join_on_entity` is required for this method."
 
         # Figure out which columns in the "left" data set correspond to the entity that we want to join on.
         # The column associations tell us which columns correspond to which instances in the data set.

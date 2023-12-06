@@ -530,6 +530,7 @@ class DataflowPlanBuilder:
     ) -> Optional[DataflowRecipe]:
         linkable_specs = linkable_spec_set.as_tuple
         potential_source_nodes: Sequence[BaseOutput]
+        use_time_spine_source_node = False
         if measure_spec_properties:
             source_nodes = self._source_nodes
             potential_source_nodes = self._select_source_nodes_with_measures(
@@ -552,6 +553,7 @@ class DataflowPlanBuilder:
             if requested_metric_time_specs:
                 # Add time_spine source node to potential source nodes
                 potential_source_nodes = list(potential_source_nodes) + [self._time_spine_source_node]
+                use_time_spine_source_node = True
             default_join_type = SqlJoinType.FULL_OUTER
 
         logger.info(f"Starting search with {len(potential_source_nodes)} potential source nodes")
@@ -573,6 +575,8 @@ class DataflowPlanBuilder:
             nodes=source_nodes,
             metric_time_dimension_reference=self._metric_time_dimension_reference,
         )
+        if use_time_spine_source_node:
+            nodes_available_for_joins = tuple(nodes_available_for_joins) + (self._time_spine_source_node,)
         logger.info(
             f"After removing unnecessary nodes, there are {len(nodes_available_for_joins)} nodes available for joins"
         )
@@ -614,7 +618,10 @@ class DataflowPlanBuilder:
 
             start_time = time.time()
             evaluation = node_evaluator.evaluate_node(
-                start_node=node, required_linkable_specs=list(linkable_specs), default_join_type=default_join_type
+                start_node=node,
+                required_linkable_specs=list(linkable_specs),
+                default_join_type=default_join_type,
+                time_spine_source_node=self._time_spine_source_node if use_time_spine_source_node else None,
             )
             logger.info(f"Evaluation of {node} took {time.time() - start_time:.2f}s")
 
@@ -660,7 +667,7 @@ class DataflowPlanBuilder:
 
             # Nodes containing the linkable instances will be joined to the source node, so these
             # entities will need to be present in the source node.
-            required_local_entity_specs = tuple(x.join_on_entity for x in evaluation.join_recipes)
+            required_local_entity_specs = tuple(x.join_on_entity for x in evaluation.join_recipes if x.join_on_entity)
             # Same thing with partitions.
             required_local_dimension_specs = tuple(
                 y.start_node_dimension_spec for x in evaluation.join_recipes for y in x.join_on_partition_dimensions

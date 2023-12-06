@@ -204,3 +204,32 @@ integration_test:
       {{ render_date_trunc("ds", TimeGranularity.WEEK) }} AS metric_time__week
     FROM {{ source_schema }}.mf_time_spine
     GROUP BY metric_time__week
+---
+integration_test:
+  name: metric_time_with_other_dimensions
+  description: Query metric_time with other dimensions and filters
+  model: SIMPLE_MODEL
+  group_bys: ["metric_time", "metric_time__month", "user__home_state_latest", "listing__is_lux_latest"]
+  time_constraint: ["2020-01-03", "2020-01-03"]
+  check_query: |
+    SELECT
+      {{ render_date_trunc("ts.ds", TimeGranularity.DAY) }} AS metric_time__day
+      , {{ render_date_trunc("ts.ds", TimeGranularity.MONTH) }} AS metric_time__month
+      , l.is_lux AS listing__is_lux_latest
+      , u.home_state_latest AS user__home_state_latest
+    FROM {{ source_schema }}.dim_listings_latest l
+    CROSS JOIN
+      {{ source_schema }}.mf_time_spine ts
+    FULL OUTER JOIN
+      {{ source_schema }}.dim_users_latest u
+    ON
+      l.user_id = u.user_id
+    GROUP BY
+      {{ render_date_trunc("ts.ds", TimeGranularity.DAY) }}
+      , {{ render_date_trunc("ts.ds", TimeGranularity.MONTH) }}
+      , l.is_lux
+      , u.home_state_latest
+
+# TODO: add test with date part
+# test with where filter
+  # where_filter: "{{ render_dimension_template('user__home_state') }} = 'CA'"
