@@ -1688,8 +1688,8 @@ integration_test:
       FROM {{ source_schema }}.mf_time_spine subq_3
       INNER JOIN
         {{ source_schema }}.fct_bookings b
-      ON (DATE_TRUNC('day', b.ds) <= subq_3.ds)
-        AND (DATE_TRUNC('day', b.ds) > subq_3.ds - INTERVAL 2 day)
+      ON ({{ render_date_trunc("b.ds", TimeGranularity.DAY) }} <= subq_3.ds)
+        AND ({{ render_date_trunc("b.ds", TimeGranularity.DAY) }} > {{ render_date_sub("subq_3", "ds", 2, TimeGranularity.DAY) }})
     ) subq_4
-    ON subq_5.metric_time__day - INTERVAL 2 day = subq_4.metric_time__day
+    ON {{ render_date_sub("subq_5", "metric_time__day", 2, TimeGranularity.DAY) }} = subq_4.metric_time__day
     GROUP BY subq_5.metric_time__day
