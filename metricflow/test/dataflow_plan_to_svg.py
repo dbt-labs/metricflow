@@ -19,7 +19,7 @@ def display_graph_if_requested(
         return
 
     plan_svg_output_path_prefix = snapshot_path_prefix(
-        request=request, snapshot_group=dag_graph.__class__.__name__, snapshot_id=dag_graph.dag_id
+        request=request, snapshot_group=dag_graph.__class__.__name__, snapshot_id=str(dag_graph.dag_id)
     )
 
     # Create parent directory since it might not exist

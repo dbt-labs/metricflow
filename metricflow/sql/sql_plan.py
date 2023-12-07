@@ -12,7 +12,7 @@ from metricflow.dag.id_generation import (
     SQL_PLAN_SELECT_STATEMENT_ID_PREFIX,
     SQL_PLAN_TABLE_FROM_CLAUSE_ID_PREFIX,
 )
-from metricflow.dag.mf_dag import DagNode, DisplayedProperty, MetricFlowDag, NodeId
+from metricflow.dag.mf_dag import DagId, DagNode, DisplayedProperty, MetricFlowDag, NodeId
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.sql.sql_exprs import SqlExpressionNode
 from metricflow.visitor import VisitorOutputT
@@ -305,7 +305,7 @@ class SqlQueryPlan(MetricFlowDag[SqlQueryPlanNode]):  # noqa: D
             render_node: The node from which to start rendering the SQL query.
         """
         self._render_node = render_node
-        super().__init__(dag_id=plan_id, sink_nodes=[self._render_node])
+        super().__init__(dag_id=DagId.from_str(plan_id), sink_nodes=[self._render_node])
 
     @property
     def render_node(self) -> SqlQueryPlanNode:  # noqa: D

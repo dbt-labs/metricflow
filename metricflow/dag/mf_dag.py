@@ -12,6 +12,8 @@ from typing import Any, Generic, List, Sequence, TypeVar
 import jinja2
 
 from metricflow.dag.id_generation import IdGeneratorRegistry
+from metricflow.dag.id_prefix import IdPrefix
+from metricflow.dag.prefix_id import PrefixIdGenerator
 from metricflow.visitor import VisitorOutputT
 
 logger = logging.getLogger(__name__)
@@ -36,6 +38,10 @@ class NodeId:
 
     def __repr__(self) -> str:  # noqa: D
         return self.id_str
+
+    @staticmethod
+    def create_unique(id_prefix: IdPrefix) -> NodeId:  # noqa: D
+        return NodeId(str(PrefixIdGenerator.create_next_id(id_prefix)))
 
 
 class DagNodeVisitor(Generic[VisitorOutputT], ABC):
@@ -146,18 +152,33 @@ def make_graphviz_label(
     )
 
 
+@dataclass(frozen=True)
+class DagId:
+    """Unique identifier for DAGs."""
+
+    id_str: str
+
+    def __str__(self) -> str:  # noqa: D
+        return self.id_str
+
+    @staticmethod
+    def from_str(id_str: str) -> DagId:
+        """Migration helper to create DAG IDs."""
+        return DagId(id_str)
+
+
 DagNodeT = TypeVar("DagNodeT", bound=DagNode)
 
 
 class MetricFlowDag(Generic[DagNodeT]):  # noqa: D
     """Represents a directed acyclic graph. The sink nodes will have the connected components."""
 
-    def __init__(self, dag_id: str, sink_nodes: List[DagNodeT]):  # noqa: D
+    def __init__(self, dag_id: DagId, sink_nodes: List[DagNodeT]):  # noqa: D
         self._dag_id = dag_id
         self._sink_nodes = sink_nodes
 
     @property
-    def dag_id(self) -> str:  # noqa: D
+    def dag_id(self) -> DagId:  # noqa: D
         return self._dag_id
 
     @property
