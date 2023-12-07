@@ -552,6 +552,10 @@ class MetricSpec(InstanceSpec):  # noqa: D
         """Return the reference object that is used for referencing the associated metric in the manifest."""
         return MetricReference(element_name=self.element_name)
 
+    @property
+    def has_time_offset(self) -> bool:  # noqa: D
+        return bool(self.offset_window or self.offset_to_grain)
+
 
 @dataclass(frozen=True)
 class CumulativeMeasureDescription:
