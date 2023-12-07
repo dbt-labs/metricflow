@@ -1672,13 +1672,13 @@ integration_test:
                 , 1 AS bookings
               FROM {{ source_schema }}.fct_bookings
             ) subq_1
-            ON subq_3.ds - INTERVAL 5 day = subq_1.metric_time__day
+            ON {{ render_date_sub("subq_3", "ds", 5, TimeGranularity.DAY) }} = subq_1.metric_time__day
             GROUP BY
               subq_3.ds
               , subq_1.booking__is_instant
           ) subq_7
         ) subq_8
-        ON subq_10.ds - INTERVAL 2 day = subq_8.metric_time__day
+        ON { render_date_sub("subq_10", "ds", 2, TimeGranularity.DAY) }} = subq_8.metric_time__day
       ) subq_11
       WHERE booking__is_instant
     )
