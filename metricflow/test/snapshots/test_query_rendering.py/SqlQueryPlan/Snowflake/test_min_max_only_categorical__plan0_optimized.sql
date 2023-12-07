@@ -1,7 +1,7 @@
 -- Calculate min and max
 SELECT
-  MIN(listing__country_latest) AS min_listing__country_latest
-  , MAX(listing__country_latest) AS max_listing__country_latest
+  MIN(listing__country_latest) AS listing__country_latest__min
+  , MAX(listing__country_latest) AS listing__country_latest__max
 FROM (
   -- Read Elements From Semantic Model 'listings_latest'
   -- Pass Only Elements:

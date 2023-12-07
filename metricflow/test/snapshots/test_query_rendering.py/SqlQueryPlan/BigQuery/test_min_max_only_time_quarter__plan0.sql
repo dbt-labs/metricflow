@@ -1,7 +1,7 @@
 -- Calculate min and max
 SELECT
-  MIN(subq_1.booking__paid_at__quarter) AS min_booking__paid_at__quarter
-  , MAX(subq_1.booking__paid_at__quarter) AS max_booking__paid_at__quarter
+  MIN(subq_1.booking__paid_at__quarter) AS booking__paid_at__quarter__min
+  , MAX(subq_1.booking__paid_at__quarter) AS booking__paid_at__quarter__max
 FROM (
   -- Pass Only Elements:
   --   ['booking__paid_at__quarter']

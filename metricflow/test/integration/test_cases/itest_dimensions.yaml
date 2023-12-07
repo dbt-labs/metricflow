@@ -210,8 +210,8 @@ integration_test:
   min_max_only: true
   check_query: |
     SELECT
-      MIN(user__home_state) AS min_user__home_state
-      , MAX(user__home_state) AS max_user__home_state
+      MIN(user__home_state) AS user__home_state__min
+      , MAX(user__home_state) AS user__home_state__max
     FROM (
       SELECT
         u.home_state AS user__home_state
@@ -228,8 +228,8 @@ integration_test:
   min_max_only: true
   check_query: |
     SELECT
-      MIN(verification__ds__day) AS min_verification__ds__day
-      , MAX(verification__ds__day) AS max_verification__ds__day
+      MIN(verification__ds__day) AS verification__ds__day__min
+      , MAX(verification__ds__day) AS verification__ds__day__max
     FROM (
       SELECT
         v.ds as verification__ds__day
@@ -246,8 +246,8 @@ integration_test:
   min_max_only: true
   check_query: |
     SELECT
-      MIN(verification__ds__month) AS min_verification__ds__month
-      , MAX(verification__ds__month) AS max_verification__ds__month
+      MIN(verification__ds__month) AS verification__ds__month__min
+      , MAX(verification__ds__month) AS verification__ds__month__max
     FROM (
       SELECT
         {{ render_date_trunc("v.ds", TimeGranularity.MONTH) }} as verification__ds__month

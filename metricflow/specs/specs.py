@@ -21,7 +21,7 @@ from typing import Any, Dict, Generic, List, Optional, Sequence, Tuple, TypeVar,
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
-from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
+from dbt_semantic_interfaces.naming.keywords import DUNDER, METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.protocols import MetricTimeWindow
 from dbt_semantic_interfaces.references import (
     DimensionReference,
@@ -130,7 +130,7 @@ class MetadataSpec(InstanceSpec):
 
     @property
     def qualified_name(self) -> str:  # noqa: D
-        return f"{self.agg_type.value}_{self.element_name}" if self.agg_type else self.element_name
+        return f"{self.element_name}{DUNDER}{self.agg_type.value}" if self.agg_type else self.element_name
 
     @staticmethod
     def from_name(name: str, agg_type: Optional[AggregationType] = None) -> MetadataSpec:  # noqa: D
