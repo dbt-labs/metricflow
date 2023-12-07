@@ -1,0 +1,21 @@
+<GroupByItemResolutionDag>
+    <QueryGroupByItemResolutionNode>
+        <!-- description = Output the group-by items for query. -->
+        <!-- node_id = qr_6 -->
+        <!-- metrics_in_query =                                                     -->
+        <!--   ["MetricReference(element_name='accumulate_last_2_months_metric')"]  -->
+        <MetricGroupByItemResolutionNode>
+            <!-- description = Output group-by-items available for this metric. -->
+            <!-- node_id = mtr_11 -->
+            <!-- metric_reference =                                                 -->
+            <!--   MetricReference(element_name='accumulate_last_2_months_metric')  -->
+            <MeasureGroupByItemSourceNode>
+                <!-- description = Output group-by-items available for this measure. -->
+                <!-- node_id = msr_9 -->
+                <!-- measure_reference = MeasureReference(element_name='monthly_measure_0') -->
+                <!-- child_metric_reference =                                           -->
+                <!--   MetricReference(element_name='accumulate_last_2_months_metric')  -->
+            </MeasureGroupByItemSourceNode>
+        </MetricGroupByItemResolutionNode>
+    </QueryGroupByItemResolutionNode>
+</GroupByItemResolutionDag>

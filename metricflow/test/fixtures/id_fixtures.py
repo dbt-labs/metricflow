@@ -7,6 +7,7 @@ from unittest.mock import patch
 import pytest
 
 from metricflow.dag.id_generation import IdGeneratorRegistry
+from metricflow.dag.prefix_id import PrefixIdGenerator
 
 
 class IdNumberSpace:
@@ -36,6 +37,8 @@ def patch_id_generators_helper(start_value: int) -> Generator[None, None, None]:
     patch_context_managers = [
         patch.object(IdGeneratorRegistry, "_class_name_to_id_generator", {}),
         patch.object(IdGeneratorRegistry, "DEFAULT_START_VALUE", start_value),
+        patch.object(PrefixIdGenerator, "_prefix_to_next_value", {}),
+        patch.object(PrefixIdGenerator, "DEFAULT_START_VALUE", start_value),
     ]
 
     # Enter the patch context for the patches above.

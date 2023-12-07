@@ -11,14 +11,16 @@ import tabulate
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 
+from metricflow.collection_helpers.pretty_print import mf_pformat
 from metricflow.dag.mf_dag import MetricFlowDag
 from metricflow.dataflow.dataflow_plan import DataflowPlan
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.execution.execution_plan import ExecutionPlan
 from metricflow.execution.execution_plan_to_text import execution_plan_to_text
 from metricflow.model.semantics.linkable_spec_resolver import LinkableElementSet
+from metricflow.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.specs.specs import InstanceSpecSet
+from metricflow.specs.specs import InstanceSpecSet, LinkableSpecSet
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState, check_sql_engine_snapshot_marker
 
 logger = logging.getLogger(__name__)
@@ -80,7 +82,17 @@ def snapshot_path_prefix(
     .../snapshots/test_file.py/DataflowPlan/test_name__plan1.svg
     """
     test_name = request.node.name
-    snapshot_file_name = test_name + "__" + snapshot_id
+
+    snapshot_file_name_parts = []
+    # Parameterized test names look like 'test_case[some_param]'. "[" and "]" are annoying to deal with in the shell,
+    # so replace them with dunders.
+    snapshot_file_name_parts.extend(re.split(r"[\[\]]", test_name))
+    # A trailing ] will produce an empty string in the list, so remove that.
+    snapshot_file_name_parts = [part for part in snapshot_file_name_parts if len(part) > 0]
+    snapshot_file_name_parts.append(snapshot_id)
+
+    snapshot_file_name = "__".join(snapshot_file_name_parts)
+
     path_items: List[str] = []
 
     test_file_path_items = os.path.normpath(request.node.fspath).split(os.sep)
@@ -128,12 +140,14 @@ def assert_plan_snapshot_text_equal(
       plans consistent when there are strings that vary between runs and shouldn't be compared.
     * additional_sub_directories_for_snapshots is used to specify additional sub-directories (in the automatically
       generated directory) where plan outputs should reside.
+
+    TODO: Make this more generic by renaming plan -> DAG.
     """
     assert_snapshot_text_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
         group_id=plan.__class__.__name__,
-        snapshot_id=plan.dag_id,
+        snapshot_id=str(plan.dag_id),
         snapshot_text=plan_snapshot_text,
         snapshot_file_extension=plan_snapshot_file_extension,
         exclude_line_regex=exclude_line_regex,
@@ -326,4 +340,20 @@ def assert_spec_set_snapshot_equal(  # noqa: D
         mf_test_session_state=mf_test_session_state,
         obj_id=set_id,
         obj=sorted(spec.qualified_name for spec in spec_set.all_specs),
+    )
+
+
+def assert_linkable_spec_set_snapshot_equal(  # noqa: D
+    request: FixtureRequest, mf_test_session_state: MetricFlowTestSessionState, set_id: str, spec_set: LinkableSpecSet
+) -> None:
+    # TODO: This will be used in a later PR and this message will be removed.
+    naming_scheme = ObjectBuilderNamingScheme()
+    assert_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        group_id=spec_set.__class__.__name__,
+        snapshot_id=set_id,
+        snapshot_text=mf_pformat(sorted(naming_scheme.input_str(spec) for spec in spec_set.as_tuple)),
+        snapshot_file_extension=".txt",
+        additional_sub_directories_for_snapshots=(),
     )
