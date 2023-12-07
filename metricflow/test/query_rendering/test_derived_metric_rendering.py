@@ -459,7 +459,7 @@ def test_nested_derived_metric_offset_with_joined_where_constraint_not_selected(
             where_constraint=WhereSpecFactory(
                 column_association_resolver=column_association_resolver,
             ).create_from_where_filter(
-                PydanticWhereFilter(where_sql_template=("{{ Dimension('booking__is_instant') }} "))
+                PydanticWhereFilter(where_sql_template=("{{ Dimension('booking__is_instant') }}"))
             ),
         )
     )
