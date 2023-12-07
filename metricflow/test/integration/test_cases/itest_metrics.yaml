@@ -1632,3 +1632,64 @@ integration_test:
     ON
       {{ render_date_sub("subq_9", "ds", 2, TimeGranularity.DAY) }} = subq_8.metric_time__day
     WHERE {{ render_time_constraint('subq_9.ds', '2020-01-08', '2020-01-09') }}
+---
+integration_test:
+  name: time_offset_metric_with_time_constraint
+  description: Tests a derived offset metric with a time constraint
+  model: SIMPLE_MODEL
+  metrics: ["bookings_5_day_lag"]
+  group_by_objs: [{"name": "metric_time", "grain": "day"}]
+  time_constraint: ["2019-12-19", "2020-01-02"]
+  check_query: |
+    SELECT
+      metric_time__day
+      , bookings_5_days_ago AS bookings_5_day_lag
+    FROM (
+      SELECT
+        subq_3.metric_time__day AS metric_time__day
+        , SUM(subq_2.bookings) AS bookings_5_days_ago
+      FROM (
+        SELECT
+          ds AS metric_time__day
+        FROM {{ source_schema }}.mf_time_spine
+        WHERE {{ render_time_constraint('ds', '2019-12-19', '2020-01-02') }}
+      ) subq_3
+      INNER JOIN (
+        SELECT
+          {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
+          , 1 AS bookings
+        FROM {{ source_schema }}.fct_bookings
+      ) subq_2
+      ON {{ render_date_sub("subq_3", "metric_time__day", 5, TimeGranularity.DAY) }} = subq_2.metric_time__day
+      GROUP BY subq_3.metric_time__day
+    )
+---
+integration_test:
+  name: cumulative_time_offset_metric_with_time_constraint
+  description: Tests a cumulative derived offset metric with a time constraint
+  model: SIMPLE_MODEL
+  metrics: ["every_2_days_bookers_2_days_ago"]
+  group_by_objs: [{"name": "metric_time", "grain": "day"}]
+  time_constraint: ["2019-12-19", "2020-01-02"]
+  check_query: |
+    SELECT
+      subq_5.metric_time__day AS metric_time__day
+      , COUNT(DISTINCT subq_4.bookers) AS every_2_days_bookers_2_days_ago
+    FROM (
+      SELECT
+        ds AS metric_time__day
+      FROM {{ source_schema }}.mf_time_spine subq_6
+      WHERE ds BETWEEN '2019-12-19' AND '2020-01-02'
+    ) subq_5
+    INNER JOIN (
+      SELECT
+        subq_3.ds AS metric_time__day
+        , b.guest_id AS bookers
+      FROM {{ source_schema }}.mf_time_spine subq_3
+      INNER JOIN
+        {{ source_schema }}.fct_bookings b
+      ON (DATE_TRUNC('day', b.ds) <= subq_3.ds)
+        AND (DATE_TRUNC('day', b.ds) > subq_3.ds - INTERVAL 2 day)
+    ) subq_4
+    ON subq_5.metric_time__day - INTERVAL 2 day = subq_4.metric_time__day
+    GROUP BY subq_5.metric_time__day
