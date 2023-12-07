@@ -27,7 +27,7 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.dataset.dataset import DataSet
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
-from metricflow.engine.models import Dimension, Entity, Measure, Metric
+from metricflow.engine.models import Dimension, Entity, Measure, Metric, SavedQuery
 from metricflow.engine.time_source import ServerTimeSource
 from metricflow.errors.errors import ExecutionException
 from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
@@ -677,6 +677,13 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 dimensions=self.simple_dimensions_for_metrics([metric.name]),
             )
             for metric in metrics
+        ]
+
+    @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
+    def list_saved_queries(self) -> List[SavedQuery]:  # noqa: D
+        return [
+            SavedQuery.from_pydantic(saved_query)
+            for saved_query in self._semantic_manifest_lookup.semantic_manifest.saved_queries
         ]
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
