@@ -1678,7 +1678,7 @@ integration_test:
               , subq_1.booking__is_instant
           ) subq_7
         ) subq_8
-        ON { render_date_sub("subq_10", "ds", 2, TimeGranularity.DAY) }} = subq_8.metric_time__day
+        ON {{ render_date_sub("subq_10", "ds", 2, TimeGranularity.DAY) }} = subq_8.metric_time__day
       ) subq_11
       WHERE booking__is_instant
     )
