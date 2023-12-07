@@ -252,6 +252,7 @@ def test_case(
         sql_client=sql_client,
         column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup),
         time_source=ConfigurableTimeSource(as_datetime("2021-01-04")),
+        enable_default_time_constraint=False,
     )
 
     check_query_helpers = CheckQueryHelpers(sql_client)
