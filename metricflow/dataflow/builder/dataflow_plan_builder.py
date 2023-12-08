@@ -229,6 +229,10 @@ class DataflowPlanBuilder:
             f"{pformat_big_objects(metric_input_specs=metric_input_specs)}"
         )
 
+        required_linkable_specs, extraneous_linkable_specs = self.__get_required_and_extraneous_linkable_specs(
+            queried_linkable_specs=queried_linkable_specs, where_constraint=where_constraint
+        )
+
         parent_nodes: List[BaseOutput] = []
         metric_has_time_offset = bool(metric_spec.offset_window or metric_spec.offset_to_grain)
         for metric_input_spec in metric_input_specs:
@@ -241,7 +245,9 @@ class DataflowPlanBuilder:
                         offset_window=metric_input_spec.offset_window,
                         offset_to_grain=metric_input_spec.offset_to_grain,
                     ),
-                    queried_linkable_specs=queried_linkable_specs,
+                    queried_linkable_specs=queried_linkable_specs
+                    if not metric_has_time_offset
+                    else required_linkable_specs,
                     # If metric is offset, we'll apply constraint after offset to avoid removing values unexpectedly.
                     where_constraint=where_constraint if not metric_has_time_offset else None,
                     time_range_constraint=time_range_constraint if not metric_has_time_offset else None,
@@ -272,6 +278,13 @@ class DataflowPlanBuilder:
                 )
             if where_constraint:
                 output_node = WhereConstraintNode(parent_node=output_node, where_constraint=where_constraint)
+            if not extraneous_linkable_specs.is_subset_of(queried_linkable_specs):
+                output_node = FilterElementsNode(
+                    parent_node=output_node,
+                    include_specs=InstanceSpecSet(metric_specs=(metric_spec.without_offset(),)).merge(
+                        queried_linkable_specs.as_spec_set
+                    ),
+                )
         return output_node
 
     def _build_any_metric_output_node(
