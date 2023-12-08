@@ -1,0 +1,7 @@
+kind: Fixes
+body: 'Bug fix: Keep where constraint column until used for nested derived offset
+  metric queries.'
+time: 2023-12-06T15:58:14.895141-08:00
+custom:
+  Author: courtneyholcomb
+  Issue: "930"

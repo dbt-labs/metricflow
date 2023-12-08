@@ -556,6 +556,10 @@ class MetricSpec(InstanceSpec):  # noqa: D
     def has_time_offset(self) -> bool:  # noqa: D
         return bool(self.offset_window or self.offset_to_grain)
 
+    def without_offset(self) -> MetricSpec:
+        """Represents the metric spec with any time offsets removed."""
+        return MetricSpec(element_name=self.element_name, constraint=self.constraint, alias=self.alias)
+
 
 @dataclass(frozen=True)
 class CumulativeMeasureDescription:

@@ -496,3 +496,34 @@ def test_cumulative_time_offset_metric_with_time_constraint(  # noqa: D
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_nested_derived_metric_offset_with_joined_where_constraint_not_selected(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+    create_source_tables: bool,
+    column_association_resolver: ColumnAssociationResolver,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        query_spec=MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings_offset_twice"),),
+            time_dimension_specs=(MTD_SPEC_DAY,),
+            where_constraint=WhereSpecFactory(
+                column_association_resolver=column_association_resolver,
+            ).create_from_where_filter(
+                PydanticWhereFilter(where_sql_template=("{{ Dimension('booking__is_instant') }}"))
+            ),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
