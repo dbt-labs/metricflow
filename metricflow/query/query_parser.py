@@ -188,6 +188,8 @@ class MetricFlowQueryParser:
         saved_query_parameter: SavedQueryParameter,
         where_filter: Optional[WhereFilter],
         limit: Optional[int],
+        time_constraint_start: Optional[datetime.datetime],
+        time_constraint_end: Optional[datetime.datetime],
         order_by_names: Optional[Sequence[str]],
         order_by_parameters: Optional[Sequence[OrderByQueryParameter]],
     ) -> MetricFlowQuerySpec:
@@ -211,6 +213,8 @@ class MetricFlowQueryParser:
                 for group_by_item_name in saved_query.query_params.group_by
             ),
             where_constraint=merge_to_single_where_filter(PydanticWhereFilterIntersection(where_filters=where_filters)),
+            time_constraint_start=time_constraint_start,
+            time_constraint_end=time_constraint_end,
             limit=limit,
             order_by_names=order_by_names,
             order_by=order_by_parameters,
