@@ -271,7 +271,17 @@ def test_saved_query_with_cumulative_metric(  # noqa: D
     sql_client: SqlClient,
 ) -> None:
     resp = cli_runner.run(
-        query, args=["--saved-query", "saved_query_with_cumulative_metric", "--order", "metric_time__day"]
+        query,
+        args=[
+            "--saved-query",
+            "saved_query_with_cumulative_metric",
+            "--order",
+            "metric_time__day",
+            "--start-time",
+            "2020-01-01",
+            "--end-time",
+            "2020-01-01",
+        ],
     )
 
     assert_object_snapshot_equal(

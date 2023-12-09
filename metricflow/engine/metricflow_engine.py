@@ -427,6 +427,8 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                     else None
                 ),
                 limit=mf_query_request.limit,
+                time_constraint_start=mf_query_request.time_constraint_start,
+                time_constraint_end=mf_query_request.time_constraint_end,
                 order_by_names=mf_query_request.order_by_names,
                 order_by_parameters=mf_query_request.order_by,
             )
