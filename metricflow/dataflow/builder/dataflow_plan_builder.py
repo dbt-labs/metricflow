@@ -248,83 +248,100 @@ class DataflowPlanBuilder:
         logger.info(
             f"Recipe for conversion measure aggregation:\n{pformat_big_objects(measure_recipe=conversion_measure_recipe)}"
         )
-        if base_measure_recipe is None or conversion_measure_recipe is None:
-            # TODO: Better error message
-            raise UnableToSatisfyQueryError("Unable to get measure recipe")
+        if base_measure_recipe is None:
+            raise UnableToSatisfyQueryError(
+                f"Recipe not found for measure spec: {base_measure_spec.measure_spec} and linkable specs: {base_required_linkable_specs}"
+            )
+        if conversion_measure_recipe is None:
+            raise UnableToSatisfyQueryError(
+                f"Recipe not found for measure spec: {conversion_measure_spec.measure_spec}"
+            )
 
         # Gets the aggregated opportunities
-        base_aggregated_measures_node = self.build_aggregated_measure(
+        aggregated_base_measure_node = self.build_aggregated_measure(
             metric_input_measure_spec=base_measure_spec,
             queried_linkable_specs=queried_linkable_specs,
             where_constraint=where_constraint,
             time_range_constraint=time_range_constraint,
         )
 
-        # Gets the successful conversions using JoinConversionEventsNode
-        # The conversion events are joined by the base events which are already time constrained. However, this could
-        # be still be constrained, where we adjust the time range to the window size similar to cumulative, but
-        # adjusted in the opposite direction.
-        conversion_measure_node = conversion_measure_recipe.source_node
-
+        # Build unaggregated conversions source node
         # Generate UUID column for conversion source to uniquely identify each row
-        conversion_measure_node = AddGeneratedUuidColumnNode(parent_node=conversion_measure_node)
+        unaggregated_conversion_measure_node = AddGeneratedUuidColumnNode(
+            parent_node=conversion_measure_recipe.source_node
+        )
         primary_key_specs = (MetadataSpec.from_name(MetricFlowReservedKeywords.MF_INTERNAL_UUID.value),)
 
-        # Get the agg time dimension for each measure
-        base_time_dimension_reference = self._semantic_model_lookup.get_agg_time_dimension_for_measure(
-            base_measure_spec.measure_spec.reference
+        # Get the agg time dimension for each measure used for matching conversion time windows
+        base_time_dimension_spec = TimeDimensionSpec.from_reference(
+            self._semantic_model_lookup.get_agg_time_dimension_for_measure(base_measure_spec.measure_spec.reference)
         )
-        conversion_time_dimension_reference = self._semantic_model_lookup.get_agg_time_dimension_for_measure(
-            conversion_measure_spec.measure_spec.reference
+        conversion_time_dimension_spec = TimeDimensionSpec.from_reference(
+            self._semantic_model_lookup.get_agg_time_dimension_for_measure(
+                conversion_measure_spec.measure_spec.reference
+            )
         )
 
         # Filter the source nodes with only the required specs needed for the calculation
         constant_property_specs = []
-        required_specs = [base_measure_spec.measure_spec, entity_spec, base_time_dimension_spec]
+        required_local_specs = [base_measure_spec.measure_spec, entity_spec, base_time_dimension_spec] + list(
+            base_measure_recipe.required_local_linkable_specs
+        )
         for constant_property in constant_properties or []:
             base_property_spec = self._semantic_model_lookup.get_element_spec_for_name(constant_property.base_property)
             conversion_property_spec = self._semantic_model_lookup.get_element_spec_for_name(
                 constant_property.conversion_property
             )
-            required_specs.append(base_property_spec)
+            required_local_specs.append(base_property_spec)
             constant_property_specs.append(
                 ConstantPropertySpec(base_spec=base_property_spec, conversion_spec=conversion_property_spec)
             )
 
-        filtered_base_node = FilterElementsNode(
-            parent_node=base_measure_recipe.source_node,
-            include_specs=InstanceSpecSet.from_specs(required_specs).merge(base_required_linkable_specs.as_spec_set),
+        # Build the unaggregated base measure node for computing conversions
+        unaggregated_base_measure_node = base_measure_recipe.source_node
+        if base_measure_recipe.join_targets:
+            unaggregated_base_measure_node = JoinToBaseOutputNode(
+                left_node=unaggregated_base_measure_node, join_targets=base_measure_recipe.join_targets
+            )
+        filtered_unaggregated_base_node = FilterElementsNode(
+            parent_node=unaggregated_base_measure_node,
+            include_specs=InstanceSpecSet.from_specs(required_local_specs)
+            .merge(base_required_linkable_specs.as_spec_set)
+            .dedupe(),
         )
 
+        # Gets the successful conversions using JoinConversionEventsNode
+        # The conversion events are joined by the base events which are already time constrained. However, this could
+        # be still be constrained, where we adjust the time range to the window size similar to cumulative, but
+        # adjusted in the opposite direction.
         join_conversion_node = JoinConversionEventsNode(
-            base_node=base_measure_recipe.source_node,
-            base_time_dimension_spec=TimeDimensionSpec.from_reference(base_time_dimension_reference),
-            conversion_node=conversion_measure_node,
+            base_node=filtered_unaggregated_base_node,
+            base_time_dimension_spec=base_time_dimension_spec,
+            conversion_node=unaggregated_conversion_measure_node,
             conversion_measure_spec=conversion_measure_spec.measure_spec,
-            conversion_time_dimension_spec=TimeDimensionSpec.from_reference(conversion_time_dimension_reference),
+            conversion_time_dimension_spec=conversion_time_dimension_spec,
             conversion_primary_key_specs=primary_key_specs,
             entity_spec=entity_spec,
             window=window,
             constant_properties=constant_property_specs,
         )
-        conversion_measure_recipe = DataflowRecipe(
+
+        # Aggregate the conversion events with the JoinConversionEventsNode as the source node
+        recipe_with_join_conversion_source_node = DataflowRecipe(
             source_node=join_conversion_node,
             required_local_linkable_specs=base_measure_recipe.required_local_linkable_specs,
             join_linkable_instances_recipes=base_measure_recipe.join_linkable_instances_recipes,
         )
-
-        conversion_aggregated_measures_node = self.build_aggregated_measure(
+        aggregated_conversions_node = self.build_aggregated_measure(
             metric_input_measure_spec=conversion_measure_spec,
             queried_linkable_specs=queried_linkable_specs,
             where_constraint=where_constraint,
             time_range_constraint=time_range_constraint,
-            measure_recipe=conversion_measure_recipe,
+            measure_recipe=recipe_with_join_conversion_source_node,
         )
 
-        # Combine the aggregated opportunities and conversion values
-        return CombineAggregatedOutputsNode(
-            parent_nodes=(base_aggregated_measures_node, conversion_aggregated_measures_node)
-        )
+        # Combine the aggregated opportunities and conversion data sets
+        return CombineAggregatedOutputsNode(parent_nodes=(aggregated_base_measure_node, aggregated_conversions_node))
 
     def _build_conversion_metric_output_node(
         self,
@@ -343,7 +360,7 @@ class DataflowPlanBuilder:
         metric = self._metric_lookup.get_metric(metric_spec.reference)
         conversion_type_params = metric.type_params.conversion_type_params
         assert conversion_type_params, "A conversion metric should have type_params.conversion_type_params defined."
-        base_measure, conversion_measure = self._build_input_measure_spec_for_conversion_metric(
+        base_measure, conversion_measure = self._build_input_measure_specs_for_conversion_metric(
             metric_reference=metric_spec.reference,
             conversion_type_params=conversion_type_params,
             column_association_resolver=self._column_association_resolver,
@@ -937,7 +954,7 @@ class DataflowPlanBuilder:
             metric_specs=[metric_spec],
         )
 
-    def _build_input_measure_spec_for_conversion_metric(
+    def _build_input_measure_specs_for_conversion_metric(
         self,
         metric_reference: MetricReference,
         conversion_type_params: ConversionTypeParams,
