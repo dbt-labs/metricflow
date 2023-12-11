@@ -127,6 +127,11 @@ class SemanticModelAccessor(ABC):
         """Return the entity prefix that can be used to access dimensions defined in the semantic model."""
         raise NotImplementedError
 
+    @abstractmethod
+    def get_element_spec_for_name(self, element_name: str) -> LinkableInstanceSpec:
+        """Returns the spec for the given name of a linkable element (dimension or entity)."""
+        raise NotImplementedError
+
 
 class MetricAccessor(ABC):
     """Interface for accessing semantic information about a set of metric objects.

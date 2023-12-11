@@ -42,6 +42,7 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.specs.specs import (
+    ConstantPropertySpec,
     EntitySpec,
     InstanceSpec,
     InstanceSpecSet,
@@ -1308,6 +1309,7 @@ class JoinConversionEventsNode(BaseOutput):
         unique_identifier_keys: Sequence[InstanceSpec],
         entity_spec: EntitySpec,
         window: Optional[MetricTimeWindow] = None,
+        constant_properties: Optional[Sequence[ConstantPropertySpec]] = None,
     ) -> None:
         """Constructor.
 
@@ -1320,6 +1322,8 @@ class JoinConversionEventsNode(BaseOutput):
             unique_identifier_keys: columns to uniquely identify each conversion event.
             entity_spec: the specific entity in which the conversion is happening for.
             window: time range bound for when a conversion is still considered valid (default: INF).
+            constant_properties: optional set of elements (either dimension/entity) to join the base
+                                 event to the conversion event.
         """
         self._base_node = base_node
         self._conversion_node = conversion_node
@@ -1329,6 +1333,7 @@ class JoinConversionEventsNode(BaseOutput):
         self._unique_identifier_keys = unique_identifier_keys
         self._entity_spec = entity_spec
         self._window = window
+        self._constant_properties = constant_properties
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[base_node, conversion_node])
 
     @classmethod
@@ -1371,6 +1376,10 @@ class JoinConversionEventsNode(BaseOutput):
         return self._window
 
     @property
+    def constant_properties(self) -> Optional[Sequence[ConstantPropertySpec]]:  # noqa: D
+        return self._constant_properties
+
+    @property
     def description(self) -> str:  # noqa: D
         return f"Find conversions for {self.entity_spec.qualified_name} within the range of {f'{self.window.count} {self.window.granularity.value}' if self.window else 'INF'}"
 
@@ -1400,6 +1409,7 @@ class JoinConversionEventsNode(BaseOutput):
             and other_node.unique_identifier_keys == self.unique_identifier_keys
             and other_node.entity_spec == self.entity_spec
             and other_node.window == self.window
+            and other_node.constant_properties == self.constant_properties
         )
 
     def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> JoinConversionEventsNode:  # noqa: D
@@ -1413,6 +1423,7 @@ class JoinConversionEventsNode(BaseOutput):
             unique_identifier_keys=self.unique_identifier_keys,
             entity_spec=self.entity_spec,
             window=self.window,
+            constant_properties=self.constant_properties,
         )
 
 

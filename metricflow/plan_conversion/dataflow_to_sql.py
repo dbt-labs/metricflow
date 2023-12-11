@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from collections import OrderedDict
-from typing import List, Optional, Sequence, Union
+from typing import List, Optional, Sequence, Tuple, Union
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols.metric import MetricInputMeasure, MetricType
@@ -1433,6 +1433,16 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         ).column_name
         entity_column_name = self._column_association_resolver.resolve_spec(node.entity_spec).column_name
 
+        constant_property_column_names: List[Tuple[str, str]] = []
+        for constant_property in node.constant_properties or []:
+            base_property_col_name = self._column_association_resolver.resolve_spec(
+                constant_property.base_spec
+            ).column_name
+            conversion_property_col_name = self._column_association_resolver.resolve_spec(
+                constant_property.conversion_spec
+            ).column_name
+            constant_property_column_names.append((base_property_col_name, conversion_property_col_name))
+
         # Builds the join conditions that is required for a successful conversion
         sql_join_description = SqlQueryPlanJoinBuilder.make_join_conversion_join_description(
             node=node,
@@ -1450,7 +1460,11 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 ColumnEqualityDescription(
                     left_column_alias=entity_column_name,
                     right_column_alias=entity_column_name,
-                ),  # add constant property here
+                ),
+            )
+            + tuple(
+                ColumnEqualityDescription(left_column_alias=base_col, right_column_alias=conversion_col)
+                for base_col, conversion_col in constant_property_column_names
             ),
         )
 
@@ -1458,7 +1472,19 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         base_sql_column_references = base_data_set.instance_set.transform(
             CreateSqlColumnReferencesForInstances(base_data_set_alias, self._column_association_resolver)
         )
-        partition_by_columns = (entity_column_name, conversion_time_dimension_column_name)  # add constant property here
+
+        conversion_primary_key_col_names = tuple(
+            self._column_association_resolver.resolve_spec(spec).column_name
+            for spec in node.conversion_primary_key_specs
+        )
+        partition_by_columns: Tuple[str, ...] = (
+            entity_column_name,
+            conversion_time_dimension_column_name,
+        ) + conversion_primary_key_col_names
+        if node.constant_properties:
+            partition_by_columns += tuple(
+                conversion_column_name for _, conversion_column_name in constant_property_column_names
+            )
         base_sql_select_columns = tuple(
             SqlSelectColumn(
                 expr=SqlWindowFunctionExpression(
@@ -1507,12 +1533,12 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 expr=SqlColumnReferenceExpression(
                     SqlColumnReference(
                         table_alias=conversion_data_set_alias,
-                        column_name=self._column_association_resolver.resolve_spec(spec).column_name,
+                        column_name=column_name,
                     ),
                 ),
-                column_alias=self._column_association_resolver.resolve_spec(spec).column_name,
+                column_alias=column_name,
             )
-            for spec in node.conversion_primary_key_specs
+            for column_name in conversion_primary_key_col_names
         )
         additional_conversion_select_columns = conversion_data_set_output_instance_set.transform(
             CreateSelectColumnsForInstances(conversion_data_set_alias, self._column_association_resolver)

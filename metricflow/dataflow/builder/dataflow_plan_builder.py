@@ -9,6 +9,7 @@ from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.protocols.metric import (
+    ConstantPropertyInput,
     ConversionTypeParams,
     MetricInputMeasure,
     MetricTimeWindow,
@@ -65,6 +66,7 @@ from metricflow.query.group_by_item.filter_spec_resolution.filter_location impor
 from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import FilterSpecResolutionLookUp
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
+    ConstantPropertySpec,
     CumulativeMeasureDescription,
     EntitySpec,
     InstanceSpecSet,
@@ -225,6 +227,7 @@ class DataflowPlanBuilder:
         queried_linkable_specs: LinkableSpecSet,
         where_constraint: Optional[WhereFilterSpec] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
+        constant_properties: Optional[Sequence[ConstantPropertyInput]] = None,
     ) -> BaseOutput:
         """Builds a node that contains aggregated values of conversions and opportunities."""
         # Build measure recipes
@@ -263,7 +266,7 @@ class DataflowPlanBuilder:
         # adjusted in the opposite direction.
         conversion_measure_node = conversion_measure_recipe.source_node
 
-        # Generate UUID column to uniquely identify each row
+        # Generate UUID column for conversion source to uniquely identify each row
         conversion_measure_node = AddGeneratedUuidColumnNode(parent_node=conversion_measure_node)
         primary_key_specs = (MetadataSpec.from_name(MetricFlowReservedKeywords.MF_INTERNAL_UUID.value),)
 
@@ -274,6 +277,25 @@ class DataflowPlanBuilder:
         conversion_time_dimension_reference = self._semantic_model_lookup.get_agg_time_dimension_for_measure(
             conversion_measure_spec.measure_spec.reference
         )
+
+        # Filter the source nodes with only the required specs needed for the calculation
+        constant_property_specs = []
+        required_specs = [base_measure_spec.measure_spec, entity_spec, base_time_dimension_spec]
+        for constant_property in constant_properties or []:
+            base_property_spec = self._semantic_model_lookup.get_element_spec_for_name(constant_property.base_property)
+            conversion_property_spec = self._semantic_model_lookup.get_element_spec_for_name(
+                constant_property.conversion_property
+            )
+            required_specs.append(base_property_spec)
+            constant_property_specs.append(
+                ConstantPropertySpec(base_spec=base_property_spec, conversion_spec=conversion_property_spec)
+            )
+
+        filtered_base_node = FilterElementsNode(
+            parent_node=base_measure_recipe.source_node,
+            include_specs=InstanceSpecSet.from_specs(required_specs).merge(base_required_linkable_specs.as_spec_set),
+        )
+
         join_conversion_node = JoinConversionEventsNode(
             base_node=base_measure_recipe.source_node,
             base_time_dimension_spec=TimeDimensionSpec.from_reference(base_time_dimension_reference),
@@ -283,12 +305,14 @@ class DataflowPlanBuilder:
             conversion_primary_key_specs=primary_key_specs,
             entity_spec=entity_spec,
             window=window,
+            constant_properties=constant_property_specs,
         )
         conversion_measure_recipe = DataflowRecipe(
             source_node=join_conversion_node,
             required_local_linkable_specs=base_measure_recipe.required_local_linkable_specs,
             join_linkable_instances_recipes=base_measure_recipe.join_linkable_instances_recipes,
         )
+
         conversion_aggregated_measures_node = self.build_aggregated_measure(
             metric_input_measure_spec=conversion_measure_spec,
             queried_linkable_specs=queried_linkable_specs,
@@ -331,6 +355,7 @@ class DataflowPlanBuilder:
             f"conversion_measure is:\n{pformat_big_objects(conversion_measure=conversion_measure)}\n"
             f"entity is:\n{pformat_big_objects(entity_spec=entity_spec)}"
         )
+
         aggregated_measures_node = self._build_aggregated_conversion_node(
             base_measure_spec=base_measure,
             conversion_measure_spec=conversion_measure,
@@ -339,6 +364,7 @@ class DataflowPlanBuilder:
             time_range_constraint=time_range_constraint,
             entity_spec=entity_spec,
             window=conversion_type_params.window,
+            constant_properties=conversion_type_params.constant_properties,
         )
 
         return self.build_computed_metrics_node(

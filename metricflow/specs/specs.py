@@ -920,6 +920,14 @@ class WhereFilterSpec(Mergeable, SerializableDataclass):
 
 
 @dataclass(frozen=True)
+class ConstantPropertySpec(SerializableDataclass):
+    """Includes the specs that are joined for conversion metric's constant properties."""
+
+    base_spec: LinkableInstanceSpec
+    conversion_spec: LinkableInstanceSpec
+
+
+@dataclass(frozen=True)
 class JoinToTimeSpineDescription:
     """Describes how a time spine join should be performed."""
 
