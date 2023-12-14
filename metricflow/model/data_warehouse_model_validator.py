@@ -488,7 +488,7 @@ class DataWarehouseModelValidator:
                 issues.append(
                     ValidationError(
                         context=task.context,
-                        message=task.error_message + f"\nRecieved following error from data warehouse:\n{e}",
+                        message=task.error_message + f"\nReceived following error from data warehouse:\n{e}",
                         extra_detail="".join(traceback.format_tb(e.__traceback__)),
                     )
                 )
