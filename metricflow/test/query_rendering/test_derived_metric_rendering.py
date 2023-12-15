@@ -443,6 +443,62 @@ def test_nested_offsets_with_time_constraint(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
+def test_time_offset_metric_with_time_constraint(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+    create_source_tables: bool,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        query_spec=MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings_5_day_lag"),),
+            time_dimension_specs=(MTD_SPEC_DAY,),
+            time_range_constraint=TimeRangeConstraint(
+                start_time=datetime.datetime(2019, 12, 19), end_time=datetime.datetime(2020, 1, 2)
+            ),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_cumulative_time_offset_metric_with_time_constraint(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+    create_source_tables: bool,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        query_spec=MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="every_2_days_bookers_2_days_ago"),),
+            time_dimension_specs=(MTD_SPEC_DAY,),
+            time_range_constraint=TimeRangeConstraint(
+                start_time=datetime.datetime(2019, 12, 19), end_time=datetime.datetime(2020, 1, 2)
+            ),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
 def test_nested_derived_metric_offset_with_joined_where_constraint_not_selected(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,

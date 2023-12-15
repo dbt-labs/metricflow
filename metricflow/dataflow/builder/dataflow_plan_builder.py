@@ -234,7 +234,6 @@ class DataflowPlanBuilder:
         )
 
         parent_nodes: List[BaseOutput] = []
-        metric_has_time_offset = bool(metric_spec.offset_window or metric_spec.offset_to_grain)
         for metric_input_spec in metric_input_specs:
             parent_nodes.append(
                 self._build_any_metric_output_node(
@@ -246,11 +245,12 @@ class DataflowPlanBuilder:
                         offset_to_grain=metric_input_spec.offset_to_grain,
                     ),
                     queried_linkable_specs=queried_linkable_specs
-                    if not metric_has_time_offset
+                    if not metric_spec.has_time_offset
                     else required_linkable_specs,
-                    # If metric is offset, we'll apply constraint after offset to avoid removing values unexpectedly.
-                    where_constraint=where_constraint if not metric_has_time_offset else None,
-                    time_range_constraint=time_range_constraint if not metric_has_time_offset else None,
+                    # If metric is offset, we'll apply where constraint after offset to avoid removing values unexpectedly.
+                    # Time constraint will be applied by INNER JOINing to time spine.
+                    where_constraint=where_constraint if not metric_spec.has_time_offset else None,
+                    time_range_constraint=time_range_constraint if not metric_spec.has_time_offset else None,
                 )
             )
 
@@ -260,7 +260,7 @@ class DataflowPlanBuilder:
         output_node: BaseOutput = ComputeMetricsNode(parent_node=parent_node, metric_specs=[metric_spec])
 
         # For nested ratio / derived metrics with time offset, apply offset & where constraint after metric computation.
-        if metric_has_time_offset:
+        if metric_spec.has_time_offset:
             assert (
                 queried_linkable_specs.contains_metric_time
             ), "Joining to time spine requires querying with metric_time."
@@ -272,10 +272,6 @@ class DataflowPlanBuilder:
                 offset_to_grain=metric_spec.offset_to_grain,
                 join_type=SqlJoinType.INNER,
             )
-            if time_range_constraint:
-                output_node = ConstrainTimeRangeNode(
-                    parent_node=output_node, time_range_constraint=time_range_constraint
-                )
             if where_constraint:
                 output_node = WhereConstraintNode(parent_node=output_node, where_constraint=where_constraint)
             if not extraneous_linkable_specs.is_subset_of(queried_linkable_specs):
@@ -868,9 +864,14 @@ class DataflowPlanBuilder:
         )
 
         find_recipe_start_time = time.time()
+        before_aggregation_time_spine_join_description = (
+            metric_input_measure_spec.before_aggregation_time_spine_join_description
+        )
         measure_recipe = self._find_dataflow_recipe(
             measure_spec_properties=measure_properties,
-            time_range_constraint=cumulative_metric_adjusted_time_constraint or time_range_constraint,
+            time_range_constraint=(cumulative_metric_adjusted_time_constraint or time_range_constraint)
+            if not before_aggregation_time_spine_join_description
+            else None,
             linkable_spec_set=required_linkable_specs,
         )
         logger.info(
@@ -894,15 +895,13 @@ class DataflowPlanBuilder:
                 parent_node=measure_recipe.source_node,
                 window=cumulative_window,
                 grain_to_date=cumulative_grain_to_date,
-                time_range_constraint=time_range_constraint,
+                time_range_constraint=time_range_constraint
+                if not before_aggregation_time_spine_join_description
+                else None,
             )
 
-        # If querying an offset metric, join to time spine.
+        # If querying an offset metric, join to time spine before aggregation.
         join_to_time_spine_node: Optional[JoinToTimeSpineNode] = None
-
-        before_aggregation_time_spine_join_description = (
-            metric_input_measure_spec.before_aggregation_time_spine_join_description
-        )
         if before_aggregation_time_spine_join_description is not None:
             assert (
                 queried_linkable_specs.contains_metric_time
@@ -1002,6 +1001,8 @@ class DataflowPlanBuilder:
             parent_node=pre_aggregate_node,
             metric_input_measure_specs=(metric_input_measure_spec,),
         )
+
+        # Joining to time spine after aggregation is for measures that specify `join_to_timespine`` in the YAML spec.
         after_aggregation_time_spine_join_description = (
             metric_input_measure_spec.after_aggregation_time_spine_join_description
         )
