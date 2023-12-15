@@ -639,7 +639,7 @@ def validate_configs(
         parsing_spinner.succeed("🎉 Successfully parsed manifest from dbt project")
     except Exception as e:
         parsing_spinner.fail(f"Exception found when parsing manifest from dbt project ({str(e)})")
-        return
+        exit(1)
 
     # Semantic validation
     semantic_spinner = Halo(text="Validating semantics of built manifest", spinner="dots")
@@ -655,7 +655,7 @@ def validate_configs(
             f"Breaking issues found when checking semantics of built manifest ({model_issues.summary()})"
         )
         _print_issues(model_issues, show_non_blocking=show_all, verbose=verbose_issues)
-        return
+        exit(1)
 
     dw_results = SemanticManifestValidationResults()
     if not skip_dw:
@@ -667,6 +667,8 @@ def validate_configs(
 
     merged_results = SemanticManifestValidationResults.merge([model_issues, dw_results])
     _print_issues(merged_results, show_non_blocking=show_all, verbose=verbose_issues)
+    if merged_results.has_blocking_issues:
+        exit(1)
 
 
 if __name__ == "__main__":
