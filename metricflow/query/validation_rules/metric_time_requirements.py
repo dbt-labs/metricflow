@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from typing import List
+from typing import List, Sequence
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
+from dbt_semantic_interfaces.protocols import WhereFilterIntersection
 from dbt_semantic_interfaces.references import MetricReference
 from dbt_semantic_interfaces.type_enums import MetricType, TimeGranularity
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
@@ -107,3 +108,13 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
             return MetricFlowQueryResolutionIssueSet.empty_instance()
         else:
             assert_values_exhausted(metric.type)
+
+    @override
+    def validate_query_in_resolution_dag(
+        self,
+        metrics_in_query: Sequence[MetricReference],
+        where_filter_intersection: WhereFilterIntersection,
+        resolver_input_for_query: ResolverInputForQuery,
+        resolution_path: MetricFlowQueryResolutionPath,
+    ) -> MetricFlowQueryResolutionIssueSet:
+        return MetricFlowQueryResolutionIssueSet.empty_instance()
