@@ -1,0 +1,6 @@
+kind: Fixes
+body: Return exit code 1 for failed validations
+time: 2023-12-15T15:43:56.503346-05:00
+custom:
+  Author: WilliamDee
+  Issue: "867"
