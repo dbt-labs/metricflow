@@ -126,7 +126,7 @@ def test_validate_configs(cli_context: CLIContext) -> None:
             resp = cli_runner.run(validate_configs)
 
         assert "ERROR" in resp.output
-        assert resp.exit_code == 0
+        assert resp.exit_code == 1
 
     finally:
         dummy_project.unlink()
