@@ -1473,14 +1473,13 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             CreateSqlColumnReferencesForInstances(base_data_set_alias, self._column_association_resolver)
         )
 
-        conversion_primary_key_col_names = tuple(
-            self._column_association_resolver.resolve_spec(spec).column_name
-            for spec in node.conversion_primary_key_specs
+        unique_conversion_col_names = tuple(
+            self._column_association_resolver.resolve_spec(spec).column_name for spec in node.unique_identifier_keys
         )
         partition_by_columns: Tuple[str, ...] = (
             entity_column_name,
             conversion_time_dimension_column_name,
-        ) + conversion_primary_key_col_names
+        ) + unique_conversion_col_names
         if node.constant_properties:
             partition_by_columns += tuple(
                 conversion_column_name for _, conversion_column_name in constant_property_column_names
@@ -1528,7 +1527,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         )
 
         # Deduplicate the fanout results
-        conversion_primary_key_select_columns = tuple(
+        conversion_unique_key_select_columns = tuple(
             SqlSelectColumn(
                 expr=SqlColumnReferenceExpression(
                     SqlColumnReference(
@@ -1538,15 +1537,15 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 ),
                 column_alias=column_name,
             )
-            for column_name in conversion_primary_key_col_names
+            for column_name in unique_conversion_col_names
         )
         additional_conversion_select_columns = conversion_data_set_output_instance_set.transform(
             CreateSelectColumnsForInstances(conversion_data_set_alias, self._column_association_resolver)
         ).as_tuple()
         deduped_sql_select_node = SqlSelectStatementNode(
-            description=f"Dedupe the fanout on {node.conversion_primary_key_specs} in the conversion data set",
+            description=f"Dedupe the fanout with {','.join(spec.qualified_name for spec in node.unique_identifier_keys)} in the conversion data set",
             select_columns=base_sql_select_columns
-            + conversion_primary_key_select_columns
+            + conversion_unique_key_select_columns
             + additional_conversion_select_columns,
             from_source=base_data_set.sql_select_node,
             from_source_alias=base_data_set_alias,

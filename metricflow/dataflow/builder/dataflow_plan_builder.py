@@ -270,7 +270,6 @@ class DataflowPlanBuilder:
         unaggregated_conversion_measure_node = AddGeneratedUuidColumnNode(
             parent_node=conversion_measure_recipe.source_node
         )
-        primary_key_specs = (MetadataSpec.from_name(MetricFlowReservedKeywords.MF_INTERNAL_UUID.value),)
 
         # Get the agg time dimension for each measure used for matching conversion time windows
         base_time_dimension_spec = TimeDimensionSpec.from_reference(
@@ -320,7 +319,7 @@ class DataflowPlanBuilder:
             conversion_node=unaggregated_conversion_measure_node,
             conversion_measure_spec=conversion_measure_spec.measure_spec,
             conversion_time_dimension_spec=conversion_time_dimension_spec,
-            conversion_primary_key_specs=primary_key_specs,
+            unique_identifier_keys=(MetadataSpec.from_name(MetricFlowReservedKeywords.MF_INTERNAL_UUID.value),),
             entity_spec=entity_spec,
             window=window,
             constant_properties=constant_property_specs,
