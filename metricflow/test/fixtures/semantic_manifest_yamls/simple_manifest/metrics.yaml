@@ -662,3 +662,21 @@ metric:
         offset_to_grain: month
         alias: booking_fees_start_of_month
       - name: booking_fees
+---
+metric:
+  name: "derived_bookings_0"
+  description: Derived metric for testing optimizations for duplicate measures in a query.
+  type: derived
+  type_params:
+    expr: bookings
+    metrics:
+      - name: bookings
+---
+metric:
+  name: "derived_bookings_1"
+  description: Derived metric for testing optimizations for duplicate measures in a query.
+  type: derived
+  type_params:
+    expr: bookings
+    metrics:
+      - name: bookings
