@@ -106,7 +106,7 @@ class TrinoSqlExpressionRenderer(DefaultSqlExpressionRenderer):
     @override
     def render_date_part(self, date_part: DatePart) -> str:
         """Render DATE PART for an EXTRACT expression.
-        
+
         Override DAY_OF_WEEK in Trino to ISO date part to ensure all engines return consistent results.
         """
         if date_part is DatePart.DOW:
