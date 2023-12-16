@@ -32,6 +32,7 @@ from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
     DimensionSpec,
@@ -1105,26 +1106,18 @@ def test_dimensions_requiring_join(
 def test_dimension_with_joined_where_constraint(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
+    query_parser: MetricFlowQueryParser,
     dataflow_plan_builder: DataflowPlanBuilder,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
     column_association_resolver: ColumnAssociationResolver,
 ) -> None:
     """Tests querying 2 dimensions that require a join."""
-    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
-        query_spec=MetricFlowQuerySpec(
-            dimension_specs=(
-                DimensionSpec(element_name="home_state_latest", entity_links=(EntityReference(element_name="user"),)),
-            ),
-            where_constraint=WhereSpecFactory(
-                column_association_resolver=column_association_resolver,
-            ).create_from_where_filter(
-                PydanticWhereFilter(
-                    where_sql_template="{{ Dimension('listing__country_latest') }} = 'us'",
-                )
-            ),
-        ),
+    query_spec = query_parser.parse_and_validate_query(
+        group_by_names=("user__home_state_latest",),
+        where_constraint_str="{{ Dimension('listing__country_latest') }} = 'us'",
     )
+    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(query_spec)
 
     convert_and_check(
         request=request,
