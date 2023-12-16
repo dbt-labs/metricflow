@@ -65,10 +65,15 @@ integration_test:
   check_order: true
   check_query: |
     SELECT
-      {{ render_date_trunc("ds", TimeGranularity.MONTH) }} AS metric_time__month
+      metric_time__month
       , SUM(booking_value) AS booking_value
-    FROM {{ source_schema }}.fct_bookings
+    FROM (
+      SELECT
+        {{ render_date_trunc("ds", TimeGranularity.MONTH) }} AS metric_time__month
+        , booking_value AS booking_value
+      FROM {{ source_schema }}.fct_bookings
+    ) a
     GROUP BY
-      {{ render_date_trunc("ds", TimeGranularity.MONTH) }}
+      metric_time__month
     ORDER BY
       metric_time__month DESC, booking_value
