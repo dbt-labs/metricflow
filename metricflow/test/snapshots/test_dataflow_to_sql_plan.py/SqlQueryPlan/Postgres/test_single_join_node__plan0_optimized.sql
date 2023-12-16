@@ -12,6 +12,6 @@ FROM (
   FROM ***************************.fct_bookings bookings_source_src_10001
 ) subq_5
 LEFT OUTER JOIN
-  ***************************.dim_listings_latest listings_latest_src_10004
+  ***************************.dim_listings_latest listings_latest_src_10005
 ON
-  subq_5.listing = listings_latest_src_10004.listing_id
+  subq_5.listing = listings_latest_src_10005.listing_id

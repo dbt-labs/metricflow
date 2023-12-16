@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional, Sequence
+from typing import Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
 from dbt_semantic_interfaces.protocols import WhereFilterIntersection
-from dbt_semantic_interfaces.references import MetricReference
+from dbt_semantic_interfaces.references import MeasureReference, MetricReference
+from dbt_semantic_interfaces.type_enums import MetricType
 
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
@@ -42,9 +43,17 @@ class GroupByItemResolutionDagBuilder:
 
         # For a base metric, the parents are measure nodes
         if len(metric.input_metrics) == 0:
-            measure_references_for_metric = tuple(
-                input_measure.measure_reference for input_measure in metric.input_measures
-            )
+            measure_references_for_metric: Tuple[MeasureReference, ...]
+            if metric.type is MetricType.CONVERSION:
+                conversion_type_params = metric.type_params.conversion_type_params
+                assert (
+                    conversion_type_params
+                ), "A conversion metric should have type_params.conversion_type_params defined."
+                measure_references_for_metric = (conversion_type_params.base_measure.measure_reference,)
+            else:
+                measure_references_for_metric = tuple(
+                    input_measure.measure_reference for input_measure in metric.input_measures
+                )
 
             source_candidates_for_measure_nodes = tuple(
                 MeasureGroupByItemSourceNode(

@@ -367,6 +367,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
                         for rendered_result, x in order_by_args_rendered.items()
                     ]
                 )
+                + " ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING"
             )
             if order_by_args_rendered
             else ""

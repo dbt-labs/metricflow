@@ -9,6 +9,7 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan import (
+    AddGeneratedUuidColumnNode,
     AggregateMeasuresNode,
     CombineAggregatedOutputsNode,
     ComputeMetricsNode,
@@ -17,6 +18,7 @@ from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,
     DataflowPlanNodeVisitor,
     FilterElementsNode,
+    JoinConversionEventsNode,
     JoinOverTimeRangeNode,
     JoinToBaseOutputNode,
     JoinToTimeSpineNode,
@@ -95,6 +97,12 @@ class ReadSqlSourceNodeCounter(DataflowPlanNodeVisitor[int]):
         return self._sum_parents(node)
 
     def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode) -> int:  # noqa: D
+        return self._sum_parents(node)
+
+    def visit_add_generated_uuid_column_node(self, node: AddGeneratedUuidColumnNode) -> int:  # noqa :D
+        return self._sum_parents(node)
+
+    def visit_join_conversion_events_node(self, node: JoinConversionEventsNode) -> int:  # noqa: D
         return self._sum_parents(node)
 
     def count_source_nodes(self, dataflow_plan: DataflowPlan) -> int:  # noqa: D

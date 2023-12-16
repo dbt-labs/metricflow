@@ -500,6 +500,16 @@ class ValidLinkableSpecResolver:
                     or metric.type is MetricType.RATIO
                 ):
                     linkable_sets_for_measure.append(self._get_linkable_element_set_for_measure(measure))
+                elif metric.type is MetricType.CONVERSION:
+                    conversion_type_params = metric.type_params.conversion_type_params
+                    assert (
+                        conversion_type_params
+                    ), "A conversion metric should have type_params.conversion_type_params defined."
+                    if measure == conversion_type_params.base_measure.measure_reference:
+                        # Only can query against the base measure's linkable elements
+                        # as it joins everything back to the base measure data set so
+                        # there is no way of getting the conversion elements
+                        linkable_sets_for_measure.append(self._get_linkable_element_set_for_measure(measure))
                 else:
                     assert_values_exhausted(metric.type)
 

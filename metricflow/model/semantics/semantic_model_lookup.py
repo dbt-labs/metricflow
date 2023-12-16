@@ -28,7 +28,14 @@ from metricflow.errors.errors import InvalidSemanticModelError
 from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.spec_converters import MeasureConverter
 from metricflow.protocols.semantics import SemanticModelAccessor
-from metricflow.specs.specs import MeasureSpec, NonAdditiveDimensionSpec
+from metricflow.specs.specs import (
+    DimensionSpec,
+    EntitySpec,
+    LinkableInstanceSpec,
+    MeasureSpec,
+    NonAdditiveDimensionSpec,
+    TimeDimensionSpec,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -56,6 +63,9 @@ class SemanticModelLookup(SemanticModelAccessor):
         self._entity_index: Dict[Optional[str], List[SemanticModel]] = defaultdict(list)
         self._entity_ref_to_entity: Dict[EntityReference, Optional[str]] = {}
         self._semantic_model_names: Set[str] = set()
+
+        self._dimension_ref_to_spec: Dict[DimensionReference, DimensionSpec] = {}
+        self._entity_ref_to_spec: Dict[EntityReference, EntitySpec] = {}
 
         self._semantic_model_to_aggregation_time_dimensions: Dict[
             SemanticModelReference, ElementGrouper[TimeDimensionReference, MeasureSpec]
@@ -242,10 +252,17 @@ class SemanticModelLookup(SemanticModelAccessor):
         for dim in semantic_model.dimensions:
             self._linkable_reference_index[dim.reference].append(semantic_model)
             self._dimension_index[dim.reference].append(semantic_model)
+            self._dimension_ref_to_spec[dim.time_dimension_reference or dim.reference] = (
+                TimeDimensionSpec.from_name(dim.name)
+                if dim.type is DimensionType.TIME
+                else DimensionSpec.from_name(dim.name)
+            )
+
         for entity in semantic_model.entities:
             self._entity_ref_to_entity[entity.reference] = entity.name
             self._entity_index[entity.name].append(semantic_model)
             self._linkable_reference_index[entity.reference].append(semantic_model)
+            self._entity_ref_to_spec[entity.reference] = EntitySpec.from_name(entity.name)
 
         self._semantic_model_reference_to_semantic_model[semantic_model.reference] = semantic_model
 
@@ -320,3 +337,13 @@ class SemanticModelLookup(SemanticModelAccessor):
                 possible_entity_links.add(entity.reference)
 
         return sorted(possible_entity_links, key=lambda entity_reference: entity_reference.element_name)
+
+    def get_element_spec_for_name(self, element_name: str) -> LinkableInstanceSpec:  # noqa: D
+        if TimeDimensionReference(element_name=element_name) in self._dimension_ref_to_spec:
+            return self._dimension_ref_to_spec[TimeDimensionReference(element_name=element_name)]
+        elif DimensionReference(element_name=element_name) in self._dimension_ref_to_spec:
+            return self._dimension_ref_to_spec[DimensionReference(element_name=element_name)]
+        elif EntityReference(element_name=element_name) in self._entity_ref_to_spec:
+            return self._entity_ref_to_spec[EntityReference(element_name=element_name)]
+        else:
+            raise ValueError(f"Unable to find linkable element {element_name} in manifest")

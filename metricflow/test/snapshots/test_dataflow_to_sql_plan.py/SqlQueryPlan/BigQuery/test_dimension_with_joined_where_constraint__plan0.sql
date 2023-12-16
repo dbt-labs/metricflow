@@ -126,62 +126,62 @@ FROM (
       -- Read Elements From Semantic Model 'listings_latest'
       SELECT
         1 AS listings
-        , listings_latest_src_10004.capacity AS largest_listing
-        , listings_latest_src_10004.capacity AS smallest_listing
-        , DATE_TRUNC(listings_latest_src_10004.created_at, day) AS ds__day
-        , DATE_TRUNC(listings_latest_src_10004.created_at, isoweek) AS ds__week
-        , DATE_TRUNC(listings_latest_src_10004.created_at, month) AS ds__month
-        , DATE_TRUNC(listings_latest_src_10004.created_at, quarter) AS ds__quarter
-        , DATE_TRUNC(listings_latest_src_10004.created_at, year) AS ds__year
-        , EXTRACT(year FROM listings_latest_src_10004.created_at) AS ds__extract_year
-        , EXTRACT(quarter FROM listings_latest_src_10004.created_at) AS ds__extract_quarter
-        , EXTRACT(month FROM listings_latest_src_10004.created_at) AS ds__extract_month
-        , EXTRACT(day FROM listings_latest_src_10004.created_at) AS ds__extract_day
-        , IF(EXTRACT(dayofweek FROM listings_latest_src_10004.created_at) = 1, 7, EXTRACT(dayofweek FROM listings_latest_src_10004.created_at) - 1) AS ds__extract_dow
-        , EXTRACT(dayofyear FROM listings_latest_src_10004.created_at) AS ds__extract_doy
-        , DATE_TRUNC(listings_latest_src_10004.created_at, day) AS created_at__day
-        , DATE_TRUNC(listings_latest_src_10004.created_at, isoweek) AS created_at__week
-        , DATE_TRUNC(listings_latest_src_10004.created_at, month) AS created_at__month
-        , DATE_TRUNC(listings_latest_src_10004.created_at, quarter) AS created_at__quarter
-        , DATE_TRUNC(listings_latest_src_10004.created_at, year) AS created_at__year
-        , EXTRACT(year FROM listings_latest_src_10004.created_at) AS created_at__extract_year
-        , EXTRACT(quarter FROM listings_latest_src_10004.created_at) AS created_at__extract_quarter
-        , EXTRACT(month FROM listings_latest_src_10004.created_at) AS created_at__extract_month
-        , EXTRACT(day FROM listings_latest_src_10004.created_at) AS created_at__extract_day
-        , IF(EXTRACT(dayofweek FROM listings_latest_src_10004.created_at) = 1, 7, EXTRACT(dayofweek FROM listings_latest_src_10004.created_at) - 1) AS created_at__extract_dow
-        , EXTRACT(dayofyear FROM listings_latest_src_10004.created_at) AS created_at__extract_doy
-        , listings_latest_src_10004.country AS country_latest
-        , listings_latest_src_10004.is_lux AS is_lux_latest
-        , listings_latest_src_10004.capacity AS capacity_latest
-        , DATE_TRUNC(listings_latest_src_10004.created_at, day) AS listing__ds__day
-        , DATE_TRUNC(listings_latest_src_10004.created_at, isoweek) AS listing__ds__week
-        , DATE_TRUNC(listings_latest_src_10004.created_at, month) AS listing__ds__month
-        , DATE_TRUNC(listings_latest_src_10004.created_at, quarter) AS listing__ds__quarter
-        , DATE_TRUNC(listings_latest_src_10004.created_at, year) AS listing__ds__year
-        , EXTRACT(year FROM listings_latest_src_10004.created_at) AS listing__ds__extract_year
-        , EXTRACT(quarter FROM listings_latest_src_10004.created_at) AS listing__ds__extract_quarter
-        , EXTRACT(month FROM listings_latest_src_10004.created_at) AS listing__ds__extract_month
-        , EXTRACT(day FROM listings_latest_src_10004.created_at) AS listing__ds__extract_day
-        , IF(EXTRACT(dayofweek FROM listings_latest_src_10004.created_at) = 1, 7, EXTRACT(dayofweek FROM listings_latest_src_10004.created_at) - 1) AS listing__ds__extract_dow
-        , EXTRACT(dayofyear FROM listings_latest_src_10004.created_at) AS listing__ds__extract_doy
-        , DATE_TRUNC(listings_latest_src_10004.created_at, day) AS listing__created_at__day
-        , DATE_TRUNC(listings_latest_src_10004.created_at, isoweek) AS listing__created_at__week
-        , DATE_TRUNC(listings_latest_src_10004.created_at, month) AS listing__created_at__month
-        , DATE_TRUNC(listings_latest_src_10004.created_at, quarter) AS listing__created_at__quarter
-        , DATE_TRUNC(listings_latest_src_10004.created_at, year) AS listing__created_at__year
-        , EXTRACT(year FROM listings_latest_src_10004.created_at) AS listing__created_at__extract_year
-        , EXTRACT(quarter FROM listings_latest_src_10004.created_at) AS listing__created_at__extract_quarter
-        , EXTRACT(month FROM listings_latest_src_10004.created_at) AS listing__created_at__extract_month
-        , EXTRACT(day FROM listings_latest_src_10004.created_at) AS listing__created_at__extract_day
-        , IF(EXTRACT(dayofweek FROM listings_latest_src_10004.created_at) = 1, 7, EXTRACT(dayofweek FROM listings_latest_src_10004.created_at) - 1) AS listing__created_at__extract_dow
-        , EXTRACT(dayofyear FROM listings_latest_src_10004.created_at) AS listing__created_at__extract_doy
-        , listings_latest_src_10004.country AS listing__country_latest
-        , listings_latest_src_10004.is_lux AS listing__is_lux_latest
-        , listings_latest_src_10004.capacity AS listing__capacity_latest
-        , listings_latest_src_10004.listing_id AS listing
-        , listings_latest_src_10004.user_id AS user
-        , listings_latest_src_10004.user_id AS listing__user
-      FROM ***************************.dim_listings_latest listings_latest_src_10004
+        , listings_latest_src_10005.capacity AS largest_listing
+        , listings_latest_src_10005.capacity AS smallest_listing
+        , DATE_TRUNC(listings_latest_src_10005.created_at, day) AS ds__day
+        , DATE_TRUNC(listings_latest_src_10005.created_at, isoweek) AS ds__week
+        , DATE_TRUNC(listings_latest_src_10005.created_at, month) AS ds__month
+        , DATE_TRUNC(listings_latest_src_10005.created_at, quarter) AS ds__quarter
+        , DATE_TRUNC(listings_latest_src_10005.created_at, year) AS ds__year
+        , EXTRACT(year FROM listings_latest_src_10005.created_at) AS ds__extract_year
+        , EXTRACT(quarter FROM listings_latest_src_10005.created_at) AS ds__extract_quarter
+        , EXTRACT(month FROM listings_latest_src_10005.created_at) AS ds__extract_month
+        , EXTRACT(day FROM listings_latest_src_10005.created_at) AS ds__extract_day
+        , IF(EXTRACT(dayofweek FROM listings_latest_src_10005.created_at) = 1, 7, EXTRACT(dayofweek FROM listings_latest_src_10005.created_at) - 1) AS ds__extract_dow
+        , EXTRACT(dayofyear FROM listings_latest_src_10005.created_at) AS ds__extract_doy
+        , DATE_TRUNC(listings_latest_src_10005.created_at, day) AS created_at__day
+        , DATE_TRUNC(listings_latest_src_10005.created_at, isoweek) AS created_at__week
+        , DATE_TRUNC(listings_latest_src_10005.created_at, month) AS created_at__month
+        , DATE_TRUNC(listings_latest_src_10005.created_at, quarter) AS created_at__quarter
+        , DATE_TRUNC(listings_latest_src_10005.created_at, year) AS created_at__year
+        , EXTRACT(year FROM listings_latest_src_10005.created_at) AS created_at__extract_year
+        , EXTRACT(quarter FROM listings_latest_src_10005.created_at) AS created_at__extract_quarter
+        , EXTRACT(month FROM listings_latest_src_10005.created_at) AS created_at__extract_month
+        , EXTRACT(day FROM listings_latest_src_10005.created_at) AS created_at__extract_day
+        , IF(EXTRACT(dayofweek FROM listings_latest_src_10005.created_at) = 1, 7, EXTRACT(dayofweek FROM listings_latest_src_10005.created_at) - 1) AS created_at__extract_dow
+        , EXTRACT(dayofyear FROM listings_latest_src_10005.created_at) AS created_at__extract_doy
+        , listings_latest_src_10005.country AS country_latest
+        , listings_latest_src_10005.is_lux AS is_lux_latest
+        , listings_latest_src_10005.capacity AS capacity_latest
+        , DATE_TRUNC(listings_latest_src_10005.created_at, day) AS listing__ds__day
+        , DATE_TRUNC(listings_latest_src_10005.created_at, isoweek) AS listing__ds__week
+        , DATE_TRUNC(listings_latest_src_10005.created_at, month) AS listing__ds__month
+        , DATE_TRUNC(listings_latest_src_10005.created_at, quarter) AS listing__ds__quarter
+        , DATE_TRUNC(listings_latest_src_10005.created_at, year) AS listing__ds__year
+        , EXTRACT(year FROM listings_latest_src_10005.created_at) AS listing__ds__extract_year
+        , EXTRACT(quarter FROM listings_latest_src_10005.created_at) AS listing__ds__extract_quarter
+        , EXTRACT(month FROM listings_latest_src_10005.created_at) AS listing__ds__extract_month
+        , EXTRACT(day FROM listings_latest_src_10005.created_at) AS listing__ds__extract_day
+        , IF(EXTRACT(dayofweek FROM listings_latest_src_10005.created_at) = 1, 7, EXTRACT(dayofweek FROM listings_latest_src_10005.created_at) - 1) AS listing__ds__extract_dow
+        , EXTRACT(dayofyear FROM listings_latest_src_10005.created_at) AS listing__ds__extract_doy
+        , DATE_TRUNC(listings_latest_src_10005.created_at, day) AS listing__created_at__day
+        , DATE_TRUNC(listings_latest_src_10005.created_at, isoweek) AS listing__created_at__week
+        , DATE_TRUNC(listings_latest_src_10005.created_at, month) AS listing__created_at__month
+        , DATE_TRUNC(listings_latest_src_10005.created_at, quarter) AS listing__created_at__quarter
+        , DATE_TRUNC(listings_latest_src_10005.created_at, year) AS listing__created_at__year
+        , EXTRACT(year FROM listings_latest_src_10005.created_at) AS listing__created_at__extract_year
+        , EXTRACT(quarter FROM listings_latest_src_10005.created_at) AS listing__created_at__extract_quarter
+        , EXTRACT(month FROM listings_latest_src_10005.created_at) AS listing__created_at__extract_month
+        , EXTRACT(day FROM listings_latest_src_10005.created_at) AS listing__created_at__extract_day
+        , IF(EXTRACT(dayofweek FROM listings_latest_src_10005.created_at) = 1, 7, EXTRACT(dayofweek FROM listings_latest_src_10005.created_at) - 1) AS listing__created_at__extract_dow
+        , EXTRACT(dayofyear FROM listings_latest_src_10005.created_at) AS listing__created_at__extract_doy
+        , listings_latest_src_10005.country AS listing__country_latest
+        , listings_latest_src_10005.is_lux AS listing__is_lux_latest
+        , listings_latest_src_10005.capacity AS listing__capacity_latest
+        , listings_latest_src_10005.listing_id AS listing
+        , listings_latest_src_10005.user_id AS user
+        , listings_latest_src_10005.user_id AS listing__user
+      FROM ***************************.dim_listings_latest listings_latest_src_10005
     ) subq_0
     FULL OUTER JOIN (
       -- Pass Only Elements:
@@ -192,32 +192,32 @@ FROM (
       FROM (
         -- Read Elements From Semantic Model 'users_latest'
         SELECT
-          DATE_TRUNC(users_latest_src_10008.ds, day) AS ds_latest__day
-          , DATE_TRUNC(users_latest_src_10008.ds, isoweek) AS ds_latest__week
-          , DATE_TRUNC(users_latest_src_10008.ds, month) AS ds_latest__month
-          , DATE_TRUNC(users_latest_src_10008.ds, quarter) AS ds_latest__quarter
-          , DATE_TRUNC(users_latest_src_10008.ds, year) AS ds_latest__year
-          , EXTRACT(year FROM users_latest_src_10008.ds) AS ds_latest__extract_year
-          , EXTRACT(quarter FROM users_latest_src_10008.ds) AS ds_latest__extract_quarter
-          , EXTRACT(month FROM users_latest_src_10008.ds) AS ds_latest__extract_month
-          , EXTRACT(day FROM users_latest_src_10008.ds) AS ds_latest__extract_day
-          , IF(EXTRACT(dayofweek FROM users_latest_src_10008.ds) = 1, 7, EXTRACT(dayofweek FROM users_latest_src_10008.ds) - 1) AS ds_latest__extract_dow
-          , EXTRACT(dayofyear FROM users_latest_src_10008.ds) AS ds_latest__extract_doy
-          , users_latest_src_10008.home_state_latest
-          , DATE_TRUNC(users_latest_src_10008.ds, day) AS user__ds_latest__day
-          , DATE_TRUNC(users_latest_src_10008.ds, isoweek) AS user__ds_latest__week
-          , DATE_TRUNC(users_latest_src_10008.ds, month) AS user__ds_latest__month
-          , DATE_TRUNC(users_latest_src_10008.ds, quarter) AS user__ds_latest__quarter
-          , DATE_TRUNC(users_latest_src_10008.ds, year) AS user__ds_latest__year
-          , EXTRACT(year FROM users_latest_src_10008.ds) AS user__ds_latest__extract_year
-          , EXTRACT(quarter FROM users_latest_src_10008.ds) AS user__ds_latest__extract_quarter
-          , EXTRACT(month FROM users_latest_src_10008.ds) AS user__ds_latest__extract_month
-          , EXTRACT(day FROM users_latest_src_10008.ds) AS user__ds_latest__extract_day
-          , IF(EXTRACT(dayofweek FROM users_latest_src_10008.ds) = 1, 7, EXTRACT(dayofweek FROM users_latest_src_10008.ds) - 1) AS user__ds_latest__extract_dow
-          , EXTRACT(dayofyear FROM users_latest_src_10008.ds) AS user__ds_latest__extract_doy
-          , users_latest_src_10008.home_state_latest AS user__home_state_latest
-          , users_latest_src_10008.user_id AS user
-        FROM ***************************.dim_users_latest users_latest_src_10008
+          DATE_TRUNC(users_latest_src_10009.ds, day) AS ds_latest__day
+          , DATE_TRUNC(users_latest_src_10009.ds, isoweek) AS ds_latest__week
+          , DATE_TRUNC(users_latest_src_10009.ds, month) AS ds_latest__month
+          , DATE_TRUNC(users_latest_src_10009.ds, quarter) AS ds_latest__quarter
+          , DATE_TRUNC(users_latest_src_10009.ds, year) AS ds_latest__year
+          , EXTRACT(year FROM users_latest_src_10009.ds) AS ds_latest__extract_year
+          , EXTRACT(quarter FROM users_latest_src_10009.ds) AS ds_latest__extract_quarter
+          , EXTRACT(month FROM users_latest_src_10009.ds) AS ds_latest__extract_month
+          , EXTRACT(day FROM users_latest_src_10009.ds) AS ds_latest__extract_day
+          , IF(EXTRACT(dayofweek FROM users_latest_src_10009.ds) = 1, 7, EXTRACT(dayofweek FROM users_latest_src_10009.ds) - 1) AS ds_latest__extract_dow
+          , EXTRACT(dayofyear FROM users_latest_src_10009.ds) AS ds_latest__extract_doy
+          , users_latest_src_10009.home_state_latest
+          , DATE_TRUNC(users_latest_src_10009.ds, day) AS user__ds_latest__day
+          , DATE_TRUNC(users_latest_src_10009.ds, isoweek) AS user__ds_latest__week
+          , DATE_TRUNC(users_latest_src_10009.ds, month) AS user__ds_latest__month
+          , DATE_TRUNC(users_latest_src_10009.ds, quarter) AS user__ds_latest__quarter
+          , DATE_TRUNC(users_latest_src_10009.ds, year) AS user__ds_latest__year
+          , EXTRACT(year FROM users_latest_src_10009.ds) AS user__ds_latest__extract_year
+          , EXTRACT(quarter FROM users_latest_src_10009.ds) AS user__ds_latest__extract_quarter
+          , EXTRACT(month FROM users_latest_src_10009.ds) AS user__ds_latest__extract_month
+          , EXTRACT(day FROM users_latest_src_10009.ds) AS user__ds_latest__extract_day
+          , IF(EXTRACT(dayofweek FROM users_latest_src_10009.ds) = 1, 7, EXTRACT(dayofweek FROM users_latest_src_10009.ds) - 1) AS user__ds_latest__extract_dow
+          , EXTRACT(dayofyear FROM users_latest_src_10009.ds) AS user__ds_latest__extract_doy
+          , users_latest_src_10009.home_state_latest AS user__home_state_latest
+          , users_latest_src_10009.user_id AS user
+        FROM ***************************.dim_users_latest users_latest_src_10009
       ) subq_1
     ) subq_2
     ON

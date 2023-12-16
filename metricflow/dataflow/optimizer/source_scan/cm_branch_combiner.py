@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import List, Optional, Sequence
 
 from metricflow.dataflow.dataflow_plan import (
+    AddGeneratedUuidColumnNode,
     AggregateMeasuresNode,
     BaseOutput,
     CombineAggregatedOutputsNode,
@@ -13,6 +14,7 @@ from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,
     DataflowPlanNodeVisitor,
     FilterElementsNode,
+    JoinConversionEventsNode,
     JoinOverTimeRangeNode,
     JoinToBaseOutputNode,
     JoinToTimeSpineNode,
@@ -399,5 +401,17 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         return self._default_handler(node)
 
     def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode) -> ComputeMetricsBranchCombinerResult:  # noqa: D
+        self._log_visit_node_type(node)
+        return self._default_handler(node)
+
+    def visit_add_generated_uuid_column_node(  # noqa: D
+        self, node: AddGeneratedUuidColumnNode
+    ) -> ComputeMetricsBranchCombinerResult:
+        self._log_visit_node_type(node)
+        return self._default_handler(node)
+
+    def visit_join_conversion_events_node(  # noqa: D
+        self, node: JoinConversionEventsNode
+    ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._default_handler(node)

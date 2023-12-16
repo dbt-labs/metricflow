@@ -141,7 +141,9 @@ class MetricLookup(MetricAccessor):  # noqa: D
         if metric.type is MetricType.CUMULATIVE or metric.type is MetricType.SIMPLE:
             assert len(metric.input_measures) == 1, "Simple and cumulative metrics should have one input measure."
             return metric.input_measures[0]
-        elif metric.type is MetricType.RATIO or metric.type is MetricType.DERIVED:
+        elif (
+            metric.type is MetricType.RATIO or metric.type is MetricType.DERIVED or metric.type is MetricType.CONVERSION
+        ):
             return None
         else:
             assert_values_exhausted(metric.type)

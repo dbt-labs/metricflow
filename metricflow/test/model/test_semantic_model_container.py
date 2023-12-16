@@ -115,7 +115,7 @@ def test_local_linked_elements_for_metric(  # noqa: D
 def test_get_semantic_models_for_entity(semantic_model_lookup: SemanticModelLookup) -> None:  # noqa: D
     entity_reference = EntityReference(element_name="user")
     linked_semantic_models = semantic_model_lookup.get_semantic_models_for_entity(entity_reference=entity_reference)
-    assert len(linked_semantic_models) == 8
+    assert len(linked_semantic_models) == 10
 
 
 def test_linkable_set(  # noqa: D
