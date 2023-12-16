@@ -22,4 +22,4 @@ semantic_model:
       type_params:
         time_granularity: month
 
-  primary_entity: daily_measure_entity
+  primary_entity: monthly_measure_entity
