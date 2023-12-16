@@ -17,12 +17,14 @@ In a separate terminal window, run PostgreSQL in the background. Note - you MUST
 make postgres
 ```
 
-Then, when running `pytest`, ensure that `MF_SQL_ENGINE_URL` and `MF_SQL_ENGINE_PASSWORD` are setup
-to access the PostgreSQL instance.
+Then, ensure that `MF_SQL_ENGINE_URL` and `MF_SQL_ENGINE_PASSWORD` are setup to access the PostgreSQL instance. Our test runs are configured to do this automatically via environment configurations. To run all tests try:
 
 ```sh
-export MF_SQL_ENGINE_URL="postgresql://metricflow@localhost:5432/metricflow"
-export MF_SQL_ENGINE_PASSWORD="metricflowing"
+make test-postgresql
+```
 
-poetry run pytest metricflow/test/
+To run some subset of tests in the postgres environment, you can use the postgres-env in a `hatch run` command, for example:
+
+```sh
+hatch -v run postgres-env:pytest -vv -n auto -k "itest_simple" metricflow/test
 ```
