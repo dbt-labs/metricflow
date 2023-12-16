@@ -65,7 +65,7 @@ FROM (
           WHERE subq_4.ds BETWEEN timestamp '2020-01-01' AND timestamp '2020-01-01'
         ) subq_3
         INNER JOIN (
-          -- Constrain Time Range to [2019-12-01T00:00:00, 2020-01-01T00:00:00]
+          -- Constrain Time Range to [2019-11-01T00:00:00, 2020-01-01T00:00:00]
           SELECT
             subq_1.ds__day
             , subq_1.ds__week
@@ -145,35 +145,35 @@ FROM (
             FROM (
               -- Read Elements From Semantic Model 'revenue'
               SELECT
-                revenue_src_10006.revenue AS txn_revenue
-                , DATE_TRUNC('day', revenue_src_10006.created_at) AS ds__day
-                , DATE_TRUNC('week', revenue_src_10006.created_at) AS ds__week
-                , DATE_TRUNC('month', revenue_src_10006.created_at) AS ds__month
-                , DATE_TRUNC('quarter', revenue_src_10006.created_at) AS ds__quarter
-                , DATE_TRUNC('year', revenue_src_10006.created_at) AS ds__year
-                , EXTRACT(year FROM revenue_src_10006.created_at) AS ds__extract_year
-                , EXTRACT(quarter FROM revenue_src_10006.created_at) AS ds__extract_quarter
-                , EXTRACT(month FROM revenue_src_10006.created_at) AS ds__extract_month
-                , EXTRACT(day FROM revenue_src_10006.created_at) AS ds__extract_day
-                , EXTRACT(DAY_OF_WEEK FROM revenue_src_10006.created_at) AS ds__extract_dow
-                , EXTRACT(doy FROM revenue_src_10006.created_at) AS ds__extract_doy
-                , DATE_TRUNC('day', revenue_src_10006.created_at) AS company__ds__day
-                , DATE_TRUNC('week', revenue_src_10006.created_at) AS company__ds__week
-                , DATE_TRUNC('month', revenue_src_10006.created_at) AS company__ds__month
-                , DATE_TRUNC('quarter', revenue_src_10006.created_at) AS company__ds__quarter
-                , DATE_TRUNC('year', revenue_src_10006.created_at) AS company__ds__year
-                , EXTRACT(year FROM revenue_src_10006.created_at) AS company__ds__extract_year
-                , EXTRACT(quarter FROM revenue_src_10006.created_at) AS company__ds__extract_quarter
-                , EXTRACT(month FROM revenue_src_10006.created_at) AS company__ds__extract_month
-                , EXTRACT(day FROM revenue_src_10006.created_at) AS company__ds__extract_day
-                , EXTRACT(DAY_OF_WEEK FROM revenue_src_10006.created_at) AS company__ds__extract_dow
-                , EXTRACT(doy FROM revenue_src_10006.created_at) AS company__ds__extract_doy
-                , revenue_src_10006.user_id AS user
-                , revenue_src_10006.user_id AS company__user
-              FROM ***************************.fct_revenue revenue_src_10006
+                revenue_src_10007.revenue AS txn_revenue
+                , DATE_TRUNC('day', revenue_src_10007.created_at) AS ds__day
+                , DATE_TRUNC('week', revenue_src_10007.created_at) AS ds__week
+                , DATE_TRUNC('month', revenue_src_10007.created_at) AS ds__month
+                , DATE_TRUNC('quarter', revenue_src_10007.created_at) AS ds__quarter
+                , DATE_TRUNC('year', revenue_src_10007.created_at) AS ds__year
+                , EXTRACT(year FROM revenue_src_10007.created_at) AS ds__extract_year
+                , EXTRACT(quarter FROM revenue_src_10007.created_at) AS ds__extract_quarter
+                , EXTRACT(month FROM revenue_src_10007.created_at) AS ds__extract_month
+                , EXTRACT(day FROM revenue_src_10007.created_at) AS ds__extract_day
+                , EXTRACT(DAY_OF_WEEK FROM revenue_src_10007.created_at) AS ds__extract_dow
+                , EXTRACT(doy FROM revenue_src_10007.created_at) AS ds__extract_doy
+                , DATE_TRUNC('day', revenue_src_10007.created_at) AS company__ds__day
+                , DATE_TRUNC('week', revenue_src_10007.created_at) AS company__ds__week
+                , DATE_TRUNC('month', revenue_src_10007.created_at) AS company__ds__month
+                , DATE_TRUNC('quarter', revenue_src_10007.created_at) AS company__ds__quarter
+                , DATE_TRUNC('year', revenue_src_10007.created_at) AS company__ds__year
+                , EXTRACT(year FROM revenue_src_10007.created_at) AS company__ds__extract_year
+                , EXTRACT(quarter FROM revenue_src_10007.created_at) AS company__ds__extract_quarter
+                , EXTRACT(month FROM revenue_src_10007.created_at) AS company__ds__extract_month
+                , EXTRACT(day FROM revenue_src_10007.created_at) AS company__ds__extract_day
+                , EXTRACT(DAY_OF_WEEK FROM revenue_src_10007.created_at) AS company__ds__extract_dow
+                , EXTRACT(doy FROM revenue_src_10007.created_at) AS company__ds__extract_doy
+                , revenue_src_10007.user_id AS user
+                , revenue_src_10007.user_id AS company__user
+              FROM ***************************.fct_revenue revenue_src_10007
             ) subq_0
           ) subq_1
-          WHERE subq_1.metric_time__day BETWEEN timestamp '2019-12-01' AND timestamp '2020-01-01'
+          WHERE subq_1.metric_time__day BETWEEN timestamp '2019-11-01' AND timestamp '2020-01-01'
         ) subq_2
         ON
           (

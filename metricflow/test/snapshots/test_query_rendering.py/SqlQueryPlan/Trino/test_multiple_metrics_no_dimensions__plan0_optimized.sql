@@ -1,4 +1,4 @@
--- Combine Metrics
+-- Combine Aggregated Outputs
 SELECT
   MAX(subq_17.bookings) AS bookings
   , MAX(subq_23.listings) AS listings
@@ -25,6 +25,6 @@ CROSS JOIN (
   -- Compute Metrics via Expressions
   SELECT
     SUM(1) AS listings
-  FROM ***************************.dim_listings_latest listings_latest_src_10004
+  FROM ***************************.dim_listings_latest listings_latest_src_10005
   WHERE DATE_TRUNC('day', created_at) BETWEEN timestamp '2020-01-01' AND timestamp '2020-01-01'
 ) subq_23

@@ -1679,7 +1679,7 @@ integration_test:
       SELECT
         ds AS metric_time__day
       FROM {{ source_schema }}.mf_time_spine subq_6
-      WHERE ds BETWEEN '2019-12-19' AND '2020-01-02'
+      WHERE {{ render_between_time_constraint("ds", "2019-12-19", "2020-01-02") }}
     ) subq_5
     INNER JOIN (
       SELECT
