@@ -53,6 +53,24 @@ jobs:
           python-version: "3.11"
           make-target: "test-postgresql"
 
+  metricflow-unit-tests-trino:
+    name: MetricFlow Tests (Trino)
+    runs-on: ubuntu-latest
+    services:
+      trino:
+        image: trinodb/trino
+        ports:
+          - 8080:8080
+    steps:
+      - name: Check-out the repo
+        uses: actions/checkout@v3
+
+      - name: Test w/ Python 3.11
+        uses: ./.github/actions/run-mf-tests
+        with:
+          python-version: "3.11"
+          make-target: "test-trino"
+
   metricflow-unit-tests:
     name: MetricFlow Unit Tests
     runs-on: ubuntu-latest
