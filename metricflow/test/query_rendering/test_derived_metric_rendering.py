@@ -11,6 +11,7 @@ from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.filters.time_constraint import TimeRangeConstraint
+from metricflow.naming.dunder_scheme import DunderNamingScheme
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.query.query_parser import MetricFlowQueryParser
@@ -495,24 +496,23 @@ def test_cumulative_time_offset_metric_with_time_constraint(  # noqa: D
 def test_nested_derived_metric_offset_with_joined_where_constraint_not_selected(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
+    query_parser: MetricFlowQueryParser,
     dataflow_plan_builder: DataflowPlanBuilder,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
     create_source_tables: bool,
     column_association_resolver: ColumnAssociationResolver,
 ) -> None:
-    dataflow_plan = dataflow_plan_builder.build_plan(
-        query_spec=MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings_offset_twice"),),
-            time_dimension_specs=(MTD_SPEC_DAY,),
-            where_constraint=WhereSpecFactory(
-                column_association_resolver=column_association_resolver,
-            ).create_from_where_filter(
-                PydanticWhereFilter(where_sql_template=("{{ Dimension('booking__is_instant') }}"))
-            ),
-        )
+    group_by_name = DunderNamingScheme().input_str(MTD_SPEC_DAY)
+    assert group_by_name is not None
+
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookings_offset_twice",),
+        group_by_names=(group_by_name,),
+        where_constraint_str="{{ Dimension('booking__is_instant') }}",
     )
 
+    dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
     convert_and_check(
         request=request,
         mf_test_session_state=mf_test_session_state,
