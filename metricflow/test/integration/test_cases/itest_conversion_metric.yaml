@@ -25,9 +25,9 @@ integration_test:
         b.ds AS metric_time, SUM(b.buys) AS buys
       FROM (
         SELECT DISTINCT
-        first_value(v.ds) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC) AS ds
-        , first_value(v.user_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC) AS user_id
-        , first_value(v.referrer_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC) AS referrer_id
+        first_value(v.ds) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS ds
+        , first_value(v.user_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS user_id
+        , first_value(v.referrer_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS referrer_id
         , buy_source.uuid
         , 1 AS buys
         FROM {{ source_schema }}.fct_visits v
@@ -65,8 +65,8 @@ integration_test:
         SUM(b.buys) AS buys
       FROM (
         SELECT DISTINCT
-        first_value(v.user_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC) AS user_id
-        , first_value(v.referrer_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC) AS referrer_id
+        first_value(v.user_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS user_id
+        , first_value(v.referrer_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS referrer_id
         , buy_source.uuid
         , 1 AS buys
         FROM {{ source_schema }}.fct_visits v
@@ -105,9 +105,9 @@ integration_test:
         b.ds AS metric_time, SUM(b.buys) AS buys
       FROM (
         SELECT DISTINCT
-        first_value(v.ds) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC) AS ds
-        , first_value(v.user_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC) AS user_id
-        , first_value(v.referrer_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC) AS referrer_id
+        first_value(v.ds) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS ds
+        , first_value(v.user_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS user_id
+        , first_value(v.referrer_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS referrer_id
         , buy_source.uuid
         , 1 AS buys
         FROM {{ source_schema }}.fct_visits v
@@ -149,9 +149,9 @@ integration_test:
         referrer_id AS referrer_id, SUM(b.buys) AS buys
       FROM (
         SELECT DISTINCT
-        first_value(v.ds) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC) AS ds
-        , first_value(v.user_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC) AS user_id
-        , first_value(v.referrer_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC) AS referrer_id
+        first_value(v.ds) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS ds
+        , first_value(v.user_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS user_id
+        , first_value(v.referrer_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS referrer_id
         , buy_source.uuid
         , 1 AS buys
         FROM {{ source_schema }}.fct_visits v
@@ -284,9 +284,9 @@ integration_test:
         b.ds AS metric_time, SUM(b.buys) AS buys
       FROM (
         SELECT DISTINCT
-        first_value(v.ds) OVER (PARTITION BY buy_source.ds, buy_source.user_id, buy_source.session_id ORDER BY v.ds DESC) AS ds
-        , first_value(v.user_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id, buy_source.session_id ORDER BY v.ds DESC) AS user_id
-        , first_value(v.referrer_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id, buy_source.session_id ORDER BY v.ds DESC) AS referrer_id
+        first_value(v.ds) OVER (PARTITION BY buy_source.ds, buy_source.user_id, buy_source.session_id ORDER BY v.ds DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS ds
+        , first_value(v.user_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id, buy_source.session_id ORDER BY v.ds DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS user_id
+        , first_value(v.referrer_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id, buy_source.session_id ORDER BY v.ds DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS referrer_id
         , buy_source.uuid
         , 1 AS buys
         FROM {{ source_schema }}.fct_visits v
@@ -331,9 +331,9 @@ integration_test:
         b.ds AS metric_time, referrer_id AS referrer_id, SUM(b.buys) AS buys
       FROM (
         SELECT DISTINCT
-        first_value(v.ds) OVER (PARTITION BY buy_source.ds, buy_source.user_id, buy_source.session_id ORDER BY v.ds DESC) AS ds
-        , first_value(v.user_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id, buy_source.session_id ORDER BY v.ds DESC) AS user_id
-        , first_value(v.referrer_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id, buy_source.session_id ORDER BY v.ds DESC) AS referrer_id
+        first_value(v.ds) OVER (PARTITION BY buy_source.ds, buy_source.user_id, buy_source.session_id ORDER BY v.ds DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS ds
+        , first_value(v.user_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id, buy_source.session_id ORDER BY v.ds DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS user_id
+        , first_value(v.referrer_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id, buy_source.session_id ORDER BY v.ds DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS referrer_id
         , buy_source.uuid
         , 1 AS buys
         FROM {{ source_schema }}.fct_visits v
