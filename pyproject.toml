@@ -204,6 +204,7 @@ description = "Dev environment for working with the Trino adapter"
 features = [
     "dev-packages",
     "dbt-trino",
+    "sql-client-packages",
     "trino-sql-client-packages",
 ]
 
