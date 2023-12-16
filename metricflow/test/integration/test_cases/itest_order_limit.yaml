@@ -69,6 +69,6 @@ integration_test:
       , SUM(booking_value) AS booking_value
     FROM {{ source_schema }}.fct_bookings
     GROUP BY
-      {{ render_date_trunc("ds", TimeGranularity.MONTH) }}
+      1
     ORDER BY
       metric_time__month DESC, booking_value
