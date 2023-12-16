@@ -74,7 +74,7 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
         metric = self._get_metric(metric_reference)
         query_includes_metric_time = self._group_by_items_include_metric_time(resolver_input_for_query)
 
-        if metric.type is MetricType.SIMPLE:
+        if metric.type is MetricType.SIMPLE or metric.type is MetricType.CONVERSION:
             return MetricFlowQueryResolutionIssueSet.empty_instance()
         elif metric.type is MetricType.CUMULATIVE:
             if (

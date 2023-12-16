@@ -159,7 +159,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
             metric = self._semantic_manifest_lookup.metric_lookup.get_metric(node.child_metric_reference)
 
             patterns_to_apply: Tuple[SpecPattern, ...] = ()
-            if metric.type is MetricType.SIMPLE:
+            if metric.type is MetricType.SIMPLE or metric.type is MetricType.CONVERSION:
                 pass
             elif metric.type is MetricType.RATIO or metric.type is MetricType.DERIVED:
                 assert False, f"A measure should have a simple or cumulative metric as a child, but got {metric.type}"
@@ -293,7 +293,11 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
 
             # For metrics with offset_to_grain, don't allow date_part group-by-items
             patterns_to_apply: Sequence[SpecPattern] = ()
-            if metric.type is MetricType.SIMPLE or metric.type is MetricType.CUMULATIVE:
+            if (
+                metric.type is MetricType.SIMPLE
+                or metric.type is MetricType.CUMULATIVE
+                or metric.type is MetricType.CONVERSION
+            ):
                 pass
             elif metric.type is MetricType.RATIO or metric.type is MetricType.DERIVED:
                 for input_metric in metric.input_metrics:

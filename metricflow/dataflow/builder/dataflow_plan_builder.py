@@ -225,7 +225,6 @@ class DataflowPlanBuilder:
         entity_spec: EntitySpec,
         window: Optional[MetricTimeWindow],
         queried_linkable_specs: LinkableSpecSet,
-        where_constraint: Optional[WhereFilterSpec] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         constant_properties: Optional[Sequence[ConstantPropertyInput]] = None,
     ) -> BaseOutput:
@@ -233,7 +232,7 @@ class DataflowPlanBuilder:
         # Build measure recipes
         base_required_linkable_specs, _ = self.__get_required_and_extraneous_linkable_specs(
             queried_linkable_specs=queried_linkable_specs,
-            where_constraint=where_constraint,
+            filter_specs=base_measure_spec.filter_specs,
         )
         base_measure_recipe = self._find_dataflow_recipe(
             measure_spec_properties=self._build_measure_spec_properties([base_measure_spec.measure_spec]),
@@ -261,7 +260,6 @@ class DataflowPlanBuilder:
         aggregated_base_measure_node = self.build_aggregated_measure(
             metric_input_measure_spec=base_measure_spec,
             queried_linkable_specs=queried_linkable_specs,
-            where_constraint=where_constraint,
             time_range_constraint=time_range_constraint,
         )
 
@@ -334,7 +332,6 @@ class DataflowPlanBuilder:
         aggregated_conversions_node = self.build_aggregated_measure(
             metric_input_measure_spec=conversion_measure_spec,
             queried_linkable_specs=queried_linkable_specs,
-            where_constraint=where_constraint,
             time_range_constraint=time_range_constraint,
             measure_recipe=recipe_with_join_conversion_source_node,
         )
@@ -346,23 +343,19 @@ class DataflowPlanBuilder:
         self,
         metric_spec: MetricSpec,
         queried_linkable_specs: LinkableSpecSet,
-        where_constraint: Optional[WhereFilterSpec] = None,
+        filter_spec_factory: WhereSpecFactory,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
     ) -> ComputeMetricsNode:
         """Builds a compute metric node for a conversion metric."""
-        combined_where = where_constraint
-        if metric_spec.constraint:
-            combined_where = (
-                combined_where.combine(metric_spec.constraint) if combined_where else metric_spec.constraint
-            )
-
-        metric = self._metric_lookup.get_metric(metric_spec.reference)
+        metric_reference = metric_spec.reference
+        metric = self._metric_lookup.get_metric(metric_reference)
         conversion_type_params = metric.type_params.conversion_type_params
         assert conversion_type_params, "A conversion metric should have type_params.conversion_type_params defined."
         base_measure, conversion_measure = self._build_input_measure_specs_for_conversion_metric(
             metric_reference=metric_spec.reference,
             conversion_type_params=conversion_type_params,
-            column_association_resolver=self._column_association_resolver,
+            filter_spec_factory=filter_spec_factory,
+            descendent_filter_specs=metric_spec.filter_specs,
         )
         entity_spec = EntitySpec.from_name(conversion_type_params.entity)
         logger.info(
@@ -376,7 +369,6 @@ class DataflowPlanBuilder:
             base_measure_spec=base_measure,
             conversion_measure_spec=conversion_measure,
             queried_linkable_specs=queried_linkable_specs,
-            where_constraint=combined_where,
             time_range_constraint=time_range_constraint,
             entity_spec=entity_spec,
             window=conversion_type_params.window,
@@ -546,7 +538,7 @@ class DataflowPlanBuilder:
             return self._build_conversion_metric_output_node(
                 metric_spec=metric_spec,
                 queried_linkable_specs=queried_linkable_specs,
-                where_constraint=where_constraint,
+                filter_spec_factory=filter_spec_factory,
                 time_range_constraint=time_range_constraint,
             )
 
@@ -957,7 +949,8 @@ class DataflowPlanBuilder:
         self,
         metric_reference: MetricReference,
         conversion_type_params: ConversionTypeParams,
-        column_association_resolver: ColumnAssociationResolver,
+        filter_spec_factory: WhereSpecFactory,
+        descendent_filter_specs: Sequence[WhereFilterSpec],
     ) -> Tuple[MetricInputMeasureSpec, MetricInputMeasureSpec]:
         """Return [base_measure_input, conversion_measure_input] for computing a conversion metric."""
         metric = self._metric_lookup.get_metric(metric_reference)
@@ -969,7 +962,7 @@ class DataflowPlanBuilder:
         ), f"A conversion metric should exactly 2 measures. Got{metric.input_measures}"
 
         def _get_matching_measure(
-            measure_to_match: MeasureReference, input_measures: Sequence[MetricInputMeasure]
+            measure_to_match: MeasureReference, input_measures: Sequence[MetricInputMeasure], is_base_measure: bool
         ) -> MetricInputMeasureSpec:
             matched_measure = next(
                 filter(
@@ -979,22 +972,37 @@ class DataflowPlanBuilder:
                 None,
             )
             assert matched_measure, f"Unable to find {measure_to_match} in {input_measures}."
+            if is_base_measure:
+                filter_specs: List[WhereFilterSpec] = []
+                filter_specs.extend(
+                    filter_spec_factory.create_from_where_filter_intersection(
+                        filter_location=WhereFilterLocation.for_metric(metric_reference),
+                        filter_intersection=metric.filter,
+                    )
+                )
+                filter_specs.extend(descendent_filter_specs)
+                filter_specs.extend(
+                    filter_spec_factory.create_from_where_filter_intersection(
+                        filter_location=WhereFilterLocation.for_metric(metric_reference),
+                        filter_intersection=matched_measure.filter,
+                    )
+                )
             return MetricInputMeasureSpec(
                 measure_spec=MeasureSpec.from_name(matched_measure.name),
                 fill_nulls_with=matched_measure.fill_nulls_with,
-                constraint=WhereSpecFactory(
-                    column_association_resolver=column_association_resolver,
-                ).create_from_where_filter_intersection(matched_measure.filter),
+                filter_specs=tuple(filter_specs) if is_base_measure else (),
                 alias=matched_measure.alias,
             )
 
         base_input_measure = _get_matching_measure(
             measure_to_match=conversion_type_params.base_measure.measure_reference,
             input_measures=metric.input_measures,
+            is_base_measure=True,
         )
         conversion_input_measure = _get_matching_measure(
             measure_to_match=conversion_type_params.conversion_measure.measure_reference,
             input_measures=metric.input_measures,
+            is_base_measure=False,
         )
         return base_input_measure, conversion_input_measure
 
