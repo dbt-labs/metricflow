@@ -16,8 +16,6 @@ from metricflow.collection_helpers.merger import Mergeable
 from metricflow.collection_helpers.pretty_print import mf_pformat
 from metricflow.formatting import indent_log_line
 from metricflow.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
-from metricflow.query.group_by_item.path_prefixable import PathPrefixable
-from metricflow.query.group_by_item.resolution_dag.resolution_nodes.base_node import GroupByItemResolutionNode
 from metricflow.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow.query.issues.issues_base import MetricFlowQueryResolutionIssueSet
 from metricflow.specs.specs import LinkableInstanceSpec
@@ -26,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
-class FilterSpecResolutionLookUp(Mergeable, PathPrefixable):
+class FilterSpecResolutionLookUp(Mergeable):
     """Allows you to look up the spec for a group-by-item in a where filter.
 
     If there are issues parsing the filter, or if the filter had specified an invalid group-by-item, the appropriate
@@ -98,15 +96,6 @@ class FilterSpecResolutionLookUp(Mergeable, PathPrefixable):
             issue_set=MetricFlowQueryResolutionIssueSet.empty_instance(),
         )
 
-    @override
-    def with_path_prefix(self, path_prefix_node: GroupByItemResolutionNode) -> FilterSpecResolutionLookUp:
-        return FilterSpecResolutionLookUp(
-            spec_resolutions=tuple(
-                resolution.with_path_prefix(path_prefix_node) for resolution in self.spec_resolutions
-            ),
-            issue_set=self.issue_set.with_path_prefix(path_prefix_node),
-        )
-
     def dedupe(self) -> FilterSpecResolutionLookUp:  # noqa: D
         deduped_spec_resolutions: List[FilterSpecResolution] = []
         deduped_lookup_keys: Set[ResolvedSpecLookUpKey] = set()
@@ -160,20 +149,12 @@ class ResolvedSpecLookUpKey:
 
 
 @dataclass(frozen=True)
-class FilterSpecResolution(PathPrefixable):
+class FilterSpecResolution:
     """Associates a lookup key and the resolved spec."""
 
     lookup_key: ResolvedSpecLookUpKey
     resolution_path: MetricFlowQueryResolutionPath
     resolved_spec: Optional[LinkableInstanceSpec]
-
-    @override
-    def with_path_prefix(self, path_prefix_node: GroupByItemResolutionNode) -> FilterSpecResolution:
-        return FilterSpecResolution(
-            lookup_key=self.lookup_key,
-            resolution_path=self.resolution_path.with_path_prefix(path_prefix_node),
-            resolved_spec=self.resolved_spec,
-        )
 
 
 CallParameterSet = Union[DimensionCallParameterSet, TimeDimensionCallParameterSet, EntityCallParameterSet]

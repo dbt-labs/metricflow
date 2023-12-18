@@ -77,12 +77,12 @@ class NoCommonItemsInParents(MetricFlowQueryResolutionIssue):
         )
 
     @override
-    def with_path_prefix(self, path_prefix_node: GroupByItemResolutionNode) -> NoCommonItemsInParents:
+    def with_path_prefix(self, path_prefix: MetricFlowQueryResolutionPath) -> NoCommonItemsInParents:
         return NoCommonItemsInParents(
             issue_type=self.issue_type,
-            parent_issues=tuple(issue.with_path_prefix(path_prefix_node) for issue in self.parent_issues),
-            query_resolution_path=self.query_resolution_path.with_path_prefix(path_prefix_node),
+            parent_issues=tuple(issue.with_path_prefix(path_prefix) for issue in self.parent_issues),
+            query_resolution_path=self.query_resolution_path.with_path_prefix(path_prefix),
             parent_candidate_sets=tuple(
-                candidate_set.with_path_prefix(path_prefix_node) for candidate_set in self.parent_candidate_sets
+                candidate_set.with_path_prefix(path_prefix) for candidate_set in self.parent_candidate_sets
             ),
         )

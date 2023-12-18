@@ -7,7 +7,6 @@ from typing import Iterable, Tuple
 from typing_extensions import override
 
 from metricflow.query.group_by_item.path_prefixable import PathPrefixable
-from metricflow.query.group_by_item.resolution_dag.resolution_nodes.base_node import GroupByItemResolutionNode
 from metricflow.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow.specs.patterns.spec_pattern import SpecPattern
 from metricflow.specs.specs import InstanceSpecSet, LinkableInstanceSpec, LinkableSpecSet
@@ -95,7 +94,7 @@ class GroupByItemCandidateSet(PathPrefixable):
         )
 
     @override
-    def with_path_prefix(self, path_prefix: GroupByItemResolutionNode) -> GroupByItemCandidateSet:
+    def with_path_prefix(self, path_prefix: MetricFlowQueryResolutionPath) -> GroupByItemCandidateSet:
         return GroupByItemCandidateSet(
             specs=self.specs,
             measure_paths=tuple(path.with_path_prefix(path_prefix) for path in self.measure_paths),
