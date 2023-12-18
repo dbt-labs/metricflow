@@ -446,10 +446,7 @@ class MetricFlowQueryParser:
 
         query_spec = query_resolution.checked_query_spec
         assert query_resolution.resolution_dag is not None
-        # Can't compute the grain of metric_time if there are no metrics.
-        if (time_constraint_start is not None or time_constraint_end is not None) and len(
-            resolver_inputs_for_metrics
-        ) > 0:
+        if time_constraint_start is not None or time_constraint_end is not None:
             if time_constraint_start is None:
                 time_constraint_start = TimeRangeConstraint.ALL_TIME_BEGIN()
                 logger.info(f"time_constraint_start was None, so it was set to {time_constraint_start}")
