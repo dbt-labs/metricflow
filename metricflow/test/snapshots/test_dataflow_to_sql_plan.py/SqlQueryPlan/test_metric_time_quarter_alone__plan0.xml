@@ -106,62 +106,62 @@
             <!--   {'class': 'SqlSelectColumn',                           -->
             <!--    'expr': SqlColumnReferenceExpression(node_id=cr_43),  -->
             <!--    'column_alias': 'metric_time__extract_doy'}           -->
-            <!-- from_source = SqlSelectStatementNode(node_id=ss_10029) -->
+            <!-- from_source = SqlSelectStatementNode(node_id=ss_10031) -->
             <!-- where = None -->
             <!-- distinct = False -->
             <SqlSelectStatementNode>
                 <!-- description = Date Spine -->
-                <!-- node_id = ss_10029 -->
+                <!-- node_id = ss_10031 -->
                 <!-- col0 =                                                -->
                 <!--   {'class': 'SqlSelectColumn',                        -->
-                <!--    'expr': SqlDateTruncExpression(node_id=dt_10340),  -->
+                <!--    'expr': SqlDateTruncExpression(node_id=dt_10360),  -->
                 <!--    'column_alias': 'ds__day'}                         -->
                 <!-- col1 =                                                -->
                 <!--   {'class': 'SqlSelectColumn',                        -->
-                <!--    'expr': SqlDateTruncExpression(node_id=dt_10341),  -->
+                <!--    'expr': SqlDateTruncExpression(node_id=dt_10361),  -->
                 <!--    'column_alias': 'ds__week'}                        -->
                 <!-- col2 =                                                -->
                 <!--   {'class': 'SqlSelectColumn',                        -->
-                <!--    'expr': SqlDateTruncExpression(node_id=dt_10342),  -->
+                <!--    'expr': SqlDateTruncExpression(node_id=dt_10362),  -->
                 <!--    'column_alias': 'ds__month'}                       -->
                 <!-- col3 =                                                -->
                 <!--   {'class': 'SqlSelectColumn',                        -->
-                <!--    'expr': SqlDateTruncExpression(node_id=dt_10343),  -->
+                <!--    'expr': SqlDateTruncExpression(node_id=dt_10363),  -->
                 <!--    'column_alias': 'ds__quarter'}                     -->
                 <!-- col4 =                                                -->
                 <!--   {'class': 'SqlSelectColumn',                        -->
-                <!--    'expr': SqlDateTruncExpression(node_id=dt_10344),  -->
+                <!--    'expr': SqlDateTruncExpression(node_id=dt_10364),  -->
                 <!--    'column_alias': 'ds__year'}                        -->
                 <!-- col5 =                                              -->
                 <!--   {'class': 'SqlSelectColumn',                      -->
-                <!--    'expr': SqlExtractExpression(node_id=ex_10422),  -->
+                <!--    'expr': SqlExtractExpression(node_id=ex_10446),  -->
                 <!--    'column_alias': 'ds__extract_year'}              -->
                 <!-- col6 =                                              -->
                 <!--   {'class': 'SqlSelectColumn',                      -->
-                <!--    'expr': SqlExtractExpression(node_id=ex_10423),  -->
+                <!--    'expr': SqlExtractExpression(node_id=ex_10447),  -->
                 <!--    'column_alias': 'ds__extract_quarter'}           -->
                 <!-- col7 =                                              -->
                 <!--   {'class': 'SqlSelectColumn',                      -->
-                <!--    'expr': SqlExtractExpression(node_id=ex_10424),  -->
+                <!--    'expr': SqlExtractExpression(node_id=ex_10448),  -->
                 <!--    'column_alias': 'ds__extract_month'}             -->
                 <!-- col8 =                                              -->
                 <!--   {'class': 'SqlSelectColumn',                      -->
-                <!--    'expr': SqlExtractExpression(node_id=ex_10425),  -->
+                <!--    'expr': SqlExtractExpression(node_id=ex_10449),  -->
                 <!--    'column_alias': 'ds__extract_day'}               -->
                 <!-- col9 =                                              -->
                 <!--   {'class': 'SqlSelectColumn',                      -->
-                <!--    'expr': SqlExtractExpression(node_id=ex_10426),  -->
+                <!--    'expr': SqlExtractExpression(node_id=ex_10450),  -->
                 <!--    'column_alias': 'ds__extract_dow'}               -->
                 <!-- col10 =                                             -->
                 <!--   {'class': 'SqlSelectColumn',                      -->
-                <!--    'expr': SqlExtractExpression(node_id=ex_10427),  -->
+                <!--    'expr': SqlExtractExpression(node_id=ex_10451),  -->
                 <!--    'column_alias': 'ds__extract_doy'}               -->
-                <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10029) -->
+                <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10031) -->
                 <!-- where = None -->
                 <!-- distinct = False -->
                 <SqlTableFromClauseNode>
                     <!-- description = Read from ***************************.mf_time_spine -->
-                    <!-- node_id = tfc_10029 -->
+                    <!-- node_id = tfc_10031 -->
                     <!-- table_id = ***************************.mf_time_spine -->
                 </SqlTableFromClauseNode>
             </SqlSelectStatementNode>

@@ -533,11 +533,6 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             linkable_dimensions_tuple,
         ) in path_key_to_linkable_dimensions.items():
             for linkable_dimension in linkable_dimensions_tuple:
-                semantic_model = self._semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
-                    linkable_dimension.semantic_model_origin
-                )
-                assert semantic_model
-
                 if LinkableElementProperties.METRIC_TIME in linkable_dimension.properties:
                     metric_time_name = DataSet.metric_time_dimension_name()
                     assert linkable_dimension.element_name == metric_time_name, (
@@ -567,6 +562,13 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                         )
                     )
                 else:
+                    assert (
+                        linkable_dimension.semantic_model_origin
+                    ), "Only metric_time can have no semantic_model_origin."
+                    semantic_model = self._semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
+                        linkable_dimension.semantic_model_origin
+                    )
+                    assert semantic_model
                     dimensions.append(
                         Dimension.from_pydantic(
                             pydantic_dimension=SemanticModelLookup.get_dimension_from_semantic_model(
