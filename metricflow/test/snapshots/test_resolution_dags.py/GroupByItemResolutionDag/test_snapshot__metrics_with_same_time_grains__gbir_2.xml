@@ -2,9 +2,8 @@
     <QueryGroupByItemResolutionNode>
         <!-- description = Output the group-by items for query. -->
         <!-- node_id = qr_2 -->
-        <!-- metrics_in_query =                                      -->
-        <!--   ["MetricReference(element_name='monthly_metric_0')",  -->
-        <!--    "MetricReference(element_name='monthly_metric_1')"]  -->
+        <!-- metrics_in_query = ['monthly_metric_0', 'monthly_metric_1'] -->
+        <!-- where_filter = ["{{ TimeDimension('metric_time') }} > '2020-01-01'"] -->
         <MetricGroupByItemResolutionNode>
             <!-- description = Output group-by-items available for this metric. -->
             <!-- node_id = mtr_1 -->
