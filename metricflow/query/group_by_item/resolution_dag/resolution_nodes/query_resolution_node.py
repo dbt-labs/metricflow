@@ -62,12 +62,27 @@ class QueryGroupByItemResolutionNode(GroupByItemResolutionNode):
     @property
     @override
     def displayed_properties(self) -> List[DisplayedProperty]:
-        return super().displayed_properties + [
-            DisplayedProperty(
-                key="metrics_in_query",
-                value=[str(metric_reference) for metric_reference in self.metrics_in_query],
+        properties = list(super().displayed_properties)
+
+        if len(self.metrics_in_query) > 0:
+            properties.append(
+                DisplayedProperty(
+                    key="metrics_in_query",
+                    value=[metric_reference.element_name for metric_reference in self.metrics_in_query],
+                )
             )
-        ]
+
+        if len(self.where_filter_intersection.where_filters) > 0:
+            properties.append(
+                DisplayedProperty(
+                    key="where_filter",
+                    value=[
+                        where_filter.where_sql_template for where_filter in self.where_filter_intersection.where_filters
+                    ],
+                )
+            )
+
+        return properties
 
     @property
     def where_filter_intersection(self) -> WhereFilterIntersection:  # noqa: D
