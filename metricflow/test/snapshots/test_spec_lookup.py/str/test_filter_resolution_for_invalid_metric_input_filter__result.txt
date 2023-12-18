@@ -1,60 +1,101 @@
 FilterSpecResolutionLookUp(
-  issue_set=MetricFlowQueryResolutionIssueSet(
-    issues=(
-      NoCommonItemsInParents(
-        issue_type=ERROR,
-        query_resolution_path=MetricFlowQueryResolutionPath(
-          resolution_path_nodes=(MetricGroupByItemResolutionNode(node_id=mtr_2),),
-        ),
-        parent_candidate_sets=(
-          GroupByItemCandidateSet(
-            specs=(
-              TimeDimensionSpec(
-                element_name='metric_time',
-                time_granularity=MONTH,
-              ),
-            ),
-            measure_paths=(
-              MetricFlowQueryResolutionPath(
-                resolution_path_nodes=(
-                  MetricGroupByItemResolutionNode(node_id=mtr_2),
-                  MetricGroupByItemResolutionNode(node_id=mtr_0),
-                  MeasureGroupByItemSourceNode(node_id=msr_0),
-                ),
-              ),
-            ),
-            path_from_leaf_node=MetricFlowQueryResolutionPath(
-              resolution_path_nodes=(
-                MetricGroupByItemResolutionNode(node_id=mtr_2),
-                MetricGroupByItemResolutionNode(node_id=mtr_0),
-              ),
+  spec_resolutions=(
+    FilterSpecResolution(
+      lookup_key=ResolvedSpecLookUpKey(
+        filter_location=WhereFilterLocation(
+          metric_references=(
+            MetricReference(
+              element_name='derived_metric_with_different_parent_time_grains',
             ),
           ),
-          GroupByItemCandidateSet(
-            specs=(
-              TimeDimensionSpec(
-                element_name='metric_time',
-                time_granularity=YEAR,
-              ),
-            ),
-            measure_paths=(
-              MetricFlowQueryResolutionPath(
-                resolution_path_nodes=(
-                  MetricGroupByItemResolutionNode(node_id=mtr_2),
-                  MetricGroupByItemResolutionNode(node_id=mtr_1),
-                  MeasureGroupByItemSourceNode(node_id=msr_1),
-                ),
-              ),
-            ),
-            path_from_leaf_node=MetricFlowQueryResolutionPath(
+        ),
+        call_parameter_set=TimeDimensionCallParameterSet(
+          time_dimension_reference=TimeDimensionReference(
+            element_name='metric_time',
+          ),
+        ),
+      ),
+      where_filter_intersection=PydanticWhereFilterIntersection(
+        where_filters=[
+          PydanticWhereFilter(
+            where_sql_template="{{ TimeDimension('metric_time') }} > '2020-01-01'",
+          ),
+        ],
+      ),
+      spec_pattern=TimeDimensionPattern(
+        parameter_set=EntityLinkPatternParameterSet(
+          fields_to_compare=(DATE_PART, ELEMENT_NAME, ENTITY_LINKS),
+          element_name='metric_time',
+        ),
+      ),
+      issue_set=MetricFlowQueryResolutionIssueSet(
+        issues=(
+          NoCommonItemsInParents(
+            issue_type=ERROR,
+            query_resolution_path=MetricFlowQueryResolutionPath(
               resolution_path_nodes=(
                 MetricGroupByItemResolutionNode(node_id=mtr_2),
-                MetricGroupByItemResolutionNode(node_id=mtr_1),
+              ),
+            ),
+            parent_candidate_sets=(
+              GroupByItemCandidateSet(
+                specs=(
+                  TimeDimensionSpec(
+                    element_name='metric_time',
+                    time_granularity=MONTH,
+                  ),
+                ),
+                measure_paths=(
+                  MetricFlowQueryResolutionPath(
+                    resolution_path_nodes=(
+                      MetricGroupByItemResolutionNode(node_id=mtr_2),
+                      MetricGroupByItemResolutionNode(node_id=mtr_0),
+                      MeasureGroupByItemSourceNode(node_id=msr_0),
+                    ),
+                  ),
+                ),
+                path_from_leaf_node=MetricFlowQueryResolutionPath(
+                  resolution_path_nodes=(
+                    MetricGroupByItemResolutionNode(node_id=mtr_2),
+                    MetricGroupByItemResolutionNode(node_id=mtr_0),
+                  ),
+                ),
+              ),
+              GroupByItemCandidateSet(
+                specs=(
+                  TimeDimensionSpec(
+                    element_name='metric_time',
+                    time_granularity=YEAR,
+                  ),
+                ),
+                measure_paths=(
+                  MetricFlowQueryResolutionPath(
+                    resolution_path_nodes=(
+                      MetricGroupByItemResolutionNode(node_id=mtr_2),
+                      MetricGroupByItemResolutionNode(node_id=mtr_1),
+                      MeasureGroupByItemSourceNode(node_id=msr_1),
+                    ),
+                  ),
+                ),
+                path_from_leaf_node=MetricFlowQueryResolutionPath(
+                  resolution_path_nodes=(
+                    MetricGroupByItemResolutionNode(node_id=mtr_2),
+                    MetricGroupByItemResolutionNode(node_id=mtr_1),
+                  ),
+                ),
               ),
             ),
           ),
         ),
       ),
+      filter_location_path=MetricFlowQueryResolutionPath(
+        resolution_path_nodes=(
+          QueryGroupByItemResolutionNode(node_id=qr_0),
+          MetricGroupByItemResolutionNode(node_id=mtr_3),
+          MetricGroupByItemResolutionNode(node_id=mtr_2),
+        ),
+      ),
+      object_builder_str="TimeDimension('metric_time')",
     ),
   ),
 )
