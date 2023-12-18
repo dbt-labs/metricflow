@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import logging
-from typing import Dict, List, Sequence
+from typing import Dict, List
 
 from dbt_semantic_interfaces.call_parameter_sets import (
     FilterCallParameterSets,
 )
-from dbt_semantic_interfaces.protocols import WhereFilter
+from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
+from dbt_semantic_interfaces.protocols import WhereFilter, WhereFilterIntersection
 from typing_extensions import override
 
 from metricflow.collection_helpers.pretty_print import mf_pformat
@@ -18,6 +19,7 @@ from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup im
     CallParameterSet,
     FilterSpecResolution,
     FilterSpecResolutionLookUp,
+    NonParsableFilterResolution,
     ResolvedSpecLookUpKey,
 )
 from metricflow.query.group_by_item.group_by_item_resolver import GroupByItemResolver
@@ -170,11 +172,11 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
 
             return resolved_spec_lookup_so_far.merge(
                 self._resolve_specs_for_where_filters(
-                    resolution_node=node,
+                    current_node=node,
                     resolution_path=resolution_path,
                     resolved_spec_lookup_so_far=resolved_spec_lookup_so_far,
                     filter_location=WhereFilterLocation.for_metric(node.metric_reference),
-                    where_filters=self._get_where_filters_at_metric_node(node),
+                    where_filter_intersection=self._get_where_filters_at_metric_node(node),
                 )
             )
 
@@ -191,11 +193,11 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
 
             return resolved_spec_lookup_so_far.merge(
                 self._resolve_specs_for_where_filters(
-                    resolution_node=node,
+                    current_node=node,
                     resolution_path=resolution_path,
                     resolved_spec_lookup_so_far=resolved_spec_lookup_so_far,
                     filter_location=WhereFilterLocation.for_query(node.metrics_in_query),
-                    where_filters=node.where_filter_intersection.where_filters,
+                    where_filter_intersection=node.where_filter_intersection,
                 )
             )
 
@@ -205,7 +207,9 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
         with self._path_from_start_node_tracker.track_node_visit(node):
             return FilterSpecResolutionLookUp.empty_instance()
 
-    def _get_where_filters_at_metric_node(self, metric_node: MetricGroupByItemResolutionNode) -> Sequence[WhereFilter]:
+    def _get_where_filters_at_metric_node(
+        self, metric_node: MetricGroupByItemResolutionNode
+    ) -> WhereFilterIntersection:
         """Return the filters used with a metric in the manifest.
 
         A derived metric definition can have a filter for an input metric, and we'll need to resolve that when the
@@ -229,38 +233,43 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
             if child_metric_input.filter is not None:
                 where_filters.extend(child_metric_input.filter.where_filters)
 
-        return where_filters
+        return PydanticWhereFilterIntersection(where_filters=where_filters)
 
     def _resolve_specs_for_where_filters(
         self,
-        resolution_node: ResolutionDagSinkNode,
+        current_node: ResolutionDagSinkNode,
         resolution_path: MetricFlowQueryResolutionPath,
         resolved_spec_lookup_so_far: FilterSpecResolutionLookUp,
         filter_location: WhereFilterLocation,
-        where_filters: Sequence[WhereFilter],
+        where_filter_intersection: WhereFilterIntersection,
     ) -> FilterSpecResolutionLookUp:
-        """Given the filters at a particular node, build the spec lookup for those filters."""
-        results_to_merge: List[FilterSpecResolutionLookUp] = []
+        """Given the filters at a particular node, build the spec lookup for those filters.
+
+        The start node should be the query node.
+        """
         resolution_dag = GroupByItemResolutionDag(
-            sink_node=resolution_node,
+            sink_node=current_node,
         )
         group_by_item_resolver = GroupByItemResolver(
             manifest_lookup=self._manifest_lookup,
             resolution_dag=resolution_dag,
         )
         call_parameter_set_to_pattern: Dict[CallParameterSet, SpecPattern] = {}
-        issue_sets_to_merge: List[MetricFlowQueryResolutionIssueSet] = []
-        for where_filter in where_filters:
+        non_parsable_resolutions: List[NonParsableFilterResolution] = []
+        for where_filter in where_filter_intersection.where_filters:
             try:
                 filter_call_parameter_sets = where_filter.call_parameter_sets
             except Exception as e:
-                issue_sets_to_merge.append(
-                    MetricFlowQueryResolutionIssueSet.from_issue(
-                        WhereFilterParsingIssue.from_parameters(
-                            where_filter=where_filter,
-                            parse_exception=e,
-                            query_resolution_path=resolution_path,
-                        )
+                non_parsable_resolutions.append(
+                    NonParsableFilterResolution(
+                        where_filter_intersection=where_filter_intersection,
+                        issue_set=MetricFlowQueryResolutionIssueSet.from_issue(
+                            WhereFilterParsingIssue.from_parameters(
+                                where_filter=where_filter,
+                                parse_exception=e,
+                                query_resolution_path=resolution_path,
+                            )
+                        ),
                     )
                 )
                 continue
@@ -277,11 +286,9 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
         for call_parameter_set, spec_pattern in call_parameter_set_to_pattern.items():
             group_by_item_resolution = group_by_item_resolver.resolve_matching_item_for_filters(
                 spec_pattern=spec_pattern,
-                resolution_node=resolution_node,
+                resolution_node=current_node,
             )
-            issue_sets_to_merge.append(group_by_item_resolution.issue_set)
-            if group_by_item_resolution.spec is None:
-                continue
+
             resolutions.append(
                 FilterSpecResolution(
                     lookup_key=ResolvedSpecLookUpKey(
@@ -290,19 +297,19 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
                     ),
                     resolution_path=resolution_path,
                     resolved_spec=group_by_item_resolution.spec,
+                    where_filter_intersection=where_filter_intersection,
+                    spec_pattern=spec_pattern,
+                    issue_set=group_by_item_resolution.issue_set,
                 )
             )
 
-        results_to_merge.append(
-            FilterSpecResolutionLookUp(
-                spec_resolutions=tuple(resolutions),
-                issue_set=MetricFlowQueryResolutionIssueSet.empty_instance(),
+        if any(resolution.issue_set.has_errors for resolution in resolutions) or len(non_parsable_resolutions) > 0:
+            return FilterSpecResolutionLookUp(
+                spec_resolutions=tuple(resolution for resolution in resolutions if resolution.issue_set.has_errors),
+                non_parsable_resolutions=tuple(non_parsable_resolutions),
             )
-        )
 
-        return FilterSpecResolutionLookUp.merge_iterable(results_to_merge).merge(
-            FilterSpecResolutionLookUp(
-                spec_resolutions=(),
-                issue_set=MetricFlowQueryResolutionIssueSet.merge_iterable(issue_sets_to_merge),
-            )
+        return FilterSpecResolutionLookUp(
+            spec_resolutions=tuple(resolutions),
+            non_parsable_resolutions=tuple(non_parsable_resolutions),
         )

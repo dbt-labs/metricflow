@@ -316,11 +316,17 @@ class MetricFlowQueryResolver:
             resolution_dag=resolution_dag,
         )
 
-        if filter_spec_lookup.issue_set.has_issues:
+        if filter_spec_lookup.has_issues:
             mappings_to_merge.append(
                 InputToIssueSetMapping.from_one_item(
                     resolver_input=filter_input,
-                    issue_set=filter_spec_lookup.issue_set,
+                    issue_set=MetricFlowQueryResolutionIssueSet.merge_iterable(
+                        tuple(spec_resolution.issue_set for spec_resolution in filter_spec_lookup.spec_resolutions)
+                        + tuple(
+                            non_parseable_resolution.issue_set
+                            for non_parseable_resolution in filter_spec_lookup.non_parsable_resolutions
+                        )
+                    ),
                 )
             )
 
