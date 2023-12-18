@@ -31,12 +31,12 @@ from metricflow.query.group_by_item.resolution_dag.resolution_nodes.query_resolu
     QueryGroupByItemResolutionNode,
 )
 from metricflow.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
+from metricflow.query.issues.group_by_item_resolver.invalid_use_of_date_part import MetricExcludesDatePartIssue
 from metricflow.query.issues.group_by_item_resolver.no_common_items import NoCommonItemsInParents
 from metricflow.query.issues.group_by_item_resolver.no_matching_items_for_measure import NoMatchingItemsForMeasure
 from metricflow.query.issues.group_by_item_resolver.no_matching_items_for_no_metrics_query import (
     NoMatchingItemsForNoMetricsQuery,
 )
-from metricflow.query.issues.group_by_item_resolver.no_matching_none_date_part import MetricExcludesDatePartIssue
 from metricflow.query.issues.issues_base import (
     MetricFlowQueryResolutionIssueSet,
 )
