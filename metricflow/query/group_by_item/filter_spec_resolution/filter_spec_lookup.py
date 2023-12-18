@@ -9,6 +9,7 @@ from dbt_semantic_interfaces.call_parameter_sets import (
     EntityCallParameterSet,
     TimeDimensionCallParameterSet,
 )
+from dbt_semantic_interfaces.protocols import WhereFilterIntersection
 from dbt_semantic_interfaces.references import MetricReference
 from typing_extensions import override
 
@@ -16,8 +17,10 @@ from metricflow.collection_helpers.merger import Mergeable
 from metricflow.collection_helpers.pretty_print import mf_pformat
 from metricflow.formatting import indent_log_line
 from metricflow.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
+from metricflow.query.group_by_item.path_prefixable import PathPrefixable
 from metricflow.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow.query.issues.issues_base import MetricFlowQueryResolutionIssueSet
+from metricflow.specs.patterns.spec_pattern import SpecPattern
 from metricflow.specs.specs import LinkableInstanceSpec
 
 logger = logging.getLogger(__name__)
@@ -32,7 +35,19 @@ class FilterSpecResolutionLookUp(Mergeable):
     """
 
     spec_resolutions: Tuple[FilterSpecResolution, ...]
-    issue_set: MetricFlowQueryResolutionIssueSet
+    non_parsable_resolutions: Tuple[NonParsableFilterResolution, ...]
+
+    @property
+    def has_errors(self) -> bool:  # noqa: D
+        return any(
+            non_parsable_resolution.issue_set.has_errors for non_parsable_resolution in self.non_parsable_resolutions
+        ) or any(spec_resolution.issue_set.has_errors for spec_resolution in self.spec_resolutions)
+
+    @property
+    def has_issues(self) -> bool:  # noqa: D
+        return any(
+            non_parsable_resolution.issue_set.has_issues for non_parsable_resolution in self.non_parsable_resolutions
+        ) or any(spec_resolution.issue_set.has_issues for spec_resolution in self.spec_resolutions)
 
     def get_spec_resolutions(self, resolved_spec_lookup_key: ResolvedSpecLookUpKey) -> Sequence[FilterSpecResolution]:
         """Return the specs resolutions associated with the given key."""
@@ -85,7 +100,7 @@ class FilterSpecResolutionLookUp(Mergeable):
     def merge(self, other: FilterSpecResolutionLookUp) -> FilterSpecResolutionLookUp:
         return FilterSpecResolutionLookUp(
             spec_resolutions=self.spec_resolutions + other.spec_resolutions,
-            issue_set=self.issue_set.merge(other.issue_set),
+            non_parsable_resolutions=self.non_parsable_resolutions + other.non_parsable_resolutions,
         )
 
     @override
@@ -93,7 +108,7 @@ class FilterSpecResolutionLookUp(Mergeable):
     def empty_instance(cls) -> FilterSpecResolutionLookUp:
         return FilterSpecResolutionLookUp(
             spec_resolutions=(),
-            issue_set=MetricFlowQueryResolutionIssueSet.empty_instance(),
+            non_parsable_resolutions=(),
         )
 
     def dedupe(self) -> FilterSpecResolutionLookUp:  # noqa: D
@@ -106,7 +121,26 @@ class FilterSpecResolutionLookUp(Mergeable):
             deduped_spec_resolutions.append(spec_resolution)
             deduped_lookup_keys.add(spec_resolution.lookup_key)
 
-        return FilterSpecResolutionLookUp(spec_resolutions=tuple(deduped_spec_resolutions), issue_set=self.issue_set)
+        return FilterSpecResolutionLookUp(
+            spec_resolutions=tuple(deduped_spec_resolutions),
+            # Need to revisit the need to dedupe non_parsable_resolutions.
+            non_parsable_resolutions=self.non_parsable_resolutions,
+        )
+
+
+@dataclass(frozen=True)
+class NonParsableFilterResolution(PathPrefixable):
+    """A where filter intersection that couldn't be parsed e.g. Jinja error."""
+
+    where_filter_intersection: WhereFilterIntersection
+    issue_set: MetricFlowQueryResolutionIssueSet
+
+    @override
+    def with_path_prefix(self, path_prefix: MetricFlowQueryResolutionPath) -> NonParsableFilterResolution:
+        return NonParsableFilterResolution(
+            where_filter_intersection=self.where_filter_intersection,
+            issue_set=self.issue_set.with_path_prefix(path_prefix),
+        )
 
 
 @dataclass(frozen=True)
@@ -154,7 +188,10 @@ class FilterSpecResolution:
 
     lookup_key: ResolvedSpecLookUpKey
     resolution_path: MetricFlowQueryResolutionPath
+    where_filter_intersection: WhereFilterIntersection
     resolved_spec: Optional[LinkableInstanceSpec]
+    spec_pattern: SpecPattern
+    issue_set: MetricFlowQueryResolutionIssueSet
 
 
 CallParameterSet = Union[DimensionCallParameterSet, TimeDimensionCallParameterSet, EntityCallParameterSet]

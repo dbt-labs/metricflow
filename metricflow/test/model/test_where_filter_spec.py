@@ -23,6 +23,7 @@ from dbt_semantic_interfaces.references import (
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
+from metricflow.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
     FilterSpecResolution,
@@ -61,10 +62,13 @@ def create_spec_lookup(
                     call_parameter_set=call_parameter_set,
                 ),
                 resolution_path=MetricFlowQueryResolutionPath.empty_instance(),
+                where_filter_intersection=create_where_filter_intersection("Dimension('dummy__dimension')"),
                 resolved_spec=resolved_spec,
+                issue_set=MetricFlowQueryResolutionIssueSet.empty_instance(),
+                spec_pattern=ObjectBuilderNamingScheme().spec_pattern("Dimension('dummy__dimension')"),
             ),
         ),
-        issue_set=MetricFlowQueryResolutionIssueSet.empty_instance(),
+        non_parsable_resolutions=(),
     )
 
 
@@ -236,15 +240,20 @@ def resolved_spec_lookup() -> FilterSpecResolutionLookUp:
                     ),
                 ),
                 resolution_path=MetricFlowQueryResolutionPath.empty_instance(),
+                where_filter_intersection=create_where_filter_intersection(
+                    "TimeDimension('metric_time', 'week', 'year')"
+                ),
                 resolved_spec=TimeDimensionSpec(
                     element_name="metric_time",
                     entity_links=(),
                     time_granularity=TimeGranularity.WEEK,
                     date_part=DatePart.YEAR,
                 ),
+                spec_pattern=ObjectBuilderNamingScheme().spec_pattern("Dimension('dummy__dimension')"),
+                issue_set=MetricFlowQueryResolutionIssueSet.empty_instance(),
             ),
         ),
-        issue_set=MetricFlowQueryResolutionIssueSet.empty_instance(),
+        non_parsable_resolutions=(),
     )
 
 
@@ -365,15 +374,18 @@ def test_dimension_time_dimension_parity(column_association_resolver: ColumnAsso
                             ),
                         ),
                         resolution_path=MetricFlowQueryResolutionPath(()),
+                        where_filter_intersection=PydanticWhereFilterIntersection(where_filters=[where_filter]),
                         resolved_spec=TimeDimensionSpec(
                             element_name=METRIC_TIME_ELEMENT_NAME,
                             entity_links=(),
                             time_granularity=TimeGranularity.WEEK,
                             date_part=DatePart.YEAR,
                         ),
+                        spec_pattern=ObjectBuilderNamingScheme().spec_pattern("Dimension('dummy__dimension')"),
+                        issue_set=MetricFlowQueryResolutionIssueSet.empty_instance(),
                     ),
                 ),
-                issue_set=MetricFlowQueryResolutionIssueSet.empty_instance(),
+                non_parsable_resolutions=(),
             ),
         ).create_from_where_filter(filter_location, where_filter)
 
