@@ -15,9 +15,6 @@ from dbt_semantic_interfaces.references import EntityReference, MeasureReference
 from dbt_semantic_interfaces.type_enums import DimensionType
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from metricflow.dataflow.builder.node_data_set import (
-    DataflowPlanNodeOutputDataSetResolver,
-)
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import DataflowPlan
 from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import (
@@ -27,7 +24,7 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.dataset.dataset import DataSet
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
-from metricflow.engine.models import Dimension, Entity, Measure, Metric
+from metricflow.engine.models import Dimension, Entity, Measure, Metric, SavedQuery
 from metricflow.engine.time_source import ServerTimeSource
 from metricflow.errors.errors import ExecutionException
 from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
@@ -58,7 +55,6 @@ from metricflow.specs.specs import InstanceSpecSet, MetricFlowQuerySpec
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
-from metricflow.time.time_granularity import TimeGranularity
 from metricflow.time.time_source import TimeSource
 
 logger = logging.getLogger(__name__)
@@ -320,7 +316,6 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         sql_client: SqlClient,
         time_source: TimeSource = ServerTimeSource(),
         column_association_resolver: Optional[ColumnAssociationResolver] = None,
-        enable_default_time_constraint: bool = True,
     ) -> None:
         """Initializer for MetricFlowEngine.
 
@@ -328,11 +323,6 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         - time_source
         - column_association_resolver
         - time_spine_source
-        - enable_default_time_constraint: In cases where the time constraint is not specified for cumulative
-        metrics, the time constraint is adjusted to reduce the number of rows produced as cumulative metrics can
-        produce rows for all time values in the time spine. This was added to avoid adding time constraints
-        automatically for tests. This could be removed if automatic adjustment is removed, or when the tests are
-        updated.
 
         These parameters are mainly there to be overridden during tests.
         """
@@ -343,7 +333,6 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         )
         self._time_source = time_source
         self._time_spine_source = semantic_manifest_lookup.time_spine_source
-        self._enable_default_time_constraint = enable_default_time_constraint
         self._source_data_sets: List[SemanticModelDataSet] = []
         converter = SemanticModelToDataSetConverter(column_association_resolver=self._column_association_resolver)
         for semantic_model in sorted(
@@ -358,11 +347,6 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         read_nodes = source_node_builder.create_read_nodes_from_data_sets(self._source_data_sets)
         time_spine_source_node = SourceNodeBuilder.build_time_spine_source_node(
             time_spine_source=self._time_spine_source, data_set_converter=converter
-        )
-
-        node_output_resolver = DataflowPlanNodeOutputDataSetResolver(
-            column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup),
-            semantic_manifest_lookup=semantic_manifest_lookup,
         )
 
         self._dataflow_plan_builder = DataflowPlanBuilder(
@@ -385,8 +369,6 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         self._query_parser = MetricFlowQueryParser(
             column_association_resolver=self._column_association_resolver,
             model=self._semantic_manifest_lookup,
-            read_nodes=read_nodes,
-            node_output_resolver=node_output_resolver,
         )
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
@@ -439,6 +421,8 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                     else None
                 ),
                 limit=mf_query_request.limit,
+                time_constraint_start=mf_query_request.time_constraint_start,
+                time_constraint_end=mf_query_request.time_constraint_end,
                 order_by_names=mf_query_request.order_by_names,
                 order_by_parameters=mf_query_request.order_by,
             )
@@ -456,51 +440,6 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 order_by=mf_query_request.order_by,
             )
         logger.info(f"Query spec is:\n{pformat_big_objects(query_spec)}")
-
-        if (
-            self._semantic_manifest_lookup.metric_lookup.contains_cumulative_or_time_offset_metric(
-                tuple(metric_spec.reference for metric_spec in query_spec.metric_specs)
-            )
-            and self._enable_default_time_constraint
-        ):
-            if self._time_spine_source.time_column_granularity != TimeGranularity.DAY:
-                raise RuntimeError(
-                    f"A time spine source with a granularity {self._time_spine_source.time_column_granularity} is not "
-                    f"yet supported."
-                )
-            logger.warning(
-                f"Query spec requires a time spine dataset conforming to the following spec: {self._time_spine_source}. "
-            )
-            time_constraint_updated = False
-
-            if mf_query_request.time_constraint_start is None:
-                time_constraint_start = self._time_source.get_time() - datetime.timedelta(days=365)
-                logger.warning(
-                    "A start time has not be supplied while querying for cumulative metrics. To avoid an excessive "
-                    f"number of rows, the start time will be changed to {time_constraint_start.isoformat()}"
-                )
-                time_constraint_updated = True
-            else:
-                time_constraint_start = mf_query_request.time_constraint_start
-
-            if not mf_query_request.time_constraint_end:
-                time_constraint_end = self._time_source.get_time()
-                logger.warning(
-                    "A end time has not be supplied while querying for cumulative metrics. To avoid an excessive "
-                    f"number of rows, the end time will be changed to {time_constraint_end.isoformat()}"
-                )
-                time_constraint_updated = True
-            else:
-                time_constraint_end = mf_query_request.time_constraint_end
-
-            if time_constraint_updated:
-                query_spec = query_spec.with_time_range_constraint(
-                    TimeRangeConstraint(
-                        start_time=time_constraint_start,
-                        end_time=time_constraint_end,
-                    )
-                )
-                logger.warning(f"Query spec updated to:\n{pformat_big_objects(query_spec)}")
 
         output_table: Optional[SqlTable] = None
         if mf_query_request.output_table is not None:
@@ -681,6 +620,13 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 dimensions=self.simple_dimensions_for_metrics([metric.name]),
             )
             for metric in metrics
+        ]
+
+    @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
+    def list_saved_queries(self) -> List[SavedQuery]:  # noqa: D
+        return [
+            SavedQuery.from_pydantic(saved_query)
+            for saved_query in self._semantic_manifest_lookup.semantic_manifest.saved_queries
         ]
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)

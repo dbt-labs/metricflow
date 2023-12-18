@@ -5,7 +5,6 @@ from typing import List
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
 from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
 from dbt_semantic_interfaces.references import EntityReference, TimeDimensionReference
 from dbt_semantic_interfaces.test_utils import as_datetime
@@ -34,10 +33,12 @@ from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
     DimensionSpec,
     InstanceSpecSet,
+    LinkableSpecSet,
     LinklessEntitySpec,
     MeasureSpec,
     MetricFlowQuerySpec,
@@ -46,9 +47,10 @@ from metricflow.specs.specs import (
     NonAdditiveDimensionSpec,
     OrderBySpec,
     TimeDimensionSpec,
+    WhereFilterSpec,
 )
-from metricflow.specs.where_filter_transform import WhereSpecFactory
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
+from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_plan import SqlJoinType
 from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
@@ -183,14 +185,18 @@ def test_filter_with_where_constraint_node(  # noqa: D
     )  # need to include ds_spec because where constraint operates on ds
     where_constraint_node = WhereConstraintNode(
         parent_node=filter_node,
-        where_constraint=(
-            WhereSpecFactory(
-                column_association_resolver=column_association_resolver,
-            ).create_from_where_filter(
-                PydanticWhereFilter(
-                    where_sql_template="{{ TimeDimension('booking__ds', 'day') }} = '2020-01-01'",
+        where_constraint=WhereFilterSpec(
+            where_sql="booking__ds__day = '2020-01-01'",
+            bind_parameters=SqlBindParameters(),
+            linkable_spec_set=LinkableSpecSet(
+                time_dimension_specs=(
+                    TimeDimensionSpec(
+                        element_name="ds",
+                        entity_links=(EntityReference(element_name="booking"),),
+                        time_granularity=TimeGranularity.DAY,
+                    ),
                 )
-            )
+            ),
         ),
     )
 
@@ -1101,26 +1107,18 @@ def test_dimensions_requiring_join(
 def test_dimension_with_joined_where_constraint(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
+    query_parser: MetricFlowQueryParser,
     dataflow_plan_builder: DataflowPlanBuilder,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
     column_association_resolver: ColumnAssociationResolver,
 ) -> None:
     """Tests querying 2 dimensions that require a join."""
-    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
-        query_spec=MetricFlowQuerySpec(
-            dimension_specs=(
-                DimensionSpec(element_name="home_state_latest", entity_links=(EntityReference(element_name="user"),)),
-            ),
-            where_constraint=WhereSpecFactory(
-                column_association_resolver=column_association_resolver,
-            ).create_from_where_filter(
-                PydanticWhereFilter(
-                    where_sql_template="{{ Dimension('listing__country_latest') }} = 'us'",
-                )
-            ),
-        ),
+    query_spec = query_parser.parse_and_validate_query(
+        group_by_names=("user__home_state_latest",),
+        where_constraint_str="{{ Dimension('listing__country_latest') }} = 'us'",
     )
+    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(query_spec)
 
     convert_and_check(
         request=request,

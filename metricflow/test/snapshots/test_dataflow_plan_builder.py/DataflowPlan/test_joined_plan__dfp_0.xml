@@ -8,7 +8,7 @@
             <!-- metric_spec =                   -->
             <!--   {'class': 'MetricSpec',       -->
             <!--    'element_name': 'bookings',  -->
-            <!--    'constraint': None,          -->
+            <!--    'filter_specs': (),          -->
             <!--    'alias': None,               -->
             <!--    'offset_window': None,       -->
             <!--    'offset_to_grain': None}     -->
@@ -70,7 +70,7 @@
                                 <ReadSqlSourceNode>
                                     <!-- description =                                                                                    -->
                                     <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))  -->
-                                    <!-- node_id = rss_10011 -->
+                                    <!-- node_id = rss_10013 -->
                                     <!-- data_set =                                                                             -->
                                     <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))  -->
                                 </ReadSqlSourceNode>
@@ -87,12 +87,12 @@
                             <!-- distinct = False -->
                             <MetricTimeDimensionTransformNode>
                                 <!-- description = Metric Time Dimension 'ds' -->
-                                <!-- node_id = sma_10004 -->
+                                <!-- node_id = sma_10005 -->
                                 <!-- aggregation_time_dimension = ds -->
                                 <ReadSqlSourceNode>
                                     <!-- description =                                                                                    -->
                                     <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))  -->
-                                    <!-- node_id = rss_10014 -->
+                                    <!-- node_id = rss_10017 -->
                                     <!-- data_set =                                                                             -->
                                     <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))  -->
                                 </ReadSqlSourceNode>

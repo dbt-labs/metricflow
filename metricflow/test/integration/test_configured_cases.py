@@ -28,6 +28,7 @@ from metricflow.sql.sql_exprs import (
     SqlColumnReferenceExpression,
     SqlDateTruncExpression,
     SqlExtractExpression,
+    SqlGenerateUuidExpression,
     SqlPercentileExpression,
     SqlPercentileExpressionArgument,
     SqlPercentileFunctionType,
@@ -165,12 +166,18 @@ class CheckQueryHelpers:
         return f"{{{{ Entity('{entity_name}', entity_path={repr(entity_path)}) }}}}"
 
     def render_time_dimension_template(
-        self, time_dimension_name: str, time_granularity: str, entity_path: Sequence[str] = ()
+        self, time_dimension_name: str, time_granularity: Optional[str] = None, entity_path: Sequence[str] = ()
     ) -> str:
         """Similar to render_dimension_template() but for time dimensions."""
-        return (
-            f"{{{{ TimeDimension('{time_dimension_name}', '{time_granularity}', entity_path={repr(entity_path)}) }}}}"
-        )
+        if time_granularity is not None:
+            return f"{{{{ TimeDimension('{time_dimension_name}', '{time_granularity}', entity_path={repr(entity_path)}) }}}}"
+        else:
+            return f"{{{{ TimeDimension('{time_dimension_name}', entity_path={repr(entity_path)}) }}}}"
+
+    def generate_random_uuid(self) -> str:
+        """Returns the generate random UUID SQL function."""
+        expr = SqlGenerateUuidExpression()
+        return self._sql_client.sql_query_plan_renderer.expr_renderer.render_sql_expr(expr).sql
 
 
 def filter_not_supported_features(
@@ -252,7 +259,6 @@ def test_case(
         sql_client=sql_client,
         column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup),
         time_source=ConfigurableTimeSource(as_datetime("2021-01-04")),
-        enable_default_time_constraint=False,
     )
 
     check_query_helpers = CheckQueryHelpers(sql_client)
@@ -273,8 +279,8 @@ def test_case(
     query_result = engine.query(
         MetricFlowQueryRequest.create_with_random_request_id(
             metric_names=case.metrics,
-            group_by_names=case.group_bys,
-            group_by=tuple(group_by),
+            group_by_names=case.group_bys if len(case.group_bys) > 0 else None,
+            group_by=tuple(group_by) if len(group_by) > 0 else None,
             limit=case.limit,
             time_constraint_start=parser.parse(case.time_constraint[0]) if case.time_constraint else None,
             time_constraint_end=parser.parse(case.time_constraint[1]) if case.time_constraint else None,
@@ -295,6 +301,7 @@ def test_case(
                 render_dimension_template=check_query_helpers.render_dimension_template,
                 render_entity_template=check_query_helpers.render_entity_template,
                 render_time_dimension_template=check_query_helpers.render_time_dimension_template,
+                generate_random_uuid=check_query_helpers.generate_random_uuid,
             )
             if case.where_filter
             else None,
@@ -319,6 +326,7 @@ def test_case(
             render_percentile_expr=check_query_helpers.render_percentile_expr,
             mf_time_spine_source=semantic_manifest_lookup.time_spine_source.spine_table.sql,
             double_data_type_name=check_query_helpers.double_data_type_name,
+            generate_random_uuid=check_query_helpers.generate_random_uuid,
         )
     )
     # If we sort, it's effectively not checking the order whatever order that the output was would be overwritten.

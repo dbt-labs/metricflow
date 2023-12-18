@@ -970,3 +970,20 @@ def create_select_columns_for_instance_sets(
         )
 
     return column_set.as_tuple()
+
+
+class AddMetadata(InstanceSetTransform[InstanceSet]):
+    """Adds the given metric instances to the instance set."""
+
+    def __init__(self, metadata_instances: Sequence[MetadataInstance]) -> None:  # noqa: D
+        self._metadata_instances = metadata_instances
+
+    def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D
+        return InstanceSet(
+            measure_instances=instance_set.measure_instances,
+            dimension_instances=instance_set.dimension_instances,
+            time_dimension_instances=instance_set.time_dimension_instances,
+            entity_instances=instance_set.entity_instances,
+            metric_instances=instance_set.metric_instances,
+            metadata_instances=instance_set.metadata_instances + tuple(self._metadata_instances),
+        )

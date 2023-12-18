@@ -7,6 +7,6 @@
 SELECT
   DATE_TRUNC('month', created_at) AS ds__month
   , SUM(revenue) AS revenue_mtd
-FROM ***************************.fct_revenue revenue_src_10006
+FROM ***************************.fct_revenue revenue_src_10007
 GROUP BY
   DATE_TRUNC('month', created_at)

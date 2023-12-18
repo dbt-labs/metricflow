@@ -18,7 +18,7 @@
             <!--   {'class': 'OrderBySpec',                        -->
             <!--    'instance_spec': {'class': 'MetricSpec',       -->
             <!--                      'element_name': 'bookings',  -->
-            <!--                      'constraint': None,          -->
+            <!--                      'filter_specs': (),          -->
             <!--                      'alias': None,               -->
             <!--                      'offset_window': None,       -->
             <!--                      'offset_to_grain': None},    -->
@@ -30,7 +30,7 @@
                 <!-- metric_spec =                   -->
                 <!--   {'class': 'MetricSpec',       -->
                 <!--    'element_name': 'bookings',  -->
-                <!--    'constraint': None,          -->
+                <!--    'filter_specs': (),          -->
                 <!--    'alias': None,               -->
                 <!--    'offset_window': None,       -->
                 <!--    'offset_to_grain': None}     -->
@@ -62,7 +62,7 @@
                             <ReadSqlSourceNode>
                                 <!-- description =                                                                                    -->
                                 <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))  -->
-                                <!-- node_id = rss_10011 -->
+                                <!-- node_id = rss_10013 -->
                                 <!-- data_set =                                                                             -->
                                 <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))  -->
                             </ReadSqlSourceNode>

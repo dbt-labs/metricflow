@@ -1632,3 +1632,114 @@ integration_test:
     ON
       {{ render_date_sub("subq_9", "ds", 2, TimeGranularity.DAY) }} = subq_8.metric_time__day
     WHERE {{ render_time_constraint('subq_9.ds', '2020-01-08', '2020-01-09') }}
+---
+integration_test:
+  name: time_offset_metric_with_time_constraint
+  description: Tests a derived offset metric with a time constraint
+  model: SIMPLE_MODEL
+  metrics: ["bookings_5_day_lag"]
+  group_by_objs: [{"name": "metric_time", "grain": "day"}]
+  time_constraint: ["2019-12-19", "2020-01-02"]
+  check_query: |
+    SELECT
+      metric_time__day
+      , bookings_5_days_ago AS bookings_5_day_lag
+    FROM (
+      SELECT
+        subq_3.metric_time__day AS metric_time__day
+        , SUM(subq_2.bookings) AS bookings_5_days_ago
+      FROM (
+        SELECT
+          ds AS metric_time__day
+        FROM {{ source_schema }}.mf_time_spine
+        WHERE {{ render_time_constraint('ds', '2019-12-19', '2020-01-02') }}
+      ) subq_3
+      INNER JOIN (
+        SELECT
+          {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
+          , 1 AS bookings
+        FROM {{ source_schema }}.fct_bookings
+      ) subq_2
+      ON {{ render_date_sub("subq_3", "metric_time__day", 5, TimeGranularity.DAY) }} = subq_2.metric_time__day
+      GROUP BY subq_3.metric_time__day
+    )
+---
+integration_test:
+  name: cumulative_time_offset_metric_with_time_constraint
+  description: Tests a cumulative derived offset metric with a time constraint
+  model: SIMPLE_MODEL
+  metrics: ["every_2_days_bookers_2_days_ago"]
+  group_by_objs: [{"name": "metric_time", "grain": "day"}]
+  time_constraint: ["2019-12-19", "2020-01-02"]
+  check_query: |
+    SELECT
+      subq_5.metric_time__day AS metric_time__day
+      , COUNT(DISTINCT subq_4.bookers) AS every_2_days_bookers_2_days_ago
+    FROM (
+      SELECT
+        ds AS metric_time__day
+      FROM {{ source_schema }}.mf_time_spine subq_6
+      WHERE ds BETWEEN '2019-12-19' AND '2020-01-02'
+    ) subq_5
+    INNER JOIN (
+      SELECT
+        subq_3.ds AS metric_time__day
+        , b.guest_id AS bookers
+      FROM {{ source_schema }}.mf_time_spine subq_3
+      INNER JOIN
+        {{ source_schema }}.fct_bookings b
+      ON ({{ render_date_trunc("b.ds", TimeGranularity.DAY) }} <= subq_3.ds)
+        AND ({{ render_date_trunc("b.ds", TimeGranularity.DAY) }} > {{ render_date_sub("subq_3", "ds", 2, TimeGranularity.DAY) }})
+    ) subq_4
+    ON {{ render_date_sub("subq_5", "metric_time__day", 2, TimeGranularity.DAY) }} = subq_4.metric_time__day
+    GROUP BY subq_5.metric_time__day
+---
+integration_test:
+  name: nested_derived_metric_offset_with_joined_where_constraint_not_selected
+  description: Tests a nested derived metric where the outer metric has an offset and where constraint that requires an additional join, and is not used in the select statement.
+  model: SIMPLE_MODEL
+  metrics: ["bookings_offset_twice"]
+  group_by_objs: [{"name": "metric_time", "grain": "day"}]
+  where_filter: "{{ render_dimension_template('booking__is_instant') }}"
+  check_query: |
+    SELECT
+      metric_time__day
+      , 2 * bookings_offset_once AS bookings_offset_twice
+    FROM (
+      SELECT
+        metric_time__day
+        , bookings_offset_once
+      FROM (
+        SELECT
+          subq_10.ds AS metric_time__day
+          , subq_8.booking__is_instant AS booking__is_instant
+          , subq_8.bookings_offset_once AS bookings_offset_once
+        FROM {{ source_schema }}.mf_time_spine subq_10
+        INNER JOIN (
+          SELECT
+            metric_time__day
+            , booking__is_instant
+            , 2 * bookings AS bookings_offset_once
+          FROM (
+            SELECT
+              subq_3.ds AS metric_time__day
+              , subq_1.booking__is_instant AS booking__is_instant
+              , SUM(subq_1.bookings) AS bookings
+            FROM {{ source_schema }}.mf_time_spine subq_3
+            INNER JOIN (
+              SELECT
+                {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
+                , is_instant AS booking__is_instant
+                , 1 AS bookings
+              FROM {{ source_schema }}.fct_bookings
+            ) subq_1
+            ON {{ render_date_sub("subq_3", "ds", 5, TimeGranularity.DAY) }} = subq_1.metric_time__day
+            GROUP BY
+              subq_3.ds
+              , subq_1.booking__is_instant
+          ) subq_7
+        ) subq_8
+        ON {{ render_date_sub("subq_10", "ds", 2, TimeGranularity.DAY) }} = subq_8.metric_time__day
+      ) subq_11
+      WHERE booking__is_instant
+    )

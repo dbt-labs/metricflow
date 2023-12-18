@@ -11,7 +11,7 @@ FROM (
   SELECT
     country AS listing__country_latest
     , 1 AS listings
-  FROM ***************************.dim_listings_latest listings_latest_src_10004
+  FROM ***************************.dim_listings_latest listings_latest_src_10005
 ) subq_6
 GROUP BY
   listing__country_latest
