@@ -195,3 +195,20 @@ class FilterSpecResolution:
 
 
 CallParameterSet = Union[DimensionCallParameterSet, TimeDimensionCallParameterSet, EntityCallParameterSet]
+
+
+@dataclass(frozen=True)
+class PatternAssociationForWhereFilterGroupByItem:
+    """Describes the pattern associated with a group-by-item in a where filter.
+
+    e.g. "TimeDimension('metric_time', 'day') = '2020-01-01'" ->
+        GroupByItemInWhereFilter(
+            call_parameter_set=TimeDimensionCallParameterSet('metric_time', DAY),
+            input_str="TimeDimension('metric_time', 'day')",
+            ...
+        )
+    """
+
+    call_parameter_set: CallParameterSet
+    input_str: str
+    spec_pattern: SpecPattern

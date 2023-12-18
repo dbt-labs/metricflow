@@ -26,12 +26,10 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
+    CallParameterSet,
     FilterSpecResolution,
     FilterSpecResolutionLookUp,
     ResolvedSpecLookUpKey,
-)
-from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_resolver import (
-    CallParameterSet,
 )
 from metricflow.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow.query.issues.issues_base import MetricFlowQueryResolutionIssueSet
