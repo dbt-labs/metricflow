@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import logging
-from typing import Dict, List
+from typing import List, Sequence
 
 from dbt_semantic_interfaces.call_parameter_sets import (
+    DimensionCallParameterSet,
+    EntityCallParameterSet,
     FilterCallParameterSets,
+    TimeDimensionCallParameterSet,
 )
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
 from dbt_semantic_interfaces.protocols import WhereFilter, WhereFilterIntersection
@@ -13,13 +16,14 @@ from typing_extensions import override
 from metricflow.collection_helpers.pretty_print import mf_pformat
 from metricflow.formatting import indent_log_line
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow.naming.object_builder_str import ObjectBuilderNameConverter
 from metricflow.query.group_by_item.candidate_push_down.push_down_visitor import DagTraversalPathTracker
 from metricflow.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
-    CallParameterSet,
     FilterSpecResolution,
     FilterSpecResolutionLookUp,
     NonParsableFilterResolution,
+    PatternAssociationForWhereFilterGroupByItem,
     ResolvedSpecLookUpKey,
 )
 from metricflow.query.group_by_item.group_by_item_resolver import GroupByItemResolver
@@ -44,7 +48,6 @@ from metricflow.query.issues.filter_spec_resolver.invalid_where import WhereFilt
 from metricflow.query.issues.issues_base import (
     MetricFlowQueryResolutionIssueSet,
 )
-from metricflow.specs.patterns.spec_pattern import SpecPattern
 from metricflow.specs.patterns.typed_patterns import DimensionPattern, EntityPattern, TimeDimensionPattern
 
 logger = logging.getLogger(__name__)
@@ -91,66 +94,111 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
         self._path_from_start_node_tracker = DagTraversalPathTracker()
 
     @staticmethod
-    def _map_filter_parameter_set_to_pattern(
+    def _dedupe_filter_call_parameter_sets(
+        filter_call_parameter_sets_sequence: Sequence[FilterCallParameterSets],
+    ) -> FilterCallParameterSets:
+        dimension_call_parameter_sets: List[DimensionCallParameterSet] = []
+        time_dimension_call_parameter_sets: List[TimeDimensionCallParameterSet] = []
+        entity_call_parameter_sets: List[EntityCallParameterSet] = []
+
+        # FilterCallParameterSets needs an update.
+        for filter_call_parameter_sets in filter_call_parameter_sets_sequence:
+            for dimension_call_parameter_set in filter_call_parameter_sets.dimension_call_parameter_sets:
+                if dimension_call_parameter_set not in dimension_call_parameter_sets:
+                    dimension_call_parameter_sets.append(dimension_call_parameter_set)
+            for time_dimension_call_parameter_set in filter_call_parameter_sets.time_dimension_call_parameter_sets:
+                if time_dimension_call_parameter_set not in time_dimension_call_parameter_sets:
+                    time_dimension_call_parameter_sets.append(time_dimension_call_parameter_set)
+            for entity_call_parameter_set in filter_call_parameter_sets.entity_call_parameter_sets:
+                if entity_call_parameter_set not in entity_call_parameter_sets:
+                    entity_call_parameter_sets.append(entity_call_parameter_set)
+
+        return FilterCallParameterSets(
+            dimension_call_parameter_sets=tuple(dimension_call_parameter_sets),
+            time_dimension_call_parameter_sets=tuple(time_dimension_call_parameter_sets),
+            entity_call_parameter_sets=tuple(entity_call_parameter_sets),
+        )
+
+    @staticmethod
+    def _map_filter_parameter_sets_to_pattern(
         filter_location: WhereFilterLocation,
         filter_call_parameter_sets: FilterCallParameterSets,
-        spec_resolution_lookup_so_far: FilterSpecResolutionLookUp,
-    ) -> Dict[CallParameterSet, SpecPattern]:
+        resolved_spec_lookup_so_far: FilterSpecResolutionLookUp,
+    ) -> Sequence[PatternAssociationForWhereFilterGroupByItem]:
         """Given the call parameter sets in a filter, map them to spec patterns.
 
         If a given call parameter set has already been resolved and in spec_resolution_lookup_so_far, it is skipped and
         not returned in the dictionary.
+
+        This assumes that the items in filter_call_parameter_sets have been deduped.
         """
-        call_parameter_set_to_spec_pattern: Dict[CallParameterSet, SpecPattern] = {}
+        patterns_in_filter: List[PatternAssociationForWhereFilterGroupByItem] = []
         for dimension_call_parameter_set in filter_call_parameter_sets.dimension_call_parameter_sets:
             lookup_key = ResolvedSpecLookUpKey(
                 filter_location=filter_location,
                 call_parameter_set=dimension_call_parameter_set,
             )
-            if spec_resolution_lookup_so_far.spec_resolution_exists(lookup_key):
+            if resolved_spec_lookup_so_far.spec_resolution_exists(lookup_key):
                 logger.info(
                     f"Skipping resolution for {dimension_call_parameter_set} at {filter_location} since it has already"
                     f"been resolved to:\n\n"
-                    f"{indent_log_line(mf_pformat(spec_resolution_lookup_so_far.get_spec_resolutions(lookup_key)))}"
+                    f"{indent_log_line(mf_pformat(resolved_spec_lookup_so_far.get_spec_resolutions(lookup_key)))}"
                 )
                 continue
-            if dimension_call_parameter_set not in call_parameter_set_to_spec_pattern:
-                call_parameter_set_to_spec_pattern[
-                    dimension_call_parameter_set
-                ] = DimensionPattern.from_call_parameter_set(dimension_call_parameter_set)
+
+            patterns_in_filter.append(
+                PatternAssociationForWhereFilterGroupByItem(
+                    call_parameter_set=dimension_call_parameter_set,
+                    input_str=ObjectBuilderNameConverter.input_str_from_dimension_call_parameter_set(
+                        dimension_call_parameter_set
+                    ),
+                    spec_pattern=DimensionPattern.from_call_parameter_set(dimension_call_parameter_set),
+                )
+            )
         for time_dimension_call_parameter_set in filter_call_parameter_sets.time_dimension_call_parameter_sets:
             lookup_key = ResolvedSpecLookUpKey(
                 filter_location=filter_location,
                 call_parameter_set=time_dimension_call_parameter_set,
             )
-            if spec_resolution_lookup_so_far.spec_resolution_exists(lookup_key):
+            if resolved_spec_lookup_so_far.spec_resolution_exists(lookup_key):
                 logger.info(
                     f"Skipping resolution for {time_dimension_call_parameter_set} at {filter_location} since it has "
                     f"been resolved to:\n"
-                    f"{mf_pformat(spec_resolution_lookup_so_far.get_spec_resolutions(lookup_key))}"
+                    f"{mf_pformat(resolved_spec_lookup_so_far.get_spec_resolutions(lookup_key))}"
                 )
-            if time_dimension_call_parameter_set not in call_parameter_set_to_spec_pattern:
-                call_parameter_set_to_spec_pattern[
-                    time_dimension_call_parameter_set
-                ] = TimeDimensionPattern.from_call_parameter_set(time_dimension_call_parameter_set)
+
+            patterns_in_filter.append(
+                PatternAssociationForWhereFilterGroupByItem(
+                    call_parameter_set=time_dimension_call_parameter_set,
+                    input_str=ObjectBuilderNameConverter.input_str_from_time_dimension_call_parameter_set(
+                        time_dimension_call_parameter_set
+                    ),
+                    spec_pattern=TimeDimensionPattern.from_call_parameter_set(time_dimension_call_parameter_set),
+                )
+            )
         for entity_call_parameter_set in filter_call_parameter_sets.entity_call_parameter_sets:
             lookup_key = ResolvedSpecLookUpKey(
                 filter_location=filter_location,
                 call_parameter_set=entity_call_parameter_set,
             )
-            if spec_resolution_lookup_so_far.spec_resolution_exists(lookup_key):
+            if resolved_spec_lookup_so_far.spec_resolution_exists(lookup_key):
                 logger.info(
                     f"Skipping resolution for {entity_call_parameter_set} at {filter_location} since it has "
                     f"been resolved to:\n"
-                    f"{mf_pformat(spec_resolution_lookup_so_far.get_spec_resolutions(lookup_key))}"
+                    f"{mf_pformat(resolved_spec_lookup_so_far.get_spec_resolutions(lookup_key))}"
                 )
 
-            if entity_call_parameter_set not in call_parameter_set_to_spec_pattern:
-                call_parameter_set_to_spec_pattern[entity_call_parameter_set] = EntityPattern.from_call_parameter_set(
-                    entity_call_parameter_set
+            patterns_in_filter.append(
+                PatternAssociationForWhereFilterGroupByItem(
+                    call_parameter_set=entity_call_parameter_set,
+                    input_str=ObjectBuilderNameConverter.input_str_from_entity_call_parameter_set(
+                        entity_call_parameter_set
+                    ),
+                    spec_pattern=EntityPattern.from_call_parameter_set(entity_call_parameter_set),
                 )
+            )
 
-        return call_parameter_set_to_spec_pattern
+        return patterns_in_filter
 
     @override
     def visit_measure_node(self, node: MeasureGroupByItemSourceNode) -> FilterSpecResolutionLookUp:
@@ -254,8 +302,8 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
             manifest_lookup=self._manifest_lookup,
             resolution_dag=resolution_dag,
         )
-        call_parameter_set_to_pattern: Dict[CallParameterSet, SpecPattern] = {}
         non_parsable_resolutions: List[NonParsableFilterResolution] = []
+        filter_call_parameter_sets_to_merge: List[FilterCallParameterSets] = []
         for where_filter in where_filter_intersection.where_filters:
             try:
                 filter_call_parameter_sets = where_filter.call_parameter_sets
@@ -273,19 +321,20 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
                     )
                 )
                 continue
+            filter_call_parameter_sets_to_merge.append(filter_call_parameter_sets)
 
-            call_parameter_set_to_pattern.update(
-                _ResolveWhereFilterSpecVisitor._map_filter_parameter_set_to_pattern(
-                    filter_location=filter_location,
-                    filter_call_parameter_sets=filter_call_parameter_sets,
-                    spec_resolution_lookup_so_far=resolved_spec_lookup_so_far,
-                )
-            )
+        deduped_filter_call_parameter_sets = _ResolveWhereFilterSpecVisitor._dedupe_filter_call_parameter_sets(
+            filter_call_parameter_sets_to_merge
+        )
 
         resolutions: List[FilterSpecResolution] = []
-        for call_parameter_set, spec_pattern in call_parameter_set_to_pattern.items():
+        for group_by_item_in_where_filter in self._map_filter_parameter_sets_to_pattern(
+            filter_location=filter_location,
+            filter_call_parameter_sets=deduped_filter_call_parameter_sets,
+            resolved_spec_lookup_so_far=resolved_spec_lookup_so_far,
+        ):
             group_by_item_resolution = group_by_item_resolver.resolve_matching_item_for_filters(
-                spec_pattern=spec_pattern,
+                spec_pattern=group_by_item_in_where_filter.spec_pattern,
                 resolution_node=current_node,
             )
 
@@ -293,12 +342,12 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
                 FilterSpecResolution(
                     lookup_key=ResolvedSpecLookUpKey(
                         filter_location=filter_location,
-                        call_parameter_set=call_parameter_set,
+                        call_parameter_set=group_by_item_in_where_filter.call_parameter_set,
                     ),
                     resolution_path=resolution_path,
                     resolved_spec=group_by_item_resolution.spec,
                     where_filter_intersection=where_filter_intersection,
-                    spec_pattern=spec_pattern,
+                    spec_pattern=group_by_item_in_where_filter.spec_pattern,
                     issue_set=group_by_item_resolution.issue_set,
                 )
             )
