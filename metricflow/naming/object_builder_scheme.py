@@ -2,18 +2,17 @@ from __future__ import annotations
 
 import logging
 import re
-from typing import Optional, Sequence
+from typing import Optional
 
-from dbt_semantic_interfaces.call_parameter_sets import ParseWhereFilterException
+from dbt_semantic_interfaces.call_parameter_sets import (
+    ParseWhereFilterException,
+)
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
-from dbt_semantic_interfaces.naming.keywords import DUNDER
 from dbt_semantic_interfaces.parsing.where_filter.where_filter_parser import WhereFilterParser
-from dbt_semantic_interfaces.references import EntityReference
-from dbt_semantic_interfaces.type_enums import TimeGranularity
-from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from typing_extensions import override
 
 from metricflow.naming.naming_scheme import QueryItemNamingScheme
+from metricflow.naming.object_builder_str import ObjectBuilderNameConverter
 from metricflow.specs.patterns.entity_link_pattern import (
     EntityLinkPattern,
     EntityLinkPatternParameterSet,
@@ -23,8 +22,6 @@ from metricflow.specs.patterns.spec_pattern import SpecPattern
 from metricflow.specs.patterns.typed_patterns import DimensionPattern, TimeDimensionPattern
 from metricflow.specs.specs import (
     InstanceSpec,
-    InstanceSpecSet,
-    InstanceSpecSetTransform,
 )
 
 logger = logging.getLogger(__name__)
@@ -37,12 +34,7 @@ class ObjectBuilderNamingScheme(QueryItemNamingScheme):
 
     @override
     def input_str(self, instance_spec: InstanceSpec) -> Optional[str]:
-        names = _ObjectBuilderNameTransform().transform(InstanceSpecSet.from_specs((instance_spec,)))
-
-        if len(names) != 1:
-            raise RuntimeError(f"Did not get exactly 1 name from {instance_spec}. Got {names}")
-
-        return names[0]
+        return ObjectBuilderNameConverter.input_str_from_spec(instance_spec)
 
     @override
     def spec_pattern(self, input_str: str) -> SpecPattern:
@@ -134,70 +126,3 @@ class ObjectBuilderNamingScheme(QueryItemNamingScheme):
     @override
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(id()={hex(id(self))})"
-
-
-class _ObjectBuilderNameTransform(InstanceSpecSetTransform[Sequence[str]]):
-    """Transforms specs into strings following the object builder scheme."""
-
-    @staticmethod
-    def _get_initializer_parameter_str(
-        element_name: str,
-        entity_links: Sequence[EntityReference],
-        time_granularity: Optional[TimeGranularity],
-        date_part: Optional[DatePart],
-    ) -> str:
-        """Return the parameters that should go in the initializer.
-
-        e.g. `'user__country', time_granularity_name='month'`
-        """
-        initializer_parameters = []
-        entity_link_names = list(entity_link.element_name for entity_link in entity_links)
-        if len(entity_link_names) > 0:
-            initializer_parameters.append(repr(entity_link_names[-1] + DUNDER + element_name))
-        else:
-            initializer_parameters.append(repr(element_name))
-        if time_granularity is not None:
-            initializer_parameters.append(
-                f"'{time_granularity.value}'",
-            )
-        if date_part is not None:
-            initializer_parameters.append(f"date_part_name={repr(date_part.value)}")
-        if len(entity_link_names) > 1:
-            initializer_parameters.append(f"entity_path={repr(entity_link_names[:-1])}")
-
-        return ", ".join(initializer_parameters)
-
-    @override
-    def transform(self, spec_set: InstanceSpecSet) -> Sequence[str]:
-        assert len(spec_set.entity_specs) + len(spec_set.dimension_specs) + len(spec_set.time_dimension_specs) == 1
-
-        names_to_return = []
-
-        for entity_spec in spec_set.entity_specs:
-            initializer_parameter_str = _ObjectBuilderNameTransform._get_initializer_parameter_str(
-                element_name=entity_spec.element_name,
-                entity_links=entity_spec.entity_links,
-                time_granularity=None,
-                date_part=None,
-            )
-            names_to_return.append(f"Entity({initializer_parameter_str})")
-
-        for dimension_spec in spec_set.dimension_specs:
-            initializer_parameter_str = _ObjectBuilderNameTransform._get_initializer_parameter_str(
-                element_name=dimension_spec.element_name,
-                entity_links=dimension_spec.entity_links,
-                time_granularity=None,
-                date_part=None,
-            )
-            names_to_return.append(f"Dimension({initializer_parameter_str})")
-
-        for time_dimension_spec in spec_set.time_dimension_specs:
-            initializer_parameter_str = _ObjectBuilderNameTransform._get_initializer_parameter_str(
-                element_name=time_dimension_spec.element_name,
-                entity_links=time_dimension_spec.entity_links,
-                time_granularity=time_dimension_spec.time_granularity,
-                date_part=time_dimension_spec.date_part,
-            )
-            names_to_return.append(f"TimeDimension({initializer_parameter_str})")
-
-        return names_to_return
