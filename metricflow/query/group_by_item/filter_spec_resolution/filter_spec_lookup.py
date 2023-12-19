@@ -132,12 +132,14 @@ class FilterSpecResolutionLookUp(Mergeable):
 class NonParsableFilterResolution(PathPrefixable):
     """A where filter intersection that couldn't be parsed e.g. Jinja error."""
 
+    filter_location_path: MetricFlowQueryResolutionPath
     where_filter_intersection: WhereFilterIntersection
     issue_set: MetricFlowQueryResolutionIssueSet
 
     @override
     def with_path_prefix(self, path_prefix: MetricFlowQueryResolutionPath) -> NonParsableFilterResolution:
         return NonParsableFilterResolution(
+            filter_location_path=self.filter_location_path.with_path_prefix(path_prefix),
             where_filter_intersection=self.where_filter_intersection,
             issue_set=self.issue_set.with_path_prefix(path_prefix),
         )
@@ -187,11 +189,13 @@ class FilterSpecResolution:
     """Associates a lookup key and the resolved spec."""
 
     lookup_key: ResolvedSpecLookUpKey
-    resolution_path: MetricFlowQueryResolutionPath
     where_filter_intersection: WhereFilterIntersection
     resolved_spec: Optional[LinkableInstanceSpec]
     spec_pattern: SpecPattern
     issue_set: MetricFlowQueryResolutionIssueSet
+    # Used for error messages.
+    filter_location_path: MetricFlowQueryResolutionPath
+    object_builder_str: str
 
 
 CallParameterSet = Union[DimensionCallParameterSet, TimeDimensionCallParameterSet, EntityCallParameterSet]
@@ -201,7 +205,7 @@ CallParameterSet = Union[DimensionCallParameterSet, TimeDimensionCallParameterSe
 class PatternAssociationForWhereFilterGroupByItem:
     """Describes the pattern associated with a group-by-item in a where filter.
 
-    e.g. "TimeDimension('metric_time', 'day') = '2020-01-01'" ->
+    e.g. "{{ TimeDimension('metric_time', 'day') }} = '2020-01-01'" ->
         GroupByItemInWhereFilter(
             call_parameter_set=TimeDimensionCallParameterSet('metric_time', DAY),
             input_str="TimeDimension('metric_time', 'day')",
@@ -210,5 +214,5 @@ class PatternAssociationForWhereFilterGroupByItem:
     """
 
     call_parameter_set: CallParameterSet
-    input_str: str
+    object_builder_str: str
     spec_pattern: SpecPattern

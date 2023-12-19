@@ -149,7 +149,7 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
             patterns_in_filter.append(
                 PatternAssociationForWhereFilterGroupByItem(
                     call_parameter_set=dimension_call_parameter_set,
-                    input_str=ObjectBuilderNameConverter.input_str_from_dimension_call_parameter_set(
+                    object_builder_str=ObjectBuilderNameConverter.input_str_from_dimension_call_parameter_set(
                         dimension_call_parameter_set
                     ),
                     spec_pattern=DimensionPattern.from_call_parameter_set(dimension_call_parameter_set),
@@ -170,7 +170,7 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
             patterns_in_filter.append(
                 PatternAssociationForWhereFilterGroupByItem(
                     call_parameter_set=time_dimension_call_parameter_set,
-                    input_str=ObjectBuilderNameConverter.input_str_from_time_dimension_call_parameter_set(
+                    object_builder_str=ObjectBuilderNameConverter.input_str_from_time_dimension_call_parameter_set(
                         time_dimension_call_parameter_set
                     ),
                     spec_pattern=TimeDimensionPattern.from_call_parameter_set(time_dimension_call_parameter_set),
@@ -191,7 +191,7 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
             patterns_in_filter.append(
                 PatternAssociationForWhereFilterGroupByItem(
                     call_parameter_set=entity_call_parameter_set,
-                    input_str=ObjectBuilderNameConverter.input_str_from_entity_call_parameter_set(
+                    object_builder_str=ObjectBuilderNameConverter.input_str_from_entity_call_parameter_set(
                         entity_call_parameter_set
                     ),
                     spec_pattern=EntityPattern.from_call_parameter_set(entity_call_parameter_set),
@@ -304,12 +304,14 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
         )
         non_parsable_resolutions: List[NonParsableFilterResolution] = []
         filter_call_parameter_sets_to_merge: List[FilterCallParameterSets] = []
+
         for where_filter in where_filter_intersection.where_filters:
             try:
                 filter_call_parameter_sets = where_filter.call_parameter_sets
             except Exception as e:
                 non_parsable_resolutions.append(
                     NonParsableFilterResolution(
+                        filter_location_path=resolution_path,
                         where_filter_intersection=where_filter_intersection,
                         issue_set=MetricFlowQueryResolutionIssueSet.from_issue(
                             WhereFilterParsingIssue.from_parameters(
@@ -344,11 +346,12 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
                         filter_location=filter_location,
                         call_parameter_set=group_by_item_in_where_filter.call_parameter_set,
                     ),
-                    resolution_path=resolution_path,
+                    filter_location_path=resolution_path,
                     resolved_spec=group_by_item_resolution.spec,
                     where_filter_intersection=where_filter_intersection,
                     spec_pattern=group_by_item_in_where_filter.spec_pattern,
                     issue_set=group_by_item_resolution.issue_set,
+                    object_builder_str=group_by_item_in_where_filter.object_builder_str,
                 )
             )
 
