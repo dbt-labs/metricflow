@@ -77,7 +77,4 @@ class MeasureGroupByItemSourceNode(GroupByItemResolutionNode):
     @property
     @override
     def ui_description(self) -> str:
-        return (
-            f"Measure({repr(self.measure_reference.element_name)}, "
-            f"child_metric={repr(self.child_metric_reference.element_name)})"
-        )
+        return f"Measure({repr(self.measure_reference.element_name)})"

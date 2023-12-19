@@ -47,7 +47,7 @@ def populate_source_schema(
 ) -> None:
     """Populate the source schema with the tables listed in table_snapshots.
 
-    This can be run via pytest when this file is specified because this function was whitelisted as a "test" in
+    This can be run via pytest when this file is specified because this function was listed as a "test" in
     pyproject.toml. However, because the filename does not begin with "test_", it's not normally collected and run. As
     such, all parameters to this function are defined in fixtures.
     """
