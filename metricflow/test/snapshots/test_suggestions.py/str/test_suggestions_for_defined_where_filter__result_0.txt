@@ -1,0 +1,37 @@
+Got errors while resolving the query.
+
+Error #1:
+  Message:
+
+    The given input does not match any of the available group-by-items for Measure('listings'). Common issues are:
+
+      * Incorrect names.
+      * No valid join paths exist from the measure to the group-by-item (fan-out joins are not yet supported).
+      * There are multiple matching join paths (disambiguation support is pending).
+
+    Suggestions:
+      [
+        "Dimension('listing__capacity_latest')",
+        "TimeDimension('listing__created_at', 'day')",
+        "TimeDimension('listing__ds', 'day')",
+        "Dimension('listing__is_lux_latest')",
+        "Dimension('listing__country_latest')",
+        "TimeDimension('user__created_at', 'day')",
+      ]
+
+  Query Input:
+
+    WhereFilter(
+      ["{{ TimeDimension('listing__paid_at') }} > '2020-01-01'",]
+    )
+    Filter Path:
+      [Resolve Query(['listings'])]
+        -> [Resolve Metric('listings')]
+    Object Builder Input:
+      TimeDimension('listing__paid_at')
+
+  Issue Location:
+
+    [Resolve Query(['listings'])]
+      -> [Resolve Metric('listings')]
+        -> [Resolve Measure('listings')]

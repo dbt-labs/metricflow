@@ -1,0 +1,30 @@
+Got errors while resolving the query.
+
+Error #1:
+  Message:
+
+    The given input does not match any of the available group-by-items for Measure('bookings'). Common issues are:
+
+      * Incorrect names.
+      * No valid join paths exist from the measure to the group-by-item (fan-out joins are not yet supported).
+      * There are multiple matching join paths (disambiguation support is pending).
+
+    Suggestions:
+      [
+        'booking__is_instant',
+        'booking__listing',
+        'booking__host',
+        'booking__guest',
+        'booking__ds__day',
+        'booking__paid_at__day',
+      ]
+
+  Query Input:
+
+    booking__instant
+
+  Issue Location:
+
+    [Resolve Query(['bookings'])]
+      -> [Resolve Metric('bookings')]
+        -> [Resolve Measure('bookings')]

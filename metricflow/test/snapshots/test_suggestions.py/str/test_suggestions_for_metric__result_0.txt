@@ -1,0 +1,17 @@
+Got errors while resolving the query.
+
+Error #1:
+  Message:
+
+    The given input does not exactly match any known metrics.
+
+    Suggestions:
+      ['bookings', 'booking_fees', 'booking_value', 'instant_bookings', 'booking_payments', 'max_booking_value']
+
+  Query Input:
+
+    booking
+
+  Issue Location:
+
+    [Resolve Query(['booking'])]
