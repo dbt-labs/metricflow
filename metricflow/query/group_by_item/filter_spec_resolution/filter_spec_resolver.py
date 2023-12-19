@@ -344,7 +344,13 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
                 spec_pattern=group_by_item_in_where_filter.spec_pattern,
                 resolution_node=current_node,
             )
-
+            # The paths in the issue set are generated relative to the current node. For error messaging, it seems more
+            # helpful for those paths to be relative to the query. To do, we have to add nodes from the resolution path.
+            # e.g. if the current node is B, and the resolution path is [A, B], an issue might have the relative path
+            # [B, C]. To join those paths to produce [A, B, C], the path prefix should be [A].
+            path_prefix = MetricFlowQueryResolutionPath(
+                resolution_path_nodes=resolution_path.resolution_path_nodes[:-1]
+            )
             resolutions.append(
                 FilterSpecResolution(
                     lookup_key=ResolvedSpecLookUpKey(
@@ -355,7 +361,7 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
                     resolved_spec=group_by_item_resolution.spec,
                     where_filter_intersection=where_filter_intersection,
                     spec_pattern=group_by_item_in_where_filter.spec_pattern,
-                    issue_set=group_by_item_resolution.issue_set,
+                    issue_set=group_by_item_resolution.issue_set.with_path_prefix(path_prefix),
                     object_builder_str=group_by_item_in_where_filter.object_builder_str,
                 )
             )
