@@ -11,7 +11,7 @@ requires-python = ">=3.8,<3.12"
 license = "BUSL-1.1"
 keywords = []
 authors = [
-    {name = "dbt Labs"}
+  {name = "dbt Labs"}
 ]
 
 classifiers = [
@@ -72,6 +72,9 @@ sql-client-packages = [
   "SQLAlchemy~=1.4.42",
   "sqlalchemy2-stubs~=0.0.2a21",
 ]
+trino-sql-client-packages = [
+  "trino~=0.327.0",
+]
 
 dbt-postgres = [
   "dbt-postgres~=1.7.0",
@@ -97,6 +100,10 @@ dbt-duckdb = [
   "dbt-duckdb~=1.7.0",
 ]
 
+dbt-trino = [
+  "dbt-trino~=1.7.0",
+]
+
 [tool.hatch.build.targets.sdist]
 exclude = [
   "/.github",
@@ -118,13 +125,13 @@ features = [
 ]
 
 [tool.hatch.envs.dev-env.env-vars]
-	MF_TEST_ADAPTER_TYPE="duckdb"
-  MF_SQL_ENGINE_URL="duckdb://"
+MF_TEST_ADAPTER_TYPE="duckdb"
+MF_SQL_ENGINE_URL="duckdb://"
 
 [tool.hatch.envs.postgres-env.env-vars]
-	MF_SQL_ENGINE_URL="postgresql://metricflow@localhost:5432/metricflow"
-	MF_SQL_ENGINE_PASSWORD="metricflowing"
-	MF_TEST_ADAPTER_TYPE="postgres"
+MF_SQL_ENGINE_URL="postgresql://metricflow@localhost:5432/metricflow"
+MF_SQL_ENGINE_PASSWORD="metricflowing"
+MF_TEST_ADAPTER_TYPE="postgres"
 
 [tool.hatch.envs.postgres-env]
 description = "Dev environment for working with Postgres adapter"
@@ -138,7 +145,7 @@ features = [
 # configured independently of the hatch env construction
 
 [tool.hatch.envs.bigquery-env.env-vars]
-	MF_TEST_ADAPTER_TYPE="bigquery"
+MF_TEST_ADAPTER_TYPE="bigquery"
 
 [tool.hatch.envs.bigquery-env]
 description = "Dev environment for working with the BigQuery adapter"
@@ -149,7 +156,7 @@ features = [
 ]
 
 [tool.hatch.envs.databricks-env.env-vars]
-	MF_TEST_ADAPTER_TYPE="databricks"
+MF_TEST_ADAPTER_TYPE="databricks"
 
 [tool.hatch.envs.databricks-env]
 description = "Dev environment for working with the Databricks adapter"
@@ -160,7 +167,7 @@ features = [
 ]
 
 [tool.hatch.envs.redshift-env.env-vars]
-	MF_TEST_ADAPTER_TYPE="redshift"
+MF_TEST_ADAPTER_TYPE="redshift"
 
 [tool.hatch.envs.redshift-env]
 description = "Dev environment for working with the Redshift adapter"
@@ -171,7 +178,7 @@ features = [
 ]
 
 [tool.hatch.envs.snowflake-env.env-vars]
-	MF_TEST_ADAPTER_TYPE="snowflake"
+MF_TEST_ADAPTER_TYPE="snowflake"
 
 [tool.hatch.envs.snowflake-env]
 description = "Dev environment for working with Snowflake adapter"
@@ -179,6 +186,20 @@ features = [
   "dev-packages",
   "dbt-snowflake",
   "sql-client-packages",
+]
+
+[tool.hatch.envs.trino-env.env-vars]
+MF_TEST_ADAPTER_TYPE = "trino"
+MF_SQL_ENGINE_URL = "trino://trino@localhost:8080/"
+DBT_ENV_SECRET_CATALOG="memory"
+
+[tool.hatch.envs.trino-env]
+description = "Dev environment for working with the Trino adapter"
+features = [
+  "dev-packages",
+  "dbt-trino",
+  "sql-client-packages",
+  "trino-sql-client-packages",
 ]
 
 [tool.black]
@@ -189,7 +210,7 @@ line-length = 120
 # warnings.
 [tool.pytest.ini_options]
 filterwarnings = [
-    "ignore:Deprecated call to.*",
-    "ignore:pkg_resources is deprecated as an API"
+  "ignore:Deprecated call to.*",
+  "ignore:pkg_resources is deprecated as an API"
 ]
 python_functions = "test_* populate_source_schema"

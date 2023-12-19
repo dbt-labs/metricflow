@@ -59,6 +59,9 @@ test-snowflake:
 populate-persistent-source-schema-snowflake:
 	hatch -v run snowflake-env:pytest -vv $(ADDITIONAL_PYTEST_OPTIONS) $(USE_PERSISTENT_SOURCE_SCHEMA) $(POPULATE_PERSISTENT_SOURCE_SCHEMA)
 
+.PHONY: test-trino
+test-trino:
+	hatch -v run trino-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) metricflow/test/
 
 .PHONY: lint
 lint:
