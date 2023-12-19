@@ -34,6 +34,7 @@ FilterSpecResolutionLookUp(
             issue_type=ERROR,
             query_resolution_path=MetricFlowQueryResolutionPath(
               resolution_path_nodes=(
+                QueryGroupByItemResolutionNode(node_id=qr_0),
                 MetricGroupByItemResolutionNode(node_id=mtr_2),
               ),
             ),
@@ -48,6 +49,7 @@ FilterSpecResolutionLookUp(
                 measure_paths=(
                   MetricFlowQueryResolutionPath(
                     resolution_path_nodes=(
+                      QueryGroupByItemResolutionNode(node_id=qr_0),
                       MetricGroupByItemResolutionNode(node_id=mtr_2),
                       MetricGroupByItemResolutionNode(node_id=mtr_0),
                       MeasureGroupByItemSourceNode(node_id=msr_0),
@@ -56,6 +58,7 @@ FilterSpecResolutionLookUp(
                 ),
                 path_from_leaf_node=MetricFlowQueryResolutionPath(
                   resolution_path_nodes=(
+                    QueryGroupByItemResolutionNode(node_id=qr_0),
                     MetricGroupByItemResolutionNode(node_id=mtr_2),
                     MetricGroupByItemResolutionNode(node_id=mtr_0),
                   ),
@@ -71,6 +74,7 @@ FilterSpecResolutionLookUp(
                 measure_paths=(
                   MetricFlowQueryResolutionPath(
                     resolution_path_nodes=(
+                      QueryGroupByItemResolutionNode(node_id=qr_0),
                       MetricGroupByItemResolutionNode(node_id=mtr_2),
                       MetricGroupByItemResolutionNode(node_id=mtr_1),
                       MeasureGroupByItemSourceNode(node_id=msr_1),
@@ -79,6 +83,7 @@ FilterSpecResolutionLookUp(
                 ),
                 path_from_leaf_node=MetricFlowQueryResolutionPath(
                   resolution_path_nodes=(
+                    QueryGroupByItemResolutionNode(node_id=qr_0),
                     MetricGroupByItemResolutionNode(node_id=mtr_2),
                     MetricGroupByItemResolutionNode(node_id=mtr_1),
                   ),
