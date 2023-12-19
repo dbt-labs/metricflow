@@ -340,6 +340,7 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
             resolved_spec_lookup_so_far=resolved_spec_lookup_so_far,
         ):
             group_by_item_resolution = group_by_item_resolver.resolve_matching_item_for_filters(
+                input_str=group_by_item_in_where_filter.object_builder_str,
                 spec_pattern=group_by_item_in_where_filter.spec_pattern,
                 resolution_node=current_node,
             )

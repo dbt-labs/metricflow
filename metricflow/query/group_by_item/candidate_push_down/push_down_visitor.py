@@ -40,6 +40,7 @@ from metricflow.query.issues.group_by_item_resolver.no_matching_items_for_no_met
 from metricflow.query.issues.issues_base import (
     MetricFlowQueryResolutionIssueSet,
 )
+from metricflow.query.suggestion_generator import QueryItemSuggestionGenerator
 from metricflow.specs.patterns.base_time_grain import BaseTimeGrainPattern
 from metricflow.specs.patterns.none_date_part import NoneDatePartPattern
 from metricflow.specs.patterns.spec_pattern import SpecPattern
@@ -122,6 +123,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
     def __init__(  # noqa: D
         self,
         manifest_lookup: SemanticManifestLookup,
+        suggestion_generator: Optional[QueryItemSuggestionGenerator],
         source_spec_patterns: Sequence[SpecPattern] = (),
         with_any_property: Optional[Set[LinkableElementProperties]] = None,
         without_any_property: Optional[Set[LinkableElementProperties]] = None,
@@ -130,6 +132,8 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
 
         Args:
             manifest_lookup: The semantic manifest lookup associated with the resolution DAG that this will traverse.
+            suggestion_generator: If there are issues with matching patterns to specs, use this to generate suggestions
+            that will go in the issue.
             source_spec_patterns: The patterns to apply to the specs available at the measure nodes.
             with_any_property: Only consider group-by-items with these properties from the measure nodes.
             without_any_property:  Only consider group-by-items without any of these properties (see
@@ -140,6 +144,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
         self._path_from_start_node_tracker = DagTraversalPathTracker()
         self._with_any_property = with_any_property
         self._without_any_property = without_any_property
+        self._suggestion_generator = suggestion_generator
 
     @override
     def visit_measure_node(self, node: MeasureGroupByItemSourceNode) -> PushDownResult:
@@ -182,13 +187,19 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
             else:
                 assert_values_exhausted(metric.type)
 
-            patterns_to_apply = patterns_to_apply + self._source_spec_patterns
-            matching_specs = specs_available_for_measure
+            specs_available_for_measure_given_child_metric = specs_available_for_measure
 
             for pattern_to_apply in patterns_to_apply:
-                matching_specs = InstanceSpecSet.from_specs(pattern_to_apply.match(matching_specs)).linkable_specs
+                specs_available_for_measure_given_child_metric = InstanceSpecSet.from_specs(
+                    pattern_to_apply.match(specs_available_for_measure_given_child_metric)
+                ).linkable_specs
 
-            logger.info(
+            matching_specs = specs_available_for_measure_given_child_metric
+
+            for source_spec_pattern in self._source_spec_patterns:
+                matching_specs = InstanceSpecSet.from_specs(source_spec_pattern.match(matching_specs)).linkable_specs
+
+            logger.debug(
                 f"For {node.ui_description}:\n"
                 + indent_log_line(
                     "After applying patterns:\n"
@@ -208,6 +219,13 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
                         NoMatchingItemsForMeasure.from_parameters(
                             parent_issues=(),
                             query_resolution_path=current_traversal_path,
+                            input_suggestions=tuple(
+                                self._suggestion_generator.input_suggestions(
+                                    specs_available_for_measure_given_child_metric
+                                )
+                            )
+                            if self._suggestion_generator is not None
+                            else (),
                         )
                     ),
                 )
@@ -282,8 +300,9 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
                 },
                 current_traversal_path=current_traversal_path,
             )
-            logger.info(
-                f"Handling {node.ui_description} with candidates from parents:\n"
+            logger.info(f"Handling {node.ui_description}")
+            logger.debug(
+                "candidates from parents:\n"
                 + indent_log_line(mf_pformat(merged_result_from_parents.candidate_set.specs))
             )
             if merged_result_from_parents.candidate_set.is_empty:
@@ -316,7 +335,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
             for pattern_to_apply in patterns_to_apply:
                 matched_specs = InstanceSpecSet.from_specs(pattern_to_apply.match(matched_specs)).linkable_specs
 
-            logger.info(
+            logger.debug(
                 f"For {node.ui_description}:\n"
                 + indent_log_line(
                     "After applying patterns:\n"
@@ -365,8 +384,9 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
                 current_traversal_path=current_traversal_path,
             )
 
-            logger.info(
-                f"Handling {node.ui_description} with candidates from parents:\n"
+            logger.info(f"Handling {node.ui_description}")
+            logger.debug(
+                "candidates from parents:\n"
                 + indent_log_line(mf_pformat(merged_result_from_parents.candidate_set.specs))
             )
 

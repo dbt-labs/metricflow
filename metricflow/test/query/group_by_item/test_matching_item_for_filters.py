@@ -36,9 +36,11 @@ def test_ambiguous_metric_time_in_query_filter(  # noqa: D
         resolution_dag=resolution_dag,
     )
 
-    spec_pattern = ObjectBuilderNamingScheme().spec_pattern(f"TimeDimension('{METRIC_TIME_ELEMENT_NAME}')")
+    input_str = f"TimeDimension('{METRIC_TIME_ELEMENT_NAME}')"
+    spec_pattern = ObjectBuilderNamingScheme().spec_pattern(input_str)
 
     result = group_by_item_resolver.resolve_matching_item_for_filters(
+        input_str=input_str,
         spec_pattern=spec_pattern,
         resolution_node=resolution_dag.sink_node,
     )

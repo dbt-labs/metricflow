@@ -3,9 +3,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Sequence, Tuple
 
-from dbt_semantic_interfaces.references import MetricReference
 from typing_extensions import override
 
+from metricflow.collection_helpers.pretty_print import mf_pformat
+from metricflow.formatting import indent_log_line
 from metricflow.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow.query.issues.issues_base import (
     MetricFlowQueryIssueType,
@@ -18,24 +19,27 @@ from metricflow.query.resolver_inputs.base_resolver_inputs import MetricFlowQuer
 class InvalidMetricIssue(MetricFlowQueryResolutionIssue):
     """Describes when a metric specified as an input to a query does not match any of the known metrics."""
 
-    candidate_metric_references: Tuple[MetricReference, ...]
+    metric_suggestions: Tuple[str, ...]
 
     @staticmethod
     def from_parameters(  # noqa: D
-        candidate_metric_references: Sequence[MetricReference],
+        metric_suggestions: Sequence[str],
         query_resolution_path: MetricFlowQueryResolutionPath,
     ) -> InvalidMetricIssue:
         return InvalidMetricIssue(
             issue_type=MetricFlowQueryIssueType.ERROR,
             parent_issues=(),
-            candidate_metric_references=tuple(candidate_metric_references),
+            metric_suggestions=tuple(metric_suggestions),
             query_resolution_path=query_resolution_path,
         )
 
     @override
     def ui_description(self, associated_input: MetricFlowQueryResolverInput) -> str:
-        # TODO: Provide suggestions for alternative metrics.
-        return "The given input does not exactly match any known metrics."
+        return (
+            f"The given input does not exactly match any known metrics.\n\n"
+            f"Suggestions:\n"
+            f"{indent_log_line(mf_pformat(list(self.metric_suggestions)))}"
+        )
 
     @override
     def with_path_prefix(self, path_prefix: MetricFlowQueryResolutionPath) -> InvalidMetricIssue:
@@ -43,5 +47,5 @@ class InvalidMetricIssue(MetricFlowQueryResolutionIssue):
             issue_type=self.issue_type,
             parent_issues=tuple(issue.with_path_prefix(path_prefix) for issue in self.parent_issues),
             query_resolution_path=self.query_resolution_path.with_path_prefix(path_prefix),
-            candidate_metric_references=self.candidate_metric_references,
+            metric_suggestions=self.metric_suggestions,
         )
