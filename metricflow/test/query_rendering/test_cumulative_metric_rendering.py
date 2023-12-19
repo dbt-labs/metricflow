@@ -5,21 +5,21 @@ from __future__ import annotations
 import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
+from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from metricflow.dataset.dataset import DataSet
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
     MetricFlowQuerySpec,
     MetricSpec,
     TimeDimensionSpec,
 )
-from metricflow.specs.where_filter_transform import WhereSpecFactory
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.query_rendering.compare_rendered_query import convert_and_check
@@ -104,6 +104,7 @@ def test_cumulative_metric_with_non_adjustable_time_filter(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     column_association_resolver: ColumnAssociationResolver,
+    query_parser: MetricFlowQueryParser,
     dataflow_plan_builder: DataflowPlanBuilder,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     consistent_id_object_repository: ConsistentIdObjectRepository,
@@ -115,22 +116,17 @@ def test_cumulative_metric_with_non_adjustable_time_filter(
     span of input data for a cumulative metric. When we do not have an adjustable time filter we must include all
     input data in order to ensure the cumulative metric is correct.
     """
-    dataflow_plan = dataflow_plan_builder.build_plan(
-        MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="every_two_days_bookers"),),
-            time_dimension_specs=(DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.DAY),),
-            where_constraint=WhereSpecFactory(
-                column_association_resolver=column_association_resolver,
-            ).create_from_where_filter(
-                PydanticWhereFilter(
-                    where_sql_template=(
-                        "{{ TimeDimension('metric_time', 'day') }} = '2020-01-03' "
-                        "or {{ TimeDimension('metric_time', 'day') }} = '2020-01-07'"
-                    )
-                ),
-            ),
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("every_two_days_bookers",),
+        group_by_names=(METRIC_TIME_ELEMENT_NAME,),
+        where_constraint=PydanticWhereFilter(
+            where_sql_template=(
+                "{{ TimeDimension('metric_time', 'day') }} = '2020-01-03' "
+                "or {{ TimeDimension('metric_time', 'day') }} = '2020-01-07'"
+            )
         ),
     )
+    dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
     convert_and_check(
         request=request,

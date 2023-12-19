@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 import textwrap
-from collections import namedtuple
 
 import pytest
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
@@ -11,7 +10,6 @@ from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
-from metricflow.errors.errors import UnableToSatisfyQueryError
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.query.query_parser import MetricFlowQueryParser
@@ -31,7 +29,6 @@ from metricflow.specs.specs import (
 from metricflow.test.fixtures.model_fixtures import query_parser_from_yaml
 from metricflow.test.model.example_project_configuration import EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE
 from metricflow.test.time.metric_time_dimension import MTD
-from metricflow.time.time_granularity_solver import RequestTimeGranularityException
 
 logger = logging.getLogger(__name__)
 
@@ -223,8 +220,7 @@ def test_query_parser_case_insensitivity(bookings_query_parser: MetricFlowQueryP
     )
 
     # Object params
-    Metric = namedtuple("Metric", ["name", "descending"])
-    metric = Metric("BOOKINGS", False)
+    metric = MetricParameter(name="BOOKINGS")
     group_by = (
         DimensionOrEntityParameter("BOOKING__IS_INSTANT"),
         DimensionOrEntityParameter("LISTING"),
@@ -256,13 +252,12 @@ def test_query_parser_case_insensitivity(bookings_query_parser: MetricFlowQueryP
 
 
 def test_query_parser_invalid_group_by(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D
-    with pytest.raises(UnableToSatisfyQueryError):
+    with pytest.raises(InvalidQueryException):
         bookings_query_parser.parse_and_validate_query(group_by_names=["random_stuff"])
 
 
 def test_query_parser_with_object_params(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D
-    Metric = namedtuple("Metric", ["name", "descending"])
-    metric = Metric("bookings", False)
+    metric = MetricParameter(name="bookings")
     group_by = (
         DimensionOrEntityParameter("booking__is_instant"),
         DimensionOrEntityParameter("listing"),
@@ -357,8 +352,8 @@ def test_time_range_constraint_conversion() -> None:
 
 def test_parse_and_validate_where_constraint_dims(bookings_query_parser: MetricFlowQueryParser) -> None:
     """Test that the returned time constraint in the query spec is adjusted to match the granularity of the query."""
-    # check constraint on invalid_dim raises UnableToSatisfyQueryError
-    with pytest.raises(UnableToSatisfyQueryError):
+    # check constraint on invalid_dim raises InvalidQueryException
+    with pytest.raises(InvalidQueryException, match="does not match any of the available"):
         bookings_query_parser.parse_and_validate_query(
             metric_names=["bookings"],
             group_by_names=[MTD],
@@ -367,7 +362,7 @@ def test_parse_and_validate_where_constraint_dims(bookings_query_parser: MetricF
             where_constraint_str="{{ Dimension('booking__invalid_dim') }} = '1'",
         )
 
-    with pytest.raises(InvalidQueryException):
+    with pytest.raises(InvalidQueryException, match="Error parsing where filter"):
         bookings_query_parser.parse_and_validate_query(
             metric_names=["bookings"],
             group_by_names=[MTD],
@@ -394,7 +389,7 @@ def test_parse_and_validate_where_constraint_metric_time() -> None:
     revenue_yaml_file = YamlConfigFile(filepath="inline_for_test_2", contents=REVENUE_YAML)
 
     query_parser = query_parser_from_yaml([EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, revenue_yaml_file])
-    with pytest.raises(RequestTimeGranularityException):
+    with pytest.raises(InvalidQueryException, match="does not match any of the available"):
         query_parser.parse_and_validate_query(
             metric_names=["revenue"],
             group_by_names=[MTD],
@@ -403,12 +398,15 @@ def test_parse_and_validate_where_constraint_metric_time() -> None:
 
 
 def test_parse_and_validate_metric_constraint_dims() -> None:
-    """Test that the returned time constraint in the query spec is adjusted to match the granularity of the query."""
+    """Test that the returned time constraint in the query spec is adjusted to match the granularity of the query.
+
+    TODO: This test doesn't do what it says it does.
+    """
     revenue_yaml_file = YamlConfigFile(filepath="inline_for_test_2", contents=REVENUE_YAML)
     query_parser = query_parser_from_yaml([EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, revenue_yaml_file])
 
-    # check constraint on invalid_dim raises UnableToSatisfyQueryError
-    with pytest.raises(UnableToSatisfyQueryError):
+    # check constraint on invalid_dim raises InvalidQueryException
+    with pytest.raises(InvalidQueryException, match="given input does not exactly match"):
         query_parser.parse_and_validate_query(
             metric_names=["metric_with_invalid_constraint"],
             group_by_names=[MTD],
@@ -430,7 +428,7 @@ def test_cumulative_metric_no_time_dimension_validation() -> None:
         [EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, bookings_yaml_file, revenue_yaml_file, metrics_yaml_file]
     )
 
-    with pytest.raises(UnableToSatisfyQueryError, match="must be queried with the dimension 'metric_time'"):
+    with pytest.raises(InvalidQueryException, match="do not include 'metric_time'"):
         query_parser.parse_and_validate_query(
             metric_names=["revenue_cumulative"],
         )
@@ -454,7 +452,7 @@ def test_cumulative_metric_wrong_time_dimension_validation() -> None:
         [EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, bookings_yaml_file, revenue_yaml_file, metrics_yaml_file]
     )
 
-    with pytest.raises(UnableToSatisfyQueryError, match="must be queried with the dimension 'metric_time'"):
+    with pytest.raises(InvalidQueryException, match="do not include 'metric_time'"):
         query_parser.parse_and_validate_query(
             metric_names=["revenue_cumulative"],
             group_by_names=["company__loaded_at"],
@@ -479,7 +477,7 @@ def test_cumulative_metric_agg_time_dimension_name_validation() -> None:
         [EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, bookings_yaml_file, revenue_yaml_file, metrics_yaml_file]
     )
 
-    with pytest.raises(UnableToSatisfyQueryError, match="must be queried with the dimension 'metric_time'"):
+    with pytest.raises(InvalidQueryException, match="do not include 'metric_time'"):
         query_parser.parse_and_validate_query(
             metric_names=["revenue_cumulative"],
             group_by_names=["company__ds"],
@@ -495,14 +493,14 @@ def test_derived_metric_query_parsing() -> None:
         [EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, bookings_yaml_file, revenue_yaml_file, metrics_yaml_file]
     )
     # Attempt to query with no dimension
-    with pytest.raises(UnableToSatisfyQueryError):
+    with pytest.raises(InvalidQueryException, match="do not include 'metric_time'"):
         query_parser.parse_and_validate_query(
             metric_names=["revenue_sub_10"],
             group_by_names=[],
         )
 
     # Attempt to query with non-time dimension
-    with pytest.raises(UnableToSatisfyQueryError):
+    with pytest.raises(InvalidQueryException, match="does not match any of the available"):
         query_parser.parse_and_validate_query(
             metric_names=["revenue_sub_10"],
             group_by_names=["country"],
@@ -523,17 +521,17 @@ def test_derived_metric_with_offset_parsing() -> None:
         [EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, revenue_yaml_file, metrics_yaml_file]
     )
     # Attempt to query with no dimension
-    with pytest.raises(UnableToSatisfyQueryError):
+    with pytest.raises(InvalidQueryException, match="do not include 'metric_time'"):
         query_parser.parse_and_validate_query(
             metric_names=["revenue_growth_2_weeks"],
             group_by_names=[],
         )
 
     # Attempt to query with non-time dimension
-    with pytest.raises(UnableToSatisfyQueryError):
+    with pytest.raises(InvalidQueryException, match="do not include 'metric_time'"):
         query_parser.parse_and_validate_query(
             metric_names=["revenue_growth_2_weeks"],
-            group_by_names=["country"],
+            group_by_names=["company__country"],
         )
 
     # Query with time dimension
@@ -552,28 +550,28 @@ def test_date_part_parsing() -> None:
     )
 
     # Date part is incompatible with metric's defined time granularity
-    with pytest.raises(RequestTimeGranularityException):
+    with pytest.raises(InvalidQueryException, match="does not match any of the available"):
         query_parser.parse_and_validate_query(
             metric_names=["revenue"],
             group_by=(TimeDimensionParameter(name="metric_time", date_part=DatePart.DOW),),
         )
 
     # Can't query date part for cumulative metrics
-    with pytest.raises(UnableToSatisfyQueryError):
+    with pytest.raises(InvalidQueryException, match="does not match any of the available"):
         query_parser.parse_and_validate_query(
             metric_names=["revenue_cumulative"],
             group_by=(TimeDimensionParameter(name="metric_time", date_part=DatePart.YEAR),),
         )
 
     # Can't query date part for metrics with offset to grain
-    with pytest.raises(UnableToSatisfyQueryError):
+    with pytest.raises(InvalidQueryException, match="does not allow group-by-items with a date part in the query"):
         query_parser.parse_and_validate_query(
             metric_names=["revenue_since_start_of_year"],
             group_by=(TimeDimensionParameter(name="metric_time", date_part=DatePart.MONTH),),
         )
 
     # Requested granularity doesn't match resolved granularity
-    with pytest.raises(RequestTimeGranularityException):
+    with pytest.raises(InvalidQueryException, match="does not match any of the available"):
         query_parser.parse_and_validate_query(
             metric_names=["revenue"],
             group_by=(

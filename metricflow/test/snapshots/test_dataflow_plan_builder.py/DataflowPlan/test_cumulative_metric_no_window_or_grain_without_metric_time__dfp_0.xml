@@ -8,7 +8,7 @@
             <!-- metric_spec =                           -->
             <!--   {'class': 'MetricSpec',               -->
             <!--    'element_name': 'revenue_all_time',  -->
-            <!--    'constraint': None,                  -->
+            <!--    'filter_specs': (),                  -->
             <!--    'alias': None,                       -->
             <!--    'offset_window': None,               -->
             <!--    'offset_to_grain': None}             -->
@@ -28,12 +28,12 @@
                     <!-- distinct = False -->
                     <MetricTimeDimensionTransformNode>
                         <!-- description = Metric Time Dimension 'ds' -->
-                        <!-- node_id = sma_10005 -->
+                        <!-- node_id = sma_10006 -->
                         <!-- aggregation_time_dimension = ds -->
                         <ReadSqlSourceNode>
                             <!-- description =                                                                            -->
                             <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='revenue'))  -->
-                            <!-- node_id = rss_10016 -->
+                            <!-- node_id = rss_10019 -->
                             <!-- data_set =                                                                     -->
                             <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='revenue'))  -->
                         </ReadSqlSourceNode>

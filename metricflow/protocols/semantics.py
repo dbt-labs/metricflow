@@ -28,11 +28,9 @@ from dbt_semantic_interfaces.references import (
 
 from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
-from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
     LinkableInstanceSpec,
     MeasureSpec,
-    MetricSpec,
     NonAdditiveDimensionSpec,
 )
 
@@ -129,6 +127,11 @@ class SemanticModelAccessor(ABC):
         """Return the entity prefix that can be used to access dimensions defined in the semantic model."""
         raise NotImplementedError
 
+    @abstractmethod
+    def get_element_spec_for_name(self, element_name: str) -> LinkableInstanceSpec:
+        """Returns the spec for the given name of a linkable element (dimension or entity)."""
+        raise NotImplementedError
+
 
 class MetricAccessor(ABC):
     """Interface for accessing semantic information about a set of metric objects.
@@ -170,15 +173,6 @@ class MetricAccessor(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def metric_input_specs_for_metric(
-        self,
-        metric_reference: MetricReference,
-        column_association_resolver: ColumnAssociationResolver,
-    ) -> Sequence[MetricSpec]:
-        """Returns the metric input specs required to compute the metric."""
-        raise NotImplementedError
-
-    @abstractmethod
     def configured_input_measure_for_metric(self, metric_reference: MetricReference) -> Optional[MetricInputMeasure]:
         """Get input measure defined in the original metric config, if exists.
 
@@ -187,4 +181,23 @@ class MetricAccessor(ABC):
         - Simple & cumulative metrics require one input measure, and can't take any input metrics.
         - Derived & ratio metrics take no input measures, only input metrics.
         """
+        raise NotImplementedError
+
+    @abstractmethod
+    def group_by_item_specs_for_measure(
+        self,
+        measure_reference: MeasureReference,
+        with_any_of: Optional[Set[LinkableElementProperties]] = None,
+        without_any_of: Optional[Set[LinkableElementProperties]] = None,
+    ) -> Sequence[LinkableInstanceSpec]:
+        """Return group-by-items that are possible for a measure."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def group_by_item_specs_for_no_metrics_query(
+        self,
+        with_any_of: Optional[Set[LinkableElementProperties]] = None,
+        without_any_of: Optional[Set[LinkableElementProperties]] = None,
+    ) -> Sequence[LinkableInstanceSpec]:
+        """Return the possible group-by-items for a dimension values query with no metrics."""
         raise NotImplementedError

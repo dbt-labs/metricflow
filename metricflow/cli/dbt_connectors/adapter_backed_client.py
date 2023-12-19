@@ -21,6 +21,7 @@ from metricflow.sql.render.postgres import PostgresSQLSqlQueryPlanRenderer
 from metricflow.sql.render.redshift import RedshiftSqlQueryPlanRenderer
 from metricflow.sql.render.snowflake import SnowflakeSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
+from metricflow.sql.render.trino import TrinoSqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_request.sql_request_attributes import SqlJsonTag, SqlRequestId, SqlRequestTagSet
 from metricflow.sql_request.sql_statement_metadata import CombinedSqlTags, SqlStatementCommentMetadata
@@ -42,6 +43,7 @@ class SupportedAdapterTypes(enum.Enum):
     REDSHIFT = "redshift"
     BIGQUERY = "bigquery"
     DUCKDB = "duckdb"
+    TRINO = "trino"
 
     @property
     def sql_engine_type(self) -> SqlEngine:
@@ -58,6 +60,8 @@ class SupportedAdapterTypes(enum.Enum):
             return SqlEngine.SNOWFLAKE
         elif self is SupportedAdapterTypes.DUCKDB:
             return SqlEngine.DUCKDB
+        elif self is SupportedAdapterTypes.TRINO:
+            return SqlEngine.TRINO
         else:
             assert_values_exhausted(self)
 
@@ -76,6 +80,8 @@ class SupportedAdapterTypes(enum.Enum):
             return SnowflakeSqlQueryPlanRenderer()
         elif self is SupportedAdapterTypes.DUCKDB:
             return DuckDbSqlQueryPlanRenderer()
+        elif self is SupportedAdapterTypes.TRINO:
+            return TrinoSqlQueryPlanRenderer()
         else:
             assert_values_exhausted(self)
 
@@ -213,7 +219,18 @@ class AdapterBackedSqlClient:
         request_id = SqlRequestId(f"mf_rid__{random_id()}")
         connection_name = f"MetricFlow_dry_run_request_{request_id}"
         # TODO - consolidate to self._adapter.validate_sql() when all implementations will work from within MetricFlow
-        if self.sql_engine_type is SqlEngine.BIGQUERY:
+
+        # Trino has a bug where explain command actually creates table. Wrapping with validate to avoid this.
+        # See https://github.com/trinodb/trino/issues/130
+        if self.sql_engine_type is SqlEngine.TRINO:
+            with self._adapter.connection_named(connection_name):
+                # Either the response will be bool value or a string with error message from Trino.
+                result = self._adapter.execute(f"EXPLAIN (type validate) {stmt}", auto_begin=True, fetch=True)
+                has_error = False if str(result[0]) == "SUCCESS" else True
+                if has_error:
+                    raise DbtDatabaseError("Encountered error in Trino dry run.")
+
+        elif self.sql_engine_type is SqlEngine.BIGQUERY:
             with self._adapter.connection_named(connection_name):
                 self._adapter.validate_sql(stmt)
         else:

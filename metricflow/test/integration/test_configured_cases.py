@@ -28,6 +28,7 @@ from metricflow.sql.sql_exprs import (
     SqlColumnReferenceExpression,
     SqlDateTruncExpression,
     SqlExtractExpression,
+    SqlGenerateUuidExpression,
     SqlPercentileExpression,
     SqlPercentileExpressionArgument,
     SqlPercentileFunctionType,
@@ -66,8 +67,25 @@ class CheckQueryHelpers:
         stop_time_plus_one_day = (
             datetime.datetime.strptime(stop_time, time_format) + datetime.timedelta(days=1)
         ).strftime(time_format)
+
         stop_expr = self.cast_to_ts(f"{stop_time_plus_one_day}")
-        return f"{expr} >= {start_expr} AND {expr} < {stop_expr}"
+        return f"{self.cast_expr_to_ts(expr)} >= {start_expr} AND {self.cast_expr_to_ts(expr)} < {stop_expr}"
+
+    def render_between_time_constraint(
+        self,
+        expr: str,
+        start_time: str,
+        stop_time: str,
+    ) -> str:
+        """Render an expression like "ds between timestamp '2020-01-01' AND timestamp '2020-01-02'".
+
+        This will cast the literals as needed for each engine, and provide an alternative to incrementing
+        the date as we do in render_time_constraint. Using BETWEEN is more robust for cases involving potentially
+        mixed granularities.
+        """
+        start_expr = self.cast_to_ts(f"{start_time}")
+        stop_expr = self.cast_to_ts(f"{stop_time}")
+        return f"{expr} BETWEEN {start_expr} AND {stop_expr}"
 
     def cast_expr_to_ts(self, expr: str) -> str:
         """Returns the expression as a new expression cast to the timestamp type, if applicable for the DB."""
@@ -165,12 +183,18 @@ class CheckQueryHelpers:
         return f"{{{{ Entity('{entity_name}', entity_path={repr(entity_path)}) }}}}"
 
     def render_time_dimension_template(
-        self, time_dimension_name: str, time_granularity: str, entity_path: Sequence[str] = ()
+        self, time_dimension_name: str, time_granularity: Optional[str] = None, entity_path: Sequence[str] = ()
     ) -> str:
         """Similar to render_dimension_template() but for time dimensions."""
-        return (
-            f"{{{{ TimeDimension('{time_dimension_name}', '{time_granularity}', entity_path={repr(entity_path)}) }}}}"
-        )
+        if time_granularity is not None:
+            return f"{{{{ TimeDimension('{time_dimension_name}', '{time_granularity}', entity_path={repr(entity_path)}) }}}}"
+        else:
+            return f"{{{{ TimeDimension('{time_dimension_name}', entity_path={repr(entity_path)}) }}}}"
+
+    def generate_random_uuid(self) -> str:
+        """Returns the generate random UUID SQL function."""
+        expr = SqlGenerateUuidExpression()
+        return self._sql_client.sql_query_plan_renderer.expr_renderer.render_sql_expr(expr).sql
 
 
 def filter_not_supported_features(
@@ -252,7 +276,6 @@ def test_case(
         sql_client=sql_client,
         column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup),
         time_source=ConfigurableTimeSource(as_datetime("2021-01-04")),
-        enable_default_time_constraint=False,
     )
 
     check_query_helpers = CheckQueryHelpers(sql_client)
@@ -273,8 +296,8 @@ def test_case(
     query_result = engine.query(
         MetricFlowQueryRequest.create_with_random_request_id(
             metric_names=case.metrics,
-            group_by_names=case.group_bys,
-            group_by=tuple(group_by),
+            group_by_names=case.group_bys if len(case.group_bys) > 0 else None,
+            group_by=tuple(group_by) if len(group_by) > 0 else None,
             limit=case.limit,
             time_constraint_start=parser.parse(case.time_constraint[0]) if case.time_constraint else None,
             time_constraint_end=parser.parse(case.time_constraint[1]) if case.time_constraint else None,
@@ -284,6 +307,7 @@ def test_case(
             ).render(
                 source_schema=mf_test_session_state.mf_source_schema,
                 render_time_constraint=check_query_helpers.render_time_constraint,
+                render_between_time_constraint=check_query_helpers.render_between_time_constraint,
                 TimeGranularity=TimeGranularity,
                 DatePart=DatePart,
                 render_date_sub=check_query_helpers.render_date_sub,
@@ -295,6 +319,8 @@ def test_case(
                 render_dimension_template=check_query_helpers.render_dimension_template,
                 render_entity_template=check_query_helpers.render_entity_template,
                 render_time_dimension_template=check_query_helpers.render_time_dimension_template,
+                generate_random_uuid=check_query_helpers.generate_random_uuid,
+                cast_to_ts=check_query_helpers.cast_to_ts,
             )
             if case.where_filter
             else None,
@@ -312,6 +338,7 @@ def test_case(
         ).render(
             source_schema=mf_test_session_state.mf_source_schema,
             render_time_constraint=check_query_helpers.render_time_constraint,
+            render_between_time_constraint=check_query_helpers.render_between_time_constraint,
             TimeGranularity=TimeGranularity,
             DatePart=DatePart,
             render_date_sub=check_query_helpers.render_date_sub,
@@ -320,6 +347,8 @@ def test_case(
             render_percentile_expr=check_query_helpers.render_percentile_expr,
             mf_time_spine_source=semantic_manifest_lookup.time_spine_source.spine_table.sql,
             double_data_type_name=check_query_helpers.double_data_type_name,
+            generate_random_uuid=check_query_helpers.generate_random_uuid,
+            cast_to_ts=check_query_helpers.cast_to_ts,
         )
     )
     # If we sort, it's effectively not checking the order whatever order that the output was would be overwritten.

@@ -25,6 +25,6 @@ CROSS JOIN (
   -- Compute Metrics via Expressions
   SELECT
     SUM(1) AS listings
-  FROM ***************************.dim_listings_latest listings_latest_src_10004
+  FROM ***************************.dim_listings_latest listings_latest_src_10005
   WHERE DATE_TRUNC(created_at, day) BETWEEN '2020-01-01' AND '2020-01-01'
 ) subq_23

@@ -8,7 +8,7 @@
             <!-- metric_spec =                   -->
             <!--   {'class': 'MetricSpec',       -->
             <!--    'element_name': 'listings',  -->
-            <!--    'constraint': None,          -->
+            <!--    'filter_specs': (),          -->
             <!--    'alias': None,               -->
             <!--    'offset_window': None,       -->
             <!--    'offset_to_grain': None}     -->
@@ -61,12 +61,12 @@
                             <!-- distinct = False -->
                             <MetricTimeDimensionTransformNode>
                                 <!-- description = Metric Time Dimension 'ds' -->
-                                <!-- node_id = sma_10010 -->
+                                <!-- node_id = sma_10012 -->
                                 <!-- aggregation_time_dimension = ds -->
                                 <ReadSqlSourceNode>
                                     <!-- description =                                                                                    -->
                                     <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))  -->
-                                    <!-- node_id = rss_10046 -->
+                                    <!-- node_id = rss_10050 -->
                                     <!-- data_set =                                                                             -->
                                     <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))  -->
                                 </ReadSqlSourceNode>
@@ -89,7 +89,7 @@
                             <ReadSqlSourceNode>
                                 <!-- description =                                                                                           -->
                                 <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest_cyclic'))  -->
-                                <!-- node_id = rss_10047 -->
+                                <!-- node_id = rss_10051 -->
                                 <!-- data_set =                                                                                    -->
                                 <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest_cyclic'))  -->
                             </ReadSqlSourceNode>

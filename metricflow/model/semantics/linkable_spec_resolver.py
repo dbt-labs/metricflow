@@ -19,6 +19,7 @@ from dbt_semantic_interfaces.references import (
     TimeDimensionReference,
 )
 from dbt_semantic_interfaces.type_enums import MetricType
+from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.dataset.dataset import DataSet
@@ -46,6 +47,7 @@ class ElementPathKey:
     element_name: str
     entity_links: Tuple[EntityReference, ...]
     time_granularity: Optional[TimeGranularity]
+    date_part: Optional[DatePart]
 
 
 @dataclass(frozen=True)
@@ -58,7 +60,8 @@ class LinkableDimension:
     entity_links: Tuple[EntityReference, ...]
     join_path: Tuple[SemanticModelJoinPathElement, ...]
     properties: FrozenSet[LinkableElementProperties]
-    time_granularity: Optional[TimeGranularity] = None
+    time_granularity: Optional[TimeGranularity]
+    date_part: Optional[DatePart]
 
     @property
     def path_key(self) -> ElementPathKey:  # noqa: D
@@ -66,6 +69,7 @@ class LinkableDimension:
             element_name=self.element_name,
             entity_links=self.entity_links,
             time_granularity=self.time_granularity,
+            date_part=self.date_part,
         )
 
     @property
@@ -86,7 +90,12 @@ class LinkableEntity:
 
     @property
     def path_key(self) -> ElementPathKey:  # noqa: D
-        return ElementPathKey(element_name=self.element_name, entity_links=self.entity_links, time_granularity=None)
+        return ElementPathKey(
+            element_name=self.element_name,
+            entity_links=self.entity_links,
+            time_granularity=None,
+            date_part=None,
+        )
 
 
 @dataclass(frozen=True)
@@ -259,6 +268,7 @@ class LinkableElementSet:
                     element_name=path_key.element_name,
                     entity_links=path_key.entity_links,
                     time_granularity=path_key.time_granularity,
+                    date_part=path_key.date_part,
                 )
                 for path_key in self.path_key_to_linkable_dimensions.keys()
                 if path_key.time_granularity
@@ -324,9 +334,25 @@ def _generate_linkable_time_dimensions(
                 entity_links=entity_links,
                 join_path=tuple(join_path),
                 time_granularity=time_granularity,
+                date_part=None,
                 properties=frozenset(properties),
             )
         )
+
+        # Add the time dimension aggregated to a different date part.
+        for date_part in DatePart:
+            if time_granularity.to_int() <= date_part.to_int():
+                linkable_dimensions.append(
+                    LinkableDimension(
+                        semantic_model_origin=semantic_model_origin,
+                        element_name=dimension.reference.element_name,
+                        entity_links=entity_links,
+                        join_path=tuple(join_path),
+                        time_granularity=time_granularity,
+                        date_part=date_part,
+                        properties=frozenset(properties),
+                    )
+                )
 
     return linkable_dimensions
 
@@ -367,6 +393,8 @@ class SemanticModelJoinPath:
                         entity_links=entity_links,
                         join_path=self.path_elements,
                         properties=with_properties,
+                        time_granularity=None,
+                        date_part=None,
                     )
                 )
             elif dimension_type == DimensionType.TIME:
@@ -472,11 +500,33 @@ class ValidLinkableSpecResolver:
                     or metric.type is MetricType.RATIO
                 ):
                     linkable_sets_for_measure.append(self._get_linkable_element_set_for_measure(measure))
+                elif metric.type is MetricType.CONVERSION:
+                    conversion_type_params = metric.type_params.conversion_type_params
+                    assert (
+                        conversion_type_params
+                    ), "A conversion metric should have type_params.conversion_type_params defined."
+                    if measure == conversion_type_params.base_measure.measure_reference:
+                        # Only can query against the base measure's linkable elements
+                        # as it joins everything back to the base measure data set so
+                        # there is no way of getting the conversion elements
+                        linkable_sets_for_measure.append(self._get_linkable_element_set_for_measure(measure))
                 else:
                     assert_values_exhausted(metric.type)
 
             self._metric_to_linkable_element_sets[metric.name] = linkable_sets_for_measure
-        logger.info(f"Building the [metric -> valid linkable element] index took: {time.time() - start_time:.2f}s")
+
+        # If no metrics are specified, the query interface supports distinct dimension values from a single semantic
+        # model.
+        linkable_element_sets_to_merge: List[LinkableElementSet] = []
+
+        for semantic_model in semantic_manifest.semantic_models:
+            linkable_element_sets_to_merge.append(
+                ValidLinkableSpecResolver._get_elements_in_semantic_model(semantic_model)
+            )
+
+        self._no_metric_linkable_element_set = LinkableElementSet.merge_by_path_key(linkable_element_sets_to_merge)
+
+        logger.info(f"Building valid group-by-item indexes took: {time.time() - start_time:.2f}s")
 
     def _get_semantic_model_for_measure(self, measure_reference: MeasureReference) -> SemanticModel:  # noqa: D
         semantic_models_where_measure_was_found = []
@@ -534,6 +584,8 @@ class ValidLinkableSpecResolver:
                             entity_links=(entity_link,),
                             join_path=(),
                             properties=dimension_properties,
+                            time_granularity=None,
+                            date_part=None,
                         )
                     )
                 elif dimension_type is DimensionType.TIME:
@@ -627,13 +679,24 @@ class ValidLinkableSpecResolver:
         )
 
         # For each of the possible time granularities, create a LinkableDimension for each one.
-        return LinkableElementSet(
-            path_key_to_linkable_dimensions={
-                ElementPathKey(
+
+        path_key_to_linkable_dimensions: Dict[ElementPathKey, List[LinkableDimension]] = defaultdict(list)
+        for time_granularity in possible_metric_time_granularities:
+            possible_date_parts: Sequence[Optional[DatePart]] = (
+                # No date part, just the metric time at a different grain.
+                (None,)
+                # date part of a metric time at a different grain.
+                + tuple(date_part for date_part in DatePart if time_granularity.to_int() <= date_part.to_int())
+            )
+
+            for date_part in possible_date_parts:
+                path_key = ElementPathKey(
                     element_name=DataSet.metric_time_dimension_name(),
                     entity_links=(),
                     time_granularity=time_granularity,
-                ): (
+                    date_part=date_part,
+                )
+                path_key_to_linkable_dimensions[path_key].append(
                     LinkableDimension(
                         semantic_model_origin=measure_semantic_model.reference,
                         element_name=DataSet.metric_time_dimension_name(),
@@ -642,7 +705,7 @@ class ValidLinkableSpecResolver:
                         # Anything that's not at the base time granularity of the measure's aggregation time dimension
                         # should be considered derived.
                         properties=frozenset({LinkableElementProperties.METRIC_TIME})
-                        if time_granularity is agg_time_dimension_granularity
+                        if time_granularity is agg_time_dimension_granularity and date_part is None
                         else frozenset(
                             {
                                 LinkableElementProperties.METRIC_TIME,
@@ -650,9 +713,14 @@ class ValidLinkableSpecResolver:
                             }
                         ),
                         time_granularity=time_granularity,
-                    ),
+                        date_part=date_part,
+                    )
                 )
-                for time_granularity in possible_metric_time_granularities
+
+        return LinkableElementSet(
+            path_key_to_linkable_dimensions={
+                path_key: tuple(linkable_dimensions)
+                for path_key, linkable_dimensions in path_key_to_linkable_dimensions.items()
             },
             path_key_to_linkable_entities={},
         )
@@ -721,8 +789,13 @@ class ValidLinkableSpecResolver:
 
         return LinkableElementSet.merge_by_path_key((single_hop_elements, multi_hop_elements))
 
-    def _get_linkable_element_set_for_measure(self, measure_reference: MeasureReference) -> LinkableElementSet:
-        """Get the valid linkable elements for the given measure."""
+    def _get_linkable_element_set_for_measure(
+        self,
+        measure_reference: MeasureReference,
+        with_any_of: FrozenSet[LinkableElementProperties] = LinkableElementProperties.all_properties(),
+        without_any_of: FrozenSet[LinkableElementProperties] = frozenset(),
+    ) -> LinkableElementSet:
+        """See get_linkable_element_set_for_measure()."""
         measure_semantic_model = self._get_semantic_model_for_measure(measure_reference)
 
         elements_in_semantic_model = self._get_elements_in_semantic_model(measure_semantic_model)
@@ -735,7 +808,34 @@ class ValidLinkableSpecResolver:
                 metric_time_elements,
                 joined_elements,
             )
+        ).filter(
+            with_any_of=with_any_of,
+            without_any_of=without_any_of,
         )
+
+    def get_linkable_element_set_for_measure(
+        self,
+        measure_reference: MeasureReference,
+        with_any_of: FrozenSet[LinkableElementProperties],
+        without_any_of: FrozenSet[LinkableElementProperties],
+    ) -> LinkableElementSet:
+        """Get the valid linkable elements for the given measure."""
+        return self._get_linkable_element_set_for_measure(
+            measure_reference=measure_reference,
+            with_any_of=with_any_of,
+            without_any_of=without_any_of,
+        )
+
+    def get_linkable_elements_for_distinct_values_query(
+        self,
+        with_any_of: FrozenSet[LinkableElementProperties],
+        without_any_of: FrozenSet[LinkableElementProperties],
+    ) -> LinkableElementSet:
+        """Returns queryable items for a distinct group-by-item values query.
+
+        A distinct group-by-item values query does not include any metrics.
+        """
+        return self._no_metric_linkable_element_set.filter(with_any_of=with_any_of, without_any_of=without_any_of)
 
     def get_linkable_elements_for_metrics(
         self,

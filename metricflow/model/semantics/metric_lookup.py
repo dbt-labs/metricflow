@@ -1,15 +1,12 @@
 from __future__ import annotations
 
 import logging
-from typing import Dict, FrozenSet, List, Optional, Sequence
+from typing import Dict, FrozenSet, Optional, Sequence, Set
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
-from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
-from dbt_semantic_interfaces.protocols import WhereFilter
 from dbt_semantic_interfaces.protocols.metric import Metric, MetricInputMeasure, MetricType
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.references import MetricReference
+from dbt_semantic_interfaces.references import MeasureReference, MetricReference
 
 from metricflow.errors.errors import DuplicateMetricError, MetricNotFoundError, NonExistentMeasureError
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
@@ -17,12 +14,9 @@ from metricflow.model.semantics.linkable_spec_resolver import LinkableElementSet
 from metricflow.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.protocols.semantics import MetricAccessor
-from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
     LinkableInstanceSpec,
-    MetricSpec,
 )
-from metricflow.specs.where_filter_transform import WhereSpecFactory
 
 logger = logging.getLogger(__name__)
 
@@ -55,6 +49,42 @@ class MetricLookup(MetricAccessor):  # noqa: D
             metric_references=metric_references,
             with_any_of=with_any_property,
             without_any_of=without_any_property,
+        ).as_spec_set
+
+        return sorted(all_linkable_specs.as_tuple, key=lambda x: x.qualified_name)
+
+    def group_by_item_specs_for_measure(
+        self,
+        measure_reference: MeasureReference,
+        with_any_of: Optional[Set[LinkableElementProperties]] = None,
+        without_any_of: Optional[Set[LinkableElementProperties]] = None,
+    ) -> Sequence[LinkableInstanceSpec]:
+        """Return group-by-items that are possible for a measure."""
+        frozen_with_any_of = (
+            LinkableElementProperties.all_properties() if with_any_of is None else frozenset(with_any_of)
+        )
+        frozen_without_any_of = frozenset() if without_any_of is None else frozenset(without_any_of)
+
+        return self._linkable_spec_resolver.get_linkable_element_set_for_measure(
+            measure_reference=measure_reference,
+            with_any_of=frozen_with_any_of,
+            without_any_of=frozen_without_any_of,
+        ).as_spec_set.as_tuple
+
+    def group_by_item_specs_for_no_metrics_query(
+        self,
+        with_any_of: Optional[Set[LinkableElementProperties]] = None,
+        without_any_of: Optional[Set[LinkableElementProperties]] = None,
+    ) -> Sequence[LinkableInstanceSpec]:
+        """Return the possible group-by-items for a dimension values query with no metrics."""
+        frozen_with_any_of = (
+            LinkableElementProperties.all_properties() if with_any_of is None else frozenset(with_any_of)
+        )
+        frozen_without_any_of = frozenset() if without_any_of is None else frozenset(without_any_of)
+
+        all_linkable_specs = self._linkable_spec_resolver.get_linkable_elements_for_distinct_values_query(
+            with_any_of=frozen_with_any_of,
+            without_any_of=frozen_without_any_of,
         ).as_spec_set
 
         return sorted(all_linkable_specs.as_tuple, key=lambda x: x.qualified_name)
@@ -111,7 +141,9 @@ class MetricLookup(MetricAccessor):  # noqa: D
         if metric.type is MetricType.CUMULATIVE or metric.type is MetricType.SIMPLE:
             assert len(metric.input_measures) == 1, "Simple and cumulative metrics should have one input measure."
             return metric.input_measures[0]
-        elif metric.type is MetricType.RATIO or metric.type is MetricType.DERIVED:
+        elif (
+            metric.type is MetricType.RATIO or metric.type is MetricType.DERIVED or metric.type is MetricType.CONVERSION
+        ):
             return None
         else:
             assert_values_exhausted(metric.type)
@@ -127,42 +159,3 @@ class MetricLookup(MetricAccessor):  # noqa: D
                     if input_metric.offset_window or input_metric.offset_to_grain:
                         return True
         return False
-
-    def metric_input_specs_for_metric(
-        self,
-        metric_reference: MetricReference,
-        column_association_resolver: ColumnAssociationResolver,
-    ) -> Sequence[MetricSpec]:
-        """Return the metric specs referenced by the metric. Current use case is for derived metrics."""
-        metric = self.get_metric(metric_reference)
-        input_metric_specs: List[MetricSpec] = []
-
-        for input_metric in metric.input_metrics:
-            original_metric_obj = self.get_metric(input_metric.as_reference)
-
-            where_filters: List[WhereFilter] = []
-
-            # This is the constraint parameter added to the input metric in the derived metric definition
-            if input_metric.filter:
-                where_filters.extend(input_metric.filter.where_filters)
-
-            # This is the constraint parameter included in the original input metric definition
-            if original_metric_obj.filter:
-                where_filters.extend(original_metric_obj.filter.where_filters)
-
-            spec = MetricSpec(
-                element_name=input_metric.name,
-                constraint=WhereSpecFactory(column_association_resolver).create_from_where_filter_intersection(
-                    PydanticWhereFilterIntersection(where_filters=where_filters)
-                ),
-                alias=input_metric.alias,
-                offset_window=PydanticMetricTimeWindow(
-                    count=input_metric.offset_window.count,
-                    granularity=input_metric.offset_window.granularity,
-                )
-                if input_metric.offset_window
-                else None,
-                offset_to_grain=input_metric.offset_to_grain,
-            )
-            input_metric_specs.append(spec)
-        return tuple(input_metric_specs)

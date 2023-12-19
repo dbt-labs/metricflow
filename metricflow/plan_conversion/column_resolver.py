@@ -31,7 +31,7 @@ class DunderColumnAssociationResolverVisitor(InstanceSpecVisitor[ColumnAssociati
 
     def visit_metric_spec(self, metric_spec: MetricSpec) -> ColumnAssociation:  # noqa: D
         return ColumnAssociation(
-            column_name=metric_spec.element_name,
+            column_name=metric_spec.element_name if metric_spec.alias is None else metric_spec.alias,
             single_column_correlation_key=SingleColumnCorrelationKey(),
         )
 

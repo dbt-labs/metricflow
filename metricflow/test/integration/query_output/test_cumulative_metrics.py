@@ -133,15 +133,18 @@ def test_cumulative_metric_with_non_adjustable_filter(
     it_helpers: IntegrationTestHelpers,
 ) -> None:
     """Tests a cumulative metric with a filter that cannot be adjusted to ensure all data is included."""
+    # Handle ds expression based on engine to support Trino.
+    first_ds_expr = f"CAST('2020-03-15' AS {sql_client.sql_query_plan_renderer.expr_renderer.timestamp_data_type})"
+    second_ds_expr = f"CAST('2020-04-30' AS {sql_client.sql_query_plan_renderer.expr_renderer.timestamp_data_type})"
+    where_constraint = f"{{{{ TimeDimension('metric_time', 'day') }}}} = {first_ds_expr} or"
+    where_constraint += f" {{{{ TimeDimension('metric_time', 'day') }}}} = {second_ds_expr}"
+
     query_result = it_helpers.mf_engine.query(
         MetricFlowQueryRequest.create_with_random_request_id(
             metric_names=["trailing_2_months_revenue"],
             group_by_names=["metric_time"],
             order_by_names=["metric_time"],
-            where_constraint=(
-                "{{ TimeDimension('metric_time', 'day') }} = '2020-03-15' or "
-                "{{ TimeDimension('metric_time', 'day') }} = '2020-04-30'"
-            ),
+            where_constraint=where_constraint,
             time_constraint_end=as_datetime("2020-12-31"),
         )
     )

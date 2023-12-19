@@ -1,0 +1,352 @@
+---
+integration_test:
+  name: conversion_rate_metric_infinite_window
+  description: Query a conversion metric that calculates the conversion rate
+  model: SIMPLE_MODEL
+  metrics: ["visit_buy_conversion_rate"]
+  group_bys: ["metric_time"]
+  check_query: |
+    SELECT
+      opportunities.metric_time AS metric_time__day
+      , CAST(conversions.buys AS {{ double_data_type_name }}) / CAST(NULLIF(opportunities.visits, 0) AS {{ double_data_type_name }}) AS visit_buy_conversion_rate
+    FROM (
+      SELECT
+        metric_time, SUM(a.visits) AS visits
+      FROM (
+        SELECT
+          ds AS metric_time, 1 AS visits
+        FROM {{ source_schema }}.fct_visits visits
+      ) a
+      GROUP BY
+        a.metric_time
+    ) opportunities
+    FULL OUTER JOIN (
+      SELECT
+        b.ds AS metric_time, SUM(b.buys) AS buys
+      FROM (
+        SELECT DISTINCT
+        first_value(v.ds) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS ds
+        , first_value(v.user_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS user_id
+        , first_value(v.referrer_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS referrer_id
+        , buy_source.uuid
+        , 1 AS buys
+        FROM {{ source_schema }}.fct_visits v
+        INNER JOIN
+        (
+          SELECT *, {{ generate_random_uuid() }} AS uuid FROM {{ source_schema }}.fct_buys
+        ) buy_source
+        ON
+          v.user_id = buy_source.user_id AND v.ds <= buy_source.ds
+      ) b
+      GROUP BY
+        b.ds
+    ) conversions
+    ON opportunities.metric_time = conversions.metric_time
+---
+integration_test:
+  name: conversion_rate_metric_no_group_by
+  description: Query a conversion metric that calculates the conversion rate with no group bys
+  model: SIMPLE_MODEL
+  metrics: ["visit_buy_conversion_rate_7days"]
+  check_query: |
+    SELECT
+      CAST(conversions.buys AS {{ double_data_type_name }}) / CAST(NULLIF(opportunities.visits, 0) AS {{ double_data_type_name }}) AS visit_buy_conversion_rate_7days
+    FROM (
+      SELECT
+        SUM(a.visits) AS visits
+      FROM (
+        SELECT
+          1 AS visits
+        FROM {{ source_schema }}.fct_visits visits
+      ) a
+    ) opportunities
+    CROSS JOIN (
+      SELECT
+        SUM(b.buys) AS buys
+      FROM (
+        SELECT DISTINCT
+        first_value(v.user_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS user_id
+        , first_value(v.referrer_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS referrer_id
+        , buy_source.uuid
+        , 1 AS buys
+        FROM {{ source_schema }}.fct_visits v
+        INNER JOIN
+        (
+          SELECT *, {{ generate_random_uuid() }} AS uuid FROM {{ source_schema }}.fct_buys
+        ) buy_source
+        ON
+          v.user_id = buy_source.user_id AND v.ds <= buy_source.ds
+      ) b
+    ) conversions
+---
+integration_test:
+  name: conversion_rate_metric
+  description: Query a conversion metric that calculates the conversion rate
+  model: SIMPLE_MODEL
+  metrics: ["visit_buy_conversion_rate_7days"]
+  group_bys: ["metric_time"]
+  check_query: |
+    SELECT
+      opportunities.metric_time AS metric_time__day
+      , CAST(conversions.buys AS {{ double_data_type_name }}) / CAST(NULLIF(opportunities.visits, 0) AS {{ double_data_type_name }}) AS visit_buy_conversion_rate_7days
+    FROM (
+      SELECT
+        metric_time, SUM(a.visits) AS visits
+      FROM (
+        SELECT
+          ds AS metric_time, 1 AS visits
+        FROM {{ source_schema }}.fct_visits visits
+      ) a
+      GROUP BY
+        a.metric_time
+    ) opportunities
+    FULL OUTER JOIN (
+      SELECT
+        b.ds AS metric_time, SUM(b.buys) AS buys
+      FROM (
+        SELECT DISTINCT
+        first_value(v.ds) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS ds
+        , first_value(v.user_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS user_id
+        , first_value(v.referrer_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS referrer_id
+        , buy_source.uuid
+        , 1 AS buys
+        FROM {{ source_schema }}.fct_visits v
+        INNER JOIN
+        (
+          SELECT *, {{ generate_random_uuid() }} AS uuid FROM {{ source_schema }}.fct_buys
+        ) buy_source
+        ON
+          v.user_id = buy_source.user_id AND v.ds <= buy_source.ds AND v.ds > {{ render_date_sub("buy_source", "ds", 7, TimeGranularity.DAY) }}
+      ) b
+      GROUP BY
+        b.ds
+    ) conversions
+    ON opportunities.metric_time = conversions.metric_time
+---
+integration_test:
+  name: conversion_rate_metric_with_dimension
+  description: Query a conversion metric that calculates the conversion rate without time dimension
+  model: SIMPLE_MODEL
+  metrics: ["visit_buy_conversion_rate_7days"]
+  group_bys: ["visit__referrer_id"]
+  check_query: |
+    SELECT
+      opportunities.referrer_id AS visit__referrer_id
+      , CAST(conversions.buys AS {{ double_data_type_name }}) / CAST(NULLIF(opportunities.visits, 0) AS {{ double_data_type_name }}) AS visit_buy_conversion_rate_7days
+    FROM (
+      SELECT
+        referrer_id, SUM(a.visits) AS visits
+      FROM (
+        SELECT
+          referrer_id, 1 AS visits
+        FROM {{ source_schema }}.fct_visits visits
+      ) a
+      GROUP BY
+        a.referrer_id
+    ) opportunities
+    FULL OUTER JOIN (
+      SELECT
+        referrer_id AS referrer_id, SUM(b.buys) AS buys
+      FROM (
+        SELECT DISTINCT
+        first_value(v.ds) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS ds
+        , first_value(v.user_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS user_id
+        , first_value(v.referrer_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS referrer_id
+        , buy_source.uuid
+        , 1 AS buys
+        FROM {{ source_schema }}.fct_visits v
+        INNER JOIN
+        (
+          SELECT *, {{ generate_random_uuid() }} AS uuid FROM {{ source_schema }}.fct_buys
+        ) buy_source
+        ON
+          v.user_id = buy_source.user_id AND v.ds <= buy_source.ds AND v.ds > {{ render_date_sub("buy_source", "ds", 7, TimeGranularity.DAY) }}
+      ) b
+      GROUP BY
+        b.referrer_id
+    ) conversions
+    ON opportunities.referrer_id = conversions.referrer_id
+# TODO: the ordering logic is different in databricks which produces a different, but still correct answer.
+# ---
+# integration_test:
+#   name: conversion_rate_metric_with_multiple_dimension
+#   description: Query a conversion metric that calculates the conversion rate with multiple dimension
+#   model: SIMPLE_MODEL
+#   metrics: ["visit_buy_conversion_rate_7days"]
+#   group_bys: ["metric_time", "visit__referrer_id"]
+#   check_query: |
+#     SELECT
+#       opportunities.referrer_id AS visit__referrer_id
+#       , opportunities.metric_time AS metric_time__day
+#       , CAST(conversions.buys AS {{ double_data_type_name }}) / CAST(NULLIF(opportunities.visits, 0) AS {{ double_data_type_name }}) AS visit_buy_conversion_rate_7days
+#     FROM (
+#       SELECT
+#         metric_time, referrer_id, SUM(a.visits) AS visits
+#       FROM (
+#         SELECT
+#           ds AS metric_time, referrer_id, 1 AS visits
+#         FROM {{ source_schema }}.fct_visits visits
+#       ) a
+#       GROUP BY
+#         a.referrer_id, a.metric_time
+#     ) opportunities
+#     FULL OUTER JOIN (
+#       SELECT
+#         b.ds AS metric_time, referrer_id AS referrer_id, SUM(b.buys) AS buys
+#       FROM (
+#         SELECT DISTINCT
+#         first_value(v.ds) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC) AS ds
+#         , first_value(v.user_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC) AS user_id
+#         , first_value(v.referrer_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC) AS referrer_id
+#         , buy_source.uuid
+#         , 1 AS buys
+#         FROM {{ source_schema }}.fct_visits v
+#         INNER JOIN
+#         (
+#           SELECT *, {{ generate_random_uuid() }} AS uuid FROM {{ source_schema }}.fct_buys
+#         ) buy_source
+#         ON
+#           v.user_id = buy_source.user_id AND v.ds <= buy_source.ds AND v.ds > {{ render_date_sub("buy_source", "ds", 7, TimeGranularity.DAY) }}
+#       ) b
+#       GROUP BY
+#         b.referrer_id, b.ds
+#     ) conversions
+#     ON opportunities.referrer_id = conversions.referrer_id AND opportunities.metric_time = conversions.metric_time
+# ---
+# integration_test:
+#   name: conversion_count_metric_with_multiple_dimension
+#   description: Query a conversion metric that calculates the conversion count with multiple dimension
+#   model: SIMPLE_MODEL
+#   metrics: ["visit_buy_conversions"]
+#   group_bys: ["metric_time", "visit__referrer_id"]
+#   check_query: |
+#     SELECT
+#       opportunities.referrer_id AS visit__referrer_id
+#       , opportunities.metric_time AS metric_time__day
+#       , COALESCE(conversions.buys, 0) AS visit_buy_conversions
+#     FROM (
+#       SELECT
+#         metric_time, referrer_id, SUM(a.visits) AS visits
+#       FROM (
+#         SELECT
+#           ds AS metric_time, referrer_id, 1 AS visits
+#         FROM {{ source_schema }}.fct_visits visits
+#       ) a
+#       GROUP BY
+#         a.referrer_id, a.metric_time
+#     ) opportunities
+#     FULL OUTER JOIN (
+#       SELECT
+#         b.ds AS metric_time, referrer_id AS referrer_id, SUM(b.buys) AS buys
+#       FROM (
+#         SELECT DISTINCT
+#         first_value(v.ds) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC) AS ds
+#         , first_value(v.user_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC) AS user_id
+#         , first_value(v.referrer_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id ORDER BY v.ds DESC) AS referrer_id
+#         , buy_source.uuid
+#         , 1 AS buys
+#         FROM {{ source_schema }}.fct_visits v
+#         INNER JOIN
+#         (
+#           SELECT *, {{ generate_random_uuid() }} AS uuid FROM {{ source_schema }}.fct_buys
+#         ) buy_source
+#         ON
+#           v.user_id = buy_source.user_id AND v.ds <= buy_source.ds AND v.ds > {{ render_date_sub("buy_source", "ds", 7, TimeGranularity.DAY) }}
+#       ) b
+#       GROUP BY
+#         b.referrer_id, b.ds
+#     ) conversions
+#     ON opportunities.referrer_id = conversions.referrer_id AND opportunities.metric_time = conversions.metric_time
+---
+integration_test:
+  name: conversion_rate_metric_with_constant_property
+  description: Query a conversion metric that calculates the conversion rate held by a constant property
+  model: SIMPLE_MODEL
+  metrics: ["visit_buy_conversion_rate_by_session"]
+  group_bys: ["metric_time"]
+  check_query: |
+    SELECT
+      opportunities.metric_time AS metric_time__day
+      , CAST(conversions.buys AS {{ double_data_type_name }}) / CAST(NULLIF(opportunities.visits, 0) AS {{ double_data_type_name }}) AS visit_buy_conversion_rate_by_session
+    FROM (
+      SELECT
+        metric_time, SUM(a.visits) AS visits
+      FROM (
+        SELECT
+          ds AS metric_time, 1 AS visits
+        FROM {{ source_schema }}.fct_visits visits
+      ) a
+      GROUP BY
+        a.metric_time
+    ) opportunities
+    FULL OUTER JOIN (
+      SELECT
+        b.ds AS metric_time, SUM(b.buys) AS buys
+      FROM (
+        SELECT DISTINCT
+        first_value(v.ds) OVER (PARTITION BY buy_source.ds, buy_source.user_id, buy_source.session_id ORDER BY v.ds DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS ds
+        , first_value(v.user_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id, buy_source.session_id ORDER BY v.ds DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS user_id
+        , first_value(v.referrer_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id, buy_source.session_id ORDER BY v.ds DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS referrer_id
+        , buy_source.uuid
+        , 1 AS buys
+        FROM {{ source_schema }}.fct_visits v
+        INNER JOIN
+        (
+          SELECT *, {{ generate_random_uuid() }} AS uuid FROM {{ source_schema }}.fct_buys
+        ) buy_source
+        ON
+          v.user_id = buy_source.user_id
+          AND v.ds <= buy_source.ds AND v.ds > {{ render_date_sub("buy_source", "ds", 7, TimeGranularity.DAY) }}
+          AND buy_source.session_id = v.session_id
+      ) b
+      GROUP BY
+        b.ds
+    ) conversions
+    ON opportunities.metric_time = conversions.metric_time
+---
+integration_test:
+  name: conversion_rate_metric_with_constant_property_multiple_dimensions
+  description: Query a conversion metric that calculates the conversion rate held by a constant property
+  model: SIMPLE_MODEL
+  metrics: ["visit_buy_conversion_rate_by_session"]
+  group_bys: ["metric_time", "visit__referrer_id"]
+  check_query: |
+    SELECT
+      opportunities.referrer_id AS visit__referrer_id
+      , opportunities.metric_time AS metric_time__day
+      , CAST(conversions.buys AS {{ double_data_type_name }}) / CAST(NULLIF(opportunities.visits, 0) AS {{ double_data_type_name }}) AS visit_buy_conversion_rate_by_session
+    FROM (
+      SELECT
+        metric_time, referrer_id, SUM(a.visits) AS visits
+      FROM (
+        SELECT
+          ds AS metric_time, referrer_id, 1 AS visits
+        FROM {{ source_schema }}.fct_visits visits
+      ) a
+      GROUP BY
+        a.referrer_id, a.metric_time
+    ) opportunities
+    FULL OUTER JOIN (
+      SELECT
+        b.ds AS metric_time, referrer_id AS referrer_id, SUM(b.buys) AS buys
+      FROM (
+        SELECT DISTINCT
+        first_value(v.ds) OVER (PARTITION BY buy_source.ds, buy_source.user_id, buy_source.session_id ORDER BY v.ds DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS ds
+        , first_value(v.user_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id, buy_source.session_id ORDER BY v.ds DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS user_id
+        , first_value(v.referrer_id) OVER (PARTITION BY buy_source.ds, buy_source.user_id, buy_source.session_id ORDER BY v.ds DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS referrer_id
+        , buy_source.uuid
+        , 1 AS buys
+        FROM {{ source_schema }}.fct_visits v
+        INNER JOIN
+        (
+          SELECT *, {{ generate_random_uuid() }} AS uuid FROM {{ source_schema }}.fct_buys
+        ) buy_source
+        ON
+          v.user_id = buy_source.user_id
+          AND v.ds <= buy_source.ds AND v.ds > {{ render_date_sub("buy_source", "ds", 7, TimeGranularity.DAY) }}
+          AND buy_source.session_id = v.session_id
+      ) b
+      GROUP BY
+        b.referrer_id, b.ds
+    ) conversions
+    ON opportunities.referrer_id = conversions.referrer_id AND opportunities.metric_time = conversions.metric_time

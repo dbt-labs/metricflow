@@ -12,7 +12,7 @@ FROM (
   --   ['bookings', 'listing__capacity', 'metric_time__day']
   SELECT
     subq_12.metric_time__day AS metric_time__day
-    , listings_src_10017.capacity AS listing__capacity
+    , listings_src_10019.capacity AS listing__capacity
     , subq_12.bookings AS bookings
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
@@ -23,21 +23,21 @@ FROM (
       DATE_TRUNC('day', ds) AS metric_time__day
       , listing_id AS listing
       , 1 AS bookings
-    FROM ***************************.fct_bookings bookings_source_src_10015
+    FROM ***************************.fct_bookings bookings_source_src_10017
   ) subq_12
   LEFT OUTER JOIN
-    ***************************.dim_listings listings_src_10017
+    ***************************.dim_listings listings_src_10019
   ON
     (
-      subq_12.listing = listings_src_10017.listing_id
+      subq_12.listing = listings_src_10019.listing_id
     ) AND (
       (
-        subq_12.metric_time__day >= listings_src_10017.active_from
+        subq_12.metric_time__day >= listings_src_10019.active_from
       ) AND (
         (
-          subq_12.metric_time__day < listings_src_10017.active_to
+          subq_12.metric_time__day < listings_src_10019.active_to
         ) OR (
-          listings_src_10017.active_to IS NULL
+          listings_src_10019.active_to IS NULL
         )
       )
     )

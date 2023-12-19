@@ -11,7 +11,7 @@
                 <!-- metric_spec =                        -->
                 <!--   {'class': 'MetricSpec',            -->
                 <!--    'element_name': 'booking_value',  -->
-                <!--    'constraint': None,               -->
+                <!--    'filter_specs': (),               -->
                 <!--    'alias': None,                    -->
                 <!--    'offset_window': None,            -->
                 <!--    'offset_to_grain': None}          -->
@@ -54,23 +54,13 @@
             <ComputeMetricsNode>
                 <!-- description = Compute Metrics via Expressions -->
                 <!-- node_id = cm_3 -->
-                <!-- metric_spec =                                                                                                    -->
-                <!--   {'class': 'MetricSpec',                                                                                        -->
-                <!--    'element_name': 'instant_booking_value',                                                                      -->
-                <!--    'constraint': {'class': 'WhereFilterSpec',                                                                    -->
-                <!--                   'where_sql': 'booking__is_instant ',                                                           -->
-                <!--                   'bind_parameters': {'class': 'SqlBindParameters',                                              -->
-                <!--                                       'param_items': ()},                                                        -->
-                <!--                   'linkable_spec_set': {'class': 'LinkableSpecSet',                                              -->
-                <!--                                         'dimension_specs': ({'class': 'DimensionSpec',                           -->
-                <!--                                                              'element_name': 'is_instant',                       -->
-                <!--                                                              'entity_links': ({'class': 'EntityReference',       -->
-                <!--                                                                                'element_name': 'booking'},)},),  -->
-                <!--                                         'time_dimension_specs': (),                                              -->
-                <!--                                         'entity_specs': ()}},                                                    -->
-                <!--    'alias': None,                                                                                                -->
-                <!--    'offset_window': None,                                                                                        -->
-                <!--    'offset_to_grain': None}                                                                                      -->
+                <!-- metric_spec =                                -->
+                <!--   {'class': 'MetricSpec',                    -->
+                <!--    'element_name': 'instant_booking_value',  -->
+                <!--    'filter_specs': (),                       -->
+                <!--    'alias': None,                            -->
+                <!--    'offset_window': None,                    -->
+                <!--    'offset_to_grain': None}                  -->
                 <AggregateMeasuresNode>
                     <!-- description = Aggregate Measures -->
                     <!-- node_id = am_3 -->
@@ -97,7 +87,7 @@
                             <!-- node_id = wcc_1 -->
                             <!-- where_condition =                                                                                 -->
                             <!--   {'class': 'WhereFilterSpec',                                                                    -->
-                            <!--    'where_sql': 'booking__is_instant ',                                                           -->
+                            <!--    'where_sql': 'booking__is_instant',                                                            -->
                             <!--    'bind_parameters': {'class': 'SqlBindParameters', 'param_items': ()},                          -->
                             <!--    'linkable_spec_set': {'class': 'LinkableSpecSet',                                              -->
                             <!--                          'dimension_specs': ({'class': 'DimensionSpec',                           -->

@@ -16,6 +16,12 @@ from dbt_semantic_interfaces.protocols.measure import MeasureAggregationParamete
 from dbt_semantic_interfaces.protocols.metadata import Metadata
 from dbt_semantic_interfaces.protocols.metric import Metric as SemanticManifestMetric
 from dbt_semantic_interfaces.protocols.metric import MetricInputMeasure, MetricType, MetricTypeParams
+from dbt_semantic_interfaces.protocols.saved_query import (
+    SavedQuery as SemanticManifestSavedQuery,
+)
+from dbt_semantic_interfaces.protocols.saved_query import (
+    SavedQueryQueryParams,
+)
 from dbt_semantic_interfaces.protocols.where_filter import WhereFilterIntersection
 from dbt_semantic_interfaces.transformations.add_input_metric_measures import AddInputMetricMeasuresRule
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
@@ -144,3 +150,25 @@ class Measure:
     description: Optional[str] = None
     expr: Optional[str] = None
     agg_params: Optional[MeasureAggregationParameters] = None
+
+
+@dataclass(frozen=True)
+class SavedQuery:
+    """Dataclass representation of a SavedQuery."""
+
+    name: str
+    description: Optional[str]
+    label: Optional[str]
+    query_params: SavedQueryQueryParams
+    metadata: Optional[Metadata]
+
+    @classmethod
+    def from_pydantic(cls, pydantic_saved_query: SemanticManifestSavedQuery) -> SavedQuery:
+        """Build from pydantic SavedQuery object."""
+        return cls(
+            name=pydantic_saved_query.name,
+            description=pydantic_saved_query.description,
+            label=pydantic_saved_query.label,
+            query_params=pydantic_saved_query.query_params,
+            metadata=pydantic_saved_query.metadata,
+        )
