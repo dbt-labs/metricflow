@@ -1,0 +1,28 @@
+version: 2
+updates:
+  # python dependencies
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    rebase-strategy: "disabled"
+    groups:
+      production-dependencies:
+        # Dependabot uses a lot of heuristic matching, so this may include some dev dependencies
+        dependency-type: "production"
+        exclude-patterns:
+          # We need to manually maintain all of our dbt and internal MetricFlow sub-package dependencies
+          - "dbt-*"
+          - "metricflow*"
+      dev-dependencies:
+        # In theory this is everything that isn't prod, but maybe it's just everything in dev-dependencies
+        dependency-type: "development"
+        exclude-patterns:
+          # Dev dependencies also have to version peg on all dbt dependencies
+          - "dbt-*"
+  # GitHub actions dependencies
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    rebase-strategy: "disabled"
