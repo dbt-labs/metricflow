@@ -26,7 +26,6 @@ classifiers = [
 ]
 dependencies = [
   "Jinja2>=2.11.3",
-  "MarkupSafe==2.0.1", # pandas implicitly requires this version
   "PyYAML~=6.0",
   "click>=7.1.2",
   "dbt-core~=1.7.0",
