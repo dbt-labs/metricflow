@@ -529,6 +529,9 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             linkable_dimensions_tuple,
         ) in path_key_to_linkable_dimensions.items():
             for linkable_dimension in linkable_dimensions_tuple:
+                # Simple dimensions shouldn't show date part items.
+                if linkable_dimension.date_part is not None:
+                    continue
                 semantic_model = self._semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
                     linkable_dimension.semantic_model_origin
                 )

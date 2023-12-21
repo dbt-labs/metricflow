@@ -249,9 +249,10 @@ class MetricFlowQueryParser:
         return tuple(order_by_query_parameter.query_resolver_input for order_by_query_parameter in order_by)
 
     @staticmethod
-    def _error_message(
+    def generate_error_message(
         input_to_issue_set: InputToIssueSetMapping,
     ) -> Optional[str]:
+        """Create an error message that formats the inputs / issues."""
         lines: List[str] = ["Got errors while resolving the query."]
         issue_counter = 0
 
@@ -292,7 +293,7 @@ class MetricFlowQueryParser:
         if not input_to_issue_set.merged_issue_set.has_errors:
             return
 
-        raise InvalidQueryException(self._error_message(input_to_issue_set=input_to_issue_set))
+        raise InvalidQueryException(self.generate_error_message(input_to_issue_set=input_to_issue_set))
 
     def parse_and_validate_query(
         self,
