@@ -1,13 +1,11 @@
 from __future__ import annotations
 
+import itertools
 import logging
 from typing import List, Sequence
 
 from dbt_semantic_interfaces.call_parameter_sets import (
-    DimensionCallParameterSet,
-    EntityCallParameterSet,
     FilterCallParameterSets,
-    TimeDimensionCallParameterSet,
 )
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
 from dbt_semantic_interfaces.protocols import WhereFilter, WhereFilterIntersection
@@ -97,26 +95,32 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
     def _dedupe_filter_call_parameter_sets(
         filter_call_parameter_sets_sequence: Sequence[FilterCallParameterSets],
     ) -> FilterCallParameterSets:
-        dimension_call_parameter_sets: List[DimensionCallParameterSet] = []
-        time_dimension_call_parameter_sets: List[TimeDimensionCallParameterSet] = []
-        entity_call_parameter_sets: List[EntityCallParameterSet] = []
-
         # FilterCallParameterSets needs an update.
-        for filter_call_parameter_sets in filter_call_parameter_sets_sequence:
-            for dimension_call_parameter_set in filter_call_parameter_sets.dimension_call_parameter_sets:
-                if dimension_call_parameter_set not in dimension_call_parameter_sets:
-                    dimension_call_parameter_sets.append(dimension_call_parameter_set)
-            for time_dimension_call_parameter_set in filter_call_parameter_sets.time_dimension_call_parameter_sets:
-                if time_dimension_call_parameter_set not in time_dimension_call_parameter_sets:
-                    time_dimension_call_parameter_sets.append(time_dimension_call_parameter_set)
-            for entity_call_parameter_set in filter_call_parameter_sets.entity_call_parameter_sets:
-                if entity_call_parameter_set not in entity_call_parameter_sets:
-                    entity_call_parameter_sets.append(entity_call_parameter_set)
-
         return FilterCallParameterSets(
-            dimension_call_parameter_sets=tuple(dimension_call_parameter_sets),
-            time_dimension_call_parameter_sets=tuple(time_dimension_call_parameter_sets),
-            entity_call_parameter_sets=tuple(entity_call_parameter_sets),
+            dimension_call_parameter_sets=tuple(
+                dict.fromkeys(
+                    itertools.chain.from_iterable(
+                        filter_call_parameter_sets.dimension_call_parameter_sets
+                        for filter_call_parameter_sets in filter_call_parameter_sets_sequence
+                    )
+                )
+            ),
+            time_dimension_call_parameter_sets=tuple(
+                dict.fromkeys(
+                    itertools.chain.from_iterable(
+                        filter_call_parameter_sets.time_dimension_call_parameter_sets
+                        for filter_call_parameter_sets in filter_call_parameter_sets_sequence
+                    )
+                )
+            ),
+            entity_call_parameter_sets=tuple(
+                dict.fromkeys(
+                    itertools.chain.from_iterable(
+                        filter_call_parameter_sets.entity_call_parameter_sets
+                        for filter_call_parameter_sets in filter_call_parameter_sets_sequence
+                    )
+                )
+            ),
         )
 
     @staticmethod
