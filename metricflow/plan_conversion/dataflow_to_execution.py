@@ -63,7 +63,7 @@ class DataflowToExecutionPlanConverter(SinkNodeVisitor[ExecutionPlan]):
             dataflow_plan_node=node,
         )
 
-        logger.debug(f"Generated SQL query plan is:\n{sql_query_plan_as_text(sql_plan)}")
+        # logger.debug(f"Generated SQL query plan is:\n{sql_query_plan_as_text(sql_plan)}")
 
         render_result = self._sql_plan_renderer.render_sql_query_plan(sql_plan)
 

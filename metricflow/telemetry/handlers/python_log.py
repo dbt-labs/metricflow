@@ -17,7 +17,8 @@ class PythonLoggerTelemetryHandler(TelemetryHandler):
         self._logger_level = logger_level
 
     def _write_log(self, client_id: str, payload: PayloadType) -> None:  # noqa: D
-        logger.log(
-            level=self._logger_level,
-            msg=f"Logging telemetry payload:\n{textwrap.indent(pformat_big_objects(payload), prefix='    ')}",
-        )
+        pass
+        # logger.log(
+        #     level=self._logger_level,
+        #     msg=f"Logging telemetry payload:\n{textwrap.indent(pformat_big_objects(payload), prefix='    ')}",
+        # )

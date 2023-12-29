@@ -309,13 +309,13 @@ class SourceScanOptimizer(
     def optimize(self, dataflow_plan: DataflowPlan) -> DataflowPlan:  # noqa: D
         optimized_result: OptimizeBranchResult = dataflow_plan.sink_output_node.accept(self)
 
-        logger.log(
-            level=self._log_level,
-            msg=f"Optimized:\n\n"
-            f"{dataflow_dag_as_text(dataflow_plan.sink_output_node)}\n\n"
-            f"to:\n\n"
-            f"{dataflow_dag_as_text(optimized_result.checked_sink_node)}",
-        )
+        # logger.log(
+        #     level=self._log_level,
+        #     msg=f"Optimized:\n\n"
+        #     f"{dataflow_dag_as_text(dataflow_plan.sink_output_node)}\n\n"
+        #     f"to:\n\n"
+        #     f"{dataflow_dag_as_text(optimized_result.checked_sink_node)}",
+        # )
 
         plan_id = IdGeneratorRegistry.for_class(self.__class__).create_id(OPTIMIZED_DATAFLOW_PLAN_PREFIX)
         logger.log(level=self._log_level, msg=f"Optimized plan ID is {plan_id}")
