@@ -42,6 +42,7 @@ from metricflow.query.resolver_inputs.query_resolver_inputs import (
     ResolverInputForGroupByItem,
     ResolverInputForLimit,
     ResolverInputForMetric,
+    ResolverInputForMinMaxOnly,
     ResolverInputForOrderByItem,
     ResolverInputForQuery,
     ResolverInputForQueryLevelWhereFilterIntersection,
@@ -307,11 +308,13 @@ class MetricFlowQueryParser:
         where_constraint_str: Optional[str] = None,
         order_by_names: Optional[Sequence[str]] = None,
         order_by: Optional[Sequence[OrderByQueryParameter]] = None,
+        min_max_only: bool = False,
     ) -> MetricFlowQuerySpec:
         """Parse the query into spec objects, validating them in the process.
 
         e.g. make sure that the given metric is a valid metric name.
         """
+        # TODO: validate min_max_only - can only be called for non-metric queries
         assert_at_most_one_arg_set(metric_names=metric_names, metrics=metrics)
         assert_at_most_one_arg_set(group_by_names=group_by_names, group_by=group_by)
         assert_at_most_one_arg_set(order_by_names=order_by_names, order_by=order_by)
@@ -423,6 +426,7 @@ class MetricFlowQueryParser:
         resolver_inputs_for_order_by.extend(MetricFlowQueryParser._parse_order_by(order_by=order_by))
 
         resolver_input_for_limit = ResolverInputForLimit(limit=limit)
+        resolver_input_for_min_max_only = ResolverInputForMinMaxOnly(min_max_only=min_max_only)
 
         resolver_input_for_query = ResolverInputForQuery(
             metric_inputs=tuple(resolver_inputs_for_metrics),
@@ -430,6 +434,7 @@ class MetricFlowQueryParser:
             order_by_item_inputs=tuple(resolver_inputs_for_order_by),
             limit_input=resolver_input_for_limit,
             filter_input=resolver_input_for_filter,
+            min_max_only=resolver_input_for_min_max_only,
         )
 
         logger.info("Resolver input for query is:\n" + indent_log_line(mf_pformat(resolver_input_for_query)))

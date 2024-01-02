@@ -105,7 +105,7 @@ integration_test:
 ---
 integration_test:
   name: query_dimension_only
-  description: Query dimenension only
+  description: Query dimension only
   model: SIMPLE_MODEL
   group_bys: ["user__home_state"]
   check_query: |
@@ -170,20 +170,6 @@ integration_test:
       ds
 ---
 integration_test:
-  name: query_dimension_only_with_constraint
-  description: Query dimenension only with where constraint
-  model: SIMPLE_MODEL
-  group_bys: ["user__home_state"]
-  where_filter: "{{ render_dimension_template('user__home_state') }} = 'CA'"
-  check_query: |
-    SELECT
-      u.home_state AS user__home_state
-    FROM {{ source_schema }}.dim_users u
-    WHERE u.home_state = 'CA'
-    GROUP BY
-      u.home_state
----
-integration_test:
   name: query_dimension_with_constraint_from_diff_source
   description: Query dimenension only with where constraint, where constraint requires a join
   model: SIMPLE_MODEL
@@ -201,4 +187,71 @@ integration_test:
     )
     WHERE listing__country_latest = 'us'
     GROUP BY user__home_state_latest
-# case where where filter not in selections, for derived metric plan that doesn't use normal one
+---
+integration_test:
+  name: query_dimension_only_with_constraint
+  description: Query dimenension only with where constraint
+  model: SIMPLE_MODEL
+  group_bys: ["user__home_state"]
+  where_filter: "{{ render_dimension_template('user__home_state') }} = 'CA'"
+  check_query: |
+    SELECT
+      u.home_state AS user__home_state
+    FROM {{ source_schema }}.dim_users u
+    WHERE u.home_state = 'CA'
+    GROUP BY
+      u.home_state
+---
+integration_test:
+  name: min_max_only_categorical
+  description: Get min and max of a categorical dimension
+  model: SIMPLE_MODEL
+  group_bys: ["user__home_state"]
+  min_max_only: true
+  check_query: |
+    SELECT
+      MIN(user__home_state) AS user__home_state__min
+      , MAX(user__home_state) AS user__home_state__max
+    FROM (
+      SELECT
+        u.home_state AS user__home_state
+      FROM {{ source_schema }}.dim_users u
+      GROUP BY
+        u.home_state
+    )
+---
+integration_test:
+  name: min_max_only_time
+  description: Get min and max of a time dimension
+  model: SIMPLE_MODEL
+  group_bys: ["verification__ds"]
+  min_max_only: true
+  check_query: |
+    SELECT
+      MIN(verification__ds__day) AS verification__ds__day__min
+      , MAX(verification__ds__day) AS verification__ds__day__max
+    FROM (
+      SELECT
+        v.ds as verification__ds__day
+      FROM {{ source_schema }}.fct_id_verifications v
+      GROUP BY
+        v.ds
+    )
+---
+integration_test:
+  name: min_max_only_time_month
+  description: Get min and max of a time dimension with month granularity
+  model: SIMPLE_MODEL
+  group_bys: ["verification__ds__month"]
+  min_max_only: true
+  check_query: |
+    SELECT
+      MIN(verification__ds__month) AS verification__ds__month__min
+      , MAX(verification__ds__month) AS verification__ds__month__max
+    FROM (
+      SELECT
+        {{ render_date_trunc("v.ds", TimeGranularity.MONTH) }} as verification__ds__month
+      FROM {{ source_schema }}.fct_id_verifications v
+      GROUP BY
+        {{ render_date_trunc("v.ds", TimeGranularity.MONTH) }}
+    )

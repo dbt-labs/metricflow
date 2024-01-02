@@ -79,7 +79,7 @@ class DunderColumnAssociationResolverVisitor(InstanceSpecVisitor[ColumnAssociati
 
     def visit_metadata_spec(self, metadata_spec: MetadataSpec) -> ColumnAssociation:  # noqa: D
         return ColumnAssociation(
-            column_name=metadata_spec.element_name,
+            column_name=metadata_spec.qualified_name,
             single_column_correlation_key=SingleColumnCorrelationKey(),
         )
 

@@ -325,6 +325,7 @@ def test_case(
             if case.where_filter
             else None,
             order_by_names=case.order_bys,
+            min_max_only=case.min_max_only,
         )
     )
 

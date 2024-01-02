@@ -950,6 +950,18 @@ class ChangeAssociatedColumns(InstanceSetTransform[InstanceSet]):
         )
 
 
+class ConvertToMetadata(InstanceSetTransform[InstanceSet]):
+    """Removes all instances from old instance set and replaces them with a set of metadata instances."""
+
+    def __init__(self, metadata_instances: Sequence[MetadataInstance]) -> None:  # noqa: D
+        self._metadata_instances = metadata_instances
+
+    def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D
+        return InstanceSet(
+            metadata_instances=tuple(self._metadata_instances),
+        )
+
+
 def create_select_columns_for_instance_sets(
     column_resolver: ColumnAssociationResolver,
     table_alias_to_instance_set: OrderedDict[str, InstanceSet],

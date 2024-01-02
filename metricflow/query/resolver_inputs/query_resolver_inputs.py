@@ -119,6 +119,18 @@ class ResolverInputForLimit(MetricFlowQueryResolverInput):
 
 
 @dataclass(frozen=True)
+class ResolverInputForMinMaxOnly(MetricFlowQueryResolverInput):
+    """An input that describes if the query will be aggregated to only the min and max."""
+
+    min_max_only: bool = False
+
+    @property
+    @override
+    def ui_description(self) -> str:
+        return str(self.min_max_only)
+
+
+@dataclass(frozen=True)
 class ResolverInputForQueryLevelWhereFilterIntersection(MetricFlowQueryResolverInput):
     """An input that describes the where filter for the query."""
 
@@ -180,6 +192,7 @@ class ResolverInputForQuery(MetricFlowQueryResolverInput):
     filter_input: ResolverInputForQueryLevelWhereFilterIntersection
     order_by_item_inputs: Tuple[ResolverInputForOrderByItem, ...]
     limit_input: ResolverInputForLimit
+    min_max_only: ResolverInputForMinMaxOnly
 
     @property
     @override

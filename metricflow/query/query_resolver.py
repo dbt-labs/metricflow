@@ -26,6 +26,7 @@ from metricflow.query.issues.issues_base import (
 )
 from metricflow.query.issues.parsing.invalid_limit import InvalidLimitIssue
 from metricflow.query.issues.parsing.invalid_metric import InvalidMetricIssue
+from metricflow.query.issues.parsing.invalid_min_max_only import InvalidMinMaxOnlyIssue
 from metricflow.query.issues.parsing.invalid_order import InvalidOrderByItemIssue
 from metricflow.query.query_resolution import (
     InputToIssueSetMapping,
@@ -36,6 +37,7 @@ from metricflow.query.resolver_inputs.query_resolver_inputs import (
     ResolverInputForGroupByItem,
     ResolverInputForLimit,
     ResolverInputForMetric,
+    ResolverInputForMinMaxOnly,
     ResolverInputForOrderByItem,
     ResolverInputForQuery,
     ResolverInputForQueryLevelWhereFilterIntersection,
@@ -77,6 +79,14 @@ class ResolveLimitResult:
     """Result of resolving a limit input."""
 
     limit: Optional[int]
+    input_to_issue_set_mapping: InputToIssueSetMapping
+
+
+@dataclass(frozen=True)
+class ResolveMinMaxOnlyResult:
+    """Result of resolving a limit input."""
+
+    min_max_only: bool
     input_to_issue_set_mapping: InputToIssueSetMapping
 
 
@@ -266,6 +276,38 @@ class MetricFlowQueryResolver:
             )
         return ResolveLimitResult(limit=limit, input_to_issue_set_mapping=InputToIssueSetMapping.empty_instance())
 
+    @staticmethod
+    def _resolve_min_max_only_input(
+        min_max_only_input: ResolverInputForMinMaxOnly,
+        query_resolution_path: MetricFlowQueryResolutionPath,
+        metric_inputs: Tuple[ResolverInputForMetric, ...],
+        group_by_item_inputs: Tuple[ResolverInputForGroupByItem, ...],
+        order_by_item_inputs: Tuple[ResolverInputForOrderByItem, ...],
+        limit_input: ResolverInputForLimit,
+    ) -> ResolveMinMaxOnlyResult:
+        min_max_only = min_max_only_input.min_max_only
+        if min_max_only:
+            if (
+                metric_inputs
+                or order_by_item_inputs
+                or (limit_input.limit is not None)
+                or len(group_by_item_inputs) != 1
+            ):
+                return ResolveMinMaxOnlyResult(
+                    min_max_only=min_max_only,
+                    input_to_issue_set_mapping=InputToIssueSetMapping.from_one_item(
+                        resolver_input=min_max_only_input,
+                        issue_set=MetricFlowQueryResolutionIssueSet.from_issue(
+                            InvalidMinMaxOnlyIssue.from_parameters(
+                                min_max_only=min_max_only, query_resolution_path=query_resolution_path
+                            ),
+                        ),
+                    ),
+                )
+        return ResolveMinMaxOnlyResult(
+            min_max_only=min_max_only, input_to_issue_set_mapping=InputToIssueSetMapping.empty_instance()
+        )
+
     def _build_filter_spec_lookup(
         self,
         resolution_dag: GroupByItemResolutionDag,
@@ -284,6 +326,7 @@ class MetricFlowQueryResolver:
         order_by_item_inputs = resolver_input_for_query.order_by_item_inputs
         limit_input = resolver_input_for_query.limit_input
         query_level_filter_input = resolver_input_for_query.filter_input
+        min_max_only_input = resolver_input_for_query.min_max_only
 
         # Define a resolution path for issues where the input is considered to be the whole query.
         query_resolution_path = MetricFlowQueryResolutionPath.from_path_item(
@@ -307,6 +350,17 @@ class MetricFlowQueryResolver:
             query_resolution_path=query_resolution_path,
         )
         mappings_to_merge.append(resolve_limit_result.input_to_issue_set_mapping)
+
+        # Resolve min max only
+        resolve_min_max_only_result = self._resolve_min_max_only_input(
+            min_max_only_input=min_max_only_input,
+            query_resolution_path=query_resolution_path,
+            metric_inputs=metric_inputs,
+            group_by_item_inputs=group_by_item_inputs,
+            order_by_item_inputs=order_by_item_inputs,
+            limit_input=limit_input,
+        )
+        mappings_to_merge.append(resolve_min_max_only_result.input_to_issue_set_mapping)
 
         # Early stop before resolving further as with invalid metrics, the errors won't be as useful.
         issue_set_mapping_so_far = InputToIssueSetMapping.merge_iterable(mappings_to_merge)
@@ -420,6 +474,7 @@ class MetricFlowQueryResolver:
                 limit=limit_input.limit,
                 filter_intersection=query_level_filter_input.where_filter_intersection,
                 filter_spec_resolution_lookup=filter_spec_lookup,
+                min_max_only=min_max_only_input.min_max_only,
             ),
             resolution_dag=resolution_dag,
             filter_spec_lookup=filter_spec_lookup,

@@ -21,6 +21,7 @@ from metricflow.dataflow.dataflow_plan import (
     JoinToBaseOutputNode,
     JoinToTimeSpineNode,
     MetricTimeDimensionTransformNode,
+    MinMaxNode,
     OrderByLimitNode,
     ReadSqlSourceNode,
     SemiAdditiveJoinNode,
@@ -339,5 +340,9 @@ class SourceScanOptimizer(
         return self._default_base_output_handler(node)
 
     def visit_join_conversion_events_node(self, node: JoinConversionEventsNode) -> OptimizeBranchResult:  # noqa: D
+        self._log_visit_node_type(node)
+        return self._default_base_output_handler(node)
+
+    def visit_min_max_node(self, node: MinMaxNode) -> OptimizeBranchResult:  # noqa: D
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)

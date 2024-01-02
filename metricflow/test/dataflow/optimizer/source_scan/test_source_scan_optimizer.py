@@ -23,6 +23,7 @@ from metricflow.dataflow.dataflow_plan import (
     JoinToBaseOutputNode,
     JoinToTimeSpineNode,
     MetricTimeDimensionTransformNode,
+    MinMaxNode,
     OrderByLimitNode,
     ReadSqlSourceNode,
     SemiAdditiveJoinNode,
@@ -97,6 +98,9 @@ class ReadSqlSourceNodeCounter(DataflowPlanNodeVisitor[int]):
         return self._sum_parents(node)
 
     def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode) -> int:  # noqa: D
+        return self._sum_parents(node)
+
+    def visit_min_max_node(self, node: MinMaxNode) -> int:  # noqa: D
         return self._sum_parents(node)
 
     def visit_add_generated_uuid_column_node(self, node: AddGeneratedUuidColumnNode) -> int:  # noqa :D
