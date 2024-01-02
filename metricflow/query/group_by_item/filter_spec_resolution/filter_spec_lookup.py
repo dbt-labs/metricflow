@@ -9,6 +9,7 @@ from dbt_semantic_interfaces.call_parameter_sets import (
     EntityCallParameterSet,
     TimeDimensionCallParameterSet,
 )
+from dbt_semantic_interfaces.protocols import WhereFilterIntersection
 from dbt_semantic_interfaces.references import MetricReference
 from typing_extensions import override
 
@@ -17,16 +18,16 @@ from metricflow.collection_helpers.pretty_print import mf_pformat
 from metricflow.formatting import indent_log_line
 from metricflow.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow.query.group_by_item.path_prefixable import PathPrefixable
-from metricflow.query.group_by_item.resolution_dag.resolution_nodes.base_node import GroupByItemResolutionNode
 from metricflow.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow.query.issues.issues_base import MetricFlowQueryResolutionIssueSet
+from metricflow.specs.patterns.spec_pattern import SpecPattern
 from metricflow.specs.specs import LinkableInstanceSpec
 
 logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
-class FilterSpecResolutionLookUp(Mergeable, PathPrefixable):
+class FilterSpecResolutionLookUp(Mergeable):
     """Allows you to look up the spec for a group-by-item in a where filter.
 
     If there are issues parsing the filter, or if the filter had specified an invalid group-by-item, the appropriate
@@ -34,7 +35,19 @@ class FilterSpecResolutionLookUp(Mergeable, PathPrefixable):
     """
 
     spec_resolutions: Tuple[FilterSpecResolution, ...]
-    issue_set: MetricFlowQueryResolutionIssueSet
+    non_parsable_resolutions: Tuple[NonParsableFilterResolution, ...]
+
+    @property
+    def has_errors(self) -> bool:  # noqa: D
+        return any(
+            non_parsable_resolution.issue_set.has_errors for non_parsable_resolution in self.non_parsable_resolutions
+        ) or any(spec_resolution.issue_set.has_errors for spec_resolution in self.spec_resolutions)
+
+    @property
+    def has_issues(self) -> bool:  # noqa: D
+        return any(
+            non_parsable_resolution.issue_set.has_issues for non_parsable_resolution in self.non_parsable_resolutions
+        ) or any(spec_resolution.issue_set.has_issues for spec_resolution in self.spec_resolutions)
 
     def get_spec_resolutions(self, resolved_spec_lookup_key: ResolvedSpecLookUpKey) -> Sequence[FilterSpecResolution]:
         """Return the specs resolutions associated with the given key."""
@@ -87,7 +100,7 @@ class FilterSpecResolutionLookUp(Mergeable, PathPrefixable):
     def merge(self, other: FilterSpecResolutionLookUp) -> FilterSpecResolutionLookUp:
         return FilterSpecResolutionLookUp(
             spec_resolutions=self.spec_resolutions + other.spec_resolutions,
-            issue_set=self.issue_set.merge(other.issue_set),
+            non_parsable_resolutions=self.non_parsable_resolutions + other.non_parsable_resolutions,
         )
 
     @override
@@ -95,16 +108,7 @@ class FilterSpecResolutionLookUp(Mergeable, PathPrefixable):
     def empty_instance(cls) -> FilterSpecResolutionLookUp:
         return FilterSpecResolutionLookUp(
             spec_resolutions=(),
-            issue_set=MetricFlowQueryResolutionIssueSet.empty_instance(),
-        )
-
-    @override
-    def with_path_prefix(self, path_prefix_node: GroupByItemResolutionNode) -> FilterSpecResolutionLookUp:
-        return FilterSpecResolutionLookUp(
-            spec_resolutions=tuple(
-                resolution.with_path_prefix(path_prefix_node) for resolution in self.spec_resolutions
-            ),
-            issue_set=self.issue_set.with_path_prefix(path_prefix_node),
+            non_parsable_resolutions=(),
         )
 
     def dedupe(self) -> FilterSpecResolutionLookUp:  # noqa: D
@@ -117,7 +121,28 @@ class FilterSpecResolutionLookUp(Mergeable, PathPrefixable):
             deduped_spec_resolutions.append(spec_resolution)
             deduped_lookup_keys.add(spec_resolution.lookup_key)
 
-        return FilterSpecResolutionLookUp(spec_resolutions=tuple(deduped_spec_resolutions), issue_set=self.issue_set)
+        return FilterSpecResolutionLookUp(
+            spec_resolutions=tuple(deduped_spec_resolutions),
+            # Need to revisit the need to dedupe non_parsable_resolutions.
+            non_parsable_resolutions=self.non_parsable_resolutions,
+        )
+
+
+@dataclass(frozen=True)
+class NonParsableFilterResolution(PathPrefixable):
+    """A where filter intersection that couldn't be parsed e.g. Jinja error."""
+
+    filter_location_path: MetricFlowQueryResolutionPath
+    where_filter_intersection: WhereFilterIntersection
+    issue_set: MetricFlowQueryResolutionIssueSet
+
+    @override
+    def with_path_prefix(self, path_prefix: MetricFlowQueryResolutionPath) -> NonParsableFilterResolution:
+        return NonParsableFilterResolution(
+            filter_location_path=self.filter_location_path.with_path_prefix(path_prefix),
+            where_filter_intersection=self.where_filter_intersection,
+            issue_set=self.issue_set.with_path_prefix(path_prefix),
+        )
 
 
 @dataclass(frozen=True)
@@ -160,20 +185,34 @@ class ResolvedSpecLookUpKey:
 
 
 @dataclass(frozen=True)
-class FilterSpecResolution(PathPrefixable):
+class FilterSpecResolution:
     """Associates a lookup key and the resolved spec."""
 
     lookup_key: ResolvedSpecLookUpKey
-    resolution_path: MetricFlowQueryResolutionPath
+    where_filter_intersection: WhereFilterIntersection
     resolved_spec: Optional[LinkableInstanceSpec]
-
-    @override
-    def with_path_prefix(self, path_prefix_node: GroupByItemResolutionNode) -> FilterSpecResolution:
-        return FilterSpecResolution(
-            lookup_key=self.lookup_key,
-            resolution_path=self.resolution_path.with_path_prefix(path_prefix_node),
-            resolved_spec=self.resolved_spec,
-        )
+    spec_pattern: SpecPattern
+    issue_set: MetricFlowQueryResolutionIssueSet
+    # Used for error messages.
+    filter_location_path: MetricFlowQueryResolutionPath
+    object_builder_str: str
 
 
 CallParameterSet = Union[DimensionCallParameterSet, TimeDimensionCallParameterSet, EntityCallParameterSet]
+
+
+@dataclass(frozen=True)
+class PatternAssociationForWhereFilterGroupByItem:
+    """Describes the pattern associated with a group-by-item in a where filter.
+
+    e.g. "{{ TimeDimension('metric_time', 'day') }} = '2020-01-01'" ->
+        GroupByItemInWhereFilter(
+            call_parameter_set=TimeDimensionCallParameterSet('metric_time', DAY),
+            input_str="TimeDimension('metric_time', 'day')",
+            ...
+        )
+    """
+
+    call_parameter_set: CallParameterSet
+    object_builder_str: str
+    spec_pattern: SpecPattern

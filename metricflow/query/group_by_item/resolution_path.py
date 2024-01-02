@@ -41,8 +41,10 @@ class MetricFlowQueryResolutionPath(PathPrefixable):
         return output
 
     @override
-    def with_path_prefix(self, path_prefix_node: GroupByItemResolutionNode) -> MetricFlowQueryResolutionPath:
-        return MetricFlowQueryResolutionPath(resolution_path_nodes=(path_prefix_node,) + self.resolution_path_nodes)
+    def with_path_prefix(self, path_prefix: MetricFlowQueryResolutionPath) -> MetricFlowQueryResolutionPath:
+        return MetricFlowQueryResolutionPath(
+            resolution_path_nodes=path_prefix.resolution_path_nodes + self.resolution_path_nodes
+        )
 
     @override
     def __str__(self) -> str:

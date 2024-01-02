@@ -4,7 +4,6 @@ from dataclasses import dataclass
 
 from typing_extensions import override
 
-from metricflow.query.group_by_item.resolution_dag.resolution_nodes.base_node import GroupByItemResolutionNode
 from metricflow.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow.query.issues.issues_base import (
     MetricFlowQueryIssueType,
@@ -35,7 +34,7 @@ class InvalidMinMaxOnlyIssue(MetricFlowQueryResolutionIssue):
         return "`min_max_only` must be used with exactly one `group_by`, and cannot be used with `metrics`, `order_by`, or `limit`."
 
     @override
-    def with_path_prefix(self, path_prefix_node: GroupByItemResolutionNode) -> InvalidMinMaxOnlyIssue:
+    def with_path_prefix(self, path_prefix_node: MetricFlowQueryResolutionPath) -> InvalidMinMaxOnlyIssue:
         return InvalidMinMaxOnlyIssue(
             issue_type=self.issue_type,
             parent_issues=tuple(issue.with_path_prefix(path_prefix_node) for issue in self.parent_issues),

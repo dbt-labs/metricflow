@@ -9,7 +9,6 @@ from typing_extensions import override
 
 from metricflow.collection_helpers.merger import Mergeable
 from metricflow.query.group_by_item.path_prefixable import PathPrefixable
-from metricflow.query.group_by_item.resolution_dag.resolution_nodes.base_node import GroupByItemResolutionNode
 from metricflow.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow.query.resolver_inputs.base_resolver_inputs import MetricFlowQueryResolverInput
 
@@ -86,9 +85,9 @@ class MetricFlowQueryResolutionIssueSet(Mergeable, PathPrefixable, Sized):
         return MetricFlowQueryResolutionIssueSet(issues=tuple(issues))
 
     @override
-    def with_path_prefix(self, path_prefix_node: GroupByItemResolutionNode) -> MetricFlowQueryResolutionIssueSet:
+    def with_path_prefix(self, path_prefix: MetricFlowQueryResolutionPath) -> MetricFlowQueryResolutionIssueSet:
         return MetricFlowQueryResolutionIssueSet(
-            issues=tuple(issue.with_path_prefix(path_prefix_node) for issue in self.issues),
+            issues=tuple(issue.with_path_prefix(path_prefix) for issue in self.issues),
         )
 
     @property

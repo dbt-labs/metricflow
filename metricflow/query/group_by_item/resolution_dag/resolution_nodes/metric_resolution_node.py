@@ -81,8 +81,8 @@ class MetricGroupByItemResolutionNode(GroupByItemResolutionNode):
     @override
     def ui_description(self) -> str:
         if self._metric_input_location is None:
-            return f"Metric('{self._metric_reference.element_name}')"
+            return f"Metric({repr(self._metric_reference.element_name)})"
         return (
-            f"Metric('{self._metric_reference.element_name}', "
+            f"Metric({repr(self._metric_reference.element_name)}, "
             f"input_metric_index={self._metric_input_location.input_metric_list_index})"
         )

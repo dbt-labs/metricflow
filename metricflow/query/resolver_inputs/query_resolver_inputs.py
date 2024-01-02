@@ -12,9 +12,11 @@ from dbt_semantic_interfaces.protocols import WhereFilterIntersection
 from typing_extensions import override
 
 from metricflow.collection_helpers.pretty_print import mf_pformat
+from metricflow.formatting import indent_log_line
 from metricflow.naming.metric_scheme import MetricNamingScheme
 from metricflow.naming.naming_scheme import QueryItemNamingScheme
 from metricflow.protocols.query_parameter import GroupByParameter, MetricQueryParameter, OrderByQueryParameter
+from metricflow.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow.query.resolver_inputs.base_resolver_inputs import InputPatternDescription, MetricFlowQueryResolverInput
 from metricflow.specs.patterns.metric_pattern import MetricSpecPattern
 from metricflow.specs.patterns.spec_pattern import SpecPattern
@@ -129,22 +131,56 @@ class ResolverInputForMinMaxOnly(MetricFlowQueryResolverInput):
 
 
 @dataclass(frozen=True)
-class ResolverInputForWhereFilterIntersection(MetricFlowQueryResolverInput):
-    """An input that describes the where filter."""
+class ResolverInputForQueryLevelWhereFilterIntersection(MetricFlowQueryResolverInput):
+    """An input that describes the where filter for the query."""
 
     where_filter_intersection: WhereFilterIntersection
 
     @property
     @override
     def ui_description(self) -> str:
-        # TODO: Improve description.
         return (
-            "WhereFilter("
-            + mf_pformat(
-                [where_filter.where_sql_template for where_filter in self.where_filter_intersection.where_filters]
+            "WhereFilter(\n"
+            + indent_log_line(
+                mf_pformat(
+                    [where_filter.where_sql_template for where_filter in self.where_filter_intersection.where_filters]
+                )
             )
-            + ")"
+            + "\n)"
         )
+
+
+@dataclass(frozen=True)
+class ResolverInputForWhereFilterIntersection(MetricFlowQueryResolverInput):
+    """An input to describe a where filter anywhere in the resolution DAG.
+
+    This can represent a query-level where filter, or one that is in a metric definition. Treating the defined filters
+    as a resolver input so that it can go through the same error flows as the other query inputs.
+    """
+
+    where_filter_intersection: WhereFilterIntersection
+    filter_resolution_path: MetricFlowQueryResolutionPath
+    # e.g. TimeDimension('metric_time'), but may not be available if filter has parsing errors.
+    object_builder_str: Optional[str]
+
+    @property
+    @override
+    def ui_description(self) -> str:
+        lines = [
+            "WhereFilter(",
+            indent_log_line(
+                mf_pformat(
+                    [where_filter.where_sql_template for where_filter in self.where_filter_intersection.where_filters]
+                )
+            ),
+            ")",
+            "Filter Path:",
+            indent_log_line(self.filter_resolution_path.ui_description),
+        ]
+        if self.object_builder_str is not None:
+            lines.append("Object Builder Input:")
+            lines.append(indent_log_line(self.object_builder_str))
+        return "\n".join(lines)
 
 
 @dataclass(frozen=True)
@@ -153,7 +189,7 @@ class ResolverInputForQuery(MetricFlowQueryResolverInput):
 
     metric_inputs: Tuple[ResolverInputForMetric, ...]
     group_by_item_inputs: Tuple[ResolverInputForGroupByItem, ...]
-    filter_input: ResolverInputForWhereFilterIntersection
+    filter_input: ResolverInputForQueryLevelWhereFilterIntersection
     order_by_item_inputs: Tuple[ResolverInputForOrderByItem, ...]
     limit_input: ResolverInputForLimit
     min_max_only: ResolverInputForMinMaxOnly

@@ -12,6 +12,7 @@ from dbt_semantic_interfaces.type_enums import TimeGranularity
 from metricflow.collection_helpers.pretty_print import mf_pformat
 from metricflow.formatting import indent_log_line
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow.query.group_by_item.candidate_push_down.push_down_visitor import (
     PushDownResult,
     _PushDownGroupByItemCandidatesVisitor,
@@ -22,6 +23,7 @@ from metricflow.query.issues.group_by_item_resolver.ambiguous_group_by_item impo
 from metricflow.query.issues.issues_base import (
     MetricFlowQueryResolutionIssueSet,
 )
+from metricflow.query.suggestion_generator import QueryItemSuggestionGenerator
 from metricflow.specs.patterns.base_time_grain import BaseTimeGrainPattern
 from metricflow.specs.patterns.spec_pattern import SpecPattern
 from metricflow.specs.patterns.typed_patterns import TimeDimensionPattern
@@ -66,6 +68,7 @@ class GroupByItemResolver:
     def resolve_matching_item_for_querying(
         self,
         spec_pattern: SpecPattern,
+        suggestion_generator: Optional[QueryItemSuggestionGenerator],
     ) -> GroupByItemResolution:
         """Returns the spec that corresponds the one described by spec_pattern and is valid for the query.
 
@@ -75,6 +78,7 @@ class GroupByItemResolver:
         push_down_visitor = _PushDownGroupByItemCandidatesVisitor(
             manifest_lookup=self._manifest_lookup,
             source_spec_patterns=(spec_pattern,),
+            suggestion_generator=suggestion_generator,
         )
 
         push_down_result: PushDownResult = self._resolution_dag.sink_node.accept(push_down_visitor)
@@ -111,21 +115,31 @@ class GroupByItemResolver:
 
     def resolve_matching_item_for_filters(
         self,
+        input_str: str,
         spec_pattern: SpecPattern,
         resolution_node: ResolutionDagSinkNode,
     ) -> GroupByItemResolution:
         """Returns the spec that matches the spec_pattern associated with the filter in the given node.
 
+        The input_str is a string representation of the input for use in generating suggestions for errors.
+
         e.g. if the query has a where filter like "{{ TimeDimension('metric_time') }} = '2020-01-01'", then to resolve
         the spec for TimeDimension('metric_time'), the resolution node would be a QueryGroupByItemResolutionNode() from
         the DAG used in the initialization of this resolver.
         """
+        suggestion_generator = QueryItemSuggestionGenerator(
+            input_naming_scheme=ObjectBuilderNamingScheme(),
+            input_str=input_str,
+            candidate_filters=QueryItemSuggestionGenerator.GROUP_BY_ITEM_CANDIDATE_FILTERS,
+        )
+
         push_down_visitor = _PushDownGroupByItemCandidatesVisitor(
             manifest_lookup=self._manifest_lookup,
             source_spec_patterns=(
                 spec_pattern,
                 BaseTimeGrainPattern(),
             ),
+            suggestion_generator=suggestion_generator,
         )
 
         push_down_result: PushDownResult = resolution_node.accept(push_down_visitor)
@@ -166,6 +180,7 @@ class GroupByItemResolver:
         push_down_visitor = _PushDownGroupByItemCandidatesVisitor(
             manifest_lookup=self._manifest_lookup,
             source_spec_patterns=(),
+            suggestion_generator=None,
         )
 
         push_down_result: PushDownResult = resolution_node.accept(push_down_visitor)
@@ -184,6 +199,7 @@ class GroupByItemResolver:
                     time_dimension_reference=TimeDimensionReference(element_name=METRIC_TIME_ELEMENT_NAME),
                 )
             ),
+            suggestion_generator=None,
         )
         metric_time_spec_set = (
             LinkableSpecSet.from_specs((metric_time_grain_resolution.spec,))
