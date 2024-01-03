@@ -29,6 +29,9 @@ logger = logging.getLogger(__name__)
 # consistently.
 PLACEHOLDER_CHAR_FOR_INCOMPARABLE_STRINGS = "*"
 
+# Needed as the table alias can vary from run to run.
+_EXCLUDE_TABLE_ALIAS_REGEX = "^.*_src.*$"
+
 
 def make_schema_replacement_function(system_schema: str, source_schema: str) -> Callable[[str], str]:
     """Generates a function to replace schema names in test outputs."""
