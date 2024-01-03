@@ -4,7 +4,6 @@ import logging
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Set
 
-from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.references import EntityReference, TimeDimensionReference
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
@@ -17,6 +16,7 @@ from metricflow.dataflow.dataflow_plan import (
     JoinToBaseOutputNode,
 )
 from metricflow.filters.time_constraint import TimeRangeConstraint
+from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS, SemanticModelJoinEvaluator
 from metricflow.protocols.semantics import SemanticModelAccessor
 from metricflow.specs.spec_set_transforms import ToElementNameSet
@@ -270,7 +270,7 @@ class PreJoinNodeProcessor:
             )
             logger.debug(
                 f"Node {multi_hop_join_candidate.node_with_multi_hop_elements} has spec set:\n"
-                f"{pformat_big_objects(output_data_set.instance_set.spec_set)}"
+                f"{mf_pformat(output_data_set.instance_set.spec_set)}"
             )
 
         return multi_hop_join_candidates

@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, List, Optional
 
-from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.protocols.entity import EntityType
 from dbt_semantic_interfaces.references import (
     EntityReference,
@@ -12,6 +11,7 @@ from dbt_semantic_interfaces.references import (
 )
 
 from metricflow.instances import EntityInstance, InstanceSet
+from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.protocols.semantics import SemanticModelAccessor
 
 MAX_JOIN_HOPS = 2
@@ -232,7 +232,7 @@ class SemanticModelJoinEvaluator:
 
         assert len(matching_instances) == 1, (
             f"Not exactly 1 matching entity instances found: {matching_instances} for {entity_reference} in "
-            f"{pformat_big_objects(instance_set)}"
+            f"{mf_pformat(instance_set)}"
         )
         return matching_instances[0].origin_semantic_model_reference.semantic_model_reference
 

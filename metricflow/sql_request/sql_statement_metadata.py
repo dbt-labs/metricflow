@@ -5,9 +5,9 @@ import logging
 from dataclasses import dataclass, field
 from typing import List, Optional
 
-from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from pydantic import ValidationError
 
+from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.sql_request.sql_request_attributes import SqlJsonTag, SqlRequestTagSet
 
 logger = logging.getLogger(__name__)
@@ -77,15 +77,13 @@ class SqlStatementCommentMetadata:
 
         if len(tag_sets) > 1:
             logger.error(
-                f"Got multiple tag sets from parsing comments:\n"
-                f"{pformat_big_objects(tag_sets)}\n"
-                f"Using the first one."
+                f"Got multiple tag sets from parsing comments:\n" f"{mf_pformat(tag_sets)}\n" f"Using the first one."
             )
 
         if len(extra_tags) > 1:
             logger.error(
                 f"Got multiple extra tags from parsing comments:\n"
-                f"{pformat_big_objects(extra_tags)}\n"
+                f"{mf_pformat(extra_tags)}\n"
                 f"Using the first one."
             )
 

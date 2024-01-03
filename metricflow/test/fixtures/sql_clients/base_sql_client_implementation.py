@@ -6,10 +6,10 @@ from abc import ABC, abstractmethod
 from typing import Optional
 
 import pandas as pd
-from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.mf_logging.formatting import indent
+from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.protocols.sql_client import (
     SqlClient,
 )
@@ -34,9 +34,7 @@ class BaseSqlClientImplementation(ABC, SqlClient):
     def _format_run_query_log_message(statement: str, sql_bind_parameters: SqlBindParameters) -> str:
         message = f"Running query:\n\n{indent(statement)}"
         if len(sql_bind_parameters.param_dict) > 0:
-            message += (
-                f"\n" f"\n" f"with parameters:\n" f"\n" f"{indent(pformat_big_objects(sql_bind_parameters.param_dict))}"
-            )
+            message += f"\n\nwith parameters:\n\n{indent(mf_pformat(sql_bind_parameters.param_dict))}"
         return message
 
     def query(

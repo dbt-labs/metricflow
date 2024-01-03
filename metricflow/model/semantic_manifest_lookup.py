@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import logging
 
-from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 
 from metricflow.dataflow.sql_table import SqlTable
+from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantics.metric_lookup import MetricLookup
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.plan_conversion.time_spine import TimeSpineSource
@@ -46,7 +46,7 @@ class SemanticManifestLookup:
             raise NotImplementedError(
                 f"Only a single time spine table configuration with {TimeGranularity.DAY} is currently "
                 f"supported. Got:\n"
-                f"{pformat_big_objects(time_spine_table_configurations)}"
+                f"{mf_pformat(time_spine_table_configurations)}"
             )
 
         time_spine_table_configuration = time_spine_table_configurations[0]
