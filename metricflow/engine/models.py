@@ -43,6 +43,7 @@ class Metric:
     filter: Optional[WhereFilterIntersection]
     metadata: Optional[Metadata]
     dimensions: List[Dimension]
+    label: Optional[str]
 
     @classmethod
     def from_pydantic(cls, pydantic_metric: SemanticManifestMetric, dimensions: List[Dimension]) -> Metric:
@@ -55,6 +56,7 @@ class Metric:
             filter=pydantic_metric.filter,
             metadata=pydantic_metric.metadata,
             dimensions=dimensions,
+            label=pydantic_metric.label,
         )
 
     @property
