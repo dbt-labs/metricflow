@@ -389,8 +389,6 @@ def mf_pformat(  # type: ignore
     string. This is an improvement on pformat_big_objects() in dbt-semantic-interfaces to be more compact and easier
     to read.
 
-    TODO: Replace calls to pformat_big_objects with this.
-
     Args:
         obj: The object to convert to string.
         max_line_length: If the string representation is going to be longer than this, split into multiple lines.

@@ -21,8 +21,6 @@ import logging
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple
 
-from dbt_semantic_interfaces.pretty_print import pformat_big_objects
-
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.partitions import PartitionJoinResolver
 from metricflow.dataflow.dataflow_plan import (
@@ -35,6 +33,7 @@ from metricflow.dataflow.dataflow_plan import (
 )
 from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.instances import InstanceSet
+from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
 from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
 from metricflow.protocols.semantics import SemanticModelAccessor
@@ -348,7 +347,7 @@ class NodeEvaluatorForLinkableInstances:
         candidate_instance_set: InstanceSet = self._node_data_set_resolver.get_output_data_set(start_node).instance_set
         candidate_spec_set = candidate_instance_set.spec_set
 
-        logger.debug(f"Candidate spec set is:\n{pformat_big_objects(candidate_spec_set)}")
+        logger.debug(f"Candidate spec set is:\n{mf_pformat(candidate_spec_set)}")
 
         data_set_linkable_specs = candidate_spec_set.linkable_specs
 
@@ -387,7 +386,7 @@ class NodeEvaluatorForLinkableInstances:
         # the most matching linkable specs. We try to join nodes with the most matching specs to minimize the number of
         # joins that we have to do to. A knapsack solution is ideal, but punting on that for simplicity.
         while len(possibly_joinable_linkable_specs) > 0:
-            logger.info(f"Looking for linkable specs:\n{pformat_big_objects(possibly_joinable_linkable_specs)}")
+            logger.info(f"Looking for linkable specs:\n{mf_pformat(possibly_joinable_linkable_specs)}")
 
             # We've run out of candidate data sets, but there are more linkable specs that we need. That means the
             # rest of the linkable specs can't be joined in, and we're left with unjoinable specs remaining.
@@ -401,7 +400,7 @@ class NodeEvaluatorForLinkableInstances:
 
             # Join the best candidate to realize the linkable specs
             next_candidate = candidates_for_join.pop(0)
-            logger.info(f"The next candidate node to be joined is:\n{pformat_big_objects(next_candidate)}")
+            logger.info(f"The next candidate node to be joined is:\n{mf_pformat(next_candidate)}")
             join_candidates.append(next_candidate)
 
             # Update the candidates. Since we'll be joined/ing the previously selected candidate, we no longer need

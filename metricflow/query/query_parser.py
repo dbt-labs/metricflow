@@ -9,7 +9,6 @@ from dbt_semantic_interfaces.implementations.filters.where_filter import (
     PydanticWhereFilter,
     PydanticWhereFilterIntersection,
 )
-from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.protocols import SavedQuery
 from dbt_semantic_interfaces.protocols.where_filter import WhereFilter
 from dbt_semantic_interfaces.type_enums import TimeGranularity
@@ -140,7 +139,7 @@ class MetricFlowQueryParser:
             )
             raise InvalidQueryException(
                 f"Did not find saved query `{saved_query_parameter.name}` in known saved queries:\n"
-                f"{pformat_big_objects(known_saved_query_names)}"
+                f"{mf_pformat(known_saved_query_names)}"
             )
 
         return matching_saved_queries[0]

@@ -5,7 +5,6 @@ from collections import defaultdict
 from copy import deepcopy
 from typing import Dict, List, Optional, Sequence, Set
 
-from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.protocols.dimension import Dimension
 from dbt_semantic_interfaces.protocols.entity import Entity
 from dbt_semantic_interfaces.protocols.measure import Measure
@@ -25,6 +24,7 @@ from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from typing_extensions import override
 
 from metricflow.errors.errors import InvalidSemanticModelError
+from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.spec_converters import MeasureConverter
 from metricflow.protocols.semantics import SemanticModelAccessor
@@ -229,7 +229,7 @@ class SemanticModelLookup(SemanticModelAccessor):
             if primary_entity is None:
                 raise RuntimeError(
                     f"The semantic model should have a primary entity since there are dimensions, but it does not. "
-                    f"Semantic model is:\n{pformat_big_objects(semantic_model)}"
+                    f"Semantic model is:\n{mf_pformat(semantic_model)}"
                 )
 
             self._semantic_model_to_aggregation_time_dimensions[semantic_model.reference].add_value(

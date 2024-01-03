@@ -9,7 +9,6 @@ from typing import Any, Callable, List, Optional, Tuple, TypeVar
 
 import tabulate
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 
 from metricflow.dag.mf_dag import MetricFlowDag
 from metricflow.dataflow.dataflow_plan import DataflowPlan
@@ -283,7 +282,7 @@ def assert_object_snapshot_equal(  # type: ignore[misc]
         mf_test_session_state=mf_test_session_state,
         group_id=obj.__class__.__name__,
         snapshot_id=obj_id,
-        snapshot_text=pformat_big_objects(obj),
+        snapshot_text=mf_pformat(obj),
         snapshot_file_extension=".txt",
         additional_sub_directories_for_snapshots=(sql_client.sql_engine_type.value,) if sql_client else (),
     )
