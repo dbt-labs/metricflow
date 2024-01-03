@@ -69,9 +69,10 @@ class NoCommonItemsInParents(MetricFlowQueryResolutionIssue):
                 (spec_str if spec_str is not None else "None") for spec_str in spec_as_strs
             ]
         return (
-            f"{last_path_item.ui_description} is built from {last_path_item_parent_descriptions}. However, the "
-            f"given input does not match to a common item that is available to those parents:\n\n"
-            f"{indent_log_line(mf_pformat(parent_to_available_items))}\n\n"
+            f"{last_path_item.ui_description} is built from:\n\n"
+            f"{indent_log_line(last_path_item_parent_descriptions)}.\n"
+            f"However, the given input does not match to a common item that is available to those parents:\n\n"
+            f"{indent_log_line(mf_pformat(parent_to_available_items, max_line_length=80))}\n\n"
             f"For time dimension inputs, please specify a time grain as ambiguous resolution only allows "
             f"resolution when the parents have the same defined time gain."
         )

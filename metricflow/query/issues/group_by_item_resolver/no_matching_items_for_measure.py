@@ -43,18 +43,19 @@ class NoMatchingItemsForMeasure(MetricFlowQueryResolutionIssue):
     @override
     def ui_description(self, associated_input: MetricFlowQueryResolverInput) -> str:
         lines = [
-            f"The given input does not match any of the available group-by-items for "
+            f"The given input does not match any of the available group-by-items for\n"
             f"{self.query_resolution_path.last_item.ui_description}. Common issues are:\n",
             indent_log_line(
                 "* Incorrect names.\n"
-                "* No valid join paths exist from the measure to the group-by-item "
-                "(fan-out joins are not yet supported).\n"
-                "* There are multiple matching join paths (disambiguation support is pending)."
+                "* No valid join paths exist from the measure to the group-by-item.\n"
+                "  (fan-out join support is pending).\n"
+                "* There are multiple matching join paths.\n"
+                "  (disambiguation support is pending)."
             ),
         ]
 
         if len(self.suggestions) > 0:
-            lines.append(f"\nSuggestions:\n{indent_log_line(mf_pformat(list(self.suggestions)))}")
+            lines.append(f"\nSuggestions:\n{indent_log_line(mf_pformat(list(self.suggestions), max_line_length=80))}")
         return "\n".join(lines)
 
     @override
