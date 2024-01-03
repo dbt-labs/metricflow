@@ -30,7 +30,7 @@ from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.test.fixtures.cli_fixtures import MetricFlowCliRunner
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.model.example_project_configuration import EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE
-from metricflow.test.snapshot_utils import assert_object_snapshot_equal
+from metricflow.test.snapshot_utils import assert_str_snapshot_equal
 
 logger = logging.getLogger(__name__)
 
@@ -177,12 +177,12 @@ def test_saved_query(  # noqa: D
 
     assert resp.exit_code == 0
 
-    assert_object_snapshot_equal(
+    assert_str_snapshot_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        obj_id="cli_output",
-        obj=resp.output,
-        sql_client=sql_client,
+        snapshot_id="cli_output",
+        snapshot_str=resp.output,
+        sql_engine=sql_client.sql_engine_type,
     )
 
 
@@ -208,12 +208,12 @@ def test_saved_query_with_where(  # noqa: D
 
     assert resp.exit_code == 0
 
-    assert_object_snapshot_equal(
+    assert_str_snapshot_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        obj_id="cli_output",
-        obj=resp.output,
-        sql_client=sql_client,
+        snapshot_id="cli_output",
+        snapshot_str=resp.output,
+        sql_engine=sql_client.sql_engine_type,
     )
 
 
@@ -239,12 +239,12 @@ def test_saved_query_with_limit(  # noqa: D
 
     assert resp.exit_code == 0
 
-    assert_object_snapshot_equal(
+    assert_str_snapshot_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        obj_id="cli_output",
-        obj=resp.output,
-        sql_client=sql_client,
+        snapshot_id="cli_output",
+        snapshot_str=resp.output,
+        sql_engine=sql_client.sql_engine_type,
     )
 
 
@@ -284,12 +284,12 @@ def test_saved_query_with_cumulative_metric(  # noqa: D
         ],
     )
 
-    assert_object_snapshot_equal(
+    assert_str_snapshot_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        obj_id="cli_output",
-        obj=resp.output,
-        sql_client=sql_client,
+        snapshot_id="cli_output",
+        snapshot_str=resp.output,
+        sql_engine=sql_client.sql_engine_type,
     )
 
     assert resp.exit_code == 0

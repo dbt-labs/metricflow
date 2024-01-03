@@ -35,7 +35,7 @@ from metricflow.test.model.modify.modify_input_metric_filter import ModifyInputM
 from metricflow.test.model.modify.modify_manifest import modify_manifest
 from metricflow.test.model.modify.modify_metric_filter import ModifyMetricFilterTransform
 from metricflow.test.query.group_by_item.conftest import AmbiguousResolutionQueryId, _build_resolution_dag
-from metricflow.test.snapshot_utils import assert_object_snapshot_equal
+from metricflow.test.snapshot_utils import assert_str_snapshot_equal
 
 logger = logging.getLogger(__name__)
 
@@ -45,11 +45,11 @@ def assert_spec_lookup_snapshot_equal(  # noqa: D
     mf_test_session_state: MetricFlowTestSessionState,
     spec_lookup: FilterSpecResolutionLookUp,
 ) -> None:
-    assert_object_snapshot_equal(
+    assert_str_snapshot_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        obj_id="result",
-        obj=mf_pformat(spec_lookup, include_none_object_fields=False),
+        snapshot_id="result",
+        snapshot_str=mf_pformat(spec_lookup, include_none_object_fields=False),
     )
 
 
