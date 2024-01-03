@@ -18,7 +18,7 @@ from metricflow.execution.execution_plan_to_text import execution_plan_to_text
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantics.linkable_spec_resolver import LinkableElementSet
 from metricflow.naming.object_builder_scheme import ObjectBuilderNamingScheme
-from metricflow.protocols.sql_client import SqlClient
+from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.specs.specs import InstanceSpecSet, LinkableSpecSet
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState, check_sql_engine_snapshot_marker
 
@@ -288,6 +288,32 @@ def assert_object_snapshot_equal(  # type: ignore[misc]
         snapshot_text=mf_pformat(obj),
         snapshot_file_extension=".txt",
         additional_sub_directories_for_snapshots=(sql_client.sql_engine_type.value,) if sql_client else (),
+    )
+
+
+def assert_sql_snapshot_equal(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    snapshot_id: str,
+    sql: str,
+    sql_engine: Optional[SqlEngine] = None,
+) -> None:
+    """For tests that generate SQL, use this to write / check snapshots."""
+    if sql_engine is not None:
+        check_sql_engine_snapshot_marker(request)
+
+    assert_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        group_id=sql.__class__.__name__,
+        snapshot_id=snapshot_id,
+        snapshot_text=sql,
+        snapshot_file_extension=".sql",
+        incomparable_strings_replacement_function=make_schema_replacement_function(
+            system_schema=mf_test_session_state.mf_system_schema, source_schema=mf_test_session_state.mf_source_schema
+        ),
+        exclude_line_regex=_EXCLUDE_TABLE_ALIAS_REGEX,
+        additional_sub_directories_for_snapshots=(sql_engine.value,) if sql_engine is not None else (),
     )
 
 
