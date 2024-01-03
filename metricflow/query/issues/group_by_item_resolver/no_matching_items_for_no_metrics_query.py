@@ -32,8 +32,8 @@ class NoMatchingItemsForNoMetricsQuery(MetricFlowQueryResolutionIssue):
     def ui_description(self, associated_input: MetricFlowQueryResolverInput) -> str:
         # Could be useful to list the candidates, but it makes the logs very long.
         return (
-            "The given input does not match any of the available group-by-items for a distinct values query without "
-            "metrics."
+            "The given input does not match any of the available group-by-items for a distinct\n"
+            "values query without metrics."
         )
 
     @override
