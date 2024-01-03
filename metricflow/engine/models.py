@@ -81,6 +81,7 @@ class Dimension:
     metadata: Optional[Metadata]
     is_partition: bool = False
     expr: Optional[str] = None
+    label: Optional[str] = None
 
     @classmethod
     def from_pydantic(cls, pydantic_dimension: SemanticManifestDimension, path_key: ElementPathKey) -> Dimension:
@@ -104,6 +105,7 @@ class Dimension:
             metadata=pydantic_dimension.metadata,
             is_partition=pydantic_dimension.is_partition,
             expr=pydantic_dimension.expr,
+            label=pydantic_dimension.label,
         )
 
     @property
