@@ -1001,8 +1001,8 @@ class DataflowPlanBuilder:
                 None,
             )
             assert matched_measure, f"Unable to find {measure_to_match} in {input_measures}."
+            filter_specs: List[WhereFilterSpec] = []
             if is_base_measure:
-                filter_specs: List[WhereFilterSpec] = []
                 filter_specs.extend(
                     filter_spec_factory.create_from_where_filter_intersection(
                         filter_location=WhereFilterLocation.for_metric(metric_reference),
@@ -1019,7 +1019,7 @@ class DataflowPlanBuilder:
             return MetricInputMeasureSpec(
                 measure_spec=MeasureSpec.from_name(matched_measure.name),
                 fill_nulls_with=matched_measure.fill_nulls_with,
-                filter_specs=tuple(filter_specs) if is_base_measure else (),
+                filter_specs=tuple(filter_specs),
                 alias=matched_measure.alias,
             )
 
