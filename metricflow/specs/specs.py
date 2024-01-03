@@ -21,7 +21,7 @@ from typing import TYPE_CHECKING, Any, Dict, Generic, List, Optional, Sequence, 
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
-from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
+from dbt_semantic_interfaces.naming.keywords import DUNDER, METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.protocols import MetricTimeWindow, WhereFilterIntersection
 from dbt_semantic_interfaces.references import (
     DimensionReference,
@@ -129,14 +129,15 @@ class MetadataSpec(InstanceSpec):
     """A specification for a specification that is built during the dataflow plan and not defined in config."""
 
     element_name: str
+    agg_type: Optional[AggregationType] = None
 
     @property
     def qualified_name(self) -> str:  # noqa: D
-        return self.element_name
+        return f"{self.element_name}{DUNDER}{self.agg_type.value}" if self.agg_type else self.element_name
 
     @staticmethod
-    def from_name(name: str) -> MetadataSpec:  # noqa: D
-        return MetadataSpec(element_name=name)
+    def from_name(name: str, agg_type: Optional[AggregationType] = None) -> MetadataSpec:  # noqa: D
+        return MetadataSpec(element_name=name, agg_type=agg_type)
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_metadata_spec(self)
@@ -719,6 +720,7 @@ class MetricFlowQuerySpec(SerializableDataclass):
     limit: Optional[int] = None
     filter_intersection: Optional[WhereFilterIntersection] = None
     filter_spec_resolution_lookup: Optional[FilterSpecResolutionLookUp] = None
+    min_max_only: bool = False
 
     @property
     def linkable_specs(self) -> LinkableSpecSet:  # noqa: D

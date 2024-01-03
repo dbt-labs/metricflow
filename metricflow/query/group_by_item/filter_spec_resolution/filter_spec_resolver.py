@@ -1,23 +1,27 @@
 from __future__ import annotations
 
+import itertools
 import logging
-from typing import Dict, List, Sequence
+from typing import List, Sequence
 
 from dbt_semantic_interfaces.call_parameter_sets import (
     FilterCallParameterSets,
 )
-from dbt_semantic_interfaces.protocols import WhereFilter
+from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
+from dbt_semantic_interfaces.protocols import WhereFilter, WhereFilterIntersection
 from typing_extensions import override
 
 from metricflow.collection_helpers.pretty_print import mf_pformat
 from metricflow.formatting import indent_log_line
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow.naming.object_builder_str import ObjectBuilderNameConverter
 from metricflow.query.group_by_item.candidate_push_down.push_down_visitor import DagTraversalPathTracker
 from metricflow.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
-    CallParameterSet,
     FilterSpecResolution,
     FilterSpecResolutionLookUp,
+    NonParsableFilterResolution,
+    PatternAssociationForWhereFilterGroupByItem,
     ResolvedSpecLookUpKey,
 )
 from metricflow.query.group_by_item.group_by_item_resolver import GroupByItemResolver
@@ -42,7 +46,6 @@ from metricflow.query.issues.filter_spec_resolver.invalid_where import WhereFilt
 from metricflow.query.issues.issues_base import (
     MetricFlowQueryResolutionIssueSet,
 )
-from metricflow.specs.patterns.spec_pattern import SpecPattern
 from metricflow.specs.patterns.typed_patterns import DimensionPattern, EntityPattern, TimeDimensionPattern
 
 logger = logging.getLogger(__name__)
@@ -89,66 +92,117 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
         self._path_from_start_node_tracker = DagTraversalPathTracker()
 
     @staticmethod
-    def _map_filter_parameter_set_to_pattern(
+    def _dedupe_filter_call_parameter_sets(
+        filter_call_parameter_sets_sequence: Sequence[FilterCallParameterSets],
+    ) -> FilterCallParameterSets:
+        # FilterCallParameterSets needs an update.
+        return FilterCallParameterSets(
+            dimension_call_parameter_sets=tuple(
+                dict.fromkeys(
+                    itertools.chain.from_iterable(
+                        filter_call_parameter_sets.dimension_call_parameter_sets
+                        for filter_call_parameter_sets in filter_call_parameter_sets_sequence
+                    )
+                )
+            ),
+            time_dimension_call_parameter_sets=tuple(
+                dict.fromkeys(
+                    itertools.chain.from_iterable(
+                        filter_call_parameter_sets.time_dimension_call_parameter_sets
+                        for filter_call_parameter_sets in filter_call_parameter_sets_sequence
+                    )
+                )
+            ),
+            entity_call_parameter_sets=tuple(
+                dict.fromkeys(
+                    itertools.chain.from_iterable(
+                        filter_call_parameter_sets.entity_call_parameter_sets
+                        for filter_call_parameter_sets in filter_call_parameter_sets_sequence
+                    )
+                )
+            ),
+        )
+
+    @staticmethod
+    def _map_filter_parameter_sets_to_pattern(
         filter_location: WhereFilterLocation,
         filter_call_parameter_sets: FilterCallParameterSets,
-        spec_resolution_lookup_so_far: FilterSpecResolutionLookUp,
-    ) -> Dict[CallParameterSet, SpecPattern]:
+        resolved_spec_lookup_so_far: FilterSpecResolutionLookUp,
+    ) -> Sequence[PatternAssociationForWhereFilterGroupByItem]:
         """Given the call parameter sets in a filter, map them to spec patterns.
 
         If a given call parameter set has already been resolved and in spec_resolution_lookup_so_far, it is skipped and
         not returned in the dictionary.
+
+        This assumes that the items in filter_call_parameter_sets have been deduped.
         """
-        call_parameter_set_to_spec_pattern: Dict[CallParameterSet, SpecPattern] = {}
+        patterns_in_filter: List[PatternAssociationForWhereFilterGroupByItem] = []
         for dimension_call_parameter_set in filter_call_parameter_sets.dimension_call_parameter_sets:
             lookup_key = ResolvedSpecLookUpKey(
                 filter_location=filter_location,
                 call_parameter_set=dimension_call_parameter_set,
             )
-            if spec_resolution_lookup_so_far.spec_resolution_exists(lookup_key):
+            if resolved_spec_lookup_so_far.spec_resolution_exists(lookup_key):
                 logger.info(
                     f"Skipping resolution for {dimension_call_parameter_set} at {filter_location} since it has already"
                     f"been resolved to:\n\n"
-                    f"{indent_log_line(mf_pformat(spec_resolution_lookup_so_far.get_spec_resolutions(lookup_key)))}"
+                    f"{indent_log_line(mf_pformat(resolved_spec_lookup_so_far.get_spec_resolutions(lookup_key)))}"
                 )
                 continue
-            if dimension_call_parameter_set not in call_parameter_set_to_spec_pattern:
-                call_parameter_set_to_spec_pattern[
-                    dimension_call_parameter_set
-                ] = DimensionPattern.from_call_parameter_set(dimension_call_parameter_set)
+
+            patterns_in_filter.append(
+                PatternAssociationForWhereFilterGroupByItem(
+                    call_parameter_set=dimension_call_parameter_set,
+                    object_builder_str=ObjectBuilderNameConverter.input_str_from_dimension_call_parameter_set(
+                        dimension_call_parameter_set
+                    ),
+                    spec_pattern=DimensionPattern.from_call_parameter_set(dimension_call_parameter_set),
+                )
+            )
         for time_dimension_call_parameter_set in filter_call_parameter_sets.time_dimension_call_parameter_sets:
             lookup_key = ResolvedSpecLookUpKey(
                 filter_location=filter_location,
                 call_parameter_set=time_dimension_call_parameter_set,
             )
-            if spec_resolution_lookup_so_far.spec_resolution_exists(lookup_key):
+            if resolved_spec_lookup_so_far.spec_resolution_exists(lookup_key):
                 logger.info(
                     f"Skipping resolution for {time_dimension_call_parameter_set} at {filter_location} since it has "
                     f"been resolved to:\n"
-                    f"{mf_pformat(spec_resolution_lookup_so_far.get_spec_resolutions(lookup_key))}"
+                    f"{mf_pformat(resolved_spec_lookup_so_far.get_spec_resolutions(lookup_key))}"
                 )
-            if time_dimension_call_parameter_set not in call_parameter_set_to_spec_pattern:
-                call_parameter_set_to_spec_pattern[
-                    time_dimension_call_parameter_set
-                ] = TimeDimensionPattern.from_call_parameter_set(time_dimension_call_parameter_set)
+
+            patterns_in_filter.append(
+                PatternAssociationForWhereFilterGroupByItem(
+                    call_parameter_set=time_dimension_call_parameter_set,
+                    object_builder_str=ObjectBuilderNameConverter.input_str_from_time_dimension_call_parameter_set(
+                        time_dimension_call_parameter_set
+                    ),
+                    spec_pattern=TimeDimensionPattern.from_call_parameter_set(time_dimension_call_parameter_set),
+                )
+            )
         for entity_call_parameter_set in filter_call_parameter_sets.entity_call_parameter_sets:
             lookup_key = ResolvedSpecLookUpKey(
                 filter_location=filter_location,
                 call_parameter_set=entity_call_parameter_set,
             )
-            if spec_resolution_lookup_so_far.spec_resolution_exists(lookup_key):
+            if resolved_spec_lookup_so_far.spec_resolution_exists(lookup_key):
                 logger.info(
                     f"Skipping resolution for {entity_call_parameter_set} at {filter_location} since it has "
                     f"been resolved to:\n"
-                    f"{mf_pformat(spec_resolution_lookup_so_far.get_spec_resolutions(lookup_key))}"
+                    f"{mf_pformat(resolved_spec_lookup_so_far.get_spec_resolutions(lookup_key))}"
                 )
 
-            if entity_call_parameter_set not in call_parameter_set_to_spec_pattern:
-                call_parameter_set_to_spec_pattern[entity_call_parameter_set] = EntityPattern.from_call_parameter_set(
-                    entity_call_parameter_set
+            patterns_in_filter.append(
+                PatternAssociationForWhereFilterGroupByItem(
+                    call_parameter_set=entity_call_parameter_set,
+                    object_builder_str=ObjectBuilderNameConverter.input_str_from_entity_call_parameter_set(
+                        entity_call_parameter_set
+                    ),
+                    spec_pattern=EntityPattern.from_call_parameter_set(entity_call_parameter_set),
                 )
+            )
 
-        return call_parameter_set_to_spec_pattern
+        return patterns_in_filter
 
     @override
     def visit_measure_node(self, node: MeasureGroupByItemSourceNode) -> FilterSpecResolutionLookUp:
@@ -170,11 +224,11 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
 
             return resolved_spec_lookup_so_far.merge(
                 self._resolve_specs_for_where_filters(
-                    resolution_node=node,
+                    current_node=node,
                     resolution_path=resolution_path,
                     resolved_spec_lookup_so_far=resolved_spec_lookup_so_far,
                     filter_location=WhereFilterLocation.for_metric(node.metric_reference),
-                    where_filters=self._get_where_filters_at_metric_node(node),
+                    where_filter_intersection=self._get_where_filters_at_metric_node(node),
                 )
             )
 
@@ -191,11 +245,11 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
 
             return resolved_spec_lookup_so_far.merge(
                 self._resolve_specs_for_where_filters(
-                    resolution_node=node,
+                    current_node=node,
                     resolution_path=resolution_path,
                     resolved_spec_lookup_so_far=resolved_spec_lookup_so_far,
                     filter_location=WhereFilterLocation.for_query(node.metrics_in_query),
-                    where_filters=node.where_filter_intersection.where_filters,
+                    where_filter_intersection=node.where_filter_intersection,
                 )
             )
 
@@ -205,7 +259,9 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
         with self._path_from_start_node_tracker.track_node_visit(node):
             return FilterSpecResolutionLookUp.empty_instance()
 
-    def _get_where_filters_at_metric_node(self, metric_node: MetricGroupByItemResolutionNode) -> Sequence[WhereFilter]:
+    def _get_where_filters_at_metric_node(
+        self, metric_node: MetricGroupByItemResolutionNode
+    ) -> WhereFilterIntersection:
         """Return the filters used with a metric in the manifest.
 
         A derived metric definition can have a filter for an input metric, and we'll need to resolve that when the
@@ -229,80 +285,94 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
             if child_metric_input.filter is not None:
                 where_filters.extend(child_metric_input.filter.where_filters)
 
-        return where_filters
+        return PydanticWhereFilterIntersection(where_filters=where_filters)
 
     def _resolve_specs_for_where_filters(
         self,
-        resolution_node: ResolutionDagSinkNode,
+        current_node: ResolutionDagSinkNode,
         resolution_path: MetricFlowQueryResolutionPath,
         resolved_spec_lookup_so_far: FilterSpecResolutionLookUp,
         filter_location: WhereFilterLocation,
-        where_filters: Sequence[WhereFilter],
+        where_filter_intersection: WhereFilterIntersection,
     ) -> FilterSpecResolutionLookUp:
-        """Given the filters at a particular node, build the spec lookup for those filters."""
-        results_to_merge: List[FilterSpecResolutionLookUp] = []
+        """Given the filters at a particular node, build the spec lookup for those filters.
+
+        The start node should be the query node.
+        """
         resolution_dag = GroupByItemResolutionDag(
-            sink_node=resolution_node,
+            sink_node=current_node,
         )
         group_by_item_resolver = GroupByItemResolver(
             manifest_lookup=self._manifest_lookup,
             resolution_dag=resolution_dag,
         )
-        call_parameter_set_to_pattern: Dict[CallParameterSet, SpecPattern] = {}
-        issue_sets_to_merge: List[MetricFlowQueryResolutionIssueSet] = []
-        for where_filter in where_filters:
+        non_parsable_resolutions: List[NonParsableFilterResolution] = []
+        filter_call_parameter_sets_to_merge: List[FilterCallParameterSets] = []
+
+        for where_filter in where_filter_intersection.where_filters:
             try:
                 filter_call_parameter_sets = where_filter.call_parameter_sets
             except Exception as e:
-                issue_sets_to_merge.append(
-                    MetricFlowQueryResolutionIssueSet.from_issue(
-                        WhereFilterParsingIssue.from_parameters(
-                            where_filter=where_filter,
-                            parse_exception=e,
-                            query_resolution_path=resolution_path,
-                        )
+                non_parsable_resolutions.append(
+                    NonParsableFilterResolution(
+                        filter_location_path=resolution_path,
+                        where_filter_intersection=where_filter_intersection,
+                        issue_set=MetricFlowQueryResolutionIssueSet.from_issue(
+                            WhereFilterParsingIssue.from_parameters(
+                                where_filter=where_filter,
+                                parse_exception=e,
+                                query_resolution_path=resolution_path,
+                            )
+                        ),
                     )
                 )
                 continue
+            filter_call_parameter_sets_to_merge.append(filter_call_parameter_sets)
 
-            call_parameter_set_to_pattern.update(
-                _ResolveWhereFilterSpecVisitor._map_filter_parameter_set_to_pattern(
-                    filter_location=filter_location,
-                    filter_call_parameter_sets=filter_call_parameter_sets,
-                    spec_resolution_lookup_so_far=resolved_spec_lookup_so_far,
-                )
-            )
+        deduped_filter_call_parameter_sets = _ResolveWhereFilterSpecVisitor._dedupe_filter_call_parameter_sets(
+            filter_call_parameter_sets_to_merge
+        )
 
         resolutions: List[FilterSpecResolution] = []
-        for call_parameter_set, spec_pattern in call_parameter_set_to_pattern.items():
+        for group_by_item_in_where_filter in self._map_filter_parameter_sets_to_pattern(
+            filter_location=filter_location,
+            filter_call_parameter_sets=deduped_filter_call_parameter_sets,
+            resolved_spec_lookup_so_far=resolved_spec_lookup_so_far,
+        ):
             group_by_item_resolution = group_by_item_resolver.resolve_matching_item_for_filters(
-                spec_pattern=spec_pattern,
-                resolution_node=resolution_node,
+                input_str=group_by_item_in_where_filter.object_builder_str,
+                spec_pattern=group_by_item_in_where_filter.spec_pattern,
+                resolution_node=current_node,
             )
-            issue_sets_to_merge.append(group_by_item_resolution.issue_set)
-            if group_by_item_resolution.spec is None:
-                continue
+            # The paths in the issue set are generated relative to the current node. For error messaging, it seems more
+            # helpful for those paths to be relative to the query. To do, we have to add nodes from the resolution path.
+            # e.g. if the current node is B, and the resolution path is [A, B], an issue might have the relative path
+            # [B, C]. To join those paths to produce [A, B, C], the path prefix should be [A].
+            path_prefix = MetricFlowQueryResolutionPath(
+                resolution_path_nodes=resolution_path.resolution_path_nodes[:-1]
+            )
             resolutions.append(
                 FilterSpecResolution(
                     lookup_key=ResolvedSpecLookUpKey(
                         filter_location=filter_location,
-                        call_parameter_set=call_parameter_set,
+                        call_parameter_set=group_by_item_in_where_filter.call_parameter_set,
                     ),
-                    resolution_path=resolution_path,
+                    filter_location_path=resolution_path,
                     resolved_spec=group_by_item_resolution.spec,
+                    where_filter_intersection=where_filter_intersection,
+                    spec_pattern=group_by_item_in_where_filter.spec_pattern,
+                    issue_set=group_by_item_resolution.issue_set.with_path_prefix(path_prefix),
+                    object_builder_str=group_by_item_in_where_filter.object_builder_str,
                 )
             )
 
-        results_to_merge.append(
-            FilterSpecResolutionLookUp(
-                spec_resolutions=tuple(resolutions),
-                issue_set=MetricFlowQueryResolutionIssueSet.empty_instance(),
+        if any(resolution.issue_set.has_errors for resolution in resolutions) or len(non_parsable_resolutions) > 0:
+            return FilterSpecResolutionLookUp(
+                spec_resolutions=tuple(resolution for resolution in resolutions if resolution.issue_set.has_errors),
+                non_parsable_resolutions=tuple(non_parsable_resolutions),
             )
-        )
 
-        return FilterSpecResolutionLookUp.merge_iterable(results_to_merge).merge(
-            FilterSpecResolutionLookUp(
-                spec_resolutions=(),
-                issue_set=MetricFlowQueryResolutionIssueSet.merge_iterable(issue_sets_to_merge),
-            )
+        return FilterSpecResolutionLookUp(
+            spec_resolutions=tuple(resolutions),
+            non_parsable_resolutions=tuple(non_parsable_resolutions),
         )

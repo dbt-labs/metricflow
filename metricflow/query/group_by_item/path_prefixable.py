@@ -2,22 +2,22 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from typing_extensions import Self
+from typing_extensions import TYPE_CHECKING, Self
 
-from metricflow.query.group_by_item.resolution_dag.resolution_nodes.base_node import GroupByItemResolutionNode
+if TYPE_CHECKING:
+    from metricflow.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 
 
 class PathPrefixable(ABC):
-    """Describes an object that contains a path that can be updated with a prefix node.
+    """Describes an object that contains a path that can be updated with a prefix path.
 
-    This is useful for building a path to a node in the process of a recursive call. e.g. to create a path from a start
-    node to target node, recursively traverse the DAG. During recursive traversal, when the traversal process reaches
-    the target node, create a path that contains only that node as a path element. As the recursive call unwinds, add
-    the node where the call unwinds. If this is done all the way to the leaf node, you'll have a path from the leaf node
-    to the target node.
+    During a recursive traversal of a DAG, we keep track of the path from the start node to the current node. From the
+    current node, a method generates a relative path from the current node to a target node. To get the path from the
+    start node to the target node, those to paths can be joined with the path from the start node to the current node
+    as a prefix of the path from the current node to the target node.
     """
 
     @abstractmethod
-    def with_path_prefix(self, path_prefix_node: GroupByItemResolutionNode) -> Self:
+    def with_path_prefix(self, path_prefix: MetricFlowQueryResolutionPath) -> Self:
         """Return a copy of Self, but with the associated path to include the path_prefix_node at the beginning."""
         raise NotImplementedError

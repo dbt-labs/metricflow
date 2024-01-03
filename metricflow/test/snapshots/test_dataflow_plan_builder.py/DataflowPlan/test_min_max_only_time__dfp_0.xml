@@ -1,0 +1,31 @@
+<DataflowPlan>
+    <WriteToResultDataframeNode>
+        <!-- description = Write to Dataframe -->
+        <!-- node_id = wrd_0 -->
+        <MinMaxNode>
+            <!-- description = Calculate min and max -->
+            <!-- node_id = mm_0 -->
+            <FilterElementsNode>
+                <!-- description =                  -->
+                <!--   Pass Only Elements:          -->
+                <!--     ['booking__paid_at__day']  -->
+                <!-- node_id = pfe_0 -->
+                <!-- include_spec =                                                                  -->
+                <!--   {'class': 'TimeDimensionSpec',                                                -->
+                <!--    'element_name': 'paid_at',                                                   -->
+                <!--    'entity_links': ({'class': 'EntityReference', 'element_name': 'booking'},),  -->
+                <!--    'time_granularity': TimeGranularity.DAY,                                     -->
+                <!--    'date_part': None,                                                           -->
+                <!--    'aggregation_state': None}                                                   -->
+                <!-- distinct = True -->
+                <ReadSqlSourceNode>
+                    <!-- description =                                                                                    -->
+                    <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))  -->
+                    <!-- node_id = rss_10001 -->
+                    <!-- data_set =                                                                             -->
+                    <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))  -->
+                </ReadSqlSourceNode>
+            </FilterElementsNode>
+        </MinMaxNode>
+    </WriteToResultDataframeNode>
+</DataflowPlan>

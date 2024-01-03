@@ -93,4 +93,4 @@ class MetricFlowQueryResolution:
 
     @property
     def has_errors(self) -> bool:  # noqa: D
-        return self.input_to_issue_set.has_issues or self.filter_spec_lookup.issue_set.has_errors
+        return self.input_to_issue_set.has_issues or self.filter_spec_lookup.has_errors

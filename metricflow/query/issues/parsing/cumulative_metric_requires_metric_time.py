@@ -6,7 +6,6 @@ from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.references import MetricReference
 from typing_extensions import override
 
-from metricflow.query.group_by_item.resolution_dag.resolution_nodes.base_node import GroupByItemResolutionNode
 from metricflow.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow.query.issues.issues_base import (
     MetricFlowQueryIssueType,
@@ -29,11 +28,11 @@ class CumulativeMetricRequiresMetricTimeIssue(MetricFlowQueryResolutionIssue):
         )
 
     @override
-    def with_path_prefix(self, path_prefix_node: GroupByItemResolutionNode) -> CumulativeMetricRequiresMetricTimeIssue:
+    def with_path_prefix(self, path_prefix: MetricFlowQueryResolutionPath) -> CumulativeMetricRequiresMetricTimeIssue:
         return CumulativeMetricRequiresMetricTimeIssue(
             issue_type=self.issue_type,
             parent_issues=self.parent_issues,
-            query_resolution_path=self.query_resolution_path.with_path_prefix(path_prefix_node),
+            query_resolution_path=self.query_resolution_path.with_path_prefix(path_prefix),
             metric_reference=self.metric_reference,
         )
 

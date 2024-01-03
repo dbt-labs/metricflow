@@ -9,6 +9,7 @@ from dbt_semantic_interfaces.references import MetricReference
 from metricflow.collection_helpers.pretty_print import mf_pformat
 from metricflow.dag.dag_to_text import dag_as_text
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow.naming.metric_scheme import MetricNamingScheme
 from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import FilterSpecResolutionLookUp
 from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_resolver import (
     WhereFilterSpecResolver,
@@ -25,6 +26,7 @@ from metricflow.query.issues.issues_base import (
 )
 from metricflow.query.issues.parsing.invalid_limit import InvalidLimitIssue
 from metricflow.query.issues.parsing.invalid_metric import InvalidMetricIssue
+from metricflow.query.issues.parsing.invalid_min_max_only import InvalidMinMaxOnlyIssue
 from metricflow.query.issues.parsing.invalid_order import InvalidOrderByItemIssue
 from metricflow.query.query_resolution import (
     InputToIssueSetMapping,
@@ -35,11 +37,15 @@ from metricflow.query.resolver_inputs.query_resolver_inputs import (
     ResolverInputForGroupByItem,
     ResolverInputForLimit,
     ResolverInputForMetric,
+    ResolverInputForMinMaxOnly,
     ResolverInputForOrderByItem,
     ResolverInputForQuery,
+    ResolverInputForQueryLevelWhereFilterIntersection,
     ResolverInputForWhereFilterIntersection,
 )
+from metricflow.query.suggestion_generator import QueryItemSuggestionGenerator
 from metricflow.query.validation_rules.query_validator import PostResolutionQueryValidator
+from metricflow.specs.patterns.match_list_pattern import MatchListSpecPattern
 from metricflow.specs.specs import (
     InstanceSpec,
     LinkableInstanceSpec,
@@ -77,6 +83,14 @@ class ResolveLimitResult:
 
 
 @dataclass(frozen=True)
+class ResolveMinMaxOnlyResult:
+    """Result of resolving a limit input."""
+
+    min_max_only: bool
+    input_to_issue_set_mapping: InputToIssueSetMapping
+
+
+@dataclass(frozen=True)
 class ResolveGroupByItemsResult:
     """Result of resolving group-by inputs to specs."""
 
@@ -94,16 +108,25 @@ class MetricFlowQueryResolver:
             manifest_lookup=self._manifest_lookup,
         )
 
+    @staticmethod
     def _resolve_group_by_item_input(
-        self, resolution_dag: GroupByItemResolutionDag, group_by_item_input: ResolverInputForGroupByItem
+        group_by_item_input: ResolverInputForGroupByItem,
+        group_by_item_resolver: GroupByItemResolver,
+        valid_group_by_item_specs_for_querying: Sequence[LinkableInstanceSpec],
     ) -> GroupByItemResolution:
-        group_by_item_resolver = GroupByItemResolver(
-            manifest_lookup=self._manifest_lookup,
-            resolution_dag=resolution_dag,
+        suggestion_generator = QueryItemSuggestionGenerator(
+            input_naming_scheme=group_by_item_input.input_obj_naming_scheme,
+            input_str=str(group_by_item_input.input_obj),
+            candidate_filters=QueryItemSuggestionGenerator.GROUP_BY_ITEM_CANDIDATE_FILTERS
+            + (
+                MatchListSpecPattern(
+                    listed_specs=valid_group_by_item_specs_for_querying,
+                ),
+            ),
         )
-
         return group_by_item_resolver.resolve_matching_item_for_querying(
             spec_pattern=group_by_item_input.spec_pattern,
+            suggestion_generator=suggestion_generator,
         )
 
     def _resolve_metric_inputs(
@@ -123,12 +146,18 @@ class MetricFlowQueryResolver:
         for metric_input in metric_inputs:
             matching_specs = metric_input.spec_pattern.match(available_metric_specs)
             if len(matching_specs) != 1:
+                suggestion_generator = QueryItemSuggestionGenerator(
+                    input_naming_scheme=MetricNamingScheme(),
+                    input_str=str(metric_input.input_obj),
+                    candidate_filters=(),
+                )
+                metric_suggestions = suggestion_generator.input_suggestions(candidate_specs=available_metric_specs)
                 input_to_issue_set_mapping_items.append(
                     InputToIssueSetMappingItem(
                         resolver_input=metric_input,
                         issue_set=MetricFlowQueryResolutionIssueSet.from_issue(
                             InvalidMetricIssue.from_parameters(
-                                candidate_metric_references=self._manifest_lookup.metric_lookup.metric_references,
+                                metric_suggestions=metric_suggestions,
                                 query_resolution_path=query_resolution_path,
                             )
                         ),
@@ -146,7 +175,7 @@ class MetricFlowQueryResolver:
         self,
         metric_references: Sequence[MetricReference],
         group_by_item_inputs: Sequence[ResolverInputForGroupByItem],
-        filter_input: ResolverInputForWhereFilterIntersection,
+        filter_input: ResolverInputForQueryLevelWhereFilterIntersection,
     ) -> ResolveGroupByItemsResult:
         resolution_dag_builder = GroupByItemResolutionDagBuilder(
             manifest_lookup=self._manifest_lookup,
@@ -157,11 +186,20 @@ class MetricFlowQueryResolver:
         )
         logger.info(f"Resolution DAG is:\n{dag_as_text(resolution_dag)}")
 
+        group_by_item_resolver = GroupByItemResolver(
+            manifest_lookup=self._manifest_lookup,
+            resolution_dag=resolution_dag,
+        )
+
+        valid_group_by_item_specs_for_querying = group_by_item_resolver.resolve_available_items().specs
+
         input_to_issue_set_mapping_items: List[InputToIssueSetMappingItem] = []
         group_by_item_specs: List[LinkableInstanceSpec] = []
         for group_by_item_input in group_by_item_inputs:
-            resolution = self._resolve_group_by_item_input(
-                resolution_dag=resolution_dag, group_by_item_input=group_by_item_input
+            resolution = MetricFlowQueryResolver._resolve_group_by_item_input(
+                group_by_item_resolver=group_by_item_resolver,
+                group_by_item_input=group_by_item_input,
+                valid_group_by_item_specs_for_querying=valid_group_by_item_specs_for_querying,
             )
             if resolution.issue_set.has_issues:
                 input_to_issue_set_mapping_items.append(
@@ -238,7 +276,39 @@ class MetricFlowQueryResolver:
             )
         return ResolveLimitResult(limit=limit, input_to_issue_set_mapping=InputToIssueSetMapping.empty_instance())
 
-    def _resolve_where(
+    @staticmethod
+    def _resolve_min_max_only_input(
+        min_max_only_input: ResolverInputForMinMaxOnly,
+        query_resolution_path: MetricFlowQueryResolutionPath,
+        metric_inputs: Tuple[ResolverInputForMetric, ...],
+        group_by_item_inputs: Tuple[ResolverInputForGroupByItem, ...],
+        order_by_item_inputs: Tuple[ResolverInputForOrderByItem, ...],
+        limit_input: ResolverInputForLimit,
+    ) -> ResolveMinMaxOnlyResult:
+        min_max_only = min_max_only_input.min_max_only
+        if min_max_only:
+            if (
+                metric_inputs
+                or order_by_item_inputs
+                or (limit_input.limit is not None)
+                or len(group_by_item_inputs) != 1
+            ):
+                return ResolveMinMaxOnlyResult(
+                    min_max_only=min_max_only,
+                    input_to_issue_set_mapping=InputToIssueSetMapping.from_one_item(
+                        resolver_input=min_max_only_input,
+                        issue_set=MetricFlowQueryResolutionIssueSet.from_issue(
+                            InvalidMinMaxOnlyIssue.from_parameters(
+                                min_max_only=min_max_only, query_resolution_path=query_resolution_path
+                            ),
+                        ),
+                    ),
+                )
+        return ResolveMinMaxOnlyResult(
+            min_max_only=min_max_only, input_to_issue_set_mapping=InputToIssueSetMapping.empty_instance()
+        )
+
+    def _build_filter_spec_lookup(
         self,
         resolution_dag: GroupByItemResolutionDag,
     ) -> FilterSpecResolutionLookUp:
@@ -255,14 +325,15 @@ class MetricFlowQueryResolver:
         group_by_item_inputs = resolver_input_for_query.group_by_item_inputs
         order_by_item_inputs = resolver_input_for_query.order_by_item_inputs
         limit_input = resolver_input_for_query.limit_input
-        filter_input = resolver_input_for_query.filter_input
+        query_level_filter_input = resolver_input_for_query.filter_input
+        min_max_only_input = resolver_input_for_query.min_max_only
 
         # Define a resolution path for issues where the input is considered to be the whole query.
         query_resolution_path = MetricFlowQueryResolutionPath.from_path_item(
             QueryGroupByItemResolutionNode(
                 parent_nodes=(),
                 metrics_in_query=tuple(metric_input.spec_pattern.metric_reference for metric_input in metric_inputs),
-                where_filter_intersection=filter_input.where_filter_intersection,
+                where_filter_intersection=query_level_filter_input.where_filter_intersection,
             )
         )
 
@@ -280,6 +351,17 @@ class MetricFlowQueryResolver:
         )
         mappings_to_merge.append(resolve_limit_result.input_to_issue_set_mapping)
 
+        # Resolve min max only
+        resolve_min_max_only_result = self._resolve_min_max_only_input(
+            min_max_only_input=min_max_only_input,
+            query_resolution_path=query_resolution_path,
+            metric_inputs=metric_inputs,
+            group_by_item_inputs=group_by_item_inputs,
+            order_by_item_inputs=order_by_item_inputs,
+            limit_input=limit_input,
+        )
+        mappings_to_merge.append(resolve_min_max_only_result.input_to_issue_set_mapping)
+
         # Early stop before resolving further as with invalid metrics, the errors won't be as useful.
         issue_set_mapping_so_far = InputToIssueSetMapping.merge_iterable(mappings_to_merge)
         if issue_set_mapping_so_far.has_issues:
@@ -294,7 +376,7 @@ class MetricFlowQueryResolver:
         resolve_group_by_item_result = self._resolve_group_by_items_result(
             metric_references=tuple(metric_spec.reference for metric_spec in metric_specs),
             group_by_item_inputs=group_by_item_inputs,
-            filter_input=filter_input,
+            filter_input=query_level_filter_input,
         )
         resolution_dag = resolve_group_by_item_result.resolution_dag
         group_by_item_specs = resolve_group_by_item_result.group_by_item_specs
@@ -311,16 +393,32 @@ class MetricFlowQueryResolver:
         if resolve_order_by_result.input_to_issue_set_mapping.has_issues:
             mappings_to_merge.append(resolve_order_by_result.input_to_issue_set_mapping)
 
-        # Resolve where.
-        filter_spec_lookup = self._resolve_where(
-            resolution_dag=resolution_dag,
-        )
+        # Resolve all where filters in the DAG.
+        filter_spec_lookup = self._build_filter_spec_lookup(resolution_dag)
+        for fitler_spec_resolution in filter_spec_lookup.spec_resolutions:
+            filter_resolver_input = ResolverInputForWhereFilterIntersection(
+                filter_resolution_path=fitler_spec_resolution.filter_location_path,
+                where_filter_intersection=fitler_spec_resolution.where_filter_intersection,
+                object_builder_str=fitler_spec_resolution.object_builder_str,
+            )
+            if fitler_spec_resolution.issue_set.has_issues:
+                mappings_to_merge.append(
+                    InputToIssueSetMapping.from_one_item(
+                        resolver_input=filter_resolver_input,
+                        issue_set=fitler_spec_resolution.issue_set,
+                    )
+                )
 
-        if filter_spec_lookup.issue_set.has_issues:
+        for non_parseable_resolution in filter_spec_lookup.non_parsable_resolutions:
+            filter_resolver_input = ResolverInputForWhereFilterIntersection(
+                filter_resolution_path=non_parseable_resolution.filter_location_path,
+                where_filter_intersection=non_parseable_resolution.where_filter_intersection,
+                object_builder_str=None,
+            )
             mappings_to_merge.append(
                 InputToIssueSetMapping.from_one_item(
-                    resolver_input=filter_input,
-                    issue_set=filter_spec_lookup.issue_set,
+                    resolver_input=filter_resolver_input,
+                    issue_set=non_parseable_resolution.issue_set,
                 )
             )
 
@@ -374,8 +472,9 @@ class MetricFlowQueryResolver:
                 time_dimension_specs=linkable_spec_set.time_dimension_specs,
                 order_by_specs=tuple(order_by_specs),
                 limit=limit_input.limit,
-                filter_intersection=filter_input.where_filter_intersection,
+                filter_intersection=query_level_filter_input.where_filter_intersection,
                 filter_spec_resolution_lookup=filter_spec_lookup,
+                min_max_only=min_max_only_input.min_max_only,
             ),
             resolution_dag=resolution_dag,
             filter_spec_lookup=filter_spec_lookup,

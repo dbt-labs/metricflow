@@ -4,7 +4,6 @@ from dataclasses import dataclass
 
 from typing_extensions import override
 
-from metricflow.query.group_by_item.resolution_dag.resolution_nodes.base_node import GroupByItemResolutionNode
 from metricflow.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow.query.issues.issues_base import (
     MetricFlowQueryIssueType,
@@ -42,10 +41,10 @@ class InvalidOrderByItemIssue(MetricFlowQueryResolutionIssue):
         )
 
     @override
-    def with_path_prefix(self, path_prefix_node: GroupByItemResolutionNode) -> InvalidOrderByItemIssue:
+    def with_path_prefix(self, path_prefix: MetricFlowQueryResolutionPath) -> InvalidOrderByItemIssue:
         return InvalidOrderByItemIssue(
             issue_type=self.issue_type,
-            parent_issues=tuple(issue.with_path_prefix(path_prefix_node) for issue in self.parent_issues),
-            query_resolution_path=self.query_resolution_path.with_path_prefix(path_prefix_node),
+            parent_issues=tuple(issue.with_path_prefix(path_prefix) for issue in self.parent_issues),
+            query_resolution_path=self.query_resolution_path.with_path_prefix(path_prefix),
             order_by_item_input=self.order_by_item_input,
         )

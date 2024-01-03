@@ -40,6 +40,7 @@ def test_ambiguous_metric_time_in_query(  # noqa: D
 
     result = group_by_item_resolver.resolve_matching_item_for_querying(
         spec_pattern=spec_pattern,
+        suggestion_generator=None,
     )
 
     if case_id is AmbiguousResolutionQueryId.NO_METRICS:
@@ -77,6 +78,7 @@ def test_unavailable_group_by_item_in_derived_metric_parent(  # noqa: D
 
     result = group_by_item_resolver.resolve_matching_item_for_querying(
         spec_pattern=spec_pattern,
+        suggestion_generator=None,
     )
 
     assert_object_snapshot_equal(
@@ -103,6 +105,7 @@ def test_invalid_group_by_item(  # noqa: D
 
     result = group_by_item_resolver.resolve_matching_item_for_querying(
         spec_pattern=naming_scheme.spec_pattern(input_str),
+        suggestion_generator=None,
     )
 
     assert_object_snapshot_equal(

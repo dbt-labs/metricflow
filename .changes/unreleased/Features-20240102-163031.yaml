@@ -1,0 +1,6 @@
+kind: Features
+body: Expose label on Metric & Dimension for use in APIs.
+time: 2024-01-02T16:30:31.302535-08:00
+custom:
+  Author: courtneyholcomb
+  Issue: "956"

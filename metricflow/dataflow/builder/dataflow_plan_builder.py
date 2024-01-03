@@ -46,6 +46,7 @@ from metricflow.dataflow.dataflow_plan import (
     JoinToBaseOutputNode,
     JoinToTimeSpineNode,
     MetricTimeDimensionTransformNode,
+    MinMaxNode,
     OrderByLimitNode,
     ReadSqlSourceNode,
     SemiAdditiveJoinNode,
@@ -633,6 +634,9 @@ class DataflowPlanBuilder:
         output_node = FilterElementsNode(
             parent_node=output_node, include_specs=query_spec.linkable_specs.as_spec_set, distinct=True
         )
+
+        if query_spec.min_max_only:
+            output_node = MinMaxNode(parent_node=output_node)
 
         sink_node = self.build_sink_node(
             parent_node=output_node, order_by_specs=query_spec.order_by_specs, limit=query_spec.limit

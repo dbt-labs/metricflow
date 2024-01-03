@@ -42,9 +42,10 @@ from metricflow.query.resolver_inputs.query_resolver_inputs import (
     ResolverInputForGroupByItem,
     ResolverInputForLimit,
     ResolverInputForMetric,
+    ResolverInputForMinMaxOnly,
     ResolverInputForOrderByItem,
     ResolverInputForQuery,
-    ResolverInputForWhereFilterIntersection,
+    ResolverInputForQueryLevelWhereFilterIntersection,
 )
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.patterns.base_time_grain import BaseTimeGrainPattern
@@ -249,9 +250,10 @@ class MetricFlowQueryParser:
         return tuple(order_by_query_parameter.query_resolver_input for order_by_query_parameter in order_by)
 
     @staticmethod
-    def _error_message(
+    def generate_error_message(
         input_to_issue_set: InputToIssueSetMapping,
     ) -> Optional[str]:
+        """Create an error message that formats the inputs / issues."""
         lines: List[str] = ["Got errors while resolving the query."]
         issue_counter = 0
 
@@ -262,26 +264,25 @@ class MetricFlowQueryParser:
             if not issue_set.has_errors:
                 continue
 
-            lines.append(f"\nQuery input: {resolver_input.ui_description} has errors:")
-            issue_set_lines: List[str] = []
+            issue_counter += 1
             for error_issue in issue_set.errors:
-                issue_counter += 1
-                issue_set_lines.extend(
-                    [
-                        f"Error #{issue_counter}:\n",
-                        error_issue.ui_description(resolver_input),
-                    ]
-                )
+                lines.append(f"\nError #{issue_counter}:")
+                issue_set_lines: List[str] = [
+                    "Message:\n",
+                    indent_log_line(error_issue.ui_description(resolver_input)),
+                    "\nQuery Input:\n",
+                    indent_log_line(resolver_input.ui_description),
+                ]
 
                 if len(error_issue.query_resolution_path.resolution_path_nodes) > 0:
                     issue_set_lines.extend(
                         [
                             "\nIssue Location:\n",
-                            error_issue.query_resolution_path.ui_description,
+                            indent_log_line(error_issue.query_resolution_path.ui_description),
                         ]
                     )
 
-            lines.extend(indent_log_line(issue_set_line) for issue_set_line in issue_set_lines)
+                lines.extend(indent_log_line(issue_set_line) for issue_set_line in issue_set_lines)
 
         return "\n".join(lines)
 
@@ -292,7 +293,7 @@ class MetricFlowQueryParser:
         if not input_to_issue_set.merged_issue_set.has_errors:
             return
 
-        raise InvalidQueryException(self._error_message(input_to_issue_set=input_to_issue_set))
+        raise InvalidQueryException(self.generate_error_message(input_to_issue_set=input_to_issue_set))
 
     def parse_and_validate_query(
         self,
@@ -307,12 +308,13 @@ class MetricFlowQueryParser:
         where_constraint_str: Optional[str] = None,
         order_by_names: Optional[Sequence[str]] = None,
         order_by: Optional[Sequence[OrderByQueryParameter]] = None,
-        include_time_range_constraint: bool = True,
+        min_max_only: bool = False,
     ) -> MetricFlowQuerySpec:
         """Parse the query into spec objects, validating them in the process.
 
         e.g. make sure that the given metric is a valid metric name.
         """
+        # TODO: validate min_max_only - can only be called for non-metric queries
         assert_at_most_one_arg_set(metric_names=metric_names, metrics=metrics)
         assert_at_most_one_arg_set(group_by_names=group_by_names, group_by=group_by)
         assert_at_most_one_arg_set(order_by_names=order_by_names, order_by=order_by)
@@ -406,7 +408,8 @@ class MetricFlowQueryParser:
             where_filters.append(PydanticWhereFilter(where_sql_template=where_constraint.where_sql_template))
         if where_constraint_str is not None:
             where_filters.append(PydanticWhereFilter(where_sql_template=where_constraint_str))
-        resolver_input_for_filter = ResolverInputForWhereFilterIntersection(
+
+        resolver_input_for_filter = ResolverInputForQueryLevelWhereFilterIntersection(
             where_filter_intersection=PydanticWhereFilterIntersection(where_filters=where_filters)
         )
 
@@ -423,6 +426,7 @@ class MetricFlowQueryParser:
         resolver_inputs_for_order_by.extend(MetricFlowQueryParser._parse_order_by(order_by=order_by))
 
         resolver_input_for_limit = ResolverInputForLimit(limit=limit)
+        resolver_input_for_min_max_only = ResolverInputForMinMaxOnly(min_max_only=min_max_only)
 
         resolver_input_for_query = ResolverInputForQuery(
             metric_inputs=tuple(resolver_inputs_for_metrics),
@@ -430,6 +434,7 @@ class MetricFlowQueryParser:
             order_by_item_inputs=tuple(resolver_inputs_for_order_by),
             limit_input=resolver_input_for_limit,
             filter_input=resolver_input_for_filter,
+            min_max_only=resolver_input_for_min_max_only,
         )
 
         logger.info("Resolver input for query is:\n" + indent_log_line(mf_pformat(resolver_input_for_query)))

@@ -25,6 +25,8 @@ from metricflow.query.group_by_item.resolution_dag.resolution_nodes.query_resolu
 )
 from metricflow.query.issues.issues_base import MetricFlowQueryResolutionIssueSet
 from metricflow.query.resolver_inputs.query_resolver_inputs import ResolverInputForQuery
+from metricflow.query.validation_rules.base_validation_rule import PostResolutionQueryValidationRule
+from metricflow.query.validation_rules.duplicate_metric import DuplicateMetricValidationRule
 from metricflow.query.validation_rules.metric_time_requirements import MetricTimeQueryValidationRule
 
 
@@ -33,7 +35,10 @@ class PostResolutionQueryValidator:
 
     def __init__(self, manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D
         self._manifest_lookup = manifest_lookup
-        self._validation_rules = (MetricTimeQueryValidationRule(self._manifest_lookup),)
+        self._validation_rules = (
+            MetricTimeQueryValidationRule(self._manifest_lookup),
+            DuplicateMetricValidationRule(self._manifest_lookup),
+        )
 
     def validate_query(
         self, resolution_dag: GroupByItemResolutionDag, resolver_input_for_query: ResolverInputForQuery
@@ -51,7 +56,9 @@ class _PostResolutionQueryValidationVisitor(GroupByItemResolutionNodeVisitor[Met
     """Visitor that runs the validation rule when it visits a metric."""
 
     def __init__(  # noqa: D
-        self, resolver_input_for_query: ResolverInputForQuery, validation_rules: Sequence[MetricTimeQueryValidationRule]
+        self,
+        resolver_input_for_query: ResolverInputForQuery,
+        validation_rules: Sequence[PostResolutionQueryValidationRule],
     ) -> None:
         self._validation_rules = validation_rules
         self._path_from_start_node_tracker = DagTraversalPathTracker()
@@ -85,7 +92,20 @@ class _PostResolutionQueryValidationVisitor(GroupByItemResolutionNodeVisitor[Met
 
     @override
     def visit_query_node(self, node: QueryGroupByItemResolutionNode) -> MetricFlowQueryResolutionIssueSet:
-        return self._default_handler(node)
+        with self._path_from_start_node_tracker.track_node_visit(node) as current_traversal_path:
+            issue_sets_to_merge = [parent_node.accept(self) for parent_node in node.parent_nodes]
+
+            for validation_rule in self._validation_rules:
+                issue_sets_to_merge.append(
+                    validation_rule.validate_query_in_resolution_dag(
+                        metrics_in_query=node.metrics_in_query,
+                        where_filter_intersection=node.where_filter_intersection,
+                        resolver_input_for_query=self._resolver_input_for_query,
+                        resolution_path=current_traversal_path,
+                    )
+                )
+
+            return MetricFlowQueryResolutionIssueSet.merge_iterable(issue_sets_to_merge)
 
     @override
     def visit_no_metrics_query_node(self, node: NoMetricsGroupByItemSourceNode) -> MetricFlowQueryResolutionIssueSet:

@@ -465,3 +465,95 @@ def test_common_semantic_model(  # noqa: D
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_min_max_only_categorical(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    """Tests a min max only query with a categorical dimension."""
+    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
+        query_spec=MetricFlowQuerySpec(
+            dimension_specs=(
+                DimensionSpec(
+                    element_name="country_latest",
+                    entity_links=(EntityReference(element_name="listing"),),
+                ),
+            ),
+            min_max_only=True,
+        ),
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_min_max_only_time(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    """Tests a min max only query with a time dimension."""
+    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
+        query_spec=MetricFlowQuerySpec(
+            time_dimension_specs=(
+                TimeDimensionSpec(
+                    element_name="paid_at",
+                    entity_links=(EntityReference("booking"),),
+                    time_granularity=TimeGranularity.DAY,
+                ),
+            ),
+            min_max_only=True,
+        ),
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_min_max_only_time_quarter(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    """Tests a min max only query with a time dimension and non-default granularity."""
+    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
+        query_spec=MetricFlowQuerySpec(
+            time_dimension_specs=(
+                TimeDimensionSpec(
+                    element_name="paid_at",
+                    entity_links=(EntityReference("booking"),),
+                    time_granularity=TimeGranularity.QUARTER,
+                ),
+            ),
+            min_max_only=True,
+        ),
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )

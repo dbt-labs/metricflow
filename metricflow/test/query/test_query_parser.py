@@ -584,3 +584,11 @@ def test_date_part_parsing() -> None:
         metric_names=["revenue"],
         group_by=(TimeDimensionParameter(name="metric_time", date_part=DatePart.MONTH),),
     )
+
+
+def test_duplicate_metric_query(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D
+    with pytest.raises(InvalidQueryException, match="duplicate metrics"):
+        bookings_query_parser.parse_and_validate_query(
+            metric_names=["bookings", "bookings"],
+            group_by_names=[MTD],
+        )

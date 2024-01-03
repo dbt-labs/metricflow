@@ -19,6 +19,7 @@ from metricflow.dataflow.dataflow_plan import (
     JoinToBaseOutputNode,
     JoinToTimeSpineNode,
     MetricTimeDimensionTransformNode,
+    MinMaxNode,
     OrderByLimitNode,
     ReadSqlSourceNode,
     SemiAdditiveJoinNode,
@@ -27,6 +28,7 @@ from metricflow.dataflow.dataflow_plan import (
     WriteToResultTableNode,
 )
 from metricflow.dataflow.optimizer.source_scan.matching_linkable_specs import MatchingLinkableSpecsTransform
+from metricflow.specs.specs import MetricSpec
 
 logger = logging.getLogger(__name__)
 
@@ -283,9 +285,17 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         assert len(combined_parent_nodes) == 1
         combined_parent_node = combined_parent_nodes[0]
         assert combined_parent_node is not None
+
+        # Dedupe (preserving order for output consistency) as it's possible for multiple derived metrics to use the same
+        # metric.
+        unique_metric_specs: List[MetricSpec] = []
+        for metric_spec in self._current_left_node.metric_specs + current_right_node.metric_specs:
+            if metric_spec not in unique_metric_specs:
+                unique_metric_specs.append(metric_spec)
+
         combined_node = ComputeMetricsNode(
             parent_node=combined_parent_node,
-            metric_specs=self._current_left_node.metric_specs + current_right_node.metric_specs,
+            metric_specs=unique_metric_specs,
         )
         self._log_combine_success(
             left_node=self._current_left_node,
@@ -413,5 +423,9 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
     def visit_join_conversion_events_node(  # noqa: D
         self, node: JoinConversionEventsNode
     ) -> ComputeMetricsBranchCombinerResult:
+        self._log_visit_node_type(node)
+        return self._default_handler(node)
+
+    def visit_min_max_node(self, node: MinMaxNode) -> ComputeMetricsBranchCombinerResult:  # noqa: D
         self._log_visit_node_type(node)
         return self._default_handler(node)

@@ -23,6 +23,7 @@ class SqlEngine(Enum):
     POSTGRES = "Postgres"
     SNOWFLAKE = "Snowflake"
     DATABRICKS = "Databricks"
+    TRINO = "Trino"
 
 
 class SqlClient(Protocol):

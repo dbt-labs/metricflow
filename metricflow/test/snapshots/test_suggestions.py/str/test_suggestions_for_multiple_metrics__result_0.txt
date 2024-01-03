@@ -1,0 +1,30 @@
+Got errors while resolving the query.
+
+Error #1:
+  Message:
+
+    The given input does not match any of the available group-by-items for Measure('listings'). Common issues are:
+
+      * Incorrect names.
+      * No valid join paths exist from the measure to the group-by-item (fan-out joins are not yet supported).
+      * There are multiple matching join paths (disambiguation support is pending).
+
+    Suggestions:
+      [
+        'listing__ds__day',
+        'listing__user',
+        'listing__lux_listing',
+        'listing__is_lux_latest',
+        'listing__country_latest',
+        'listing__created_at__day',
+      ]
+
+  Query Input:
+
+    booking__ds
+
+  Issue Location:
+
+    [Resolve Query(['bookings', 'listings'])]
+      -> [Resolve Metric('listings')]
+        -> [Resolve Measure('listings')]

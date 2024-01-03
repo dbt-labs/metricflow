@@ -101,7 +101,6 @@ def test_primary_entity_dimension(  # noqa: D
 def test_joined_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    column_association_resolver: ColumnAssociationResolver,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a plan getting a measure and a joined dimension."""
@@ -924,6 +923,64 @@ def test_nested_derived_metric_with_outer_offset(  # noqa: D
     )
 
 
+def test_min_max_only_categorical(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+) -> None:
+    """Tests a plan to get the min & max distinct values of a categorical dimension."""
+    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
+        query_spec=MetricFlowQuerySpec(
+            dimension_specs=(
+                DimensionSpec(element_name="country_latest", entity_links=(EntityReference(element_name="listing"),)),
+            ),
+            min_max_only=True,
+        )
+    )
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dag_graph=dataflow_plan,
+    )
+
+
+def test_min_max_only_time(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+) -> None:
+    """Tests a plan to get the min & max distinct values of a time dimension."""
+    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
+        query_spec=MetricFlowQuerySpec(
+            time_dimension_specs=(
+                TimeDimensionSpec(element_name="paid_at", entity_links=(EntityReference("booking"),)),
+            ),
+            min_max_only=True,
+        )
+    )
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dag_graph=dataflow_plan,
+    )
+
+
 def test_metric_time_only(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
@@ -1026,3 +1083,39 @@ def test_dimensions_with_time_constraint(  # noqa: D
         mf_test_session_state=mf_test_session_state,
         dag_graph=dataflow_plan,
     )
+
+
+def test_min_max_only_time_year(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+) -> None:
+    """Tests a plan to get the min & max distinct values of a time dimension with year granularity."""
+    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
+        query_spec=MetricFlowQuerySpec(
+            time_dimension_specs=(
+                TimeDimensionSpec(
+                    element_name="paid_at",
+                    entity_links=(EntityReference("booking"),),
+                    time_granularity=TimeGranularity.YEAR,
+                ),
+            ),
+            min_max_only=True,
+        )
+    )
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dag_graph=dataflow_plan,
+    )
+
+
+# TODO: add test for min max metric_time (various granularities) when supported

@@ -23,6 +23,7 @@ from metricflow.dataflow.dataflow_plan import (
     JoinToBaseOutputNode,
     JoinToTimeSpineNode,
     MetricTimeDimensionTransformNode,
+    MinMaxNode,
     OrderByLimitNode,
     ReadSqlSourceNode,
     SemiAdditiveJoinNode,
@@ -97,6 +98,9 @@ class ReadSqlSourceNodeCounter(DataflowPlanNodeVisitor[int]):
         return self._sum_parents(node)
 
     def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode) -> int:  # noqa: D
+        return self._sum_parents(node)
+
+    def visit_min_max_node(self, node: MinMaxNode) -> int:  # noqa: D
         return self._sum_parents(node)
 
     def visit_add_generated_uuid_column_node(self, node: AddGeneratedUuidColumnNode) -> int:  # noqa :D
@@ -348,5 +352,28 @@ def test_2_ratio_metrics_from_1_semantic_model(  # noqa: D
             dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
         ),
         expected_num_sources_in_unoptimized=4,
+        expected_num_sources_in_optimized=1,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_duplicate_measures(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+) -> None:
+    """Tests a case where derived metrics in a query use the same measure (in the same form e.g. filters)."""
+    check_optimization(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=MetricFlowQuerySpec(
+            metric_specs=(
+                MetricSpec(element_name="derived_bookings_0"),
+                MetricSpec(element_name="derived_bookings_1"),
+            ),
+            dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
+        ),
+        expected_num_sources_in_unoptimized=2,
         expected_num_sources_in_optimized=1,
     )
