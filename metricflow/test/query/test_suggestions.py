@@ -19,7 +19,7 @@ from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.model.modify.modify_manifest import modify_manifest
 from metricflow.test.model.modify.modify_metric_filter import ModifyMetricFilterTransform
-from metricflow.test.snapshot_utils import assert_object_snapshot_equal
+from metricflow.test.snapshot_utils import assert_str_snapshot_equal
 
 logger = logging.getLogger(__name__)
 
@@ -30,11 +30,11 @@ def test_suggestions_for_group_by_item(  # noqa: D
     with pytest.raises(InvalidQueryException) as e:
         query_parser.parse_and_validate_query(metric_names=("bookings",), group_by_names=("booking__instant",))
 
-    assert_object_snapshot_equal(
+    assert_str_snapshot_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        obj_id="result_0",
-        obj=str(e.value),
+        snapshot_id="result_0",
+        snapshot_str=str(e.value),
     )
 
 
@@ -44,11 +44,11 @@ def test_suggestions_for_metric(  # noqa: D
     with pytest.raises(InvalidQueryException) as e:
         query_parser.parse_and_validate_query(metric_names=("booking",), group_by_names=(METRIC_TIME_ELEMENT_NAME,))
 
-    assert_object_snapshot_equal(
+    assert_str_snapshot_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        obj_id="result_0",
-        obj=str(e.value),
+        snapshot_id="result_0",
+        snapshot_str=str(e.value),
     )
 
 
@@ -58,11 +58,11 @@ def test_suggestions_for_multiple_metrics(  # noqa: D
     with pytest.raises(InvalidQueryException) as e:
         query_parser.parse_and_validate_query(metric_names=("bookings", "listings"), group_by_names=("booking__ds",))
 
-    assert_object_snapshot_equal(
+    assert_str_snapshot_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        obj_id="result_0",
-        obj=str(e.value),
+        snapshot_id="result_0",
+        snapshot_str=str(e.value),
     )
 
 
@@ -91,11 +91,11 @@ def test_suggestions_for_defined_where_filter(  # noqa: D
     with pytest.raises(InvalidQueryException) as e:
         query_parser.parse_and_validate_query(metric_names=("listings",), group_by_names=(METRIC_TIME_ELEMENT_NAME,))
 
-    assert_object_snapshot_equal(
+    assert_str_snapshot_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        obj_id="result_0",
-        obj=str(e.value),
+        snapshot_id="result_0",
+        snapshot_str=str(e.value),
     )
 
 
@@ -144,9 +144,9 @@ def test_suggestions_for_defined_filters_in_multi_metric_query(
             group_by_names=(METRIC_TIME_ELEMENT_NAME,),
         )
 
-    assert_object_snapshot_equal(
+    assert_str_snapshot_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        obj_id="result_0",
-        obj=str(e.value),
+        snapshot_id="result_0",
+        snapshot_str=str(e.value),
     )

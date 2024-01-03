@@ -317,6 +317,28 @@ def assert_sql_snapshot_equal(
     )
 
 
+def assert_str_snapshot_equal(  # type: ignore[misc]
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    snapshot_id: str,
+    snapshot_str: str,
+    sql_engine: Optional[SqlEngine] = None,
+) -> None:
+    """Write / compare a string snapshot."""
+    if sql_engine is not None:
+        check_sql_engine_snapshot_marker(request)
+
+    assert_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        group_id=snapshot_str.__class__.__name__,
+        snapshot_id=snapshot_id,
+        snapshot_text=snapshot_str,
+        snapshot_file_extension=".txt",
+        additional_sub_directories_for_snapshots=(sql_engine.value,) if sql_engine is not None else (),
+    )
+
+
 def assert_linkable_element_set_snapshot_equal(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,

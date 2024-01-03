@@ -1103,10 +1103,7 @@ class FilterElementsNode(BaseOutput):
         if self._replace_description:
             return self._replace_description
 
-        formatted_str = textwrap.indent(
-            mf_pformat([x.qualified_name for x in self._include_specs.all_specs]), prefix="  "
-        )
-        return f"Pass Only Elements:\n{formatted_str}"
+        return f"Pass Only Elements: {mf_pformat([x.qualified_name for x in self._include_specs.all_specs])}"
 
     @property
     def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
