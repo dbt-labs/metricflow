@@ -38,7 +38,7 @@ FROM (
           , subq_1.booking__listing AS booking__listing
           , subq_1.bookings_monthly AS bookings_monthly
         FROM (
-          -- Date Spine
+          -- Time Spine
           SELECT
             DATE_TRUNC(subq_3.ds, month) AS metric_time__month
           FROM ***************************.mf_time_spine subq_3

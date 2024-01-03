@@ -28,7 +28,7 @@ FROM (
     , subq_0.ds__extract_dow AS metric_time__extract_dow
     , subq_0.ds__extract_doy AS metric_time__extract_doy
   FROM (
-    -- Date Spine
+    -- Time Spine
     SELECT
       DATE_TRUNC(time_spine_src_10000.ds, day) AS ds__day
       , DATE_TRUNC(time_spine_src_10000.ds, isoweek) AS ds__week

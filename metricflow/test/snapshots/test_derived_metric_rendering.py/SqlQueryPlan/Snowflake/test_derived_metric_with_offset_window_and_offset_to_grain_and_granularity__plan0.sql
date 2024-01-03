@@ -116,7 +116,7 @@ FROM (
             , subq_1.approximate_continuous_booking_value_p99 AS approximate_continuous_booking_value_p99
             , subq_1.approximate_discrete_booking_value_p99 AS approximate_discrete_booking_value_p99
           FROM (
-            -- Date Spine
+            -- Time Spine
             SELECT
               subq_3.ds AS metric_time__day
             FROM ***************************.mf_time_spine subq_3
@@ -433,7 +433,7 @@ FROM (
             , subq_9.approximate_continuous_booking_value_p99 AS approximate_continuous_booking_value_p99
             , subq_9.approximate_discrete_booking_value_p99 AS approximate_discrete_booking_value_p99
           FROM (
-            -- Date Spine
+            -- Time Spine
             SELECT
               subq_11.ds AS metric_time__day
             FROM ***************************.mf_time_spine subq_11

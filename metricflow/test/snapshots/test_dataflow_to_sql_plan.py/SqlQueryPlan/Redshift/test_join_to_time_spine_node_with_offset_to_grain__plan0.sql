@@ -4,7 +4,7 @@ SELECT
   , subq_4.listing AS listing
   , subq_4.booking_fees AS booking_fees
 FROM (
-  -- Date Spine
+  -- Time Spine
   SELECT
     subq_6.ds AS metric_time__day
   FROM ***************************.mf_time_spine subq_6

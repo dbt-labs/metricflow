@@ -1,4 +1,4 @@
--- Date Spine
+-- Time Spine
 -- Metric Time Dimension 'ds'
 -- Pass Only Elements:
 --   ['metric_time__day']

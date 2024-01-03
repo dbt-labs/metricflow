@@ -12,7 +12,7 @@ FROM (
     subq_10.metric_time__day AS metric_time__day
     , SUM(subq_9.bookings) AS bookings_5_days_ago
   FROM (
-    -- Date Spine
+    -- Time Spine
     SELECT
       ds AS metric_time__day
     FROM ***************************.mf_time_spine subq_11

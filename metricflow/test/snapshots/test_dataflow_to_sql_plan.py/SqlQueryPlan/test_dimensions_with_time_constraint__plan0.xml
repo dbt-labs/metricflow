@@ -863,7 +863,7 @@
                         <!-- where = None -->
                         <!-- distinct = False -->
                         <SqlSelectStatementNode>
-                            <!-- description = Date Spine -->
+                            <!-- description = Time Spine -->
                             <!-- node_id = ss_10031 -->
                             <!-- col0 =                                                -->
                             <!--   {'class': 'SqlSelectColumn',                        -->

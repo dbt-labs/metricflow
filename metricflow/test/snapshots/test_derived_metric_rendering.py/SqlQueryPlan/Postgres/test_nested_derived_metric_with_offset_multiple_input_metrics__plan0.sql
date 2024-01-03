@@ -14,7 +14,7 @@ FROM (
       subq_6.metric_time__day AS metric_time__day
       , subq_5.booking_fees_start_of_month AS booking_fees_start_of_month
     FROM (
-      -- Date Spine
+      -- Time Spine
       SELECT
         subq_7.ds AS metric_time__day
       FROM ***************************.mf_time_spine subq_7

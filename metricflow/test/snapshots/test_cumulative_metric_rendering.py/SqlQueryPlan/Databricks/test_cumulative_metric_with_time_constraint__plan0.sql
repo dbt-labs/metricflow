@@ -58,7 +58,7 @@ FROM (
           , subq_2.company__user AS company__user
           , subq_2.txn_revenue AS txn_revenue
         FROM (
-          -- Date Spine
+          -- Time Spine
           SELECT
             subq_4.ds AS metric_time__day
           FROM ***************************.mf_time_spine subq_4
