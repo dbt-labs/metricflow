@@ -393,19 +393,18 @@ class MetricFlowQueryResolver:
         if resolve_order_by_result.input_to_issue_set_mapping.has_issues:
             mappings_to_merge.append(resolve_order_by_result.input_to_issue_set_mapping)
 
-        # Resolve all where filters in the DAG.
+        # Resolve all where filters in the DAG and generate mappings if there are issues.
         filter_spec_lookup = self._build_filter_spec_lookup(resolution_dag)
-        for fitler_spec_resolution in filter_spec_lookup.spec_resolutions:
-            filter_resolver_input = ResolverInputForWhereFilterIntersection(
-                filter_resolution_path=fitler_spec_resolution.filter_location_path,
-                where_filter_intersection=fitler_spec_resolution.where_filter_intersection,
-                object_builder_str=fitler_spec_resolution.object_builder_str,
-            )
-            if fitler_spec_resolution.issue_set.has_issues:
+        for filter_spec_resolution in filter_spec_lookup.spec_resolutions:
+            if filter_spec_resolution.issue_set.has_issues:
                 mappings_to_merge.append(
                     InputToIssueSetMapping.from_one_item(
-                        resolver_input=filter_resolver_input,
-                        issue_set=fitler_spec_resolution.issue_set,
+                        resolver_input=ResolverInputForWhereFilterIntersection(
+                            filter_resolution_path=filter_spec_resolution.filter_location_path,
+                            where_filter_intersection=filter_spec_resolution.where_filter_intersection,
+                            object_builder_str=filter_spec_resolution.object_builder_str,
+                        ),
+                        issue_set=filter_spec_resolution.issue_set,
                     )
                 )
 
