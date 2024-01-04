@@ -183,6 +183,21 @@ class NodeEvaluatorForLinkableInstances:
         candidates_for_join: List[JoinLinkableInstancesRecipe] = []
         start_node_spec_set = start_node_instance_set.spec_set
         for right_node in self._nodes_available_for_joins:
+            # If right node is time spine source node, use cross join.
+            if right_node == time_spine_source_node:
+                needed_metric_time_specs = LinkableSpecSet.from_specs(needed_linkable_specs).metric_time_specs
+                candidates_for_join.append(
+                    JoinLinkableInstancesRecipe(
+                        node_to_join=right_node,
+                        join_on_entity=None,
+                        satisfiable_linkable_specs=list(needed_metric_time_specs),
+                        join_on_partition_dimensions=(),
+                        join_on_partition_time_dimensions=(),
+                        join_type=SqlJoinType.CROSS_JOIN,
+                    )
+                )
+                continue
+
             data_set_in_right_node: SqlDataSet = self._node_data_set_resolver.get_output_data_set(right_node)
             linkable_specs_in_right_node = data_set_in_right_node.instance_set.spec_set.linkable_specs
             entity_specs_in_right_node = data_set_in_right_node.instance_set.spec_set.entity_specs
@@ -301,20 +316,6 @@ class NodeEvaluatorForLinkableInstances:
                             join_type=default_join_type,
                         )
                     )
-
-            # If right node is time spine source node, we can cross join.
-            if right_node == time_spine_source_node:
-                needed_metric_time_specs = LinkableSpecSet.from_specs(needed_linkable_specs).metric_time_specs
-                candidates_for_join.append(
-                    JoinLinkableInstancesRecipe(
-                        node_to_join=right_node,
-                        join_on_entity=None,
-                        satisfiable_linkable_specs=list(needed_metric_time_specs),
-                        join_on_partition_dimensions=(),
-                        join_on_partition_time_dimensions=(),
-                        join_type=SqlJoinType.CROSS_JOIN,
-                    )
-                )
 
         # Return with the candidate set that can satisfy the most linkable specs at the front.
         return sorted(
