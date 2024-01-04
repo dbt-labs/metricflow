@@ -21,6 +21,7 @@ import logging
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple
 
+from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
@@ -80,6 +81,13 @@ class JoinLinkableInstancesRecipe:
         """The recipe as a join description to use in the dataflow plan node."""
         # Figure out what elements to filter from the joined node.
         include_specs: List[LinkableInstanceSpec] = []
+        assert all(
+            [
+                len(spec.entity_links) > 0
+                for spec in self.satisfiable_linkable_specs
+                if not spec.element_name == METRIC_TIME_ELEMENT_NAME
+            ]
+        )
 
         include_specs.extend(
             [
@@ -263,6 +271,9 @@ class NodeEvaluatorForLinkableInstances:
                 satisfiable_linkable_specs = []
                 for needed_linkable_spec in needed_linkable_specs:
                     if len(needed_linkable_spec.entity_links) == 0:
+                        assert (
+                            needed_linkable_spec.element_name == METRIC_TIME_ELEMENT_NAME
+                        ), "Only metric_time should have 0 entity links."
                         continue
 
                     # If the entity in the data set matches the link, then it can be used for joins. For example,
