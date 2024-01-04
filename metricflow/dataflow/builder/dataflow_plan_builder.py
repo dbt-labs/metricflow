@@ -723,16 +723,16 @@ class DataflowPlanBuilder:
         self, linkable_specs: LinkableSpecSet, read_nodes: Sequence[ReadSqlSourceNode]
     ) -> List[ReadSqlSourceNode]:
         """Find source nodes with requested linkable specs and no measures."""
-        selected_nodes: List[ReadSqlSourceNode] = []
+        selected_nodes: Set[ReadSqlSourceNode] = set()
         requested_linkable_specs_set = set(linkable_specs.as_tuple)
         for read_node in read_nodes:
             output_spec_set = self._node_data_set_resolver.get_output_data_set(read_node).instance_set.spec_set
             all_linkable_specs_in_node = set(output_spec_set.linkable_specs)
             requested_linkable_specs_in_node = requested_linkable_specs_set.intersection(all_linkable_specs_in_node)
             if requested_linkable_specs_in_node:
-                selected_nodes.append(read_node)
+                selected_nodes.add(read_node)
 
-        return selected_nodes
+        return list(selected_nodes)
 
     def _find_non_additive_dimension_in_linkable_specs(
         self,
