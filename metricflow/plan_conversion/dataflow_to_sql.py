@@ -395,20 +395,11 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             right_data_set: SqlDataSet = right_node_to_join.accept(self)
             right_data_set_alias = self._next_unique_table_alias()
 
-            if join_description.join_type == SqlJoinType.CROSS_JOIN:
-                sql_join_desc = SqlQueryPlanJoinBuilder.make_column_equality_sql_join_description(
-                    right_source_node=right_data_set.sql_select_node,
-                    left_source_alias=from_data_set_alias,
-                    right_source_alias=right_data_set_alias,
-                    column_equality_descriptions=(),
-                    join_type=join_description.join_type,
-                )
-            else:
-                sql_join_desc = SqlQueryPlanJoinBuilder.make_base_output_join_description(
-                    left_data_set=AnnotatedSqlDataSet(data_set=from_data_set, alias=from_data_set_alias),
-                    right_data_set=AnnotatedSqlDataSet(data_set=right_data_set, alias=right_data_set_alias),
-                    join_description=join_description,
-                )
+            sql_join_desc = SqlQueryPlanJoinBuilder.make_base_output_join_description(
+                left_data_set=AnnotatedSqlDataSet(data_set=from_data_set, alias=from_data_set_alias),
+                right_data_set=AnnotatedSqlDataSet(data_set=right_data_set, alias=right_data_set_alias),
+                join_description=join_description,
+            )
             sql_join_descs.append(sql_join_desc)
 
             if join_on_entity:
