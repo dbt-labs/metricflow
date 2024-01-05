@@ -10,6 +10,7 @@ from metricflow.collection_helpers.pretty_print import mf_pformat
 from metricflow.dag.dag_to_text import dag_as_text
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.naming.metric_scheme import MetricNamingScheme
+from metricflow.query.group_by_item.filter_spec_resolution.filter_pattern_factory import WhereFilterPatternFactory
 from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import FilterSpecResolutionLookUp
 from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_resolver import (
     WhereFilterSpecResolver,
@@ -102,11 +103,16 @@ class ResolveGroupByItemsResult:
 class MetricFlowQueryResolver:
     """Resolves inputs to a query (e.g. metrics, group by items into concrete specs."""
 
-    def __init__(self, manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D
+    def __init__(  # noqa: D
+        self,
+        manifest_lookup: SemanticManifestLookup,
+        where_filter_pattern_factory: WhereFilterPatternFactory,
+    ) -> None:
         self._manifest_lookup = manifest_lookup
         self._post_resolution_query_validator = PostResolutionQueryValidator(
             manifest_lookup=self._manifest_lookup,
         )
+        self._where_filter_pattern_factory = where_filter_pattern_factory
 
     @staticmethod
     def _resolve_group_by_item_input(
@@ -315,6 +321,7 @@ class MetricFlowQueryResolver:
         where_filter_spec_resolver = WhereFilterSpecResolver(
             manifest_lookup=self._manifest_lookup,
             resolution_dag=resolution_dag,
+            spec_pattern_factory=self._where_filter_pattern_factory,
         )
 
         return where_filter_spec_resolver.resolve_lookup()
