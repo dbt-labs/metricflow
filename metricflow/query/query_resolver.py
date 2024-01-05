@@ -8,6 +8,7 @@ from dbt_semantic_interfaces.references import MetricReference
 
 from metricflow.dag.dag_to_text import dag_as_text
 from metricflow.mf_logging.pretty_print import mf_pformat
+from metricflow.mf_logging.runtime import log_runtime
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.naming.metric_scheme import MetricNamingScheme
 from metricflow.query.group_by_item.filter_spec_resolution.filter_pattern_factory import WhereFilterPatternFactory
@@ -328,6 +329,12 @@ class MetricFlowQueryResolver:
 
     def resolve_query(self, resolver_input_for_query: ResolverInputForQuery) -> MetricFlowQueryResolution:
         """Resolve the query into specs that can be passed into the next stage in query processing."""
+        # Workaround for a Pycharm type inspection issue with decorators.
+        # noinspection PyArgumentList
+        return self._resolve_query(resolver_input_for_query=resolver_input_for_query)
+
+    @log_runtime()
+    def _resolve_query(self, resolver_input_for_query: ResolverInputForQuery) -> MetricFlowQueryResolution:
         metric_inputs = resolver_input_for_query.metric_inputs
         group_by_item_inputs = resolver_input_for_query.group_by_item_inputs
         order_by_item_inputs = resolver_input_for_query.order_by_item_inputs

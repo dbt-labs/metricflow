@@ -11,6 +11,7 @@ from dbt_semantic_interfaces.implementations.filters.where_filter import Pydanti
 from dbt_semantic_interfaces.protocols import WhereFilter, WhereFilterIntersection
 from typing_extensions import override
 
+from metricflow.mf_logging.runtime import log_runtime
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.naming.object_builder_str import ObjectBuilderNameConverter
 from metricflow.query.group_by_item.candidate_push_down.push_down_visitor import DagTraversalPathTracker
@@ -74,11 +75,16 @@ class WhereFilterSpecResolver:
 
     def resolve_lookup(self) -> FilterSpecResolutionLookUp:
         """Find all where filters and return a lookup that provides the specs for the included group-by-items."""
+        # Workaround for a Pycharm type inspection issue with decorators.
+        # noinspection PyArgumentList
+        return self._resolve_lookup()
+
+    @log_runtime()
+    def _resolve_lookup(self) -> FilterSpecResolutionLookUp:
         visitor = _ResolveWhereFilterSpecVisitor(
             manifest_lookup=self._manifest_lookup,
             spec_pattern_factory=self.spec_pattern_factory,
         )
-
         return self._resolution_dag.sink_node.accept(visitor)
 
 
