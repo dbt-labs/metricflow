@@ -15,10 +15,10 @@ from dbt_semantic_interfaces.protocols.where_filter import WhereFilter
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 
 from metricflow.assert_one_arg import assert_at_most_one_arg_set
-from metricflow.collection_helpers.pretty_print import mf_pformat
 from metricflow.filters.merge_where import merge_to_single_where_filter
 from metricflow.filters.time_constraint import TimeRangeConstraint
-from metricflow.formatting import indent_log_line
+from metricflow.mf_logging.formatting import indent_log_line
+from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.naming.dunder_scheme import DunderNamingScheme
 from metricflow.naming.metric_scheme import MetricNamingScheme

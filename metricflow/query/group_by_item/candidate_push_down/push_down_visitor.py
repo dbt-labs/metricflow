@@ -9,8 +9,8 @@ from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.type_enums import MetricType
 from typing_extensions import override
 
-from metricflow.collection_helpers.pretty_print import mf_pformat, mf_pformat_many
-from metricflow.formatting import indent_log_line
+from metricflow.mf_logging.formatting import indent_log_line
+from metricflow.mf_logging.pretty_print import mf_pformat, mf_pformat_many
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.query.group_by_item.candidate_push_down.group_by_item_candidate import GroupByItemCandidateSet

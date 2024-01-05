@@ -19,7 +19,7 @@ from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.references import MetricReference
 from dbt_semantic_interfaces.transformations.transform_rule import SemanticManifestTransformRule
 
-from metricflow.collection_helpers.pretty_print import mf_pformat
+from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.naming.naming_scheme import QueryItemNamingScheme
 from metricflow.query.group_by_item.filter_spec_resolution.filter_pattern_factory import (

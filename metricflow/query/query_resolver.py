@@ -6,8 +6,8 @@ from typing import List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.references import MetricReference
 
-from metricflow.collection_helpers.pretty_print import mf_pformat
 from metricflow.dag.dag_to_text import dag_as_text
+from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.naming.metric_scheme import MetricNamingScheme
 from metricflow.query.group_by_item.filter_spec_resolution.filter_pattern_factory import WhereFilterPatternFactory

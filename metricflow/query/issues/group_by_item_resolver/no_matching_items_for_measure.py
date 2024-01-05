@@ -6,8 +6,8 @@ from typing import Sequence, Tuple
 
 from typing_extensions import override
 
-from metricflow.collection_helpers.pretty_print import mf_pformat
-from metricflow.formatting import indent_log_line
+from metricflow.mf_logging.formatting import indent_log_line
+from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow.query.issues.issues_base import (
     MetricFlowQueryIssueType,

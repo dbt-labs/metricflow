@@ -11,8 +11,8 @@ from typing import Optional, Tuple, Union
 from dbt_semantic_interfaces.protocols import WhereFilterIntersection
 from typing_extensions import override
 
-from metricflow.collection_helpers.pretty_print import mf_pformat
-from metricflow.formatting import indent_log_line
+from metricflow.mf_logging.formatting import indent_log_line
+from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.naming.metric_scheme import MetricNamingScheme
 from metricflow.naming.naming_scheme import QueryItemNamingScheme
 from metricflow.protocols.query_parameter import GroupByParameter, MetricQueryParameter, OrderByQueryParameter

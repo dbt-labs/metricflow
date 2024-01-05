@@ -6,7 +6,7 @@ from typing import Optional, Sized, Tuple
 from typing_extensions import override
 
 from metricflow.collection_helpers.merger import Mergeable
-from metricflow.collection_helpers.pretty_print import mf_pformat
+from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import FilterSpecResolutionLookUp
 from metricflow.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
 from metricflow.query.issues.issues_base import MetricFlowQueryResolutionIssueSet

@@ -9,8 +9,8 @@ from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.references import TimeDimensionReference
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 
-from metricflow.collection_helpers.pretty_print import mf_pformat
-from metricflow.formatting import indent_log_line
+from metricflow.mf_logging.formatting import indent_log_line
+from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow.query.group_by_item.candidate_push_down.push_down_visitor import (

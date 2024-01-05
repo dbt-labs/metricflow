@@ -9,7 +9,7 @@ from typing import Any, Dict, List, Optional, Sized, Union
 
 from pydantic import BaseModel
 
-from metricflow.formatting import indent_log_line
+from metricflow.mf_logging.formatting import indent_log_line
 
 logger = logging.getLogger(__name__)
 
