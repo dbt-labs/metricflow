@@ -22,6 +22,9 @@ from dbt_semantic_interfaces.transformations.transform_rule import SemanticManif
 from metricflow.collection_helpers.pretty_print import mf_pformat
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.naming.naming_scheme import QueryItemNamingScheme
+from metricflow.query.group_by_item.filter_spec_resolution.filter_pattern_factory import (
+    DefaultWhereFilterPatternFactory,
+)
 from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
     FilterSpecResolutionLookUp,
 )
@@ -65,6 +68,7 @@ def test_filter_spec_resolution(  # noqa: D
     spec_pattern_resolver = WhereFilterSpecResolver(
         manifest_lookup=ambiguous_resolution_manifest_lookup,
         resolution_dag=resolution_dag,
+        spec_pattern_factory=DefaultWhereFilterPatternFactory(),
     )
 
     resolution_result = spec_pattern_resolver.resolve_lookup()
@@ -104,6 +108,7 @@ def check_resolution_with_filter(  # noqa: D
     spec_pattern_resolver = WhereFilterSpecResolver(
         manifest_lookup=manifest_lookup,
         resolution_dag=resolution_dag,
+        spec_pattern_factory=DefaultWhereFilterPatternFactory(),
     )
 
     resolution_result = spec_pattern_resolver.resolve_lookup()

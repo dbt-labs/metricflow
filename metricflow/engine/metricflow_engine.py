@@ -318,6 +318,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         semantic_manifest_lookup: SemanticManifestLookup,
         sql_client: SqlClient,
         time_source: TimeSource = ServerTimeSource(),
+        query_parser: Optional[MetricFlowQueryParser] = None,
         column_association_resolver: Optional[ColumnAssociationResolver] = None,
     ) -> None:
         """Initializer for MetricFlowEngine.
@@ -365,7 +366,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         )
         self._executor = SequentialPlanExecutor()
 
-        self._query_parser = MetricFlowQueryParser(
+        self._query_parser = query_parser or MetricFlowQueryParser(
             semantic_manifest_lookup=self._semantic_manifest_lookup,
         )
 

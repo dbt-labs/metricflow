@@ -29,6 +29,10 @@ from metricflow.protocols.query_parameter import (
     OrderByQueryParameter,
     SavedQueryParameter,
 )
+from metricflow.query.group_by_item.filter_spec_resolution.filter_pattern_factory import (
+    DefaultWhereFilterPatternFactory,
+    WhereFilterPatternFactory,
+)
 from metricflow.query.group_by_item.group_by_item_resolver import GroupByItemResolver
 from metricflow.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
 from metricflow.query.issues.issues_base import MetricFlowQueryResolutionIssueSet
@@ -78,13 +82,15 @@ class MetricFlowQueryParser:
     def __init__(  # noqa: D
         self,
         semantic_manifest_lookup: SemanticManifestLookup,
+        where_filter_pattern_factory: WhereFilterPatternFactory = DefaultWhereFilterPatternFactory(),
     ) -> None:
         self._manifest_lookup = semantic_manifest_lookup
+        self._metric_naming_schemes = (MetricNamingScheme(),)
         self._group_by_item_naming_schemes = (
             ObjectBuilderNamingScheme(),
             DunderNamingScheme(),
         )
-        self._metric_naming_schemes = (MetricNamingScheme(),)
+        self._where_filter_pattern_factory = where_filter_pattern_factory
 
     def parse_and_validate_saved_query(
         self,
@@ -412,7 +418,7 @@ class MetricFlowQueryParser:
         )
 
         query_resolver = MetricFlowQueryResolver(
-            manifest_lookup=self._manifest_lookup,
+            manifest_lookup=self._manifest_lookup, where_filter_pattern_factory=self._where_filter_pattern_factory
         )
 
         resolver_inputs_for_order_by: List[ResolverInputForOrderByItem] = []

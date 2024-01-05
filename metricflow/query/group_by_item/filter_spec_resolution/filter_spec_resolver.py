@@ -15,6 +15,7 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.naming.object_builder_str import ObjectBuilderNameConverter
 from metricflow.query.group_by_item.candidate_push_down.push_down_visitor import DagTraversalPathTracker
 from metricflow.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
+from metricflow.query.group_by_item.filter_spec_resolution.filter_pattern_factory import WhereFilterPatternFactory
 from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
     FilterSpecResolution,
     FilterSpecResolutionLookUp,
@@ -44,7 +45,6 @@ from metricflow.query.issues.filter_spec_resolver.invalid_where import WhereFilt
 from metricflow.query.issues.issues_base import (
     MetricFlowQueryResolutionIssueSet,
 )
-from metricflow.specs.patterns.typed_patterns import DimensionPattern, EntityPattern, TimeDimensionPattern
 
 logger = logging.getLogger(__name__)
 
@@ -66,13 +66,18 @@ class WhereFilterSpecResolver:
         self,
         manifest_lookup: SemanticManifestLookup,
         resolution_dag: GroupByItemResolutionDag,
+        spec_pattern_factory: WhereFilterPatternFactory,
     ) -> None:
         self._manifest_lookup = manifest_lookup
         self._resolution_dag = resolution_dag
+        self.spec_pattern_factory = spec_pattern_factory
 
     def resolve_lookup(self) -> FilterSpecResolutionLookUp:
         """Find all where filters and return a lookup that provides the specs for the included group-by-items."""
-        visitor = _ResolveWhereFilterSpecVisitor(manifest_lookup=self._manifest_lookup)
+        visitor = _ResolveWhereFilterSpecVisitor(
+            manifest_lookup=self._manifest_lookup,
+            spec_pattern_factory=self.spec_pattern_factory,
+        )
 
         return self._resolution_dag.sink_node.accept(visitor)
 
@@ -85,9 +90,12 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
     collected and returned in a lookup object.
     """
 
-    def __init__(self, manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D
+    def __init__(  # noqa: D
+        self, manifest_lookup: SemanticManifestLookup, spec_pattern_factory: WhereFilterPatternFactory
+    ) -> None:
         self._manifest_lookup = manifest_lookup
         self._path_from_start_node_tracker = DagTraversalPathTracker()
+        self._spec_pattern_factory = spec_pattern_factory
 
     @staticmethod
     def _dedupe_filter_call_parameter_sets(
@@ -121,8 +129,8 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
             ),
         )
 
-    @staticmethod
     def _map_filter_parameter_sets_to_pattern(
+        self,
         filter_call_parameter_sets: FilterCallParameterSets,
     ) -> Sequence[PatternAssociationForWhereFilterGroupByItem]:
         """Given the call parameter sets in a filter, map them to spec patterns.
@@ -140,7 +148,9 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
                     object_builder_str=ObjectBuilderNameConverter.input_str_from_dimension_call_parameter_set(
                         dimension_call_parameter_set
                     ),
-                    spec_pattern=DimensionPattern.from_call_parameter_set(dimension_call_parameter_set),
+                    spec_pattern=self._spec_pattern_factory.create_for_dimension_call_parameter_set(
+                        dimension_call_parameter_set
+                    ),
                 )
             )
         for time_dimension_call_parameter_set in filter_call_parameter_sets.time_dimension_call_parameter_sets:
@@ -150,7 +160,9 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
                     object_builder_str=ObjectBuilderNameConverter.input_str_from_time_dimension_call_parameter_set(
                         time_dimension_call_parameter_set
                     ),
-                    spec_pattern=TimeDimensionPattern.from_call_parameter_set(time_dimension_call_parameter_set),
+                    spec_pattern=self._spec_pattern_factory.create_for_time_dimension_call_parameter_set(
+                        time_dimension_call_parameter_set
+                    ),
                 )
             )
         for entity_call_parameter_set in filter_call_parameter_sets.entity_call_parameter_sets:
@@ -160,7 +172,9 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
                     object_builder_str=ObjectBuilderNameConverter.input_str_from_entity_call_parameter_set(
                         entity_call_parameter_set
                     ),
-                    spec_pattern=EntityPattern.from_call_parameter_set(entity_call_parameter_set),
+                    spec_pattern=self._spec_pattern_factory.create_for_entity_call_parameter_set(
+                        entity_call_parameter_set
+                    ),
                 )
             )
 
