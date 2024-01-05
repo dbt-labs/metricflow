@@ -19,6 +19,7 @@ from metricflow.filters.merge_where import merge_to_single_where_filter
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.mf_logging.formatting import indent
 from metricflow.mf_logging.pretty_print import mf_pformat
+from metricflow.mf_logging.runtime import log_runtime
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.naming.dunder_scheme import DunderNamingScheme
 from metricflow.naming.metric_scheme import MetricNamingScheme
@@ -318,6 +319,39 @@ class MetricFlowQueryParser:
 
         e.g. make sure that the given metric is a valid metric name.
         """
+        # Workaround for a Pycharm type inspection issue with decorators.
+        # noinspection PyArgumentList
+        return self._parse_and_validate_query(
+            metric_names=metric_names,
+            metrics=metrics,
+            group_by_names=group_by_names,
+            group_by=group_by,
+            limit=limit,
+            time_constraint_start=time_constraint_start,
+            time_constraint_end=time_constraint_end,
+            where_constraint=where_constraint,
+            where_constraint_str=where_constraint_str,
+            order_by_names=order_by_names,
+            order_by=order_by,
+            min_max_only=min_max_only,
+        )
+
+    @log_runtime()
+    def _parse_and_validate_query(
+        self,
+        metric_names: Optional[Sequence[str]],
+        metrics: Optional[Sequence[MetricQueryParameter]],
+        group_by_names: Optional[Sequence[str]],
+        group_by: Optional[Tuple[GroupByParameter, ...]],
+        limit: Optional[int],
+        time_constraint_start: Optional[datetime.datetime],
+        time_constraint_end: Optional[datetime.datetime],
+        where_constraint: Optional[WhereFilter],
+        where_constraint_str: Optional[str],
+        order_by_names: Optional[Sequence[str]],
+        order_by: Optional[Sequence[OrderByQueryParameter]],
+        min_max_only: bool,
+    ) -> MetricFlowQuerySpec:
         # TODO: validate min_max_only - can only be called for non-metric queries
         assert_at_most_one_arg_set(metric_names=metric_names, metrics=metrics)
         assert_at_most_one_arg_set(group_by_names=group_by_names, group_by=group_by)

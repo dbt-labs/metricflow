@@ -60,6 +60,7 @@ from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.mf_logging.pretty_print import mf_pformat
+from metricflow.mf_logging.runtime import log_runtime
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.node_processor import PreJoinNodeProcessor
@@ -157,6 +158,23 @@ class DataflowPlanBuilder:
         optimizers: Sequence[DataflowPlanOptimizer] = (),
     ) -> DataflowPlan:
         """Generate a plan for reading the results of a query with the given spec into a dataframe or table."""
+        # Workaround for a Pycharm type inspection issue with decorators.
+        # noinspection PyArgumentList
+        return self._build_plan(
+            query_spec=query_spec,
+            output_sql_table=output_sql_table,
+            output_selection_specs=output_selection_specs,
+            optimizers=optimizers,
+        )
+
+    @log_runtime()
+    def _build_plan(
+        self,
+        query_spec: MetricFlowQuerySpec,
+        output_sql_table: Optional[SqlTable],
+        output_selection_specs: Optional[InstanceSpecSet],
+        optimizers: Sequence[DataflowPlanOptimizer],
+    ) -> DataflowPlan:
         for metric_spec in query_spec.metric_specs:
             if (
                 len(metric_spec.filter_specs) > 0
@@ -588,8 +606,13 @@ class DataflowPlanBuilder:
 
         e.g. distinct listing__country_latest for bookings by listing__country_latest
         """
-        assert not query_spec.metric_specs, "Can't build distinct values plan with metrics."
+        # Workaround for a Pycharm type inspection issue with decorators.
+        # noinspection PyArgumentList
+        return self._build_plan_for_distinct_values(query_spec)
 
+    @log_runtime()
+    def _build_plan_for_distinct_values(self, query_spec: MetricFlowQuerySpec) -> DataflowPlan:
+        assert not query_spec.metric_specs, "Can't build distinct values plan with metrics."
         query_level_filter_specs: Sequence[WhereFilterSpec] = ()
         if query_spec.filter_intersection is not None and len(query_spec.filter_intersection.where_filters) > 0:
             filter_spec_factory = WhereSpecFactory(
