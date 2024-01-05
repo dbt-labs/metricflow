@@ -1,0 +1,80 @@
+FilterSpecResolutionLookUp(
+  spec_resolutions=(
+    FilterSpecResolution(
+      lookup_key=ResolvedSpecLookUpKey(
+        filter_location=WhereFilterLocation(
+          metric_references=(
+            MetricReference(
+              element_name='monthly_metric_0',
+            ),
+          ),
+        ),
+        call_parameter_set=TimeDimensionCallParameterSet(
+          time_dimension_reference=TimeDimensionReference(
+            element_name='metric_time',
+          ),
+        ),
+      ),
+      where_filter_intersection=PydanticWhereFilterIntersection(
+        where_filters=[
+          PydanticWhereFilter(
+            where_sql_template="{{ TimeDimension('metric_time') }} = '2020-01-01'",
+          ),
+        ],
+      ),
+      resolved_spec=TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH),
+      spec_pattern=TimeDimensionPattern(
+        parameter_set=EntityLinkPatternParameterSet(
+          fields_to_compare=(DATE_PART, ELEMENT_NAME, ENTITY_LINKS),
+          element_name='metric_time',
+        ),
+      ),
+      filter_location_path=MetricFlowQueryResolutionPath(
+        resolution_path_nodes=(
+          QueryGroupByItemResolutionNode(node_id=qr_0),
+          MetricGroupByItemResolutionNode(node_id=mtr_1),
+          MetricGroupByItemResolutionNode(node_id=mtr_0),
+        ),
+      ),
+      object_builder_str="TimeDimension('metric_time')",
+    ),
+    FilterSpecResolution(
+      lookup_key=ResolvedSpecLookUpKey(
+        filter_location=WhereFilterLocation(
+          metric_references=(
+            MetricReference(
+              element_name='monthly_metric_0',
+            ),
+          ),
+        ),
+        call_parameter_set=TimeDimensionCallParameterSet(
+          time_dimension_reference=TimeDimensionReference(
+            element_name='metric_time',
+          ),
+        ),
+      ),
+      where_filter_intersection=PydanticWhereFilterIntersection(
+        where_filters=[
+          PydanticWhereFilter(
+            where_sql_template="{{ TimeDimension('metric_time') }} = '2020-01-01'",
+          ),
+        ],
+      ),
+      resolved_spec=TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH),
+      spec_pattern=TimeDimensionPattern(
+        parameter_set=EntityLinkPatternParameterSet(
+          fields_to_compare=(DATE_PART, ELEMENT_NAME, ENTITY_LINKS),
+          element_name='metric_time',
+        ),
+      ),
+      filter_location_path=MetricFlowQueryResolutionPath(
+        resolution_path_nodes=(
+          QueryGroupByItemResolutionNode(node_id=qr_0),
+          MetricGroupByItemResolutionNode(node_id=mtr_3),
+          MetricGroupByItemResolutionNode(node_id=mtr_2),
+        ),
+      ),
+      object_builder_str="TimeDimension('metric_time')",
+    ),
+  ),
+)

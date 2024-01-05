@@ -6,7 +6,7 @@ more detail through the query parser.
 from __future__ import annotations
 
 import logging
-from typing import Dict, Sequence
+from typing import Dict, Optional, Sequence
 
 import pytest
 from _pytest.fixtures import FixtureRequest
@@ -78,18 +78,27 @@ def check_resolution_with_filter(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     semantic_manifest: PydanticSemanticManifest,
-    transform_rule: SemanticManifestTransformRule[PydanticSemanticManifest],
+    transform_rules: Sequence[SemanticManifestTransformRule[PydanticSemanticManifest]],
     queried_metrics: Sequence[MetricReference],
+    where_filter_intersection: Optional[PydanticWhereFilterIntersection] = None,
 ) -> None:
-    modified_manifest = modify_manifest(
-        semantic_manifest=semantic_manifest,
-        transform_rule=transform_rule,
-    )
+    where_filter_intersection = where_filter_intersection or PydanticWhereFilterIntersection(where_filters=[])
+
+    modified_manifest_so_far = semantic_manifest
+
+    for transform_rule in transform_rules:
+        modified_manifest_so_far = modify_manifest(
+            semantic_manifest=modified_manifest_so_far,
+            transform_rule=transform_rule,
+        )
+
+    modified_manifest = modified_manifest_so_far
 
     manifest_lookup = SemanticManifestLookup(modified_manifest)
     resolution_dag = _build_resolution_dag(
         manifest_lookup=manifest_lookup,
         queried_metrics=queried_metrics,
+        where_filter_intersection=where_filter_intersection,
     )
 
     spec_pattern_resolver = WhereFilterSpecResolver(
@@ -115,14 +124,18 @@ def test_filter_resolution_for_valid_metric_filter(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         semantic_manifest=ambiguous_resolution_manifest,
-        transform_rule=ModifyMetricFilterTransform(
-            metric_reference=MetricReference(element_name="derived_metric_with_same_parent_time_grains"),
-            where_filter_intersection=PydanticWhereFilterIntersection(
-                where_filters=[
-                    PydanticWhereFilter(
-                        where_sql_template=("{{ TimeDimension('" + METRIC_TIME_ELEMENT_NAME + "') }} > '2020-01-01'")
-                    ),
-                ]
+        transform_rules=(
+            ModifyMetricFilterTransform(
+                metric_reference=MetricReference(element_name="derived_metric_with_same_parent_time_grains"),
+                where_filter_intersection=PydanticWhereFilterIntersection(
+                    where_filters=[
+                        PydanticWhereFilter(
+                            where_sql_template=(
+                                "{{ TimeDimension('" + METRIC_TIME_ELEMENT_NAME + "') }} > '2020-01-01'"
+                            )
+                        ),
+                    ]
+                ),
             ),
         ),
         queried_metrics=(MetricReference(element_name="derived_metric_with_same_parent_time_grains"),),
@@ -138,14 +151,18 @@ def test_filter_resolution_for_invalid_metric_filter(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         semantic_manifest=ambiguous_resolution_manifest,
-        transform_rule=ModifyMetricFilterTransform(
-            metric_reference=MetricReference(element_name="derived_metric_with_different_parent_time_grains"),
-            where_filter_intersection=PydanticWhereFilterIntersection(
-                where_filters=[
-                    PydanticWhereFilter(
-                        where_sql_template=("{{ TimeDimension('" + METRIC_TIME_ELEMENT_NAME + "') }} > '2020-01-01'")
-                    ),
-                ]
+        transform_rules=(
+            ModifyMetricFilterTransform(
+                metric_reference=MetricReference(element_name="derived_metric_with_different_parent_time_grains"),
+                where_filter_intersection=PydanticWhereFilterIntersection(
+                    where_filters=[
+                        PydanticWhereFilter(
+                            where_sql_template=(
+                                "{{ TimeDimension('" + METRIC_TIME_ELEMENT_NAME + "') }} > '2020-01-01'"
+                            )
+                        ),
+                    ]
+                ),
             ),
         ),
         queried_metrics=(MetricReference(element_name="derived_metric_with_different_parent_time_grains"),),
@@ -161,14 +178,18 @@ def test_filter_resolution_for_valid_metric_input_filter(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         semantic_manifest=ambiguous_resolution_manifest,
-        transform_rule=ModifyInputMetricFilterTransform(
-            metric_reference=MetricReference(element_name="metric_derived_from_homogeneous_derived_metric"),
-            where_filter_intersection=PydanticWhereFilterIntersection(
-                where_filters=[
-                    PydanticWhereFilter(
-                        where_sql_template=("{{ TimeDimension('" + METRIC_TIME_ELEMENT_NAME + "') }} > '2020-01-01'")
-                    ),
-                ]
+        transform_rules=(
+            ModifyInputMetricFilterTransform(
+                metric_reference=MetricReference(element_name="metric_derived_from_homogeneous_derived_metric"),
+                where_filter_intersection=PydanticWhereFilterIntersection(
+                    where_filters=[
+                        PydanticWhereFilter(
+                            where_sql_template=(
+                                "{{ TimeDimension('" + METRIC_TIME_ELEMENT_NAME + "') }} > '2020-01-01'"
+                            )
+                        ),
+                    ]
+                ),
             ),
         ),
         queried_metrics=(MetricReference(element_name="metric_derived_from_homogeneous_derived_metric"),),
@@ -184,15 +205,40 @@ def test_filter_resolution_for_invalid_metric_input_filter(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         semantic_manifest=ambiguous_resolution_manifest,
-        transform_rule=ModifyInputMetricFilterTransform(
-            metric_reference=MetricReference(element_name="metric_derived_from_heterogeneous_derived_metric"),
-            where_filter_intersection=PydanticWhereFilterIntersection(
-                where_filters=[
-                    PydanticWhereFilter(
-                        where_sql_template=("{{ TimeDimension('" + METRIC_TIME_ELEMENT_NAME + "') }} > '2020-01-01'")
-                    ),
-                ]
+        transform_rules=(
+            ModifyInputMetricFilterTransform(
+                metric_reference=MetricReference(element_name="metric_derived_from_heterogeneous_derived_metric"),
+                where_filter_intersection=PydanticWhereFilterIntersection(
+                    where_filters=[
+                        PydanticWhereFilter(
+                            where_sql_template=(
+                                "{{ TimeDimension('" + METRIC_TIME_ELEMENT_NAME + "') }} > '2020-01-01'"
+                            )
+                        ),
+                    ]
+                ),
             ),
         ),
         queried_metrics=(MetricReference(element_name="metric_derived_from_heterogeneous_derived_metric"),),
+    )
+
+
+def test_filter_resolution_for_derived_metrics_with_common_filtered_metric(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    ambiguous_resolution_manifest: PydanticSemanticManifest,
+) -> None:
+    """Checks that there are 2 filter spec resolutions even if the metric + filter combination is repeated.
+
+    The resolutions will have a different filter_location_path.
+    """
+    check_resolution_with_filter(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        semantic_manifest=ambiguous_resolution_manifest,
+        transform_rules=(),
+        queried_metrics=(
+            MetricReference(element_name="derived_metric_with_common_filtered_metric_0"),
+            MetricReference(element_name="derived_metric_with_common_filtered_metric_1"),
+        ),
     )
