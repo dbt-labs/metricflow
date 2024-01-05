@@ -62,8 +62,7 @@ def query_parser_from_yaml(yaml_contents: List[YamlConfigFile]) -> MetricFlowQue
     )
     SemanticManifestValidator[SemanticManifest]().checked_validations(semantic_manifest_lookup.semantic_manifest)
     return MetricFlowQueryParser(
-        model=semantic_manifest_lookup,
-        column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup),
+        semantic_manifest_lookup=semantic_manifest_lookup,
     )
 
 

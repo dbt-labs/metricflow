@@ -47,7 +47,6 @@ from metricflow.query.resolver_inputs.query_resolver_inputs import (
     ResolverInputForQuery,
     ResolverInputForQueryLevelWhereFilterIntersection,
 )
-from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.patterns.base_time_grain import BaseTimeGrainPattern
 from metricflow.specs.patterns.metric_time_pattern import MetricTimePattern
 from metricflow.specs.patterns.none_date_part import NoneDatePartPattern
@@ -78,10 +77,9 @@ class MetricFlowQueryParser:
 
     def __init__(  # noqa: D
         self,
-        column_association_resolver: ColumnAssociationResolver,
-        model: SemanticManifestLookup,
+        semantic_manifest_lookup: SemanticManifestLookup,
     ) -> None:
-        self._manifest_lookup = model
+        self._manifest_lookup = semantic_manifest_lookup
         self._group_by_item_naming_schemes = (
             ObjectBuilderNamingScheme(),
             DunderNamingScheme(),

@@ -84,11 +84,9 @@ def test_suggestions_for_defined_where_filter(  # noqa: D
     )
 
     semantic_manifest_lookup = SemanticManifestLookup(modified_manifest)
-    column_association_resolver = DunderColumnAssociationResolver(modified_manifest)
 
     query_parser = MetricFlowQueryParser(
-        column_association_resolver=column_association_resolver,
-        model=semantic_manifest_lookup,
+        semantic_manifest_lookup=semantic_manifest_lookup,
     )
     with pytest.raises(InvalidQueryException) as e:
         query_parser.parse_and_validate_query(metric_names=("listings",), group_by_names=(METRIC_TIME_ELEMENT_NAME,))
@@ -132,11 +130,10 @@ def test_suggestions_for_defined_filters_in_multi_metric_query(
     )
 
     semantic_manifest_lookup = SemanticManifestLookup(modified_manifest)
-    column_association_resolver = DunderColumnAssociationResolver(modified_manifest)
+    DunderColumnAssociationResolver(modified_manifest)
 
     query_parser = MetricFlowQueryParser(
-        column_association_resolver=column_association_resolver,
-        model=semantic_manifest_lookup,
+        semantic_manifest_lookup=semantic_manifest_lookup,
     )
     with pytest.raises(InvalidQueryException) as e:
         query_parser.parse_and_validate_query(

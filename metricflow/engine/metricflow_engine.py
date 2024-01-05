@@ -366,8 +366,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         self._executor = SequentialPlanExecutor()
 
         self._query_parser = MetricFlowQueryParser(
-            column_association_resolver=self._column_association_resolver,
-            model=self._semantic_manifest_lookup,
+            semantic_manifest_lookup=self._semantic_manifest_lookup,
         )
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
