@@ -71,3 +71,23 @@ metric:
   type_params:
     measure: monthly_measure_0
     window: 2 months
+---
+metric:
+  name: derived_metric_with_common_filtered_metric_0
+  description: One of the derived metrics that have the same metric + filter
+  type: derived
+  type_params:
+    expr: monthly_metric_0
+    metrics:
+      - name: monthly_metric_0
+        filter: "{{ TimeDimension('metric_time') }} = '2020-01-01'"
+---
+metric:
+  name: derived_metric_with_common_filtered_metric_1
+  description: One of the derived metrics that have the same metric + filter
+  type: derived
+  type_params:
+    expr: monthly_metric_0
+    metrics:
+      - name: monthly_metric_0
+        filter: "{{ TimeDimension('metric_time') }} = '2020-01-01'"
