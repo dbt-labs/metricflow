@@ -11,7 +11,7 @@ from typing import Optional, Tuple, Union
 from dbt_semantic_interfaces.protocols import WhereFilterIntersection
 from typing_extensions import override
 
-from metricflow.mf_logging.formatting import indent_log_line
+from metricflow.mf_logging.formatting import indent
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.naming.metric_scheme import MetricNamingScheme
 from metricflow.naming.naming_scheme import QueryItemNamingScheme
@@ -141,7 +141,7 @@ class ResolverInputForQueryLevelWhereFilterIntersection(MetricFlowQueryResolverI
     def ui_description(self) -> str:
         return (
             "WhereFilter(\n"
-            + indent_log_line(
+            + indent(
                 mf_pformat(
                     [where_filter.where_sql_template for where_filter in self.where_filter_intersection.where_filters]
                 )
@@ -168,18 +168,18 @@ class ResolverInputForWhereFilterIntersection(MetricFlowQueryResolverInput):
     def ui_description(self) -> str:
         lines = [
             "WhereFilter(",
-            indent_log_line(
+            indent(
                 mf_pformat(
                     [where_filter.where_sql_template for where_filter in self.where_filter_intersection.where_filters]
                 )
             ),
             ")",
             "Filter Path:",
-            indent_log_line(self.filter_resolution_path.ui_description),
+            indent(self.filter_resolution_path.ui_description),
         ]
         if self.object_builder_str is not None:
             lines.append("Object Builder Input:")
-            lines.append(indent_log_line(self.object_builder_str))
+            lines.append(indent(self.object_builder_str))
         return "\n".join(lines)
 
 

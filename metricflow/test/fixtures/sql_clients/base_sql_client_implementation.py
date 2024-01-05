@@ -9,7 +9,7 @@ import pandas as pd
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 
 from metricflow.dataflow.sql_table import SqlTable
-from metricflow.mf_logging.formatting import indent_log_line
+from metricflow.mf_logging.formatting import indent
 from metricflow.protocols.sql_client import (
     SqlClient,
 )
@@ -32,14 +32,10 @@ class BaseSqlClientImplementation(ABC, SqlClient):
 
     @staticmethod
     def _format_run_query_log_message(statement: str, sql_bind_parameters: SqlBindParameters) -> str:
-        message = f"Running query:\n\n{indent_log_line(statement)}"
+        message = f"Running query:\n\n{indent(statement)}"
         if len(sql_bind_parameters.param_dict) > 0:
             message += (
-                f"\n"
-                f"\n"
-                f"with parameters:\n"
-                f"\n"
-                f"{indent_log_line(pformat_big_objects(sql_bind_parameters.param_dict))}"
+                f"\n" f"\n" f"with parameters:\n" f"\n" f"{indent(pformat_big_objects(sql_bind_parameters.param_dict))}"
             )
         return message
 
@@ -113,7 +109,7 @@ class BaseSqlClientImplementation(ABC, SqlClient):
         start = time.time()
         logger.info(
             f"Running dry_run of:"
-            f"\n\n{indent_log_line(stmt)}\n"
+            f"\n\n{indent(stmt)}\n"
             + (f"\nwith parameters: {dict(sql_bind_parameters.param_dict)}" if sql_bind_parameters.param_dict else "")
         )
         results = self._engine_specific_dry_run_implementation(stmt, sql_bind_parameters)

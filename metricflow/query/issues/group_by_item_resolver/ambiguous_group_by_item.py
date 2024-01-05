@@ -5,7 +5,7 @@ from typing import List
 
 from typing_extensions import override
 
-from metricflow.mf_logging.formatting import indent_log_line
+from metricflow.mf_logging.formatting import indent
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow.query.group_by_item.candidate_push_down.group_by_item_candidate import GroupByItemCandidateSet
@@ -51,7 +51,7 @@ class AmbiguousGroupByItemIssue(MetricFlowQueryResolutionIssue):
                 candidates_str.append(str(spec))
         return (
             f"The given input is ambiguous and can't be resolved. The input could match:\n\n"
-            f"{indent_log_line(mf_pformat(candidates_str))}"
+            f"{indent(mf_pformat(candidates_str))}"
         )
 
     @override

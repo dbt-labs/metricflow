@@ -9,7 +9,7 @@ from typing import Any, Dict, List, Optional, Sized, Union
 
 from pydantic import BaseModel
 
-from metricflow.mf_logging.formatting import indent_log_line
+from metricflow.mf_logging.formatting import indent
 
 logger = logging.getLogger(__name__)
 
@@ -101,7 +101,7 @@ class MetricFlowPrettyFormatter:
         item_block = ",\n".join(items_as_str) + ","
         # Indent the item_block
         if len(item_block) > 0:
-            lines.append(indent_log_line(item_block, indent_prefix=self._indent_prefix))
+            lines.append(indent(item_block, indent_prefix=self._indent_prefix))
         lines.append(right_enclose_str)
         return "\n".join(lines)
 
@@ -145,9 +145,7 @@ class MetricFlowPrettyFormatter:
             result_items_without_limit.append(key_value_seperator)
             result_items_without_limit.append(self._handle_any_obj(value, remaining_line_width=None))
 
-            result_without_limit = indent_log_line(
-                "".join(result_items_without_limit), indent_prefix=self._indent_prefix
-            )
+            result_without_limit = indent("".join(result_items_without_limit), indent_prefix=self._indent_prefix)
             if remaining_line_width is None or len(result_without_limit) <= remaining_line_width:
                 return result_without_limit
 
@@ -223,7 +221,7 @@ class MetricFlowPrettyFormatter:
             result_lines[-1] = result_lines[-1] + value_lines[0]
             result_lines.extend(value_lines[1:])
 
-        return indent_log_line("\n".join(result_lines), indent_prefix=self._indent_prefix)
+        return indent("\n".join(result_lines), indent_prefix=self._indent_prefix)
 
     def _handle_mapping_like_obj(
         self,
@@ -434,7 +432,7 @@ def mf_pformat_many(  # type: ignore
     for key, value in obj_dict.items():
         item_block_lines = (
             f"{key}:",
-            indent_log_line(
+            indent(
                 mf_pformat(
                     obj=value,
                     max_line_length=max(0, max_line_length - len(indent_prefix)),
