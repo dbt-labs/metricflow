@@ -5,7 +5,7 @@ from typing import Sequence, Tuple
 
 from typing_extensions import override
 
-from metricflow.mf_logging.formatting import indent_log_line
+from metricflow.mf_logging.formatting import indent
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow.query.issues.issues_base import (
@@ -38,7 +38,7 @@ class InvalidMetricIssue(MetricFlowQueryResolutionIssue):
         return (
             f"The given input does not exactly match any known metrics.\n\n"
             f"Suggestions:\n"
-            f"{indent_log_line(mf_pformat(list(self.metric_suggestions)))}"
+            f"{indent(mf_pformat(list(self.metric_suggestions)))}"
         )
 
     @override

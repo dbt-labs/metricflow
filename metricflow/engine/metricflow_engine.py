@@ -31,7 +31,7 @@ from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
 from metricflow.execution.execution_plan_to_text import execution_plan_to_text
 from metricflow.execution.executor import SequentialPlanExecutor
 from metricflow.filters.time_constraint import TimeRangeConstraint
-from metricflow.mf_logging.formatting import indent_log_line
+from metricflow.mf_logging.formatting import indent
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.model.semantics.linkable_element_properties import (
     LinkableElementProperties,
@@ -372,7 +372,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def query(self, mf_request: MetricFlowQueryRequest) -> MetricFlowQueryResult:  # noqa: D
-        logger.info(f"Starting query request:\n" f"{indent_log_line(pformat_big_objects(mf_request))}")
+        logger.info(f"Starting query request:\n" f"{indent(pformat_big_objects(mf_request))}")
         explain_result = self._create_execution_plan(mf_request)
         execution_plan = explain_result.execution_plan
 

@@ -6,7 +6,7 @@ import textwrap
 from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimension
 from dbt_semantic_interfaces.type_enums import DimensionType
 
-from metricflow.mf_logging.formatting import indent_log_line
+from metricflow.mf_logging.formatting import indent
 from metricflow.mf_logging.pretty_print import mf_pformat, mf_pformat_many
 from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY
 
@@ -65,7 +65,7 @@ def test_multi_line_key_value_dict() -> None:
         result = mf_pformat(obj={(1,): (4, 5, 6)}, max_line_length=max_line_length)
         if result != previous_result:
             output_lines.append(f"max_line_length={max_line_length}:")
-            output_lines.append(indent_log_line(result))
+            output_lines.append(indent(result))
             previous_result = result
     result = "\n".join(output_lines)
     assert (
@@ -105,7 +105,7 @@ def test_multi_line_key_value_dict_short_value() -> None:
         result = mf_pformat(obj={(1,): 2}, max_line_length=max_line_length)
         if result != previous_result:
             output_lines.append(f"max_line_length={max_line_length}:")
-            output_lines.append(indent_log_line(result))
+            output_lines.append(indent(result))
             previous_result = result
     result = "\n".join(output_lines)
     assert (

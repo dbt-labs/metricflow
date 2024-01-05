@@ -11,7 +11,7 @@ from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 
 from metricflow.errors.errors import SqlBindParametersNotSupportedError
-from metricflow.mf_logging.formatting import indent_log_line
+from metricflow.mf_logging.formatting import indent
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.random_id import random_id
 from metricflow.sql.render.big_query import BigQuerySqlQueryPlanRenderer
@@ -213,7 +213,7 @@ class AdapterBackedSqlClient:
         start = time.time()
         logger.info(
             f"Running dry_run of:"
-            f"\n\n{indent_log_line(stmt)}\n"
+            f"\n\n{indent(stmt)}\n"
             + (f"\nwith parameters: {dict(sql_bind_parameters.param_dict)}" if sql_bind_parameters.param_dict else "")
         )
         request_id = SqlRequestId(f"mf_rid__{random_id()}")
@@ -266,14 +266,10 @@ class AdapterBackedSqlClient:
     @staticmethod
     def _format_run_query_log_message(statement: str, sql_bind_parameters: SqlBindParameters) -> str:
         """Helper for creating nicely formatted query logging."""
-        message = f"Running query:\n\n{indent_log_line(statement)}"
+        message = f"Running query:\n\n{indent(statement)}"
         if len(sql_bind_parameters.param_dict) > 0:
             message += (
-                f"\n"
-                f"\n"
-                f"with parameters:\n"
-                f"\n"
-                f"{indent_log_line(pformat_big_objects(sql_bind_parameters.param_dict))}"
+                f"\n" f"\n" f"with parameters:\n" f"\n" f"{indent(pformat_big_objects(sql_bind_parameters.param_dict))}"
             )
         return message
 

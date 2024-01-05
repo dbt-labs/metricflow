@@ -5,7 +5,7 @@ from typing import Dict, Sequence, Tuple
 
 from typing_extensions import override
 
-from metricflow.mf_logging.formatting import indent_log_line
+from metricflow.mf_logging.formatting import indent
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow.query.group_by_item.candidate_push_down.group_by_item_candidate import GroupByItemCandidateSet
@@ -70,9 +70,9 @@ class NoCommonItemsInParents(MetricFlowQueryResolutionIssue):
             ]
         return (
             f"{last_path_item.ui_description} is built from:\n\n"
-            f"{indent_log_line(last_path_item_parent_descriptions)}.\n"
+            f"{indent(last_path_item_parent_descriptions)}.\n"
             f"However, the given input does not match to a common item that is available to those parents:\n\n"
-            f"{indent_log_line(mf_pformat(parent_to_available_items, max_line_length=80))}\n\n"
+            f"{indent(mf_pformat(parent_to_available_items, max_line_length=80))}\n\n"
             f"For time dimension inputs, please specify a time grain as ambiguous resolution only allows "
             f"resolution when the parents have the same defined time gain."
         )
