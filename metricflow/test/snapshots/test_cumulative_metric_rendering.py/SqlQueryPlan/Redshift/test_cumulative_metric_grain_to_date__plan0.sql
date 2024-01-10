@@ -8,8 +8,7 @@ FROM (
     subq_2.ds__month
     , SUM(subq_2.txn_revenue) AS txn_revenue
   FROM (
-    -- Pass Only Elements:
-    --   ['txn_revenue', 'ds__month']
+    -- Pass Only Elements: ['txn_revenue', 'ds__month']
     SELECT
       subq_1.ds__month
       , subq_1.txn_revenue

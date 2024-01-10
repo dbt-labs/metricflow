@@ -12,8 +12,7 @@ FROM (
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
-    -- Pass Only Elements:
-    --   ['bookings', 'metric_time__day']
+    -- Pass Only Elements: ['bookings', 'metric_time__day']
     SELECT
       DATE_TRUNC(ds, day) AS metric_time__day
       , 1 AS bookings
@@ -25,8 +24,7 @@ FROM (
 FULL OUTER JOIN (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
-  -- Pass Only Elements:
-  --   ['booking_value', 'metric_time__day']
+  -- Pass Only Elements: ['booking_value', 'metric_time__day']
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT

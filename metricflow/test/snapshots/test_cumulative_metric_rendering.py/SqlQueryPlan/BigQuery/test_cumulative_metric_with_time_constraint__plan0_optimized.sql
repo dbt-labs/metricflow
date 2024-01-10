@@ -1,6 +1,5 @@
 -- Join Self Over Time Range
--- Pass Only Elements:
---   ['txn_revenue', 'metric_time__month']
+-- Pass Only Elements: ['txn_revenue', 'metric_time__month']
 -- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-01T00:00:00]
 -- Aggregate Measures
 -- Compute Metrics via Expressions

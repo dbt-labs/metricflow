@@ -1,6 +1,5 @@
 -- Join Standard Outputs
--- Pass Only Elements:
---   ['identity_verifications', 'user__home_state']
+-- Pass Only Elements: ['identity_verifications', 'user__home_state']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
@@ -9,8 +8,7 @@ SELECT
 FROM (
   -- Read Elements From Semantic Model 'id_verifications'
   -- Metric Time Dimension 'ds'
-  -- Pass Only Elements:
-  --   ['identity_verifications', 'ds_partitioned__day', 'user']
+  -- Pass Only Elements: ['identity_verifications', 'ds_partitioned__day', 'user']
   SELECT
     DATE_TRUNC('day', ds_partitioned) AS ds_partitioned__day
     , user_id AS user

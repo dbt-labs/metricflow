@@ -1,6 +1,5 @@
 -- Constrain Output with WHERE
--- Pass Only Elements:
---   ['user__home_state_latest', 'listing__is_lux_latest']
+-- Pass Only Elements: ['user__home_state_latest', 'listing__is_lux_latest']
 SELECT
   listing__is_lux_latest
   , user__home_state_latest

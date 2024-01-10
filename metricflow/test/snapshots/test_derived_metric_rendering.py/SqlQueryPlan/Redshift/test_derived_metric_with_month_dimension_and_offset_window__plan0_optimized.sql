@@ -4,8 +4,7 @@ SELECT
   , bookings_last_month AS bookings_last_month
 FROM (
   -- Join to Time Spine Dataset
-  -- Pass Only Elements:
-  --   ['bookings_monthly', 'metric_time__month']
+  -- Pass Only Elements: ['bookings_monthly', 'metric_time__month']
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT

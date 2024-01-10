@@ -13,8 +13,7 @@ FROM (
       subq_6.metric_time__month
       , subq_6.txn_revenue
     FROM (
-      -- Pass Only Elements:
-      --   ['txn_revenue', 'metric_time__month']
+      -- Pass Only Elements: ['txn_revenue', 'metric_time__month']
       SELECT
         subq_5.metric_time__month
         , subq_5.txn_revenue

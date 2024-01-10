@@ -1,6 +1,5 @@
 -- Join Standard Outputs
--- Pass Only Elements:
---   ['txn_count', 'account_id__customer_id__customer_name']
+-- Pass Only Elements: ['txn_count', 'account_id__customer_id__customer_name']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
@@ -9,8 +8,7 @@ SELECT
 FROM ***************************.account_month_txns account_month_txns_src_10012
 LEFT OUTER JOIN (
   -- Join Standard Outputs
-  -- Pass Only Elements:
-  --   ['customer_id__customer_name', 'ds_partitioned__day', 'account_id']
+  -- Pass Only Elements: ['customer_id__customer_name', 'ds_partitioned__day', 'account_id']
   SELECT
     DATE_TRUNC(bridge_table_src_10013.ds_partitioned, day) AS ds_partitioned__day
     , bridge_table_src_10013.account_id AS account_id

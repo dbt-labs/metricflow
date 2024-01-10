@@ -19,8 +19,7 @@ INNER JOIN (
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
-    -- Pass Only Elements:
-    --   ['booking_value', 'metric_time__day', 'listing']
+    -- Pass Only Elements: ['booking_value', 'metric_time__day', 'listing']
     -- Aggregate Measures
     SELECT
       DATE_TRUNC('day', ds) AS metric_time__day

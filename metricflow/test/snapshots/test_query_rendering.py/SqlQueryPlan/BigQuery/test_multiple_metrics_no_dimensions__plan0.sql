@@ -11,8 +11,7 @@ FROM (
     SELECT
       SUM(subq_3.bookings) AS bookings
     FROM (
-      -- Pass Only Elements:
-      --   ['bookings']
+      -- Pass Only Elements: ['bookings',]
       SELECT
         subq_2.bookings
       FROM (
@@ -325,8 +324,7 @@ CROSS JOIN (
     SELECT
       SUM(subq_9.listings) AS listings
     FROM (
-      -- Pass Only Elements:
-      --   ['listings']
+      -- Pass Only Elements: ['listings',]
       SELECT
         subq_8.listings
       FROM (

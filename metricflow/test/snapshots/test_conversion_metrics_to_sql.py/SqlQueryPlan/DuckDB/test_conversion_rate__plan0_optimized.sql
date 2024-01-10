@@ -16,8 +16,7 @@ FROM (
     FROM (
       -- Read Elements From Semantic Model 'visits_source'
       -- Metric Time Dimension 'ds'
-      -- Pass Only Elements:
-      --   ['visits', 'visit__referrer_id']
+      -- Pass Only Elements: ['visits', 'visit__referrer_id']
       SELECT
         referrer_id AS visit__referrer_id
         , 1 AS visits
@@ -28,8 +27,7 @@ FROM (
   ) subq_18
   FULL OUTER JOIN (
     -- Find conversions for user within the range of INF
-    -- Pass Only Elements:
-    --   ['buys', 'visit__referrer_id']
+    -- Pass Only Elements: ['buys', 'visit__referrer_id']
     -- Aggregate Measures
     SELECT
       visit__referrer_id
@@ -46,8 +44,7 @@ FROM (
       FROM (
         -- Read Elements From Semantic Model 'visits_source'
         -- Metric Time Dimension 'ds'
-        -- Pass Only Elements:
-        --   ['visits', 'visit__referrer_id', 'ds__day', 'user']
+        -- Pass Only Elements: ['visits', 'visit__referrer_id', 'ds__day', 'user']
         SELECT
           DATE_TRUNC('day', ds) AS ds__day
           , user_id AS user

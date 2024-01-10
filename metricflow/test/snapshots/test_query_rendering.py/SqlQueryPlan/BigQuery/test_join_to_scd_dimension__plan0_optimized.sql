@@ -1,6 +1,5 @@
 -- Constrain Output with WHERE
--- Pass Only Elements:
---   ['bookings', 'metric_time__day']
+-- Pass Only Elements: ['bookings', 'metric_time__day']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
@@ -8,8 +7,7 @@ SELECT
   , SUM(bookings) AS family_bookings
 FROM (
   -- Join Standard Outputs
-  -- Pass Only Elements:
-  --   ['bookings', 'listing__capacity', 'metric_time__day']
+  -- Pass Only Elements: ['bookings', 'listing__capacity', 'metric_time__day']
   SELECT
     subq_12.metric_time__day AS metric_time__day
     , listings_src_10019.capacity AS listing__capacity
@@ -17,8 +15,7 @@ FROM (
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
-    -- Pass Only Elements:
-    --   ['bookings', 'metric_time__day', 'listing']
+    -- Pass Only Elements: ['bookings', 'metric_time__day', 'listing']
     SELECT
       DATE_TRUNC(ds, day) AS metric_time__day
       , listing_id AS listing

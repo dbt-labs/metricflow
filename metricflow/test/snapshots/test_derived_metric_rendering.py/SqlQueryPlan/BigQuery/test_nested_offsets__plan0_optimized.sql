@@ -15,8 +15,7 @@ FROM (
       , 2 * bookings AS bookings_offset_once
     FROM (
       -- Join to Time Spine Dataset
-      -- Pass Only Elements:
-      --   ['bookings', 'metric_time__day']
+      -- Pass Only Elements: ['bookings', 'metric_time__day']
       -- Aggregate Measures
       -- Compute Metrics via Expressions
       SELECT
