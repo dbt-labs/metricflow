@@ -240,8 +240,10 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         combined_parent_node = combined_parent_nodes[0]
         assert combined_parent_node is not None
 
-        combined_metric_input_measure_specs = (
-            self._current_left_node.metric_input_measure_specs + current_right_node.metric_input_measure_specs
+        combined_metric_input_measure_specs = tuple(
+            dict.fromkeys(
+                self._current_left_node.metric_input_measure_specs + current_right_node.metric_input_measure_specs
+            ).keys()
         )
 
         for spec in combined_metric_input_measure_specs:
