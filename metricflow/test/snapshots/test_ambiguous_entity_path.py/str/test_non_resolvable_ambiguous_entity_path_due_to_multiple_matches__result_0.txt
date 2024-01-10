@@ -1,0 +1,16 @@
+('Got errors while resolving the query.\n'
+ '\n'
+ 'Error #1:\n'
+ '  Message:\n'
+ '\n'
+ "    The given input is ambiguous and can't be resolved. The input could match:\n"
+ '\n'
+ "      ['entity_1__entity_0__country', 'entity_2__entity_0__country']\n"
+ '\n'
+ '  Query Input:\n'
+ '\n'
+ '    entity_0__country\n'
+ '\n'
+ '  Issue Location:\n'
+ '\n'
+ "    [Resolve Query(['entity_1_and_entity_2_metric'])]")
