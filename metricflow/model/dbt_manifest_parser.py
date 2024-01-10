@@ -16,6 +16,8 @@ from dbt_semantic_interfaces.transformations.semantic_manifest_transformer impor
     PydanticSemanticManifestTransformer,
 )
 
+from metricflow.model.transformations.dedupe_metric_input_measures import DedupeMetricInputMeasuresRule
+
 
 def parse_manifest_from_dbt_generated_manifest(manifest_json_string: str) -> PydanticSemanticManifest:
     """Parse a PydanticSemanticManifest given the generated semantic_manifest json from dbt."""
@@ -32,7 +34,7 @@ def parse_manifest_from_dbt_generated_manifest(manifest_json_string: str) -> Pyd
             BooleanMeasureAggregationRule(),
             ConvertCountToSumRule(),
             ConvertMedianToPercentileRule(),
-            # AddInputMetricMeasuresRule(), Fixed by dbt-core=1.6.0b8
+            DedupeMetricInputMeasuresRule(),  # Remove once fix is in core
         ),
     )
     model = PydanticSemanticManifestTransformer.transform(raw_model, rules)
