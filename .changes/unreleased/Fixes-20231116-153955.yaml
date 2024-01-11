@@ -1,6 +1,0 @@
-kind: Fixes
-body: Apply time offset for nested dervied & ratio metrics
-time: 2023-11-16T15:39:55.211195-08:00
-custom:
-  Author: courtneyholcomb
-  Issue: "882"

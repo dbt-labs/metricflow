@@ -1,6 +1,0 @@
-kind: Fixes
-body: Fix Incorrect SQL Column Name Rendering for WhereConstraintNode
-time: 2023-11-28T14:23:15.269611-08:00
-custom:
-  Author: plypaul
-  Issue: "908"
