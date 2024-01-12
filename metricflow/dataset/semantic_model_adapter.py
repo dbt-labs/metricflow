@@ -20,7 +20,7 @@ class SemanticModelDataSet(SqlDataSet):
         super().__init__(instance_set=instance_set, sql_select_node=sql_select_node)
 
     def __repr__(self) -> str:  # noqa: D
-        return f"{self.__class__.__name__}({self._semantic_model_reference})"
+        return f"{self.__class__.__name__}({repr(self._semantic_model_reference.semantic_model_name)})"
 
     @property
     def semantic_model_reference(self) -> SemanticModelReference:  # noqa: D
