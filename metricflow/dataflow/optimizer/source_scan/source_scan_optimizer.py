@@ -30,7 +30,6 @@ from metricflow.dataflow.dataflow_plan import (
     WriteToResultDataframeNode,
     WriteToResultTableNode,
 )
-from metricflow.dataflow.dataflow_plan_to_text import dataflow_dag_as_text
 from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOptimizer
 from metricflow.dataflow.optimizer.source_scan.cm_branch_combiner import (
     ComputeMetricsBranchCombiner,
@@ -313,9 +312,9 @@ class SourceScanOptimizer(
         logger.log(
             level=self._log_level,
             msg=f"Optimized:\n\n"
-            f"{dataflow_dag_as_text(dataflow_plan.sink_output_node)}\n\n"
+            f"{dataflow_plan.sink_output_node.text_structure()}\n\n"
             f"to:\n\n"
-            f"{dataflow_dag_as_text(optimized_result.checked_sink_node)}",
+            f"{optimized_result.checked_sink_node.text_structure()}",
         )
 
         plan_id = IdGeneratorRegistry.for_class(self.__class__).create_id(OPTIMIZED_DATAFLOW_PLAN_PREFIX)

@@ -10,7 +10,6 @@ from metricflow.dataflow.dataflow_plan import (
     FilterElementsNode,
     WriteToResultDataframeNode,
 )
-from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.dataflow.optimizer.source_scan.cm_branch_combiner import (
     ComputeMetricsBranchCombiner,
     ComputeMetricsBranchCombinerResult,
@@ -48,7 +47,7 @@ def test_read_sql_source_combination(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -86,7 +85,7 @@ def test_filter_combination(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(

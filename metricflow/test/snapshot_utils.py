@@ -12,9 +12,7 @@ from _pytest.fixtures import FixtureRequest
 
 from metricflow.dag.mf_dag import MetricFlowDag
 from metricflow.dataflow.dataflow_plan import DataflowPlan
-from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.execution.execution_plan import ExecutionPlan
-from metricflow.execution.execution_plan_to_text import execution_plan_to_text
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantics.linkable_spec_resolver import LinkableElementSet
 from metricflow.naming.object_builder_scheme import ObjectBuilderNamingScheme
@@ -244,7 +242,7 @@ def assert_execution_plan_text_equal(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=execution_plan,
-        plan_snapshot_text=execution_plan_to_text(execution_plan),
+        plan_snapshot_text=execution_plan.text_structure(),
         incomparable_strings_replacement_function=make_schema_replacement_function(
             system_schema=mf_test_session_state.mf_system_schema,
             source_schema=mf_test_session_state.mf_source_schema,
@@ -263,7 +261,7 @@ def assert_dataflow_plan_text_equal(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
         incomparable_strings_replacement_function=replace_dataset_id_hash,
         additional_sub_directories_for_snapshots=(sql_client.sql_engine_type.value,),
     )

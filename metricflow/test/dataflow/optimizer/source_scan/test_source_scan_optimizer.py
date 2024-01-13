@@ -31,7 +31,6 @@ from metricflow.dataflow.dataflow_plan import (
     WriteToResultDataframeNode,
     WriteToResultTableNode,
 )
-from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import SourceScanOptimizer
 from metricflow.dataset.dataset import DataSet
 from metricflow.query.query_parser import MetricFlowQueryParser
@@ -127,7 +126,7 @@ def check_optimization(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -146,7 +145,7 @@ def check_optimization(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=optimized_dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(optimized_dataflow_plan),
+        plan_snapshot_text=optimized_dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(

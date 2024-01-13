@@ -38,7 +38,6 @@ from metricflow.cli.utils import (
     start_end_time_options,
 )
 from metricflow.dag.dag_visualization import display_dag_as_svg
-from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.engine.metricflow_engine import MetricFlowExplainResult, MetricFlowQueryRequest, MetricFlowQueryResult
 from metricflow.model.data_warehouse_model_validator import DataWarehouseModelValidator
 from metricflow.telemetry.models import TelemetryLevel
@@ -315,7 +314,7 @@ def query(
                             """
                         ),
                         undefined=jinja2.StrictUndefined,
-                    ).render(plan_text=dataflow_plan_as_text(explain_result.dataflow_plan)),
+                    ).render(plan_text=explain_result.dataflow_plan.text_structure()),
                     prefix="-- ",
                 )
             )

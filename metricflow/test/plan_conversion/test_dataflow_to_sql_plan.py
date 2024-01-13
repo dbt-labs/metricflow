@@ -28,7 +28,6 @@ from metricflow.dataflow.dataflow_plan import (
     WhereConstraintNode,
     WriteToResultDataframeNode,
 )
-from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
@@ -496,7 +495,7 @@ def test_compute_metrics_node_simple_expr(
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -561,7 +560,7 @@ def test_join_to_time_spine_node_without_offset(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -627,7 +626,7 @@ def test_join_to_time_spine_node_with_offset_window(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -694,7 +693,7 @@ def test_join_to_time_spine_node_with_offset_to_grain(
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(

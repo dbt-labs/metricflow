@@ -7,7 +7,6 @@ from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.references import EntityReference
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.specs.specs import (
     DimensionSpec,
@@ -60,7 +59,7 @@ def test_cyclic_join(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
