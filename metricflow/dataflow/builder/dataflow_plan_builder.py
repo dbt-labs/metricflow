@@ -235,6 +235,10 @@ class DataflowPlanBuilder:
             logger.info(f"Applying {optimizer.__class__.__name__}")
             try:
                 plan = optimizer.optimize(plan)
+                logger.info(
+                    f"After applying {optimizer.__class__.__name__}, the dataflow plan is:\n"
+                    f"{indent(plan.text_structure())}"
+                )
             except Exception:
                 logger.exception(f"Got an exception applying {optimizer.__class__.__name__}")
 
