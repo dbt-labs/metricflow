@@ -454,23 +454,46 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 time_dimension_specs=query_spec.time_dimension_specs,
             )
 
-        if query_spec.metric_specs:
-            dataflow_plan = self._dataflow_plan_builder.build_plan(
-                query_spec=query_spec,
-                output_sql_table=output_table,
-                output_selection_specs=output_selection_specs,
-                optimizers=(SourceScanOptimizer(),),
-            )
-        else:
-            dataflow_plan = self._dataflow_plan_builder.build_plan_for_distinct_values(query_spec=query_spec)
+        dataflow_plan_optimizer_sets_to_try = (
+            (SourceScanOptimizer(),),
+            (),
+        )
+        dataflow_plan: Optional[DataflowPlan] = None
+        execution_plan: Optional[ExecutionPlan] = None
 
-        if len(dataflow_plan.sink_output_nodes) > 1:
-            raise NotImplementedError(
-                f"Multiple output nodes in the dataflow plan not yet supported. "
-                f"Got tasks: {dataflow_plan.sink_output_nodes}"
-            )
+        for i, dataflow_plan_optimizer_set in enumerate(dataflow_plan_optimizer_sets_to_try):
+            try:
+                if query_spec.metric_specs:
+                    dataflow_plan = self._dataflow_plan_builder.build_plan(
+                        query_spec=query_spec,
+                        output_sql_table=output_table,
+                        output_selection_specs=output_selection_specs,
+                        optimizers=(SourceScanOptimizer(),),
+                    )
+                else:
+                    dataflow_plan = self._dataflow_plan_builder.build_plan_for_distinct_values(query_spec=query_spec)
 
-        execution_plan = self._to_execution_plan_converter.convert_to_execution_plan(dataflow_plan)
+                if len(dataflow_plan.sink_output_nodes) > 1:
+                    raise NotImplementedError(
+                        f"Multiple output nodes in the dataflow plan not yet supported. "
+                        f"Got tasks: {dataflow_plan.sink_output_nodes}"
+                    )
+
+                execution_plan = self._to_execution_plan_converter.convert_to_execution_plan(dataflow_plan)
+                break
+            except Exception as e:
+                # Exception even if no optimizers were applied, so propagate the exception up.
+                if i == len(dataflow_plan_optimizer_sets_to_try) - 1:
+                    raise e
+
+                logger.exception(
+                    f"Got an exception building an execution plan using a dataflow plan created with optimizers: "
+                    f"{dataflow_plan_optimizer_set}. In case the error was due to the optimizer producing an incorrect"
+                    f"plan, retrying creating the dataflow plan with optimizers: "
+                    f"{dataflow_plan_optimizer_sets_to_try[i+1]}"
+                )
+        assert dataflow_plan is not None
+        assert execution_plan is not None
 
         return MetricFlowExplainResult(
             query_spec=query_spec,
