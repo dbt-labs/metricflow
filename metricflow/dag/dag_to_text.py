@@ -3,31 +3,89 @@ from __future__ import annotations
 
 import logging
 import textwrap
+import threading
 import typing
-from typing import Optional
+from contextlib import contextmanager
+from typing import Iterator, Optional
 
 import jinja2
 
 if typing.TYPE_CHECKING:
-    from metricflow.dag.mf_dag import DagNode, DagNodeT, MetricFlowDag
+    from metricflow.dag.mf_dag import DagNode, DagNodeT, DisplayedProperty, MetricFlowDag
 
 from metricflow.mf_logging.pretty_print import mf_pformat
 
 logger = logging.getLogger(__name__)
 
 
+class MaxWidthTracker:
+    """Helps to number columns remaining as the DAG is formatted to text recursively.
+
+    This is needed as the parents of a given node are formatted with an indent. For example, if we want to print a DAG
+    with a column width of 80 and the indent is 4 spaces, then we would want to print the parents with a column width of
+    76.
+    """
+
+    def __init__(self, max_width: int) -> None:  # noqa: D
+        self._current_max_width = max_width
+
+    @contextmanager
+    def update_max_width_for_indented_section(self, indent_prefix: str) -> Iterator[None]:
+        """Context manager used to wrap the code that prints an indented section."""
+        previous_max_width = self._current_max_width
+        self._current_max_width = max(0, self._current_max_width - len(indent_prefix))
+        yield None
+        self._current_max_width = previous_max_width
+
+    @property
+    def current_max_width(self) -> int:  # noqa: D
+        return self._current_max_width
+
+
 class MetricFlowDagTextFormatter:
     """Converts the given node and parents (recursively) to a text representation.
 
-    The text representation should be similar to the XML format:
+    The text representation should be similar to the XML format where the parents are printed in an indented section.:
 
     <FilterElementsNode>
       ...
     </>
     """
 
-    # Parameters for controlling the text output.
-    MAX_WIDTH = 60
+    def __init__(
+        self, max_width: int = 120, node_parent_indent_prefix: str = "    ", value_indent_prefix: str = "  "
+    ) -> None:
+        """Initializer.
+
+        Args:
+            max_width: Try to keep the generated text to this many columns wide.
+            node_parent_indent_prefix: When printing a parent node, use this as a prefix for the indent.
+            value_indent_prefix: When printing the values for a DisplayedProperty, use this indent.
+        """
+        self._max_width = max_width
+        self._node_parent_indent_prefix = node_parent_indent_prefix
+        self._value_indent_prefix = value_indent_prefix
+
+        # In case this gets used in a multi-threaded context, use a thread-local variable since it has mutable state.
+        self._thread_local_data = threading.local()
+        self._thread_local_data.max_width_tracker = MaxWidthTracker(max_width)
+
+    @property
+    def _max_width_tracker(self) -> MaxWidthTracker:  # noqa: D
+        return self._thread_local_data.max_width_tracker
+
+    def _displayed_property_on_one_line(self, displayed_property: DisplayedProperty) -> str:
+        return jinja2.Template(
+            textwrap.dedent(
+                """\
+                <!-- {{ key }} = {{ value }} -->
+                """
+            ),
+            undefined=jinja2.StrictUndefined,
+        ).render(
+            key=displayed_property.key,
+            value=mf_pformat(displayed_property.value, max_line_length=self._max_width_tracker.current_max_width),
+        )
 
     def _format_to_text(self, node: DagNode, inner_contents: Optional[str]) -> str:
         """Convert the given node to the text representation.
@@ -36,62 +94,71 @@ class MetricFlowDagTextFormatter:
         """
         # Generate the descriptions for the node
         node_fields = []
+        max_width = self._max_width_tracker.current_max_width
         for displayed_property in node.displayed_properties:
-            if len(str(displayed_property.value)) > self.MAX_WIDTH or "\n" in str(displayed_property.value):
-                value_str_split = mf_pformat(displayed_property.value).split("\n")
-                max_value_str_length = max([len(x) for x in value_str_split])
+            # See if the displayed property can be printed on one line.
+            displayed_property_on_one_line = self._displayed_property_on_one_line(displayed_property)
+            if len(displayed_property_on_one_line) <= max_width:
+                node_fields.append(displayed_property_on_one_line)
+                continue
+
+            # If not, split them into multiple lines.
+            value_str = mf_pformat(
+                displayed_property.value,
+                # The string representation of displayed_property.value will be wrapped with "<!-- ", " -->" so subtract
+                # the width of those.
+                max_line_length=max_width - len("<!-- ") - len(" -->"),
+                indent_prefix=self._value_indent_prefix,
+            )
+
+            # Figure out the max width of the value so that we can add appropriate spacing so that the "<!--" / "-->"
+            # line up.
+            value_str_split = value_str.split("\n")
+            max_value_str_length = max([len(x) for x in value_str_split])
+
+            # Print the key on multiple lines.
+            node_fields.append(
+                jinja2.Template(
+                    textwrap.dedent(
+                        """\
+                        <!-- {{ key }} = {{ padding }} -->
+                        """
+                    ),
+                    undefined=jinja2.StrictUndefined,
+                ).render(
+                    key=displayed_property.key,
+                    padding=" "
+                    * (
+                        (len("<!-- ") + len(self._value_indent_prefix) + max_value_str_length + len(" -->"))
+                        - len("<!-- ")
+                        - len(displayed_property.key)
+                        - len(" =")
+                        - len(" -->")
+                    ),
+                )
+            )
+
+            # Print the lines for the value in an indented section.
+            for value_str in value_str_split:
                 node_fields.append(
                     jinja2.Template(
                         textwrap.dedent(
                             """\
-                            <!-- {{ key }} = {{ padding }} -->
+                            <!-- {{ indent_prefix }}{{ value }} {{ padding }} -->
                             """
                         ),
                         undefined=jinja2.StrictUndefined,
                     ).render(
-                        key=displayed_property.key,
+                        indent_prefix=self._value_indent_prefix,
+                        value=value_str,
                         padding=" "
                         * (
-                            (len("<!--   ") + max_value_str_length + len(" -->"))
+                            (len("<!-- ") + len(self._value_indent_prefix) + max_value_str_length + len(" -->"))
                             - len("<!-- ")
-                            - len(displayed_property.key)
-                            - len(" = ")
-                            - len("-->")
+                            - len(self._value_indent_prefix)
+                            - len(value_str)
+                            - len(" -->")
                         ),
-                    )
-                )
-                for value_str in value_str_split:
-                    node_fields.append(
-                        jinja2.Template(
-                            textwrap.dedent(
-                                """\
-                                <!--   {{ value }} {{ padding }} -->
-                                """
-                            ),
-                            undefined=jinja2.StrictUndefined,
-                        ).render(
-                            value=value_str,
-                            padding=" "
-                            * (
-                                (len("<!-- ") + max_value_str_length + len(" -->"))
-                                - len("<!-- ")
-                                - len(value_str)
-                                - len(" -->")
-                            ),
-                        )
-                    )
-            else:
-                node_fields.append(
-                    jinja2.Template(
-                        textwrap.dedent(
-                            """\
-                            <!-- {{ key }} = {{ value }} -->
-                            """
-                        ),
-                        undefined=jinja2.StrictUndefined,
-                    ).render(
-                        key=displayed_property.key,
-                        value=displayed_property.value,
                     )
                 )
 
@@ -122,8 +189,11 @@ class MetricFlowDagTextFormatter:
         The text representation is similar to XML.
         """
         parent_node_descriptions = []
-        for parent_node in node.parent_nodes:
-            parent_node_descriptions.append(self._recursively_format_to_text(parent_node))
+        with self._max_width_tracker.update_max_width_for_indented_section(
+            indent_prefix=self._node_parent_indent_prefix
+        ):
+            for parent_node in node.parent_nodes:
+                parent_node_descriptions.append(self._recursively_format_to_text(parent_node))
 
         return self._format_to_text(node=node, inner_contents="\n".join(parent_node_descriptions))
 
@@ -135,8 +205,10 @@ class MetricFlowDagTextFormatter:
         try:
             # Convert each of the components that are associated with the sink nodes to a text representation.
             component_from_sink_nodes_as_text = []
-            for sink_node in dag.sink_nodes:
-                component_from_sink_nodes_as_text.append(self.dag_component_to_text(sink_node))
+
+            with self._max_width_tracker.update_max_width_for_indented_section(self._node_parent_indent_prefix):
+                for sink_node in dag.sink_nodes:
+                    component_from_sink_nodes_as_text.append(self.dag_component_to_text(sink_node))
 
             # Under <DataflowPlan>, render all components.
             return jinja2.Template(
