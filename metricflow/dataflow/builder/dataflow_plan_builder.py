@@ -57,7 +57,8 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
 from metricflow.filters.time_constraint import TimeRangeConstraint
-from metricflow.mf_logging.pretty_print import mf_pformat, mf_pformat_many
+from metricflow.mf_logging.formatting import indent
+from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.mf_logging.runtime import log_runtime
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
@@ -889,13 +890,9 @@ class DataflowPlanBuilder:
             logger.info(f"Evaluation of {node} took {time.time() - start_time:.2f}s")
 
             logger.info(
-                mf_pformat_many(
-                    description="Evaluation for source node:",
-                    obj_dict={
-                        "node": node.text_structure(),
-                        "evaluation": evaluation,
-                    },
-                )
+                "Evaluation for source node:"
+                + indent(f"\nnode:\n{indent(node.text_structure())}")
+                + indent(f"\nevaluation:\n{indent(mf_pformat(evaluation))}")
             )
 
             if len(evaluation.unjoinable_linkable_specs) > 0:
@@ -926,14 +923,10 @@ class DataflowPlanBuilder:
             evaluation = node_to_evaluation[node_with_lowest_cost_plan]
 
             logger.info(
-                mf_pformat_many(
-                    description="Lowest cost plan is:",
-                    obj_dict={
-                        "node": node_with_lowest_cost_plan.text_structure(),
-                        "evaluation": evaluation,
-                        "joins": len(node_to_evaluation[node_with_lowest_cost_plan].join_recipes),
-                    },
-                )
+                "Lowest cost plan is:"
+                + indent(f"\nnode:\n{indent(node_with_lowest_cost_plan.text_structure())}")
+                + indent(f"\nevaluation:\n{indent(mf_pformat(evaluation))}")
+                + indent(f"\njoins: {len(node_to_evaluation[node_with_lowest_cost_plan].join_recipes)}")
             )
 
             # Nodes containing the linkable instances will be joined to the source node, so these
@@ -1250,14 +1243,11 @@ class DataflowPlanBuilder:
 
         if measure_recipe is None:
             logger.info(
-                mf_pformat_many(
-                    description="Looking for a recipe to get:",
-                    obj_dict={
-                        "measure_specs": [measure_spec],
-                        "required_linkable_set": required_linkable_specs,
-                    },
-                )
+                "Looking for a recipe to get:"
+                + indent(f"\nmeasure_specs:\n{mf_pformat([measure_spec])}")
+                + indent(f"\nevaluation:\n{mf_pformat(required_linkable_specs)}")
             )
+
             find_recipe_start_time = time.time()
             measure_recipe = self._find_dataflow_recipe(
                 measure_spec_properties=measure_properties,
@@ -1271,7 +1261,7 @@ class DataflowPlanBuilder:
                 f"{time.time() - find_recipe_start_time:.2f}s"
             )
 
-        logger.info(f"Using recipe:\n{mf_pformat(measure_recipe)}")
+        logger.info(f"Using recipe:\n{indent(mf_pformat(measure_recipe))}")
 
         if measure_recipe is None:
             # TODO: Improve for better user understandability.
