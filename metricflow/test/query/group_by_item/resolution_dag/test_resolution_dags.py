@@ -6,7 +6,6 @@ from typing import Dict
 import pytest
 from _pytest.fixtures import FixtureRequest
 
-from metricflow.dag.dag_to_text import dag_as_text
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
@@ -30,5 +29,5 @@ def test_snapshot(
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=resolution_dag,
-        plan_snapshot_text=dag_as_text(resolution_dag),
+        plan_snapshot_text=resolution_dag.text_structure(),
     )

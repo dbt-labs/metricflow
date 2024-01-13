@@ -5,7 +5,6 @@ from _pytest.fixtures import FixtureRequest
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from metricflow.sql.sql_plan import SqlQueryPlan, SqlQueryPlanNode, SqlSelectStatementNode
-from metricflow.sql.sql_plan_to_text import sql_query_plan_as_text
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState, check_sql_engine_snapshot_marker
 from metricflow.test.snapshot_utils import (
     assert_plan_snapshot_text_equal,
@@ -84,7 +83,7 @@ def assert_sql_plan_text_equal(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=sql_query_plan,
-        plan_snapshot_text=sql_query_plan_as_text(sql_query_plan),
+        plan_snapshot_text=sql_query_plan.text_structure(),
         incomparable_strings_replacement_function=make_schema_replacement_function(
             system_schema=mf_test_session_state.mf_system_schema, source_schema=mf_test_session_state.mf_source_schema
         ),
