@@ -4,6 +4,7 @@ import logging
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple
 
+from metricflow.mf_logging.formatting import indent
 from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlQueryPlanOptimizer
 from metricflow.sql.sql_exprs import (
     SqlColumnAliasReferenceExpression,
@@ -684,7 +685,7 @@ class SqlGroupByRewritingVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
                     )
                 )
             else:
-                logger.error(f"Did not find matching select for {group_by} in {node}")
+                logger.info(f"Did not find matching select for {group_by} in:\n{indent(node.text_structure())}")
                 new_group_bys.append(group_by)
 
         return SqlSelectStatementNode(
