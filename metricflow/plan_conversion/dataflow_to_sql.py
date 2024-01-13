@@ -40,6 +40,7 @@ from metricflow.dataset.dataset import DataSet
 from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.instances import InstanceSet, MetadataInstance, MetricInstance, TimeDimensionInstance
+from metricflow.mf_logging.formatting import indent
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.instance_converters import (
     AddLinkToLinkableElements,
@@ -188,6 +189,10 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         ):
             logger.info(f"Applying optimizer: {optimizer.__class__.__name__}")
             sql_select_node = optimizer.optimize(sql_select_node)
+            logger.info(
+                f"After applying {optimizer.__class__.__name__}, the SQL query plan is:\n"
+                f"{indent(sql_select_node.text_structure())}"
+            )
 
         return SqlQueryPlan(plan_id=sql_query_plan_id, render_node=sql_select_node)
 
