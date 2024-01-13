@@ -53,7 +53,6 @@ from metricflow.dataflow.dataflow_plan import (
     WriteToResultDataframeNode,
     WriteToResultTableNode,
 )
-from metricflow.dataflow.dataflow_plan_to_text import dataflow_dag_as_text
 from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOptimizer
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.dataset import DataSet
@@ -891,11 +890,11 @@ class DataflowPlanBuilder:
                 if missing_specs:
                     logger.debug(
                         f"Skipping evaluation for node since it does not have all of the measure specs {missing_specs}:"
-                        f"\n\n{dataflow_dag_as_text(node)}"
+                        f"\n\n{node.text_structure()}"
                     )
                     continue
 
-            logger.debug(f"Evaluating source node:\n{mf_pformat(dataflow_dag_as_text(node))}")
+            logger.debug(f"Evaluating source node:\n{mf_pformat(node.text_structure())}")
 
             start_time = time.time()
             evaluation = node_evaluator.evaluate_node(
@@ -910,7 +909,7 @@ class DataflowPlanBuilder:
                 mf_pformat_many(
                     description="Evaluation for source node:",
                     obj_dict={
-                        "node": dataflow_dag_as_text(node),
+                        "node": node.text_structure(),
                         "evaluation": evaluation,
                     },
                 )
@@ -947,7 +946,7 @@ class DataflowPlanBuilder:
                 mf_pformat_many(
                     description="Lowest cost plan is:",
                     obj_dict={
-                        "node": dataflow_dag_as_text(node_with_lowest_cost_plan),
+                        "node": node_with_lowest_cost_plan.text_structure(),
                         "evaluation": evaluation,
                         "joins": len(node_to_evaluation[node_with_lowest_cost_plan].join_recipes),
                     },

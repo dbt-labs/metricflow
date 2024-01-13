@@ -23,7 +23,6 @@ from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanCon
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_plan import SqlQueryPlan
-from metricflow.sql.sql_plan_to_text import sql_query_plan_as_text
 from metricflow.sql_request.sql_request_attributes import SqlJsonTag
 
 logger = logging.getLogger(__name__)
@@ -63,7 +62,7 @@ class DataflowToExecutionPlanConverter(SinkNodeVisitor[ExecutionPlan]):
             dataflow_plan_node=node,
         )
 
-        logger.debug(f"Generated SQL query plan is:\n{sql_query_plan_as_text(sql_plan)}")
+        logger.debug(f"Generated SQL query plan is:\n{sql_plan.text_structure()}")
 
         render_result = self._sql_plan_renderer.render_sql_query_plan(sql_plan)
 

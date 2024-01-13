@@ -6,7 +6,6 @@ from typing import List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.references import MetricReference
 
-from metricflow.dag.dag_to_text import dag_as_text
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.mf_logging.runtime import log_runtime
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
@@ -191,7 +190,7 @@ class MetricFlowQueryResolver:
             metric_references=metric_references,
             where_filter_intersection=filter_input.where_filter_intersection,
         )
-        logger.info(f"Resolution DAG is:\n{dag_as_text(resolution_dag)}")
+        logger.info(f"Resolution DAG is:\n{resolution_dag.text_structure()}")
 
         group_by_item_resolver = GroupByItemResolver(
             manifest_lookup=self._manifest_lookup,

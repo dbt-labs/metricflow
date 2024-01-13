@@ -9,7 +9,6 @@ from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
 from metricflow.filters.time_constraint import TimeRangeConstraint
@@ -54,7 +53,7 @@ def test_simple_plan(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -87,7 +86,7 @@ def test_primary_entity_dimension(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -124,7 +123,7 @@ def test_joined_plan(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -162,7 +161,7 @@ def test_order_by_plan(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -191,7 +190,7 @@ def test_limit_rows_plan(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -225,7 +224,7 @@ def test_multiple_metrics_plan(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -259,7 +258,7 @@ def test_single_semantic_model_ratio_metrics_plan(
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -293,7 +292,7 @@ def test_multi_semantic_model_ratio_metrics_plan(
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -329,7 +328,7 @@ def test_multihop_join_plan(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -359,7 +358,7 @@ def test_where_constrained_plan(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -388,7 +387,7 @@ def test_where_constrained_plan_time_dimension(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -418,7 +417,7 @@ def test_where_constrained_with_common_linkable_plan(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -470,7 +469,7 @@ def test_cumulative_metric_with_window(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -498,7 +497,7 @@ def test_cumulative_metric_no_window_or_grain_with_metric_time(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -526,7 +525,7 @@ def test_cumulative_metric_no_window_or_grain_without_metric_time(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -557,7 +556,7 @@ def test_distinct_values_plan(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -587,7 +586,7 @@ def test_distinct_values_plan_with_join(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -615,7 +614,7 @@ def test_measure_constraint_plan(
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -643,7 +642,7 @@ def test_measure_constraint_with_reused_measure_plan(
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -674,7 +673,7 @@ def test_common_semantic_model(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -702,7 +701,7 @@ def test_derived_metric_offset_window(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -730,7 +729,7 @@ def test_derived_metric_offset_to_grain(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -757,7 +756,7 @@ def test_derived_metric_offset_with_granularity(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -784,7 +783,7 @@ def test_derived_offset_cumulative_metric(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -810,7 +809,7 @@ def test_join_to_time_spine_with_metric_time(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -836,7 +835,7 @@ def test_join_to_time_spine_derived_metric(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -864,7 +863,7 @@ def test_join_to_time_spine_with_non_metric_time(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -887,7 +886,7 @@ def test_dont_join_to_time_spine_if_no_time_dimension_requested(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -913,7 +912,7 @@ def test_nested_derived_metric_with_outer_offset(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -942,7 +941,7 @@ def test_min_max_only_categorical(
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -971,7 +970,7 @@ def test_min_max_only_time(
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -994,7 +993,7 @@ def test_metric_time_only(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -1017,7 +1016,7 @@ def test_metric_time_quarter(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -1046,7 +1045,7 @@ def test_metric_time_with_other_dimensions(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -1075,7 +1074,7 @@ def test_dimensions_with_time_constraint(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(
@@ -1108,7 +1107,7 @@ def test_min_max_only_time_year(
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+        plan_snapshot_text=dataflow_plan.text_structure(),
     )
 
     display_graph_if_requested(

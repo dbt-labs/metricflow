@@ -27,7 +27,6 @@ from metricflow.engine.models import Dimension, Entity, Measure, Metric, SavedQu
 from metricflow.engine.time_source import ServerTimeSource
 from metricflow.errors.errors import ExecutionException
 from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
-from metricflow.execution.execution_plan_to_text import execution_plan_to_text
 from metricflow.execution.executor import SequentialPlanExecutor
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.mf_logging.formatting import indent
@@ -385,7 +384,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
         task = execution_plan.tasks[0]
 
-        logger.info(f"Sequentially running tasks in:\n" f"{execution_plan_to_text(execution_plan)}")
+        logger.info(f"Sequentially running tasks in:\n" f"{execution_plan.text_structure()}")
         execution_results = self._executor.execute_plan(execution_plan)
         logger.info("Finished running tasks in execution plan")
 
