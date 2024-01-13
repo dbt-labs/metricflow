@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "dbt-metricflow"
-version = "0.4.0"
+version = "0.5.0"
 description = "Execute commands against the MetricFlow semantic layer with dbt."
 readme = "README.md"
 requires-python = ">=3.8,<3.12"
@@ -24,8 +24,8 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
-  "dbt-core~=1.7.0",
-  "metricflow~=0.203.0"
+  "dbt-core~=1.7.4",
+  "metricflow~=0.204.0"
 ]
 
 [project.urls]
