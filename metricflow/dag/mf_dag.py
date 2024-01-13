@@ -11,6 +11,7 @@ from typing import Any, Generic, List, Sequence, TypeVar
 
 import jinja2
 
+from metricflow.dag.dag_to_text import MetricFlowDagTextFormatter
 from metricflow.dag.id_generation import IdGeneratorRegistry
 from metricflow.dag.id_prefix import IdPrefix
 from metricflow.dag.prefix_id import PrefixIdGenerator
@@ -111,6 +112,10 @@ class DagNode(ABC):
         """Visit this node."""
         return visitor.visit_node(self)
 
+    def text_structure(self, formatter: MetricFlowDagTextFormatter = MetricFlowDagTextFormatter()) -> str:
+        """Return a text representation that shows the structure of the DAG component starting from this node."""
+        return formatter.dag_component_to_text(self)
+
 
 def make_graphviz_label(
     title: str, properties: List[DisplayedProperty], title_font_size: int = 12, property_font_size: int = 6
@@ -184,3 +189,7 @@ class MetricFlowDag(Generic[DagNodeT]):  # noqa: D
     @property
     def sink_nodes(self) -> List[DagNodeT]:  # noqa: D
         return self._sink_nodes
+
+    def text_structure(self, formatter: MetricFlowDagTextFormatter = MetricFlowDagTextFormatter()) -> str:
+        """Return a text representation that shows the structure of this DAG."""
+        return formatter.dag_to_text(self)
