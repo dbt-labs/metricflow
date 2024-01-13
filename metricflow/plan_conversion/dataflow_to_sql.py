@@ -169,6 +169,28 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
     def column_association_resolver(self) -> ColumnAssociationResolver:  # noqa: D
         return self._column_association_resolver
 
+    def convert_to_sql_query_plan(
+        self,
+        sql_engine_type: SqlEngine,
+        sql_query_plan_id: str,
+        dataflow_plan_node: Union[BaseOutput, ComputedMetricsOutput],
+        optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O4,
+    ) -> SqlQueryPlan:
+        """Create an SQL query plan that represents the computation up to the given dataflow plan node."""
+        sql_select_node: SqlQueryPlanNode = dataflow_plan_node.accept(self).sql_select_node
+
+        # TODO: Make this a more generally accessible attribute instead of checking against the
+        # BigQuery-ness of the engine
+        use_column_alias_in_group_by = sql_engine_type is SqlEngine.BIGQUERY
+
+        for optimizer in SqlQueryOptimizerConfiguration.optimizers_for_level(
+            optimization_level, use_column_alias_in_group_by=use_column_alias_in_group_by
+        ):
+            logger.info(f"Applying optimizer: {optimizer.__class__.__name__}")
+            sql_select_node = optimizer.optimize(sql_select_node)
+
+        return SqlQueryPlan(plan_id=sql_query_plan_id, render_node=sql_select_node)
+
     def _next_unique_table_alias(self) -> str:
         """Return the next unique table alias to use in generating queries."""
         return IdGeneratorRegistry.for_class(self.__class__).create_id(prefix="subq")
@@ -1001,28 +1023,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 order_bys=(),
             ),
         )
-
-    def convert_to_sql_query_plan(
-        self,
-        sql_engine_type: SqlEngine,
-        sql_query_plan_id: str,
-        dataflow_plan_node: Union[BaseOutput, ComputedMetricsOutput],
-        optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O4,
-    ) -> SqlQueryPlan:
-        """Create an SQL query plan that represents the computation up to the given dataflow plan node."""
-        sql_select_node: SqlQueryPlanNode = dataflow_plan_node.accept(self).sql_select_node
-
-        # TODO: Make this a more generally accessible attribute instead of checking against the
-        # BigQuery-ness of the engine
-        use_column_alias_in_group_by = sql_engine_type is SqlEngine.BIGQUERY
-
-        for optimizer in SqlQueryOptimizerConfiguration.optimizers_for_level(
-            optimization_level, use_column_alias_in_group_by=use_column_alias_in_group_by
-        ):
-            logger.info(f"Applying optimizer: {optimizer.__class__.__name__}")
-            sql_select_node = optimizer.optimize(sql_select_node)
-
-        return SqlQueryPlan(plan_id=sql_query_plan_id, render_node=sql_select_node)
 
     def visit_metric_time_dimension_transform_node(self, node: MetricTimeDimensionTransformNode) -> SqlDataSet:
         """Implement the behavior of the MetricTimeDimensionTransformNode.
