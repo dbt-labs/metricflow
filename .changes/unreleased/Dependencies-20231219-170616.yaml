@@ -1,6 +1,0 @@
-kind: Dependencies
-body: Remove unnecessary MarkupSafe dependency
-time: 2023-12-19T17:06:16.61921-08:00
-custom:
-  Author: tlento
-  PR: "950"
