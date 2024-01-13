@@ -1,7 +1,7 @@
 <ExecutionPlan>
     <SelectSqlQueryToDataFrameTask>
-        <!-- description = Run a query and write the results to a data frame -->
-        <!-- node_id = rsq_0 -->
+        <!-- description = 'Run a query and write the results to a data frame' -->
+        <!-- node_id = NodeId(id_str='rsq_0') -->
         <!-- sql_query =                                                                                  -->
         <!--   ('-- Combine Aggregated Outputs\n'                                                         -->
         <!--    'SELECT\n'                                                                                -->

@@ -1,44 +1,56 @@
 <DataflowPlan>
     <WriteToResultDataframeNode>
-        <!-- description = Write to Dataframe -->
-        <!-- node_id = wrd_0 -->
+        <!-- description = 'Write to Dataframe' -->
+        <!-- node_id = NodeId(id_str='wrd_0') -->
         <OrderByLimitNode>
-            <!-- description = Order By ['listing__is_lux_latest'] Limit 100 -->
-            <!-- node_id = obl_0 -->
-            <!-- order_by_spec =                                                                                                          -->
-            <!--   OrderBySpec(                                                                                                           -->
-            <!--     instance_spec=DimensionSpec(element_name='is_lux_latest', entity_links=(EntityReference(element_name='listing'),)),  -->
-            <!--     descending=True,                                                                                                     -->
-            <!--   )                                                                                                                      -->
-            <!-- limit = 100 -->
+            <!-- description = "Order By ['listing__is_lux_latest'] Limit 100" -->
+            <!-- node_id = NodeId(id_str='obl_0') -->
+            <!-- order_by_spec =                                                 -->
+            <!--   OrderBySpec(                                                  -->
+            <!--     instance_spec=DimensionSpec(                                -->
+            <!--       element_name='is_lux_latest',                             -->
+            <!--       entity_links=(EntityReference(element_name='listing'),),  -->
+            <!--     ),                                                          -->
+            <!--     descending=True,                                            -->
+            <!--   )                                                             -->
+            <!-- limit = '100' -->
             <FilterElementsNode>
-                <!-- description =                                                                  -->
-                <!--   "Pass Only Elements: ['user__home_state_latest', 'listing__is_lux_latest']"  -->
-                <!-- node_id = pfe_2 -->
-                <!-- include_spec =                                                                                           -->
-                <!--   DimensionSpec(element_name='home_state_latest', entity_links=(EntityReference(element_name='user'),))  -->
-                <!-- include_spec =                                                                                          -->
-                <!--   DimensionSpec(element_name='is_lux_latest', entity_links=(EntityReference(element_name='listing'),))  -->
+                <!-- description = "Pass Only Elements: ['user__home_state_latest', 'listing__is_lux_latest']" -->
+                <!-- node_id = NodeId(id_str='pfe_2') -->
+                <!-- include_spec =                                             -->
+                <!--   DimensionSpec(                                           -->
+                <!--     element_name='home_state_latest',                      -->
+                <!--     entity_links=(EntityReference(element_name='user'),),  -->
+                <!--   )                                                        -->
+                <!-- include_spec =                                                -->
+                <!--   DimensionSpec(                                              -->
+                <!--     element_name='is_lux_latest',                             -->
+                <!--     entity_links=(EntityReference(element_name='listing'),),  -->
+                <!--   )                                                           -->
                 <!-- distinct = True -->
                 <WhereConstraintNode>
-                    <!-- description = Constrain Output with WHERE -->
-                    <!-- node_id = wcc_0 -->
-                    <!-- where_condition =                                                   -->
-                    <!--   WhereFilterSpec(                                                  -->
-                    <!--     where_sql="listing__country_latest = 'us'",                     -->
-                    <!--     bind_parameters=SqlBindParameters(),                            -->
-                    <!--     linkable_spec_set=LinkableSpecSet(                              -->
-                    <!--       dimension_specs=(                                             -->
-                    <!--         DimensionSpec(                                              -->
-                    <!--           element_name='country_latest',                            -->
-                    <!--           entity_links=(EntityReference(element_name='listing'),),  -->
-                    <!--         ),                                                          -->
-                    <!--       ),                                                            -->
-                    <!--     ),                                                              -->
-                    <!--   )                                                                 -->
+                    <!-- description = 'Constrain Output with WHERE' -->
+                    <!-- node_id = NodeId(id_str='wcc_0') -->
+                    <!-- where_condition =                                -->
+                    <!--   WhereFilterSpec(                               -->
+                    <!--     where_sql="listing__country_latest = 'us'",  -->
+                    <!--     bind_parameters=SqlBindParameters(),         -->
+                    <!--     linkable_spec_set=LinkableSpecSet(           -->
+                    <!--       dimension_specs=(                          -->
+                    <!--         DimensionSpec(                           -->
+                    <!--           element_name='country_latest',         -->
+                    <!--           entity_links=(                         -->
+                    <!--             EntityReference(                     -->
+                    <!--               element_name='listing',            -->
+                    <!--             ),                                   -->
+                    <!--           ),                                     -->
+                    <!--         ),                                       -->
+                    <!--       ),                                         -->
+                    <!--     ),                                           -->
+                    <!--   )                                              -->
                     <JoinToBaseOutputNode>
-                        <!-- description = Join Standard Outputs -->
-                        <!-- node_id = jso_0 -->
+                        <!-- description = 'Join Standard Outputs' -->
+                        <!-- node_id = NodeId(id_str='jso_0') -->
                         <!-- join0_for_node_id_pfe_1 =                                    -->
                         <!--   JoinDescription(                                           -->
                         <!--     join_node=FilterElementsNode(node_id=pfe_1),             -->
@@ -46,25 +58,20 @@
                         <!--     join_type=FULL_OUTER,                                    -->
                         <!--   )                                                          -->
                         <ReadSqlSourceNode>
-                            <!-- description =                                                                                      -->
-                            <!--   "Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))"  -->
-                            <!-- node_id = rss_10005 -->
-                            <!-- data_set =                                                                             -->
-                            <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))  -->
+                            <!-- description = "Read From SemanticModelDataSet('listings_latest')" -->
+                            <!-- node_id = NodeId(id_str='rss_10005') -->
+                            <!-- data_set = SemanticModelDataSet('listings_latest') -->
                         </ReadSqlSourceNode>
                         <FilterElementsNode>
-                            <!-- description = Pass Only Elements: ['home_state_latest', 'user'] -->
-                            <!-- node_id = pfe_1 -->
-                            <!-- include_spec =                                     -->
-                            <!--   DimensionSpec(element_name='home_state_latest')  -->
-                            <!-- include_spec = LinklessEntitySpec(element_name='user', entity_links=()) -->
+                            <!-- description = "Pass Only Elements: ['home_state_latest', 'user']" -->
+                            <!-- node_id = NodeId(id_str='pfe_1') -->
+                            <!-- include_spec = DimensionSpec(element_name='home_state_latest') -->
+                            <!-- include_spec = LinklessEntitySpec(element_name='user') -->
                             <!-- distinct = False -->
                             <ReadSqlSourceNode>
-                                <!-- description =                                                                                   -->
-                                <!--   "Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='users_latest'))"  -->
-                                <!-- node_id = rss_10009 -->
-                                <!-- data_set =                                                                          -->
-                                <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='users_latest'))  -->
+                                <!-- description = "Read From SemanticModelDataSet('users_latest')" -->
+                                <!-- node_id = NodeId(id_str='rss_10009') -->
+                                <!-- data_set = SemanticModelDataSet('users_latest') -->
                             </ReadSqlSourceNode>
                         </FilterElementsNode>
                     </JoinToBaseOutputNode>

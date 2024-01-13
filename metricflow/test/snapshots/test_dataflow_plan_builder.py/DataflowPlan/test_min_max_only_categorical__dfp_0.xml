@@ -1,22 +1,23 @@
 <DataflowPlan>
     <WriteToResultDataframeNode>
-        <!-- description = Write to Dataframe -->
-        <!-- node_id = wrd_0 -->
+        <!-- description = 'Write to Dataframe' -->
+        <!-- node_id = NodeId(id_str='wrd_0') -->
         <MinMaxNode>
-            <!-- description = Calculate min and max -->
-            <!-- node_id = mm_0 -->
+            <!-- description = 'Calculate min and max' -->
+            <!-- node_id = NodeId(id_str='mm_0') -->
             <FilterElementsNode>
-                <!-- description = Pass Only Elements: ['listing__country_latest',] -->
-                <!-- node_id = pfe_0 -->
-                <!-- include_spec =                                                                                           -->
-                <!--   DimensionSpec(element_name='country_latest', entity_links=(EntityReference(element_name='listing'),))  -->
+                <!-- description = "Pass Only Elements: ['listing__country_latest',]" -->
+                <!-- node_id = NodeId(id_str='pfe_0') -->
+                <!-- include_spec =                                                -->
+                <!--   DimensionSpec(                                              -->
+                <!--     element_name='country_latest',                            -->
+                <!--     entity_links=(EntityReference(element_name='listing'),),  -->
+                <!--   )                                                           -->
                 <!-- distinct = True -->
                 <ReadSqlSourceNode>
-                    <!-- description =                                                                                      -->
-                    <!--   "Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))"  -->
-                    <!-- node_id = rss_10005 -->
-                    <!-- data_set =                                                                             -->
-                    <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))  -->
+                    <!-- description = "Read From SemanticModelDataSet('listings_latest')" -->
+                    <!-- node_id = NodeId(id_str='rss_10005') -->
+                    <!-- data_set = SemanticModelDataSet('listings_latest') -->
                 </ReadSqlSourceNode>
             </FilterElementsNode>
         </MinMaxNode>

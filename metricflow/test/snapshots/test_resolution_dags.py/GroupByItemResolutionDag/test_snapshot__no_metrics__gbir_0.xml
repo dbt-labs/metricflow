@@ -1,11 +1,10 @@
 <GroupByItemResolutionDag>
     <QueryGroupByItemResolutionNode>
-        <!-- description = Output the group-by items for query. -->
-        <!-- node_id = qr_0 -->
+        <!-- description = 'Output the group-by items for query.' -->
+        <!-- node_id = NodeId(id_str='qr_0') -->
         <NoMetricsGroupByItemSourceNode>
-            <!-- description =                                                             -->
-            <!--   'Output the available group-by-items for a query without any metrics.'  -->
-            <!-- node_id = vr_0 -->
+            <!-- description = 'Output the available group-by-items for a query without any metrics.' -->
+            <!-- node_id = NodeId(id_str='vr_0') -->
         </NoMetricsGroupByItemSourceNode>
     </QueryGroupByItemResolutionNode>
 </GroupByItemResolutionDag>

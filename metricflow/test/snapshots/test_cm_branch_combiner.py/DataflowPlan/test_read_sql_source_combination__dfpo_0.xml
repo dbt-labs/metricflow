@@ -1,13 +1,11 @@
 <DataflowPlan>
     <WriteToResultDataframeNode>
-        <!-- description = Write to Dataframe -->
-        <!-- node_id = wrd_0 -->
+        <!-- description = 'Write to Dataframe' -->
+        <!-- node_id = NodeId(id_str='wrd_0') -->
         <ReadSqlSourceNode>
-            <!-- description =                                                                                      -->
-            <!--   "Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))"  -->
-            <!-- node_id = rss_0 -->
-            <!-- data_set =                                                                             -->
-            <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))  -->
+            <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
+            <!-- node_id = NodeId(id_str='rss_0') -->
+            <!-- data_set = SemanticModelDataSet('bookings_source') -->
         </ReadSqlSourceNode>
     </WriteToResultDataframeNode>
 </DataflowPlan>
