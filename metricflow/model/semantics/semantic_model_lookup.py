@@ -58,7 +58,7 @@ class SemanticModelLookup(SemanticModelAccessor):
         ] = {}  # maps measures to their one consistent aggregation
         self._measure_agg_time_dimension: Dict[MeasureReference, TimeDimensionReference] = {}
         self._measure_non_additive_dimension_specs: Dict[MeasureReference, NonAdditiveDimensionSpec] = {}
-        self._dimension_index: Dict[DimensionReference, List[SemanticModel]] = defaultdict(list)
+        self._dimension_index: Dict[DimensionReference, List[SemanticModel]] = {}
         self._linkable_reference_index: Dict[LinkableElementReference, List[SemanticModel]] = defaultdict(list)
         self._entity_index: Dict[Optional[str], List[SemanticModel]] = defaultdict(list)
         self._entity_ref_to_entity: Dict[EntityReference, Optional[str]] = {}
@@ -92,34 +92,23 @@ class SemanticModelLookup(SemanticModelAccessor):
 
     def get_dimension(self, dimension_reference: DimensionReference) -> Dimension:
         """Retrieves a full dimension object by name."""
-        for dimension_source in self._dimension_index[dimension_reference]:
-            dimension = SemanticModelLookup.get_dimension_from_semantic_model(
-                semantic_model=dimension_source, dimension_reference=dimension_reference
-            )
-
-            return deepcopy(dimension)
-
-        raise ValueError(
-            f"Could not find dimension with name ({dimension_reference.element_name}) in configured semantic models"
-        )
-
-    def get_time_dimension(self, time_dimension_reference: TimeDimensionReference) -> Dimension:
-        """Retrieves a full dimension object by name."""
-        dimension_reference = time_dimension_reference.dimension_reference()
-
-        if dimension_reference not in self._dimension_index:
+        semantic_models = self._dimension_index.get(dimension_reference)
+        if not semantic_models:
             raise ValueError(
                 f"Could not find dimension with name ({dimension_reference.element_name}) in configured semantic models"
             )
 
-        for dimension_source in self._dimension_index[dimension_reference]:
-            dimension = SemanticModelLookup.get_dimension_from_semantic_model(
-                semantic_model=dimension_source, dimension_reference=dimension_reference
-            )
-            # TODO: Unclear if the deepcopy is necessary.
-            return deepcopy(dimension)
+        dimension = SemanticModelLookup.get_dimension_from_semantic_model(
+            # Dimension object should match across semantic models, so just use the first semantic model.
+            semantic_model=semantic_models[0],
+            dimension_reference=dimension_reference,
+        )
+        # TODO: Unclear if the deepcopy is necessary.
+        return deepcopy(dimension)
 
-        assert False, f"{time_dimension_reference} should have been in the dimension index"
+    def get_time_dimension(self, time_dimension_reference: TimeDimensionReference) -> Dimension:
+        """Retrieves a full dimension object by name."""
+        return self.get_dimension(dimension_reference=time_dimension_reference.dimension_reference())
 
     @property
     def measure_references(self) -> Sequence[MeasureReference]:  # noqa: D
@@ -258,7 +247,11 @@ class SemanticModelLookup(SemanticModelAccessor):
                 self._measure_non_additive_dimension_specs[measure.reference] = non_additive_dimension_spec
         for dim in semantic_model.dimensions:
             self._linkable_reference_index[dim.reference].append(semantic_model)
-            self._dimension_index[dim.reference].append(semantic_model)
+
+            semantic_models_for_dimension = self._dimension_index.get(dim.reference, [])
+            semantic_models_for_dimension.append(semantic_model)
+            self._dimension_index[dim.reference] = semantic_models_for_dimension
+
             self._dimension_ref_to_spec[dim.time_dimension_reference or dim.reference] = (
                 TimeDimensionSpec.from_name(dim.name)
                 if dim.type is DimensionType.TIME
