@@ -711,10 +711,12 @@ class DataflowPlanBuilder:
         """
         semantic_model_names: Set[str] = set()
         for measure in measures:
-            semantic_model = self._semantic_model_lookup.get_semantic_model_for_measure(measure.reference)
-            if not semantic_model:
-                raise ValueError(f"Could not find measure with name {measure.reference} in configured semantic models.")
-            semantic_model_names.add(semantic_model.name)
+            semantic_model_names.update(
+                {
+                    semantic_model.name
+                    for semantic_model in self._semantic_model_lookup.get_semantic_models_for_measure(measure.reference)
+                }
+            )
 
         return semantic_model_names
 

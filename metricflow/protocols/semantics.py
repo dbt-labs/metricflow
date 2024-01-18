@@ -85,7 +85,7 @@ class SemanticModelAccessor(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_semantic_model_for_measure(self, measure_reference: MeasureReference) -> Optional[SemanticModel]:
+    def get_semantic_models_for_measure(self, measure_reference: MeasureReference) -> Sequence[SemanticModel]:
         """Retrieve a list of all semantic model model objects associated with the measure reference."""
         raise NotImplementedError
 
