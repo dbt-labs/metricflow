@@ -27,17 +27,17 @@ FROM (
         , subq_0.ds__extract_day
         , subq_0.ds__extract_dow
         , subq_0.ds__extract_doy
-        , subq_0.company__ds__day
-        , subq_0.company__ds__week
-        , subq_0.company__ds__month
-        , subq_0.company__ds__quarter
-        , subq_0.company__ds__year
-        , subq_0.company__ds__extract_year
-        , subq_0.company__ds__extract_quarter
-        , subq_0.company__ds__extract_month
-        , subq_0.company__ds__extract_day
-        , subq_0.company__ds__extract_dow
-        , subq_0.company__ds__extract_doy
+        , subq_0.revenue_instance__ds__day
+        , subq_0.revenue_instance__ds__week
+        , subq_0.revenue_instance__ds__month
+        , subq_0.revenue_instance__ds__quarter
+        , subq_0.revenue_instance__ds__year
+        , subq_0.revenue_instance__ds__extract_year
+        , subq_0.revenue_instance__ds__extract_quarter
+        , subq_0.revenue_instance__ds__extract_month
+        , subq_0.revenue_instance__ds__extract_day
+        , subq_0.revenue_instance__ds__extract_dow
+        , subq_0.revenue_instance__ds__extract_doy
         , subq_0.ds__day AS metric_time__day
         , subq_0.ds__week AS metric_time__week
         , subq_0.ds__month AS metric_time__month
@@ -50,7 +50,7 @@ FROM (
         , subq_0.ds__extract_dow AS metric_time__extract_dow
         , subq_0.ds__extract_doy AS metric_time__extract_doy
         , subq_0.user
-        , subq_0.company__user
+        , subq_0.revenue_instance__user
         , subq_0.txn_revenue
       FROM (
         -- Read Elements From Semantic Model 'revenue'
@@ -67,19 +67,19 @@ FROM (
           , EXTRACT(day FROM revenue_src_10007.created_at) AS ds__extract_day
           , EXTRACT(dayofweekiso FROM revenue_src_10007.created_at) AS ds__extract_dow
           , EXTRACT(doy FROM revenue_src_10007.created_at) AS ds__extract_doy
-          , DATE_TRUNC('day', revenue_src_10007.created_at) AS company__ds__day
-          , DATE_TRUNC('week', revenue_src_10007.created_at) AS company__ds__week
-          , DATE_TRUNC('month', revenue_src_10007.created_at) AS company__ds__month
-          , DATE_TRUNC('quarter', revenue_src_10007.created_at) AS company__ds__quarter
-          , DATE_TRUNC('year', revenue_src_10007.created_at) AS company__ds__year
-          , EXTRACT(year FROM revenue_src_10007.created_at) AS company__ds__extract_year
-          , EXTRACT(quarter FROM revenue_src_10007.created_at) AS company__ds__extract_quarter
-          , EXTRACT(month FROM revenue_src_10007.created_at) AS company__ds__extract_month
-          , EXTRACT(day FROM revenue_src_10007.created_at) AS company__ds__extract_day
-          , EXTRACT(dayofweekiso FROM revenue_src_10007.created_at) AS company__ds__extract_dow
-          , EXTRACT(doy FROM revenue_src_10007.created_at) AS company__ds__extract_doy
+          , DATE_TRUNC('day', revenue_src_10007.created_at) AS revenue_instance__ds__day
+          , DATE_TRUNC('week', revenue_src_10007.created_at) AS revenue_instance__ds__week
+          , DATE_TRUNC('month', revenue_src_10007.created_at) AS revenue_instance__ds__month
+          , DATE_TRUNC('quarter', revenue_src_10007.created_at) AS revenue_instance__ds__quarter
+          , DATE_TRUNC('year', revenue_src_10007.created_at) AS revenue_instance__ds__year
+          , EXTRACT(year FROM revenue_src_10007.created_at) AS revenue_instance__ds__extract_year
+          , EXTRACT(quarter FROM revenue_src_10007.created_at) AS revenue_instance__ds__extract_quarter
+          , EXTRACT(month FROM revenue_src_10007.created_at) AS revenue_instance__ds__extract_month
+          , EXTRACT(day FROM revenue_src_10007.created_at) AS revenue_instance__ds__extract_day
+          , EXTRACT(dayofweekiso FROM revenue_src_10007.created_at) AS revenue_instance__ds__extract_dow
+          , EXTRACT(doy FROM revenue_src_10007.created_at) AS revenue_instance__ds__extract_doy
           , revenue_src_10007.user_id AS user
-          , revenue_src_10007.user_id AS company__user
+          , revenue_src_10007.user_id AS revenue_instance__user
         FROM ***************************.fct_revenue revenue_src_10007
       ) subq_0
     ) subq_1
