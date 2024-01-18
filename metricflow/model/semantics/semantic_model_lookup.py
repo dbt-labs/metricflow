@@ -52,7 +52,7 @@ class SemanticModelLookup(SemanticModelAccessor):
         model: SemanticManifest,
     ) -> None:
         self._model = model
-        self._measure_index: Dict[MeasureReference, List[SemanticModel]] = defaultdict(list)
+        self._measure_index: Dict[MeasureReference, List[SemanticModel]] = {}
         self._measure_aggs: Dict[
             MeasureReference, AggregationType
         ] = {}  # maps measures to their one consistent aggregation
@@ -144,11 +144,14 @@ class SemanticModelLookup(SemanticModelAccessor):
         if measure_reference not in self._measure_index:
             raise ValueError(f"Could not find measure with name ({measure_reference}) in configured semantic models")
 
-        assert len(self._measure_index[measure_reference]) >= 1
-        # Measures should be consistent across semantic models, so just use the first one.
-        semantic_model = list(self._measure_index[measure_reference])[0]
+        # Measures should be unique across semantic models.
+        semantic_models = self._measure_index[measure_reference]
+        assert (
+            len(semantic_models) == 1
+        ), f"Expected exactly 1 semantic model for measure {measure_reference}, but found semantic models {semantic_models}."
+
         return SemanticModelLookup.get_measure_from_semantic_model(
-            semantic_model=semantic_model, measure_reference=measure_reference
+            semantic_model=semantic_models[0], measure_reference=measure_reference
         )
 
     def get_entity_references(self) -> Sequence[EntityReference]:  # noqa: D
@@ -158,7 +161,7 @@ class SemanticModelLookup(SemanticModelAccessor):
     def get_semantic_models_for_measure(  # noqa: D
         self, measure_reference: MeasureReference
     ) -> Sequence[SemanticModel]:
-        return self._measure_index[measure_reference]
+        return self._measure_index.get(measure_reference, [])
 
     def get_agg_time_dimension_for_measure(  # noqa: D
         self, measure_reference: MeasureReference
@@ -202,7 +205,11 @@ class SemanticModelLookup(SemanticModelAccessor):
 
         for measure in semantic_model.measures:
             self._measure_aggs[measure.reference] = measure.agg
-            self._measure_index[measure.reference].append(semantic_model)
+
+            semantic_models_for_measure = self._measure_index.get(measure.reference, [])
+            semantic_models_for_measure.append(semantic_model)
+            self._measure_index[measure.reference] = semantic_models_for_measure
+
             agg_time_dimension_reference = semantic_model.checked_agg_time_dimension_for_measure(measure.reference)
 
             matching_dimensions = tuple(
