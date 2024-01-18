@@ -81,24 +81,27 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
         valid_agg_time_dimension_specs: List[TimeDimensionSpec] = []
         for measure_reference in metric.measure_references:
             agg_time_dimension_reference = semantic_model_lookup.get_agg_time_dimension_for_measure(measure_reference)
-            semantic_model = semantic_model_lookup.get_semantic_model_for_measure(measure_reference)
-            assert semantic_model, f"No semantic model found for measure {measure_reference}."
 
-            # is this too broad? need to narrow entity links?
-            possible_entity_links = semantic_model_lookup.entity_links_for_local_elements(semantic_model)
-            for entity_link in possible_entity_links:
-                valid_agg_time_dimension_specs.extend(
-                    self._generate_valid_specs_for_time_dimension(
-                        time_dimension_reference=agg_time_dimension_reference, entity_links=(entity_link,)
-                    )
+            # A measure's gg_time_dimension is required to be in the same semantic model as the measure,
+            # so we can assume the same semantic model for both measure and dimension.
+            semantic_models = semantic_model_lookup.get_semantic_models_for_measure(measure_reference)
+            assert (
+                len(semantic_models) == 1
+            ), f"Expected exactly one semantic model for measure {measure_reference}, but found semantic models {semantic_models}."
+            semantic_model = semantic_models[0]
+
+            entity_link = semantic_model_lookup.resolved_primary_entity(semantic_model)
+            assert (
+                entity_link is not None
+            ), f"Expected semantic model {semantic_model} to have a primary entity since is contains dimensions, but found none."
+
+            valid_agg_time_dimension_specs.extend(
+                self._generate_valid_specs_for_time_dimension(
+                    time_dimension_reference=agg_time_dimension_reference, entity_links=(entity_link,)
                 )
-        print("valid:::")
-        for x in valid_agg_time_dimension_specs:
-            print(f"\n{x}")
+            )
 
-        print("requested:::")
         for group_by_item_input in query_resolver_input.group_by_item_inputs:
-            print(print(f"\n{group_by_item_input}"))
             if group_by_item_input.spec_pattern.matches_any(valid_agg_time_dimension_specs):
                 return True
 

@@ -103,7 +103,7 @@ REVENUE_YAML = textwrap.dedent(
           type: categorical
           expr: country
 
-      primary_entity: company
+      primary_entity: revenue_instance
 
       entities:
         - name: user
@@ -455,7 +455,7 @@ def test_cumulative_metric_wrong_time_dimension_validation() -> None:
     with pytest.raises(InvalidQueryException, match="do not include 'metric_time'"):
         query_parser.parse_and_validate_query(
             metric_names=["revenue_cumulative"],
-            group_by_names=["company__loaded_at"],
+            group_by_names=["revenue_instance__loaded_at"],
         )
 
 
@@ -480,7 +480,7 @@ def test_cumulative_metric_agg_time_dimension_name_validation() -> None:
     with pytest.raises(InvalidQueryException, match="do not include 'metric_time'"):
         query_parser.parse_and_validate_query(
             metric_names=["revenue_cumulative"],
-            group_by_names=["company__ds"],
+            group_by_names=["revenue_instance__loaded_at"],
         )
 
 
@@ -531,7 +531,7 @@ def test_derived_metric_with_offset_parsing() -> None:
     with pytest.raises(InvalidQueryException, match="do not include 'metric_time'"):
         query_parser.parse_and_validate_query(
             metric_names=["revenue_growth_2_weeks"],
-            group_by_names=["company__country"],
+            group_by_names=["revenue_instance__country"],
         )
 
     # Query with time dimension

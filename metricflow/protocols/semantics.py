@@ -98,6 +98,11 @@ class SemanticModelAccessor(ABC):
         """Retrieve the entity matching the element -> semantic model mapping, if any."""
         raise NotImplementedError
 
+    @staticmethod
+    def resolved_primary_entity(semantic_model: SemanticModel) -> Optional[EntityReference]:
+        """Return the primary entity for dimensions in the model."""
+        raise NotImplementedError
+
     @abstractmethod
     def get_by_reference(self, semantic_model_reference: SemanticModelReference) -> Optional[SemanticModel]:
         """Retrieve the semantic model object matching the input semantic model reference, if any."""

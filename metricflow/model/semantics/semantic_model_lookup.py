@@ -224,7 +224,7 @@ class SemanticModelLookup(SemanticModelAccessor):
                     f"Aggregation time dimension does not have a time granularity set: {agg_time_dimension}"
                 )
 
-            primary_entity = SemanticModelLookup._resolved_primary_entity(semantic_model)
+            primary_entity = SemanticModelLookup.resolved_primary_entity(semantic_model)
 
             if primary_entity is None:
                 raise RuntimeError(
@@ -299,7 +299,7 @@ class SemanticModelLookup(SemanticModelAccessor):
         )
 
     @staticmethod
-    def _resolved_primary_entity(semantic_model: SemanticModel) -> Optional[EntityReference]:
+    def resolved_primary_entity(semantic_model: SemanticModel) -> Optional[EntityReference]:
         """Return the primary entity for dimensions in the model."""
         primary_entity_reference = semantic_model.primary_entity_reference
 
@@ -308,14 +308,12 @@ class SemanticModelLookup(SemanticModelAccessor):
         )
 
         # This should be caught by the validation, but adding a sanity check.
-        assert len(entities_with_type_primary) <= 1, f"Found >1 primary entity in {semantic_model}"
+        assert len(entities_with_type_primary) <= 1, f"Found > 1 primary entity in {semantic_model}"
         if primary_entity_reference is not None:
             assert len(entities_with_type_primary) == 0, (
                 f"The primary_entity field was set to {primary_entity_reference}, but there are non-zero entities with "
                 f"type {EntityType.PRIMARY} in {semantic_model}"
             )
-
-        if primary_entity_reference is not None:
             return primary_entity_reference
 
         if len(entities_with_type_primary) > 0:

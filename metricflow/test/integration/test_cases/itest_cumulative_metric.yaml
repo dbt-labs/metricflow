@@ -353,13 +353,13 @@ integration_test:
   description: Query a cumulative metric with its agg_time_dimension.
   model: SIMPLE_MODEL
   metrics: ["trailing_2_months_revenue"]
-  group_bys: ["company__ds__day"]
-  order_bys: ["company__ds__day"]
+  group_bys: ["revenue_instance__ds__day"]
+  order_bys: ["revenue_instance__ds__day"]
   time_constraint: ["2020-03-05", "2021-01-04"]
   check_query: |
     SELECT
       SUM(b.txn_revenue) as trailing_2_months_revenue
-      , a.ds AS company__ds__day
+      , a.ds AS revenue_instance__ds__day
     FROM (
       SELECT ds
       FROM {{ mf_time_spine_source }}
