@@ -347,3 +347,31 @@ integration_test:
       OR {{ render_time_constraint("a.ds", "2020-01-04", "2020-01-04") }}
     GROUP BY a.ds
     ORDER BY a.ds
+---
+integration_test:
+  name: cumulative_metric_with_agg_time_dimension
+  description: Query a cumulative metric with its agg_time_dimension.
+  model: SIMPLE_MODEL
+  metrics: ["trailing_2_months_revenue"]
+  group_bys: ["company__ds__day"]
+  order_bys: ["company__ds__day"]
+  time_constraint: ["2020-03-05", "2021-01-04"]
+  check_query: |
+    SELECT
+      SUM(b.txn_revenue) as trailing_2_months_revenue
+      , a.ds AS company__ds__day
+    FROM (
+      SELECT ds
+      FROM {{ mf_time_spine_source }}
+      WHERE {{ render_time_constraint("ds", "2020-01-05", "2021-01-04") }}
+    ) a
+    INNER JOIN (
+      SELECT
+        revenue as txn_revenue
+        , created_at AS ds
+      FROM {{ source_schema }}.fct_revenue
+    ) b
+    ON b.ds <= a.ds AND b.ds > {{ render_date_sub("a", "ds", 2, TimeGranularity.MONTH) }}
+    WHERE {{ render_time_constraint("a.ds", "2020-03-05", "2021-01-04") }}
+    GROUP BY a.ds
+    ORDER BY a.ds
