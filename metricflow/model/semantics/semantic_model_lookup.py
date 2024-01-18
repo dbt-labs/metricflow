@@ -60,8 +60,7 @@ class SemanticModelLookup(SemanticModelAccessor):
         self._measure_non_additive_dimension_specs: Dict[MeasureReference, NonAdditiveDimensionSpec] = {}
         self._dimension_index: Dict[DimensionReference, List[SemanticModel]] = {}
         self._linkable_reference_index: Dict[LinkableElementReference, List[SemanticModel]] = defaultdict(list)
-        self._entity_index: Dict[Optional[str], List[SemanticModel]] = defaultdict(list)
-        self._entity_ref_to_entity: Dict[EntityReference, Optional[str]] = {}
+        self._entity_index: Dict[EntityReference, List[SemanticModel]] = {}
         self._semantic_model_names: Set[str] = set()
 
         self._dimension_ref_to_spec: Dict[DimensionReference, DimensionSpec] = {}
@@ -144,7 +143,7 @@ class SemanticModelLookup(SemanticModelAccessor):
         )
 
     def get_entity_references(self) -> Sequence[EntityReference]:  # noqa: D
-        return list(self._entity_ref_to_entity.keys())
+        return list(self._entity_index.keys())
 
     # DSC interface
     def get_semantic_models_for_measure(  # noqa: D
@@ -259,8 +258,10 @@ class SemanticModelLookup(SemanticModelAccessor):
             )
 
         for entity in semantic_model.entities:
-            self._entity_ref_to_entity[entity.reference] = entity.name
-            self._entity_index[entity.name].append(semantic_model)
+            semantic_models_for_entity = self._entity_index.get(entity.reference, [])
+            semantic_models_for_entity.append(semantic_model)
+            self._entity_index[entity.reference] = semantic_models_for_entity
+
             self._linkable_reference_index[entity.reference].append(semantic_model)
             self._entity_ref_to_spec[entity.reference] = EntitySpec.from_name(entity.name)
 
@@ -282,8 +283,7 @@ class SemanticModelLookup(SemanticModelAccessor):
 
     def get_semantic_models_for_entity(self, entity_reference: EntityReference) -> Set[SemanticModel]:
         """Return all semantic models associated with an entity reference."""
-        entity = self._entity_ref_to_entity[entity_reference]
-        return set(self._entity_index[entity])
+        return set(self._entity_index.get(entity_reference, []))
 
     @staticmethod
     def get_entity_from_semantic_model(
