@@ -4,8 +4,7 @@ SELECT
   , every_2_days_bookers_2_days_ago AS every_2_days_bookers_2_days_ago
 FROM (
   -- Join to Time Spine Dataset
-  -- Pass Only Elements:
-  --   ['bookers', 'metric_time__day']
+  -- Pass Only Elements: ['bookers', 'metric_time__day']
   -- Constrain Time Range to [2019-12-19T00:00:00, 2020-01-02T00:00:00]
   -- Aggregate Measures
   -- Compute Metrics via Expressions

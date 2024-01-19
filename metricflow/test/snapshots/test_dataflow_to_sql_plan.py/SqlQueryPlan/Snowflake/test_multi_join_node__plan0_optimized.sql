@@ -6,8 +6,7 @@ SELECT
   , subq_7.bookings AS bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
-  -- Pass Only Elements:
-  --   ['bookings', 'listing']
+  -- Pass Only Elements: ['bookings', 'listing']
   SELECT
     listing_id AS listing
     , 1 AS bookings
@@ -15,8 +14,7 @@ FROM (
 ) subq_7
 LEFT OUTER JOIN (
   -- Read Elements From Semantic Model 'listings_latest'
-  -- Pass Only Elements:
-  --   ['country_latest', 'listing']
+  -- Pass Only Elements: ['country_latest', 'listing']
   SELECT
     listing_id AS listing
     , country AS country_latest
@@ -26,8 +24,7 @@ ON
   subq_7.listing = subq_9.listing
 LEFT OUTER JOIN (
   -- Read Elements From Semantic Model 'listings_latest'
-  -- Pass Only Elements:
-  --   ['country_latest', 'listing']
+  -- Pass Only Elements: ['country_latest', 'listing']
   SELECT
     listing_id AS listing
     , country AS country_latest

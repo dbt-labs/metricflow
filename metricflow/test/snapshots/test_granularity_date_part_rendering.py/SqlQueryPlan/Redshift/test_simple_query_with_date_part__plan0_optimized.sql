@@ -6,8 +6,7 @@ SELECT
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
-  -- Pass Only Elements:
-  --   ['bookings', 'metric_time__extract_dow']
+  -- Pass Only Elements: ['bookings', 'metric_time__extract_dow']
   SELECT
     CASE WHEN EXTRACT(dow FROM ds) = 0 THEN EXTRACT(dow FROM ds) + 7 ELSE EXTRACT(dow FROM ds) END AS metric_time__extract_dow
     , 1 AS bookings

@@ -7,8 +7,7 @@ SELECT
   , SUM(bookings) AS bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
-  -- Pass Only Elements:
-  --   ['bookings', 'is_instant', 'ds__day']
+  -- Pass Only Elements: ['bookings', 'is_instant', 'ds__day']
   SELECT
     DATE_TRUNC('day', ds) AS ds__day
     , is_instant

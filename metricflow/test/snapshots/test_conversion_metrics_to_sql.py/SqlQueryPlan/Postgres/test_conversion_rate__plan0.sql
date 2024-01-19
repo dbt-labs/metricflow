@@ -14,8 +14,7 @@ FROM (
       subq_2.visit__referrer_id
       , SUM(subq_2.visits) AS visits
     FROM (
-      -- Pass Only Elements:
-      --   ['visits', 'visit__referrer_id']
+      -- Pass Only Elements: ['visits', 'visit__referrer_id']
       SELECT
         subq_1.visit__referrer_id
         , subq_1.visits
@@ -109,8 +108,7 @@ FROM (
       subq_12.visit__referrer_id
       , SUM(subq_12.buys) AS buys
     FROM (
-      -- Pass Only Elements:
-      --   ['buys', 'visit__referrer_id']
+      -- Pass Only Elements: ['buys', 'visit__referrer_id']
       SELECT
         subq_11.visit__referrer_id
         , subq_11.buys
@@ -132,8 +130,7 @@ FROM (
             , subq_9.mf_internal_uuid AS mf_internal_uuid
             , subq_9.buys AS buys
           FROM (
-            -- Pass Only Elements:
-            --   ['visits', 'visit__referrer_id', 'ds__day', 'user']
+            -- Pass Only Elements: ['visits', 'visit__referrer_id', 'ds__day', 'user']
             SELECT
               subq_5.ds__day
               , subq_5.user

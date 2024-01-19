@@ -5,61 +5,45 @@
         <ComputeMetricsNode>
             <!-- description = Compute Metrics via Expressions -->
             <!-- node_id = cm_0 -->
-            <!-- metric_spec =                       -->
-            <!--   {'class': 'MetricSpec',           -->
-            <!--    'element_name': 'booking_fees',  -->
-            <!--    'filter_specs': (),              -->
-            <!--    'alias': None,                   -->
-            <!--    'offset_window': None,           -->
-            <!--    'offset_to_grain': None}         -->
+            <!-- metric_spec =                              -->
+            <!--   MetricSpec(element_name='booking_fees')  -->
             <AggregateMeasuresNode>
                 <!-- description = Aggregate Measures -->
                 <!-- node_id = am_0 -->
                 <JoinToBaseOutputNode>
                     <!-- description = Join Standard Outputs -->
                     <!-- node_id = jso_0 -->
-                    <!-- join0_for_node_id_pfe_1 =                             -->
-                    <!--   {'class': 'JoinDescription',                        -->
-                    <!--    'join_node': FilterElementsNode(node_id=pfe_1),    -->
-                    <!--    'join_on_entity': {'class': 'LinklessEntitySpec',  -->
-                    <!--                       'element_name': 'listing',      -->
-                    <!--                       'entity_links': ()},            -->
-                    <!--    'join_type': SqlJoinType.LEFT_OUTER,               -->
-                    <!--    'join_on_partition_dimensions': (),                -->
-                    <!--    'join_on_partition_time_dimensions': (),           -->
-                    <!--    'validity_window': None}                           -->
+                    <!-- join0_for_node_id_pfe_1 =                                       -->
+                    <!--   JoinDescription(                                              -->
+                    <!--     join_node=FilterElementsNode(node_id=pfe_1),                -->
+                    <!--     join_on_entity=LinklessEntitySpec(element_name='listing'),  -->
+                    <!--     join_type=LEFT_OUTER,                                       -->
+                    <!--   )                                                             -->
                     <FilterElementsNode>
-                        <!-- description =                     -->
-                        <!--   Pass Only Elements:             -->
-                        <!--     ['booking_value', 'listing']  -->
+                        <!-- description = Pass Only Elements: ['booking_value', 'listing'] -->
                         <!-- node_id = pfe_0 -->
-                        <!-- include_spec =                           -->
-                        <!--   {'class': 'MeasureSpec',               -->
-                        <!--    'element_name': 'booking_value',      -->
-                        <!--    'non_additive_dimension_spec': None,  -->
-                        <!--    'fill_nulls_with': None}              -->
+                        <!-- include_spec =                               -->
+                        <!--   MeasureSpec(element_name='booking_value')  -->
                         <!-- include_spec = LinklessEntitySpec(element_name='listing', entity_links=()) -->
                         <!-- distinct = False -->
                         <ReadSqlSourceNode>
-                            <!-- description =                                                                                    -->
-                            <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))  -->
+                            <!-- description =                                                                                      -->
+                            <!--   "Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))"  -->
                             <!-- node_id = rss_10001 -->
                             <!-- data_set =                                                                             -->
                             <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))  -->
                         </ReadSqlSourceNode>
                     </FilterElementsNode>
                     <FilterElementsNode>
-                        <!-- description =                      -->
-                        <!--   Pass Only Elements:              -->
-                        <!--     ['country_latest', 'listing']  -->
+                        <!-- description = Pass Only Elements: ['country_latest', 'listing'] -->
                         <!-- node_id = pfe_1 -->
-                        <!-- include_spec =                                                                      -->
-                        <!--   {'class': 'DimensionSpec', 'element_name': 'country_latest', 'entity_links': ()}  -->
+                        <!-- include_spec =                                  -->
+                        <!--   DimensionSpec(element_name='country_latest')  -->
                         <!-- include_spec = LinklessEntitySpec(element_name='listing', entity_links=()) -->
                         <!-- distinct = False -->
                         <ReadSqlSourceNode>
-                            <!-- description =                                                                                    -->
-                            <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))  -->
+                            <!-- description =                                                                                      -->
+                            <!--   "Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))"  -->
                             <!-- node_id = rss_10005 -->
                             <!-- data_set =                                                                             -->
                             <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))  -->

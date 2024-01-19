@@ -11,8 +11,7 @@ FROM (
     , SUM(bookings) AS bookings
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
-    -- Pass Only Elements:
-    --   ['bookings', 'is_instant']
+    -- Pass Only Elements: ['bookings', 'is_instant']
     SELECT
       is_instant
       , 1 AS bookings
@@ -29,8 +28,7 @@ FULL OUTER JOIN (
     , COUNT(DISTINCT bookers) AS bookers
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
-    -- Pass Only Elements:
-    --   ['instant_bookings', 'bookers', 'is_instant']
+    -- Pass Only Elements: ['instant_bookings', 'bookers', 'is_instant']
     SELECT
       is_instant
       , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings

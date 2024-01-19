@@ -18,14 +18,15 @@ FROM (
     , subq_2.metric_time__extract_doy
     , SUM(subq_2.bookings) AS bookings
   FROM (
-    -- Pass Only Elements:
-    --   ['bookings',
-    --    'metric_time__extract_day',
-    --    'metric_time__extract_dow',
-    --    'metric_time__extract_doy',
-    --    'metric_time__extract_month',
-    --    'metric_time__extract_quarter',
-    --    'metric_time__extract_year']
+    -- Pass Only Elements: [
+    --   'bookings',
+    --   'metric_time__extract_day',
+    --   'metric_time__extract_dow',
+    --   'metric_time__extract_doy',
+    --   'metric_time__extract_month',
+    --   'metric_time__extract_quarter',
+    --   'metric_time__extract_year',
+    -- ]
     SELECT
       subq_1.metric_time__extract_year
       , subq_1.metric_time__extract_quarter

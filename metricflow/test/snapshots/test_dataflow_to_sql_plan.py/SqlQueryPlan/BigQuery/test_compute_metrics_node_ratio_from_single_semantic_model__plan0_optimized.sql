@@ -13,8 +13,7 @@ FROM (
     , COUNT(DISTINCT subq_7.bookers) AS bookers
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
-    -- Pass Only Elements:
-    --   ['bookings', 'bookers', 'listing']
+    -- Pass Only Elements: ['bookings', 'bookers', 'listing']
     SELECT
       listing_id AS listing
       , 1 AS bookings

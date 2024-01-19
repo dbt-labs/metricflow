@@ -10,8 +10,7 @@ FROM (
     , subq_9.listing__user__home_state_latest
     , SUM(subq_9.bookings) AS bookings
   FROM (
-    -- Pass Only Elements:
-    --   ['bookings', 'listing__user__home_state_latest', 'metric_time__day']
+    -- Pass Only Elements: ['bookings', 'listing__user__home_state_latest', 'metric_time__day']
     SELECT
       subq_8.metric_time__day
       , subq_8.listing__user__home_state_latest
@@ -26,8 +25,7 @@ FROM (
         , subq_7.user__home_state_latest AS listing__user__home_state_latest
         , subq_2.bookings AS bookings
       FROM (
-        -- Pass Only Elements:
-        --   ['bookings', 'metric_time__day', 'listing']
+        -- Pass Only Elements: ['bookings', 'metric_time__day', 'listing']
         SELECT
           subq_1.metric_time__day
           , subq_1.listing
@@ -217,8 +215,7 @@ FROM (
         ) subq_1
       ) subq_2
       LEFT OUTER JOIN (
-        -- Pass Only Elements:
-        --   ['user__home_state_latest', 'window_start__day', 'window_end__day', 'listing']
+        -- Pass Only Elements: ['user__home_state_latest', 'window_start__day', 'window_end__day', 'listing']
         SELECT
           subq_6.window_start__day
           , subq_6.window_end__day
@@ -351,32 +348,33 @@ FROM (
             FROM ***************************.dim_listings listings_src_10019
           ) subq_3
           LEFT OUTER JOIN (
-            -- Pass Only Elements:
-            --   ['home_state_latest',
-            --    'user__home_state_latest',
-            --    'ds__day',
-            --    'ds__week',
-            --    'ds__month',
-            --    'ds__quarter',
-            --    'ds__year',
-            --    'ds__extract_year',
-            --    'ds__extract_quarter',
-            --    'ds__extract_month',
-            --    'ds__extract_day',
-            --    'ds__extract_dow',
-            --    'ds__extract_doy',
-            --    'user__ds__day',
-            --    'user__ds__week',
-            --    'user__ds__month',
-            --    'user__ds__quarter',
-            --    'user__ds__year',
-            --    'user__ds__extract_year',
-            --    'user__ds__extract_quarter',
-            --    'user__ds__extract_month',
-            --    'user__ds__extract_day',
-            --    'user__ds__extract_dow',
-            --    'user__ds__extract_doy',
-            --    'user']
+            -- Pass Only Elements: [
+            --   'home_state_latest',
+            --   'user__home_state_latest',
+            --   'ds__day',
+            --   'ds__week',
+            --   'ds__month',
+            --   'ds__quarter',
+            --   'ds__year',
+            --   'ds__extract_year',
+            --   'ds__extract_quarter',
+            --   'ds__extract_month',
+            --   'ds__extract_day',
+            --   'ds__extract_dow',
+            --   'ds__extract_doy',
+            --   'user__ds__day',
+            --   'user__ds__week',
+            --   'user__ds__month',
+            --   'user__ds__quarter',
+            --   'user__ds__year',
+            --   'user__ds__extract_year',
+            --   'user__ds__extract_quarter',
+            --   'user__ds__extract_month',
+            --   'user__ds__extract_day',
+            --   'user__ds__extract_dow',
+            --   'user__ds__extract_doy',
+            --   'user',
+            -- ]
             SELECT
               subq_4.ds__day
               , subq_4.ds__week

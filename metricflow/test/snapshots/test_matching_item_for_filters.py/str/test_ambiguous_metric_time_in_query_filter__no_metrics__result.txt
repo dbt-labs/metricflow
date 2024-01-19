@@ -1,15 +1,15 @@
-GroupByItemResolution(
-  issue_set=MetricFlowQueryResolutionIssueSet(
-    issues=(
-      NoMatchingItemsForNoMetricsQuery(
-        issue_type=ERROR,
-        query_resolution_path=MetricFlowQueryResolutionPath(
-          resolution_path_nodes=(
-            QueryGroupByItemResolutionNode(node_id=qr_0),
-            NoMetricsGroupByItemSourceNode(node_id=vr_0),
-          ),
-        ),
-      ),
-    ),
-  ),
-)
+('GroupByItemResolution(\n'
+ '  issue_set=MetricFlowQueryResolutionIssueSet(\n'
+ '    issues=(\n'
+ '      NoMatchingItemsForNoMetricsQuery(\n'
+ '        issue_type=ERROR,\n'
+ '        query_resolution_path=MetricFlowQueryResolutionPath(\n'
+ '          resolution_path_nodes=(\n'
+ '            QueryGroupByItemResolutionNode(node_id=qr_0),\n'
+ '            NoMetricsGroupByItemSourceNode(node_id=vr_0),\n'
+ '          ),\n'
+ '        ),\n'
+ '      ),\n'
+ '    ),\n'
+ '  ),\n'
+ ')')

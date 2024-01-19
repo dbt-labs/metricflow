@@ -7,8 +7,8 @@
         <MetricGroupByItemResolutionNode>
             <!-- description = Output group-by-items available for this metric. -->
             <!-- node_id = mtr_7 -->
-            <!-- metric_reference =                                                             -->
-            <!--   MetricReference(element_name='derived_metric_with_same_parent_time_grains')  -->
+            <!-- metric_reference =                                                               -->
+            <!--   "MetricReference(element_name='derived_metric_with_same_parent_time_grains')"  -->
             <MetricGroupByItemResolutionNode>
                 <!-- description = Output group-by-items available for this metric. -->
                 <!-- node_id = mtr_5 -->

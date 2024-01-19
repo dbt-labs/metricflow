@@ -5,34 +5,24 @@
         <ComputeMetricsNode>
             <!-- description = Compute Metrics via Expressions -->
             <!-- node_id = cm_0 -->
-            <!-- metric_spec =                           -->
-            <!--   {'class': 'MetricSpec',               -->
-            <!--    'element_name': 'revenue_all_time',  -->
-            <!--    'filter_specs': (),                  -->
-            <!--    'alias': None,                       -->
-            <!--    'offset_window': None,               -->
-            <!--    'offset_to_grain': None}             -->
+            <!-- metric_spec =                                  -->
+            <!--   MetricSpec(element_name='revenue_all_time')  -->
             <AggregateMeasuresNode>
                 <!-- description = Aggregate Measures -->
                 <!-- node_id = am_0 -->
                 <FilterElementsNode>
-                    <!-- description =          -->
-                    <!--   Pass Only Elements:  -->
-                    <!--     ['txn_revenue']    -->
+                    <!-- description = Pass Only Elements: ['txn_revenue',] -->
                     <!-- node_id = pfe_0 -->
-                    <!-- include_spec =                           -->
-                    <!--   {'class': 'MeasureSpec',               -->
-                    <!--    'element_name': 'txn_revenue',        -->
-                    <!--    'non_additive_dimension_spec': None,  -->
-                    <!--    'fill_nulls_with': None}              -->
+                    <!-- include_spec =                             -->
+                    <!--   MeasureSpec(element_name='txn_revenue')  -->
                     <!-- distinct = False -->
                     <MetricTimeDimensionTransformNode>
                         <!-- description = Metric Time Dimension 'ds' -->
                         <!-- node_id = sma_10006 -->
                         <!-- aggregation_time_dimension = ds -->
                         <ReadSqlSourceNode>
-                            <!-- description =                                                                            -->
-                            <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='revenue'))  -->
+                            <!-- description =                                                                              -->
+                            <!--   "Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='revenue'))"  -->
                             <!-- node_id = rss_10019 -->
                             <!-- data_set =                                                                     -->
                             <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='revenue'))  -->

@@ -3,8 +3,7 @@ SELECT
   subq_13.metric_time__day
   , 2 * bookings_offset_once AS bookings_offset_twice
 FROM (
-  -- Pass Only Elements:
-  --   ['metric_time__day', 'bookings_offset_once']
+  -- Pass Only Elements: ['metric_time__day', 'bookings_offset_once']
   SELECT
     subq_12.metric_time__day
     , subq_12.bookings_offset_once
@@ -45,8 +44,7 @@ FROM (
               , subq_5.booking__is_instant
               , SUM(subq_5.bookings) AS bookings
             FROM (
-              -- Pass Only Elements:
-              --   ['bookings', 'booking__is_instant', 'metric_time__day']
+              -- Pass Only Elements: ['bookings', 'booking__is_instant', 'metric_time__day']
               SELECT
                 subq_4.metric_time__day
                 , subq_4.booking__is_instant
