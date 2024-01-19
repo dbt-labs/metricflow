@@ -3,8 +3,8 @@
         <!-- description = Write to Dataframe -->
         <!-- node_id = wrd_0 -->
         <ReadSqlSourceNode>
-            <!-- description =                                                                                    -->
-            <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))  -->
+            <!-- description =                                                                                      -->
+            <!--   "Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))"  -->
             <!-- node_id = rss_0 -->
             <!-- data_set =                                                                             -->
             <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))  -->

@@ -23,8 +23,7 @@ FROM (
         , subq_7.listing__country_latest
         , SUM(subq_7.bookings) AS bookings
       FROM (
-        -- Pass Only Elements:
-        --   ['bookings', 'listing__country_latest', 'ds__day']
+        -- Pass Only Elements: ['bookings', 'listing__country_latest', 'ds__day']
         SELECT
           subq_6.ds__day
           , subq_6.listing__country_latest
@@ -37,8 +36,7 @@ FROM (
             , subq_5.country_latest AS listing__country_latest
             , subq_2.bookings AS bookings
           FROM (
-            -- Pass Only Elements:
-            --   ['bookings', 'ds__day', 'listing']
+            -- Pass Only Elements: ['bookings', 'ds__day', 'listing']
             SELECT
               subq_1.ds__day
               , subq_1.listing
@@ -240,8 +238,7 @@ FROM (
             ) subq_1
           ) subq_2
           LEFT OUTER JOIN (
-            -- Pass Only Elements:
-            --   ['country_latest', 'listing']
+            -- Pass Only Elements: ['country_latest', 'listing']
             SELECT
               subq_4.listing
               , subq_4.country_latest
@@ -400,8 +397,7 @@ FROM (
         , subq_17.listing__country_latest
         , SUM(subq_17.views) AS views
       FROM (
-        -- Pass Only Elements:
-        --   ['views', 'listing__country_latest', 'ds__day']
+        -- Pass Only Elements: ['views', 'listing__country_latest', 'ds__day']
         SELECT
           subq_16.ds__day
           , subq_16.listing__country_latest
@@ -414,8 +410,7 @@ FROM (
             , subq_15.country_latest AS listing__country_latest
             , subq_12.views AS views
           FROM (
-            -- Pass Only Elements:
-            --   ['views', 'ds__day', 'listing']
+            -- Pass Only Elements: ['views', 'ds__day', 'listing']
             SELECT
               subq_11.ds__day
               , subq_11.listing
@@ -540,8 +535,7 @@ FROM (
             ) subq_11
           ) subq_12
           LEFT OUTER JOIN (
-            -- Pass Only Elements:
-            --   ['country_latest', 'listing']
+            -- Pass Only Elements: ['country_latest', 'listing']
             SELECT
               subq_14.listing
               , subq_14.country_latest

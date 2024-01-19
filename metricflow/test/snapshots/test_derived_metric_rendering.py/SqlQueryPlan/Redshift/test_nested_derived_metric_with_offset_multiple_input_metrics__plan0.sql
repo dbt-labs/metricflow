@@ -35,8 +35,7 @@ FROM (
             subq_2.metric_time__day
             , SUM(subq_2.booking_value) AS booking_value
           FROM (
-            -- Pass Only Elements:
-            --   ['booking_value', 'metric_time__day']
+            -- Pass Only Elements: ['booking_value', 'metric_time__day']
             SELECT
               subq_1.metric_time__day
               , subq_1.booking_value
@@ -260,8 +259,7 @@ FROM (
           subq_11.metric_time__day
           , SUM(subq_11.booking_value) AS booking_value
         FROM (
-          -- Pass Only Elements:
-          --   ['booking_value', 'metric_time__day']
+          -- Pass Only Elements: ['booking_value', 'metric_time__day']
           SELECT
             subq_10.metric_time__day
             , subq_10.booking_value

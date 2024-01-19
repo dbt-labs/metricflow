@@ -1,6 +1,5 @@
 -- Read Elements From Semantic Model 'bookings_source'
--- Pass Only Elements:
---   ['bookings', 'instant_bookings', 'average_booking_value', 'bookers']
+-- Pass Only Elements: ['bookings', 'instant_bookings', 'average_booking_value', 'bookers']
 -- Aggregate Measures
 SELECT
   SUM(1) AS bookings

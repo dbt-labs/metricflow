@@ -10,8 +10,7 @@ FROM (
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
-    -- Pass Only Elements:
-    --   ['bookings', 'booking__paid_at__day']
+    -- Pass Only Elements: ['bookings', 'booking__paid_at__day']
     SELECT
       DATE_TRUNC('day', paid_at) AS booking__paid_at__day
       , 1 AS bookings

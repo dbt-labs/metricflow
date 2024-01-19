@@ -6,18 +6,14 @@
             <!-- description = Calculate min and max -->
             <!-- node_id = mm_0 -->
             <FilterElementsNode>
-                <!-- description =                    -->
-                <!--   Pass Only Elements:            -->
-                <!--     ['listing__country_latest']  -->
+                <!-- description = Pass Only Elements: ['listing__country_latest',] -->
                 <!-- node_id = pfe_0 -->
-                <!-- include_spec =                                                                  -->
-                <!--   {'class': 'DimensionSpec',                                                    -->
-                <!--    'element_name': 'country_latest',                                            -->
-                <!--    'entity_links': ({'class': 'EntityReference', 'element_name': 'listing'},)}  -->
+                <!-- include_spec =                                                                                           -->
+                <!--   DimensionSpec(element_name='country_latest', entity_links=(EntityReference(element_name='listing'),))  -->
                 <!-- distinct = True -->
                 <ReadSqlSourceNode>
-                    <!-- description =                                                                                    -->
-                    <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))  -->
+                    <!-- description =                                                                                      -->
+                    <!--   "Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))"  -->
                     <!-- node_id = rss_10005 -->
                     <!-- data_set =                                                                             -->
                     <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))  -->

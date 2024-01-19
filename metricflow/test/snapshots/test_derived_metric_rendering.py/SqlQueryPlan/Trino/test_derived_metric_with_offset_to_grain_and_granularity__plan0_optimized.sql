@@ -17,8 +17,7 @@ FROM (
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
-      -- Pass Only Elements:
-      --   ['bookings', 'metric_time__week']
+      -- Pass Only Elements: ['bookings', 'metric_time__week']
       SELECT
         DATE_TRUNC('week', ds) AS metric_time__week
         , 1 AS bookings
@@ -29,8 +28,7 @@ FROM (
   ) subq_18
   FULL OUTER JOIN (
     -- Join to Time Spine Dataset
-    -- Pass Only Elements:
-    --   ['bookings', 'metric_time__week']
+    -- Pass Only Elements: ['bookings', 'metric_time__week']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT

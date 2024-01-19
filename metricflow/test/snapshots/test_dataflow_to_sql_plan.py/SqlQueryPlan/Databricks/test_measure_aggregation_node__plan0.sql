@@ -5,8 +5,7 @@ SELECT
   , COUNT(DISTINCT subq_1.bookers) AS bookers
   , AVG(subq_1.average_booking_value) AS average_booking_value
 FROM (
-  -- Pass Only Elements:
-  --   ['bookings', 'instant_bookings', 'average_booking_value', 'bookers']
+  -- Pass Only Elements: ['bookings', 'instant_bookings', 'average_booking_value', 'bookers']
   SELECT
     subq_0.bookings
     , subq_0.instant_bookings

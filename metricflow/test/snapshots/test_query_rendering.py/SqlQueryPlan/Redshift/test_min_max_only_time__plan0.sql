@@ -3,8 +3,7 @@ SELECT
   MIN(subq_1.booking__paid_at__day) AS booking__paid_at__day__min
   , MAX(subq_1.booking__paid_at__day) AS booking__paid_at__day__max
 FROM (
-  -- Pass Only Elements:
-  --   ['booking__paid_at__day']
+  -- Pass Only Elements: ['booking__paid_at__day',]
   SELECT
     subq_0.booking__paid_at__day
   FROM (

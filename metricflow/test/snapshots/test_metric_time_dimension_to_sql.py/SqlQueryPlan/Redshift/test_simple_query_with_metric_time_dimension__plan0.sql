@@ -14,8 +14,7 @@ FROM (
       subq_2.metric_time__day
       , SUM(subq_2.bookings) AS bookings
     FROM (
-      -- Pass Only Elements:
-      --   ['bookings', 'metric_time__day']
+      -- Pass Only Elements: ['bookings', 'metric_time__day']
       SELECT
         subq_1.metric_time__day
         , subq_1.bookings
@@ -230,8 +229,7 @@ FULL OUTER JOIN (
       subq_7.metric_time__day
       , SUM(subq_7.booking_payments) AS booking_payments
     FROM (
-      -- Pass Only Elements:
-      --   ['booking_payments', 'metric_time__day']
+      -- Pass Only Elements: ['booking_payments', 'metric_time__day']
       SELECT
         subq_6.metric_time__day
         , subq_6.booking_payments

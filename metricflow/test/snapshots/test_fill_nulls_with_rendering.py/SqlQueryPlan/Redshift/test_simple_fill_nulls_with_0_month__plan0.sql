@@ -21,8 +21,7 @@ FROM (
       subq_2.metric_time__month
       , SUM(subq_2.bookings) AS bookings
     FROM (
-      -- Pass Only Elements:
-      --   ['bookings', 'metric_time__month']
+      -- Pass Only Elements: ['bookings', 'metric_time__month']
       SELECT
         subq_1.metric_time__month
         , subq_1.bookings

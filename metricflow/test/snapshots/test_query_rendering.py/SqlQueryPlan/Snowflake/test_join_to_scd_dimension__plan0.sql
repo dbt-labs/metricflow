@@ -8,8 +8,7 @@ FROM (
     subq_8.metric_time__day
     , SUM(subq_8.bookings) AS bookings
   FROM (
-    -- Pass Only Elements:
-    --   ['bookings', 'metric_time__day']
+    -- Pass Only Elements: ['bookings', 'metric_time__day']
     SELECT
       subq_7.metric_time__day
       , subq_7.bookings
@@ -20,8 +19,7 @@ FROM (
         , subq_6.listing__capacity
         , subq_6.bookings
       FROM (
-        -- Pass Only Elements:
-        --   ['bookings', 'listing__capacity', 'metric_time__day']
+        -- Pass Only Elements: ['bookings', 'listing__capacity', 'metric_time__day']
         SELECT
           subq_5.metric_time__day
           , subq_5.listing__capacity
@@ -36,8 +34,7 @@ FROM (
             , subq_4.capacity AS listing__capacity
             , subq_2.bookings AS bookings
           FROM (
-            -- Pass Only Elements:
-            --   ['bookings', 'metric_time__day', 'listing']
+            -- Pass Only Elements: ['bookings', 'metric_time__day', 'listing']
             SELECT
               subq_1.metric_time__day
               , subq_1.listing
@@ -227,8 +224,7 @@ FROM (
             ) subq_1
           ) subq_2
           LEFT OUTER JOIN (
-            -- Pass Only Elements:
-            --   ['capacity', 'window_start__day', 'window_end__day', 'listing']
+            -- Pass Only Elements: ['capacity', 'window_start__day', 'window_end__day', 'listing']
             SELECT
               subq_3.window_start__day
               , subq_3.window_end__day

@@ -34,8 +34,7 @@ FROM (
             subq_5.metric_time__day
             , SUM(subq_5.bookings) AS bookings
           FROM (
-            -- Pass Only Elements:
-            --   ['bookings', 'metric_time__day']
+            -- Pass Only Elements: ['bookings', 'metric_time__day']
             SELECT
               subq_4.metric_time__day
               , subq_4.bookings

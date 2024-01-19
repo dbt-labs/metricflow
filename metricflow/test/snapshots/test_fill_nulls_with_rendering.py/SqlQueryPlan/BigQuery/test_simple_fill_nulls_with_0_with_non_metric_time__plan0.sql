@@ -8,8 +8,7 @@ FROM (
     subq_2.booking__paid_at__day
     , SUM(subq_2.bookings) AS bookings
   FROM (
-    -- Pass Only Elements:
-    --   ['bookings', 'booking__paid_at__day']
+    -- Pass Only Elements: ['bookings', 'booking__paid_at__day']
     SELECT
       subq_1.booking__paid_at__day
       , subq_1.bookings

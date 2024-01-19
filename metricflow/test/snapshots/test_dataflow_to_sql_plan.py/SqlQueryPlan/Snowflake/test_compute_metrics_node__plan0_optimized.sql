@@ -7,8 +7,7 @@ SELECT
   , SUM(subq_7.bookings) AS bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
-  -- Pass Only Elements:
-  --   ['bookings', 'listing']
+  -- Pass Only Elements: ['bookings', 'listing']
   SELECT
     listing_id AS listing
     , 1 AS bookings

@@ -16,8 +16,7 @@ FROM (
       , subq_3.country_latest AS listing__country_latest
       , subq_1.bookings AS bookings
     FROM (
-      -- Pass Only Elements:
-      --   ['bookings', 'listing']
+      -- Pass Only Elements: ['bookings', 'listing']
       SELECT
         subq_0.listing
         , subq_0.bookings
@@ -116,8 +115,7 @@ FROM (
       ) subq_0
     ) subq_1
     LEFT OUTER JOIN (
-      -- Pass Only Elements:
-      --   ['country_latest', 'listing']
+      -- Pass Only Elements: ['country_latest', 'listing']
       SELECT
         subq_2.listing
         , subq_2.country_latest

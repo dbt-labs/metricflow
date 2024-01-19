@@ -6,8 +6,7 @@ SELECT
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
-  -- Pass Only Elements:
-  --   ['bookings', 'metric_time__extract_dow']
+  -- Pass Only Elements: ['bookings', 'metric_time__extract_dow']
   SELECT
     EXTRACT(DAYOFWEEK_ISO FROM ds) AS metric_time__extract_dow
     , 1 AS bookings
