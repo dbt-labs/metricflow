@@ -8,7 +8,6 @@ from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 
-from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.naming.naming_scheme import QueryItemNamingScheme
 from metricflow.naming.object_builder_scheme import ObjectBuilderNamingScheme
@@ -24,7 +23,6 @@ logger = logging.getLogger(__name__)
 
 @pytest.mark.parametrize("dag_case_id", [case_id.value for case_id in AmbiguousResolutionQueryId])
 def test_ambiguous_metric_time_in_query(  # noqa: D
-    mf_test_session_state: MetricFlowTestSessionState,
     ambiguous_resolution_manifest_lookup: SemanticManifestLookup,
     resolution_dags: Dict[AmbiguousResolutionQueryId, GroupByItemResolutionDag],
     dag_case_id: str,
@@ -85,7 +83,7 @@ def test_unavailable_group_by_item_in_derived_metric_parent(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         obj_id="result",
-        obj=mf_pformat(result),
+        obj=result,
     )
 
 
@@ -112,5 +110,5 @@ def test_invalid_group_by_item(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         obj_id="result",
-        obj=mf_pformat(result),
+        obj=result,
     )
