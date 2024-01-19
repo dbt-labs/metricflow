@@ -75,17 +75,9 @@ class MetricFlowDagTextFormatter:
         return self._thread_local_data.max_width_tracker
 
     def _displayed_property_on_one_line(self, displayed_property: DisplayedProperty) -> str:
-        return jinja2.Template(
-            textwrap.dedent(
-                """\
-                <!-- {{ key }} = {{ value }} -->
-                """
-            ),
-            undefined=jinja2.StrictUndefined,
-        ).render(
-            key=displayed_property.key,
-            value=mf_pformat(displayed_property.value, max_line_length=self._max_width_tracker.current_max_width),
-        )
+        key = displayed_property.key
+        value = mf_pformat(displayed_property.value, max_line_length=self._max_width_tracker.current_max_width)
+        return f"<!-- {key} = {value} -->"
 
     def _format_to_text(self, node: DagNode, inner_contents: Optional[str]) -> str:
         """Convert the given node to the text representation.
@@ -117,50 +109,28 @@ class MetricFlowDagTextFormatter:
             max_value_str_length = max([len(x) for x in value_str_split])
 
             # Print the key on multiple lines.
-            node_fields.append(
-                jinja2.Template(
-                    textwrap.dedent(
-                        """\
-                        <!-- {{ key }} = {{ padding }} -->
-                        """
-                    ),
-                    undefined=jinja2.StrictUndefined,
-                ).render(
-                    key=displayed_property.key,
-                    padding=" "
-                    * (
-                        (len("<!-- ") + len(self._value_indent_prefix) + max_value_str_length + len(" -->"))
-                        - len("<!-- ")
-                        - len(displayed_property.key)
-                        - len(" =")
-                        - len(" -->")
-                    ),
-                )
+            key = displayed_property.key
+            # Add padding so that all fields of this object have <!-- and --> that align.
+            key_padding = " " * (
+                (len("<!-- ") + len(self._value_indent_prefix) + max_value_str_length + len(" -->"))
+                - len("<!-- ")
+                - len(key)
+                - len(" = ")
+                - len(" -->")
             )
+
+            node_fields.append(f"<!-- {key} = {key_padding} -->")
 
             # Print the lines for the value in an indented section.
             for value_str in value_str_split:
-                node_fields.append(
-                    jinja2.Template(
-                        textwrap.dedent(
-                            """\
-                            <!-- {{ indent_prefix }}{{ value }} {{ padding }} -->
-                            """
-                        ),
-                        undefined=jinja2.StrictUndefined,
-                    ).render(
-                        indent_prefix=self._value_indent_prefix,
-                        value=value_str,
-                        padding=" "
-                        * (
-                            (len("<!-- ") + len(self._value_indent_prefix) + max_value_str_length + len(" -->"))
-                            - len("<!-- ")
-                            - len(self._value_indent_prefix)
-                            - len(value_str)
-                            - len(" -->")
-                        ),
-                    )
+                value_padding = " " * (
+                    (len("<!-- ") + len(self._value_indent_prefix) + max_value_str_length + len(" -->"))
+                    - len("<!-- ")
+                    - len(self._value_indent_prefix)
+                    - len(value_str)
+                    - len(" -->")
                 )
+                node_fields.append(f"<!-- {self._value_indent_prefix}{value_str}{value_padding} -->")
 
         return jinja2.Template(
             textwrap.dedent(
