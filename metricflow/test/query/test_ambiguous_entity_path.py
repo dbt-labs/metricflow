@@ -12,7 +12,7 @@ from metricflow.query.group_by_item.filter_spec_resolution.filter_pattern_factor
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
-from metricflow.test.snapshot_utils import assert_object_snapshot_equal
+from metricflow.test.snapshot_utils import assert_object_snapshot_equal, assert_str_snapshot_equal
 
 logger = logging.getLogger(__name__)
 
@@ -79,11 +79,11 @@ def test_non_resolvable_ambiguous_entity_path_due_to_multiple_matches(
             group_by_names=["entity_0__country"],
         )
 
-    assert_object_snapshot_equal(
+    assert_str_snapshot_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        obj_id="result_0",
-        obj=str(e.value),
+        snapshot_id="result_0",
+        snapshot_str=str(e.value),
     )
 
 
@@ -102,9 +102,9 @@ def test_non_resolvable_ambiguous_entity_path_due_to_mismatch(
             group_by_names=["entity_0__country"],
         )
 
-    assert_object_snapshot_equal(
+    assert_str_snapshot_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        obj_id="result_0",
-        obj=str(e.value),
+        snapshot_id="result_0",
+        snapshot_str=str(e.value),
     )

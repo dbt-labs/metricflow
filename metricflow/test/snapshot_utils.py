@@ -376,11 +376,11 @@ def assert_linkable_element_set_snapshot_equal(  # noqa: D
                     sorted(linkable_element_property.name for linkable_element_property in linkable_entity.properties),
                 )
             )
-    assert_object_snapshot_equal(
+    assert_str_snapshot_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        obj_id=set_id,
-        obj=tabulate.tabulate(headers=headers, tabular_data=sorted(rows)),
+        snapshot_id=set_id,
+        snapshot_str=tabulate.tabulate(headers=headers, tabular_data=sorted(rows)),
     )
 
 

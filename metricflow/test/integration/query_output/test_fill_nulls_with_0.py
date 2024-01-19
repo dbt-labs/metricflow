@@ -9,7 +9,7 @@ from metricflow.engine.metricflow_engine import MetricFlowQueryRequest
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.integration.conftest import IntegrationTestHelpers
-from metricflow.test.snapshot_utils import assert_object_snapshot_equal
+from metricflow.test.snapshot_utils import assert_str_snapshot_equal
 
 
 @pytest.mark.sql_engine_snapshot
@@ -30,12 +30,12 @@ def test_simple_fill_nulls_with_0_metric_time(  # noqa: D
     )
     assert query_result.result_df is not None, "Unexpected empty result."
 
-    assert_object_snapshot_equal(
+    assert_str_snapshot_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        obj_id="query_output",
-        obj=query_result.result_df.to_string(),
-        sql_client=sql_client,
+        snapshot_id="query_output",
+        snapshot_str=query_result.result_df.to_string(),
+        sql_engine=sql_client.sql_engine_type,
     )
 
 
@@ -57,12 +57,12 @@ def test_simple_fill_nulls_with_0_month(  # noqa: D
     )
     assert query_result.result_df is not None, "Unexpected empty result."
 
-    assert_object_snapshot_equal(
+    assert_str_snapshot_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        obj_id="query_output",
-        obj=query_result.result_df.to_string(),
-        sql_client=sql_client,
+        snapshot_id="query_output",
+        snapshot_str=query_result.result_df.to_string(),
+        sql_engine=sql_client.sql_engine_type,
     )
 
 
@@ -84,12 +84,12 @@ def test_simple_join_to_time_spine(  # noqa: D
     )
     assert query_result.result_df is not None, "Unexpected empty result."
 
-    assert_object_snapshot_equal(
+    assert_str_snapshot_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        obj_id="query_output",
-        obj=query_result.result_df.to_string(),
-        sql_client=sql_client,
+        snapshot_id="query_output",
+        snapshot_str=query_result.result_df.to_string(),
+        sql_engine=sql_client.sql_engine_type,
     )
 
 
@@ -111,12 +111,12 @@ def test_fill_nulls_with_0_multi_metric_query(  # noqa: D
     )
     assert query_result.result_df is not None, "Unexpected empty result."
 
-    assert_object_snapshot_equal(
+    assert_str_snapshot_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        obj_id="query_output",
-        obj=query_result.result_df.to_string(),
-        sql_client=sql_client,
+        snapshot_id="query_output",
+        snapshot_str=query_result.result_df.to_string(),
+        sql_engine=sql_client.sql_engine_type,
     )
 
 
@@ -136,10 +136,10 @@ def test_fill_nulls_with_0_multi_metric_query_with_categorical_dimension(  # noq
     )
     assert query_result.result_df is not None, "Unexpected empty result."
 
-    assert_object_snapshot_equal(
+    assert_str_snapshot_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        obj_id="query_output",
-        obj=query_result.result_df.to_string(),
-        sql_client=sql_client,
+        snapshot_id="query_output",
+        snapshot_str=query_result.result_df.to_string(),
+        sql_engine=sql_client.sql_engine_type,
     )
