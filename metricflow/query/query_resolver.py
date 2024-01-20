@@ -6,10 +6,12 @@ from typing import List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.references import MetricReference
 
-from metricflow.collection_helpers.pretty_print import mf_pformat
 from metricflow.dag.dag_to_text import dag_as_text
+from metricflow.mf_logging.pretty_print import mf_pformat
+from metricflow.mf_logging.runtime import log_runtime
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.naming.metric_scheme import MetricNamingScheme
+from metricflow.query.group_by_item.filter_spec_resolution.filter_pattern_factory import WhereFilterPatternFactory
 from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import FilterSpecResolutionLookUp
 from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_resolver import (
     WhereFilterSpecResolver,
@@ -102,11 +104,16 @@ class ResolveGroupByItemsResult:
 class MetricFlowQueryResolver:
     """Resolves inputs to a query (e.g. metrics, group by items into concrete specs."""
 
-    def __init__(self, manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D
+    def __init__(  # noqa: D
+        self,
+        manifest_lookup: SemanticManifestLookup,
+        where_filter_pattern_factory: WhereFilterPatternFactory,
+    ) -> None:
         self._manifest_lookup = manifest_lookup
         self._post_resolution_query_validator = PostResolutionQueryValidator(
             manifest_lookup=self._manifest_lookup,
         )
+        self._where_filter_pattern_factory = where_filter_pattern_factory
 
     @staticmethod
     def _resolve_group_by_item_input(
@@ -315,12 +322,19 @@ class MetricFlowQueryResolver:
         where_filter_spec_resolver = WhereFilterSpecResolver(
             manifest_lookup=self._manifest_lookup,
             resolution_dag=resolution_dag,
+            spec_pattern_factory=self._where_filter_pattern_factory,
         )
 
         return where_filter_spec_resolver.resolve_lookup()
 
     def resolve_query(self, resolver_input_for_query: ResolverInputForQuery) -> MetricFlowQueryResolution:
         """Resolve the query into specs that can be passed into the next stage in query processing."""
+        # Workaround for a Pycharm type inspection issue with decorators.
+        # noinspection PyArgumentList
+        return self._resolve_query(resolver_input_for_query=resolver_input_for_query)
+
+    @log_runtime()
+    def _resolve_query(self, resolver_input_for_query: ResolverInputForQuery) -> MetricFlowQueryResolution:
         metric_inputs = resolver_input_for_query.metric_inputs
         group_by_item_inputs = resolver_input_for_query.group_by_item_inputs
         order_by_item_inputs = resolver_input_for_query.order_by_item_inputs
@@ -393,19 +407,18 @@ class MetricFlowQueryResolver:
         if resolve_order_by_result.input_to_issue_set_mapping.has_issues:
             mappings_to_merge.append(resolve_order_by_result.input_to_issue_set_mapping)
 
-        # Resolve all where filters in the DAG.
+        # Resolve all where filters in the DAG and generate mappings if there are issues.
         filter_spec_lookup = self._build_filter_spec_lookup(resolution_dag)
-        for fitler_spec_resolution in filter_spec_lookup.spec_resolutions:
-            filter_resolver_input = ResolverInputForWhereFilterIntersection(
-                filter_resolution_path=fitler_spec_resolution.filter_location_path,
-                where_filter_intersection=fitler_spec_resolution.where_filter_intersection,
-                object_builder_str=fitler_spec_resolution.object_builder_str,
-            )
-            if fitler_spec_resolution.issue_set.has_issues:
+        for filter_spec_resolution in filter_spec_lookup.spec_resolutions:
+            if filter_spec_resolution.issue_set.has_issues:
                 mappings_to_merge.append(
                     InputToIssueSetMapping.from_one_item(
-                        resolver_input=filter_resolver_input,
-                        issue_set=fitler_spec_resolution.issue_set,
+                        resolver_input=ResolverInputForWhereFilterIntersection(
+                            filter_resolution_path=filter_spec_resolution.filter_location_path,
+                            where_filter_intersection=filter_spec_resolution.where_filter_intersection,
+                            object_builder_str=filter_spec_resolution.object_builder_str,
+                        ),
+                        issue_set=filter_spec_resolution.issue_set,
                     )
                 )
 

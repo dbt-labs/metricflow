@@ -1,6 +1,0 @@
-kind: Fixes
-body: Remove default time constraint for queries with cumulative metrics.
-time: 2023-12-07T17:07:04.040509-08:00
-custom:
-  Author: plypaul
-  Issue: "917"

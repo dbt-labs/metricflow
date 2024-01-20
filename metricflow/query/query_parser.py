@@ -9,16 +9,16 @@ from dbt_semantic_interfaces.implementations.filters.where_filter import (
     PydanticWhereFilter,
     PydanticWhereFilterIntersection,
 )
-from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.protocols import SavedQuery
 from dbt_semantic_interfaces.protocols.where_filter import WhereFilter
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 
 from metricflow.assert_one_arg import assert_at_most_one_arg_set
-from metricflow.collection_helpers.pretty_print import mf_pformat
 from metricflow.filters.merge_where import merge_to_single_where_filter
 from metricflow.filters.time_constraint import TimeRangeConstraint
-from metricflow.formatting import indent_log_line
+from metricflow.mf_logging.formatting import indent
+from metricflow.mf_logging.pretty_print import mf_pformat
+from metricflow.mf_logging.runtime import log_runtime
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.naming.dunder_scheme import DunderNamingScheme
 from metricflow.naming.metric_scheme import MetricNamingScheme
@@ -28,6 +28,10 @@ from metricflow.protocols.query_parameter import (
     MetricQueryParameter,
     OrderByQueryParameter,
     SavedQueryParameter,
+)
+from metricflow.query.group_by_item.filter_spec_resolution.filter_pattern_factory import (
+    DefaultWhereFilterPatternFactory,
+    WhereFilterPatternFactory,
 )
 from metricflow.query.group_by_item.group_by_item_resolver import GroupByItemResolver
 from metricflow.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
@@ -47,7 +51,6 @@ from metricflow.query.resolver_inputs.query_resolver_inputs import (
     ResolverInputForQuery,
     ResolverInputForQueryLevelWhereFilterIntersection,
 )
-from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.patterns.base_time_grain import BaseTimeGrainPattern
 from metricflow.specs.patterns.metric_time_pattern import MetricTimePattern
 from metricflow.specs.patterns.none_date_part import NoneDatePartPattern
@@ -78,15 +81,16 @@ class MetricFlowQueryParser:
 
     def __init__(  # noqa: D
         self,
-        column_association_resolver: ColumnAssociationResolver,
-        model: SemanticManifestLookup,
+        semantic_manifest_lookup: SemanticManifestLookup,
+        where_filter_pattern_factory: WhereFilterPatternFactory = DefaultWhereFilterPatternFactory(),
     ) -> None:
-        self._manifest_lookup = model
+        self._manifest_lookup = semantic_manifest_lookup
+        self._metric_naming_schemes = (MetricNamingScheme(),)
         self._group_by_item_naming_schemes = (
             ObjectBuilderNamingScheme(),
             DunderNamingScheme(),
         )
-        self._metric_naming_schemes = (MetricNamingScheme(),)
+        self._where_filter_pattern_factory = where_filter_pattern_factory
 
     def parse_and_validate_saved_query(
         self,
@@ -135,7 +139,7 @@ class MetricFlowQueryParser:
             )
             raise InvalidQueryException(
                 f"Did not find saved query `{saved_query_parameter.name}` in known saved queries:\n"
-                f"{pformat_big_objects(known_saved_query_names)}"
+                f"{mf_pformat(known_saved_query_names)}"
             )
 
         return matching_saved_queries[0]
@@ -269,20 +273,20 @@ class MetricFlowQueryParser:
                 lines.append(f"\nError #{issue_counter}:")
                 issue_set_lines: List[str] = [
                     "Message:\n",
-                    indent_log_line(error_issue.ui_description(resolver_input)),
+                    indent(error_issue.ui_description(resolver_input)),
                     "\nQuery Input:\n",
-                    indent_log_line(resolver_input.ui_description),
+                    indent(resolver_input.ui_description),
                 ]
 
                 if len(error_issue.query_resolution_path.resolution_path_nodes) > 0:
                     issue_set_lines.extend(
                         [
                             "\nIssue Location:\n",
-                            indent_log_line(error_issue.query_resolution_path.ui_description),
+                            indent(error_issue.query_resolution_path.ui_description),
                         ]
                     )
 
-                lines.extend(indent_log_line(issue_set_line) for issue_set_line in issue_set_lines)
+                lines.extend(indent(issue_set_line) for issue_set_line in issue_set_lines)
 
         return "\n".join(lines)
 
@@ -314,6 +318,39 @@ class MetricFlowQueryParser:
 
         e.g. make sure that the given metric is a valid metric name.
         """
+        # Workaround for a Pycharm type inspection issue with decorators.
+        # noinspection PyArgumentList
+        return self._parse_and_validate_query(
+            metric_names=metric_names,
+            metrics=metrics,
+            group_by_names=group_by_names,
+            group_by=group_by,
+            limit=limit,
+            time_constraint_start=time_constraint_start,
+            time_constraint_end=time_constraint_end,
+            where_constraint=where_constraint,
+            where_constraint_str=where_constraint_str,
+            order_by_names=order_by_names,
+            order_by=order_by,
+            min_max_only=min_max_only,
+        )
+
+    @log_runtime()
+    def _parse_and_validate_query(
+        self,
+        metric_names: Optional[Sequence[str]],
+        metrics: Optional[Sequence[MetricQueryParameter]],
+        group_by_names: Optional[Sequence[str]],
+        group_by: Optional[Tuple[GroupByParameter, ...]],
+        limit: Optional[int],
+        time_constraint_start: Optional[datetime.datetime],
+        time_constraint_end: Optional[datetime.datetime],
+        where_constraint: Optional[WhereFilter],
+        where_constraint_str: Optional[str],
+        order_by_names: Optional[Sequence[str]],
+        order_by: Optional[Sequence[OrderByQueryParameter]],
+        min_max_only: bool,
+    ) -> MetricFlowQuerySpec:
         # TODO: validate min_max_only - can only be called for non-metric queries
         assert_at_most_one_arg_set(metric_names=metric_names, metrics=metrics)
         assert_at_most_one_arg_set(group_by_names=group_by_names, group_by=group_by)
@@ -387,9 +424,9 @@ class MetricFlowQueryParser:
 
             logger.info(
                 "Converted group-by-item input:\n"
-                + indent_log_line(f"Input: {repr(group_by_name)}")
+                + indent(f"Input: {repr(group_by_name)}")
                 + "\n"
-                + indent_log_line(f"Resolver Input: {mf_pformat(resolver_input_for_group_by_item)}")
+                + indent(f"Resolver Input: {mf_pformat(resolver_input_for_group_by_item)}")
             )
 
         for group_by_parameter in group_by:
@@ -397,9 +434,9 @@ class MetricFlowQueryParser:
             resolver_inputs_for_group_by_items.append(resolver_input_for_group_by_parameter)
             logger.info(
                 "Converted group-by-item input:\n"
-                + indent_log_line(f"Input: {repr(group_by_parameter)}")
+                + indent(f"Input: {repr(group_by_parameter)}")
                 + "\n"
-                + indent_log_line(f"Resolver Input: {mf_pformat(resolver_input_for_group_by_parameter)}")
+                + indent(f"Resolver Input: {mf_pformat(resolver_input_for_group_by_parameter)}")
             )
 
         where_filters: List[PydanticWhereFilter] = []
@@ -414,7 +451,7 @@ class MetricFlowQueryParser:
         )
 
         query_resolver = MetricFlowQueryResolver(
-            manifest_lookup=self._manifest_lookup,
+            manifest_lookup=self._manifest_lookup, where_filter_pattern_factory=self._where_filter_pattern_factory
         )
 
         resolver_inputs_for_order_by: List[ResolverInputForOrderByItem] = []
@@ -437,11 +474,11 @@ class MetricFlowQueryParser:
             min_max_only=resolver_input_for_min_max_only,
         )
 
-        logger.info("Resolver input for query is:\n" + indent_log_line(mf_pformat(resolver_input_for_query)))
+        logger.info("Resolver input for query is:\n" + indent(mf_pformat(resolver_input_for_query)))
 
         query_resolution = query_resolver.resolve_query(resolver_input_for_query)
 
-        logger.info("Query resolution is:\n" + indent_log_line(mf_pformat(query_resolution)))
+        logger.info("Query resolution is:\n" + indent(mf_pformat(query_resolution)))
 
         self._raise_exception_if_there_are_errors(
             input_to_issue_set=query_resolution.input_to_issue_set.merge(

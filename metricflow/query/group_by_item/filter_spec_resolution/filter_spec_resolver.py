@@ -11,12 +11,12 @@ from dbt_semantic_interfaces.implementations.filters.where_filter import Pydanti
 from dbt_semantic_interfaces.protocols import WhereFilter, WhereFilterIntersection
 from typing_extensions import override
 
-from metricflow.collection_helpers.pretty_print import mf_pformat
-from metricflow.formatting import indent_log_line
+from metricflow.mf_logging.runtime import log_runtime
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.naming.object_builder_str import ObjectBuilderNameConverter
 from metricflow.query.group_by_item.candidate_push_down.push_down_visitor import DagTraversalPathTracker
 from metricflow.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
+from metricflow.query.group_by_item.filter_spec_resolution.filter_pattern_factory import WhereFilterPatternFactory
 from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
     FilterSpecResolution,
     FilterSpecResolutionLookUp,
@@ -46,7 +46,6 @@ from metricflow.query.issues.filter_spec_resolver.invalid_where import WhereFilt
 from metricflow.query.issues.issues_base import (
     MetricFlowQueryResolutionIssueSet,
 )
-from metricflow.specs.patterns.typed_patterns import DimensionPattern, EntityPattern, TimeDimensionPattern
 
 logger = logging.getLogger(__name__)
 
@@ -68,14 +67,24 @@ class WhereFilterSpecResolver:
         self,
         manifest_lookup: SemanticManifestLookup,
         resolution_dag: GroupByItemResolutionDag,
+        spec_pattern_factory: WhereFilterPatternFactory,
     ) -> None:
         self._manifest_lookup = manifest_lookup
         self._resolution_dag = resolution_dag
+        self.spec_pattern_factory = spec_pattern_factory
 
     def resolve_lookup(self) -> FilterSpecResolutionLookUp:
         """Find all where filters and return a lookup that provides the specs for the included group-by-items."""
-        visitor = _ResolveWhereFilterSpecVisitor(manifest_lookup=self._manifest_lookup)
+        # Workaround for a Pycharm type inspection issue with decorators.
+        # noinspection PyArgumentList
+        return self._resolve_lookup()
 
+    @log_runtime()
+    def _resolve_lookup(self) -> FilterSpecResolutionLookUp:
+        visitor = _ResolveWhereFilterSpecVisitor(
+            manifest_lookup=self._manifest_lookup,
+            spec_pattern_factory=self.spec_pattern_factory,
+        )
         return self._resolution_dag.sink_node.accept(visitor)
 
 
@@ -87,9 +96,12 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
     collected and returned in a lookup object.
     """
 
-    def __init__(self, manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D
+    def __init__(  # noqa: D
+        self, manifest_lookup: SemanticManifestLookup, spec_pattern_factory: WhereFilterPatternFactory
+    ) -> None:
         self._manifest_lookup = manifest_lookup
         self._path_from_start_node_tracker = DagTraversalPathTracker()
+        self._spec_pattern_factory = spec_pattern_factory
 
     @staticmethod
     def _dedupe_filter_call_parameter_sets(
@@ -123,11 +135,9 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
             ),
         )
 
-    @staticmethod
     def _map_filter_parameter_sets_to_pattern(
-        filter_location: WhereFilterLocation,
+        self,
         filter_call_parameter_sets: FilterCallParameterSets,
-        resolved_spec_lookup_so_far: FilterSpecResolutionLookUp,
     ) -> Sequence[PatternAssociationForWhereFilterGroupByItem]:
         """Given the call parameter sets in a filter, map them to spec patterns.
 
@@ -138,67 +148,39 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
         """
         patterns_in_filter: List[PatternAssociationForWhereFilterGroupByItem] = []
         for dimension_call_parameter_set in filter_call_parameter_sets.dimension_call_parameter_sets:
-            lookup_key = ResolvedSpecLookUpKey(
-                filter_location=filter_location,
-                call_parameter_set=dimension_call_parameter_set,
-            )
-            if resolved_spec_lookup_so_far.spec_resolution_exists(lookup_key):
-                logger.info(
-                    f"Skipping resolution for {dimension_call_parameter_set} at {filter_location} since it has already"
-                    f"been resolved to:\n\n"
-                    f"{indent_log_line(mf_pformat(resolved_spec_lookup_so_far.get_spec_resolutions(lookup_key)))}"
-                )
-                continue
-
             patterns_in_filter.append(
                 PatternAssociationForWhereFilterGroupByItem(
                     call_parameter_set=dimension_call_parameter_set,
                     object_builder_str=ObjectBuilderNameConverter.input_str_from_dimension_call_parameter_set(
                         dimension_call_parameter_set
                     ),
-                    spec_pattern=DimensionPattern.from_call_parameter_set(dimension_call_parameter_set),
+                    spec_pattern=self._spec_pattern_factory.create_for_dimension_call_parameter_set(
+                        dimension_call_parameter_set
+                    ),
                 )
             )
         for time_dimension_call_parameter_set in filter_call_parameter_sets.time_dimension_call_parameter_sets:
-            lookup_key = ResolvedSpecLookUpKey(
-                filter_location=filter_location,
-                call_parameter_set=time_dimension_call_parameter_set,
-            )
-            if resolved_spec_lookup_so_far.spec_resolution_exists(lookup_key):
-                logger.info(
-                    f"Skipping resolution for {time_dimension_call_parameter_set} at {filter_location} since it has "
-                    f"been resolved to:\n"
-                    f"{mf_pformat(resolved_spec_lookup_so_far.get_spec_resolutions(lookup_key))}"
-                )
-
             patterns_in_filter.append(
                 PatternAssociationForWhereFilterGroupByItem(
                     call_parameter_set=time_dimension_call_parameter_set,
                     object_builder_str=ObjectBuilderNameConverter.input_str_from_time_dimension_call_parameter_set(
                         time_dimension_call_parameter_set
                     ),
-                    spec_pattern=TimeDimensionPattern.from_call_parameter_set(time_dimension_call_parameter_set),
+                    spec_pattern=self._spec_pattern_factory.create_for_time_dimension_call_parameter_set(
+                        time_dimension_call_parameter_set
+                    ),
                 )
             )
         for entity_call_parameter_set in filter_call_parameter_sets.entity_call_parameter_sets:
-            lookup_key = ResolvedSpecLookUpKey(
-                filter_location=filter_location,
-                call_parameter_set=entity_call_parameter_set,
-            )
-            if resolved_spec_lookup_so_far.spec_resolution_exists(lookup_key):
-                logger.info(
-                    f"Skipping resolution for {entity_call_parameter_set} at {filter_location} since it has "
-                    f"been resolved to:\n"
-                    f"{mf_pformat(resolved_spec_lookup_so_far.get_spec_resolutions(lookup_key))}"
-                )
-
             patterns_in_filter.append(
                 PatternAssociationForWhereFilterGroupByItem(
                     call_parameter_set=entity_call_parameter_set,
                     object_builder_str=ObjectBuilderNameConverter.input_str_from_entity_call_parameter_set(
                         entity_call_parameter_set
                     ),
-                    spec_pattern=EntityPattern.from_call_parameter_set(entity_call_parameter_set),
+                    spec_pattern=self._spec_pattern_factory.create_for_entity_call_parameter_set(
+                        entity_call_parameter_set
+                    ),
                 )
             )
 
@@ -218,15 +200,12 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
             for parent_node in node.parent_nodes:
                 results_to_merge.append(parent_node.accept(self))
 
-            # Need to dedupe as it's possible that the same metric with the same filter is used multiple times to
-            # define a derived metric.
-            resolved_spec_lookup_so_far = FilterSpecResolutionLookUp.merge_iterable(results_to_merge).dedupe()
+            resolved_spec_lookup_so_far = FilterSpecResolutionLookUp.merge_iterable(results_to_merge)
 
             return resolved_spec_lookup_so_far.merge(
                 self._resolve_specs_for_where_filters(
                     current_node=node,
                     resolution_path=resolution_path,
-                    resolved_spec_lookup_so_far=resolved_spec_lookup_so_far,
                     filter_location=WhereFilterLocation.for_metric(node.metric_reference),
                     where_filter_intersection=self._get_where_filters_at_metric_node(node),
                 )
@@ -247,7 +226,6 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
                 self._resolve_specs_for_where_filters(
                     current_node=node,
                     resolution_path=resolution_path,
-                    resolved_spec_lookup_so_far=resolved_spec_lookup_so_far,
                     filter_location=WhereFilterLocation.for_query(node.metrics_in_query),
                     where_filter_intersection=node.where_filter_intersection,
                 )
@@ -291,7 +269,6 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
         self,
         current_node: ResolutionDagSinkNode,
         resolution_path: MetricFlowQueryResolutionPath,
-        resolved_spec_lookup_so_far: FilterSpecResolutionLookUp,
         filter_location: WhereFilterLocation,
         where_filter_intersection: WhereFilterIntersection,
     ) -> FilterSpecResolutionLookUp:
@@ -335,9 +312,7 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
 
         resolutions: List[FilterSpecResolution] = []
         for group_by_item_in_where_filter in self._map_filter_parameter_sets_to_pattern(
-            filter_location=filter_location,
             filter_call_parameter_sets=deduped_filter_call_parameter_sets,
-            resolved_spec_lookup_so_far=resolved_spec_lookup_so_far,
         ):
             group_by_item_resolution = group_by_item_resolver.resolve_matching_item_for_filters(
                 input_str=group_by_item_in_where_filter.object_builder_str,

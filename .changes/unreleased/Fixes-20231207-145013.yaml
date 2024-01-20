@@ -1,6 +1,0 @@
-kind: Fixes
-body: Fixes incorrect time constraint applied to derived offset metrics.
-time: 2023-12-07T14:50:13.630957-08:00
-custom:
-  Author: courtneyholcomb
-  Issue: "925"

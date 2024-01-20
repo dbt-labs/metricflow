@@ -1,8 +1,7 @@
 -- Read Elements From Semantic Model 'revenue'
 -- Metric Time Dimension 'ds'
 -- Constrain Time Range to [2000-01-01T00:00:00, 2020-01-01T00:00:00]
--- Pass Only Elements:
---   ['txn_revenue', 'ds__month']
+-- Pass Only Elements: ['txn_revenue', 'ds__month']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT

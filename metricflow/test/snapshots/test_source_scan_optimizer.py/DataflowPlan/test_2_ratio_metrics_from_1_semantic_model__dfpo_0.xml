@@ -5,82 +5,42 @@
         <ComputeMetricsNode>
             <!-- description = Compute Metrics via Expressions -->
             <!-- node_id = cm_15 -->
-            <!-- metric_spec =                              -->
-            <!--   {'class': 'MetricSpec',                  -->
-            <!--    'element_name': 'bookings_per_booker',  -->
-            <!--    'filter_specs': (),                     -->
-            <!--    'alias': None,                          -->
-            <!--    'offset_window': None,                  -->
-            <!--    'offset_to_grain': None}                -->
-            <!-- metric_spec =                              -->
-            <!--   {'class': 'MetricSpec',                  -->
-            <!--    'element_name': 'bookings_per_dollar',  -->
-            <!--    'filter_specs': (),                     -->
-            <!--    'alias': None,                          -->
-            <!--    'offset_window': None,                  -->
-            <!--    'offset_to_grain': None}                -->
+            <!-- metric_spec =                                     -->
+            <!--   MetricSpec(element_name='bookings_per_booker')  -->
+            <!-- metric_spec =                                     -->
+            <!--   MetricSpec(element_name='bookings_per_dollar')  -->
             <ComputeMetricsNode>
                 <!-- description = Compute Metrics via Expressions -->
                 <!-- node_id = cm_14 -->
-                <!-- metric_spec =                   -->
-                <!--   {'class': 'MetricSpec',       -->
-                <!--    'element_name': 'bookings',  -->
-                <!--    'filter_specs': (),          -->
-                <!--    'alias': None,               -->
-                <!--    'offset_window': None,       -->
-                <!--    'offset_to_grain': None}     -->
-                <!-- metric_spec =                  -->
-                <!--   {'class': 'MetricSpec',      -->
-                <!--    'element_name': 'bookers',  -->
-                <!--    'filter_specs': (),         -->
-                <!--    'alias': None,              -->
-                <!--    'offset_window': None,      -->
-                <!--    'offset_to_grain': None}    -->
-                <!-- metric_spec =                        -->
-                <!--   {'class': 'MetricSpec',            -->
-                <!--    'element_name': 'booking_value',  -->
-                <!--    'filter_specs': (),               -->
-                <!--    'alias': None,                    -->
-                <!--    'offset_window': None,            -->
-                <!--    'offset_to_grain': None}          -->
+                <!-- metric_spec =                          -->
+                <!--   MetricSpec(element_name='bookings')  -->
+                <!-- metric_spec =                         -->
+                <!--   MetricSpec(element_name='bookers')  -->
+                <!-- metric_spec =                               -->
+                <!--   MetricSpec(element_name='booking_value')  -->
                 <AggregateMeasuresNode>
                     <!-- description = Aggregate Measures -->
                     <!-- node_id = am_10 -->
                     <FilterElementsNode>
-                        <!-- description =                                                     -->
-                        <!--   Pass Only Elements:                                             -->
-                        <!--     ['bookings', 'bookers', 'booking_value', 'metric_time__day']  -->
+                        <!-- description =                                                                         -->
+                        <!--   "Pass Only Elements: ['bookings', 'bookers', 'booking_value', 'metric_time__day']"  -->
                         <!-- node_id = pfe_10 -->
-                        <!-- include_spec =                           -->
-                        <!--   {'class': 'MeasureSpec',               -->
-                        <!--    'element_name': 'bookings',           -->
-                        <!--    'non_additive_dimension_spec': None,  -->
-                        <!--    'fill_nulls_with': None}              -->
-                        <!-- include_spec =                           -->
-                        <!--   {'class': 'MeasureSpec',               -->
-                        <!--    'element_name': 'bookers',            -->
-                        <!--    'non_additive_dimension_spec': None,  -->
-                        <!--    'fill_nulls_with': None}              -->
-                        <!-- include_spec =                           -->
-                        <!--   {'class': 'MeasureSpec',               -->
-                        <!--    'element_name': 'booking_value',      -->
-                        <!--    'non_additive_dimension_spec': None,  -->
-                        <!--    'fill_nulls_with': None}              -->
+                        <!-- include_spec =                          -->
+                        <!--   MeasureSpec(element_name='bookings')  -->
+                        <!-- include_spec =                         -->
+                        <!--   MeasureSpec(element_name='bookers')  -->
                         <!-- include_spec =                               -->
-                        <!--   {'class': 'TimeDimensionSpec',             -->
-                        <!--    'element_name': 'metric_time',            -->
-                        <!--    'entity_links': (),                       -->
-                        <!--    'time_granularity': TimeGranularity.DAY,  -->
-                        <!--    'date_part': None,                        -->
-                        <!--    'aggregation_state': None}                -->
+                        <!--   MeasureSpec(element_name='booking_value')  -->
+                        <!-- include_spec =                                                         -->
+                        <!--   TimeDimensionSpec(element_name='metric_time', time_granularity=DAY)  -->
                         <!-- distinct = False -->
                         <MetricTimeDimensionTransformNode>
                             <!-- description = Metric Time Dimension 'ds' -->
                             <!-- node_id = sma_6 -->
                             <!-- aggregation_time_dimension = ds -->
                             <ReadSqlSourceNode>
-                                <!-- description =                                                                                    -->
-                                <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))  -->
+                                <!-- description =                                                                                      -->
+                                <!--   "Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))"  -->
                                 <!-- node_id = rss_6 -->
                                 <!-- data_set =                                                                             -->
                                 <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))  -->

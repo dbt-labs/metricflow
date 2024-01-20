@@ -4,8 +4,7 @@ SELECT
   , MAX(booking__paid_at__day) AS booking__paid_at__day__max
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
-  -- Pass Only Elements:
-  --   ['booking__paid_at__day']
+  -- Pass Only Elements: ['booking__paid_at__day',]
   SELECT
     DATE_TRUNC(paid_at, day) AS booking__paid_at__day
   FROM ***************************.fct_bookings bookings_source_src_10001

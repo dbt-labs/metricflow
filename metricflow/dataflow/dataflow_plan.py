@@ -9,7 +9,6 @@ from dataclasses import dataclass
 from typing import Generic, List, Optional, Sequence, Tuple, Type, TypeVar, Union
 
 import jinja2
-from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.protocols.metric import MetricTimeWindow
 from dbt_semantic_interfaces.references import TimeDimensionReference
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
@@ -42,6 +41,7 @@ from metricflow.dataflow.builder.partitions import (
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.filters.time_constraint import TimeRangeConstraint
+from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.specs.specs import (
     ConstantPropertySpec,
     EntitySpec,
@@ -1107,10 +1107,7 @@ class FilterElementsNode(BaseOutput):
         if self._replace_description:
             return self._replace_description
 
-        formatted_str = textwrap.indent(
-            pformat_big_objects([x.qualified_name for x in self._include_specs.all_specs]), prefix="  "
-        )
-        return f"Pass Only Elements:\n{formatted_str}"
+        return f"Pass Only Elements: {mf_pformat([x.qualified_name for x in self._include_specs.all_specs])}"
 
     @property
     def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D

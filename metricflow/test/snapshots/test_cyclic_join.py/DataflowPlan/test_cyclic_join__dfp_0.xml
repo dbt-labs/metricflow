@@ -5,91 +5,62 @@
         <ComputeMetricsNode>
             <!-- description = Compute Metrics via Expressions -->
             <!-- node_id = cm_0 -->
-            <!-- metric_spec =                   -->
-            <!--   {'class': 'MetricSpec',       -->
-            <!--    'element_name': 'listings',  -->
-            <!--    'filter_specs': (),          -->
-            <!--    'alias': None,               -->
-            <!--    'offset_window': None,       -->
-            <!--    'offset_to_grain': None}     -->
+            <!-- metric_spec =                          -->
+            <!--   MetricSpec(element_name='listings')  -->
             <AggregateMeasuresNode>
                 <!-- description = Aggregate Measures -->
                 <!-- node_id = am_0 -->
                 <FilterElementsNode>
-                    <!-- description =                                       -->
-                    <!--   Pass Only Elements:                               -->
-                    <!--     ['listings', 'cyclic_entity__capacity_latest']  -->
+                    <!-- description =                                                           -->
+                    <!--   "Pass Only Elements: ['listings', 'cyclic_entity__capacity_latest']"  -->
                     <!-- node_id = pfe_2 -->
-                    <!-- include_spec =                           -->
-                    <!--   {'class': 'MeasureSpec',               -->
-                    <!--    'element_name': 'listings',           -->
-                    <!--    'non_additive_dimension_spec': None,  -->
-                    <!--    'fill_nulls_with': None}              -->
-                    <!-- include_spec =                                            -->
-                    <!--   {'class': 'DimensionSpec',                              -->
-                    <!--    'element_name': 'capacity_latest',                     -->
-                    <!--    'entity_links': ({'class': 'EntityReference',          -->
-                    <!--                      'element_name': 'cyclic_entity'},)}  -->
+                    <!-- include_spec =                          -->
+                    <!--   MeasureSpec(element_name='listings')  -->
+                    <!-- include_spec =                                                                                                  -->
+                    <!--   DimensionSpec(element_name='capacity_latest', entity_links=(EntityReference(element_name='cyclic_entity'),))  -->
                     <!-- distinct = False -->
                     <JoinToBaseOutputNode>
                         <!-- description = Join Standard Outputs -->
                         <!-- node_id = jso_0 -->
-                        <!-- join0_for_node_id_pfe_1 =                               -->
-                        <!--   {'class': 'JoinDescription',                          -->
-                        <!--    'join_node': FilterElementsNode(node_id=pfe_1),      -->
-                        <!--    'join_on_entity': {'class': 'LinklessEntitySpec',    -->
-                        <!--                       'element_name': 'cyclic_entity',  -->
-                        <!--                       'entity_links': ()},              -->
-                        <!--    'join_type': SqlJoinType.LEFT_OUTER,                 -->
-                        <!--    'join_on_partition_dimensions': (),                  -->
-                        <!--    'join_on_partition_time_dimensions': (),             -->
-                        <!--    'validity_window': None}                             -->
+                        <!-- join0_for_node_id_pfe_1 =                                             -->
+                        <!--   JoinDescription(                                                    -->
+                        <!--     join_node=FilterElementsNode(node_id=pfe_1),                      -->
+                        <!--     join_on_entity=LinklessEntitySpec(element_name='cyclic_entity'),  -->
+                        <!--     join_type=LEFT_OUTER,                                             -->
+                        <!--   )                                                                   -->
                         <FilterElementsNode>
-                            <!-- description =                      -->
-                            <!--   Pass Only Elements:              -->
-                            <!--     ['listings', 'cyclic_entity']  -->
+                            <!-- description = Pass Only Elements: ['listings', 'cyclic_entity'] -->
                             <!-- node_id = pfe_0 -->
-                            <!-- include_spec =                           -->
-                            <!--   {'class': 'MeasureSpec',               -->
-                            <!--    'element_name': 'listings',           -->
-                            <!--    'non_additive_dimension_spec': None,  -->
-                            <!--    'fill_nulls_with': None}              -->
-                            <!-- include_spec =                       -->
-                            <!--   {'class': 'LinklessEntitySpec',    -->
-                            <!--    'element_name': 'cyclic_entity',  -->
-                            <!--    'entity_links': ()}               -->
+                            <!-- include_spec =                          -->
+                            <!--   MeasureSpec(element_name='listings')  -->
+                            <!-- include_spec =                                      -->
+                            <!--   LinklessEntitySpec(element_name='cyclic_entity')  -->
                             <!-- distinct = False -->
                             <MetricTimeDimensionTransformNode>
                                 <!-- description = Metric Time Dimension 'ds' -->
                                 <!-- node_id = sma_10015 -->
                                 <!-- aggregation_time_dimension = ds -->
                                 <ReadSqlSourceNode>
-                                    <!-- description =                                                                                    -->
-                                    <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))  -->
-                                    <!-- node_id = rss_10053 -->
+                                    <!-- description =                                                                                      -->
+                                    <!--   "Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))"  -->
+                                    <!-- node_id = rss_10050 -->
                                     <!-- data_set =                                                                             -->
                                     <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))  -->
                                 </ReadSqlSourceNode>
                             </MetricTimeDimensionTransformNode>
                         </FilterElementsNode>
                         <FilterElementsNode>
-                            <!-- description =                             -->
-                            <!--   Pass Only Elements:                     -->
-                            <!--     ['capacity_latest', 'cyclic_entity']  -->
+                            <!-- description = Pass Only Elements: ['capacity_latest', 'cyclic_entity'] -->
                             <!-- node_id = pfe_1 -->
-                            <!-- include_spec =                         -->
-                            <!--   {'class': 'DimensionSpec',           -->
-                            <!--    'element_name': 'capacity_latest',  -->
-                            <!--    'entity_links': ()}                 -->
-                            <!-- include_spec =                       -->
-                            <!--   {'class': 'LinklessEntitySpec',    -->
-                            <!--    'element_name': 'cyclic_entity',  -->
-                            <!--    'entity_links': ()}               -->
+                            <!-- include_spec =                                   -->
+                            <!--   DimensionSpec(element_name='capacity_latest')  -->
+                            <!-- include_spec =                                      -->
+                            <!--   LinklessEntitySpec(element_name='cyclic_entity')  -->
                             <!-- distinct = False -->
                             <ReadSqlSourceNode>
-                                <!-- description =                                                                                           -->
-                                <!--   Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest_cyclic'))  -->
-                                <!-- node_id = rss_10054 -->
+                                <!-- description =                                                                                             -->
+                                <!--   "Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest_cyclic'))"  -->
+                                <!-- node_id = rss_10051 -->
                                 <!-- data_set =                                                                                    -->
                                 <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest_cyclic'))  -->
                             </ReadSqlSourceNode>

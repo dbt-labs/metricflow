@@ -29,8 +29,7 @@ FROM (
         FROM (
           -- Read Elements From Semantic Model 'bookings_source'
           -- Metric Time Dimension 'ds'
-          -- Pass Only Elements:
-          --   ['referred_bookings', 'metric_time__day']
+          -- Pass Only Elements: ['referred_bookings', 'metric_time__day']
           SELECT
             DATE_TRUNC('day', ds) AS metric_time__day
             , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS referred_bookings
@@ -48,8 +47,7 @@ FROM (
         FROM (
           -- Read Elements From Semantic Model 'bookings_source'
           -- Metric Time Dimension 'ds'
-          -- Pass Only Elements:
-          --   ['bookings', 'metric_time__day']
+          -- Pass Only Elements: ['bookings', 'metric_time__day']
           SELECT
             DATE_TRUNC('day', ds) AS metric_time__day
             , 1 AS bookings
@@ -73,8 +71,7 @@ FROM (
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
-      -- Pass Only Elements:
-      --   ['instant_bookings', 'metric_time__day']
+      -- Pass Only Elements: ['instant_bookings', 'metric_time__day']
       SELECT
         DATE_TRUNC('day', ds) AS metric_time__day
         , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings
@@ -94,8 +91,7 @@ FROM (
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
-      -- Pass Only Elements:
-      --   ['bookings', 'metric_time__day']
+      -- Pass Only Elements: ['bookings', 'metric_time__day']
       SELECT
         DATE_TRUNC('day', ds) AS metric_time__day
         , 1 AS bookings

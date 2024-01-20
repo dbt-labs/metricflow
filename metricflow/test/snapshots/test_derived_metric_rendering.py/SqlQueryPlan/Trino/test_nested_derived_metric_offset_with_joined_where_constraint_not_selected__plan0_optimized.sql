@@ -4,8 +4,7 @@ SELECT
   , 2 * bookings_offset_once AS bookings_offset_twice
 FROM (
   -- Constrain Output with WHERE
-  -- Pass Only Elements:
-  --   ['metric_time__day', 'bookings_offset_once']
+  -- Pass Only Elements: ['metric_time__day', 'bookings_offset_once']
   SELECT
     metric_time__day
     , bookings_offset_once
@@ -24,8 +23,7 @@ FROM (
         , 2 * bookings AS bookings_offset_once
       FROM (
         -- Join to Time Spine Dataset
-        -- Pass Only Elements:
-        --   ['bookings', 'booking__is_instant', 'metric_time__day']
+        -- Pass Only Elements: ['bookings', 'booking__is_instant', 'metric_time__day']
         -- Aggregate Measures
         -- Compute Metrics via Expressions
         SELECT

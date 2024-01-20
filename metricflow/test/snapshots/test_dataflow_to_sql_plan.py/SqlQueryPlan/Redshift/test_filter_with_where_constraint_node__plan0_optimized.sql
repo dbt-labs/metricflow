@@ -4,8 +4,7 @@ SELECT
   , bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
-  -- Pass Only Elements:
-  --   ['bookings', 'ds__day']
+  -- Pass Only Elements: ['bookings', 'ds__day']
   SELECT
     DATE_TRUNC('day', ds) AS ds__day
     , 1 AS bookings

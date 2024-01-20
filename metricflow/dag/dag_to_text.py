@@ -6,9 +6,9 @@ import textwrap
 from typing import TypeVar
 
 import jinja2
-from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 
 from metricflow.dag.mf_dag import DagNode, DagNodeVisitor, MetricFlowDag
+from metricflow.mf_logging.pretty_print import mf_pformat
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +35,7 @@ class MetricFlowDagToText(DagNodeVisitor[str]):
         node_fields = []
         for displayed_property in node.displayed_properties:
             if len(str(displayed_property.value)) > self.MAX_WIDTH or "\n" in str(displayed_property.value):
-                value_str_split = pformat_big_objects(displayed_property.value).split("\n")
+                value_str_split = mf_pformat(displayed_property.value).split("\n")
                 max_value_str_length = max([len(x) for x in value_str_split])
                 node_fields.append(
                     jinja2.Template(

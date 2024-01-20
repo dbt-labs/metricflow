@@ -1,6 +1,0 @@
-kind: Fixes
-body: Optimizer Does Not Deduplicate Common Metrics
-time: 2023-12-15T14:17:44.7035-08:00
-custom:
-  Author: plypaul
-  Issue: "941"

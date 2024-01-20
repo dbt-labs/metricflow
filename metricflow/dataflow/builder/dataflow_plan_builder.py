@@ -7,7 +7,6 @@ from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
-from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.protocols.metric import (
     ConstantPropertyInput,
     ConversionTypeParams,
@@ -23,7 +22,6 @@ from dbt_semantic_interfaces.references import (
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 
-from metricflow.collection_helpers.pretty_print import mf_pformat
 from metricflow.dag.id_generation import DATAFLOW_PLAN_PREFIX, IdGeneratorRegistry
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.node_evaluator import (
@@ -61,6 +59,8 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
 from metricflow.filters.time_constraint import TimeRangeConstraint
+from metricflow.mf_logging.pretty_print import mf_pformat, mf_pformat_many
+from metricflow.mf_logging.runtime import log_runtime
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.node_processor import PreJoinNodeProcessor
@@ -161,6 +161,23 @@ class DataflowPlanBuilder:
         optimizers: Sequence[DataflowPlanOptimizer] = (),
     ) -> DataflowPlan:
         """Generate a plan for reading the results of a query with the given spec into a dataframe or table."""
+        # Workaround for a Pycharm type inspection issue with decorators.
+        # noinspection PyArgumentList
+        return self._build_plan(
+            query_spec=query_spec,
+            output_sql_table=output_sql_table,
+            output_selection_specs=output_selection_specs,
+            optimizers=optimizers,
+        )
+
+    @log_runtime()
+    def _build_plan(
+        self,
+        query_spec: MetricFlowQuerySpec,
+        output_sql_table: Optional[SqlTable],
+        output_selection_specs: Optional[InstanceSpecSet],
+        optimizers: Sequence[DataflowPlanOptimizer],
+    ) -> DataflowPlan:
         for metric_spec in query_spec.metric_specs:
             if (
                 len(metric_spec.filter_specs) > 0
@@ -244,14 +261,12 @@ class DataflowPlanBuilder:
             time_range_constraint=time_range_constraint,
             linkable_spec_set=base_required_linkable_specs,
         )
-        logger.info(f"Recipe for base measure aggregation:\n{pformat_big_objects(measure_recipe=base_measure_recipe)}")
+        logger.info(f"Recipe for base measure aggregation:\n{mf_pformat(base_measure_recipe)}")
         conversion_measure_recipe = self._find_dataflow_recipe(
             measure_spec_properties=self._build_measure_spec_properties([conversion_measure_spec.measure_spec]),
             linkable_spec_set=LinkableSpecSet(),
         )
-        logger.info(
-            f"Recipe for conversion measure aggregation:\n{pformat_big_objects(measure_recipe=conversion_measure_recipe)}"
-        )
+        logger.info(f"Recipe for conversion measure aggregation:\n{mf_pformat(conversion_measure_recipe)}")
         if base_measure_recipe is None:
             raise UnableToSatisfyQueryError(
                 f"Recipe not found for measure spec: {base_measure_spec.measure_spec} and linkable specs: {base_required_linkable_specs}"
@@ -365,9 +380,9 @@ class DataflowPlanBuilder:
         entity_spec = EntitySpec.from_name(conversion_type_params.entity)
         logger.info(
             f"For conversion metric {metric_spec},\n"
-            f"base_measure is:\n{pformat_big_objects(base_measure=base_measure)}\n"
-            f"conversion_measure is:\n{pformat_big_objects(conversion_measure=conversion_measure)}\n"
-            f"entity is:\n{pformat_big_objects(entity_spec=entity_spec)}"
+            f"base_measure is:\n{mf_pformat(base_measure)}\n"
+            f"conversion_measure is:\n{mf_pformat(conversion_measure)}\n"
+            f"entity is:\n{mf_pformat(entity_spec)}"
         )
 
         aggregated_measures_node = self._build_aggregated_conversion_node(
@@ -410,10 +425,7 @@ class DataflowPlanBuilder:
             descendent_filter_specs=metric_spec.filter_specs,
         )
 
-        logger.info(
-            f"For {metric_spec}, needed measure is:\n"
-            f"{pformat_big_objects(metric_input_measure_spec=metric_input_measure_spec)}"
-        )
+        logger.info(f"For {metric_spec}, needed measure is:\n" f"{mf_pformat(metric_input_measure_spec)}")
 
         aggregated_measures_node = self.build_aggregated_measure(
             metric_input_measure_spec=metric_input_measure_spec,
@@ -439,8 +451,7 @@ class DataflowPlanBuilder:
             filter_spec_factory=filter_spec_factory,
         )
         logger.info(
-            f"For {metric.type} metric: {metric_spec}, needed metrics are:\n"
-            f"{pformat_big_objects(metric_input_specs=metric_input_specs)}"
+            f"For {metric.type} metric: {metric_spec}, needed metrics are:\n" f"{mf_pformat(metric_input_specs)}"
         )
 
         required_linkable_specs, extraneous_linkable_specs = self.__get_required_and_extraneous_linkable_specs(
@@ -592,8 +603,13 @@ class DataflowPlanBuilder:
 
         e.g. distinct listing__country_latest for bookings by listing__country_latest
         """
-        assert not query_spec.metric_specs, "Can't build distinct values plan with metrics."
+        # Workaround for a Pycharm type inspection issue with decorators.
+        # noinspection PyArgumentList
+        return self._build_plan_for_distinct_values(query_spec)
 
+    @log_runtime()
+    def _build_plan_for_distinct_values(self, query_spec: MetricFlowQuerySpec) -> DataflowPlan:
+        assert not query_spec.metric_specs, "Can't build distinct values plan with metrics."
         query_level_filter_specs: Sequence[WhereFilterSpec] = ()
         if query_spec.filter_intersection is not None and len(query_spec.filter_intersection.where_filters) > 0:
             filter_spec_factory = WhereSpecFactory(
@@ -851,7 +867,7 @@ class DataflowPlanBuilder:
             )
             logger.info(
                 f"After adding multi-hop nodes, there are {len(nodes_available_for_joins)} nodes available for joins:\n"
-                f"{pformat_big_objects(nodes_available_for_joins)}"
+                f"{mf_pformat(nodes_available_for_joins)}"
             )
         logger.info(f"Processing nodes took: {time.time()-start_time:.2f}s")
 
@@ -879,7 +895,7 @@ class DataflowPlanBuilder:
                     )
                     continue
 
-            logger.debug(f"Evaluating source node:\n{pformat_big_objects(source_node=dataflow_dag_as_text(node))}")
+            logger.debug(f"Evaluating source node:\n{mf_pformat(dataflow_dag_as_text(node))}")
 
             start_time = time.time()
             evaluation = node_evaluator.evaluate_node(
@@ -890,9 +906,14 @@ class DataflowPlanBuilder:
             )
             logger.info(f"Evaluation of {node} took {time.time() - start_time:.2f}s")
 
-            logger.debug(
-                f"Evaluation for source node is:\n"
-                f"{pformat_big_objects(node=dataflow_dag_as_text(node), evaluation=evaluation)}"
+            logger.info(
+                mf_pformat_many(
+                    description="Evaluation for source node:",
+                    obj_dict={
+                        "node": dataflow_dag_as_text(node),
+                        "evaluation": evaluation,
+                    },
+                )
             )
 
             if len(evaluation.unjoinable_linkable_specs) > 0:
@@ -921,12 +942,15 @@ class DataflowPlanBuilder:
                 node_to_evaluation, key=lambda node: len(node_to_evaluation[node].join_recipes)
             )
             evaluation = node_to_evaluation[node_with_lowest_cost_plan]
+
             logger.info(
-                "Lowest cost plan is:\n"
-                + pformat_big_objects(
-                    node=dataflow_dag_as_text(node_with_lowest_cost_plan),
-                    evaluation=evaluation,
-                    joins=len(node_to_evaluation[node_with_lowest_cost_plan].join_recipes),
+                mf_pformat_many(
+                    description="Lowest cost plan is:",
+                    obj_dict={
+                        "node": dataflow_dag_as_text(node_with_lowest_cost_plan),
+                        "evaluation": evaluation,
+                        "joins": len(node_to_evaluation[node_with_lowest_cost_plan].join_recipes),
+                    },
                 )
             )
 
@@ -994,8 +1018,8 @@ class DataflowPlanBuilder:
                 None,
             )
             assert matched_measure, f"Unable to find {measure_to_match} in {input_measures}."
+            filter_specs: List[WhereFilterSpec] = []
             if is_base_measure:
-                filter_specs: List[WhereFilterSpec] = []
                 filter_specs.extend(
                     filter_spec_factory.create_from_where_filter_intersection(
                         filter_location=WhereFilterLocation.for_metric(metric_reference),
@@ -1012,7 +1036,7 @@ class DataflowPlanBuilder:
             return MetricInputMeasureSpec(
                 measure_spec=MeasureSpec.from_name(matched_measure.name),
                 fill_nulls_with=matched_measure.fill_nulls_with,
-                filter_specs=tuple(filter_specs) if is_base_measure else (),
+                filter_specs=tuple(filter_specs),
                 alias=matched_measure.alias,
             )
 
@@ -1244,8 +1268,13 @@ class DataflowPlanBuilder:
 
         if measure_recipe is None:
             logger.info(
-                f"Looking for a recipe to get:\n"
-                f"{pformat_big_objects(measure_specs=[measure_spec], required_linkable_set=required_linkable_specs)}"
+                mf_pformat_many(
+                    description="Looking for a recipe to get:",
+                    obj_dict={
+                        "measure_specs": [measure_spec],
+                        "required_linkable_set": required_linkable_specs,
+                    },
+                )
             )
             find_recipe_start_time = time.time()
             measure_recipe = self._find_dataflow_recipe(
@@ -1260,7 +1289,7 @@ class DataflowPlanBuilder:
                 f"{time.time() - find_recipe_start_time:.2f}s"
             )
 
-        logger.info(f"Using recipe:\n{pformat_big_objects(measure_recipe=measure_recipe)}")
+        logger.info(f"Using recipe:\n{mf_pformat(measure_recipe)}")
 
         if measure_recipe is None:
             # TODO: Improve for better user understandability.

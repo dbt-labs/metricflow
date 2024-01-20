@@ -11,11 +11,11 @@ from dbt.cli.main import dbtRunner
 from dbt.config.profile import Profile
 from dbt.config.project import Project
 from dbt.config.runtime import load_profile, load_project
-from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from typing_extensions import Self
 
 from metricflow.errors.errors import ModelCreationException
+from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.dbt_manifest_parser import parse_manifest_from_dbt_generated_manifest
 
 logger = logging.getLogger(__name__)
@@ -46,7 +46,7 @@ class dbtProjectMetadata:
         profile = load_profile(str(project_path), {})
         project = load_project(str(project_path), version_check=False, profile=profile)
         project_path = project_path
-        logger.info(f"Loaded project {project.project_name} with profile details:\n{pformat_big_objects(profile)}")
+        logger.info(f"Loaded project {project.project_name} with profile details:\n{mf_pformat(profile)}")
         return cls(profile=profile, project=project, project_path=project_path)
 
     @property

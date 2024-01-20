@@ -6,8 +6,7 @@ FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
   -- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-01T00:00:00]
-  -- Pass Only Elements:
-  --   ['bookings']
+  -- Pass Only Elements: ['bookings',]
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
@@ -19,8 +18,7 @@ CROSS JOIN (
   -- Read Elements From Semantic Model 'listings_latest'
   -- Metric Time Dimension 'ds'
   -- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-01T00:00:00]
-  -- Pass Only Elements:
-  --   ['listings']
+  -- Pass Only Elements: ['listings',]
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT

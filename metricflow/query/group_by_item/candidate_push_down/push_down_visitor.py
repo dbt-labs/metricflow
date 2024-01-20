@@ -9,8 +9,8 @@ from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.type_enums import MetricType
 from typing_extensions import override
 
-from metricflow.collection_helpers.pretty_print import mf_pformat, mf_pformat_many
-from metricflow.formatting import indent_log_line
+from metricflow.mf_logging.formatting import indent
+from metricflow.mf_logging.pretty_print import mf_pformat, mf_pformat_many
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.query.group_by_item.candidate_push_down.group_by_item_candidate import GroupByItemCandidateSet
@@ -201,12 +201,12 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
 
             logger.debug(
                 f"For {node.ui_description}:\n"
-                + indent_log_line(
+                + indent(
                     "After applying patterns:\n"
-                    + indent_log_line(mf_pformat(patterns_to_apply))
+                    + indent(mf_pformat(patterns_to_apply))
                     + "\n"
                     + "to inputs, matches are:\n"
-                    + indent_log_line(mf_pformat(matching_specs))
+                    + indent(mf_pformat(matching_specs))
                 )
             )
 
@@ -302,8 +302,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
             )
             logger.info(f"Handling {node.ui_description}")
             logger.debug(
-                "candidates from parents:\n"
-                + indent_log_line(mf_pformat(merged_result_from_parents.candidate_set.specs))
+                "candidates from parents:\n" + indent(mf_pformat(merged_result_from_parents.candidate_set.specs))
             )
             if merged_result_from_parents.candidate_set.is_empty:
                 return merged_result_from_parents
@@ -337,12 +336,12 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
 
             logger.debug(
                 f"For {node.ui_description}:\n"
-                + indent_log_line(
+                + indent(
                     "After applying patterns:\n"
-                    + indent_log_line(mf_pformat(patterns_to_apply))
+                    + indent(mf_pformat(patterns_to_apply))
                     + "\n"
                     + "to inputs, outputs are:\n"
-                    + indent_log_line(mf_pformat(matched_specs))
+                    + indent(mf_pformat(matched_specs))
                 )
             )
 
@@ -386,8 +385,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
 
             logger.info(f"Handling {node.ui_description}")
             logger.debug(
-                "candidates from parents:\n"
-                + indent_log_line(mf_pformat(merged_result_from_parents.candidate_set.specs))
+                "candidates from parents:\n" + indent(mf_pformat(merged_result_from_parents.candidate_set.specs))
             )
 
             return merged_result_from_parents

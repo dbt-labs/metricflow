@@ -7,7 +7,6 @@ from dataclasses import dataclass
 from typing import Dict, FrozenSet, List, Optional, Sequence, Set, Tuple
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.protocols.dimension import Dimension, DimensionType
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.protocols.semantic_model import SemanticModel
@@ -24,6 +23,7 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnknownMetricLinkingError
+from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
@@ -546,7 +546,7 @@ class ValidLinkableSpecResolver:
         elif len(semantic_models_where_measure_was_found) > 1:
             raise ValueError(
                 f"Measure {measure_reference} was found in multiple semantic models:\n"
-                f"{pformat_big_objects(semantic_models_where_measure_was_found)}"
+                f"{mf_pformat(semantic_models_where_measure_was_found)}"
             )
         return semantic_models_where_measure_was_found[0]
 

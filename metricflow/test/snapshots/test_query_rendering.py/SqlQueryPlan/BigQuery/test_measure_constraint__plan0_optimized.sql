@@ -11,8 +11,7 @@ FROM (
     , MAX(subq_58.booking_value) AS booking_value
   FROM (
     -- Constrain Output with WHERE
-    -- Pass Only Elements:
-    --   ['average_booking_value', 'metric_time__day']
+    -- Pass Only Elements: ['average_booking_value', 'metric_time__day']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
@@ -20,8 +19,7 @@ FROM (
       , AVG(average_booking_value) AS average_booking_value
     FROM (
       -- Join Standard Outputs
-      -- Pass Only Elements:
-      --   ['average_booking_value', 'listing__is_lux_latest', 'metric_time__day']
+      -- Pass Only Elements: ['average_booking_value', 'listing__is_lux_latest', 'metric_time__day']
       SELECT
         DATE_TRUNC(bookings_source_src_10001.ds, day) AS metric_time__day
         , listings_latest_src_10005.is_lux AS listing__is_lux_latest
@@ -38,8 +36,7 @@ FROM (
   ) subq_41
   FULL OUTER JOIN (
     -- Constrain Output with WHERE
-    -- Pass Only Elements:
-    --   ['bookings', 'metric_time__day']
+    -- Pass Only Elements: ['bookings', 'metric_time__day']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
@@ -47,8 +44,7 @@ FROM (
       , SUM(bookings) AS bookings
     FROM (
       -- Join Standard Outputs
-      -- Pass Only Elements:
-      --   ['bookings', 'listing__is_lux_latest', 'metric_time__day']
+      -- Pass Only Elements: ['bookings', 'listing__is_lux_latest', 'metric_time__day']
       SELECT
         subq_44.metric_time__day AS metric_time__day
         , listings_latest_src_10005.is_lux AS listing__is_lux_latest
@@ -56,8 +52,7 @@ FROM (
       FROM (
         -- Read Elements From Semantic Model 'bookings_source'
         -- Metric Time Dimension 'ds'
-        -- Pass Only Elements:
-        --   ['bookings', 'metric_time__day', 'listing']
+        -- Pass Only Elements: ['bookings', 'metric_time__day', 'listing']
         SELECT
           DATE_TRUNC(ds, day) AS metric_time__day
           , listing_id AS listing
@@ -78,8 +73,7 @@ FROM (
   FULL OUTER JOIN (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
-    -- Pass Only Elements:
-    --   ['booking_value', 'metric_time__day']
+    -- Pass Only Elements: ['booking_value', 'metric_time__day']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT

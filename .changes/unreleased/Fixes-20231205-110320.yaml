@@ -1,7 +1,0 @@
-kind: Fixes
-body: Fixes a bug in dimension-only queries where the filter column is removed before
-  the filter has been applied.
-time: 2023-12-05T11:03:20.124953-08:00
-custom:
-  Author: courtneyholcomb
-  Issue: "923"

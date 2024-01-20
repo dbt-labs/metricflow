@@ -8,8 +8,7 @@ FROM (
     subq_6.user__home_state
     , SUM(subq_6.identity_verifications) AS identity_verifications
   FROM (
-    -- Pass Only Elements:
-    --   ['identity_verifications', 'user__home_state']
+    -- Pass Only Elements: ['identity_verifications', 'user__home_state']
     SELECT
       subq_5.user__home_state
       , subq_5.identity_verifications
@@ -22,8 +21,7 @@ FROM (
         , subq_4.home_state AS user__home_state
         , subq_2.identity_verifications AS identity_verifications
       FROM (
-        -- Pass Only Elements:
-        --   ['identity_verifications', 'ds_partitioned__day', 'user']
+        -- Pass Only Elements: ['identity_verifications', 'ds_partitioned__day', 'user']
         SELECT
           subq_1.ds_partitioned__day
           , subq_1.user
@@ -150,8 +148,7 @@ FROM (
         ) subq_1
       ) subq_2
       LEFT OUTER JOIN (
-        -- Pass Only Elements:
-        --   ['home_state', 'ds_partitioned__day', 'user']
+        -- Pass Only Elements: ['home_state', 'ds_partitioned__day', 'user']
         SELECT
           subq_3.ds_partitioned__day
           , subq_3.user

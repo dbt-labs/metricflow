@@ -19,8 +19,7 @@ FROM (
         subq_5.metric_time__year
         , SUM(subq_5.bookings) AS bookings
       FROM (
-        -- Pass Only Elements:
-        --   ['bookings', 'metric_time__year']
+        -- Pass Only Elements: ['bookings', 'metric_time__year']
         SELECT
           subq_4.metric_time__year
           , subq_4.bookings
@@ -336,8 +335,7 @@ FROM (
         subq_13.metric_time__year
         , SUM(subq_13.bookings) AS bookings
       FROM (
-        -- Pass Only Elements:
-        --   ['bookings', 'metric_time__year']
+        -- Pass Only Elements: ['bookings', 'metric_time__year']
         SELECT
           subq_12.metric_time__year
           , subq_12.bookings

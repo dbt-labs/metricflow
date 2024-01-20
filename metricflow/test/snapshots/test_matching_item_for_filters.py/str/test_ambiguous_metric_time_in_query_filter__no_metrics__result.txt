@@ -1,1 +1,15 @@
-GroupByItemResolution(spec=TimeDimensionSpec(element_name='metric_time', time_granularity=DAY))
+('GroupByItemResolution(\n'
+ '  issue_set=MetricFlowQueryResolutionIssueSet(\n'
+ '    issues=(\n'
+ '      NoMatchingItemsForNoMetricsQuery(\n'
+ '        issue_type=ERROR,\n'
+ '        query_resolution_path=MetricFlowQueryResolutionPath(\n'
+ '          resolution_path_nodes=(\n'
+ '            QueryGroupByItemResolutionNode(node_id=qr_0),\n'
+ '            NoMetricsGroupByItemSourceNode(node_id=vr_0),\n'
+ '          ),\n'
+ '        ),\n'
+ '      ),\n'
+ '    ),\n'
+ '  ),\n'
+ ')')

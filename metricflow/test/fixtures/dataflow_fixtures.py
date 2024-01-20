@@ -43,12 +43,10 @@ def dataflow_plan_builder(  # noqa: D
 @pytest.fixture
 def query_parser(  # noqa: D
     simple_semantic_manifest_lookup: SemanticManifestLookup,
-    column_association_resolver: ColumnAssociationResolver,
     consistent_id_object_repository: ConsistentIdObjectRepository,
 ) -> MetricFlowQueryParser:
     return MetricFlowQueryParser(
-        column_association_resolver=column_association_resolver,
-        model=simple_semantic_manifest_lookup,
+        semantic_manifest_lookup=simple_semantic_manifest_lookup,
     )
 
 
@@ -108,8 +106,7 @@ def scd_query_parser(  # noqa: D
     scd_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> MetricFlowQueryParser:
     return MetricFlowQueryParser(
-        column_association_resolver=scd_column_association_resolver,
-        model=scd_semantic_manifest_lookup,
+        semantic_manifest_lookup=scd_semantic_manifest_lookup,
     )
 
 

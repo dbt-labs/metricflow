@@ -24,8 +24,7 @@ FROM (
           subq_2.metric_time__day
           , subq_2.bookings
         FROM (
-          -- Pass Only Elements:
-          --   ['bookings', 'metric_time__day']
+          -- Pass Only Elements: ['bookings', 'metric_time__day']
           SELECT
             subq_1.metric_time__day
             , subq_1.bookings
@@ -247,8 +246,7 @@ FROM (
           subq_11.metric_time__day
           , subq_11.bookings
         FROM (
-          -- Pass Only Elements:
-          --   ['bookings', 'metric_time__day']
+          -- Pass Only Elements: ['bookings', 'metric_time__day']
           SELECT
             subq_10.metric_time__day
             , subq_10.bookings

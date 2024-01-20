@@ -8,8 +8,7 @@ FROM (
     subq_2.listing__country_latest
     , SUM(subq_2.listings) AS listings
   FROM (
-    -- Pass Only Elements:
-    --   ['listings', 'listing__country_latest']
+    -- Pass Only Elements: ['listings', 'listing__country_latest']
     SELECT
       subq_1.listing__country_latest
       , subq_1.listings

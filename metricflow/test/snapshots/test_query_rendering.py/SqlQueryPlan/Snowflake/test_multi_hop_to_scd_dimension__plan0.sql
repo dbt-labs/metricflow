@@ -10,8 +10,7 @@ FROM (
     , subq_9.listing__lux_listing__is_confirmed_lux
     , SUM(subq_9.bookings) AS bookings
   FROM (
-    -- Pass Only Elements:
-    --   ['bookings', 'listing__lux_listing__is_confirmed_lux', 'metric_time__day']
+    -- Pass Only Elements: ['bookings', 'listing__lux_listing__is_confirmed_lux', 'metric_time__day']
     SELECT
       subq_8.metric_time__day
       , subq_8.listing__lux_listing__is_confirmed_lux
@@ -26,8 +25,7 @@ FROM (
         , subq_7.lux_listing__is_confirmed_lux AS listing__lux_listing__is_confirmed_lux
         , subq_2.bookings AS bookings
       FROM (
-        -- Pass Only Elements:
-        --   ['bookings', 'metric_time__day', 'listing']
+        -- Pass Only Elements: ['bookings', 'metric_time__day', 'listing']
         SELECT
           subq_1.metric_time__day
           , subq_1.listing
@@ -217,11 +215,7 @@ FROM (
         ) subq_1
       ) subq_2
       LEFT OUTER JOIN (
-        -- Pass Only Elements:
-        --   ['lux_listing__is_confirmed_lux',
-        --    'lux_listing__window_start__day',
-        --    'lux_listing__window_end__day',
-        --    'listing']
+        -- Pass Only Elements: ['lux_listing__is_confirmed_lux', 'lux_listing__window_start__day', 'lux_listing__window_end__day', 'listing']
         SELECT
           subq_6.lux_listing__window_start__day
           , subq_6.lux_listing__window_end__day
@@ -265,54 +259,55 @@ FROM (
             FROM ***************************.dim_lux_listing_id_mapping lux_listing_mapping_src_10020
           ) subq_3
           LEFT OUTER JOIN (
-            -- Pass Only Elements:
-            --   ['is_confirmed_lux',
-            --    'lux_listing__is_confirmed_lux',
-            --    'window_start__day',
-            --    'window_start__week',
-            --    'window_start__month',
-            --    'window_start__quarter',
-            --    'window_start__year',
-            --    'window_start__extract_year',
-            --    'window_start__extract_quarter',
-            --    'window_start__extract_month',
-            --    'window_start__extract_day',
-            --    'window_start__extract_dow',
-            --    'window_start__extract_doy',
-            --    'window_end__day',
-            --    'window_end__week',
-            --    'window_end__month',
-            --    'window_end__quarter',
-            --    'window_end__year',
-            --    'window_end__extract_year',
-            --    'window_end__extract_quarter',
-            --    'window_end__extract_month',
-            --    'window_end__extract_day',
-            --    'window_end__extract_dow',
-            --    'window_end__extract_doy',
-            --    'lux_listing__window_start__day',
-            --    'lux_listing__window_start__week',
-            --    'lux_listing__window_start__month',
-            --    'lux_listing__window_start__quarter',
-            --    'lux_listing__window_start__year',
-            --    'lux_listing__window_start__extract_year',
-            --    'lux_listing__window_start__extract_quarter',
-            --    'lux_listing__window_start__extract_month',
-            --    'lux_listing__window_start__extract_day',
-            --    'lux_listing__window_start__extract_dow',
-            --    'lux_listing__window_start__extract_doy',
-            --    'lux_listing__window_end__day',
-            --    'lux_listing__window_end__week',
-            --    'lux_listing__window_end__month',
-            --    'lux_listing__window_end__quarter',
-            --    'lux_listing__window_end__year',
-            --    'lux_listing__window_end__extract_year',
-            --    'lux_listing__window_end__extract_quarter',
-            --    'lux_listing__window_end__extract_month',
-            --    'lux_listing__window_end__extract_day',
-            --    'lux_listing__window_end__extract_dow',
-            --    'lux_listing__window_end__extract_doy',
-            --    'lux_listing']
+            -- Pass Only Elements: [
+            --   'is_confirmed_lux',
+            --   'lux_listing__is_confirmed_lux',
+            --   'window_start__day',
+            --   'window_start__week',
+            --   'window_start__month',
+            --   'window_start__quarter',
+            --   'window_start__year',
+            --   'window_start__extract_year',
+            --   'window_start__extract_quarter',
+            --   'window_start__extract_month',
+            --   'window_start__extract_day',
+            --   'window_start__extract_dow',
+            --   'window_start__extract_doy',
+            --   'window_end__day',
+            --   'window_end__week',
+            --   'window_end__month',
+            --   'window_end__quarter',
+            --   'window_end__year',
+            --   'window_end__extract_year',
+            --   'window_end__extract_quarter',
+            --   'window_end__extract_month',
+            --   'window_end__extract_day',
+            --   'window_end__extract_dow',
+            --   'window_end__extract_doy',
+            --   'lux_listing__window_start__day',
+            --   'lux_listing__window_start__week',
+            --   'lux_listing__window_start__month',
+            --   'lux_listing__window_start__quarter',
+            --   'lux_listing__window_start__year',
+            --   'lux_listing__window_start__extract_year',
+            --   'lux_listing__window_start__extract_quarter',
+            --   'lux_listing__window_start__extract_month',
+            --   'lux_listing__window_start__extract_day',
+            --   'lux_listing__window_start__extract_dow',
+            --   'lux_listing__window_start__extract_doy',
+            --   'lux_listing__window_end__day',
+            --   'lux_listing__window_end__week',
+            --   'lux_listing__window_end__month',
+            --   'lux_listing__window_end__quarter',
+            --   'lux_listing__window_end__year',
+            --   'lux_listing__window_end__extract_year',
+            --   'lux_listing__window_end__extract_quarter',
+            --   'lux_listing__window_end__extract_month',
+            --   'lux_listing__window_end__extract_day',
+            --   'lux_listing__window_end__extract_dow',
+            --   'lux_listing__window_end__extract_doy',
+            --   'lux_listing',
+            -- ]
             SELECT
               subq_4.window_start__day
               , subq_4.window_start__week

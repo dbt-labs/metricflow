@@ -8,8 +8,7 @@ FROM (
     subq_9.account_id__customer_id__customer_name
     , SUM(subq_9.txn_count) AS txn_count
   FROM (
-    -- Pass Only Elements:
-    --   ['txn_count', 'account_id__customer_id__customer_name']
+    -- Pass Only Elements: ['txn_count', 'account_id__customer_id__customer_name']
     SELECT
       subq_8.account_id__customer_id__customer_name
       , subq_8.txn_count
@@ -22,8 +21,7 @@ FROM (
         , subq_7.customer_id__customer_name AS account_id__customer_id__customer_name
         , subq_2.txn_count AS txn_count
       FROM (
-        -- Pass Only Elements:
-        --   ['txn_count', 'ds_partitioned__day', 'account_id']
+        -- Pass Only Elements: ['txn_count', 'ds_partitioned__day', 'account_id']
         SELECT
           subq_1.ds_partitioned__day
           , subq_1.account_id
@@ -146,8 +144,7 @@ FROM (
         ) subq_1
       ) subq_2
       LEFT OUTER JOIN (
-        -- Pass Only Elements:
-        --   ['customer_id__customer_name', 'ds_partitioned__day', 'account_id']
+        -- Pass Only Elements: ['customer_id__customer_name', 'ds_partitioned__day', 'account_id']
         SELECT
           subq_6.ds_partitioned__day
           , subq_6.account_id
@@ -256,34 +253,35 @@ FROM (
             FROM ***************************.bridge_table bridge_table_src_10013
           ) subq_3
           LEFT OUTER JOIN (
-            -- Pass Only Elements:
-            --   ['customer_name',
-            --    'customer_atomic_weight',
-            --    'customer_id__customer_name',
-            --    'customer_id__customer_atomic_weight',
-            --    'ds_partitioned__day',
-            --    'ds_partitioned__week',
-            --    'ds_partitioned__month',
-            --    'ds_partitioned__quarter',
-            --    'ds_partitioned__year',
-            --    'ds_partitioned__extract_year',
-            --    'ds_partitioned__extract_quarter',
-            --    'ds_partitioned__extract_month',
-            --    'ds_partitioned__extract_day',
-            --    'ds_partitioned__extract_dow',
-            --    'ds_partitioned__extract_doy',
-            --    'customer_id__ds_partitioned__day',
-            --    'customer_id__ds_partitioned__week',
-            --    'customer_id__ds_partitioned__month',
-            --    'customer_id__ds_partitioned__quarter',
-            --    'customer_id__ds_partitioned__year',
-            --    'customer_id__ds_partitioned__extract_year',
-            --    'customer_id__ds_partitioned__extract_quarter',
-            --    'customer_id__ds_partitioned__extract_month',
-            --    'customer_id__ds_partitioned__extract_day',
-            --    'customer_id__ds_partitioned__extract_dow',
-            --    'customer_id__ds_partitioned__extract_doy',
-            --    'customer_id']
+            -- Pass Only Elements: [
+            --   'customer_name',
+            --   'customer_atomic_weight',
+            --   'customer_id__customer_name',
+            --   'customer_id__customer_atomic_weight',
+            --   'ds_partitioned__day',
+            --   'ds_partitioned__week',
+            --   'ds_partitioned__month',
+            --   'ds_partitioned__quarter',
+            --   'ds_partitioned__year',
+            --   'ds_partitioned__extract_year',
+            --   'ds_partitioned__extract_quarter',
+            --   'ds_partitioned__extract_month',
+            --   'ds_partitioned__extract_day',
+            --   'ds_partitioned__extract_dow',
+            --   'ds_partitioned__extract_doy',
+            --   'customer_id__ds_partitioned__day',
+            --   'customer_id__ds_partitioned__week',
+            --   'customer_id__ds_partitioned__month',
+            --   'customer_id__ds_partitioned__quarter',
+            --   'customer_id__ds_partitioned__year',
+            --   'customer_id__ds_partitioned__extract_year',
+            --   'customer_id__ds_partitioned__extract_quarter',
+            --   'customer_id__ds_partitioned__extract_month',
+            --   'customer_id__ds_partitioned__extract_day',
+            --   'customer_id__ds_partitioned__extract_dow',
+            --   'customer_id__ds_partitioned__extract_doy',
+            --   'customer_id',
+            -- ]
             SELECT
               subq_4.ds_partitioned__day
               , subq_4.ds_partitioned__week

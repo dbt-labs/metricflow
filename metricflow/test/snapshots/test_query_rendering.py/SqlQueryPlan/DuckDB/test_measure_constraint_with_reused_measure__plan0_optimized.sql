@@ -10,8 +10,7 @@ FROM (
     , MAX(subq_24.booking_value) AS booking_value
   FROM (
     -- Constrain Output with WHERE
-    -- Pass Only Elements:
-    --   ['booking_value', 'metric_time__day']
+    -- Pass Only Elements: ['booking_value', 'metric_time__day']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
@@ -20,8 +19,7 @@ FROM (
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
-      -- Pass Only Elements:
-      --   ['booking_value', 'booking__is_instant', 'metric_time__day']
+      -- Pass Only Elements: ['booking_value', 'booking__is_instant', 'metric_time__day']
       SELECT
         DATE_TRUNC('day', ds) AS metric_time__day
         , is_instant AS booking__is_instant
@@ -35,8 +33,7 @@ FROM (
   FULL OUTER JOIN (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
-    -- Pass Only Elements:
-    --   ['booking_value', 'metric_time__day']
+    -- Pass Only Elements: ['booking_value', 'metric_time__day']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT

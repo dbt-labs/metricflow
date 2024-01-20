@@ -5,7 +5,7 @@ from typing import Tuple
 
 from typing_extensions import override
 
-from metricflow.formatting import indent_log_line
+from metricflow.mf_logging.formatting import indent
 from metricflow.query.group_by_item.path_prefixable import PathPrefixable
 from metricflow.query.group_by_item.resolution_dag.resolution_nodes.base_node import GroupByItemResolutionNode
 
@@ -36,7 +36,7 @@ class MetricFlowQueryResolutionPath(PathPrefixable):
 
         for i, description in enumerate(descriptions[1:]):
             output += "\n"
-            output += indent_log_line("-> " + description, indent_level=i + 1)
+            output += indent("-> " + description, indent_level=i + 1)
 
         return output
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import List, Optional, Sequence, Set, Tuple, Union
+from typing import Optional, Sequence, Tuple, Union
 
 from dbt_semantic_interfaces.call_parameter_sets import (
     DimensionCallParameterSet,
@@ -14,8 +14,8 @@ from dbt_semantic_interfaces.references import MetricReference
 from typing_extensions import override
 
 from metricflow.collection_helpers.merger import Mergeable
-from metricflow.collection_helpers.pretty_print import mf_pformat
-from metricflow.formatting import indent_log_line
+from metricflow.mf_logging.formatting import indent
+from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow.query.group_by_item.path_prefixable import PathPrefixable
 from metricflow.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
@@ -69,22 +69,15 @@ class FilterSpecResolutionLookUp(Mergeable):
             raise RuntimeError(
                 f"Unable to find a resolved spec.\n\n"
                 f"Expected 1 resolution for:\n\n"
-                f"{indent_log_line(mf_pformat(resolved_spec_lookup_key))}\n\n"
+                f"{indent(mf_pformat(resolved_spec_lookup_key))}\n\n"
                 f"but did not find any. All resolutions are:\n\n"
-                f"{indent_log_line(mf_pformat(self.spec_resolutions))}"
+                f"{indent(mf_pformat(self.spec_resolutions))}"
             )
 
-        if len(resolutions) > 1:
-            raise RuntimeError(
-                f"Got multiple resolved specs.\n\n"
-                f"Expected 1 resolution for:\n\n"
-                f"{indent_log_line(mf_pformat(resolved_spec_lookup_key))}\n\n"
-                f"but got:\n\n"
-                f"{indent_log_line(mf_pformat(resolutions))}.\n\n"
-                f"All resolutions are:\n\n"
-                f"{indent_log_line(mf_pformat(self.spec_resolutions))}"
-            )
-
+        # There may be multiple resolutions that match a given key because it's possible the same metric / filter is
+        # used multiple times in a query (e.g. as a part of a derived metric). However, for a given metric and
+        # a CallParameterSet, it should resolve to the same thing. Multiple resolutions are kept in this object for
+        # error-reporting purposes.
         resolution = resolutions[0]
         if resolution.resolved_spec is None:
             raise RuntimeError(
@@ -109,22 +102,6 @@ class FilterSpecResolutionLookUp(Mergeable):
         return FilterSpecResolutionLookUp(
             spec_resolutions=(),
             non_parsable_resolutions=(),
-        )
-
-    def dedupe(self) -> FilterSpecResolutionLookUp:  # noqa: D
-        deduped_spec_resolutions: List[FilterSpecResolution] = []
-        deduped_lookup_keys: Set[ResolvedSpecLookUpKey] = set()
-        for spec_resolution in self.spec_resolutions:
-            if spec_resolution.lookup_key in deduped_lookup_keys:
-                continue
-
-            deduped_spec_resolutions.append(spec_resolution)
-            deduped_lookup_keys.add(spec_resolution.lookup_key)
-
-        return FilterSpecResolutionLookUp(
-            spec_resolutions=tuple(deduped_spec_resolutions),
-            # Need to revisit the need to dedupe non_parsable_resolutions.
-            non_parsable_resolutions=self.non_parsable_resolutions,
         )
 
 

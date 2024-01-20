@@ -1,6 +1,0 @@
-kind: Features
-body: Implemented date_part in where filter.
-time: 2023-11-07T18:08:43.67846-06:00
-custom:
-  Author: DevonFulcher
-  Issue: None

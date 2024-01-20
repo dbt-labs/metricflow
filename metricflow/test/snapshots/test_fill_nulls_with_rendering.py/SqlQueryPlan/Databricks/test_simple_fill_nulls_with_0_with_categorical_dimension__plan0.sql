@@ -8,8 +8,7 @@ FROM (
     subq_2.booking__is_instant
     , SUM(subq_2.bookings) AS bookings
   FROM (
-    -- Pass Only Elements:
-    --   ['bookings', 'booking__is_instant']
+    -- Pass Only Elements: ['bookings', 'booking__is_instant']
     SELECT
       subq_1.booking__is_instant
       , subq_1.bookings

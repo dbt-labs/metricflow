@@ -7,7 +7,7 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 
-from metricflow.collection_helpers.pretty_print import mf_pformat
+from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.naming.naming_scheme import QueryItemNamingScheme
 from metricflow.naming.object_builder_scheme import ObjectBuilderNamingScheme

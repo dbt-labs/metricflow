@@ -9,8 +9,8 @@ from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.references import TimeDimensionReference
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 
-from metricflow.collection_helpers.pretty_print import mf_pformat
-from metricflow.formatting import indent_log_line
+from metricflow.mf_logging.formatting import indent
+from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow.query.group_by_item.candidate_push_down.push_down_visitor import (
@@ -94,9 +94,9 @@ class GroupByItemResolver:
         )
         logger.info(
             f"Spec pattern:\n"
-            f"{indent_log_line(mf_pformat(spec_pattern))}\n"
+            f"{indent(mf_pformat(spec_pattern))}\n"
             f"was resolved to:\n"
-            f"{indent_log_line(mf_pformat(push_down_result.candidate_set.specs))}"
+            f"{indent(mf_pformat(push_down_result.candidate_set.specs))}"
         )
         if push_down_result.candidate_set.num_candidates > 1:
             return GroupByItemResolution(
@@ -210,6 +210,6 @@ class GroupByItemResolver:
             raise RuntimeError(
                 f"The grain for {repr(METRIC_TIME_ELEMENT_NAME)} could not be resolved. Got spec "
                 f"{metric_time_grain_resolution.spec} and issues:\n\n"
-                f"{indent_log_line(mf_pformat(metric_time_grain_resolution.issue_set))}"
+                f"{indent(mf_pformat(metric_time_grain_resolution.issue_set))}"
             )
         return metric_time_spec_set.time_dimension_specs[0].time_granularity
