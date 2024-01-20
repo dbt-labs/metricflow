@@ -3,8 +3,10 @@ from __future__ import annotations
 import logging
 from collections import defaultdict
 from copy import deepcopy
-from typing import Dict, List, Optional, Sequence, Set
+from typing import Dict, List, Optional, Sequence, Set, Tuple
 
+from dbt_semantic_interfaces.type_enums import TimeGranularity
+from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.protocols.dimension import Dimension
 from dbt_semantic_interfaces.protocols.entity import Entity
@@ -20,6 +22,7 @@ from dbt_semantic_interfaces.references import (
     SemanticModelReference,
     TimeDimensionReference,
 )
+from metricflow.model.semantics.linkable_spec_resolver import ElementPathKey
 from dbt_semantic_interfaces.type_enums import DimensionType, EntityType
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from typing_extensions import override
@@ -345,3 +348,21 @@ class SemanticModelLookup(SemanticModelAccessor):
             return self._entity_ref_to_spec[EntityReference(element_name=element_name)]
         else:
             raise ValueError(f"Unable to find linkable element {element_name} in manifest")
+
+    def get_agg_time_dimension_path_key_for_measure(self, measure_reference: MeasureReference) -> ElementPathKey:
+        agg_time_dimension = self.get_agg_time_dimension_for_measure(measure_reference)
+
+        # A measure's agg_time_dimension is required to be in the same semantic model as the measure,
+        # so we can assume the same semantic model for both measure and dimension.
+        semantic_models = self.get_semantic_models_for_measure(measure_reference)
+        assert (
+            len(semantic_models) == 1
+        ), f"Expected exactly one semantic model for measure {measure_reference}, but found semantic models {semantic_models}."
+        semantic_model = semantic_models[0]
+
+        entity_link = self.resolved_primary_entity(semantic_model)
+        assert (
+            entity_link is not None
+        ), f"Expected semantic model {semantic_model} to have a primary entity since is contains dimensions, but found none."
+
+        return ElementPathKey(element_name=agg_time_dimension.element_name, entity_links=(entity_link,))

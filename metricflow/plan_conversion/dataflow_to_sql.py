@@ -293,8 +293,13 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 metric_time_dimension_instance = instance
                 metric_time_dimension_spec = instance.spec
                 break
+        # User might refer to the agg_time_dimension by its dimension name instead of 'metric_time'.
+        if not metric_time_dimension_spec:
+            pass  # finish this
 
-        assert metric_time_dimension_spec
+        assert (
+            metric_time_dimension_spec and metric_time_dimension_instance
+        ), "No metric time dimension or agg_time_dimension found in join over time range query. This should have been caught by validations."
         time_spine_data_set_alias = self._next_unique_table_alias()
 
         metric_time_dimension_column_name = self.column_association_resolver.resolve_spec(
@@ -303,7 +308,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
         # Assemble time_spine dataset with metric_time_dimension to join.
         # Granularity of time_spine column should match granularity of metric_time column from parent dataset.
-        assert metric_time_dimension_instance
         time_spine_data_set = self._make_time_spine_data_set(
             metric_time_dimension_instance=metric_time_dimension_instance,
             metric_time_dimension_column_name=metric_time_dimension_column_name,
@@ -1249,6 +1253,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         parent_alias = self._next_unique_table_alias()
 
         # Build time spine dataset
+        # Here: if no metric time instance, replace this var with agg_time_dim
         metric_time_dimension_instance: Optional[TimeDimensionInstance] = None
         for instance in parent_data_set.metric_time_dimension_instances:
             if len(instance.spec.entity_links) == 0:

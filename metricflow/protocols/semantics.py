@@ -26,6 +26,8 @@ from dbt_semantic_interfaces.references import (
     TimeDimensionReference,
 )
 
+from metricflow.model.semantics.linkable_spec_resolver import ElementPathKey
+
 from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.specs.specs import (
@@ -92,6 +94,7 @@ class SemanticModelAccessor(ABC):
     @abstractmethod
     def get_agg_time_dimension_for_measure(self, measure_reference: MeasureReference) -> TimeDimensionReference:
         """Retrieves the aggregate time dimension that is associated with the measure reference."""
+        raise NotImplementedError
 
     @abstractmethod
     def get_entity_in_semantic_model(self, ref: SemanticModelElementReference) -> Optional[Entity]:
@@ -99,6 +102,7 @@ class SemanticModelAccessor(ABC):
         raise NotImplementedError
 
     @staticmethod
+    @abstractmethod
     def resolved_primary_entity(semantic_model: SemanticModel) -> Optional[EntityReference]:
         """Return the primary entity for dimensions in the model."""
         raise NotImplementedError
@@ -135,6 +139,10 @@ class SemanticModelAccessor(ABC):
     @abstractmethod
     def get_element_spec_for_name(self, element_name: str) -> LinkableInstanceSpec:
         """Returns the spec for the given name of a linkable element (dimension or entity)."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_agg_time_dimension_path_key_for_measure(self, measure_reference: MeasureReference) -> ElementPathKey:
         raise NotImplementedError
 
 

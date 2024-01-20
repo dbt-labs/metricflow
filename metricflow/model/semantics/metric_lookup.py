@@ -1,16 +1,25 @@
 from __future__ import annotations
 
 import logging
-from typing import Dict, FrozenSet, Optional, Sequence, Set
+from typing import Dict, FrozenSet, Optional, Sequence, Set, Tuple
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols.metric import Metric, MetricInputMeasure, MetricType
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.references import MeasureReference, MetricReference
+from dbt_semantic_interfaces.references import (
+    EntityReference,
+    MeasureReference,
+    MetricReference,
+    TimeDimensionReference,
+)
 
 from metricflow.errors.errors import DuplicateMetricError, MetricNotFoundError, NonExistentMeasureError
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
-from metricflow.model.semantics.linkable_spec_resolver import LinkableElementSet, ValidLinkableSpecResolver
+from metricflow.model.semantics.linkable_spec_resolver import (
+    LinkableElementSet,
+    ValidLinkableSpecResolver,
+    ElementPathKey,
+)
 from metricflow.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.protocols.semantics import MetricAccessor
@@ -159,3 +168,24 @@ class MetricLookup(MetricAccessor):  # noqa: D
                     if input_metric.offset_window or input_metric.offset_to_grain:
                         return True
         return False
+
+    def _get_agg_time_dimension_path_keys_for_metric(self, metric_reference: MetricReference) -> Set[ElementPathKey]:
+        """Retrieves the aggregate time dimensions associated with the metric's measures."""
+        metric = self.get_metric(metric_reference)
+        assert metric.input_measures, f"No input measures found for metric {metric_reference}"
+        return {
+            self._semantic_model_lookup.get_agg_time_dimension_path_key_for_measure(
+                measure_reference=input_measure.measure_reference
+            )
+            for input_measure in metric.input_measures
+        }
+
+    def get_agg_time_dimension_to_replace_metric_time(
+        self, metric_reference: MetricReference
+    ) -> Optional[ElementPathKey]:
+        agg_time_dimension_element_path_keys = self._get_agg_time_dimension_path_keys_for_metric(metric_reference)
+        if len(agg_time_dimension_element_path_keys) == 1:
+            return agg_time_dimension_element_path_keys[0]
+
+        # If the metric's input measures have different agg_time_dimensions, user must use metric_time.
+        return None

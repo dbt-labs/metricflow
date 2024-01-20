@@ -449,6 +449,32 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
             exclude_fields=exclude_fields,
         )
 
+    @staticmethod
+    def generate_possible_specs_for_time_dimension(
+        time_dimension_reference: TimeDimensionReference, entity_links: Tuple[EntityReference, ...]
+    ) -> List[TimeDimensionSpec]:
+        time_dimension_specs: List[TimeDimensionSpec] = []
+        for time_granularity in TimeGranularity:
+            time_dimension_specs.append(
+                TimeDimensionSpec(
+                    element_name=time_dimension_reference.element_name,
+                    entity_links=entity_links,
+                    time_granularity=time_granularity,
+                    date_part=None,
+                )
+            )
+        for date_part in DatePart:
+            for time_granularity in date_part.compatible_granularities:
+                time_dimension_specs.append(
+                    TimeDimensionSpec(
+                        element_name=time_dimension_reference.element_name,
+                        entity_links=entity_links,
+                        time_granularity=time_granularity,
+                        date_part=date_part,
+                    )
+                )
+        return time_dimension_specs
+
 
 @dataclass(frozen=True)
 class NonAdditiveDimensionSpec(SerializableDataclass):
@@ -585,7 +611,7 @@ class MetricInputMeasureSpec(SerializableDataclass):
     fill_nulls_with: Optional[int] = None
     offset_window: Optional[MetricTimeWindow] = None
     offset_to_grain: Optional[TimeGranularity] = None
-    culmination_description: Optional[CumulativeMeasureDescription] = None
+    cumulation_description: Optional[CumulativeMeasureDescription] = None
     filter_specs: Tuple[WhereFilterSpec, ...] = ()
     alias: Optional[str] = None
     before_aggregation_time_spine_join_description: Optional[JoinToTimeSpineDescription] = None

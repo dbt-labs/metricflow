@@ -35,35 +35,10 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
         super().__init__(manifest_lookup=manifest_lookup)
 
         self._metric_time_specs = tuple(
-            self._generate_valid_specs_for_time_dimension(
+            TimeDimensionSpec.generate_possible_specs_for_time_dimension(
                 time_dimension_reference=TimeDimensionReference(element_name=METRIC_TIME_ELEMENT_NAME), entity_links=()
             )
         )
-
-    def _generate_valid_specs_for_time_dimension(
-        self, time_dimension_reference: TimeDimensionReference, entity_links: Tuple[EntityReference, ...]
-    ) -> List[TimeDimensionSpec]:
-        time_dimension_specs: List[TimeDimensionSpec] = []
-        for time_granularity in TimeGranularity:
-            time_dimension_specs.append(
-                TimeDimensionSpec(
-                    element_name=time_dimension_reference.element_name,
-                    entity_links=entity_links,
-                    time_granularity=time_granularity,
-                    date_part=None,
-                )
-            )
-        for date_part in DatePart:
-            for time_granularity in date_part.compatible_granularities:
-                time_dimension_specs.append(
-                    TimeDimensionSpec(
-                        element_name=time_dimension_reference.element_name,
-                        entity_links=entity_links,
-                        time_granularity=time_granularity,
-                        date_part=date_part,
-                    )
-                )
-        return time_dimension_specs
 
     def _group_by_items_include_metric_time(self, query_resolver_input: ResolverInputForQuery) -> bool:
         for group_by_item_input in query_resolver_input.group_by_item_inputs:
@@ -75,32 +50,16 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
     def _group_by_items_include_agg_time_dimension(
         self, query_resolver_input: ResolverInputForQuery, metric_reference: MetricReference
     ) -> bool:
-        metric = self._manifest_lookup.metric_lookup.get_metric(metric_reference=metric_reference)
-        semantic_model_lookup = self._manifest_lookup.semantic_model_lookup
+        agg_time_dimension_and_entity_link = (
+            self._manifest_lookup.metric_lookup.get_agg_time_dimension_to_replace_metric_time(metric_reference)
+        )
+        if agg_time_dimension_and_entity_link is None:
+            return False
 
-        valid_agg_time_dimension_specs: List[TimeDimensionSpec] = []
-        for measure_reference in metric.measure_references:
-            agg_time_dimension_reference = semantic_model_lookup.get_agg_time_dimension_for_measure(measure_reference)
-
-            # A measure's gg_time_dimension is required to be in the same semantic model as the measure,
-            # so we can assume the same semantic model for both measure and dimension.
-            semantic_models = semantic_model_lookup.get_semantic_models_for_measure(measure_reference)
-            assert (
-                len(semantic_models) == 1
-            ), f"Expected exactly one semantic model for measure {measure_reference}, but found semantic models {semantic_models}."
-            semantic_model = semantic_models[0]
-
-            entity_link = semantic_model_lookup.resolved_primary_entity(semantic_model)
-            assert (
-                entity_link is not None
-            ), f"Expected semantic model {semantic_model} to have a primary entity since is contains dimensions, but found none."
-
-            valid_agg_time_dimension_specs.extend(
-                self._generate_valid_specs_for_time_dimension(
-                    time_dimension_reference=agg_time_dimension_reference, entity_links=(entity_link,)
-                )
-            )
-
+        agg_time_dimension_reference, entity_link = agg_time_dimension_and_entity_link
+        valid_agg_time_dimension_specs = TimeDimensionSpec.generate_possible_specs_for_time_dimension(
+            time_dimension_reference=agg_time_dimension_reference, entity_links=(entity_link,)
+        )
         for group_by_item_input in query_resolver_input.group_by_item_inputs:
             if group_by_item_input.spec_pattern.matches_any(valid_agg_time_dimension_specs):
                 return True
