@@ -197,7 +197,7 @@ integration_test:
     SELECT
       {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
     FROM {{ source_schema }}.mf_time_spine
-    GROUP BY metric_time__day
+    GROUP BY {{ render_date_trunc("ds", TimeGranularity.DAY) }}
 ---
 integration_test:
   name: metric_time_week
@@ -208,7 +208,7 @@ integration_test:
     SELECT
       {{ render_date_trunc("ds", TimeGranularity.WEEK) }} AS metric_time__week
     FROM {{ source_schema }}.mf_time_spine
-    GROUP BY metric_time__week
+    GROUP BY {{ render_date_trunc("ds", TimeGranularity.WEEK) }}
 ---
 integration_test:
   name: metric_time_date_part
@@ -219,7 +219,7 @@ integration_test:
     SELECT
       {{ render_extract("ds", DatePart.DOW) }} AS metric_time__extract_dow
     FROM {{ source_schema }}.mf_time_spine
-    GROUP BY metric_time__extract_dow
+    GROUP BY {{ render_extract("ds", DatePart.DOW) }}
 ---
 integration_test:
   name: metric_time_with_other_dimensions
