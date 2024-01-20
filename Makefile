@@ -74,7 +74,7 @@ postgresql postgres:
 
 .PHONY: trino
 trino:
-	docker run --name trino -d -p 8080:8080 trinodb/trino
+	make -C local-data-warehouses trino
 
 # Re-generate test snapshots using all supported SQL engines.
 .PHONY: regenerate-test-snapshots
