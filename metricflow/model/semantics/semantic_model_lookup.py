@@ -192,11 +192,7 @@ class SemanticModelLookup(SemanticModelAccessor):
 
         for measure in semantic_model.measures:
             self._measure_aggs[measure.reference] = measure.agg
-
-            semantic_models_for_measure = self._measure_index.get(measure.reference, [])
-            semantic_models_for_measure.append(semantic_model)
-            self._measure_index[measure.reference] = semantic_models_for_measure
-
+            self._measure_index[measure.reference] = self._measure_index.get(measure.reference, []) + [semantic_model]
             agg_time_dimension_reference = semantic_model.checked_agg_time_dimension_for_measure(measure.reference)
 
             matching_dimensions = tuple(
@@ -244,8 +240,7 @@ class SemanticModelLookup(SemanticModelAccessor):
                 )
                 self._measure_non_additive_dimension_specs[measure.reference] = non_additive_dimension_spec
         for dim in semantic_model.dimensions:
-            semantic_models_for_dimension = self._dimension_index.get(dim.reference, [])
-            semantic_models_for_dimension.append(semantic_model)
+            semantic_models_for_dimension = self._dimension_index.get(dim.reference, []) + [semantic_model]
             self._dimension_index[dim.reference] = semantic_models_for_dimension
             self._linkable_reference_index[dim.reference] = semantic_models_for_dimension
 
@@ -256,8 +251,7 @@ class SemanticModelLookup(SemanticModelAccessor):
             )
 
         for entity in semantic_model.entities:
-            semantic_models_for_entity = self._entity_index.get(entity.reference, [])
-            semantic_models_for_entity.append(semantic_model)
+            semantic_models_for_entity = self._entity_index.get(entity.reference, []) + [semantic_model]
             self._entity_index[entity.reference] = semantic_models_for_entity
             self._linkable_reference_index[entity.reference] = semantic_models_for_entity
 
