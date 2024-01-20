@@ -259,7 +259,7 @@ integration_test:
     FROM {{ source_schema }}.dim_listings_latest l
     CROSS JOIN {{ source_schema }}.mf_time_spine t
     FULL OUTER JOIN {{ source_schema }}.dim_users_latest u ON l.user_id = u.user_id
-    WHERE {{ render_date_trunc("t.ds", TimeGranularity.DAY) }} BETWEEN '2020-01-03' AND '2020-01-03'
+    WHERE {{ render_time_constraint(render_date_trunc("t.ds", TimeGranularity.DAY), "2020-01-03", "2020-01-03") }}
     GROUP BY
       {{ render_date_trunc("t.ds", TimeGranularity.DAY) }}
       , l.country
