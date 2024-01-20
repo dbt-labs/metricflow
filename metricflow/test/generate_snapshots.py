@@ -73,7 +73,7 @@ class MetricFlowTestCredentialSetForAllEngines(FrozenBaseModel):  # noqa: D
     big_query: MetricFlowTestCredentialSet
     databricks: MetricFlowTestCredentialSet
     postgres: MetricFlowTestCredentialSet
-    # trino: MetricFlowTestCredentialSet
+    trino: MetricFlowTestCredentialSet
 
     @property
     def as_configurations(self) -> Sequence[MetricFlowTestConfiguration]:  # noqa: D
@@ -102,10 +102,10 @@ class MetricFlowTestCredentialSetForAllEngines(FrozenBaseModel):  # noqa: D
                 engine=SqlEngine.POSTGRES,
                 credential_set=self.postgres,
             ),
-            # MetricFlowTestConfiguration(
-            #     engine=SqlEngine.TRINO,
-            #     credential_set=self.trino,
-            # ),
+            MetricFlowTestConfiguration(
+                engine=SqlEngine.TRINO,
+                credential_set=self.trino,
+            ),
         )
 
 
