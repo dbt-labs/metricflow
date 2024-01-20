@@ -11,7 +11,7 @@ FROM (
     subq_10.metric_time__month AS metric_time__month
     , SUM(bookings_monthly_source_src_10026.bookings_monthly) AS bookings_last_month
   FROM (
-    -- Date Spine
+    -- Time Spine
     SELECT
       DATE_TRUNC(ds, month) AS metric_time__month
     FROM ***************************.mf_time_spine subq_11

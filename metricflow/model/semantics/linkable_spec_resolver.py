@@ -55,7 +55,7 @@ class LinkableDimension:
     """Describes how a dimension can be realized by joining based on entity links."""
 
     # The semantic model where this dimension was defined.
-    semantic_model_origin: SemanticModelReference
+    semantic_model_origin: Optional[SemanticModelReference]
     element_name: str
     entity_links: Tuple[EntityReference, ...]
     join_path: Tuple[SemanticModelJoinPathElement, ...]
@@ -189,7 +189,11 @@ class LinkableElementSet:
                 path_key: tuple(
                     sorted(
                         dimensions,
-                        key=lambda linkable_dimension: linkable_dimension.semantic_model_origin.semantic_model_name,
+                        key=lambda linkable_dimension: (
+                            linkable_dimension.semantic_model_origin.semantic_model_name
+                            if linkable_dimension.semantic_model_origin
+                            else ""
+                        ),
                     )
                 )
                 for path_key, dimensions in join_path_to_linkable_dimensions.items()
@@ -524,7 +528,10 @@ class ValidLinkableSpecResolver:
                 ValidLinkableSpecResolver._get_elements_in_semantic_model(semantic_model)
             )
 
-        self._no_metric_linkable_element_set = LinkableElementSet.merge_by_path_key(linkable_element_sets_to_merge)
+        metric_time_elements_for_no_metrics = self._get_metric_time_elements(measure_reference=None)
+        self._no_metric_linkable_element_set = LinkableElementSet.merge_by_path_key(
+            linkable_element_sets_to_merge + [metric_time_elements_for_no_metrics]
+        )
 
         logger.info(f"Building valid group-by-item indexes took: {time.time() - start_time:.2f}s")
 
@@ -547,7 +554,7 @@ class ValidLinkableSpecResolver:
     def _get_elements_in_semantic_model(semantic_model: SemanticModel) -> LinkableElementSet:
         """Gets the elements in the semantic model, without requiring any joins.
 
-        Elements related to metric_time are handled separately in _create_elements_for_metric_time().
+        Elements related to metric_time are handled separately in _get_metric_time_elements().
         """
         linkable_dimensions = []
         linkable_entities = []
@@ -653,33 +660,34 @@ class ValidLinkableSpecResolver:
 
         return type_params.time_granularity
 
-    def _get_metric_time_elements(self, measure_reference: MeasureReference) -> LinkableElementSet:
+    def _get_metric_time_elements(self, measure_reference: Optional[MeasureReference] = None) -> LinkableElementSet:
         """Create elements for metric_time for a given measure in a semantic model.
 
         metric_time is a virtual dimension that is the same as aggregation time dimension for a measure, but with a
         different name. Because it doesn't actually exist in the semantic model, these elements need to be created based
         on what aggregation time dimension was used to define the measure.
         """
-        measure_semantic_model = self._get_semantic_model_for_measure(measure_reference)
-
-        measure_agg_time_dimension_reference = measure_semantic_model.checked_agg_time_dimension_for_measure(
-            measure_reference=measure_reference
-        )
-
-        agg_time_dimension_granularity = ValidLinkableSpecResolver._get_time_granularity_for_dimension(
-            semantic_model=measure_semantic_model,
-            time_dimension_reference=measure_agg_time_dimension_reference,
-        )
+        measure_semantic_model: Optional[SemanticModel] = None
+        if measure_reference:
+            measure_semantic_model = self._get_semantic_model_for_measure(measure_reference)
+            measure_agg_time_dimension_reference = measure_semantic_model.checked_agg_time_dimension_for_measure(
+                measure_reference=measure_reference
+            )
+            defined_granularity = ValidLinkableSpecResolver._get_time_granularity_for_dimension(
+                semantic_model=measure_semantic_model,
+                time_dimension_reference=measure_agg_time_dimension_reference,
+            )
+        else:
+            defined_granularity = DEFAULT_TIME_GRANULARITY
 
         # It's possible to aggregate measures to coarser time granularities (except with cumulative metrics).
         possible_metric_time_granularities = tuple(
             time_granularity
             for time_granularity in TimeGranularity
-            if agg_time_dimension_granularity.is_smaller_than_or_equal(time_granularity)
+            if defined_granularity.is_smaller_than_or_equal(time_granularity)
         )
 
         # For each of the possible time granularities, create a LinkableDimension for each one.
-
         path_key_to_linkable_dimensions: Dict[ElementPathKey, List[LinkableDimension]] = defaultdict(list)
         for time_granularity in possible_metric_time_granularities:
             possible_date_parts: Sequence[Optional[DatePart]] = (
@@ -698,14 +706,14 @@ class ValidLinkableSpecResolver:
                 )
                 path_key_to_linkable_dimensions[path_key].append(
                     LinkableDimension(
-                        semantic_model_origin=measure_semantic_model.reference,
+                        semantic_model_origin=measure_semantic_model.reference if measure_semantic_model else None,
                         element_name=DataSet.metric_time_dimension_name(),
                         entity_links=(),
                         join_path=(),
                         # Anything that's not at the base time granularity of the measure's aggregation time dimension
                         # should be considered derived.
                         properties=frozenset({LinkableElementProperties.METRIC_TIME})
-                        if time_granularity is agg_time_dimension_granularity and date_part is None
+                        if time_granularity is defined_granularity and date_part is None
                         else frozenset(
                             {
                                 LinkableElementProperties.METRIC_TIME,

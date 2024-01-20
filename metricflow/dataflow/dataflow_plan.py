@@ -268,13 +268,17 @@ class JoinDescription:
     """Describes how data from a node should be joined to data from another node."""
 
     join_node: BaseOutput
-    join_on_entity: LinklessEntitySpec
+    join_on_entity: Optional[LinklessEntitySpec]
     join_type: SqlJoinType
 
     join_on_partition_dimensions: Tuple[PartitionDimensionJoinDescription, ...]
     join_on_partition_time_dimensions: Tuple[PartitionTimeDimensionJoinDescription, ...]
 
     validity_window: Optional[ValidityWindowJoinDescription] = None
+
+    def __post_init__(self) -> None:  # noqa: D
+        if self.join_on_entity is None and self.join_type != SqlJoinType.CROSS_JOIN:
+            raise RuntimeError("`join_on_entity` is required unless using CROSS JOIN.")
 
 
 class JoinToBaseOutputNode(BaseOutput):

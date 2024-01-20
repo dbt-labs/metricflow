@@ -352,7 +352,9 @@ def assert_linkable_element_set_snapshot_equal(  # noqa: D
             rows.append(
                 (
                     # Checking a limited set of fields as the result is large due to the paths in the object.
-                    linkable_dimension.semantic_model_origin.semantic_model_name,
+                    linkable_dimension.semantic_model_origin.semantic_model_name
+                    if linkable_dimension.semantic_model_origin
+                    else None,
                     tuple(entity_link.element_name for entity_link in linkable_dimension.entity_links),
                     linkable_dimension.element_name,
                     linkable_dimension.time_granularity.name if linkable_dimension.time_granularity is not None else "",

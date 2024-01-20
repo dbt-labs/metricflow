@@ -189,6 +189,83 @@ integration_test:
     GROUP BY user__home_state_latest
 ---
 integration_test:
+  name: metric_time_only
+  description: Query metric_time alone
+  model: SIMPLE_MODEL
+  group_bys: ["metric_time"]
+  check_query: |
+    SELECT
+      {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
+    FROM {{ source_schema }}.mf_time_spine
+    GROUP BY {{ render_date_trunc("ds", TimeGranularity.DAY) }}
+---
+integration_test:
+  name: metric_time_week
+  description: Query metric_time alone with non-default granularity
+  model: SIMPLE_MODEL
+  group_bys: ["metric_time__week"]
+  check_query: |
+    SELECT
+      {{ render_date_trunc("ds", TimeGranularity.WEEK) }} AS metric_time__week
+    FROM {{ source_schema }}.mf_time_spine
+    GROUP BY {{ render_date_trunc("ds", TimeGranularity.WEEK) }}
+---
+integration_test:
+  name: metric_time_date_part
+  description: Query metric_time alone with date part
+  model: SIMPLE_MODEL
+  group_by_objs: [{"name": "metric_time", "date_part": "dow"}]
+  check_query: |
+    SELECT
+      {{ render_extract("ds", DatePart.DOW) }} AS metric_time__extract_dow
+    FROM {{ source_schema }}.mf_time_spine
+    GROUP BY {{ render_extract("ds", DatePart.DOW) }}
+---
+integration_test:
+  name: metric_time_with_other_dimensions
+  description: Query metric_time with other dimensions and filters
+  model: SIMPLE_MODEL
+  group_bys: ["metric_time", "metric_time__month", "user__home_state_latest", "listing__is_lux_latest"]
+  check_query: |
+    SELECT
+      {{ render_date_trunc("ts.ds", TimeGranularity.DAY) }} AS metric_time__day
+      , {{ render_date_trunc("ts.ds", TimeGranularity.MONTH) }} AS metric_time__month
+      , l.is_lux AS listing__is_lux_latest
+      , u.home_state_latest AS user__home_state_latest
+    FROM {{ source_schema }}.dim_listings_latest l
+    CROSS JOIN
+      {{ source_schema }}.mf_time_spine ts
+    FULL OUTER JOIN
+      {{ source_schema }}.dim_users_latest u
+    ON
+      l.user_id = u.user_id
+    GROUP BY
+      {{ render_date_trunc("ts.ds", TimeGranularity.DAY) }}
+      , {{ render_date_trunc("ts.ds", TimeGranularity.MONTH) }}
+      , l.is_lux
+      , u.home_state_latest
+---
+integration_test:
+  name: query_dimensions_with_time_constraint
+  description: Query dimensions with time constraint
+  model: SIMPLE_MODEL
+  group_bys: ["user__home_state_latest", "listing__country_latest", "metric_time__day"]
+  time_constraint: ["2020-01-03", "2020-01-03"]
+  check_query: |
+    SELECT
+      {{ render_date_trunc("t.ds", TimeGranularity.DAY) }} AS metric_time__day
+      , l.country AS listing__country_latest
+      , u.home_state_latest AS user__home_state_latest
+    FROM {{ source_schema }}.dim_listings_latest l
+    CROSS JOIN {{ source_schema }}.mf_time_spine t
+    FULL OUTER JOIN {{ source_schema }}.dim_users_latest u ON l.user_id = u.user_id
+    WHERE {{ render_time_constraint(render_date_trunc("t.ds", TimeGranularity.DAY), "2020-01-03", "2020-01-03") }}
+    GROUP BY
+      {{ render_date_trunc("t.ds", TimeGranularity.DAY) }}
+      , l.country
+      , u.home_state_latest
+---
+integration_test:
   name: query_dimension_only_with_constraint
   description: Query dimenension only with where constraint
   model: SIMPLE_MODEL
@@ -255,3 +332,4 @@ integration_test:
       GROUP BY
         {{ render_date_trunc("v.ds", TimeGranularity.MONTH) }}
     )
+# TODO: add test case for range of metric time values

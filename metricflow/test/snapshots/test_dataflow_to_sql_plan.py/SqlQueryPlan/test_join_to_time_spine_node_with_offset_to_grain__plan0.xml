@@ -19,7 +19,7 @@
         <!-- where = None -->
         <!-- distinct = False -->
         <SqlSelectStatementNode>
-            <!-- description = Date Spine -->
+            <!-- description = Time Spine -->
             <!-- node_id = ss_4 -->
             <!-- col0 =                                                                                                 -->
             <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_106), column_alias='metric_time__day')  -->

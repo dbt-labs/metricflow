@@ -349,10 +349,14 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         source_node_builder = SourceNodeBuilder(self._semantic_manifest_lookup)
         source_nodes = source_node_builder.create_from_data_sets(self._source_data_sets)
         read_nodes = source_node_builder.create_read_nodes_from_data_sets(self._source_data_sets)
+        time_spine_source_node = SourceNodeBuilder.build_time_spine_source_node(
+            time_spine_source=self._time_spine_source, data_set_converter=converter
+        )
 
         self._dataflow_plan_builder = DataflowPlanBuilder(
             source_nodes=source_nodes,
             read_nodes=read_nodes,
+            time_spine_source_node=time_spine_source_node,
             semantic_manifest_lookup=self._semantic_manifest_lookup,
         )
         self._to_sql_query_plan_converter = DataflowToSqlQueryPlanConverter(
@@ -536,10 +540,6 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 # Simple dimensions shouldn't show date part items.
                 if linkable_dimension.date_part is not None:
                     continue
-                semantic_model = self._semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
-                    linkable_dimension.semantic_model_origin
-                )
-                assert semantic_model
 
                 if LinkableElementProperties.METRIC_TIME in linkable_dimension.properties:
                     metric_time_name = DataSet.metric_time_dimension_name()
@@ -570,6 +570,13 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                         )
                     )
                 else:
+                    assert (
+                        linkable_dimension.semantic_model_origin
+                    ), "Only metric_time can have no semantic_model_origin."
+                    semantic_model = self._semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
+                        linkable_dimension.semantic_model_origin
+                    )
+                    assert semantic_model
                     dimensions.append(
                         Dimension.from_pydantic(
                             pydantic_dimension=SemanticModelLookup.get_dimension_from_semantic_model(

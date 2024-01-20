@@ -8,7 +8,7 @@ FROM (
     subq_21.metric_time__day AS metric_time__day
     , subq_20.bookings_offset_once AS bookings_offset_once
   FROM (
-    -- Date Spine
+    -- Time Spine
     SELECT
       ds AS metric_time__day
     FROM ***************************.mf_time_spine subq_22

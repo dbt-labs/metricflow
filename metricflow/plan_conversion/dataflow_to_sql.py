@@ -73,7 +73,7 @@ from metricflow.plan_conversion.sql_join_builder import (
     ColumnEqualityDescription,
     SqlQueryPlanJoinBuilder,
 )
-from metricflow.plan_conversion.time_spine import TimeSpineSource
+from metricflow.plan_conversion.time_spine import TIME_SPINE_DATA_SET_DESCRIPTION, TimeSpineSource
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.specs.column_assoc import ColumnAssociation, ColumnAssociationResolver, SingleColumnCorrelationKey
 from metricflow.specs.specs import (
@@ -197,10 +197,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 spec=metric_time_dimension_instance.spec,
             ),
         )
-        time_spine_instance_set = InstanceSet(
-            time_dimension_instances=time_spine_instance,
-        )
-        description = "Date Spine"
+        time_spine_instance_set = InstanceSet(time_dimension_instances=time_spine_instance)
         time_spine_table_alias = self._next_unique_table_alias()
 
         # If the requested granularity is the same as the granularity of the spine, do a direct select.
@@ -208,8 +205,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             return SqlDataSet(
                 instance_set=time_spine_instance_set,
                 sql_select_node=SqlSelectStatementNode(
-                    description=description,
-                    # This creates select expressions for all columns referenced in the instance set.
+                    description=TIME_SPINE_DATA_SET_DESCRIPTION,
                     select_columns=(
                         SqlSelectColumn(
                             expr=SqlColumnReferenceExpression(
@@ -254,8 +250,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             return SqlDataSet(
                 instance_set=time_spine_instance_set,
                 sql_select_node=SqlSelectStatementNode(
-                    description=description,
-                    # This creates select expressions for all columns referenced in the instance set.
+                    description=TIME_SPINE_DATA_SET_DESCRIPTION,
                     select_columns=select_columns,
                     from_source=SqlTableFromClauseNode(sql_table=time_spine_source.spine_table),
                     from_source_alias=time_spine_table_alias,
@@ -400,32 +395,34 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             right_data_set: SqlDataSet = right_node_to_join.accept(self)
             right_data_set_alias = self._next_unique_table_alias()
 
-            sql_join_descs.append(
-                SqlQueryPlanJoinBuilder.make_base_output_join_description(
-                    left_data_set=AnnotatedSqlDataSet(data_set=from_data_set, alias=from_data_set_alias),
-                    right_data_set=AnnotatedSqlDataSet(data_set=right_data_set, alias=right_data_set_alias),
-                    join_description=join_description,
+            sql_join_desc = SqlQueryPlanJoinBuilder.make_base_output_join_description(
+                left_data_set=AnnotatedSqlDataSet(data_set=from_data_set, alias=from_data_set_alias),
+                right_data_set=AnnotatedSqlDataSet(data_set=right_data_set, alias=right_data_set_alias),
+                join_description=join_description,
+            )
+            sql_join_descs.append(sql_join_desc)
+
+            if join_on_entity:
+                # Remove the linkable instances with the join_on_entity as the leading link as the next step adds the
+                # link. This is to avoid cases where there is a primary entity and a dimension in the data set, and we
+                # create an instance in the next step that has the same entity link.
+                # e.g. a data set has the dimension "listing__country_latest" and "listing" is a primary entity in the
+                # data set. The next step would create an instance like "listing__listing__country_latest" without this
+                # filter.
+                right_data_set_instance_set_filtered = FilterLinkableInstancesWithLeadingLink(
+                    entity_link=join_on_entity,
+                ).transform(right_data_set.instance_set)
+
+                # After the right data set is joined to the "from" data set, we need to change the links for some of the
+                # instances that represent the right data set. For example, if the "from" data set contains the "bookings"
+                # measure instance and the right dataset contains the "country" dimension instance, then after the join,
+                # the output data set should have the "country" dimension instance with the "user_id" entity link
+                # (if "user_id" equality was the join condition). "country" -> "user_id__country"
+                right_data_set_instance_set_after_join = right_data_set_instance_set_filtered.transform(
+                    AddLinkToLinkableElements(join_on_entity=join_on_entity)
                 )
-            )
-
-            # Remove the linkable instances with the join_on_entity as the leading link as the next step adds the
-            # link. This is to avoid cases where there is a primary entity and a dimension in the data set, and we
-            # create an instance in the next step that has the same entity link.
-            # e.g. a data set has the dimension "listing__country_latest" and "listing" is a primary entity in the
-            # data set. The next step would create an instance like "listing__listing__country_latest" without this
-            # filter.
-            right_data_set_instance_set_filtered = FilterLinkableInstancesWithLeadingLink(
-                entity_link=join_on_entity,
-            ).transform(right_data_set.instance_set)
-
-            # After the right data set is joined to the "from" data set, we need to change the links for some of the
-            # instances that represent the right data set. For example, if the "from" data set contains the "bookings"
-            # measure instance and the right dataset contains the "country" dimension instance, then after the join,
-            # the output data set should have the "country" dimension instance with the "user_id" entity link
-            # (if "user_id" equality was the join condition). "country" -> "user_id__country"
-            right_data_set_instance_set_after_join = right_data_set_instance_set_filtered.transform(
-                AddLinkToLinkableElements(join_on_entity=join_on_entity)
-            )
+            else:
+                right_data_set_instance_set_after_join = right_data_set.instance_set
             table_alias_to_instance_set[right_data_set_alias] = right_data_set_instance_set_after_join
 
         from_data_set_output_instance_set = from_data_set.instance_set.transform(
@@ -1050,12 +1047,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             )
             if aggregation_time_dimension_for_measure == node.aggregation_time_dimension_reference:
                 output_measure_instances.append(measure_instance)
-
-        if len(output_measure_instances) == 0:
-            raise RuntimeError(
-                f"No measure instances in the input source match the aggregation time dimension "
-                f"{node.aggregation_time_dimension_reference}. Check if the dataflow plan was constructed correctly."
-            )
 
         # Find time dimension instances that refer to the same dimension as the one specified in the node.
         matching_time_dimension_instances = []

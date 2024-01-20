@@ -12,7 +12,7 @@ FROM (
     subq_17.metric_time__day AS metric_time__day
     , COUNT(DISTINCT subq_16.bookers) AS every_2_days_bookers_2_days_ago
   FROM (
-    -- Date Spine
+    -- Time Spine
     SELECT
       ds AS metric_time__day
     FROM ***************************.mf_time_spine subq_18

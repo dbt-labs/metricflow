@@ -7,7 +7,7 @@ SELECT
   subq_11.metric_time__month AS metric_time__month
   , SUM(subq_11.txn_revenue) AS trailing_2_months_revenue
 FROM (
-  -- Date Spine
+  -- Time Spine
   SELECT
     ds AS metric_time__day
   FROM ***************************.mf_time_spine subq_13

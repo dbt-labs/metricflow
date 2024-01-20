@@ -1,0 +1,74 @@
+<DataflowPlan>
+    <WriteToResultDataframeNode>
+        <!-- description = Write to Dataframe -->
+        <!-- node_id = wrd_0 -->
+        <FilterElementsNode>
+            <!-- description =                                                                                                            -->
+            <!--   "Pass Only Elements: ['user__home_state_latest', 'listing__is_lux_latest', 'metric_time__day', 'metric_time__month']"  -->
+            <!-- node_id = pfe_4 -->
+            <!-- include_spec =                                                                                           -->
+            <!--   DimensionSpec(element_name='home_state_latest', entity_links=(EntityReference(element_name='user'),))  -->
+            <!-- include_spec =                                                                                          -->
+            <!--   DimensionSpec(element_name='is_lux_latest', entity_links=(EntityReference(element_name='listing'),))  -->
+            <!-- include_spec =                                                         -->
+            <!--   TimeDimensionSpec(element_name='metric_time', time_granularity=DAY)  -->
+            <!-- include_spec =                                                           -->
+            <!--   TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH)  -->
+            <!-- distinct = True -->
+            <JoinToBaseOutputNode>
+                <!-- description = Join Standard Outputs -->
+                <!-- node_id = jso_0 -->
+                <!-- join0_for_node_id_pfe_2 =                                                             -->
+                <!--   JoinDescription(join_node=FilterElementsNode(node_id=pfe_2), join_type=CROSS_JOIN)  -->
+                <!-- join1_for_node_id_pfe_3 =                                    -->
+                <!--   JoinDescription(                                           -->
+                <!--     join_node=FilterElementsNode(node_id=pfe_3),             -->
+                <!--     join_on_entity=LinklessEntitySpec(element_name='user'),  -->
+                <!--     join_type=FULL_OUTER,                                    -->
+                <!--   )                                                          -->
+                <ReadSqlSourceNode>
+                    <!-- description =                                                                                      -->
+                    <!--   "Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))"  -->
+                    <!-- node_id = rss_10005 -->
+                    <!-- data_set =                                                                             -->
+                    <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))  -->
+                </ReadSqlSourceNode>
+                <FilterElementsNode>
+                    <!-- description =                                                       -->
+                    <!--   "Pass Only Elements: ['metric_time__day', 'metric_time__month']"  -->
+                    <!-- node_id = pfe_2 -->
+                    <!-- include_spec =                                                         -->
+                    <!--   TimeDimensionSpec(element_name='metric_time', time_granularity=DAY)  -->
+                    <!-- include_spec =                                                           -->
+                    <!--   TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH)  -->
+                    <!-- distinct = False -->
+                    <MetricTimeDimensionTransformNode>
+                        <!-- description = Metric Time Dimension 'ds' -->
+                        <!-- node_id = sma_10009 -->
+                        <!-- aggregation_time_dimension = ds -->
+                        <ReadSqlSourceNode>
+                            <!-- description = Read From SqlDataSet() -->
+                            <!-- node_id = rss_10024 -->
+                            <!-- data_set = SqlDataSet() -->
+                        </ReadSqlSourceNode>
+                    </MetricTimeDimensionTransformNode>
+                </FilterElementsNode>
+                <FilterElementsNode>
+                    <!-- description = Pass Only Elements: ['home_state_latest', 'user'] -->
+                    <!-- node_id = pfe_3 -->
+                    <!-- include_spec =                                     -->
+                    <!--   DimensionSpec(element_name='home_state_latest')  -->
+                    <!-- include_spec = LinklessEntitySpec(element_name='user', entity_links=()) -->
+                    <!-- distinct = False -->
+                    <ReadSqlSourceNode>
+                        <!-- description =                                                                                   -->
+                        <!--   "Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='users_latest'))"  -->
+                        <!-- node_id = rss_10009 -->
+                        <!-- data_set =                                                                          -->
+                        <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='users_latest'))  -->
+                    </ReadSqlSourceNode>
+                </FilterElementsNode>
+            </JoinToBaseOutputNode>
+        </FilterElementsNode>
+    </WriteToResultDataframeNode>
+</DataflowPlan>

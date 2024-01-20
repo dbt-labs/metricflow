@@ -21,23 +21,27 @@ import logging
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple
 
+from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
+
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.partitions import PartitionJoinResolver
 from metricflow.dataflow.dataflow_plan import (
     BaseOutput,
     FilterElementsNode,
     JoinDescription,
+    MetricTimeDimensionTransformNode,
     PartitionDimensionJoinDescription,
     PartitionTimeDimensionJoinDescription,
     ValidityWindowJoinDescription,
 )
+from metricflow.dataset.dataset import DataSet
 from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.instances import InstanceSet
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
 from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
 from metricflow.protocols.semantics import SemanticModelAccessor
-from metricflow.specs.specs import InstanceSpecSet, LinkableInstanceSpec, LinklessEntitySpec
+from metricflow.specs.specs import InstanceSpecSet, LinkableInstanceSpec, LinkableSpecSet, LinklessEntitySpec
 from metricflow.sql.sql_plan import SqlJoinType
 
 logger = logging.getLogger(__name__)
@@ -53,8 +57,8 @@ class JoinLinkableInstancesRecipe:
     """
 
     node_to_join: BaseOutput
-    # The entity to join "node_to_join" on.
-    join_on_entity: LinklessEntitySpec
+    # The entity to join "node_to_join" on. Only nullable if using CROSS JOIN.
+    join_on_entity: Optional[LinklessEntitySpec]
     # The linkable instances from the query that can be satisfied if we join this node. Note that this is different from
     # the linkable specs in the node that can help to satisfy the query. e.g. "user_id__country" might be one of the
     # "satisfiable_linkable_specs", but "country" is the linkable spec in the node.
@@ -68,14 +72,29 @@ class JoinLinkableInstancesRecipe:
 
     validity_window: Optional[ValidityWindowJoinDescription] = None
 
+    def __post_init__(self) -> None:  # noqa: D
+        if self.join_on_entity is None and self.join_type != SqlJoinType.CROSS_JOIN:
+            raise RuntimeError("`join_on_entity` is required unless using CROSS JOIN.")
+
     @property
     def join_description(self) -> JoinDescription:
         """The recipe as a join description to use in the dataflow plan node."""
         # Figure out what elements to filter from the joined node.
         include_specs: List[LinkableInstanceSpec] = []
-        assert all([len(spec.entity_links) > 0 for spec in self.satisfiable_linkable_specs])
+        assert all(
+            [
+                len(spec.entity_links) > 0
+                for spec in self.satisfiable_linkable_specs
+                if not spec.element_name == METRIC_TIME_ELEMENT_NAME
+            ]
+        )
+
         include_specs.extend(
-            [LinklessEntitySpec.from_reference(spec.entity_links[0]) for spec in self.satisfiable_linkable_specs]
+            [
+                LinklessEntitySpec.from_reference(spec.entity_links[0])
+                for spec in self.satisfiable_linkable_specs
+                if len(spec.entity_links) > 0
+            ]
         )
 
         include_specs.extend([join.node_to_join_dimension_spec for join in self.join_on_partition_dimensions])
@@ -89,7 +108,12 @@ class JoinLinkableInstancesRecipe:
         # link when filtering before the join.
         # e.g. if the node is used to satisfy "user_id__country", then the node must have the entity
         # "user_id" and the "country" dimension so that it can be joined to the source node.
-        include_specs.extend([spec.without_first_entity_link for spec in self.satisfiable_linkable_specs])
+        include_specs.extend(
+            [
+                spec.without_first_entity_link if len(spec.entity_links) > 0 else spec
+                for spec in self.satisfiable_linkable_specs
+            ]
+        )
         filtered_node_to_join = FilterElementsNode(
             parent_node=self.node_to_join, include_specs=InstanceSpecSet.from_specs(include_specs)
         )
@@ -157,7 +181,8 @@ class NodeEvaluatorForLinkableInstances:
         self,
         start_node_instance_set: InstanceSet,
         needed_linkable_specs: List[LinkableInstanceSpec],
-        join_type: SqlJoinType,
+        default_join_type: SqlJoinType,
+        time_spine_source_node: Optional[MetricTimeDimensionTransformNode] = None,
     ) -> List[JoinLinkableInstancesRecipe]:
         """Get nodes that can be joined to get 1 or more of the "needed_linkable_specs".
 
@@ -166,6 +191,21 @@ class NodeEvaluatorForLinkableInstances:
         candidates_for_join: List[JoinLinkableInstancesRecipe] = []
         start_node_spec_set = start_node_instance_set.spec_set
         for right_node in self._nodes_available_for_joins:
+            # If right node is time spine source node, use cross join.
+            if right_node == time_spine_source_node:
+                needed_metric_time_specs = LinkableSpecSet.from_specs(needed_linkable_specs).metric_time_specs
+                candidates_for_join.append(
+                    JoinLinkableInstancesRecipe(
+                        node_to_join=right_node,
+                        join_on_entity=None,
+                        satisfiable_linkable_specs=list(needed_metric_time_specs),
+                        join_on_partition_dimensions=(),
+                        join_on_partition_time_dimensions=(),
+                        join_type=SqlJoinType.CROSS_JOIN,
+                    )
+                )
+                continue
+
             data_set_in_right_node: SqlDataSet = self._node_data_set_resolver.get_output_data_set(right_node)
             linkable_specs_in_right_node = data_set_in_right_node.instance_set.spec_set.linkable_specs
             entity_specs_in_right_node = data_set_in_right_node.instance_set.spec_set.entity_specs
@@ -230,9 +270,11 @@ class NodeEvaluatorForLinkableInstances:
 
                 satisfiable_linkable_specs = []
                 for needed_linkable_spec in needed_linkable_specs:
-                    assert (
-                        len(needed_linkable_spec.entity_links) != 0
-                    ), f"Invalid needed linkable spec passed in {needed_linkable_spec}"
+                    if len(needed_linkable_spec.entity_links) == 0:
+                        assert (
+                            needed_linkable_spec.element_name == METRIC_TIME_ELEMENT_NAME
+                        ), "Only metric_time should have 0 entity links."
+                        continue
 
                     # If the entity in the data set matches the link, then it can be used for joins. For example,
                     # if the node has the entity "user_id", and dimension "country" then it can be used for
@@ -282,7 +324,7 @@ class NodeEvaluatorForLinkableInstances:
                             join_on_partition_dimensions=join_on_partition_dimensions,
                             join_on_partition_time_dimensions=join_on_partition_time_dimensions,
                             validity_window=validity_window_join_description,
-                            join_type=join_type,
+                            join_type=default_join_type,
                         )
                     )
 
@@ -335,6 +377,7 @@ class NodeEvaluatorForLinkableInstances:
         start_node: BaseOutput,
         required_linkable_specs: Sequence[LinkableInstanceSpec],
         default_join_type: SqlJoinType,
+        time_spine_source_node: Optional[MetricTimeDimensionTransformNode] = None,
     ) -> LinkableInstanceSatisfiabilityEvaluation:
         """Evaluates if the "required_linkable_specs" can be realized by joining the "start_node" with other nodes.
 
@@ -351,17 +394,18 @@ class NodeEvaluatorForLinkableInstances:
 
         data_set_linkable_specs = candidate_spec_set.linkable_specs
 
-        # These are linkable specs in the same data set as the measure. Those are considered "local".
-        local_linkable_specs = []
+        # These are linkable specs in the start node data set. Those are considered "local".
+        local_linkable_specs: List[LinkableInstanceSpec] = []
 
         # These are linkable specs that aren't in the data set, but they might be able to be joined in.
-        possibly_joinable_linkable_specs = []
+        possibly_joinable_linkable_specs: List[LinkableInstanceSpec] = []
 
         # Group required_linkable_specs into local / un-joinable / or possibly joinable.
         unjoinable_linkable_specs = []
         for required_linkable_spec in required_linkable_specs:
+            is_metric_time = required_linkable_spec.element_name == DataSet.metric_time_dimension_name()
             is_local = required_linkable_spec in data_set_linkable_specs
-            is_unjoinable = (
+            is_unjoinable = not is_metric_time and (
                 len(required_linkable_spec.entity_links) == 0
                 or LinklessEntitySpec.from_reference(required_linkable_spec.entity_links[0])
                 not in data_set_linkable_specs
@@ -376,7 +420,8 @@ class NodeEvaluatorForLinkableInstances:
         candidates_for_join = self._find_joinable_candidate_nodes_that_can_satisfy_linkable_specs(
             start_node_instance_set=candidate_instance_set,
             needed_linkable_specs=possibly_joinable_linkable_specs,
-            join_type=default_join_type,
+            default_join_type=default_join_type,
+            time_spine_source_node=time_spine_source_node,
         )
         join_candidates: List[JoinLinkableInstancesRecipe] = []
 

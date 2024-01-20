@@ -1,0 +1,23 @@
+<DataflowPlan>
+    <WriteToResultDataframeNode>
+        <!-- description = Write to Dataframe -->
+        <!-- node_id = wrd_0 -->
+        <FilterElementsNode>
+            <!-- description = Pass Only Elements: ['metric_time__quarter',] -->
+            <!-- node_id = pfe_0 -->
+            <!-- include_spec =                                                             -->
+            <!--   TimeDimensionSpec(element_name='metric_time', time_granularity=QUARTER)  -->
+            <!-- distinct = True -->
+            <MetricTimeDimensionTransformNode>
+                <!-- description = Metric Time Dimension 'ds' -->
+                <!-- node_id = sma_10009 -->
+                <!-- aggregation_time_dimension = ds -->
+                <ReadSqlSourceNode>
+                    <!-- description = Read From SqlDataSet() -->
+                    <!-- node_id = rss_10024 -->
+                    <!-- data_set = SqlDataSet() -->
+                </ReadSqlSourceNode>
+            </MetricTimeDimensionTransformNode>
+        </FilterElementsNode>
+    </WriteToResultDataframeNode>
+</DataflowPlan>
