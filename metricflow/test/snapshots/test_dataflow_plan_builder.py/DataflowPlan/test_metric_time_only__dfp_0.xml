@@ -3,17 +3,10 @@
         <!-- description = Write to Dataframe -->
         <!-- node_id = wrd_0 -->
         <FilterElementsNode>
-            <!-- description =             -->
-            <!--   Pass Only Elements:     -->
-            <!--     ['metric_time__day']  -->
+            <!-- description = Pass Only Elements: ['metric_time__day',] -->
             <!-- node_id = pfe_0 -->
-            <!-- include_spec =                               -->
-            <!--   {'class': 'TimeDimensionSpec',             -->
-            <!--    'element_name': 'metric_time',            -->
-            <!--    'entity_links': (),                       -->
-            <!--    'time_granularity': TimeGranularity.DAY,  -->
-            <!--    'date_part': None,                        -->
-            <!--    'aggregation_state': None}                -->
+            <!-- include_spec =                                                         -->
+            <!--   TimeDimensionSpec(element_name='metric_time', time_granularity=DAY)  -->
             <!-- distinct = True -->
             <MetricTimeDimensionTransformNode>
                 <!-- description = Metric Time Dimension 'ds' -->
