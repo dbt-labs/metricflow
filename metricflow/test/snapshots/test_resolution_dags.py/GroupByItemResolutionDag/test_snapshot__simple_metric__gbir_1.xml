@@ -1,18 +1,18 @@
 <GroupByItemResolutionDag>
     <QueryGroupByItemResolutionNode>
-        <!-- description = Output the group-by items for query. -->
-        <!-- node_id = qr_1 -->
-        <!-- metrics_in_query = ['monthly_metric_0'] -->
-        <!-- where_filter = ["{{ TimeDimension('metric_time') }} > '2020-01-01'"] -->
+        <!-- description = 'Output the group-by items for query.' -->
+        <!-- node_id = NodeId(id_str='qr_1') -->
+        <!-- metrics_in_query = ['monthly_metric_0',] -->
+        <!-- where_filter = ["{{ TimeDimension('metric_time') }} > '2020-01-01'",] -->
         <MetricGroupByItemResolutionNode>
-            <!-- description = Output group-by-items available for this metric. -->
-            <!-- node_id = mtr_0 -->
-            <!-- metric_reference = MetricReference(element_name='monthly_metric_0') -->
+            <!-- description = 'Output group-by-items available for this metric.' -->
+            <!-- node_id = NodeId(id_str='mtr_0') -->
+            <!-- metric_reference = "MetricReference(element_name='monthly_metric_0')" -->
             <MeasureGroupByItemSourceNode>
-                <!-- description = Output group-by-items available for this measure. -->
-                <!-- node_id = msr_0 -->
-                <!-- measure_reference = MeasureReference(element_name='monthly_measure_0') -->
-                <!-- child_metric_reference = MetricReference(element_name='monthly_metric_0') -->
+                <!-- description = 'Output group-by-items available for this measure.' -->
+                <!-- node_id = NodeId(id_str='msr_0') -->
+                <!-- measure_reference = "MeasureReference(element_name='monthly_measure_0')" -->
+                <!-- child_metric_reference = "MetricReference(element_name='monthly_metric_0')" -->
             </MeasureGroupByItemSourceNode>
         </MetricGroupByItemResolutionNode>
     </QueryGroupByItemResolutionNode>

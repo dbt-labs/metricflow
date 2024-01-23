@@ -1,29 +1,29 @@
 <GroupByItemResolutionDag>
     <QueryGroupByItemResolutionNode>
-        <!-- description = Output the group-by items for query. -->
-        <!-- node_id = qr_3 -->
+        <!-- description = 'Output the group-by items for query.' -->
+        <!-- node_id = NodeId(id_str='qr_3') -->
         <!-- metrics_in_query = ['monthly_metric_0', 'yearly_metric_0'] -->
-        <!-- where_filter = ["{{ TimeDimension('metric_time') }} > '2020-01-01'"] -->
+        <!-- where_filter = ["{{ TimeDimension('metric_time') }} > '2020-01-01'",] -->
         <MetricGroupByItemResolutionNode>
-            <!-- description = Output group-by-items available for this metric. -->
-            <!-- node_id = mtr_3 -->
-            <!-- metric_reference = MetricReference(element_name='monthly_metric_0') -->
+            <!-- description = 'Output group-by-items available for this metric.' -->
+            <!-- node_id = NodeId(id_str='mtr_3') -->
+            <!-- metric_reference = "MetricReference(element_name='monthly_metric_0')" -->
             <MeasureGroupByItemSourceNode>
-                <!-- description = Output group-by-items available for this measure. -->
-                <!-- node_id = msr_3 -->
-                <!-- measure_reference = MeasureReference(element_name='monthly_measure_0') -->
-                <!-- child_metric_reference = MetricReference(element_name='monthly_metric_0') -->
+                <!-- description = 'Output group-by-items available for this measure.' -->
+                <!-- node_id = NodeId(id_str='msr_3') -->
+                <!-- measure_reference = "MeasureReference(element_name='monthly_measure_0')" -->
+                <!-- child_metric_reference = "MetricReference(element_name='monthly_metric_0')" -->
             </MeasureGroupByItemSourceNode>
         </MetricGroupByItemResolutionNode>
         <MetricGroupByItemResolutionNode>
-            <!-- description = Output group-by-items available for this metric. -->
-            <!-- node_id = mtr_4 -->
-            <!-- metric_reference = MetricReference(element_name='yearly_metric_0') -->
+            <!-- description = 'Output group-by-items available for this metric.' -->
+            <!-- node_id = NodeId(id_str='mtr_4') -->
+            <!-- metric_reference = "MetricReference(element_name='yearly_metric_0')" -->
             <MeasureGroupByItemSourceNode>
-                <!-- description = Output group-by-items available for this measure. -->
-                <!-- node_id = msr_4 -->
-                <!-- measure_reference = MeasureReference(element_name='yearly_measure_0') -->
-                <!-- child_metric_reference = MetricReference(element_name='yearly_metric_0') -->
+                <!-- description = 'Output group-by-items available for this measure.' -->
+                <!-- node_id = NodeId(id_str='msr_4') -->
+                <!-- measure_reference = "MeasureReference(element_name='yearly_measure_0')" -->
+                <!-- child_metric_reference = "MetricReference(element_name='yearly_metric_0')" -->
             </MeasureGroupByItemSourceNode>
         </MetricGroupByItemResolutionNode>
     </QueryGroupByItemResolutionNode>
