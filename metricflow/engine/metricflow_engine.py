@@ -683,6 +683,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         group_by: Optional[GroupByParameter] = None,
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
+        min_max_only: bool = False,
     ) -> MetricFlowExplainResult:
         assert not (
             get_group_by_values and group_by
@@ -695,6 +696,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 group_by=(group_by,) if group_by else None,
                 time_constraint_start=time_constraint_start,
                 time_constraint_end=time_constraint_end,
+                min_max_only=min_max_only,
                 query_type=MetricFlowQueryType.DIMENSION_VALUES,
             )
         )
