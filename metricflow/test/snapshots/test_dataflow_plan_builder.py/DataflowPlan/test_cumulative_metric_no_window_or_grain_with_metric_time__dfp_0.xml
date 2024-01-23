@@ -1,36 +1,31 @@
 <DataflowPlan>
     <WriteToResultDataframeNode>
-        <!-- description = Write to Dataframe -->
-        <!-- node_id = wrd_0 -->
+        <!-- description = 'Write to Dataframe' -->
+        <!-- node_id = NodeId(id_str='wrd_0') -->
         <ComputeMetricsNode>
-            <!-- description = Compute Metrics via Expressions -->
-            <!-- node_id = cm_0 -->
-            <!-- metric_spec =                                  -->
-            <!--   MetricSpec(element_name='revenue_all_time')  -->
+            <!-- description = 'Compute Metrics via Expressions' -->
+            <!-- node_id = NodeId(id_str='cm_0') -->
+            <!-- metric_spec = MetricSpec(element_name='revenue_all_time') -->
             <AggregateMeasuresNode>
-                <!-- description = Aggregate Measures -->
-                <!-- node_id = am_0 -->
+                <!-- description = 'Aggregate Measures' -->
+                <!-- node_id = NodeId(id_str='am_0') -->
                 <FilterElementsNode>
-                    <!-- description = Pass Only Elements: ['txn_revenue', 'metric_time__quarter'] -->
-                    <!-- node_id = pfe_0 -->
-                    <!-- include_spec =                             -->
-                    <!--   MeasureSpec(element_name='txn_revenue')  -->
-                    <!-- include_spec =                                                             -->
-                    <!--   TimeDimensionSpec(element_name='metric_time', time_granularity=QUARTER)  -->
+                    <!-- description = "Pass Only Elements: ['txn_revenue', 'metric_time__quarter']" -->
+                    <!-- node_id = NodeId(id_str='pfe_0') -->
+                    <!-- include_spec = MeasureSpec(element_name='txn_revenue') -->
+                    <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=QUARTER) -->
                     <!-- distinct = False -->
                     <JoinOverTimeRangeNode>
-                        <!-- description = Join Self Over Time Range -->
-                        <!-- node_id = jotr_0 -->
+                        <!-- description = 'Join Self Over Time Range' -->
+                        <!-- node_id = NodeId(id_str='jotr_0') -->
                         <MetricTimeDimensionTransformNode>
-                            <!-- description = Metric Time Dimension 'ds' -->
-                            <!-- node_id = sma_10006 -->
-                            <!-- aggregation_time_dimension = ds -->
+                            <!-- description = "Metric Time Dimension 'ds'" -->
+                            <!-- node_id = NodeId(id_str='sma_10006') -->
+                            <!-- aggregation_time_dimension = 'ds' -->
                             <ReadSqlSourceNode>
-                                <!-- description =                                                                              -->
-                                <!--   "Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='revenue'))"  -->
-                                <!-- node_id = rss_10019 -->
-                                <!-- data_set =                                                                     -->
-                                <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='revenue'))  -->
+                                <!-- description = "Read From SemanticModelDataSet('revenue')" -->
+                                <!-- node_id = NodeId(id_str='rss_10019') -->
+                                <!-- data_set = SemanticModelDataSet('revenue') -->
                             </ReadSqlSourceNode>
                         </MetricTimeDimensionTransformNode>
                     </JoinOverTimeRangeNode>

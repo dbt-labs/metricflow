@@ -1,1 +1,0 @@
-"GroupByItemResolution(spec=TimeDimensionSpec(element_name='metric_time', time_granularity=DAY))"

@@ -1,54 +1,49 @@
 <DataflowPlan>
     <WriteToResultDataframeNode>
-        <!-- description = Write to Dataframe -->
-        <!-- node_id = wrd_0 -->
+        <!-- description = 'Write to Dataframe' -->
+        <!-- node_id = NodeId(id_str='wrd_0') -->
         <ComputeMetricsNode>
-            <!-- description = Compute Metrics via Expressions -->
-            <!-- node_id = cm_1 -->
-            <!-- metric_spec =                                                 -->
-            <!--   MetricSpec(element_name='every_2_days_bookers_2_days_ago')  -->
+            <!-- description = 'Compute Metrics via Expressions' -->
+            <!-- node_id = NodeId(id_str='cm_1') -->
+            <!-- metric_spec = MetricSpec(element_name='every_2_days_bookers_2_days_ago') -->
             <ComputeMetricsNode>
-                <!-- description = Compute Metrics via Expressions -->
-                <!-- node_id = cm_0 -->
-                <!-- metric_spec =                                                          -->
-                <!--   MetricSpec(                                                          -->
-                <!--     element_name='every_two_days_bookers',                             -->
-                <!--     alias='every_2_days_bookers_2_days_ago',                           -->
-                <!--     offset_window=PydanticMetricTimeWindow(count=2, granularity=DAY),  -->
-                <!--   )                                                                    -->
+                <!-- description = 'Compute Metrics via Expressions' -->
+                <!-- node_id = NodeId(id_str='cm_0') -->
+                <!-- metric_spec =                                                         -->
+                <!--   MetricSpec(                                                         -->
+                <!--     element_name='every_two_days_bookers',                            -->
+                <!--     alias='every_2_days_bookers_2_days_ago',                          -->
+                <!--     offset_window=PydanticMetricTimeWindow(count=2, granularity=DAY), -->
+                <!--   )                                                                   -->
                 <AggregateMeasuresNode>
-                    <!-- description = Aggregate Measures -->
-                    <!-- node_id = am_0 -->
+                    <!-- description = 'Aggregate Measures' -->
+                    <!-- node_id = NodeId(id_str='am_0') -->
                     <FilterElementsNode>
-                        <!-- description = Pass Only Elements: ['bookers', 'metric_time__day'] -->
-                        <!-- node_id = pfe_0 -->
-                        <!-- include_spec =                         -->
-                        <!--   MeasureSpec(element_name='bookers')  -->
-                        <!-- include_spec =                                                         -->
-                        <!--   TimeDimensionSpec(element_name='metric_time', time_granularity=DAY)  -->
+                        <!-- description = "Pass Only Elements: ['bookers', 'metric_time__day']" -->
+                        <!-- node_id = NodeId(id_str='pfe_0') -->
+                        <!-- include_spec = MeasureSpec(element_name='bookers') -->
+                        <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
                         <!-- distinct = False -->
                         <JoinToTimeSpineNode>
-                            <!-- description = Join to Time Spine Dataset -->
-                            <!-- node_id = jts_0 -->
-                            <!-- requested_metric_time_dimension_specs =                                   -->
-                            <!--   [TimeDimensionSpec(element_name='metric_time', time_granularity=DAY),]  -->
+                            <!-- description = 'Join to Time Spine Dataset' -->
+                            <!-- node_id = NodeId(id_str='jts_0') -->
+                            <!-- requested_metric_time_dimension_specs =                                  -->
+                            <!--   [TimeDimensionSpec(element_name='metric_time', time_granularity=DAY),] -->
                             <!-- time_range_constraint = None -->
-                            <!-- offset_window = count=2 granularity=TimeGranularity.DAY -->
+                            <!-- offset_window = PydanticMetricTimeWindow(count=2, granularity=DAY) -->
                             <!-- offset_to_grain = None -->
-                            <!-- join_type = SqlJoinType.INNER -->
+                            <!-- join_type = INNER -->
                             <JoinOverTimeRangeNode>
-                                <!-- description = Join Self Over Time Range -->
-                                <!-- node_id = jotr_0 -->
+                                <!-- description = 'Join Self Over Time Range' -->
+                                <!-- node_id = NodeId(id_str='jotr_0') -->
                                 <MetricTimeDimensionTransformNode>
-                                    <!-- description = Metric Time Dimension 'ds' -->
-                                    <!-- node_id = sma_10001 -->
-                                    <!-- aggregation_time_dimension = ds -->
+                                    <!-- description = "Metric Time Dimension 'ds'" -->
+                                    <!-- node_id = NodeId(id_str='sma_10001') -->
+                                    <!-- aggregation_time_dimension = 'ds' -->
                                     <ReadSqlSourceNode>
-                                        <!-- description =                                                                                      -->
-                                        <!--   "Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))"  -->
-                                        <!-- node_id = rss_10013 -->
-                                        <!-- data_set =                                                                             -->
-                                        <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))  -->
+                                        <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
+                                        <!-- node_id = NodeId(id_str='rss_10013') -->
+                                        <!-- data_set = SemanticModelDataSet('bookings_source') -->
                                     </ReadSqlSourceNode>
                                 </MetricTimeDimensionTransformNode>
                             </JoinOverTimeRangeNode>

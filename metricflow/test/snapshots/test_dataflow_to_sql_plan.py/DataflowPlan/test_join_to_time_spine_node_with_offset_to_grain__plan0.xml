@@ -1,44 +1,42 @@
 <DataflowPlan>
     <WriteToResultDataframeNode>
-        <!-- description = Write to Dataframe -->
-        <!-- node_id = wrd_0 -->
+        <!-- description = 'Write to Dataframe' -->
+        <!-- node_id = NodeId(id_str='wrd_0') -->
         <JoinToTimeSpineNode>
-            <!-- description = Join to Time Spine Dataset -->
-            <!-- node_id = jts_0 -->
-            <!-- requested_metric_time_dimension_specs =                                   -->
-            <!--   [TimeDimensionSpec(element_name='metric_time', time_granularity=DAY),]  -->
-            <!-- time_range_constraint = [2020-01-01T00:00:00, 2021-01-01T00:00:00] -->
+            <!-- description = 'Join to Time Spine Dataset' -->
+            <!-- node_id = NodeId(id_str='jts_0') -->
+            <!-- requested_metric_time_dimension_specs =                                  -->
+            <!--   [TimeDimensionSpec(element_name='metric_time', time_granularity=DAY),] -->
+            <!-- time_range_constraint =                             -->
+            <!--   TimeRangeConstraint(                              -->
+            <!--     start_time=datetime.datetime(2020, 1, 1, 0, 0), -->
+            <!--     end_time=datetime.datetime(2021, 1, 1, 0, 0),   -->
+            <!--   )                                                 -->
             <!-- offset_window = None -->
-            <!-- offset_to_grain = TimeGranularity.MONTH -->
-            <!-- join_type = SqlJoinType.INNER -->
+            <!-- offset_to_grain = MONTH -->
+            <!-- join_type = INNER -->
             <ComputeMetricsNode>
-                <!-- description = Compute Metrics via Expressions -->
-                <!-- node_id = cm_0 -->
-                <!-- metric_spec =                              -->
-                <!--   MetricSpec(element_name='booking_fees')  -->
+                <!-- description = 'Compute Metrics via Expressions' -->
+                <!-- node_id = NodeId(id_str='cm_0') -->
+                <!-- metric_spec = MetricSpec(element_name='booking_fees') -->
                 <AggregateMeasuresNode>
-                    <!-- description = Aggregate Measures -->
-                    <!-- node_id = am_0 -->
+                    <!-- description = 'Aggregate Measures' -->
+                    <!-- node_id = NodeId(id_str='am_0') -->
                     <FilterElementsNode>
-                        <!-- description =                                                             -->
-                        <!--   "Pass Only Elements: ['booking_value', 'metric_time__day', 'listing']"  -->
-                        <!-- node_id = pfe_0 -->
-                        <!-- include_spec =                               -->
-                        <!--   MeasureSpec(element_name='booking_value')  -->
-                        <!-- include_spec =                                                         -->
-                        <!--   TimeDimensionSpec(element_name='metric_time', time_granularity=DAY)  -->
-                        <!-- include_spec = LinklessEntitySpec(element_name='listing', entity_links=()) -->
+                        <!-- description = "Pass Only Elements: ['booking_value', 'metric_time__day', 'listing']" -->
+                        <!-- node_id = NodeId(id_str='pfe_0') -->
+                        <!-- include_spec = MeasureSpec(element_name='booking_value') -->
+                        <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
+                        <!-- include_spec = LinklessEntitySpec(element_name='listing') -->
                         <!-- distinct = False -->
                         <MetricTimeDimensionTransformNode>
-                            <!-- description = Metric Time Dimension 'ds' -->
-                            <!-- node_id = sma_0 -->
-                            <!-- aggregation_time_dimension = ds -->
+                            <!-- description = "Metric Time Dimension 'ds'" -->
+                            <!-- node_id = NodeId(id_str='sma_0') -->
+                            <!-- aggregation_time_dimension = 'ds' -->
                             <ReadSqlSourceNode>
-                                <!-- description =                                                                                      -->
-                                <!--   "Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))"  -->
-                                <!-- node_id = rss_10001 -->
-                                <!-- data_set =                                                                             -->
-                                <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='bookings_source'))  -->
+                                <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
+                                <!-- node_id = NodeId(id_str='rss_10001') -->
+                                <!-- data_set = SemanticModelDataSet('bookings_source') -->
                             </ReadSqlSourceNode>
                         </MetricTimeDimensionTransformNode>
                     </FilterElementsNode>

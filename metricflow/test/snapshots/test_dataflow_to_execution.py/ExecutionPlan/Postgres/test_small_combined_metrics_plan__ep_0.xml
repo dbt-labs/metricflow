@@ -1,47 +1,47 @@
 <ExecutionPlan>
     <SelectSqlQueryToDataFrameTask>
-        <!-- description = Run a query and write the results to a data frame -->
-        <!-- node_id = rsq_0 -->
-        <!-- sql_query =                                                                         -->
-        <!--   ('-- Combine Aggregated Outputs\n'                                                -->
-        <!--    'SELECT\n'                                                                       -->
-        <!--    '  COALESCE(subq_4.is_instant, subq_9.is_instant) AS is_instant\n'               -->
-        <!--    '  , MAX(subq_4.bookings) AS bookings\n'                                         -->
-        <!--    '  , MAX(subq_9.booking_value) AS booking_value\n'                               -->
-        <!--    'FROM (\n'                                                                       -->
-        <!--    '  -- Aggregate Measures\n'                                                      -->
-        <!--    '  -- Compute Metrics via Expressions\n'                                         -->
-        <!--    '  SELECT\n'                                                                     -->
-        <!--    '    is_instant\n'                                                               -->
-        <!--    '    , SUM(bookings) AS bookings\n'                                              -->
-        <!--    '  FROM (\n'                                                                     -->
-        <!--    "    -- Read Elements From Semantic Model 'bookings_source'\n"                   -->
-        <!--    "    -- Metric Time Dimension 'ds'\n"                                            -->
-        <!--    "    -- Pass Only Elements: ['bookings', 'is_instant']\n"                        -->
-        <!--    '    SELECT\n'                                                                   -->
-        <!--    '      is_instant\n'                                                             -->
-        <!--    '      , 1 AS bookings\n'                                                        -->
-        <!--    '    FROM ***************************.fct_bookings bookings_source_src_10001\n'  -->
-        <!--    '  ) subq_2\n'                                                                   -->
-        <!--    '  GROUP BY\n'                                                                   -->
-        <!--    '    is_instant\n'                                                               -->
-        <!--    ') subq_4\n'                                                                     -->
-        <!--    'FULL OUTER JOIN (\n'                                                            -->
-        <!--    "  -- Read Elements From Semantic Model 'bookings_source'\n"                     -->
-        <!--    "  -- Metric Time Dimension 'ds'\n"                                              -->
-        <!--    "  -- Pass Only Elements: ['booking_value', 'is_instant']\n"                     -->
-        <!--    '  -- Aggregate Measures\n'                                                      -->
-        <!--    '  -- Compute Metrics via Expressions\n'                                         -->
-        <!--    '  SELECT\n'                                                                     -->
-        <!--    '    is_instant\n'                                                               -->
-        <!--    '    , SUM(booking_value) AS booking_value\n'                                    -->
-        <!--    '  FROM ***************************.fct_bookings bookings_source_src_10001\n'    -->
-        <!--    '  GROUP BY\n'                                                                   -->
-        <!--    '    is_instant\n'                                                               -->
-        <!--    ') subq_9\n'                                                                     -->
-        <!--    'ON\n'                                                                           -->
-        <!--    '  subq_4.is_instant = subq_9.is_instant\n'                                      -->
-        <!--    'GROUP BY\n'                                                                     -->
-        <!--    '  COALESCE(subq_4.is_instant, subq_9.is_instant)')                              -->
+        <!-- description = 'Run a query and write the results to a data frame' -->
+        <!-- node_id = NodeId(id_str='rsq_0') -->
+        <!-- sql_query =                                                                        -->
+        <!--   ('-- Combine Aggregated Outputs\n'                                               -->
+        <!--    'SELECT\n'                                                                      -->
+        <!--    '  COALESCE(subq_4.is_instant, subq_9.is_instant) AS is_instant\n'              -->
+        <!--    '  , MAX(subq_4.bookings) AS bookings\n'                                        -->
+        <!--    '  , MAX(subq_9.booking_value) AS booking_value\n'                              -->
+        <!--    'FROM (\n'                                                                      -->
+        <!--    '  -- Aggregate Measures\n'                                                     -->
+        <!--    '  -- Compute Metrics via Expressions\n'                                        -->
+        <!--    '  SELECT\n'                                                                    -->
+        <!--    '    is_instant\n'                                                              -->
+        <!--    '    , SUM(bookings) AS bookings\n'                                             -->
+        <!--    '  FROM (\n'                                                                    -->
+        <!--    "    -- Read Elements From Semantic Model 'bookings_source'\n"                  -->
+        <!--    "    -- Metric Time Dimension 'ds'\n"                                           -->
+        <!--    "    -- Pass Only Elements: ['bookings', 'is_instant']\n"                       -->
+        <!--    '    SELECT\n'                                                                  -->
+        <!--    '      is_instant\n'                                                            -->
+        <!--    '      , 1 AS bookings\n'                                                       -->
+        <!--    '    FROM ***************************.fct_bookings bookings_source_src_10001\n' -->
+        <!--    '  ) subq_2\n'                                                                  -->
+        <!--    '  GROUP BY\n'                                                                  -->
+        <!--    '    is_instant\n'                                                              -->
+        <!--    ') subq_4\n'                                                                    -->
+        <!--    'FULL OUTER JOIN (\n'                                                           -->
+        <!--    "  -- Read Elements From Semantic Model 'bookings_source'\n"                    -->
+        <!--    "  -- Metric Time Dimension 'ds'\n"                                             -->
+        <!--    "  -- Pass Only Elements: ['booking_value', 'is_instant']\n"                    -->
+        <!--    '  -- Aggregate Measures\n'                                                     -->
+        <!--    '  -- Compute Metrics via Expressions\n'                                        -->
+        <!--    '  SELECT\n'                                                                    -->
+        <!--    '    is_instant\n'                                                              -->
+        <!--    '    , SUM(booking_value) AS booking_value\n'                                   -->
+        <!--    '  FROM ***************************.fct_bookings bookings_source_src_10001\n'   -->
+        <!--    '  GROUP BY\n'                                                                  -->
+        <!--    '    is_instant\n'                                                              -->
+        <!--    ') subq_9\n'                                                                    -->
+        <!--    'ON\n'                                                                          -->
+        <!--    '  subq_4.is_instant = subq_9.is_instant\n'                                     -->
+        <!--    'GROUP BY\n'                                                                    -->
+        <!--    '  COALESCE(subq_4.is_instant, subq_9.is_instant)')                             -->
     </SelectSqlQueryToDataFrameTask>
 </ExecutionPlan>
