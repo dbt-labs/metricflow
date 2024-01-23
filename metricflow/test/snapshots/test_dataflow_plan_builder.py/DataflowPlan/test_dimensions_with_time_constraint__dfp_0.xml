@@ -1,0 +1,53 @@
+<DataflowPlan>
+    <WriteToResultDataframeNode>
+        <!-- description = Write to Dataframe -->
+        <!-- node_id = wrd_0 -->
+        <FilterElementsNode>
+            <!-- description =                                                             -->
+            <!--   "Pass Only Elements: ['listing__is_lux_latest', 'metric_time__month']"  -->
+            <!-- node_id = pfe_2 -->
+            <!-- include_spec =                                                                                          -->
+            <!--   DimensionSpec(element_name='is_lux_latest', entity_links=(EntityReference(element_name='listing'),))  -->
+            <!-- include_spec =                                                           -->
+            <!--   TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH)  -->
+            <!-- distinct = True -->
+            <ConstrainTimeRangeNode>
+                <!-- description =                                                           -->
+                <!--   'Constrain Time Range to [2020-01-01T00:00:00, 2020-01-03T00:00:00]'  -->
+                <!-- node_id = ctr_1 -->
+                <!-- time_range_start = 2020-01-01T00:00:00 -->
+                <!-- time_range_end = 2020-01-03T00:00:00 -->
+                <JoinToBaseOutputNode>
+                    <!-- description = Join Standard Outputs -->
+                    <!-- node_id = jso_0 -->
+                    <!-- join0_for_node_id_pfe_1 =                                                             -->
+                    <!--   JoinDescription(join_node=FilterElementsNode(node_id=pfe_1), join_type=CROSS_JOIN)  -->
+                    <ReadSqlSourceNode>
+                        <!-- description =                                                                                      -->
+                        <!--   "Read From SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))"  -->
+                        <!-- node_id = rss_10005 -->
+                        <!-- data_set =                                                                             -->
+                        <!--   SemanticModelDataSet(SemanticModelReference(semantic_model_name='listings_latest'))  -->
+                    </ReadSqlSourceNode>
+                    <FilterElementsNode>
+                        <!-- description = Pass Only Elements: ['metric_time__month',] -->
+                        <!-- node_id = pfe_1 -->
+                        <!-- include_spec =                                                           -->
+                        <!--   TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH)  -->
+                        <!-- distinct = False -->
+                        <MetricTimeDimensionTransformNode>
+                            <!-- description = Metric Time Dimension 'ds' -->
+                            <!-- node_id = sma_10009 -->
+                            <!-- aggregation_time_dimension = ds -->
+                            <ReadSqlSourceNode>
+                                <!-- description = Read From SqlDataSet() -->
+                                <!-- node_id = rss_10024 -->
+                                <!-- data_set = SqlDataSet() -->
+                            </ReadSqlSourceNode>
+                        </MetricTimeDimensionTransformNode>
+                    </FilterElementsNode>
+                </JoinToBaseOutputNode>
+            </ConstrainTimeRangeNode>
+        </FilterElementsNode>
+    </WriteToResultDataframeNode>
+</DataflowPlan>

@@ -22,8 +22,7 @@ FROM (
       FROM (
         -- Read Elements From Semantic Model 'bookings_source'
         -- Metric Time Dimension 'ds'
-        -- Pass Only Elements:
-        --   ['booking_value', 'metric_time__day']
+        -- Pass Only Elements: ['booking_value', 'metric_time__day']
         -- Aggregate Measures
         -- Compute Metrics via Expressions
         SELECT
@@ -45,8 +44,7 @@ FROM (
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
-      -- Pass Only Elements:
-      --   ['booking_value', 'metric_time__day']
+      -- Pass Only Elements: ['booking_value', 'metric_time__day']
       -- Aggregate Measures
       -- Compute Metrics via Expressions
       SELECT

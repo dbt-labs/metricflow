@@ -31,8 +31,7 @@ FROM (
             subq_2.metric_time__day
             , SUM(subq_2.referred_bookings) AS referred_bookings
           FROM (
-            -- Pass Only Elements:
-            --   ['referred_bookings', 'metric_time__day']
+            -- Pass Only Elements: ['referred_bookings', 'metric_time__day']
             SELECT
               subq_1.metric_time__day
               , subq_1.referred_bookings
@@ -247,8 +246,7 @@ FROM (
             subq_7.metric_time__day
             , SUM(subq_7.bookings) AS bookings
           FROM (
-            -- Pass Only Elements:
-            --   ['bookings', 'metric_time__day']
+            -- Pass Only Elements: ['bookings', 'metric_time__day']
             SELECT
               subq_6.metric_time__day
               , subq_6.bookings
@@ -469,8 +467,7 @@ FROM (
         subq_14.metric_time__day
         , SUM(subq_14.instant_bookings) AS instant_bookings
       FROM (
-        -- Pass Only Elements:
-        --   ['instant_bookings', 'metric_time__day']
+        -- Pass Only Elements: ['instant_bookings', 'metric_time__day']
         SELECT
           subq_13.metric_time__day
           , subq_13.instant_bookings
@@ -687,8 +684,7 @@ FROM (
         subq_19.metric_time__day
         , SUM(subq_19.bookings) AS bookings
       FROM (
-        -- Pass Only Elements:
-        --   ['bookings', 'metric_time__day']
+        -- Pass Only Elements: ['bookings', 'metric_time__day']
         SELECT
           subq_18.metric_time__day
           , subq_18.bookings

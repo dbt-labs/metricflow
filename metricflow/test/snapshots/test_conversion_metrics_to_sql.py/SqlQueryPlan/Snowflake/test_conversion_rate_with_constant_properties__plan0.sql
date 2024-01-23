@@ -17,8 +17,7 @@ FROM (
       , subq_2.visit__referrer_id
       , SUM(subq_2.visits) AS visits
     FROM (
-      -- Pass Only Elements:
-      --   ['visits', 'visit__referrer_id', 'metric_time__day']
+      -- Pass Only Elements: ['visits', 'visit__referrer_id', 'metric_time__day']
       SELECT
         subq_1.metric_time__day
         , subq_1.visit__referrer_id
@@ -115,8 +114,7 @@ FROM (
       , subq_12.visit__referrer_id
       , SUM(subq_12.buys) AS buys
     FROM (
-      -- Pass Only Elements:
-      --   ['buys', 'visit__referrer_id', 'metric_time__day']
+      -- Pass Only Elements: ['buys', 'visit__referrer_id', 'metric_time__day']
       SELECT
         subq_11.metric_time__day
         , subq_11.visit__referrer_id
@@ -143,13 +141,7 @@ FROM (
             , subq_9.mf_internal_uuid AS mf_internal_uuid
             , subq_9.buys AS buys
           FROM (
-            -- Pass Only Elements:
-            --   ['visits',
-            --    'visit__referrer_id',
-            --    'ds__day',
-            --    'metric_time__day',
-            --    'user',
-            --    'session']
+            -- Pass Only Elements: ['visits', 'visit__referrer_id', 'ds__day', 'metric_time__day', 'user', 'session']
             SELECT
               subq_5.ds__day
               , subq_5.metric_time__day

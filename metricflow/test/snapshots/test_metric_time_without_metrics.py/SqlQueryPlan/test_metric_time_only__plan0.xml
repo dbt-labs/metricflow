@@ -1,0 +1,98 @@
+<SqlQueryPlan>
+    <SqlSelectStatementNode>
+        <!-- description = Pass Only Elements: ['metric_time__day',] -->
+        <!-- node_id = ss_2 -->
+        <!-- col0 =                                                                                                -->
+        <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_44), column_alias='metric_time__day')  -->
+        <!-- from_source = SqlSelectStatementNode(node_id=ss_1) -->
+        <!-- group_by0 =                                                                                           -->
+        <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_44), column_alias='metric_time__day')  -->
+        <!-- where = None -->
+        <!-- distinct = False -->
+        <SqlSelectStatementNode>
+            <!-- description = Metric Time Dimension 'ds' -->
+            <!-- node_id = ss_1 -->
+            <!-- col0 =                                                                                       -->
+            <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_22), column_alias='ds__day')  -->
+            <!-- col1 =                                                                                        -->
+            <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_23), column_alias='ds__week')  -->
+            <!-- col2 =                                                                                         -->
+            <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_24), column_alias='ds__month')  -->
+            <!-- col3 =                                                                                           -->
+            <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_25), column_alias='ds__quarter')  -->
+            <!-- col4 =                                                                                        -->
+            <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_26), column_alias='ds__year')  -->
+            <!-- col5 =                                                                                                -->
+            <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_27), column_alias='ds__extract_year')  -->
+            <!-- col6 =                                                                                                   -->
+            <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28), column_alias='ds__extract_quarter')  -->
+            <!-- col7 =                                                                                                 -->
+            <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_29), column_alias='ds__extract_month')  -->
+            <!-- col8 =                                                                                               -->
+            <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_30), column_alias='ds__extract_day')  -->
+            <!-- col9 =                                                                                               -->
+            <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_31), column_alias='ds__extract_dow')  -->
+            <!-- col10 =                                                                                              -->
+            <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_32), column_alias='ds__extract_doy')  -->
+            <!-- col11 =                                                                                               -->
+            <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_33), column_alias='metric_time__day')  -->
+            <!-- col12 =                                                                                                -->
+            <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_34), column_alias='metric_time__week')  -->
+            <!-- col13 =                                                                                                 -->
+            <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_35), column_alias='metric_time__month')  -->
+            <!-- col14 =                                                                                                   -->
+            <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_36), column_alias='metric_time__quarter')  -->
+            <!-- col15 =                                                                                                -->
+            <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_37), column_alias='metric_time__year')  -->
+            <!-- col16 =                                                                                                        -->
+            <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_38), column_alias='metric_time__extract_year')  -->
+            <!-- col17 =                                                                                                           -->
+            <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_39), column_alias='metric_time__extract_quarter')  -->
+            <!-- col18 =                                                                                                         -->
+            <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_40), column_alias='metric_time__extract_month')  -->
+            <!-- col19 =                                                                                                       -->
+            <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_41), column_alias='metric_time__extract_day')  -->
+            <!-- col20 =                                                                                                       -->
+            <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_42), column_alias='metric_time__extract_dow')  -->
+            <!-- col21 =                                                                                                       -->
+            <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_43), column_alias='metric_time__extract_doy')  -->
+            <!-- from_source = SqlSelectStatementNode(node_id=ss_10031) -->
+            <!-- where = None -->
+            <!-- distinct = False -->
+            <SqlSelectStatementNode>
+                <!-- description = Time Spine -->
+                <!-- node_id = ss_10031 -->
+                <!-- col0 =                                                                                    -->
+                <!--   SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_10360), column_alias='ds__day')  -->
+                <!-- col1 =                                                                                     -->
+                <!--   SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_10361), column_alias='ds__week')  -->
+                <!-- col2 =                                                                                      -->
+                <!--   SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_10362), column_alias='ds__month')  -->
+                <!-- col3 =                                                                                        -->
+                <!--   SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_10363), column_alias='ds__quarter')  -->
+                <!-- col4 =                                                                                     -->
+                <!--   SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_10364), column_alias='ds__year')  -->
+                <!-- col5 =                                                                                           -->
+                <!--   SqlSelectColumn(expr=SqlExtractExpression(node_id=ex_10446), column_alias='ds__extract_year')  -->
+                <!-- col6 =                                                                                              -->
+                <!--   SqlSelectColumn(expr=SqlExtractExpression(node_id=ex_10447), column_alias='ds__extract_quarter')  -->
+                <!-- col7 =                                                                                            -->
+                <!--   SqlSelectColumn(expr=SqlExtractExpression(node_id=ex_10448), column_alias='ds__extract_month')  -->
+                <!-- col8 =                                                                                          -->
+                <!--   SqlSelectColumn(expr=SqlExtractExpression(node_id=ex_10449), column_alias='ds__extract_day')  -->
+                <!-- col9 =                                                                                          -->
+                <!--   SqlSelectColumn(expr=SqlExtractExpression(node_id=ex_10450), column_alias='ds__extract_dow')  -->
+                <!-- col10 =                                                                                         -->
+                <!--   SqlSelectColumn(expr=SqlExtractExpression(node_id=ex_10451), column_alias='ds__extract_doy')  -->
+                <!-- from_source = SqlTableFromClauseNode(node_id=tfc_10031) -->
+                <!-- where = None -->
+                <!-- distinct = False -->
+                <SqlTableFromClauseNode>
+                    <!-- description = Read from ***************************.mf_time_spine -->
+                    <!-- node_id = tfc_10031 -->
+                    <!-- table_id = ***************************.mf_time_spine -->
+                </SqlTableFromClauseNode>
+            </SqlSelectStatementNode>
+        </SqlSelectStatementNode>
+    </SqlSelectStatementNode>
+</SqlQueryPlan>

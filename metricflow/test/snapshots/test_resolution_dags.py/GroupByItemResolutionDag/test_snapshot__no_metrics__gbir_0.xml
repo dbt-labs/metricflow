@@ -3,8 +3,8 @@
         <!-- description = Output the group-by items for query. -->
         <!-- node_id = qr_0 -->
         <NoMetricsGroupByItemSourceNode>
-            <!-- description =                                                           -->
-            <!--   Output the available group-by-items for a query without any metrics.  -->
+            <!-- description =                                                             -->
+            <!--   'Output the available group-by-items for a query without any metrics.'  -->
             <!-- node_id = vr_0 -->
         </NoMetricsGroupByItemSourceNode>
     </QueryGroupByItemResolutionNode>

@@ -4,7 +4,7 @@ SELECT
   , subq_4.listing AS listing
   , subq_4.booking_fees AS booking_fees
 FROM (
-  -- Date Spine
+  -- Time Spine
   SELECT
     subq_6.ds AS metric_time__day
   FROM ***************************.mf_time_spine subq_6
@@ -23,8 +23,7 @@ INNER JOIN (
       , subq_2.listing
       , SUM(subq_2.booking_value) AS booking_value
     FROM (
-      -- Pass Only Elements:
-      --   ['booking_value', 'metric_time__day', 'listing']
+      -- Pass Only Elements: ['booking_value', 'metric_time__day', 'listing']
       SELECT
         subq_1.metric_time__day
         , subq_1.listing

@@ -9,7 +9,6 @@ from dbt_semantic_interfaces.implementations.filters.where_filter import (
     PydanticWhereFilter,
     PydanticWhereFilterIntersection,
 )
-from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.protocols import SavedQuery
 from dbt_semantic_interfaces.protocols.where_filter import WhereFilter
 from dbt_semantic_interfaces.type_enums import TimeGranularity
@@ -140,7 +139,7 @@ class MetricFlowQueryParser:
             )
             raise InvalidQueryException(
                 f"Did not find saved query `{saved_query_parameter.name}` in known saved queries:\n"
-                f"{pformat_big_objects(known_saved_query_names)}"
+                f"{mf_pformat(known_saved_query_names)}"
             )
 
         return matching_saved_queries[0]
@@ -489,10 +488,7 @@ class MetricFlowQueryParser:
 
         query_spec = query_resolution.checked_query_spec
         assert query_resolution.resolution_dag is not None
-        # Can't compute the grain of metric_time if there are no metrics.
-        if (time_constraint_start is not None or time_constraint_end is not None) and len(
-            resolver_inputs_for_metrics
-        ) > 0:
+        if time_constraint_start is not None or time_constraint_end is not None:
             if time_constraint_start is None:
                 time_constraint_start = TimeRangeConstraint.ALL_TIME_BEGIN()
                 logger.info(f"time_constraint_start was None, so it was set to {time_constraint_start}")

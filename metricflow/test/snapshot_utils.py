@@ -9,7 +9,6 @@ from typing import Any, Callable, List, Optional, Tuple, TypeVar
 
 import tabulate
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 
 from metricflow.dag.mf_dag import MetricFlowDag
 from metricflow.dataflow.dataflow_plan import DataflowPlan
@@ -19,7 +18,7 @@ from metricflow.execution.execution_plan_to_text import execution_plan_to_text
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantics.linkable_spec_resolver import LinkableElementSet
 from metricflow.naming.object_builder_scheme import ObjectBuilderNamingScheme
-from metricflow.protocols.sql_client import SqlClient
+from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.specs.specs import InstanceSpecSet, LinkableSpecSet
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState, check_sql_engine_snapshot_marker
 
@@ -29,6 +28,9 @@ logger = logging.getLogger(__name__)
 # In plan outputs, replace strings that vary from run to run with this so that comparisons can be made
 # consistently.
 PLACEHOLDER_CHAR_FOR_INCOMPARABLE_STRINGS = "*"
+
+# Needed as the table alias can vary from run to run.
+_EXCLUDE_TABLE_ALIAS_REGEX = "^.*_src.*$"
 
 
 def make_schema_replacement_function(system_schema: str, source_schema: str) -> Callable[[str], str]:
@@ -283,9 +285,57 @@ def assert_object_snapshot_equal(  # type: ignore[misc]
         mf_test_session_state=mf_test_session_state,
         group_id=obj.__class__.__name__,
         snapshot_id=obj_id,
-        snapshot_text=pformat_big_objects(obj),
+        snapshot_text=mf_pformat(obj),
         snapshot_file_extension=".txt",
         additional_sub_directories_for_snapshots=(sql_client.sql_engine_type.value,) if sql_client else (),
+    )
+
+
+def assert_sql_snapshot_equal(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    snapshot_id: str,
+    sql: str,
+    sql_engine: Optional[SqlEngine] = None,
+) -> None:
+    """For tests that generate SQL, use this to write / check snapshots."""
+    if sql_engine is not None:
+        check_sql_engine_snapshot_marker(request)
+
+    assert_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        group_id=sql.__class__.__name__,
+        snapshot_id=snapshot_id,
+        snapshot_text=sql,
+        snapshot_file_extension=".sql",
+        incomparable_strings_replacement_function=make_schema_replacement_function(
+            system_schema=mf_test_session_state.mf_system_schema, source_schema=mf_test_session_state.mf_source_schema
+        ),
+        exclude_line_regex=_EXCLUDE_TABLE_ALIAS_REGEX,
+        additional_sub_directories_for_snapshots=(sql_engine.value,) if sql_engine is not None else (),
+    )
+
+
+def assert_str_snapshot_equal(  # type: ignore[misc]
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    snapshot_id: str,
+    snapshot_str: str,
+    sql_engine: Optional[SqlEngine] = None,
+) -> None:
+    """Write / compare a string snapshot."""
+    if sql_engine is not None:
+        check_sql_engine_snapshot_marker(request)
+
+    assert_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        group_id=snapshot_str.__class__.__name__,
+        snapshot_id=snapshot_id,
+        snapshot_text=snapshot_str,
+        snapshot_file_extension=".txt",
+        additional_sub_directories_for_snapshots=(sql_engine.value,) if sql_engine is not None else (),
     )
 
 
@@ -302,7 +352,9 @@ def assert_linkable_element_set_snapshot_equal(  # noqa: D
             rows.append(
                 (
                     # Checking a limited set of fields as the result is large due to the paths in the object.
-                    linkable_dimension.semantic_model_origin.semantic_model_name,
+                    linkable_dimension.semantic_model_origin.semantic_model_name
+                    if linkable_dimension.semantic_model_origin
+                    else None,
                     tuple(entity_link.element_name for entity_link in linkable_dimension.entity_links),
                     linkable_dimension.element_name,
                     linkable_dimension.time_granularity.name if linkable_dimension.time_granularity is not None else "",

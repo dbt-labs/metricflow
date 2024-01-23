@@ -4,15 +4,14 @@ SELECT
   , bookings_last_month AS bookings_last_month
 FROM (
   -- Join to Time Spine Dataset
-  -- Pass Only Elements:
-  --   ['bookings_monthly', 'metric_time__month']
+  -- Pass Only Elements: ['bookings_monthly', 'metric_time__month']
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
     subq_10.metric_time__month AS metric_time__month
     , SUM(bookings_monthly_source_src_10026.bookings_monthly) AS bookings_last_month
   FROM (
-    -- Date Spine
+    -- Time Spine
     SELECT
       DATE_TRUNC('month', ds) AS metric_time__month
     FROM ***************************.mf_time_spine subq_11

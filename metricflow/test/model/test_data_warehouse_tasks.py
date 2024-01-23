@@ -23,7 +23,9 @@ from metricflow.model.data_warehouse_model_validator import (
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
-from metricflow.test.snapshot_utils import assert_snapshot_text_equal, make_schema_replacement_function
+from metricflow.test.snapshot_utils import (
+    assert_sql_snapshot_equal,
+)
 
 
 @pytest.fixture(scope="session")
@@ -199,8 +201,8 @@ def test_validate_measures(  # noqa: D
     model.semantic_models[0].measures = measures
 
     issues = dw_validator.validate_measures(model)
-    # One isssue is created for the short circuit query failure, and another is
-    # created for the sub task checking the specific measure
+    # One issue is created for the short circuit query failure, and another is
+    # created for the subtask checking the specific measure
     assert len(issues.all_issues) == 2
 
 
@@ -217,17 +219,13 @@ def test_build_metric_tasks(  # noqa: D
     )
     assert len(tasks) == 1
     (query_string, _params) = tasks[0].query_and_params_callable()
-    assert_snapshot_text_equal(
+
+    assert_sql_snapshot_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        group_id="data_warehouse_validation_manifest",
         snapshot_id="query0",
-        snapshot_text=query_string,
-        snapshot_file_extension=".sql",
-        incomparable_strings_replacement_function=make_schema_replacement_function(
-            system_schema=mf_test_session_state.mf_system_schema, source_schema=mf_test_session_state.mf_source_schema
-        ),
-        additional_sub_directories_for_snapshots=(sql_client.sql_engine_type.value,),
+        sql=query_string,
+        sql_engine=sql_client.sql_engine_type,
     )
 
 

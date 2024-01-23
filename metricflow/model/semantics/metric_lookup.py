@@ -1,31 +1,27 @@
 from __future__ import annotations
 
 import logging
-from typing import Dict, FrozenSet, Optional, Sequence, Set, Tuple
+from typing import Dict, FrozenSet, Optional, Sequence, Set
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols.metric import Metric, MetricInputMeasure, MetricType
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import (
-    EntityReference,
     MeasureReference,
     MetricReference,
-    TimeDimensionReference,
 )
 
 from metricflow.errors.errors import DuplicateMetricError, MetricNotFoundError, NonExistentMeasureError
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.linkable_spec_resolver import (
+    ElementPathKey,
     LinkableElementSet,
     ValidLinkableSpecResolver,
-    ElementPathKey,
 )
 from metricflow.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.protocols.semantics import MetricAccessor
-from metricflow.specs.specs import (
-    LinkableInstanceSpec,
-)
+from metricflow.specs.specs import LinkableInstanceSpec
 
 logger = logging.getLogger(__name__)
 

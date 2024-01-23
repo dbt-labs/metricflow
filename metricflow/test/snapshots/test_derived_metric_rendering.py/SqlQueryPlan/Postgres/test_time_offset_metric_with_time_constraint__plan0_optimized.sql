@@ -4,15 +4,14 @@ SELECT
   , bookings_5_days_ago AS bookings_5_day_lag
 FROM (
   -- Join to Time Spine Dataset
-  -- Pass Only Elements:
-  --   ['bookings', 'metric_time__day']
+  -- Pass Only Elements: ['bookings', 'metric_time__day']
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
     subq_10.metric_time__day AS metric_time__day
     , SUM(subq_9.bookings) AS bookings_5_days_ago
   FROM (
-    -- Date Spine
+    -- Time Spine
     SELECT
       ds AS metric_time__day
     FROM ***************************.mf_time_spine subq_11

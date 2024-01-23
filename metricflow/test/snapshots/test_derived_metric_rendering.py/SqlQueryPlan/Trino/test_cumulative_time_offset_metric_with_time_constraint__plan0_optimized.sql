@@ -4,8 +4,7 @@ SELECT
   , every_2_days_bookers_2_days_ago AS every_2_days_bookers_2_days_ago
 FROM (
   -- Join to Time Spine Dataset
-  -- Pass Only Elements:
-  --   ['bookers', 'metric_time__day']
+  -- Pass Only Elements: ['bookers', 'metric_time__day']
   -- Constrain Time Range to [2019-12-19T00:00:00, 2020-01-02T00:00:00]
   -- Aggregate Measures
   -- Compute Metrics via Expressions
@@ -13,7 +12,7 @@ FROM (
     subq_17.metric_time__day AS metric_time__day
     , COUNT(DISTINCT subq_16.bookers) AS every_2_days_bookers_2_days_ago
   FROM (
-    -- Date Spine
+    -- Time Spine
     SELECT
       ds AS metric_time__day
     FROM ***************************.mf_time_spine subq_18

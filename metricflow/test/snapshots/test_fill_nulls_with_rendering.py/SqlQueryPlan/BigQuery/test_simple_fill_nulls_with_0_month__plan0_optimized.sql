@@ -8,7 +8,7 @@ FROM (
     subq_11.metric_time__month AS metric_time__month
     , subq_10.bookings AS bookings
   FROM (
-    -- Date Spine
+    -- Time Spine
     SELECT
       DATE_TRUNC(ds, month) AS metric_time__month
     FROM ***************************.mf_time_spine subq_12
@@ -23,8 +23,7 @@ FROM (
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
-      -- Pass Only Elements:
-      --   ['bookings', 'metric_time__month']
+      -- Pass Only Elements: ['bookings', 'metric_time__month']
       SELECT
         DATE_TRUNC(ds, month) AS metric_time__month
         , 1 AS bookings

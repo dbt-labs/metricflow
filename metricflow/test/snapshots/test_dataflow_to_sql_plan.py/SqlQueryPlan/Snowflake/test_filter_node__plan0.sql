@@ -1,5 +1,4 @@
--- Pass Only Elements:
---   ['bookings']
+-- Pass Only Elements: ['bookings',]
 SELECT
   subq_0.bookings
 FROM (

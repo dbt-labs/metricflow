@@ -6,8 +6,7 @@ FROM (
   SELECT
     SUM(subq_2.txn_revenue) AS txn_revenue
   FROM (
-    -- Pass Only Elements:
-    --   ['txn_revenue']
+    -- Pass Only Elements: ['txn_revenue',]
     SELECT
       subq_1.txn_revenue
     FROM (

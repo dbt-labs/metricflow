@@ -7,10 +7,9 @@ from metricflow.dataflow.sql_table import SqlTable
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.integration.conftest import IntegrationTestHelpers
-from metricflow.test.snapshot_utils import assert_snapshot_text_equal, make_schema_replacement_function
-
-# Needed as the table alias can vary from run to run.
-_EXCLUDE_TABLE_ALIAS_REGEX = "^.*_src.*$"
+from metricflow.test.snapshot_utils import (
+    assert_sql_snapshot_equal,
+)
 
 
 @pytest.mark.sql_engine_snapshot
@@ -24,18 +23,12 @@ def test_render_query(  # noqa: D
         )
     )
 
-    assert_snapshot_text_equal(
+    assert_sql_snapshot_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        group_id=result.__class__.__name__,
         snapshot_id="query0",
-        snapshot_text=result.rendered_sql.sql_query,
-        snapshot_file_extension=".sql",
-        incomparable_strings_replacement_function=make_schema_replacement_function(
-            system_schema=it_helpers.mf_system_schema, source_schema=it_helpers.source_schema
-        ),
-        exclude_line_regex=_EXCLUDE_TABLE_ALIAS_REGEX,
-        additional_sub_directories_for_snapshots=(it_helpers.sql_client.sql_engine_type.value,),
+        sql=result.rendered_sql.sql_query,
+        sql_engine=it_helpers.sql_client.sql_engine_type,
     )
 
 
@@ -51,16 +44,10 @@ def test_render_write_to_table_query(  # noqa: D
         )
     )
 
-    assert_snapshot_text_equal(
+    assert_sql_snapshot_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        group_id=result.__class__.__name__,
         snapshot_id="query0",
-        snapshot_text=result.rendered_sql.sql_query,
-        snapshot_file_extension=".sql",
-        incomparable_strings_replacement_function=make_schema_replacement_function(
-            system_schema=it_helpers.mf_system_schema, source_schema=it_helpers.source_schema
-        ),
-        exclude_line_regex=_EXCLUDE_TABLE_ALIAS_REGEX,
-        additional_sub_directories_for_snapshots=(it_helpers.sql_client.sql_engine_type.value,),
+        sql=result.rendered_sql.sql_query,
+        sql_engine=it_helpers.sql_client.sql_engine_type,
     )

@@ -10,8 +10,7 @@ FROM (
   FROM ***************************.mf_time_spine subq_18
   LEFT OUTER JOIN (
     -- Join Self Over Time Range
-    -- Pass Only Elements:
-    --   ['bookers', 'metric_time__day']
+    -- Pass Only Elements: ['bookers', 'metric_time__day']
     -- Aggregate Measures
     SELECT
       subq_13.ds AS metric_time__day

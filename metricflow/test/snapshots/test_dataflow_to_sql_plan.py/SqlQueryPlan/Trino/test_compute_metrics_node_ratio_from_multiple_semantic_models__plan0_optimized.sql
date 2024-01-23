@@ -12,8 +12,7 @@ FROM (
     , MAX(subq_40.views) AS views
   FROM (
     -- Join Standard Outputs
-    -- Pass Only Elements:
-    --   ['bookings', 'listing__country_latest', 'ds__day']
+    -- Pass Only Elements: ['bookings', 'listing__country_latest', 'ds__day']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
@@ -23,8 +22,7 @@ FROM (
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
-      -- Pass Only Elements:
-      --   ['bookings', 'ds__day', 'listing']
+      -- Pass Only Elements: ['bookings', 'ds__day', 'listing']
       SELECT
         DATE_TRUNC('day', ds) AS ds__day
         , listing_id AS listing
@@ -41,8 +39,7 @@ FROM (
   ) subq_30
   FULL OUTER JOIN (
     -- Join Standard Outputs
-    -- Pass Only Elements:
-    --   ['views', 'listing__country_latest', 'ds__day']
+    -- Pass Only Elements: ['views', 'listing__country_latest', 'ds__day']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
@@ -52,8 +49,7 @@ FROM (
     FROM (
       -- Read Elements From Semantic Model 'views_source'
       -- Metric Time Dimension 'ds'
-      -- Pass Only Elements:
-      --   ['views', 'ds__day', 'listing']
+      -- Pass Only Elements: ['views', 'ds__day', 'listing']
       SELECT
         DATE_TRUNC('day', ds) AS ds__day
         , listing_id AS listing

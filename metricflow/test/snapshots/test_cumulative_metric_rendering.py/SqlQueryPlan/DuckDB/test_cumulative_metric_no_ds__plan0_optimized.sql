@@ -1,7 +1,6 @@
 -- Read Elements From Semantic Model 'revenue'
 -- Metric Time Dimension 'ds'
--- Pass Only Elements:
---   ['txn_revenue']
+-- Pass Only Elements: ['txn_revenue',]
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT

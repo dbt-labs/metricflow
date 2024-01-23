@@ -5,8 +5,7 @@ SELECT
 FROM (
   -- Read Elements From Semantic Model 'visits_source'
   -- Metric Time Dimension 'ds'
-  -- Pass Only Elements:
-  --   ['visits']
+  -- Pass Only Elements: ['visits',]
   -- Aggregate Measures
   SELECT
     SUM(1) AS visits
@@ -14,8 +13,7 @@ FROM (
 ) subq_18
 CROSS JOIN (
   -- Find conversions for user within the range of 7 day
-  -- Pass Only Elements:
-  --   ['buys']
+  -- Pass Only Elements: ['buys',]
   -- Aggregate Measures
   SELECT
     SUM(buys) AS buys
@@ -30,8 +28,7 @@ CROSS JOIN (
     FROM (
       -- Read Elements From Semantic Model 'visits_source'
       -- Metric Time Dimension 'ds'
-      -- Pass Only Elements:
-      --   ['visits', 'ds__day', 'user']
+      -- Pass Only Elements: ['visits', 'ds__day', 'user']
       SELECT
         DATE_TRUNC('day', ds) AS ds__day
         , user_id AS user

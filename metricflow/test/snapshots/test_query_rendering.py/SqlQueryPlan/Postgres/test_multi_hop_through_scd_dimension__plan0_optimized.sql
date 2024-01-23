@@ -1,6 +1,5 @@
 -- Join Standard Outputs
--- Pass Only Elements:
---   ['bookings', 'listing__user__home_state_latest', 'metric_time__day']
+-- Pass Only Elements: ['bookings', 'listing__user__home_state_latest', 'metric_time__day']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
@@ -10,8 +9,7 @@ SELECT
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
-  -- Pass Only Elements:
-  --   ['bookings', 'metric_time__day', 'listing']
+  -- Pass Only Elements: ['bookings', 'metric_time__day', 'listing']
   SELECT
     DATE_TRUNC('day', ds) AS metric_time__day
     , listing_id AS listing
@@ -20,8 +18,7 @@ FROM (
 ) subq_13
 LEFT OUTER JOIN (
   -- Join Standard Outputs
-  -- Pass Only Elements:
-  --   ['user__home_state_latest', 'window_start__day', 'window_end__day', 'listing']
+  -- Pass Only Elements: ['user__home_state_latest', 'window_start__day', 'window_end__day', 'listing']
   SELECT
     listings_src_10019.active_from AS window_start__day
     , listings_src_10019.active_to AS window_end__day

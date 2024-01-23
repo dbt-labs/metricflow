@@ -6,8 +6,7 @@ SELECT
 FROM (
   -- Read Elements From Semantic Model 'listings_latest'
   -- Metric Time Dimension 'ds'
-  -- Pass Only Elements:
-  --   ['listings', 'listing__country_latest']
+  -- Pass Only Elements: ['listings', 'listing__country_latest']
   SELECT
     country AS listing__country_latest
     , 1 AS listings

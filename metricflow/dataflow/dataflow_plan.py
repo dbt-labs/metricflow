@@ -9,7 +9,6 @@ from dataclasses import dataclass
 from typing import Generic, List, Optional, Sequence, Tuple, Type, TypeVar, Union
 
 import jinja2
-from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.protocols.metric import MetricTimeWindow
 from dbt_semantic_interfaces.references import TimeDimensionReference
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
@@ -42,6 +41,7 @@ from metricflow.dataflow.builder.partitions import (
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.filters.time_constraint import TimeRangeConstraint
+from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.specs.specs import (
     ConstantPropertySpec,
     EntitySpec,
@@ -268,13 +268,17 @@ class JoinDescription:
     """Describes how data from a node should be joined to data from another node."""
 
     join_node: BaseOutput
-    join_on_entity: LinklessEntitySpec
+    join_on_entity: Optional[LinklessEntitySpec]
     join_type: SqlJoinType
 
     join_on_partition_dimensions: Tuple[PartitionDimensionJoinDescription, ...]
     join_on_partition_time_dimensions: Tuple[PartitionTimeDimensionJoinDescription, ...]
 
     validity_window: Optional[ValidityWindowJoinDescription] = None
+
+    def __post_init__(self) -> None:  # noqa: D
+        if self.join_on_entity is None and self.join_type != SqlJoinType.CROSS_JOIN:
+            raise RuntimeError("`join_on_entity` is required unless using CROSS JOIN.")
 
 
 class JoinToBaseOutputNode(BaseOutput):
@@ -1103,10 +1107,7 @@ class FilterElementsNode(BaseOutput):
         if self._replace_description:
             return self._replace_description
 
-        formatted_str = textwrap.indent(
-            pformat_big_objects([x.qualified_name for x in self._include_specs.all_specs]), prefix="  "
-        )
-        return f"Pass Only Elements:\n{formatted_str}"
+        return f"Pass Only Elements: {mf_pformat([x.qualified_name for x in self._include_specs.all_specs])}"
 
     @property
     def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D

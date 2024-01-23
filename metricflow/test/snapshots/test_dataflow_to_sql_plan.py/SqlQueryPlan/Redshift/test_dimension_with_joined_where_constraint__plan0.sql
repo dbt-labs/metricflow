@@ -1,5 +1,4 @@
--- Pass Only Elements:
---   ['user__home_state_latest']
+-- Pass Only Elements: ['user__home_state_latest',]
 SELECT
   subq_4.user__home_state_latest
 FROM (
@@ -184,8 +183,7 @@ FROM (
       FROM ***************************.dim_listings_latest listings_latest_src_10005
     ) subq_0
     FULL OUTER JOIN (
-      -- Pass Only Elements:
-      --   ['home_state_latest', 'user']
+      -- Pass Only Elements: ['home_state_latest', 'user']
       SELECT
         subq_1.user
         , subq_1.home_state_latest

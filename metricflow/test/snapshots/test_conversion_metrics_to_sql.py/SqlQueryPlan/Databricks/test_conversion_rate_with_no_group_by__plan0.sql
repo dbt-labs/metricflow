@@ -11,8 +11,7 @@ FROM (
     SELECT
       SUM(subq_2.visits) AS visits
     FROM (
-      -- Pass Only Elements:
-      --   ['visits']
+      -- Pass Only Elements: ['visits',]
       SELECT
         subq_1.visits
       FROM (
@@ -102,8 +101,7 @@ FROM (
     SELECT
       SUM(subq_12.buys) AS buys
     FROM (
-      -- Pass Only Elements:
-      --   ['buys']
+      -- Pass Only Elements: ['buys',]
       SELECT
         subq_11.buys
       FROM (
@@ -122,8 +120,7 @@ FROM (
             , subq_9.mf_internal_uuid AS mf_internal_uuid
             , subq_9.buys AS buys
           FROM (
-            -- Pass Only Elements:
-            --   ['visits', 'ds__day', 'user']
+            -- Pass Only Elements: ['visits', 'ds__day', 'user']
             SELECT
               subq_5.ds__day
               , subq_5.user

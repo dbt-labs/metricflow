@@ -1,6 +1,5 @@
 -- Join Standard Outputs
--- Pass Only Elements:
---   ['bookings', 'listing__lux_listing__is_confirmed_lux', 'metric_time__day']
+-- Pass Only Elements: ['bookings', 'listing__lux_listing__is_confirmed_lux', 'metric_time__day']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
@@ -10,8 +9,7 @@ SELECT
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
-  -- Pass Only Elements:
-  --   ['bookings', 'metric_time__day', 'listing']
+  -- Pass Only Elements: ['bookings', 'metric_time__day', 'listing']
   SELECT
     DATE_TRUNC('day', ds) AS metric_time__day
     , listing_id AS listing
@@ -20,11 +18,7 @@ FROM (
 ) subq_13
 LEFT OUTER JOIN (
   -- Join Standard Outputs
-  -- Pass Only Elements:
-  --   ['lux_listing__is_confirmed_lux',
-  --    'lux_listing__window_start__day',
-  --    'lux_listing__window_end__day',
-  --    'listing']
+  -- Pass Only Elements: ['lux_listing__is_confirmed_lux', 'lux_listing__window_start__day', 'lux_listing__window_end__day', 'listing']
   SELECT
     lux_listings_src_10021.valid_from AS lux_listing__window_start__day
     , lux_listings_src_10021.valid_to AS lux_listing__window_end__day

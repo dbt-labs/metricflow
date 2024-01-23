@@ -13,8 +13,7 @@ FROM (
       subq_5.metric_time__month
       , SUM(subq_5.bookings_monthly) AS bookings_monthly
     FROM (
-      -- Pass Only Elements:
-      --   ['bookings_monthly', 'metric_time__month']
+      -- Pass Only Elements: ['bookings_monthly', 'metric_time__month']
       SELECT
         subq_4.metric_time__month
         , subq_4.bookings_monthly
@@ -38,7 +37,7 @@ FROM (
           , subq_1.booking__listing AS booking__listing
           , subq_1.bookings_monthly AS bookings_monthly
         FROM (
-          -- Date Spine
+          -- Time Spine
           SELECT
             DATE_TRUNC(subq_3.ds, month) AS metric_time__month
           FROM ***************************.mf_time_spine subq_3

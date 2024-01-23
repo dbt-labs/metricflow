@@ -1,6 +1,5 @@
 -- Constrain Output with WHERE
--- Pass Only Elements:
---   ['bookings', 'booking__is_instant']
+-- Pass Only Elements: ['bookings', 'booking__is_instant']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
@@ -8,8 +7,7 @@ SELECT
   , SUM(bookings) AS bookings
 FROM (
   -- Join Standard Outputs
-  -- Pass Only Elements:
-  --   ['bookings', 'booking__is_instant', 'listing__country_latest']
+  -- Pass Only Elements: ['bookings', 'booking__is_instant', 'listing__country_latest']
   SELECT
     subq_13.booking__is_instant AS booking__is_instant
     , listings_latest_src_10005.country AS listing__country_latest
@@ -17,8 +15,7 @@ FROM (
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
-    -- Pass Only Elements:
-    --   ['bookings', 'booking__is_instant', 'listing']
+    -- Pass Only Elements: ['bookings', 'booking__is_instant', 'listing']
     SELECT
       listing_id AS listing
       , is_instant AS booking__is_instant

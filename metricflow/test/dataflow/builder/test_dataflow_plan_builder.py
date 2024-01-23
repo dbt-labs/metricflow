@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 import logging
 
 import pytest
@@ -11,6 +12,7 @@ from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilde
 from metricflow.dataflow.dataflow_plan_to_text import dataflow_plan_as_text
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
+from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
@@ -962,6 +964,110 @@ def test_min_max_only_time(
                 TimeDimensionSpec(element_name="paid_at", entity_links=(EntityReference("booking"),)),
             ),
             min_max_only=True,
+        )
+    )
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dag_graph=dataflow_plan,
+    )
+
+
+def test_metric_time_only(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
+        MetricFlowQuerySpec(time_dimension_specs=(MTD_SPEC_DAY,))
+    )
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dag_graph=dataflow_plan,
+    )
+
+
+def test_metric_time_quarter(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
+        MetricFlowQuerySpec(time_dimension_specs=(MTD_SPEC_QUARTER,))
+    )
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dag_graph=dataflow_plan,
+    )
+
+
+def test_metric_time_with_other_dimensions(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
+        MetricFlowQuerySpec(
+            time_dimension_specs=(MTD_SPEC_DAY, MTD_SPEC_MONTH),
+            dimension_specs=(
+                DimensionSpec(element_name="home_state_latest", entity_links=(EntityReference("user"),)),
+                DimensionSpec(element_name="is_lux_latest", entity_links=(EntityReference("listing"),)),
+            ),
+        )
+    )
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan_as_text(dataflow_plan),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dag_graph=dataflow_plan,
+    )
+
+
+def test_dimensions_with_time_constraint(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
+        MetricFlowQuerySpec(
+            time_dimension_specs=(MTD_SPEC_MONTH,),
+            dimension_specs=(DimensionSpec(element_name="is_lux_latest", entity_links=(EntityReference("listing"),)),),
+            time_range_constraint=TimeRangeConstraint(
+                start_time=datetime.datetime(2020, 1, 1), end_time=datetime.datetime(2020, 1, 3)
+            ),
         )
     )
 

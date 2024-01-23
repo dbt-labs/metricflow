@@ -1,6 +1,5 @@
 -- Constrain Output with WHERE
--- Pass Only Elements:
---   ['listing__country_latest']
+-- Pass Only Elements: ['listing__country_latest',]
 -- Order By ['listing__country_latest'] Limit 100
 SELECT
   listing__country_latest

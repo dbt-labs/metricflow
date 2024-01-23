@@ -10,8 +10,7 @@ FROM (
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
-    -- Pass Only Elements:
-    --   ['bookings', 'booking__is_instant']
+    -- Pass Only Elements: ['bookings', 'booking__is_instant']
     SELECT
       is_instant AS booking__is_instant
       , 1 AS bookings

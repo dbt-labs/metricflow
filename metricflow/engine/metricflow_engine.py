@@ -10,7 +10,6 @@ from typing import List, Optional, Sequence, Tuple
 import pandas as pd
 from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimensionTypeParams
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
-from dbt_semantic_interfaces.pretty_print import pformat_big_objects
 from dbt_semantic_interfaces.references import EntityReference, MeasureReference, MetricReference
 from dbt_semantic_interfaces.type_enums import DimensionType
 
@@ -32,6 +31,7 @@ from metricflow.execution.execution_plan_to_text import execution_plan_to_text
 from metricflow.execution.executor import SequentialPlanExecutor
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.mf_logging.formatting import indent
+from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.model.semantics.linkable_element_properties import (
     LinkableElementProperties,
@@ -349,10 +349,14 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         source_node_builder = SourceNodeBuilder(self._semantic_manifest_lookup)
         source_nodes = source_node_builder.create_from_data_sets(self._source_data_sets)
         read_nodes = source_node_builder.create_read_nodes_from_data_sets(self._source_data_sets)
+        time_spine_source_node = SourceNodeBuilder.build_time_spine_source_node(
+            time_spine_source=self._time_spine_source, data_set_converter=converter
+        )
 
         self._dataflow_plan_builder = DataflowPlanBuilder(
             source_nodes=source_nodes,
             read_nodes=read_nodes,
+            time_spine_source_node=time_spine_source_node,
             semantic_manifest_lookup=self._semantic_manifest_lookup,
         )
         self._to_sql_query_plan_converter = DataflowToSqlQueryPlanConverter(
@@ -372,7 +376,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def query(self, mf_request: MetricFlowQueryRequest) -> MetricFlowQueryResult:  # noqa: D
-        logger.info(f"Starting query request:\n" f"{indent(pformat_big_objects(mf_request))}")
+        logger.info(f"Starting query request:\n{indent(mf_pformat(mf_request))}")
         explain_result = self._create_execution_plan(mf_request)
         execution_plan = explain_result.execution_plan
 
@@ -439,7 +443,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 order_by=mf_query_request.order_by,
                 min_max_only=mf_query_request.min_max_only,
             )
-        logger.info(f"Query spec is:\n{pformat_big_objects(query_spec)}")
+        logger.info(f"Query spec is:\n{mf_pformat(query_spec)}")
 
         output_table: Optional[SqlTable] = None
         if mf_query_request.output_table is not None:
@@ -536,10 +540,6 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 # Simple dimensions shouldn't show date part items.
                 if linkable_dimension.date_part is not None:
                     continue
-                semantic_model = self._semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
-                    linkable_dimension.semantic_model_origin
-                )
-                assert semantic_model
 
                 if LinkableElementProperties.METRIC_TIME in linkable_dimension.properties:
                     metric_time_name = DataSet.metric_time_dimension_name()
@@ -570,6 +570,13 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                         )
                     )
                 else:
+                    assert (
+                        linkable_dimension.semantic_model_origin
+                    ), "Only metric_time can have no semantic_model_origin."
+                    semantic_model = self._semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
+                        linkable_dimension.semantic_model_origin
+                    )
+                    assert semantic_model
                     dimensions.append(
                         Dimension.from_pydantic(
                             pydantic_dimension=SemanticModelLookup.get_dimension_from_semantic_model(
@@ -676,6 +683,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         group_by: Optional[GroupByParameter] = None,
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
+        min_max_only: bool = False,
     ) -> MetricFlowExplainResult:
         assert not (
             get_group_by_values and group_by
@@ -688,6 +696,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 group_by=(group_by,) if group_by else None,
                 time_constraint_start=time_constraint_start,
                 time_constraint_end=time_constraint_end,
+                min_max_only=min_max_only,
                 query_type=MetricFlowQueryType.DIMENSION_VALUES,
             )
         )

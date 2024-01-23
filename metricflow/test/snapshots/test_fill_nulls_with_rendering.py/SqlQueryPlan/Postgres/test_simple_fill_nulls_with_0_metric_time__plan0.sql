@@ -8,7 +8,7 @@ FROM (
     subq_4.metric_time__day AS metric_time__day
     , subq_3.bookings AS bookings
   FROM (
-    -- Date Spine
+    -- Time Spine
     SELECT
       subq_5.ds AS metric_time__day
     FROM ***************************.mf_time_spine subq_5
@@ -19,8 +19,7 @@ FROM (
       subq_2.metric_time__day
       , SUM(subq_2.bookings) AS bookings
     FROM (
-      -- Pass Only Elements:
-      --   ['bookings', 'metric_time__day']
+      -- Pass Only Elements: ['bookings', 'metric_time__day']
       SELECT
         subq_1.metric_time__day
         , subq_1.bookings

@@ -24,8 +24,7 @@ FROM (
           subq_2.metric_time__day
           , subq_2.bookings
         FROM (
-          -- Pass Only Elements:
-          --   ['bookings', 'metric_time__day']
+          -- Pass Only Elements: ['bookings', 'metric_time__day']
           SELECT
             subq_1.metric_time__day
             , subq_1.bookings
@@ -247,8 +246,7 @@ FROM (
           subq_11.metric_time__day
           , subq_11.bookings
         FROM (
-          -- Pass Only Elements:
-          --   ['bookings', 'metric_time__day']
+          -- Pass Only Elements: ['bookings', 'metric_time__day']
           SELECT
             subq_10.metric_time__day
             , subq_10.bookings
@@ -344,7 +342,7 @@ FROM (
               , subq_7.approximate_continuous_booking_value_p99 AS approximate_continuous_booking_value_p99
               , subq_7.approximate_discrete_booking_value_p99 AS approximate_discrete_booking_value_p99
             FROM (
-              -- Date Spine
+              -- Time Spine
               SELECT
                 subq_9.ds AS metric_time__day
               FROM ***************************.mf_time_spine subq_9

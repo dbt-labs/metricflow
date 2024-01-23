@@ -8,7 +8,7 @@ FROM (
     subq_7.metric_time__day AS metric_time__day
     , subq_6.bookers AS bookers
   FROM (
-    -- Date Spine
+    -- Time Spine
     SELECT
       subq_8.ds AS metric_time__day
     FROM ***************************.mf_time_spine subq_8
@@ -19,8 +19,7 @@ FROM (
       subq_5.metric_time__day
       , COUNT(DISTINCT subq_5.bookers) AS bookers
     FROM (
-      -- Pass Only Elements:
-      --   ['bookers', 'metric_time__day']
+      -- Pass Only Elements: ['bookers', 'metric_time__day']
       SELECT
         subq_4.metric_time__day
         , subq_4.bookers
@@ -126,7 +125,7 @@ FROM (
           , subq_1.approximate_continuous_booking_value_p99 AS approximate_continuous_booking_value_p99
           , subq_1.approximate_discrete_booking_value_p99 AS approximate_discrete_booking_value_p99
         FROM (
-          -- Date Spine
+          -- Time Spine
           SELECT
             subq_3.ds AS metric_time__day
           FROM ***************************.mf_time_spine subq_3
