@@ -9,11 +9,9 @@ SELECT
 FROM (
   -- Time Spine
   SELECT
-    DATE_TRUNC('month', ds) AS metric_time__month
+    ds AS metric_time__day
   FROM ***************************.mf_time_spine subq_13
   WHERE ds BETWEEN '2020-01-01' AND '2020-01-01'
-  GROUP BY
-    DATE_TRUNC('month', ds)
 ) subq_12
 INNER JOIN (
   -- Read Elements From Semantic Model 'revenue'
@@ -27,9 +25,9 @@ INNER JOIN (
 ) subq_11
 ON
   (
-    subq_11.metric_time__month <= subq_12.metric_time__month
+    subq_11.metric_time__day <= subq_12.metric_time__day
   ) AND (
-    subq_11.metric_time__month > subq_12.metric_time__month - INTERVAL 2 month
+    subq_11.metric_time__day > subq_12.metric_time__day - INTERVAL 2 month
   )
 WHERE subq_12.metric_time__day BETWEEN '2020-01-01' AND '2020-01-01'
 GROUP BY
