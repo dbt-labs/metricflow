@@ -1,21 +1,21 @@
 -- Compute Metrics via Expressions
 SELECT
-  subq_8.metric_time__month
+  subq_8.metric_time__day
   , subq_8.txn_revenue AS trailing_2_months_revenue
 FROM (
   -- Aggregate Measures
   SELECT
-    subq_7.metric_time__month
+    subq_7.metric_time__day
     , SUM(subq_7.txn_revenue) AS txn_revenue
   FROM (
     -- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-01T00:00:00]
     SELECT
-      subq_6.metric_time__month
+      subq_6.metric_time__day
       , subq_6.txn_revenue
     FROM (
-      -- Pass Only Elements: ['txn_revenue', 'metric_time__month']
+      -- Pass Only Elements: ['txn_revenue', 'metric_time__day']
       SELECT
-        subq_5.metric_time__month
+        subq_5.metric_time__day
         , subq_5.txn_revenue
       FROM (
         -- Join Self Over Time Range
@@ -182,8 +182,8 @@ FROM (
           )
       ) subq_5
     ) subq_6
-    WHERE subq_6.metric_time__month BETWEEN timestamp '2020-01-01' AND timestamp '2020-01-01'
+    WHERE subq_6.metric_time__day BETWEEN timestamp '2020-01-01' AND timestamp '2020-01-01'
   ) subq_7
   GROUP BY
-    subq_7.metric_time__month
+    subq_7.metric_time__day
 ) subq_8

@@ -11,12 +11,12 @@
                 <!-- description = Aggregate Measures -->
                 <!-- node_id = am_0 -->
                 <FilterElementsNode>
-                    <!-- description = Pass Only Elements: ['txn_revenue', 'metric_time__month'] -->
+                    <!-- description = Pass Only Elements: ['txn_revenue', 'metric_time__day'] -->
                     <!-- node_id = pfe_0 -->
                     <!-- include_spec =                             -->
                     <!--   MeasureSpec(element_name='txn_revenue')  -->
-                    <!-- include_spec =                                                           -->
-                    <!--   TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH)  -->
+                    <!-- include_spec =                                                         -->
+                    <!--   TimeDimensionSpec(element_name='metric_time', time_granularity=DAY)  -->
                     <!-- distinct = False -->
                     <JoinOverTimeRangeNode>
                         <!-- description = Join Self Over Time Range -->

@@ -23,6 +23,7 @@ from metricflow.specs.specs import (
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.query_rendering.compare_rendered_query import convert_and_check
+from metricflow.test.time.metric_time_dimension import MTD_SPEC_MONTH
 
 
 @pytest.mark.sql_engine_snapshot
@@ -43,7 +44,7 @@ def test_cumulative_metric(
                 TimeDimensionSpec(
                     element_name="ds",
                     entity_links=(),
-                    time_granularity=TimeGranularity.MONTH,
+                    time_granularity=TimeGranularity.DAY,
                 ),
             ),
         )
@@ -81,7 +82,7 @@ def test_cumulative_metric_with_time_constraint(
                 TimeDimensionSpec(
                     element_name="metric_time",
                     entity_links=(),
-                    time_granularity=TimeGranularity.MONTH,
+                    time_granularity=TimeGranularity.DAY,
                 ),
             ),
             time_range_constraint=TimeRangeConstraint(
@@ -261,6 +262,36 @@ def test_cumulative_metric_grain_to_date(
         request=request,
         mf_test_session_state=mf_test_session_state,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_cumulative_metric_month(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    extended_date_dataflow_plan_builder: DataflowPlanBuilder,
+    extended_date_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    consistent_id_object_repository: ConsistentIdObjectRepository,
+    sql_client: SqlClient,
+) -> None:
+    """Tests rendering a query for a cumulative metric based on a monthly time dimension."""
+    dataflow_plan = extended_date_dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="trailing_3_months_bookings"),),
+            dimension_specs=(),
+            time_dimension_specs=(MTD_SPEC_MONTH,),
+            time_range_constraint=TimeRangeConstraint(
+                start_time=as_datetime("2020-03-05"), end_time=as_datetime("2021-01-04")
+            ),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=extended_date_dataflow_to_sql_converter,
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
     )

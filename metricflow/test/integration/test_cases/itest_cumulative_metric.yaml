@@ -349,6 +349,43 @@ integration_test:
     ORDER BY a.ds
 ---
 integration_test:
+  name: cumulative_metric_month_granularity
+  description: Query a cumulative metric that uses non-day granularity.
+  model: EXTENDED_DATE_MODEL
+  metrics: ["trailing_3_months_bookings"]
+  group_bys: ["metric_time__month"]
+  order_bys: ["metric_time__month"]
+  time_constraint: ["2020-03-05", "2021-01-04"]
+  check_query: |
+    SELECT
+      subq_3.metric_time__month
+      , SUM(subq_2.bookings_monthly) AS trailing_3_months_bookings
+    FROM (
+      SELECT
+        {{ render_date_trunc("ds", TimeGranularity.MONTH) }} AS metric_time__month
+      FROM {{ source_schema }}.mf_time_spine
+      WHERE {{ render_time_constraint("ds", "2020-03-01", "2021-01-31") }}
+      GROUP BY
+        {{ render_date_trunc("ds", TimeGranularity.MONTH) }}
+    ) subq_3
+    INNER JOIN (
+      SELECT
+        {{ render_date_trunc("ds", TimeGranularity.MONTH) }} AS metric_time__month
+        , bookings_monthly
+      FROM {{ source_schema }}.fct_bookings_extended_monthly
+      WHERE {{ render_time_constraint(render_date_trunc("ds", TimeGranularity.MONTH), "2019-12-01", "2021-01-31") }}
+    ) subq_2
+    ON (
+        subq_2.metric_time__month <= subq_3.metric_time__month
+      ) AND (
+        subq_2.metric_time__month > {{ render_date_sub("subq_3", "metric_time__month", 3, TimeGranularity.MONTH) }}
+      )
+    WHERE {{ render_time_constraint("subq_3.metric_time__month", "2020-03-01", "2021-01-31") }}
+    GROUP BY
+      subq_3.metric_time__month
+    ORDER BY subq_3.metric_time__month
+---
+integration_test:
   name: cumulative_metric_with_agg_time_dimension
   description: Query a cumulative metric with its agg_time_dimension.
   model: SIMPLE_MODEL
