@@ -462,7 +462,7 @@ def test_cumulative_metric_with_window(  # noqa: D
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="trailing_2_months_revenue"),),
             dimension_specs=(),
-            time_dimension_specs=(MTD_SPEC_MONTH,),
+            time_dimension_specs=(MTD_SPEC_DAY,),
         )
     )
 

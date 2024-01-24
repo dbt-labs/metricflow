@@ -43,7 +43,7 @@ def test_cumulative_metric(
                 TimeDimensionSpec(
                     element_name="ds",
                     entity_links=(),
-                    time_granularity=TimeGranularity.MONTH,
+                    time_granularity=TimeGranularity.DAY,
                 ),
             ),
         )
@@ -81,7 +81,7 @@ def test_cumulative_metric_with_time_constraint(
                 TimeDimensionSpec(
                     element_name="metric_time",
                     entity_links=(),
-                    time_granularity=TimeGranularity.MONTH,
+                    time_granularity=TimeGranularity.DAY,
                 ),
             ),
             time_range_constraint=TimeRangeConstraint(
