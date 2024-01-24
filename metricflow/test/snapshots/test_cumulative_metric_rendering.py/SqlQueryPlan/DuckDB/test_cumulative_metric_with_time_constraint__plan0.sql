@@ -20,7 +20,7 @@ FROM (
       FROM (
         -- Join Self Over Time Range
         SELECT
-          subq_3.metric_time__day AS metric_time__day
+          subq_3.metric_time__month AS metric_time__month
           , subq_2.ds__day AS ds__day
           , subq_2.ds__week AS ds__week
           , subq_2.ds__month AS ds__month
@@ -43,8 +43,8 @@ FROM (
           , subq_2.revenue_instance__ds__extract_day AS revenue_instance__ds__extract_day
           , subq_2.revenue_instance__ds__extract_dow AS revenue_instance__ds__extract_dow
           , subq_2.revenue_instance__ds__extract_doy AS revenue_instance__ds__extract_doy
+          , subq_2.metric_time__day AS metric_time__day
           , subq_2.metric_time__week AS metric_time__week
-          , subq_2.metric_time__month AS metric_time__month
           , subq_2.metric_time__quarter AS metric_time__quarter
           , subq_2.metric_time__year AS metric_time__year
           , subq_2.metric_time__extract_year AS metric_time__extract_year
@@ -59,9 +59,11 @@ FROM (
         FROM (
           -- Time Spine
           SELECT
-            subq_4.ds AS metric_time__day
+            DATE_TRUNC('month', subq_4.ds) AS metric_time__month
           FROM ***************************.mf_time_spine subq_4
           WHERE subq_4.ds BETWEEN '2020-01-01' AND '2020-01-01'
+          GROUP BY
+            DATE_TRUNC('month', subq_4.ds)
         ) subq_3
         INNER JOIN (
           -- Constrain Time Range to [2019-11-01T00:00:00, 2020-01-01T00:00:00]
@@ -176,9 +178,9 @@ FROM (
         ) subq_2
         ON
           (
-            subq_2.metric_time__day <= subq_3.metric_time__day
+            subq_2.metric_time__month <= subq_3.metric_time__month
           ) AND (
-            subq_2.metric_time__day > subq_3.metric_time__day - INTERVAL 2 month
+            subq_2.metric_time__month > subq_3.metric_time__month - INTERVAL 2 month
           )
       ) subq_5
     ) subq_6

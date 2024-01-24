@@ -143,7 +143,7 @@ class SemanticModelAccessor(ABC):
         """Get the agg time dimension associated with the measure."""
         raise NotImplementedError
 
-    def get_agg_time_dimensions_to_replace_metric_time_for_measure(
+    def get_agg_time_dimension_specs_for_measure(
         self, measure_reference: MeasureReference
     ) -> Sequence[TimeDimensionSpec]:
         """Get the agg time dimension specs that can be used in place of metric time for this measure."""
@@ -220,7 +220,7 @@ class MetricAccessor(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_agg_time_dimensions_to_replace_metric_time_for_metric(
+    def get_valid_agg_time_dimensions_for_metric(
         self, metric_reference: MetricReference
     ) -> Sequence[TimeDimensionSpec]:
         """Get the agg time dimension specs that can be used in place of metric time for this metric, if applicable."""

@@ -363,7 +363,7 @@ class SemanticModelLookup(SemanticModelAccessor):
             date_part=None,
         )
 
-    def get_agg_time_dimensions_to_replace_metric_time_for_measure(
+    def get_agg_time_dimension_specs_for_measure(
         self, measure_reference: MeasureReference
     ) -> Sequence[TimeDimensionSpec]:
         """Get the agg time dimension specs that can be used in place of metric time for this measure."""

@@ -1743,3 +1743,74 @@ integration_test:
       ) subq_11
       WHERE booking__is_instant
     )
+---
+integration_test:
+  name: offset_window_with_agg_time_dim
+  description: Tests a derived metric query with an offset_window queried with agg_time_dimension
+  model: SIMPLE_MODEL
+  metrics: ["bookings_growth_2_weeks"]
+  group_bys: ["booking__ds__day"]
+  check_query: |
+    SELECT
+      COALESCE(a.booking__ds__day, b.booking__ds__day) AS booking__ds__day
+      , bookings - bookings_2_weeks_ago AS bookings_growth_2_weeks
+    FROM (
+      SELECT
+        ds AS booking__ds__day
+        , SUM(1) AS bookings
+      FROM {{ source_schema }}.fct_bookings
+      GROUP BY
+        ds
+    ) a
+    FULL OUTER JOIN (
+      SELECT
+        c.ds AS booking__ds__day
+        , d.bookings_2_weeks_ago AS bookings_2_weeks_ago
+      FROM {{ mf_time_spine_source }} c
+      INNER JOIN (
+        SELECT
+          ds AS booking__ds__day
+          , SUM(1) AS bookings_2_weeks_ago
+        FROM {{ source_schema }}.fct_bookings
+        GROUP BY
+          ds
+      ) d
+      ON {{ render_date_sub("C", "ds", 14, TimeGranularity.DAY) }} = d.booking__ds__day
+    ) b
+    ON a.booking__ds__day = b.booking__ds__day
+---
+integration_test:
+  name: offset_to_grain_with_agg_time_dim
+  description: Tests a derived metric query with an offset_to_grain and agg_time_dimension.
+  model: SIMPLE_MODEL
+  metrics: ["bookings_growth_since_start_of_month"]
+  group_bys: ["booking__ds__day"]
+  check_query: |
+    SELECT
+      COALESCE(a.booking__ds__day, b.booking__ds__day) AS booking__ds__day
+      , bookings - bookings_at_start_of_month AS bookings_growth_since_start_of_month
+    FROM (
+      SELECT
+        ds AS booking__ds__day
+        , SUM(1) AS bookings
+      FROM {{ source_schema }}.fct_bookings
+      GROUP BY
+        ds
+    ) a
+    FULL OUTER JOIN (
+      SELECT
+        c.ds AS booking__ds__day
+        , d.bookings_at_start_of_month AS bookings_at_start_of_month
+      FROM {{ mf_time_spine_source }} c
+      INNER JOIN (
+        SELECT
+          ds AS booking__ds__day
+          , SUM(1) AS bookings_at_start_of_month
+        FROM {{ source_schema }}.fct_bookings
+        GROUP BY
+          ds
+      ) d
+      ON {{ render_date_trunc("c.ds", TimeGranularity.MONTH) }} = d.booking__ds__day
+    ) b
+    ON a.booking__ds__day = b.booking__ds__day
+# TODO: tests with granularity, date part, multiple metric time / agg time options

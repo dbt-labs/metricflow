@@ -49,10 +49,8 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
     def _group_by_items_include_agg_time_dimension(
         self, query_resolver_input: ResolverInputForQuery, metric_reference: MetricReference
     ) -> bool:
-        valid_agg_time_dimension_specs = (
-            self._manifest_lookup.metric_lookup.get_agg_time_dimensions_to_replace_metric_time_for_metric(
-                metric_reference
-            )
+        valid_agg_time_dimension_specs = self._manifest_lookup.metric_lookup.get_valid_agg_time_dimensions_for_metric(
+            metric_reference
         )
         for group_by_item_input in query_resolver_input.group_by_item_inputs:
             if group_by_item_input.spec_pattern.matches_any(valid_agg_time_dimension_specs):

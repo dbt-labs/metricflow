@@ -476,6 +476,10 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
                 )
         return time_dimension_specs
 
+    @property
+    def is_metric_time(self) -> bool:  # noqa: D
+        return self.element_name == METRIC_TIME_ELEMENT_NAME
+
 
 @dataclass(frozen=True)
 class NonAdditiveDimensionSpec(SerializableDataclass):
@@ -662,7 +666,7 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
         return tuple(
             time_dimension_spec
             for time_dimension_spec in self.time_dimension_specs
-            if time_dimension_spec.element_name == METRIC_TIME_ELEMENT_NAME
+            if time_dimension_spec.is_metric_time
         )
 
     # TODO: what about date part? not allowed for cumulative, right?
