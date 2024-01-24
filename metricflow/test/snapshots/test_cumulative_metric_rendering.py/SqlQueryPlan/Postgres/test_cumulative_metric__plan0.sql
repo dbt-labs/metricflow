@@ -1,16 +1,16 @@
 -- Compute Metrics via Expressions
 SELECT
-  subq_3.ds__month
+  subq_3.ds__day
   , subq_3.txn_revenue AS trailing_2_months_revenue
 FROM (
   -- Aggregate Measures
   SELECT
-    subq_2.ds__month
+    subq_2.ds__day
     , SUM(subq_2.txn_revenue) AS txn_revenue
   FROM (
-    -- Pass Only Elements: ['txn_revenue', 'ds__month']
+    -- Pass Only Elements: ['txn_revenue', 'ds__day']
     SELECT
-      subq_1.ds__month
+      subq_1.ds__day
       , subq_1.txn_revenue
     FROM (
       -- Metric Time Dimension 'ds'
@@ -84,5 +84,5 @@ FROM (
     ) subq_1
   ) subq_2
   GROUP BY
-    subq_2.ds__month
+    subq_2.ds__day
 ) subq_3
