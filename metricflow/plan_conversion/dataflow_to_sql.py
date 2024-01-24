@@ -281,24 +281,19 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         input_data_set = node.parent_node.accept(self)
         input_data_set_alias = self._next_unique_table_alias()
 
-        metric_time_dimension_spec: Optional[TimeDimensionSpec] = None
         metric_time_dimension_instance: Optional[TimeDimensionInstance] = None
-        for instance in input_data_set.metric_time_dimension_instances:
-            if len(instance.spec.entity_links) == 0:
+        for instance in input_data_set.instance_set.time_dimension_instances:
+            if instance.spec == node.metric_time_dimension_spec:
                 metric_time_dimension_instance = instance
-                metric_time_dimension_spec = instance.spec
                 break
-        # User might refer to the agg_time_dimension by its dimension name instead of 'metric_time'.
-        if not metric_time_dimension_spec:
-            pass  # finish this
 
         assert (
-            metric_time_dimension_spec and metric_time_dimension_instance
-        ), "No metric time dimension or agg_time_dimension found in join over time range query. This should have been caught by validations."
+            metric_time_dimension_instance
+        ), "Specified metric time spec not found in join over time range query. This should have been caught by validations."
         time_spine_data_set_alias = self._next_unique_table_alias()
 
         metric_time_dimension_column_name = self.column_association_resolver.resolve_spec(
-            metric_time_dimension_spec
+            metric_time_dimension_instance.spec
         ).column_name
 
         # Assemble time_spine dataset with metric_time_dimension to join.
@@ -313,12 +308,12 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
         # Figure out which columns correspond to the time dimension that we want to join on.
         input_data_set_metric_time_column_association = input_data_set.column_association_for_time_dimension(
-            metric_time_dimension_spec
+            metric_time_dimension_instance.spec
         )
         input_data_set_metric_time_col = input_data_set_metric_time_column_association.column_name
 
         time_spine_data_set_column_associations = time_spine_data_set.column_association_for_time_dimension(
-            metric_time_dimension_spec
+            metric_time_dimension_instance.spec
         )
         time_spine_data_set_time_dimension_col = time_spine_data_set_column_associations.column_name
 
@@ -346,13 +341,14 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 [
                     time_dimension_instance
                     for time_dimension_instance in input_data_set.instance_set.time_dimension_instances
-                    if time_dimension_instance.spec != metric_time_dimension_spec
+                    if time_dimension_instance != metric_time_dimension_instance
                 ]
             ),
         )
         table_alias_to_instance_set[input_data_set_alias] = modified_input_instance_set
 
         # The output instances are the same as the input instances.
+        # Shouldn't this just be the selected ones? maybe it is (un-optimized)
         output_instance_set = ChangeAssociatedColumns(self._column_association_resolver).transform(
             input_data_set.instance_set
         )

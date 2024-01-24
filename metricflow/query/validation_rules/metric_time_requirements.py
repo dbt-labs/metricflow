@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from typing import List, Sequence, Tuple
+from typing import Sequence
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.protocols import WhereFilterIntersection
-from dbt_semantic_interfaces.references import EntityReference, MetricReference, TimeDimensionReference
-from dbt_semantic_interfaces.type_enums import MetricType, TimeGranularity
-from dbt_semantic_interfaces.type_enums.date_part import DatePart
+from dbt_semantic_interfaces.references import MetricReference, TimeDimensionReference
+from dbt_semantic_interfaces.type_enums import MetricType
 from typing_extensions import override
 
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
@@ -50,15 +49,10 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
     def _group_by_items_include_agg_time_dimension(
         self, query_resolver_input: ResolverInputForQuery, metric_reference: MetricReference
     ) -> bool:
-        agg_time_dimension_and_entity_link = (
-            self._manifest_lookup.metric_lookup.get_agg_time_dimension_to_replace_metric_time(metric_reference)
-        )
-        if agg_time_dimension_and_entity_link is None:
-            return False
-
-        agg_time_dimension_reference, entity_link = agg_time_dimension_and_entity_link
-        valid_agg_time_dimension_specs = TimeDimensionSpec.generate_possible_specs_for_time_dimension(
-            time_dimension_reference=agg_time_dimension_reference, entity_links=(entity_link,)
+        valid_agg_time_dimension_specs = (
+            self._manifest_lookup.metric_lookup.get_agg_time_dimensions_to_replace_metric_time_for_metric(
+                metric_reference
+            )
         )
         for group_by_item_input in query_resolver_input.group_by_item_inputs:
             if group_by_item_input.spec_pattern.matches_any(valid_agg_time_dimension_specs):

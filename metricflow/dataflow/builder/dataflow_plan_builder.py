@@ -1315,21 +1315,25 @@ class DataflowPlanBuilder:
         # Otherwise, the measure will be aggregated over all time.
         time_range_node: Optional[JoinOverTimeRangeNode] = None
         if cumulative:
-            query_contains_metric_time_or_agg_time_dimension = queried_linkable_specs.contains_metric_time
-            if not query_contains_metric_time_or_agg_time_dimension:
-                # TODO: Write a test case for this scenario
-                agg_time_dimension_element_path_key = (
-                    self._semantic_model_lookup.get_agg_time_dimension_path_key_for_measure(measure_spec.reference)
+            queried_metric_time_spec = queried_linkable_specs.metric_time_spec_with_smallest_granularity
+            if not queried_metric_time_spec:
+                valid_agg_time_dimensions = (
+                    self._semantic_model_lookup.get_agg_time_dimensions_to_replace_metric_time_for_measure(
+                        measure_spec.reference
+                    )
                 )
-                for time_dimension_spec in queried_linkable_specs.time_dimension_specs:
-                    if (
-                        time_dimension_spec.element_name == agg_time_dimension_element_path_key.element_name
-                        and time_dimension_spec.entity_links == agg_time_dimension_element_path_key.entity_links
-                    ):
-                        query_contains_metric_time_or_agg_time_dimension = True
-            if query_contains_metric_time_or_agg_time_dimension:
+                # is there actually only one we allow?? no other granularity/date part?
+                queried_agg_time_dims = sorted(
+                    set(queried_linkable_specs.time_dimension_specs).intersection(set(valid_agg_time_dimensions)),
+                    key=lambda x: x.time_granularity.to_int(),
+                )
+                if queried_agg_time_dims:
+                    queried_metric_time_spec = queried_agg_time_dims[0]
+
+            if queried_metric_time_spec:
                 time_range_node = JoinOverTimeRangeNode(
                     parent_node=measure_recipe.source_node,
+                    metric_time_dimension_spec=queried_metric_time_spec,
                     window=cumulative_window,
                     grain_to_date=cumulative_grain_to_date,
                     time_range_constraint=time_range_constraint

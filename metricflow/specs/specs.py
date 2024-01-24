@@ -453,6 +453,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
     def generate_possible_specs_for_time_dimension(
         time_dimension_reference: TimeDimensionReference, entity_links: Tuple[EntityReference, ...]
     ) -> List[TimeDimensionSpec]:
+        """Generate a list of time dimension specs with all combinations of granularity & date part."""
         time_dimension_specs: List[TimeDimensionSpec] = []
         for time_granularity in TimeGranularity:
             time_dimension_specs.append(
@@ -663,6 +664,13 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
             for time_dimension_spec in self.time_dimension_specs
             if time_dimension_spec.element_name == METRIC_TIME_ELEMENT_NAME
         )
+
+    # TODO: what about date part? not allowed for cumulative, right?
+    @property
+    def metric_time_spec_with_smallest_granularity(self) -> Optional[TimeDimensionSpec]:
+        """Get the metric time spec with the smallest granularity, if there are any metric time specs."""
+        sorted_specs = sorted(self.metric_time_specs, key=lambda x: x.time_granularity)
+        return sorted_specs[0] if sorted_specs else None
 
     @property
     def as_tuple(self) -> Tuple[LinkableInstanceSpec, ...]:  # noqa: D

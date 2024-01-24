@@ -340,6 +340,7 @@ class SemanticModelLookup(SemanticModelAccessor):
             raise ValueError(f"Unable to find linkable element {element_name} in manifest")
 
     def get_agg_time_dimension_path_key_for_measure(self, measure_reference: MeasureReference) -> ElementPathKey:
+        """Get the agg time dimension associated with the measure."""
         agg_time_dimension = self.get_agg_time_dimension_for_measure(measure_reference)
 
         # A measure's agg_time_dimension is required to be in the same semantic model as the measure,
@@ -355,4 +356,19 @@ class SemanticModelLookup(SemanticModelAccessor):
             entity_link is not None
         ), f"Expected semantic model {semantic_model} to have a primary entity since is contains dimensions, but found none."
 
-        return ElementPathKey(element_name=agg_time_dimension.element_name, entity_links=(entity_link,))
+        return ElementPathKey(
+            element_name=agg_time_dimension.element_name,
+            entity_links=(entity_link,),
+            time_granularity=None,
+            date_part=None,
+        )
+
+    def get_agg_time_dimensions_to_replace_metric_time_for_measure(
+        self, measure_reference: MeasureReference
+    ) -> Sequence[TimeDimensionSpec]:
+        """Get the agg time dimension specs that can be used in place of metric time for this measure."""
+        path_key = self.get_agg_time_dimension_path_key_for_measure(measure_reference)
+        return TimeDimensionSpec.generate_possible_specs_for_time_dimension(
+            time_dimension_reference=TimeDimensionReference(element_name=path_key.element_name),
+            entity_links=path_key.entity_links,
+        )

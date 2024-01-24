@@ -9,7 +9,7 @@ than the interface specifications.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Dict, FrozenSet, Optional, Sequence, Set
+from typing import TYPE_CHECKING, Dict, FrozenSet, Optional, Sequence, Set
 
 from dbt_semantic_interfaces.protocols.dimension import Dimension
 from dbt_semantic_interfaces.protocols.entity import Entity
@@ -26,15 +26,12 @@ from dbt_semantic_interfaces.references import (
     TimeDimensionReference,
 )
 
-from metricflow.model.semantics.linkable_spec_resolver import ElementPathKey
-
 from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
-from metricflow.specs.specs import (
-    LinkableInstanceSpec,
-    MeasureSpec,
-    NonAdditiveDimensionSpec,
-)
+from metricflow.specs.specs import LinkableInstanceSpec, MeasureSpec, NonAdditiveDimensionSpec, TimeDimensionSpec
+
+if TYPE_CHECKING:
+    from metricflow.model.semantics.linkable_spec_resolver import ElementPathKey
 
 
 class SemanticModelAccessor(ABC):
@@ -143,6 +140,13 @@ class SemanticModelAccessor(ABC):
 
     @abstractmethod
     def get_agg_time_dimension_path_key_for_measure(self, measure_reference: MeasureReference) -> ElementPathKey:
+        """Get the agg time dimension associated with the measure."""
+        raise NotImplementedError
+
+    def get_agg_time_dimensions_to_replace_metric_time_for_measure(
+        self, measure_reference: MeasureReference
+    ) -> Sequence[TimeDimensionSpec]:
+        """Get the agg time dimension specs that can be used in place of metric time for this measure."""
         raise NotImplementedError
 
 
@@ -213,4 +217,11 @@ class MetricAccessor(ABC):
         without_any_of: Optional[Set[LinkableElementProperties]] = None,
     ) -> Sequence[LinkableInstanceSpec]:
         """Return the possible group-by-items for a dimension values query with no metrics."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_agg_time_dimensions_to_replace_metric_time_for_metric(
+        self, metric_reference: MetricReference
+    ) -> Sequence[TimeDimensionSpec]:
+        """Get the agg time dimension specs that can be used in place of metric time for this metric, if applicable."""
         raise NotImplementedError

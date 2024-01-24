@@ -26,7 +26,6 @@ from metricflow.errors.errors import UnknownMetricLinkingError
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
-from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.protocols.semantics import SemanticModelAccessor
 from metricflow.specs.specs import (
     DEFAULT_TIME_GRANULARITY,
@@ -524,9 +523,7 @@ class ValidLinkableSpecResolver:
         linkable_element_sets_to_merge: List[LinkableElementSet] = []
 
         for semantic_model in semantic_manifest.semantic_models:
-            linkable_element_sets_to_merge.append(
-                ValidLinkableSpecResolver._get_elements_in_semantic_model(semantic_model)
-            )
+            linkable_element_sets_to_merge.append(self._get_elements_in_semantic_model(semantic_model))
 
         metric_time_elements_for_no_metrics = self._get_metric_time_elements(measure_reference=None)
         self._no_metric_linkable_element_set = LinkableElementSet.merge_by_path_key(
@@ -550,8 +547,7 @@ class ValidLinkableSpecResolver:
             )
         return semantic_models_where_measure_was_found[0]
 
-    @staticmethod
-    def _get_elements_in_semantic_model(semantic_model: SemanticModel) -> LinkableElementSet:
+    def _get_elements_in_semantic_model(self, semantic_model: SemanticModel) -> LinkableElementSet:
         """Gets the elements in the semantic model, without requiring any joins.
 
         Elements related to metric_time are handled separately in _get_metric_time_elements().
@@ -568,7 +564,7 @@ class ValidLinkableSpecResolver:
                     properties=frozenset({LinkableElementProperties.LOCAL, LinkableElementProperties.ENTITY}),
                 )
             )
-            for entity_link in SemanticModelLookup.entity_links_for_local_elements(semantic_model):
+            for entity_link in self._semantic_model_lookup.entity_links_for_local_elements(semantic_model):
                 linkable_entities.append(
                     LinkableEntity(
                         semantic_model_origin=semantic_model.reference,
@@ -579,7 +575,7 @@ class ValidLinkableSpecResolver:
                     )
                 )
 
-        for entity_link in SemanticModelLookup.entity_links_for_local_elements(semantic_model):
+        for entity_link in self._semantic_model_lookup.entity_links_for_local_elements(semantic_model):
             dimension_properties = frozenset({LinkableElementProperties.LOCAL})
             for dimension in semantic_model.dimensions:
                 dimension_type = dimension.type
