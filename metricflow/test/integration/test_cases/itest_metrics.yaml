@@ -1813,4 +1813,5 @@ integration_test:
       ON {{ render_date_trunc("c.ds", TimeGranularity.MONTH) }} = d.booking__ds__day
     ) b
     ON a.booking__ds__day = b.booking__ds__day
-# TODO: tests with granularity, date part, multiple metric time / agg time options
+# TODO: offset tests with granularity, date part, multiple metric time / agg time options
+# TODO: cumulative tests with multiple metric_time / agg time options
