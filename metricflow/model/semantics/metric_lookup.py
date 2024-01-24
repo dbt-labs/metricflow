@@ -187,6 +187,7 @@ class MetricLookup(MetricAccessor):  # noqa: D
             return []
 
         path_key = agg_time_dimension_element_path_keys[0]
+        # TODO: do we need all these? Or just the one valid granularity? Depends what's allowed for time_offset
         valid_agg_time_dimension_specs = TimeDimensionSpec.generate_possible_specs_for_time_dimension(
             time_dimension_reference=TimeDimensionReference(element_name=path_key.element_name),
             entity_links=path_key.entity_links,

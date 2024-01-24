@@ -26,7 +26,6 @@ class CumulativeMetricRequiresMetricTimeIssue(MetricFlowQueryResolutionIssue):
             f"The query includes a cumulative metric {repr(self.metric_reference.element_name)} that does not "
             f"accumulate over all-time, but the group-by items do not include {repr(METRIC_TIME_ELEMENT_NAME)} "
             "or the metric's agg_time_dimension."
-            # TODO: add name of agg_time_dim?
         )
 
     @override

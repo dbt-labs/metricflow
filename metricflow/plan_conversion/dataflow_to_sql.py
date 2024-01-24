@@ -289,7 +289,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
         assert (
             metric_time_dimension_instance
-        ), "Specified metric time spec not found in join over time range query. This should have been caught by validations."
+        ), "Specified metric time spec not found in parent data set. This should have been caught by validations."
         time_spine_data_set_alias = self._next_unique_table_alias()
 
         metric_time_dimension_column_name = self.column_association_resolver.resolve_spec(
