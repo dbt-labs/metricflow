@@ -81,7 +81,6 @@ def test_cumulative_metric_with_time_constraint(
                 TimeDimensionSpec(
                     element_name="metric_time",
                     entity_links=(),
-                    # TODO: figure out this case. Do we allow querying by month here?
                     time_granularity=TimeGranularity.MONTH,
                 ),
             ),
