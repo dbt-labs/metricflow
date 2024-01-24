@@ -416,7 +416,7 @@ class DataflowPlanBuilder:
             queried_linkable_specs=queried_linkable_specs,
             child_metric_offset_window=metric_spec.offset_window,
             child_metric_offset_to_grain=metric_spec.offset_to_grain,
-            cumulation_description=CumulativeMeasureDescription(
+            cumulative_description=CumulativeMeasureDescription(
                 cumulative_window=metric.type_params.window,
                 cumulative_grain_to_date=metric.type_params.grain_to_date,
             )
@@ -1073,7 +1073,7 @@ class DataflowPlanBuilder:
         child_metric_offset_to_grain: Optional[TimeGranularity],
         descendent_filter_specs: Sequence[WhereFilterSpec],
         queried_linkable_specs: LinkableSpecSet,
-        cumulation_description: Optional[CumulativeMeasureDescription],
+        cumulative_description: Optional[CumulativeMeasureDescription],
     ) -> MetricInputMeasureSpec:
         """Return the input measure spec required to compute the base metric.
 
@@ -1155,7 +1155,7 @@ class DataflowPlanBuilder:
             fill_nulls_with=input_measure.fill_nulls_with,
             offset_window=child_metric_offset_window,
             offset_to_grain=child_metric_offset_to_grain,
-            cumulation_description=cumulation_description,
+            cumulative_description=cumulative_description,
             filter_specs=tuple(filter_specs),
             alias=input_measure.alias,
             before_aggregation_time_spine_join_description=before_aggregation_time_spine_join_description,
@@ -1250,15 +1250,15 @@ class DataflowPlanBuilder:
         measure_recipe: Optional[DataflowRecipe] = None,
     ) -> BaseOutput:
         measure_spec = metric_input_measure_spec.measure_spec
-        cumulative = metric_input_measure_spec.cumulation_description is not None
+        cumulative = metric_input_measure_spec.cumulative_description is not None
         cumulative_window = (
-            metric_input_measure_spec.cumulation_description.cumulative_window
-            if metric_input_measure_spec.cumulation_description is not None
+            metric_input_measure_spec.cumulative_description.cumulative_window
+            if metric_input_measure_spec.cumulative_description is not None
             else None
         )
         cumulative_grain_to_date = (
-            metric_input_measure_spec.cumulation_description.cumulative_grain_to_date
-            if metric_input_measure_spec.cumulation_description
+            metric_input_measure_spec.cumulative_description.cumulative_grain_to_date
+            if metric_input_measure_spec.cumulative_description
             else None
         )
         measure_properties = self._build_measure_spec_properties([measure_spec])

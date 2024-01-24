@@ -616,7 +616,7 @@ class MetricInputMeasureSpec(SerializableDataclass):
     fill_nulls_with: Optional[int] = None
     offset_window: Optional[MetricTimeWindow] = None
     offset_to_grain: Optional[TimeGranularity] = None
-    cumulation_description: Optional[CumulativeMeasureDescription] = None
+    cumulative_description: Optional[CumulativeMeasureDescription] = None
     filter_specs: Tuple[WhereFilterSpec, ...] = ()
     alias: Optional[str] = None
     before_aggregation_time_spine_join_description: Optional[JoinToTimeSpineDescription] = None
