@@ -1298,8 +1298,10 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             time_dimension_instances=tuple(
                 time_dimension_instance
                 for time_dimension_instance in parent_data_set.instance_set.time_dimension_instances
-                if time_dimension_instance.spec.element_name != agg_time_dimension_for_join.element_name
-                # and time_dimension_instance.spec.entity_links != agg_time_dimension_for_join.entity_links
+                if not (
+                    time_dimension_instance.spec.element_name == agg_time_dimension_for_join.element_name
+                    and time_dimension_instance.spec.entity_links == agg_time_dimension_for_join.entity_links
+                )
             ),
             entity_instances=parent_data_set.instance_set.entity_instances,
             metric_instances=parent_data_set.instance_set.metric_instances,

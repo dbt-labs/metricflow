@@ -242,6 +242,17 @@ FROM (
           -- Join to Time Spine Dataset
           SELECT
             subq_7.booking__ds__day AS booking__ds__day
+            , subq_6.ds__day AS ds__day
+            , subq_6.ds__week AS ds__week
+            , subq_6.ds__month AS ds__month
+            , subq_6.ds__quarter AS ds__quarter
+            , subq_6.ds__year AS ds__year
+            , subq_6.ds__extract_year AS ds__extract_year
+            , subq_6.ds__extract_quarter AS ds__extract_quarter
+            , subq_6.ds__extract_month AS ds__extract_month
+            , subq_6.ds__extract_day AS ds__extract_day
+            , subq_6.ds__extract_dow AS ds__extract_dow
+            , subq_6.ds__extract_doy AS ds__extract_doy
             , subq_6.ds_partitioned__day AS ds_partitioned__day
             , subq_6.ds_partitioned__week AS ds_partitioned__week
             , subq_6.ds_partitioned__month AS ds_partitioned__month
