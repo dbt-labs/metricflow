@@ -1331,7 +1331,7 @@ class DataflowPlanBuilder:
                 valid_agg_time_dimensions = self._semantic_model_lookup.get_agg_time_dimension_specs_for_measure(
                     measure_spec.reference
                 )
-                # TODO: will it be a problem if we get one with date part or diff granularity?
+                # TODO: will it be a problem if we get one with date part or diff granularity? Write test case
                 queried_agg_time_dims = sorted(
                     set(queried_linkable_specs.time_dimension_specs).intersection(set(valid_agg_time_dimensions)),
                     key=lambda x: x.time_granularity.to_int(),
