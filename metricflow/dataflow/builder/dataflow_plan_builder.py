@@ -698,15 +698,15 @@ class DataflowPlanBuilder:
         """Returns true if any of the linkable specs requires a multi-hop join to realize."""
         return any(len(x.entity_links) > 1 for x in linkable_specs)
 
-    def _get_semantic_model_names_for_measures(self, measure_names: Sequence[MeasureSpec]) -> Set[str]:
+    def _get_semantic_model_names_for_measures(self, measures: Sequence[MeasureSpec]) -> Set[str]:
         """Return the names of the semantic models needed to compute the input measures.
 
         This is a temporary method for use in assertion boundaries while we implement support for multiple semantic models
         """
         semantic_model_names: Set[str] = set()
-        for measure_name in measure_names:
+        for measure in measures:
             semantic_model_names = semantic_model_names.union(
-                {d.name for d in self._semantic_model_lookup.get_semantic_models_for_measure(measure_name.reference)}
+                {d.name for d in self._semantic_model_lookup.get_semantic_models_for_measure(measure.reference)}
             )
         return semantic_model_names
 
