@@ -387,7 +387,7 @@ integration_test:
 ---
 integration_test:
   name: cumulative_metric_with_agg_time_dimension
-  description: Query a cumulative metric with its agg_time_dimension.
+  description: Query a cumulative metric with its agg_time_dimension and a time constraint.
   model: SIMPLE_MODEL
   metrics: ["trailing_2_months_revenue"]
   group_bys: ["revenue_instance__ds__day"]
