@@ -9,7 +9,7 @@ than the interface specifications.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Dict, FrozenSet, Optional, Sequence, Set
+from typing import TYPE_CHECKING, Dict, FrozenSet, Optional, Sequence, Set
 
 from dbt_semantic_interfaces.protocols.dimension import Dimension
 from dbt_semantic_interfaces.protocols.entity import Entity
@@ -28,11 +28,10 @@ from dbt_semantic_interfaces.references import (
 
 from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
-from metricflow.specs.specs import (
-    LinkableInstanceSpec,
-    MeasureSpec,
-    NonAdditiveDimensionSpec,
-)
+from metricflow.specs.specs import LinkableInstanceSpec, MeasureSpec, NonAdditiveDimensionSpec, TimeDimensionSpec
+
+if TYPE_CHECKING:
+    from metricflow.model.semantics.linkable_spec_resolver import ElementPathKey
 
 
 class SemanticModelAccessor(ABC):
@@ -92,10 +91,17 @@ class SemanticModelAccessor(ABC):
     @abstractmethod
     def get_agg_time_dimension_for_measure(self, measure_reference: MeasureReference) -> TimeDimensionReference:
         """Retrieves the aggregate time dimension that is associated with the measure reference."""
+        raise NotImplementedError
 
     @abstractmethod
     def get_entity_in_semantic_model(self, ref: SemanticModelElementReference) -> Optional[Entity]:
         """Retrieve the entity matching the element -> semantic model mapping, if any."""
+        raise NotImplementedError
+
+    @staticmethod
+    @abstractmethod
+    def resolved_primary_entity(semantic_model: SemanticModel) -> Optional[EntityReference]:
+        """Return the primary entity for dimensions in the model."""
         raise NotImplementedError
 
     @abstractmethod
@@ -130,6 +136,17 @@ class SemanticModelAccessor(ABC):
     @abstractmethod
     def get_element_spec_for_name(self, element_name: str) -> LinkableInstanceSpec:
         """Returns the spec for the given name of a linkable element (dimension or entity)."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_agg_time_dimension_path_key_for_measure(self, measure_reference: MeasureReference) -> ElementPathKey:
+        """Get the agg time dimension associated with the measure."""
+        raise NotImplementedError
+
+    def get_agg_time_dimension_specs_for_measure(
+        self, measure_reference: MeasureReference
+    ) -> Sequence[TimeDimensionSpec]:
+        """Get the agg time dimension specs that can be used in place of metric time for this measure."""
         raise NotImplementedError
 
 
@@ -200,4 +217,11 @@ class MetricAccessor(ABC):
         without_any_of: Optional[Set[LinkableElementProperties]] = None,
     ) -> Sequence[LinkableInstanceSpec]:
         """Return the possible group-by-items for a dimension values query with no metrics."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_valid_agg_time_dimensions_for_metric(
+        self, metric_reference: MetricReference
+    ) -> Sequence[TimeDimensionSpec]:
+        """Get the agg time dimension specs that can be used in place of metric time for this metric, if applicable."""
         raise NotImplementedError

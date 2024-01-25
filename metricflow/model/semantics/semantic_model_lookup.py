@@ -25,6 +25,7 @@ from typing_extensions import override
 from metricflow.errors.errors import InvalidSemanticModelError
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantics.element_group import ElementGrouper
+from metricflow.model.semantics.linkable_spec_resolver import ElementPathKey
 from metricflow.model.spec_converters import MeasureConverter
 from metricflow.protocols.semantics import SemanticModelAccessor
 from metricflow.specs.specs import (
@@ -214,7 +215,7 @@ class SemanticModelLookup(SemanticModelAccessor):
                     f"Aggregation time dimension does not have a time granularity set: {agg_time_dimension}"
                 )
 
-            primary_entity = SemanticModelLookup._resolved_primary_entity(semantic_model)
+            primary_entity = SemanticModelLookup.resolved_primary_entity(semantic_model)
 
             if primary_entity is None:
                 raise RuntimeError(
@@ -291,7 +292,7 @@ class SemanticModelLookup(SemanticModelAccessor):
         )
 
     @staticmethod
-    def _resolved_primary_entity(semantic_model: SemanticModel) -> Optional[EntityReference]:
+    def resolved_primary_entity(semantic_model: SemanticModel) -> Optional[EntityReference]:
         """Return the primary entity for dimensions in the model."""
         primary_entity_reference = semantic_model.primary_entity_reference
 
@@ -300,14 +301,12 @@ class SemanticModelLookup(SemanticModelAccessor):
         )
 
         # This should be caught by the validation, but adding a sanity check.
-        assert len(entities_with_type_primary) <= 1, f"Found >1 primary entity in {semantic_model}"
+        assert len(entities_with_type_primary) <= 1, f"Found > 1 primary entity in {semantic_model}"
         if primary_entity_reference is not None:
             assert len(entities_with_type_primary) == 0, (
                 f"The primary_entity field was set to {primary_entity_reference}, but there are non-zero entities with "
                 f"type {EntityType.PRIMARY} in {semantic_model}"
             )
-
-        if primary_entity_reference is not None:
             return primary_entity_reference
 
         if len(entities_with_type_primary) > 0:
@@ -339,3 +338,38 @@ class SemanticModelLookup(SemanticModelAccessor):
             return self._entity_ref_to_spec[EntityReference(element_name=element_name)]
         else:
             raise ValueError(f"Unable to find linkable element {element_name} in manifest")
+
+    def get_agg_time_dimension_path_key_for_measure(self, measure_reference: MeasureReference) -> ElementPathKey:
+        """Get the agg time dimension associated with the measure."""
+        agg_time_dimension = self.get_agg_time_dimension_for_measure(measure_reference)
+
+        # A measure's agg_time_dimension is required to be in the same semantic model as the measure,
+        # so we can assume the same semantic model for both measure and dimension.
+        semantic_models = self.get_semantic_models_for_measure(measure_reference)
+        assert (
+            len(semantic_models) == 1
+        ), f"Expected exactly one semantic model for measure {measure_reference}, but found semantic models {semantic_models}."
+        semantic_model = semantic_models[0]
+
+        entity_link = self.resolved_primary_entity(semantic_model)
+        assert entity_link is not None, (
+            f"Expected semantic model {semantic_model} to have a primary entity since it has a "
+            "measure requiring an agg_time_dimension, but found none.",
+        )
+
+        return ElementPathKey(
+            element_name=agg_time_dimension.element_name,
+            entity_links=(entity_link,),
+            time_granularity=None,
+            date_part=None,
+        )
+
+    def get_agg_time_dimension_specs_for_measure(
+        self, measure_reference: MeasureReference
+    ) -> Sequence[TimeDimensionSpec]:
+        """Get the agg time dimension specs that can be used in place of metric time for this measure."""
+        path_key = self.get_agg_time_dimension_path_key_for_measure(measure_reference)
+        return TimeDimensionSpec.generate_possible_specs_for_time_dimension(
+            time_dimension_reference=TimeDimensionReference(element_name=path_key.element_name),
+            entity_links=path_key.entity_links,
+        )
