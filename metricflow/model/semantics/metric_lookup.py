@@ -167,9 +167,6 @@ class MetricLookup(MetricAccessor):  # noqa: D
     ) -> Sequence[ElementPathKey]:
         """Retrieves the aggregate time dimensions associated with the metric's measures."""
         metric = self.get_metric(metric_reference)
-        # This should get hit on offset metric, right?
-        assert metric.input_measures, f"No input measures found for metric {metric_reference}"
-
         path_keys = set()
         for input_measure in metric.input_measures:
             path_key = self._semantic_model_lookup.get_agg_time_dimension_path_key_for_measure(
