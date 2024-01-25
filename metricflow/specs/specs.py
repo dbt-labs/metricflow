@@ -449,6 +449,37 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
             exclude_fields=exclude_fields,
         )
 
+    @staticmethod
+    def generate_possible_specs_for_time_dimension(
+        time_dimension_reference: TimeDimensionReference, entity_links: Tuple[EntityReference, ...]
+    ) -> List[TimeDimensionSpec]:
+        """Generate a list of time dimension specs with all combinations of granularity & date part."""
+        time_dimension_specs: List[TimeDimensionSpec] = []
+        for time_granularity in TimeGranularity:
+            time_dimension_specs.append(
+                TimeDimensionSpec(
+                    element_name=time_dimension_reference.element_name,
+                    entity_links=entity_links,
+                    time_granularity=time_granularity,
+                    date_part=None,
+                )
+            )
+        for date_part in DatePart:
+            for time_granularity in date_part.compatible_granularities:
+                time_dimension_specs.append(
+                    TimeDimensionSpec(
+                        element_name=time_dimension_reference.element_name,
+                        entity_links=entity_links,
+                        time_granularity=time_granularity,
+                        date_part=date_part,
+                    )
+                )
+        return time_dimension_specs
+
+    @property
+    def is_metric_time(self) -> bool:  # noqa: D
+        return self.element_name == METRIC_TIME_ELEMENT_NAME
+
 
 @dataclass(frozen=True)
 class NonAdditiveDimensionSpec(SerializableDataclass):
@@ -635,7 +666,7 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
         return tuple(
             time_dimension_spec
             for time_dimension_spec in self.time_dimension_specs
-            if time_dimension_spec.element_name == METRIC_TIME_ELEMENT_NAME
+            if time_dimension_spec.is_metric_time
         )
 
     @property
