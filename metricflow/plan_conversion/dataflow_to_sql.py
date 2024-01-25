@@ -1240,14 +1240,13 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         parent_data_set = node.parent_node.accept(self)
         parent_alias = self._next_unique_table_alias()
 
-        # TODO: rename requested_metric_time_dimension_specs -> requested_agg_time_dimension_specs
         assert (
-            len(node.requested_metric_time_dimension_specs) > 0
-        ), "Must have at least one value in requested_metric_time_dimension_specs for JoinToTimeSpineNode."
+            len(node.requested_agg_time_dimension_specs) > 0
+        ), "Must have at least one value in requested_agg_time_dimension_specs for JoinToTimeSpineNode."
 
         # Determine if the time spine join should use metric_time or the agg_time_dimension (metric_time takes priority).
-        agg_time_dimension_for_join = node.requested_metric_time_dimension_specs[0]
-        for spec in node.requested_metric_time_dimension_specs[1:]:
+        agg_time_dimension_for_join = node.requested_agg_time_dimension_specs[0]
+        for spec in node.requested_agg_time_dimension_specs[1:]:
             if spec.element_name == METRIC_TIME_ELEMENT_NAME:
                 agg_time_dimension_for_join = spec
                 break
@@ -1327,7 +1326,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         time_spine_select_columns = []
         time_spine_dim_instances = []
         where: Optional[SqlExpressionNode] = None
-        for requested_time_dimension_spec in node.requested_metric_time_dimension_specs:
+        for requested_time_dimension_spec in node.requested_agg_time_dimension_specs:
             # Apply granularity to time spine column select expression.
             if requested_time_dimension_spec.time_granularity == time_spine_dim_instance.spec.time_granularity:
                 select_expr: SqlExpressionNode = time_spine_column_select_expr
