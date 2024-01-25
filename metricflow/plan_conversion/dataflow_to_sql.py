@@ -1243,7 +1243,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         # TODO: rename requested_metric_time_dimension_specs -> requested_agg_time_dimension_specs
         assert (
             len(node.requested_metric_time_dimension_specs) > 0
-        ), "Must have at least one  value in requested_metric_time_dimension_specs for JoinToTimeSpineNode."
+        ), "Must have at least one value in requested_metric_time_dimension_specs for JoinToTimeSpineNode."
 
         # Determine if the time spine join should use metric_time or the agg_time_dimension (metric_time takes priority).
         agg_time_dimension_for_join = node.requested_metric_time_dimension_specs[0]

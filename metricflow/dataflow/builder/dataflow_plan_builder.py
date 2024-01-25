@@ -1115,7 +1115,6 @@ class DataflowPlanBuilder:
         # there's no need to join to the time spine since all time will be aggregated.
         after_aggregation_time_spine_join_description = None
         if input_measure.join_to_timespine:
-            # TODO: Write a test case for this scenario
             query_contains_agg_time_dimension = queried_linkable_specs.contains_metric_time
             if not query_contains_agg_time_dimension:
                 # TODO: should this be checking valid agg time dims for measure or metric?
@@ -1468,7 +1467,7 @@ class DataflowPlanBuilder:
             )
             return JoinToTimeSpineNode(
                 parent_node=aggregate_measures_node,
-                requested_metric_time_dimension_specs=list(queried_linkable_specs.metric_time_specs),
+                requested_metric_time_dimension_specs=queried_agg_time_dimension_specs,
                 join_type=after_aggregation_time_spine_join_description.join_type,
                 time_range_constraint=time_range_constraint,
                 offset_window=after_aggregation_time_spine_join_description.offset_window,
