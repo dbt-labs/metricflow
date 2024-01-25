@@ -392,7 +392,7 @@ integration_test:
   metrics: ["trailing_2_months_revenue"]
   group_bys: ["revenue_instance__ds__day"]
   order_bys: ["revenue_instance__ds__day"]
-  time_constraint: ["2020-03-05", "2021-01-04"]
+  where_filter: '{{ render_time_constraint("revenue_instance__ds__day", "2020-03-05", "2021-01-04") }}'
   check_query: |
     SELECT
       SUM(b.txn_revenue) as trailing_2_months_revenue

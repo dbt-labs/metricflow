@@ -958,7 +958,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
         instead of this: DATE_TRUNC('month', ds) >= '2020-01-01' AND DATE_TRUNC('month', ds <= '2020-02-01')
         """
-        from_data_set: SqlDataSet = node.parent_node.accept(self)
+        from_data_set = node.parent_node.accept(self)
         from_data_set_alias = self._next_unique_table_alias()
 
         time_dimension_instances_for_metric_time = sorted(

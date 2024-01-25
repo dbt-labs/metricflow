@@ -310,9 +310,6 @@ def test_cumulative_metric_with_agg_time_dimension(
             time_dimension_specs=(
                 TimeDimensionSpec(element_name="ds", entity_links=(EntityReference("revenue_instance"),)),
             ),
-            time_range_constraint=TimeRangeConstraint(
-                start_time=as_datetime("2020-03-05"), end_time=as_datetime("2021-01-04")
-            ),
         )
     )
 
