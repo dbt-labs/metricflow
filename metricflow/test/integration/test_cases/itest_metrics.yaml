@@ -1868,5 +1868,24 @@ integration_test:
     ) subq_8
     ON
       {{ render_date_sub("subq_9", "ds", 2, TimeGranularity.DAY) }} = subq_8.booking__ds__day
-# TODO: offset tests with granularity, date part, multiple metric time / agg time options
-# TODO: cumulative tests with multiple metric_time / agg time options
+---
+integration_test:
+  name: offset_metric_with_agg_time_dim_date_part
+  description: Tests a derived metric query with an offset and agg_time_dimension with date part.
+  model: SIMPLE_MODEL
+  metrics: ["bookings_5_day_lag"]
+  group_by_objs: [{"name": "booking__ds", "date_part": "doy"}]
+  check_query: |
+    SELECT
+      {{ render_extract("a.ds", DatePart.DOY) }} AS booking__ds__extract_doy
+      , b.bookings_5_day_lag
+    FROM {{ mf_time_spine_source }} a
+    INNER JOIN (
+      SELECT
+        ds
+        , SUM(1) AS bookings_5_day_lag
+      FROM {{ source_schema }}.fct_bookings
+      GROUP BY
+        ds
+    ) b
+    ON {{ render_date_sub("a", "ds", 5, TimeGranularity.DAY) }} = b.ds

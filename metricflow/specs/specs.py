@@ -669,13 +669,6 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
             if time_dimension_spec.is_metric_time
         )
 
-    # TODO: what about date part? not allowed for cumulative, right?
-    @property
-    def metric_time_spec_with_smallest_granularity(self) -> Optional[TimeDimensionSpec]:
-        """Get the metric time spec with the smallest granularity, if there are any metric time specs."""
-        sorted_specs = sorted(self.metric_time_specs, key=lambda x: x.time_granularity)
-        return sorted_specs[0] if sorted_specs else None
-
     @property
     def as_tuple(self) -> Tuple[LinkableInstanceSpec, ...]:  # noqa: D
         return tuple(itertools.chain(self.dimension_specs, self.time_dimension_specs, self.entity_specs))

@@ -5,7 +5,7 @@
         <JoinToTimeSpineNode>
             <!-- description = Join to Time Spine Dataset -->
             <!-- node_id = jts_0 -->
-            <!-- requested_metric_time_dimension_specs =                                   -->
+            <!-- requested_agg_time_dimension_specs =                                      -->
             <!--   [TimeDimensionSpec(element_name='metric_time', time_granularity=DAY),]  -->
             <!-- time_range_constraint = [2020-01-01T00:00:00, 2021-01-01T00:00:00] -->
             <!-- offset_window = None -->
