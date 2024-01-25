@@ -499,7 +499,6 @@ class DataflowPlanBuilder:
         )
         output_node: BaseOutput = ComputeMetricsNode(parent_node=parent_node, metric_specs=[metric_spec])
 
-        # TODO: Write a test case for this scenario
         # For nested ratio / derived metrics with time offset, apply offset & where constraint after metric computation.
         if metric_spec.has_time_offset:
             queried_agg_time_dimension_specs = list(queried_linkable_specs.metric_time_specs)
