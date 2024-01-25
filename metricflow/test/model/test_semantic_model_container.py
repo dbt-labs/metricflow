@@ -157,3 +157,32 @@ def test_linkable_set_for_common_dimensions_in_different_models(
             ),
         ),
     )
+
+
+def test_get_valid_agg_time_dimensions_for_metric(  # noqa: D
+    metric_lookup: MetricLookup, semantic_model_lookup: SemanticModelLookup
+) -> None:
+    for metric_name in ["views", "listings", "bookings_per_view"]:
+        metric_reference = MetricReference(metric_name)
+        metric = metric_lookup.get_metric(metric_reference)
+        metric_agg_time_dims = metric_lookup.get_valid_agg_time_dimensions_for_metric(metric_reference)
+        measure_agg_time_dims = list(
+            {
+                semantic_model_lookup.get_agg_time_dimension_for_measure(measure.measure_reference)
+                for measure in metric.input_measures
+            }
+        )
+        if len(measure_agg_time_dims) == 1:
+            for metric_agg_time_dim in metric_agg_time_dims:
+                assert metric_agg_time_dim.reference == measure_agg_time_dims[0]
+        else:
+            assert len(metric_agg_time_dims) == 0
+
+
+def test_get_agg_time_dimension_specs_for_measure(semantic_model_lookup: SemanticModelLookup) -> None:  # noqa: D
+    for measure_name in ["bookings", "views", "listings"]:
+        measure_reference = MeasureReference(measure_name)
+        agg_time_dim_specs = semantic_model_lookup.get_agg_time_dimension_specs_for_measure(measure_reference)
+        agg_time_dim_reference = semantic_model_lookup.get_agg_time_dimension_for_measure(measure_reference)
+        for spec in agg_time_dim_specs:
+            assert spec.reference == agg_time_dim_reference
