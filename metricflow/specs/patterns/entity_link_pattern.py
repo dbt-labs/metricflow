@@ -81,23 +81,49 @@ class EntityLinkPattern(SpecPattern):
     item using a specified entity. Additional semantic models can be joined using additional entities to obtain the
     group-by-item. The series of entities that are used form the entity path. Since the entity path does not specify
     which semantic models need to be used, additional resolution is done in later stages to generate the necessary SQL.
+
+    The entity links that are specified is used as a suffix match.
     """
 
     parameter_set: EntityLinkPatternParameterSet
 
+    def _match_entity_links(self, candidate_specs: Sequence[LinkableInstanceSpec]) -> Sequence[LinkableInstanceSpec]:
+        assert self.parameter_set.entity_links is not None
+        num_links_to_check = len(self.parameter_set.entity_links)
+        matching_specs: Sequence[LinkableInstanceSpec] = tuple(
+            candidate_spec
+            for candidate_spec in candidate_specs
+            if (
+                self.parameter_set.entity_links[-num_links_to_check:]
+                == candidate_spec.entity_links[-num_links_to_check:]
+            )
+        )
+
+        if len(matching_specs) <= 1:
+            return matching_specs
+
+        # If multiple match, then return only the ones with the shortest entity link path. There could be multiple
+        # e.g. booking__listing__country and listing__country will match with listing__country.
+        shortest_entity_link_length = min(len(matching_spec.entity_links) for matching_spec in matching_specs)
+        return tuple(spec for spec in matching_specs if len(spec.entity_links) == shortest_entity_link_length)
+
     @override
     def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[LinkableInstanceSpec]:
         filtered_candidate_specs = InstanceSpecSet.from_specs(candidate_specs).linkable_specs
+        # Checks that EntityLinkPatternParameterSetField is valid wrt to the parameter set.
+
+        # Entity links could be a partial match, so it's handled separately.
+        if ParameterSetField.ENTITY_LINKS in self.parameter_set.fields_to_compare:
+            filtered_candidate_specs = self._match_entity_links(filtered_candidate_specs)
+
+        other_keys_to_check = set(
+            field_to_compare.value for field_to_compare in self.parameter_set.fields_to_compare
+        ).difference({ParameterSetField.ENTITY_LINKS.value})
 
         matching_specs: List[LinkableInstanceSpec] = []
-
-        # Using some Python introspection magic to figure out specs that match the listed fields.
-        keys_to_check = set(field_to_compare.value for field_to_compare in self.parameter_set.fields_to_compare)
-        # Checks that EntityLinkPatternParameterSetField is valid wrt to the parameter set.
-        parameter_set_values = tuple(getattr(self.parameter_set, key_to_check) for key_to_check in keys_to_check)
-
+        parameter_set_values = tuple(getattr(self.parameter_set, key_to_check) for key_to_check in other_keys_to_check)
         for spec in filtered_candidate_specs:
-            spec_values = tuple(getattr(spec, key_to_check, None) for key_to_check in keys_to_check)
+            spec_values = tuple(getattr(spec, key_to_check, None) for key_to_check in other_keys_to_check)
             if spec_values == parameter_set_values:
                 matching_specs.append(spec)
 

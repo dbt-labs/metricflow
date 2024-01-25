@@ -1,0 +1,12 @@
+---
+table_snapshot:
+  table_name: entity_0_measure_table
+  column_definitions:
+    - name: entity_0_measure
+      type: INT
+    - name: entity_0
+      type: STRING
+    - name: ds
+      type: TIME
+  rows:
+    - ["0", "E0_0", "2020-01-01"]

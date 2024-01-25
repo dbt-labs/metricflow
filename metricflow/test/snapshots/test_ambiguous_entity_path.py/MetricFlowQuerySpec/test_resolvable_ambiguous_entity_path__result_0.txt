@@ -1,0 +1,12 @@
+MetricFlowQuerySpec(
+  metric_specs=(MetricSpec(element_name='entity_1_metric'),),
+  dimension_specs=(
+    DimensionSpec(
+      element_name='country',
+      entity_links=(EntityReference(element_name='entity_1'), EntityReference(element_name='entity_0')),
+    ),
+  ),
+  filter_intersection=PydanticWhereFilterIntersection(),
+  filter_spec_resolution_lookup=FilterSpecResolutionLookUp(),
+  min_max_only=False,
+)

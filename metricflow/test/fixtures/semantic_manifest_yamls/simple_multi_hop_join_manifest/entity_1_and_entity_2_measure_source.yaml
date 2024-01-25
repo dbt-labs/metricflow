@@ -1,0 +1,31 @@
+---
+semantic_model:
+  name: entity_1_and_entity_2_measure_source
+  description: A measure source associated with "entity_1" and "entity_2".
+
+  node_relation:
+    schema_name: $source_schema
+    alias: entity_1_and_entity_2_measure_table
+
+  defaults:
+    agg_time_dimension: ds
+
+  measures:
+    - name: entity_1_and_entity_2_measure
+      agg: sum
+      expr: "1"
+
+  dimensions:
+    - name: ds
+      type: time
+      type_params:
+        time_granularity: day
+
+  entities:
+    - name: composite_entity
+      type: primary
+      expr: entity_1 || entity_2
+    - name: entity_1
+      type: foreign
+    - name: entity_2
+      type: foreign

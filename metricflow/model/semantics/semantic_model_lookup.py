@@ -352,9 +352,10 @@ class SemanticModelLookup(SemanticModelAccessor):
         semantic_model = semantic_models[0]
 
         entity_link = self.resolved_primary_entity(semantic_model)
-        assert (
-            entity_link is not None
-        ), f"Expected semantic model {semantic_model} to have a primary entity since is contains dimensions, but found none."
+        assert entity_link is not None, (
+            f"Expected semantic model {semantic_model} to have a primary entity since it has a "
+            "measure requiring an agg_time_dimension, but found none.",
+        )
 
         return ElementPathKey(
             element_name=agg_time_dimension.element_name,
