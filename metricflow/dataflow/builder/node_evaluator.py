@@ -339,7 +339,6 @@ class NodeEvaluatorForLinkableInstances:
     def _update_candidates_that_can_satisfy_linkable_specs(
         candidates_for_join: List[JoinLinkableInstancesRecipe],
         already_satisfisfied_linkable_specs: List[LinkableInstanceSpec],
-        join_type: SqlJoinType,
     ) -> List[JoinLinkableInstancesRecipe]:
         """Update / filter candidates_for_join based on linkable instance specs that we have already satisfied.
 
@@ -363,7 +362,7 @@ class NodeEvaluatorForLinkableInstances:
                         join_on_partition_dimensions=candidate_for_join.join_on_partition_dimensions,
                         join_on_partition_time_dimensions=candidate_for_join.join_on_partition_time_dimensions,
                         validity_window=candidate_for_join.validity_window,
-                        join_type=join_type,
+                        join_type=candidate_for_join.join_type,
                     )
                 )
         return sorted(
@@ -454,7 +453,6 @@ class NodeEvaluatorForLinkableInstances:
             candidates_for_join = self._update_candidates_that_can_satisfy_linkable_specs(
                 candidates_for_join=candidates_for_join,
                 already_satisfisfied_linkable_specs=next_candidate.satisfiable_linkable_specs,
-                join_type=default_join_type,
             )
 
             # The once possibly joinable specs are definitely joinable and no longer need to be searched for.
