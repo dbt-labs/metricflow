@@ -1,0 +1,27 @@
+('Got errors while resolving the query.\n'
+ '\n'
+ 'Error #1:\n'
+ '  Message:\n'
+ '\n'
+ "    Query(['entity_0_metric', 'entity_1_metric']) is built from:\n"
+ '\n'
+ "      Metric('entity_0_metric'), Metric('entity_1_metric').\n"
+ '    However, the given input does not match to a common item that is available to those parents:\n'
+ '\n'
+ '      {\n'
+ '        "Matching items for: Metric(\'entity_0_metric\')": [\'entity_0__country\',],\n'
+ '        "Matching items for: Metric(\'entity_1_metric\')": [\n'
+ "          'entity_1__entity_0__country',\n"
+ '        ],\n'
+ '      }\n'
+ '\n'
+ '    For time dimension inputs, please specify a time grain as ambiguous resolution only allows resolution when the '
+ 'parents have the same defined time gain.\n'
+ '\n'
+ '  Query Input:\n'
+ '\n'
+ '    entity_0__country\n'
+ '\n'
+ '  Issue Location:\n'
+ '\n'
+ "    [Resolve Query(['entity_0_metric', 'entity_1_metric'])]")
