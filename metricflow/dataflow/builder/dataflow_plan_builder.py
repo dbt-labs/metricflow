@@ -1117,7 +1117,6 @@ class DataflowPlanBuilder:
         if input_measure.join_to_timespine:
             query_contains_agg_time_dimension = queried_linkable_specs.contains_metric_time
             if not query_contains_agg_time_dimension:
-                # TODO: should this be checking valid agg time dims for measure or metric?
                 valid_agg_time_dimensions = self._semantic_model_lookup.get_agg_time_dimension_specs_for_measure(
                     measure_spec.reference
                 )
@@ -1338,8 +1337,7 @@ class DataflowPlanBuilder:
             )[0]
             time_range_node = JoinOverTimeRangeNode(
                 parent_node=measure_recipe.source_node,
-                # TODO: rename param
-                metric_time_dimension_spec=agg_time_dimension_spec_for_join,
+                time_dimension_spec_for_join=agg_time_dimension_spec_for_join,
                 window=cumulative_window,
                 grain_to_date=cumulative_grain_to_date,
                 time_range_constraint=time_range_constraint

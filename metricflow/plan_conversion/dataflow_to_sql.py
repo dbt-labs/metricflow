@@ -284,7 +284,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
         metric_time_dimension_instance: Optional[TimeDimensionInstance] = None
         for instance in input_data_set.instance_set.time_dimension_instances:
-            if instance.spec == node.metric_time_dimension_spec:
+            if instance.spec == node.time_dimension_spec_for_join:
                 metric_time_dimension_instance = instance
                 break
 
