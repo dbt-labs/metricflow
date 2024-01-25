@@ -22,4 +22,4 @@ semantic_model:
 
   entities:
     - name: entity_0
-      type: foreign
+      type: primary
