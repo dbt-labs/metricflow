@@ -9,7 +9,7 @@
             <JoinToTimeSpineNode>
                 <!-- description = 'Join to Time Spine Dataset' -->
                 <!-- node_id = NodeId(id_str='jts_0') -->
-                <!-- requested_metric_time_dimension_specs =                                  -->
+                <!-- requested_agg_time_dimension_specs =                                     -->
                 <!--   [TimeDimensionSpec(element_name='metric_time', time_granularity=DAY),] -->
                 <!-- time_range_constraint = None -->
                 <!-- offset_window = None -->

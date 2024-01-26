@@ -1309,7 +1309,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         time_spine_select_columns = []
         time_spine_dim_instances = []
         where: Optional[SqlExpressionNode] = None
-        for requested_time_dimension_spec in node.requested_metric_time_dimension_specs:
+        for requested_time_dimension_spec in node.requested_agg_time_dimension_specs:
             # Apply granularity to time spine column select expression.
             if requested_time_dimension_spec.time_granularity == time_spine_dim_instance.spec.time_granularity:
                 select_expr: SqlExpressionNode = time_spine_column_select_expr
