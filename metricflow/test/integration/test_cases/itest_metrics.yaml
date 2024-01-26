@@ -1743,3 +1743,129 @@ integration_test:
       ) subq_11
       WHERE booking__is_instant
     )
+---
+integration_test:
+  name: offset_window_with_agg_time_dim
+  description: Tests a derived metric query with an offset_window queried with agg_time_dimension
+  model: SIMPLE_MODEL
+  metrics: ["bookings_growth_2_weeks"]
+  group_bys: ["booking__ds__day"]
+  check_query: |
+    SELECT
+      COALESCE(a.booking__ds__day, b.booking__ds__day) AS booking__ds__day
+      , bookings - bookings_2_weeks_ago AS bookings_growth_2_weeks
+    FROM (
+      SELECT
+        ds AS booking__ds__day
+        , SUM(1) AS bookings
+      FROM {{ source_schema }}.fct_bookings
+      GROUP BY
+        ds
+    ) a
+    FULL OUTER JOIN (
+      SELECT
+        c.ds AS booking__ds__day
+        , d.bookings_2_weeks_ago AS bookings_2_weeks_ago
+      FROM {{ mf_time_spine_source }} c
+      INNER JOIN (
+        SELECT
+          ds AS booking__ds__day
+          , SUM(1) AS bookings_2_weeks_ago
+        FROM {{ source_schema }}.fct_bookings
+        GROUP BY
+          ds
+      ) d
+      ON {{ render_date_sub("C", "ds", 14, TimeGranularity.DAY) }} = d.booking__ds__day
+    ) b
+    ON a.booking__ds__day = b.booking__ds__day
+---
+integration_test:
+  name: offset_to_grain_with_agg_time_dim
+  description: Tests a derived metric query with an offset_to_grain and agg_time_dimension.
+  model: SIMPLE_MODEL
+  metrics: ["bookings_growth_since_start_of_month"]
+  group_bys: ["booking__ds__day"]
+  check_query: |
+    SELECT
+      COALESCE(a.booking__ds__day, b.booking__ds__day) AS booking__ds__day
+      , bookings - bookings_at_start_of_month AS bookings_growth_since_start_of_month
+    FROM (
+      SELECT
+        ds AS booking__ds__day
+        , SUM(1) AS bookings
+      FROM {{ source_schema }}.fct_bookings
+      GROUP BY
+        ds
+    ) a
+    FULL OUTER JOIN (
+      SELECT
+        c.ds AS booking__ds__day
+        , d.bookings_at_start_of_month AS bookings_at_start_of_month
+      FROM {{ mf_time_spine_source }} c
+      INNER JOIN (
+        SELECT
+          ds AS booking__ds__day
+          , SUM(1) AS bookings_at_start_of_month
+        FROM {{ source_schema }}.fct_bookings
+        GROUP BY
+          ds
+      ) d
+      ON {{ render_date_trunc("c.ds", TimeGranularity.MONTH) }} = d.booking__ds__day
+    ) b
+    ON a.booking__ds__day = b.booking__ds__day
+---
+integration_test:
+  name: nested_derived_metric_outer_offset_with_agg_time_dimension
+  description: Tests a nested derived metric where the outer metric has an input metric with offset_window, queried with agg_time_dimension.
+  model: SIMPLE_MODEL
+  metrics: ["bookings_offset_twice"]
+  group_by_objs: [{"name": "booking__ds__day"}]
+  check_query: |
+    SELECT
+      subq_9.ds AS booking__ds__day
+      , 2 * bookings_offset_once AS bookings_offset_twice
+    FROM {{ source_schema }}.mf_time_spine subq_9
+    INNER JOIN (
+      SELECT
+        booking__ds__day
+        , 2 * bookings AS bookings_offset_once
+      FROM (
+        SELECT
+          subq_3.ds AS booking__ds__day
+          , SUM(subq_1.bookings) AS bookings
+        FROM {{ source_schema }}.mf_time_spine subq_3
+        INNER JOIN (
+          SELECT
+            {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS booking__ds__day
+            , 1 AS bookings
+          FROM {{ source_schema }}.fct_bookings bookings_source_src_1
+        ) subq_1
+        ON
+          {{ render_date_sub("subq_3", "ds", 5, TimeGranularity.DAY) }} = subq_1.booking__ds__day
+        GROUP BY
+          subq_3.ds
+      ) subq_7
+    ) subq_8
+    ON
+      {{ render_date_sub("subq_9", "ds", 2, TimeGranularity.DAY) }} = subq_8.booking__ds__day
+---
+integration_test:
+  name: offset_metric_with_agg_time_dim_date_part
+  description: Tests a derived metric query with an offset and agg_time_dimension with date part.
+  model: SIMPLE_MODEL
+  metrics: ["bookings_5_day_lag"]
+  group_by_objs: [{"name": "booking__ds", "date_part": "doy"}]
+  check_query: |
+    SELECT
+      {{ render_extract("a.ds", DatePart.DOY) }} AS booking__ds__extract_doy
+      , b.bookings_5_day_lag
+    FROM {{ mf_time_spine_source }} a
+    INNER JOIN (
+      SELECT
+        ds
+        , SUM(1) AS bookings_5_day_lag
+      FROM {{ source_schema }}.fct_bookings
+      GROUP BY
+        ds
+    ) b
+    ON {{ render_date_sub("a", "ds", 5, TimeGranularity.DAY) }} = b.ds
