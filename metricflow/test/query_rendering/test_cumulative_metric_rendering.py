@@ -15,11 +15,7 @@ from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanCon
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.specs.specs import (
-    MetricFlowQuerySpec,
-    MetricSpec,
-    TimeDimensionSpec,
-)
+from metricflow.specs.specs import EntityReference, MetricFlowQuerySpec, MetricSpec, TimeDimensionSpec
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.query_rendering.compare_rendered_query import convert_and_check
@@ -292,6 +288,35 @@ def test_cumulative_metric_month(
         request=request,
         mf_test_session_state=mf_test_session_state,
         dataflow_to_sql_converter=extended_date_dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_cumulative_metric_with_agg_time_dimension(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    consistent_id_object_repository: ConsistentIdObjectRepository,
+    sql_client: SqlClient,
+) -> None:
+    """Tests rendering a query for a cumulative metric queried with agg time dimension."""
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="trailing_2_months_revenue"),),
+            dimension_specs=(),
+            time_dimension_specs=(
+                TimeDimensionSpec(element_name="ds", entity_links=(EntityReference("revenue_instance"),)),
+            ),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
     )
