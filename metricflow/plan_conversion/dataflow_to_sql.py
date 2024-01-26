@@ -203,8 +203,8 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
     def _make_time_spine_data_set(
         self,
-        metric_time_dimension_instance: TimeDimensionInstance,
-        metric_time_dimension_column_name: str,
+        agg_time_dimension_instance: TimeDimensionInstance,
+        agg_time_dimension_column_name: str,
         time_spine_source: TimeSpineSource,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
     ) -> SqlDataSet:
@@ -215,21 +215,21 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         """
         time_spine_instance = (
             TimeDimensionInstance(
-                defined_from=metric_time_dimension_instance.defined_from,
+                defined_from=agg_time_dimension_instance.defined_from,
                 associated_columns=(
                     ColumnAssociation(
-                        column_name=metric_time_dimension_column_name,
+                        column_name=agg_time_dimension_column_name,
                         single_column_correlation_key=SingleColumnCorrelationKey(),
                     ),
                 ),
-                spec=metric_time_dimension_instance.spec,
+                spec=agg_time_dimension_instance.spec,
             ),
         )
         time_spine_instance_set = InstanceSet(time_dimension_instances=time_spine_instance)
         time_spine_table_alias = self._next_unique_table_alias()
 
         # If the requested granularity is the same as the granularity of the spine, do a direct select.
-        if metric_time_dimension_instance.spec.time_granularity == time_spine_source.time_column_granularity:
+        if agg_time_dimension_instance.spec.time_granularity == time_spine_source.time_column_granularity:
             return SqlDataSet(
                 instance_set=time_spine_instance_set,
                 sql_select_node=SqlSelectStatementNode(
@@ -242,7 +242,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                                     column_name=time_spine_source.time_column_name,
                                 ),
                             ),
-                            column_alias=metric_time_dimension_column_name,
+                            column_alias=agg_time_dimension_column_name,
                         ),
                     ),
                     from_source=SqlTableFromClauseNode(sql_table=time_spine_source.spine_table),
@@ -264,7 +264,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             select_columns = (
                 SqlSelectColumn(
                     expr=SqlDateTruncExpression(
-                        time_granularity=metric_time_dimension_instance.spec.time_granularity,
+                        time_granularity=agg_time_dimension_instance.spec.time_granularity,
                         arg=SqlColumnReferenceExpression(
                             SqlColumnReference(
                                 table_alias=time_spine_table_alias,
@@ -272,7 +272,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                             ),
                         ),
                     ),
-                    column_alias=metric_time_dimension_column_name,
+                    column_alias=agg_time_dimension_column_name,
                 ),
             )
             return SqlDataSet(
@@ -328,8 +328,8 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         # Granularity of time_spine column should match granularity of metric_time column from parent dataset.
         assert metric_time_dimension_instance
         time_spine_data_set = self._make_time_spine_data_set(
-            metric_time_dimension_instance=metric_time_dimension_instance,
-            metric_time_dimension_column_name=metric_time_dimension_column_name,
+            agg_time_dimension_instance=metric_time_dimension_instance,
+            agg_time_dimension_column_name=metric_time_dimension_column_name,
             time_spine_source=self._time_spine_source,
             time_range_constraint=node.time_range_constraint,
         )
@@ -1279,8 +1279,8 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         ).column_name
         time_spine_alias = self._next_unique_table_alias()
         time_spine_dataset = self._make_time_spine_data_set(
-            metric_time_dimension_instance=agg_time_dimension_instance_for_join,
-            metric_time_dimension_column_name=agg_time_dimension_column_name,
+            agg_time_dimension_instance=agg_time_dimension_instance_for_join,
+            agg_time_dimension_column_name=agg_time_dimension_column_name,
             time_spine_source=self._time_spine_source,
             time_range_constraint=node.time_range_constraint,
         )
@@ -1289,7 +1289,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         join_description = SqlQueryPlanJoinBuilder.make_join_to_time_spine_join_description(
             node=node,
             time_spine_alias=time_spine_alias,
-            metric_time_dimension_column_name=agg_time_dimension_column_name,
+            agg_time_dimension_column_name=agg_time_dimension_column_name,
             parent_sql_select_node=parent_data_set.sql_select_node,
             parent_alias=parent_alias,
         )
