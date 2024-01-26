@@ -592,3 +592,8 @@ def test_duplicate_metric_query(bookings_query_parser: MetricFlowQueryParser) ->
             metric_names=["bookings", "bookings"],
             group_by_names=[MTD],
         )
+
+
+def test_no_metrics_or_group_by(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D
+    with pytest.raises(InvalidQueryException, match="no metrics or group by items"):
+        bookings_query_parser.parse_and_validate_query()
