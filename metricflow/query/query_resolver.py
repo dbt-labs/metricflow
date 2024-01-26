@@ -29,6 +29,7 @@ from metricflow.query.issues.parsing.invalid_limit import InvalidLimitIssue
 from metricflow.query.issues.parsing.invalid_metric import InvalidMetricIssue
 from metricflow.query.issues.parsing.invalid_min_max_only import InvalidMinMaxOnlyIssue
 from metricflow.query.issues.parsing.invalid_order import InvalidOrderByItemIssue
+from metricflow.query.issues.parsing.no_metric_or_group_by import NoMetricOrGroupByIssue
 from metricflow.query.query_resolution import (
     InputToIssueSetMapping,
     InputToIssueSetMappingItem,
@@ -100,6 +101,13 @@ class ResolveGroupByItemsResult:
     input_to_issue_set_mapping: InputToIssueSetMapping
 
 
+@dataclass(frozen=True)
+class ResolveMetricOrGroupByItemsResult:
+    """Result of checking that there are metrics or group by items in the query."""
+
+    input_to_issue_set_mapping: InputToIssueSetMapping
+
+
 class MetricFlowQueryResolver:
     """Resolves inputs to a query (e.g. metrics, group by items into concrete specs."""
 
@@ -113,6 +121,24 @@ class MetricFlowQueryResolver:
             manifest_lookup=self._manifest_lookup,
         )
         self._where_filter_pattern_factory = where_filter_pattern_factory
+
+    @staticmethod
+    def _resolve_has_metric_or_group_by_inputs(
+        resolver_input_for_query: ResolverInputForQuery, query_resolution_path: MetricFlowQueryResolutionPath
+    ) -> ResolveMetricOrGroupByItemsResult:
+        if len(resolver_input_for_query.metric_inputs) == 0 and len(resolver_input_for_query.group_by_item_inputs) == 0:
+            return ResolveMetricOrGroupByItemsResult(
+                input_to_issue_set_mapping=InputToIssueSetMapping.from_one_item(
+                    resolver_input=resolver_input_for_query,
+                    issue_set=MetricFlowQueryResolutionIssueSet.from_issue(
+                        NoMetricOrGroupByIssue.from_parameters(
+                            resolver_input_for_query=resolver_input_for_query,
+                            query_resolution_path=query_resolution_path,
+                        ),
+                    ),
+                )
+            )
+        return ResolveMetricOrGroupByItemsResult(input_to_issue_set_mapping=InputToIssueSetMapping.empty_instance())
 
     @staticmethod
     def _resolve_group_by_item_input(
@@ -351,6 +377,12 @@ class MetricFlowQueryResolver:
         )
 
         mappings_to_merge: List[InputToIssueSetMapping] = []
+
+        # Check that the query contains metrics or group by items.
+        resolve_metrics_or_group_by_result = self._resolve_has_metric_or_group_by_inputs(
+            resolver_input_for_query=resolver_input_for_query, query_resolution_path=query_resolution_path
+        )
+        mappings_to_merge.append(resolve_metrics_or_group_by_result.input_to_issue_set_mapping)
 
         # Resolve metrics.
         resolve_metrics_result = self._resolve_metric_inputs(metric_inputs, query_resolution_path=query_resolution_path)
