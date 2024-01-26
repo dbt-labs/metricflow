@@ -460,16 +460,7 @@ def test_cumulative_metric_wrong_time_dimension_validation() -> None:
 
 
 def test_cumulative_metric_agg_time_dimension_name_validation() -> None:
-    """Test that queries for cumulative metrics fail if the agg_time_dimension is selected by name.
-
-    Currently, cumulative metrics only return correct results if the query includes the `metric_time` virtual
-    dimension. In many cases the underlying agg_time_dimension is a single column and users will use it
-    directly instead of requesting metric_time. While shis should be fine, we cannot allow it until we fix
-    the query rendering issues that prevent this from working correctly.
-
-    This is a test of validation enforcement to ensure users don't get incorrect results due to current
-    limitations, and should be deleted or updated when this restriction is lifted.
-    """
+    """Test that queries for cumulative metrics succeed if the agg_time_dimension is selected by name."""
     bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=BOOKINGS_YAML)
     metrics_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=METRICS_YAML)
     revenue_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=REVENUE_YAML)
@@ -477,11 +468,7 @@ def test_cumulative_metric_agg_time_dimension_name_validation() -> None:
         [EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, bookings_yaml_file, revenue_yaml_file, metrics_yaml_file]
     )
 
-    with pytest.raises(InvalidQueryException, match="do not include 'metric_time'"):
-        query_parser.parse_and_validate_query(
-            metric_names=["revenue_cumulative"],
-            group_by_names=["company__ds"],
-        )
+    query_parser.parse_and_validate_query(metric_names=["revenue_cumulative"], group_by_names=["company__ds"])
 
 
 def test_derived_metric_query_parsing() -> None:
