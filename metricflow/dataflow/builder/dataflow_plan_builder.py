@@ -417,7 +417,7 @@ class DataflowPlanBuilder:
         metric_input_measure_spec = self._build_input_measure_spec_for_base_metric(
             filter_spec_factory=filter_spec_factory,
             metric_reference=metric_reference,
-            query_contains_metric_time=queried_linkable_specs.contains_metric_time,
+            queried_linkable_specs=queried_linkable_specs,
             child_metric_offset_window=metric_spec.offset_window,
             child_metric_offset_to_grain=metric_spec.offset_to_grain,
             cumulative_description=CumulativeMeasureDescription(
@@ -1061,7 +1061,7 @@ class DataflowPlanBuilder:
         child_metric_offset_window: Optional[MetricTimeWindow],
         child_metric_offset_to_grain: Optional[TimeGranularity],
         descendent_filter_specs: Sequence[WhereFilterSpec],
-        query_contains_metric_time: bool,
+        queried_linkable_specs: LinkableSpecSet,
         cumulative_description: Optional[CumulativeMeasureDescription],
     ) -> MetricInputMeasureSpec:
         """Return the input measure spec required to compute the base metric.
@@ -1103,15 +1103,25 @@ class DataflowPlanBuilder:
                 offset_to_grain=child_metric_offset_to_grain,
             )
 
-        # Even if the measure is configured to join to time spine, if there's no metric_time in the query,
-        # there's no need to join to the time spine since all metric_time will be aggregated.
+        # Even if the measure is configured to join to time spine, if there's no agg_time_dimension in the query,
+        # there's no need to join to the time spine since all time will be aggregated.
         after_aggregation_time_spine_join_description = None
-        if input_measure.join_to_timespine and query_contains_metric_time:
-            after_aggregation_time_spine_join_description = JoinToTimeSpineDescription(
-                join_type=SqlJoinType.LEFT_OUTER,
-                offset_window=None,
-                offset_to_grain=None,
-            )
+        if input_measure.join_to_timespine:
+            query_contains_agg_time_dimension = queried_linkable_specs.contains_metric_time
+            if not query_contains_agg_time_dimension:
+                valid_agg_time_dimensions = self._semantic_model_lookup.get_agg_time_dimension_specs_for_measure(
+                    measure_spec.reference
+                )
+                query_contains_agg_time_dimension = bool(
+                    set(queried_linkable_specs.time_dimension_specs).intersection(set(valid_agg_time_dimensions))
+                )
+
+            if query_contains_agg_time_dimension:
+                after_aggregation_time_spine_join_description = JoinToTimeSpineDescription(
+                    join_type=SqlJoinType.LEFT_OUTER,
+                    offset_window=None,
+                    offset_to_grain=None,
+                )
 
         filter_specs: List[WhereFilterSpec] = []
         filter_specs.extend(
@@ -1434,7 +1444,7 @@ class DataflowPlanBuilder:
             )
             return JoinToTimeSpineNode(
                 parent_node=aggregate_measures_node,
-                requested_agg_time_dimension_specs=list(queried_linkable_specs.metric_time_specs),
+                requested_agg_time_dimension_specs=queried_agg_time_dimension_specs,
                 join_type=after_aggregation_time_spine_join_description.join_type,
                 time_range_constraint=time_range_constraint,
                 offset_window=after_aggregation_time_spine_join_description.offset_window,
