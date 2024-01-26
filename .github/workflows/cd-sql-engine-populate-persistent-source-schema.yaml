@@ -20,9 +20,7 @@ env:
 jobs:
   snowflake-populate:
     environment: DW_INTEGRATION_TESTS
-    if: >
-      github.event.action == 'workflow_dispatch'
-      || (github.event.action == 'labeled' && github.event.label.name == 'Reload Test Data in SQL Engines')
+    if: ${{ github.event.action != 'labeled' || github.event.label.name == 'Reload Test Data in SQL Engines' }}
     name: Snowflake
     runs-on: ubuntu-latest
     steps:
@@ -41,9 +39,7 @@ jobs:
   redshift-populate:
     environment: DW_INTEGRATION_TESTS
     name: Redshift
-    if: >
-      github.event.action == 'workflow_dispatch'
-      || (github.event.action == 'labeled' && github.event.label.name == 'Reload Test Data in SQL Engines')
+    if: ${{ github.event.action != 'labeled' || github.event.label.name == 'Reload Test Data in SQL Engines' }}
     runs-on: ubuntu-latest
     steps:
       - name: Check-out the repo
@@ -61,9 +57,7 @@ jobs:
   bigquery-populate:
     environment: DW_INTEGRATION_TESTS
     name: BigQuery
-    if: >
-      github.event.action == 'workflow_dispatch'
-      || (github.event.action == 'labeled' && github.event.label.name == 'Reload Test Data in SQL Engines')
+    if: ${{ github.event.action != 'labeled' || github.event.label.name == 'Reload Test Data in SQL Engines' }}
     runs-on: ubuntu-latest
     steps:
       - name: Check-out the repo
@@ -81,9 +75,7 @@ jobs:
   databricks-populate:
     environment: DW_INTEGRATION_TESTS
     name: Databricks SQL Warehouse
-    if: >
-      github.event.action == 'workflow_dispatch'
-      || (github.event.action == 'labeled' && github.event.label.name == 'Reload Test Data in SQL Engines')
+    if: ${{ github.event.action != 'labeled' || github.event.label.name == 'Reload Test Data in SQL Engines' }}
     runs-on: ubuntu-latest
     steps:
       - name: Check-out the repo
