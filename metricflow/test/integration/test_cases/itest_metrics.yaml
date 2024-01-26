@@ -1195,6 +1195,26 @@ integration_test:
       1
 ---
 integration_test:
+  name: simple_fill_nulls_with_0_agg_time_dim
+  description: Test a simple query that joins to time spine and fills nulls, with agg_time_dimension
+  model: SIMPLE_MODEL
+  metrics: ["bookings_fill_nulls_with_0"]
+  group_by_objs: [{"name": "booking__ds__day"}]
+  check_query: |
+    SELECT
+      subq_5.ds AS booking__ds__day
+      , COALESCE(subq_3.bookings, 0) AS bookings_fill_nulls_with_0
+    FROM {{ source_schema }}.mf_time_spine subq_5
+    LEFT OUTER JOIN (
+      SELECT
+        {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS booking__ds__day
+        , SUM(1) AS bookings
+      FROM {{ source_schema }}.fct_bookings bookings_source_src_1
+      GROUP BY 1
+    ) subq_3
+    ON subq_5.ds = subq_3.booking__ds__day
+---
+integration_test:
   name: simple_fill_nulls_with_0_with_categorical_dimension
   description: Test simple query that fills nulls but doesn't join to time spine (categorical dimension)
   model: SIMPLE_MODEL
