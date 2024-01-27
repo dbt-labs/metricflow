@@ -120,17 +120,17 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, clean: bool) -
             4.  Try validating your data model: `mf validate-configs`
             5.  Check out your metrics: `mf list metrics`
             6.  Check out dimensions for your metric `mf list dimensions --metrics transactions`
-            7.  Query your first metric: `mf query --metrics transactions --group-bys metric_time --order metric_time`
+            7.  Query your first metric: `mf query --metrics transactions --group-by metric_time --order metric_time`
             8.  Show the SQL MetricFlow generates:
-                `mf query --metrics transactions --group-bys metric_time --order metric_time --explain`
+                `mf query --metrics transactions --group-by metric_time --order metric_time --explain`
             9.  Visualize the plan:
-                `mf query --metrics transactions --group-bys metric_time --order metric_time --explain --display-plans`
+                `mf query --metrics transactions --group-by metric_time --order metric_time --explain --display-plans`
                 * This only works if you have graphviz installed - see README.
             10.  Add another dimension:
-                `mf query --metrics transactions --group-bys metric_time,customer__customer_country --order metric_time`
+                `mf query --metrics transactions --group-by metric_time,customer__customer_country --order metric_time`
             11.  Add a coarser time granularity:
-                `mf query --metrics transactions --group-bys metric_time__week --order metric_time__week`
-            12. Try a more complicated query: mf query --metrics transactions,transaction_usd_na --group-bys metric_time,is_large --order metric_time --start-time 2022-03-20 --end-time 2022-04-01.
+                `mf query --metrics transactions --group-by metric_time__week --order metric_time__week`
+            12. Try a more complicated query: mf query --metrics transactions,transaction_usd_na --group-by metric_time,is_large --order metric_time --start-time 2022-03-20 --end-time 2022-04-01.
             13. When you're done with the tutorial, run mf tutorial --clean to delete sample models and seeds.
         """
     )
