@@ -25,7 +25,7 @@ class PrefixIdGenerator:
     TODO: Migrate ID generation use cases to this class.
     """
 
-    DEFAULT_START_VALUE = 0
+    _default_start_value = 0
     _state_lock = threading.Lock()
     _prefix_to_next_value: Dict[IdPrefix, int] = {}
 
@@ -33,8 +33,15 @@ class PrefixIdGenerator:
     def create_next_id(cls, id_prefix: IdPrefix) -> SequentialId:  # noqa: D
         with cls._state_lock:
             if id_prefix not in cls._prefix_to_next_value:
-                cls._prefix_to_next_value[id_prefix] = cls.DEFAULT_START_VALUE
+                cls._prefix_to_next_value[id_prefix] = cls._default_start_value
             index = cls._prefix_to_next_value[id_prefix]
             cls._prefix_to_next_value[id_prefix] = index + 1
 
             return SequentialId(id_prefix, index)
+
+    @classmethod
+    def reset(cls, default_start_value: int = 0) -> None:
+        """Resets the numbering of the generated IDs so that it starts at 0."""
+        with cls._state_lock:
+            cls._prefix_to_next_value = {}
+            cls._default_start_value = default_start_value
