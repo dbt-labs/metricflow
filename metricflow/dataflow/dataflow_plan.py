@@ -14,25 +14,7 @@ from dbt_semantic_interfaces.references import TimeDimensionReference
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
-from metricflow.dag.id_generation import (
-    DATAFLOW_NODE_ADD_UUID_COLUMN_PREFIX,
-    DATAFLOW_NODE_AGGREGATE_MEASURES_ID_PREFIX,
-    DATAFLOW_NODE_COMBINE_AGGREGATED_OUTPUTS_ID_PREFIX,
-    DATAFLOW_NODE_COMPUTE_METRICS_ID_PREFIX,
-    DATAFLOW_NODE_CONSTRAIN_TIME_RANGE_ID_PREFIX,
-    DATAFLOW_NODE_JOIN_CONVERSION_EVENTS_PREFIX,
-    DATAFLOW_NODE_JOIN_SELF_OVER_TIME_RANGE_ID_PREFIX,
-    DATAFLOW_NODE_JOIN_TO_STANDARD_OUTPUT_ID_PREFIX,
-    DATAFLOW_NODE_JOIN_TO_TIME_SPINE_ID_PREFIX,
-    DATAFLOW_NODE_MIN_MAX_ID_PREFIX,
-    DATAFLOW_NODE_ORDER_BY_LIMIT_ID_PREFIX,
-    DATAFLOW_NODE_PASS_FILTER_ELEMENTS_ID_PREFIX,
-    DATAFLOW_NODE_READ_SQL_SOURCE_ID_PREFIX,
-    DATAFLOW_NODE_SEMI_ADDITIVE_JOIN_ID_PREFIX,
-    DATAFLOW_NODE_SET_MEASURE_AGGREGATION_TIME,
-    DATAFLOW_NODE_WHERE_CONSTRAINT_ID_PREFIX,
-    DATAFLOW_NODE_WRITE_TO_RESULT_DATAFRAME_ID_PREFIX,
-)
+from metricflow.dag.id_prefix import IdPrefix
 from metricflow.dag.mf_dag import DagId, DagNode, DisplayedProperty, MetricFlowDag, NodeId
 from metricflow.dataflow.builder.partitions import (
     PartitionDimensionJoinDescription,
@@ -218,7 +200,7 @@ class ReadSqlSourceNode(BaseOutput):
 
     @classmethod
     def id_prefix(cls) -> str:  # noqa: D
-        return DATAFLOW_NODE_READ_SQL_SOURCE_ID_PREFIX
+        return IdPrefix.DATAFLOW_NODE_READ_SQL_SOURCE_ID_PREFIX
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_source_node(self)
@@ -308,7 +290,7 @@ class JoinToBaseOutputNode(BaseOutput):
 
     @classmethod
     def id_prefix(cls) -> str:  # noqa: D
-        return DATAFLOW_NODE_JOIN_TO_STANDARD_OUTPUT_ID_PREFIX
+        return IdPrefix.DATAFLOW_NODE_JOIN_TO_STANDARD_OUTPUT_ID_PREFIX
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_join_to_base_output_node(self)
@@ -410,7 +392,7 @@ class JoinOverTimeRangeNode(BaseOutput):
 
     @classmethod
     def id_prefix(cls) -> str:  # noqa: D
-        return DATAFLOW_NODE_JOIN_SELF_OVER_TIME_RANGE_ID_PREFIX
+        return IdPrefix.DATAFLOW_NODE_JOIN_SELF_OVER_TIME_RANGE_ID_PREFIX
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_join_over_time_range_node(self)
@@ -490,7 +472,7 @@ class AggregateMeasuresNode(AggregatedMeasuresOutput):
 
     @classmethod
     def id_prefix(cls) -> str:  # noqa: D
-        return DATAFLOW_NODE_AGGREGATE_MEASURES_ID_PREFIX
+        return IdPrefix.DATAFLOW_NODE_AGGREGATE_MEASURES_ID_PREFIX
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_aggregate_measures_node(self)
@@ -603,7 +585,7 @@ class SemiAdditiveJoinNode(BaseOutput):
 
     @classmethod
     def id_prefix(cls) -> str:  # noqa: D
-        return DATAFLOW_NODE_SEMI_ADDITIVE_JOIN_ID_PREFIX
+        return IdPrefix.DATAFLOW_NODE_SEMI_ADDITIVE_JOIN_ID_PREFIX
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_semi_additive_join_node(self)
@@ -710,7 +692,7 @@ class JoinToTimeSpineNode(BaseOutput, ABC):
 
     @classmethod
     def id_prefix(cls) -> str:  # noqa: D
-        return DATAFLOW_NODE_JOIN_TO_TIME_SPINE_ID_PREFIX
+        return IdPrefix.DATAFLOW_NODE_JOIN_TO_TIME_SPINE_ID_PREFIX
 
     @property
     def requested_agg_time_dimension_specs(self) -> List[TimeDimensionSpec]:
@@ -804,7 +786,7 @@ class ComputeMetricsNode(ComputedMetricsOutput):
 
     @classmethod
     def id_prefix(cls) -> str:  # noqa: D
-        return DATAFLOW_NODE_COMPUTE_METRICS_ID_PREFIX
+        return IdPrefix.DATAFLOW_NODE_COMPUTE_METRICS_ID_PREFIX
 
     @property
     def metric_specs(self) -> List[MetricSpec]:  # noqa: D
@@ -868,7 +850,7 @@ class OrderByLimitNode(ComputedMetricsOutput):
 
     @classmethod
     def id_prefix(cls) -> str:  # noqa: D
-        return DATAFLOW_NODE_ORDER_BY_LIMIT_ID_PREFIX
+        return IdPrefix.DATAFLOW_NODE_ORDER_BY_LIMIT_ID_PREFIX
 
     @property
     def order_by_specs(self) -> List[OrderBySpec]:
@@ -940,7 +922,7 @@ class MetricTimeDimensionTransformNode(BaseOutput):
 
     @classmethod
     def id_prefix(cls) -> str:  # noqa: D
-        return DATAFLOW_NODE_SET_MEASURE_AGGREGATION_TIME
+        return IdPrefix.DATAFLOW_NODE_SET_MEASURE_AGGREGATION_TIME
 
     @property
     def aggregation_time_dimension_reference(self) -> TimeDimensionReference:
@@ -1012,7 +994,7 @@ class WriteToResultDataframeNode(SinkOutput):
 
     @classmethod
     def id_prefix(cls) -> str:  # noqa: D
-        return DATAFLOW_NODE_WRITE_TO_RESULT_DATAFRAME_ID_PREFIX
+        return IdPrefix.DATAFLOW_NODE_WRITE_TO_RESULT_DATAFRAME_ID_PREFIX
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_write_to_result_dataframe_node(self)
@@ -1057,7 +1039,7 @@ class WriteToResultTableNode(SinkOutput):
 
     @classmethod
     def id_prefix(cls) -> str:  # noqa: D
-        return DATAFLOW_NODE_WRITE_TO_RESULT_DATAFRAME_ID_PREFIX
+        return IdPrefix.DATAFLOW_NODE_WRITE_TO_RESULT_DATAFRAME_ID_PREFIX
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_write_to_result_table_node(self)
@@ -1106,7 +1088,7 @@ class FilterElementsNode(BaseOutput):
 
     @classmethod
     def id_prefix(cls) -> str:  # noqa: D
-        return DATAFLOW_NODE_PASS_FILTER_ELEMENTS_ID_PREFIX
+        return IdPrefix.DATAFLOW_NODE_PASS_FILTER_ELEMENTS_ID_PREFIX
 
     @property
     def include_specs(self) -> InstanceSpecSet:
@@ -1172,7 +1154,7 @@ class WhereConstraintNode(AggregatedMeasuresOutput):
 
     @classmethod
     def id_prefix(cls) -> str:  # noqa: D
-        return DATAFLOW_NODE_WHERE_CONSTRAINT_ID_PREFIX
+        return IdPrefix.DATAFLOW_NODE_WHERE_CONSTRAINT_ID_PREFIX
 
     @property
     def where(self) -> WhereFilterSpec:
@@ -1214,7 +1196,7 @@ class CombineAggregatedOutputsNode(ComputedMetricsOutput):
 
     @classmethod
     def id_prefix(cls) -> str:  # noqa: D
-        return DATAFLOW_NODE_COMBINE_AGGREGATED_OUTPUTS_ID_PREFIX
+        return IdPrefix.DATAFLOW_NODE_COMBINE_AGGREGATED_OUTPUTS_ID_PREFIX
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_combine_aggregated_outputs_node(self)
@@ -1248,7 +1230,7 @@ class ConstrainTimeRangeNode(AggregatedMeasuresOutput, BaseOutput):
 
     @classmethod
     def id_prefix(cls) -> str:  # noqa: D
-        return DATAFLOW_NODE_CONSTRAIN_TIME_RANGE_ID_PREFIX
+        return IdPrefix.DATAFLOW_NODE_CONSTRAIN_TIME_RANGE_ID_PREFIX
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_constrain_time_range_node(self)
@@ -1296,7 +1278,7 @@ class MinMaxNode(BaseOutput):
 
     @classmethod
     def id_prefix(cls) -> str:  # noqa: D
-        return DATAFLOW_NODE_MIN_MAX_ID_PREFIX
+        return IdPrefix.DATAFLOW_NODE_MIN_MAX_ID_PREFIX
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_min_max_node(self)
@@ -1325,7 +1307,7 @@ class AddGeneratedUuidColumnNode(BaseOutput):
 
     @classmethod
     def id_prefix(cls) -> str:  # noqa: D
-        return DATAFLOW_NODE_ADD_UUID_COLUMN_PREFIX
+        return IdPrefix.DATAFLOW_NODE_ADD_UUID_COLUMN_PREFIX
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_add_generated_uuid_column_node(self)
@@ -1393,7 +1375,7 @@ class JoinConversionEventsNode(BaseOutput):
 
     @classmethod
     def id_prefix(cls) -> str:  # noqa: D
-        return DATAFLOW_NODE_JOIN_CONVERSION_EVENTS_PREFIX
+        return IdPrefix.DATAFLOW_NODE_JOIN_CONVERSION_EVENTS_PREFIX
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_join_conversion_events_node(self)

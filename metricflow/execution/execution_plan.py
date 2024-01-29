@@ -10,7 +10,7 @@ from typing import List, Optional, Sequence, Tuple
 import jinja2
 import pandas as pd
 
-from metricflow.dag.id_generation import EXEC_NODE_READ_SQL_QUERY, EXEC_NODE_WRITE_TO_TABLE
+from metricflow.dag.id_prefix import IdPrefix
 from metricflow.dag.mf_dag import DagId, DagNode, DisplayedProperty, MetricFlowDag, NodeId
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_client import SqlClient
@@ -105,7 +105,7 @@ class SelectSqlQueryToDataFrameTask(ExecutionPlanTask):
 
     @classmethod
     def id_prefix(cls) -> str:  # noqa: D
-        return EXEC_NODE_READ_SQL_QUERY
+        return IdPrefix.EXEC_NODE_READ_SQL_QUERY
 
     @property
     def description(self) -> str:  # noqa: D
@@ -162,7 +162,7 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
 
     @classmethod
     def id_prefix(cls) -> str:  # noqa: D
-        return EXEC_NODE_WRITE_TO_TABLE
+        return IdPrefix.EXEC_NODE_WRITE_TO_TABLE
 
     @property
     def description(self) -> str:  # noqa: D
