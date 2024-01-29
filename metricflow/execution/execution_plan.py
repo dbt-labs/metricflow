@@ -216,14 +216,13 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
 class ExecutionPlan(MetricFlowDag[ExecutionPlanTask]):
     """A DAG where the nodes are tasks, and parents represent prerequisite tasks."""
 
-    def __init__(self, plan_id: str, leaf_tasks: List[ExecutionPlanTask]) -> None:
+    def __init__(self, leaf_tasks: List[ExecutionPlanTask]) -> None:
         """Constructor.
 
         Args:
-            plan_id: A string to uniquely identify this plan.
             leaf_tasks: The final set of tasks that will run, after task dependencies are finished.
         """
-        super().__init__(dag_id=DagId.from_str(plan_id), sink_nodes=leaf_tasks)
+        super().__init__(dag_id=DagId.from_id_prefix(IdPrefix.EXEC_PLAN_PREFIX), sink_nodes=leaf_tasks)
 
     @property
     def tasks(self) -> Sequence[ExecutionPlanTask]:

@@ -1467,11 +1467,11 @@ class JoinConversionEventsNode(BaseOutput):
 class DataflowPlan(MetricFlowDag[SinkOutput]):
     """Describes the flow of metric data as it goes from source nodes to sink nodes in the graph."""
 
-    def __init__(self, plan_id: str, sink_output_nodes: List[SinkOutput]) -> None:  # noqa: D
+    def __init__(self, sink_output_nodes: List[SinkOutput]) -> None:  # noqa: D
         if len(sink_output_nodes) == 0:
             raise RuntimeError("Can't create a dataflow plan without sink node(s).")
         self._sink_output_nodes = sink_output_nodes
-        super().__init__(dag_id=DagId.from_str(plan_id), sink_nodes=sink_output_nodes)
+        super().__init__(dag_id=DagId.from_id_prefix(IdPrefix.DATAFLOW_PLAN_PREFIX), sink_nodes=sink_output_nodes)
 
     @property
     def sink_output_nodes(self) -> List[SinkOutput]:  # noqa: D

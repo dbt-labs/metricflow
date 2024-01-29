@@ -513,7 +513,7 @@ def test_compute_metrics_node_simple_expr(
     compute_metrics_node = ComputeMetricsNode(parent_node=aggregated_measures_node, metric_specs=[metric_spec])
 
     sink_node = WriteToResultDataframeNode(compute_metrics_node)
-    dataflow_plan = DataflowPlan("plan0", sink_output_nodes=[sink_node])
+    dataflow_plan = DataflowPlan(sink_output_nodes=[sink_node])
 
     assert_plan_snapshot_text_equal(
         request=request,
@@ -581,7 +581,7 @@ def test_join_to_time_spine_node_without_offset(  # noqa: D
         join_type=SqlJoinType.INNER,
     )
     sink_node = WriteToResultDataframeNode(join_to_time_spine_node)
-    dataflow_plan = DataflowPlan("plan0", sink_output_nodes=[sink_node])
+    dataflow_plan = DataflowPlan(sink_output_nodes=[sink_node])
 
     assert_plan_snapshot_text_equal(
         request=request,
@@ -650,7 +650,7 @@ def test_join_to_time_spine_node_with_offset_window(  # noqa: D
     )
 
     sink_node = WriteToResultDataframeNode(join_to_time_spine_node)
-    dataflow_plan = DataflowPlan("plan0", sink_output_nodes=[sink_node])
+    dataflow_plan = DataflowPlan(sink_output_nodes=[sink_node])
 
     assert_plan_snapshot_text_equal(
         request=request,
@@ -720,7 +720,7 @@ def test_join_to_time_spine_node_with_offset_to_grain(
     )
 
     sink_node = WriteToResultDataframeNode(join_to_time_spine_node)
-    dataflow_plan = DataflowPlan("plan0", sink_output_nodes=[sink_node])
+    dataflow_plan = DataflowPlan(sink_output_nodes=[sink_node])
 
     assert_plan_snapshot_text_equal(
         request=request,

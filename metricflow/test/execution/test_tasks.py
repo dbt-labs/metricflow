@@ -18,7 +18,7 @@ from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 
 def test_read_sql_task(sql_client: SqlClient) -> None:  # noqa: D
     task = SelectSqlQueryToDataFrameTask(sql_client, "SELECT 1 AS foo", SqlBindParameters())
-    execution_plan = ExecutionPlan("plan0", leaf_tasks=[task])
+    execution_plan = ExecutionPlan(leaf_tasks=[task])
 
     results = SequentialPlanExecutor().execute_plan(execution_plan)
     task_result = results.get_result(task.task_id)
@@ -44,7 +44,7 @@ def test_write_table_task(mf_test_session_state: MetricFlowTestSessionState, sql
         bind_parameters=SqlBindParameters(),
         output_table=output_table,
     )
-    execution_plan = ExecutionPlan("plan0", leaf_tasks=[task])
+    execution_plan = ExecutionPlan(leaf_tasks=[task])
 
     results = SequentialPlanExecutor().execute_plan(execution_plan)
 
