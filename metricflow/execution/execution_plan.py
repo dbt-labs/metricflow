@@ -104,7 +104,7 @@ class SelectSqlQueryToDataFrameTask(ExecutionPlanTask):
         super().__init__(task_id=self.create_unique_id(), parent_nodes=parent_nodes or [])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.EXEC_NODE_READ_SQL_QUERY
 
     @property
@@ -161,7 +161,7 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
         super().__init__(task_id=self.create_unique_id(), parent_nodes=parent_nodes or [])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.EXEC_NODE_WRITE_TO_TABLE
 
     @property

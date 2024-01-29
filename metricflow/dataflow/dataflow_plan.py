@@ -199,7 +199,7 @@ class ReadSqlSourceNode(BaseOutput):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.DATAFLOW_NODE_READ_SQL_SOURCE_ID_PREFIX
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
@@ -289,7 +289,7 @@ class JoinToBaseOutputNode(BaseOutput):
         super().__init__(node_id=node_id or self.create_unique_id(), parent_nodes=parent_nodes)
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.DATAFLOW_NODE_JOIN_TO_STANDARD_OUTPUT_ID_PREFIX
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
@@ -391,7 +391,7 @@ class JoinOverTimeRangeNode(BaseOutput):
         super().__init__(node_id=node_id or self.create_unique_id(), parent_nodes=parent_nodes)
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.DATAFLOW_NODE_JOIN_SELF_OVER_TIME_RANGE_ID_PREFIX
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
@@ -471,7 +471,7 @@ class AggregateMeasuresNode(AggregatedMeasuresOutput):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[self._parent_node])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.DATAFLOW_NODE_AGGREGATE_MEASURES_ID_PREFIX
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
@@ -584,7 +584,7 @@ class SemiAdditiveJoinNode(BaseOutput):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=parent_nodes)
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.DATAFLOW_NODE_SEMI_ADDITIVE_JOIN_ID_PREFIX
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
@@ -691,7 +691,7 @@ class JoinToTimeSpineNode(BaseOutput, ABC):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[self._parent_node])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.DATAFLOW_NODE_JOIN_TO_TIME_SPINE_ID_PREFIX
 
     @property
@@ -785,7 +785,7 @@ class ComputeMetricsNode(ComputedMetricsOutput):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[self._parent_node])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.DATAFLOW_NODE_COMPUTE_METRICS_ID_PREFIX
 
     @property
@@ -849,7 +849,7 @@ class OrderByLimitNode(ComputedMetricsOutput):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[self._parent_node])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.DATAFLOW_NODE_ORDER_BY_LIMIT_ID_PREFIX
 
     @property
@@ -921,7 +921,7 @@ class MetricTimeDimensionTransformNode(BaseOutput):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[parent_node])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.DATAFLOW_NODE_SET_MEASURE_AGGREGATION_TIME
 
     @property
@@ -993,7 +993,7 @@ class WriteToResultDataframeNode(SinkOutput):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[parent_node])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.DATAFLOW_NODE_WRITE_TO_RESULT_DATAFRAME_ID_PREFIX
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
@@ -1038,7 +1038,7 @@ class WriteToResultTableNode(SinkOutput):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[parent_node])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.DATAFLOW_NODE_WRITE_TO_RESULT_DATAFRAME_ID_PREFIX
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
@@ -1087,7 +1087,7 @@ class FilterElementsNode(BaseOutput):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[parent_node])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.DATAFLOW_NODE_PASS_FILTER_ELEMENTS_ID_PREFIX
 
     @property
@@ -1153,7 +1153,7 @@ class WhereConstraintNode(AggregatedMeasuresOutput):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[parent_node])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.DATAFLOW_NODE_WHERE_CONSTRAINT_ID_PREFIX
 
     @property
@@ -1195,7 +1195,7 @@ class CombineAggregatedOutputsNode(ComputedMetricsOutput):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=list(parent_nodes))
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.DATAFLOW_NODE_COMBINE_AGGREGATED_OUTPUTS_ID_PREFIX
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
@@ -1229,7 +1229,7 @@ class ConstrainTimeRangeNode(AggregatedMeasuresOutput, BaseOutput):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[parent_node])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.DATAFLOW_NODE_CONSTRAIN_TIME_RANGE_ID_PREFIX
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
@@ -1277,7 +1277,7 @@ class MinMaxNode(BaseOutput):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[parent_node])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.DATAFLOW_NODE_MIN_MAX_ID_PREFIX
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
@@ -1306,7 +1306,7 @@ class AddGeneratedUuidColumnNode(BaseOutput):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[parent_node])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.DATAFLOW_NODE_ADD_UUID_COLUMN_PREFIX
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
@@ -1374,7 +1374,7 @@ class JoinConversionEventsNode(BaseOutput):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[base_node, conversion_node])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.DATAFLOW_NODE_JOIN_CONVERSION_EVENTS_PREFIX
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D

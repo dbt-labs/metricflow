@@ -67,3 +67,7 @@ class IdPrefix(Enum):
     EXEC_PLAN_PREFIX = "ep"
 
     MF_DAG = "mfd"
+
+    TIME_SPINE_SOURCE = "spine"
+    SEMANTIC_MODEL_SOURCE = "src"
+    SUB_QUERY = "subq"

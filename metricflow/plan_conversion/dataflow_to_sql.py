@@ -13,7 +13,6 @@ from dbt_semantic_interfaces.type_enums.conversion_calculation_type import Conve
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 
 from metricflow.aggregation_properties import AggregationState
-from metricflow.dag.id_generation import IdGeneratorRegistry
 from metricflow.dataflow.dataflow_plan import (
     AddGeneratedUuidColumnNode,
     AggregateMeasuresNode,
@@ -200,7 +199,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
     def _next_unique_table_alias(self) -> str:
         """Return the next unique table alias to use in generating queries."""
-        return IdGeneratorRegistry.for_class(self.__class__).create_id(prefix="subq")
+        return PrefixIdGenerator.create_next_id(IdPrefix.SUB_QUERY).str_value
 
     def _make_time_spine_data_set(
         self,

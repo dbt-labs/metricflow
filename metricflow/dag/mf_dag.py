@@ -12,7 +12,6 @@ from typing import Any, Generic, List, Sequence, TypeVar
 import jinja2
 
 from metricflow.dag.dag_to_text import MetricFlowDagTextFormatter
-from metricflow.dag.id_generation import IdGeneratorRegistry
 from metricflow.dag.id_prefix import IdPrefix
 from metricflow.dag.prefix_id import PrefixIdGenerator
 from metricflow.visitor import VisitorOutputT
@@ -96,7 +95,7 @@ class DagNode(ABC):
 
     @classmethod
     @abstractmethod
-    def id_prefix(cls) -> str:
+    def id_prefix(cls) -> IdPrefix:
         """The prefix to use when generating IDs for nodes.
 
         e.g. a prefix of "my_node" will generate an ID like "my_node_0"
@@ -106,7 +105,7 @@ class DagNode(ABC):
     @classmethod
     def create_unique_id(cls) -> NodeId:
         """Create and return a unique identifier to use when creating nodes."""
-        return NodeId(IdGeneratorRegistry.for_class(cls).create_id(cls.id_prefix()))
+        return NodeId(id_str=PrefixIdGenerator.create_next_id(cls.id_prefix()).str_value)
 
     def accept_dag_node_visitor(self, visitor: DagNodeVisitor[VisitorOutputT]) -> VisitorOutputT:
         """Visit this node."""
