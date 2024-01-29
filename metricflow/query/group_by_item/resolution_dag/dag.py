@@ -4,7 +4,6 @@ from typing import Union
 
 from metricflow.dag.id_prefix import IdPrefix
 from metricflow.dag.mf_dag import DagId, MetricFlowDag
-from metricflow.dag.prefix_id import PrefixIdGenerator
 from metricflow.query.group_by_item.resolution_dag.resolution_nodes.base_node import GroupByItemResolutionNode
 from metricflow.query.group_by_item.resolution_dag.resolution_nodes.metric_resolution_node import (
     MetricGroupByItemResolutionNode,
@@ -31,7 +30,7 @@ class GroupByItemResolutionDag(MetricFlowDag[GroupByItemResolutionNode]):
 
     def __init__(self, sink_node: ResolutionDagSinkNode) -> None:  # noqa: D
         super().__init__(
-            dag_id=DagId.from_str(PrefixIdGenerator.create_next_id(IdPrefix.GROUP_BY_ITEM_RESOLUTION_DAG.value)),
+            dag_id=DagId.from_id_prefix(IdPrefix.GROUP_BY_ITEM_RESOLUTION_DAG),
             sink_nodes=[sink_node],
         )
         self._sink_node = sink_node

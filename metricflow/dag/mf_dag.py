@@ -170,6 +170,10 @@ class DagId:
         """Migration helper to create DAG IDs."""
         return DagId(id_str)
 
+    @staticmethod
+    def from_id_prefix(id_prefix: IdPrefix) -> DagId:  # noqa: D
+        return DagId(id_str=PrefixIdGenerator.create_next_id(id_prefix).str_value)
+
 
 DagNodeT = TypeVar("DagNodeT", bound=DagNode)
 

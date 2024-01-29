@@ -13,6 +13,8 @@ from dbt_semantic_interfaces.type_enums.conversion_calculation_type import Conve
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 
 from metricflow.aggregation_properties import AggregationState
+from metricflow.dag.id_prefix import IdPrefix
+from metricflow.dag.prefix_id import PrefixIdGenerator
 from metricflow.dataflow.dataflow_plan import (
     AddGeneratedUuidColumnNode,
     AggregateMeasuresNode,

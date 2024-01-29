@@ -22,8 +22,6 @@ from dbt_semantic_interfaces.references import (
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 
-from metricflow.dag.id_prefix import IdPrefix
-from metricflow.dag.prefix_id import PrefixIdGenerator
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.node_evaluator import (
     JoinLinkableInstancesRecipe,
@@ -207,9 +205,7 @@ class DataflowPlanBuilder:
             output_selection_specs=output_selection_specs,
         )
 
-        plan_id = PrefixIdGenerator.create_next_id(IdPrefix.DATAFLOW_PLAN_PREFIX)
-
-        plan = DataflowPlan(plan_id=plan_id, sink_output_nodes=[sink_node])
+        plan = DataflowPlan(sink_output_nodes=[sink_node])
         for optimizer in optimizers:
             logger.info(f"Applying {optimizer.__class__.__name__}")
             try:
@@ -647,9 +643,7 @@ class DataflowPlanBuilder:
             parent_node=output_node, order_by_specs=query_spec.order_by_specs, limit=query_spec.limit
         )
 
-        plan_id = PrefixIdGenerator.create_next_id(IdPrefix.DATAFLOW_PLAN_PREFIX)
-
-        return DataflowPlan(plan_id=plan_id, sink_output_nodes=[sink_node])
+        return DataflowPlan(sink_output_nodes=[sink_node])
 
     @staticmethod
     def build_sink_node(

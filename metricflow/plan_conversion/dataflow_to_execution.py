@@ -79,7 +79,6 @@ class DataflowToExecutionPlanConverter(SinkNodeVisitor[ExecutionPlan]):
             )
 
         return ExecutionPlan(
-            plan_id=PrefixIdGenerator.create_next_id(IdPrefix.EXEC_PLAN_PREFIX),
             leaf_tasks=[leaf_task],
         )
 
