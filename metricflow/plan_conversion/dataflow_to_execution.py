@@ -3,8 +3,8 @@ from __future__ import annotations
 import logging
 from typing import Optional, Union
 
-from metricflow.dag.id_generation import IdGeneratorRegistry
 from metricflow.dag.id_prefix import IdPrefix
+from metricflow.dag.prefix_id import PrefixIdGenerator
 from metricflow.dataflow.dataflow_plan import (
     BaseOutput,
     ComputedMetricsOutput,
@@ -23,7 +23,6 @@ from metricflow.execution.execution_plan import (
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
-from metricflow.sql.sql_plan import SqlQueryPlan
 
 logger = logging.getLogger(__name__)
 
@@ -55,7 +54,7 @@ class DataflowToExecutionPlanConverter(SinkNodeVisitor[ExecutionPlan]):
     ) -> ExecutionPlan:
         sql_plan = self._sql_plan_converter.convert_to_sql_query_plan(
             sql_engine_type=self._sql_client.sql_engine_type,
-            sql_query_plan_id=IdGeneratorRegistry.for_class(SqlQueryPlan).create_id(IdPrefix.SQL_QUERY_PLAN_PREFIX),
+            sql_query_plan_id=PrefixIdGenerator.create_next_id(IdPrefix.SQL_QUERY_PLAN_PREFIX),
             dataflow_plan_node=node,
         )
 
@@ -80,7 +79,7 @@ class DataflowToExecutionPlanConverter(SinkNodeVisitor[ExecutionPlan]):
             )
 
         return ExecutionPlan(
-            plan_id=IdGeneratorRegistry.for_class(self.__class__).create_id(IdPrefix.EXEC_PLAN_PREFIX),
+            plan_id=PrefixIdGenerator.create_next_id(IdPrefix.EXEC_PLAN_PREFIX),
             leaf_tasks=[leaf_task],
         )
 

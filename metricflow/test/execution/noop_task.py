@@ -36,7 +36,7 @@ class NoOpExecutionPlanTask(ExecutionPlanTask):
         return "Dummy No-Op"
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.EXEC_NODE_NOOP
 
     def execute(self) -> TaskExecutionResult:  # noqa: D

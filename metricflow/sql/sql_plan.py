@@ -155,7 +155,7 @@ class SqlSelectStatementNode(SqlQueryPlanNode):
         )
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.SQL_PLAN_SELECT_STATEMENT_ID_PREFIX
 
     @property
@@ -231,7 +231,7 @@ class SqlTableFromClauseNode(SqlQueryPlanNode):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.SQL_PLAN_TABLE_FROM_CLAUSE_ID_PREFIX
 
     @property
@@ -268,7 +268,7 @@ class SqlSelectQueryFromClauseNode(SqlQueryPlanNode):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.SQL_PLAN_TABLE_FROM_CLAUSE_ID_PREFIX
 
     @property

@@ -260,7 +260,7 @@ class SqlStringExpression(SqlExpressionNode):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.SQL_EXPR_STRING_ID_PREFIX
 
     def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
@@ -329,7 +329,7 @@ class SqlStringLiteralExpression(SqlExpressionNode):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.SQL_EXPR_STRING_LITERAL_PREFIX
 
     def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
@@ -402,7 +402,7 @@ class SqlColumnReferenceExpression(SqlExpressionNode):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.SQL_EXPR_COLUMN_REFERENCE_ID_PREFIX
 
     def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
@@ -490,7 +490,7 @@ class SqlColumnAliasReferenceExpression(SqlExpressionNode):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.SQL_EXPR_COLUMN_REFERENCE_ID_PREFIX
 
     def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
@@ -563,7 +563,7 @@ class SqlComparisonExpression(SqlExpressionNode):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[self._left_expr, self._right_expr])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.SQL_EXPR_COMPARISON_ID_PREFIX
 
     def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
@@ -755,7 +755,7 @@ class SqlAggregateFunctionExpression(SqlFunctionExpression):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=sql_function_args)
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.SQL_EXPR_FUNCTION_ID_PREFIX
 
     @property
@@ -878,7 +878,7 @@ class SqlPercentileExpression(SqlFunctionExpression):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[order_by_arg])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.SQL_EXPR_PERCENTILE_ID_PREFIX
 
     @property
@@ -1000,7 +1000,7 @@ class SqlWindowFunctionExpression(SqlFunctionExpression):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=parent_nodes)
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.SQL_EXPR_WINDOW_FUNCTION_ID_PREFIX
 
     @property
@@ -1093,7 +1093,7 @@ class SqlNullExpression(SqlExpressionNode):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.SQL_EXPR_NULL_PREFIX
 
     @property
@@ -1140,7 +1140,7 @@ class SqlLogicalExpression(SqlExpressionNode):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=list(args))
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.SQL_EXPR_LOGICAL_OPERATOR_PREFIX
 
     @property
@@ -1192,7 +1192,7 @@ class SqlIsNullExpression(SqlExpressionNode):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[arg])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.SQL_EXPR_IS_NULL_PREFIX
 
     @property
@@ -1248,7 +1248,7 @@ class SqlSubtractTimeIntervalExpression(SqlExpressionNode):
         self._arg = arg
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.SQL_EXPR_SUBTRACT_TIME_INTERVAL_PREFIX
 
     @property
@@ -1304,7 +1304,7 @@ class SqlCastToTimestampExpression(SqlExpressionNode):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[arg])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.SQL_EXPR_CAST_TO_TIMESTAMP_PREFIX
 
     @property
@@ -1356,7 +1356,7 @@ class SqlDateTruncExpression(SqlExpressionNode):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[arg])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.SQL_EXPR_DATE_TRUNC
 
     @property
@@ -1414,7 +1414,7 @@ class SqlExtractExpression(SqlExpressionNode):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[arg])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.SQL_EXPR_EXTRACT
 
     @property
@@ -1479,7 +1479,7 @@ class SqlRatioComputationExpression(SqlExpressionNode):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[numerator, denominator])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.SQL_EXPR_RATIO_COMPUTATION
 
     @property
@@ -1535,7 +1535,7 @@ class SqlBetweenExpression(SqlExpressionNode):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[column_arg, start_expr, end_expr])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.SQL_EXPR_BETWEEN_PREFIX
 
     @property
@@ -1591,7 +1591,7 @@ class SqlGenerateUuidExpression(SqlExpressionNode):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
         return IdPrefix.SQL_EXPR_GENERATE_UUID_PREFIX
 
     def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D

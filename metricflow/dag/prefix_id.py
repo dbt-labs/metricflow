@@ -4,8 +4,6 @@ import threading
 from dataclasses import dataclass
 from typing import Dict
 
-from typing_extensions import override
-
 from metricflow.dag.id_prefix import IdPrefix
 
 
@@ -16,8 +14,8 @@ class SequentialId:
     id_prefix: IdPrefix
     index: int
 
-    @override
-    def __str__(self) -> str:
+    @property
+    def str_value(self) -> str:  # noqa: D
         return f"{self.id_prefix.value}_{self.index}"
 
 

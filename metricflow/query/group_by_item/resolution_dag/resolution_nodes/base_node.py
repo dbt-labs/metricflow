@@ -51,7 +51,7 @@ class GroupByItemResolutionNode(DagNode, Visitable, ABC):
 
     @classmethod
     @override
-    def id_prefix(cls) -> str:
+    def id_prefix(cls) -> IdPrefix:
         return cls.id_prefix()
 
     @classmethod

@@ -4,8 +4,8 @@ import logging
 from dataclasses import dataclass
 from typing import List, Optional, Sequence
 
-from metricflow.dag.id_generation import IdGeneratorRegistry
 from metricflow.dag.id_prefix import IdPrefix
+from metricflow.dag.prefix_id import PrefixIdGenerator
 from metricflow.dataflow.dataflow_plan import (
     AddGeneratedUuidColumnNode,
     AggregateMeasuresNode,
@@ -318,7 +318,7 @@ class SourceScanOptimizer(
             f"{optimized_result.checked_sink_node.text_structure()}",
         )
 
-        plan_id = IdGeneratorRegistry.for_class(self.__class__).create_id(IdPrefix.OPTIMIZED_DATAFLOW_PLAN_PREFIX)
+        plan_id = PrefixIdGenerator.create_next_id(IdPrefix.OPTIMIZED_DATAFLOW_PLAN_PREFIX)
         logger.log(level=self._log_level, msg=f"Optimized plan ID is {plan_id}")
         if optimized_result.sink_node:
             return DataflowPlan(

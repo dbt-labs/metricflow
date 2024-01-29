@@ -5,8 +5,8 @@ from typing import Mapping
 import pytest
 from _pytest.fixtures import FixtureRequest
 
-from metricflow.dag.id_generation import IdGeneratorRegistry
 from metricflow.dag.id_prefix import IdPrefix
+from metricflow.dag.prefix_id import PrefixIdGenerator
 from metricflow.dataflow.dataflow_plan import (
     BaseOutput,
     DataflowPlan,
@@ -26,9 +26,7 @@ from metricflow.test.snapshot_utils import assert_plan_snapshot_text_equal
 
 def make_dataflow_plan(node: BaseOutput) -> DataflowPlan:  # noqa: D
     return DataflowPlan(
-        plan_id=IdGeneratorRegistry.for_class(ComputeMetricsBranchCombiner).create_id(
-            IdPrefix.OPTIMIZED_DATAFLOW_PLAN_PREFIX
-        ),
+        plan_id=PrefixIdGenerator.create_next_id(IdPrefix.OPTIMIZED_DATAFLOW_PLAN_PREFIX),
         sink_output_nodes=[WriteToResultDataframeNode(node)],
     )
 
