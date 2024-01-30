@@ -48,7 +48,7 @@ class MeasureGroupByItemSourceNode(GroupByItemResolutionNode):
 
     @classmethod
     @override
-    def id_prefix_enum(cls) -> IdPrefix:
+    def id_prefix(cls) -> IdPrefix:
         return IdPrefix.MEASURE_GROUP_BY_ITEM_RESOLUTION_NODE
 
     @property

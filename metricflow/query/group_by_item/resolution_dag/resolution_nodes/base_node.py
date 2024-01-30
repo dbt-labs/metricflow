@@ -3,9 +3,6 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Generic, Sequence
 
-from typing_extensions import override
-
-from metricflow.dag.id_prefix import IdPrefix
 from metricflow.dag.mf_dag import DagNode, NodeId
 from metricflow.visitor import Visitable, VisitorOutputT
 
@@ -31,7 +28,7 @@ class GroupByItemResolutionNode(DagNode, Visitable, ABC):
     """
 
     def __init__(self) -> None:  # noqa: D
-        super().__init__(node_id=NodeId.create_unique(self.__class__.id_prefix_enum()))
+        super().__init__(node_id=NodeId.create_unique(self.__class__.id_prefix()))
 
     @abstractmethod
     def accept(self, visitor: GroupByItemResolutionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:
@@ -47,20 +44,6 @@ class GroupByItemResolutionNode(DagNode, Visitable, ABC):
     @property
     @abstractmethod
     def parent_nodes(self) -> Sequence[GroupByItemResolutionNode]:  # noqa: D
-        raise NotImplementedError
-
-    @classmethod
-    @override
-    def id_prefix(cls) -> IdPrefix:
-        return cls.id_prefix()
-
-    @classmethod
-    @abstractmethod
-    def id_prefix_enum(cls) -> IdPrefix:
-        """The ID prefix as an enum instead of a string.
-
-        TODO: Update other node classes to use the enum, then replace the existing id_prefix.
-        """
         raise NotImplementedError
 
 
