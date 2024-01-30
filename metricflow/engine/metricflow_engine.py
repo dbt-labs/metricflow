@@ -13,6 +13,7 @@ from dbt_semantic_interfaces.implementations.filters.where_filter import Pydanti
 from dbt_semantic_interfaces.references import EntityReference, MeasureReference, MetricReference
 from dbt_semantic_interfaces.type_enums import DimensionType
 
+from metricflow.dag.sequential_id import SequentialIdGenerator
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
@@ -315,6 +316,11 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     TODO: provide a more stable API layer instead of assuming this class is stable.
     """
 
+    # When generating IDs in the initializer, start from this value.
+    _INITIALIZER_ID_START_VALUE = 10000
+    # When generating IDs in queries, start from this value.
+    _QUERY_ID_START_VALUE = 0
+
     def __init__(
         self,
         semantic_manifest_lookup: SemanticManifestLookup,
@@ -332,6 +338,12 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
         These parameters are mainly there to be overridden during tests.
         """
+        # Some of the objects that are created created below use generated IDs. To avoid collision with IDs that are
+        # generated for queries, set the ID generation numbering to start at a high enough number.
+        logger.info(
+            f"For creating setup objects, setting ID start value to: {MetricFlowEngine._INITIALIZER_ID_START_VALUE}"
+        )
+        SequentialIdGenerator.reset(MetricFlowEngine._INITIALIZER_ID_START_VALUE)
         self._semantic_manifest_lookup = semantic_manifest_lookup
         self._sql_client = sql_client
         self._column_association_resolver = column_association_resolver or (
@@ -384,6 +396,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def query(self, mf_request: MetricFlowQueryRequest) -> MetricFlowQueryResult:  # noqa: D
         logger.info(f"Starting query request:\n{indent(mf_pformat(mf_request))}")
+        logger.info(f"Setting ID generation to start at: {MetricFlowEngine._QUERY_ID_START_VALUE}")
         explain_result = self._create_execution_plan(mf_request)
         execution_plan = explain_result.execution_plan
 
