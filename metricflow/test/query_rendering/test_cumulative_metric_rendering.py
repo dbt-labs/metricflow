@@ -208,13 +208,7 @@ def test_cumulative_metric_no_window_with_time_constraint(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="revenue_all_time"),),
             dimension_specs=(),
-            time_dimension_specs=(
-                TimeDimensionSpec(
-                    element_name="ds",
-                    entity_links=(),
-                    time_granularity=TimeGranularity.MONTH,
-                ),
-            ),
+            time_dimension_specs=(MTD_SPEC_MONTH,),
             time_range_constraint=TimeRangeConstraint(
                 start_time=as_datetime("2020-01-01"), end_time=as_datetime("2020-01-01")
             ),
