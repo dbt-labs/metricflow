@@ -41,7 +41,7 @@ class PrefixIdGenerator:
 
     @classmethod
     def reset(cls, default_start_value: int = 0) -> None:
-        """Resets the numbering of the generated IDs so that it starts at 0."""
+        """Resets the numbering of the generated IDs so that it starts at the given value."""
         with cls._state_lock:
             cls._prefix_to_next_value = {}
             cls._default_start_value = default_start_value
