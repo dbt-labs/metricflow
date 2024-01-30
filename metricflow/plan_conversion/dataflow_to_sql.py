@@ -15,7 +15,7 @@ from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowRese
 from metricflow.aggregation_properties import AggregationState
 from metricflow.dag.id_prefix import IdPrefix
 from metricflow.dag.mf_dag import DagId
-from metricflow.dag.prefix_id import PrefixIdGenerator
+from metricflow.dag.sequential_id import SequentialIdGenerator
 from metricflow.dataflow.dataflow_plan import (
     AddGeneratedUuidColumnNode,
     AggregateMeasuresNode,
@@ -202,7 +202,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
     def _next_unique_table_alias(self) -> str:
         """Return the next unique table alias to use in generating queries."""
-        return PrefixIdGenerator.create_next_id(IdPrefix.SUB_QUERY).str_value
+        return SequentialIdGenerator.create_next_id(IdPrefix.SUB_QUERY).str_value
 
     def _make_time_spine_data_set(
         self,

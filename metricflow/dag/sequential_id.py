@@ -25,11 +25,8 @@ class SequentialId:
         return self.str_value
 
 
-class PrefixIdGenerator:
-    """Generate ID values based on an ID prefix.
-
-    TODO: Migrate ID generation use cases to this class.
-    """
+class SequentialIdGenerator:
+    """Generates sequential ID values based on a prefix."""
 
     _default_start_value = 0
     _state_lock = threading.Lock()
