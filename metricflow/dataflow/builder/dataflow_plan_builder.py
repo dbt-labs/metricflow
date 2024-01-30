@@ -515,7 +515,7 @@ class DataflowPlanBuilder:
                 )
             assert (
                 queried_agg_time_dimension_specs
-            ), "Joining to time spine requires querying with metric_timeor the appropriate agg_time_dimension."
+            ), "Joining to time spine requires querying with metric_time or the appropriate agg_time_dimension."
             output_node = JoinToTimeSpineNode(
                 parent_node=output_node,
                 requested_agg_time_dimension_specs=queried_agg_time_dimension_specs,
