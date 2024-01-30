@@ -505,14 +505,9 @@ class DataflowPlanBuilder:
 
         # For nested ratio / derived metrics with time offset, apply offset & where constraint after metric computation.
         if metric_spec.has_time_offset:
-            queried_agg_time_dimension_specs = list(queried_linkable_specs.metric_time_specs)
-            if not queried_agg_time_dimension_specs:
-                valid_agg_time_dimensions = self._metric_lookup.get_valid_agg_time_dimensions_for_metric(
-                    metric_spec.reference
-                )
-                queried_agg_time_dimension_specs = list(
-                    set(queried_linkable_specs.time_dimension_specs).intersection(set(valid_agg_time_dimensions))
-                )
+            queried_agg_time_dimension_specs = queried_linkable_specs.included_agg_time_dimension_specs_for_metric(
+                metric_reference=metric_spec.reference, metric_lookup=self._metric_lookup
+            )
             assert (
                 queried_agg_time_dimension_specs
             ), "Joining to time spine requires querying with metric_time or the appropriate agg_time_dimension."
@@ -1296,14 +1291,9 @@ class DataflowPlanBuilder:
                 f"Recipe not found for measure spec: {measure_spec} and linkable specs: {required_linkable_specs}"
             )
 
-        queried_agg_time_dimension_specs = list(queried_linkable_specs.metric_time_specs)
-        if not queried_agg_time_dimension_specs:
-            valid_agg_time_dimensions = self._semantic_model_lookup.get_agg_time_dimension_specs_for_measure(
-                measure_spec.reference
-            )
-            queried_agg_time_dimension_specs = list(
-                set(queried_linkable_specs.time_dimension_specs).intersection(set(valid_agg_time_dimensions))
-            )
+        queried_agg_time_dimension_specs = queried_linkable_specs.included_agg_time_dimension_specs_for_measure(
+            measure_reference=measure_spec.reference, semantic_model_lookup=self._semantic_model_lookup
+        )
 
         # If a cumulative metric is queried with metric_time, join over time range.
         # Otherwise, the measure will be aggregated over all time.
