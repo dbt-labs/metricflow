@@ -13,7 +13,7 @@ import jinja2
 
 from metricflow.dag.dag_to_text import MetricFlowDagTextFormatter
 from metricflow.dag.id_prefix import IdPrefix
-from metricflow.dag.prefix_id import PrefixIdGenerator
+from metricflow.dag.sequential_id import SequentialIdGenerator
 from metricflow.visitor import VisitorOutputT
 
 logger = logging.getLogger(__name__)
@@ -41,7 +41,7 @@ class NodeId:
 
     @staticmethod
     def create_unique(id_prefix: IdPrefix) -> NodeId:  # noqa: D
-        return NodeId(str(PrefixIdGenerator.create_next_id(id_prefix)))
+        return NodeId(str(SequentialIdGenerator.create_next_id(id_prefix)))
 
 
 class DagNodeVisitor(Generic[VisitorOutputT], ABC):
@@ -105,7 +105,7 @@ class DagNode(ABC):
     @classmethod
     def create_unique_id(cls) -> NodeId:
         """Create and return a unique identifier to use when creating nodes."""
-        return NodeId(id_str=PrefixIdGenerator.create_next_id(cls.id_prefix()).str_value)
+        return NodeId(id_str=SequentialIdGenerator.create_next_id(cls.id_prefix()).str_value)
 
     def accept_dag_node_visitor(self, visitor: DagNodeVisitor[VisitorOutputT]) -> VisitorOutputT:
         """Visit this node."""
@@ -172,7 +172,7 @@ class DagId:
 
     @staticmethod
     def from_id_prefix(id_prefix: IdPrefix) -> DagId:  # noqa: D
-        return DagId(id_str=PrefixIdGenerator.create_next_id(id_prefix).str_value)
+        return DagId(id_str=SequentialIdGenerator.create_next_id(id_prefix).str_value)
 
 
 DagNodeT = TypeVar("DagNodeT", bound=DagNode)

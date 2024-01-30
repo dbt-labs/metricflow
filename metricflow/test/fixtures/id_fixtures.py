@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 import pytest
 
-from metricflow.dag.prefix_id import PrefixIdGenerator
+from metricflow.dag.sequential_id import SequentialIdGenerator
 
 
 @dataclass(frozen=True)
@@ -55,8 +55,8 @@ def patch_id_generators_helper(start_value: int) -> Generator[None, None, None]:
     """
     # Create patch context managers for all ID generators in the registry with introspection magic.
     patch_context_managers = [
-        patch.object(PrefixIdGenerator, "_prefix_to_next_value", {}),
-        patch.object(PrefixIdGenerator, "_default_start_value", start_value),
+        patch.object(SequentialIdGenerator, "_prefix_to_next_value", {}),
+        patch.object(SequentialIdGenerator, "_default_start_value", start_value),
     ]
 
     # Enter the patch context for the patches above.
