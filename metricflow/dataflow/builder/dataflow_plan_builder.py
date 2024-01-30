@@ -1373,11 +1373,10 @@ class DataflowPlanBuilder:
         # If time constraint was previously adjusted for cumulative window or grain, apply original time constraint
         # here. Can skip if metric is being aggregated over all time.
         cumulative_metric_constrained_node: Optional[ConstrainTimeRangeNode] = None
-        if (
-            cumulative_metric_adjusted_time_constraint is not None
-            and time_range_constraint is not None
-            and queried_agg_time_dimension_specs
-        ):
+        if cumulative_metric_adjusted_time_constraint is not None and time_range_constraint is not None:
+            assert (
+                queried_linkable_specs.contains_metric_time
+            ), "Using time constraints currently requires querying with metric_time."
             cumulative_metric_constrained_node = ConstrainTimeRangeNode(
                 unaggregated_measure_node, time_range_constraint
             )
