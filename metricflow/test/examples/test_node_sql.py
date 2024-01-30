@@ -51,7 +51,6 @@ def test_view_sql_generated_at_a_node(
     read_source_node = ReadSqlSourceNode(bookings_source_data_set)
     sql_plan_at_read_node = to_sql_plan_converter.convert_to_sql_query_plan(
         sql_engine_type=sql_client.sql_engine_type,
-        sql_query_plan_id="example_sql_plan",
         dataflow_plan_node=read_source_node,
         optimization_level=SqlQueryOptimizationLevel.O4,
     )
@@ -76,7 +75,6 @@ def test_view_sql_generated_at_a_node(
     )
     sql_plan_at_filter_elements_node = to_sql_plan_converter.convert_to_sql_query_plan(
         sql_engine_type=sql_client.sql_engine_type,
-        sql_query_plan_id="example_sql_plan",
         dataflow_plan_node=filter_elements_node,
         optimization_level=SqlQueryOptimizationLevel.O4,
     )

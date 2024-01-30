@@ -10,6 +10,7 @@ from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
+from metricflow.dag.mf_dag import DagId
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan import (
     AggregateMeasuresNode,
@@ -69,7 +70,7 @@ def convert_and_check(
     # Generate plans w/o optimizers
     sql_query_plan = dataflow_to_sql_converter.convert_to_sql_query_plan(
         sql_engine_type=sql_client.sql_engine_type,
-        sql_query_plan_id="plan0",
+        sql_query_plan_id=DagId.from_str("plan"),
         dataflow_plan_node=node,
         optimization_level=SqlQueryOptimizationLevel.O0,
     )
@@ -96,7 +97,7 @@ def convert_and_check(
     # Generate plans with optimizers
     sql_query_plan = dataflow_to_sql_converter.convert_to_sql_query_plan(
         sql_engine_type=sql_client.sql_engine_type,
-        sql_query_plan_id="plan0_optimized",
+        sql_query_plan_id=DagId.from_str("plan_optimized"),
         dataflow_plan_node=node,
         optimization_level=SqlQueryOptimizationLevel.O4,
     )

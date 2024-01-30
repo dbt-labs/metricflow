@@ -294,15 +294,18 @@ class SqlSelectQueryFromClauseNode(SqlQueryPlanNode):
 class SqlQueryPlan(MetricFlowDag[SqlQueryPlanNode]):  # noqa: D
     """Model for an SQL Query as a DAG."""
 
-    def __init__(self, plan_id: str, render_node: SqlQueryPlanNode) -> None:
+    def __init__(self, render_node: SqlQueryPlanNode, plan_id: Optional[DagId] = None) -> None:
         """Constructor.
 
         Args:
-            plan_id: The ID to associate with this plan.
             render_node: The node from which to start rendering the SQL query.
+            plan_id: If specified, use this sql_query_plan_id instead of a generated one.
         """
         self._render_node = render_node
-        super().__init__(dag_id=DagId.from_str(plan_id), sink_nodes=[self._render_node])
+        super().__init__(
+            dag_id=plan_id or DagId.from_id_prefix(IdPrefix.SQL_QUERY_PLAN_PREFIX),
+            sink_nodes=[self._render_node],
+        )
 
     @property
     def render_node(self) -> SqlQueryPlanNode:  # noqa: D

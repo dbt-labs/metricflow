@@ -14,6 +14,7 @@ from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowRese
 
 from metricflow.aggregation_properties import AggregationState
 from metricflow.dag.id_prefix import IdPrefix
+from metricflow.dag.mf_dag import DagId
 from metricflow.dag.prefix_id import PrefixIdGenerator
 from metricflow.dataflow.dataflow_plan import (
     AddGeneratedUuidColumnNode,
@@ -176,9 +177,9 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
     def convert_to_sql_query_plan(
         self,
         sql_engine_type: SqlEngine,
-        sql_query_plan_id: str,
         dataflow_plan_node: Union[BaseOutput, ComputedMetricsOutput],
         optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O4,
+        sql_query_plan_id: Optional[DagId] = None,
     ) -> SqlQueryPlan:
         """Create an SQL query plan that represents the computation up to the given dataflow plan node."""
         sql_select_node: SqlQueryPlanNode = dataflow_plan_node.accept(self).sql_select_node
@@ -197,7 +198,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 f"{indent(sql_select_node.text_structure())}"
             )
 
-        return SqlQueryPlan(plan_id=sql_query_plan_id, render_node=sql_select_node)
+        return SqlQueryPlan(render_node=sql_select_node, plan_id=sql_query_plan_id)
 
     def _next_unique_table_alias(self) -> str:
         """Return the next unique table alias to use in generating queries."""

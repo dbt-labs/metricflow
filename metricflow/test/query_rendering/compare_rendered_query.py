@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from _pytest.fixtures import FixtureRequest
 
+from metricflow.dag.mf_dag import DagId
 from metricflow.dataflow.dataflow_plan import BaseOutput
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
@@ -26,9 +27,9 @@ def convert_and_check(
     # Run dataflow -> sql conversion without optimizers
     sql_query_plan = dataflow_to_sql_converter.convert_to_sql_query_plan(
         sql_engine_type=sql_client.sql_engine_type,
-        sql_query_plan_id="plan0",
         dataflow_plan_node=node,
         optimization_level=SqlQueryOptimizationLevel.O0,
+        sql_query_plan_id=DagId.from_str("plan"),
     )
 
     display_graph_if_requested(
@@ -47,9 +48,9 @@ def convert_and_check(
     # Run dataflow -> sql conversion with optimizers
     sql_query_plan = dataflow_to_sql_converter.convert_to_sql_query_plan(
         sql_engine_type=sql_client.sql_engine_type,
-        sql_query_plan_id="plan0_optimized",
         dataflow_plan_node=node,
         optimization_level=SqlQueryOptimizationLevel.O4,
+        sql_query_plan_id=DagId.from_str("plan_optimized"),
     )
 
     display_graph_if_requested(
