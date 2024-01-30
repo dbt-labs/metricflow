@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from _pytest.fixtures import FixtureRequest
 
+from metricflow.dag.mf_dag import DagId
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from metricflow.sql.sql_plan import SqlQueryPlan, SqlQueryPlanNode, SqlSelectStatementNode
@@ -19,7 +20,7 @@ def assert_default_rendered_sql_equal(  # noqa: D
     sql_plan_node: SqlQueryPlanNode,
 ) -> None:
     """Helper function to render a select statement and compare with the one saved as a file."""
-    sql_query_plan = SqlQueryPlan(plan_id=plan_id, render_node=sql_plan_node)
+    sql_query_plan = SqlQueryPlan(render_node=sql_plan_node, plan_id=DagId.from_str(plan_id))
 
     rendered_sql = DefaultSqlQueryPlanRenderer().render_sql_query_plan(sql_query_plan).sql
 
@@ -40,7 +41,7 @@ def assert_rendered_sql_equal(  # noqa: D
     sql_client: SqlClient,
 ) -> None:
     """Helper function to render a select statement and compare with the one saved as a file."""
-    sql_query_plan = SqlQueryPlan(plan_id=plan_id, render_node=select_node)
+    sql_query_plan = SqlQueryPlan(render_node=select_node, plan_id=DagId.from_str(plan_id))
 
     assert_rendered_sql_from_plan_equal(
         request=request,

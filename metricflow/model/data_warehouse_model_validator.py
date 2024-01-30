@@ -123,7 +123,6 @@ class DataWarehouseTaskBuilder:
         """Generates a sql query plan and returns the rendered sql and bind_parameters."""
         sql_plan = plan_converter.convert_to_sql_query_plan(
             sql_engine_type=sql_client.sql_engine_type,
-            sql_query_plan_id=plan_id,
             dataflow_plan_node=nodes,
         )
 

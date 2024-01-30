@@ -3,8 +3,6 @@ from __future__ import annotations
 import logging
 from typing import Optional, Union
 
-from metricflow.dag.id_prefix import IdPrefix
-from metricflow.dag.prefix_id import PrefixIdGenerator
 from metricflow.dataflow.dataflow_plan import (
     BaseOutput,
     ComputedMetricsOutput,
@@ -54,7 +52,6 @@ class DataflowToExecutionPlanConverter(SinkNodeVisitor[ExecutionPlan]):
     ) -> ExecutionPlan:
         sql_plan = self._sql_plan_converter.convert_to_sql_query_plan(
             sql_engine_type=self._sql_client.sql_engine_type,
-            sql_query_plan_id=PrefixIdGenerator.create_next_id(IdPrefix.SQL_QUERY_PLAN_PREFIX),
             dataflow_plan_node=node,
         )
 
