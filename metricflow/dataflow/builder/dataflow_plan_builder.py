@@ -1103,16 +1103,14 @@ class DataflowPlanBuilder:
         # there's no need to join to the time spine since all time will be aggregated.
         after_aggregation_time_spine_join_description = None
         if input_measure.join_to_timespine:
-            query_contains_agg_time_dimension = queried_linkable_specs.contains_metric_time
-            if not query_contains_agg_time_dimension:
-                valid_agg_time_dimensions = self._semantic_model_lookup.get_agg_time_dimension_specs_for_measure(
-                    measure_spec.reference
+            if (
+                len(
+                    queried_linkable_specs.included_agg_time_dimension_specs_for_measure(
+                        measure_reference=measure_spec.reference, semantic_model_lookup=self._semantic_model_lookup
+                    )
                 )
-                query_contains_agg_time_dimension = bool(
-                    set(queried_linkable_specs.time_dimension_specs).intersection(set(valid_agg_time_dimensions))
-                )
-
-            if query_contains_agg_time_dimension:
+                > 0
+            ):
                 after_aggregation_time_spine_join_description = JoinToTimeSpineDescription(
                     join_type=SqlJoinType.LEFT_OUTER,
                     offset_window=None,
