@@ -15,7 +15,6 @@ from metricflow.dag.mf_dag import DagId, DagNode, DisplayedProperty, MetricFlowD
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.sql_request.sql_request_attributes import SqlJsonTag
 from metricflow.visitor import Visitable
 
 logger = logging.getLogger(__name__)
@@ -97,13 +96,11 @@ class SelectSqlQueryToDataFrameTask(ExecutionPlanTask):
         sql_client: SqlClient,
         sql_query: str,
         bind_parameters: SqlBindParameters,
-        extra_sql_tags: SqlJsonTag = SqlJsonTag(),
         parent_nodes: Optional[List[ExecutionPlanTask]] = None,
     ) -> None:
         self._sql_client = sql_client
         self._sql_query = sql_query
         self._bind_parameters = bind_parameters
-        self._extra_sql_tags = extra_sql_tags
         super().__init__(task_id=self.create_unique_id(), parent_nodes=parent_nodes or [])
 
     @classmethod
@@ -128,7 +125,6 @@ class SelectSqlQueryToDataFrameTask(ExecutionPlanTask):
         df = self._sql_client.query(
             self._sql_query,
             sql_bind_parameters=self.bind_parameters,
-            extra_tags=self._extra_sql_tags,
         )
 
         end_time = time.time()
@@ -156,14 +152,12 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
         sql_query: str,
         bind_parameters: SqlBindParameters,
         output_table: SqlTable,
-        extra_sql_tags: SqlJsonTag = SqlJsonTag(),
         parent_nodes: Optional[List[ExecutionPlanTask]] = None,
     ) -> None:
         self._sql_client = sql_client
         self._sql_query = sql_query
         self._output_table = output_table
         self._bind_parameters = bind_parameters
-        self._extra_sql_tags = extra_sql_tags
         super().__init__(task_id=self.create_unique_id(), parent_nodes=parent_nodes or [])
 
     @classmethod
@@ -192,7 +186,6 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
         self._sql_client.execute(
             sql_query.sql_query,
             sql_bind_parameters=sql_query.bind_parameters,
-            extra_tags=self._extra_sql_tags,
         )
 
         end_time = time.time()

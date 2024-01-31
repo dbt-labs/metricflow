@@ -23,7 +23,6 @@ from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanCon
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_plan import SqlQueryPlan
-from metricflow.sql_request.sql_request_attributes import SqlJsonTag
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +35,6 @@ class DataflowToExecutionPlanConverter(SinkNodeVisitor[ExecutionPlan]):
         sql_plan_converter: DataflowToSqlQueryPlanConverter,
         sql_plan_renderer: SqlQueryPlanRenderer,
         sql_client: SqlClient,
-        extra_sql_tags: SqlJsonTag = SqlJsonTag(),
     ) -> None:
         """Constructor.
 
@@ -44,12 +42,10 @@ class DataflowToExecutionPlanConverter(SinkNodeVisitor[ExecutionPlan]):
             sql_plan_converter: Converts a dataflow plan node to a SQL query plan
             sql_plan_renderer: Converts a SQL query plan to SQL text
             sql_client: The client to use for running queries.
-            extra_sql_tags: Tags to supply to the SQL client when running statements.
         """
         self._sql_plan_converter = sql_plan_converter
         self._sql_plan_renderer = sql_plan_renderer
         self._sql_client = sql_client
-        self._sql_tags = extra_sql_tags
 
     def _build_execution_plan(  # noqa: D
         self,
@@ -73,7 +69,6 @@ class DataflowToExecutionPlanConverter(SinkNodeVisitor[ExecutionPlan]):
                 sql_client=self._sql_client,
                 sql_query=render_result.sql,
                 bind_parameters=render_result.bind_parameters,
-                extra_sql_tags=self._sql_tags,
             )
         else:
             leaf_task = SelectSqlQueryToTableTask(
@@ -81,7 +76,6 @@ class DataflowToExecutionPlanConverter(SinkNodeVisitor[ExecutionPlan]):
                 sql_query=render_result.sql,
                 bind_parameters=render_result.bind_parameters,
                 output_table=output_table,
-                extra_sql_tags=self._sql_tags,
             )
 
         return ExecutionPlan(

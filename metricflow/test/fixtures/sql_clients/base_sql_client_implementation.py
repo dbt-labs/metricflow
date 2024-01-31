@@ -15,8 +15,7 @@ from metricflow.protocols.sql_client import (
 )
 from metricflow.random_id import random_id
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.sql_request.sql_request_attributes import SqlJsonTag, SqlRequestId, SqlRequestTagSet
-from metricflow.sql_request.sql_statement_metadata import CombinedSqlTags, SqlStatementCommentMetadata
+from metricflow.sql_request.sql_request_attributes import SqlRequestId
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +40,6 @@ class BaseSqlClientImplementation(ABC, SqlClient):
         self,
         stmt: str,
         sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
-        extra_tags: SqlJsonTag = SqlJsonTag(),
     ) -> pd.DataFrame:
         """Query statement; result expected to be data which will be returned as a DataFrame.
 
@@ -51,17 +49,11 @@ class BaseSqlClientImplementation(ABC, SqlClient):
                 concrete values for SQL query parameters.
         """
         start = time.time()
-        request_id = SqlRequestId(f"mf_rid__{random_id()}")
-        combined_tags = BaseSqlClientImplementation._consolidate_tags(json_tags=extra_tags, request_id=request_id)
-        statement = SqlStatementCommentMetadata.add_tag_metadata_as_comment(
-            sql_statement=stmt, combined_tags=combined_tags
-        )
-        logger.info(BaseSqlClientImplementation._format_run_query_log_message(statement, sql_bind_parameters))
+        SqlRequestId(f"mf_rid__{random_id()}")
+        logger.info(BaseSqlClientImplementation._format_run_query_log_message(stmt, sql_bind_parameters))
         df = self._engine_specific_query_implementation(
-            stmt=statement,
+            stmt=stmt,
             bind_params=sql_bind_parameters,
-            system_tags=combined_tags.system_tags,
-            extra_tags=combined_tags.extra_tag,
         )
         if not isinstance(df, pd.DataFrame):
             raise RuntimeError(f"Expected query to return a DataFrame, got {type(df)}")
@@ -73,20 +65,12 @@ class BaseSqlClientImplementation(ABC, SqlClient):
         self,
         stmt: str,
         sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
-        extra_tags: SqlJsonTag = SqlJsonTag(),
     ) -> None:
         start = time.time()
-        request_id = SqlRequestId(f"mf_rid__{random_id()}")
-        combined_tags = BaseSqlClientImplementation._consolidate_tags(json_tags=extra_tags, request_id=request_id)
-        statement = SqlStatementCommentMetadata.add_tag_metadata_as_comment(
-            sql_statement=stmt, combined_tags=combined_tags
-        )
-        logger.info(BaseSqlClientImplementation._format_run_query_log_message(statement, sql_bind_parameters))
+        logger.info(BaseSqlClientImplementation._format_run_query_log_message(stmt, sql_bind_parameters))
         self._engine_specific_execute_implementation(
-            stmt=statement,
+            stmt=stmt,
             bind_params=sql_bind_parameters,
-            system_tags=combined_tags.system_tags,
-            extra_tags=combined_tags.extra_tag,
         )
         stop = time.time()
         logger.info(f"Finished running the query in {stop - start:.2f}s")
@@ -120,8 +104,6 @@ class BaseSqlClientImplementation(ABC, SqlClient):
         self,
         stmt: str,
         bind_params: SqlBindParameters,
-        system_tags: SqlRequestTagSet = SqlRequestTagSet(),
-        extra_tags: SqlJsonTag = SqlJsonTag(),
     ) -> pd.DataFrame:
         """Sub-classes should implement this to query the engine."""
         pass
@@ -131,8 +113,6 @@ class BaseSqlClientImplementation(ABC, SqlClient):
         self,
         stmt: str,
         bind_params: SqlBindParameters,
-        system_tags: SqlRequestTagSet = SqlRequestTagSet(),
-        extra_tags: SqlJsonTag = SqlJsonTag(),
     ) -> None:
         """Sub-classes should implement this to execute a statement that doesn't return results."""
         pass
@@ -163,11 +143,3 @@ class BaseSqlClientImplementation(ABC, SqlClient):
     def render_bind_parameter_key(self, bind_parameter_key: str) -> str:
         """Wrap execution parameter key with syntax accepted by engine."""
         return f":{bind_parameter_key}"
-
-    @staticmethod
-    def _consolidate_tags(json_tags: SqlJsonTag, request_id: SqlRequestId) -> CombinedSqlTags:
-        """Consolidates json tags and request ID into a single set of tags."""
-        return CombinedSqlTags(
-            system_tags=SqlRequestTagSet().add_request_id(request_id=request_id),
-            extra_tag=json_tags,
-        )
