@@ -12,6 +12,7 @@ from dbt_semantic_interfaces.protocols.dimension import (
     DimensionTypeParams,
 )
 from dbt_semantic_interfaces.protocols.entity import Entity as SemanticManifestEntity
+from dbt_semantic_interfaces.protocols.export import Export
 from dbt_semantic_interfaces.protocols.measure import MeasureAggregationParameters
 from dbt_semantic_interfaces.protocols.metadata import Metadata
 from dbt_semantic_interfaces.protocols.metric import Metric as SemanticManifestMetric
@@ -165,6 +166,7 @@ class SavedQuery:
     label: Optional[str]
     query_params: SavedQueryQueryParams
     metadata: Optional[Metadata]
+    exports: Sequence[Export]
 
     @classmethod
     def from_pydantic(cls, pydantic_saved_query: SemanticManifestSavedQuery) -> SavedQuery:
@@ -175,4 +177,5 @@ class SavedQuery:
             label=pydantic_saved_query.label,
             query_params=pydantic_saved_query.query_params,
             metadata=pydantic_saved_query.metadata,
+            exports=pydantic_saved_query.exports,
         )

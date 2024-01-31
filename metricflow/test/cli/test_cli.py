@@ -174,6 +174,7 @@ def test_saved_query(  # noqa: D
     resp = cli_runner.run(
         query, args=["--saved-query", "p0_booking", "--order", "metric_time__day,listing__capacity_latest"]
     )
+    print(resp.output)
 
     assert resp.exit_code == 0
 
@@ -291,5 +292,5 @@ def test_saved_query_with_cumulative_metric(  # noqa: D
         snapshot_str=resp.output,
         sql_engine=sql_client.sql_engine_type,
     )
-
+    print(resp.output)
     assert resp.exit_code == 0

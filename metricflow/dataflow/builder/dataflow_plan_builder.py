@@ -1298,9 +1298,14 @@ class DataflowPlanBuilder:
         # If a cumulative metric is queried with metric_time, join over time range.
         # Otherwise, the measure will be aggregated over all time.
         time_range_node: Optional[JoinOverTimeRangeNode] = None
-        if cumulative and queried_linkable_specs.contains_metric_time:
+        if cumulative and queried_agg_time_dimension_specs:
+            # Use the time dimension spec with the smallest granularity.
+            agg_time_dimension_spec_for_join = sorted(
+                queried_agg_time_dimension_specs, key=lambda spec: spec.time_granularity.to_int()
+            )[0]
             time_range_node = JoinOverTimeRangeNode(
                 parent_node=measure_recipe.source_node,
+                time_dimension_spec_for_join=agg_time_dimension_spec_for_join,
                 window=cumulative_window,
                 grain_to_date=cumulative_grain_to_date,
                 time_range_constraint=time_range_constraint
@@ -1355,12 +1360,13 @@ class DataflowPlanBuilder:
         else:
             unaggregated_measure_node = filtered_measure_source_node
 
+        # If time constraint was previously adjusted for cumulative window or grain, apply original time constraint
+        # here. Can skip if metric is being aggregated over all time.
         cumulative_metric_constrained_node: Optional[ConstrainTimeRangeNode] = None
-        if (
-            cumulative_metric_adjusted_time_constraint is not None
-            and time_range_constraint is not None
-            and queried_linkable_specs.contains_metric_time
-        ):
+        if cumulative_metric_adjusted_time_constraint is not None and time_range_constraint is not None:
+            assert (
+                queried_linkable_specs.contains_metric_time
+            ), "Using time constraints currently requires querying with metric_time."
             cumulative_metric_constrained_node = ConstrainTimeRangeNode(
                 unaggregated_measure_node, time_range_constraint
             )

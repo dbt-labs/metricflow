@@ -376,6 +376,7 @@ class JoinOverTimeRangeNode(BaseOutput):
     def __init__(
         self,
         parent_node: BaseOutput,
+        time_dimension_spec_for_join: TimeDimensionSpec,
         window: Optional[MetricTimeWindow],
         grain_to_date: Optional[TimeGranularity],
         node_id: Optional[NodeId] = None,
@@ -390,6 +391,7 @@ class JoinOverTimeRangeNode(BaseOutput):
             (eg month to day)
             node_id: Override the node ID with this value
             time_range_constraint: time range to aggregate over
+            time_dimension_spec_for_join: time dimension spec to use when joining to time spine
         """
         if window and grain_to_date:
             raise RuntimeError(
@@ -400,6 +402,7 @@ class JoinOverTimeRangeNode(BaseOutput):
         self._grain_to_date = grain_to_date
         self._window = window
         self.time_range_constraint = time_range_constraint
+        self.time_dimension_spec_for_join = time_dimension_spec_for_join
 
         # Doing a list comprehension throws a type error, so doing it this way.
         parent_nodes: List[DataflowPlanNode] = [self._parent_node]
@@ -447,6 +450,7 @@ class JoinOverTimeRangeNode(BaseOutput):
             window=self.window,
             grain_to_date=self.grain_to_date,
             time_range_constraint=self.time_range_constraint,
+            time_dimension_spec_for_join=self.time_dimension_spec_for_join,
         )
 
 

@@ -80,7 +80,7 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
             if (
                 metric.type_params is not None
                 and (metric.type_params.window is not None or metric.type_params.grain_to_date is not None)
-                and not query_includes_metric_time
+                and not query_includes_metric_time_or_agg_time_dimension
             ):
                 return MetricFlowQueryResolutionIssueSet.from_issue(
                     CumulativeMetricRequiresMetricTimeIssue.from_parameters(
