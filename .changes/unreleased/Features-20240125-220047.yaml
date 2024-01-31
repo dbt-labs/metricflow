@@ -1,0 +1,6 @@
+kind: Features
+body: Enable querying cumulative metrics with their agg_time_dimension.
+time: 2024-01-25T22:00:47.648696-08:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1000"
