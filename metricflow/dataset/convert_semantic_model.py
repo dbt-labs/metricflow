@@ -17,7 +17,7 @@ from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.aggregation_properties import AggregationState
-from metricflow.dag.id_prefix import StaticIdPrefix
+from metricflow.dag.id_prefix import DynamicIdPrefix, StaticIdPrefix
 from metricflow.dag.sequential_id import SequentialIdGenerator
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
@@ -424,7 +424,9 @@ class SemanticModelToDataSetConverter:
         all_entity_instances: List[EntityInstance] = []
 
         all_select_columns: List[SqlSelectColumn] = []
-        from_source_alias = SequentialIdGenerator.create_next_id(StaticIdPrefix.SEMANTIC_MODEL_SOURCE).str_value
+        from_source_alias = SequentialIdGenerator.create_next_id(
+            DynamicIdPrefix(prefix=f"{semantic_model.name}_src")
+        ).str_value
         # Handle measures
         if len(semantic_model.measures) > 0:
             measure_instances, select_columns = self._convert_measures(

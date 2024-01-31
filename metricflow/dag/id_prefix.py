@@ -93,8 +93,7 @@ class StaticIdPrefix(IdPrefix, Enum, metaclass=EnumMetaClassHelper):
 
     MF_DAG = "mfd"
 
-    TIME_SPINE_SOURCE = "spine"
-    SEMANTIC_MODEL_SOURCE = "src"
+    TIME_SPINE_SOURCE = "time_spine_src"
     SUB_QUERY = "subq"
 
     @property
