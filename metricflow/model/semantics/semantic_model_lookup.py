@@ -71,7 +71,7 @@ class SemanticModelLookup(SemanticModelAccessor):
         ] = {}
 
         self._semantic_model_reference_to_semantic_model: Dict[SemanticModelReference, SemanticModel] = {}
-        for semantic_model in self._model.semantic_models:
+        for semantic_model in sorted(self._model.semantic_models, key=lambda semantic_model: semantic_model.name):
             self._add_semantic_model(semantic_model)
 
     def get_dimension_references(self) -> Sequence[DimensionReference]:  # noqa: D
