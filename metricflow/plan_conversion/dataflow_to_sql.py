@@ -1244,10 +1244,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         parent_data_set = node.parent_node.accept(self)
         parent_alias = self._next_unique_table_alias()
 
-        assert (
-            len(node.requested_agg_time_dimension_specs) > 0
-        ), "Must have at least one value in requested_agg_time_dimension_specs for JoinToTimeSpineNode."
-
         # Determine if the time spine join should use metric_time or the agg_time_dimension (metric_time takes priority).
         agg_time_dimension_for_join = node.requested_agg_time_dimension_specs[0]
         for spec in node.requested_agg_time_dimension_specs[1:]:

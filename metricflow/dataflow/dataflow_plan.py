@@ -692,6 +692,10 @@ class JoinToTimeSpineNode(BaseOutput, ABC):
         assert not (
             offset_window and offset_to_grain
         ), "Can't set both offset_window and offset_to_grain when joining to time spine. Choose one or the other."
+        assert (
+            len(requested_agg_time_dimension_specs) > 0
+        ), "Must have at least one value in requested_agg_time_dimension_specs for JoinToTimeSpineNode."
+
         self._parent_node = parent_node
         self._requested_agg_time_dimension_specs = requested_agg_time_dimension_specs
         self._offset_window = offset_window
