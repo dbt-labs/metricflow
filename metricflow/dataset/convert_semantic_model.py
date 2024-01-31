@@ -424,7 +424,6 @@ class SemanticModelToDataSetConverter:
         all_entity_instances: List[EntityInstance] = []
 
         all_select_columns: List[SqlSelectColumn] = []
-        # from_source_alias = IdGeneratorRegistry.for_class(self.__class__).create_id(f"{semantic_model.name}_src")
         from_source_alias = SequentialIdGenerator.create_next_id(IdPrefix.SEMANTIC_MODEL_SOURCE).str_value
         # Handle measures
         if len(semantic_model.measures) > 0:
