@@ -317,9 +317,9 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     """
 
     # When generating IDs in the initializer, start from this value.
-    _INITIALIZER_ID_START_VALUE = 10000
+    _ID_ENUMERATION_START_VALUE_FOR_INITIALIZER = 10000
     # When generating IDs in queries, start from this value.
-    _QUERY_ID_START_VALUE = 0
+    _ID_ENUMERATION_START_VALUE_FOR_QUERIES = 0
 
     def __init__(
         self,
@@ -328,8 +328,12 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         time_source: TimeSource = ServerTimeSource(),
         query_parser: Optional[MetricFlowQueryParser] = None,
         column_association_resolver: Optional[ColumnAssociationResolver] = None,
+        consistent_id_enumeration: Optional[bool] = True,
     ) -> None:
         """Initializer for MetricFlowEngine.
+
+        consistent_id_enumeration can be set to True to reset the numbering of sequentially generated IDs on each query. This
+        will help generate consistent SQL between queries as aliases will be the same.
 
         For direct calls to construct MetricFlowEngine, do not pass the following parameters,
         - time_source
@@ -338,12 +342,15 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
         These parameters are mainly there to be overridden during tests.
         """
-        # Some of the objects that are created created below use generated IDs. To avoid collision with IDs that are
-        # generated for queries, set the ID generation numbering to start at a high enough number.
-        logger.info(
-            f"For creating setup objects, setting ID start value to: {MetricFlowEngine._INITIALIZER_ID_START_VALUE}"
-        )
-        SequentialIdGenerator.reset(MetricFlowEngine._INITIALIZER_ID_START_VALUE)
+        self._reset_id_enumeration = consistent_id_enumeration
+        if self._reset_id_enumeration:
+            # Some of the objects that are created below use generated IDs. To avoid collision with IDs that are
+            # generated for queries, set the ID generation numbering to start at a high enough number.
+            logger.info(
+                f"For creating setup objects, setting numbering of generated IDs to start at: "
+                f"{MetricFlowEngine._ID_ENUMERATION_START_VALUE_FOR_INITIALIZER}"
+            )
+            SequentialIdGenerator.reset(MetricFlowEngine._ID_ENUMERATION_START_VALUE_FOR_INITIALIZER)
         self._semantic_manifest_lookup = semantic_manifest_lookup
         self._sql_client = sql_client
         self._column_association_resolver = column_association_resolver or (
@@ -396,7 +403,6 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def query(self, mf_request: MetricFlowQueryRequest) -> MetricFlowQueryResult:  # noqa: D
         logger.info(f"Starting query request:\n{indent(mf_pformat(mf_request))}")
-        logger.info(f"Setting ID generation to start at: {MetricFlowEngine._QUERY_ID_START_VALUE}")
         explain_result = self._create_execution_plan(mf_request)
         execution_plan = explain_result.execution_plan
 
@@ -431,6 +437,12 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         return TimeRangeConstraint.all_time()
 
     def _create_execution_plan(self, mf_query_request: MetricFlowQueryRequest) -> MetricFlowExplainResult:
+        if self._reset_id_enumeration:
+            logger.info(
+                f"Setting ID generation to start at: {MetricFlowEngine._ID_ENUMERATION_START_VALUE_FOR_QUERIES}"
+            )
+            SequentialIdGenerator.reset(MetricFlowEngine._ID_ENUMERATION_START_VALUE_FOR_QUERIES)
+
         if mf_query_request.saved_query_name is not None:
             if mf_query_request.metrics or mf_query_request.metric_names:
                 raise InvalidQueryException("Metrics can't be specified with a saved query.")
