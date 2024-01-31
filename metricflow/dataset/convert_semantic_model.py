@@ -17,7 +17,7 @@ from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.aggregation_properties import AggregationState
-from metricflow.dag.id_prefix import IdPrefix
+from metricflow.dag.id_prefix import StaticIdPrefix
 from metricflow.dag.sequential_id import SequentialIdGenerator
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
@@ -424,7 +424,7 @@ class SemanticModelToDataSetConverter:
         all_entity_instances: List[EntityInstance] = []
 
         all_select_columns: List[SqlSelectColumn] = []
-        from_source_alias = SequentialIdGenerator.create_next_id(IdPrefix.SEMANTIC_MODEL_SOURCE).str_value
+        from_source_alias = SequentialIdGenerator.create_next_id(StaticIdPrefix.SEMANTIC_MODEL_SOURCE).str_value
         # Handle measures
         if len(semantic_model.measures) > 0:
             measure_instances, select_columns = self._convert_measures(
@@ -518,7 +518,7 @@ class SemanticModelToDataSetConverter:
 
     def build_time_spine_source_data_set(self, time_spine_source: TimeSpineSource) -> SqlDataSet:
         """Build data set for time spine."""
-        from_source_alias = SequentialIdGenerator.create_next_id(IdPrefix.TIME_SPINE_SOURCE).str_value
+        from_source_alias = SequentialIdGenerator.create_next_id(StaticIdPrefix.TIME_SPINE_SOURCE).str_value
         defined_time_granularity = time_spine_source.time_column_granularity
         time_column_name = time_spine_source.time_column_name
 

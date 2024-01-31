@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Generic, List, Optional, Sequence, Tuple
 
-from metricflow.dag.id_prefix import IdPrefix
+from metricflow.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow.dag.mf_dag import DagId, DagNode, DisplayedProperty, MetricFlowDag, NodeId
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.sql.sql_exprs import SqlExpressionNode
@@ -156,7 +156,7 @@ class SqlSelectStatementNode(SqlQueryPlanNode):
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
-        return IdPrefix.SQL_PLAN_SELECT_STATEMENT_ID_PREFIX
+        return StaticIdPrefix.SQL_PLAN_SELECT_STATEMENT_ID_PREFIX
 
     @property
     def description(self) -> str:  # noqa: D
@@ -232,7 +232,7 @@ class SqlTableFromClauseNode(SqlQueryPlanNode):
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
-        return IdPrefix.SQL_PLAN_TABLE_FROM_CLAUSE_ID_PREFIX
+        return StaticIdPrefix.SQL_PLAN_TABLE_FROM_CLAUSE_ID_PREFIX
 
     @property
     def description(self) -> str:  # noqa: D
@@ -269,7 +269,7 @@ class SqlSelectQueryFromClauseNode(SqlQueryPlanNode):
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
-        return IdPrefix.SQL_PLAN_TABLE_FROM_CLAUSE_ID_PREFIX
+        return StaticIdPrefix.SQL_PLAN_TABLE_FROM_CLAUSE_ID_PREFIX
 
     @property
     def description(self) -> str:  # noqa: D
@@ -303,7 +303,7 @@ class SqlQueryPlan(MetricFlowDag[SqlQueryPlanNode]):  # noqa: D
         """
         self._render_node = render_node
         super().__init__(
-            dag_id=plan_id or DagId.from_id_prefix(IdPrefix.SQL_QUERY_PLAN_PREFIX),
+            dag_id=plan_id or DagId.from_id_prefix(StaticIdPrefix.SQL_QUERY_PLAN_PREFIX),
             sink_nodes=[self._render_node],
         )
 

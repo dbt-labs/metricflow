@@ -1,13 +1,38 @@
 from __future__ import annotations
 
-from enum import Enum
+from abc import ABC, ABCMeta, abstractmethod
+from dataclasses import dataclass
+from enum import Enum, EnumMeta
+
+from typing_extensions import override
 
 
-class IdPrefix(Enum):
-    """Enumerates the prefixes used for generating IDs.
+class IdPrefix(ABC):
+    """A prefix for generating IDs. e.g. prefix=foo -> id=foo_0."""
 
-    TODO: Move all ID prefixes here.
+    @property
+    @abstractmethod
+    def str_value(self) -> str:
+        """Return the string value of this ID prefix."""
+        raise NotImplementedError
+
+
+class EnumMetaClassHelper(ABCMeta, EnumMeta):
+    """Metaclass to allow subclassing of IdPrefix / Enum.
+
+    Without this, you'll get an error:
+
+        Metaclass conflict: the metaclass of a derived class must be a (non-strict) subclass of the metaclasses of all
+        its bases
+
+    since Enum has a special metaclass.
     """
+
+    pass
+
+
+class StaticIdPrefix(IdPrefix, Enum, metaclass=EnumMetaClassHelper):
+    """Enumerates the prefixes used for generating IDs."""
 
     DATAFLOW_NODE_AGGREGATE_MEASURES_ID_PREFIX = "am"
     DATAFLOW_NODE_COMPUTE_METRICS_ID_PREFIX = "cm"
@@ -71,3 +96,20 @@ class IdPrefix(Enum):
     TIME_SPINE_SOURCE = "spine"
     SEMANTIC_MODEL_SOURCE = "src"
     SUB_QUERY = "subq"
+
+    @property
+    @override
+    def str_value(self) -> str:
+        return self.value
+
+
+@dataclass(frozen=True)
+class DynamicIdPrefix(IdPrefix):
+    """ID prefixes based on any string value."""
+
+    prefix: str
+
+    @property
+    @override
+    def str_value(self) -> str:
+        return self.prefix

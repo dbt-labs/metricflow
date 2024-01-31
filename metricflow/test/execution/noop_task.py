@@ -4,7 +4,7 @@ import logging
 import time
 from typing import Optional, Sequence
 
-from metricflow.dag.id_prefix import IdPrefix
+from metricflow.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow.execution.execution_plan import (
     ExecutionPlanTask,
     SqlQuery,
@@ -37,7 +37,7 @@ class NoOpExecutionPlanTask(ExecutionPlanTask):
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
-        return IdPrefix.EXEC_NODE_NOOP
+        return StaticIdPrefix.EXEC_NODE_NOOP
 
     def execute(self) -> TaskExecutionResult:  # noqa: D
         start_time = time.time()
