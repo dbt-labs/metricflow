@@ -10,7 +10,7 @@ from typing import List, Optional, Sequence, Tuple
 import jinja2
 import pandas as pd
 
-from metricflow.dag.id_prefix import IdPrefix
+from metricflow.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow.dag.mf_dag import DagId, DagNode, DisplayedProperty, MetricFlowDag, NodeId
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_client import SqlClient
@@ -105,7 +105,7 @@ class SelectSqlQueryToDataFrameTask(ExecutionPlanTask):
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
-        return IdPrefix.EXEC_NODE_READ_SQL_QUERY
+        return StaticIdPrefix.EXEC_NODE_READ_SQL_QUERY
 
     @property
     def description(self) -> str:  # noqa: D
@@ -162,7 +162,7 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
-        return IdPrefix.EXEC_NODE_WRITE_TO_TABLE
+        return StaticIdPrefix.EXEC_NODE_WRITE_TO_TABLE
 
     @property
     def description(self) -> str:  # noqa: D
@@ -222,7 +222,7 @@ class ExecutionPlan(MetricFlowDag[ExecutionPlanTask]):
         Args:
             leaf_tasks: The final set of tasks that will run, after task dependencies are finished.
         """
-        super().__init__(dag_id=DagId.from_id_prefix(IdPrefix.EXEC_PLAN_PREFIX), sink_nodes=leaf_tasks)
+        super().__init__(dag_id=DagId.from_id_prefix(StaticIdPrefix.EXEC_PLAN_PREFIX), sink_nodes=leaf_tasks)
 
     @property
     def tasks(self) -> Sequence[ExecutionPlanTask]:

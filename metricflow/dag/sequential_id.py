@@ -18,7 +18,7 @@ class SequentialId:
 
     @property
     def str_value(self) -> str:  # noqa: D
-        return f"{self.id_prefix.value}_{self.index}"
+        return f"{self.id_prefix.str_value}_{self.index}"
 
     @override
     def __repr__(self) -> str:

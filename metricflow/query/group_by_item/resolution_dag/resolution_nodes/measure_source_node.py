@@ -5,7 +5,7 @@ from typing import List, Sequence
 from dbt_semantic_interfaces.references import MeasureReference, MetricReference
 from typing_extensions import override
 
-from metricflow.dag.id_prefix import IdPrefix
+from metricflow.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow.dag.mf_dag import DisplayedProperty
 from metricflow.query.group_by_item.resolution_dag.resolution_nodes.base_node import (
     GroupByItemResolutionNode,
@@ -49,7 +49,7 @@ class MeasureGroupByItemSourceNode(GroupByItemResolutionNode):
     @classmethod
     @override
     def id_prefix(cls) -> IdPrefix:
-        return IdPrefix.MEASURE_GROUP_BY_ITEM_RESOLUTION_NODE
+        return StaticIdPrefix.MEASURE_GROUP_BY_ITEM_RESOLUTION_NODE
 
     @property
     @override

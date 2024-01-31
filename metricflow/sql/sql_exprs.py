@@ -15,7 +15,7 @@ from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
-from metricflow.dag.id_prefix import IdPrefix
+from metricflow.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow.dag.mf_dag import DagNode, DisplayedProperty, NodeId
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.visitor import Visitable, VisitorOutputT
@@ -261,7 +261,7 @@ class SqlStringExpression(SqlExpressionNode):
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
-        return IdPrefix.SQL_EXPR_STRING_ID_PREFIX
+        return StaticIdPrefix.SQL_EXPR_STRING_ID_PREFIX
 
     def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_string_expr(self)
@@ -330,7 +330,7 @@ class SqlStringLiteralExpression(SqlExpressionNode):
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
-        return IdPrefix.SQL_EXPR_STRING_LITERAL_PREFIX
+        return StaticIdPrefix.SQL_EXPR_STRING_LITERAL_PREFIX
 
     def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_string_literal_expr(self)
@@ -403,7 +403,7 @@ class SqlColumnReferenceExpression(SqlExpressionNode):
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
-        return IdPrefix.SQL_EXPR_COLUMN_REFERENCE_ID_PREFIX
+        return StaticIdPrefix.SQL_EXPR_COLUMN_REFERENCE_ID_PREFIX
 
     def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_column_reference_expr(self)
@@ -491,7 +491,7 @@ class SqlColumnAliasReferenceExpression(SqlExpressionNode):
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
-        return IdPrefix.SQL_EXPR_COLUMN_REFERENCE_ID_PREFIX
+        return StaticIdPrefix.SQL_EXPR_COLUMN_REFERENCE_ID_PREFIX
 
     def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_column_alias_reference_expr(self)
@@ -564,7 +564,7 @@ class SqlComparisonExpression(SqlExpressionNode):
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
-        return IdPrefix.SQL_EXPR_COMPARISON_ID_PREFIX
+        return StaticIdPrefix.SQL_EXPR_COMPARISON_ID_PREFIX
 
     def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_comparison_expr(self)
@@ -756,7 +756,7 @@ class SqlAggregateFunctionExpression(SqlFunctionExpression):
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
-        return IdPrefix.SQL_EXPR_FUNCTION_ID_PREFIX
+        return StaticIdPrefix.SQL_EXPR_FUNCTION_ID_PREFIX
 
     @property
     def requires_parenthesis(self) -> bool:  # noqa: D
@@ -879,7 +879,7 @@ class SqlPercentileExpression(SqlFunctionExpression):
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
-        return IdPrefix.SQL_EXPR_PERCENTILE_ID_PREFIX
+        return StaticIdPrefix.SQL_EXPR_PERCENTILE_ID_PREFIX
 
     @property
     def requires_parenthesis(self) -> bool:  # noqa: D
@@ -1001,7 +1001,7 @@ class SqlWindowFunctionExpression(SqlFunctionExpression):
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
-        return IdPrefix.SQL_EXPR_WINDOW_FUNCTION_ID_PREFIX
+        return StaticIdPrefix.SQL_EXPR_WINDOW_FUNCTION_ID_PREFIX
 
     @property
     def requires_parenthesis(self) -> bool:  # noqa: D
@@ -1094,7 +1094,7 @@ class SqlNullExpression(SqlExpressionNode):
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
-        return IdPrefix.SQL_EXPR_NULL_PREFIX
+        return StaticIdPrefix.SQL_EXPR_NULL_PREFIX
 
     @property
     def requires_parenthesis(self) -> bool:  # noqa: D
@@ -1141,7 +1141,7 @@ class SqlLogicalExpression(SqlExpressionNode):
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
-        return IdPrefix.SQL_EXPR_LOGICAL_OPERATOR_PREFIX
+        return StaticIdPrefix.SQL_EXPR_LOGICAL_OPERATOR_PREFIX
 
     @property
     def requires_parenthesis(self) -> bool:  # noqa: D
@@ -1193,7 +1193,7 @@ class SqlIsNullExpression(SqlExpressionNode):
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
-        return IdPrefix.SQL_EXPR_IS_NULL_PREFIX
+        return StaticIdPrefix.SQL_EXPR_IS_NULL_PREFIX
 
     @property
     def requires_parenthesis(self) -> bool:  # noqa: D
@@ -1249,7 +1249,7 @@ class SqlSubtractTimeIntervalExpression(SqlExpressionNode):
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
-        return IdPrefix.SQL_EXPR_SUBTRACT_TIME_INTERVAL_PREFIX
+        return StaticIdPrefix.SQL_EXPR_SUBTRACT_TIME_INTERVAL_PREFIX
 
     @property
     def requires_parenthesis(self) -> bool:  # noqa: D
@@ -1305,7 +1305,7 @@ class SqlCastToTimestampExpression(SqlExpressionNode):
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
-        return IdPrefix.SQL_EXPR_CAST_TO_TIMESTAMP_PREFIX
+        return StaticIdPrefix.SQL_EXPR_CAST_TO_TIMESTAMP_PREFIX
 
     @property
     def requires_parenthesis(self) -> bool:  # noqa: D
@@ -1357,7 +1357,7 @@ class SqlDateTruncExpression(SqlExpressionNode):
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
-        return IdPrefix.SQL_EXPR_DATE_TRUNC
+        return StaticIdPrefix.SQL_EXPR_DATE_TRUNC
 
     @property
     def requires_parenthesis(self) -> bool:  # noqa: D
@@ -1415,7 +1415,7 @@ class SqlExtractExpression(SqlExpressionNode):
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
-        return IdPrefix.SQL_EXPR_EXTRACT
+        return StaticIdPrefix.SQL_EXPR_EXTRACT
 
     @property
     def requires_parenthesis(self) -> bool:  # noqa: D
@@ -1480,7 +1480,7 @@ class SqlRatioComputationExpression(SqlExpressionNode):
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
-        return IdPrefix.SQL_EXPR_RATIO_COMPUTATION
+        return StaticIdPrefix.SQL_EXPR_RATIO_COMPUTATION
 
     @property
     def requires_parenthesis(self) -> bool:  # noqa: D
@@ -1536,7 +1536,7 @@ class SqlBetweenExpression(SqlExpressionNode):
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
-        return IdPrefix.SQL_EXPR_BETWEEN_PREFIX
+        return StaticIdPrefix.SQL_EXPR_BETWEEN_PREFIX
 
     @property
     def requires_parenthesis(self) -> bool:  # noqa: D
@@ -1592,7 +1592,7 @@ class SqlGenerateUuidExpression(SqlExpressionNode):
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
-        return IdPrefix.SQL_EXPR_GENERATE_UUID_PREFIX
+        return StaticIdPrefix.SQL_EXPR_GENERATE_UUID_PREFIX
 
     def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_generate_uuid_expr(self)
