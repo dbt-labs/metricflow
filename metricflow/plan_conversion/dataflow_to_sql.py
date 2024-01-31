@@ -7,7 +7,7 @@ from typing import List, Optional, Sequence, Tuple, Union
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.protocols.metric import MetricInputMeasure, MetricType
-from dbt_semantic_interfaces.references import MetricModelReference
+from dbt_semantic_interfaces.references import EntityReference, MetricModelReference
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.conversion_calculation_type import ConversionCalculationType
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
@@ -309,27 +309,26 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         input_data_set = node.parent_node.accept(self)
         input_data_set_alias = self._next_unique_table_alias()
 
-        metric_time_dimension_spec: Optional[TimeDimensionSpec] = None
-        metric_time_dimension_instance: Optional[TimeDimensionInstance] = None
-        for instance in input_data_set.metric_time_dimension_instances:
-            if len(instance.spec.entity_links) == 0:
-                metric_time_dimension_instance = instance
-                metric_time_dimension_spec = instance.spec
+        agg_time_dimension_instance: Optional[TimeDimensionInstance] = None
+        for instance in input_data_set.instance_set.time_dimension_instances:
+            if instance.spec == node.time_dimension_spec_for_join:
+                agg_time_dimension_instance = instance
                 break
+        assert (
+            agg_time_dimension_instance
+        ), "Specified metric time spec not found in parent data set. This should have been caught by validations."
 
-        assert metric_time_dimension_spec
         time_spine_data_set_alias = self._next_unique_table_alias()
 
-        metric_time_dimension_column_name = self.column_association_resolver.resolve_spec(
-            metric_time_dimension_spec
+        agg_time_dimension_column_name = self.column_association_resolver.resolve_spec(
+            agg_time_dimension_instance.spec
         ).column_name
 
         # Assemble time_spine dataset with metric_time_dimension to join.
         # Granularity of time_spine column should match granularity of metric_time column from parent dataset.
-        assert metric_time_dimension_instance
         time_spine_data_set = self._make_time_spine_data_set(
-            agg_time_dimension_instance=metric_time_dimension_instance,
-            agg_time_dimension_column_name=metric_time_dimension_column_name,
+            agg_time_dimension_instance=agg_time_dimension_instance,
+            agg_time_dimension_column_name=agg_time_dimension_column_name,
             time_spine_source=self._time_spine_source,
             time_range_constraint=node.time_range_constraint,
         )
@@ -337,12 +336,12 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
         # Figure out which columns correspond to the time dimension that we want to join on.
         input_data_set_metric_time_column_association = input_data_set.column_association_for_time_dimension(
-            metric_time_dimension_spec
+            agg_time_dimension_instance.spec
         )
         input_data_set_metric_time_col = input_data_set_metric_time_column_association.column_name
 
         time_spine_data_set_column_associations = time_spine_data_set.column_association_for_time_dimension(
-            metric_time_dimension_spec
+            agg_time_dimension_instance.spec
         )
         time_spine_data_set_time_dimension_col = time_spine_data_set_column_associations.column_name
 
@@ -370,7 +369,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 [
                     time_dimension_instance
                     for time_dimension_instance in input_data_set.instance_set.time_dimension_instances
-                    if time_dimension_instance.spec != metric_time_dimension_spec
+                    if time_dimension_instance != agg_time_dimension_instance
                 ]
             ),
         )
@@ -1245,24 +1244,21 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         parent_data_set = node.parent_node.accept(self)
         parent_alias = self._next_unique_table_alias()
 
-        assert (
-            len(node.requested_agg_time_dimension_specs) > 0
-        ), "Must have at least one value in requested_agg_time_dimension_specs for JoinToTimeSpineNode."
-
-        # Determine if the time spine join should use metric_time or the agg_time_dimension (metric_time takes priority).
-        agg_time_dimension_for_join = node.requested_agg_time_dimension_specs[0]
-        for spec in node.requested_agg_time_dimension_specs[1:]:
-            if spec.element_name == METRIC_TIME_ELEMENT_NAME:
-                agg_time_dimension_for_join = spec
-                break
+        if node.query_includes_metric_time:
+            agg_time_element_name = METRIC_TIME_ELEMENT_NAME
+            agg_time_entity_links: Tuple[EntityReference, ...] = ()
+        else:
+            agg_time_dimension = node.requested_agg_time_dimension_specs[0]
+            agg_time_element_name = agg_time_dimension.element_name
+            agg_time_entity_links = agg_time_dimension.entity_links
 
         # Find the time dimension instances in the parent data set that match the one we want to join with.
         agg_time_dimension_instances: List[TimeDimensionInstance] = []
         for instance in parent_data_set.instance_set.time_dimension_instances:
             if (
                 instance.spec.date_part is None  # Ensure we don't join using an instance with date part
-                and instance.spec.element_name == agg_time_dimension_for_join.element_name
-                and instance.spec.entity_links == agg_time_dimension_for_join.entity_links
+                and instance.spec.element_name == agg_time_element_name
+                and instance.spec.entity_links == agg_time_entity_links
             ):
                 agg_time_dimension_instances.append(instance)
 
@@ -1303,8 +1299,8 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 time_dimension_instance
                 for time_dimension_instance in parent_data_set.instance_set.time_dimension_instances
                 if not (
-                    time_dimension_instance.spec.element_name == agg_time_dimension_for_join.element_name
-                    and time_dimension_instance.spec.entity_links == agg_time_dimension_for_join.entity_links
+                    time_dimension_instance.spec.element_name == agg_time_element_name
+                    and time_dimension_instance.spec.entity_links == agg_time_entity_links
                 )
             ),
             entity_instances=parent_data_set.instance_set.entity_instances,

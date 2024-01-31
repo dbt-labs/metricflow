@@ -505,20 +505,16 @@ class DataflowPlanBuilder:
 
         # For nested ratio / derived metrics with time offset, apply offset & where constraint after metric computation.
         if metric_spec.has_time_offset:
-            queried_agg_time_dimension_specs = list(queried_linkable_specs.metric_time_specs)
-            if not queried_agg_time_dimension_specs:
-                valid_agg_time_dimensions = self._metric_lookup.get_valid_agg_time_dimensions_for_metric(
-                    metric_spec.reference
-                )
-                queried_agg_time_dimension_specs = list(
-                    set(queried_linkable_specs.time_dimension_specs).intersection(set(valid_agg_time_dimensions))
-                )
+            queried_agg_time_dimension_specs = queried_linkable_specs.included_agg_time_dimension_specs_for_metric(
+                metric_reference=metric_spec.reference, metric_lookup=self._metric_lookup
+            )
             assert (
                 queried_agg_time_dimension_specs
-            ), "Joining to time spine requires querying with metric_timeor the appropriate agg_time_dimension."
+            ), "Joining to time spine requires querying with metric_time or the appropriate agg_time_dimension."
             output_node = JoinToTimeSpineNode(
                 parent_node=output_node,
                 requested_agg_time_dimension_specs=queried_agg_time_dimension_specs,
+                query_includes_metric_time=queried_linkable_specs.contains_metric_time,
                 time_range_constraint=time_range_constraint,
                 offset_window=metric_spec.offset_window,
                 offset_to_grain=metric_spec.offset_to_grain,
@@ -1306,21 +1302,21 @@ class DataflowPlanBuilder:
                 f"Recipe not found for measure spec: {measure_spec} and linkable specs: {required_linkable_specs}"
             )
 
-        queried_agg_time_dimension_specs = list(queried_linkable_specs.metric_time_specs)
-        if not queried_agg_time_dimension_specs:
-            valid_agg_time_dimensions = self._semantic_model_lookup.get_agg_time_dimension_specs_for_measure(
-                measure_spec.reference
-            )
-            queried_agg_time_dimension_specs = list(
-                set(queried_linkable_specs.time_dimension_specs).intersection(set(valid_agg_time_dimensions))
-            )
+        queried_agg_time_dimension_specs = queried_linkable_specs.included_agg_time_dimension_specs_for_measure(
+            measure_reference=measure_spec.reference, semantic_model_lookup=self._semantic_model_lookup
+        )
 
         # If a cumulative metric is queried with metric_time, join over time range.
         # Otherwise, the measure will be aggregated over all time.
         time_range_node: Optional[JoinOverTimeRangeNode] = None
-        if cumulative and queried_linkable_specs.contains_metric_time:
+        if cumulative and queried_agg_time_dimension_specs:
+            # Use the time dimension spec with the smallest granularity.
+            agg_time_dimension_spec_for_join = sorted(
+                queried_agg_time_dimension_specs, key=lambda spec: spec.time_granularity.to_int()
+            )[0]
             time_range_node = JoinOverTimeRangeNode(
                 parent_node=measure_recipe.source_node,
+                time_dimension_spec_for_join=agg_time_dimension_spec_for_join,
                 window=cumulative_window,
                 grain_to_date=cumulative_grain_to_date,
                 time_range_constraint=time_range_constraint
@@ -1342,6 +1338,7 @@ class DataflowPlanBuilder:
             join_to_time_spine_node = JoinToTimeSpineNode(
                 parent_node=time_range_node or measure_recipe.source_node,
                 requested_agg_time_dimension_specs=queried_agg_time_dimension_specs,
+                query_includes_metric_time=queried_linkable_specs.contains_metric_time,
                 time_range_constraint=time_range_constraint,
                 offset_window=before_aggregation_time_spine_join_description.offset_window,
                 offset_to_grain=before_aggregation_time_spine_join_description.offset_to_grain,
@@ -1375,12 +1372,13 @@ class DataflowPlanBuilder:
         else:
             unaggregated_measure_node = filtered_measure_source_node
 
+        # If time constraint was previously adjusted for cumulative window or grain, apply original time constraint
+        # here. Can skip if metric is being aggregated over all time.
         cumulative_metric_constrained_node: Optional[ConstrainTimeRangeNode] = None
-        if (
-            cumulative_metric_adjusted_time_constraint is not None
-            and time_range_constraint is not None
-            and queried_linkable_specs.contains_metric_time
-        ):
+        if cumulative_metric_adjusted_time_constraint is not None and time_range_constraint is not None:
+            assert (
+                queried_linkable_specs.contains_metric_time
+            ), "Using time constraints currently requires querying with metric_time."
             cumulative_metric_constrained_node = ConstrainTimeRangeNode(
                 unaggregated_measure_node, time_range_constraint
             )
@@ -1445,6 +1443,7 @@ class DataflowPlanBuilder:
             return JoinToTimeSpineNode(
                 parent_node=aggregate_measures_node,
                 requested_agg_time_dimension_specs=queried_agg_time_dimension_specs,
+                query_includes_metric_time=queried_linkable_specs.contains_metric_time,
                 join_type=after_aggregation_time_spine_join_description.join_type,
                 time_range_constraint=time_range_constraint,
                 offset_window=after_aggregation_time_spine_join_description.offset_window,

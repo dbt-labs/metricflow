@@ -66,12 +66,10 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
         resolution_path: MetricFlowQueryResolutionPath,
     ) -> MetricFlowQueryResolutionIssueSet:
         metric = self._get_metric(metric_reference)
-        query_includes_metric_time = self._group_by_items_include_metric_time(resolver_input_for_query)
-        query_includes_metric_time_or_agg_time_dimension = (
-            query_includes_metric_time
-            or self._group_by_items_include_agg_time_dimension(
-                query_resolver_input=resolver_input_for_query, metric_reference=metric_reference
-            )
+        query_includes_metric_time_or_agg_time_dimension = self._group_by_items_include_metric_time(
+            resolver_input_for_query
+        ) or self._group_by_items_include_agg_time_dimension(
+            query_resolver_input=resolver_input_for_query, metric_reference=metric_reference
         )
 
         if metric.type is MetricType.SIMPLE or metric.type is MetricType.CONVERSION:
@@ -80,7 +78,7 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
             if (
                 metric.type_params is not None
                 and (metric.type_params.window is not None or metric.type_params.grain_to_date is not None)
-                and not query_includes_metric_time
+                and not query_includes_metric_time_or_agg_time_dimension
             ):
                 return MetricFlowQueryResolutionIssueSet.from_issue(
                     CumulativeMetricRequiresMetricTimeIssue.from_parameters(
