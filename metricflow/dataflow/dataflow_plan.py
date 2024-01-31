@@ -673,6 +673,7 @@ class JoinToTimeSpineNode(BaseOutput, ABC):
         self,
         parent_node: BaseOutput,
         requested_agg_time_dimension_specs: List[TimeDimensionSpec],
+        query_includes_metric_time: bool,
         join_type: SqlJoinType,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         offset_window: Optional[MetricTimeWindow] = None,
@@ -683,6 +684,7 @@ class JoinToTimeSpineNode(BaseOutput, ABC):
         Args:
             parent_node: Node that returns desired dataset to join to time spine.
             requested_agg_time_dimension_specs: Time dimensions requested in query.
+            query_includes_metric_time: Indicates if metric time was queried.
             time_range_constraint: Time range to constrain the time spine to.
             offset_window: Time window to offset the parent dataset by when joining to time spine.
             offset_to_grain: Granularity period to offset the parent dataset to when joining to time spine.
@@ -698,6 +700,7 @@ class JoinToTimeSpineNode(BaseOutput, ABC):
 
         self._parent_node = parent_node
         self._requested_agg_time_dimension_specs = requested_agg_time_dimension_specs
+        self._query_includes_metric_time = query_includes_metric_time
         self._offset_window = offset_window
         self._offset_to_grain = offset_to_grain
         self._time_range_constraint = time_range_constraint
@@ -713,6 +716,11 @@ class JoinToTimeSpineNode(BaseOutput, ABC):
     def requested_agg_time_dimension_specs(self) -> List[TimeDimensionSpec]:
         """Time dimension specs to use when creating time spine table."""
         return self._requested_agg_time_dimension_specs
+
+    @property
+    def query_includes_metric_time(self) -> bool:
+        """Whether or not metric_time was included in the query."""
+        return self._query_includes_metric_time
 
     @property
     def time_range_constraint(self) -> Optional[TimeRangeConstraint]:
@@ -745,6 +753,7 @@ class JoinToTimeSpineNode(BaseOutput, ABC):
     def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
         return super().displayed_properties + [
             DisplayedProperty("requested_agg_time_dimension_specs", self._requested_agg_time_dimension_specs),
+            DisplayedProperty("query_includes_metric_time", self._query_includes_metric_time),
             DisplayedProperty("time_range_constraint", self._time_range_constraint),
             DisplayedProperty("offset_window", self._offset_window),
             DisplayedProperty("offset_to_grain", self._offset_to_grain),
@@ -762,6 +771,7 @@ class JoinToTimeSpineNode(BaseOutput, ABC):
             and other_node.offset_window == self.offset_window
             and other_node.offset_to_grain == self.offset_to_grain
             and other_node.requested_agg_time_dimension_specs == self.requested_agg_time_dimension_specs
+            and other_node.query_includes_metric_time == self.query_includes_metric_time
             and other_node.join_type == self.join_type
         )
 
@@ -770,6 +780,7 @@ class JoinToTimeSpineNode(BaseOutput, ABC):
         return JoinToTimeSpineNode(
             parent_node=new_parent_nodes[0],
             requested_agg_time_dimension_specs=self.requested_agg_time_dimension_specs,
+            query_includes_metric_time=self.query_includes_metric_time,
             time_range_constraint=self.time_range_constraint,
             offset_window=self.offset_window,
             offset_to_grain=self.offset_to_grain,

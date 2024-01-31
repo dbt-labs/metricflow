@@ -7,7 +7,7 @@ from typing import List, Optional, Sequence, Tuple, Union
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.protocols.metric import MetricInputMeasure, MetricType
-from dbt_semantic_interfaces.references import MetricModelReference
+from dbt_semantic_interfaces.references import EntityReference, MetricModelReference
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.conversion_calculation_type import ConversionCalculationType
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
@@ -1244,20 +1244,21 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         parent_data_set = node.parent_node.accept(self)
         parent_alias = self._next_unique_table_alias()
 
-        # Determine if the time spine join should use metric_time or the agg_time_dimension (metric_time takes priority).
-        agg_time_dimension_for_join = node.requested_agg_time_dimension_specs[0]
-        for spec in node.requested_agg_time_dimension_specs[1:]:
-            if spec.element_name == METRIC_TIME_ELEMENT_NAME:
-                agg_time_dimension_for_join = spec
-                break
+        if node.query_includes_metric_time:
+            agg_time_element_name = METRIC_TIME_ELEMENT_NAME
+            agg_time_entity_links: Tuple[EntityReference, ...] = ()
+        else:
+            agg_time_dimension = node.requested_agg_time_dimension_specs[0]
+            agg_time_element_name = agg_time_dimension.element_name
+            agg_time_entity_links = agg_time_dimension.entity_links
 
         # Find the time dimension instances in the parent data set that match the one we want to join with.
         agg_time_dimension_instances: List[TimeDimensionInstance] = []
         for instance in parent_data_set.instance_set.time_dimension_instances:
             if (
                 instance.spec.date_part is None  # Ensure we don't join using an instance with date part
-                and instance.spec.element_name == agg_time_dimension_for_join.element_name
-                and instance.spec.entity_links == agg_time_dimension_for_join.entity_links
+                and instance.spec.element_name == agg_time_element_name
+                and instance.spec.entity_links == agg_time_entity_links
             ):
                 agg_time_dimension_instances.append(instance)
 
@@ -1298,8 +1299,8 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 time_dimension_instance
                 for time_dimension_instance in parent_data_set.instance_set.time_dimension_instances
                 if not (
-                    time_dimension_instance.spec.element_name == agg_time_dimension_for_join.element_name
-                    and time_dimension_instance.spec.entity_links == agg_time_dimension_for_join.entity_links
+                    time_dimension_instance.spec.element_name == agg_time_element_name
+                    and time_dimension_instance.spec.entity_links == agg_time_entity_links
                 )
             ),
             entity_instances=parent_data_set.instance_set.entity_instances,

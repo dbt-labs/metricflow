@@ -29,6 +29,7 @@
                             <!-- node_id = NodeId(id_str='jts_0') -->
                             <!-- requested_agg_time_dimension_specs =                                       -->
                             <!--   [TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH),] -->
+                            <!-- query_includes_metric_time = True -->
                             <!-- time_range_constraint = None -->
                             <!-- offset_window = PydanticMetricTimeWindow(count=5, granularity=DAY) -->
                             <!-- offset_to_grain = None -->
