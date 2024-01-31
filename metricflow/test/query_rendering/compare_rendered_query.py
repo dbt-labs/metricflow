@@ -29,7 +29,7 @@ def convert_and_check(
         sql_engine_type=sql_client.sql_engine_type,
         dataflow_plan_node=node,
         optimization_level=SqlQueryOptimizationLevel.O0,
-        sql_query_plan_id=DagId.from_str("plan"),
+        sql_query_plan_id=DagId.from_str("plan0"),
     )
 
     display_graph_if_requested(
@@ -50,7 +50,7 @@ def convert_and_check(
         sql_engine_type=sql_client.sql_engine_type,
         dataflow_plan_node=node,
         optimization_level=SqlQueryOptimizationLevel.O4,
-        sql_query_plan_id=DagId.from_str("plan_optimized"),
+        sql_query_plan_id=DagId.from_str("plan0_optimized"),
     )
 
     display_graph_if_requested(
