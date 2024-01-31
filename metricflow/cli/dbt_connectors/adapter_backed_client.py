@@ -23,8 +23,7 @@ from metricflow.sql.render.snowflake import SnowflakeSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.render.trino import TrinoSqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.sql_request.sql_request_attributes import SqlJsonTag, SqlRequestId, SqlRequestTagSet
-from metricflow.sql_request.sql_statement_metadata import CombinedSqlTags, SqlStatementCommentMetadata
+from metricflow.sql_request.sql_request_attributes import SqlRequestId
 
 logger = logging.getLogger(__name__)
 
@@ -128,7 +127,6 @@ class AdapterBackedSqlClient:
         self,
         stmt: str,
         sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
-        extra_tags: SqlJsonTag = SqlJsonTag(),
     ) -> pd.DataFrame:
         """Query statement; result expected to be data which will be returned as a DataFrame.
 
@@ -140,19 +138,15 @@ class AdapterBackedSqlClient:
         """
         start = time.time()
         request_id = SqlRequestId(f"mf_rid__{random_id()}")
-        combined_tags = AdapterBackedSqlClient._consolidate_tags(json_tags=extra_tags, request_id=request_id)
-        statement = SqlStatementCommentMetadata.add_tag_metadata_as_comment(
-            sql_statement=stmt, combined_tags=combined_tags
-        )
         if sql_bind_parameters.param_dict:
             raise SqlBindParametersNotSupportedError(
                 f"Invalid execute statement - we do not support queries with bind parameters through dbt adapters! "
                 f"Bind params: {sql_bind_parameters.param_dict}"
             )
-        logger.info(AdapterBackedSqlClient._format_run_query_log_message(statement, sql_bind_parameters))
+        logger.info(AdapterBackedSqlClient._format_run_query_log_message(stmt, sql_bind_parameters))
         with self._adapter.connection_named(f"MetricFlow_request_{request_id}"):
             # returns a Tuple[AdapterResponse, agate.Table] but the decorator converts it to Any
-            result = self._adapter.execute(sql=statement, auto_begin=True, fetch=True)
+            result = self._adapter.execute(sql=stmt, auto_begin=True, fetch=True)
             logger.info(f"Query returned from dbt Adapter with response {result[0]}")
 
         agate_data = result[1]
@@ -165,7 +159,6 @@ class AdapterBackedSqlClient:
         self,
         stmt: str,
         sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
-        extra_tags: SqlJsonTag = SqlJsonTag(),
     ) -> None:
         """Execute a SQL statement. No result will be returned.
 
@@ -173,7 +166,6 @@ class AdapterBackedSqlClient:
             stmt: The SQL query statement to run. This should not produce output.
             sql_bind_parameters: The parameter replacement mapping for filling in
                 concrete values for SQL query parameters.
-            extra_tags: An object containing JSON serialized tags meant for annotating queries.
         """
         if sql_bind_parameters.param_dict:
             raise SqlBindParametersNotSupportedError(
@@ -182,13 +174,9 @@ class AdapterBackedSqlClient:
             )
         start = time.time()
         request_id = SqlRequestId(f"mf_rid__{random_id()}")
-        combined_tags = AdapterBackedSqlClient._consolidate_tags(json_tags=extra_tags, request_id=request_id)
-        statement = SqlStatementCommentMetadata.add_tag_metadata_as_comment(
-            sql_statement=stmt, combined_tags=combined_tags
-        )
-        logger.info(AdapterBackedSqlClient._format_run_query_log_message(statement, sql_bind_parameters))
+        logger.info(AdapterBackedSqlClient._format_run_query_log_message(stmt, sql_bind_parameters))
         with self._adapter.connection_named(f"MetricFlow_request_{request_id}"):
-            result = self._adapter.execute(statement, auto_begin=True, fetch=False)
+            result = self._adapter.execute(stmt, auto_begin=True, fetch=False)
             # Calls to execute often involve some amount of DDL so we commit here
             self._adapter.commit_if_has_connection()
             logger.info(f"Query executed via dbt Adapter with response {result[0]}")
@@ -270,11 +258,3 @@ class AdapterBackedSqlClient:
         if len(sql_bind_parameters.param_dict) > 0:
             message += f"\n\nwith parameters:\n\n{indent(mf_pformat(sql_bind_parameters.param_dict))}"
         return message
-
-    @staticmethod
-    def _consolidate_tags(json_tags: SqlJsonTag, request_id: SqlRequestId) -> CombinedSqlTags:
-        """Consolidates json tags and request ID into a single set of tags."""
-        return CombinedSqlTags(
-            system_tags=SqlRequestTagSet().add_request_id(request_id=request_id),
-            extra_tag=json_tags,
-        )
