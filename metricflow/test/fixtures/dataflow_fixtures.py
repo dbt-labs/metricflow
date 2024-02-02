@@ -1,15 +1,15 @@
 from __future__ import annotations
 
+from typing import Mapping
+
 import pytest
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
+from metricflow.test.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestName
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.fixtures.sql_client_fixtures import sql_client  # noqa: F401, F403
 
@@ -22,92 +22,60 @@ Using 'session' scope can result in other 'session' scope fixtures causing ID co
 
 @pytest.fixture
 def column_association_resolver(  # noqa: D
-    simple_semantic_manifest_lookup: SemanticManifestLookup,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture]
 ) -> ColumnAssociationResolver:
-    return DunderColumnAssociationResolver(simple_semantic_manifest_lookup)
+    return mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].column_association_resolver
 
 
 @pytest.fixture
 def dataflow_plan_builder(  # noqa: D
-    simple_semantic_manifest_lookup: SemanticManifestLookup,
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture]
 ) -> DataflowPlanBuilder:
-    return DataflowPlanBuilder(
-        source_nodes=consistent_id_object_repository.simple_model_source_nodes,
-        read_nodes=list(consistent_id_object_repository.simple_model_read_nodes.values()),
-        semantic_manifest_lookup=simple_semantic_manifest_lookup,
-        time_spine_source_node=consistent_id_object_repository.simple_model_time_spine_source_node,
-    )
+    return mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].dataflow_plan_builder
 
 
 @pytest.fixture
 def query_parser(  # noqa: D
-    simple_semantic_manifest_lookup: SemanticManifestLookup,
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture]
 ) -> MetricFlowQueryParser:
-    return MetricFlowQueryParser(
-        semantic_manifest_lookup=simple_semantic_manifest_lookup,
-    )
+    return mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].query_parser
 
 
 @pytest.fixture
 def extended_date_dataflow_plan_builder(  # noqa: D
-    extended_date_semantic_manifest_lookup: SemanticManifestLookup,
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture]
 ) -> DataflowPlanBuilder:
-    return DataflowPlanBuilder(
-        source_nodes=consistent_id_object_repository.extended_date_model_source_nodes,
-        read_nodes=list(consistent_id_object_repository.extended_date_model_read_nodes.values()),
-        semantic_manifest_lookup=extended_date_semantic_manifest_lookup,
-        time_spine_source_node=consistent_id_object_repository.extended_date_model_time_spine_source_node,
-    )
+    return mf_engine_test_fixture_mapping[SemanticManifestName.EXTENDED_DATE_MANIFEST].dataflow_plan_builder
 
 
 @pytest.fixture
 def multihop_dataflow_plan_builder(  # noqa: D
-    partitioned_multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
-    consistent_id_object_repository: ConsistentIdObjectRepository,
-    time_spine_source: TimeSpineSource,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture]
 ) -> DataflowPlanBuilder:
-    return DataflowPlanBuilder(
-        source_nodes=consistent_id_object_repository.multihop_model_source_nodes,
-        read_nodes=list(consistent_id_object_repository.multihop_model_read_nodes.values()),
-        semantic_manifest_lookup=partitioned_multi_hop_join_semantic_manifest_lookup,
-        time_spine_source_node=consistent_id_object_repository.multihop_model_time_spine_source_node,
-    )
+    return mf_engine_test_fixture_mapping[
+        SemanticManifestName.PARTITIONED_MULTI_HOP_JOIN_MANIFEST
+    ].dataflow_plan_builder
 
 
 @pytest.fixture
 def scd_column_association_resolver(  # noqa: D
-    scd_semantic_manifest_lookup: SemanticManifestLookup,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture]
 ) -> ColumnAssociationResolver:
-    return DunderColumnAssociationResolver(scd_semantic_manifest_lookup)
+    return mf_engine_test_fixture_mapping[SemanticManifestName.SCD_MANIFEST].column_association_resolver
 
 
 @pytest.fixture
 def scd_dataflow_plan_builder(  # noqa: D
-    scd_semantic_manifest_lookup: SemanticManifestLookup,
-    scd_column_association_resolver: ColumnAssociationResolver,
-    consistent_id_object_repository: ConsistentIdObjectRepository,
-    time_spine_source: TimeSpineSource,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture]
 ) -> DataflowPlanBuilder:
-    return DataflowPlanBuilder(
-        source_nodes=consistent_id_object_repository.scd_model_source_nodes,
-        read_nodes=list(consistent_id_object_repository.scd_model_read_nodes.values()),
-        semantic_manifest_lookup=scd_semantic_manifest_lookup,
-        column_association_resolver=scd_column_association_resolver,
-        time_spine_source_node=consistent_id_object_repository.scd_model_time_spine_source_node,
-    )
+    return mf_engine_test_fixture_mapping[SemanticManifestName.SCD_MANIFEST].dataflow_plan_builder
 
 
 @pytest.fixture
 def scd_query_parser(  # noqa: D
-    scd_column_association_resolver: ColumnAssociationResolver,
-    scd_semantic_manifest_lookup: SemanticManifestLookup,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture]
 ) -> MetricFlowQueryParser:
-    return MetricFlowQueryParser(
-        semantic_manifest_lookup=scd_semantic_manifest_lookup,
-    )
+    return mf_engine_test_fixture_mapping[SemanticManifestName.SCD_MANIFEST].query_parser
 
 
 @pytest.fixture(scope="session")
