@@ -1,15 +1,21 @@
 from __future__ import annotations
 
 import logging
+import os
+from collections import OrderedDict
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, Mapping, OrderedDict, Sequence
-from typing import Tuple
+from typing import Dict, Mapping, Optional, OrderedDict, Sequence, Tuple
 
 import pytest
 from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
+from dbt_semantic_interfaces.parsing.dir_to_model import (
+    SemanticManifestBuildResult,
+    parse_directory_of_yaml_files_to_semantic_manifest,
+)
 from dbt_semantic_interfaces.protocols import SemanticModel
 from dbt_semantic_interfaces.test_utils import as_datetime
+from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
@@ -25,7 +31,7 @@ from metricflow.protocols.sql_client import SqlClient
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.test.fixtures.id_fixtures import IdNumberSpace, patch_id_generators_helper
-from metricflow.test.fixtures.model_fixtures import load_semantic_manifest
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.time.configurable_time_source import ConfigurableTimeSource
 
 logger = logging.getLogger(__name__)
@@ -200,3 +206,23 @@ def mf_engine_test_fixture_mapping(
             )
 
         return fixture_mapping
+
+
+def load_semantic_manifest(
+    relative_manifest_path: str,
+    template_mapping: Optional[Dict[str, str]] = None,
+) -> SemanticManifestBuildResult:
+    """Reads the manifest YAMLs from the standard location, applies transformations, runs validations."""
+    yaml_file_directory = os.path.join(os.path.dirname(__file__), f"semantic_manifest_yamls/{relative_manifest_path}")
+    build_result = parse_directory_of_yaml_files_to_semantic_manifest(
+        yaml_file_directory, template_mapping=template_mapping
+    )
+    validator = SemanticManifestValidator[PydanticSemanticManifest]()
+    validator.checked_validations(build_result.semantic_manifest)
+    return build_result
+
+
+@pytest.fixture(scope="session")
+def template_mapping(mf_test_session_state: MetricFlowTestSessionState) -> Dict[str, str]:
+    """Mapping for template variables in the model YAML files."""
+    return {"source_schema": mf_test_session_state.mf_source_schema}
