@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Mapping
+
 import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
@@ -16,7 +18,7 @@ from metricflow.protocols.sql_client import SqlClient
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import EntityReference, MetricFlowQuerySpec, MetricSpec, TimeDimensionSpec
-from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
+from metricflow.test.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestName
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.query_rendering.compare_rendered_query import convert_and_check
 from metricflow.test.time.metric_time_dimension import MTD_SPEC_MONTH
@@ -28,7 +30,7 @@ def test_cumulative_metric(
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
     """Tests rendering a basic cumulative metric query."""
@@ -61,7 +63,7 @@ def test_cumulative_metric_with_time_constraint(
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
     """Tests rendering a cumulative metric query with an adjustable time constraint.
@@ -104,7 +106,7 @@ def test_cumulative_metric_with_non_adjustable_time_filter(
     query_parser: MetricFlowQueryParser,
     dataflow_plan_builder: DataflowPlanBuilder,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
     """Tests rendering a cumulative metric query with a time filter that cannot be automatically adjusted.
@@ -140,7 +142,7 @@ def test_cumulative_metric_no_ds(
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
     """Tests rendering a cumulative metric with no time dimension specified."""
@@ -167,7 +169,7 @@ def test_cumulative_metric_no_window(
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
     """Tests rendering a query where there is a windowless cumulative metric to compute."""
@@ -200,7 +202,7 @@ def test_cumulative_metric_no_window_with_time_constraint(
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
     """Tests rendering a query for a windowless cumulative metric query with an adjustable time constraint."""
@@ -230,7 +232,7 @@ def test_cumulative_metric_grain_to_date(
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
     """Tests rendering a query against a grain_to_date cumulative metric."""
@@ -263,7 +265,7 @@ def test_cumulative_metric_month(
     mf_test_session_state: MetricFlowTestSessionState,
     extended_date_dataflow_plan_builder: DataflowPlanBuilder,
     extended_date_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
     """Tests rendering a query for a cumulative metric based on a monthly time dimension."""
@@ -293,7 +295,7 @@ def test_cumulative_metric_with_agg_time_dimension(
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
     """Tests rendering a query for a cumulative metric queried with agg time dimension."""

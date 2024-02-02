@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Mapping
+
 import pytest
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
@@ -8,15 +10,16 @@ from metricflow.instances import InstanceSet
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
 from metricflow.specs.specs import TimeDimensionSpec
-from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
+from metricflow.test.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestName
 
 
 def test_no_validity_dims(
-    consistent_id_object_repository: ConsistentIdObjectRepository, scd_semantic_manifest_lookup: SemanticManifestLookup
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    scd_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Tests converting an instance set with no matching dimensions to a ValidityWindowJoinDescription."""
     # bookings_source is a fact table, and has no validity window dimensions
-    dataset = consistent_id_object_repository.scd_model_data_sets["bookings_source"]
+    dataset = mf_engine_test_fixture_mapping[SemanticManifestName.SCD_MANIFEST].data_set_mapping["bookings_source"]
 
     validity_window_join_description = CreateValidityWindowJoinDescription(
         semantic_model_lookup=scd_semantic_manifest_lookup.semantic_model_lookup
@@ -29,11 +32,12 @@ def test_no_validity_dims(
 
 
 def test_validity_window_conversion(
-    consistent_id_object_repository: ConsistentIdObjectRepository, scd_semantic_manifest_lookup: SemanticManifestLookup
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    scd_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Tests converting an instance set with a single validity window into a ValidityWindowJoinDescription."""
     # The listings semantic model uses a 2-column SCD Type III layout
-    dataset = consistent_id_object_repository.scd_model_data_sets["listings"]
+    dataset = mf_engine_test_fixture_mapping[SemanticManifestName.SCD_MANIFEST].data_set_mapping["listings"]
     expected_join_description = ValidityWindowJoinDescription(
         window_start_dimension=TimeDimensionSpec(
             element_name="window_start",
@@ -58,11 +62,14 @@ def test_validity_window_conversion(
 
 
 def test_multiple_validity_windows(
-    consistent_id_object_repository: ConsistentIdObjectRepository, scd_semantic_manifest_lookup: SemanticManifestLookup
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    scd_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Tests the behavior of this converter when it encounters an instance set with multiple validity windows."""
-    first_dataset = consistent_id_object_repository.scd_model_data_sets["listings"]
-    second_dataset = consistent_id_object_repository.scd_model_data_sets["primary_accounts"]
+    first_dataset = mf_engine_test_fixture_mapping[SemanticManifestName.SCD_MANIFEST].data_set_mapping["listings"]
+    second_dataset = mf_engine_test_fixture_mapping[SemanticManifestName.SCD_MANIFEST].data_set_mapping[
+        "primary_accounts"
+    ]
     merged_instance_set = InstanceSet.merge([first_dataset.instance_set, second_dataset.instance_set])
     with pytest.raises(AssertionError, match="Found more than 1 set of validity window specs"):
         CreateValidityWindowJoinDescription(

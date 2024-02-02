@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import logging
+from typing import Mapping
 
 import pytest
 from dbt_semantic_interfaces.dataclass_serialization import DataClassDeserializer, DataclassSerializer
 
 from metricflow.instances import InstanceSet
-from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
+from metricflow.test.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestName
 
 logger = logging.getLogger(__name__)
 
@@ -22,11 +23,11 @@ def deserializer() -> DataClassDeserializer:  # noqa: D
 
 
 def test_serialization(  # noqa: D
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
     serializer: DataclassSerializer,
     deserializer: DataClassDeserializer,
 ) -> None:
-    for _, data_set in consistent_id_object_repository.simple_model_data_sets.items():
+    for _, data_set in mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].data_set_mapping.items():
         serialized_obj = serializer.pydantic_serialize(data_set.instance_set)
         deserialized_obj = deserializer.pydantic_deserialize(dataclass_type=InstanceSet, serialized_obj=serialized_obj)
         assert data_set.instance_set == deserialized_obj

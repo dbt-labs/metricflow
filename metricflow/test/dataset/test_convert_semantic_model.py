@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import logging
+from typing import Mapping
 
 import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.references import SemanticModelReference
 
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
+from metricflow.test.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestName
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.snapshot_utils import assert_spec_set_snapshot_equal
 from metricflow.test.sql.compare_sql_plan import assert_rendered_sql_equal
@@ -20,10 +21,12 @@ def test_convert_table_semantic_model_without_measures(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     sql_client: SqlClient,
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
 ) -> None:
     """Simple test for converting a table semantic model. Since there are no measures, primary time is not checked."""
-    users_data_set = consistent_id_object_repository.simple_model_data_sets["users_latest"]
+    users_data_set = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].data_set_mapping[
+        "users_latest"
+    ]
 
     assert_spec_set_snapshot_equal(
         request=request,
@@ -46,14 +49,16 @@ def test_convert_table_semantic_model_with_measures(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     sql_client: SqlClient,
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
 ) -> None:
     """Complete test of table semantic model conversion. This includes the full set of measures/entities/dimensions.
 
     Measures trigger a primary time dimension validation. Additionally, this includes both categorical and time
     dimension types, which should cover most, if not all, of the table source branches in the target class.
     """
-    id_verifications_data_set = consistent_id_object_repository.simple_model_data_sets["id_verifications"]
+    id_verifications_data_set = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].data_set_mapping[
+        "id_verifications"
+    ]
 
     assert_spec_set_snapshot_equal(
         request=request,
@@ -79,9 +84,9 @@ def test_convert_query_semantic_model(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     sql_client: SqlClient,
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
 ) -> None:
-    bookings_data_set = consistent_id_object_repository.simple_model_data_sets["revenue"]
+    bookings_data_set = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].data_set_mapping["revenue"]
 
     assert_rendered_sql_equal(
         request=request,

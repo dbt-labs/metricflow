@@ -3,7 +3,8 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, Mapping, OrderedDict, Sequence, Tuple
+from typing import Dict, Mapping, OrderedDict, Sequence
+from typing import Tuple
 
 import pytest
 from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
