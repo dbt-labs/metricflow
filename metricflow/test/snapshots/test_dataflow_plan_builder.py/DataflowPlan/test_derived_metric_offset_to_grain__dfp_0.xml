@@ -54,7 +54,7 @@
                                 <!-- node_id = NodeId(id_str='jts_0') -->
                                 <!-- requested_agg_time_dimension_specs =                                     -->
                                 <!--   [TimeDimensionSpec(element_name='metric_time', time_granularity=DAY),] -->
-                                <!-- query_includes_metric_time = True -->
+                                <!-- use_custom_agg_time_dimension = False -->
                                 <!-- time_range_constraint = None -->
                                 <!-- offset_window = None -->
                                 <!-- offset_to_grain = MONTH -->

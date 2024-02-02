@@ -420,12 +420,14 @@ class DataflowPlanBuilder:
             query_contains_metric_time=queried_linkable_specs.contains_metric_time,
             child_metric_offset_window=metric_spec.offset_window,
             child_metric_offset_to_grain=metric_spec.offset_to_grain,
-            cumulative_description=CumulativeMeasureDescription(
-                cumulative_window=metric.type_params.window,
-                cumulative_grain_to_date=metric.type_params.grain_to_date,
-            )
-            if metric.type is MetricType.CUMULATIVE
-            else None,
+            cumulative_description=(
+                CumulativeMeasureDescription(
+                    cumulative_window=metric.type_params.window,
+                    cumulative_grain_to_date=metric.type_params.grain_to_date,
+                )
+                if metric.type is MetricType.CUMULATIVE
+                else None
+            ),
             descendent_filter_specs=metric_spec.filter_specs,
         )
 
@@ -490,9 +492,9 @@ class DataflowPlanBuilder:
                         offset_window=metric_input_spec.offset_window,
                         offset_to_grain=metric_input_spec.offset_to_grain,
                     ),
-                    queried_linkable_specs=queried_linkable_specs
-                    if not metric_spec.has_time_offset
-                    else required_linkable_specs,
+                    queried_linkable_specs=(
+                        queried_linkable_specs if not metric_spec.has_time_offset else required_linkable_specs
+                    ),
                     filter_spec_factory=filter_spec_factory,
                     time_range_constraint=time_range_constraint if not metric_spec.has_time_offset else None,
                 )
@@ -514,7 +516,7 @@ class DataflowPlanBuilder:
             output_node = JoinToTimeSpineNode(
                 parent_node=output_node,
                 requested_agg_time_dimension_specs=queried_agg_time_dimension_specs,
-                query_includes_metric_time=queried_linkable_specs.contains_metric_time,
+                use_custom_agg_time_dimension=not queried_linkable_specs.contains_metric_time,
                 time_range_constraint=time_range_constraint,
                 offset_window=metric_spec.offset_window,
                 offset_to_grain=metric_spec.offset_to_grain,
@@ -1154,12 +1156,14 @@ class DataflowPlanBuilder:
                 element_name=input_metric.name,
                 filter_specs=tuple(filter_specs),
                 alias=input_metric.alias,
-                offset_window=PydanticMetricTimeWindow(
-                    count=input_metric.offset_window.count,
-                    granularity=input_metric.offset_window.granularity,
-                )
-                if input_metric.offset_window
-                else None,
+                offset_window=(
+                    PydanticMetricTimeWindow(
+                        count=input_metric.offset_window.count,
+                        granularity=input_metric.offset_window.granularity,
+                    )
+                    if input_metric.offset_window
+                    else None
+                ),
                 offset_to_grain=input_metric.offset_to_grain,
             )
             input_metric_specs.append(spec)
@@ -1274,9 +1278,11 @@ class DataflowPlanBuilder:
             find_recipe_start_time = time.time()
             measure_recipe = self._find_dataflow_recipe(
                 measure_spec_properties=measure_properties,
-                time_range_constraint=(cumulative_metric_adjusted_time_constraint or time_range_constraint)
-                if not before_aggregation_time_spine_join_description
-                else None,
+                time_range_constraint=(
+                    (cumulative_metric_adjusted_time_constraint or time_range_constraint)
+                    if not before_aggregation_time_spine_join_description
+                    else None
+                ),
                 linkable_spec_set=required_linkable_specs,
             )
             logger.info(
@@ -1309,9 +1315,9 @@ class DataflowPlanBuilder:
                 time_dimension_spec_for_join=agg_time_dimension_spec_for_join,
                 window=cumulative_window,
                 grain_to_date=cumulative_grain_to_date,
-                time_range_constraint=time_range_constraint
-                if not before_aggregation_time_spine_join_description
-                else None,
+                time_range_constraint=(
+                    time_range_constraint if not before_aggregation_time_spine_join_description else None
+                ),
             )
 
         # If querying an offset metric, join to time spine before aggregation.
@@ -1328,7 +1334,7 @@ class DataflowPlanBuilder:
             join_to_time_spine_node = JoinToTimeSpineNode(
                 parent_node=time_range_node or measure_recipe.source_node,
                 requested_agg_time_dimension_specs=queried_agg_time_dimension_specs,
-                query_includes_metric_time=queried_linkable_specs.contains_metric_time,
+                use_custom_agg_time_dimension=not queried_linkable_specs.contains_metric_time,
                 time_range_constraint=time_range_constraint,
                 offset_window=before_aggregation_time_spine_join_description.offset_window,
                 offset_to_grain=before_aggregation_time_spine_join_description.offset_to_grain,
@@ -1433,7 +1439,7 @@ class DataflowPlanBuilder:
             return JoinToTimeSpineNode(
                 parent_node=aggregate_measures_node,
                 requested_agg_time_dimension_specs=list(queried_linkable_specs.metric_time_specs),
-                query_includes_metric_time=queried_linkable_specs.contains_metric_time,
+                use_custom_agg_time_dimension=not queried_linkable_specs.contains_metric_time,
                 join_type=after_aggregation_time_spine_join_description.join_type,
                 time_range_constraint=time_range_constraint,
                 offset_window=after_aggregation_time_spine_join_description.offset_window,

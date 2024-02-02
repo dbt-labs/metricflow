@@ -249,13 +249,15 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                     from_source_alias=time_spine_table_alias,
                     joins_descs=(),
                     group_bys=(),
-                    where=_make_time_range_comparison_expr(
-                        table_alias=time_spine_table_alias,
-                        column_alias=time_spine_source.time_column_name,
-                        time_range_constraint=time_range_constraint,
-                    )
-                    if time_range_constraint
-                    else None,
+                    where=(
+                        _make_time_range_comparison_expr(
+                            table_alias=time_spine_table_alias,
+                            column_alias=time_spine_source.time_column_name,
+                            time_range_constraint=time_range_constraint,
+                        )
+                        if time_range_constraint
+                        else None
+                    ),
                     order_bys=(),
                 ),
             )
@@ -284,13 +286,15 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                     from_source_alias=time_spine_table_alias,
                     joins_descs=(),
                     group_bys=select_columns,
-                    where=_make_time_range_comparison_expr(
-                        table_alias=time_spine_table_alias,
-                        column_alias=time_spine_source.time_column_name,
-                        time_range_constraint=time_range_constraint,
-                    )
-                    if time_range_constraint
-                    else None,
+                    where=(
+                        _make_time_range_comparison_expr(
+                            table_alias=time_spine_table_alias,
+                            column_alias=time_spine_source.time_column_name,
+                            time_range_constraint=time_range_constraint,
+                        )
+                        if time_range_constraint
+                        else None
+                    ),
                     order_bys=(),
                 ),
             )
@@ -1244,13 +1248,13 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         parent_data_set = node.parent_node.accept(self)
         parent_alias = self._next_unique_table_alias()
 
-        if node.query_includes_metric_time:
-            agg_time_element_name = METRIC_TIME_ELEMENT_NAME
-            agg_time_entity_links: Tuple[EntityReference, ...] = ()
-        else:
+        if node.use_custom_agg_time_dimension:
             agg_time_dimension = node.requested_agg_time_dimension_specs[0]
             agg_time_element_name = agg_time_dimension.element_name
-            agg_time_entity_links = agg_time_dimension.entity_links
+            agg_time_entity_links: Tuple[EntityReference, ...] = agg_time_dimension.entity_links
+        else:
+            agg_time_element_name = METRIC_TIME_ELEMENT_NAME
+            agg_time_entity_links = ()
 
         # Find the time dimension instances in the parent data set that match the one we want to join with.
         agg_time_dimension_instances: List[TimeDimensionInstance] = []
