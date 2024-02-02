@@ -15,15 +15,12 @@ from dbt_semantic_interfaces.parsing.dir_to_model import (
 )
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.protocols.semantic_model import SemanticModel
 from dbt_semantic_interfaces.transformations.pydantic_rule_set import PydanticSemanticManifestTransformRuleSet
 from dbt_semantic_interfaces.transformations.semantic_manifest_transformer import PydanticSemanticManifestTransformer
 from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
-from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import BaseOutput, MetricTimeDimensionTransformNode, ReadSqlSourceNode
-from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
@@ -32,34 +29,6 @@ from metricflow.test.fixtures.id_fixtures import IdNumberSpace, patch_id_generat
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 
 logger = logging.getLogger(__name__)
-
-
-def _data_set_to_read_nodes(data_sets: OrderedDict[str, SemanticModelDataSet]) -> OrderedDict[str, ReadSqlSourceNode]:
-    """Return a mapping from the name of the semantic model to the dataflow plan node that reads from it."""
-    return_dict: OrderedDict[str, ReadSqlSourceNode] = OrderedDict()
-    for semantic_model_name, data_set in data_sets.items():
-        return_dict[semantic_model_name] = ReadSqlSourceNode(data_set)
-        logger.debug(
-            f"For semantic model {semantic_model_name}, creating node_id {return_dict[semantic_model_name].node_id}"
-        )
-
-    return return_dict
-
-
-def _data_set_to_source_nodes(
-    semantic_manifest_lookup: SemanticManifestLookup, data_sets: OrderedDict[str, SemanticModelDataSet]
-) -> Sequence[BaseOutput]:
-    source_node_builder = SourceNodeBuilder(semantic_manifest_lookup)
-    return source_node_builder.create_from_data_sets(list(data_sets.values()))
-
-
-def _build_time_spine_source_node(semantic_manifest_lookup: SemanticManifestLookup) -> MetricTimeDimensionTransformNode:
-    return SourceNodeBuilder.build_time_spine_source_node(
-        time_spine_source=semantic_manifest_lookup.time_spine_source,
-        data_set_converter=SemanticModelToDataSetConverter(
-            column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup)
-        ),
-    )
 
 
 def query_parser_from_yaml(yaml_contents: List[YamlConfigFile]) -> MetricFlowQueryParser:
@@ -166,28 +135,6 @@ def consistent_id_object_repository(
                 ambiguous_resolution_manifest_lookup
             ),
         )
-
-
-def create_data_sets(
-    multihop_semantic_manifest_lookup: SemanticManifestLookup,
-) -> OrderedDict[str, SemanticModelDataSet]:
-    """Convert the SemanticModels in the model to SqlDataSets.
-
-    Key is the name of the semantic model, value is the associated data set.
-    """
-    # Use ordered dict and sort by name to get consistency when running tests.
-    data_sets = OrderedDict()
-    semantic_models: Sequence[SemanticModel] = multihop_semantic_manifest_lookup.semantic_manifest.semantic_models
-    semantic_models = sorted(semantic_models, key=lambda x: x.name)
-
-    converter = SemanticModelToDataSetConverter(
-        column_association_resolver=DunderColumnAssociationResolver(multihop_semantic_manifest_lookup)
-    )
-
-    for semantic_model in semantic_models:
-        data_sets[semantic_model.name] = converter.create_sql_source_data_set(semantic_model)
-
-    return data_sets
 
 
 def load_semantic_manifest(
