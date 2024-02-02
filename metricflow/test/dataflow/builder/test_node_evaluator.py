@@ -28,7 +28,6 @@ from metricflow.specs.specs import (
 )
 from metricflow.sql.sql_plan import SqlJoinType
 from metricflow.test.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestName
-from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 
 logger = logging.getLogger(__name__)
 
@@ -90,10 +89,12 @@ def make_multihop_node_evaluator(
 
 
 def test_node_evaluator_with_no_linkable_specs(  # noqa: D
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
     node_evaluator: NodeEvaluatorForLinkableInstances,
 ) -> None:
-    bookings_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
+    bookings_source_node = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+        "bookings_source"
+    ]
     evaluation = node_evaluator.evaluate_node(
         required_linkable_specs=[], start_node=bookings_source_node, default_join_type=SqlJoinType.LEFT_OUTER
     )
@@ -103,10 +104,12 @@ def test_node_evaluator_with_no_linkable_specs(  # noqa: D
 
 
 def test_node_evaluator_with_unjoinable_specs(  # noqa: D
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
     node_evaluator: NodeEvaluatorForLinkableInstances,
 ) -> None:
-    bookings_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
+    bookings_source_node = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+        "bookings_source"
+    ]
     evaluation = node_evaluator.evaluate_node(
         required_linkable_specs=[
             DimensionSpec(
@@ -131,11 +134,13 @@ def test_node_evaluator_with_unjoinable_specs(  # noqa: D
 
 
 def test_node_evaluator_with_local_spec(  # noqa: D
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
     node_evaluator: NodeEvaluatorForLinkableInstances,
 ) -> None:
     """Tests the case where the requested linkable spec in available in the start node."""
-    bookings_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
+    bookings_source_node = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+        "bookings_source"
+    ]
     evaluation = node_evaluator.evaluate_node(
         required_linkable_specs=[DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),))],
         start_node=bookings_source_node,
@@ -150,11 +155,13 @@ def test_node_evaluator_with_local_spec(  # noqa: D
 
 
 def test_node_evaluator_with_local_spec_using_primary_entity(  # noqa: D
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
     node_evaluator: NodeEvaluatorForLinkableInstances,
 ) -> None:
     """Tests the case where the requested linkable spec with an entity link is available in the start node."""
-    bookings_source_node = consistent_id_object_repository.simple_model_read_nodes["users_latest"]
+    bookings_source_node = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+        "users_latest"
+    ]
     evaluation = node_evaluator.evaluate_node(
         required_linkable_specs=[
             DimensionSpec(element_name="home_state_latest", entity_links=(EntityReference(element_name="user"),))
@@ -179,11 +186,13 @@ def test_node_evaluator_with_local_spec_using_primary_entity(  # noqa: D
 
 
 def test_node_evaluator_with_joined_spec(  # noqa: D
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
     node_evaluator: NodeEvaluatorForLinkableInstances,
 ) -> None:
     """Tests the case where the requested linkable spec is available if another node is joined."""
-    bookings_source_node = consistent_id_object_repository.simple_model_read_nodes["bookings_source"]
+    bookings_source_node = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+        "bookings_source"
+    ]
     evaluation = node_evaluator.evaluate_node(
         required_linkable_specs=[
             DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),
@@ -214,7 +223,9 @@ def test_node_evaluator_with_joined_spec(  # noqa: D
         ),
         join_recipes=(
             JoinLinkableInstancesRecipe(
-                node_to_join=consistent_id_object_repository.simple_model_read_nodes["listings_latest"],
+                node_to_join=mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+                    "listings_latest"
+                ],
                 join_on_entity=LinklessEntitySpec.from_element_name("listing"),
                 satisfiable_linkable_specs=[
                     DimensionSpec(
@@ -236,11 +247,13 @@ def test_node_evaluator_with_joined_spec(  # noqa: D
 
 
 def test_node_evaluator_with_joined_spec_on_unique_id(  # noqa: D
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
     node_evaluator: NodeEvaluatorForLinkableInstances,
 ) -> None:
     """Similar to test_node_evaluator_with_joined_spec() but using a unique entity."""
-    listings_node = consistent_id_object_repository.simple_model_read_nodes["listings_latest"]
+    listings_node = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+        "listings_latest"
+    ]
     evaluation = node_evaluator.evaluate_node(
         required_linkable_specs=[
             DimensionSpec(
@@ -262,7 +275,9 @@ def test_node_evaluator_with_joined_spec_on_unique_id(  # noqa: D
         ),
         join_recipes=(
             JoinLinkableInstancesRecipe(
-                node_to_join=consistent_id_object_repository.simple_model_read_nodes["companies"],
+                node_to_join=mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+                    "companies"
+                ],
                 join_on_entity=LinklessEntitySpec.from_element_name("user"),
                 satisfiable_linkable_specs=[
                     DimensionSpec(
@@ -280,11 +295,13 @@ def test_node_evaluator_with_joined_spec_on_unique_id(  # noqa: D
 
 
 def test_node_evaluator_with_multiple_joined_specs(  # noqa: D
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
     node_evaluator: NodeEvaluatorForLinkableInstances,
 ) -> None:
     """Tests the case where multiple nodes need to be joined to get all linkable specs."""
-    views_source = consistent_id_object_repository.simple_model_read_nodes["views_source"]
+    views_source = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+        "views_source"
+    ]
     evaluation = node_evaluator.evaluate_node(
         required_linkable_specs=[
             DimensionSpec(
@@ -314,7 +331,9 @@ def test_node_evaluator_with_multiple_joined_specs(  # noqa: D
         ),
         join_recipes=(
             JoinLinkableInstancesRecipe(
-                node_to_join=consistent_id_object_repository.simple_model_read_nodes["listings_latest"],
+                node_to_join=mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+                    "listings_latest"
+                ],
                 join_on_entity=LinklessEntitySpec.from_element_name("listing"),
                 satisfiable_linkable_specs=[
                     EntitySpec(
@@ -327,7 +346,9 @@ def test_node_evaluator_with_multiple_joined_specs(  # noqa: D
                 join_type=SqlJoinType.LEFT_OUTER,
             ),
             JoinLinkableInstancesRecipe(
-                node_to_join=consistent_id_object_repository.simple_model_read_nodes["users_latest"],
+                node_to_join=mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+                    "users_latest"
+                ],
                 join_on_entity=LinklessEntitySpec.from_element_name("user"),
                 satisfiable_linkable_specs=[
                     DimensionSpec(
@@ -345,11 +366,13 @@ def test_node_evaluator_with_multiple_joined_specs(  # noqa: D
 
 
 def test_node_evaluator_with_multihop_joined_spec(  # noqa: D
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
     partitioned_multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Tests the case where multiple nodes need to be joined to get all linkable specs."""
-    txn_source = consistent_id_object_repository.multihop_model_read_nodes["account_month_txns"]
+    txn_source = mf_engine_test_fixture_mapping[
+        SemanticManifestName.PARTITIONED_MULTI_HOP_JOIN_MANIFEST
+    ].read_node_mapping["account_month_txns"]
 
     linkable_specs = [
         DimensionSpec(
@@ -362,7 +385,9 @@ def test_node_evaluator_with_multihop_joined_spec(  # noqa: D
     ]
 
     multihop_node_evaluator = make_multihop_node_evaluator(
-        model_source_nodes=consistent_id_object_repository.multihop_model_source_nodes,
+        model_source_nodes=mf_engine_test_fixture_mapping[
+            SemanticManifestName.PARTITIONED_MULTI_HOP_JOIN_MANIFEST
+        ].source_nodes,
         semantic_manifest_lookup_with_multihop_links=partitioned_multi_hop_join_semantic_manifest_lookup,
         desired_linkable_specs=linkable_specs,
     )
@@ -416,7 +441,7 @@ def test_node_evaluator_with_multihop_joined_spec(  # noqa: D
 
 
 def test_node_evaluator_with_partition_joined_spec(  # noqa: D
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
     node_evaluator: NodeEvaluatorForLinkableInstances,
 ) -> None:
     """Tests the case where the joined node required a partitioned join."""
@@ -427,7 +452,9 @@ def test_node_evaluator_with_partition_joined_spec(  # noqa: D
                 entity_links=(EntityReference(element_name="user"),),
             ),
         ],
-        start_node=consistent_id_object_repository.simple_model_read_nodes["id_verifications"],
+        start_node=mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+            "id_verifications"
+        ],
         default_join_type=SqlJoinType.LEFT_OUTER,
     )
 
@@ -441,7 +468,9 @@ def test_node_evaluator_with_partition_joined_spec(  # noqa: D
         ),
         join_recipes=(
             JoinLinkableInstancesRecipe(
-                node_to_join=consistent_id_object_repository.simple_model_read_nodes["users_ds_source"],
+                node_to_join=mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+                    "users_ds_source"
+                ],
                 join_on_entity=LinklessEntitySpec.from_element_name("user"),
                 satisfiable_linkable_specs=[
                     DimensionSpec(
@@ -470,7 +499,7 @@ def test_node_evaluator_with_partition_joined_spec(  # noqa: D
 
 
 def test_node_evaluator_with_scd_target(
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
     scd_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Tests the case where the joined node is an SCD with a validity window filter."""
@@ -479,7 +508,7 @@ def test_node_evaluator_with_scd_target(
         semantic_manifest_lookup=scd_semantic_manifest_lookup,
     )
 
-    source_nodes = tuple(consistent_id_object_repository.scd_model_read_nodes.values())
+    source_nodes = tuple(mf_engine_test_fixture_mapping[SemanticManifestName.SCD_MANIFEST].read_node_mapping.values())
 
     node_evaluator = NodeEvaluatorForLinkableInstances(
         semantic_model_lookup=scd_semantic_manifest_lookup.semantic_model_lookup,
@@ -495,7 +524,9 @@ def test_node_evaluator_with_scd_target(
                 entity_links=(EntityReference(element_name="listing"),),
             )
         ],
-        start_node=consistent_id_object_repository.scd_model_read_nodes["bookings_source"],
+        start_node=mf_engine_test_fixture_mapping[SemanticManifestName.SCD_MANIFEST].read_node_mapping[
+            "bookings_source"
+        ],
         default_join_type=SqlJoinType.LEFT_OUTER,
     )
 
@@ -509,7 +540,9 @@ def test_node_evaluator_with_scd_target(
         ),
         join_recipes=(
             JoinLinkableInstancesRecipe(
-                node_to_join=consistent_id_object_repository.scd_model_read_nodes["listings"],
+                node_to_join=mf_engine_test_fixture_mapping[SemanticManifestName.SCD_MANIFEST].read_node_mapping[
+                    "listings"
+                ],
                 join_on_entity=LinklessEntitySpec.from_element_name("listing"),
                 satisfiable_linkable_specs=[
                     DimensionSpec(
@@ -531,7 +564,7 @@ def test_node_evaluator_with_scd_target(
 
 
 def test_node_evaluator_with_multi_hop_scd_target(
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
     scd_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Tests the case where the joined node is an SCD reached through another node.
@@ -541,14 +574,16 @@ def test_node_evaluator_with_multi_hop_scd_target(
     """
     linkable_specs = [DimensionSpec.from_name("listing__lux_listing__is_confirmed_lux")]
     node_evaluator = make_multihop_node_evaluator(
-        model_source_nodes=consistent_id_object_repository.scd_model_source_nodes,
+        model_source_nodes=mf_engine_test_fixture_mapping[SemanticManifestName.SCD_MANIFEST].source_nodes,
         semantic_manifest_lookup_with_multihop_links=scd_semantic_manifest_lookup,
         desired_linkable_specs=linkable_specs,
     )
 
     evaluation = node_evaluator.evaluate_node(
         required_linkable_specs=linkable_specs,
-        start_node=consistent_id_object_repository.scd_model_read_nodes["bookings_source"],
+        start_node=mf_engine_test_fixture_mapping[SemanticManifestName.SCD_MANIFEST].read_node_mapping[
+            "bookings_source"
+        ],
         default_join_type=SqlJoinType.LEFT_OUTER,
     )
 
@@ -594,7 +629,7 @@ def test_node_evaluator_with_multi_hop_scd_target(
 
 
 def test_node_evaluator_with_multi_hop_through_scd(
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
     scd_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Tests the case where the joined node is reached via an SCD.
@@ -604,14 +639,16 @@ def test_node_evaluator_with_multi_hop_through_scd(
     """
     linkable_specs = [DimensionSpec.from_name("listing__user__home_state_latest")]
     node_evaluator = make_multihop_node_evaluator(
-        model_source_nodes=consistent_id_object_repository.scd_model_source_nodes,
+        model_source_nodes=mf_engine_test_fixture_mapping[SemanticManifestName.SCD_MANIFEST].source_nodes,
         semantic_manifest_lookup_with_multihop_links=scd_semantic_manifest_lookup,
         desired_linkable_specs=linkable_specs,
     )
 
     evaluation = node_evaluator.evaluate_node(
         required_linkable_specs=linkable_specs,
-        start_node=consistent_id_object_repository.scd_model_read_nodes["bookings_source"],
+        start_node=mf_engine_test_fixture_mapping[SemanticManifestName.SCD_MANIFEST].read_node_mapping[
+            "bookings_source"
+        ],
         default_join_type=SqlJoinType.LEFT_OUTER,
     )
 
@@ -653,7 +690,7 @@ def test_node_evaluator_with_multi_hop_through_scd(
 
 
 def test_node_evaluator_with_invalid_multi_hop_scd(
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
     scd_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Tests the case where the joined node is reached via an illegal SCD <-> SCD join.
@@ -662,14 +699,16 @@ def test_node_evaluator_with_invalid_multi_hop_scd(
     """
     linkable_specs = [DimensionSpec.from_name("listing__user__account_type")]
     node_evaluator = make_multihop_node_evaluator(
-        model_source_nodes=consistent_id_object_repository.scd_model_source_nodes,
+        model_source_nodes=mf_engine_test_fixture_mapping[SemanticManifestName.SCD_MANIFEST].source_nodes,
         semantic_manifest_lookup_with_multihop_links=scd_semantic_manifest_lookup,
         desired_linkable_specs=linkable_specs,
     )
 
     evaluation = node_evaluator.evaluate_node(
         required_linkable_specs=linkable_specs,
-        start_node=consistent_id_object_repository.scd_model_read_nodes["bookings_source"],
+        start_node=mf_engine_test_fixture_mapping[SemanticManifestName.SCD_MANIFEST].read_node_mapping[
+            "bookings_source"
+        ],
         default_join_type=SqlJoinType.LEFT_OUTER,
     )
 
