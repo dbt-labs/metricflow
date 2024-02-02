@@ -38,11 +38,13 @@ from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY
 
 @pytest.fixture(scope="session")
 def multihop_dataflow_to_sql_converter(  # noqa: D
-    multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
+    partitioned_multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> DataflowToSqlQueryPlanConverter:
     return DataflowToSqlQueryPlanConverter(
-        column_association_resolver=DunderColumnAssociationResolver(multi_hop_join_semantic_manifest_lookup),
-        semantic_manifest_lookup=multi_hop_join_semantic_manifest_lookup,
+        column_association_resolver=DunderColumnAssociationResolver(
+            partitioned_multi_hop_join_semantic_manifest_lookup
+        ),
+        semantic_manifest_lookup=partitioned_multi_hop_join_semantic_manifest_lookup,
     )
 
 
