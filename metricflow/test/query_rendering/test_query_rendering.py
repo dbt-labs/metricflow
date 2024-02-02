@@ -1,7 +1,7 @@
 """Tests base query rendering behavior by comparing rendered output against snapshot files.
 
 This module is meant to start with a MetricFlowQuerySpec or equivalent representation of
-a MetricFlow query input and end up with a query rendered for execution against a the
+a MetricFlow query input and end up with a query rendered for execution against the
 target engine. This will depend on test semantic manifests and engine-specific rendering
 logic as propagated via the SqlClient input.
 """
