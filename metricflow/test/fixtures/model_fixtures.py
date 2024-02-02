@@ -1,16 +1,13 @@
 from __future__ import annotations
 
 import logging
-import os
 from collections import OrderedDict
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Sequence
+from typing import Dict, List, Sequence
 
 import pytest
 from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from dbt_semantic_interfaces.parsing.dir_to_model import (
-    SemanticManifestBuildResult,
-    parse_directory_of_yaml_files_to_semantic_manifest,
     parse_yaml_files_to_validation_ready_semantic_manifest,
 )
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
@@ -26,7 +23,6 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.test.fixtures.id_fixtures import IdNumberSpace, patch_id_generators_helper
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 
 logger = logging.getLogger(__name__)
 
@@ -135,26 +131,6 @@ def consistent_id_object_repository(
                 ambiguous_resolution_manifest_lookup
             ),
         )
-
-
-def load_semantic_manifest(
-    relative_manifest_path: str,
-    template_mapping: Optional[Dict[str, str]] = None,
-) -> SemanticManifestBuildResult:
-    """Reads the manifest YAMLs from the standard location, applies transformations, runs validations."""
-    yaml_file_directory = os.path.join(os.path.dirname(__file__), f"semantic_manifest_yamls/{relative_manifest_path}")
-    build_result = parse_directory_of_yaml_files_to_semantic_manifest(
-        yaml_file_directory, template_mapping=template_mapping
-    )
-    validator = SemanticManifestValidator[PydanticSemanticManifest]()
-    validator.checked_validations(build_result.semantic_manifest)
-    return build_result
-
-
-@pytest.fixture(scope="session")
-def template_mapping(mf_test_session_state: MetricFlowTestSessionState) -> Dict[str, str]:
-    """Mapping for template variables in the model YAML files."""
-    return {"source_schema": mf_test_session_state.mf_source_schema}
 
 
 @pytest.fixture(scope="session")
