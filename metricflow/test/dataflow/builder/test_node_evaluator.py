@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 import logging
-from typing import Sequence
+from typing import Mapping, Sequence
 
 import pytest
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
-from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.node_evaluator import (
     JoinLinkableInstancesRecipe,
@@ -28,6 +27,7 @@ from metricflow.specs.specs import (
     TimeDimensionSpec,
 )
 from metricflow.sql.sql_plan import SqlJoinType
+from metricflow.test.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestName
 from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 
 logger = logging.getLogger(__name__)
@@ -35,22 +35,21 @@ logger = logging.getLogger(__name__)
 
 @pytest.fixture
 def node_evaluator(
-    consistent_id_object_repository: ConsistentIdObjectRepository,
-    simple_semantic_manifest_lookup: SemanticManifestLookup,
-    dataflow_plan_builder: DataflowPlanBuilder,
-) -> NodeEvaluatorForLinkableInstances:  # noqa: D
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture]
+) -> NodeEvaluatorForLinkableInstances:
     """Return a node evaluator using the nodes in semantic_model_name_to_nodes."""
+    mf_engine_fixture = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST]
+
     node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver = DataflowPlanNodeOutputDataSetResolver(
-        column_association_resolver=DunderColumnAssociationResolver(simple_semantic_manifest_lookup),
-        semantic_manifest_lookup=simple_semantic_manifest_lookup,
+        column_association_resolver=mf_engine_fixture.column_association_resolver,
+        semantic_manifest_lookup=mf_engine_fixture.semantic_manifest_lookup,
     )
 
-    source_nodes = tuple(consistent_id_object_repository.simple_model_read_nodes.values())
-
     return NodeEvaluatorForLinkableInstances(
-        semantic_model_lookup=simple_semantic_manifest_lookup.semantic_model_lookup,
-        # Use all nodes in the simple model as candidates for joins.
-        nodes_available_for_joins=source_nodes,
+        semantic_model_lookup=mf_engine_test_fixture_mapping[
+            SemanticManifestName.SIMPLE_MANIFEST
+        ].semantic_manifest_lookup.semantic_model_lookup,
+        nodes_available_for_joins=tuple(mf_engine_fixture.read_node_mapping.values()),
         node_data_set_resolver=node_data_set_resolver,
     )
 

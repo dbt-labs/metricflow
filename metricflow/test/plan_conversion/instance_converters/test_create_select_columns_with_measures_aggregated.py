@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Mapping
+
 from metricflow.instances import InstanceSet
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
@@ -14,16 +16,18 @@ from metricflow.sql.sql_exprs import (
     SqlFunction,
     SqlPercentileExpression,
 )
-from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
+from metricflow.test.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestName
 
 __SOURCE_TABLE_ALIAS = "a"
 
 
 def __get_filtered_measure_instance_set(
-    semantic_model_name: str, measure_name: str, object_repo: ConsistentIdObjectRepository
+    semantic_model_name: str,
+    measure_name: str,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
 ) -> InstanceSet:
     """Gets an InstanceSet consisting of only the measure instance matching the given name and semantic model."""
-    dataset = object_repo.simple_model_data_sets[semantic_model_name]
+    dataset = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].data_set_mapping[semantic_model_name]
     instance_set = dataset.instance_set
     include_specs = tuple(
         instance.spec for instance in instance_set.measure_instances if instance.spec.element_name == measure_name
@@ -32,12 +36,12 @@ def __get_filtered_measure_instance_set(
 
 
 def test_sum_aggregation(
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Checks for function expression handling for booking_value, a SUM type metric in the simple model."""
     measure_name = "booking_value"
-    instance_set = __get_filtered_measure_instance_set("bookings_source", measure_name, consistent_id_object_repository)
+    instance_set = __get_filtered_measure_instance_set("bookings_source", measure_name, mf_engine_test_fixture_mapping)
 
     select_column_set: SelectColumnSet = CreateSelectColumnsWithMeasuresAggregated(
         __SOURCE_TABLE_ALIAS,
@@ -54,12 +58,12 @@ def test_sum_aggregation(
 
 
 def test_sum_boolean_aggregation(
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Checks for function expression handling for instant_bookings, a SUM_BOOLEAN type metric in the simple model."""
     measure_name = "instant_bookings"
-    instance_set = __get_filtered_measure_instance_set("bookings_source", measure_name, consistent_id_object_repository)
+    instance_set = __get_filtered_measure_instance_set("bookings_source", measure_name, mf_engine_test_fixture_mapping)
 
     select_column_set: SelectColumnSet = CreateSelectColumnsWithMeasuresAggregated(
         __SOURCE_TABLE_ALIAS,
@@ -77,12 +81,12 @@ def test_sum_boolean_aggregation(
 
 
 def test_avg_aggregation(
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Checks for function expression handling for average_booking_value, an AVG type metric in the simple model."""
     measure_name = "average_booking_value"
-    instance_set = __get_filtered_measure_instance_set("bookings_source", measure_name, consistent_id_object_repository)
+    instance_set = __get_filtered_measure_instance_set("bookings_source", measure_name, mf_engine_test_fixture_mapping)
 
     select_column_set: SelectColumnSet = CreateSelectColumnsWithMeasuresAggregated(
         __SOURCE_TABLE_ALIAS,
@@ -99,12 +103,12 @@ def test_avg_aggregation(
 
 
 def test_count_distinct_aggregation(
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Checks for function expression handling for bookers, a COUNT_DISTINCT type metric in the simple model."""
     measure_name = "bookers"
-    instance_set = __get_filtered_measure_instance_set("bookings_source", measure_name, consistent_id_object_repository)
+    instance_set = __get_filtered_measure_instance_set("bookings_source", measure_name, mf_engine_test_fixture_mapping)
 
     select_column_set: SelectColumnSet = CreateSelectColumnsWithMeasuresAggregated(
         __SOURCE_TABLE_ALIAS,
@@ -121,12 +125,12 @@ def test_count_distinct_aggregation(
 
 
 def test_max_aggregation(
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Checks for function expression handling for largest_listing, a MAX type metric in the simple model."""
     measure_name = "largest_listing"
-    instance_set = __get_filtered_measure_instance_set("listings_latest", measure_name, consistent_id_object_repository)
+    instance_set = __get_filtered_measure_instance_set("listings_latest", measure_name, mf_engine_test_fixture_mapping)
 
     select_column_set: SelectColumnSet = CreateSelectColumnsWithMeasuresAggregated(
         __SOURCE_TABLE_ALIAS,
@@ -143,12 +147,12 @@ def test_max_aggregation(
 
 
 def test_min_aggregation(
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Checks for function expression handling for smallest_listing, a MIN type metric in the simple model."""
     measure_name = "smallest_listing"
-    instance_set = __get_filtered_measure_instance_set("listings_latest", measure_name, consistent_id_object_repository)
+    instance_set = __get_filtered_measure_instance_set("listings_latest", measure_name, mf_engine_test_fixture_mapping)
 
     select_column_set: SelectColumnSet = CreateSelectColumnsWithMeasuresAggregated(
         __SOURCE_TABLE_ALIAS,
@@ -165,12 +169,12 @@ def test_min_aggregation(
 
 
 def test_aliased_sum(
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Checks for function expression handling for booking_value, a SUM type metric in the simple model, with an alias."""
     measure_name = "booking_value"
-    instance_set = __get_filtered_measure_instance_set("bookings_source", measure_name, consistent_id_object_repository)
+    instance_set = __get_filtered_measure_instance_set("bookings_source", measure_name, mf_engine_test_fixture_mapping)
 
     select_column_set: SelectColumnSet = CreateSelectColumnsWithMeasuresAggregated(
         __SOURCE_TABLE_ALIAS,
@@ -188,12 +192,12 @@ def test_aliased_sum(
 
 
 def test_percentile_aggregation(
-    consistent_id_object_repository: ConsistentIdObjectRepository,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Checks for function expression handling for booking_value, a percentile type metric in the simple model."""
     measure_name = "booking_value_p99"
-    instance_set = __get_filtered_measure_instance_set("bookings_source", measure_name, consistent_id_object_repository)
+    instance_set = __get_filtered_measure_instance_set("bookings_source", measure_name, mf_engine_test_fixture_mapping)
 
     select_column_set: SelectColumnSet = CreateSelectColumnsWithMeasuresAggregated(
         __SOURCE_TABLE_ALIAS,
