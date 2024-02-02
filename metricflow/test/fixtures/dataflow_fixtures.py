@@ -65,14 +65,14 @@ def extended_date_dataflow_plan_builder(  # noqa: D
 
 @pytest.fixture
 def multihop_dataflow_plan_builder(  # noqa: D
-    multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
+    partitioned_multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
     consistent_id_object_repository: ConsistentIdObjectRepository,
     time_spine_source: TimeSpineSource,
 ) -> DataflowPlanBuilder:
     return DataflowPlanBuilder(
         source_nodes=consistent_id_object_repository.multihop_model_source_nodes,
         read_nodes=list(consistent_id_object_repository.multihop_model_read_nodes.values()),
-        semantic_manifest_lookup=multi_hop_join_semantic_manifest_lookup,
+        semantic_manifest_lookup=partitioned_multi_hop_join_semantic_manifest_lookup,
         time_spine_source_node=consistent_id_object_repository.multihop_model_time_spine_source_node,
     )
 

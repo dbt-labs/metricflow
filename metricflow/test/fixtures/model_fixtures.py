@@ -109,7 +109,7 @@ class ConsistentIdObjectRepository:
 @pytest.fixture(scope="session")
 def consistent_id_object_repository(
     simple_semantic_manifest_lookup: SemanticManifestLookup,
-    multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
+    partitioned_multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
     scd_semantic_manifest_lookup: SemanticManifestLookup,
     cyclic_join_semantic_manifest_lookup: SemanticManifestLookup,
     extended_date_semantic_manifest_lookup: SemanticManifestLookup,
@@ -122,7 +122,7 @@ def consistent_id_object_repository(
     """
     with patch_id_generators_helper(start_value=IdNumberSpace.CONSISTENT_ID_REPOSITORY):
         sm_data_sets = create_data_sets(simple_semantic_manifest_lookup)
-        multihop_data_sets = create_data_sets(multi_hop_join_semantic_manifest_lookup)
+        multihop_data_sets = create_data_sets(partitioned_multi_hop_join_semantic_manifest_lookup)
         scd_data_sets = create_data_sets(scd_semantic_manifest_lookup)
         cyclic_join_data_sets = create_data_sets(cyclic_join_semantic_manifest_lookup)
         extended_date_data_sets = create_data_sets(extended_date_semantic_manifest_lookup)
@@ -135,10 +135,10 @@ def consistent_id_object_repository(
             simple_model_time_spine_source_node=_build_time_spine_source_node(simple_semantic_manifest_lookup),
             multihop_model_read_nodes=_data_set_to_read_nodes(multihop_data_sets),
             multihop_model_source_nodes=_data_set_to_source_nodes(
-                multi_hop_join_semantic_manifest_lookup, multihop_data_sets
+                partitioned_multi_hop_join_semantic_manifest_lookup, multihop_data_sets
             ),
             multihop_model_time_spine_source_node=_build_time_spine_source_node(
-                multi_hop_join_semantic_manifest_lookup
+                partitioned_multi_hop_join_semantic_manifest_lookup
             ),
             scd_model_data_sets=scd_data_sets,
             scd_model_read_nodes=_data_set_to_read_nodes(scd_data_sets),
@@ -223,16 +223,16 @@ def simple_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> Semanti
 
 
 @pytest.fixture(scope="session")
-def multi_hop_join_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> SemanticManifestLookup:  # noqa: D
-    build_result = load_semantic_manifest("multi_hop_join_manifest/partitioned_semantic_models", template_mapping)
+def partitioned_multi_hop_join_semantic_manifest_lookup(  # noqa: D
+    template_mapping: Dict[str, str]
+) -> SemanticManifestLookup:
+    build_result = load_semantic_manifest("partitioned_multi_hop_join_manifest", template_mapping)
     return SemanticManifestLookup(build_result.semantic_manifest)
 
 
 @pytest.fixture(scope="session")
-def unpartitioned_multi_hop_join_semantic_manifest_lookup(  # noqa: D
-    template_mapping: Dict[str, str]
-) -> SemanticManifestLookup:
-    build_result = load_semantic_manifest("multi_hop_join_manifest/unpartitioned_semantic_models", template_mapping)
+def multi_hop_join_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> SemanticManifestLookup:  # noqa: D
+    build_result = load_semantic_manifest("multi_hop_join_manifest", template_mapping)
     return SemanticManifestLookup(build_result.semantic_manifest)
 
 

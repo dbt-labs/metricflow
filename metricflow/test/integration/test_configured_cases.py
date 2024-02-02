@@ -238,8 +238,8 @@ def test_case(
     mf_test_session_state: MetricFlowTestSessionState,
     simple_semantic_manifest_lookup: SemanticManifestLookup,
     simple_semantic_manifest_lookup_non_ds: SemanticManifestLookup,
-    unpartitioned_multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
     multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
+    partitioned_multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
     extended_date_semantic_manifest_lookup: SemanticManifestLookup,
     scd_semantic_manifest_lookup: SemanticManifestLookup,
     sql_client: SqlClient,
@@ -259,9 +259,9 @@ def test_case(
     elif case.model is IntegrationTestModel.SIMPLE_MODEL_NON_DS:
         semantic_manifest_lookup = simple_semantic_manifest_lookup_non_ds
     elif case.model is IntegrationTestModel.UNPARTITIONED_MULTI_HOP_JOIN_MODEL:
-        semantic_manifest_lookup = unpartitioned_multi_hop_join_semantic_manifest_lookup
-    elif case.model is IntegrationTestModel.PARTITIONED_MULTI_HOP_JOIN_MODEL:
         semantic_manifest_lookup = multi_hop_join_semantic_manifest_lookup
+    elif case.model is IntegrationTestModel.PARTITIONED_MULTI_HOP_JOIN_MODEL:
+        semantic_manifest_lookup = partitioned_multi_hop_join_semantic_manifest_lookup
     elif case.model is IntegrationTestModel.EXTENDED_DATE_MODEL:
         semantic_manifest_lookup = extended_date_semantic_manifest_lookup
     elif case.model is IntegrationTestModel.SCD_MODEL:

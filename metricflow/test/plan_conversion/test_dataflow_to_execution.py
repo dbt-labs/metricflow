@@ -155,7 +155,7 @@ def test_multihop_joined_plan(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     multihop_dataflow_plan_builder: DataflowPlanBuilder,
-    multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
+    partitioned_multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
     sql_client: SqlClient,
 ) -> None:
     """Tests a plan getting a measure and a joined dimension."""
@@ -176,8 +176,10 @@ def test_multihop_joined_plan(  # noqa: D
 
     to_execution_plan_converter = DataflowToExecutionPlanConverter(
         sql_plan_converter=DataflowToSqlQueryPlanConverter(
-            column_association_resolver=DunderColumnAssociationResolver(multi_hop_join_semantic_manifest_lookup),
-            semantic_manifest_lookup=multi_hop_join_semantic_manifest_lookup,
+            column_association_resolver=DunderColumnAssociationResolver(
+                partitioned_multi_hop_join_semantic_manifest_lookup
+            ),
+            semantic_manifest_lookup=partitioned_multi_hop_join_semantic_manifest_lookup,
         ),
         sql_plan_renderer=DefaultSqlQueryPlanRenderer(),
         sql_client=sql_client,

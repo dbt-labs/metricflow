@@ -347,7 +347,7 @@ def test_node_evaluator_with_multiple_joined_specs(  # noqa: D
 
 def test_node_evaluator_with_multihop_joined_spec(  # noqa: D
     consistent_id_object_repository: ConsistentIdObjectRepository,
-    multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
+    partitioned_multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Tests the case where multiple nodes need to be joined to get all linkable specs."""
     txn_source = consistent_id_object_repository.multihop_model_read_nodes["account_month_txns"]
@@ -364,7 +364,7 @@ def test_node_evaluator_with_multihop_joined_spec(  # noqa: D
 
     multihop_node_evaluator = make_multihop_node_evaluator(
         model_source_nodes=consistent_id_object_repository.multihop_model_source_nodes,
-        semantic_manifest_lookup_with_multihop_links=multi_hop_join_semantic_manifest_lookup,
+        semantic_manifest_lookup_with_multihop_links=partitioned_multi_hop_join_semantic_manifest_lookup,
         desired_linkable_specs=linkable_specs,
     )
 
