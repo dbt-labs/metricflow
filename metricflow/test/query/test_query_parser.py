@@ -87,6 +87,12 @@ REVENUE_YAML = textwrap.dedent(
           expr: revenue
           agg: sum
           create_metric: true
+        - name: revenue_daily
+          expr: revenue
+          agg: sum
+          create_metric: true
+          agg_time_dimension: loaded_at
+
 
       dimensions:
         - name: ds
@@ -155,6 +161,18 @@ METRICS_YAML = textwrap.dedent(
           - name: revenue
             offset_to_grain: year
             alias: revenue_start_of_year
+    ---
+    metric:
+      name: monthly_revenue_last_7_days
+      description: Derived offset metric with 2 different agg_time_dimensions
+      type: derived
+      type_params:
+        expr: revenue - revenue_daily
+        metrics:
+          - name: revenue
+          - name: revenue_daily
+            offset_window: 1 week
+            alias: revenue_last_7_days
     """
 )
 
@@ -163,6 +181,12 @@ METRICS_YAML = textwrap.dedent(
 def bookings_query_parser() -> MetricFlowQueryParser:  # noqa
     bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=BOOKINGS_YAML)
     return query_parser_from_yaml([EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, bookings_yaml_file])
+
+
+@pytest.fixture
+def revenue_query_parser() -> MetricFlowQueryParser:  # noqa
+    revenue_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=REVENUE_YAML)
+    return query_parser_from_yaml([EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, revenue_yaml_file])
 
 
 def test_query_parser(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D
@@ -584,3 +608,16 @@ def test_duplicate_metric_query(bookings_query_parser: MetricFlowQueryParser) ->
 def test_no_metrics_or_group_by(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D
     with pytest.raises(InvalidQueryException, match="no metrics or group by items"):
         bookings_query_parser.parse_and_validate_query()
+
+
+def test_offset_metric_with_diff_agg_time_dims_error() -> None:  # noqa: D
+    metrics_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=METRICS_YAML)
+    revenue_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=REVENUE_YAML)
+    query_parser = query_parser_from_yaml(
+        [EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, revenue_yaml_file, metrics_yaml_file]
+    )
+    with pytest.raises(InvalidQueryException, match="does not match any of the available group-by-items"):
+        query_parser.parse_and_validate_query(
+            metric_names=["monthly_revenue_last_7_days"],
+            group_by_names=["revenue___ds"],
+        )
