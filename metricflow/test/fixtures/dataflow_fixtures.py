@@ -20,7 +20,7 @@ Using 'session' scope can result in other 'session' scope fixtures causing ID co
 """
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def column_association_resolver(  # noqa: D
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture]
 ) -> ColumnAssociationResolver:
@@ -31,10 +31,11 @@ def column_association_resolver(  # noqa: D
 def dataflow_plan_builder(  # noqa: D
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture]
 ) -> DataflowPlanBuilder:
+    # Scope needs to be function as the DataflowPlanBuilder contains state.
     return mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].dataflow_plan_builder
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def query_parser(  # noqa: D
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture]
 ) -> MetricFlowQueryParser:
@@ -45,6 +46,7 @@ def query_parser(  # noqa: D
 def extended_date_dataflow_plan_builder(  # noqa: D
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture]
 ) -> DataflowPlanBuilder:
+    # Scope needs to be function as the DataflowPlanBuilder contains state.
     return mf_engine_test_fixture_mapping[SemanticManifestName.EXTENDED_DATE_MANIFEST].dataflow_plan_builder
 
 
@@ -52,12 +54,13 @@ def extended_date_dataflow_plan_builder(  # noqa: D
 def multihop_dataflow_plan_builder(  # noqa: D
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture]
 ) -> DataflowPlanBuilder:
+    # Scope needs to be function as the DataflowPlanBuilder contains state.
     return mf_engine_test_fixture_mapping[
         SemanticManifestName.PARTITIONED_MULTI_HOP_JOIN_MANIFEST
     ].dataflow_plan_builder
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def scd_column_association_resolver(  # noqa: D
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture]
 ) -> ColumnAssociationResolver:
@@ -68,10 +71,11 @@ def scd_column_association_resolver(  # noqa: D
 def scd_dataflow_plan_builder(  # noqa: D
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture]
 ) -> DataflowPlanBuilder:
+    # Scope needs to be function as the DataflowPlanBuilder contains state.
     return mf_engine_test_fixture_mapping[SemanticManifestName.SCD_MANIFEST].dataflow_plan_builder
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def scd_query_parser(  # noqa: D
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture]
 ) -> MetricFlowQueryParser:

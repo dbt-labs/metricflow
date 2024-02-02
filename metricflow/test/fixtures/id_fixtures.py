@@ -19,7 +19,7 @@ class IdNumberSpace:
     CONSISTENT_ID_REPOSITORY = 10000
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(autouse=True, scope="function")
 def patch_id_generators() -> Generator[None, None, None]:
     """Patch ID generators with a new one to get repeatability in plan outputs before every test.
 
