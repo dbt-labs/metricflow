@@ -45,6 +45,8 @@ from metricflow.sql.sql_plan import SqlJoinType
 from metricflow.visitor import VisitorOutputT
 
 if TYPE_CHECKING:
+    from metricflow.model.semantics.metric_lookup import MetricLookup
+    from metricflow.protocols.semantics import SemanticModelAccessor
     from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import FilterSpecResolutionLookUp
 
 
@@ -659,6 +661,34 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
     def contains_metric_time(self) -> bool:
         """Returns true if this set contains a spec referring to metric time at any grain."""
         return len(self.metric_time_specs) > 0
+
+    def included_agg_time_dimension_specs_for_metric(
+        self, metric_reference: MetricReference, metric_lookup: MetricLookup
+    ) -> List[TimeDimensionSpec]:
+        """Get the time dims included that are valid agg time dimensions for the specified metric."""
+        queried_metric_time_specs = list(self.metric_time_specs)
+
+        valid_agg_time_dimensions = metric_lookup.get_valid_agg_time_dimensions_for_metric(metric_reference)
+        queried_agg_time_dimension_specs = (
+            list(set(self.time_dimension_specs).intersection(set(valid_agg_time_dimensions)))
+            + queried_metric_time_specs
+        )
+
+        return queried_agg_time_dimension_specs
+
+    def included_agg_time_dimension_specs_for_measure(
+        self, measure_reference: MeasureReference, semantic_model_lookup: SemanticModelAccessor
+    ) -> List[TimeDimensionSpec]:
+        """Get the time dims included that are valid agg time dimensions for the specified measure."""
+        queried_metric_time_specs = list(self.metric_time_specs)
+
+        valid_agg_time_dimensions = semantic_model_lookup.get_agg_time_dimension_specs_for_measure(measure_reference)
+        queried_agg_time_dimension_specs = (
+            list(set(self.time_dimension_specs).intersection(set(valid_agg_time_dimensions)))
+            + queried_metric_time_specs
+        )
+
+        return queried_agg_time_dimension_specs
 
     @property
     def metric_time_specs(self) -> Sequence[TimeDimensionSpec]:

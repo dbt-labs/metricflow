@@ -66,12 +66,10 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
         resolution_path: MetricFlowQueryResolutionPath,
     ) -> MetricFlowQueryResolutionIssueSet:
         metric = self._get_metric(metric_reference)
-        query_includes_metric_time = self._group_by_items_include_metric_time(resolver_input_for_query)
-        query_includes_metric_time_or_agg_time_dimension = (
-            query_includes_metric_time
-            or self._group_by_items_include_agg_time_dimension(
-                query_resolver_input=resolver_input_for_query, metric_reference=metric_reference
-            )
+        query_includes_metric_time_or_agg_time_dimension = self._group_by_items_include_metric_time(
+            resolver_input_for_query
+        ) or self._group_by_items_include_agg_time_dimension(
+            query_resolver_input=resolver_input_for_query, metric_reference=metric_reference
         )
 
         if metric.type is MetricType.SIMPLE or metric.type is MetricType.CONVERSION:
@@ -96,7 +94,7 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
                 for input_metric in metric.input_metrics
             )
 
-            if has_time_offset and not query_includes_metric_time:
+            if has_time_offset and not query_includes_metric_time_or_agg_time_dimension:
                 return MetricFlowQueryResolutionIssueSet.from_issue(
                     OffsetMetricRequiresMetricTimeIssue.from_parameters(
                         metric_reference=metric_reference,

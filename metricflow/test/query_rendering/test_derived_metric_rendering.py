@@ -542,3 +542,81 @@ def test_nested_derived_metric_offset_with_joined_where_constraint_not_selected(
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_offset_window_with_agg_time_dim(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    query_parser: MetricFlowQueryParser,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+    create_source_tables: bool,
+    column_association_resolver: ColumnAssociationResolver,
+) -> None:
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookings_growth_2_weeks",),
+        group_by_names=("booking__ds__day",),
+    )
+
+    dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_offset_to_grain_with_agg_time_dim(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    query_parser: MetricFlowQueryParser,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+    create_source_tables: bool,
+    column_association_resolver: ColumnAssociationResolver,
+) -> None:
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookings_growth_since_start_of_month",),
+        group_by_names=("booking__ds__day",),
+    )
+
+    dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_derived_offset_metric_with_agg_time_dim(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    query_parser: MetricFlowQueryParser,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+    create_source_tables: bool,
+    column_association_resolver: ColumnAssociationResolver,
+) -> None:
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("booking_fees_last_week_per_booker_this_week",),
+        group_by_names=("booking__ds__day",),
+    )
+
+    dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
