@@ -68,7 +68,6 @@ class MetricFlowDagTextFormatter:
 
         # In case this gets used in a multi-threaded context, use a thread-local variable since it has mutable state.
         self._thread_local_data = threading.local()
-        self._thread_local_data.max_width_tracker = MaxWidthTracker(max_width)
 
     @property
     def _max_width_tracker(self) -> MaxWidthTracker:  # noqa: D
