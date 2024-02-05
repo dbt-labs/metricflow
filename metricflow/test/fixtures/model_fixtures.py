@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from collections import OrderedDict
 from dataclasses import dataclass
-from typing import Dict, List, Sequence
+from typing import List, Mapping, Sequence
 
 import pytest
 from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
@@ -12,17 +12,14 @@ from dbt_semantic_interfaces.parsing.dir_to_model import (
 )
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.transformations.pydantic_rule_set import PydanticSemanticManifestTransformRuleSet
-from dbt_semantic_interfaces.transformations.semantic_manifest_transformer import PydanticSemanticManifestTransformer
 from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 
-from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.dataflow_plan import BaseOutput, MetricTimeDimensionTransformNode, ReadSqlSourceNode
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.test.fixtures.id_fixtures import IdNumberSpace, patch_id_generators_helper
+
 
 logger = logging.getLogger(__name__)
 
@@ -134,109 +131,99 @@ def consistent_id_object_repository(
 
 
 @pytest.fixture(scope="session")
-def simple_semantic_manifest_lookup_non_ds(template_mapping: Dict[str, str]) -> SemanticManifestLookup:  # noqa: D
-    build_result = load_semantic_manifest("non_sm_manifest", template_mapping)
-    return SemanticManifestLookup(build_result.semantic_manifest)
+def simple_semantic_manifest_lookup_non_ds(  # noqa: D
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture]
+) -> SemanticManifestLookup:
+    return mf_engine_test_fixture_mapping[SemanticManifestName.NON_SM_MANIFEST].semantic_manifest_lookup
 
 
 @pytest.fixture(scope="session")
-def simple_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> SemanticManifestLookup:  # noqa: D
-    build_result = load_semantic_manifest("simple_manifest", template_mapping)
-    return SemanticManifestLookup(build_result.semantic_manifest)
+def simple_semantic_manifest_lookup(  # noqa: D
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture]
+) -> SemanticManifestLookup:
+    return mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].semantic_manifest_lookup
 
 
 @pytest.fixture(scope="session")
 def partitioned_multi_hop_join_semantic_manifest_lookup(  # noqa: D
-    template_mapping: Dict[str, str]
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture]
 ) -> SemanticManifestLookup:
-    build_result = load_semantic_manifest("partitioned_multi_hop_join_manifest", template_mapping)
-    return SemanticManifestLookup(build_result.semantic_manifest)
+    return mf_engine_test_fixture_mapping[
+        SemanticManifestName.PARTITIONED_MULTI_HOP_JOIN_MANIFEST
+    ].semantic_manifest_lookup
 
 
 @pytest.fixture(scope="session")
-def multi_hop_join_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> SemanticManifestLookup:  # noqa: D
-    build_result = load_semantic_manifest("multi_hop_join_manifest", template_mapping)
-    return SemanticManifestLookup(build_result.semantic_manifest)
+def multi_hop_join_semantic_manifest_lookup(  # noqa: D
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture]
+) -> SemanticManifestLookup:
+    return mf_engine_test_fixture_mapping[SemanticManifestName.MULTI_HOP_JOIN_MANIFEST].semantic_manifest_lookup
 
 
 @pytest.fixture(scope="session")
-def simple_semantic_manifest(template_mapping: Dict[str, str]) -> SemanticManifest:
+def simple_semantic_manifest(
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture]
+) -> SemanticManifest:
     """Model used for many tests."""
-    build_result = load_semantic_manifest("simple_manifest", template_mapping)
-    return build_result.semantic_manifest
+    return mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].semantic_manifest
 
 
 @pytest.fixture(scope="session")
-def simple_model__with_primary_transforms(template_mapping: Dict[str, str]) -> SemanticManifest:
-    """Model used for tests pre-transformations."""
-    build_result = load_semantic_manifest("simple_manifest", template_mapping)
-    transformed_model = PydanticSemanticManifestTransformer().transform(
-        model=build_result.semantic_manifest,
-        ordered_rule_sequences=(PydanticSemanticManifestTransformRuleSet().primary_rules,),
-    )
-    return transformed_model
+def extended_date_semantic_manifest_lookup(  # noqa: D
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture]
+) -> SemanticManifestLookup:
+    return mf_engine_test_fixture_mapping[SemanticManifestName.EXTENDED_DATE_MANIFEST].semantic_manifest_lookup
 
 
 @pytest.fixture(scope="session")
-def extended_date_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> SemanticManifestLookup:  # noqa: D
-    build_result = load_semantic_manifest("extended_date_manifest", template_mapping)
-    return SemanticManifestLookup(build_result.semantic_manifest)
-
-
-@pytest.fixture(scope="session")
-def scd_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> SemanticManifestLookup:
+def scd_semantic_manifest_lookup(
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture]
+) -> SemanticManifestLookup:
     """Initialize semantic model for SCD tests."""
-    build_result = load_semantic_manifest("scd_manifest", template_mapping)
-    return SemanticManifestLookup(build_result.semantic_manifest)
+    return mf_engine_test_fixture_mapping[SemanticManifestName.SCD_MANIFEST].semantic_manifest_lookup
 
 
 @pytest.fixture(scope="session")
-def data_warehouse_validation_model(template_mapping: Dict[str, str]) -> SemanticManifest:
+def data_warehouse_validation_model(
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture]
+) -> SemanticManifest:
     """Model used for data warehouse validation tests."""
-    build_result = load_semantic_manifest("data_warehouse_validation_manifest", template_mapping)
-    return build_result.semantic_manifest
+    return mf_engine_test_fixture_mapping[SemanticManifestName.DATA_WAREHOUSE_VALIDATION_MANIFEST].semantic_manifest
 
 
 @pytest.fixture(scope="session")
-def cyclic_join_semantic_manifest_lookup(template_mapping: Dict[str, str]) -> SemanticManifestLookup:
+def cyclic_join_semantic_manifest_lookup(
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture]
+) -> SemanticManifestLookup:
     """Manifest that contains a potential cycle in the join graph (if not handled properly)."""
-    build_result = load_semantic_manifest("cyclic_join_manifest", template_mapping)
-    return SemanticManifestLookup(build_result.semantic_manifest)
+    return mf_engine_test_fixture_mapping[SemanticManifestName.CYCLIC_JOIN_MANIFEST].semantic_manifest_lookup
 
 
 @pytest.fixture(scope="session")
-def node_output_resolver(  # noqa:D
-    simple_semantic_manifest_lookup: SemanticManifestLookup,
-) -> DataflowPlanNodeOutputDataSetResolver:
-    return DataflowPlanNodeOutputDataSetResolver(
-        column_association_resolver=DunderColumnAssociationResolver(simple_semantic_manifest_lookup),
-        semantic_manifest_lookup=simple_semantic_manifest_lookup,
-    )
-
-
-@pytest.fixture(scope="session")
-def ambiguous_resolution_manifest(template_mapping: Dict[str, str]) -> PydanticSemanticManifest:
+def ambiguous_resolution_manifest(
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture]
+) -> PydanticSemanticManifest:
     """Manifest used to test ambiguous resolution of group-by-items."""
-    build_result = load_semantic_manifest("ambiguous_resolution_manifest", template_mapping)
-    return build_result.semantic_manifest
+    return mf_engine_test_fixture_mapping[SemanticManifestName.AMBIGUOUS_RESOLUTION_MANIFEST].semantic_manifest
 
 
 @pytest.fixture(scope="session")
 def ambiguous_resolution_manifest_lookup(  # noqa: D
-    ambiguous_resolution_manifest: PydanticSemanticManifest,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture]
 ) -> SemanticManifestLookup:
-    return SemanticManifestLookup(ambiguous_resolution_manifest)
+    return mf_engine_test_fixture_mapping[SemanticManifestName.AMBIGUOUS_RESOLUTION_MANIFEST].semantic_manifest_lookup
 
 
 @pytest.fixture(scope="session")
-def simple_multi_hop_join_manifest(template_mapping: Dict[str, str]) -> PydanticSemanticManifest:  # noqa: D
-    build_result = load_semantic_manifest("simple_multi_hop_join_manifest", template_mapping)
-    return build_result.semantic_manifest
+def simple_multi_hop_join_manifest(  # noqa: D
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture]
+) -> PydanticSemanticManifest:
+    return mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MULTI_HOP_JOIN_MANIFEST].semantic_manifest
 
 
 @pytest.fixture(scope="session")
 def simple_multi_hop_join_manifest_lookup(  # noqa: D
-    simple_multi_hop_join_manifest: PydanticSemanticManifest,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture]
 ) -> SemanticManifestLookup:
     """Manifest used to test ambiguous resolution of group-by-items."""
-    return SemanticManifestLookup(simple_multi_hop_join_manifest)
+    return mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MULTI_HOP_JOIN_MANIFEST].semantic_manifest_lookup
