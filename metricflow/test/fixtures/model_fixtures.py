@@ -3,38 +3,19 @@ from __future__ import annotations
 import logging
 from collections import OrderedDict
 from dataclasses import dataclass
-from typing import List, Mapping, Sequence
+from typing import Mapping, Sequence
 
 import pytest
 from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
-from dbt_semantic_interfaces.parsing.dir_to_model import (
-    parse_yaml_files_to_validation_ready_semantic_manifest,
-)
-from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 
 from metricflow.dataflow.dataflow_plan import BaseOutput, MetricTimeDimensionTransformNode, ReadSqlSourceNode
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.test.fixtures.id_fixtures import IdNumberSpace, patch_id_generators_helper
 
 
 logger = logging.getLogger(__name__)
-
-
-def query_parser_from_yaml(yaml_contents: List[YamlConfigFile]) -> MetricFlowQueryParser:
-    """Given yaml files, return a query parser using default source nodes, resolvers and time spine source."""
-    semantic_manifest_lookup = SemanticManifestLookup(
-        parse_yaml_files_to_validation_ready_semantic_manifest(
-            yaml_contents, apply_transformations=True
-        ).semantic_manifest
-    )
-    SemanticManifestValidator[SemanticManifest]().checked_validations(semantic_manifest_lookup.semantic_manifest)
-    return MetricFlowQueryParser(
-        semantic_manifest_lookup=semantic_manifest_lookup,
-    )
 
 
 @dataclass(frozen=True)
