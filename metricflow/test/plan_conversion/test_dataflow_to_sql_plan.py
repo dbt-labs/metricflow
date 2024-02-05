@@ -548,7 +548,7 @@ def test_join_to_time_spine_node_without_offset(  # noqa: D
     join_to_time_spine_node = JoinToTimeSpineNode(
         parent_node=compute_metrics_node,
         requested_agg_time_dimension_specs=[MTD_SPEC_DAY],
-        query_includes_metric_time=True,
+        use_custom_agg_time_dimension=False,
         time_range_constraint=TimeRangeConstraint(
             start_time=as_datetime("2020-01-01"), end_time=as_datetime("2021-01-01")
         ),
@@ -613,7 +613,7 @@ def test_join_to_time_spine_node_with_offset_window(  # noqa: D
     join_to_time_spine_node = JoinToTimeSpineNode(
         parent_node=compute_metrics_node,
         requested_agg_time_dimension_specs=[MTD_SPEC_DAY],
-        query_includes_metric_time=True,
+        use_custom_agg_time_dimension=False,
         time_range_constraint=TimeRangeConstraint(
             start_time=as_datetime("2020-01-01"), end_time=as_datetime("2021-01-01")
         ),
@@ -680,7 +680,7 @@ def test_join_to_time_spine_node_with_offset_to_grain(
     join_to_time_spine_node = JoinToTimeSpineNode(
         parent_node=compute_metrics_node,
         requested_agg_time_dimension_specs=[MTD_SPEC_DAY],
-        query_includes_metric_time=True,
+        use_custom_agg_time_dimension=False,
         time_range_constraint=TimeRangeConstraint(
             start_time=as_datetime("2020-01-01"), end_time=as_datetime("2021-01-01")
         ),

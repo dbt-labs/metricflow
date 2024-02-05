@@ -180,6 +180,17 @@ metric:
       - name: bookers
 ---
 metric:
+  name: booking_fees_last_week_per_booker_this_week
+  description: booking_fees divided by bookers - single source multi measure expr test
+  type: derived
+  type_params:
+    expr: "booking_value * 0.05 / bookers"
+    metrics:
+      - name: booking_value
+        offset_window: 1 week
+      - name: bookers
+---
+metric:
   name: views_times_booking_value
   description: Booking_value multiplied by views - expr metric test
   type: derived

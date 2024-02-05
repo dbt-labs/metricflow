@@ -72,6 +72,8 @@ class MetricFlowDagTextFormatter:
 
     @property
     def _max_width_tracker(self) -> MaxWidthTracker:  # noqa: D
+        if not hasattr(self._thread_local_data, "max_width_tracker"):
+            self._thread_local_data.max_width_tracker = MaxWidthTracker(self._max_width)
         return self._thread_local_data.max_width_tracker
 
     def _displayed_property_on_one_line(self, displayed_property: DisplayedProperty) -> str:
