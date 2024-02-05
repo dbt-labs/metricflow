@@ -1,114 +1,15 @@
 from __future__ import annotations
 
 import logging
-from collections import OrderedDict
-from dataclasses import dataclass
-from typing import Mapping, Sequence
+from typing import Mapping
 
 import pytest
 from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 
-from metricflow.dataflow.dataflow_plan import BaseOutput, MetricTimeDimensionTransformNode, ReadSqlSourceNode
-from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.test.fixtures.id_fixtures import IdNumberSpace, patch_id_generators_helper
-
 
 logger = logging.getLogger(__name__)
-
-
-@dataclass(frozen=True)
-class ConsistentIdObjectRepository:
-    """Stores all objects that should have consistent IDs in tests."""
-
-    simple_model_data_sets: OrderedDict[str, SemanticModelDataSet]
-    simple_model_read_nodes: OrderedDict[str, ReadSqlSourceNode]
-    simple_model_source_nodes: Sequence[BaseOutput]
-    simple_model_time_spine_source_node: MetricTimeDimensionTransformNode
-
-    multihop_model_read_nodes: OrderedDict[str, ReadSqlSourceNode]
-    multihop_model_source_nodes: Sequence[BaseOutput]
-    multihop_model_time_spine_source_node: MetricTimeDimensionTransformNode
-
-    scd_model_data_sets: OrderedDict[str, SemanticModelDataSet]
-    scd_model_read_nodes: OrderedDict[str, ReadSqlSourceNode]
-    scd_model_source_nodes: Sequence[BaseOutput]
-    scd_model_time_spine_source_node: MetricTimeDimensionTransformNode
-
-    cyclic_join_read_nodes: OrderedDict[str, ReadSqlSourceNode]
-    cyclic_join_source_nodes: Sequence[BaseOutput]
-    cyclic_join_time_spine_source_node: MetricTimeDimensionTransformNode
-
-    extended_date_model_read_nodes: OrderedDict[str, ReadSqlSourceNode]
-    extended_date_model_source_nodes: Sequence[BaseOutput]
-    extended_date_model_time_spine_source_node: MetricTimeDimensionTransformNode
-
-    ambiguous_resolution_read_nodes: OrderedDict[str, ReadSqlSourceNode]
-    ambiguous_resolution_source_nodes: Sequence[BaseOutput]
-    ambiguous_resolution_time_spine_source_node: MetricTimeDimensionTransformNode
-
-
-@pytest.fixture(scope="session")
-def consistent_id_object_repository(
-    simple_semantic_manifest_lookup: SemanticManifestLookup,
-    partitioned_multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
-    scd_semantic_manifest_lookup: SemanticManifestLookup,
-    cyclic_join_semantic_manifest_lookup: SemanticManifestLookup,
-    extended_date_semantic_manifest_lookup: SemanticManifestLookup,
-    ambiguous_resolution_manifest_lookup: SemanticManifestLookup,
-) -> ConsistentIdObjectRepository:  # noqa: D
-    """Create objects that have incremental numeric IDs with a consistent value.
-
-    This should use IDs with a high enough value so that when other tests run with ID generators set to 0 at the start
-    of the test and create objects, there is no overlap in the IDs.
-    """
-    with patch_id_generators_helper(start_value=IdNumberSpace.CONSISTENT_ID_REPOSITORY):
-        sm_data_sets = create_data_sets(simple_semantic_manifest_lookup)
-        multihop_data_sets = create_data_sets(partitioned_multi_hop_join_semantic_manifest_lookup)
-        scd_data_sets = create_data_sets(scd_semantic_manifest_lookup)
-        cyclic_join_data_sets = create_data_sets(cyclic_join_semantic_manifest_lookup)
-        extended_date_data_sets = create_data_sets(extended_date_semantic_manifest_lookup)
-        ambiguous_resolution_data_sets = create_data_sets(ambiguous_resolution_manifest_lookup)
-
-        return ConsistentIdObjectRepository(
-            simple_model_data_sets=sm_data_sets,
-            simple_model_read_nodes=_data_set_to_read_nodes(sm_data_sets),
-            simple_model_source_nodes=_data_set_to_source_nodes(simple_semantic_manifest_lookup, sm_data_sets),
-            simple_model_time_spine_source_node=_build_time_spine_source_node(simple_semantic_manifest_lookup),
-            multihop_model_read_nodes=_data_set_to_read_nodes(multihop_data_sets),
-            multihop_model_source_nodes=_data_set_to_source_nodes(
-                partitioned_multi_hop_join_semantic_manifest_lookup, multihop_data_sets
-            ),
-            multihop_model_time_spine_source_node=_build_time_spine_source_node(
-                partitioned_multi_hop_join_semantic_manifest_lookup
-            ),
-            scd_model_data_sets=scd_data_sets,
-            scd_model_read_nodes=_data_set_to_read_nodes(scd_data_sets),
-            scd_model_source_nodes=_data_set_to_source_nodes(
-                semantic_manifest_lookup=scd_semantic_manifest_lookup, data_sets=scd_data_sets
-            ),
-            scd_model_time_spine_source_node=_build_time_spine_source_node(scd_semantic_manifest_lookup),
-            cyclic_join_read_nodes=_data_set_to_read_nodes(cyclic_join_data_sets),
-            cyclic_join_source_nodes=_data_set_to_source_nodes(
-                semantic_manifest_lookup=cyclic_join_semantic_manifest_lookup, data_sets=cyclic_join_data_sets
-            ),
-            cyclic_join_time_spine_source_node=_build_time_spine_source_node(cyclic_join_semantic_manifest_lookup),
-            extended_date_model_read_nodes=_data_set_to_read_nodes(extended_date_data_sets),
-            extended_date_model_source_nodes=_data_set_to_source_nodes(
-                semantic_manifest_lookup=extended_date_semantic_manifest_lookup, data_sets=extended_date_data_sets
-            ),
-            extended_date_model_time_spine_source_node=_build_time_spine_source_node(
-                extended_date_semantic_manifest_lookup
-            ),
-            ambiguous_resolution_read_nodes=_data_set_to_read_nodes(ambiguous_resolution_data_sets),
-            ambiguous_resolution_source_nodes=_data_set_to_source_nodes(
-                semantic_manifest_lookup=ambiguous_resolution_manifest_lookup, data_sets=ambiguous_resolution_data_sets
-            ),
-            ambiguous_resolution_time_spine_source_node=_build_time_spine_source_node(
-                ambiguous_resolution_manifest_lookup
-            ),
-        )
 
 
 @pytest.fixture(scope="session")
