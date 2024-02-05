@@ -1,0 +1,7 @@
+kind: Fixes
+body: For measures that join to time spine, allow joining when agg_time_dimension
+  is queried.
+time: 2024-01-26T14:53:38.462443-08:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1009"
