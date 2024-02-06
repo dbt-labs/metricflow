@@ -2,4 +2,4 @@
 -- Pass Only Elements: ['bookings',]
 SELECT
   1 AS bookings
-FROM ***************************.fct_bookings bookings_source_src_28001
+FROM ***************************.fct_bookings bookings_source_src_28000

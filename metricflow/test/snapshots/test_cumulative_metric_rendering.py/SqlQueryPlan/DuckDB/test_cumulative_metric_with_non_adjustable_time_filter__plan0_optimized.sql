@@ -9,15 +9,15 @@ FROM (
   -- Pass Only Elements: ['bookers', 'metric_time__day']
   SELECT
     subq_11.ds AS metric_time__day
-    , bookings_source_src_28001.guest_id AS bookers
+    , bookings_source_src_28000.guest_id AS bookers
   FROM ***************************.mf_time_spine subq_11
   INNER JOIN
-    ***************************.fct_bookings bookings_source_src_28001
+    ***************************.fct_bookings bookings_source_src_28000
   ON
     (
-      DATE_TRUNC('day', bookings_source_src_28001.ds) <= subq_11.ds
+      DATE_TRUNC('day', bookings_source_src_28000.ds) <= subq_11.ds
     ) AND (
-      DATE_TRUNC('day', bookings_source_src_28001.ds) > subq_11.ds - INTERVAL 2 day
+      DATE_TRUNC('day', bookings_source_src_28000.ds) > subq_11.ds - INTERVAL 2 day
     )
 ) subq_13
 WHERE metric_time__day = '2020-01-03' or metric_time__day = '2020-01-07'

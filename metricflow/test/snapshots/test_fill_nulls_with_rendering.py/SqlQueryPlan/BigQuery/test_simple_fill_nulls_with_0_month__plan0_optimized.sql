@@ -27,7 +27,7 @@ FROM (
       SELECT
         DATE_TRUNC(ds, month) AS metric_time__month
         , 1 AS bookings
-      FROM ***************************.fct_bookings bookings_source_src_28001
+      FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_9
     GROUP BY
       metric_time__month

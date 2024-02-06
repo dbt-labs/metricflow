@@ -7,7 +7,7 @@ FROM (
   -- Pass Only Elements: ['listing__country_latest',]
   SELECT
     country AS listing__country_latest
-  FROM ***************************.dim_listings_latest listings_latest_src_28005
+  FROM ***************************.dim_listings_latest listings_latest_src_28000
   GROUP BY
     country
 ) subq_3

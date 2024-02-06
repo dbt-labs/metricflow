@@ -15,15 +15,15 @@ FROM (
     -- Join Self Over Time Range
     SELECT
       subq_14.ds AS metric_time__day
-      , bookings_source_src_28001.guest_id AS bookers
+      , bookings_source_src_28000.guest_id AS bookers
     FROM ***************************.mf_time_spine subq_14
     INNER JOIN
-      ***************************.fct_bookings bookings_source_src_28001
+      ***************************.fct_bookings bookings_source_src_28000
     ON
       (
-        DATE_TRUNC('day', bookings_source_src_28001.ds) <= subq_14.ds
+        DATE_TRUNC('day', bookings_source_src_28000.ds) <= subq_14.ds
       ) AND (
-        DATE_TRUNC('day', bookings_source_src_28001.ds) > subq_14.ds - INTERVAL 2 day
+        DATE_TRUNC('day', bookings_source_src_28000.ds) > subq_14.ds - INTERVAL 2 day
       )
   ) subq_15
   ON

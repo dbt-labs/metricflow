@@ -24,7 +24,7 @@ FROM (
         DATE_TRUNC(ds, day) AS metric_time__day
         , referrer_id AS visit__referrer_id
         , 1 AS visits
-      FROM ***************************.fct_visits visits_source_src_28011
+      FROM ***************************.fct_visits visits_source_src_28000
     ) subq_17
     GROUP BY
       metric_time__day
@@ -60,7 +60,7 @@ FROM (
           , session_id AS session
           , referrer_id AS visit__referrer_id
           , 1 AS visits
-        FROM ***************************.fct_visits visits_source_src_28011
+        FROM ***************************.fct_visits visits_source_src_28000
       ) subq_21
       INNER JOIN (
         -- Read Elements From Semantic Model 'buys_source'
@@ -72,7 +72,7 @@ FROM (
           , session_id
           , 1 AS buys
           , GENERATE_UUID() AS mf_internal_uuid
-        FROM ***************************.fct_buys buys_source_src_28002
+        FROM ***************************.fct_buys buys_source_src_28000
       ) subq_24
       ON
         (

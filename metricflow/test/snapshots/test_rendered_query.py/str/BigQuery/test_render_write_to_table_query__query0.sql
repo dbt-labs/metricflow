@@ -11,7 +11,7 @@ CREATE TABLE ***************************.test_table AS (
     SELECT
       DATE_TRUNC(ds, day) AS metric_time__day
       , 1 AS bookings
-    FROM ***************************.fct_bookings bookings_source_src_1
+    FROM ***************************.fct_bookings bookings_source_src_10000
   ) subq_2
   GROUP BY
     metric_time__day

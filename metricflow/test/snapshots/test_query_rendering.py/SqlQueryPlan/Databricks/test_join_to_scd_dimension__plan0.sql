@@ -233,60 +233,60 @@ FROM (
             FROM (
               -- Read Elements From Semantic Model 'listings'
               SELECT
-                listings_src_26002.active_from AS window_start__day
-                , DATE_TRUNC('week', listings_src_26002.active_from) AS window_start__week
-                , DATE_TRUNC('month', listings_src_26002.active_from) AS window_start__month
-                , DATE_TRUNC('quarter', listings_src_26002.active_from) AS window_start__quarter
-                , DATE_TRUNC('year', listings_src_26002.active_from) AS window_start__year
-                , EXTRACT(year FROM listings_src_26002.active_from) AS window_start__extract_year
-                , EXTRACT(quarter FROM listings_src_26002.active_from) AS window_start__extract_quarter
-                , EXTRACT(month FROM listings_src_26002.active_from) AS window_start__extract_month
-                , EXTRACT(day FROM listings_src_26002.active_from) AS window_start__extract_day
-                , EXTRACT(DAYOFWEEK_ISO FROM listings_src_26002.active_from) AS window_start__extract_dow
-                , EXTRACT(doy FROM listings_src_26002.active_from) AS window_start__extract_doy
-                , listings_src_26002.active_to AS window_end__day
-                , DATE_TRUNC('week', listings_src_26002.active_to) AS window_end__week
-                , DATE_TRUNC('month', listings_src_26002.active_to) AS window_end__month
-                , DATE_TRUNC('quarter', listings_src_26002.active_to) AS window_end__quarter
-                , DATE_TRUNC('year', listings_src_26002.active_to) AS window_end__year
-                , EXTRACT(year FROM listings_src_26002.active_to) AS window_end__extract_year
-                , EXTRACT(quarter FROM listings_src_26002.active_to) AS window_end__extract_quarter
-                , EXTRACT(month FROM listings_src_26002.active_to) AS window_end__extract_month
-                , EXTRACT(day FROM listings_src_26002.active_to) AS window_end__extract_day
-                , EXTRACT(DAYOFWEEK_ISO FROM listings_src_26002.active_to) AS window_end__extract_dow
-                , EXTRACT(doy FROM listings_src_26002.active_to) AS window_end__extract_doy
-                , listings_src_26002.country
-                , listings_src_26002.is_lux
-                , listings_src_26002.capacity
-                , listings_src_26002.active_from AS listing__window_start__day
-                , DATE_TRUNC('week', listings_src_26002.active_from) AS listing__window_start__week
-                , DATE_TRUNC('month', listings_src_26002.active_from) AS listing__window_start__month
-                , DATE_TRUNC('quarter', listings_src_26002.active_from) AS listing__window_start__quarter
-                , DATE_TRUNC('year', listings_src_26002.active_from) AS listing__window_start__year
-                , EXTRACT(year FROM listings_src_26002.active_from) AS listing__window_start__extract_year
-                , EXTRACT(quarter FROM listings_src_26002.active_from) AS listing__window_start__extract_quarter
-                , EXTRACT(month FROM listings_src_26002.active_from) AS listing__window_start__extract_month
-                , EXTRACT(day FROM listings_src_26002.active_from) AS listing__window_start__extract_day
-                , EXTRACT(DAYOFWEEK_ISO FROM listings_src_26002.active_from) AS listing__window_start__extract_dow
-                , EXTRACT(doy FROM listings_src_26002.active_from) AS listing__window_start__extract_doy
-                , listings_src_26002.active_to AS listing__window_end__day
-                , DATE_TRUNC('week', listings_src_26002.active_to) AS listing__window_end__week
-                , DATE_TRUNC('month', listings_src_26002.active_to) AS listing__window_end__month
-                , DATE_TRUNC('quarter', listings_src_26002.active_to) AS listing__window_end__quarter
-                , DATE_TRUNC('year', listings_src_26002.active_to) AS listing__window_end__year
-                , EXTRACT(year FROM listings_src_26002.active_to) AS listing__window_end__extract_year
-                , EXTRACT(quarter FROM listings_src_26002.active_to) AS listing__window_end__extract_quarter
-                , EXTRACT(month FROM listings_src_26002.active_to) AS listing__window_end__extract_month
-                , EXTRACT(day FROM listings_src_26002.active_to) AS listing__window_end__extract_day
-                , EXTRACT(DAYOFWEEK_ISO FROM listings_src_26002.active_to) AS listing__window_end__extract_dow
-                , EXTRACT(doy FROM listings_src_26002.active_to) AS listing__window_end__extract_doy
-                , listings_src_26002.country AS listing__country
-                , listings_src_26002.is_lux AS listing__is_lux
-                , listings_src_26002.capacity AS listing__capacity
-                , listings_src_26002.listing_id AS listing
-                , listings_src_26002.user_id AS user
-                , listings_src_26002.user_id AS listing__user
-              FROM ***************************.dim_listings listings_src_26002
+                listings_src_26000.active_from AS window_start__day
+                , DATE_TRUNC('week', listings_src_26000.active_from) AS window_start__week
+                , DATE_TRUNC('month', listings_src_26000.active_from) AS window_start__month
+                , DATE_TRUNC('quarter', listings_src_26000.active_from) AS window_start__quarter
+                , DATE_TRUNC('year', listings_src_26000.active_from) AS window_start__year
+                , EXTRACT(year FROM listings_src_26000.active_from) AS window_start__extract_year
+                , EXTRACT(quarter FROM listings_src_26000.active_from) AS window_start__extract_quarter
+                , EXTRACT(month FROM listings_src_26000.active_from) AS window_start__extract_month
+                , EXTRACT(day FROM listings_src_26000.active_from) AS window_start__extract_day
+                , EXTRACT(DAYOFWEEK_ISO FROM listings_src_26000.active_from) AS window_start__extract_dow
+                , EXTRACT(doy FROM listings_src_26000.active_from) AS window_start__extract_doy
+                , listings_src_26000.active_to AS window_end__day
+                , DATE_TRUNC('week', listings_src_26000.active_to) AS window_end__week
+                , DATE_TRUNC('month', listings_src_26000.active_to) AS window_end__month
+                , DATE_TRUNC('quarter', listings_src_26000.active_to) AS window_end__quarter
+                , DATE_TRUNC('year', listings_src_26000.active_to) AS window_end__year
+                , EXTRACT(year FROM listings_src_26000.active_to) AS window_end__extract_year
+                , EXTRACT(quarter FROM listings_src_26000.active_to) AS window_end__extract_quarter
+                , EXTRACT(month FROM listings_src_26000.active_to) AS window_end__extract_month
+                , EXTRACT(day FROM listings_src_26000.active_to) AS window_end__extract_day
+                , EXTRACT(DAYOFWEEK_ISO FROM listings_src_26000.active_to) AS window_end__extract_dow
+                , EXTRACT(doy FROM listings_src_26000.active_to) AS window_end__extract_doy
+                , listings_src_26000.country
+                , listings_src_26000.is_lux
+                , listings_src_26000.capacity
+                , listings_src_26000.active_from AS listing__window_start__day
+                , DATE_TRUNC('week', listings_src_26000.active_from) AS listing__window_start__week
+                , DATE_TRUNC('month', listings_src_26000.active_from) AS listing__window_start__month
+                , DATE_TRUNC('quarter', listings_src_26000.active_from) AS listing__window_start__quarter
+                , DATE_TRUNC('year', listings_src_26000.active_from) AS listing__window_start__year
+                , EXTRACT(year FROM listings_src_26000.active_from) AS listing__window_start__extract_year
+                , EXTRACT(quarter FROM listings_src_26000.active_from) AS listing__window_start__extract_quarter
+                , EXTRACT(month FROM listings_src_26000.active_from) AS listing__window_start__extract_month
+                , EXTRACT(day FROM listings_src_26000.active_from) AS listing__window_start__extract_day
+                , EXTRACT(DAYOFWEEK_ISO FROM listings_src_26000.active_from) AS listing__window_start__extract_dow
+                , EXTRACT(doy FROM listings_src_26000.active_from) AS listing__window_start__extract_doy
+                , listings_src_26000.active_to AS listing__window_end__day
+                , DATE_TRUNC('week', listings_src_26000.active_to) AS listing__window_end__week
+                , DATE_TRUNC('month', listings_src_26000.active_to) AS listing__window_end__month
+                , DATE_TRUNC('quarter', listings_src_26000.active_to) AS listing__window_end__quarter
+                , DATE_TRUNC('year', listings_src_26000.active_to) AS listing__window_end__year
+                , EXTRACT(year FROM listings_src_26000.active_to) AS listing__window_end__extract_year
+                , EXTRACT(quarter FROM listings_src_26000.active_to) AS listing__window_end__extract_quarter
+                , EXTRACT(month FROM listings_src_26000.active_to) AS listing__window_end__extract_month
+                , EXTRACT(day FROM listings_src_26000.active_to) AS listing__window_end__extract_day
+                , EXTRACT(DAYOFWEEK_ISO FROM listings_src_26000.active_to) AS listing__window_end__extract_dow
+                , EXTRACT(doy FROM listings_src_26000.active_to) AS listing__window_end__extract_doy
+                , listings_src_26000.country AS listing__country
+                , listings_src_26000.is_lux AS listing__is_lux
+                , listings_src_26000.capacity AS listing__capacity
+                , listings_src_26000.listing_id AS listing
+                , listings_src_26000.user_id AS user
+                , listings_src_26000.user_id AS listing__user
+              FROM ***************************.dim_listings listings_src_26000
             ) subq_3
           ) subq_4
           ON

@@ -7,15 +7,15 @@ FROM (
   -- Join Standard Outputs
   -- Aggregate Measures
   SELECT
-    bookings_source_src_28001.listing_id AS listing
-    , listings_latest_src_28005.country AS listing__country_latest
-    , SUM(bookings_source_src_28001.booking_value) AS booking_value
-  FROM ***************************.fct_bookings bookings_source_src_28001
+    bookings_source_src_28000.listing_id AS listing
+    , listings_latest_src_28000.country AS listing__country_latest
+    , SUM(bookings_source_src_28000.booking_value) AS booking_value
+  FROM ***************************.fct_bookings bookings_source_src_28000
   LEFT OUTER JOIN
-    ***************************.dim_listings_latest listings_latest_src_28005
+    ***************************.dim_listings_latest listings_latest_src_28000
   ON
-    bookings_source_src_28001.listing_id = listings_latest_src_28005.listing_id
+    bookings_source_src_28000.listing_id = listings_latest_src_28000.listing_id
   GROUP BY
-    bookings_source_src_28001.listing_id
-    , listings_latest_src_28005.country
+    bookings_source_src_28000.listing_id
+    , listings_latest_src_28000.country
 ) subq_11
