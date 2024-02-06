@@ -427,13 +427,13 @@
                 <!-- join_0 =                                               -->
                 <!--   SqlJoinDescription(                                  -->
                 <!--     right_source=SqlSelectStatementNode(node_id=ss_3), -->
-                <!--     right_source_alias='subq_3',                       -->
+                <!--     right_source_alias='subq_5',                       -->
                 <!--     join_type=CROSS_JOIN,                              -->
                 <!--   )                                                    -->
                 <!-- join_1 =                                                 -->
                 <!--   SqlJoinDescription(                                    -->
                 <!--     right_source=SqlSelectStatementNode(node_id=ss_4),   -->
-                <!--     right_source_alias='subq_5',                         -->
+                <!--     right_source_alias='subq_7',                         -->
                 <!--     join_type=FULL_OUTER,                                -->
                 <!--     on_condition=SqlComparisonExpression(node_id=cmp_0), -->
                 <!--   )                                                      -->

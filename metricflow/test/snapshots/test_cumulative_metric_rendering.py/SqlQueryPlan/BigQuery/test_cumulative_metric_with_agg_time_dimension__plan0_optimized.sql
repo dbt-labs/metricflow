@@ -4,15 +4,15 @@
 -- Compute Metrics via Expressions
 SELECT
   subq_10.ds AS revenue_instance__ds__day
-  , SUM(revenue_src_28007.revenue) AS trailing_2_months_revenue
+  , SUM(revenue_src_28000.revenue) AS trailing_2_months_revenue
 FROM ***************************.mf_time_spine subq_10
 INNER JOIN
-  ***************************.fct_revenue revenue_src_28007
+  ***************************.fct_revenue revenue_src_28000
 ON
   (
-    DATE_TRUNC(revenue_src_28007.created_at, day) <= subq_10.ds
+    DATE_TRUNC(revenue_src_28000.created_at, day) <= subq_10.ds
   ) AND (
-    DATE_TRUNC(revenue_src_28007.created_at, day) > DATE_SUB(CAST(subq_10.ds AS DATETIME), INTERVAL 2 month)
+    DATE_TRUNC(revenue_src_28000.created_at, day) > DATE_SUB(CAST(subq_10.ds AS DATETIME), INTERVAL 2 month)
   )
 GROUP BY
   revenue_instance__ds__day

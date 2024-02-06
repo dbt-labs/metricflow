@@ -9,7 +9,7 @@
         <!--    '-- Compute Metrics via Expressions\n'                                           -->
         <!--    'SELECT\n'                                                                       -->
         <!--    '  subq_2.is_instant AS is_instant\n'                                            -->
-        <!--    '  , listings_latest_src_28005.country AS listing__country_latest\n'             -->
+        <!--    '  , listings_latest_src_28000.country AS listing__country_latest\n'             -->
         <!--    '  , SUM(subq_2.bookings) AS bookings\n'                                         -->
         <!--    'FROM (\n'                                                                       -->
         <!--    "  -- Read Elements From Semantic Model 'bookings_source'\n"                     -->
@@ -19,14 +19,14 @@
         <!--    '    listing_id AS listing\n'                                                    -->
         <!--    '    , is_instant\n'                                                             -->
         <!--    '    , 1 AS bookings\n'                                                          -->
-        <!--    '  FROM ***************************.fct_bookings bookings_source_src_28001\n'    -->
+        <!--    '  FROM ***************************.fct_bookings bookings_source_src_28000\n'    -->
         <!--    ') subq_2\n'                                                                     -->
         <!--    'LEFT OUTER JOIN\n'                                                              -->
-        <!--    '  ***************************.dim_listings_latest listings_latest_src_28005\n'  -->
+        <!--    '  ***************************.dim_listings_latest listings_latest_src_28000\n'  -->
         <!--    'ON\n'                                                                           -->
-        <!--    '  subq_2.listing = listings_latest_src_28005.listing_id\n'                      -->
+        <!--    '  subq_2.listing = listings_latest_src_28000.listing_id\n'                      -->
         <!--    'GROUP BY\n'                                                                     -->
         <!--    '  subq_2.is_instant\n'                                                          -->
-        <!--    '  , listings_latest_src_28005.country')                                         -->
+        <!--    '  , listings_latest_src_28000.country')                                         -->
     </SelectSqlQueryToDataFrameTask>
 </ExecutionPlan>

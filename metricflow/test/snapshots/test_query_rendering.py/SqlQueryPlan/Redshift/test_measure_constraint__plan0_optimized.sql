@@ -21,14 +21,14 @@ FROM (
       -- Join Standard Outputs
       -- Pass Only Elements: ['average_booking_value', 'listing__is_lux_latest', 'metric_time__day']
       SELECT
-        DATE_TRUNC('day', bookings_source_src_28001.ds) AS metric_time__day
-        , listings_latest_src_28005.is_lux AS listing__is_lux_latest
-        , bookings_source_src_28001.booking_value AS average_booking_value
-      FROM ***************************.fct_bookings bookings_source_src_28001
+        DATE_TRUNC('day', bookings_source_src_28000.ds) AS metric_time__day
+        , listings_latest_src_28000.is_lux AS listing__is_lux_latest
+        , bookings_source_src_28000.booking_value AS average_booking_value
+      FROM ***************************.fct_bookings bookings_source_src_28000
       LEFT OUTER JOIN
-        ***************************.dim_listings_latest listings_latest_src_28005
+        ***************************.dim_listings_latest listings_latest_src_28000
       ON
-        bookings_source_src_28001.listing_id = listings_latest_src_28005.listing_id
+        bookings_source_src_28000.listing_id = listings_latest_src_28000.listing_id
     ) subq_37
     WHERE listing__is_lux_latest
     GROUP BY
@@ -47,7 +47,7 @@ FROM (
       -- Pass Only Elements: ['bookings', 'listing__is_lux_latest', 'metric_time__day']
       SELECT
         subq_44.metric_time__day AS metric_time__day
-        , listings_latest_src_28005.is_lux AS listing__is_lux_latest
+        , listings_latest_src_28000.is_lux AS listing__is_lux_latest
         , subq_44.bookings AS bookings
       FROM (
         -- Read Elements From Semantic Model 'bookings_source'
@@ -57,12 +57,12 @@ FROM (
           DATE_TRUNC('day', ds) AS metric_time__day
           , listing_id AS listing
           , 1 AS bookings
-        FROM ***************************.fct_bookings bookings_source_src_28001
+        FROM ***************************.fct_bookings bookings_source_src_28000
       ) subq_44
       LEFT OUTER JOIN
-        ***************************.dim_listings_latest listings_latest_src_28005
+        ***************************.dim_listings_latest listings_latest_src_28000
       ON
-        subq_44.listing = listings_latest_src_28005.listing_id
+        subq_44.listing = listings_latest_src_28000.listing_id
     ) subq_49
     WHERE listing__is_lux_latest
     GROUP BY
@@ -79,7 +79,7 @@ FROM (
     SELECT
       DATE_TRUNC('day', ds) AS metric_time__day
       , SUM(booking_value) AS booking_value
-    FROM ***************************.fct_bookings bookings_source_src_28001
+    FROM ***************************.fct_bookings bookings_source_src_28000
     GROUP BY
       DATE_TRUNC('day', ds)
   ) subq_58

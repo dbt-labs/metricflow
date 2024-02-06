@@ -21,7 +21,7 @@ FROM (
       SELECT
         DATE_TRUNC(ds, day) AS booking__ds__day
         , 1 AS bookings
-      FROM ***************************.fct_bookings bookings_source_src_28001
+      FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_16
     GROUP BY
       booking__ds__day
@@ -41,7 +41,7 @@ FROM (
       SELECT
         DATE_TRUNC(ds, day) AS booking__ds__day
         , 1 AS bookings
-      FROM ***************************.fct_bookings bookings_source_src_28001
+      FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_20
     ON
       DATE_SUB(CAST(subq_22.ds AS DATETIME), INTERVAL 14 day) = subq_20.booking__ds__day

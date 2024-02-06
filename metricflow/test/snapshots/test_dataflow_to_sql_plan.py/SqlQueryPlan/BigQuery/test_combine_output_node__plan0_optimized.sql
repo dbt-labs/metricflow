@@ -15,7 +15,7 @@ FROM (
     SELECT
       is_instant
       , 1 AS bookings
-    FROM ***************************.fct_bookings bookings_source_src_28001
+    FROM ***************************.fct_bookings bookings_source_src_28000
   ) subq_7
   GROUP BY
     is_instant
@@ -33,7 +33,7 @@ FULL OUTER JOIN (
       is_instant
       , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings
       , guest_id AS bookers
-    FROM ***************************.fct_bookings bookings_source_src_28001
+    FROM ***************************.fct_bookings bookings_source_src_28000
   ) subq_10
   GROUP BY
     is_instant

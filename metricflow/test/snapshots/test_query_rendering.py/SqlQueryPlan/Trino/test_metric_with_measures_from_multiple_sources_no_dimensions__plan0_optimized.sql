@@ -10,7 +10,7 @@ FROM (
   -- Compute Metrics via Expressions
   SELECT
     SUM(1) AS bookings
-  FROM ***************************.fct_bookings bookings_source_src_28001
+  FROM ***************************.fct_bookings bookings_source_src_28000
 ) subq_15
 CROSS JOIN (
   -- Read Elements From Semantic Model 'listings_latest'
@@ -20,5 +20,5 @@ CROSS JOIN (
   -- Compute Metrics via Expressions
   SELECT
     SUM(1) AS listings
-  FROM ***************************.dim_listings_latest listings_latest_src_28005
+  FROM ***************************.dim_listings_latest listings_latest_src_28000
 ) subq_20

@@ -22,7 +22,7 @@ FROM (
       SELECT
         DATE_TRUNC('day', ds) AS metric_time__day
         , 1 AS bookings
-      FROM ***************************.fct_bookings bookings_source_src_28001
+      FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_18
     WHERE metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14'
     GROUP BY
@@ -48,7 +48,7 @@ FROM (
         SELECT
           DATE_TRUNC('day', ds) AS metric_time__day
           , 1 AS bookings
-        FROM ***************************.fct_bookings bookings_source_src_28001
+        FROM ***************************.fct_bookings bookings_source_src_28000
       ) subq_23
       ON
         DATEADD(day, -14, subq_25.ds) = subq_23.metric_time__day
