@@ -25,7 +25,7 @@ from metricflow.specs.specs import (
 )
 from metricflow.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpression
 from metricflow.sql.sql_plan import SqlJoinType, SqlSelectColumn, SqlSelectStatementNode, SqlTableFromClauseNode
-from metricflow.test.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestName
+from metricflow.test.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.snapshot_utils import assert_spec_set_snapshot_equal
 
@@ -91,7 +91,7 @@ def test_no_parent_node_data_set(
 def test_joined_node_data_set(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     simple_semantic_manifest_lookup: SemanticManifestLookup,
     time_spine_source: TimeSpineSource,
 ) -> None:
@@ -102,8 +102,8 @@ def test_joined_node_data_set(  # noqa: D
     )
 
     # Join "revenue" with "users_latest" to get "user__home_state_latest"
-    revenue_node = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping["revenue"]
-    users_node = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping["users_latest"]
+    revenue_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping["revenue"]
+    users_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping["users_latest"]
     join_node = JoinToBaseOutputNode(
         left_node=revenue_node,
         join_targets=[

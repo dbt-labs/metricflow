@@ -51,7 +51,7 @@ from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLev
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_plan import SqlJoinType
 from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
-from metricflow.test.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestName
+from metricflow.test.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.snapshot_utils import assert_plan_snapshot_text_equal
 from metricflow.test.sql.compare_sql_plan import assert_rendered_sql_from_plan_equal, assert_sql_plan_text_equal
@@ -120,11 +120,11 @@ def test_source_node(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan where there is a single source node."""
-    source_node = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+    source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
 
@@ -142,14 +142,14 @@ def test_filter_node(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan where there is a leaf pass filter node."""
     measure_spec = MeasureSpec(
         element_name="bookings",
     )
-    source_node = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+    source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
     filter_node = FilterElementsNode(
@@ -171,14 +171,14 @@ def test_filter_with_where_constraint_node(  # noqa: D
     mf_test_session_state: MetricFlowTestSessionState,
     column_association_resolver: ColumnAssociationResolver,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan where there is a leaf pass filter node."""
     measure_spec = MeasureSpec(
         element_name="bookings",
     )
-    source_node = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+    source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
 
@@ -218,7 +218,7 @@ def test_measure_aggregation_node(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan where there is a leaf measure aggregation node.
@@ -240,7 +240,7 @@ def test_measure_aggregation_node(  # noqa: D
     measure_specs: List[MeasureSpec] = [sum_spec, sum_boolean_spec, avg_spec, count_distinct_spec]
     metric_input_measure_specs = tuple(MetricInputMeasureSpec(measure_spec=x) for x in measure_specs)
 
-    measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+    measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
     filtered_measure_node = FilterElementsNode(
@@ -266,7 +266,7 @@ def test_single_join_node(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan where there is a join between 1 measure and 1 dimension."""
@@ -274,7 +274,7 @@ def test_single_join_node(  # noqa: D
         element_name="bookings",
     )
     entity_spec = LinklessEntitySpec.from_element_name(element_name="listing")
-    measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+    measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
     filtered_measure_node = FilterElementsNode(
@@ -289,7 +289,7 @@ def test_single_join_node(  # noqa: D
         element_name="country_latest",
         entity_links=(EntityReference("listing"),),
     )
-    dimension_source_node = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+    dimension_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "listings_latest"
     ]
     filtered_dimension_node = FilterElementsNode(
@@ -327,7 +327,7 @@ def test_multi_join_node(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan where there is a join between 1 measure and 2 dimensions."""
@@ -335,7 +335,7 @@ def test_multi_join_node(
         element_name="bookings",
     )
     entity_spec = LinklessEntitySpec.from_element_name(element_name="listing")
-    measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+    measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
     filtered_measure_node = FilterElementsNode(
@@ -347,7 +347,7 @@ def test_multi_join_node(
         element_name="country_latest",
         entity_links=(),
     )
-    dimension_source_node = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+    dimension_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "listings_latest"
     ]
     filtered_dimension_node = FilterElementsNode(
@@ -392,7 +392,7 @@ def test_compute_metrics_node(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan where there is a leaf compute metrics node."""
@@ -401,7 +401,7 @@ def test_compute_metrics_node(
     )
     entity_spec = LinklessEntitySpec.from_element_name(element_name="listing")
     metric_input_measure_specs = (MetricInputMeasureSpec(measure_spec=measure_spec),)
-    measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+    measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
     filtered_measure_node = FilterElementsNode(
@@ -416,7 +416,7 @@ def test_compute_metrics_node(
         element_name="country_latest",
         entity_links=(),
     )
-    dimension_source_node = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+    dimension_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "listings_latest"
     ]
     filtered_dimension_node = FilterElementsNode(
@@ -461,7 +461,7 @@ def test_compute_metrics_node_simple_expr(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
     """Tests the compute metrics node for expr type metrics sourced from a single measure."""
@@ -470,7 +470,7 @@ def test_compute_metrics_node_simple_expr(
     )
     entity_spec = LinklessEntitySpec.from_element_name(element_name="listing")
     metric_input_measure_specs = (MetricInputMeasureSpec(measure_spec=measure_spec),)
-    measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+    measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
     filtered_measure_node = FilterElementsNode(
@@ -482,7 +482,7 @@ def test_compute_metrics_node_simple_expr(
         element_name="country_latest",
         entity_links=(),
     )
-    dimension_source_node = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+    dimension_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "listings_latest"
     ]
     filtered_dimension_node = FilterElementsNode(
@@ -542,7 +542,7 @@ def test_join_to_time_spine_node_without_offset(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
     """Tests JoinToTimeSpineNode for a single metric with offset_window."""
@@ -552,7 +552,7 @@ def test_join_to_time_spine_node_without_offset(  # noqa: D
     metric_time_spec = TimeDimensionSpec(
         element_name="metric_time", entity_links=(), time_granularity=TimeGranularity.DAY
     )
-    measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+    measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
     metric_time_node = MetricTimeDimensionTransformNode(
@@ -610,7 +610,7 @@ def test_join_to_time_spine_node_with_offset_window(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
     """Tests JoinToTimeSpineNode for a single metric with offset_window."""
@@ -620,7 +620,7 @@ def test_join_to_time_spine_node_with_offset_window(  # noqa: D
     metric_time_spec = TimeDimensionSpec(
         element_name="metric_time", entity_links=(), time_granularity=TimeGranularity.DAY
     )
-    measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+    measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
     metric_time_node = MetricTimeDimensionTransformNode(
@@ -679,7 +679,7 @@ def test_join_to_time_spine_node_with_offset_to_grain(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
     """Tests JoinToTimeSpineNode for a single metric with offset_to_grain."""
@@ -689,7 +689,7 @@ def test_join_to_time_spine_node_with_offset_to_grain(
     metric_time_spec = TimeDimensionSpec(
         element_name="metric_time", entity_links=(), time_granularity=TimeGranularity.DAY
     )
-    measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+    measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
     metric_time_node = MetricTimeDimensionTransformNode(
@@ -749,7 +749,7 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
     """Tests the compute metrics node for ratio type metrics sourced from a single semantic model."""
@@ -764,7 +764,7 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
         MetricInputMeasureSpec(measure_spec=numerator_spec),
         MetricInputMeasureSpec(measure_spec=denominator_spec),
     )
-    measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+    measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
     filtered_measures_node = FilterElementsNode(
@@ -776,7 +776,7 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
         element_name="country_latest",
         entity_links=(),
     )
-    dimension_source_node = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+    dimension_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "listings_latest"
     ]
     filtered_dimension_node = FilterElementsNode(
@@ -819,7 +819,7 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
 def test_order_by_node(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
@@ -838,7 +838,7 @@ def test_order_by_node(
         element_name="ds",
         entity_links=(),
     )
-    measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+    measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
 
@@ -885,7 +885,7 @@ def test_order_by_node(
 def test_semi_additive_join_node(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
@@ -893,7 +893,7 @@ def test_semi_additive_join_node(
     non_additive_dimension_spec = NonAdditiveDimensionSpec(name="ds", window_choice=AggregationType.MIN)
     time_dimension_spec = TimeDimensionSpec(element_name="ds", entity_links=())
 
-    measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+    measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "accounts_source"
     ]
     semi_additive_join_node = SemiAdditiveJoinNode(
@@ -916,7 +916,7 @@ def test_semi_additive_join_node(
 def test_semi_additive_join_node_with_queried_group_by(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
@@ -927,7 +927,7 @@ def test_semi_additive_join_node_with_queried_group_by(
         element_name="ds", entity_links=(), time_granularity=TimeGranularity.WEEK
     )
 
-    measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+    measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "accounts_source"
     ]
     semi_additive_join_node = SemiAdditiveJoinNode(
@@ -950,7 +950,7 @@ def test_semi_additive_join_node_with_queried_group_by(
 def test_semi_additive_join_node_with_grouping(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
@@ -963,7 +963,7 @@ def test_semi_additive_join_node_with_grouping(
     entity_spec = LinklessEntitySpec(element_name="user", entity_links=())
     time_dimension_spec = TimeDimensionSpec(element_name="ds", entity_links=())
 
-    measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+    measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "accounts_source"
     ]
     semi_additive_join_node = SemiAdditiveJoinNode(
@@ -985,12 +985,12 @@ def test_semi_additive_join_node_with_grouping(
 def test_constrain_time_range_node(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
     """Tests converting the ConstrainTimeRangeNode to SQL."""
-    measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+    measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
     filtered_measure_node = FilterElementsNode(
@@ -1069,7 +1069,7 @@ def test_combine_output_node(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
     """Tests combining AggregateMeasuresNode."""
@@ -1086,7 +1086,7 @@ def test_combine_output_node(  # noqa: D
         element_name="is_instant",
         entity_links=(),
     )
-    measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+    measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
 

@@ -11,7 +11,7 @@ from metricflow.dataflow.dataflow_plan import MetricTimeDimensionTransformNode
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.specs.specs import MetricFlowQuerySpec, MetricSpec
-from metricflow.test.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestName
+from metricflow.test.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.plan_conversion.test_dataflow_to_sql_plan import convert_and_check
 from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY
@@ -22,11 +22,11 @@ def test_metric_time_dimension_transform_node_using_primary_time(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a PlotTimeDimensionTransform node using the primary time dimension to SQL."""
-    source_node = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+    source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
     metric_time_dimension_transform_node = MetricTimeDimensionTransformNode(
@@ -46,11 +46,11 @@ def test_metric_time_dimension_transform_node_using_non_primary_time(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a PlotTimeDimensionTransform node using a non-primary time dimension to SQL."""
-    source_node = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].read_node_mapping[
+    source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
     metric_time_dimension_transform_node = MetricTimeDimensionTransformNode(
@@ -71,7 +71,7 @@ def test_simple_query_with_metric_time_dimension(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
