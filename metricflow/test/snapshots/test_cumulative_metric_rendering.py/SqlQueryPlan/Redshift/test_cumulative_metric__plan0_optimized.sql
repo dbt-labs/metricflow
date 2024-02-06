@@ -6,6 +6,6 @@
 SELECT
   DATE_TRUNC('day', created_at) AS ds__day
   , SUM(revenue) AS trailing_2_months_revenue
-FROM ***************************.fct_revenue revenue_src_10007
+FROM ***************************.fct_revenue revenue_src_28007
 GROUP BY
   DATE_TRUNC('day', created_at)

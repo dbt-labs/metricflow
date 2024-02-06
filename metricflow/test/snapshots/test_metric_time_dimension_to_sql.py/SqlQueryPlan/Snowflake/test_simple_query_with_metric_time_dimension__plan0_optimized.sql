@@ -16,7 +16,7 @@ FROM (
     SELECT
       DATE_TRUNC('day', ds) AS metric_time__day
       , 1 AS bookings
-    FROM ***************************.fct_bookings bookings_source_src_10001
+    FROM ***************************.fct_bookings bookings_source_src_28001
   ) subq_12
   GROUP BY
     metric_time__day
@@ -30,7 +30,7 @@ FULL OUTER JOIN (
   SELECT
     DATE_TRUNC('day', paid_at) AS metric_time__day
     , SUM(booking_value) AS booking_payments
-  FROM ***************************.fct_bookings bookings_source_src_10001
+  FROM ***************************.fct_bookings bookings_source_src_28001
   GROUP BY
     DATE_TRUNC('day', paid_at)
 ) subq_19

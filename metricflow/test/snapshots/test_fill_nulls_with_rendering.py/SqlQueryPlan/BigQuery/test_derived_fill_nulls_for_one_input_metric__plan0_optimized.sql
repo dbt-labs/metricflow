@@ -31,7 +31,7 @@ FROM (
           SELECT
             DATE_TRUNC(ds, day) AS metric_time__day
             , 1 AS bookings
-          FROM ***************************.fct_bookings bookings_source_src_10001
+          FROM ***************************.fct_bookings bookings_source_src_28001
         ) subq_19
         GROUP BY
           metric_time__day
@@ -55,7 +55,7 @@ FROM (
       SELECT
         DATE_TRUNC(ds, day) AS metric_time__day
         , 1 AS bookings
-      FROM ***************************.fct_bookings bookings_source_src_10001
+      FROM ***************************.fct_bookings bookings_source_src_28001
     ) subq_26
     ON
       DATE_SUB(CAST(subq_28.ds AS DATETIME), INTERVAL 14 day) = subq_26.metric_time__day

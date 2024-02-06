@@ -21,7 +21,7 @@ FROM (
       SELECT
         DATE_TRUNC('day', ds) AS metric_time__day
         , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS referred_bookings
-      FROM ***************************.fct_bookings bookings_source_src_10001
+      FROM ***************************.fct_bookings bookings_source_src_28001
     ) subq_13
     GROUP BY
       metric_time__day
@@ -39,7 +39,7 @@ FROM (
       SELECT
         DATE_TRUNC('day', ds) AS metric_time__day
         , 1 AS bookings
-      FROM ***************************.fct_bookings bookings_source_src_10001
+      FROM ***************************.fct_bookings bookings_source_src_28001
     ) subq_18
     GROUP BY
       metric_time__day

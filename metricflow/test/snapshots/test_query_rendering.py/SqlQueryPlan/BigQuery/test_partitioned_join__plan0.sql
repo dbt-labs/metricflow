@@ -94,56 +94,56 @@ FROM (
             -- Read Elements From Semantic Model 'id_verifications'
             SELECT
               1 AS identity_verifications
-              , DATE_TRUNC(id_verifications_src_10004.ds, day) AS ds__day
-              , DATE_TRUNC(id_verifications_src_10004.ds, isoweek) AS ds__week
-              , DATE_TRUNC(id_verifications_src_10004.ds, month) AS ds__month
-              , DATE_TRUNC(id_verifications_src_10004.ds, quarter) AS ds__quarter
-              , DATE_TRUNC(id_verifications_src_10004.ds, year) AS ds__year
-              , EXTRACT(year FROM id_verifications_src_10004.ds) AS ds__extract_year
-              , EXTRACT(quarter FROM id_verifications_src_10004.ds) AS ds__extract_quarter
-              , EXTRACT(month FROM id_verifications_src_10004.ds) AS ds__extract_month
-              , EXTRACT(day FROM id_verifications_src_10004.ds) AS ds__extract_day
-              , IF(EXTRACT(dayofweek FROM id_verifications_src_10004.ds) = 1, 7, EXTRACT(dayofweek FROM id_verifications_src_10004.ds) - 1) AS ds__extract_dow
-              , EXTRACT(dayofyear FROM id_verifications_src_10004.ds) AS ds__extract_doy
-              , DATE_TRUNC(id_verifications_src_10004.ds_partitioned, day) AS ds_partitioned__day
-              , DATE_TRUNC(id_verifications_src_10004.ds_partitioned, isoweek) AS ds_partitioned__week
-              , DATE_TRUNC(id_verifications_src_10004.ds_partitioned, month) AS ds_partitioned__month
-              , DATE_TRUNC(id_verifications_src_10004.ds_partitioned, quarter) AS ds_partitioned__quarter
-              , DATE_TRUNC(id_verifications_src_10004.ds_partitioned, year) AS ds_partitioned__year
-              , EXTRACT(year FROM id_verifications_src_10004.ds_partitioned) AS ds_partitioned__extract_year
-              , EXTRACT(quarter FROM id_verifications_src_10004.ds_partitioned) AS ds_partitioned__extract_quarter
-              , EXTRACT(month FROM id_verifications_src_10004.ds_partitioned) AS ds_partitioned__extract_month
-              , EXTRACT(day FROM id_verifications_src_10004.ds_partitioned) AS ds_partitioned__extract_day
-              , IF(EXTRACT(dayofweek FROM id_verifications_src_10004.ds_partitioned) = 1, 7, EXTRACT(dayofweek FROM id_verifications_src_10004.ds_partitioned) - 1) AS ds_partitioned__extract_dow
-              , EXTRACT(dayofyear FROM id_verifications_src_10004.ds_partitioned) AS ds_partitioned__extract_doy
-              , id_verifications_src_10004.verification_type
-              , DATE_TRUNC(id_verifications_src_10004.ds, day) AS verification__ds__day
-              , DATE_TRUNC(id_verifications_src_10004.ds, isoweek) AS verification__ds__week
-              , DATE_TRUNC(id_verifications_src_10004.ds, month) AS verification__ds__month
-              , DATE_TRUNC(id_verifications_src_10004.ds, quarter) AS verification__ds__quarter
-              , DATE_TRUNC(id_verifications_src_10004.ds, year) AS verification__ds__year
-              , EXTRACT(year FROM id_verifications_src_10004.ds) AS verification__ds__extract_year
-              , EXTRACT(quarter FROM id_verifications_src_10004.ds) AS verification__ds__extract_quarter
-              , EXTRACT(month FROM id_verifications_src_10004.ds) AS verification__ds__extract_month
-              , EXTRACT(day FROM id_verifications_src_10004.ds) AS verification__ds__extract_day
-              , IF(EXTRACT(dayofweek FROM id_verifications_src_10004.ds) = 1, 7, EXTRACT(dayofweek FROM id_verifications_src_10004.ds) - 1) AS verification__ds__extract_dow
-              , EXTRACT(dayofyear FROM id_verifications_src_10004.ds) AS verification__ds__extract_doy
-              , DATE_TRUNC(id_verifications_src_10004.ds_partitioned, day) AS verification__ds_partitioned__day
-              , DATE_TRUNC(id_verifications_src_10004.ds_partitioned, isoweek) AS verification__ds_partitioned__week
-              , DATE_TRUNC(id_verifications_src_10004.ds_partitioned, month) AS verification__ds_partitioned__month
-              , DATE_TRUNC(id_verifications_src_10004.ds_partitioned, quarter) AS verification__ds_partitioned__quarter
-              , DATE_TRUNC(id_verifications_src_10004.ds_partitioned, year) AS verification__ds_partitioned__year
-              , EXTRACT(year FROM id_verifications_src_10004.ds_partitioned) AS verification__ds_partitioned__extract_year
-              , EXTRACT(quarter FROM id_verifications_src_10004.ds_partitioned) AS verification__ds_partitioned__extract_quarter
-              , EXTRACT(month FROM id_verifications_src_10004.ds_partitioned) AS verification__ds_partitioned__extract_month
-              , EXTRACT(day FROM id_verifications_src_10004.ds_partitioned) AS verification__ds_partitioned__extract_day
-              , IF(EXTRACT(dayofweek FROM id_verifications_src_10004.ds_partitioned) = 1, 7, EXTRACT(dayofweek FROM id_verifications_src_10004.ds_partitioned) - 1) AS verification__ds_partitioned__extract_dow
-              , EXTRACT(dayofyear FROM id_verifications_src_10004.ds_partitioned) AS verification__ds_partitioned__extract_doy
-              , id_verifications_src_10004.verification_type AS verification__verification_type
-              , id_verifications_src_10004.verification_id AS verification
-              , id_verifications_src_10004.user_id AS user
-              , id_verifications_src_10004.user_id AS verification__user
-            FROM ***************************.fct_id_verifications id_verifications_src_10004
+              , DATE_TRUNC(id_verifications_src_28004.ds, day) AS ds__day
+              , DATE_TRUNC(id_verifications_src_28004.ds, isoweek) AS ds__week
+              , DATE_TRUNC(id_verifications_src_28004.ds, month) AS ds__month
+              , DATE_TRUNC(id_verifications_src_28004.ds, quarter) AS ds__quarter
+              , DATE_TRUNC(id_verifications_src_28004.ds, year) AS ds__year
+              , EXTRACT(year FROM id_verifications_src_28004.ds) AS ds__extract_year
+              , EXTRACT(quarter FROM id_verifications_src_28004.ds) AS ds__extract_quarter
+              , EXTRACT(month FROM id_verifications_src_28004.ds) AS ds__extract_month
+              , EXTRACT(day FROM id_verifications_src_28004.ds) AS ds__extract_day
+              , IF(EXTRACT(dayofweek FROM id_verifications_src_28004.ds) = 1, 7, EXTRACT(dayofweek FROM id_verifications_src_28004.ds) - 1) AS ds__extract_dow
+              , EXTRACT(dayofyear FROM id_verifications_src_28004.ds) AS ds__extract_doy
+              , DATE_TRUNC(id_verifications_src_28004.ds_partitioned, day) AS ds_partitioned__day
+              , DATE_TRUNC(id_verifications_src_28004.ds_partitioned, isoweek) AS ds_partitioned__week
+              , DATE_TRUNC(id_verifications_src_28004.ds_partitioned, month) AS ds_partitioned__month
+              , DATE_TRUNC(id_verifications_src_28004.ds_partitioned, quarter) AS ds_partitioned__quarter
+              , DATE_TRUNC(id_verifications_src_28004.ds_partitioned, year) AS ds_partitioned__year
+              , EXTRACT(year FROM id_verifications_src_28004.ds_partitioned) AS ds_partitioned__extract_year
+              , EXTRACT(quarter FROM id_verifications_src_28004.ds_partitioned) AS ds_partitioned__extract_quarter
+              , EXTRACT(month FROM id_verifications_src_28004.ds_partitioned) AS ds_partitioned__extract_month
+              , EXTRACT(day FROM id_verifications_src_28004.ds_partitioned) AS ds_partitioned__extract_day
+              , IF(EXTRACT(dayofweek FROM id_verifications_src_28004.ds_partitioned) = 1, 7, EXTRACT(dayofweek FROM id_verifications_src_28004.ds_partitioned) - 1) AS ds_partitioned__extract_dow
+              , EXTRACT(dayofyear FROM id_verifications_src_28004.ds_partitioned) AS ds_partitioned__extract_doy
+              , id_verifications_src_28004.verification_type
+              , DATE_TRUNC(id_verifications_src_28004.ds, day) AS verification__ds__day
+              , DATE_TRUNC(id_verifications_src_28004.ds, isoweek) AS verification__ds__week
+              , DATE_TRUNC(id_verifications_src_28004.ds, month) AS verification__ds__month
+              , DATE_TRUNC(id_verifications_src_28004.ds, quarter) AS verification__ds__quarter
+              , DATE_TRUNC(id_verifications_src_28004.ds, year) AS verification__ds__year
+              , EXTRACT(year FROM id_verifications_src_28004.ds) AS verification__ds__extract_year
+              , EXTRACT(quarter FROM id_verifications_src_28004.ds) AS verification__ds__extract_quarter
+              , EXTRACT(month FROM id_verifications_src_28004.ds) AS verification__ds__extract_month
+              , EXTRACT(day FROM id_verifications_src_28004.ds) AS verification__ds__extract_day
+              , IF(EXTRACT(dayofweek FROM id_verifications_src_28004.ds) = 1, 7, EXTRACT(dayofweek FROM id_verifications_src_28004.ds) - 1) AS verification__ds__extract_dow
+              , EXTRACT(dayofyear FROM id_verifications_src_28004.ds) AS verification__ds__extract_doy
+              , DATE_TRUNC(id_verifications_src_28004.ds_partitioned, day) AS verification__ds_partitioned__day
+              , DATE_TRUNC(id_verifications_src_28004.ds_partitioned, isoweek) AS verification__ds_partitioned__week
+              , DATE_TRUNC(id_verifications_src_28004.ds_partitioned, month) AS verification__ds_partitioned__month
+              , DATE_TRUNC(id_verifications_src_28004.ds_partitioned, quarter) AS verification__ds_partitioned__quarter
+              , DATE_TRUNC(id_verifications_src_28004.ds_partitioned, year) AS verification__ds_partitioned__year
+              , EXTRACT(year FROM id_verifications_src_28004.ds_partitioned) AS verification__ds_partitioned__extract_year
+              , EXTRACT(quarter FROM id_verifications_src_28004.ds_partitioned) AS verification__ds_partitioned__extract_quarter
+              , EXTRACT(month FROM id_verifications_src_28004.ds_partitioned) AS verification__ds_partitioned__extract_month
+              , EXTRACT(day FROM id_verifications_src_28004.ds_partitioned) AS verification__ds_partitioned__extract_day
+              , IF(EXTRACT(dayofweek FROM id_verifications_src_28004.ds_partitioned) = 1, 7, EXTRACT(dayofweek FROM id_verifications_src_28004.ds_partitioned) - 1) AS verification__ds_partitioned__extract_dow
+              , EXTRACT(dayofyear FROM id_verifications_src_28004.ds_partitioned) AS verification__ds_partitioned__extract_doy
+              , id_verifications_src_28004.verification_type AS verification__verification_type
+              , id_verifications_src_28004.verification_id AS verification
+              , id_verifications_src_28004.user_id AS user
+              , id_verifications_src_28004.user_id AS verification__user
+            FROM ***************************.fct_id_verifications id_verifications_src_28004
           ) subq_0
         ) subq_1
       ) subq_2
@@ -156,76 +156,76 @@ FROM (
         FROM (
           -- Read Elements From Semantic Model 'users_ds_source'
           SELECT
-            DATE_TRUNC(users_ds_source_src_10008.ds, day) AS ds__day
-            , DATE_TRUNC(users_ds_source_src_10008.ds, isoweek) AS ds__week
-            , DATE_TRUNC(users_ds_source_src_10008.ds, month) AS ds__month
-            , DATE_TRUNC(users_ds_source_src_10008.ds, quarter) AS ds__quarter
-            , DATE_TRUNC(users_ds_source_src_10008.ds, year) AS ds__year
-            , EXTRACT(year FROM users_ds_source_src_10008.ds) AS ds__extract_year
-            , EXTRACT(quarter FROM users_ds_source_src_10008.ds) AS ds__extract_quarter
-            , EXTRACT(month FROM users_ds_source_src_10008.ds) AS ds__extract_month
-            , EXTRACT(day FROM users_ds_source_src_10008.ds) AS ds__extract_day
-            , IF(EXTRACT(dayofweek FROM users_ds_source_src_10008.ds) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_10008.ds) - 1) AS ds__extract_dow
-            , EXTRACT(dayofyear FROM users_ds_source_src_10008.ds) AS ds__extract_doy
-            , DATE_TRUNC(users_ds_source_src_10008.created_at, day) AS created_at__day
-            , DATE_TRUNC(users_ds_source_src_10008.created_at, isoweek) AS created_at__week
-            , DATE_TRUNC(users_ds_source_src_10008.created_at, month) AS created_at__month
-            , DATE_TRUNC(users_ds_source_src_10008.created_at, quarter) AS created_at__quarter
-            , DATE_TRUNC(users_ds_source_src_10008.created_at, year) AS created_at__year
-            , EXTRACT(year FROM users_ds_source_src_10008.created_at) AS created_at__extract_year
-            , EXTRACT(quarter FROM users_ds_source_src_10008.created_at) AS created_at__extract_quarter
-            , EXTRACT(month FROM users_ds_source_src_10008.created_at) AS created_at__extract_month
-            , EXTRACT(day FROM users_ds_source_src_10008.created_at) AS created_at__extract_day
-            , IF(EXTRACT(dayofweek FROM users_ds_source_src_10008.created_at) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_10008.created_at) - 1) AS created_at__extract_dow
-            , EXTRACT(dayofyear FROM users_ds_source_src_10008.created_at) AS created_at__extract_doy
-            , DATE_TRUNC(users_ds_source_src_10008.ds_partitioned, day) AS ds_partitioned__day
-            , DATE_TRUNC(users_ds_source_src_10008.ds_partitioned, isoweek) AS ds_partitioned__week
-            , DATE_TRUNC(users_ds_source_src_10008.ds_partitioned, month) AS ds_partitioned__month
-            , DATE_TRUNC(users_ds_source_src_10008.ds_partitioned, quarter) AS ds_partitioned__quarter
-            , DATE_TRUNC(users_ds_source_src_10008.ds_partitioned, year) AS ds_partitioned__year
-            , EXTRACT(year FROM users_ds_source_src_10008.ds_partitioned) AS ds_partitioned__extract_year
-            , EXTRACT(quarter FROM users_ds_source_src_10008.ds_partitioned) AS ds_partitioned__extract_quarter
-            , EXTRACT(month FROM users_ds_source_src_10008.ds_partitioned) AS ds_partitioned__extract_month
-            , EXTRACT(day FROM users_ds_source_src_10008.ds_partitioned) AS ds_partitioned__extract_day
-            , IF(EXTRACT(dayofweek FROM users_ds_source_src_10008.ds_partitioned) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_10008.ds_partitioned) - 1) AS ds_partitioned__extract_dow
-            , EXTRACT(dayofyear FROM users_ds_source_src_10008.ds_partitioned) AS ds_partitioned__extract_doy
-            , users_ds_source_src_10008.home_state
-            , DATE_TRUNC(users_ds_source_src_10008.ds, day) AS user__ds__day
-            , DATE_TRUNC(users_ds_source_src_10008.ds, isoweek) AS user__ds__week
-            , DATE_TRUNC(users_ds_source_src_10008.ds, month) AS user__ds__month
-            , DATE_TRUNC(users_ds_source_src_10008.ds, quarter) AS user__ds__quarter
-            , DATE_TRUNC(users_ds_source_src_10008.ds, year) AS user__ds__year
-            , EXTRACT(year FROM users_ds_source_src_10008.ds) AS user__ds__extract_year
-            , EXTRACT(quarter FROM users_ds_source_src_10008.ds) AS user__ds__extract_quarter
-            , EXTRACT(month FROM users_ds_source_src_10008.ds) AS user__ds__extract_month
-            , EXTRACT(day FROM users_ds_source_src_10008.ds) AS user__ds__extract_day
-            , IF(EXTRACT(dayofweek FROM users_ds_source_src_10008.ds) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_10008.ds) - 1) AS user__ds__extract_dow
-            , EXTRACT(dayofyear FROM users_ds_source_src_10008.ds) AS user__ds__extract_doy
-            , DATE_TRUNC(users_ds_source_src_10008.created_at, day) AS user__created_at__day
-            , DATE_TRUNC(users_ds_source_src_10008.created_at, isoweek) AS user__created_at__week
-            , DATE_TRUNC(users_ds_source_src_10008.created_at, month) AS user__created_at__month
-            , DATE_TRUNC(users_ds_source_src_10008.created_at, quarter) AS user__created_at__quarter
-            , DATE_TRUNC(users_ds_source_src_10008.created_at, year) AS user__created_at__year
-            , EXTRACT(year FROM users_ds_source_src_10008.created_at) AS user__created_at__extract_year
-            , EXTRACT(quarter FROM users_ds_source_src_10008.created_at) AS user__created_at__extract_quarter
-            , EXTRACT(month FROM users_ds_source_src_10008.created_at) AS user__created_at__extract_month
-            , EXTRACT(day FROM users_ds_source_src_10008.created_at) AS user__created_at__extract_day
-            , IF(EXTRACT(dayofweek FROM users_ds_source_src_10008.created_at) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_10008.created_at) - 1) AS user__created_at__extract_dow
-            , EXTRACT(dayofyear FROM users_ds_source_src_10008.created_at) AS user__created_at__extract_doy
-            , DATE_TRUNC(users_ds_source_src_10008.ds_partitioned, day) AS user__ds_partitioned__day
-            , DATE_TRUNC(users_ds_source_src_10008.ds_partitioned, isoweek) AS user__ds_partitioned__week
-            , DATE_TRUNC(users_ds_source_src_10008.ds_partitioned, month) AS user__ds_partitioned__month
-            , DATE_TRUNC(users_ds_source_src_10008.ds_partitioned, quarter) AS user__ds_partitioned__quarter
-            , DATE_TRUNC(users_ds_source_src_10008.ds_partitioned, year) AS user__ds_partitioned__year
-            , EXTRACT(year FROM users_ds_source_src_10008.ds_partitioned) AS user__ds_partitioned__extract_year
-            , EXTRACT(quarter FROM users_ds_source_src_10008.ds_partitioned) AS user__ds_partitioned__extract_quarter
-            , EXTRACT(month FROM users_ds_source_src_10008.ds_partitioned) AS user__ds_partitioned__extract_month
-            , EXTRACT(day FROM users_ds_source_src_10008.ds_partitioned) AS user__ds_partitioned__extract_day
-            , IF(EXTRACT(dayofweek FROM users_ds_source_src_10008.ds_partitioned) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_10008.ds_partitioned) - 1) AS user__ds_partitioned__extract_dow
-            , EXTRACT(dayofyear FROM users_ds_source_src_10008.ds_partitioned) AS user__ds_partitioned__extract_doy
-            , users_ds_source_src_10008.home_state AS user__home_state
-            , users_ds_source_src_10008.user_id AS user
-          FROM ***************************.dim_users users_ds_source_src_10008
+            DATE_TRUNC(users_ds_source_src_28008.ds, day) AS ds__day
+            , DATE_TRUNC(users_ds_source_src_28008.ds, isoweek) AS ds__week
+            , DATE_TRUNC(users_ds_source_src_28008.ds, month) AS ds__month
+            , DATE_TRUNC(users_ds_source_src_28008.ds, quarter) AS ds__quarter
+            , DATE_TRUNC(users_ds_source_src_28008.ds, year) AS ds__year
+            , EXTRACT(year FROM users_ds_source_src_28008.ds) AS ds__extract_year
+            , EXTRACT(quarter FROM users_ds_source_src_28008.ds) AS ds__extract_quarter
+            , EXTRACT(month FROM users_ds_source_src_28008.ds) AS ds__extract_month
+            , EXTRACT(day FROM users_ds_source_src_28008.ds) AS ds__extract_day
+            , IF(EXTRACT(dayofweek FROM users_ds_source_src_28008.ds) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_28008.ds) - 1) AS ds__extract_dow
+            , EXTRACT(dayofyear FROM users_ds_source_src_28008.ds) AS ds__extract_doy
+            , DATE_TRUNC(users_ds_source_src_28008.created_at, day) AS created_at__day
+            , DATE_TRUNC(users_ds_source_src_28008.created_at, isoweek) AS created_at__week
+            , DATE_TRUNC(users_ds_source_src_28008.created_at, month) AS created_at__month
+            , DATE_TRUNC(users_ds_source_src_28008.created_at, quarter) AS created_at__quarter
+            , DATE_TRUNC(users_ds_source_src_28008.created_at, year) AS created_at__year
+            , EXTRACT(year FROM users_ds_source_src_28008.created_at) AS created_at__extract_year
+            , EXTRACT(quarter FROM users_ds_source_src_28008.created_at) AS created_at__extract_quarter
+            , EXTRACT(month FROM users_ds_source_src_28008.created_at) AS created_at__extract_month
+            , EXTRACT(day FROM users_ds_source_src_28008.created_at) AS created_at__extract_day
+            , IF(EXTRACT(dayofweek FROM users_ds_source_src_28008.created_at) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_28008.created_at) - 1) AS created_at__extract_dow
+            , EXTRACT(dayofyear FROM users_ds_source_src_28008.created_at) AS created_at__extract_doy
+            , DATE_TRUNC(users_ds_source_src_28008.ds_partitioned, day) AS ds_partitioned__day
+            , DATE_TRUNC(users_ds_source_src_28008.ds_partitioned, isoweek) AS ds_partitioned__week
+            , DATE_TRUNC(users_ds_source_src_28008.ds_partitioned, month) AS ds_partitioned__month
+            , DATE_TRUNC(users_ds_source_src_28008.ds_partitioned, quarter) AS ds_partitioned__quarter
+            , DATE_TRUNC(users_ds_source_src_28008.ds_partitioned, year) AS ds_partitioned__year
+            , EXTRACT(year FROM users_ds_source_src_28008.ds_partitioned) AS ds_partitioned__extract_year
+            , EXTRACT(quarter FROM users_ds_source_src_28008.ds_partitioned) AS ds_partitioned__extract_quarter
+            , EXTRACT(month FROM users_ds_source_src_28008.ds_partitioned) AS ds_partitioned__extract_month
+            , EXTRACT(day FROM users_ds_source_src_28008.ds_partitioned) AS ds_partitioned__extract_day
+            , IF(EXTRACT(dayofweek FROM users_ds_source_src_28008.ds_partitioned) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_28008.ds_partitioned) - 1) AS ds_partitioned__extract_dow
+            , EXTRACT(dayofyear FROM users_ds_source_src_28008.ds_partitioned) AS ds_partitioned__extract_doy
+            , users_ds_source_src_28008.home_state
+            , DATE_TRUNC(users_ds_source_src_28008.ds, day) AS user__ds__day
+            , DATE_TRUNC(users_ds_source_src_28008.ds, isoweek) AS user__ds__week
+            , DATE_TRUNC(users_ds_source_src_28008.ds, month) AS user__ds__month
+            , DATE_TRUNC(users_ds_source_src_28008.ds, quarter) AS user__ds__quarter
+            , DATE_TRUNC(users_ds_source_src_28008.ds, year) AS user__ds__year
+            , EXTRACT(year FROM users_ds_source_src_28008.ds) AS user__ds__extract_year
+            , EXTRACT(quarter FROM users_ds_source_src_28008.ds) AS user__ds__extract_quarter
+            , EXTRACT(month FROM users_ds_source_src_28008.ds) AS user__ds__extract_month
+            , EXTRACT(day FROM users_ds_source_src_28008.ds) AS user__ds__extract_day
+            , IF(EXTRACT(dayofweek FROM users_ds_source_src_28008.ds) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_28008.ds) - 1) AS user__ds__extract_dow
+            , EXTRACT(dayofyear FROM users_ds_source_src_28008.ds) AS user__ds__extract_doy
+            , DATE_TRUNC(users_ds_source_src_28008.created_at, day) AS user__created_at__day
+            , DATE_TRUNC(users_ds_source_src_28008.created_at, isoweek) AS user__created_at__week
+            , DATE_TRUNC(users_ds_source_src_28008.created_at, month) AS user__created_at__month
+            , DATE_TRUNC(users_ds_source_src_28008.created_at, quarter) AS user__created_at__quarter
+            , DATE_TRUNC(users_ds_source_src_28008.created_at, year) AS user__created_at__year
+            , EXTRACT(year FROM users_ds_source_src_28008.created_at) AS user__created_at__extract_year
+            , EXTRACT(quarter FROM users_ds_source_src_28008.created_at) AS user__created_at__extract_quarter
+            , EXTRACT(month FROM users_ds_source_src_28008.created_at) AS user__created_at__extract_month
+            , EXTRACT(day FROM users_ds_source_src_28008.created_at) AS user__created_at__extract_day
+            , IF(EXTRACT(dayofweek FROM users_ds_source_src_28008.created_at) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_28008.created_at) - 1) AS user__created_at__extract_dow
+            , EXTRACT(dayofyear FROM users_ds_source_src_28008.created_at) AS user__created_at__extract_doy
+            , DATE_TRUNC(users_ds_source_src_28008.ds_partitioned, day) AS user__ds_partitioned__day
+            , DATE_TRUNC(users_ds_source_src_28008.ds_partitioned, isoweek) AS user__ds_partitioned__week
+            , DATE_TRUNC(users_ds_source_src_28008.ds_partitioned, month) AS user__ds_partitioned__month
+            , DATE_TRUNC(users_ds_source_src_28008.ds_partitioned, quarter) AS user__ds_partitioned__quarter
+            , DATE_TRUNC(users_ds_source_src_28008.ds_partitioned, year) AS user__ds_partitioned__year
+            , EXTRACT(year FROM users_ds_source_src_28008.ds_partitioned) AS user__ds_partitioned__extract_year
+            , EXTRACT(quarter FROM users_ds_source_src_28008.ds_partitioned) AS user__ds_partitioned__extract_quarter
+            , EXTRACT(month FROM users_ds_source_src_28008.ds_partitioned) AS user__ds_partitioned__extract_month
+            , EXTRACT(day FROM users_ds_source_src_28008.ds_partitioned) AS user__ds_partitioned__extract_day
+            , IF(EXTRACT(dayofweek FROM users_ds_source_src_28008.ds_partitioned) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_28008.ds_partitioned) - 1) AS user__ds_partitioned__extract_dow
+            , EXTRACT(dayofyear FROM users_ds_source_src_28008.ds_partitioned) AS user__ds_partitioned__extract_doy
+            , users_ds_source_src_28008.home_state AS user__home_state
+            , users_ds_source_src_28008.user_id AS user
+          FROM ***************************.dim_users users_ds_source_src_28008
         ) subq_3
       ) subq_4
       ON

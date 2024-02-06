@@ -27,11 +27,11 @@
                                 <!-- distinct = False -->
                                 <MetricTimeDimensionTransformNode>
                                     <!-- description = "Metric Time Dimension 'ds'" -->
-                                    <!-- node_id = NodeId(id_str='sma_10001') -->
+                                    <!-- node_id = NodeId(id_str='sma_1') -->
                                     <!-- aggregation_time_dimension = 'ds' -->
                                     <ReadSqlSourceNode>
                                         <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
-                                        <!-- node_id = NodeId(id_str='rss_10013') -->
+                                        <!-- node_id = NodeId(id_str='rss_1') -->
                                         <!-- data_set = SemanticModelDataSet('bookings_source') -->
                                     </ReadSqlSourceNode>
                                 </MetricTimeDimensionTransformNode>
@@ -53,11 +53,11 @@
                                 <!-- distinct = False -->
                                 <MetricTimeDimensionTransformNode>
                                     <!-- description = "Metric Time Dimension 'ds'" -->
-                                    <!-- node_id = NodeId(id_str='sma_10001') -->
+                                    <!-- node_id = NodeId(id_str='sma_1') -->
                                     <!-- aggregation_time_dimension = 'ds' -->
                                     <ReadSqlSourceNode>
                                         <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
-                                        <!-- node_id = NodeId(id_str='rss_10013') -->
+                                        <!-- node_id = NodeId(id_str='rss_1') -->
                                         <!-- data_set = SemanticModelDataSet('bookings_source') -->
                                     </ReadSqlSourceNode>
                                 </MetricTimeDimensionTransformNode>
@@ -88,11 +88,11 @@
                                 <!-- distinct = False -->
                                 <MetricTimeDimensionTransformNode>
                                     <!-- description = "Metric Time Dimension 'ds'" -->
-                                    <!-- node_id = NodeId(id_str='sma_10001') -->
+                                    <!-- node_id = NodeId(id_str='sma_1') -->
                                     <!-- aggregation_time_dimension = 'ds' -->
                                     <ReadSqlSourceNode>
                                         <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
-                                        <!-- node_id = NodeId(id_str='rss_10013') -->
+                                        <!-- node_id = NodeId(id_str='rss_1') -->
                                         <!-- data_set = SemanticModelDataSet('bookings_source') -->
                                     </ReadSqlSourceNode>
                                 </MetricTimeDimensionTransformNode>
@@ -114,11 +114,11 @@
                                 <!-- distinct = False -->
                                 <MetricTimeDimensionTransformNode>
                                     <!-- description = "Metric Time Dimension 'ds'" -->
-                                    <!-- node_id = NodeId(id_str='sma_10001') -->
+                                    <!-- node_id = NodeId(id_str='sma_1') -->
                                     <!-- aggregation_time_dimension = 'ds' -->
                                     <ReadSqlSourceNode>
                                         <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
-                                        <!-- node_id = NodeId(id_str='rss_10013') -->
+                                        <!-- node_id = NodeId(id_str='rss_1') -->
                                         <!-- data_set = SemanticModelDataSet('bookings_source') -->
                                     </ReadSqlSourceNode>
                                 </MetricTimeDimensionTransformNode>

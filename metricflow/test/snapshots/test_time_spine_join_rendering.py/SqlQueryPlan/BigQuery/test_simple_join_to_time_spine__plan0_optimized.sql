@@ -16,7 +16,7 @@ LEFT OUTER JOIN (
     SELECT
       DATE_TRUNC(ds, day) AS metric_time__day
       , 1 AS bookings
-    FROM ***************************.fct_bookings bookings_source_src_10001
+    FROM ***************************.fct_bookings bookings_source_src_28001
   ) subq_9
   GROUP BY
     metric_time__day

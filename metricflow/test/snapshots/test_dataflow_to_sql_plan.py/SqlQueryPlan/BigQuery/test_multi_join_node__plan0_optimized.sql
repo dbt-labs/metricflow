@@ -10,7 +10,7 @@ FROM (
   SELECT
     listing_id AS listing
     , 1 AS bookings
-  FROM ***************************.fct_bookings bookings_source_src_10001
+  FROM ***************************.fct_bookings bookings_source_src_28001
 ) subq_7
 LEFT OUTER JOIN (
   -- Read Elements From Semantic Model 'listings_latest'
@@ -18,7 +18,7 @@ LEFT OUTER JOIN (
   SELECT
     listing_id AS listing
     , country AS country_latest
-  FROM ***************************.dim_listings_latest listings_latest_src_10005
+  FROM ***************************.dim_listings_latest listings_latest_src_28005
 ) subq_9
 ON
   subq_7.listing = subq_9.listing
@@ -28,7 +28,7 @@ LEFT OUTER JOIN (
   SELECT
     listing_id AS listing
     , country AS country_latest
-  FROM ***************************.dim_listings_latest listings_latest_src_10005
+  FROM ***************************.dim_listings_latest listings_latest_src_28005
 ) subq_11
 ON
   subq_7.listing = subq_11.listing

@@ -23,7 +23,7 @@ FROM (
     SELECT
       DATE_TRUNC('day', ds) AS metric_time__day
       , 1 AS bookings
-    FROM ***************************.fct_bookings bookings_source_src_10001
+    FROM ***************************.fct_bookings bookings_source_src_28001
   ) subq_9
   ON
     DATEADD(day, -5, subq_10.metric_time__day) = subq_9.metric_time__day

@@ -91,55 +91,55 @@ FROM (
           FROM (
             -- Read Elements From Semantic Model 'account_month_txns'
             SELECT
-              account_month_txns_src_10012.txn_count
-              , DATE_TRUNC(account_month_txns_src_10012.ds_partitioned, day) AS ds_partitioned__day
-              , DATE_TRUNC(account_month_txns_src_10012.ds_partitioned, isoweek) AS ds_partitioned__week
-              , DATE_TRUNC(account_month_txns_src_10012.ds_partitioned, month) AS ds_partitioned__month
-              , DATE_TRUNC(account_month_txns_src_10012.ds_partitioned, quarter) AS ds_partitioned__quarter
-              , DATE_TRUNC(account_month_txns_src_10012.ds_partitioned, year) AS ds_partitioned__year
-              , EXTRACT(year FROM account_month_txns_src_10012.ds_partitioned) AS ds_partitioned__extract_year
-              , EXTRACT(quarter FROM account_month_txns_src_10012.ds_partitioned) AS ds_partitioned__extract_quarter
-              , EXTRACT(month FROM account_month_txns_src_10012.ds_partitioned) AS ds_partitioned__extract_month
-              , EXTRACT(day FROM account_month_txns_src_10012.ds_partitioned) AS ds_partitioned__extract_day
-              , IF(EXTRACT(dayofweek FROM account_month_txns_src_10012.ds_partitioned) = 1, 7, EXTRACT(dayofweek FROM account_month_txns_src_10012.ds_partitioned) - 1) AS ds_partitioned__extract_dow
-              , EXTRACT(dayofyear FROM account_month_txns_src_10012.ds_partitioned) AS ds_partitioned__extract_doy
-              , DATE_TRUNC(account_month_txns_src_10012.ds, day) AS ds__day
-              , DATE_TRUNC(account_month_txns_src_10012.ds, isoweek) AS ds__week
-              , DATE_TRUNC(account_month_txns_src_10012.ds, month) AS ds__month
-              , DATE_TRUNC(account_month_txns_src_10012.ds, quarter) AS ds__quarter
-              , DATE_TRUNC(account_month_txns_src_10012.ds, year) AS ds__year
-              , EXTRACT(year FROM account_month_txns_src_10012.ds) AS ds__extract_year
-              , EXTRACT(quarter FROM account_month_txns_src_10012.ds) AS ds__extract_quarter
-              , EXTRACT(month FROM account_month_txns_src_10012.ds) AS ds__extract_month
-              , EXTRACT(day FROM account_month_txns_src_10012.ds) AS ds__extract_day
-              , IF(EXTRACT(dayofweek FROM account_month_txns_src_10012.ds) = 1, 7, EXTRACT(dayofweek FROM account_month_txns_src_10012.ds) - 1) AS ds__extract_dow
-              , EXTRACT(dayofyear FROM account_month_txns_src_10012.ds) AS ds__extract_doy
-              , account_month_txns_src_10012.account_month
-              , DATE_TRUNC(account_month_txns_src_10012.ds_partitioned, day) AS account_id__ds_partitioned__day
-              , DATE_TRUNC(account_month_txns_src_10012.ds_partitioned, isoweek) AS account_id__ds_partitioned__week
-              , DATE_TRUNC(account_month_txns_src_10012.ds_partitioned, month) AS account_id__ds_partitioned__month
-              , DATE_TRUNC(account_month_txns_src_10012.ds_partitioned, quarter) AS account_id__ds_partitioned__quarter
-              , DATE_TRUNC(account_month_txns_src_10012.ds_partitioned, year) AS account_id__ds_partitioned__year
-              , EXTRACT(year FROM account_month_txns_src_10012.ds_partitioned) AS account_id__ds_partitioned__extract_year
-              , EXTRACT(quarter FROM account_month_txns_src_10012.ds_partitioned) AS account_id__ds_partitioned__extract_quarter
-              , EXTRACT(month FROM account_month_txns_src_10012.ds_partitioned) AS account_id__ds_partitioned__extract_month
-              , EXTRACT(day FROM account_month_txns_src_10012.ds_partitioned) AS account_id__ds_partitioned__extract_day
-              , IF(EXTRACT(dayofweek FROM account_month_txns_src_10012.ds_partitioned) = 1, 7, EXTRACT(dayofweek FROM account_month_txns_src_10012.ds_partitioned) - 1) AS account_id__ds_partitioned__extract_dow
-              , EXTRACT(dayofyear FROM account_month_txns_src_10012.ds_partitioned) AS account_id__ds_partitioned__extract_doy
-              , DATE_TRUNC(account_month_txns_src_10012.ds, day) AS account_id__ds__day
-              , DATE_TRUNC(account_month_txns_src_10012.ds, isoweek) AS account_id__ds__week
-              , DATE_TRUNC(account_month_txns_src_10012.ds, month) AS account_id__ds__month
-              , DATE_TRUNC(account_month_txns_src_10012.ds, quarter) AS account_id__ds__quarter
-              , DATE_TRUNC(account_month_txns_src_10012.ds, year) AS account_id__ds__year
-              , EXTRACT(year FROM account_month_txns_src_10012.ds) AS account_id__ds__extract_year
-              , EXTRACT(quarter FROM account_month_txns_src_10012.ds) AS account_id__ds__extract_quarter
-              , EXTRACT(month FROM account_month_txns_src_10012.ds) AS account_id__ds__extract_month
-              , EXTRACT(day FROM account_month_txns_src_10012.ds) AS account_id__ds__extract_day
-              , IF(EXTRACT(dayofweek FROM account_month_txns_src_10012.ds) = 1, 7, EXTRACT(dayofweek FROM account_month_txns_src_10012.ds) - 1) AS account_id__ds__extract_dow
-              , EXTRACT(dayofyear FROM account_month_txns_src_10012.ds) AS account_id__ds__extract_doy
-              , account_month_txns_src_10012.account_month AS account_id__account_month
-              , account_month_txns_src_10012.account_id
-            FROM ***************************.account_month_txns account_month_txns_src_10012
+              account_month_txns_src_22000.txn_count
+              , DATE_TRUNC(account_month_txns_src_22000.ds_partitioned, day) AS ds_partitioned__day
+              , DATE_TRUNC(account_month_txns_src_22000.ds_partitioned, isoweek) AS ds_partitioned__week
+              , DATE_TRUNC(account_month_txns_src_22000.ds_partitioned, month) AS ds_partitioned__month
+              , DATE_TRUNC(account_month_txns_src_22000.ds_partitioned, quarter) AS ds_partitioned__quarter
+              , DATE_TRUNC(account_month_txns_src_22000.ds_partitioned, year) AS ds_partitioned__year
+              , EXTRACT(year FROM account_month_txns_src_22000.ds_partitioned) AS ds_partitioned__extract_year
+              , EXTRACT(quarter FROM account_month_txns_src_22000.ds_partitioned) AS ds_partitioned__extract_quarter
+              , EXTRACT(month FROM account_month_txns_src_22000.ds_partitioned) AS ds_partitioned__extract_month
+              , EXTRACT(day FROM account_month_txns_src_22000.ds_partitioned) AS ds_partitioned__extract_day
+              , IF(EXTRACT(dayofweek FROM account_month_txns_src_22000.ds_partitioned) = 1, 7, EXTRACT(dayofweek FROM account_month_txns_src_22000.ds_partitioned) - 1) AS ds_partitioned__extract_dow
+              , EXTRACT(dayofyear FROM account_month_txns_src_22000.ds_partitioned) AS ds_partitioned__extract_doy
+              , DATE_TRUNC(account_month_txns_src_22000.ds, day) AS ds__day
+              , DATE_TRUNC(account_month_txns_src_22000.ds, isoweek) AS ds__week
+              , DATE_TRUNC(account_month_txns_src_22000.ds, month) AS ds__month
+              , DATE_TRUNC(account_month_txns_src_22000.ds, quarter) AS ds__quarter
+              , DATE_TRUNC(account_month_txns_src_22000.ds, year) AS ds__year
+              , EXTRACT(year FROM account_month_txns_src_22000.ds) AS ds__extract_year
+              , EXTRACT(quarter FROM account_month_txns_src_22000.ds) AS ds__extract_quarter
+              , EXTRACT(month FROM account_month_txns_src_22000.ds) AS ds__extract_month
+              , EXTRACT(day FROM account_month_txns_src_22000.ds) AS ds__extract_day
+              , IF(EXTRACT(dayofweek FROM account_month_txns_src_22000.ds) = 1, 7, EXTRACT(dayofweek FROM account_month_txns_src_22000.ds) - 1) AS ds__extract_dow
+              , EXTRACT(dayofyear FROM account_month_txns_src_22000.ds) AS ds__extract_doy
+              , account_month_txns_src_22000.account_month
+              , DATE_TRUNC(account_month_txns_src_22000.ds_partitioned, day) AS account_id__ds_partitioned__day
+              , DATE_TRUNC(account_month_txns_src_22000.ds_partitioned, isoweek) AS account_id__ds_partitioned__week
+              , DATE_TRUNC(account_month_txns_src_22000.ds_partitioned, month) AS account_id__ds_partitioned__month
+              , DATE_TRUNC(account_month_txns_src_22000.ds_partitioned, quarter) AS account_id__ds_partitioned__quarter
+              , DATE_TRUNC(account_month_txns_src_22000.ds_partitioned, year) AS account_id__ds_partitioned__year
+              , EXTRACT(year FROM account_month_txns_src_22000.ds_partitioned) AS account_id__ds_partitioned__extract_year
+              , EXTRACT(quarter FROM account_month_txns_src_22000.ds_partitioned) AS account_id__ds_partitioned__extract_quarter
+              , EXTRACT(month FROM account_month_txns_src_22000.ds_partitioned) AS account_id__ds_partitioned__extract_month
+              , EXTRACT(day FROM account_month_txns_src_22000.ds_partitioned) AS account_id__ds_partitioned__extract_day
+              , IF(EXTRACT(dayofweek FROM account_month_txns_src_22000.ds_partitioned) = 1, 7, EXTRACT(dayofweek FROM account_month_txns_src_22000.ds_partitioned) - 1) AS account_id__ds_partitioned__extract_dow
+              , EXTRACT(dayofyear FROM account_month_txns_src_22000.ds_partitioned) AS account_id__ds_partitioned__extract_doy
+              , DATE_TRUNC(account_month_txns_src_22000.ds, day) AS account_id__ds__day
+              , DATE_TRUNC(account_month_txns_src_22000.ds, isoweek) AS account_id__ds__week
+              , DATE_TRUNC(account_month_txns_src_22000.ds, month) AS account_id__ds__month
+              , DATE_TRUNC(account_month_txns_src_22000.ds, quarter) AS account_id__ds__quarter
+              , DATE_TRUNC(account_month_txns_src_22000.ds, year) AS account_id__ds__year
+              , EXTRACT(year FROM account_month_txns_src_22000.ds) AS account_id__ds__extract_year
+              , EXTRACT(quarter FROM account_month_txns_src_22000.ds) AS account_id__ds__extract_quarter
+              , EXTRACT(month FROM account_month_txns_src_22000.ds) AS account_id__ds__extract_month
+              , EXTRACT(day FROM account_month_txns_src_22000.ds) AS account_id__ds__extract_day
+              , IF(EXTRACT(dayofweek FROM account_month_txns_src_22000.ds) = 1, 7, EXTRACT(dayofweek FROM account_month_txns_src_22000.ds) - 1) AS account_id__ds__extract_dow
+              , EXTRACT(dayofyear FROM account_month_txns_src_22000.ds) AS account_id__ds__extract_doy
+              , account_month_txns_src_22000.account_month AS account_id__account_month
+              , account_month_txns_src_22000.account_id
+            FROM ***************************.account_month_txns account_month_txns_src_22000
           ) subq_0
         ) subq_1
       ) subq_2
@@ -209,48 +209,48 @@ FROM (
           FROM (
             -- Read Elements From Semantic Model 'bridge_table'
             SELECT
-              bridge_table_src_10013.extra_dim
-              , DATE_TRUNC(bridge_table_src_10013.ds_partitioned, day) AS ds_partitioned__day
-              , DATE_TRUNC(bridge_table_src_10013.ds_partitioned, isoweek) AS ds_partitioned__week
-              , DATE_TRUNC(bridge_table_src_10013.ds_partitioned, month) AS ds_partitioned__month
-              , DATE_TRUNC(bridge_table_src_10013.ds_partitioned, quarter) AS ds_partitioned__quarter
-              , DATE_TRUNC(bridge_table_src_10013.ds_partitioned, year) AS ds_partitioned__year
-              , EXTRACT(year FROM bridge_table_src_10013.ds_partitioned) AS ds_partitioned__extract_year
-              , EXTRACT(quarter FROM bridge_table_src_10013.ds_partitioned) AS ds_partitioned__extract_quarter
-              , EXTRACT(month FROM bridge_table_src_10013.ds_partitioned) AS ds_partitioned__extract_month
-              , EXTRACT(day FROM bridge_table_src_10013.ds_partitioned) AS ds_partitioned__extract_day
-              , IF(EXTRACT(dayofweek FROM bridge_table_src_10013.ds_partitioned) = 1, 7, EXTRACT(dayofweek FROM bridge_table_src_10013.ds_partitioned) - 1) AS ds_partitioned__extract_dow
-              , EXTRACT(dayofyear FROM bridge_table_src_10013.ds_partitioned) AS ds_partitioned__extract_doy
-              , bridge_table_src_10013.extra_dim AS account_id__extra_dim
-              , DATE_TRUNC(bridge_table_src_10013.ds_partitioned, day) AS account_id__ds_partitioned__day
-              , DATE_TRUNC(bridge_table_src_10013.ds_partitioned, isoweek) AS account_id__ds_partitioned__week
-              , DATE_TRUNC(bridge_table_src_10013.ds_partitioned, month) AS account_id__ds_partitioned__month
-              , DATE_TRUNC(bridge_table_src_10013.ds_partitioned, quarter) AS account_id__ds_partitioned__quarter
-              , DATE_TRUNC(bridge_table_src_10013.ds_partitioned, year) AS account_id__ds_partitioned__year
-              , EXTRACT(year FROM bridge_table_src_10013.ds_partitioned) AS account_id__ds_partitioned__extract_year
-              , EXTRACT(quarter FROM bridge_table_src_10013.ds_partitioned) AS account_id__ds_partitioned__extract_quarter
-              , EXTRACT(month FROM bridge_table_src_10013.ds_partitioned) AS account_id__ds_partitioned__extract_month
-              , EXTRACT(day FROM bridge_table_src_10013.ds_partitioned) AS account_id__ds_partitioned__extract_day
-              , IF(EXTRACT(dayofweek FROM bridge_table_src_10013.ds_partitioned) = 1, 7, EXTRACT(dayofweek FROM bridge_table_src_10013.ds_partitioned) - 1) AS account_id__ds_partitioned__extract_dow
-              , EXTRACT(dayofyear FROM bridge_table_src_10013.ds_partitioned) AS account_id__ds_partitioned__extract_doy
-              , bridge_table_src_10013.extra_dim AS bridge_account__extra_dim
-              , DATE_TRUNC(bridge_table_src_10013.ds_partitioned, day) AS bridge_account__ds_partitioned__day
-              , DATE_TRUNC(bridge_table_src_10013.ds_partitioned, isoweek) AS bridge_account__ds_partitioned__week
-              , DATE_TRUNC(bridge_table_src_10013.ds_partitioned, month) AS bridge_account__ds_partitioned__month
-              , DATE_TRUNC(bridge_table_src_10013.ds_partitioned, quarter) AS bridge_account__ds_partitioned__quarter
-              , DATE_TRUNC(bridge_table_src_10013.ds_partitioned, year) AS bridge_account__ds_partitioned__year
-              , EXTRACT(year FROM bridge_table_src_10013.ds_partitioned) AS bridge_account__ds_partitioned__extract_year
-              , EXTRACT(quarter FROM bridge_table_src_10013.ds_partitioned) AS bridge_account__ds_partitioned__extract_quarter
-              , EXTRACT(month FROM bridge_table_src_10013.ds_partitioned) AS bridge_account__ds_partitioned__extract_month
-              , EXTRACT(day FROM bridge_table_src_10013.ds_partitioned) AS bridge_account__ds_partitioned__extract_day
-              , IF(EXTRACT(dayofweek FROM bridge_table_src_10013.ds_partitioned) = 1, 7, EXTRACT(dayofweek FROM bridge_table_src_10013.ds_partitioned) - 1) AS bridge_account__ds_partitioned__extract_dow
-              , EXTRACT(dayofyear FROM bridge_table_src_10013.ds_partitioned) AS bridge_account__ds_partitioned__extract_doy
-              , bridge_table_src_10013.account_id
-              , bridge_table_src_10013.customer_id
-              , bridge_table_src_10013.customer_id AS account_id__customer_id
-              , bridge_table_src_10013.account_id AS bridge_account__account_id
-              , bridge_table_src_10013.customer_id AS bridge_account__customer_id
-            FROM ***************************.bridge_table bridge_table_src_10013
+              bridge_table_src_22001.extra_dim
+              , DATE_TRUNC(bridge_table_src_22001.ds_partitioned, day) AS ds_partitioned__day
+              , DATE_TRUNC(bridge_table_src_22001.ds_partitioned, isoweek) AS ds_partitioned__week
+              , DATE_TRUNC(bridge_table_src_22001.ds_partitioned, month) AS ds_partitioned__month
+              , DATE_TRUNC(bridge_table_src_22001.ds_partitioned, quarter) AS ds_partitioned__quarter
+              , DATE_TRUNC(bridge_table_src_22001.ds_partitioned, year) AS ds_partitioned__year
+              , EXTRACT(year FROM bridge_table_src_22001.ds_partitioned) AS ds_partitioned__extract_year
+              , EXTRACT(quarter FROM bridge_table_src_22001.ds_partitioned) AS ds_partitioned__extract_quarter
+              , EXTRACT(month FROM bridge_table_src_22001.ds_partitioned) AS ds_partitioned__extract_month
+              , EXTRACT(day FROM bridge_table_src_22001.ds_partitioned) AS ds_partitioned__extract_day
+              , IF(EXTRACT(dayofweek FROM bridge_table_src_22001.ds_partitioned) = 1, 7, EXTRACT(dayofweek FROM bridge_table_src_22001.ds_partitioned) - 1) AS ds_partitioned__extract_dow
+              , EXTRACT(dayofyear FROM bridge_table_src_22001.ds_partitioned) AS ds_partitioned__extract_doy
+              , bridge_table_src_22001.extra_dim AS account_id__extra_dim
+              , DATE_TRUNC(bridge_table_src_22001.ds_partitioned, day) AS account_id__ds_partitioned__day
+              , DATE_TRUNC(bridge_table_src_22001.ds_partitioned, isoweek) AS account_id__ds_partitioned__week
+              , DATE_TRUNC(bridge_table_src_22001.ds_partitioned, month) AS account_id__ds_partitioned__month
+              , DATE_TRUNC(bridge_table_src_22001.ds_partitioned, quarter) AS account_id__ds_partitioned__quarter
+              , DATE_TRUNC(bridge_table_src_22001.ds_partitioned, year) AS account_id__ds_partitioned__year
+              , EXTRACT(year FROM bridge_table_src_22001.ds_partitioned) AS account_id__ds_partitioned__extract_year
+              , EXTRACT(quarter FROM bridge_table_src_22001.ds_partitioned) AS account_id__ds_partitioned__extract_quarter
+              , EXTRACT(month FROM bridge_table_src_22001.ds_partitioned) AS account_id__ds_partitioned__extract_month
+              , EXTRACT(day FROM bridge_table_src_22001.ds_partitioned) AS account_id__ds_partitioned__extract_day
+              , IF(EXTRACT(dayofweek FROM bridge_table_src_22001.ds_partitioned) = 1, 7, EXTRACT(dayofweek FROM bridge_table_src_22001.ds_partitioned) - 1) AS account_id__ds_partitioned__extract_dow
+              , EXTRACT(dayofyear FROM bridge_table_src_22001.ds_partitioned) AS account_id__ds_partitioned__extract_doy
+              , bridge_table_src_22001.extra_dim AS bridge_account__extra_dim
+              , DATE_TRUNC(bridge_table_src_22001.ds_partitioned, day) AS bridge_account__ds_partitioned__day
+              , DATE_TRUNC(bridge_table_src_22001.ds_partitioned, isoweek) AS bridge_account__ds_partitioned__week
+              , DATE_TRUNC(bridge_table_src_22001.ds_partitioned, month) AS bridge_account__ds_partitioned__month
+              , DATE_TRUNC(bridge_table_src_22001.ds_partitioned, quarter) AS bridge_account__ds_partitioned__quarter
+              , DATE_TRUNC(bridge_table_src_22001.ds_partitioned, year) AS bridge_account__ds_partitioned__year
+              , EXTRACT(year FROM bridge_table_src_22001.ds_partitioned) AS bridge_account__ds_partitioned__extract_year
+              , EXTRACT(quarter FROM bridge_table_src_22001.ds_partitioned) AS bridge_account__ds_partitioned__extract_quarter
+              , EXTRACT(month FROM bridge_table_src_22001.ds_partitioned) AS bridge_account__ds_partitioned__extract_month
+              , EXTRACT(day FROM bridge_table_src_22001.ds_partitioned) AS bridge_account__ds_partitioned__extract_day
+              , IF(EXTRACT(dayofweek FROM bridge_table_src_22001.ds_partitioned) = 1, 7, EXTRACT(dayofweek FROM bridge_table_src_22001.ds_partitioned) - 1) AS bridge_account__ds_partitioned__extract_dow
+              , EXTRACT(dayofyear FROM bridge_table_src_22001.ds_partitioned) AS bridge_account__ds_partitioned__extract_doy
+              , bridge_table_src_22001.account_id
+              , bridge_table_src_22001.customer_id
+              , bridge_table_src_22001.customer_id AS account_id__customer_id
+              , bridge_table_src_22001.account_id AS bridge_account__account_id
+              , bridge_table_src_22001.customer_id AS bridge_account__customer_id
+            FROM ***************************.bridge_table bridge_table_src_22001
           ) subq_3
           LEFT OUTER JOIN (
             -- Pass Only Elements: [
@@ -313,34 +313,34 @@ FROM (
             FROM (
               -- Read Elements From Semantic Model 'customer_table'
               SELECT
-                customer_table_src_10015.customer_name
-                , customer_table_src_10015.customer_atomic_weight
-                , DATE_TRUNC(customer_table_src_10015.ds_partitioned, day) AS ds_partitioned__day
-                , DATE_TRUNC(customer_table_src_10015.ds_partitioned, isoweek) AS ds_partitioned__week
-                , DATE_TRUNC(customer_table_src_10015.ds_partitioned, month) AS ds_partitioned__month
-                , DATE_TRUNC(customer_table_src_10015.ds_partitioned, quarter) AS ds_partitioned__quarter
-                , DATE_TRUNC(customer_table_src_10015.ds_partitioned, year) AS ds_partitioned__year
-                , EXTRACT(year FROM customer_table_src_10015.ds_partitioned) AS ds_partitioned__extract_year
-                , EXTRACT(quarter FROM customer_table_src_10015.ds_partitioned) AS ds_partitioned__extract_quarter
-                , EXTRACT(month FROM customer_table_src_10015.ds_partitioned) AS ds_partitioned__extract_month
-                , EXTRACT(day FROM customer_table_src_10015.ds_partitioned) AS ds_partitioned__extract_day
-                , IF(EXTRACT(dayofweek FROM customer_table_src_10015.ds_partitioned) = 1, 7, EXTRACT(dayofweek FROM customer_table_src_10015.ds_partitioned) - 1) AS ds_partitioned__extract_dow
-                , EXTRACT(dayofyear FROM customer_table_src_10015.ds_partitioned) AS ds_partitioned__extract_doy
-                , customer_table_src_10015.customer_name AS customer_id__customer_name
-                , customer_table_src_10015.customer_atomic_weight AS customer_id__customer_atomic_weight
-                , DATE_TRUNC(customer_table_src_10015.ds_partitioned, day) AS customer_id__ds_partitioned__day
-                , DATE_TRUNC(customer_table_src_10015.ds_partitioned, isoweek) AS customer_id__ds_partitioned__week
-                , DATE_TRUNC(customer_table_src_10015.ds_partitioned, month) AS customer_id__ds_partitioned__month
-                , DATE_TRUNC(customer_table_src_10015.ds_partitioned, quarter) AS customer_id__ds_partitioned__quarter
-                , DATE_TRUNC(customer_table_src_10015.ds_partitioned, year) AS customer_id__ds_partitioned__year
-                , EXTRACT(year FROM customer_table_src_10015.ds_partitioned) AS customer_id__ds_partitioned__extract_year
-                , EXTRACT(quarter FROM customer_table_src_10015.ds_partitioned) AS customer_id__ds_partitioned__extract_quarter
-                , EXTRACT(month FROM customer_table_src_10015.ds_partitioned) AS customer_id__ds_partitioned__extract_month
-                , EXTRACT(day FROM customer_table_src_10015.ds_partitioned) AS customer_id__ds_partitioned__extract_day
-                , IF(EXTRACT(dayofweek FROM customer_table_src_10015.ds_partitioned) = 1, 7, EXTRACT(dayofweek FROM customer_table_src_10015.ds_partitioned) - 1) AS customer_id__ds_partitioned__extract_dow
-                , EXTRACT(dayofyear FROM customer_table_src_10015.ds_partitioned) AS customer_id__ds_partitioned__extract_doy
-                , customer_table_src_10015.customer_id
-              FROM ***************************.customer_table customer_table_src_10015
+                customer_table_src_22003.customer_name
+                , customer_table_src_22003.customer_atomic_weight
+                , DATE_TRUNC(customer_table_src_22003.ds_partitioned, day) AS ds_partitioned__day
+                , DATE_TRUNC(customer_table_src_22003.ds_partitioned, isoweek) AS ds_partitioned__week
+                , DATE_TRUNC(customer_table_src_22003.ds_partitioned, month) AS ds_partitioned__month
+                , DATE_TRUNC(customer_table_src_22003.ds_partitioned, quarter) AS ds_partitioned__quarter
+                , DATE_TRUNC(customer_table_src_22003.ds_partitioned, year) AS ds_partitioned__year
+                , EXTRACT(year FROM customer_table_src_22003.ds_partitioned) AS ds_partitioned__extract_year
+                , EXTRACT(quarter FROM customer_table_src_22003.ds_partitioned) AS ds_partitioned__extract_quarter
+                , EXTRACT(month FROM customer_table_src_22003.ds_partitioned) AS ds_partitioned__extract_month
+                , EXTRACT(day FROM customer_table_src_22003.ds_partitioned) AS ds_partitioned__extract_day
+                , IF(EXTRACT(dayofweek FROM customer_table_src_22003.ds_partitioned) = 1, 7, EXTRACT(dayofweek FROM customer_table_src_22003.ds_partitioned) - 1) AS ds_partitioned__extract_dow
+                , EXTRACT(dayofyear FROM customer_table_src_22003.ds_partitioned) AS ds_partitioned__extract_doy
+                , customer_table_src_22003.customer_name AS customer_id__customer_name
+                , customer_table_src_22003.customer_atomic_weight AS customer_id__customer_atomic_weight
+                , DATE_TRUNC(customer_table_src_22003.ds_partitioned, day) AS customer_id__ds_partitioned__day
+                , DATE_TRUNC(customer_table_src_22003.ds_partitioned, isoweek) AS customer_id__ds_partitioned__week
+                , DATE_TRUNC(customer_table_src_22003.ds_partitioned, month) AS customer_id__ds_partitioned__month
+                , DATE_TRUNC(customer_table_src_22003.ds_partitioned, quarter) AS customer_id__ds_partitioned__quarter
+                , DATE_TRUNC(customer_table_src_22003.ds_partitioned, year) AS customer_id__ds_partitioned__year
+                , EXTRACT(year FROM customer_table_src_22003.ds_partitioned) AS customer_id__ds_partitioned__extract_year
+                , EXTRACT(quarter FROM customer_table_src_22003.ds_partitioned) AS customer_id__ds_partitioned__extract_quarter
+                , EXTRACT(month FROM customer_table_src_22003.ds_partitioned) AS customer_id__ds_partitioned__extract_month
+                , EXTRACT(day FROM customer_table_src_22003.ds_partitioned) AS customer_id__ds_partitioned__extract_day
+                , IF(EXTRACT(dayofweek FROM customer_table_src_22003.ds_partitioned) = 1, 7, EXTRACT(dayofweek FROM customer_table_src_22003.ds_partitioned) - 1) AS customer_id__ds_partitioned__extract_dow
+                , EXTRACT(dayofyear FROM customer_table_src_22003.ds_partitioned) AS customer_id__ds_partitioned__extract_doy
+                , customer_table_src_22003.customer_id
+              FROM ***************************.customer_table customer_table_src_22003
             ) subq_4
           ) subq_5
           ON

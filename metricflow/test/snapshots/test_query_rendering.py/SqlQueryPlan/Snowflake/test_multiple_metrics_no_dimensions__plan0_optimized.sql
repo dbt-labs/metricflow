@@ -11,7 +11,7 @@ FROM (
   -- Compute Metrics via Expressions
   SELECT
     SUM(1) AS bookings
-  FROM ***************************.fct_bookings bookings_source_src_10001
+  FROM ***************************.fct_bookings bookings_source_src_28001
   WHERE DATE_TRUNC('day', ds) BETWEEN '2020-01-01' AND '2020-01-01'
 ) subq_17
 CROSS JOIN (
@@ -23,6 +23,6 @@ CROSS JOIN (
   -- Compute Metrics via Expressions
   SELECT
     SUM(1) AS listings
-  FROM ***************************.dim_listings_latest listings_latest_src_10005
+  FROM ***************************.dim_listings_latest listings_latest_src_28005
   WHERE DATE_TRUNC('day', created_at) BETWEEN '2020-01-01' AND '2020-01-01'
 ) subq_23

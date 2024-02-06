@@ -22,11 +22,11 @@
                         <!-- distinct = False -->
                         <MetricTimeDimensionTransformNode>
                             <!-- description = "Metric Time Dimension 'ds'" -->
-                            <!-- node_id = NodeId(id_str='sma_3') -->
+                            <!-- node_id = NodeId(id_str='sma_13') -->
                             <!-- aggregation_time_dimension = 'ds' -->
                             <ReadSqlSourceNode>
                                 <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
-                                <!-- node_id = NodeId(id_str='rss_3') -->
+                                <!-- node_id = NodeId(id_str='rss_16') -->
                                 <!-- data_set = SemanticModelDataSet('bookings_source') -->
                             </ReadSqlSourceNode>
                         </MetricTimeDimensionTransformNode>
@@ -48,11 +48,11 @@
                         <!-- distinct = False -->
                         <MetricTimeDimensionTransformNode>
                             <!-- description = "Metric Time Dimension 'ds'" -->
-                            <!-- node_id = NodeId(id_str='sma_2') -->
+                            <!-- node_id = NodeId(id_str='sma_12') -->
                             <!-- aggregation_time_dimension = 'ds' -->
                             <ReadSqlSourceNode>
                                 <!-- description = "Read From SemanticModelDataSet('listings_latest')" -->
-                                <!-- node_id = NodeId(id_str='rss_2') -->
+                                <!-- node_id = NodeId(id_str='rss_15') -->
                                 <!-- data_set = SemanticModelDataSet('listings_latest') -->
                             </ReadSqlSourceNode>
                         </MetricTimeDimensionTransformNode>

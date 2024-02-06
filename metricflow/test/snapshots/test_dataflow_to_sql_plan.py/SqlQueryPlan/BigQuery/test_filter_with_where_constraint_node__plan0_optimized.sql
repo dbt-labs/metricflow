@@ -8,6 +8,6 @@ FROM (
   SELECT
     DATE_TRUNC(ds, day) AS ds__day
     , 1 AS bookings
-  FROM ***************************.fct_bookings bookings_source_src_10001
+  FROM ***************************.fct_bookings bookings_source_src_28001
 ) subq_3
 WHERE booking__ds__day = '2020-01-01'

@@ -87,4 +87,4 @@ SELECT
   , is_instant
   , is_instant AS booking__is_instant
   , booking_value AS booking_payments
-FROM ***************************.fct_bookings bookings_source_src_10001
+FROM ***************************.fct_bookings bookings_source_src_28001

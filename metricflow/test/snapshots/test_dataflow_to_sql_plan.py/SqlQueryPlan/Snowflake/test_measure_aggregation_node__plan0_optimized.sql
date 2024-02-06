@@ -6,4 +6,4 @@ SELECT
   , SUM(CASE WHEN is_instant THEN 1 ELSE 0 END) AS instant_bookings
   , COUNT(DISTINCT guest_id) AS bookers
   , AVG(booking_value) AS average_booking_value
-FROM ***************************.fct_bookings bookings_source_src_10001
+FROM ***************************.fct_bookings bookings_source_src_28001
