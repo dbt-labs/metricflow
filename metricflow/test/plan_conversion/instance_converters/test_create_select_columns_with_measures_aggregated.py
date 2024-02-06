@@ -16,7 +16,7 @@ from metricflow.sql.sql_exprs import (
     SqlFunction,
     SqlPercentileExpression,
 )
-from metricflow.test.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestName
+from metricflow.test.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 
 __SOURCE_TABLE_ALIAS = "a"
 
@@ -24,10 +24,12 @@ __SOURCE_TABLE_ALIAS = "a"
 def __get_filtered_measure_instance_set(
     semantic_model_name: str,
     measure_name: str,
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
 ) -> InstanceSet:
     """Gets an InstanceSet consisting of only the measure instance matching the given name and semantic model."""
-    dataset = mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].data_set_mapping[semantic_model_name]
+    dataset = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].data_set_mapping[
+        semantic_model_name
+    ]
     instance_set = dataset.instance_set
     include_specs = tuple(
         instance.spec for instance in instance_set.measure_instances if instance.spec.element_name == measure_name
@@ -36,7 +38,7 @@ def __get_filtered_measure_instance_set(
 
 
 def test_sum_aggregation(
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Checks for function expression handling for booking_value, a SUM type metric in the simple model."""
@@ -58,7 +60,7 @@ def test_sum_aggregation(
 
 
 def test_sum_boolean_aggregation(
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Checks for function expression handling for instant_bookings, a SUM_BOOLEAN type metric in the simple model."""
@@ -81,7 +83,7 @@ def test_sum_boolean_aggregation(
 
 
 def test_avg_aggregation(
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Checks for function expression handling for average_booking_value, an AVG type metric in the simple model."""
@@ -103,7 +105,7 @@ def test_avg_aggregation(
 
 
 def test_count_distinct_aggregation(
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Checks for function expression handling for bookers, a COUNT_DISTINCT type metric in the simple model."""
@@ -125,7 +127,7 @@ def test_count_distinct_aggregation(
 
 
 def test_max_aggregation(
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Checks for function expression handling for largest_listing, a MAX type metric in the simple model."""
@@ -147,7 +149,7 @@ def test_max_aggregation(
 
 
 def test_min_aggregation(
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Checks for function expression handling for smallest_listing, a MIN type metric in the simple model."""
@@ -169,7 +171,7 @@ def test_min_aggregation(
 
 
 def test_aliased_sum(
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Checks for function expression handling for booking_value, a SUM type metric in the simple model, with an alias."""
@@ -192,7 +194,7 @@ def test_aliased_sum(
 
 
 def test_percentile_aggregation(
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Checks for function expression handling for booking_value, a percentile type metric in the simple model."""

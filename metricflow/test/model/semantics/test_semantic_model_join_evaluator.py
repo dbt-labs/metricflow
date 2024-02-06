@@ -13,7 +13,7 @@ from metricflow.model.semantics.semantic_model_join_evaluator import (
     SemanticModelJoinEvaluator,
     SemanticModelLink,
 )
-from metricflow.test.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestName
+from metricflow.test.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 
 
 def _get_join_types_for_entity_type(entity_type: EntityType) -> Sequence[SemanticModelEntityJoinType]:
@@ -208,22 +208,22 @@ def test_semantic_model_join_validation_on_missing_entity(
 
 
 def test_distinct_target_instance_set_join_validation(
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Tests instance set join validation to a PRIMARY or UNIQUE entity."""
     foreign_user_instance_set = (
-        mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST]
+        mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST]
         .data_set_mapping["listings_latest"]
         .instance_set
     )
     primary_user_instance_set = (
-        mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST]
+        mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST]
         .data_set_mapping["users_latest"]
         .instance_set
     )
     unique_user_instance_set = (
-        mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].data_set_mapping["companies"].instance_set
+        mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].data_set_mapping["companies"].instance_set
     )
     user_entity_reference = EntityReference(element_name="user")
     join_evaluator = SemanticModelJoinEvaluator(
@@ -276,22 +276,22 @@ def test_distinct_target_instance_set_join_validation(
 
 
 def test_foreign_target_instance_set_join_validation(
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Tests semantic model join validation to FOREIGN entity types."""
     foreign_user_instance_set = (
-        mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST]
+        mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST]
         .data_set_mapping["listings_latest"]
         .instance_set
     )
     primary_user_instance_set = (
-        mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST]
+        mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST]
         .data_set_mapping["users_latest"]
         .instance_set
     )
     unique_user_instance_set = (
-        mf_engine_test_fixture_mapping[SemanticManifestName.SIMPLE_MANIFEST].data_set_mapping["companies"].instance_set
+        mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].data_set_mapping["companies"].instance_set
     )
     user_entity_reference = EntityReference(element_name="user")
     join_evaluator = SemanticModelJoinEvaluator(
@@ -501,7 +501,7 @@ def test_natural_entity_semantic_model_validation(scd_semantic_manifest_lookup: 
 
 
 def test_natural_entity_instance_set_validation(
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestName, MetricFlowEngineTestFixture],
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     scd_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Tests instance set validation for NATURAL target entity types.
@@ -509,20 +509,20 @@ def test_natural_entity_instance_set_validation(
     These tests rely on the scd_semantic_manifest_lookup, which makes extensive use of NATURAL key types.
     """
     natural_user_instance_set = (
-        mf_engine_test_fixture_mapping[SemanticManifestName.SCD_MANIFEST]
+        mf_engine_test_fixture_mapping[SemanticManifestSetup.SCD_MANIFEST]
         .data_set_mapping["primary_accounts"]
         .instance_set
     )
     primary_user_instance_set = (
-        mf_engine_test_fixture_mapping[SemanticManifestName.SCD_MANIFEST].data_set_mapping["users_latest"].instance_set
+        mf_engine_test_fixture_mapping[SemanticManifestSetup.SCD_MANIFEST].data_set_mapping["users_latest"].instance_set
     )
     foreign_user_instance_set = (
-        mf_engine_test_fixture_mapping[SemanticManifestName.SCD_MANIFEST]
+        mf_engine_test_fixture_mapping[SemanticManifestSetup.SCD_MANIFEST]
         .data_set_mapping["bookings_source"]
         .instance_set
     )
     unique_user_instance_set = (
-        mf_engine_test_fixture_mapping[SemanticManifestName.SCD_MANIFEST].data_set_mapping["companies"].instance_set
+        mf_engine_test_fixture_mapping[SemanticManifestSetup.SCD_MANIFEST].data_set_mapping["companies"].instance_set
     )
     user_entity_reference = EntityReference(element_name="user")
     join_evaluator = SemanticModelJoinEvaluator(
