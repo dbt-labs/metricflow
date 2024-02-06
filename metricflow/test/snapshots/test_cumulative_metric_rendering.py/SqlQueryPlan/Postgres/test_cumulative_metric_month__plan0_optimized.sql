@@ -22,7 +22,7 @@ INNER JOIN (
   SELECT
     DATE_TRUNC('month', ds) AS metric_time__month
     , bookings_monthly
-  FROM ***************************.fct_bookings_extended_monthly bookings_monthly_source_src_10026
+  FROM ***************************.fct_bookings_extended_monthly bookings_monthly_source_src_16000
   WHERE DATE_TRUNC('month', ds) BETWEEN '2019-12-05' AND '2021-01-04'
 ) subq_11
 ON

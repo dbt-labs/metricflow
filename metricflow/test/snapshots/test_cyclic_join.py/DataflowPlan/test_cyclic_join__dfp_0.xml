@@ -36,11 +36,11 @@
                             <!-- distinct = False -->
                             <MetricTimeDimensionTransformNode>
                                 <!-- description = "Metric Time Dimension 'ds'" -->
-                                <!-- node_id = NodeId(id_str='sma_10015') -->
+                                <!-- node_id = NodeId(id_str='sma_0') -->
                                 <!-- aggregation_time_dimension = 'ds' -->
                                 <ReadSqlSourceNode>
                                     <!-- description = "Read From SemanticModelDataSet('listings_latest')" -->
-                                    <!-- node_id = NodeId(id_str='rss_10053') -->
+                                    <!-- node_id = NodeId(id_str='rss_0') -->
                                     <!-- data_set = SemanticModelDataSet('listings_latest') -->
                                 </ReadSqlSourceNode>
                             </MetricTimeDimensionTransformNode>
@@ -53,7 +53,7 @@
                             <!-- distinct = False -->
                             <ReadSqlSourceNode>
                                 <!-- description = "Read From SemanticModelDataSet('listings_latest_cyclic')" -->
-                                <!-- node_id = NodeId(id_str='rss_10054') -->
+                                <!-- node_id = NodeId(id_str='rss_1') -->
                                 <!-- data_set = SemanticModelDataSet('listings_latest_cyclic') -->
                             </ReadSqlSourceNode>
                         </FilterElementsNode>

@@ -12,7 +12,7 @@ FROM (
     DATE_TRUNC('day', ds) AS ds__day
     , is_instant
     , 1 AS bookings
-  FROM ***************************.fct_bookings bookings_source_src_10001
+  FROM ***************************.fct_bookings bookings_source_src_28001
 ) subq_5
 GROUP BY
   ds__day

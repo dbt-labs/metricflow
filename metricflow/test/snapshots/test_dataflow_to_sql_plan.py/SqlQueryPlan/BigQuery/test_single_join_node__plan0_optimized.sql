@@ -8,9 +8,9 @@ FROM (
   SELECT
     listing_id AS listing
     , 1 AS bookings
-  FROM ***************************.fct_bookings bookings_source_src_10001
+  FROM ***************************.fct_bookings bookings_source_src_28001
 ) subq_5
 LEFT OUTER JOIN
-  ***************************.dim_listings_latest listings_latest_src_10005
+  ***************************.dim_listings_latest listings_latest_src_28005
 ON
-  subq_5.listing = listings_latest_src_10005.listing_id
+  subq_5.listing = listings_latest_src_28005.listing_id

@@ -38,7 +38,7 @@ FROM (
             DATE_TRUNC(ds, day) AS metric_time__day
             , is_instant AS booking__is_instant
             , 1 AS bookings
-          FROM ***************************.fct_bookings bookings_source_src_10001
+          FROM ***************************.fct_bookings bookings_source_src_28001
         ) subq_15
         ON
           DATE_SUB(CAST(subq_17.ds AS DATETIME), INTERVAL 5 day) = subq_15.metric_time__day

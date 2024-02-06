@@ -101,22 +101,22 @@ FROM (
             FROM (
               -- Read Elements From Semantic Model 'bookings_monthly_source'
               SELECT
-                bookings_monthly_source_src_10026.bookings_monthly
-                , DATE_TRUNC('month', bookings_monthly_source_src_10026.ds) AS monthly_ds__month
-                , DATE_TRUNC('quarter', bookings_monthly_source_src_10026.ds) AS monthly_ds__quarter
-                , DATE_TRUNC('year', bookings_monthly_source_src_10026.ds) AS monthly_ds__year
-                , EXTRACT(year FROM bookings_monthly_source_src_10026.ds) AS monthly_ds__extract_year
-                , EXTRACT(quarter FROM bookings_monthly_source_src_10026.ds) AS monthly_ds__extract_quarter
-                , EXTRACT(month FROM bookings_monthly_source_src_10026.ds) AS monthly_ds__extract_month
-                , DATE_TRUNC('month', bookings_monthly_source_src_10026.ds) AS booking__monthly_ds__month
-                , DATE_TRUNC('quarter', bookings_monthly_source_src_10026.ds) AS booking__monthly_ds__quarter
-                , DATE_TRUNC('year', bookings_monthly_source_src_10026.ds) AS booking__monthly_ds__year
-                , EXTRACT(year FROM bookings_monthly_source_src_10026.ds) AS booking__monthly_ds__extract_year
-                , EXTRACT(quarter FROM bookings_monthly_source_src_10026.ds) AS booking__monthly_ds__extract_quarter
-                , EXTRACT(month FROM bookings_monthly_source_src_10026.ds) AS booking__monthly_ds__extract_month
-                , bookings_monthly_source_src_10026.listing_id AS listing
-                , bookings_monthly_source_src_10026.listing_id AS booking__listing
-              FROM ***************************.fct_bookings_extended_monthly bookings_monthly_source_src_10026
+                bookings_monthly_source_src_16000.bookings_monthly
+                , DATE_TRUNC('month', bookings_monthly_source_src_16000.ds) AS monthly_ds__month
+                , DATE_TRUNC('quarter', bookings_monthly_source_src_16000.ds) AS monthly_ds__quarter
+                , DATE_TRUNC('year', bookings_monthly_source_src_16000.ds) AS monthly_ds__year
+                , EXTRACT(year FROM bookings_monthly_source_src_16000.ds) AS monthly_ds__extract_year
+                , EXTRACT(quarter FROM bookings_monthly_source_src_16000.ds) AS monthly_ds__extract_quarter
+                , EXTRACT(month FROM bookings_monthly_source_src_16000.ds) AS monthly_ds__extract_month
+                , DATE_TRUNC('month', bookings_monthly_source_src_16000.ds) AS booking__monthly_ds__month
+                , DATE_TRUNC('quarter', bookings_monthly_source_src_16000.ds) AS booking__monthly_ds__quarter
+                , DATE_TRUNC('year', bookings_monthly_source_src_16000.ds) AS booking__monthly_ds__year
+                , EXTRACT(year FROM bookings_monthly_source_src_16000.ds) AS booking__monthly_ds__extract_year
+                , EXTRACT(quarter FROM bookings_monthly_source_src_16000.ds) AS booking__monthly_ds__extract_quarter
+                , EXTRACT(month FROM bookings_monthly_source_src_16000.ds) AS booking__monthly_ds__extract_month
+                , bookings_monthly_source_src_16000.listing_id AS listing
+                , bookings_monthly_source_src_16000.listing_id AS booking__listing
+              FROM ***************************.fct_bookings_extended_monthly bookings_monthly_source_src_16000
             ) subq_0
           ) subq_1
           WHERE subq_1.metric_time__month BETWEEN '2019-12-05' AND '2021-01-04'

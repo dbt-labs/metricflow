@@ -22,7 +22,7 @@ INNER JOIN (
   SELECT
     DATE_TRUNC(created_at, month) AS metric_time__month
     , revenue AS txn_revenue
-  FROM ***************************.fct_revenue revenue_src_10007
+  FROM ***************************.fct_revenue revenue_src_28007
   WHERE DATE_TRUNC(created_at, day) BETWEEN '2000-01-01' AND '2020-01-01'
 ) subq_11
 ON

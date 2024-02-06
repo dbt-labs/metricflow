@@ -61,7 +61,7 @@ FROM (
     , account_type AS account__account_type
     , user_id AS user
     , user_id AS account__user
-  FROM ***************************.fct_accounts accounts_source_src_10000
+  FROM ***************************.fct_accounts accounts_source_src_28000
 ) subq_3
 INNER JOIN (
   -- Read Elements From Semantic Model 'accounts_source'
@@ -69,7 +69,7 @@ INNER JOIN (
   SELECT
     user_id AS user
     , MAX(DATE_TRUNC(ds, day)) AS ds__day__complete
-  FROM ***************************.fct_accounts accounts_source_src_10000
+  FROM ***************************.fct_accounts accounts_source_src_28000
   GROUP BY
     user
 ) subq_5

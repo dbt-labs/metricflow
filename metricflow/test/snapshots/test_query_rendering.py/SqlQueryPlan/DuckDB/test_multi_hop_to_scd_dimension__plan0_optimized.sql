@@ -14,21 +14,21 @@ FROM (
     DATE_TRUNC('day', ds) AS metric_time__day
     , listing_id AS listing
     , 1 AS bookings
-  FROM ***************************.fct_bookings bookings_source_src_10017
+  FROM ***************************.fct_bookings bookings_source_src_26000
 ) subq_13
 LEFT OUTER JOIN (
   -- Join Standard Outputs
   -- Pass Only Elements: ['lux_listing__is_confirmed_lux', 'lux_listing__window_start__day', 'lux_listing__window_end__day', 'listing']
   SELECT
-    lux_listings_src_10021.valid_from AS lux_listing__window_start__day
-    , lux_listings_src_10021.valid_to AS lux_listing__window_end__day
-    , lux_listing_mapping_src_10020.listing_id AS listing
-    , lux_listings_src_10021.is_confirmed_lux AS lux_listing__is_confirmed_lux
-  FROM ***************************.dim_lux_listing_id_mapping lux_listing_mapping_src_10020
+    lux_listings_src_26004.valid_from AS lux_listing__window_start__day
+    , lux_listings_src_26004.valid_to AS lux_listing__window_end__day
+    , lux_listing_mapping_src_26003.listing_id AS listing
+    , lux_listings_src_26004.is_confirmed_lux AS lux_listing__is_confirmed_lux
+  FROM ***************************.dim_lux_listing_id_mapping lux_listing_mapping_src_26003
   LEFT OUTER JOIN
-    ***************************.dim_lux_listings lux_listings_src_10021
+    ***************************.dim_lux_listings lux_listings_src_26004
   ON
-    lux_listing_mapping_src_10020.lux_listing_id = lux_listings_src_10021.lux_listing_id
+    lux_listing_mapping_src_26003.lux_listing_id = lux_listings_src_26004.lux_listing_id
 ) subq_18
 ON
   (

@@ -14,21 +14,21 @@ FROM (
     DATE_TRUNC('day', ds) AS metric_time__day
     , listing_id AS listing
     , 1 AS bookings
-  FROM ***************************.fct_bookings bookings_source_src_10017
+  FROM ***************************.fct_bookings bookings_source_src_26000
 ) subq_13
 LEFT OUTER JOIN (
   -- Join Standard Outputs
   -- Pass Only Elements: ['user__home_state_latest', 'window_start__day', 'window_end__day', 'listing']
   SELECT
-    listings_src_10019.active_from AS window_start__day
-    , listings_src_10019.active_to AS window_end__day
-    , listings_src_10019.listing_id AS listing
-    , users_latest_src_10023.home_state_latest AS user__home_state_latest
-  FROM ***************************.dim_listings listings_src_10019
+    listings_src_26002.active_from AS window_start__day
+    , listings_src_26002.active_to AS window_end__day
+    , listings_src_26002.listing_id AS listing
+    , users_latest_src_26006.home_state_latest AS user__home_state_latest
+  FROM ***************************.dim_listings listings_src_26002
   LEFT OUTER JOIN
-    ***************************.dim_users_latest users_latest_src_10023
+    ***************************.dim_users_latest users_latest_src_26006
   ON
-    listings_src_10019.user_id = users_latest_src_10023.user_id
+    listings_src_26002.user_id = users_latest_src_26006.user_id
 ) subq_18
 ON
   (

@@ -21,7 +21,7 @@
         <!--    '    SELECT\n'                                                                  -->
         <!--    '      is_instant\n'                                                            -->
         <!--    '      , 1 AS bookings\n'                                                       -->
-        <!--    '    FROM ***************************.fct_bookings bookings_source_src_10001\n' -->
+        <!--    '    FROM ***************************.fct_bookings bookings_source_src_28001\n' -->
         <!--    '  ) subq_2\n'                                                                  -->
         <!--    '  GROUP BY\n'                                                                  -->
         <!--    '    is_instant\n'                                                              -->
@@ -35,7 +35,7 @@
         <!--    '  SELECT\n'                                                                    -->
         <!--    '    is_instant\n'                                                              -->
         <!--    '    , SUM(booking_value) AS booking_value\n'                                   -->
-        <!--    '  FROM ***************************.fct_bookings bookings_source_src_10001\n'   -->
+        <!--    '  FROM ***************************.fct_bookings bookings_source_src_28001\n'   -->
         <!--    '  GROUP BY\n'                                                                  -->
         <!--    '    is_instant\n'                                                              -->
         <!--    ') subq_9\n'                                                                    -->

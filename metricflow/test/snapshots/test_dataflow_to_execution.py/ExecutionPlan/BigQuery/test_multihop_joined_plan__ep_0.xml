@@ -9,31 +9,31 @@
         <!--    '-- Compute Metrics via Expressions\n'                                                              -->
         <!--    'SELECT\n'                                                                                          -->
         <!--    '  subq_7.customer_id__customer_name AS account_id__customer_id__customer_name\n'                   -->
-        <!--    '  , SUM(account_month_txns_src_10012.txn_count) AS txn_count\n'                                    -->
-        <!--    'FROM ***************************.account_month_txns account_month_txns_src_10012\n'                -->
+        <!--    '  , SUM(account_month_txns_src_22000.txn_count) AS txn_count\n'                                    -->
+        <!--    'FROM ***************************.account_month_txns account_month_txns_src_22000\n'                -->
         <!--    'LEFT OUTER JOIN (\n'                                                                               -->
         <!--    '  -- Join Standard Outputs\n'                                                                      -->
         <!--    "  -- Pass Only Elements: ['customer_id__customer_name', 'ds_partitioned__day', 'account_id']\n"    -->
         <!--    '  SELECT\n'                                                                                        -->
-        <!--    "    DATE_TRUNC('day', bridge_table_src_10013.ds_partitioned) AS ds_partitioned__day\n"             -->
-        <!--    '    , bridge_table_src_10013.account_id AS account_id\n'                                           -->
-        <!--    '    , customer_table_src_10015.customer_name AS customer_id__customer_name\n'                      -->
-        <!--    '  FROM ***************************.bridge_table bridge_table_src_10013\n'                          -->
+        <!--    "    DATE_TRUNC('day', bridge_table_src_22001.ds_partitioned) AS ds_partitioned__day\n"             -->
+        <!--    '    , bridge_table_src_22001.account_id AS account_id\n'                                           -->
+        <!--    '    , customer_table_src_22003.customer_name AS customer_id__customer_name\n'                      -->
+        <!--    '  FROM ***************************.bridge_table bridge_table_src_22001\n'                          -->
         <!--    '  LEFT OUTER JOIN\n'                                                                               -->
-        <!--    '    ***************************.customer_table customer_table_src_10015\n'                         -->
+        <!--    '    ***************************.customer_table customer_table_src_22003\n'                         -->
         <!--    '  ON\n'                                                                                            -->
         <!--    '    (\n'                                                                                           -->
-        <!--    '      bridge_table_src_10013.customer_id = customer_table_src_10015.customer_id\n'                 -->
+        <!--    '      bridge_table_src_22001.customer_id = customer_table_src_22003.customer_id\n'                 -->
         <!--    '    ) AND (\n'                                                                                     -->
-        <!--    "      DATE_TRUNC('day', bridge_table_src_10013.ds_partitioned) = DATE_TRUNC('day', "               -->
-        <!--    'customer_table_src_10015.ds_partitioned)\n'                                                        -->
+        <!--    "      DATE_TRUNC('day', bridge_table_src_22001.ds_partitioned) = DATE_TRUNC('day', "               -->
+        <!--    'customer_table_src_22003.ds_partitioned)\n'                                                        -->
         <!--    '    )\n'                                                                                           -->
         <!--    ') subq_7\n'                                                                                        -->
         <!--    'ON\n'                                                                                              -->
         <!--    '  (\n'                                                                                             -->
-        <!--    '    account_month_txns_src_10012.account_id = subq_7.account_id\n'                                 -->
+        <!--    '    account_month_txns_src_22000.account_id = subq_7.account_id\n'                                 -->
         <!--    '  ) AND (\n'                                                                                       -->
-        <!--    "    DATE_TRUNC('day', account_month_txns_src_10012.ds_partitioned) = subq_7.ds_partitioned__day\n" -->
+        <!--    "    DATE_TRUNC('day', account_month_txns_src_22000.ds_partitioned) = subq_7.ds_partitioned__day\n" -->
         <!--    '  )\n'                                                                                             -->
         <!--    'GROUP BY\n'                                                                                        -->
         <!--    '  account_id__customer_id__customer_name')                                                         -->

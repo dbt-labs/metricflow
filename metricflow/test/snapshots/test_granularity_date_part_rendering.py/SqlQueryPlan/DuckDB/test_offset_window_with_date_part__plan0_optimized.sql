@@ -21,7 +21,7 @@ FROM (
       SELECT
         EXTRACT(isodow FROM ds) AS metric_time__extract_dow
         , 1 AS bookings
-      FROM ***************************.fct_bookings bookings_source_src_10001
+      FROM ***************************.fct_bookings bookings_source_src_28001
     ) subq_16
     GROUP BY
       metric_time__extract_dow
@@ -41,7 +41,7 @@ FROM (
       SELECT
         DATE_TRUNC('day', ds) AS metric_time__day
         , 1 AS bookings
-      FROM ***************************.fct_bookings bookings_source_src_10001
+      FROM ***************************.fct_bookings bookings_source_src_28001
     ) subq_20
     ON
       subq_22.ds - INTERVAL 14 day = subq_20.metric_time__day
