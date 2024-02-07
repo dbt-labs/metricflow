@@ -199,7 +199,10 @@ class MetricFlowDagTextFormatter:
                 inner_contents="\n".join(component_from_sink_nodes_as_text),
             )
         except Exception:
-            logger.exception(f"Got an exception while converting {dag} to text")
+            logger.exception(
+                f"Got an exception while converting {dag} to text. This exception will be swallowed, and the built-in "
+                f"string representation will be returned instead."
+            )
             return str(dag)
 
     def dag_component_to_text(self, dag_component_leaf_node: DagNode) -> str:
