@@ -3,7 +3,8 @@ from __future__ import annotations
 import functools
 import logging
 import time
-from typing import Callable, TypeVar
+from contextlib import contextmanager
+from typing import Callable, Iterator, TypeVar
 
 from typing_extensions import ParamSpec
 
@@ -14,7 +15,7 @@ ParametersType = ParamSpec("ParametersType")
 
 
 def log_runtime(
-    runtime_warning_threshold: float = 3.0,
+    runtime_warning_threshold: float = 5.0,
 ) -> Callable[[Callable[ParametersType, ReturnType]], Callable[ParametersType, ReturnType]]:
     """Logs how long a function took to run.
 
@@ -43,3 +44,18 @@ def log_runtime(
         return _inner
 
     return decorator
+
+
+@contextmanager
+def log_block_runtime(code_block_name: str, runtime_warning_threshold: float = 5.0) -> Iterator[None]:
+    """Logs the runtime of the enclosed code block."""
+    start_time = time.time()
+    description = f"code_block_name={repr(code_block_name)}"
+    logger.info(f"Starting {description}")
+
+    yield
+
+    runtime = time.time() - start_time
+    logger.info(f"Finished {description} in {runtime:.1f}s")
+    if runtime > runtime_warning_threshold:
+        logger.warning(f"{description} is slow with a runtime of {runtime:.1f}s")
