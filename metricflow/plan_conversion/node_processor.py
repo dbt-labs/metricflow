@@ -229,11 +229,11 @@ class PreJoinNodeProcessor:
                 )
 
                 join_on_partition_dimensions = self._partition_resolver.resolve_partition_dimension_joins(
-                    start_node_spec_set=data_set_of_first_node_that_could_be_joined.instance_set.spec_set,
+                    left_node_spec_set=data_set_of_first_node_that_could_be_joined.instance_set.spec_set,
                     node_to_join_spec_set=data_set_of_second_node_that_can_be_joined.instance_set.spec_set,
                 )
                 join_on_partition_time_dimensions = self._partition_resolver.resolve_partition_time_dimension_joins(
-                    start_node_spec_set=data_set_of_first_node_that_could_be_joined.instance_set.spec_set,
+                    left_node_spec_set=data_set_of_first_node_that_could_be_joined.instance_set.spec_set,
                     node_to_join_spec_set=data_set_of_second_node_that_can_be_joined.instance_set.spec_set,
                 )
 

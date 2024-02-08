@@ -100,7 +100,7 @@ def test_node_evaluator_with_no_linkable_specs(  # noqa: D
         "bookings_source"
     ]
     evaluation = node_evaluator.evaluate_node(
-        required_linkable_specs=[], start_node=bookings_source_node, default_join_type=SqlJoinType.LEFT_OUTER
+        required_linkable_specs=[], left_node=bookings_source_node, default_join_type=SqlJoinType.LEFT_OUTER
     )
     assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
         local_linkable_specs=(), joinable_linkable_specs=(), join_recipes=(), unjoinable_linkable_specs=()
@@ -121,7 +121,7 @@ def test_node_evaluator_with_unjoinable_specs(  # noqa: D
                 entity_links=(EntityReference(element_name="verification"),),
             )
         ],
-        start_node=bookings_source_node,
+        left_node=bookings_source_node,
         default_join_type=SqlJoinType.LEFT_OUTER,
     )
     assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
@@ -147,7 +147,7 @@ def test_node_evaluator_with_local_spec(  # noqa: D
     ]
     evaluation = node_evaluator.evaluate_node(
         required_linkable_specs=[DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),))],
-        start_node=bookings_source_node,
+        left_node=bookings_source_node,
         default_join_type=SqlJoinType.LEFT_OUTER,
     )
     assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
@@ -170,7 +170,7 @@ def test_node_evaluator_with_local_spec_using_primary_entity(  # noqa: D
         required_linkable_specs=[
             DimensionSpec(element_name="home_state_latest", entity_links=(EntityReference(element_name="user"),))
         ],
-        start_node=bookings_source_node,
+        left_node=bookings_source_node,
         default_join_type=SqlJoinType.LEFT_OUTER,
     )
 
@@ -209,7 +209,7 @@ def test_node_evaluator_with_joined_spec(  # noqa: D
                 entity_links=(EntityReference(element_name="listing"),),
             ),
         ],
-        start_node=bookings_source_node,
+        left_node=bookings_source_node,
         default_join_type=SqlJoinType.LEFT_OUTER,
     )
 
@@ -265,7 +265,7 @@ def test_node_evaluator_with_joined_spec_on_unique_id(  # noqa: D
                 entity_links=(EntityReference(element_name="user"),),
             ),
         ],
-        start_node=listings_node,
+        left_node=listings_node,
         default_join_type=SqlJoinType.LEFT_OUTER,
     )
 
@@ -317,7 +317,7 @@ def test_node_evaluator_with_multiple_joined_specs(  # noqa: D
                 entity_links=(EntityReference(element_name="listing"),),
             ),
         ],
-        start_node=views_source,
+        left_node=views_source,
         default_join_type=SqlJoinType.LEFT_OUTER,
     )
 
@@ -397,7 +397,7 @@ def test_node_evaluator_with_multihop_joined_spec(  # noqa: D
     )
 
     evaluation = multihop_node_evaluator.evaluate_node(
-        required_linkable_specs=linkable_specs, start_node=txn_source, default_join_type=SqlJoinType.LEFT_OUTER
+        required_linkable_specs=linkable_specs, left_node=txn_source, default_join_type=SqlJoinType.LEFT_OUTER
     )
 
     assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
@@ -456,7 +456,7 @@ def test_node_evaluator_with_partition_joined_spec(  # noqa: D
                 entity_links=(EntityReference(element_name="user"),),
             ),
         ],
-        start_node=mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
+        left_node=mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
             "id_verifications"
         ],
         default_join_type=SqlJoinType.LEFT_OUTER,
@@ -529,7 +529,7 @@ def test_node_evaluator_with_scd_target(
                 entity_links=(EntityReference(element_name="listing"),),
             )
         ],
-        start_node=mf_engine_test_fixture_mapping[SemanticManifestSetup.SCD_MANIFEST].read_node_mapping[
+        left_node=mf_engine_test_fixture_mapping[SemanticManifestSetup.SCD_MANIFEST].read_node_mapping[
             "bookings_source"
         ],
         default_join_type=SqlJoinType.LEFT_OUTER,
@@ -586,7 +586,7 @@ def test_node_evaluator_with_multi_hop_scd_target(
 
     evaluation = node_evaluator.evaluate_node(
         required_linkable_specs=linkable_specs,
-        start_node=mf_engine_test_fixture_mapping[SemanticManifestSetup.SCD_MANIFEST].read_node_mapping[
+        left_node=mf_engine_test_fixture_mapping[SemanticManifestSetup.SCD_MANIFEST].read_node_mapping[
             "bookings_source"
         ],
         default_join_type=SqlJoinType.LEFT_OUTER,
@@ -651,7 +651,7 @@ def test_node_evaluator_with_multi_hop_through_scd(
 
     evaluation = node_evaluator.evaluate_node(
         required_linkable_specs=linkable_specs,
-        start_node=mf_engine_test_fixture_mapping[SemanticManifestSetup.SCD_MANIFEST].read_node_mapping[
+        left_node=mf_engine_test_fixture_mapping[SemanticManifestSetup.SCD_MANIFEST].read_node_mapping[
             "bookings_source"
         ],
         default_join_type=SqlJoinType.LEFT_OUTER,
@@ -711,7 +711,7 @@ def test_node_evaluator_with_invalid_multi_hop_scd(
 
     evaluation = node_evaluator.evaluate_node(
         required_linkable_specs=linkable_specs,
-        start_node=mf_engine_test_fixture_mapping[SemanticManifestSetup.SCD_MANIFEST].read_node_mapping[
+        left_node=mf_engine_test_fixture_mapping[SemanticManifestSetup.SCD_MANIFEST].read_node_mapping[
             "bookings_source"
         ],
         default_join_type=SqlJoinType.LEFT_OUTER,

@@ -9,7 +9,7 @@ Can I join that node with other nodes using a common entity to get those dimensi
 what entity should I join on, and if I do that join, what dimensions can be retrieved?
 
 Note: the term "dimension" is used below, but it actually refers to any LinkableInstance. Also, when you see the term
-"start_node", think "node containing the measure". Using the term "start_node" as the scenario of joining measure nodes
+"left_node", think "node containing the measure". Using the term "left_node" as the scenario of joining measure nodes
 to dimension nodes is an easy case to explain, but there are non-measure nodes that can be joined with dimension nodes
 to realize other planned features.
 """
@@ -49,7 +49,7 @@ logger = logging.getLogger(__name__)
 
 @dataclass(frozen=True)
 class JoinLinkableInstancesRecipe:
-    """A recipe for how to join a node containing linkable instances to the "start_node".
+    """A recipe for how to join a node containing linkable instances to the "left_node".
 
     node_to_join contains the linkable instances that are needed - it should be filtered so that the output data set of
     that node only includes the entity instance for the join and the instances associated with
@@ -66,7 +66,7 @@ class JoinLinkableInstancesRecipe:
     # Join type to use when joining nodes
     join_type: SqlJoinType
 
-    # The partitions to join on, if there are matching partitions between the start_node and node_to_join.
+    # The partitions to join on, if there are matching partitions between the left_node and node_to_join.
     join_on_partition_dimensions: Tuple[PartitionDimensionJoinDescription, ...]
     join_on_partition_time_dimensions: Tuple[PartitionTimeDimensionJoinDescription, ...]
 
@@ -146,15 +146,15 @@ class LinkableInstanceSatisfiabilityEvaluation:
 class NodeEvaluatorForLinkableInstances:
     """Helps to evaluate if linkable instances can be obtained using the given node, with joins if necessary.
 
-    For example, consider a "start_node" containing the "bookings" measure, "is_instant" dimension, and "listing_id"
-    entity with nodes_available_for_joins including a node with the "listing_id" entity, and the "country"
-    dimension.
+    For example, consider a "left_node" (that will be on the left side of the join) containing the "bookings" measure,
+    "is_instant" dimension, and "listing_id" entity with nodes_available_for_joins including a node with the
+    "listing_id" entity, and the "country" dimension.
 
-    We want to know if we can get "bookings", "is_instant", "listing_id__country" using the start_node. The result
+    We want to know if we can get "bookings", "is_instant", "listing_id__country" using the left_node. The result
     should be that we know: "is_instant" is available locally (i.e. in the same node), and if we join another node
-    containing "listing_id" and "country" by "listing_id", we can get "listing_id__country".
+    (on the right side of the join) containing "listing_id" and "country" by "listing_id", we can get
+    "listing_id__country".
 
-    Since it's used on the left side of the join, the items in the "start_node" are sometimes labeled "left".
     """
 
     def __init__(
@@ -168,8 +168,8 @@ class NodeEvaluatorForLinkableInstances:
 
         Args:
             semantic_model_lookup: Needed to resolve partition dimensions.
-            nodes_available_for_joins: Nodes that contain linkable instances and may be joined with the "start_node"
-            (e.g. the node containing a desired measure) to retrieve the needed linkable instances.
+            nodes_available_for_joins: Nodes that contain linkable instances and may be joined with "left_node" (on the
+            left side of the join and containing a desired measure) to retrieve the needed linkable instances.
             node_data_set_resolver: Figures out what data set is output by a node.
             time_spine_node: If nodes_available_for_joins contains a time spine node, it should be identical to this
             one as there is logic to check for equality.
@@ -183,7 +183,7 @@ class NodeEvaluatorForLinkableInstances:
 
     def _find_joinable_candidate_nodes_that_can_satisfy_linkable_specs(
         self,
-        start_node_instance_set: InstanceSet,
+        left_node_instance_set: InstanceSet,
         needed_linkable_specs: List[LinkableInstanceSpec],
         default_join_type: SqlJoinType,
     ) -> List[JoinLinkableInstancesRecipe]:
@@ -192,7 +192,7 @@ class NodeEvaluatorForLinkableInstances:
         The returned list is ordered by the number of "needed_linkable_specs" that it can satisfy.
         """
         candidates_for_join: List[JoinLinkableInstancesRecipe] = []
-        start_node_spec_set = start_node_instance_set.spec_set
+        left_node_spec_set = left_node_instance_set.spec_set
         for right_node in self._nodes_available_for_joins:
             # If right node is time spine source node, use cross join.
             if right_node == self._time_spine_node:
@@ -246,7 +246,7 @@ class NodeEvaluatorForLinkableInstances:
                     )
 
                 entity_instance_in_left_node = None
-                for instance in start_node_instance_set.entity_instances:
+                for instance in left_node_instance_set.entity_instances:
                     if instance.spec.reference == entity_spec_in_right_node.reference:
                         entity_instance_in_left_node = instance
                         break
@@ -308,11 +308,11 @@ class NodeEvaluatorForLinkableInstances:
                 # candidate list.
                 if len(satisfiable_linkable_specs) > 0:
                     join_on_partition_dimensions = self._partition_resolver.resolve_partition_dimension_joins(
-                        start_node_spec_set=start_node_spec_set,
+                        left_node_spec_set=left_node_spec_set,
                         node_to_join_spec_set=data_set_in_right_node.instance_set.spec_set,
                     )
                     join_on_partition_time_dimensions = self._partition_resolver.resolve_partition_time_dimension_joins(
-                        start_node_spec_set=start_node_spec_set,
+                        left_node_spec_set=left_node_spec_set,
                         node_to_join_spec_set=data_set_in_right_node.instance_set.spec_set,
                     )
                     validity_window_join_description = CreateValidityWindowJoinDescription(
@@ -346,7 +346,7 @@ class NodeEvaluatorForLinkableInstances:
         """Update / filter candidates_for_join based on linkable instance specs that we have already satisfied.
 
         Those linkable instances are no longer needed because those were satisfied previously by joining a node
-        containing some needed linkable instances to the "start_node". This method will then remove the satisfied
+        containing some needed linkable instances to the "left_node". This method will then remove the satisfied
         linkable instances from the candidate recipes, and if a candidate recipe doesn't have any linkable instances
         that can help satisfy the query, it is removed.
         """
@@ -376,19 +376,19 @@ class NodeEvaluatorForLinkableInstances:
 
     def evaluate_node(
         self,
-        start_node: BaseOutput,
+        left_node: BaseOutput,
         required_linkable_specs: Sequence[LinkableInstanceSpec],
         default_join_type: SqlJoinType,
     ) -> LinkableInstanceSatisfiabilityEvaluation:
-        """Evaluates if the "required_linkable_specs" can be realized by joining the "start_node" with other nodes.
+        """Evaluates if the "required_linkable_specs" can be realized by joining the "left_node" with other nodes.
 
-        In other words, given the data set associated with "start_node":
+        In other words, given the data set associated with "left_node":
 
-        * Can all "required_linkable_specs" be retrieved from the start_node? (These would be considered "local").
+        * Can all "required_linkable_specs" be retrieved from the left_node? (These would be considered "local").
         * If not, can they be retrieved by joining an available node though a common entity?
         * If so, return all possible ways (by joining different nodes) that can be done.
         """
-        candidate_instance_set: InstanceSet = self._node_data_set_resolver.get_output_data_set(start_node).instance_set
+        candidate_instance_set: InstanceSet = self._node_data_set_resolver.get_output_data_set(left_node).instance_set
         candidate_spec_set = candidate_instance_set.spec_set
 
         logger.debug(f"Candidate spec set is:\n{mf_pformat(candidate_spec_set)}")
@@ -419,7 +419,7 @@ class NodeEvaluatorForLinkableInstances:
                 possibly_joinable_linkable_specs.append(required_linkable_spec)
 
         candidates_for_join = self._find_joinable_candidate_nodes_that_can_satisfy_linkable_specs(
-            start_node_instance_set=candidate_instance_set,
+            left_node_instance_set=candidate_instance_set,
             needed_linkable_specs=possibly_joinable_linkable_specs,
             default_join_type=default_join_type,
         )
