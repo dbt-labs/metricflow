@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, Sequence
+from typing import Dict, Optional, Sequence
 
 from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,
@@ -59,8 +59,9 @@ class DataflowPlanNodeOutputDataSetResolver(DataflowToSqlQueryPlanConverter):
         self,
         column_association_resolver: ColumnAssociationResolver,
         semantic_manifest_lookup: SemanticManifestLookup,
+        _node_to_output_data_set: Optional[Dict[DataflowPlanNode, SqlDataSet]] = None,
     ) -> None:
-        self._node_to_output_data_set: Dict[DataflowPlanNode, SqlDataSet] = {}
+        self._node_to_output_data_set: Dict[DataflowPlanNode, SqlDataSet] = _node_to_output_data_set or {}
         super().__init__(
             column_association_resolver=column_association_resolver,
             semantic_manifest_lookup=semantic_manifest_lookup,
@@ -81,3 +82,11 @@ class DataflowPlanNodeOutputDataSetResolver(DataflowToSqlQueryPlanConverter):
         with log_block_runtime(f"cache_output_data_sets for {len(nodes)} nodes"):
             for node in nodes:
                 self.get_output_data_set(node)
+
+    def copy(self) -> DataflowPlanNodeOutputDataSetResolver:
+        """Return a copy of this with the same nodes cached."""
+        return DataflowPlanNodeOutputDataSetResolver(
+            column_association_resolver=self.column_association_resolver,
+            semantic_manifest_lookup=self._semantic_manifest_lookup,
+            _node_to_output_data_set=dict(self._node_to_output_data_set),
+        )

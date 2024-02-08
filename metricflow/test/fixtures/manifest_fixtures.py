@@ -111,6 +111,8 @@ class MetricFlowEngineTestFixture:
     query_parser: MetricFlowQueryParser
     metricflow_engine: MetricFlowEngine
 
+    _node_output_resolver: DataflowPlanNodeOutputDataSetResolver
+
     @staticmethod
     def from_parameters(  # noqa: D
         sql_client: SqlClient, semantic_manifest: PydanticSemanticManifest
@@ -122,7 +124,11 @@ class MetricFlowEngineTestFixture:
         source_node_set = MetricFlowEngineTestFixture._data_set_to_source_node_set(
             column_association_resolver, semantic_manifest_lookup, data_set_mapping
         )
-
+        node_output_resolver = DataflowPlanNodeOutputDataSetResolver(
+            column_association_resolver=column_association_resolver,
+            semantic_manifest_lookup=semantic_manifest_lookup,
+        )
+        node_output_resolver.cache_output_data_sets(source_node_set.all_nodes)
         query_parser = MetricFlowQueryParser(semantic_manifest_lookup=semantic_manifest_lookup)
         return MetricFlowEngineTestFixture(
             semantic_manifest=semantic_manifest,
@@ -131,6 +137,7 @@ class MetricFlowEngineTestFixture:
             data_set_mapping=data_set_mapping,
             read_node_mapping=read_node_mapping,
             source_node_set=source_node_set,
+            _node_output_resolver=node_output_resolver,
             dataflow_to_sql_converter=DataflowToSqlQueryPlanConverter(
                 column_association_resolver=column_association_resolver,
                 semantic_manifest_lookup=semantic_manifest_lookup,
@@ -151,15 +158,10 @@ class MetricFlowEngineTestFixture:
 
         This should be recreated for each test since DataflowPlanBuilder contains a stateful cache.
         """
-        node_output_resolver = DataflowPlanNodeOutputDataSetResolver(
-            column_association_resolver=self.column_association_resolver,
-            semantic_manifest_lookup=self.semantic_manifest_lookup,
-        )
-
         return DataflowPlanBuilder(
             source_node_set=self.source_node_set,
             semantic_manifest_lookup=self.semantic_manifest_lookup,
-            node_output_resolver=node_output_resolver,
+            node_output_resolver=self._node_output_resolver.copy(),
             column_association_resolver=self.column_association_resolver,
         )
 
