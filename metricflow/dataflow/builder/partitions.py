@@ -63,10 +63,10 @@ class PartitionJoinResolver:
         return sorted_dimension_specs[0]
 
     def resolve_partition_dimension_joins(
-        self, start_node_spec_set: InstanceSpecSet, node_to_join_spec_set: InstanceSpecSet
+        self, left_node_spec_set: InstanceSpecSet, node_to_join_spec_set: InstanceSpecSet
     ) -> Tuple[PartitionDimensionJoinDescription, ...]:
         """Figures out which partition dimensions to join on."""
-        start_node_partitions = self._get_partitions(start_node_spec_set)
+        start_node_partitions = self._get_partitions(left_node_spec_set)
         join_node_partitions = self._get_partitions(node_to_join_spec_set)
 
         partition_join_descriptions = []
@@ -103,10 +103,10 @@ class PartitionJoinResolver:
         return sorted_specs[0]
 
     def resolve_partition_time_dimension_joins(
-        self, start_node_spec_set: InstanceSpecSet, node_to_join_spec_set: InstanceSpecSet
+        self, left_node_spec_set: InstanceSpecSet, node_to_join_spec_set: InstanceSpecSet
     ) -> Tuple[PartitionTimeDimensionJoinDescription, ...]:
         """Figures out which partition time dimensions to join on."""
-        start_node_partitions = self._get_partitions(start_node_spec_set)
+        start_node_partitions = self._get_partitions(left_node_spec_set)
         join_node_partitions = self._get_partitions(node_to_join_spec_set)
         partition_join_descriptions: List[PartitionTimeDimensionJoinDescription] = []
 

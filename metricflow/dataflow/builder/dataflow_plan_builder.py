@@ -903,7 +903,7 @@ class DataflowPlanBuilder:
 
             start_time = time.time()
             evaluation = node_evaluator.evaluate_node(
-                start_node=node,
+                left_node=node,
                 required_linkable_specs=list(linkable_specs),
                 default_join_type=default_join_type,
             )
