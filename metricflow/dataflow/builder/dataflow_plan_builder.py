@@ -874,6 +874,7 @@ class DataflowPlanBuilder:
             semantic_model_lookup=self._semantic_model_lookup,
             nodes_available_for_joins=self._sort_by_suitability(candidate_nodes_for_right_side_of_join),
             node_data_set_resolver=self._node_data_set_resolver,
+            time_spine_node=self._source_node_set.time_spine_node,
         )
 
         # Dict from the node that contains the source node to the evaluation results.
@@ -905,7 +906,6 @@ class DataflowPlanBuilder:
                 start_node=node,
                 required_linkable_specs=list(linkable_specs),
                 default_join_type=default_join_type,
-                time_spine_source_node=self._source_node_set.time_spine_node,
             )
             logger.info(f"Evaluation of {node} took {time.time() - start_time:.2f}s")
 
