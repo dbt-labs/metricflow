@@ -162,27 +162,30 @@ class NodeEvaluatorForLinkableInstances:
         semantic_model_lookup: SemanticModelAccessor,
         nodes_available_for_joins: Sequence[BaseOutput],
         node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver,
+        time_spine_node: MetricTimeDimensionTransformNode,
     ) -> None:
-        """Constructor.
+        """Initializer.
 
         Args:
             semantic_model_lookup: Needed to resolve partition dimensions.
             nodes_available_for_joins: Nodes that contain linkable instances and may be joined with the "start_node"
             (e.g. the node containing a desired measure) to retrieve the needed linkable instances.
             node_data_set_resolver: Figures out what data set is output by a node.
+            time_spine_node: If nodes_available_for_joins contains a time spine node, it should be identical to this
+            one as there is logic to check for equality.
         """
         self._semantic_model_lookup = semantic_model_lookup
         self._nodes_available_for_joins = nodes_available_for_joins
         self._node_data_set_resolver = node_data_set_resolver
         self._partition_resolver = PartitionJoinResolver(self._semantic_model_lookup)
         self._join_evaluator = SemanticModelJoinEvaluator(self._semantic_model_lookup)
+        self._time_spine_node = time_spine_node
 
     def _find_joinable_candidate_nodes_that_can_satisfy_linkable_specs(
         self,
         start_node_instance_set: InstanceSet,
         needed_linkable_specs: List[LinkableInstanceSpec],
         default_join_type: SqlJoinType,
-        time_spine_source_node: Optional[MetricTimeDimensionTransformNode] = None,
     ) -> List[JoinLinkableInstancesRecipe]:
         """Get nodes that can be joined to get 1 or more of the "needed_linkable_specs".
 
@@ -192,7 +195,7 @@ class NodeEvaluatorForLinkableInstances:
         start_node_spec_set = start_node_instance_set.spec_set
         for right_node in self._nodes_available_for_joins:
             # If right node is time spine source node, use cross join.
-            if right_node == time_spine_source_node:
+            if right_node == self._time_spine_node:
                 needed_metric_time_specs = LinkableSpecSet.from_specs(needed_linkable_specs).metric_time_specs
                 candidates_for_join.append(
                     JoinLinkableInstancesRecipe(
@@ -376,7 +379,6 @@ class NodeEvaluatorForLinkableInstances:
         start_node: BaseOutput,
         required_linkable_specs: Sequence[LinkableInstanceSpec],
         default_join_type: SqlJoinType,
-        time_spine_source_node: Optional[MetricTimeDimensionTransformNode] = None,
     ) -> LinkableInstanceSatisfiabilityEvaluation:
         """Evaluates if the "required_linkable_specs" can be realized by joining the "start_node" with other nodes.
 
@@ -420,7 +422,6 @@ class NodeEvaluatorForLinkableInstances:
             start_node_instance_set=candidate_instance_set,
             needed_linkable_specs=possibly_joinable_linkable_specs,
             default_join_type=default_join_type,
-            time_spine_source_node=time_spine_source_node,
         )
         join_candidates: List[JoinLinkableInstancesRecipe] = []
 

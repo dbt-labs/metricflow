@@ -51,6 +51,7 @@ def node_evaluator(
         ].semantic_manifest_lookup.semantic_model_lookup,
         nodes_available_for_joins=tuple(mf_engine_fixture.read_node_mapping.values()),
         node_data_set_resolver=node_data_set_resolver,
+        time_spine_node=mf_engine_fixture.source_node_set.time_spine_node,
     )
 
 
@@ -87,6 +88,7 @@ def make_multihop_node_evaluator(
         semantic_model_lookup=semantic_manifest_lookup_with_multihop_links.semantic_model_lookup,
         nodes_available_for_joins=nodes_available_for_joins,
         node_data_set_resolver=node_data_set_resolver,
+        time_spine_node=source_node_set.time_spine_node,
     )
 
 
@@ -510,13 +512,14 @@ def test_node_evaluator_with_scd_target(
         semantic_manifest_lookup=scd_semantic_manifest_lookup,
     )
 
-    source_nodes = tuple(mf_engine_test_fixture_mapping[SemanticManifestSetup.SCD_MANIFEST].read_node_mapping.values())
+    mf_engine_fixture = mf_engine_test_fixture_mapping[SemanticManifestSetup.SCD_MANIFEST]
 
     node_evaluator = NodeEvaluatorForLinkableInstances(
         semantic_model_lookup=scd_semantic_manifest_lookup.semantic_model_lookup,
         # Use all nodes in the simple model as candidates for joins.
-        nodes_available_for_joins=source_nodes,
+        nodes_available_for_joins=tuple(mf_engine_fixture.read_node_mapping.values()),
         node_data_set_resolver=node_data_set_resolver,
+        time_spine_node=mf_engine_fixture.source_node_set.time_spine_node,
     )
 
     evaluation = node_evaluator.evaluate_node(
