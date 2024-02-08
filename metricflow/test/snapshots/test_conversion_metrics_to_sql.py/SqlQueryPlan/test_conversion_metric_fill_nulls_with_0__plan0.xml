@@ -3,11 +3,11 @@
         <!-- description = 'Compute Metrics via Expressions' -->
         <!-- node_id = NodeId(id_str='ss_21') -->
         <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_741), column_alias='metric_time__day') -->
-        <!-- col1 =                                                -->
-        <!--   SqlSelectColumn(                                    -->
-        <!--     expr=SqlRatioComputationExpression(node_id=rc_0), -->
-        <!--     column_alias='visit_buy_conversion_rate_7days',   -->
-        <!--   )                                                   -->
+        <!-- col1 =                                                                -->
+        <!--   SqlSelectColumn(                                                    -->
+        <!--     expr=SqlRatioComputationExpression(node_id=rc_0),                 -->
+        <!--     column_alias='visit_buy_conversion_rate_7days_fill_nulls_with_0', -->
+        <!--   )                                                                   -->
         <!-- from_source = SqlSelectStatementNode(node_id=ss_20) -->
         <!-- where = None -->
         <!-- distinct = False -->
@@ -16,19 +16,19 @@
             <!-- node_id = NodeId(id_str='ss_20') -->
             <!-- col0 =                                                                         -->
             <!--   SqlSelectColumn(                                                             -->
-            <!--     expr=SqlAggregateFunctionExpression(node_id=fnc_4, sql_function=COALESCE), -->
+            <!--     expr=SqlAggregateFunctionExpression(node_id=fnc_6, sql_function=COALESCE), -->
             <!--     column_alias='metric_time__day',                                           -->
             <!--   )                                                                            -->
-            <!-- col1 =                                                                    -->
-            <!--   SqlSelectColumn(                                                        -->
-            <!--     expr=SqlAggregateFunctionExpression(node_id=fnc_2, sql_function=MAX), -->
-            <!--     column_alias='visits',                                                -->
-            <!--   )                                                                       -->
-            <!-- col2 =                                                                    -->
-            <!--   SqlSelectColumn(                                                        -->
-            <!--     expr=SqlAggregateFunctionExpression(node_id=fnc_3, sql_function=MAX), -->
-            <!--     column_alias='buys',                                                  -->
-            <!--   )                                                                       -->
+            <!-- col1 =                                                                         -->
+            <!--   SqlSelectColumn(                                                             -->
+            <!--     expr=SqlAggregateFunctionExpression(node_id=fnc_3, sql_function=COALESCE), -->
+            <!--     column_alias='visits',                                                     -->
+            <!--   )                                                                            -->
+            <!-- col2 =                                                                         -->
+            <!--   SqlSelectColumn(                                                             -->
+            <!--     expr=SqlAggregateFunctionExpression(node_id=fnc_5, sql_function=COALESCE), -->
+            <!--     column_alias='buys',                                                       -->
+            <!--   )                                                                            -->
             <!-- from_source = SqlSelectStatementNode(node_id=ss_11) -->
             <!-- join_0 =                                                 -->
             <!--   SqlJoinDescription(                                    -->
@@ -39,7 +39,7 @@
             <!--   )                                                      -->
             <!-- group_by0 =                                                                    -->
             <!--   SqlSelectColumn(                                                             -->
-            <!--     expr=SqlAggregateFunctionExpression(node_id=fnc_4, sql_function=COALESCE), -->
+            <!--     expr=SqlAggregateFunctionExpression(node_id=fnc_6, sql_function=COALESCE), -->
             <!--     column_alias='metric_time__day',                                           -->
             <!--   )                                                                            -->
             <!-- where = None -->

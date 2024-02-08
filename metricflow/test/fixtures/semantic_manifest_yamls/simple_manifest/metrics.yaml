@@ -704,3 +704,39 @@ metric:
     expr: bookings
     metrics:
       - name: bookings
+---
+metric:
+  name: twice_bookings_fill_nulls_with_0_without_time_spine
+  description: 2x twice_bookings_fill_nulls_with_0_without_time_spine
+  type: derived
+  type_params:
+    expr: 2 * bookings_fill_nulls_with_0_without_time_spine
+    metrics:
+      - name: bookings_fill_nulls_with_0_without_time_spine
+---
+metric:
+  name: nested_fill_nulls_without_time_spine
+  description: 2x twice_bookings_fill_nulls_with_0_without_time_spine but then x3
+  type: derived
+  type_params:
+    expr: 3 * twice_bookings_fill_nulls_with_0_without_time_spine
+    metrics:
+      - name: twice_bookings_fill_nulls_with_0_without_time_spine
+---
+metric:
+  name: visit_buy_conversion_rate_7days_fill_nulls_with_0
+  description: conversion rate on visits-buys on a 7 day window, filling nulls with 0 for both input measures
+  type: conversion
+  type_params:
+    conversion_type_params:
+      base_measure:
+        name: visits
+        fill_nulls_with: 0
+        join_to_timespine: true
+      conversion_measure:
+        name: buys
+        fill_nulls_with: 0
+        join_to_timespine: true
+      window: 7 days
+      entity: user
+      calculation: conversion_rate

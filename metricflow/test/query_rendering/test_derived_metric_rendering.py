@@ -620,3 +620,89 @@ def test_derived_offset_metric_with_agg_time_dim(  # noqa: D
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_multi_metric_fill_null(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+    create_source_tables: bool,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        query_spec=MetricFlowQuerySpec(
+            metric_specs=(
+                MetricSpec(element_name="twice_bookings_fill_nulls_with_0_without_time_spine"),
+                MetricSpec(element_name="listings"),
+            ),
+            time_dimension_specs=(MTD_SPEC_DAY,),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_nested_fill_nulls_without_time_spine(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+    create_source_tables: bool,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        query_spec=MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="nested_fill_nulls_without_time_spine"),),
+            time_dimension_specs=(MTD_SPEC_DAY,),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_nested_fill_nulls_without_time_spine_multi_metric(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+    create_source_tables: bool,
+) -> None:
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        query_spec=MetricFlowQuerySpec(
+            metric_specs=(
+                MetricSpec(element_name="nested_fill_nulls_without_time_spine"),
+                MetricSpec(element_name="listings"),
+            ),
+            time_dimension_specs=(MTD_SPEC_DAY,),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+# case where there are multiple input metrics filling null in a derived metric
+# case where only one of multiple input metrics fills null
+# test case for conversion metrics not coalescing nulls

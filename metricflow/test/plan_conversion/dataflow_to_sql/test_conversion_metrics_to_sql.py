@@ -58,10 +58,6 @@ def test_conversion_rate_with_window(
     sql_client: SqlClient,
 ) -> None:
     """Test conversion metric with a window data flow plan rendering."""
-    dimension_spec = DimensionSpec(
-        element_name="referrer_id",
-        entity_links=(EntityReference(element_name="visit"),),
-    )
     metric_time_spec = TimeDimensionSpec(
         element_name="metric_time", entity_links=(), time_granularity=TimeGranularity.DAY
     )
@@ -70,7 +66,6 @@ def test_conversion_rate_with_window(
     dataflow_plan = dataflow_plan_builder.build_plan(
         query_spec=MetricFlowQuerySpec(
             metric_specs=(metric_spec,),
-            dimension_specs=(dimension_spec,),
             time_dimension_specs=(metric_time_spec,),
         ),
     )
@@ -157,6 +152,35 @@ def test_conversion_rate_with_constant_properties(
         query_spec=MetricFlowQuerySpec(
             metric_specs=(metric_spec,),
             dimension_specs=(dimension_spec,),
+            time_dimension_specs=(metric_time_spec,),
+        ),
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_conversion_metric_fill_nulls_with_0(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    """Test conversion metric with constant properties by data flow plan rendering."""
+    metric_spec = MetricSpec(element_name="visit_buy_conversion_rate_7days_fill_nulls_with_0")
+    metric_time_spec = TimeDimensionSpec(
+        element_name="metric_time", entity_links=(), time_granularity=TimeGranularity.DAY
+    )
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        query_spec=MetricFlowQuerySpec(
+            metric_specs=(metric_spec,),
             time_dimension_specs=(metric_time_spec,),
         ),
     )

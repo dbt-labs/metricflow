@@ -727,6 +727,8 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             ),
         )
 
+    # COALESCE applied to measure aggregation subquery. Currently used for simple & cumulative metrics,
+    # but should be used for all metrics that take input measures (missing for conversion metrics).
     def __make_col_reference_or_coalesce_expr(
         self, column_name: str, input_measure: Optional[MetricInputMeasure], from_data_set_alias: str
     ) -> SqlExpressionNode:

@@ -1,13 +1,13 @@
 -- Compute Metrics via Expressions
 SELECT
   subq_14.metric_time__day
-  , CAST(subq_14.buys AS DOUBLE) / CAST(NULLIF(subq_14.visits, 0) AS DOUBLE) AS visit_buy_conversion_rate_7days
+  , CAST(subq_14.buys AS DOUBLE) / CAST(NULLIF(subq_14.visits, 0) AS DOUBLE) AS visit_buy_conversion_rate_7days_fill_nulls_with_0
 FROM (
   -- Combine Aggregated Outputs
   SELECT
     COALESCE(subq_3.metric_time__day, subq_13.metric_time__day) AS metric_time__day
-    , MAX(subq_3.visits) AS visits
-    , MAX(subq_13.buys) AS buys
+    , COALESCE(MAX(subq_3.visits), 0) AS visits
+    , COALESCE(MAX(subq_13.buys), 0) AS buys
   FROM (
     -- Aggregate Measures
     SELECT
