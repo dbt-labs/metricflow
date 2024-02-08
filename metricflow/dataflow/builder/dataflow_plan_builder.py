@@ -61,7 +61,6 @@ from metricflow.mf_logging.formatting import indent
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.mf_logging.runtime import log_runtime
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.node_processor import PreJoinNodeProcessor
 from metricflow.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import FilterSpecResolutionLookUp
@@ -122,30 +121,15 @@ class DataflowPlanBuilder:
         self,
         source_node_set: SourceNodeSet,
         semantic_manifest_lookup: SemanticManifestLookup,
-        node_output_resolver: Optional[DataflowPlanNodeOutputDataSetResolver] = None,
-        column_association_resolver: Optional[ColumnAssociationResolver] = None,
+        node_output_resolver: DataflowPlanNodeOutputDataSetResolver,
+        column_association_resolver: ColumnAssociationResolver,
     ) -> None:
         self._semantic_model_lookup = semantic_manifest_lookup.semantic_model_lookup
         self._metric_lookup = semantic_manifest_lookup.metric_lookup
         self._metric_time_dimension_reference = DataSet.metric_time_dimension_reference()
         self._source_node_set = source_node_set
-        self._column_association_resolver = (
-            DunderColumnAssociationResolver(semantic_manifest_lookup)
-            if not column_association_resolver
-            else column_association_resolver
-        )
-        self._node_data_set_resolver = (
-            DataflowPlanNodeOutputDataSetResolver(
-                column_association_resolver=(
-                    DunderColumnAssociationResolver(semantic_manifest_lookup)
-                    if not column_association_resolver
-                    else column_association_resolver
-                ),
-                semantic_manifest_lookup=semantic_manifest_lookup,
-            )
-            if not node_output_resolver
-            else node_output_resolver
-        )
+        self._column_association_resolver = column_association_resolver
+        self._node_data_set_resolver = node_output_resolver
 
     def build_plan(
         self,
