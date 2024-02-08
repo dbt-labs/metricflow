@@ -218,18 +218,18 @@ FROM (
         FROM (
           -- Time Spine
           SELECT
-            DATE_TRUNC('day', time_spine_src_0.ds) AS ds__day
-            , DATE_TRUNC('week', time_spine_src_0.ds) AS ds__week
-            , DATE_TRUNC('month', time_spine_src_0.ds) AS ds__month
-            , DATE_TRUNC('quarter', time_spine_src_0.ds) AS ds__quarter
-            , DATE_TRUNC('year', time_spine_src_0.ds) AS ds__year
-            , EXTRACT(year FROM time_spine_src_0.ds) AS ds__extract_year
-            , EXTRACT(quarter FROM time_spine_src_0.ds) AS ds__extract_quarter
-            , EXTRACT(month FROM time_spine_src_0.ds) AS ds__extract_month
-            , EXTRACT(day FROM time_spine_src_0.ds) AS ds__extract_day
-            , CASE WHEN EXTRACT(dow FROM time_spine_src_0.ds) = 0 THEN EXTRACT(dow FROM time_spine_src_0.ds) + 7 ELSE EXTRACT(dow FROM time_spine_src_0.ds) END AS ds__extract_dow
-            , EXTRACT(doy FROM time_spine_src_0.ds) AS ds__extract_doy
-          FROM ***************************.mf_time_spine time_spine_src_0
+            DATE_TRUNC('day', time_spine_src_28000.ds) AS ds__day
+            , DATE_TRUNC('week', time_spine_src_28000.ds) AS ds__week
+            , DATE_TRUNC('month', time_spine_src_28000.ds) AS ds__month
+            , DATE_TRUNC('quarter', time_spine_src_28000.ds) AS ds__quarter
+            , DATE_TRUNC('year', time_spine_src_28000.ds) AS ds__year
+            , EXTRACT(year FROM time_spine_src_28000.ds) AS ds__extract_year
+            , EXTRACT(quarter FROM time_spine_src_28000.ds) AS ds__extract_quarter
+            , EXTRACT(month FROM time_spine_src_28000.ds) AS ds__extract_month
+            , EXTRACT(day FROM time_spine_src_28000.ds) AS ds__extract_day
+            , CASE WHEN EXTRACT(dow FROM time_spine_src_28000.ds) = 0 THEN EXTRACT(dow FROM time_spine_src_28000.ds) + 7 ELSE EXTRACT(dow FROM time_spine_src_28000.ds) END AS ds__extract_dow
+            , EXTRACT(doy FROM time_spine_src_28000.ds) AS ds__extract_doy
+          FROM ***************************.mf_time_spine time_spine_src_28000
         ) subq_1
       ) subq_2
     ) subq_3
