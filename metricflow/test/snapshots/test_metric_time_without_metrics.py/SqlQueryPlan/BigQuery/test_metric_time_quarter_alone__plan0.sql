@@ -29,18 +29,18 @@ FROM (
   FROM (
     -- Time Spine
     SELECT
-      DATE_TRUNC(time_spine_src_0.ds, day) AS ds__day
-      , DATE_TRUNC(time_spine_src_0.ds, isoweek) AS ds__week
-      , DATE_TRUNC(time_spine_src_0.ds, month) AS ds__month
-      , DATE_TRUNC(time_spine_src_0.ds, quarter) AS ds__quarter
-      , DATE_TRUNC(time_spine_src_0.ds, year) AS ds__year
-      , EXTRACT(year FROM time_spine_src_0.ds) AS ds__extract_year
-      , EXTRACT(quarter FROM time_spine_src_0.ds) AS ds__extract_quarter
-      , EXTRACT(month FROM time_spine_src_0.ds) AS ds__extract_month
-      , EXTRACT(day FROM time_spine_src_0.ds) AS ds__extract_day
-      , IF(EXTRACT(dayofweek FROM time_spine_src_0.ds) = 1, 7, EXTRACT(dayofweek FROM time_spine_src_0.ds) - 1) AS ds__extract_dow
-      , EXTRACT(dayofyear FROM time_spine_src_0.ds) AS ds__extract_doy
-    FROM ***************************.mf_time_spine time_spine_src_0
+      DATE_TRUNC(time_spine_src_28000.ds, day) AS ds__day
+      , DATE_TRUNC(time_spine_src_28000.ds, isoweek) AS ds__week
+      , DATE_TRUNC(time_spine_src_28000.ds, month) AS ds__month
+      , DATE_TRUNC(time_spine_src_28000.ds, quarter) AS ds__quarter
+      , DATE_TRUNC(time_spine_src_28000.ds, year) AS ds__year
+      , EXTRACT(year FROM time_spine_src_28000.ds) AS ds__extract_year
+      , EXTRACT(quarter FROM time_spine_src_28000.ds) AS ds__extract_quarter
+      , EXTRACT(month FROM time_spine_src_28000.ds) AS ds__extract_month
+      , EXTRACT(day FROM time_spine_src_28000.ds) AS ds__extract_day
+      , IF(EXTRACT(dayofweek FROM time_spine_src_28000.ds) = 1, 7, EXTRACT(dayofweek FROM time_spine_src_28000.ds) - 1) AS ds__extract_dow
+      , EXTRACT(dayofyear FROM time_spine_src_28000.ds) AS ds__extract_doy
+    FROM ***************************.mf_time_spine time_spine_src_28000
   ) subq_0
 ) subq_1
 GROUP BY
