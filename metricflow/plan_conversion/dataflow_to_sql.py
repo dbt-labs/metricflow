@@ -1268,9 +1268,10 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
         # Choose the instance with the smallest granularity available.
         agg_time_dimension_instances.sort(key=lambda instance: instance.spec.time_granularity.to_int())
-        assert (
-            len(agg_time_dimension_instances) > 0
-        ), "Couldn't find requested agg_time_dimension in parent data set. The dataflow plan may have been configured incorrectly."
+        assert len(agg_time_dimension_instances) > 0, (
+            "Couldn't find requested agg_time_dimension in parent data set. The dataflow plan may have been "
+            "configured incorrectly."
+        )
         agg_time_dimension_instance_for_join = agg_time_dimension_instances[0]
 
         # Build time spine data set using the requested agg_time_dimension name.

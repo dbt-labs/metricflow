@@ -345,17 +345,14 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             self._source_data_sets.append(data_set)
             logger.info(f"Created source dataset from semantic model '{semantic_model.name}'")
 
-        source_node_builder = SourceNodeBuilder(self._semantic_manifest_lookup)
-        source_nodes = source_node_builder.create_from_data_sets(self._source_data_sets)
-        read_nodes = source_node_builder.create_read_nodes_from_data_sets(self._source_data_sets)
-        time_spine_source_node = SourceNodeBuilder.build_time_spine_source_node(
-            time_spine_source=self._time_spine_source, data_set_converter=converter
+        source_node_builder = SourceNodeBuilder(
+            column_association_resolver=self._column_association_resolver,
+            semantic_manifest_lookup=self._semantic_manifest_lookup,
         )
+        source_node_set = source_node_builder.create_from_data_sets(self._source_data_sets)
 
         self._dataflow_plan_builder = DataflowPlanBuilder(
-            source_nodes=source_nodes,
-            read_nodes=read_nodes,
-            time_spine_source_node=time_spine_source_node,
+            source_node_set=source_node_set,
             semantic_manifest_lookup=self._semantic_manifest_lookup,
         )
         self._to_sql_query_plan_converter = DataflowToSqlQueryPlanConverter(
