@@ -31,11 +31,17 @@ class SourceNodeSet:
     source_nodes_for_metric_queries: Tuple[BaseOutput, ...]
 
     # Semantic models are 1:1 mapped to a ReadSqlSourceNode. The tuple also contains the same `time_spine_node` as
-    # below.
+    # below. See usage in `DataflowPlanBuilder`.
     source_nodes_for_group_by_item_queries: Tuple[BaseOutput, ...]
 
     # Provides the time spine.
     time_spine_node: MetricTimeDimensionTransformNode
+
+    @property
+    def all_nodes(self) -> Sequence[BaseOutput]:  # noqa: D
+        return (
+            self.source_nodes_for_metric_queries + self.source_nodes_for_group_by_item_queries + (self.time_spine_node,)
+        )
 
 
 class SourceNodeBuilder:
