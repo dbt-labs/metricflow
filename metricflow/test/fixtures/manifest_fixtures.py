@@ -5,7 +5,7 @@ import os
 from collections import OrderedDict
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, Mapping, Optional, Sequence, Tuple
+from typing import Dict, Mapping, Optional, Sequence
 
 import pytest
 from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
@@ -19,8 +19,8 @@ from dbt_semantic_interfaces.validations.semantic_manifest_validator import Sema
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
-from metricflow.dataflow.builder.source_node import SourceNodeBuilder
-from metricflow.dataflow.dataflow_plan import BaseOutput, MetricTimeDimensionTransformNode, ReadSqlSourceNode
+from metricflow.dataflow.builder.source_node import SourceNodeBuilder, SourceNodeSet
+from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.engine.metricflow_engine import MetricFlowEngine
@@ -106,7 +106,7 @@ class MetricFlowEngineTestFixture:
     column_association_resolver: ColumnAssociationResolver
     data_set_mapping: OrderedDict[str, SemanticModelDataSet]
     read_node_mapping: OrderedDict[str, ReadSqlSourceNode]
-    source_nodes: Tuple[BaseOutput, ...]
+    source_node_set: SourceNodeSet
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter
     query_parser: MetricFlowQueryParser
     metricflow_engine: MetricFlowEngine
@@ -118,8 +118,10 @@ class MetricFlowEngineTestFixture:
         semantic_manifest_lookup = SemanticManifestLookup(semantic_manifest)
         data_set_mapping = MetricFlowEngineTestFixture._create_data_sets(semantic_manifest_lookup)
         read_node_mapping = MetricFlowEngineTestFixture._data_set_to_read_nodes(data_set_mapping)
-        source_nodes = MetricFlowEngineTestFixture._data_set_to_source_nodes(semantic_manifest_lookup, data_set_mapping)
         column_association_resolver = DunderColumnAssociationResolver(semantic_manifest_lookup)
+        source_node_set = MetricFlowEngineTestFixture._data_set_to_source_node_set(
+            column_association_resolver, semantic_manifest_lookup, data_set_mapping
+        )
 
         query_parser = MetricFlowQueryParser(semantic_manifest_lookup=semantic_manifest_lookup)
         return MetricFlowEngineTestFixture(
@@ -128,7 +130,7 @@ class MetricFlowEngineTestFixture:
             column_association_resolver=column_association_resolver,
             data_set_mapping=data_set_mapping,
             read_node_mapping=read_node_mapping,
-            source_nodes=tuple(source_nodes),
+            source_node_set=source_node_set,
             dataflow_to_sql_converter=DataflowToSqlQueryPlanConverter(
                 column_association_resolver=column_association_resolver,
                 semantic_manifest_lookup=semantic_manifest_lookup,
@@ -149,20 +151,13 @@ class MetricFlowEngineTestFixture:
 
         This should be recreated for each test since DataflowPlanBuilder contains a stateful cache.
         """
-        source_nodes = MetricFlowEngineTestFixture._data_set_to_source_nodes(
-            self.semantic_manifest_lookup, self.data_set_mapping
-        )
-        time_spine_source_node = MetricFlowEngineTestFixture._build_time_spine_source_node(
-            self.semantic_manifest_lookup
-        )
         node_output_resolver = DataflowPlanNodeOutputDataSetResolver(
             column_association_resolver=self.column_association_resolver,
             semantic_manifest_lookup=self.semantic_manifest_lookup,
         )
+
         return DataflowPlanBuilder(
-            source_nodes=source_nodes,
-            read_nodes=tuple(self.read_node_mapping.values()),
-            time_spine_source_node=time_spine_source_node,
+            source_node_set=self.source_node_set,
             semantic_manifest_lookup=self.semantic_manifest_lookup,
             node_output_resolver=node_output_resolver,
             column_association_resolver=self.column_association_resolver,
@@ -184,24 +179,14 @@ class MetricFlowEngineTestFixture:
         return return_dict
 
     @staticmethod
-    def _data_set_to_source_nodes(
-        semantic_manifest_lookup: SemanticManifestLookup, data_sets: OrderedDict[str, SemanticModelDataSet]
-    ) -> Sequence[BaseOutput]:
-        # Moved from model_fixtures.py.
-        source_node_builder = SourceNodeBuilder(semantic_manifest_lookup)
-        return source_node_builder.create_from_data_sets(list(data_sets.values()))
-
-    @staticmethod
-    def _build_time_spine_source_node(
+    def _data_set_to_source_node_set(
+        column_association_resolver: ColumnAssociationResolver,
         semantic_manifest_lookup: SemanticManifestLookup,
-    ) -> MetricTimeDimensionTransformNode:
+        data_sets: OrderedDict[str, SemanticModelDataSet],
+    ) -> SourceNodeSet:
         # Moved from model_fixtures.py.
-        return SourceNodeBuilder.build_time_spine_source_node(
-            time_spine_source=semantic_manifest_lookup.time_spine_source,
-            data_set_converter=SemanticModelToDataSetConverter(
-                column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup)
-            ),
-        )
+        source_node_builder = SourceNodeBuilder(column_association_resolver, semantic_manifest_lookup)
+        return source_node_builder.create_from_data_sets(list(data_sets.values()))
 
     @staticmethod
     def _create_data_sets(

@@ -13,7 +13,8 @@ from metricflow.dataflow.builder.node_evaluator import (
     NodeEvaluatorForLinkableInstances,
 )
 from metricflow.dataflow.builder.partitions import PartitionTimeDimensionJoinDescription
-from metricflow.dataflow.dataflow_plan import BaseOutput, ValidityWindowJoinDescription
+from metricflow.dataflow.builder.source_node import SourceNodeSet
+from metricflow.dataflow.dataflow_plan import ValidityWindowJoinDescription
 from metricflow.dataset.dataset import DataSet
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
@@ -54,7 +55,7 @@ def node_evaluator(
 
 
 def make_multihop_node_evaluator(
-    model_source_nodes: Sequence[BaseOutput],
+    source_node_set: SourceNodeSet,
     semantic_manifest_lookup_with_multihop_links: SemanticManifestLookup,
     desired_linkable_specs: Sequence[LinkableInstanceSpec],
 ) -> NodeEvaluatorForLinkableInstances:  # noqa: D
@@ -71,8 +72,9 @@ def make_multihop_node_evaluator(
 
     nodes_available_for_joins = node_processor.remove_unnecessary_nodes(
         desired_linkable_specs=desired_linkable_specs,
-        nodes=model_source_nodes,
+        nodes=source_node_set.source_nodes_for_metric_queries,
         metric_time_dimension_reference=DataSet.metric_time_dimension_reference(),
+        time_spine_node=source_node_set.time_spine_node,
     )
 
     nodes_available_for_joins = node_processor.add_multi_hop_joins(
@@ -385,9 +387,9 @@ def test_node_evaluator_with_multihop_joined_spec(  # noqa: D
     ]
 
     multihop_node_evaluator = make_multihop_node_evaluator(
-        model_source_nodes=mf_engine_test_fixture_mapping[
+        source_node_set=mf_engine_test_fixture_mapping[
             SemanticManifestSetup.PARTITIONED_MULTI_HOP_JOIN_MANIFEST
-        ].source_nodes,
+        ].source_node_set,
         semantic_manifest_lookup_with_multihop_links=partitioned_multi_hop_join_semantic_manifest_lookup,
         desired_linkable_specs=linkable_specs,
     )
@@ -574,7 +576,7 @@ def test_node_evaluator_with_multi_hop_scd_target(
     """
     linkable_specs = [DimensionSpec.from_name("listing__lux_listing__is_confirmed_lux")]
     node_evaluator = make_multihop_node_evaluator(
-        model_source_nodes=mf_engine_test_fixture_mapping[SemanticManifestSetup.SCD_MANIFEST].source_nodes,
+        source_node_set=mf_engine_test_fixture_mapping[SemanticManifestSetup.SCD_MANIFEST].source_node_set,
         semantic_manifest_lookup_with_multihop_links=scd_semantic_manifest_lookup,
         desired_linkable_specs=linkable_specs,
     )
@@ -639,7 +641,7 @@ def test_node_evaluator_with_multi_hop_through_scd(
     """
     linkable_specs = [DimensionSpec.from_name("listing__user__home_state_latest")]
     node_evaluator = make_multihop_node_evaluator(
-        model_source_nodes=mf_engine_test_fixture_mapping[SemanticManifestSetup.SCD_MANIFEST].source_nodes,
+        source_node_set=mf_engine_test_fixture_mapping[SemanticManifestSetup.SCD_MANIFEST].source_node_set,
         semantic_manifest_lookup_with_multihop_links=scd_semantic_manifest_lookup,
         desired_linkable_specs=linkable_specs,
     )
@@ -699,7 +701,7 @@ def test_node_evaluator_with_invalid_multi_hop_scd(
     """
     linkable_specs = [DimensionSpec.from_name("listing__user__account_type")]
     node_evaluator = make_multihop_node_evaluator(
-        model_source_nodes=mf_engine_test_fixture_mapping[SemanticManifestSetup.SCD_MANIFEST].source_nodes,
+        source_node_set=mf_engine_test_fixture_mapping[SemanticManifestSetup.SCD_MANIFEST].source_node_set,
         semantic_manifest_lookup_with_multihop_links=scd_semantic_manifest_lookup,
         desired_linkable_specs=linkable_specs,
     )
