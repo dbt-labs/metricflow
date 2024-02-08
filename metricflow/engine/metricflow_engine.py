@@ -14,6 +14,7 @@ from dbt_semantic_interfaces.references import EntityReference, MeasureReference
 from dbt_semantic_interfaces.type_enums import DimensionType
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
+from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import DataflowPlan
 from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import (
@@ -271,7 +272,7 @@ class AbstractMetricFlowEngine(ABC):
         """Retrieves a list of dimension values given a [metric_name, get_group_by_values].
 
         Args:
-            metric_name: Names of metrics that contain the group_by.
+            metric_names: Names of metrics that contain the group_by.
             get_group_by_values: Name of group_by to get values from.
             time_constraint_start: Get data for the start of this time range.
             time_constraint_end: Get data for the end of this time range.
@@ -294,8 +295,10 @@ class AbstractMetricFlowEngine(ABC):
         """Returns the SQL query for get_dimension_values.
 
         Args:
-            metric_name: Names of metrics that contain the group_by.
+            metric_names: Names of metrics that contain the group_by.
+            metrics: Similar to `metric_names`, but specified via parameter objects.
             get_group_by_values: Name of group_by to get values from.
+            group_by: Similar to `get_group_by_values`, but specified via parameter objects.
             time_constraint_start: Get data for the start of this time range.
             time_constraint_end: Get data for the end of this time range.
 
@@ -351,9 +354,17 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         )
         source_node_set = source_node_builder.create_from_data_sets(self._source_data_sets)
 
+        node_output_resolver = DataflowPlanNodeOutputDataSetResolver(
+            column_association_resolver=self._column_association_resolver,
+            semantic_manifest_lookup=self._semantic_manifest_lookup,
+        )
+        node_output_resolver.cache_output_data_sets(source_node_set.all_nodes)
+
         self._dataflow_plan_builder = DataflowPlanBuilder(
             source_node_set=source_node_set,
             semantic_manifest_lookup=self._semantic_manifest_lookup,
+            column_association_resolver=self._column_association_resolver,
+            node_output_resolver=node_output_resolver,
         )
         self._to_sql_query_plan_converter = DataflowToSqlQueryPlanConverter(
             column_association_resolver=self._column_association_resolver,
