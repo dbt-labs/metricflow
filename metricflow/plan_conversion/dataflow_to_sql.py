@@ -163,6 +163,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             semantic_manifest_lookup: Self-explanatory.
         """
         self._column_association_resolver = column_association_resolver
+        self._semantic_manifest_lookup = semantic_manifest_lookup
         self._metric_lookup = semantic_manifest_lookup.metric_lookup
         self._semantic_model_lookup = semantic_manifest_lookup.semantic_model_lookup
         self._time_spine_source = semantic_manifest_lookup.time_spine_source
