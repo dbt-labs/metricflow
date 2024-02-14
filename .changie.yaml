@@ -11,10 +11,12 @@ changeFormat: |-
   {{- $IssueList := list }}
   {{- $changes := splitList " " $.Custom.Issue }}
   {{- range $issueNbr := $changes }}
-    {{- $changeLink := "[#nbr](https://github.com/dbt-labs/metricflow/issues/nbr)" | replace "nbr" $issueNbr }}
-    {{- $IssueList = append $IssueList $changeLink  }}
+    {{- if atoi $issueNbr }}
+      {{- $changeLink := "[#nbr](https://github.com/dbt-labs/metricflow/issues/nbr)" | replace "nbr" $issueNbr }}
+      {{- $IssueList = append $IssueList $changeLink  }}
+    {{- end -}}
   {{- end -}}
-  - {{.Body}} ({{ range $index, $element := $IssueList }}{{if $index}}, {{end}}{{$element}}{{end}})
+  - {{.Body}}{{if $IssueList}} ({{ join ", " $IssueList }}){{end}}
 
 kinds:
   - label: Breaking Changes
@@ -57,8 +59,10 @@ footerFormat: |
         {{- $changeLink := $change.Kind }}
         {{- $changes := splitList " " $change.Custom.Issue }}
         {{- range $issueNbr := $changes }}
-          {{- $changeLink := "[#nbr](https://github.com/dbt-labs/metricflow/issues/nbr)" | replace "nbr" $issueNbr }}
-          {{- $IssueList = append $IssueList $changeLink  }}
+          {{- if atoi $issueNbr }}
+            {{- $changeLink := "[#nbr](https://github.com/dbt-labs/metricflow/issues/nbr)" | replace "nbr" $issueNbr }}
+            {{- $IssueList = append $IssueList $changeLink  }}
+          {{- end -}}
         {{- end -}}
         {{- /* check if this contributor has other changes associated with them already */}}
         {{- if hasKey $contributorDict $author }}
@@ -76,6 +80,6 @@ footerFormat: |
   {{- if $contributorDict}}
   ### Contributors
   {{- range $k,$v := $contributorDict }}
-  - [@{{$k}}](https://github.com/{{$k}}) ({{ range $index, $element := $v }}{{if $index}}, {{end}}{{$element}}{{end}})
+  - [@{{$k}}](https://github.com/{{$k}}){{if $v}} ({{ join ", " $v }}){{end}}
   {{- end }}
   {{- end }}
