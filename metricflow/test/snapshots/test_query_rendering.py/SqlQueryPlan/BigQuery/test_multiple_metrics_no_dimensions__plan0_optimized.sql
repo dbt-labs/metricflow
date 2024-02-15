@@ -1,7 +1,7 @@
 -- Combine Aggregated Outputs
 SELECT
-  MAX(subq_17.bookings) AS bookings
-  , MAX(subq_23.listings) AS listings
+  MAX(subq_21.bookings) AS bookings
+  , MAX(subq_27.listings) AS listings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
@@ -11,9 +11,9 @@ FROM (
   -- Compute Metrics via Expressions
   SELECT
     SUM(1) AS bookings
-  FROM ***************************.fct_bookings bookings_source_src_10001
+  FROM ***************************.fct_bookings bookings_source_src_28000
   WHERE DATE_TRUNC(ds, day) BETWEEN '2020-01-01' AND '2020-01-01'
-) subq_17
+) subq_21
 CROSS JOIN (
   -- Read Elements From Semantic Model 'listings_latest'
   -- Metric Time Dimension 'ds'
@@ -23,6 +23,6 @@ CROSS JOIN (
   -- Compute Metrics via Expressions
   SELECT
     SUM(1) AS listings
-  FROM ***************************.dim_listings_latest listings_latest_src_10005
+  FROM ***************************.dim_listings_latest listings_latest_src_28000
   WHERE DATE_TRUNC(created_at, day) BETWEEN '2020-01-01' AND '2020-01-01'
-) subq_23
+) subq_27

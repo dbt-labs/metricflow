@@ -28,7 +28,7 @@ FROM (
         SELECT
           DATE_TRUNC(ds, day) AS metric_time__day
           , SUM(booking_value) AS booking_value
-        FROM ***************************.fct_bookings bookings_source_src_10001
+        FROM ***************************.fct_bookings bookings_source_src_28000
         GROUP BY
           metric_time__day
       ) subq_20
@@ -50,7 +50,7 @@ FROM (
       SELECT
         DATE_TRUNC(ds, day) AS metric_time__day
         , SUM(booking_value) AS booking_value
-      FROM ***************************.fct_bookings bookings_source_src_10001
+      FROM ***************************.fct_bookings bookings_source_src_28000
       GROUP BY
         metric_time__day
     ) subq_29

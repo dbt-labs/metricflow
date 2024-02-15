@@ -60,7 +60,10 @@ class QueryRenderingTools:
 
     def __init__(self, manifest: SemanticManifest) -> None:  # noqa: D
         self.semantic_manifest_lookup = SemanticManifestLookup(semantic_manifest=manifest)
-        self.source_node_builder = SourceNodeBuilder(semantic_manifest_lookup=self.semantic_manifest_lookup)
+        self.source_node_builder = SourceNodeBuilder(
+            column_association_resolver=DunderColumnAssociationResolver(self.semantic_manifest_lookup),
+            semantic_manifest_lookup=self.semantic_manifest_lookup,
+        )
         self.time_spine_source = self.semantic_manifest_lookup.time_spine_source
         self.converter = SemanticModelToDataSetConverter(
             column_association_resolver=DunderColumnAssociationResolver(
@@ -108,7 +111,7 @@ class DataWarehouseTaskBuilder:
 
         source_nodes = render_tools.source_node_builder.create_from_data_sets(
             (render_tools.converter.create_sql_source_data_set(fetched_semantic_model),)
-        )
+        ).source_nodes_for_metric_queries
 
         assert len(source_nodes) >= 1
         return source_nodes
@@ -120,7 +123,6 @@ class DataWarehouseTaskBuilder:
         """Generates a sql query plan and returns the rendered sql and bind_parameters."""
         sql_plan = plan_converter.convert_to_sql_query_plan(
             sql_engine_type=sql_client.sql_engine_type,
-            sql_query_plan_id=plan_id,
             dataflow_plan_node=nodes,
         )
 

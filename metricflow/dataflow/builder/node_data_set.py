@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-from typing import Dict
+from typing import Dict, Optional, Sequence
 
 from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,
 )
 from metricflow.dataset.sql_dataset import SqlDataSet
+from metricflow.mf_logging.runtime import log_block_runtime
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.specs.column_assoc import ColumnAssociationResolver
@@ -58,16 +59,34 @@ class DataflowPlanNodeOutputDataSetResolver(DataflowToSqlQueryPlanConverter):
         self,
         column_association_resolver: ColumnAssociationResolver,
         semantic_manifest_lookup: SemanticManifestLookup,
+        _node_to_output_data_set: Optional[Dict[DataflowPlanNode, SqlDataSet]] = None,
     ) -> None:
-        self._node_to_output_data_set: Dict[DataflowPlanNode, SqlDataSet] = {}
+        self._node_to_output_data_set: Dict[DataflowPlanNode, SqlDataSet] = _node_to_output_data_set or {}
         super().__init__(
             column_association_resolver=column_association_resolver,
             semantic_manifest_lookup=semantic_manifest_lookup,
         )
 
     def get_output_data_set(self, node: DataflowPlanNode) -> SqlDataSet:  # noqa: D
-        """Cached since this will be called repeatedly during the computation of multiple metrics."""
+        """Cached since this will be called repeatedly during the computation of multiple metrics.
+
+        # TODO: The cache needs to be pruned, but has not yet been an issue.
+        """
         if node not in self._node_to_output_data_set:
             self._node_to_output_data_set[node] = node.accept(self)
 
         return self._node_to_output_data_set[node]
+
+    def cache_output_data_sets(self, nodes: Sequence[DataflowPlanNode]) -> None:
+        """Cache the output of the given nodes for consistent retrieval with `get_output_data_set`."""
+        with log_block_runtime(f"cache_output_data_sets for {len(nodes)} nodes"):
+            for node in nodes:
+                self.get_output_data_set(node)
+
+    def copy(self) -> DataflowPlanNodeOutputDataSetResolver:
+        """Return a copy of this with the same nodes cached."""
+        return DataflowPlanNodeOutputDataSetResolver(
+            column_association_resolver=self.column_association_resolver,
+            semantic_manifest_lookup=self._semantic_manifest_lookup,
+            _node_to_output_data_set=dict(self._node_to_output_data_set),
+        )

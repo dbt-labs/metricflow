@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+from typing import Mapping
+
 import pytest
 
-from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer, SqlQueryPlanRenderer
+from metricflow.test.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 
 
 @pytest.fixture
@@ -15,19 +16,29 @@ def default_sql_plan_renderer() -> SqlQueryPlanRenderer:  # noqa: D
 
 @pytest.fixture(scope="session")
 def dataflow_to_sql_converter(  # noqa: D
-    simple_semantic_manifest_lookup: SemanticManifestLookup,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture]
 ) -> DataflowToSqlQueryPlanConverter:
-    return DataflowToSqlQueryPlanConverter(
-        column_association_resolver=DunderColumnAssociationResolver(simple_semantic_manifest_lookup),
-        semantic_manifest_lookup=simple_semantic_manifest_lookup,
-    )
+    return mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].dataflow_to_sql_converter
 
 
 @pytest.fixture(scope="session")
 def extended_date_dataflow_to_sql_converter(  # noqa: D
-    extended_date_semantic_manifest_lookup: SemanticManifestLookup,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture]
 ) -> DataflowToSqlQueryPlanConverter:
-    return DataflowToSqlQueryPlanConverter(
-        column_association_resolver=DunderColumnAssociationResolver(extended_date_semantic_manifest_lookup),
-        semantic_manifest_lookup=extended_date_semantic_manifest_lookup,
-    )
+    return mf_engine_test_fixture_mapping[SemanticManifestSetup.EXTENDED_DATE_MANIFEST].dataflow_to_sql_converter
+
+
+@pytest.fixture(scope="session")
+def multihop_dataflow_to_sql_converter(  # noqa: D
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture]
+) -> DataflowToSqlQueryPlanConverter:
+    return mf_engine_test_fixture_mapping[
+        SemanticManifestSetup.PARTITIONED_MULTI_HOP_JOIN_MANIFEST
+    ].dataflow_to_sql_converter
+
+
+@pytest.fixture(scope="session")
+def scd_dataflow_to_sql_converter(  # noqa: D
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture]
+) -> DataflowToSqlQueryPlanConverter:
+    return mf_engine_test_fixture_mapping[SemanticManifestSetup.SCD_MANIFEST].dataflow_to_sql_converter

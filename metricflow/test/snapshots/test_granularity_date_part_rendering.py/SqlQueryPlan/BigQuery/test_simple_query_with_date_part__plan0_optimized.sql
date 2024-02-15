@@ -10,7 +10,7 @@ FROM (
   SELECT
     IF(EXTRACT(dayofweek FROM ds) = 1, 7, EXTRACT(dayofweek FROM ds) - 1) AS metric_time__extract_dow
     , 1 AS bookings
-  FROM ***************************.fct_bookings bookings_source_src_10001
+  FROM ***************************.fct_bookings bookings_source_src_28000
 ) subq_6
 GROUP BY
   metric_time__extract_dow

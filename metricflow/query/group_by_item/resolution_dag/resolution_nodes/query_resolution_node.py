@@ -6,7 +6,7 @@ from dbt_semantic_interfaces.protocols import WhereFilterIntersection
 from dbt_semantic_interfaces.references import MetricReference
 from typing_extensions import override
 
-from metricflow.dag.id_prefix import IdPrefix
+from metricflow.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow.dag.mf_dag import DisplayedProperty
 from metricflow.query.group_by_item.resolution_dag.resolution_nodes.base_node import (
     GroupByItemResolutionNode,
@@ -51,8 +51,8 @@ class QueryGroupByItemResolutionNode(GroupByItemResolutionNode):
 
     @classmethod
     @override
-    def id_prefix_enum(cls) -> IdPrefix:
-        return IdPrefix.QUERY_GROUP_BY_ITEM_RESOLUTION_NODE
+    def id_prefix(cls) -> IdPrefix:
+        return StaticIdPrefix.QUERY_GROUP_BY_ITEM_RESOLUTION_NODE
 
     @property
     def metrics_in_query(self) -> Sequence[MetricReference]:

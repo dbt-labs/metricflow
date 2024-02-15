@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging
 from typing import Optional, Union
 
-from metricflow.dag.id_generation import EXEC_PLAN_PREFIX, SQL_QUERY_PLAN_PREFIX, IdGeneratorRegistry
 from metricflow.dataflow.dataflow_plan import (
     BaseOutput,
     ComputedMetricsOutput,
@@ -22,8 +21,6 @@ from metricflow.execution.execution_plan import (
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
-from metricflow.sql.sql_plan import SqlQueryPlan
-from metricflow.sql_request.sql_request_attributes import SqlJsonTag
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +33,6 @@ class DataflowToExecutionPlanConverter(SinkNodeVisitor[ExecutionPlan]):
         sql_plan_converter: DataflowToSqlQueryPlanConverter,
         sql_plan_renderer: SqlQueryPlanRenderer,
         sql_client: SqlClient,
-        extra_sql_tags: SqlJsonTag = SqlJsonTag(),
     ) -> None:
         """Constructor.
 
@@ -44,12 +40,10 @@ class DataflowToExecutionPlanConverter(SinkNodeVisitor[ExecutionPlan]):
             sql_plan_converter: Converts a dataflow plan node to a SQL query plan
             sql_plan_renderer: Converts a SQL query plan to SQL text
             sql_client: The client to use for running queries.
-            extra_sql_tags: Tags to supply to the SQL client when running statements.
         """
         self._sql_plan_converter = sql_plan_converter
         self._sql_plan_renderer = sql_plan_renderer
         self._sql_client = sql_client
-        self._sql_tags = extra_sql_tags
 
     def _build_execution_plan(  # noqa: D
         self,
@@ -58,7 +52,6 @@ class DataflowToExecutionPlanConverter(SinkNodeVisitor[ExecutionPlan]):
     ) -> ExecutionPlan:
         sql_plan = self._sql_plan_converter.convert_to_sql_query_plan(
             sql_engine_type=self._sql_client.sql_engine_type,
-            sql_query_plan_id=IdGeneratorRegistry.for_class(SqlQueryPlan).create_id(SQL_QUERY_PLAN_PREFIX),
             dataflow_plan_node=node,
         )
 
@@ -73,7 +66,6 @@ class DataflowToExecutionPlanConverter(SinkNodeVisitor[ExecutionPlan]):
                 sql_client=self._sql_client,
                 sql_query=render_result.sql,
                 bind_parameters=render_result.bind_parameters,
-                extra_sql_tags=self._sql_tags,
             )
         else:
             leaf_task = SelectSqlQueryToTableTask(
@@ -81,11 +73,10 @@ class DataflowToExecutionPlanConverter(SinkNodeVisitor[ExecutionPlan]):
                 sql_query=render_result.sql,
                 bind_parameters=render_result.bind_parameters,
                 output_table=output_table,
-                extra_sql_tags=self._sql_tags,
             )
 
         return ExecutionPlan(
-            plan_id=IdGeneratorRegistry.for_class(self.__class__).create_id(EXEC_PLAN_PREFIX), leaf_tasks=[leaf_task]
+            leaf_tasks=[leaf_task],
         )
 
     def visit_write_to_result_dataframe_node(self, node: WriteToResultDataframeNode) -> ExecutionPlan:  # noqa: D

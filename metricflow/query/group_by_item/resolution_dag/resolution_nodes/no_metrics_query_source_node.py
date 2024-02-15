@@ -4,7 +4,7 @@ from typing import Sequence
 
 from typing_extensions import override
 
-from metricflow.dag.id_prefix import IdPrefix
+from metricflow.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow.query.group_by_item.resolution_dag.resolution_nodes.base_node import (
     GroupByItemResolutionNode,
     GroupByItemResolutionNodeVisitor,
@@ -37,8 +37,8 @@ class NoMetricsGroupByItemSourceNode(GroupByItemResolutionNode):
 
     @classmethod
     @override
-    def id_prefix_enum(cls) -> IdPrefix:
-        return IdPrefix.VALUES_GROUP_BY_ITEM_RESOLUTION_NODE
+    def id_prefix(cls) -> IdPrefix:
+        return StaticIdPrefix.VALUES_GROUP_BY_ITEM_RESOLUTION_NODE
 
     @property
     @override

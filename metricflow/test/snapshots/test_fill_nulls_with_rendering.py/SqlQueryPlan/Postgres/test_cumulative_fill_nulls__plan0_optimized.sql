@@ -14,15 +14,15 @@ FROM (
     -- Aggregate Measures
     SELECT
       subq_13.ds AS metric_time__day
-      , COUNT(DISTINCT bookings_source_src_10001.guest_id) AS bookers
+      , COUNT(DISTINCT bookings_source_src_28000.guest_id) AS bookers
     FROM ***************************.mf_time_spine subq_13
     INNER JOIN
-      ***************************.fct_bookings bookings_source_src_10001
+      ***************************.fct_bookings bookings_source_src_28000
     ON
       (
-        DATE_TRUNC('day', bookings_source_src_10001.ds) <= subq_13.ds
+        DATE_TRUNC('day', bookings_source_src_28000.ds) <= subq_13.ds
       ) AND (
-        DATE_TRUNC('day', bookings_source_src_10001.ds) > subq_13.ds - MAKE_INTERVAL(days => 2)
+        DATE_TRUNC('day', bookings_source_src_28000.ds) > subq_13.ds - MAKE_INTERVAL(days => 2)
       )
     GROUP BY
       subq_13.ds

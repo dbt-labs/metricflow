@@ -8,10 +8,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Generic, List, Optional, Sequence, Tuple
 
-from metricflow.dag.id_generation import (
-    SQL_PLAN_SELECT_STATEMENT_ID_PREFIX,
-    SQL_PLAN_TABLE_FROM_CLAUSE_ID_PREFIX,
-)
+from metricflow.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow.dag.mf_dag import DagId, DagNode, DisplayedProperty, MetricFlowDag, NodeId
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.sql.sql_exprs import SqlExpressionNode
@@ -158,8 +155,8 @@ class SqlSelectStatementNode(SqlQueryPlanNode):
         )
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
-        return SQL_PLAN_SELECT_STATEMENT_ID_PREFIX
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
+        return StaticIdPrefix.SQL_PLAN_SELECT_STATEMENT_ID_PREFIX
 
     @property
     def description(self) -> str:  # noqa: D
@@ -234,8 +231,8 @@ class SqlTableFromClauseNode(SqlQueryPlanNode):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
-        return SQL_PLAN_TABLE_FROM_CLAUSE_ID_PREFIX
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
+        return StaticIdPrefix.SQL_PLAN_TABLE_FROM_CLAUSE_ID_PREFIX
 
     @property
     def description(self) -> str:  # noqa: D
@@ -271,8 +268,8 @@ class SqlSelectQueryFromClauseNode(SqlQueryPlanNode):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
-        return SQL_PLAN_TABLE_FROM_CLAUSE_ID_PREFIX
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
+        return StaticIdPrefix.SQL_PLAN_TABLE_FROM_CLAUSE_ID_PREFIX
 
     @property
     def description(self) -> str:  # noqa: D
@@ -297,15 +294,18 @@ class SqlSelectQueryFromClauseNode(SqlQueryPlanNode):
 class SqlQueryPlan(MetricFlowDag[SqlQueryPlanNode]):  # noqa: D
     """Model for an SQL Query as a DAG."""
 
-    def __init__(self, plan_id: str, render_node: SqlQueryPlanNode) -> None:
+    def __init__(self, render_node: SqlQueryPlanNode, plan_id: Optional[DagId] = None) -> None:
         """Constructor.
 
         Args:
-            plan_id: The ID to associate with this plan.
             render_node: The node from which to start rendering the SQL query.
+            plan_id: If specified, use this sql_query_plan_id instead of a generated one.
         """
         self._render_node = render_node
-        super().__init__(dag_id=DagId.from_str(plan_id), sink_nodes=[self._render_node])
+        super().__init__(
+            dag_id=plan_id or DagId.from_id_prefix(StaticIdPrefix.SQL_QUERY_PLAN_PREFIX),
+            sink_nodes=[self._render_node],
+        )
 
     @property
     def render_node(self) -> SqlQueryPlanNode:  # noqa: D

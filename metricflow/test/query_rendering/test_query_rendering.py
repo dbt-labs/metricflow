@@ -1,7 +1,7 @@
 """Tests base query rendering behavior by comparing rendered output against snapshot files.
 
 This module is meant to start with a MetricFlowQuerySpec or equivalent representation of
-a MetricFlow query input and end up with a query rendered for execution against a the
+a MetricFlow query input and end up with a query rendered for execution against the
 target engine. This will depend on test semantic manifests and engine-specific rendering
 logic as propagated via the SqlClient input.
 """
@@ -18,8 +18,6 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataset.dataset import DataSet
 from metricflow.filters.time_constraint import TimeRangeConstraint
-from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.query.query_parser import MetricFlowQueryParser
@@ -30,30 +28,9 @@ from metricflow.specs.specs import (
     MetricSpec,
     TimeDimensionSpec,
 )
-from metricflow.test.fixtures.model_fixtures import ConsistentIdObjectRepository
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.query_rendering.compare_rendered_query import convert_and_check
 from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY
-
-
-@pytest.fixture(scope="session")
-def multihop_dataflow_to_sql_converter(  # noqa: D
-    multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
-) -> DataflowToSqlQueryPlanConverter:
-    return DataflowToSqlQueryPlanConverter(
-        column_association_resolver=DunderColumnAssociationResolver(multi_hop_join_semantic_manifest_lookup),
-        semantic_manifest_lookup=multi_hop_join_semantic_manifest_lookup,
-    )
-
-
-@pytest.fixture(scope="session")
-def scd_dataflow_to_sql_converter(  # noqa: D
-    scd_semantic_manifest_lookup: SemanticManifestLookup,
-) -> DataflowToSqlQueryPlanConverter:
-    return DataflowToSqlQueryPlanConverter(
-        column_association_resolver=DunderColumnAssociationResolver(scd_semantic_manifest_lookup),
-        semantic_manifest_lookup=scd_semantic_manifest_lookup,
-    )
 
 
 @pytest.mark.sql_engine_snapshot
@@ -93,11 +70,9 @@ def test_multihop_node(
 def test_filter_with_where_constraint_on_join_dim(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
-    column_association_resolver: ColumnAssociationResolver,
     dataflow_plan_builder: DataflowPlanBuilder,
     query_parser: MetricFlowQueryParser,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan where there is a join between 1 measure and 2 dimensions."""
@@ -125,7 +100,6 @@ def test_partitioned_join(
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    consistent_id_object_repository: ConsistentIdObjectRepository,
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan where there's a join on a partitioned dimension."""

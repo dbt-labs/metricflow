@@ -13,7 +13,9 @@ from dbt_semantic_interfaces.type_enums.conversion_calculation_type import Conve
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 
 from metricflow.aggregation_properties import AggregationState
-from metricflow.dag.id_generation import IdGeneratorRegistry
+from metricflow.dag.id_prefix import StaticIdPrefix
+from metricflow.dag.mf_dag import DagId
+from metricflow.dag.sequential_id import SequentialIdGenerator
 from metricflow.dataflow.dataflow_plan import (
     AddGeneratedUuidColumnNode,
     AggregateMeasuresNode,
@@ -163,6 +165,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             semantic_manifest_lookup: Self-explanatory.
         """
         self._column_association_resolver = column_association_resolver
+        self._semantic_manifest_lookup = semantic_manifest_lookup
         self._metric_lookup = semantic_manifest_lookup.metric_lookup
         self._semantic_model_lookup = semantic_manifest_lookup.semantic_model_lookup
         self._time_spine_source = semantic_manifest_lookup.time_spine_source
@@ -174,9 +177,9 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
     def convert_to_sql_query_plan(
         self,
         sql_engine_type: SqlEngine,
-        sql_query_plan_id: str,
         dataflow_plan_node: Union[BaseOutput, ComputedMetricsOutput],
         optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O4,
+        sql_query_plan_id: Optional[DagId] = None,
     ) -> SqlQueryPlan:
         """Create an SQL query plan that represents the computation up to the given dataflow plan node."""
         sql_select_node: SqlQueryPlanNode = dataflow_plan_node.accept(self).sql_select_node
@@ -195,11 +198,11 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 f"{indent(sql_select_node.text_structure())}"
             )
 
-        return SqlQueryPlan(plan_id=sql_query_plan_id, render_node=sql_select_node)
+        return SqlQueryPlan(render_node=sql_select_node, plan_id=sql_query_plan_id)
 
     def _next_unique_table_alias(self) -> str:
         """Return the next unique table alias to use in generating queries."""
-        return IdGeneratorRegistry.for_class(self.__class__).create_id(prefix="subq")
+        return SequentialIdGenerator.create_next_id(StaticIdPrefix.SUB_QUERY).str_value
 
     def _make_time_spine_data_set(
         self,
@@ -727,8 +730,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             ),
         )
 
-    # COALESCE applied to measure aggregation subquery. Currently used for simple & cumulative metrics,
-    # but should be used for all metrics that take input measures (missing for conversion metrics).
     def __make_col_reference_or_coalesce_expr(
         self, column_name: str, input_measure: Optional[MetricInputMeasure], from_data_set_alias: str
     ) -> SqlExpressionNode:
@@ -1270,9 +1271,10 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
         # Choose the instance with the smallest granularity available.
         agg_time_dimension_instances.sort(key=lambda instance: instance.spec.time_granularity.to_int())
-        assert (
-            len(agg_time_dimension_instances) > 0
-        ), "Couldn't find requested agg_time_dimension in parent data set. The dataflow plan may have been configured incorrectly."
+        assert len(agg_time_dimension_instances) > 0, (
+            "Couldn't find requested agg_time_dimension in parent data set. The dataflow plan may have been "
+            "configured incorrectly."
+        )
         agg_time_dimension_instance_for_join = agg_time_dimension_instances[0]
 
         # Build time spine data set using the requested agg_time_dimension name.

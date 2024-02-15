@@ -22,14 +22,14 @@ FROM (
         -- Join Standard Outputs
         -- Pass Only Elements: ['average_booking_value', 'listing__is_lux_latest', 'booking__is_instant']
         SELECT
-          bookings_source_src_10001.is_instant AS booking__is_instant
-          , listings_latest_src_10005.is_lux AS listing__is_lux_latest
-          , bookings_source_src_10001.booking_value AS average_booking_value
-        FROM ***************************.fct_bookings bookings_source_src_10001
+          bookings_source_src_28000.is_instant AS booking__is_instant
+          , listings_latest_src_28000.is_lux AS listing__is_lux_latest
+          , bookings_source_src_28000.booking_value AS average_booking_value
+        FROM ***************************.fct_bookings bookings_source_src_28000
         LEFT OUTER JOIN
-          ***************************.dim_listings_latest listings_latest_src_10005
+          ***************************.dim_listings_latest listings_latest_src_28000
         ON
-          bookings_source_src_10001.listing_id = listings_latest_src_10005.listing_id
+          bookings_source_src_28000.listing_id = listings_latest_src_28000.listing_id
       ) subq_40
       WHERE (listing__is_lux_latest) AND (booking__is_instant)
     ) subq_44
@@ -45,7 +45,7 @@ FROM (
         -- Pass Only Elements: ['bookings', 'listing__is_lux_latest', 'booking__is_instant']
         SELECT
           subq_47.booking__is_instant AS booking__is_instant
-          , listings_latest_src_10005.is_lux AS listing__is_lux_latest
+          , listings_latest_src_28000.is_lux AS listing__is_lux_latest
           , subq_47.bookings AS bookings
         FROM (
           -- Read Elements From Semantic Model 'bookings_source'
@@ -55,12 +55,12 @@ FROM (
             listing_id AS listing
             , is_instant AS booking__is_instant
             , 1 AS bookings
-          FROM ***************************.fct_bookings bookings_source_src_10001
+          FROM ***************************.fct_bookings bookings_source_src_28000
         ) subq_47
         LEFT OUTER JOIN
-          ***************************.dim_listings_latest listings_latest_src_10005
+          ***************************.dim_listings_latest listings_latest_src_28000
         ON
-          subq_47.listing = listings_latest_src_10005.listing_id
+          subq_47.listing = listings_latest_src_28000.listing_id
       ) subq_52
       WHERE (listing__is_lux_latest) AND (booking__is_instant)
     ) subq_56
@@ -78,7 +78,7 @@ FROM (
         SELECT
           is_instant AS booking__is_instant
           , booking_value
-        FROM ***************************.fct_bookings bookings_source_src_10001
+        FROM ***************************.fct_bookings bookings_source_src_28000
       ) subq_59
       WHERE booking__is_instant
     ) subq_63

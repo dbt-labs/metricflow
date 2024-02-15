@@ -68,7 +68,6 @@ class MetricFlowDagTextFormatter:
 
         # In case this gets used in a multi-threaded context, use a thread-local variable since it has mutable state.
         self._thread_local_data = threading.local()
-        self._thread_local_data.max_width_tracker = MaxWidthTracker(max_width)
 
     @property
     def _max_width_tracker(self) -> MaxWidthTracker:  # noqa: D
@@ -200,7 +199,10 @@ class MetricFlowDagTextFormatter:
                 inner_contents="\n".join(component_from_sink_nodes_as_text),
             )
         except Exception:
-            logger.exception(f"Got an exception while converting {dag} to text")
+            logger.exception(
+                f"Got an exception while converting {dag} to text. This exception will be swallowed, and the built-in "
+                f"string representation will be returned instead."
+            )
             return str(dag)
 
     def dag_component_to_text(self, dag_component_leaf_node: DagNode) -> str:

@@ -7,7 +7,7 @@ FROM (
   -- Read Elements From Semantic Model 'listings_latest'
   SELECT
     country AS listing__country_latest
-  FROM ***************************.dim_listings_latest listings_latest_src_10005
+  FROM ***************************.dim_listings_latest listings_latest_src_28000
 ) subq_3
 WHERE listing__country_latest = 'us'
 GROUP BY

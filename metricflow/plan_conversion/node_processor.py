@@ -14,6 +14,7 @@ from metricflow.dataflow.dataflow_plan import (
     FilterElementsNode,
     JoinDescription,
     JoinToBaseOutputNode,
+    MetricTimeDimensionTransformNode,
 )
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.mf_logging.pretty_print import mf_pformat
@@ -228,11 +229,11 @@ class PreJoinNodeProcessor:
                 )
 
                 join_on_partition_dimensions = self._partition_resolver.resolve_partition_dimension_joins(
-                    start_node_spec_set=data_set_of_first_node_that_could_be_joined.instance_set.spec_set,
+                    left_node_spec_set=data_set_of_first_node_that_could_be_joined.instance_set.spec_set,
                     node_to_join_spec_set=data_set_of_second_node_that_can_be_joined.instance_set.spec_set,
                 )
                 join_on_partition_time_dimensions = self._partition_resolver.resolve_partition_time_dimension_joins(
-                    start_node_spec_set=data_set_of_first_node_that_could_be_joined.instance_set.spec_set,
+                    left_node_spec_set=data_set_of_first_node_that_could_be_joined.instance_set.spec_set,
                     node_to_join_spec_set=data_set_of_second_node_that_can_be_joined.instance_set.spec_set,
                 )
 
@@ -301,6 +302,7 @@ class PreJoinNodeProcessor:
         desired_linkable_specs: Sequence[LinkableInstanceSpec],
         nodes: Sequence[BaseOutput],
         metric_time_dimension_reference: TimeDimensionReference,
+        time_spine_node: MetricTimeDimensionTransformNode,
     ) -> Sequence[BaseOutput]:
         """Filters out many of the nodes that can't possibly be useful for joins to obtain the desired linkable specs.
 
@@ -332,10 +334,19 @@ class PreJoinNodeProcessor:
         relevant_nodes = []
 
         for node in nodes:
+            logger.debug(f"Examining {node} for pruning")
             data_set = self._node_data_set_resolver.get_output_data_set(node)
             element_names_in_data_set = ToElementNameSet().transform(data_set.instance_set.spec_set)
-
-            if len(element_names_in_data_set.intersection(relevant_element_names)) > 0:
+            element_names_intersection = element_names_in_data_set.intersection(relevant_element_names)
+            if len(element_names_intersection) > 0:
+                logger.debug(f"Including {node} since `element_names_intersection` is {element_names_intersection}")
                 relevant_nodes.append(node)
+                continue
+
+            # Used for group-by-item-values queries.
+            if node == time_spine_node:
+                logger.debug(f"Including {node} since it matches `time_spine_node`")
+                relevant_nodes.append(node)
+                continue
 
         return relevant_nodes

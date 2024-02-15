@@ -10,12 +10,11 @@ from typing import List, Optional, Sequence, Tuple
 import jinja2
 import pandas as pd
 
-from metricflow.dag.id_generation import EXEC_NODE_READ_SQL_QUERY, EXEC_NODE_WRITE_TO_TABLE
+from metricflow.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow.dag.mf_dag import DagId, DagNode, DisplayedProperty, MetricFlowDag, NodeId
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.sql_request.sql_request_attributes import SqlJsonTag
 from metricflow.visitor import Visitable
 
 logger = logging.getLogger(__name__)
@@ -97,18 +96,16 @@ class SelectSqlQueryToDataFrameTask(ExecutionPlanTask):
         sql_client: SqlClient,
         sql_query: str,
         bind_parameters: SqlBindParameters,
-        extra_sql_tags: SqlJsonTag = SqlJsonTag(),
         parent_nodes: Optional[List[ExecutionPlanTask]] = None,
     ) -> None:
         self._sql_client = sql_client
         self._sql_query = sql_query
         self._bind_parameters = bind_parameters
-        self._extra_sql_tags = extra_sql_tags
         super().__init__(task_id=self.create_unique_id(), parent_nodes=parent_nodes or [])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
-        return EXEC_NODE_READ_SQL_QUERY
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
+        return StaticIdPrefix.EXEC_NODE_READ_SQL_QUERY
 
     @property
     def description(self) -> str:  # noqa: D
@@ -128,7 +125,6 @@ class SelectSqlQueryToDataFrameTask(ExecutionPlanTask):
         df = self._sql_client.query(
             self._sql_query,
             sql_bind_parameters=self.bind_parameters,
-            extra_tags=self._extra_sql_tags,
         )
 
         end_time = time.time()
@@ -156,19 +152,17 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
         sql_query: str,
         bind_parameters: SqlBindParameters,
         output_table: SqlTable,
-        extra_sql_tags: SqlJsonTag = SqlJsonTag(),
         parent_nodes: Optional[List[ExecutionPlanTask]] = None,
     ) -> None:
         self._sql_client = sql_client
         self._sql_query = sql_query
         self._output_table = output_table
         self._bind_parameters = bind_parameters
-        self._extra_sql_tags = extra_sql_tags
         super().__init__(task_id=self.create_unique_id(), parent_nodes=parent_nodes or [])
 
     @classmethod
-    def id_prefix(cls) -> str:  # noqa: D
-        return EXEC_NODE_WRITE_TO_TABLE
+    def id_prefix(cls) -> IdPrefix:  # noqa: D
+        return StaticIdPrefix.EXEC_NODE_WRITE_TO_TABLE
 
     @property
     def description(self) -> str:  # noqa: D
@@ -192,7 +186,6 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
         self._sql_client.execute(
             sql_query.sql_query,
             sql_bind_parameters=sql_query.bind_parameters,
-            extra_tags=self._extra_sql_tags,
         )
 
         end_time = time.time()
@@ -223,14 +216,13 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
 class ExecutionPlan(MetricFlowDag[ExecutionPlanTask]):
     """A DAG where the nodes are tasks, and parents represent prerequisite tasks."""
 
-    def __init__(self, plan_id: str, leaf_tasks: List[ExecutionPlanTask]) -> None:
+    def __init__(self, leaf_tasks: List[ExecutionPlanTask], dag_id: Optional[DagId] = None) -> None:
         """Constructor.
 
         Args:
-            plan_id: A string to uniquely identify this plan.
             leaf_tasks: The final set of tasks that will run, after task dependencies are finished.
         """
-        super().__init__(dag_id=DagId.from_str(plan_id), sink_nodes=leaf_tasks)
+        super().__init__(dag_id=dag_id or DagId.from_id_prefix(StaticIdPrefix.EXEC_PLAN_PREFIX), sink_nodes=leaf_tasks)
 
     @property
     def tasks(self) -> Sequence[ExecutionPlanTask]:

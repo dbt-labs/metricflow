@@ -22,13 +22,15 @@ from dbt_semantic_interfaces.references import (
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 
-from metricflow.dag.id_generation import DATAFLOW_PLAN_PREFIX, IdGeneratorRegistry
+from metricflow.dag.id_prefix import StaticIdPrefix
+from metricflow.dag.mf_dag import DagId
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.node_evaluator import (
     JoinLinkableInstancesRecipe,
     LinkableInstanceSatisfiabilityEvaluation,
     NodeEvaluatorForLinkableInstances,
 )
+from metricflow.dataflow.builder.source_node import SourceNodeSet
 from metricflow.dataflow.dataflow_plan import (
     AddGeneratedUuidColumnNode,
     AggregateMeasuresNode,
@@ -43,10 +45,8 @@ from metricflow.dataflow.dataflow_plan import (
     JoinOverTimeRangeNode,
     JoinToBaseOutputNode,
     JoinToTimeSpineNode,
-    MetricTimeDimensionTransformNode,
     MinMaxNode,
     OrderByLimitNode,
-    ReadSqlSourceNode,
     SemiAdditiveJoinNode,
     SinkOutput,
     WhereConstraintNode,
@@ -62,7 +62,6 @@ from metricflow.mf_logging.formatting import indent
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.mf_logging.runtime import log_runtime
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.node_processor import PreJoinNodeProcessor
 from metricflow.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import FilterSpecResolutionLookUp
@@ -121,37 +120,17 @@ class DataflowPlanBuilder:
 
     def __init__(  # noqa: D
         self,
-        source_nodes: Sequence[BaseOutput],
-        read_nodes: Sequence[ReadSqlSourceNode],
-        time_spine_source_node: MetricTimeDimensionTransformNode,
+        source_node_set: SourceNodeSet,
         semantic_manifest_lookup: SemanticManifestLookup,
-        node_output_resolver: Optional[DataflowPlanNodeOutputDataSetResolver] = None,
-        column_association_resolver: Optional[ColumnAssociationResolver] = None,
+        node_output_resolver: DataflowPlanNodeOutputDataSetResolver,
+        column_association_resolver: ColumnAssociationResolver,
     ) -> None:
         self._semantic_model_lookup = semantic_manifest_lookup.semantic_model_lookup
         self._metric_lookup = semantic_manifest_lookup.metric_lookup
-        self._time_spine_source = semantic_manifest_lookup.time_spine_source
-        self._time_spine_source_node = time_spine_source_node
         self._metric_time_dimension_reference = DataSet.metric_time_dimension_reference()
-        self._source_nodes = source_nodes
-        self._read_nodes = read_nodes
-        self._column_association_resolver = (
-            DunderColumnAssociationResolver(semantic_manifest_lookup)
-            if not column_association_resolver
-            else column_association_resolver
-        )
-        self._node_data_set_resolver = (
-            DataflowPlanNodeOutputDataSetResolver(
-                column_association_resolver=(
-                    DunderColumnAssociationResolver(semantic_manifest_lookup)
-                    if not column_association_resolver
-                    else column_association_resolver
-                ),
-                semantic_manifest_lookup=semantic_manifest_lookup,
-            )
-            if not node_output_resolver
-            else node_output_resolver
-        )
+        self._source_node_set = source_node_set
+        self._column_association_resolver = column_association_resolver
+        self._node_data_set_resolver = node_output_resolver
 
     def build_plan(
         self,
@@ -228,9 +207,8 @@ class DataflowPlanBuilder:
             output_selection_specs=output_selection_specs,
         )
 
-        plan_id = IdGeneratorRegistry.for_class(DataflowPlanBuilder).create_id(DATAFLOW_PLAN_PREFIX)
-
-        plan = DataflowPlan(plan_id=plan_id, sink_output_nodes=[sink_node])
+        plan_id = DagId.from_id_prefix(StaticIdPrefix.DATAFLOW_PLAN_PREFIX)
+        plan = DataflowPlan(sink_output_nodes=[sink_node], plan_id=plan_id)
         for optimizer in optimizers:
             logger.info(f"Applying {optimizer.__class__.__name__}")
             try:
@@ -668,9 +646,7 @@ class DataflowPlanBuilder:
             parent_node=output_node, order_by_specs=query_spec.order_by_specs, limit=query_spec.limit
         )
 
-        plan_id = IdGeneratorRegistry.for_class(DataflowPlanBuilder).create_id(DATAFLOW_PLAN_PREFIX)
-
-        return DataflowPlan(plan_id=plan_id, sink_output_nodes=[sink_node])
+        return DataflowPlan(sink_output_nodes=[sink_node])
 
     @staticmethod
     def build_sink_node(
@@ -745,20 +721,21 @@ class DataflowPlanBuilder:
                 nodes.append(source_node)
         return nodes
 
-    def _select_read_nodes_with_linkable_specs(
-        self, linkable_specs: LinkableSpecSet, read_nodes: Sequence[ReadSqlSourceNode]
-    ) -> List[ReadSqlSourceNode]:
+    def _select_source_nodes_with_linkable_specs(
+        self, linkable_specs: LinkableSpecSet, source_nodes: Sequence[BaseOutput]
+    ) -> Sequence[BaseOutput]:
         """Find source nodes with requested linkable specs and no measures."""
-        selected_nodes: Set[ReadSqlSourceNode] = set()
+        # Use a dictionary to dedupe for consistent ordering.
+        selected_nodes: Dict[BaseOutput, None] = {}
         requested_linkable_specs_set = set(linkable_specs.as_tuple)
-        for read_node in read_nodes:
-            output_spec_set = self._node_data_set_resolver.get_output_data_set(read_node).instance_set.spec_set
+        for source_node in source_nodes:
+            output_spec_set = self._node_data_set_resolver.get_output_data_set(source_node).instance_set.spec_set
             all_linkable_specs_in_node = set(output_spec_set.linkable_specs)
             requested_linkable_specs_in_node = requested_linkable_specs_set.intersection(all_linkable_specs_in_node)
             if requested_linkable_specs_in_node:
-                selected_nodes.add(read_node)
+                selected_nodes[source_node] = None
 
-        return list(selected_nodes)
+        return tuple(selected_nodes.keys())
 
     def _find_non_additive_dimension_in_linkable_specs(
         self,
@@ -817,34 +794,28 @@ class DataflowPlanBuilder:
         time_range_constraint: Optional[TimeRangeConstraint] = None,
     ) -> Optional[DataflowRecipe]:
         linkable_specs = linkable_spec_set.as_tuple
-        potential_source_nodes: Sequence[BaseOutput]
-        input_time_spine_source_node: Optional[MetricTimeDimensionTransformNode] = None
+        candidate_nodes_for_left_side_of_join: Sequence[BaseOutput]
+        candidate_nodes_for_right_side_of_join: Sequence[BaseOutput]
         if measure_spec_properties:
-            source_nodes = self._source_nodes
-            potential_source_nodes = self._select_source_nodes_with_measures(
-                measure_specs=set(measure_spec_properties.measure_specs), source_nodes=source_nodes
+            candidate_nodes_for_right_side_of_join = self._source_node_set.source_nodes_for_metric_queries
+            candidate_nodes_for_left_side_of_join = self._select_source_nodes_with_measures(
+                measure_specs=set(measure_spec_properties.measure_specs),
+                source_nodes=self._source_node_set.source_nodes_for_metric_queries,
             )
             default_join_type = SqlJoinType.LEFT_OUTER
         else:
-            # Only read nodes can be source nodes for queries without measures
-            source_nodes = list(self._read_nodes)
-            potential_source_nodes = self._select_read_nodes_with_linkable_specs(
-                linkable_specs=linkable_spec_set, read_nodes=self._read_nodes
+            candidate_nodes_for_right_side_of_join = list(self._source_node_set.source_nodes_for_group_by_item_queries)
+            candidate_nodes_for_left_side_of_join = self._select_source_nodes_with_linkable_specs(
+                linkable_specs=linkable_spec_set,
+                source_nodes=self._source_node_set.source_nodes_for_group_by_item_queries,
             )
-            # `metric_time` does not exist if there is no metric in the query.
-            # In that case, we'll use the time spine table to represent `metric_time` values.
-            requested_metric_time_specs = [
-                time_dimension_spec
-                for time_dimension_spec in linkable_spec_set.time_dimension_specs
-                if time_dimension_spec.element_name == self._metric_time_dimension_reference.element_name
-            ]
-            if requested_metric_time_specs:
-                input_time_spine_source_node = self._time_spine_source_node
-                # Add time_spine source node to potential source nodes
-                potential_source_nodes = list(potential_source_nodes) + [self._time_spine_source_node]
             default_join_type = SqlJoinType.FULL_OUTER
 
-        logger.info(f"Starting search with {len(potential_source_nodes)} potential source nodes")
+        logger.info(
+            f"Starting search with {len(candidate_nodes_for_left_side_of_join)} potential source nodes on the left "
+            f"side of the join, and {len(candidate_nodes_for_right_side_of_join)} potential nodes on the right side "
+            f"of the join."
+        )
         start_time = time.time()
 
         node_processor = PreJoinNodeProcessor(
@@ -852,43 +823,46 @@ class DataflowPlanBuilder:
             node_data_set_resolver=self._node_data_set_resolver,
         )
         if time_range_constraint:
-            potential_source_nodes = node_processor.add_time_range_constraint(
-                source_nodes=potential_source_nodes,
+            candidate_nodes_for_left_side_of_join = node_processor.add_time_range_constraint(
+                source_nodes=candidate_nodes_for_left_side_of_join,
                 metric_time_dimension_reference=self._metric_time_dimension_reference,
                 time_range_constraint=time_range_constraint,
             )
 
-        nodes_available_for_joins = node_processor.remove_unnecessary_nodes(
+        candidate_nodes_for_right_side_of_join = node_processor.remove_unnecessary_nodes(
             desired_linkable_specs=linkable_specs,
-            nodes=source_nodes,
+            nodes=candidate_nodes_for_right_side_of_join,
             metric_time_dimension_reference=self._metric_time_dimension_reference,
+            time_spine_node=self._source_node_set.time_spine_node,
         )
-        nodes_available_for_joins = tuple(nodes_available_for_joins)
-        if input_time_spine_source_node:
-            nodes_available_for_joins += (input_time_spine_source_node,)
         logger.info(
-            f"After removing unnecessary nodes, there are {len(nodes_available_for_joins)} nodes available for joins"
+            f"After removing unnecessary nodes, there are {len(candidate_nodes_for_right_side_of_join)} candidate "
+            f"nodes for the right side of the join"
         )
         if DataflowPlanBuilder._contains_multihop_linkables(linkable_specs):
-            nodes_available_for_joins = node_processor.add_multi_hop_joins(
-                desired_linkable_specs=linkable_specs, nodes=source_nodes, join_type=default_join_type
+            candidate_nodes_for_right_side_of_join = node_processor.add_multi_hop_joins(
+                desired_linkable_specs=linkable_specs,
+                nodes=candidate_nodes_for_right_side_of_join,
+                join_type=default_join_type,
             )
             logger.info(
-                f"After adding multi-hop nodes, there are {len(nodes_available_for_joins)} nodes available for joins:\n"
-                f"{mf_pformat(nodes_available_for_joins)}"
+                f"After adding multi-hop nodes, there are {len(candidate_nodes_for_right_side_of_join)} candidate "
+                f"nodes for the right side of the join:\n"
+                f"{mf_pformat(candidate_nodes_for_right_side_of_join)}"
             )
         logger.info(f"Processing nodes took: {time.time()-start_time:.2f}s")
 
         node_evaluator = NodeEvaluatorForLinkableInstances(
             semantic_model_lookup=self._semantic_model_lookup,
-            nodes_available_for_joins=self._sort_by_suitability(nodes_available_for_joins),
+            nodes_available_for_joins=self._sort_by_suitability(candidate_nodes_for_right_side_of_join),
             node_data_set_resolver=self._node_data_set_resolver,
+            time_spine_node=self._source_node_set.time_spine_node,
         )
 
         # Dict from the node that contains the source node to the evaluation results.
         node_to_evaluation: Dict[BaseOutput, LinkableInstanceSatisfiabilityEvaluation] = {}
 
-        for node in self._sort_by_suitability(potential_source_nodes):
+        for node in self._sort_by_suitability(candidate_nodes_for_left_side_of_join):
             data_set = self._node_data_set_resolver.get_output_data_set(node)
 
             if measure_spec_properties:
@@ -898,19 +872,22 @@ class DataflowPlanBuilder:
                 ]
                 if missing_specs:
                     logger.debug(
-                        f"Skipping evaluation for node since it does not have all of the measure specs {missing_specs}:"
-                        f"\n\n{node.text_structure()}"
+                        f"Skipping evaluation for:\n"
+                        f"{indent(node.text_structure())}"
+                        f"since it does not have all of the measure specs:\n"
+                        f"{indent(mf_pformat(missing_specs))}"
                     )
                     continue
 
-            logger.debug(f"Evaluating source node:\n{mf_pformat(node.text_structure())}")
+            logger.debug(
+                f"Evaluating candidate node for the left side of the join:\n{indent(mf_pformat(node.text_structure()))}"
+            )
 
             start_time = time.time()
             evaluation = node_evaluator.evaluate_node(
-                start_node=node,
+                left_node=node,
                 required_linkable_specs=list(linkable_specs),
                 default_join_type=default_join_type,
-                time_spine_source_node=input_time_spine_source_node,
             )
             logger.info(f"Evaluation of {node} took {time.time() - start_time:.2f}s")
 
@@ -1294,8 +1271,8 @@ class DataflowPlanBuilder:
                 linkable_spec_set=required_linkable_specs,
             )
             logger.info(
-                f"With {len(self._source_nodes)} source nodes, finding a recipe took "
-                f"{time.time() - find_recipe_start_time:.2f}s"
+                f"With {len(self._source_node_set.source_nodes_for_metric_queries)} source nodes, finding a recipe "
+                f"took {time.time() - find_recipe_start_time:.2f}s"
             )
 
         logger.info(f"Using recipe:\n{indent(mf_pformat(measure_recipe))}")
@@ -1435,7 +1412,7 @@ class DataflowPlanBuilder:
             metric_input_measure_specs=(metric_input_measure_spec,),
         )
 
-        # Joining to time spine after aggregation is for measures that specify `join_to_timespine`` in the YAML spec.
+        # Joining to time spine after aggregation is for measures that specify `join_to_timespine` in the YAML spec.
         after_aggregation_time_spine_join_description = (
             metric_input_measure_spec.after_aggregation_time_spine_join_description
         )

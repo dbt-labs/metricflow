@@ -33,7 +33,7 @@ FROM (
           SELECT
             DATE_TRUNC(ds, day) AS metric_time__day
             , 1 AS bookings
-          FROM ***************************.fct_bookings bookings_source_src_10001
+          FROM ***************************.fct_bookings bookings_source_src_28000
         ) subq_14
         ON
           DATE_SUB(CAST(subq_16.ds AS DATETIME), INTERVAL 5 day) = subq_14.metric_time__day

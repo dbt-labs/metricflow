@@ -4,7 +4,8 @@ import logging
 from dataclasses import dataclass
 from typing import List, Optional, Sequence
 
-from metricflow.dag.id_generation import OPTIMIZED_DATAFLOW_PLAN_PREFIX, IdGeneratorRegistry
+from metricflow.dag.id_prefix import StaticIdPrefix
+from metricflow.dag.mf_dag import DagId
 from metricflow.dataflow.dataflow_plan import (
     AddGeneratedUuidColumnNode,
     AggregateMeasuresNode,
@@ -317,16 +318,13 @@ class SourceScanOptimizer(
             f"{optimized_result.checked_sink_node.text_structure()}",
         )
 
-        plan_id = IdGeneratorRegistry.for_class(self.__class__).create_id(OPTIMIZED_DATAFLOW_PLAN_PREFIX)
-        logger.log(level=self._log_level, msg=f"Optimized plan ID is {plan_id}")
         if optimized_result.sink_node:
             return DataflowPlan(
-                plan_id=plan_id,
+                plan_id=DagId.from_id_prefix(StaticIdPrefix.OPTIMIZED_DATAFLOW_PLAN_PREFIX),
                 sink_output_nodes=[optimized_result.sink_node],
             )
         logger.log(level=self._log_level, msg="Optimizer didn't produce a result, so returning the same plan")
         return DataflowPlan(
-            plan_id=plan_id,
             sink_output_nodes=[dataflow_plan.sink_output_node],
         )
 

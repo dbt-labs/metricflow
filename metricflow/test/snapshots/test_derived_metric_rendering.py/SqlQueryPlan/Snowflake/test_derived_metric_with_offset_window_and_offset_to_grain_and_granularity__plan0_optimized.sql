@@ -23,7 +23,7 @@ FROM (
       SELECT
         DATE_TRUNC('day', ds) AS metric_time__day
         , 1 AS bookings
-      FROM ***************************.fct_bookings bookings_source_src_10001
+      FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_18
     ON
       DATE_TRUNC('month', subq_20.ds) = subq_18.metric_time__day
@@ -46,7 +46,7 @@ FROM (
       SELECT
         DATE_TRUNC('day', ds) AS metric_time__day
         , 1 AS bookings
-      FROM ***************************.fct_bookings bookings_source_src_10001
+      FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_26
     ON
       DATEADD(month, -1, subq_28.ds) = subq_26.metric_time__day

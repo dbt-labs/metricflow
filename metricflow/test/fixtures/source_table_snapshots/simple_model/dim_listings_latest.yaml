@@ -21,4 +21,3 @@ table_snapshot:
     - ["2020-01-02", "l9658588-incomplete", "us", null, null, "u1004114"]
     - ["2020-01-02", "l8912456-incomplete", null, null, null, "u1004114"]
     - ["2020-01-02", "l7891283-incomplete", "ca", null, "False", "u1004114"]
-    - ["2020-01-04", "l7891283-incomplete", "ca", null, "False", "u1004114"]

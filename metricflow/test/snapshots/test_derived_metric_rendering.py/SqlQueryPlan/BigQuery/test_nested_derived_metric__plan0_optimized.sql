@@ -33,7 +33,7 @@ FROM (
           SELECT
             DATE_TRUNC(ds, day) AS metric_time__day
             , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS referred_bookings
-          FROM ***************************.fct_bookings bookings_source_src_10001
+          FROM ***************************.fct_bookings bookings_source_src_28000
         ) subq_25
         GROUP BY
           metric_time__day
@@ -51,7 +51,7 @@ FROM (
           SELECT
             DATE_TRUNC(ds, day) AS metric_time__day
             , 1 AS bookings
-          FROM ***************************.fct_bookings bookings_source_src_10001
+          FROM ***************************.fct_bookings bookings_source_src_28000
         ) subq_30
         GROUP BY
           metric_time__day
@@ -75,7 +75,7 @@ FROM (
       SELECT
         DATE_TRUNC(ds, day) AS metric_time__day
         , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings
-      FROM ***************************.fct_bookings bookings_source_src_10001
+      FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_37
     GROUP BY
       metric_time__day
@@ -95,7 +95,7 @@ FROM (
       SELECT
         DATE_TRUNC(ds, day) AS metric_time__day
         , 1 AS bookings
-      FROM ***************************.fct_bookings bookings_source_src_10001
+      FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_42
     GROUP BY
       metric_time__day

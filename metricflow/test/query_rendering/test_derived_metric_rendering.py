@@ -701,8 +701,3 @@ def test_nested_fill_nulls_without_time_spine_multi_metric(  # noqa: D
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
     )
-
-
-# case where there are multiple input metrics filling null in a derived metric
-# case where only one of multiple input metrics fills null
-# test case for conversion metrics not coalescing nulls

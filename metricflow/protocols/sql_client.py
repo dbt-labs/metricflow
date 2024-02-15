@@ -8,7 +8,6 @@ from pandas import DataFrame
 
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.sql_request.sql_request_attributes import SqlJsonTag
 
 
 class SqlEngine(Enum):
@@ -53,7 +52,6 @@ class SqlClient(Protocol):
         self,
         stmt: str,
         sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
-        extra_tags: SqlJsonTag = SqlJsonTag(),
     ) -> DataFrame:
         """Base query method, upon execution will run a query that returns a pandas DataFrame."""
         raise NotImplementedError
@@ -63,7 +61,6 @@ class SqlClient(Protocol):
         self,
         stmt: str,
         sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
-        extra_tags: SqlJsonTag = SqlJsonTag(),
     ) -> None:
         """Base execute method."""
         raise NotImplementedError

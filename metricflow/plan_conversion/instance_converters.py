@@ -811,16 +811,12 @@ class CreateSelectColumnForCombineOutputNode(InstanceSetTransform[SelectColumnSe
             column_alias=column_name,
         )
 
-    # COALESCE applied when combining metrics. ONLY applied if the metric takes input measures. i.e., if the
-    # input metric(s) for a derived or ratio metric fills nulls, the additional COALESCE will not be applied
-    # when combining input metrics. Do we want to keep this behavior?
-    # Alt behavior: there might be multiple input measures for ratio/derived metrics (inherited from input metrics).
-    # If all input measures fill 0, apply COALESCE here. If some do but others don't, don't apply COALESCE.
-    def _create_select_columns_for_metrics(self, metric_instances: Tuple[MetricInstance, ...]) -> List[SqlSelectColumn]:
+    def _create_select_columns_for_metrics(
+        self, metric_instances: Tuple[MetricInstance, ...]
+    ) -> List[SqlSelectColumn]:  # noqa: D
         select_columns: List[SqlSelectColumn] = []
         for metric_instance in metric_instances:
             metric_reference = MetricReference(element_name=metric_instance.defined_from.metric_name)
-            # Would need to look up all inherited input measures for the metric here
             input_measure = self._metric_lookup.configured_input_measure_for_metric(metric_reference=metric_reference)
             fill_nulls_with: Optional[int] = None
             if input_measure and input_measure.fill_nulls_with is not None:
@@ -830,7 +826,7 @@ class CreateSelectColumnForCombineOutputNode(InstanceSetTransform[SelectColumnSe
             )
         return select_columns
 
-    def _create_select_columns_for_measures(
+    def _create_select_columns_for_measures(  # noqa: D
         self, measure_instances: Tuple[MeasureInstance, ...]
     ) -> List[SqlSelectColumn]:
         select_columns: List[SqlSelectColumn] = []

@@ -11,63 +11,21 @@ changeFormat: |-
   {{- $IssueList := list }}
   {{- $changes := splitList " " $.Custom.Issue }}
   {{- range $issueNbr := $changes }}
-    {{- $changeLink := "[#nbr](https://github.com/dbt-labs/metricflow/issues/nbr)" | replace "nbr" $issueNbr }}
-    {{- $IssueList = append $IssueList $changeLink  }}
+    {{- if atoi $issueNbr }}
+      {{- $changeLink := "[#nbr](https://github.com/dbt-labs/metricflow/issues/nbr)" | replace "nbr" $issueNbr }}
+      {{- $IssueList = append $IssueList $changeLink  }}
+    {{- end -}}
   {{- end -}}
-  - {{.Body}} ({{ range $index, $element := $IssueList }}{{if $index}}, {{end}}{{$element}}{{end}})
+  - {{.Body}}{{if $IssueList}} ({{ join ", " $IssueList }}){{end}}
 
 kinds:
   - label: Breaking Changes
   - label: Features
   - label: Fixes
   - label: Docs
-    changeFormat: |-
-      {{- $IssueList := list }}
-      {{- $changes := splitList " " $.Custom.Issue }}
-      {{- range $issueNbr := $changes }}
-        {{- $changeLink := "[dbt-docs/#nbr](https://github.com/dbt-labs/dbt-docs/issues/nbr)" | replace "nbr" $issueNbr }}
-        {{- $IssueList = append $IssueList $changeLink }}
-      {{- end -}}
-      - {{.Body}} ({{ range $index, $element := $IssueList }}{{if $index}}, {{end}}{{$element}}{{end}})
   - label: Under the Hood
   - label: Dependencies
-    changeFormat: |-
-      {{- $PRList := list }}
-      {{- $changes := splitList " " $.Custom.PR }}
-      {{- range $pullrequest := $changes }}
-        {{- $changeLink := "[#nbr](https://github.com/dbt-labs/metricflow/pull/nbr)" | replace "nbr" $pullrequest }}
-        {{- $PRList = append $PRList $changeLink  }}
-      {{- end -}}
-      - {{.Body}} ({{ range $index, $element := $PRList }}{{if $index}}, {{end}}{{$element}}{{end}})
-    skipGlobalChoices: true
-    additionalChoices:
-      - key: Author
-        label: GitHub Username(s) (separated by a single space if multiple)
-        type: string
-        minLength: 3
-      - key: PR
-        label: GitHub Pull Request Number (separated by a single space if multiple)
-        type: string
-        minLength: 1
   - label: Security
-    changeFormat: |-
-      {{- $PRList := list }}
-      {{- $changes := splitList " " $.Custom.PR }}
-      {{- range $pullrequest := $changes }}
-        {{- $changeLink := "[#nbr](https://github.com/dbt-labs/metricflow/pull/nbr)" | replace "nbr" $pullrequest }}
-        {{- $PRList = append $PRList $changeLink  }}
-      {{- end -}}
-      - {{.Body}} ({{ range $index, $element := $PRList }}{{if $index}}, {{end}}{{$element}}{{end}})
-    skipGlobalChoices: true
-    additionalChoices:
-      - key: Author
-        label: GitHub Username(s) (separated by a single space if multiple)
-        type: string
-        minLength: 3
-      - key: PR
-        label: GitHub Pull Request Number (separated by a single space if multiple)
-        type: string
-        minLength: 1
 
 newlines:
   afterChangelogHeader: 1
@@ -82,7 +40,7 @@ custom:
   type: string
   minLength: 3
 - key: Issue
-  label: GitHub Issue Number (separated by a single space if multiple)
+  label: "GitHub Issue (or PR) Number(s) (separated by a single space if multiple)"
   type: string
   minLength: 1
 
@@ -97,38 +55,31 @@ footerFormat: |
       {{- $authorLower := lower $author }}
       {{- /* we only want to include non-core team contributors */}}
       {{- if not (has $authorLower $maintainers)}}
-        {{- $changeList := splitList " " $change.Custom.Author }}
-          {{- $IssueList := list }}
-          {{- $changeLink := $change.Kind }}
-          {{- if or (eq $change.Kind "Dependencies") (eq $change.Kind "Security") }}
-            {{- $changes := splitList " " $change.Custom.PR }}
-            {{- range $issueNbr := $changes }}
-              {{- $changeLink := "[#nbr](https://github.com/dbt-labs/metricflow/pull/nbr)" | replace "nbr" $issueNbr }}
-              {{- $IssueList = append $IssueList $changeLink  }}
-            {{- end -}}
-          {{- else }}
-            {{- $changes := splitList " " $change.Custom.Issue }}
-            {{- range $issueNbr := $changes }}
-              {{- $changeLink := "[#nbr](https://github.com/dbt-labs/metricflow/issues/nbr)" | replace "nbr" $issueNbr }}
-              {{- $IssueList = append $IssueList $changeLink  }}
-            {{- end -}}
-          {{- end }}
-          {{- /* check if this contributor has other changes associated with them already */}}
-          {{- if hasKey $contributorDict $author }}
-            {{- $contributionList := get $contributorDict $author }}
-            {{- $contributionList = concat $contributionList $IssueList  }}
-            {{- $contributorDict := set $contributorDict $author $contributionList }}
-          {{- else }}
-            {{- $contributionList := $IssueList }}
-            {{- $contributorDict := set $contributorDict $author $contributionList }}
-          {{- end }}
-        {{- end}}
+        {{- $IssueList := list }}
+        {{- $changeLink := $change.Kind }}
+        {{- $changes := splitList " " $change.Custom.Issue }}
+        {{- range $issueNbr := $changes }}
+          {{- if atoi $issueNbr }}
+            {{- $changeLink := "[#nbr](https://github.com/dbt-labs/metricflow/issues/nbr)" | replace "nbr" $issueNbr }}
+            {{- $IssueList = append $IssueList $changeLink  }}
+          {{- end -}}
+        {{- end -}}
+        {{- /* check if this contributor has other changes associated with them already */}}
+        {{- if hasKey $contributorDict $author }}
+          {{- $contributionList := get $contributorDict $author }}
+          {{- $contributionList = concat $contributionList $IssueList  }}
+          {{- $contributorDict := set $contributorDict $author $contributionList }}
+        {{- else }}
+          {{- $contributionList := $IssueList }}
+          {{- $contributorDict := set $contributorDict $author $contributionList }}
+        {{- end }}
+      {{- end}}
     {{- end}}
   {{- end }}
   {{- /* no indentation here for formatting so the final markdown doesn't have unneeded indentations */}}
   {{- if $contributorDict}}
   ### Contributors
   {{- range $k,$v := $contributorDict }}
-  - [@{{$k}}](https://github.com/{{$k}}) ({{ range $index, $element := $v }}{{if $index}}, {{end}}{{$element}}{{end}})
+  - [@{{$k}}](https://github.com/{{$k}}){{if $v}} ({{ join ", " $v }}){{end}}
   {{- end }}
   {{- end }}

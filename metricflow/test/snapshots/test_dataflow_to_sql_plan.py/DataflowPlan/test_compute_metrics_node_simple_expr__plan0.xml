@@ -26,7 +26,7 @@
                         <!-- distinct = False -->
                         <ReadSqlSourceNode>
                             <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
-                            <!-- node_id = NodeId(id_str='rss_10001') -->
+                            <!-- node_id = NodeId(id_str='rss_28001') -->
                             <!-- data_set = SemanticModelDataSet('bookings_source') -->
                         </ReadSqlSourceNode>
                     </FilterElementsNode>
@@ -38,7 +38,7 @@
                         <!-- distinct = False -->
                         <ReadSqlSourceNode>
                             <!-- description = "Read From SemanticModelDataSet('listings_latest')" -->
-                            <!-- node_id = NodeId(id_str='rss_10005') -->
+                            <!-- node_id = NodeId(id_str='rss_28005') -->
                             <!-- data_set = SemanticModelDataSet('listings_latest') -->
                         </ReadSqlSourceNode>
                     </FilterElementsNode>

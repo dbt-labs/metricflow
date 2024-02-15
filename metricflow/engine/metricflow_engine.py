@@ -13,7 +13,9 @@ from dbt_semantic_interfaces.implementations.filters.where_filter import Pydanti
 from dbt_semantic_interfaces.references import EntityReference, MeasureReference, MetricReference
 from dbt_semantic_interfaces.type_enums import DimensionType
 
+from metricflow.dag.sequential_id import SequentialIdGenerator
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
+from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import DataflowPlan
 from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import (
@@ -271,7 +273,7 @@ class AbstractMetricFlowEngine(ABC):
         """Retrieves a list of dimension values given a [metric_name, get_group_by_values].
 
         Args:
-            metric_name: Names of metrics that contain the group_by.
+            metric_names: Names of metrics that contain the group_by.
             get_group_by_values: Name of group_by to get values from.
             time_constraint_start: Get data for the start of this time range.
             time_constraint_end: Get data for the end of this time range.
@@ -294,8 +296,10 @@ class AbstractMetricFlowEngine(ABC):
         """Returns the SQL query for get_dimension_values.
 
         Args:
-            metric_name: Names of metrics that contain the group_by.
+            metric_names: Names of metrics that contain the group_by.
+            metrics: Similar to `metric_names`, but specified via parameter objects.
             get_group_by_values: Name of group_by to get values from.
+            group_by: Similar to `get_group_by_values`, but specified via parameter objects.
             time_constraint_start: Get data for the start of this time range.
             time_constraint_end: Get data for the end of this time range.
 
@@ -312,6 +316,11 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     TODO: provide a more stable API layer instead of assuming this class is stable.
     """
 
+    # When generating IDs in the initializer, start from this value.
+    _ID_ENUMERATION_START_VALUE_FOR_INITIALIZER = 10000
+    # When generating IDs in queries, start from this value.
+    _ID_ENUMERATION_START_VALUE_FOR_QUERIES = 0
+
     def __init__(
         self,
         semantic_manifest_lookup: SemanticManifestLookup,
@@ -319,8 +328,12 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         time_source: TimeSource = ServerTimeSource(),
         query_parser: Optional[MetricFlowQueryParser] = None,
         column_association_resolver: Optional[ColumnAssociationResolver] = None,
+        consistent_id_enumeration: Optional[bool] = True,
     ) -> None:
         """Initializer for MetricFlowEngine.
+
+        consistent_id_enumeration can be set to True to reset the numbering of sequentially generated IDs on each query. This
+        will help generate consistent SQL between queries as aliases will be the same.
 
         For direct calls to construct MetricFlowEngine, do not pass the following parameters,
         - time_source
@@ -329,6 +342,15 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
         These parameters are mainly there to be overridden during tests.
         """
+        self._reset_id_enumeration = consistent_id_enumeration
+        if self._reset_id_enumeration:
+            # Some of the objects that are created below use generated IDs. To avoid collision with IDs that are
+            # generated for queries, set the ID generation numbering to start at a high enough number.
+            logger.info(
+                f"For creating setup objects, setting numbering of generated IDs to start at: "
+                f"{MetricFlowEngine._ID_ENUMERATION_START_VALUE_FOR_INITIALIZER}"
+            )
+            SequentialIdGenerator.reset(MetricFlowEngine._ID_ENUMERATION_START_VALUE_FOR_INITIALIZER)
         self._semantic_manifest_lookup = semantic_manifest_lookup
         self._sql_client = sql_client
         self._column_association_resolver = column_association_resolver or (
@@ -345,18 +367,23 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             self._source_data_sets.append(data_set)
             logger.info(f"Created source dataset from semantic model '{semantic_model.name}'")
 
-        source_node_builder = SourceNodeBuilder(self._semantic_manifest_lookup)
-        source_nodes = source_node_builder.create_from_data_sets(self._source_data_sets)
-        read_nodes = source_node_builder.create_read_nodes_from_data_sets(self._source_data_sets)
-        time_spine_source_node = SourceNodeBuilder.build_time_spine_source_node(
-            time_spine_source=self._time_spine_source, data_set_converter=converter
+        source_node_builder = SourceNodeBuilder(
+            column_association_resolver=self._column_association_resolver,
+            semantic_manifest_lookup=self._semantic_manifest_lookup,
         )
+        source_node_set = source_node_builder.create_from_data_sets(self._source_data_sets)
+
+        node_output_resolver = DataflowPlanNodeOutputDataSetResolver(
+            column_association_resolver=self._column_association_resolver,
+            semantic_manifest_lookup=self._semantic_manifest_lookup,
+        )
+        node_output_resolver.cache_output_data_sets(source_node_set.all_nodes)
 
         self._dataflow_plan_builder = DataflowPlanBuilder(
-            source_nodes=source_nodes,
-            read_nodes=read_nodes,
-            time_spine_source_node=time_spine_source_node,
+            source_node_set=source_node_set,
             semantic_manifest_lookup=self._semantic_manifest_lookup,
+            column_association_resolver=self._column_association_resolver,
+            node_output_resolver=node_output_resolver,
         )
         self._to_sql_query_plan_converter = DataflowToSqlQueryPlanConverter(
             column_association_resolver=self._column_association_resolver,
@@ -410,6 +437,12 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         return TimeRangeConstraint.all_time()
 
     def _create_execution_plan(self, mf_query_request: MetricFlowQueryRequest) -> MetricFlowExplainResult:
+        if self._reset_id_enumeration:
+            logger.info(
+                f"Setting ID generation to start at: {MetricFlowEngine._ID_ENUMERATION_START_VALUE_FOR_QUERIES}"
+            )
+            SequentialIdGenerator.reset(MetricFlowEngine._ID_ENUMERATION_START_VALUE_FOR_QUERIES)
+
         if mf_query_request.saved_query_name is not None:
             if mf_query_request.metrics or mf_query_request.metric_names:
                 raise InvalidQueryException("Metrics can't be specified with a saved query.")

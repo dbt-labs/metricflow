@@ -2,15 +2,20 @@ from __future__ import annotations
 
 import logging
 import textwrap
+from typing import List
 
 import pytest
+from dbt_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_validation_ready_semantic_manifest
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
+from dbt_semantic_interfaces.protocols import SemanticManifest
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 
 from metricflow.filters.time_constraint import TimeRangeConstraint
+from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.specs.query_param_implementations import (
@@ -26,7 +31,6 @@ from metricflow.specs.specs import (
     OrderBySpec,
     TimeDimensionSpec,
 )
-from metricflow.test.fixtures.model_fixtures import query_parser_from_yaml
 from metricflow.test.model.example_project_configuration import EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE
 from metricflow.test.time.metric_time_dimension import MTD
 
@@ -621,3 +625,16 @@ def test_offset_metric_with_diff_agg_time_dims_error() -> None:  # noqa: D
             metric_names=["monthly_revenue_last_7_days"],
             group_by_names=["revenue___ds"],
         )
+
+
+def query_parser_from_yaml(yaml_contents: List[YamlConfigFile]) -> MetricFlowQueryParser:
+    """Given yaml files, return a query parser using default source nodes, resolvers and time spine source."""
+    semantic_manifest_lookup = SemanticManifestLookup(
+        parse_yaml_files_to_validation_ready_semantic_manifest(
+            yaml_contents, apply_transformations=True
+        ).semantic_manifest
+    )
+    SemanticManifestValidator[SemanticManifest]().checked_validations(semantic_manifest_lookup.semantic_manifest)
+    return MetricFlowQueryParser(
+        semantic_manifest_lookup=semantic_manifest_lookup,
+    )

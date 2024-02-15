@@ -15,12 +15,12 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       subq_17.ds AS booking__ds__day
-      , SUM(bookings_source_src_10001.booking_value) AS booking_value
+      , SUM(bookings_source_src_28000.booking_value) AS booking_value
     FROM ***************************.mf_time_spine subq_17
     INNER JOIN
-      ***************************.fct_bookings bookings_source_src_10001
+      ***************************.fct_bookings bookings_source_src_28000
     ON
-      subq_17.ds - MAKE_INTERVAL(weeks => 1) = DATE_TRUNC('day', bookings_source_src_10001.ds)
+      subq_17.ds - MAKE_INTERVAL(weeks => 1) = DATE_TRUNC('day', bookings_source_src_28000.ds)
     GROUP BY
       subq_17.ds
   ) subq_21
@@ -33,7 +33,7 @@ FROM (
     SELECT
       DATE_TRUNC('day', ds) AS booking__ds__day
       , COUNT(DISTINCT guest_id) AS bookers
-    FROM ***************************.fct_bookings bookings_source_src_10001
+    FROM ***************************.fct_bookings bookings_source_src_28000
     GROUP BY
       DATE_TRUNC('day', ds)
   ) subq_26

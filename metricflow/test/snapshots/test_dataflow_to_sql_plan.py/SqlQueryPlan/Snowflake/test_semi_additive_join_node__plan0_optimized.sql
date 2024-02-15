@@ -61,14 +61,14 @@ FROM (
     , account_type AS account__account_type
     , user_id AS user
     , user_id AS account__user
-  FROM ***************************.fct_accounts accounts_source_src_10000
+  FROM ***************************.fct_accounts accounts_source_src_28000
 ) subq_3
 INNER JOIN (
   -- Read Elements From Semantic Model 'accounts_source'
   -- Filter row on MIN(ds__day)
   SELECT
     MIN(DATE_TRUNC('day', ds)) AS ds__day__complete
-  FROM ***************************.fct_accounts accounts_source_src_10000
+  FROM ***************************.fct_accounts accounts_source_src_28000
 ) subq_5
 ON
   subq_3.ds__day = subq_5.ds__day__complete

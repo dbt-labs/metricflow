@@ -9,7 +9,7 @@ FROM (
   -- Aggregate Measures
   SELECT
     SUM(1) AS visits
-  FROM ***************************.fct_visits visits_source_src_10011
+  FROM ***************************.fct_visits visits_source_src_28000
 ) subq_18
 CROSS JOIN (
   -- Find conversions for user within the range of 7 day
@@ -33,7 +33,7 @@ CROSS JOIN (
         DATE_TRUNC('day', ds) AS ds__day
         , user_id AS user
         , 1 AS visits
-      FROM ***************************.fct_visits visits_source_src_10011
+      FROM ***************************.fct_visits visits_source_src_28000
     ) subq_21
     INNER JOIN (
       -- Read Elements From Semantic Model 'buys_source'
@@ -44,7 +44,7 @@ CROSS JOIN (
         , user_id AS user
         , 1 AS buys
         , GEN_RANDOM_UUID() AS mf_internal_uuid
-      FROM ***************************.fct_buys buys_source_src_10002
+      FROM ***************************.fct_buys buys_source_src_28000
     ) subq_24
     ON
       (

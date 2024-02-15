@@ -6,5 +6,5 @@ SELECT
   DATE_TRUNC('day', ds) AS ds__day
   , DATE_TRUNC('day', ds) AS metric_time__day
   , 1 AS bookings
-FROM ***************************.fct_bookings bookings_source_src_10001
+FROM ***************************.fct_bookings bookings_source_src_28000
 WHERE DATE_TRUNC('day', ds) BETWEEN '2020-01-01' AND '2020-01-02'

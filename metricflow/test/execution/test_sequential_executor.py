@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from metricflow.dag.mf_dag import DagId
 from metricflow.execution.execution_plan import ExecutionPlan
 from metricflow.execution.executor import SequentialPlanExecutor
 from metricflow.test.execution.noop_task import NoOpExecutionPlanTask
@@ -8,7 +9,7 @@ from metricflow.test.execution.noop_task import NoOpExecutionPlanTask
 def test_single_task() -> None:
     """Tests running an execution plan with a single task."""
     task = NoOpExecutionPlanTask()
-    execution_plan = ExecutionPlan("plan0", leaf_tasks=[task])
+    execution_plan = ExecutionPlan(leaf_tasks=[task], dag_id=DagId.from_str("plan0"))
     results = SequentialPlanExecutor().execute_plan(execution_plan)
     assert results.get_result(task.task_id)
 
@@ -16,7 +17,7 @@ def test_single_task() -> None:
 def test_single_task_error() -> None:
     """Check that an error is properly returned in the results if a task errors out."""
     task = NoOpExecutionPlanTask(should_error=True)
-    execution_plan = ExecutionPlan("plan0", leaf_tasks=[task])
+    execution_plan = ExecutionPlan(leaf_tasks=[task], dag_id=DagId.from_str("plan0"))
     executor = SequentialPlanExecutor()
     results = executor.execute_plan(execution_plan)
     assert len(results.get_result(task.task_id).errors) == 1
@@ -28,7 +29,7 @@ def test_task_with_parents() -> None:
     parent_task1 = NoOpExecutionPlanTask()
     parent_task2 = NoOpExecutionPlanTask()
     leaf_task = NoOpExecutionPlanTask(parent_tasks=[parent_task1, parent_task2])
-    execution_plan = ExecutionPlan("plan0", leaf_tasks=[leaf_task])
+    execution_plan = ExecutionPlan(leaf_tasks=[leaf_task], dag_id=DagId.from_str("plan0"))
     results = SequentialPlanExecutor().execute_plan(execution_plan)
 
     # Check that they all finished.
@@ -48,7 +49,7 @@ def test_parent_task_error() -> None:
     parent_task1 = NoOpExecutionPlanTask(should_error=True)
     parent_task2 = NoOpExecutionPlanTask()
     leaf_task = NoOpExecutionPlanTask(parent_tasks=[parent_task1, parent_task2])
-    execution_plan = ExecutionPlan("plan0", leaf_tasks=[leaf_task])
+    execution_plan = ExecutionPlan(leaf_tasks=[leaf_task], dag_id=DagId.from_str("plan0"))
 
     executor = SequentialPlanExecutor()
     results = executor.execute_plan(execution_plan)

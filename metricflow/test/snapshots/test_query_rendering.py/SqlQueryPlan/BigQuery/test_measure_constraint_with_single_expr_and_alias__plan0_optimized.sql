@@ -18,7 +18,7 @@ FROM (
       DATE_TRUNC(ds, day) AS metric_time__day
       , is_instant AS booking__is_instant
       , 1 AS bookings
-    FROM ***************************.fct_bookings bookings_source_src_10001
+    FROM ***************************.fct_bookings bookings_source_src_28000
   ) subq_9
   WHERE NOT booking__is_instant
   GROUP BY

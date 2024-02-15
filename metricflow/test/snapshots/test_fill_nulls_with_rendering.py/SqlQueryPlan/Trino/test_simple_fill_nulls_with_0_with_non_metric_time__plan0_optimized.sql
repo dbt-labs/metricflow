@@ -14,7 +14,7 @@ FROM (
     SELECT
       DATE_TRUNC('day', paid_at) AS booking__paid_at__day
       , 1 AS bookings
-    FROM ***************************.fct_bookings bookings_source_src_10001
+    FROM ***************************.fct_bookings bookings_source_src_28000
   ) subq_6
   GROUP BY
     booking__paid_at__day
