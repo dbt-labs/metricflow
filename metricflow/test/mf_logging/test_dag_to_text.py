@@ -7,6 +7,7 @@ import time
 from typing import List
 
 from metricflow.dag.dag_to_text import MetricFlowDagTextFormatter
+from metricflow.dag.mf_dag import DagId
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.mf_logging.formatting import indent
 from metricflow.sql.sql_exprs import (
@@ -25,7 +26,7 @@ def test_multithread_dag_to_text() -> None:
     # Using a nested structure w/ small max_line_length to force recursion / cover recursive width tracking.
     dag_to_text_formatter = MetricFlowDagTextFormatter(max_width=1)
     dag = SqlQueryPlan(
-        plan_id="plan",
+        plan_id=DagId("plan"),
         render_node=SqlSelectStatementNode(
             description="test",
             select_columns=(
