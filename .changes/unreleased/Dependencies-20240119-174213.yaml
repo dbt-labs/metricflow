@@ -3,4 +3,4 @@ body: Remove unused numpy dependency
 time: 2024-01-19T17:42:13.46617-08:00
 custom:
   Author: tlento
-  PR: "984"
+  Issue: "984"
