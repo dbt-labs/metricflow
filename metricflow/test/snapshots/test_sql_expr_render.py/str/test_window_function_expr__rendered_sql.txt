@@ -1,0 +1,40 @@
+-- Window function with 0 PARTITION BY items(s)
+first_value(a.col0) OVER ()
+
+-- Window function with 1 PARTITION BY items(s)
+first_value(a.col0) OVER (PARTITION BY b.col0)
+
+-- Window function with 2 PARTITION BY items(s)
+first_value(a.col0) OVER (
+  PARTITION BY
+    b.col0
+    , b.col1
+)
+
+-- Window function with 0 ORDER BY items(s)
+first_value(a.col0) OVER ()
+
+-- Window function with 1 ORDER BY items(s)
+first_value(a.col0) OVER (
+  ORDER BY a.col0 DESC NULLS FIRST
+  ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+)
+
+-- Window function with 2 ORDER BY items(s)
+first_value(a.col0) OVER (
+  ORDER BY
+    a.col0 DESC NULLS FIRST
+    , b.col0 ASC NULLS LAST
+  ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+)
+
+-- Window function with PARTITION BY and ORDER BY items
+first_value(a.col0) OVER (
+  PARTITION BY
+    b.col0
+    , b.col1
+  ORDER BY
+    a.col0 DESC NULLS FIRST
+    , b.col0 ASC NULLS LAST
+  ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+)
