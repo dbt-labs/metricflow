@@ -972,9 +972,9 @@ class SqlWindowFunctionExpression(SqlFunctionExpression):
     def __init__(
         self,
         sql_function: SqlWindowFunction,
-        sql_function_args: Optional[List[SqlExpressionNode]] = None,
-        partition_by_args: Optional[List[SqlExpressionNode]] = None,
-        order_by_args: Optional[List[SqlWindowOrderByArgument]] = None,
+        sql_function_args: Sequence[SqlExpressionNode] = (),
+        partition_by_args: Sequence[SqlExpressionNode] = (),
+        order_by_args: Sequence[SqlWindowOrderByArgument] = (),
     ) -> None:
         """Constructor.
 
@@ -987,10 +987,10 @@ class SqlWindowFunctionExpression(SqlFunctionExpression):
             order_by_args: The expr to order the partitions by.
         """
         self._sql_function = sql_function
-        self._sql_function_args = sql_function_args
-        self._partition_by_args = partition_by_args
+        self._sql_function_args = tuple(sql_function_args)
+        self._partition_by_args = tuple(partition_by_args)
         self._order_by_args = order_by_args
-        parent_nodes = []
+        parent_nodes: List[SqlExpressionNode] = []
         if sql_function_args:
             parent_nodes.extend(sql_function_args)
         if partition_by_args:
@@ -1029,16 +1029,16 @@ class SqlWindowFunctionExpression(SqlFunctionExpression):
         return self._sql_function
 
     @property
-    def sql_function_args(self) -> List[SqlExpressionNode]:  # noqa: D
-        return self._sql_function_args or []
+    def sql_function_args(self) -> Sequence[SqlExpressionNode]:  # noqa: D
+        return self._sql_function_args
 
     @property
-    def partition_by_args(self) -> List[SqlExpressionNode]:  # noqa: D
-        return self._partition_by_args or []
+    def partition_by_args(self) -> Sequence[SqlExpressionNode]:  # noqa: D
+        return self._partition_by_args
 
     @property
-    def order_by_args(self) -> List[SqlWindowOrderByArgument]:  # noqa: D
-        return self._order_by_args or []
+    def order_by_args(self) -> Sequence[SqlWindowOrderByArgument]:  # noqa: D
+        return self._order_by_args
 
     @property
     def is_aggregate_function(self) -> bool:  # noqa: D
