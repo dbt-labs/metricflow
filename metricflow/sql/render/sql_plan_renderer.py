@@ -6,11 +6,13 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple
 
+from metricflow.mf_logging.formatting import indent
 from metricflow.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,
     SqlExpressionRenderer,
     SqlExpressionRenderResult,
 )
+from metricflow.sql.render.rendering_constants import SqlRenderingConstants
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_plan import (
     SqlJoinDescription,
@@ -110,9 +112,11 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
 
             if first_column:
                 first_column = False
-                select_section_lines.append(f"{self.INDENT}{column_select_str}")
+                select_section_lines.append(indent(column_select_str, indent_prefix=SqlRenderingConstants.INDENT))
             else:
-                select_section_lines.append(f"{self.INDENT}, {column_select_str}")
+                select_section_lines.append(
+                    indent(", " + column_select_str, indent_prefix=SqlRenderingConstants.INDENT)
+                )
 
         return "\n".join(select_section_lines), params
 
@@ -137,7 +141,7 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
             from_section_lines.append(f"FROM {from_render_result.sql} {from_source_alias}")
         else:
             from_section_lines.append("FROM (")
-            from_section_lines.append(textwrap.indent(from_render_result.sql, prefix=self.INDENT))
+            from_section_lines.append(indent(from_render_result.sql, indent_prefix=SqlRenderingConstants.INDENT))
             from_section_lines.append(f") {from_source_alias}")
         from_section = "\n".join(from_section_lines)
 
@@ -172,17 +176,22 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
                 join_section_lines.append(join_description.join_type.value)
                 join_section_lines.append(
                     textwrap.indent(
-                        f"{right_source_rendered.sql} {join_description.right_source_alias}", prefix=self.INDENT
+                        f"{right_source_rendered.sql} {join_description.right_source_alias}",
+                        prefix=SqlRenderingConstants.INDENT,
                     )
                 )
             else:
                 join_section_lines.append(f"{join_description.join_type.value} (")
-                join_section_lines.append(textwrap.indent(right_source_rendered.sql, prefix=self.INDENT))
+                join_section_lines.append(
+                    textwrap.indent(right_source_rendered.sql, prefix=SqlRenderingConstants.INDENT)
+                )
                 join_section_lines.append(f") {join_description.right_source_alias}")
 
             if on_condition_rendered:
                 join_section_lines.append("ON")
-                join_section_lines.append(textwrap.indent(on_condition_rendered.sql, prefix=self.INDENT))
+                join_section_lines.append(
+                    textwrap.indent(on_condition_rendered.sql, prefix=SqlRenderingConstants.INDENT)
+                )
 
         return "\n".join(join_section_lines), params
 
@@ -204,9 +213,13 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
             if first:
                 first = False
                 group_by_section_lines.append("GROUP BY")
-                group_by_section_lines.append(textwrap.indent(group_by_expr_rendered.sql, prefix=self.INDENT))
+                group_by_section_lines.append(
+                    textwrap.indent(group_by_expr_rendered.sql, prefix=SqlRenderingConstants.INDENT)
+                )
             else:
-                group_by_section_lines.append(textwrap.indent(f", {group_by_expr_rendered.sql}", prefix=self.INDENT))
+                group_by_section_lines.append(
+                    textwrap.indent(f", {group_by_expr_rendered.sql}", prefix=SqlRenderingConstants.INDENT)
+                )
 
         return "\n".join(group_by_section_lines), params
 
