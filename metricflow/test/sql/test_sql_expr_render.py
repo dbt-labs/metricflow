@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import logging
 import textwrap
+from typing import List
 
 import pytest
+from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
@@ -31,6 +33,8 @@ from metricflow.sql.sql_exprs import (
     SqlWindowFunctionExpression,
     SqlWindowOrderByArgument,
 )
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.snapshot_utils import assert_str_snapshot_equal
 
 logger = logging.getLogger(__name__)
 
@@ -252,30 +256,73 @@ def test_between_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> No
     assert actual == "a.col0 BETWEEN CAST('2020-01-01' AS TIMESTAMP) AND CAST('2020-01-10' AS TIMESTAMP)"
 
 
-def test_window_function_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D
-    actual = default_expr_renderer.render_sql_expr(
-        SqlWindowFunctionExpression(
-            sql_function=SqlWindowFunction.FIRST_VALUE,
-            sql_function_args=[SqlColumnReferenceExpression(SqlColumnReference("a", "col0"))],
-            partition_by_args=[
-                SqlColumnReferenceExpression(SqlColumnReference("b", "col0")),
-                SqlColumnReferenceExpression(SqlColumnReference("b", "col1")),
-            ],
-            order_by_args=[
-                SqlWindowOrderByArgument(
-                    expr=SqlColumnReferenceExpression(SqlColumnReference("a", "col0")),
-                    descending=True,
-                    nulls_last=False,
-                ),
-                SqlWindowOrderByArgument(
-                    expr=SqlColumnReferenceExpression(SqlColumnReference("b", "col0")),
-                    descending=False,
-                    nulls_last=True,
-                ),
-            ],
+def test_window_function_expr(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    default_expr_renderer: DefaultSqlExpressionRenderer,
+) -> None:
+    partition_by_args = (
+        SqlColumnReferenceExpression(SqlColumnReference("b", "col0")),
+        SqlColumnReferenceExpression(SqlColumnReference("b", "col1")),
+    )
+    order_by_args = (
+        SqlWindowOrderByArgument(
+            expr=SqlColumnReferenceExpression(SqlColumnReference("a", "col0")),
+            descending=True,
+            nulls_last=False,
+        ),
+        SqlWindowOrderByArgument(
+            expr=SqlColumnReferenceExpression(SqlColumnReference("b", "col0")),
+            descending=False,
+            nulls_last=True,
+        ),
+    )
+
+    rendered_sql_lines: List[str] = []
+
+    for num_partition_by_args in range(3):
+        rendered_sql_lines.append(f"-- Window function with {num_partition_by_args} PARTITION BY items(s)")
+        rendered_sql_lines.append(
+            default_expr_renderer.render_sql_expr(
+                SqlWindowFunctionExpression(
+                    sql_function=SqlWindowFunction.FIRST_VALUE,
+                    sql_function_args=[SqlColumnReferenceExpression(SqlColumnReference("a", "col0"))],
+                    partition_by_args=partition_by_args[:num_partition_by_args],
+                    order_by_args=(),
+                )
+            ).sql,
         )
-    ).sql
-    assert (
-        actual
-        == "first_value(a.col0) OVER (PARTITION BY b.col0, b.col1 ORDER BY a.col0 DESC NULLS FIRST, b.col0 ASC NULLS LAST ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)"
+        rendered_sql_lines.append("")
+
+    for num_order_by_args in range(3):
+        rendered_sql_lines.append(f"-- Window function with {num_order_by_args} ORDER BY items(s)")
+        rendered_sql_lines.append(
+            default_expr_renderer.render_sql_expr(
+                SqlWindowFunctionExpression(
+                    sql_function=SqlWindowFunction.FIRST_VALUE,
+                    sql_function_args=[SqlColumnReferenceExpression(SqlColumnReference("a", "col0"))],
+                    partition_by_args=(),
+                    order_by_args=order_by_args[:num_order_by_args],
+                )
+            ).sql,
+        )
+        rendered_sql_lines.append("")
+
+    rendered_sql_lines.append("-- Window function with PARTITION BY and ORDER BY items")
+    rendered_sql_lines.append(
+        default_expr_renderer.render_sql_expr(
+            SqlWindowFunctionExpression(
+                sql_function=SqlWindowFunction.FIRST_VALUE,
+                sql_function_args=[SqlColumnReferenceExpression(SqlColumnReference("a", "col0"))],
+                partition_by_args=partition_by_args,
+                order_by_args=order_by_args,
+            )
+        ).sql
+    )
+
+    assert_str_snapshot_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        snapshot_id="rendered_sql",
+        snapshot_str="\n".join(rendered_sql_lines),
     )
