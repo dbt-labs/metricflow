@@ -12,6 +12,8 @@ from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
 
+from metricflow.mf_logging.formatting import indent
+from metricflow.sql.render.rendering_constants import SqlRenderingConstants
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_exprs import (
     SqlAggregateFunctionExpression,
@@ -353,31 +355,52 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
             combined_params = combined_params.combine(arg_rendered.bind_parameters)
 
         sql_function_args_string = ", ".join([x.sql for x in sql_function_args_rendered])
-        partition_by_args_string = (
-            ("PARTITION BY " + ", ".join([x.sql for x in partition_by_args_rendered]))
-            if partition_by_args_rendered
-            else ""
-        )
-        order_by_args_string = (
-            (
-                "ORDER BY "
-                + ", ".join(
-                    [
-                        rendered_result.sql + (f" {x.suffix}" if x.suffix else "")
-                        for rendered_result, x in order_by_args_rendered.items()
-                    ]
+        window_string_lines: List[str] = []
+        if len(partition_by_args_rendered) == 1:
+            window_string_lines.append(f"PARTITION BY {partition_by_args_rendered[0].sql}")
+        elif len(partition_by_args_rendered) > 1:
+            window_string_lines.append("PARTITION BY")
+            window_string_lines.append(
+                indent(
+                    "\n, ".join([x.sql for x in partition_by_args_rendered]),
+                    indent_prefix=SqlRenderingConstants.INDENT,
                 )
-                + " ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING"
             )
-            if order_by_args_rendered
-            else ""
-        )
+        if len(order_by_args_rendered) == 1:
+            rendered_result, order_by_arg = tuple(order_by_args_rendered.items())[0]
+            window_string_lines.append(
+                "ORDER BY " + rendered_result.sql + (f" {order_by_arg.suffix}" if order_by_arg.suffix else "")
+            )
+        elif len(order_by_args_rendered) > 1:
+            window_string_lines.append("ORDER BY")
+            window_string_lines.append(
+                indent(
+                    "\n, ".join(
+                        [
+                            rendered_result.sql + (f" {order_by_arg.suffix}" if order_by_arg.suffix else "")
+                            for rendered_result, order_by_arg in order_by_args_rendered.items()
+                        ]
+                    ),
+                    indent_prefix=SqlRenderingConstants.INDENT,
+                )
+            )
 
-        window_string = " ".join(filter(bool, [partition_by_args_string, order_by_args_string]))
-        return SqlExpressionRenderResult(
-            sql=f"{node.sql_function.value}({sql_function_args_string}) OVER ({window_string})",
-            bind_parameters=combined_params,
-        )
+        if len(order_by_args_rendered) > 0:
+            window_string_lines.append("ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING")
+
+        window_string = "\n".join(window_string_lines)
+
+        if len(window_string_lines) <= 1:
+            return SqlExpressionRenderResult(
+                sql=f"{node.sql_function.value}({sql_function_args_string}) OVER ({window_string})",
+                bind_parameters=combined_params,
+            )
+        else:
+            indented_window_string = indent(window_string, indent_prefix=SqlRenderingConstants.INDENT)
+            return SqlExpressionRenderResult(
+                sql=f"{node.sql_function.value}({sql_function_args_string}) OVER (\n{indented_window_string}\n)",
+                bind_parameters=combined_params,
+            )
 
     def visit_generate_uuid_expr(self, node: SqlGenerateUuidExpression) -> SqlExpressionRenderResult:  # noqa: D
         return SqlExpressionRenderResult(
