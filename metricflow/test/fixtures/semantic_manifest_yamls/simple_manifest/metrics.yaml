@@ -707,7 +707,7 @@ metric:
 ---
 metric:
   name: twice_bookings_fill_nulls_with_0_without_time_spine
-  description: 2x twice_bookings_fill_nulls_with_0_without_time_spine
+  description: 2x bookings_fill_nulls_with_0_without_time_spine
   type: derived
   type_params:
     expr: 2 * bookings_fill_nulls_with_0_without_time_spine
@@ -716,7 +716,7 @@ metric:
 ---
 metric:
   name: nested_fill_nulls_without_time_spine
-  description: 2x twice_bookings_fill_nulls_with_0_without_time_spine but then x3
+  description: 3x twice_bookings_fill_nulls_with_0_without_time_spine
   type: derived
   type_params:
     expr: 3 * twice_bookings_fill_nulls_with_0_without_time_spine
