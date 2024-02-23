@@ -148,10 +148,38 @@ FROM (
           FROM (
             -- Dedupe the fanout with mf_internal_uuid in the conversion data set
             SELECT DISTINCT
-              first_value(subq_9.visits) OVER (PARTITION BY subq_12.user, subq_12.ds__day, subq_12.mf_internal_uuid ORDER BY subq_9.ds__day DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS visits
-              , first_value(subq_9.ds__day) OVER (PARTITION BY subq_12.user, subq_12.ds__day, subq_12.mf_internal_uuid ORDER BY subq_9.ds__day DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS ds__day
-              , first_value(subq_9.metric_time__day) OVER (PARTITION BY subq_12.user, subq_12.ds__day, subq_12.mf_internal_uuid ORDER BY subq_9.ds__day DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS metric_time__day
-              , first_value(subq_9.user) OVER (PARTITION BY subq_12.user, subq_12.ds__day, subq_12.mf_internal_uuid ORDER BY subq_9.ds__day DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS user
+              first_value(subq_9.visits) OVER (
+                PARTITION BY
+                  subq_12.user
+                  , subq_12.ds__day
+                  , subq_12.mf_internal_uuid
+                ORDER BY subq_9.ds__day DESC
+                ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+              ) AS visits
+              , first_value(subq_9.ds__day) OVER (
+                PARTITION BY
+                  subq_12.user
+                  , subq_12.ds__day
+                  , subq_12.mf_internal_uuid
+                ORDER BY subq_9.ds__day DESC
+                ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+              ) AS ds__day
+              , first_value(subq_9.metric_time__day) OVER (
+                PARTITION BY
+                  subq_12.user
+                  , subq_12.ds__day
+                  , subq_12.mf_internal_uuid
+                ORDER BY subq_9.ds__day DESC
+                ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+              ) AS metric_time__day
+              , first_value(subq_9.user) OVER (
+                PARTITION BY
+                  subq_12.user
+                  , subq_12.ds__day
+                  , subq_12.mf_internal_uuid
+                ORDER BY subq_9.ds__day DESC
+                ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+              ) AS user
               , subq_12.mf_internal_uuid AS mf_internal_uuid
               , subq_12.buys AS buys
             FROM (

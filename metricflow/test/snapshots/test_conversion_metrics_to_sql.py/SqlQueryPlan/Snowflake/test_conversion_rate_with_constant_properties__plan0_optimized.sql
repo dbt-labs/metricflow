@@ -41,12 +41,60 @@ FROM (
     FROM (
       -- Dedupe the fanout with mf_internal_uuid in the conversion data set
       SELECT DISTINCT
-        first_value(subq_21.visits) OVER (PARTITION BY subq_24.user, subq_24.ds__day, subq_24.mf_internal_uuid, subq_24.session_id ORDER BY subq_21.ds__day DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS visits
-        , first_value(subq_21.visit__referrer_id) OVER (PARTITION BY subq_24.user, subq_24.ds__day, subq_24.mf_internal_uuid, subq_24.session_id ORDER BY subq_21.ds__day DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS visit__referrer_id
-        , first_value(subq_21.ds__day) OVER (PARTITION BY subq_24.user, subq_24.ds__day, subq_24.mf_internal_uuid, subq_24.session_id ORDER BY subq_21.ds__day DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS ds__day
-        , first_value(subq_21.metric_time__day) OVER (PARTITION BY subq_24.user, subq_24.ds__day, subq_24.mf_internal_uuid, subq_24.session_id ORDER BY subq_21.ds__day DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS metric_time__day
-        , first_value(subq_21.user) OVER (PARTITION BY subq_24.user, subq_24.ds__day, subq_24.mf_internal_uuid, subq_24.session_id ORDER BY subq_21.ds__day DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS user
-        , first_value(subq_21.session) OVER (PARTITION BY subq_24.user, subq_24.ds__day, subq_24.mf_internal_uuid, subq_24.session_id ORDER BY subq_21.ds__day DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS session
+        first_value(subq_21.visits) OVER (
+          PARTITION BY
+            subq_24.user
+            , subq_24.ds__day
+            , subq_24.mf_internal_uuid
+            , subq_24.session_id
+          ORDER BY subq_21.ds__day DESC
+          ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+        ) AS visits
+        , first_value(subq_21.visit__referrer_id) OVER (
+          PARTITION BY
+            subq_24.user
+            , subq_24.ds__day
+            , subq_24.mf_internal_uuid
+            , subq_24.session_id
+          ORDER BY subq_21.ds__day DESC
+          ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+        ) AS visit__referrer_id
+        , first_value(subq_21.ds__day) OVER (
+          PARTITION BY
+            subq_24.user
+            , subq_24.ds__day
+            , subq_24.mf_internal_uuid
+            , subq_24.session_id
+          ORDER BY subq_21.ds__day DESC
+          ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+        ) AS ds__day
+        , first_value(subq_21.metric_time__day) OVER (
+          PARTITION BY
+            subq_24.user
+            , subq_24.ds__day
+            , subq_24.mf_internal_uuid
+            , subq_24.session_id
+          ORDER BY subq_21.ds__day DESC
+          ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+        ) AS metric_time__day
+        , first_value(subq_21.user) OVER (
+          PARTITION BY
+            subq_24.user
+            , subq_24.ds__day
+            , subq_24.mf_internal_uuid
+            , subq_24.session_id
+          ORDER BY subq_21.ds__day DESC
+          ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+        ) AS user
+        , first_value(subq_21.session) OVER (
+          PARTITION BY
+            subq_24.user
+            , subq_24.ds__day
+            , subq_24.mf_internal_uuid
+            , subq_24.session_id
+          ORDER BY subq_21.ds__day DESC
+          ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+        ) AS session
         , subq_24.mf_internal_uuid AS mf_internal_uuid
         , subq_24.buys AS buys
       FROM (
