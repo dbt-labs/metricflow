@@ -525,7 +525,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
                 logger.exception(
                     f"Got an exception building an execution plan using a dataflow plan created with optimizers: "
-                    f"{dataflow_plan_optimizer_set}. In case the error was due to the optimizer producing an incorrect"
+                    f"{dataflow_plan_optimizer_set}. In case the error was due to the optimizer producing an incorrect "
                     f"plan, retrying creating the dataflow plan with optimizers: "
                     f"{dataflow_plan_optimizer_sets_to_try[i+1]}"
                 )

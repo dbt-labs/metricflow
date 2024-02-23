@@ -220,6 +220,20 @@ def test_query_parser(bookings_query_parser: MetricFlowQueryParser) -> None:  # 
     )
 
 
+def test_empty_query(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D
+    query_spec = bookings_query_parser.parse_and_validate_query(
+        metric_names=[],
+        group_by_names=[],
+    )
+
+
+def test_no_group_by(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D
+    query_spec = bookings_query_parser.parse_and_validate_query(
+        metric_names=["bookings"],
+        group_by_names=[],
+    )
+
+
 def test_query_parser_case_insensitivity(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D
     # String params
     query_spec = bookings_query_parser.parse_and_validate_query(

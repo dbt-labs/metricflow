@@ -198,6 +198,6 @@ class ResolverInputForQuery(MetricFlowQueryResolverInput):
     @override
     def ui_description(self) -> str:
         return (
-            f"Query({repr([metric_input.ui_description for metric_input in self.metric_inputs])}, "
+            f"Query({repr([metric_input.ui_description for metric_input in self.metric_inputs])}), "
             f"{repr([group_by_item_input.input_obj for group_by_item_input in self.group_by_item_inputs])}"
         )
