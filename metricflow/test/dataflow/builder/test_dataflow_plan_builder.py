@@ -5,6 +5,7 @@ import logging
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
@@ -1102,6 +1103,38 @@ def test_min_max_only_time_year(
             min_max_only=True,
         )
     )
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan.text_structure(),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dag_graph=dataflow_plan,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_offset_metric_filter_and_query_have_different_granularities(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    query_parser: MetricFlowQueryParser,
+    create_source_tables: bool,
+) -> None:
+    """Test a query where an offset metrics is queried with one granularity and filtered by a different one."""
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("booking_fees_last_week_per_booker_this_week",),
+        group_by_names=("metric_time__month",),
+        where_constraint=PydanticWhereFilter(
+            where_sql_template=("{{ TimeDimension('metric_time', 'day') }} = '2020-01-01' ")
+        ),
+    )
+    dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
     assert_plan_snapshot_text_equal(
         request=request,

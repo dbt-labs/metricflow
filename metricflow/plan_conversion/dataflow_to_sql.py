@@ -1252,6 +1252,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         parent_alias = self._next_unique_table_alias()
 
         if node.use_custom_agg_time_dimension:
+            # TODO: do we need the `requested_agg_time_dimension_specs` property anymore?
             agg_time_dimension = node.requested_agg_time_dimension_specs[0]
             agg_time_element_name = agg_time_dimension.element_name
             agg_time_entity_links: Tuple[EntityReference, ...] = agg_time_dimension.entity_links
@@ -1300,6 +1301,16 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
         # Select all instances from the parent data set, EXCEPT the requested agg_time_dimension.
         # The agg_time_dimension will be selected from the time spine data set.
+        time_dimensions_to_select_from_parent: Tuple[TimeDimensionInstance, ...] = ()
+        time_dimensions_to_select_from_time_spine: Tuple[TimeDimensionInstance, ...] = ()
+        for time_dimension_instance in parent_data_set.instance_set.time_dimension_instances:
+            if (
+                time_dimension_instance.spec.element_name == agg_time_element_name
+                and time_dimension_instance.spec.entity_links == agg_time_entity_links
+            ):
+                time_dimensions_to_select_from_time_spine += (time_dimension_instance,)
+            else:
+                time_dimensions_to_select_from_parent += (time_dimension_instance,)
         parent_instance_set = InstanceSet(
             measure_instances=parent_data_set.instance_set.measure_instances,
             dimension_instances=parent_data_set.instance_set.dimension_instances,
@@ -1335,14 +1346,17 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         time_spine_select_columns = []
         time_spine_dim_instances = []
         where: Optional[SqlExpressionNode] = None
-        for requested_time_dimension_spec in node.requested_agg_time_dimension_specs:
+        for time_dimension_instance in time_dimensions_to_select_from_time_spine:
+            time_dimension_spec = time_dimension_instance.spec
+
             # Apply granularity to time spine column select expression.
-            if requested_time_dimension_spec.time_granularity == time_spine_dim_instance.spec.time_granularity:
+            if time_dimension_spec.time_granularity == time_spine_dim_instance.spec.time_granularity:
                 select_expr: SqlExpressionNode = time_spine_column_select_expr
             else:
                 select_expr = SqlDateTruncExpression(
-                    time_granularity=requested_time_dimension_spec.time_granularity, arg=time_spine_column_select_expr
+                    time_granularity=time_dimension_spec.time_granularity, arg=time_spine_column_select_expr
                 )
+                # Does this work if multiple are selected?
                 if node.offset_to_grain:
                     # Filter down to one row per granularity period
                     new_filter = SqlComparisonExpression(
@@ -1353,13 +1367,13 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                     else:
                         where = SqlLogicalExpression(operator=SqlLogicalOperator.OR, args=(where, new_filter))
             # Apply date_part to time spine column select expression.
-            if requested_time_dimension_spec.date_part:
-                select_expr = SqlExtractExpression(date_part=requested_time_dimension_spec.date_part, arg=select_expr)
+            if time_dimension_spec.date_part:
+                select_expr = SqlExtractExpression(date_part=time_dimension_spec.date_part, arg=select_expr)
             time_dim_spec = TimeDimensionSpec(
                 element_name=time_spine_dim_instance.spec.element_name,
                 entity_links=time_spine_dim_instance.spec.entity_links,
-                time_granularity=requested_time_dimension_spec.time_granularity,
-                date_part=requested_time_dimension_spec.date_part,
+                time_granularity=time_dimension_spec.time_granularity,
+                date_part=time_dimension_spec.date_part,
                 aggregation_state=time_spine_dim_instance.spec.aggregation_state,
             )
             time_spine_dim_instance = TimeDimensionInstance(

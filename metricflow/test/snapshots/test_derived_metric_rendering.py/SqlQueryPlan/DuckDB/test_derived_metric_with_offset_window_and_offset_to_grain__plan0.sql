@@ -27,6 +27,16 @@ FROM (
           -- Join to Time Spine Dataset
           SELECT
             subq_2.metric_time__day AS metric_time__day
+            , DATE_TRUNC('week', subq_2.metric_time__day) AS metric_time__week
+            , DATE_TRUNC('month', subq_2.metric_time__day) AS metric_time__month
+            , DATE_TRUNC('quarter', subq_2.metric_time__day) AS metric_time__quarter
+            , DATE_TRUNC('year', subq_2.metric_time__day) AS metric_time__year
+            , EXTRACT(year FROM DATE_TRUNC('day', subq_2.metric_time__day)) AS metric_time__extract_year
+            , EXTRACT(quarter FROM subq_2.metric_time__day) AS metric_time__extract_quarter
+            , EXTRACT(month FROM subq_2.metric_time__day) AS metric_time__extract_month
+            , EXTRACT(day FROM subq_2.metric_time__day) AS metric_time__extract_day
+            , EXTRACT(isodow FROM subq_2.metric_time__day) AS metric_time__extract_dow
+            , EXTRACT(doy FROM subq_2.metric_time__day) AS metric_time__extract_doy
             , subq_1.ds__day AS ds__day
             , subq_1.ds__week AS ds__week
             , subq_1.ds__month AS ds__month
@@ -317,6 +327,23 @@ FROM (
           ) subq_1
           ON
             DATE_TRUNC('month', subq_2.metric_time__day) = subq_1.metric_time__day
+          WHERE (
+            (
+              (
+                (
+                  DATE_TRUNC('week', subq_2.metric_time__day) = subq_2.metric_time__day
+                ) OR (
+                  DATE_TRUNC('month', subq_2.metric_time__day) = subq_2.metric_time__day
+                )
+              ) OR (
+                DATE_TRUNC('quarter', subq_2.metric_time__day) = subq_2.metric_time__day
+              )
+            ) OR (
+              DATE_TRUNC('year', subq_2.metric_time__day) = subq_2.metric_time__day
+            )
+          ) OR (
+            DATE_TRUNC('day', subq_2.metric_time__day) = subq_2.metric_time__day
+          )
         ) subq_4
       ) subq_5
       GROUP BY
@@ -342,6 +369,16 @@ FROM (
           -- Join to Time Spine Dataset
           SELECT
             subq_10.metric_time__day AS metric_time__day
+            , DATE_TRUNC('week', subq_10.metric_time__day) AS metric_time__week
+            , DATE_TRUNC('month', subq_10.metric_time__day) AS metric_time__month
+            , DATE_TRUNC('quarter', subq_10.metric_time__day) AS metric_time__quarter
+            , DATE_TRUNC('year', subq_10.metric_time__day) AS metric_time__year
+            , EXTRACT(year FROM DATE_TRUNC('day', subq_10.metric_time__day)) AS metric_time__extract_year
+            , EXTRACT(quarter FROM subq_10.metric_time__day) AS metric_time__extract_quarter
+            , EXTRACT(month FROM subq_10.metric_time__day) AS metric_time__extract_month
+            , EXTRACT(day FROM subq_10.metric_time__day) AS metric_time__extract_day
+            , EXTRACT(isodow FROM subq_10.metric_time__day) AS metric_time__extract_dow
+            , EXTRACT(doy FROM subq_10.metric_time__day) AS metric_time__extract_doy
             , subq_9.ds__day AS ds__day
             , subq_9.ds__week AS ds__week
             , subq_9.ds__month AS ds__month
