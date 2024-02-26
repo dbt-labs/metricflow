@@ -10,6 +10,7 @@ from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWin
 from dbt_semantic_interfaces.protocols.metric import (
     ConstantPropertyInput,
     ConversionTypeParams,
+    Metric,
     MetricInputMeasure,
     MetricTimeWindow,
     MetricType,
@@ -392,9 +393,22 @@ class DataflowPlanBuilder:
         """Builds a node to compute a metric that is not defined from other metrics."""
         metric_reference = metric_spec.reference
         metric = self._metric_lookup.get_metric(metric_reference)
-        metric_input_measure_spec = self._build_input_measure_spec_for_base_metric(
+        if metric.type is MetricType.SIMPLE or metric.type is MetricType.CUMULATIVE:
+            pass
+        elif (
+            metric.type is MetricType.RATIO or metric.type is MetricType.DERIVED or metric.type is MetricType.CONVERSION
+        ):
+            raise ValueError(f"This should only be called for base metrics (simple or cumulative). Got: {metric.type}")
+        else:
+            assert_values_exhausted(metric.type)
+        assert (
+            len(metric.input_measures) == 1
+        ), f"A base metric should not have multiple measures. Got {metric.input_measures}"
+
+        metric_input_measure_spec = self._build_input_measure_spec(
             filter_spec_factory=filter_spec_factory,
-            metric_reference=metric_reference,
+            metric=metric,
+            input_measure=metric.input_measures[0],
             queried_linkable_specs=queried_linkable_specs,
             child_metric_offset_window=metric_spec.offset_window,
             child_metric_offset_to_grain=metric_spec.offset_to_grain,
@@ -982,7 +996,7 @@ class DataflowPlanBuilder:
 
         assert (
             len(metric.input_measures) == 2
-        ), f"A conversion metric should exactly 2 measures. Got{metric.input_measures}"
+        ), f"A conversion metric should exactly 2 measures. Got {metric.input_measures}"
 
         def _get_matching_measure(
             measure_to_match: MeasureReference, input_measures: Sequence[MetricInputMeasure], is_base_measure: bool
@@ -995,25 +1009,18 @@ class DataflowPlanBuilder:
                 None,
             )
             assert matched_measure, f"Unable to find {measure_to_match} in {input_measures}."
-            filter_specs: List[WhereFilterSpec] = []
+            filter_specs: Tuple[WhereFilterSpec, ...] = ()
             if is_base_measure:
-                filter_specs.extend(
-                    filter_spec_factory.create_from_where_filter_intersection(
-                        filter_location=WhereFilterLocation.for_metric(metric_reference),
-                        filter_intersection=metric.filter,
-                    )
-                )
-                filter_specs.extend(descendent_filter_specs)
-                filter_specs.extend(
-                    filter_spec_factory.create_from_where_filter_intersection(
-                        filter_location=WhereFilterLocation.for_metric(metric_reference),
-                        filter_intersection=matched_measure.filter,
-                    )
+                filter_specs = self._build_filter_specs_for_input_measure(
+                    filter_spec_factory=filter_spec_factory,
+                    metric=metric,
+                    input_measure=matched_measure,
+                    descendent_filter_specs=descendent_filter_specs,
                 )
             return MetricInputMeasureSpec(
                 measure_spec=MeasureSpec.from_name(matched_measure.name),
                 fill_nulls_with=matched_measure.fill_nulls_with,
-                filter_specs=tuple(filter_specs),
+                filter_specs=filter_specs,
                 alias=matched_measure.alias,
             )
 
@@ -1029,10 +1036,11 @@ class DataflowPlanBuilder:
         )
         return base_input_measure, conversion_input_measure
 
-    def _build_input_measure_spec_for_base_metric(
+    def _build_input_measure_spec(
         self,
         filter_spec_factory: WhereSpecFactory,
-        metric_reference: MetricReference,
+        metric: Metric,
+        input_measure: MetricInputMeasure,
         child_metric_offset_window: Optional[MetricTimeWindow],
         child_metric_offset_to_grain: Optional[TimeGranularity],
         descendent_filter_specs: Sequence[WhereFilterSpec],
@@ -1045,22 +1053,12 @@ class DataflowPlanBuilder:
         descendent_filter_specs includes all filter specs required to compute the metric in the query. This includes the
         filters in the query and any filter in the definition of metrics in between.
         """
-        metric = self._metric_lookup.get_metric(metric_reference)
-
-        if metric.type is MetricType.SIMPLE or metric.type is MetricType.CUMULATIVE:
-            pass
-        elif (
-            metric.type is MetricType.RATIO or metric.type is MetricType.DERIVED or metric.type is MetricType.CONVERSION
-        ):
-            raise ValueError("This should only be called for base metrics.")
-        else:
-            assert_values_exhausted(metric.type)
-
-        assert (
-            len(metric.input_measures) == 1
-        ), f"A base metric should not have multiple measures. Got{metric.input_measures}"
-
-        input_measure = metric.input_measures[0]
+        filter_specs = self._build_filter_specs_for_input_measure(
+            filter_spec_factory=filter_spec_factory,
+            metric=metric,
+            input_measure=input_measure,
+            descendent_filter_specs=descendent_filter_specs,
+        )
 
         measure_spec = MeasureSpec(
             element_name=input_measure.name,
@@ -1096,31 +1094,36 @@ class DataflowPlanBuilder:
                     offset_to_grain=None,
                 )
 
-        filter_specs: List[WhereFilterSpec] = []
-        filter_specs.extend(
-            filter_spec_factory.create_from_where_filter_intersection(
-                filter_location=WhereFilterLocation.for_metric(metric_reference),
-                filter_intersection=input_measure.filter,
-            )
-        )
-        filter_specs.extend(
-            filter_spec_factory.create_from_where_filter_intersection(
-                filter_location=WhereFilterLocation.for_metric(metric_reference), filter_intersection=metric.filter
-            )
-        )
-        filter_specs.extend(descendent_filter_specs)
-
         return MetricInputMeasureSpec(
             measure_spec=measure_spec,
             fill_nulls_with=input_measure.fill_nulls_with,
             offset_window=child_metric_offset_window,
             offset_to_grain=child_metric_offset_to_grain,
             cumulative_description=cumulative_description,
-            filter_specs=tuple(filter_specs),
+            filter_specs=filter_specs,
             alias=input_measure.alias,
             before_aggregation_time_spine_join_description=before_aggregation_time_spine_join_description,
             after_aggregation_time_spine_join_description=after_aggregation_time_spine_join_description,
         )
+
+    def _build_filter_specs_for_input_measure(
+        self,
+        filter_spec_factory: WhereSpecFactory,
+        metric: Metric,
+        input_measure: MetricInputMeasure,
+        descendent_filter_specs: Sequence[WhereFilterSpec],
+    ) -> Tuple[WhereFilterSpec, ...]:
+        metric_reference = MetricReference(element_name=metric.name)
+        filter_specs: List[WhereFilterSpec] = []
+        filter_location = WhereFilterLocation.for_metric(metric_reference)
+        for filter_ in (input_measure.filter, metric.filter):
+            filter_specs.extend(
+                filter_spec_factory.create_from_where_filter_intersection(
+                    filter_location=filter_location, filter_intersection=filter_
+                )
+            )
+        filter_specs.extend(descendent_filter_specs)
+        return tuple(filter_specs)
 
     def _build_input_metric_specs_for_derived_metric(
         self,
