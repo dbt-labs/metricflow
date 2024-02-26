@@ -10,7 +10,7 @@
             <!--     element_name='booking_fees_last_week_per_booker_this_week', -->
             <!--     filter_specs=(                                              -->
             <!--       WhereFilterSpec(                                          -->
-            <!--         where_sql="metric_time__day = '2020-01-01' ",           -->
+            <!--         where_sql="metric_time__day = '2020-01-01'",            -->
             <!--         bind_parameters=SqlBindParameters(),                    -->
             <!--         linkable_spec_set=LinkableSpecSet(                      -->
             <!--           time_dimension_specs=(                                -->
@@ -34,7 +34,7 @@
                     <!--     element_name='booking_value',                                      -->
                     <!--     filter_specs=(                                                     -->
                     <!--       WhereFilterSpec(                                                 -->
-                    <!--         where_sql="metric_time__day = '2020-01-01' ",                  -->
+                    <!--         where_sql="metric_time__day = '2020-01-01'",                   -->
                     <!--         bind_parameters=SqlBindParameters(),                           -->
                     <!--         linkable_spec_set=LinkableSpecSet(                             -->
                     <!--           time_dimension_specs=(                                       -->
@@ -60,19 +60,19 @@
                             <WhereConstraintNode>
                                 <!-- description = 'Constrain Output with WHERE' -->
                                 <!-- node_id = NodeId(id_str='wcc_0') -->
-                                <!-- where_condition =                                 -->
-                                <!--   WhereFilterSpec(                                -->
-                                <!--     where_sql="metric_time__day = '2020-01-01' ", -->
-                                <!--     bind_parameters=SqlBindParameters(),          -->
-                                <!--     linkable_spec_set=LinkableSpecSet(            -->
-                                <!--       time_dimension_specs=(                      -->
-                                <!--         TimeDimensionSpec(                        -->
-                                <!--           element_name='metric_time',             -->
-                                <!--           time_granularity=DAY,                   -->
-                                <!--         ),                                        -->
-                                <!--       ),                                          -->
-                                <!--     ),                                            -->
-                                <!--   )                                               -->
+                                <!-- where_condition =                                -->
+                                <!--   WhereFilterSpec(                               -->
+                                <!--     where_sql="metric_time__day = '2020-01-01'", -->
+                                <!--     bind_parameters=SqlBindParameters(),         -->
+                                <!--     linkable_spec_set=LinkableSpecSet(           -->
+                                <!--       time_dimension_specs=(                     -->
+                                <!--         TimeDimensionSpec(                       -->
+                                <!--           element_name='metric_time',            -->
+                                <!--           time_granularity=DAY,                  -->
+                                <!--         ),                                       -->
+                                <!--       ),                                         -->
+                                <!--     ),                                           -->
+                                <!--   )                                              -->
                                 <FilterElementsNode>
                                     <!-- description =                                                     -->
                                     <!--   ("Pass Only Elements: ['booking_value', 'metric_time__month', " -->
@@ -113,24 +113,24 @@
                 <ComputeMetricsNode>
                     <!-- description = 'Compute Metrics via Expressions' -->
                     <!-- node_id = NodeId(id_str='cm_1') -->
-                    <!-- metric_spec =                                         -->
-                    <!--   MetricSpec(                                         -->
-                    <!--     element_name='bookers',                           -->
-                    <!--     filter_specs=(                                    -->
-                    <!--       WhereFilterSpec(                                -->
-                    <!--         where_sql="metric_time__day = '2020-01-01' ", -->
-                    <!--         bind_parameters=SqlBindParameters(),          -->
-                    <!--         linkable_spec_set=LinkableSpecSet(            -->
-                    <!--           time_dimension_specs=(                      -->
-                    <!--             TimeDimensionSpec(                        -->
-                    <!--               element_name='metric_time',             -->
-                    <!--               time_granularity=DAY,                   -->
-                    <!--             ),                                        -->
-                    <!--           ),                                          -->
-                    <!--         ),                                            -->
-                    <!--       ),                                              -->
-                    <!--     ),                                                -->
-                    <!--   )                                                   -->
+                    <!-- metric_spec =                                        -->
+                    <!--   MetricSpec(                                        -->
+                    <!--     element_name='bookers',                          -->
+                    <!--     filter_specs=(                                   -->
+                    <!--       WhereFilterSpec(                               -->
+                    <!--         where_sql="metric_time__day = '2020-01-01'", -->
+                    <!--         bind_parameters=SqlBindParameters(),         -->
+                    <!--         linkable_spec_set=LinkableSpecSet(           -->
+                    <!--           time_dimension_specs=(                     -->
+                    <!--             TimeDimensionSpec(                       -->
+                    <!--               element_name='metric_time',            -->
+                    <!--               time_granularity=DAY,                  -->
+                    <!--             ),                                       -->
+                    <!--           ),                                         -->
+                    <!--         ),                                           -->
+                    <!--       ),                                             -->
+                    <!--     ),                                               -->
+                    <!--   )                                                  -->
                     <AggregateMeasuresNode>
                         <!-- description = 'Aggregate Measures' -->
                         <!-- node_id = NodeId(id_str='am_1') -->
@@ -143,19 +143,19 @@
                             <WhereConstraintNode>
                                 <!-- description = 'Constrain Output with WHERE' -->
                                 <!-- node_id = NodeId(id_str='wcc_1') -->
-                                <!-- where_condition =                                 -->
-                                <!--   WhereFilterSpec(                                -->
-                                <!--     where_sql="metric_time__day = '2020-01-01' ", -->
-                                <!--     bind_parameters=SqlBindParameters(),          -->
-                                <!--     linkable_spec_set=LinkableSpecSet(            -->
-                                <!--       time_dimension_specs=(                      -->
-                                <!--         TimeDimensionSpec(                        -->
-                                <!--           element_name='metric_time',             -->
-                                <!--           time_granularity=DAY,                   -->
-                                <!--         ),                                        -->
-                                <!--       ),                                          -->
-                                <!--     ),                                            -->
-                                <!--   )                                               -->
+                                <!-- where_condition =                                -->
+                                <!--   WhereFilterSpec(                               -->
+                                <!--     where_sql="metric_time__day = '2020-01-01'", -->
+                                <!--     bind_parameters=SqlBindParameters(),         -->
+                                <!--     linkable_spec_set=LinkableSpecSet(           -->
+                                <!--       time_dimension_specs=(                     -->
+                                <!--         TimeDimensionSpec(                       -->
+                                <!--           element_name='metric_time',            -->
+                                <!--           time_granularity=DAY,                  -->
+                                <!--         ),                                       -->
+                                <!--       ),                                         -->
+                                <!--     ),                                           -->
+                                <!--   )                                              -->
                                 <FilterElementsNode>
                                     <!-- description =                                                                 -->
                                     <!--   "Pass Only Elements: ['bookers', 'metric_time__month', 'metric_time__day']" -->
