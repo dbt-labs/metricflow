@@ -171,7 +171,7 @@ def test_conversion_rate_with_constant_properties(
 
 
 @pytest.mark.sql_engine_snapshot
-def test_conversion_metric_fill_nulls_with_0(
+def test_conversion_metric_join_to_timespine_and_fill_nulls_with_0(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -179,7 +179,6 @@ def test_conversion_metric_fill_nulls_with_0(
     sql_client: SqlClient,
 ) -> None:
     """Test conversion metric that joins to time spine and fills nulls with 0."""
-    # TODO: update test name after SQL comparison
     metric_spec = MetricSpec(element_name="visit_buy_conversion_rate_7days_fill_nulls_with_0")
     metric_time_spec = TimeDimensionSpec(
         element_name="metric_time", entity_links=(), time_granularity=TimeGranularity.DAY
