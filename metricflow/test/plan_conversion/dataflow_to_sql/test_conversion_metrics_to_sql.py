@@ -171,23 +171,14 @@ def test_conversion_rate_with_constant_properties(
 
 
 @pytest.mark.sql_engine_snapshot
-def test_conversion_metric_fill_nulls_with_0(
+def test_conversion_metric_join_to_timespine_and_fill_nulls_with_0(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
-    """Test conversion metric that fills nulls with 0.
-
-    Current behavior: COALESCE is applied when joining the two measures. COALESCE should
-    also be applied to each measure after aggregation - we plan to add that soon and the
-    rendering here should change at that time.
-
-    Also note that conversion metrics will return null if the denominator is null. This
-    default behavior is intentional, but if users want to return 0 instead of null, that
-    won't be possible until we enable `fill_nulls_with` at the metric level.
-    """
+    """Test conversion metric that joins to time spine and fills nulls with 0."""
     metric_spec = MetricSpec(element_name="visit_buy_conversion_rate_7days_fill_nulls_with_0")
     metric_time_spec = TimeDimensionSpec(
         element_name="metric_time", entity_links=(), time_granularity=TimeGranularity.DAY

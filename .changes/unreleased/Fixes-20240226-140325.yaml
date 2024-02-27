@@ -1,0 +1,6 @@
+kind: Fixes
+body: Join to time spine if requested for conversion metric input measures.
+time: 2024-02-26T14:03:25.677752-08:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1048"
