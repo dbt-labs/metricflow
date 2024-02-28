@@ -26,7 +26,7 @@ from metricflow.specs.specs import (
 from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.snapshot_utils import assert_plan_snapshot_text_equal
-from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_MONTH, MTD_SPEC_QUARTER
+from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_MONTH, MTD_SPEC_QUARTER, MTD_SPEC_WEEK
 
 logger = logging.getLogger(__name__)
 
@@ -1118,7 +1118,60 @@ def test_min_max_only_time_year(
     )
 
 
-@pytest.mark.sql_engine_snapshot
+def test_min_max_metric_time(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+) -> None:
+    """Tests a plan to get the min & max distinct values of metric_time."""
+    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
+        query_spec=MetricFlowQuerySpec(
+            time_dimension_specs=(MTD_SPEC_DAY,),
+            min_max_only=True,
+        )
+    )
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan.text_structure(),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dag_graph=dataflow_plan,
+    )
+
+
+def test_min_max_metric_time_week(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+) -> None:
+    """Tests a plan to get the min & max distinct values of metric_time with non-default granularity."""
+    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
+        query_spec=MetricFlowQuerySpec(
+            time_dimension_specs=(MTD_SPEC_WEEK,),
+            min_max_only=True,
+        )
+    )
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan.text_structure(),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dag_graph=dataflow_plan,
+    )
+
+
 def test_join_to_time_spine_with_filters(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
