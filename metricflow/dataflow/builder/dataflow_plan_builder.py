@@ -497,7 +497,7 @@ class DataflowPlanBuilder:
         )
         output_node: BaseOutput = ComputeMetricsNode(parent_node=parent_node, metric_specs=[metric_spec])
 
-        # For nested ratio / derived metrics with time offset, apply offset & where constraint after metric computation.
+        # For ratio / derived metrics with time offset, apply offset & where constraint after metric computation.
         if metric_spec.has_time_offset:
             queried_agg_time_dimension_specs = queried_linkable_specs.included_agg_time_dimension_specs_for_metric(
                 metric_reference=metric_spec.reference, metric_lookup=self._metric_lookup
@@ -1348,10 +1348,13 @@ class DataflowPlanBuilder:
             )
 
         pre_aggregate_node: BaseOutput = cumulative_metric_constrained_node or unaggregated_measure_node
-        if len(metric_input_measure_spec.filter_specs) > 0:
+        merged_where_filter_spec = WhereFilterSpec.merge_iterable(metric_input_measure_spec.filter_specs)
+        if (
+            len(metric_input_measure_spec.filter_specs) > 0
+            # If joining to time spine, apply where constraint later.
+            and not metric_input_measure_spec.after_aggregation_time_spine_join_description
+        ):
             # Apply where constraint on the node
-
-            merged_where_filter_spec = WhereFilterSpec.merge_iterable(metric_input_measure_spec.filter_specs)
             pre_aggregate_node = WhereConstraintNode(
                 parent_node=pre_aggregate_node,
                 where_constraint=merged_where_filter_spec,
