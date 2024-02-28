@@ -1298,8 +1298,8 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             parent_alias=parent_alias,
         )
 
-        # Select all instances from the parent data set, EXCEPT the requested agg_time_dimension.
-        # The agg_time_dimension will be selected from the time spine data set.
+        # Select all instances from the parent data set, EXCEPT agg_time_dimensions.
+        # The agg_time_dimensions will be selected from the time spine data set.
         time_dimensions_to_select_from_parent: Tuple[TimeDimensionInstance, ...] = ()
         time_dimensions_to_select_from_time_spine: Tuple[TimeDimensionInstance, ...] = ()
         for time_dimension_instance in parent_data_set.instance_set.time_dimension_instances:
@@ -1355,9 +1355,8 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 select_expr = SqlDateTruncExpression(
                     time_granularity=time_dimension_spec.time_granularity, arg=time_spine_column_select_expr
                 )
-                # Should this be a separate step in the DFP? Applying a where filter for offset to grain?
                 if node.offset_to_grain and time_dimension_spec in node.requested_agg_time_dimension_specs:
-                    # Filter down to one row per requested granularity period
+                    # Filter down to one row per granularity period requested in the group by
                     new_filter = SqlComparisonExpression(
                         left_expr=select_expr, comparison=SqlComparison.EQUALS, right_expr=time_spine_column_select_expr
                     )
@@ -1367,7 +1366,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                         where = SqlLogicalExpression(operator=SqlLogicalOperator.OR, args=(where, new_filter))
 
             # Apply date_part to time spine column select expression.
-            # Should date part work with offset to grain? Do we need a filter for that, too? Add tests for offset to grain with date part.
             if time_dimension_spec.date_part:
                 select_expr = SqlExtractExpression(date_part=time_dimension_spec.date_part, arg=select_expr)
             time_dim_spec = TimeDimensionSpec(
