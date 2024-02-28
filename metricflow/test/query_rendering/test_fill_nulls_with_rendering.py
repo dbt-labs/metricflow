@@ -6,7 +6,6 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.implementations.filters.where_filter import (
     PydanticWhereFilter,
-    PydanticWhereFilterIntersection,
 )
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
@@ -15,6 +14,7 @@ from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilde
 from metricflow.dataset.dataset import DataSet
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.specs.specs import (
     DimensionSpec,
     MetricFlowQuerySpec,
@@ -202,19 +202,17 @@ def test_join_to_time_spine_with_filter(  # noqa: D
     dataflow_plan_builder: DataflowPlanBuilder,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
+    query_parser: MetricFlowQueryParser,
 ) -> None:
-    dataflow_plan = dataflow_plan_builder.build_plan(
-        MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings_fill_nulls_with_0"),),
-            time_dimension_specs=(DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.DAY),),
-            filter_intersection=PydanticWhereFilterIntersection(
-                where_filters=[
-                    # This filter won't work, but unclear why!
-                    PydanticWhereFilter(where_sql_template="{{ TimeDimension('metric_time', 'day') }} = '2020-01-01'")
-                ]
-            ),
-        )
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookings_fill_nulls_with_0",),
+        group_by_names=("metric_time__day",),
+        where_constraint=PydanticWhereFilter(
+            where_sql_template="{{ TimeDimension('metric_time') }} > '2020-01-01'",
+        ),
     )
+    dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
+
     convert_and_check(
         request=request,
         mf_test_session_state=mf_test_session_state,

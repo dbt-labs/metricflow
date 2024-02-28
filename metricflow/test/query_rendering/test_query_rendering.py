@@ -5,7 +5,6 @@ a MetricFlow query input and end up with a query rendered for execution against 
 target engine. This will depend on test semantic manifests and engine-specific rendering
 logic as propagated via the SqlClient input.
 """
-
 from __future__ import annotations
 
 import pytest
