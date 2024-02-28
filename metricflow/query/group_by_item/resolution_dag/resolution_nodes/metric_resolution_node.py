@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List, Optional, Sequence, Union
+from typing import Optional, Sequence, Union
 
 from dbt_semantic_interfaces.references import MetricReference
 from typing_extensions import Self, override
@@ -61,13 +61,13 @@ class MetricGroupByItemResolutionNode(GroupByItemResolutionNode):
 
     @property
     @override
-    def displayed_properties(self) -> List[DisplayedProperty]:
-        return super().displayed_properties + [
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:
+        return tuple(super().displayed_properties) + (
             DisplayedProperty(
                 key="metric_reference",
                 value=str(self._metric_reference),
             ),
-        ]
+        )
 
     @property
     def metric_reference(self) -> MetricReference:  # noqa: D

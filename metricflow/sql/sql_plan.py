@@ -163,16 +163,16 @@ class SqlSelectStatementNode(SqlQueryPlanNode):
         return self._description
 
     @property
-    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
         return (
-            super().displayed_properties
-            + [DisplayedProperty(f"col{i}", column) for i, column in enumerate(self._select_columns)]
-            + [DisplayedProperty("from_source", self.from_source)]
-            + [DisplayedProperty(f"join_{i}", join_desc) for i, join_desc in enumerate(self._join_descs)]
-            + [DisplayedProperty(f"group_by{i}", group_by) for i, group_by in enumerate(self._group_bys)]
-            + [DisplayedProperty("where", self._where)]
-            + [DisplayedProperty(f"order_by{i}", order_by) for i, order_by in enumerate(self._order_bys)]
-            + [DisplayedProperty("distinct", self._distinct)]
+            tuple(super().displayed_properties)
+            + tuple(DisplayedProperty(f"col{i}", column) for i, column in enumerate(self._select_columns))
+            + (DisplayedProperty("from_source", self.from_source),)
+            + tuple(DisplayedProperty(f"join_{i}", join_desc) for i, join_desc in enumerate(self._join_descs))
+            + tuple(DisplayedProperty(f"group_by{i}", group_by) for i, group_by in enumerate(self._group_bys))
+            + (DisplayedProperty("where", self._where),)
+            + tuple(DisplayedProperty(f"order_by{i}", order_by) for i, order_by in enumerate(self._order_bys))
+            + (DisplayedProperty("distinct", self._distinct),)
         )
 
     @property
@@ -239,10 +239,8 @@ class SqlTableFromClauseNode(SqlQueryPlanNode):
         return f"Read from {self._sql_table.sql}"
 
     @property
-    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
-        return super().displayed_properties + [
-            DisplayedProperty("table_id", self._sql_table.sql),
-        ]
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
+        return tuple(super().displayed_properties) + (DisplayedProperty("table_id", self._sql_table.sql),)
 
     def accept(self, visitor: SqlQueryPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
         return visitor.visit_table_from_clause_node(self)

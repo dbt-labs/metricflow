@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List, Sequence
+from typing import Sequence
 
 from dbt_semantic_interfaces.references import MeasureReference, MetricReference
 from typing_extensions import override
@@ -53,8 +53,8 @@ class MeasureGroupByItemSourceNode(GroupByItemResolutionNode):
 
     @property
     @override
-    def displayed_properties(self) -> List[DisplayedProperty]:
-        return super().displayed_properties + [
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:
+        return tuple(super().displayed_properties) + (
             DisplayedProperty(
                 key="measure_reference",
                 value=str(self._measure_reference),
@@ -63,7 +63,7 @@ class MeasureGroupByItemSourceNode(GroupByItemResolutionNode):
                 key="child_metric_reference",
                 value=str(self._child_metric_reference),
             ),
-        ]
+        )
 
     @property
     def measure_reference(self) -> MeasureReference:  # noqa: D

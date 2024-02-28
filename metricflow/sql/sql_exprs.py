@@ -271,8 +271,8 @@ class SqlStringExpression(SqlExpressionNode):
         return f"String SQL Expression: {self._sql_expr}"
 
     @property
-    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
-        return super().displayed_properties + [DisplayedProperty("sql_expr", self._sql_expr)]
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
+        return tuple(super().displayed_properties) + (DisplayedProperty("sql_expr", self._sql_expr),)
 
     @property
     def sql_expr(self) -> str:  # noqa: D
@@ -340,8 +340,8 @@ class SqlStringLiteralExpression(SqlExpressionNode):
         return f"String Literal: {self._literal_value}"
 
     @property
-    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
-        return super().displayed_properties + [DisplayedProperty("value", self._literal_value)]
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
+        return tuple(super().displayed_properties) + (DisplayedProperty("value", self._literal_value),)
 
     @property
     def literal_value(self) -> str:  # noqa: D
@@ -417,8 +417,8 @@ class SqlColumnReferenceExpression(SqlExpressionNode):
         return f"Column: {self.col_ref}"
 
     @property
-    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
-        return super().displayed_properties + [DisplayedProperty("col_ref", self.col_ref)]
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
+        return tuple(super().displayed_properties) + (DisplayedProperty("col_ref", self.col_ref),)
 
     @property
     def requires_parenthesis(self) -> bool:  # noqa: D
@@ -505,8 +505,8 @@ class SqlColumnAliasReferenceExpression(SqlExpressionNode):
         return f"Unqualified Column: {self._column_alias}"
 
     @property
-    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
-        return super().displayed_properties + [DisplayedProperty("column_alias", self.column_alias)]
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
+        return tuple(super().displayed_properties) + (DisplayedProperty("column_alias", self.column_alias),)
 
     @property
     def requires_parenthesis(self) -> bool:  # noqa: D
@@ -582,12 +582,12 @@ class SqlComparisonExpression(SqlExpressionNode):
         return f"{self._comparison.value} Expression"
 
     @property
-    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
-        return super().displayed_properties + [
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
+        return tuple(super().displayed_properties) + (
             DisplayedProperty("left_expr", self.left_expr),
             DisplayedProperty("comparison", self.comparison.value),
             DisplayedProperty("right_expr", self.right_expr),
-        ]
+        )
 
     @property
     def requires_parenthesis(self) -> bool:  # noqa: D
@@ -770,11 +770,11 @@ class SqlAggregateFunctionExpression(SqlFunctionExpression):
         return f"{self._sql_function.value} Expression"
 
     @property
-    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
         return (
-            super().displayed_properties
-            + [DisplayedProperty("function", self.sql_function)]
-            + [DisplayedProperty("argument", x) for x in self.sql_function_args]
+            tuple(super().displayed_properties)
+            + (DisplayedProperty("function", self.sql_function),)
+            + tuple(DisplayedProperty("argument", x) for x in self.sql_function_args)
         )
 
     @property
@@ -901,11 +901,11 @@ class SqlPercentileExpression(SqlFunctionExpression):
         return f"{self._percentile_args.function_type.value} Percentile({self._percentile_args.percentile}) Expression"
 
     @property
-    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
         return (
-            super().displayed_properties
-            + [DisplayedProperty("argument", self._order_by_arg)]
-            + [DisplayedProperty("percentile_args", self._percentile_args)]
+            tuple(super().displayed_properties)
+            + (DisplayedProperty("argument", self._order_by_arg),)
+            + (DisplayedProperty("percentile_args", self._percentile_args),)
         )
 
     def __repr__(self) -> str:  # noqa: D
@@ -1015,13 +1015,13 @@ class SqlWindowFunctionExpression(SqlFunctionExpression):
         return f"{self._sql_function.value} Window Function Expression"
 
     @property
-    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
         return (
-            super().displayed_properties
-            + [DisplayedProperty("function", self.sql_function)]
-            + [DisplayedProperty("argument", x) for x in self.sql_function_args]
-            + [DisplayedProperty("partition_by_argument", x) for x in self.partition_by_args]
-            + [DisplayedProperty("order_by_argument", x) for x in self.order_by_args]
+            tuple(super().displayed_properties)
+            + (DisplayedProperty("function", self.sql_function),)
+            + tuple(DisplayedProperty("argument", x) for x in self.sql_function_args)
+            + tuple(DisplayedProperty("partition_by_argument", x) for x in self.partition_by_args)
+            + tuple(DisplayedProperty("order_by_argument", x) for x in self.order_by_args)
         )
 
     @property
@@ -1602,7 +1602,7 @@ class SqlGenerateUuidExpression(SqlExpressionNode):
         return "Generate a universally unique identifier"
 
     @property
-    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
         return super().displayed_properties
 
     @property
