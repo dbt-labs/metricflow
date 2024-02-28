@@ -1,8 +1,14 @@
 """Tests query rendering for coalescing null measures by comparing rendered output against snapshot files."""
+
 from __future__ import annotations
+
+import datetime
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+from dbt_semantic_interfaces.implementations.filters.where_filter import (
+    PydanticWhereFilter,
+)
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
@@ -10,6 +16,7 @@ from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilde
 from metricflow.dataset.dataset import DataSet
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.specs.specs import (
     DimensionSpec,
     MetricFlowQuerySpec,
@@ -180,6 +187,35 @@ def test_derived_fill_nulls_for_one_input_metric(  # noqa: D
             time_dimension_specs=(DataSet.metric_time_dimension_spec(time_granularity=TimeGranularity.DAY),),
         )
     )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_join_to_time_spine_with_filters(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+    query_parser: MetricFlowQueryParser,
+) -> None:
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookings_fill_nulls_with_0",),
+        group_by_names=("metric_time__day",),
+        where_constraint=PydanticWhereFilter(
+            where_sql_template="{{ TimeDimension('metric_time') }} > '2020-01-01'",
+        ),
+        time_constraint_start=datetime.datetime(2020, 1, 3),
+        time_constraint_end=datetime.datetime(2020, 1, 5),
+    )
+    dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
     convert_and_check(
         request=request,
