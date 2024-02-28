@@ -6,7 +6,7 @@ import logging
 import textwrap
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Generic, List, Optional, Sequence, Tuple, Type, TypeVar, Union
+from typing import Generic, Optional, Sequence, Tuple, Type, TypeVar, Union
 
 import jinja2
 from dbt_semantic_interfaces.protocols.metric import MetricTimeWindow
@@ -52,14 +52,14 @@ class DataflowPlanNode(DagNode, Visitable, ABC):
     passed to the child nodes. The flow of data starts from source nodes, and ends at sink nodes.
     """
 
-    def __init__(self, node_id: NodeId, parent_nodes: List[DataflowPlanNode]) -> None:
+    def __init__(self, node_id: NodeId, parent_nodes: Sequence[DataflowPlanNode]) -> None:
         """Constructor.
 
         Args:
             node_id: the ID for the node
             parent_nodes: data comes from the parent nodes.
         """
-        self._parent_nodes = parent_nodes
+        self._parent_nodes = tuple(parent_nodes)
         super().__init__(node_id=node_id)
 
     @property
@@ -224,7 +224,7 @@ class ReadSqlSourceNode(BaseOutput):
         return f"""Read From {self.data_set}"""
 
     @property
-    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
         return super().displayed_properties + [
             DisplayedProperty("data_set", self.data_set),
         ]
@@ -269,7 +269,7 @@ class JoinToBaseOutputNode(BaseOutput):
     def __init__(
         self,
         left_node: BaseOutput,
-        join_targets: List[JoinDescription],
+        join_targets: Sequence[JoinDescription],
         node_id: Optional[NodeId] = None,
     ) -> None:
         """Constructor.
@@ -280,10 +280,10 @@ class JoinToBaseOutputNode(BaseOutput):
             node_id: Override the node ID with this value
         """
         self._left_node = left_node
-        self._join_targets = join_targets
+        self._join_targets = tuple(join_targets)
 
         # Doing a list comprehension throws a type error, so doing it this way.
-        parent_nodes: List[DataflowPlanNode] = [self._left_node]
+        parent_nodes: Sequence[DataflowPlanNode] = [self._left_node]
         for join_target in self._join_targets:
             parent_nodes.append(join_target.join_node)
         super().__init__(node_id=node_id or self.create_unique_id(), parent_nodes=parent_nodes)
@@ -304,11 +304,11 @@ class JoinToBaseOutputNode(BaseOutput):
         return self._left_node
 
     @property
-    def join_targets(self) -> List[JoinDescription]:  # noqa: D
+    def join_targets(self) -> Sequence[JoinDescription]:  # noqa: D
         return self._join_targets
 
     @property
-    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
         return super().displayed_properties + [
             DisplayedProperty(f"join{i}_for_node_id_{join_description.join_node.node_id}", join_description)
             for i, join_description in enumerate(self._join_targets)
@@ -387,7 +387,7 @@ class JoinOverTimeRangeNode(BaseOutput):
         self.time_dimension_spec_for_join = time_dimension_spec_for_join
 
         # Doing a list comprehension throws a type error, so doing it this way.
-        parent_nodes: List[DataflowPlanNode] = [self._parent_node]
+        parent_nodes: Sequence[DataflowPlanNode] = [self._parent_node]
         super().__init__(node_id=node_id or self.create_unique_id(), parent_nodes=parent_nodes)
 
     @classmethod
@@ -414,7 +414,7 @@ class JoinOverTimeRangeNode(BaseOutput):
         return self._window
 
     @property
-    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
         return super().displayed_properties
 
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D
@@ -580,7 +580,7 @@ class SemiAdditiveJoinNode(BaseOutput):
         self._queried_time_dimension_spec = queried_time_dimension_spec
 
         # Doing a list comprehension throws a type error, so doing it this way.
-        parent_nodes: List[DataflowPlanNode] = [self._parent_node]
+        parent_nodes: Sequence[DataflowPlanNode] = [self._parent_node]
         super().__init__(node_id=self.create_unique_id(), parent_nodes=parent_nodes)
 
     @classmethod
@@ -615,7 +615,7 @@ class SemiAdditiveJoinNode(BaseOutput):
         return self._queried_time_dimension_spec
 
     @property
-    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
         return super().displayed_properties
 
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D
@@ -654,7 +654,7 @@ class JoinToTimeSpineNode(BaseOutput, ABC):
     def __init__(
         self,
         parent_node: BaseOutput,
-        requested_agg_time_dimension_specs: List[TimeDimensionSpec],
+        requested_agg_time_dimension_specs: Sequence[TimeDimensionSpec],
         use_custom_agg_time_dimension: bool,
         join_type: SqlJoinType,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
@@ -681,7 +681,7 @@ class JoinToTimeSpineNode(BaseOutput, ABC):
         ), "Must have at least one value in requested_agg_time_dimension_specs for JoinToTimeSpineNode."
 
         self._parent_node = parent_node
-        self._requested_agg_time_dimension_specs = requested_agg_time_dimension_specs
+        self._requested_agg_time_dimension_specs = tuple(requested_agg_time_dimension_specs)
         self._use_custom_agg_time_dimension = use_custom_agg_time_dimension
         self._offset_window = offset_window
         self._offset_to_grain = offset_to_grain
@@ -695,7 +695,7 @@ class JoinToTimeSpineNode(BaseOutput, ABC):
         return StaticIdPrefix.DATAFLOW_NODE_JOIN_TO_TIME_SPINE_ID_PREFIX
 
     @property
-    def requested_agg_time_dimension_specs(self) -> List[TimeDimensionSpec]:
+    def requested_agg_time_dimension_specs(self) -> Sequence[TimeDimensionSpec]:
         """Time dimension specs to use when creating time spine table."""
         return self._requested_agg_time_dimension_specs
 
@@ -732,7 +732,7 @@ class JoinToTimeSpineNode(BaseOutput, ABC):
         return """Join to Time Spine Dataset"""
 
     @property
-    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
         return super().displayed_properties + [
             DisplayedProperty("requested_agg_time_dimension_specs", self._requested_agg_time_dimension_specs),
             DisplayedProperty("use_custom_agg_time_dimension", self._use_custom_agg_time_dimension),
@@ -773,7 +773,7 @@ class JoinToTimeSpineNode(BaseOutput, ABC):
 class ComputeMetricsNode(ComputedMetricsOutput):
     """A node that computes metrics from input measures. Dimensions / entities are passed through."""
 
-    def __init__(self, parent_node: BaseOutput, metric_specs: List[MetricSpec]) -> None:  # noqa: D
+    def __init__(self, parent_node: BaseOutput, metric_specs: Sequence[MetricSpec]) -> None:  # noqa: D
         """Constructor.
 
         Args:
@@ -781,7 +781,7 @@ class ComputeMetricsNode(ComputedMetricsOutput):
             metric_specs: The specs for the metrics that this should compute.
         """
         self._parent_node = parent_node
-        self._metric_specs = metric_specs
+        self._metric_specs = tuple(metric_specs)
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[self._parent_node])
 
     @classmethod
@@ -789,7 +789,7 @@ class ComputeMetricsNode(ComputedMetricsOutput):
         return StaticIdPrefix.DATAFLOW_NODE_COMPUTE_METRICS_ID_PREFIX
 
     @property
-    def metric_specs(self) -> List[MetricSpec]:  # noqa: D
+    def metric_specs(self) -> Sequence[MetricSpec]:  # noqa: D
         """The metric instances that this node is supposed to compute and should have in the output."""
         return self._metric_specs
 
@@ -801,7 +801,7 @@ class ComputeMetricsNode(ComputedMetricsOutput):
         return """Compute Metrics via Expressions"""
 
     @property
-    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
         return super().displayed_properties + [
             DisplayedProperty("metric_spec", metric_spec) for metric_spec in self._metric_specs
         ]
@@ -832,7 +832,7 @@ class OrderByLimitNode(ComputedMetricsOutput):
 
     def __init__(
         self,
-        order_by_specs: List[OrderBySpec],
+        order_by_specs: Sequence[OrderBySpec],
         parent_node: Union[BaseOutput, ComputedMetricsOutput],
         limit: Optional[int] = None,
     ) -> None:
@@ -843,7 +843,7 @@ class OrderByLimitNode(ComputedMetricsOutput):
             limit: number of rows to limit.
             parent_node: self-explanatory.
         """
-        self._order_by_specs = order_by_specs
+        self._order_by_specs = tuple(order_by_specs)
         self._limit = limit
         self._parent_node = parent_node
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[self._parent_node])
@@ -853,7 +853,7 @@ class OrderByLimitNode(ComputedMetricsOutput):
         return StaticIdPrefix.DATAFLOW_NODE_ORDER_BY_LIMIT_ID_PREFIX
 
     @property
-    def order_by_specs(self) -> List[OrderBySpec]:
+    def order_by_specs(self) -> Sequence[OrderBySpec]:
         """The elements that this node should order the input data."""
         return self._order_by_specs
 
@@ -872,7 +872,7 @@ class OrderByLimitNode(ComputedMetricsOutput):
         )
 
     @property
-    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
         return (
             super().displayed_properties
             + [DisplayedProperty("order_by_spec", order_by_spec) for order_by_spec in self._order_by_specs]
@@ -937,7 +937,7 @@ class MetricTimeDimensionTransformNode(BaseOutput):
         return f"Metric Time Dimension '{self.aggregation_time_dimension_reference.element_name}'" ""
 
     @property
-    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
         return super().displayed_properties + [
             DisplayedProperty("aggregation_time_dimension", self.aggregation_time_dimension_reference.element_name)
         ]
@@ -1111,7 +1111,7 @@ class FilterElementsNode(BaseOutput):
         return f"Pass Only Elements: {mf_pformat([x.qualified_name for x in self._include_specs.all_specs])}"
 
     @property
-    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
         additional_properties = []
         if not self._replace_description:
             additional_properties = [
@@ -1171,7 +1171,7 @@ class WhereConstraintNode(AggregatedMeasuresOutput):
         return "Constrain Output with WHERE"
 
     @property
-    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
         return super().displayed_properties + [DisplayedProperty("where_condition", self.where)]
 
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D
@@ -1252,7 +1252,7 @@ class ConstrainTimeRangeNode(AggregatedMeasuresOutput, BaseOutput):
         return self.parent_nodes[0]
 
     @property
-    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
         return super().displayed_properties + [
             DisplayedProperty("time_range_start", self.time_range_constraint.start_time.isoformat()),
             DisplayedProperty("time_range_end", self.time_range_constraint.end_time.isoformat()),
@@ -1322,7 +1322,7 @@ class AddGeneratedUuidColumnNode(BaseOutput):
         return self.parent_nodes[0]
 
     @property
-    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
         return super().displayed_properties
 
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D
@@ -1421,7 +1421,7 @@ class JoinConversionEventsNode(BaseOutput):
         return f"Find conversions for {self.entity_spec.qualified_name} within the range of {f'{self.window.count} {self.window.granularity.value}' if self.window else 'INF'}"
 
     @property
-    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
         return (
             super().displayed_properties
             + [
@@ -1467,16 +1467,16 @@ class JoinConversionEventsNode(BaseOutput):
 class DataflowPlan(MetricFlowDag[SinkOutput]):
     """Describes the flow of metric data as it goes from source nodes to sink nodes in the graph."""
 
-    def __init__(self, sink_output_nodes: List[SinkOutput], plan_id: Optional[DagId] = None) -> None:  # noqa: D
+    def __init__(self, sink_output_nodes: Sequence[SinkOutput], plan_id: Optional[DagId] = None) -> None:  # noqa: D
         if len(sink_output_nodes) == 0:
             raise RuntimeError("Can't create a dataflow plan without sink node(s).")
-        self._sink_output_nodes = sink_output_nodes
+        self._sink_output_nodes = tuple(sink_output_nodes)
         super().__init__(
             dag_id=plan_id or DagId.from_id_prefix(StaticIdPrefix.DATAFLOW_PLAN_PREFIX), sink_nodes=sink_output_nodes
         )
 
     @property
-    def sink_output_nodes(self) -> List[SinkOutput]:  # noqa: D
+    def sink_output_nodes(self) -> Sequence[SinkOutput]:  # noqa: D
         return self._sink_output_nodes
 
     @property
