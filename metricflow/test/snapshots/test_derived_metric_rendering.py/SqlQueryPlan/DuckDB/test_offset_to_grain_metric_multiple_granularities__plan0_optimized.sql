@@ -25,11 +25,6 @@ FROM (
   ) subq_9
   ON
     DATE_TRUNC('month', subq_11.ds) = subq_9.metric_time__day
-  WHERE (
-    DATE_TRUNC('month', subq_11.ds) = subq_11.ds
-  ) OR (
-    DATE_TRUNC('year', subq_11.ds) = subq_11.ds
-  )
   GROUP BY
     subq_11.ds
     , DATE_TRUNC('month', subq_11.ds)

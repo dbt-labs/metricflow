@@ -1,38 +1,33 @@
 -- Compute Metrics via Expressions
 SELECT
-  subq_11.metric_time__day
-  , 2 * bookings_offset_once AS bookings_offset_twice
+  subq_9.metric_time__month
+  , bookings_start_of_month AS bookings_at_start_of_month
 FROM (
-  -- Join to Time Spine Dataset
+  -- Compute Metrics via Expressions
   SELECT
-    subq_9.metric_time__day AS metric_time__day
-    , subq_8.bookings_offset_once AS bookings_offset_once
+    subq_8.metric_time__month
+    , subq_8.bookings AS bookings_start_of_month
   FROM (
-    -- Time Spine
+    -- Aggregate Measures
     SELECT
-      subq_10.ds AS metric_time__day
-    FROM ***************************.mf_time_spine subq_10
-    WHERE subq_10.ds BETWEEN '2020-01-12' AND '2020-01-13'
-  ) subq_9
-  INNER JOIN (
-    -- Compute Metrics via Expressions
-    SELECT
-      subq_7.metric_time__day
-      , 2 * bookings AS bookings_offset_once
+      subq_7.metric_time__month
+      , SUM(subq_7.bookings) AS bookings
     FROM (
-      -- Compute Metrics via Expressions
+      -- Pass Only Elements: ['bookings', 'metric_time__month']
       SELECT
-        subq_6.metric_time__day
+        subq_6.metric_time__month
         , subq_6.bookings
       FROM (
-        -- Aggregate Measures
+        -- Constrain Output with WHERE
         SELECT
           subq_5.metric_time__day
-          , SUM(subq_5.bookings) AS bookings
+          , subq_5.metric_time__month
+          , subq_5.bookings
         FROM (
-          -- Pass Only Elements: ['bookings', 'metric_time__day']
+          -- Pass Only Elements: ['bookings', 'metric_time__month', 'metric_time__day']
           SELECT
             subq_4.metric_time__day
+            , subq_4.metric_time__month
             , subq_4.bookings
           FROM (
             -- Join to Time Spine Dataset
@@ -337,14 +332,14 @@ FROM (
               ) subq_0
             ) subq_1
             ON
-              subq_2.metric_time__day - INTERVAL 5 day = subq_1.metric_time__day
+              DATE_TRUNC('month', subq_2.metric_time__day) = subq_1.metric_time__day
+            WHERE DATE_TRUNC('month', subq_2.metric_time__day) = subq_2.metric_time__day
           ) subq_4
         ) subq_5
-        GROUP BY
-          subq_5.metric_time__day
+        WHERE metric_time__day = '2020-01-01'
       ) subq_6
     ) subq_7
+    GROUP BY
+      subq_7.metric_time__month
   ) subq_8
-  ON
-    subq_9.metric_time__day - INTERVAL 2 day = subq_8.metric_time__day
-) subq_11
+) subq_9
