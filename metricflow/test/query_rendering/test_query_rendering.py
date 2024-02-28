@@ -5,6 +5,7 @@ a MetricFlow query input and end up with a query rendered for execution against 
 target engine. This will depend on test semantic manifests and engine-specific rendering
 logic as propagated via the SqlClient input.
 """
+
 from __future__ import annotations
 
 import pytest
@@ -30,7 +31,7 @@ from metricflow.specs.specs import (
 )
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.query_rendering.compare_rendered_query import convert_and_check
-from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY
+from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_WEEK
 
 
 @pytest.mark.sql_engine_snapshot
@@ -522,6 +523,56 @@ def test_min_max_only_time_quarter(
             ),
             min_max_only=True,
         ),
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_min_max_metric_time(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    sql_client: SqlClient,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+) -> None:
+    """Tests a plan to get the min & max distinct values of metric_time."""
+    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
+        query_spec=MetricFlowQuerySpec(
+            time_dimension_specs=(MTD_SPEC_DAY,),
+            min_max_only=True,
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_min_max_metric_time_week(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    sql_client: SqlClient,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+) -> None:
+    """Tests a plan to get the min & max distinct values of metric_time with non-default granularity."""
+    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
+        query_spec=MetricFlowQuerySpec(
+            time_dimension_specs=(MTD_SPEC_WEEK,),
+            min_max_only=True,
+        )
     )
 
     convert_and_check(
