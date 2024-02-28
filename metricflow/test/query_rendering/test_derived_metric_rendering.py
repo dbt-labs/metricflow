@@ -716,7 +716,7 @@ def test_offset_window_metric_multiple_granularities(
     """Test a query where an offset window metric is queried with multiple granularities."""
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("booking_fees_last_week_per_booker_this_week",),
-        group_by_names=("metric_time__day", "metric_time__month"),
+        group_by_names=("metric_time__day", "metric_time__month", "metric_time__year"),
     )
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
@@ -742,7 +742,7 @@ def test_offset_to_grain_metric_multiple_granularities(
     """Test a query where an offset to grain metric is queried with multiple granularities."""
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("bookings_at_start_of_month",),
-        group_by_names=("metric_time__day", "metric_time__month"),
+        group_by_names=("metric_time__day", "metric_time__month", "metric_time__year"),
     )
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 

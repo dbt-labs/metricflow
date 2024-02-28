@@ -44,7 +44,7 @@ def test_offset_to_grain_with_multiple_granularities(  # noqa: D
     query_result = it_helpers.mf_engine.query(
         MetricFlowQueryRequest.create_with_random_request_id(
             metric_names=["bookings_at_start_of_month"],
-            group_by_names=["metric_time__day", "metric_time__month"],
+            group_by_names=["metric_time__day", "metric_time__month", "metric_time__year"],
         )
     )
     assert query_result.result_df is not None, "Unexpected empty result."

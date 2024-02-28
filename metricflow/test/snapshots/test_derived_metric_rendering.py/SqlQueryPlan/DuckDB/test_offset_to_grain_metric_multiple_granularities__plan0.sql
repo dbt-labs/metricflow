@@ -2,24 +2,28 @@
 SELECT
   subq_7.metric_time__day
   , subq_7.metric_time__month
+  , subq_7.metric_time__year
   , bookings_start_of_month AS bookings_at_start_of_month
 FROM (
   -- Compute Metrics via Expressions
   SELECT
     subq_6.metric_time__day
     , subq_6.metric_time__month
+    , subq_6.metric_time__year
     , subq_6.bookings AS bookings_start_of_month
   FROM (
     -- Aggregate Measures
     SELECT
       subq_5.metric_time__day
       , subq_5.metric_time__month
+      , subq_5.metric_time__year
       , SUM(subq_5.bookings) AS bookings
     FROM (
-      -- Pass Only Elements: ['bookings', 'metric_time__day', 'metric_time__month']
+      -- Pass Only Elements: ['bookings', 'metric_time__day', 'metric_time__month', 'metric_time__year']
       SELECT
         subq_4.metric_time__day
         , subq_4.metric_time__month
+        , subq_4.metric_time__year
         , subq_4.bookings
       FROM (
         -- Join to Time Spine Dataset
@@ -325,11 +329,11 @@ FROM (
         ) subq_1
         ON
           DATE_TRUNC('month', subq_2.metric_time__day) = subq_1.metric_time__day
-        WHERE DATE_TRUNC('month', subq_2.metric_time__day) = subq_2.metric_time__day
       ) subq_4
     ) subq_5
     GROUP BY
       subq_5.metric_time__day
       , subq_5.metric_time__month
+      , subq_5.metric_time__year
   ) subq_6
 ) subq_7

@@ -2,12 +2,14 @@
 SELECT
   subq_13.metric_time__day
   , subq_13.metric_time__month
+  , subq_13.metric_time__year
   , booking_value * 0.05 / bookers AS booking_fees_last_week_per_booker_this_week
 FROM (
   -- Combine Aggregated Outputs
   SELECT
     COALESCE(subq_7.metric_time__day, subq_12.metric_time__day) AS metric_time__day
     , COALESCE(subq_7.metric_time__month, subq_12.metric_time__month) AS metric_time__month
+    , COALESCE(subq_7.metric_time__year, subq_12.metric_time__year) AS metric_time__year
     , MAX(subq_7.booking_value) AS booking_value
     , MAX(subq_12.bookers) AS bookers
   FROM (
@@ -15,18 +17,21 @@ FROM (
     SELECT
       subq_6.metric_time__day
       , subq_6.metric_time__month
+      , subq_6.metric_time__year
       , subq_6.booking_value
     FROM (
       -- Aggregate Measures
       SELECT
         subq_5.metric_time__day
         , subq_5.metric_time__month
+        , subq_5.metric_time__year
         , SUM(subq_5.booking_value) AS booking_value
       FROM (
-        -- Pass Only Elements: ['booking_value', 'metric_time__day', 'metric_time__month']
+        -- Pass Only Elements: ['booking_value', 'metric_time__day', 'metric_time__month', 'metric_time__year']
         SELECT
           subq_4.metric_time__day
           , subq_4.metric_time__month
+          , subq_4.metric_time__year
           , subq_4.booking_value
         FROM (
           -- Join to Time Spine Dataset
@@ -337,6 +342,7 @@ FROM (
       GROUP BY
         subq_5.metric_time__day
         , subq_5.metric_time__month
+        , subq_5.metric_time__year
     ) subq_6
   ) subq_7
   FULL OUTER JOIN (
@@ -344,18 +350,21 @@ FROM (
     SELECT
       subq_11.metric_time__day
       , subq_11.metric_time__month
+      , subq_11.metric_time__year
       , subq_11.bookers
     FROM (
       -- Aggregate Measures
       SELECT
         subq_10.metric_time__day
         , subq_10.metric_time__month
+        , subq_10.metric_time__year
         , COUNT(DISTINCT subq_10.bookers) AS bookers
       FROM (
-        -- Pass Only Elements: ['bookers', 'metric_time__day', 'metric_time__month']
+        -- Pass Only Elements: ['bookers', 'metric_time__day', 'metric_time__month', 'metric_time__year']
         SELECT
           subq_9.metric_time__day
           , subq_9.metric_time__month
+          , subq_9.metric_time__year
           , subq_9.bookers
         FROM (
           -- Metric Time Dimension 'ds'
@@ -556,6 +565,7 @@ FROM (
       GROUP BY
         subq_10.metric_time__day
         , subq_10.metric_time__month
+        , subq_10.metric_time__year
     ) subq_11
   ) subq_12
   ON
@@ -563,8 +573,11 @@ FROM (
       subq_7.metric_time__day = subq_12.metric_time__day
     ) AND (
       subq_7.metric_time__month = subq_12.metric_time__month
+    ) AND (
+      subq_7.metric_time__year = subq_12.metric_time__year
     )
   GROUP BY
     COALESCE(subq_7.metric_time__day, subq_12.metric_time__day)
     , COALESCE(subq_7.metric_time__month, subq_12.metric_time__month)
+    , COALESCE(subq_7.metric_time__year, subq_12.metric_time__year)
 ) subq_13

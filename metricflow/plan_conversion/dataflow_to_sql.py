@@ -1341,30 +1341,39 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             SqlColumnReference(table_alias=time_spine_alias, column_name=time_spine_dim_instance.spec.qualified_name)
         )
 
-        # Add requested granularities (if different from time_spine) and date_parts to time spine column.
         time_spine_select_columns = []
         time_spine_dim_instances = []
-        where: Optional[SqlExpressionNode] = None
+        where_filter: Optional[SqlExpressionNode] = None
+
+        # If offset_to_grain is used, will need to filter down to rows that match selected granularities.
+        # Does not apply if one of the granularities selected matches the time spine column granularity.
+        need_where_filter = (
+            node.offset_to_grain and time_spine_dim_instance.spec not in node.requested_agg_time_dimension_specs
+        )
+
+        # Add requested granularities (if different from time_spine) and date_parts to time spine column.
         for time_dimension_instance in time_dimensions_to_select_from_time_spine:
             time_dimension_spec = time_dimension_instance.spec
 
-            # Apply granularity to time spine column select expression.
-            if time_dimension_spec.time_granularity == time_spine_dim_instance.spec.time_granularity:
-                select_expr: SqlExpressionNode = time_spine_column_select_expr
-            else:
-                select_expr = SqlDateTruncExpression(
+            # Apply grain to time spine column select expression, unless grain already matches time spine column.
+            select_expr = (
+                time_spine_column_select_expr
+                if time_dimension_spec.time_granularity == time_spine_dim_instance.spec.time_granularity
+                else SqlDateTruncExpression(
                     time_granularity=time_dimension_spec.time_granularity, arg=time_spine_column_select_expr
                 )
-                if node.offset_to_grain and time_dimension_spec in node.requested_agg_time_dimension_specs:
-                    # Filter down to one row per granularity period if requested in the group by.
-                    # Any other granularities will be filtered out in later nodes so should not be included in where filter.
-                    new_filter = SqlComparisonExpression(
-                        left_expr=select_expr, comparison=SqlComparison.EQUALS, right_expr=time_spine_column_select_expr
-                    )
-                    if not where:
-                        where = new_filter
-                    else:
-                        where = SqlLogicalExpression(operator=SqlLogicalOperator.OR, args=(where, new_filter))
+            )
+            # Filter down to one row per granularity period requested in the group by. Any other granularities
+            # included here will be filtered out in later nodes so should not be included in where filter.
+            if need_where_filter and time_dimension_spec in node.requested_agg_time_dimension_specs:
+                new_where_filter = SqlComparisonExpression(
+                    left_expr=select_expr, comparison=SqlComparison.EQUALS, right_expr=time_spine_column_select_expr
+                )
+                where_filter = (
+                    SqlLogicalExpression(operator=SqlLogicalOperator.OR, args=(where_filter, new_where_filter))
+                    if where_filter
+                    else new_where_filter
+                )
 
             # Apply date_part to time spine column select expression.
             if time_dimension_spec.date_part:
@@ -1397,7 +1406,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 joins_descs=(join_description,),
                 group_bys=(),
                 order_bys=(),
-                where=where,
+                where=where_filter,
             ),
         )
 

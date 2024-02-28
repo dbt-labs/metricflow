@@ -2,15 +2,17 @@
 SELECT
   metric_time__day
   , metric_time__month
+  , metric_time__year
   , bookings_start_of_month AS bookings_at_start_of_month
 FROM (
   -- Join to Time Spine Dataset
-  -- Pass Only Elements: ['bookings', 'metric_time__day', 'metric_time__month']
+  -- Pass Only Elements: ['bookings', 'metric_time__day', 'metric_time__month', 'metric_time__year']
   -- Aggregate Measures
   -- Compute Metrics via Expressions
   SELECT
     subq_11.ds AS metric_time__day
     , DATE_TRUNC('month', subq_11.ds) AS metric_time__month
+    , DATE_TRUNC('year', subq_11.ds) AS metric_time__year
     , SUM(subq_9.bookings) AS bookings_start_of_month
   FROM ***************************.mf_time_spine subq_11
   INNER JOIN (
@@ -23,8 +25,8 @@ FROM (
   ) subq_9
   ON
     DATE_TRUNC('month', subq_11.ds) = subq_9.metric_time__day
-  WHERE DATE_TRUNC('month', subq_11.ds) = subq_11.ds
   GROUP BY
     subq_11.ds
     , DATE_TRUNC('month', subq_11.ds)
+    , DATE_TRUNC('year', subq_11.ds)
 ) subq_15
