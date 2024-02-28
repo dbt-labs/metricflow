@@ -1212,11 +1212,6 @@ class DataflowPlanBuilder:
         measure_properties = self._build_measure_spec_properties([measure_spec])
         non_additive_dimension_spec = measure_properties.non_additive_dimension_spec
 
-        if time_range_constraint is not None:
-            assert (
-                queried_linkable_specs.contains_metric_time
-            ), "Using time constraints currently requires querying with metric_time."
-
         cumulative_metric_adjusted_time_constraint: Optional[TimeRangeConstraint] = None
         if cumulative and time_range_constraint is not None:
             logger.info(f"Time range constraint before adjustment is {time_range_constraint}")
@@ -1349,6 +1344,9 @@ class DataflowPlanBuilder:
         # here. Can skip if metric is being aggregated over all time.
         cumulative_metric_constrained_node: Optional[ConstrainTimeRangeNode] = None
         if cumulative_metric_adjusted_time_constraint is not None and time_range_constraint is not None:
+            assert (
+                queried_linkable_specs.contains_metric_time
+            ), "Using time constraints currently requires querying with metric_time."
             cumulative_metric_constrained_node = ConstrainTimeRangeNode(
                 unaggregated_measure_node, time_range_constraint
             )
