@@ -224,6 +224,3 @@ def test_join_to_time_spine_with_filter(  # noqa: D
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
     )
-
-
-# TODO: add same test case but with cumulative metric that joins to timespine
