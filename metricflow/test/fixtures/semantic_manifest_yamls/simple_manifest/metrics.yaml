@@ -676,6 +676,19 @@ metric:
         offset_window: 2 days
 ---
 metric:
+  name: bookings_at_start_of_month
+  description: |
+    Derived metric with offset to grain - single input metric.
+    Not a particularly useful metric but it allows us to isolate behavior for offset to grain.
+  type: derived
+  type_params:
+    expr: bookings_start_of_month
+    metrics:
+      - name: bookings
+        offset_to_grain: month
+        alias: bookings_start_of_month
+---
+metric:
   name: booking_fees_since_start_of_month
   description: nested derived metric with offset and multiple input metrics
   type: derived
