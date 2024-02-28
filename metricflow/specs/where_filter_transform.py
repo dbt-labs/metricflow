@@ -75,21 +75,20 @@ class WhereSpecFactory:
                 where_filter_location=filter_location,
                 rendered_spec_tracker=rendered_spec_tracker,
             )
-            # try:
-            # If there was an error with the template, it should have been caught while resolving the specs for
-            # the filters during query resolution.
-            template = jinja2.Template(where_filter.where_sql_template, undefined=jinja2.StrictUndefined)
-            where_sql = template.render(
-                {
-                    "Dimension": dimension_factory.create,
-                    "TimeDimension": time_dimension_factory.create,
-                    "Entity": entity_factory.create,
-                }
-            )
-            # except (jinja2.exceptions.UndefinedError, jinja2.exceptions.TemplateSyntaxError) as e:
-            #     raise RenderSqlTemplateException(
-            #         f"Error while rendering Jinja template:\n{where_filter.where_sql_template}"
-            #     ) from e
+            try:
+                # If there was an error with the template, it should have been caught while resolving the specs for
+                # the filters during query resolution.
+                where_sql = jinja2.Template(where_filter.where_sql_template, undefined=jinja2.StrictUndefined).render(
+                    {
+                        "Dimension": dimension_factory.create,
+                        "TimeDimension": time_dimension_factory.create,
+                        "Entity": entity_factory.create,
+                    }
+                )
+            except (jinja2.exceptions.UndefinedError, jinja2.exceptions.TemplateSyntaxError) as e:
+                raise RenderSqlTemplateException(
+                    f"Error while rendering Jinja template:\n{where_filter.where_sql_template}"
+                ) from e
             filter_specs.append(
                 WhereFilterSpec(
                     where_sql=where_sql,
