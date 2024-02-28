@@ -21,6 +21,7 @@ def test_offset_to_grain_with_single_granularity(  # noqa: D
         MetricFlowQueryRequest.create_with_random_request_id(
             metric_names=["bookings_at_start_of_month"],
             group_by_names=["metric_time__day"],
+            order_by_names=["metric_time__day"],
         )
     )
     assert query_result.result_df is not None, "Unexpected empty result."
@@ -45,6 +46,7 @@ def test_offset_to_grain_with_multiple_granularities(  # noqa: D
         MetricFlowQueryRequest.create_with_random_request_id(
             metric_names=["bookings_at_start_of_month"],
             group_by_names=["metric_time__day", "metric_time__month", "metric_time__year"],
+            order_by_names=["metric_time__day", "metric_time__month", "metric_time__year"],
         )
     )
     assert query_result.result_df is not None, "Unexpected empty result."
