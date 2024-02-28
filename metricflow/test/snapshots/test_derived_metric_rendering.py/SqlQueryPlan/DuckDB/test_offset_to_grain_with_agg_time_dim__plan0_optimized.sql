@@ -45,23 +45,6 @@ FROM (
     ) subq_20
     ON
       DATE_TRUNC('month', subq_22.ds) = subq_20.booking__ds__day
-    WHERE (
-      (
-        (
-          (
-            DATE_TRUNC('week', subq_22.ds) = subq_22.ds
-          ) OR (
-            DATE_TRUNC('month', subq_22.ds) = subq_22.ds
-          )
-        ) OR (
-          DATE_TRUNC('quarter', subq_22.ds) = subq_22.ds
-        )
-      ) OR (
-        DATE_TRUNC('year', subq_22.ds) = subq_22.ds
-      )
-    ) OR (
-      DATE_TRUNC('day', subq_22.ds) = subq_22.ds
-    )
     GROUP BY
       subq_22.ds
   ) subq_26

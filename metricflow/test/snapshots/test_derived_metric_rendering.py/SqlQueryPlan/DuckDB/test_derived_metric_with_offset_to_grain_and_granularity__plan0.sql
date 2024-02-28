@@ -542,23 +542,7 @@ FROM (
           ) subq_6
           ON
             DATE_TRUNC('month', subq_7.metric_time__day) = subq_6.metric_time__day
-          WHERE (
-            (
-              (
-                (
-                  DATE_TRUNC('week', subq_7.metric_time__day) = subq_7.metric_time__day
-                ) OR (
-                  DATE_TRUNC('month', subq_7.metric_time__day) = subq_7.metric_time__day
-                )
-              ) OR (
-                DATE_TRUNC('quarter', subq_7.metric_time__day) = subq_7.metric_time__day
-              )
-            ) OR (
-              DATE_TRUNC('year', subq_7.metric_time__day) = subq_7.metric_time__day
-            )
-          ) OR (
-            DATE_TRUNC('day', subq_7.metric_time__day) = subq_7.metric_time__day
-          )
+          WHERE DATE_TRUNC('week', subq_7.metric_time__day) = subq_7.metric_time__day
         ) subq_9
       ) subq_10
       GROUP BY

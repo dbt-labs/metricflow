@@ -706,7 +706,7 @@ def test_nested_fill_nulls_without_time_spine_multi_metric(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_offset_metric_filter_and_query_have_different_granularities(
+def test_offset_window_metric_filter_and_query_have_different_granularities(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -715,7 +715,7 @@ def test_offset_metric_filter_and_query_have_different_granularities(
     query_parser: MetricFlowQueryParser,
     create_source_tables: bool,
 ) -> None:
-    """Test a query where an offset metrics is queried with one granularity and filtered by a different one."""
+    """Test a query where an offset window metric is queried with one granularity and filtered by a different one."""
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("booking_fees_last_week_per_booker_this_week",),
         group_by_names=("metric_time__month",),
@@ -724,7 +724,6 @@ def test_offset_metric_filter_and_query_have_different_granularities(
         ),
     )
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
-    print(dataflow_plan)
 
     convert_and_check(
         request=request,
@@ -733,3 +732,35 @@ def test_offset_metric_filter_and_query_have_different_granularities(
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_offset_to_grain_metric_filter_and_query_have_different_granularities(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+    query_parser: MetricFlowQueryParser,
+    create_source_tables: bool,
+) -> None:
+    """Test a query where an offset to grain metric is queried with one granularity and filtered by a different one."""
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookings_at_start_of_month",),
+        group_by_names=("metric_time__month",),
+        where_constraint=PydanticWhereFilter(
+            where_sql_template=("{{ TimeDimension('metric_time', 'day') }} = '2020-01-01'")
+        ),
+    )
+    dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
+
+    convert_and_check(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+    # TODO: write test for existing offset to grain SQL off of main with one granularity, also multiple granularities
+    # output tests for both of those, too
