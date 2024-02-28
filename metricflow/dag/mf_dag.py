@@ -7,7 +7,7 @@ import logging
 import textwrap
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, Generic, List, Sequence, TypeVar
+from typing import Any, Generic, Sequence, TypeVar
 
 import jinja2
 
@@ -70,12 +70,12 @@ class DagNode(ABC):
         pass
 
     @property
-    def displayed_properties(self) -> List[DisplayedProperty]:
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:
         """When the node is represented in a visualization, the properties to display with it."""
-        return [
+        return (
             DisplayedProperty("description", self.description),
             DisplayedProperty("node_id", self.node_id),
-        ]
+        )
 
     @property
     def graphviz_label(self) -> str:
@@ -117,7 +117,7 @@ class DagNode(ABC):
 
 
 def make_graphviz_label(
-    title: str, properties: List[DisplayedProperty], title_font_size: int = 12, property_font_size: int = 6
+    title: str, properties: Sequence[DisplayedProperty], title_font_size: int = 12, property_font_size: int = 6
 ) -> str:
     """Make a graphviz label that can be used for rendering to an image.
 
@@ -181,16 +181,16 @@ DagNodeT = TypeVar("DagNodeT", bound=DagNode)
 class MetricFlowDag(Generic[DagNodeT]):  # noqa: D
     """Represents a directed acyclic graph. The sink nodes will have the connected components."""
 
-    def __init__(self, dag_id: DagId, sink_nodes: List[DagNodeT]):  # noqa: D
+    def __init__(self, dag_id: DagId, sink_nodes: Sequence[DagNodeT]):  # noqa: D
         self._dag_id = dag_id
-        self._sink_nodes = sink_nodes
+        self._sink_nodes = tuple(sink_nodes)
 
     @property
     def dag_id(self) -> DagId:  # noqa: D
         return self._dag_id
 
     @property
-    def sink_nodes(self) -> List[DagNodeT]:  # noqa: D
+    def sink_nodes(self) -> Sequence[DagNodeT]:  # noqa: D
         return self._sink_nodes
 
     def text_structure(self, formatter: MetricFlowDagTextFormatter = MetricFlowDagTextFormatter()) -> str:

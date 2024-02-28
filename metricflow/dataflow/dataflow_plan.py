@@ -225,9 +225,7 @@ class ReadSqlSourceNode(BaseOutput):
 
     @property
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
-        return super().displayed_properties + [
-            DisplayedProperty("data_set", self.data_set),
-        ]
+        return tuple(super().displayed_properties) + (DisplayedProperty("data_set", self.data_set),)
 
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D
         return isinstance(other_node, self.__class__) and other_node.data_set == self.data_set
@@ -309,10 +307,10 @@ class JoinToBaseOutputNode(BaseOutput):
 
     @property
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
-        return super().displayed_properties + [
+        return tuple(super().displayed_properties) + tuple(
             DisplayedProperty(f"join{i}_for_node_id_{join_description.join_node.node_id}", join_description)
             for i, join_description in enumerate(self._join_targets)
-        ]
+        )
 
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D
         if not isinstance(other_node, self.__class__) or len(self.join_targets) != len(other_node.join_targets):
@@ -733,14 +731,14 @@ class JoinToTimeSpineNode(BaseOutput, ABC):
 
     @property
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
-        return super().displayed_properties + [
+        return tuple(super().displayed_properties) + (
             DisplayedProperty("requested_agg_time_dimension_specs", self._requested_agg_time_dimension_specs),
             DisplayedProperty("use_custom_agg_time_dimension", self._use_custom_agg_time_dimension),
             DisplayedProperty("time_range_constraint", self._time_range_constraint),
             DisplayedProperty("offset_window", self._offset_window),
             DisplayedProperty("offset_to_grain", self._offset_to_grain),
             DisplayedProperty("join_type", self._join_type),
-        ]
+        )
 
     @property
     def parent_node(self) -> BaseOutput:  # noqa: D
@@ -802,9 +800,9 @@ class ComputeMetricsNode(ComputedMetricsOutput):
 
     @property
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
-        return super().displayed_properties + [
+        return tuple(super().displayed_properties) + tuple(
             DisplayedProperty("metric_spec", metric_spec) for metric_spec in self._metric_specs
-        ]
+        )
 
     @property
     def parent_node(self) -> BaseOutput:  # noqa: D
@@ -874,9 +872,9 @@ class OrderByLimitNode(ComputedMetricsOutput):
     @property
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
         return (
-            super().displayed_properties
-            + [DisplayedProperty("order_by_spec", order_by_spec) for order_by_spec in self._order_by_specs]
-            + [DisplayedProperty("limit", str(self.limit))]
+            tuple(super().displayed_properties)
+            + tuple(DisplayedProperty("order_by_spec", order_by_spec) for order_by_spec in self._order_by_specs)
+            + (DisplayedProperty("limit", str(self.limit)),)
         )
 
     @property
@@ -938,9 +936,9 @@ class MetricTimeDimensionTransformNode(BaseOutput):
 
     @property
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
-        return super().displayed_properties + [
-            DisplayedProperty("aggregation_time_dimension", self.aggregation_time_dimension_reference.element_name)
-        ]
+        return tuple(super().displayed_properties) + (
+            DisplayedProperty("aggregation_time_dimension", self.aggregation_time_dimension_reference.element_name),
+        )
 
     @property
     def parent_node(self) -> BaseOutput:  # noqa: D
@@ -1112,12 +1110,14 @@ class FilterElementsNode(BaseOutput):
 
     @property
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
-        additional_properties = []
+        additional_properties: Tuple[DisplayedProperty, ...] = ()
         if not self._replace_description:
-            additional_properties = [
+            additional_properties = tuple(
                 DisplayedProperty("include_spec", include_spec) for include_spec in self._include_specs.all_specs
-            ] + [DisplayedProperty("distinct", self._distinct)]
-        return super().displayed_properties + additional_properties
+            ) + (
+                DisplayedProperty("distinct", self._distinct),
+            )
+        return tuple(super().displayed_properties) + additional_properties
 
     @property
     def parent_node(self) -> BaseOutput:  # noqa: D
@@ -1172,7 +1172,7 @@ class WhereConstraintNode(AggregatedMeasuresOutput):
 
     @property
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
-        return super().displayed_properties + [DisplayedProperty("where_condition", self.where)]
+        return tuple(super().displayed_properties) + (DisplayedProperty("where_condition", self.where),)
 
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D
         return isinstance(other_node, self.__class__) and other_node.where == self.where
@@ -1253,10 +1253,10 @@ class ConstrainTimeRangeNode(AggregatedMeasuresOutput, BaseOutput):
 
     @property
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
-        return super().displayed_properties + [
+        return tuple(super().displayed_properties) + (
             DisplayedProperty("time_range_start", self.time_range_constraint.start_time.isoformat()),
             DisplayedProperty("time_range_end", self.time_range_constraint.end_time.isoformat()),
-        ]
+        )
 
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D
         return isinstance(other_node, self.__class__) and self.time_range_constraint == other_node.time_range_constraint
@@ -1429,18 +1429,18 @@ class JoinConversionEventsNode(BaseOutput):
     @property
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
         return (
-            super().displayed_properties
-            + [
+            tuple(super().displayed_properties)
+            + (
                 DisplayedProperty("base_time_dimension_spec", self.base_time_dimension_spec),
                 DisplayedProperty("conversion_time_dimension_spec", self.conversion_time_dimension_spec),
                 DisplayedProperty("entity_spec", self.entity_spec),
                 DisplayedProperty("window", self.window),
-            ]
-            + [DisplayedProperty("unique_key_specs", unique_spec) for unique_spec in self.unique_identifier_keys]
-            + [
+            )
+            + tuple(DisplayedProperty("unique_key_specs", unique_spec) for unique_spec in self.unique_identifier_keys)
+            + tuple(
                 DisplayedProperty("constant_property", constant_property)
                 for constant_property in self.constant_properties or []
-            ]
+            )
         )
 
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D
@@ -1478,7 +1478,8 @@ class DataflowPlan(MetricFlowDag[SinkOutput]):
             raise RuntimeError("Can't create a dataflow plan without sink node(s).")
         self._sink_output_nodes = tuple(sink_output_nodes)
         super().__init__(
-            dag_id=plan_id or DagId.from_id_prefix(StaticIdPrefix.DATAFLOW_PLAN_PREFIX), sink_nodes=sink_output_nodes
+            dag_id=plan_id or DagId.from_id_prefix(StaticIdPrefix.DATAFLOW_PLAN_PREFIX),
+            sink_nodes=tuple(sink_output_nodes),
         )
 
     @property

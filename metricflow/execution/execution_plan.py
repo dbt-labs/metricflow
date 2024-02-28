@@ -112,8 +112,8 @@ class SelectSqlQueryToDataFrameTask(ExecutionPlanTask):
         return "Run a query and write the results to a data frame"
 
     @property
-    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
-        return super().displayed_properties + [DisplayedProperty(key="sql_query", value=self._sql_query)]
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
+        return tuple(super().displayed_properties) + (DisplayedProperty(key="sql_query", value=self._sql_query),)
 
     @property
     def bind_parameters(self) -> SqlBindParameters:  # noqa: D
@@ -169,12 +169,12 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
         return "Run a query and write the results to a table"
 
     @property
-    def displayed_properties(self) -> List[DisplayedProperty]:  # noqa: D
-        return super().displayed_properties + [
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
+        return tuple(super().displayed_properties) + (
             DisplayedProperty(key="sql_query", value=self._sql_query),
             DisplayedProperty(key="output_table", value=self._output_table),
             DisplayedProperty(key="bind_parameters", value=self._bind_parameters),
-        ]
+        )
 
     def execute(self) -> TaskExecutionResult:  # noqa: D
         start_time = time.time()
