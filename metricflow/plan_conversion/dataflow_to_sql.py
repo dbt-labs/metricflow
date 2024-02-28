@@ -1356,7 +1356,8 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                     time_granularity=time_dimension_spec.time_granularity, arg=time_spine_column_select_expr
                 )
                 if node.offset_to_grain and time_dimension_spec in node.requested_agg_time_dimension_specs:
-                    # Filter down to one row per granularity period requested in the group by
+                    # Filter down to one row per granularity period if requested in the group by.
+                    # Any other granularities will be filtered out in later nodes so should not be included in where filter.
                     new_filter = SqlComparisonExpression(
                         left_expr=select_expr, comparison=SqlComparison.EQUALS, right_expr=time_spine_column_select_expr
                     )
