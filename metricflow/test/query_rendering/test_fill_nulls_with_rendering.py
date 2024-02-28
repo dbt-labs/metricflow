@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import datetime
+
 import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.implementations.filters.where_filter import (
@@ -210,6 +212,8 @@ def test_join_to_time_spine_with_filter(  # noqa: D
         where_constraint=PydanticWhereFilter(
             where_sql_template="{{ TimeDimension('metric_time') }} > '2020-01-01'",
         ),
+        time_constraint_start=datetime.datetime(2020, 1, 3),
+        time_constraint_end=datetime.datetime(2020, 1, 5),
     )
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
@@ -220,3 +224,6 @@ def test_join_to_time_spine_with_filter(  # noqa: D
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
     )
+
+
+# TODO: add same test case but with cumulative metric that joins to timespine

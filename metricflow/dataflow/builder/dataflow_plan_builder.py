@@ -233,6 +233,9 @@ class DataflowPlanBuilder:
         constant_properties: Optional[Sequence[ConstantPropertyInput]] = None,
     ) -> BaseOutput:
         """Builds a node that contains aggregated values of conversions and opportunities."""
+        # If conversion metrics use a separate method for building aggregated measures, are we skipping
+        # any steps? e.g., do we apply time constraints & where filters properly?
+
         # Build measure recipes
         base_required_linkable_specs, _ = self.__get_required_and_extraneous_linkable_specs(
             queried_linkable_specs=queried_linkable_specs,
@@ -1209,6 +1212,11 @@ class DataflowPlanBuilder:
         measure_properties = self._build_measure_spec_properties([measure_spec])
         non_additive_dimension_spec = measure_properties.non_additive_dimension_spec
 
+        if time_range_constraint is not None:
+            assert (
+                queried_linkable_specs.contains_metric_time
+            ), "Using time constraints currently requires querying with metric_time."
+
         cumulative_metric_adjusted_time_constraint: Optional[TimeRangeConstraint] = None
         if cumulative and time_range_constraint is not None:
             logger.info(f"Time range constraint before adjustment is {time_range_constraint}")
@@ -1248,6 +1256,7 @@ class DataflowPlanBuilder:
                 measure_spec_properties=measure_properties,
                 time_range_constraint=(
                     (cumulative_metric_adjusted_time_constraint or time_range_constraint)
+                    # If joining to time spine for time offset, constraints will be applied after that join.
                     if not before_aggregation_time_spine_join_description
                     else None
                 ),
@@ -1340,20 +1349,13 @@ class DataflowPlanBuilder:
         # here. Can skip if metric is being aggregated over all time.
         cumulative_metric_constrained_node: Optional[ConstrainTimeRangeNode] = None
         if cumulative_metric_adjusted_time_constraint is not None and time_range_constraint is not None:
-            assert (
-                queried_linkable_specs.contains_metric_time
-            ), "Using time constraints currently requires querying with metric_time."
             cumulative_metric_constrained_node = ConstrainTimeRangeNode(
                 unaggregated_measure_node, time_range_constraint
             )
 
         pre_aggregate_node: BaseOutput = cumulative_metric_constrained_node or unaggregated_measure_node
         merged_where_filter_spec = WhereFilterSpec.merge_iterable(metric_input_measure_spec.filter_specs)
-        if (
-            len(metric_input_measure_spec.filter_specs) > 0
-            # If joining to time spine, apply where constraint later.
-            and not metric_input_measure_spec.after_aggregation_time_spine_join_description
-        ):
+        if len(metric_input_measure_spec.filter_specs) > 0:
             # Apply where constraint on the node
             pre_aggregate_node = WhereConstraintNode(
                 parent_node=pre_aggregate_node,
@@ -1398,7 +1400,7 @@ class DataflowPlanBuilder:
             metric_input_measure_specs=(metric_input_measure_spec,),
         )
 
-        # Joining to time spine after aggregation is for measures that specify `join_to_timespine`` in the YAML spec.
+        # Joining to time spine after aggregation is for measures that specify `join_to_timespine` in the YAML spec.
         after_aggregation_time_spine_join_description = (
             metric_input_measure_spec.after_aggregation_time_spine_join_description
         )
@@ -1407,7 +1409,7 @@ class DataflowPlanBuilder:
                 f"Expected {SqlJoinType.LEFT_OUTER} for joining to time spine after aggregation. Remove this if "
                 f"there's a new use case."
             )
-            return JoinToTimeSpineNode(
+            output_node: BaseOutput = JoinToTimeSpineNode(
                 parent_node=aggregate_measures_node,
                 requested_agg_time_dimension_specs=queried_agg_time_dimension_specs,
                 use_custom_agg_time_dimension=not queried_linkable_specs.contains_metric_time,
@@ -1416,5 +1418,13 @@ class DataflowPlanBuilder:
                 offset_window=after_aggregation_time_spine_join_description.offset_window,
                 offset_to_grain=after_aggregation_time_spine_join_description.offset_to_grain,
             )
-        else:
-            return aggregate_measures_node
+            # Since new rows might have been added due to time spine join, apply constraints again here.
+            if len(metric_input_measure_spec.filter_specs) > 0:
+                output_node = WhereConstraintNode(parent_node=output_node, where_constraint=merged_where_filter_spec)
+            if time_range_constraint is not None:
+                output_node = ConstrainTimeRangeNode(
+                    parent_node=output_node, time_range_constraint=time_range_constraint
+                )
+            return output_node
+
+        return aggregate_measures_node
