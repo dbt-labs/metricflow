@@ -21,6 +21,11 @@ FROM (
         -- Join to Time Spine Dataset
         SELECT
           subq_2.metric_time__month AS metric_time__month
+          , DATE_TRUNC(subq_2.metric_time__month, quarter) AS metric_time__quarter
+          , DATE_TRUNC(subq_2.metric_time__month, year) AS metric_time__year
+          , EXTRACT(year FROM DATE_TRUNC(subq_2.metric_time__month, month)) AS metric_time__extract_year
+          , EXTRACT(quarter FROM subq_2.metric_time__month) AS metric_time__extract_quarter
+          , EXTRACT(month FROM subq_2.metric_time__month) AS metric_time__extract_month
           , subq_1.monthly_ds__month AS monthly_ds__month
           , subq_1.monthly_ds__quarter AS monthly_ds__quarter
           , subq_1.monthly_ds__year AS monthly_ds__year
