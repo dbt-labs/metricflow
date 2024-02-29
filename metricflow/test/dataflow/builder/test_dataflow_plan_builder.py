@@ -1172,6 +1172,39 @@ def test_min_max_metric_time_week(
     )
 
 
+def test_join_to_time_spine_with_filters(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    query_parser: MetricFlowQueryParser,
+    create_source_tables: bool,
+) -> None:
+    """Test that filter is not applied until after time spine join."""
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookings_fill_nulls_with_0",),
+        group_by_names=("metric_time__day",),
+        where_constraint=PydanticWhereFilter(
+            where_sql_template=("{{ TimeDimension('metric_time', 'day') }} = '2020-01-01'")
+        ),
+        time_constraint_start=datetime.datetime(2020, 1, 3),
+        time_constraint_end=datetime.datetime(2020, 1, 5),
+    )
+    dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan.text_structure(),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dag_graph=dataflow_plan,
+    )
+
+
 def test_offset_window_metric_filter_and_query_have_different_granularities(
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,

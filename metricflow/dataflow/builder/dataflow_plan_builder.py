@@ -497,7 +497,7 @@ class DataflowPlanBuilder:
         )
         output_node: BaseOutput = ComputeMetricsNode(parent_node=parent_node, metric_specs=[metric_spec])
 
-        # For nested ratio / derived metrics with time offset, apply offset & where constraint after metric computation.
+        # For ratio / derived metrics with time offset, apply offset & where constraint after metric computation.
         if metric_spec.has_time_offset:
             queried_agg_time_dimension_specs = queried_linkable_specs.included_agg_time_dimension_specs_for_metric(
                 metric_reference=metric_spec.reference, metric_lookup=self._metric_lookup
@@ -1248,6 +1248,7 @@ class DataflowPlanBuilder:
                 measure_spec_properties=measure_properties,
                 time_range_constraint=(
                     (cumulative_metric_adjusted_time_constraint or time_range_constraint)
+                    # If joining to time spine for time offset, constraints will be applied after that join.
                     if not before_aggregation_time_spine_join_description
                     else None
                 ),
@@ -1348,10 +1349,9 @@ class DataflowPlanBuilder:
             )
 
         pre_aggregate_node: BaseOutput = cumulative_metric_constrained_node or unaggregated_measure_node
+        merged_where_filter_spec = WhereFilterSpec.merge_iterable(metric_input_measure_spec.filter_specs)
         if len(metric_input_measure_spec.filter_specs) > 0:
             # Apply where constraint on the node
-
-            merged_where_filter_spec = WhereFilterSpec.merge_iterable(metric_input_measure_spec.filter_specs)
             pre_aggregate_node = WhereConstraintNode(
                 parent_node=pre_aggregate_node,
                 where_constraint=merged_where_filter_spec,
@@ -1395,7 +1395,7 @@ class DataflowPlanBuilder:
             metric_input_measure_specs=(metric_input_measure_spec,),
         )
 
-        # Joining to time spine after aggregation is for measures that specify `join_to_timespine`` in the YAML spec.
+        # Joining to time spine after aggregation is for measures that specify `join_to_timespine` in the YAML spec.
         after_aggregation_time_spine_join_description = (
             metric_input_measure_spec.after_aggregation_time_spine_join_description
         )
@@ -1404,7 +1404,7 @@ class DataflowPlanBuilder:
                 f"Expected {SqlJoinType.LEFT_OUTER} for joining to time spine after aggregation. Remove this if "
                 f"there's a new use case."
             )
-            return JoinToTimeSpineNode(
+            output_node: BaseOutput = JoinToTimeSpineNode(
                 parent_node=aggregate_measures_node,
                 requested_agg_time_dimension_specs=queried_agg_time_dimension_specs,
                 use_custom_agg_time_dimension=not queried_linkable_specs.contains_metric_time,
@@ -1413,5 +1413,13 @@ class DataflowPlanBuilder:
                 offset_window=after_aggregation_time_spine_join_description.offset_window,
                 offset_to_grain=after_aggregation_time_spine_join_description.offset_to_grain,
             )
-        else:
-            return aggregate_measures_node
+            # Since new rows might have been added due to time spine join, apply constraints again here.
+            if len(metric_input_measure_spec.filter_specs) > 0:
+                output_node = WhereConstraintNode(parent_node=output_node, where_constraint=merged_where_filter_spec)
+            if time_range_constraint is not None:
+                output_node = ConstrainTimeRangeNode(
+                    parent_node=output_node, time_range_constraint=time_range_constraint
+                )
+            return output_node
+
+        return aggregate_measures_node
