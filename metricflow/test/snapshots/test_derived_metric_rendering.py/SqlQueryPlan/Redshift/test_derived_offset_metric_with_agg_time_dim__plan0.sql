@@ -31,7 +31,7 @@ FROM (
             , DATE_TRUNC('month', subq_2.booking__ds__day) AS booking__ds__month
             , DATE_TRUNC('quarter', subq_2.booking__ds__day) AS booking__ds__quarter
             , DATE_TRUNC('year', subq_2.booking__ds__day) AS booking__ds__year
-            , EXTRACT(year FROM DATE_TRUNC('day', subq_2.booking__ds__day)) AS booking__ds__extract_year
+            , EXTRACT(year FROM subq_2.booking__ds__day) AS booking__ds__extract_year
             , EXTRACT(quarter FROM subq_2.booking__ds__day) AS booking__ds__extract_quarter
             , EXTRACT(month FROM subq_2.booking__ds__day) AS booking__ds__extract_month
             , EXTRACT(day FROM subq_2.booking__ds__day) AS booking__ds__extract_day

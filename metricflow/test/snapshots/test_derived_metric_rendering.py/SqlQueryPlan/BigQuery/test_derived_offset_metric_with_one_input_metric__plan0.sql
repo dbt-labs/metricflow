@@ -25,7 +25,7 @@ FROM (
           , DATE_TRUNC(subq_2.metric_time__day, month) AS metric_time__month
           , DATE_TRUNC(subq_2.metric_time__day, quarter) AS metric_time__quarter
           , DATE_TRUNC(subq_2.metric_time__day, year) AS metric_time__year
-          , EXTRACT(year FROM DATE_TRUNC(subq_2.metric_time__day, day)) AS metric_time__extract_year
+          , EXTRACT(year FROM subq_2.metric_time__day) AS metric_time__extract_year
           , EXTRACT(quarter FROM subq_2.metric_time__day) AS metric_time__extract_quarter
           , EXTRACT(month FROM subq_2.metric_time__day) AS metric_time__extract_month
           , EXTRACT(day FROM subq_2.metric_time__day) AS metric_time__extract_day
