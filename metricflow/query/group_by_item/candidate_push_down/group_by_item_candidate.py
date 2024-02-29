@@ -49,7 +49,7 @@ class GroupByItemCandidateSet(PathPrefixable):
         where the new candidate set was created.
         """
         specs_as_sets = tuple(set(candidate_set.specs) for candidate_set in candidate_sets)
-        common_specs = set.intersection(*specs_as_sets)
+        common_specs = set.intersection(*specs_as_sets) if specs_as_sets else set()
         if len(common_specs) == 0:
             return GroupByItemCandidateSet.empty_instance()
 

@@ -7,12 +7,16 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
+from dbt_semantic_interfaces.references import MetricReference
 
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.naming.naming_scheme import QueryItemNamingScheme
 from metricflow.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow.query.group_by_item.group_by_item_resolver import GroupByItemResolver
 from metricflow.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
+from metricflow.query.group_by_item.resolution_dag.resolution_nodes.metric_resolution_node import (
+    MetricGroupByItemResolutionNode,
+)
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.query.group_by_item.conftest import AmbiguousResolutionQueryId
 from metricflow.test.snapshot_utils import assert_object_snapshot_equal
@@ -111,4 +115,32 @@ def test_invalid_group_by_item(  # noqa: D
         mf_test_session_state=mf_test_session_state,
         obj_id="result",
         obj=result,
+    )
+
+
+def test_missing_parent_for_metric(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    naming_scheme: QueryItemNamingScheme,
+    ambiguous_resolution_manifest_lookup: SemanticManifestLookup,
+) -> None:
+    """Tests a search for a group by item with a metric stub with no parents.
+
+    We operate under the logical assumption that metric and query items have parent nodes - for a query,
+    these are the inputs (group by items, metrics, etc.). For metrics, these are the metric inputs (metrics
+    or measures). However, in the event of a validation gap upstream, we sometimes encounter inscrutable errors
+    caused by missing parent nodes for these input types, so we add a more informative error and test for it here.
+    """
+    metric_node = MetricGroupByItemResolutionNode(
+        metric_reference=MetricReference(element_name="bad_metric"), metric_input_location=None, parent_nodes=tuple()
+    )
+    resolution_dag = GroupByItemResolutionDag(sink_node=metric_node)
+    group_by_item_resolver = GroupByItemResolver(
+        manifest_lookup=ambiguous_resolution_manifest_lookup, resolution_dag=resolution_dag
+    )
+
+    result = group_by_item_resolver.resolve_available_items(metric_node)
+
+    assert_object_snapshot_equal(
+        request=request, mf_test_session_state=mf_test_session_state, obj_id="result", obj=result
     )

@@ -1,0 +1,6 @@
+kind: Fixes
+body: Improve error message for metrics/queries with missing inputs
+time: 2024-02-29T11:28:31.939604-08:00
+custom:
+  Author: tlento
+  Issue: "1051"
