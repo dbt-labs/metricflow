@@ -1,0 +1,112 @@
+<DataflowPlan>
+    <WriteToResultDataframeNode>
+        <!-- description = 'Write to Dataframe' -->
+        <!-- node_id = NodeId(id_str='wrd_0') -->
+        <ComputeMetricsNode>
+            <!-- description = 'Compute Metrics via Expressions' -->
+            <!-- node_id = NodeId(id_str='cm_0') -->
+            <!-- metric_spec =                                        -->
+            <!--   MetricSpec(                                        -->
+            <!--     element_name='bookings_fill_nulls_with_0',       -->
+            <!--     filter_specs=(                                   -->
+            <!--       WhereFilterSpec(                               -->
+            <!--         where_sql="metric_time__day = '2020-01-01'", -->
+            <!--         bind_parameters=SqlBindParameters(),         -->
+            <!--         linkable_spec_set=LinkableSpecSet(           -->
+            <!--           time_dimension_specs=(                     -->
+            <!--             TimeDimensionSpec(                       -->
+            <!--               element_name='metric_time',            -->
+            <!--               time_granularity=DAY,                  -->
+            <!--             ),                                       -->
+            <!--           ),                                         -->
+            <!--         ),                                           -->
+            <!--       ),                                             -->
+            <!--     ),                                               -->
+            <!--   )                                                  -->
+            <ConstrainTimeRangeNode>
+                <!-- description = 'Constrain Time Range to [2020-01-03T00:00:00, 2020-01-05T00:00:00]' -->
+                <!-- node_id = NodeId(id_str='ctr_1') -->
+                <!-- time_range_start = '2020-01-03T00:00:00' -->
+                <!-- time_range_end = '2020-01-05T00:00:00' -->
+                <WhereConstraintNode>
+                    <!-- description = 'Constrain Output with WHERE' -->
+                    <!-- node_id = NodeId(id_str='wcc_1') -->
+                    <!-- where_condition =                                -->
+                    <!--   WhereFilterSpec(                               -->
+                    <!--     where_sql="metric_time__day = '2020-01-01'", -->
+                    <!--     bind_parameters=SqlBindParameters(),         -->
+                    <!--     linkable_spec_set=LinkableSpecSet(           -->
+                    <!--       time_dimension_specs=(                     -->
+                    <!--         TimeDimensionSpec(                       -->
+                    <!--           element_name='metric_time',            -->
+                    <!--           time_granularity=DAY,                  -->
+                    <!--         ),                                       -->
+                    <!--       ),                                         -->
+                    <!--     ),                                           -->
+                    <!--   )                                              -->
+                    <JoinToTimeSpineNode>
+                        <!-- description = 'Join to Time Spine Dataset' -->
+                        <!-- node_id = NodeId(id_str='jts_0') -->
+                        <!-- requested_agg_time_dimension_specs =                                     -->
+                        <!--   [TimeDimensionSpec(element_name='metric_time', time_granularity=DAY),] -->
+                        <!-- use_custom_agg_time_dimension = False -->
+                        <!-- time_range_constraint =                             -->
+                        <!--   TimeRangeConstraint(                              -->
+                        <!--     start_time=datetime.datetime(2020, 1, 3, 0, 0), -->
+                        <!--     end_time=datetime.datetime(2020, 1, 5, 0, 0),   -->
+                        <!--   )                                                 -->
+                        <!-- offset_window = None -->
+                        <!-- offset_to_grain = None -->
+                        <!-- join_type = LEFT_OUTER -->
+                        <AggregateMeasuresNode>
+                            <!-- description = 'Aggregate Measures' -->
+                            <!-- node_id = NodeId(id_str='am_0') -->
+                            <WhereConstraintNode>
+                                <!-- description = 'Constrain Output with WHERE' -->
+                                <!-- node_id = NodeId(id_str='wcc_0') -->
+                                <!-- where_condition =                                -->
+                                <!--   WhereFilterSpec(                               -->
+                                <!--     where_sql="metric_time__day = '2020-01-01'", -->
+                                <!--     bind_parameters=SqlBindParameters(),         -->
+                                <!--     linkable_spec_set=LinkableSpecSet(           -->
+                                <!--       time_dimension_specs=(                     -->
+                                <!--         TimeDimensionSpec(                       -->
+                                <!--           element_name='metric_time',            -->
+                                <!--           time_granularity=DAY,                  -->
+                                <!--         ),                                       -->
+                                <!--       ),                                         -->
+                                <!--     ),                                           -->
+                                <!--   )                                              -->
+                                <FilterElementsNode>
+                                    <!-- description = "Pass Only Elements: ['bookings', 'metric_time__day']" -->
+                                    <!-- node_id = NodeId(id_str='pfe_0') -->
+                                    <!-- include_spec = MeasureSpec(element_name='bookings') -->
+                                    <!-- include_spec =                                                        -->
+                                    <!--   TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
+                                    <!-- distinct = False -->
+                                    <ConstrainTimeRangeNode>
+                                        <!-- description =                                                          -->
+                                        <!--   'Constrain Time Range to [2020-01-03T00:00:00, 2020-01-05T00:00:00]' -->
+                                        <!-- node_id = NodeId(id_str='ctr_0') -->
+                                        <!-- time_range_start = '2020-01-03T00:00:00' -->
+                                        <!-- time_range_end = '2020-01-05T00:00:00' -->
+                                        <MetricTimeDimensionTransformNode>
+                                            <!-- description = "Metric Time Dimension 'ds'" -->
+                                            <!-- node_id = NodeId(id_str='sma_28002') -->
+                                            <!-- aggregation_time_dimension = 'ds' -->
+                                            <ReadSqlSourceNode>
+                                                <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
+                                                <!-- node_id = NodeId(id_str='rss_28014') -->
+                                                <!-- data_set = SemanticModelDataSet('bookings_source') -->
+                                            </ReadSqlSourceNode>
+                                        </MetricTimeDimensionTransformNode>
+                                    </ConstrainTimeRangeNode>
+                                </FilterElementsNode>
+                            </WhereConstraintNode>
+                        </AggregateMeasuresNode>
+                    </JoinToTimeSpineNode>
+                </WhereConstraintNode>
+            </ConstrainTimeRangeNode>
+        </ComputeMetricsNode>
+    </WriteToResultDataframeNode>
+</DataflowPlan>
