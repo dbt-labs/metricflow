@@ -256,6 +256,16 @@ FROM (
           -- Join to Time Spine Dataset
           SELECT
             subq_10.metric_time__day AS metric_time__day
+            , DATE_TRUNC('week', subq_10.metric_time__day) AS metric_time__week
+            , DATE_TRUNC('month', subq_10.metric_time__day) AS metric_time__month
+            , DATE_TRUNC('quarter', subq_10.metric_time__day) AS metric_time__quarter
+            , DATE_TRUNC('year', subq_10.metric_time__day) AS metric_time__year
+            , EXTRACT(year FROM subq_10.metric_time__day) AS metric_time__extract_year
+            , EXTRACT(quarter FROM subq_10.metric_time__day) AS metric_time__extract_quarter
+            , EXTRACT(month FROM subq_10.metric_time__day) AS metric_time__extract_month
+            , EXTRACT(day FROM subq_10.metric_time__day) AS metric_time__extract_day
+            , EXTRACT(DAY_OF_WEEK FROM subq_10.metric_time__day) AS metric_time__extract_dow
+            , EXTRACT(doy FROM subq_10.metric_time__day) AS metric_time__extract_doy
             , subq_9.ds__day AS ds__day
             , subq_9.ds__week AS ds__week
             , subq_9.ds__month AS ds__month

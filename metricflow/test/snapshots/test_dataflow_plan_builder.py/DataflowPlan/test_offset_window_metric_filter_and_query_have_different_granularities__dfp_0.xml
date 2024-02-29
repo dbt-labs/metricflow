@@ -1,0 +1,187 @@
+<DataflowPlan>
+    <WriteToResultDataframeNode>
+        <!-- description = 'Write to Dataframe' -->
+        <!-- node_id = NodeId(id_str='wrd_0') -->
+        <ComputeMetricsNode>
+            <!-- description = 'Compute Metrics via Expressions' -->
+            <!-- node_id = NodeId(id_str='cm_2') -->
+            <!-- metric_spec =                                                   -->
+            <!--   MetricSpec(                                                   -->
+            <!--     element_name='booking_fees_last_week_per_booker_this_week', -->
+            <!--     filter_specs=(                                              -->
+            <!--       WhereFilterSpec(                                          -->
+            <!--         where_sql="metric_time__day = '2020-01-01'",            -->
+            <!--         bind_parameters=SqlBindParameters(),                    -->
+            <!--         linkable_spec_set=LinkableSpecSet(                      -->
+            <!--           time_dimension_specs=(                                -->
+            <!--             TimeDimensionSpec(                                  -->
+            <!--               element_name='metric_time',                       -->
+            <!--               time_granularity=DAY,                             -->
+            <!--             ),                                                  -->
+            <!--           ),                                                    -->
+            <!--         ),                                                      -->
+            <!--       ),                                                        -->
+            <!--     ),                                                          -->
+            <!--   )                                                             -->
+            <CombineAggregatedOutputsNode>
+                <!-- description = 'Combine Aggregated Outputs' -->
+                <!-- node_id = NodeId(id_str='cao_0') -->
+                <ComputeMetricsNode>
+                    <!-- description = 'Compute Metrics via Expressions' -->
+                    <!-- node_id = NodeId(id_str='cm_0') -->
+                    <!-- metric_spec =                                                          -->
+                    <!--   MetricSpec(                                                          -->
+                    <!--     element_name='booking_value',                                      -->
+                    <!--     filter_specs=(                                                     -->
+                    <!--       WhereFilterSpec(                                                 -->
+                    <!--         where_sql="metric_time__day = '2020-01-01'",                   -->
+                    <!--         bind_parameters=SqlBindParameters(),                           -->
+                    <!--         linkable_spec_set=LinkableSpecSet(                             -->
+                    <!--           time_dimension_specs=(                                       -->
+                    <!--             TimeDimensionSpec(                                         -->
+                    <!--               element_name='metric_time',                              -->
+                    <!--               time_granularity=DAY,                                    -->
+                    <!--             ),                                                         -->
+                    <!--           ),                                                           -->
+                    <!--         ),                                                             -->
+                    <!--       ),                                                               -->
+                    <!--     ),                                                                 -->
+                    <!--     offset_window=PydanticMetricTimeWindow(count=1, granularity=WEEK), -->
+                    <!--   )                                                                    -->
+                    <AggregateMeasuresNode>
+                        <!-- description = 'Aggregate Measures' -->
+                        <!-- node_id = NodeId(id_str='am_0') -->
+                        <FilterElementsNode>
+                            <!-- description = "Pass Only Elements: ['booking_value', 'metric_time__month']" -->
+                            <!-- node_id = NodeId(id_str='pfe_1') -->
+                            <!-- include_spec = MeasureSpec(element_name='booking_value') -->
+                            <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH) -->
+                            <!-- distinct = False -->
+                            <WhereConstraintNode>
+                                <!-- description = 'Constrain Output with WHERE' -->
+                                <!-- node_id = NodeId(id_str='wcc_0') -->
+                                <!-- where_condition =                                -->
+                                <!--   WhereFilterSpec(                               -->
+                                <!--     where_sql="metric_time__day = '2020-01-01'", -->
+                                <!--     bind_parameters=SqlBindParameters(),         -->
+                                <!--     linkable_spec_set=LinkableSpecSet(           -->
+                                <!--       time_dimension_specs=(                     -->
+                                <!--         TimeDimensionSpec(                       -->
+                                <!--           element_name='metric_time',            -->
+                                <!--           time_granularity=DAY,                  -->
+                                <!--         ),                                       -->
+                                <!--       ),                                         -->
+                                <!--     ),                                           -->
+                                <!--   )                                              -->
+                                <FilterElementsNode>
+                                    <!-- description =                                                     -->
+                                    <!--   ("Pass Only Elements: ['booking_value', 'metric_time__month', " -->
+                                    <!--    "'metric_time__day']")                                         -->
+                                    <!-- node_id = NodeId(id_str='pfe_0') -->
+                                    <!-- include_spec = MeasureSpec(element_name='booking_value') -->
+                                    <!-- include_spec =                                                          -->
+                                    <!--   TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH) -->
+                                    <!-- include_spec =                                                        -->
+                                    <!--   TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
+                                    <!-- distinct = False -->
+                                    <JoinToTimeSpineNode>
+                                        <!-- description = 'Join to Time Spine Dataset' -->
+                                        <!-- node_id = NodeId(id_str='jts_0') -->
+                                        <!-- requested_agg_time_dimension_specs =                                       -->
+                                        <!--   [TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH),] -->
+                                        <!-- use_custom_agg_time_dimension = False -->
+                                        <!-- time_range_constraint = None -->
+                                        <!-- offset_window = PydanticMetricTimeWindow(count=1, granularity=WEEK) -->
+                                        <!-- offset_to_grain = None -->
+                                        <!-- join_type = INNER -->
+                                        <MetricTimeDimensionTransformNode>
+                                            <!-- description = "Metric Time Dimension 'ds'" -->
+                                            <!-- node_id = NodeId(id_str='sma_28002') -->
+                                            <!-- aggregation_time_dimension = 'ds' -->
+                                            <ReadSqlSourceNode>
+                                                <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
+                                                <!-- node_id = NodeId(id_str='rss_28014') -->
+                                                <!-- data_set = SemanticModelDataSet('bookings_source') -->
+                                            </ReadSqlSourceNode>
+                                        </MetricTimeDimensionTransformNode>
+                                    </JoinToTimeSpineNode>
+                                </FilterElementsNode>
+                            </WhereConstraintNode>
+                        </FilterElementsNode>
+                    </AggregateMeasuresNode>
+                </ComputeMetricsNode>
+                <ComputeMetricsNode>
+                    <!-- description = 'Compute Metrics via Expressions' -->
+                    <!-- node_id = NodeId(id_str='cm_1') -->
+                    <!-- metric_spec =                                        -->
+                    <!--   MetricSpec(                                        -->
+                    <!--     element_name='bookers',                          -->
+                    <!--     filter_specs=(                                   -->
+                    <!--       WhereFilterSpec(                               -->
+                    <!--         where_sql="metric_time__day = '2020-01-01'", -->
+                    <!--         bind_parameters=SqlBindParameters(),         -->
+                    <!--         linkable_spec_set=LinkableSpecSet(           -->
+                    <!--           time_dimension_specs=(                     -->
+                    <!--             TimeDimensionSpec(                       -->
+                    <!--               element_name='metric_time',            -->
+                    <!--               time_granularity=DAY,                  -->
+                    <!--             ),                                       -->
+                    <!--           ),                                         -->
+                    <!--         ),                                           -->
+                    <!--       ),                                             -->
+                    <!--     ),                                               -->
+                    <!--   )                                                  -->
+                    <AggregateMeasuresNode>
+                        <!-- description = 'Aggregate Measures' -->
+                        <!-- node_id = NodeId(id_str='am_1') -->
+                        <FilterElementsNode>
+                            <!-- description = "Pass Only Elements: ['bookers', 'metric_time__month']" -->
+                            <!-- node_id = NodeId(id_str='pfe_3') -->
+                            <!-- include_spec = MeasureSpec(element_name='bookers') -->
+                            <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH) -->
+                            <!-- distinct = False -->
+                            <WhereConstraintNode>
+                                <!-- description = 'Constrain Output with WHERE' -->
+                                <!-- node_id = NodeId(id_str='wcc_1') -->
+                                <!-- where_condition =                                -->
+                                <!--   WhereFilterSpec(                               -->
+                                <!--     where_sql="metric_time__day = '2020-01-01'", -->
+                                <!--     bind_parameters=SqlBindParameters(),         -->
+                                <!--     linkable_spec_set=LinkableSpecSet(           -->
+                                <!--       time_dimension_specs=(                     -->
+                                <!--         TimeDimensionSpec(                       -->
+                                <!--           element_name='metric_time',            -->
+                                <!--           time_granularity=DAY,                  -->
+                                <!--         ),                                       -->
+                                <!--       ),                                         -->
+                                <!--     ),                                           -->
+                                <!--   )                                              -->
+                                <FilterElementsNode>
+                                    <!-- description =                                                                 -->
+                                    <!--   "Pass Only Elements: ['bookers', 'metric_time__month', 'metric_time__day']" -->
+                                    <!-- node_id = NodeId(id_str='pfe_2') -->
+                                    <!-- include_spec = MeasureSpec(element_name='bookers') -->
+                                    <!-- include_spec =                                                          -->
+                                    <!--   TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH) -->
+                                    <!-- include_spec =                                                        -->
+                                    <!--   TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
+                                    <!-- distinct = False -->
+                                    <MetricTimeDimensionTransformNode>
+                                        <!-- description = "Metric Time Dimension 'ds'" -->
+                                        <!-- node_id = NodeId(id_str='sma_28002') -->
+                                        <!-- aggregation_time_dimension = 'ds' -->
+                                        <ReadSqlSourceNode>
+                                            <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
+                                            <!-- node_id = NodeId(id_str='rss_28014') -->
+                                            <!-- data_set = SemanticModelDataSet('bookings_source') -->
+                                        </ReadSqlSourceNode>
+                                    </MetricTimeDimensionTransformNode>
+                                </FilterElementsNode>
+                            </WhereConstraintNode>
+                        </FilterElementsNode>
+                    </AggregateMeasuresNode>
+                </ComputeMetricsNode>
+            </CombineAggregatedOutputsNode>
+        </ComputeMetricsNode>
+    </WriteToResultDataframeNode>
+</DataflowPlan>

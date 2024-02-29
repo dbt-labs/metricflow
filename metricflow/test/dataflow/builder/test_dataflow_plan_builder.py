@@ -1203,3 +1203,65 @@ def test_join_to_time_spine_with_filters(
         mf_test_session_state=mf_test_session_state,
         dag_graph=dataflow_plan,
     )
+
+
+def test_offset_window_metric_filter_and_query_have_different_granularities(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    query_parser: MetricFlowQueryParser,
+    create_source_tables: bool,
+) -> None:
+    """Test a query where an offset window metric is queried with one granularity and filtered by a different one."""
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("booking_fees_last_week_per_booker_this_week",),
+        group_by_names=("metric_time__month",),
+        where_constraint=PydanticWhereFilter(
+            where_sql_template=("{{ TimeDimension('metric_time', 'day') }} = '2020-01-01'")
+        ),
+    )
+    dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan.text_structure(),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dag_graph=dataflow_plan,
+    )
+
+
+def test_offset_to_grain_metric_filter_and_query_have_different_granularities(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    query_parser: MetricFlowQueryParser,
+    create_source_tables: bool,
+) -> None:
+    """Test a query where an offset to grain metric is queried with one granularity and filtered by a different one."""
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookings_at_start_of_month",),
+        group_by_names=("metric_time__month",),
+        where_constraint=PydanticWhereFilter(
+            where_sql_template=("{{ TimeDimension('metric_time', 'day') }} = '2020-01-01'")
+        ),
+    )
+    dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan.text_structure(),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dag_graph=dataflow_plan,
+    )

@@ -27,6 +27,16 @@ FROM (
           -- Join to Time Spine Dataset
           SELECT
             subq_2.booking__ds__day AS booking__ds__day
+            , DATE_TRUNC(subq_2.booking__ds__day, isoweek) AS booking__ds__week
+            , DATE_TRUNC(subq_2.booking__ds__day, month) AS booking__ds__month
+            , DATE_TRUNC(subq_2.booking__ds__day, quarter) AS booking__ds__quarter
+            , DATE_TRUNC(subq_2.booking__ds__day, year) AS booking__ds__year
+            , EXTRACT(year FROM subq_2.booking__ds__day) AS booking__ds__extract_year
+            , EXTRACT(quarter FROM subq_2.booking__ds__day) AS booking__ds__extract_quarter
+            , EXTRACT(month FROM subq_2.booking__ds__day) AS booking__ds__extract_month
+            , EXTRACT(day FROM subq_2.booking__ds__day) AS booking__ds__extract_day
+            , IF(EXTRACT(dayofweek FROM subq_2.booking__ds__day) = 1, 7, EXTRACT(dayofweek FROM subq_2.booking__ds__day) - 1) AS booking__ds__extract_dow
+            , EXTRACT(dayofyear FROM subq_2.booking__ds__day) AS booking__ds__extract_doy
             , subq_1.ds__day AS ds__day
             , subq_1.ds__week AS ds__week
             , subq_1.ds__month AS ds__month
