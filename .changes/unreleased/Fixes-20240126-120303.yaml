@@ -1,6 +1,0 @@
-kind: Fixes
-body: Validate that there are metrics or group by items in each query.
-time: 2024-01-26T12:03:03.494439-08:00
-custom:
-  Author: courtneyholcomb
-  Issue: "1002"

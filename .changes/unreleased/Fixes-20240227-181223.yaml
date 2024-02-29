@@ -1,7 +1,0 @@
-kind: Fixes
-body: Enable querying offset metric with multiple agg_time_dimensions at once. Also
-  fixes a bug when filtering by a different grain than the group by grain.
-time: 2024-02-27T18:12:23.601203-08:00
-custom:
-  Author: courtneyholcomb
-  Issue: 1052 1053

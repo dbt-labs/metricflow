@@ -1,6 +1,0 @@
-kind: Fixes
-body: 'Bug fix: if measure joins to time spine, apply filters again after that join.'
-time: 2024-02-28T08:43:35.044076-08:00
-custom:
-  Author: courtneyholcomb
-  Issue: "1039"
