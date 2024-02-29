@@ -37,6 +37,7 @@ from metricflow.query.issues.group_by_item_resolver.no_matching_items_for_measur
 from metricflow.query.issues.group_by_item_resolver.no_matching_items_for_no_metrics_query import (
     NoMatchingItemsForNoMetricsQuery,
 )
+from metricflow.query.issues.group_by_item_resolver.no_parent_candidates import NoParentCandidates
 from metricflow.query.issues.issues_base import (
     MetricFlowQueryResolutionIssueSet,
 )
@@ -253,6 +254,12 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
         merged_issue_set: MetricFlowQueryResolutionIssueSet = MetricFlowQueryResolutionIssueSet.merge_iterable(
             parent_candidate_set.issue_set for parent_candidate_set in push_down_results_from_parents.values()
         )
+        if len(push_down_results_from_parents) == 0:
+            # If there are no results of any kind from the parents it means there are no parents, which means
+            # something is likely wrong with the semantic manifest or the query construction itself
+            merged_issue_set = merged_issue_set.add_issue(
+                NoParentCandidates.from_parameters(query_resolution_path=current_traversal_path)
+            )
 
         if merged_issue_set.has_errors:
             return PushDownResult(
