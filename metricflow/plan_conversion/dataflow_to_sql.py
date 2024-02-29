@@ -216,19 +216,18 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         This is useful in computing cumulative metrics. This will need to be updated to support granularities finer than a
         day.
         """
-        time_spine_instance = (
-            TimeDimensionInstance(
-                defined_from=agg_time_dimension_instance.defined_from,
-                associated_columns=(
-                    ColumnAssociation(
-                        column_name=agg_time_dimension_column_name,
-                        single_column_correlation_key=SingleColumnCorrelationKey(),
-                    ),
+        time_spine_instance = TimeDimensionInstance(
+            defined_from=agg_time_dimension_instance.defined_from,
+            associated_columns=(
+                ColumnAssociation(
+                    column_name=agg_time_dimension_column_name,
+                    single_column_correlation_key=SingleColumnCorrelationKey(),
                 ),
-                spec=agg_time_dimension_instance.spec,
             ),
+            spec=agg_time_dimension_instance.spec,
         )
-        time_spine_instance_set = InstanceSet(time_dimension_instances=time_spine_instance)
+
+        time_spine_instance_set = InstanceSet(time_dimension_instances=(time_spine_instance,))
         time_spine_table_alias = self._next_unique_table_alias()
 
         # If the requested granularity is the same as the granularity of the spine, do a direct select.
@@ -1334,11 +1333,13 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             len(time_spine_dataset.instance_set.time_dimension_instances) == 1
             and len(time_spine_dataset.sql_select_node.select_columns) == 1
         ), "Time spine dataset not configured properly. Expected exactly one column."
-        time_spine_dim_instance = time_spine_dataset.instance_set.time_dimension_instances[0]
+        original_time_spine_dim_instance = time_spine_dataset.instance_set.time_dimension_instances[0]
         time_spine_column_select_expr: Union[
             SqlColumnReferenceExpression, SqlDateTruncExpression
         ] = SqlColumnReferenceExpression(
-            SqlColumnReference(table_alias=time_spine_alias, column_name=time_spine_dim_instance.spec.qualified_name)
+            SqlColumnReference(
+                table_alias=time_spine_alias, column_name=original_time_spine_dim_instance.spec.qualified_name
+            )
         )
 
         time_spine_select_columns = []
@@ -1348,17 +1349,30 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         # If offset_to_grain is used, will need to filter down to rows that match selected granularities.
         # Does not apply if one of the granularities selected matches the time spine column granularity.
         need_where_filter = (
-            node.offset_to_grain and time_spine_dim_instance.spec not in node.requested_agg_time_dimension_specs
+            node.offset_to_grain
+            and original_time_spine_dim_instance.spec not in node.requested_agg_time_dimension_specs
         )
 
         # Add requested granularities (if different from time_spine) and date_parts to time spine column.
         for time_dimension_instance in time_dimensions_to_select_from_time_spine:
             time_dimension_spec = time_dimension_instance.spec
 
-            # Apply grain to time spine column select expression, unless grain already matches time spine column.
+            # TODO: this will break when we start supporting smaller grain than DAY unless the time spine table is
+            # updated to use the smallest available grain.
+            if (
+                time_dimension_spec.time_granularity.to_int()
+                < original_time_spine_dim_instance.spec.time_granularity.to_int()
+            ):
+                raise RuntimeError(
+                    f"Can't join to time spine for a time dimension with a smaller granularity than that of the time "
+                    f"spine column. Got {time_dimension_spec.time_granularity} for time dimension, "
+                    f"{original_time_spine_dim_instance.spec.time_granularity} for time spine."
+                )
+
+            # Apply grain to time spine select expression, unless grain already matches original time spine column.
             select_expr: SqlExpressionNode = (
                 time_spine_column_select_expr
-                if time_dimension_spec.time_granularity == time_spine_dim_instance.spec.time_granularity
+                if time_dimension_spec.time_granularity == original_time_spine_dim_instance.spec.time_granularity
                 else SqlDateTruncExpression(
                     time_granularity=time_dimension_spec.time_granularity, arg=time_spine_column_select_expr
                 )
@@ -1379,14 +1393,14 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             if time_dimension_spec.date_part:
                 select_expr = SqlExtractExpression(date_part=time_dimension_spec.date_part, arg=select_expr)
             time_dim_spec = TimeDimensionSpec(
-                element_name=time_spine_dim_instance.spec.element_name,
-                entity_links=time_spine_dim_instance.spec.entity_links,
+                element_name=original_time_spine_dim_instance.spec.element_name,
+                entity_links=original_time_spine_dim_instance.spec.entity_links,
                 time_granularity=time_dimension_spec.time_granularity,
                 date_part=time_dimension_spec.date_part,
-                aggregation_state=time_spine_dim_instance.spec.aggregation_state,
+                aggregation_state=original_time_spine_dim_instance.spec.aggregation_state,
             )
             time_spine_dim_instance = TimeDimensionInstance(
-                defined_from=time_spine_dim_instance.defined_from,
+                defined_from=original_time_spine_dim_instance.defined_from,
                 associated_columns=(self._column_association_resolver.resolve_spec(time_dim_spec),),
                 spec=time_dim_spec,
             )
