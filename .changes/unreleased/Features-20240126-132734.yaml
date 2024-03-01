@@ -1,6 +1,0 @@
-kind: Features
-body: Enable offset metrics to be queried with agg_time_dimension.
-time: 2024-01-26T13:27:34.200253-08:00
-custom:
-  Author: courtneyholcomb
-  Issue: "1006"
