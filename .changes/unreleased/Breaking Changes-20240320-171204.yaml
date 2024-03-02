@@ -1,0 +1,6 @@
+kind: Breaking Changes
+body: Remove unsupported legacy MetricFlowClient APIs
+time: 2024-03-20T17:12:04.717298-07:00
+custom:
+  Author: tlento
+  Issue: "1094"
