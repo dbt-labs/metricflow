@@ -22,22 +22,31 @@ def _dataframes_contain_same_data(
 
     for c in range(expected.shape[0]):
         for r in range(expected.shape[1]):
+            expected_value = expected.iloc[c, r]
+            actual_value = actual.iloc[c, r]
+
             # NaNs can't be compared for equality.
-            if pd.isna(expected.iloc[c, r]) and pd.isna(actual.iloc[c, r]):
-                pass
-            elif isinstance(expected.iloc[c, r], SupportsFloat) and isinstance(actual.iloc[c, r], SupportsFloat):
-                if not math.isclose(expected.iloc[c, r], actual.iloc[c, r], rel_tol=1e-6):
-                    return False
-            elif (
-                isinstance(expected.iloc[c, r], pd.Timestamp)
-                and isinstance(actual.iloc[c, r], pd.Timestamp)
-                # If expected has no tz but actual is UTC, remove timezone. Some engines add UTC by default.
-                and actual.iloc[c, r].tzname() == "UTC"
-                and expected.iloc[c, r].tzname() is None
+            if pd.isna(expected_value) and pd.isna(actual_value):
+                continue
+
+            if (
+                isinstance(expected_value, SupportsFloat)
+                and isinstance(actual_value, SupportsFloat)
+                and math.isclose(expected_value, actual_value, rel_tol=1e-6)
             ):
-                if actual.iloc[c, r].tz_localize(None) != expected.iloc[c, r].tz_localize(None):
-                    return False
-            elif expected.iloc[c, r] != actual.iloc[c, r]:
+                continue
+
+            if (
+                isinstance(expected_value, pd.Timestamp)
+                and isinstance(actual_value, pd.Timestamp)
+                # If expected has no tz but actual is UTC, remove timezone. Some engines add UTC by default.
+                and actual_value.tzname() == "UTC"
+                and expected_value.tzname() is None
+            ):
+                actual_value = actual_value.tz_localize(None)
+                expected_value = expected_value.tz_localize(None)
+
+            if expected_value != actual_value:
                 return False
     return True
 
