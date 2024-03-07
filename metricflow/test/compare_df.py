@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 import logging
 import math
 from typing import SupportsFloat
@@ -35,6 +36,13 @@ def _dataframes_contain_same_data(
                 and math.isclose(expected_value, actual_value, rel_tol=1e-6)
             ):
                 continue
+
+            # Convert dates to timestamps as Pandas will give a warning when comparing dates and timestamps.
+            if isinstance(expected_value, datetime.date):
+                expected_value = pd.Timestamp(expected_value)
+
+            if isinstance(actual_value, datetime.date):
+                actual_value = pd.Timestamp(actual_value)
 
             if (
                 isinstance(expected_value, pd.Timestamp)
