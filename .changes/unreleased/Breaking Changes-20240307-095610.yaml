@@ -1,0 +1,6 @@
+kind: Breaking Changes
+body: dd Python 3.12 Support / Remove Python 3.8 Support
+time: 2024-03-07T09:56:10.062042-08:00
+custom:
+  Author: plypaul
+  Issue: "1065"
