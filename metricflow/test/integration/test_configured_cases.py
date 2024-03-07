@@ -7,6 +7,7 @@ from typing import List, Optional, Sequence, Tuple
 
 import jinja2
 import pytest
+from _pytest.fixtures import FixtureRequest
 from dateutil import parser
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.implementations.elements.measure import PydanticMeasureAggregationParameters
@@ -196,6 +197,27 @@ class CheckQueryHelpers:
         expr = SqlGenerateUuidExpression()
         return self._sql_client.sql_query_plan_renderer.expr_renderer.render_sql_expr(expr).sql
 
+    def render_time_filter(
+        self,
+        element_name: str,
+        start_time: str,
+        stop_time: str,
+        time_granularity: Optional[str] = None,
+    ) -> str:
+        """Render an expression like '{{ TimeDimension("metric_time") }} >= ...'."""
+        start_expr = self.cast_to_ts(f"{start_time}")
+        time_format = "%Y-%m-%d"
+        stop_time_plus_one_day = (
+            datetime.datetime.strptime(stop_time, time_format) + datetime.timedelta(days=1)
+        ).strftime(time_format)
+
+        if time_granularity is not None and time_granularity != "day":
+            raise NotImplementedError("Only the day grain is supported.")
+
+        object_builder_notation = "{{ " + f"TimeDimension({repr(element_name)})" + " }}"
+        stop_expr = self.cast_to_ts(f"{stop_time_plus_one_day}")
+        return f"{object_builder_notation} >= {start_expr} AND {object_builder_notation} < {stop_expr}"
+
 
 def filter_not_supported_features(
     sql_client: SqlClient, required_features: Tuple[RequiredDwEngineFeatures, ...]
@@ -235,6 +257,7 @@ def filter_not_supported_features(
 )
 def test_case(
     name: str,
+    request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     simple_semantic_manifest_lookup: SemanticManifestLookup,
     simple_semantic_manifest_lookup_non_ds: SemanticManifestLookup,
@@ -321,6 +344,7 @@ def test_case(
                 render_time_dimension_template=check_query_helpers.render_time_dimension_template,
                 generate_random_uuid=check_query_helpers.generate_random_uuid,
                 cast_to_ts=check_query_helpers.cast_to_ts,
+                render_time_filter=check_query_helpers.render_time_filter,
             )
             if case.where_filter
             else None,
