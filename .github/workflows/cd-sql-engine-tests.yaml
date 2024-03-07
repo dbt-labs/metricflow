@@ -8,7 +8,7 @@ on:
     types: [labeled]
 
 env:
-  PYTHON_VERSION: "3.8"
+  PYTHON_VERSION: "3.9"
   EXTERNAL_ENGINE_TEST_PARALLELISM: 8
   ADDITIONAL_PYTEST_OPTIONS: "--use-persistent-source-schema"
 

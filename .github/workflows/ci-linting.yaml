@@ -18,7 +18,7 @@ jobs:
     name: Run Pre-Commit Linting Hooks
     runs-on: ubuntu-latest
     env:
-      python-version: "3.8"
+      python-version: "3.9"
     steps:
 
       - name: Check-out the repo
