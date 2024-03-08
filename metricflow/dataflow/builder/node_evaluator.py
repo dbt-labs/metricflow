@@ -24,16 +24,15 @@ from typing import List, Optional, Sequence, Tuple
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
-from metricflow.dataflow.builder.partitions import PartitionJoinResolver
-from metricflow.dataflow.dataflow_plan import (
-    BaseOutput,
-    FilterElementsNode,
-    JoinDescription,
-    MetricTimeDimensionTransformNode,
+from metricflow.dataflow.builder.partitions import (
     PartitionDimensionJoinDescription,
+    PartitionJoinResolver,
     PartitionTimeDimensionJoinDescription,
-    ValidityWindowJoinDescription,
 )
+from metricflow.dataflow.dataflow_plan import BaseOutput
+from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
+from metricflow.dataflow.nodes.join_to_base import JoinDescription, ValidityWindowJoinDescription
+from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.dataset.dataset import DataSet
 from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.instances import InstanceSet

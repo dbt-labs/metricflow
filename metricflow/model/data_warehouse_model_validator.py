@@ -31,7 +31,8 @@ from dbt_semantic_interfaces.validations.validator_helpers import (
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
-from metricflow.dataflow.dataflow_plan import BaseOutput, FilterElementsNode
+from metricflow.dataflow.dataflow_plan import BaseOutput
+from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.dataset.dataset import DataSet
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
