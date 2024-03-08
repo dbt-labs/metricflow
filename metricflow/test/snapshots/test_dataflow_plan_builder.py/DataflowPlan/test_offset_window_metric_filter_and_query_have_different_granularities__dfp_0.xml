@@ -88,7 +88,7 @@
                                         <!-- description = 'Join to Time Spine Dataset' -->
                                         <!-- node_id = NodeId(id_str='jts_0') -->
                                         <!-- requested_agg_time_dimension_specs =                                       -->
-                                        <!--   [TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH),] -->
+                                        <!--   (TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH),) -->
                                         <!-- use_custom_agg_time_dimension = False -->
                                         <!-- time_range_constraint = None -->
                                         <!-- offset_window = PydanticMetricTimeWindow(count=1, granularity=WEEK) -->
