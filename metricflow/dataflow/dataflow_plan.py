@@ -6,7 +6,7 @@ import logging
 import textwrap
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Generic, Optional, Sequence, Tuple, Type, TypeVar, Union
+from typing import Generic, List, Optional, Sequence, Tuple, Type, TypeVar, Union
 
 import jinja2
 from dbt_semantic_interfaces.protocols.metric import MetricTimeWindow
@@ -196,7 +196,7 @@ class ReadSqlSourceNode(BaseOutput):
             data_set: dataset describing the SQL table / SQL query
         """
         self._dataset = data_set
-        super().__init__(node_id=self.create_unique_id(), parent_nodes=[])
+        super().__init__(node_id=self.create_unique_id(), parent_nodes=())
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
@@ -283,7 +283,7 @@ class JoinToBaseOutputNode(BaseOutput):
         self._join_targets = tuple(join_targets)
 
         # Doing a list comprehension throws a type error, so doing it this way.
-        parent_nodes: Sequence[DataflowPlanNode] = [self._left_node]
+        parent_nodes: List[DataflowPlanNode] = [self._left_node]
         for join_target in self._join_targets:
             parent_nodes.append(join_target.join_node)
         super().__init__(node_id=node_id or self.create_unique_id(), parent_nodes=parent_nodes)
@@ -457,7 +457,7 @@ class AggregateMeasuresNode(AggregatedMeasuresOutput):
     def __init__(
         self,
         parent_node: BaseOutput,
-        metric_input_measure_specs: Tuple[MetricInputMeasureSpec, ...],
+        metric_input_measure_specs: Sequence[MetricInputMeasureSpec, ...],
     ) -> None:
         """Initializer for AggregateMeasuresNode.
 
@@ -466,9 +466,9 @@ class AggregateMeasuresNode(AggregatedMeasuresOutput):
         same input measure.
         """
         self._parent_node = parent_node
-        self._metric_input_measure_specs = metric_input_measure_specs
+        self._metric_input_measure_specs = tuple(metric_input_measure_specs)
 
-        super().__init__(node_id=self.create_unique_id(), parent_nodes=[self._parent_node])
+        super().__init__(node_id=self.create_unique_id(), parent_nodes=(self._parent_node,))
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
@@ -574,7 +574,7 @@ class SemiAdditiveJoinNode(BaseOutput):
             queried_time_dimension_spec: The group by provided in the query used to build the windows we want to filter on.
         """
         self._parent_node = parent_node
-        self._entity_specs = entity_specs
+        self._entity_specs = tuple(entity_specs)
         self._time_dimension_spec = time_dimension_spec
         self._agg_by_function = agg_by_function
         self._queried_time_dimension_spec = queried_time_dimension_spec
@@ -688,7 +688,7 @@ class JoinToTimeSpineNode(BaseOutput, ABC):
         self._time_range_constraint = time_range_constraint
         self._join_type = join_type
 
-        super().__init__(node_id=self.create_unique_id(), parent_nodes=[self._parent_node])
+        super().__init__(node_id=self.create_unique_id(), parent_nodes=(self._parent_node,))
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
@@ -782,7 +782,7 @@ class ComputeMetricsNode(ComputedMetricsOutput):
         """
         self._parent_node = parent_node
         self._metric_specs = tuple(metric_specs)
-        super().__init__(node_id=self.create_unique_id(), parent_nodes=[self._parent_node])
+        super().__init__(node_id=self.create_unique_id(), parent_nodes=(self._parent_node,))
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
@@ -846,7 +846,7 @@ class OrderByLimitNode(ComputedMetricsOutput):
         self._order_by_specs = tuple(order_by_specs)
         self._limit = limit
         self._parent_node = parent_node
-        super().__init__(node_id=self.create_unique_id(), parent_nodes=[self._parent_node])
+        super().__init__(node_id=self.create_unique_id(), parent_nodes=(self._parent_node,))
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
@@ -918,7 +918,7 @@ class MetricTimeDimensionTransformNode(BaseOutput):
     ) -> None:
         self._aggregation_time_dimension_reference = aggregation_time_dimension_reference
         self._parent_node = parent_node
-        super().__init__(node_id=self.create_unique_id(), parent_nodes=[parent_node])
+        super().__init__(node_id=self.create_unique_id(), parent_nodes=(parent_node,))
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
@@ -990,7 +990,7 @@ class WriteToResultDataframeNode(SinkOutput):
 
     def __init__(self, parent_node: BaseOutput) -> None:  # noqa: D
         self._parent_node = parent_node
-        super().__init__(node_id=self.create_unique_id(), parent_nodes=[parent_node])
+        super().__init__(node_id=self.create_unique_id(), parent_nodes=(parent_node,))
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
@@ -1035,7 +1035,7 @@ class WriteToResultTableNode(SinkOutput):
         """
         self._parent_node = parent_node
         self._output_sql_table = output_sql_table
-        super().__init__(node_id=self.create_unique_id(), parent_nodes=[parent_node])
+        super().__init__(node_id=self.create_unique_id(), parent_nodes=(parent_node,))
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
@@ -1084,7 +1084,7 @@ class FilterElementsNode(BaseOutput):
         self._replace_description = replace_description
         self._parent_node = parent_node
         self._distinct = distinct
-        super().__init__(node_id=self.create_unique_id(), parent_nodes=[parent_node])
+        super().__init__(node_id=self.create_unique_id(), parent_nodes=(parent_node,))
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
@@ -1150,7 +1150,7 @@ class WhereConstraintNode(AggregatedMeasuresOutput):
     ) -> None:
         self._where = where_constraint
         self.parent_node = parent_node
-        super().__init__(node_id=self.create_unique_id(), parent_nodes=[parent_node])
+        super().__init__(node_id=self.create_unique_id(), parent_nodes=(parent_node,))
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
@@ -1192,7 +1192,7 @@ class CombineAggregatedOutputsNode(ComputedMetricsOutput):
         self,
         parent_nodes: Sequence[Union[BaseOutput, ComputedMetricsOutput]],
     ) -> None:
-        super().__init__(node_id=self.create_unique_id(), parent_nodes=list(parent_nodes))
+        super().__init__(node_id=self.create_unique_id(), parent_nodes=parent_nodes)
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
@@ -1226,7 +1226,7 @@ class ConstrainTimeRangeNode(AggregatedMeasuresOutput, BaseOutput):
         time_range_constraint: TimeRangeConstraint,
     ) -> None:
         self._time_range_constraint = time_range_constraint
-        super().__init__(node_id=self.create_unique_id(), parent_nodes=[parent_node])
+        super().__init__(node_id=self.create_unique_id(), parent_nodes=(parent_node,))
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
@@ -1274,7 +1274,7 @@ class MinMaxNode(BaseOutput):
 
     def __init__(self, parent_node: BaseOutput) -> None:  # noqa: D
         self._parent_node = parent_node
-        super().__init__(node_id=self.create_unique_id(), parent_nodes=[parent_node])
+        super().__init__(node_id=self.create_unique_id(), parent_nodes=(parent_node,))
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
@@ -1303,7 +1303,7 @@ class AddGeneratedUuidColumnNode(BaseOutput):
     """Adds a UUID column."""
 
     def __init__(self, parent_node: BaseOutput) -> None:  # noqa: D
-        super().__init__(node_id=self.create_unique_id(), parent_nodes=[parent_node])
+        super().__init__(node_id=self.create_unique_id(), parent_nodes=(parent_node,))
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
@@ -1367,11 +1367,17 @@ class JoinConversionEventsNode(BaseOutput):
         self._base_time_dimension_spec = base_time_dimension_spec
         self._conversion_measure_spec = conversion_measure_spec
         self._conversion_time_dimension_spec = conversion_time_dimension_spec
-        self._unique_identifier_keys = unique_identifier_keys
+        self._unique_identifier_keys = tuple(unique_identifier_keys)
         self._entity_spec = entity_spec
         self._window = window
         self._constant_properties = constant_properties
-        super().__init__(node_id=self.create_unique_id(), parent_nodes=[base_node, conversion_node])
+        super().__init__(
+            node_id=self.create_unique_id(),
+            parent_nodes=(
+                base_node,
+                conversion_node,
+            ),
+        )
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
