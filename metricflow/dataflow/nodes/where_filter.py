@@ -19,12 +19,16 @@ class WhereConstraintNode(AggregatedMeasuresOutput):
         where_constraint: WhereFilterSpec,
     ) -> None:
         self._where = where_constraint
-        self.parent_node = parent_node
+        self._parent_node = parent_node
         super().__init__(node_id=self.create_unique_id(), parent_nodes=(parent_node,))
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
         return StaticIdPrefix.DATAFLOW_NODE_WHERE_CONSTRAINT_ID_PREFIX
+
+    @property
+    def parent_node(self) -> BaseOutput:  # noqa: D
+        return self._parent_node
 
     @property
     def where(self) -> WhereFilterSpec:
