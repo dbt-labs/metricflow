@@ -8,7 +8,8 @@ from dbt_semantic_interfaces.references import SemanticModelElementReference
 
 from metricflow.aggregation_properties import AggregationState
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
-from metricflow.dataflow.dataflow_plan import JoinDescription, JoinToBaseOutputNode, ReadSqlSourceNode
+from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinToBaseOutputNode
+from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.instances import (

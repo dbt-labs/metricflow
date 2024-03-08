@@ -5,7 +5,7 @@ from typing import Mapping
 import pytest
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
-from metricflow.dataflow.dataflow_plan import ValidityWindowJoinDescription
+from metricflow.dataflow.nodes.join_to_base import ValidityWindowJoinDescription
 from metricflow.instances import InstanceSet
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription

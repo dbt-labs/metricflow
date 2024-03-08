@@ -7,7 +7,7 @@ from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.references import TimeDimensionReference
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from metricflow.dataflow.dataflow_plan import MetricTimeDimensionTransformNode
+from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.specs.specs import MetricFlowQuerySpec, MetricSpec

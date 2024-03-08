@@ -10,9 +10,9 @@ from metricflow.dag.mf_dag import DagId
 from metricflow.dataflow.dataflow_plan import (
     BaseOutput,
     DataflowPlan,
-    FilterElementsNode,
-    WriteToResultDataframeNode,
 )
+from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
+from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataframeNode
 from metricflow.dataflow.optimizer.source_scan.cm_branch_combiner import (
     ComputeMetricsBranchCombiner,
     ComputeMetricsBranchCombinerResult,

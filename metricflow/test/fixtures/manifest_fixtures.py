@@ -20,7 +20,7 @@ from dbt_semantic_interfaces.validations.semantic_manifest_validator import Sema
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder, SourceNodeSet
-from metricflow.dataflow.dataflow_plan import ReadSqlSourceNode
+from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.engine.metricflow_engine import MetricFlowEngine
