@@ -16,7 +16,7 @@ from more_itertools import bucket
 
 from metricflow.aggregation_properties import AggregationState
 from metricflow.assert_one_arg import assert_exactly_one_arg_set
-from metricflow.dataflow.dataflow_plan import ValidityWindowJoinDescription
+from metricflow.dataflow.nodes.join_to_base import ValidityWindowJoinDescription
 from metricflow.instances import (
     DimensionInstance,
     EntityInstance,

@@ -8,9 +8,9 @@ from metricflow.dataflow.dataflow_plan import (
     ComputedMetricsOutput,
     DataflowPlan,
     SinkNodeVisitor,
-    WriteToResultDataframeNode,
-    WriteToResultTableNode,
 )
+from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataframeNode
+from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataflow.sql_table import SqlTable
 from metricflow.execution.execution_plan import (
     ExecutionPlan,
