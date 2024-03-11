@@ -753,3 +753,11 @@ metric:
       window: 7 days
       entity: user
       calculation: conversion_rate
+---
+metric:
+  name: active_listings
+  description: Listings with at least 2 bookings
+  type: simple
+  type_params:
+    measure: listings
+  filter: "{{ Metric('listing__bookings') }} > 2"

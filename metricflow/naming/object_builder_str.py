@@ -5,6 +5,7 @@ from typing import Optional, Sequence
 from dbt_semantic_interfaces.call_parameter_sets import (
     DimensionCallParameterSet,
     EntityCallParameterSet,
+    MetricCallParameterSet,
     TimeDimensionCallParameterSet,
 )
 from dbt_semantic_interfaces.naming.keywords import DUNDER
@@ -33,6 +34,16 @@ class ObjectBuilderNameConverter:
             date_part=None,
         )
         return f"Entity({initializer_parameter_str})"
+
+    @staticmethod
+    def input_str_from_metric_call_parameter_set(parameter_set: MetricCallParameterSet) -> str:  # noqa: D
+        initializer_parameter_str = ObjectBuilderNameConverter.initializer_parameter_str(
+            element_name=parameter_set.metric_reference.element_name,
+            entity_links=parameter_set.entity_path,
+            time_granularity=None,
+            date_part=None,
+        )
+        return f"Metric({initializer_parameter_str})"
 
     @staticmethod
     def initializer_parameter_str(

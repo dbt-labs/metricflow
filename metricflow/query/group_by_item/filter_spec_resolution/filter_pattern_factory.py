@@ -5,12 +5,18 @@ from abc import ABC, abstractmethod
 from dbt_semantic_interfaces.call_parameter_sets import (
     DimensionCallParameterSet,
     EntityCallParameterSet,
+    MetricCallParameterSet,
     TimeDimensionCallParameterSet,
 )
 from typing_extensions import override
 
 from metricflow.specs.patterns.spec_pattern import SpecPattern
-from metricflow.specs.patterns.typed_patterns import DimensionPattern, EntityPattern, TimeDimensionPattern
+from metricflow.specs.patterns.typed_patterns import (
+    DimensionPattern,
+    EntityPattern,
+    MetricPattern,
+    TimeDimensionPattern,
+)
 
 
 class WhereFilterPatternFactory(ABC):
@@ -34,6 +40,12 @@ class WhereFilterPatternFactory(ABC):
     ) -> SpecPattern:
         raise NotImplementedError
 
+    @abstractmethod
+    def create_for_metric_call_parameter_set(  # noqa: D
+        self, metric_call_parameter_set: MetricCallParameterSet
+    ) -> SpecPattern:
+        raise NotImplementedError
+
 
 class DefaultWhereFilterPatternFactory(WhereFilterPatternFactory):
     """Default implementation using patterns derived from EntityLinkPattern."""
@@ -53,3 +65,7 @@ class DefaultWhereFilterPatternFactory(WhereFilterPatternFactory):
     @override
     def create_for_entity_call_parameter_set(self, entity_call_parameter_set: EntityCallParameterSet) -> SpecPattern:
         return EntityPattern.from_call_parameter_set(entity_call_parameter_set)
+
+    @override
+    def create_for_metric_call_parameter_set(self, metric_call_parameter_set: MetricCallParameterSet) -> SpecPattern:
+        return MetricPattern.from_call_parameter_set(metric_call_parameter_set)

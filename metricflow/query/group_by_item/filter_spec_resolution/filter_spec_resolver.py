@@ -133,6 +133,14 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
                     )
                 )
             ),
+            metric_call_parameter_sets=tuple(
+                dict.fromkeys(
+                    itertools.chain.from_iterable(
+                        filter_call_parameter_sets.metric_call_parameter_sets
+                        for filter_call_parameter_sets in filter_call_parameter_sets_sequence
+                    )
+                )
+            ),
         )
 
     def _map_filter_parameter_sets_to_pattern(
@@ -180,6 +188,18 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
                     ),
                     spec_pattern=self._spec_pattern_factory.create_for_entity_call_parameter_set(
                         entity_call_parameter_set
+                    ),
+                )
+            )
+        for metric_call_parameter_set in filter_call_parameter_sets.metric_call_parameter_sets:
+            patterns_in_filter.append(
+                PatternAssociationForWhereFilterGroupByItem(
+                    call_parameter_set=metric_call_parameter_set,
+                    object_builder_str=ObjectBuilderNameConverter.input_str_from_metric_call_parameter_set(
+                        metric_call_parameter_set
+                    ),
+                    spec_pattern=self._spec_pattern_factory.create_for_metric_call_parameter_set(
+                        metric_call_parameter_set
                     ),
                 )
             )

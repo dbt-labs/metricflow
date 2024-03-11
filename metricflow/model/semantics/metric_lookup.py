@@ -63,7 +63,10 @@ class MetricLookup(MetricAccessor):  # noqa: D
     ) -> Sequence[LinkableInstanceSpec]:
         """Return group-by-items that are possible for a measure."""
         frozen_with_any_of = (
-            LinkableElementProperties.all_properties() if with_any_of is None else frozenset(with_any_of)
+            # TODO: add metric as a linkable element property
+            LinkableElementProperties.all_properties()
+            if with_any_of is None
+            else frozenset(with_any_of)
         )
         frozen_without_any_of = frozenset() if without_any_of is None else frozenset(without_any_of)
 
@@ -119,10 +122,15 @@ class MetricLookup(MetricAccessor):  # noqa: D
     def metric_references(self) -> Sequence[MetricReference]:  # noqa: D
         return list(self._metrics.keys())
 
+    def get_metric_if_exists(self, metric_reference: MetricReference) -> Optional[Metric]:  # noqa:D
+        return self._metrics.get(metric_reference)
+
     def get_metric(self, metric_reference: MetricReference) -> Metric:  # noqa:D
-        if metric_reference not in self._metrics:
-            raise MetricNotFoundError(f"Unable to find metric `{metric_reference}`. Perhaps it has not been registered")
-        return self._metrics[metric_reference]
+        metric = self.get_metric_if_exists(metric_reference)
+        if metric:
+            return metric
+
+        raise MetricNotFoundError(f"Unable to find metric `{metric_reference}`. Perhaps it has not been registered")
 
     def add_metric(self, metric: Metric) -> None:
         """Add metric, validating presence of required measures."""

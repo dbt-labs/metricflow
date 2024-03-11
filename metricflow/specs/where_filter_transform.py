@@ -13,7 +13,7 @@ from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.rendered_spec_tracker import RenderedSpecTracker
 from metricflow.specs.specs import LinkableSpecSet, WhereFilterSpec
 from metricflow.specs.where_filter_dimension import WhereFilterDimensionFactory
-from metricflow.specs.where_filter_entity import WhereFilterEntityFactory
+from metricflow.specs.where_filter_entity import WhereFilterEntityFactory, WhereFilterMetricFactory
 from metricflow.specs.where_filter_time_dimension import WhereFilterTimeDimensionFactory
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 
@@ -75,20 +75,22 @@ class WhereSpecFactory:
                 where_filter_location=filter_location,
                 rendered_spec_tracker=rendered_spec_tracker,
             )
-            try:
-                # If there was an error with the template, it should have been caught while resolving the specs for
-                # the filters during query resolution.
-                where_sql = jinja2.Template(where_filter.where_sql_template, undefined=jinja2.StrictUndefined).render(
-                    {
-                        "Dimension": dimension_factory.create,
-                        "TimeDimension": time_dimension_factory.create,
-                        "Entity": entity_factory.create,
-                    }
-                )
-            except (jinja2.exceptions.UndefinedError, jinja2.exceptions.TemplateSyntaxError) as e:
-                raise RenderSqlTemplateException(
-                    f"Error while rendering Jinja template:\n{where_filter.where_sql_template}"
-                ) from e
+            metric_factory = WhereFilterMetricFactory(
+                column_association_resolver=self._column_association_resolver,
+                spec_resolution_lookup=self._spec_resolution_lookup,
+                where_filter_location=filter_location,
+                rendered_spec_tracker=rendered_spec_tracker,
+            )
+            # If there was an error with the template, it should have been caught while resolving the specs for
+            # the filters during query resolution.
+            where_sql = jinja2.Template(where_filter.where_sql_template, undefined=jinja2.StrictUndefined).render(
+                {
+                    "Dimension": dimension_factory.create,
+                    "TimeDimension": time_dimension_factory.create,
+                    "Entity": entity_factory.create,
+                    "Metric": metric_factory.create,
+                }
+            )
             filter_specs.append(
                 WhereFilterSpec(
                     where_sql=where_sql,

@@ -29,7 +29,6 @@ dependencies = [
   "PyYAML>=6.0, <7.0.0",
   "click>=7.1.2",
   "dbt-core>=1.7.0, <1.8.0",
-  "dbt-semantic-interfaces>=0.4.2, <0.5.0",
   "graphviz>=0.18.2, <0.21",
   "halo>=0.0.31, <0.1.0",
   "more-itertools>=8.10.0, <10.2.0",
@@ -116,11 +115,15 @@ exclude = [
 
 [tool.hatch.envs.dev-env]
 description = "Environment for development. Includes a DuckDB-backed client."
+pre-install-commands = [
+  "pip install -e ~/dbt-semantic-interfaces",
+]
 features = [
   "dev-packages",
   "sql-client-packages",
   "dbt-duckdb",
 ]
+
 
 [tool.hatch.envs.dev-env.env-vars]
 MF_TEST_ADAPTER_TYPE="duckdb"

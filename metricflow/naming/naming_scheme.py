@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from metricflow.specs.patterns.spec_pattern import SpecPattern
-from metricflow.specs.specs import InstanceSpec
+
+if TYPE_CHECKING:
+    from metricflow.specs.specs import InstanceSpec
 
 
 class QueryItemNamingScheme(ABC):

@@ -45,8 +45,8 @@ class ElementPathKey:
 
     element_name: str
     entity_links: Tuple[EntityReference, ...]
-    time_granularity: Optional[TimeGranularity]
-    date_part: Optional[DatePart]
+    time_granularity: Optional[TimeGranularity] = None
+    date_part: Optional[DatePart] = None
 
 
 @dataclass(frozen=True)
@@ -708,13 +708,15 @@ class ValidLinkableSpecResolver:
                         join_path=(),
                         # Anything that's not at the base time granularity of the measure's aggregation time dimension
                         # should be considered derived.
-                        properties=frozenset({LinkableElementProperties.METRIC_TIME})
-                        if time_granularity is defined_granularity and date_part is None
-                        else frozenset(
-                            {
-                                LinkableElementProperties.METRIC_TIME,
-                                LinkableElementProperties.DERIVED_TIME_GRANULARITY,
-                            }
+                        properties=(
+                            frozenset({LinkableElementProperties.METRIC_TIME})
+                            if time_granularity is defined_granularity and date_part is None
+                            else frozenset(
+                                {
+                                    LinkableElementProperties.METRIC_TIME,
+                                    LinkableElementProperties.DERIVED_TIME_GRANULARITY,
+                                }
+                            )
                         ),
                         time_granularity=time_granularity,
                         date_part=date_part,

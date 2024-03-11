@@ -191,6 +191,7 @@ class SemanticModelLookup(SemanticModelAccessor):
             TimeDimensionReference, MeasureSpec
         ]()
 
+        primary_entity = self.resolved_primary_entity(semantic_model)
         for measure in semantic_model.measures:
             self._measure_aggs[measure.reference] = measure.agg
             self._measure_index[measure.reference] = self._measure_index.get(measure.reference, []) + [semantic_model]
@@ -214,8 +215,6 @@ class SemanticModelLookup(SemanticModelAccessor):
                 raise RuntimeError(
                     f"Aggregation time dimension does not have a time granularity set: {agg_time_dimension}"
                 )
-
-            primary_entity = SemanticModelLookup.resolved_primary_entity(semantic_model)
 
             if primary_entity is None:
                 raise RuntimeError(
@@ -245,10 +244,11 @@ class SemanticModelLookup(SemanticModelAccessor):
             self._dimension_index[dim.reference] = semantic_models_for_dimension
             self._linkable_reference_index[dim.reference] = semantic_models_for_dimension
 
+            entity_links = (primary_entity,) if primary_entity else ()
             self._dimension_ref_to_spec[dim.time_dimension_reference or dim.reference] = (
-                TimeDimensionSpec.from_name(dim.name)
+                TimeDimensionSpec(element_name=dim.name, entity_links=entity_links)
                 if dim.type is DimensionType.TIME
-                else DimensionSpec.from_name(dim.name)
+                else DimensionSpec(element_name=dim.name, entity_links=entity_links)
             )
 
         for entity in semantic_model.entities:
@@ -259,6 +259,9 @@ class SemanticModelLookup(SemanticModelAccessor):
             self._entity_ref_to_spec[entity.reference] = EntitySpec.from_name(entity.name)
 
         self._semantic_model_reference_to_semantic_model[semantic_model.reference] = semantic_model
+
+    def get_dimension_spec(self, dimension_reference: DimensionReference) -> Optional[DimensionSpec]:  # noqa: D
+        return self._dimension_ref_to_spec.get(dimension_reference)
 
     @property
     def semantic_model_references(self) -> Sequence[SemanticModelReference]:  # noqa: D
@@ -357,12 +360,7 @@ class SemanticModelLookup(SemanticModelAccessor):
             "measure requiring an agg_time_dimension, but found none.",
         )
 
-        return ElementPathKey(
-            element_name=agg_time_dimension.element_name,
-            entity_links=(entity_link,),
-            time_granularity=None,
-            date_part=None,
-        )
+        return ElementPathKey(element_name=agg_time_dimension.element_name, entity_links=(entity_link,))
 
     def get_agg_time_dimension_specs_for_measure(
         self, measure_reference: MeasureReference

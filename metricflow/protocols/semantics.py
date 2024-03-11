@@ -28,7 +28,13 @@ from dbt_semantic_interfaces.references import (
 
 from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
-from metricflow.specs.specs import LinkableInstanceSpec, MeasureSpec, NonAdditiveDimensionSpec, TimeDimensionSpec
+from metricflow.specs.specs import (
+    DimensionSpec,
+    LinkableInstanceSpec,
+    MeasureSpec,
+    NonAdditiveDimensionSpec,
+    TimeDimensionSpec,
+)
 
 if TYPE_CHECKING:
     from metricflow.model.semantics.linkable_spec_resolver import ElementPathKey
@@ -46,6 +52,11 @@ class SemanticModelAccessor(ABC):
     @abstractmethod
     def get_dimension_references(self) -> Sequence[DimensionReference]:
         """Retrieve all dimension references from the collection of semantic models."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_dimension_spec(self, dimension_reference: DimensionReference) -> Optional[DimensionSpec]:
+        """Get dimension spec, if it exists."""
         raise NotImplementedError
 
     @abstractmethod

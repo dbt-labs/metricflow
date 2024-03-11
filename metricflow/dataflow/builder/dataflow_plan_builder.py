@@ -15,10 +15,7 @@ from dbt_semantic_interfaces.protocols.metric import (
     MetricTimeWindow,
     MetricType,
 )
-from dbt_semantic_interfaces.references import (
-    MetricReference,
-    TimeDimensionReference,
-)
+from dbt_semantic_interfaces.references import EntityReference, MetricReference, TimeDimensionReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 
@@ -65,6 +62,7 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.node_processor import PreJoinNodeProcessor
 from metricflow.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import FilterSpecResolutionLookUp
+from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
     ConstantPropertySpec,
@@ -124,6 +122,7 @@ class DataflowPlanBuilder:
         semantic_manifest_lookup: SemanticManifestLookup,
         node_output_resolver: DataflowPlanNodeOutputDataSetResolver,
         column_association_resolver: ColumnAssociationResolver,
+        query_parser: MetricFlowQueryParser,
     ) -> None:
         self._semantic_model_lookup = semantic_manifest_lookup.semantic_model_lookup
         self._metric_lookup = semantic_manifest_lookup.metric_lookup
@@ -131,6 +130,7 @@ class DataflowPlanBuilder:
         self._source_node_set = source_node_set
         self._column_association_resolver = column_association_resolver
         self._node_data_set_resolver = node_output_resolver
+        self._query_parser = query_parser
 
     def build_plan(
         self,
@@ -147,6 +147,25 @@ class DataflowPlanBuilder:
             output_sql_table=output_sql_table,
             output_selection_specs=output_selection_specs,
             optimizers=optimizers,
+        )
+
+    def build_metric_entity_source_node(
+        self, metric_reference: MetricReference, entity_reference: EntityReference
+    ) -> BaseOutput:
+        """Create DataFlow Plan to to build SQL for a metric query.
+
+        Might be used at the top level of a query or embedded as a source node.
+        """
+        query_spec = self._query_parser.parse_and_validate_query(
+            metric_names=(metric_reference.element_name,), group_by_names=(entity_reference.element_name,)
+        )
+        return self._build_metrics_output_node(
+            metric_specs=query_spec.metric_specs,
+            queried_linkable_specs=query_spec.linkable_specs,
+            filter_spec_factory=WhereSpecFactory(
+                column_association_resolver=self._column_association_resolver,
+                spec_resolution_lookup=query_spec.filter_spec_resolution_lookup,
+            ),
         )
 
     @log_runtime()
@@ -168,15 +187,12 @@ class DataflowPlanBuilder:
                     f"The metric specs in the query spec should not contain any metric modifiers. Got: {metric_spec}"
                 )
 
-        if query_spec.filter_spec_resolution_lookup is None:
-            resolved_spec_lookup = FilterSpecResolutionLookUp.empty_instance()
-        else:
-            resolved_spec_lookup = query_spec.filter_spec_resolution_lookup
-
         filter_spec_factory = WhereSpecFactory(
-            column_association_resolver=self._column_association_resolver, spec_resolution_lookup=resolved_spec_lookup
+            column_association_resolver=self._column_association_resolver,
+            spec_resolution_lookup=query_spec.filter_spec_resolution_lookup,
         )
 
+        # Should these be passed into the metric output node if it's a source node?
         query_level_filter_specs = tuple(
             filter_spec_factory.create_from_where_filter_intersection(
                 filter_location=WhereFilterLocation.for_query(
@@ -234,7 +250,7 @@ class DataflowPlanBuilder:
     ) -> BaseOutput:
         """Builds a node that contains aggregated values of conversions and opportunities."""
         # Build measure recipes
-        base_required_linkable_specs, _ = self.__get_required_and_extraneous_linkable_specs(
+        base_required_linkable_specs, _ = self._get_required_and_extraneous_linkable_specs(
             queried_linkable_specs=queried_linkable_specs,
             filter_specs=base_measure_spec.filter_specs,
         )
@@ -452,7 +468,7 @@ class DataflowPlanBuilder:
             f"For {metric.type} metric: {metric_spec}, needed metrics are:\n" f"{mf_pformat(metric_input_specs)}"
         )
 
-        required_linkable_specs, extraneous_linkable_specs = self.__get_required_and_extraneous_linkable_specs(
+        required_linkable_specs, extraneous_linkable_specs = self._get_required_and_extraneous_linkable_specs(
             queried_linkable_specs=queried_linkable_specs, filter_specs=metric_spec.filter_specs
         )
 
@@ -627,7 +643,7 @@ class DataflowPlanBuilder:
                 filter_intersection=query_spec.filter_intersection,
             )
 
-        required_linkable_specs, _ = self.__get_required_and_extraneous_linkable_specs(
+        required_linkable_specs, _ = self._get_required_and_extraneous_linkable_specs(
             queried_linkable_specs=query_spec.linkable_specs, filter_specs=query_level_filter_specs
         )
         dataflow_recipe = self._find_dataflow_recipe(
@@ -807,22 +823,51 @@ class DataflowPlanBuilder:
         measure_spec_properties: Optional[MeasureSpecProperties] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
     ) -> Optional[DataflowRecipe]:
+        metric_entity_source_nodes: Tuple[BaseOutput, ...] = ()
+        # Is this where metrics as dimensions will live? Or need new field?
+        for group_by_spec in linkable_spec_set.dimension_specs:
+            if not group_by_spec.entity_links:
+                continue
+            # There might be name conflicts between metrics and dimensions, so first check if this is
+            # a dimension. If it's both, we'll assume the user is querying the dimenison.
+            # TODO: handle the case where a metric has the same name as a dimension,
+            # but we're using an entity that doesn't work for the dimension so should assume the metric
+            if self._semantic_model_lookup.get_dimension_spec(group_by_spec.reference):
+                continue
+
+            # If it's a metric, build source node for that metric-entity combo.
+            if self._metric_lookup.get_metric_if_exists(MetricReference(group_by_spec.element_name)):
+                metric_entity_source_node = self.build_metric_entity_source_node(
+                    metric_reference=MetricReference(group_by_spec.element_name),
+                    entity_reference=group_by_spec.entity_links[0],
+                )
+                metric_entity_source_nodes += (metric_entity_source_node,)
+
         linkable_specs = linkable_spec_set.as_tuple
         candidate_nodes_for_left_side_of_join: Sequence[BaseOutput]
         candidate_nodes_for_right_side_of_join: Sequence[BaseOutput]
         if measure_spec_properties:
-            candidate_nodes_for_right_side_of_join = self._source_node_set.source_nodes_for_metric_queries
+            candidate_nodes_for_right_side_of_join = (
+                self._source_node_set.source_nodes_for_metric_queries + metric_entity_source_nodes
+            )
             candidate_nodes_for_left_side_of_join = self._select_source_nodes_with_measures(
                 measure_specs=set(measure_spec_properties.measure_specs),
                 source_nodes=self._source_node_set.source_nodes_for_metric_queries,
             )
             default_join_type = SqlJoinType.LEFT_OUTER
         else:
-            candidate_nodes_for_right_side_of_join = list(self._source_node_set.source_nodes_for_group_by_item_queries)
-            candidate_nodes_for_left_side_of_join = self._select_source_nodes_with_linkable_specs(
-                linkable_specs=linkable_spec_set,
-                source_nodes=self._source_node_set.source_nodes_for_group_by_item_queries,
+            candidate_nodes = (
+                tuple(
+                    self._select_source_nodes_with_linkable_specs(
+                        linkable_specs=linkable_spec_set,
+                        source_nodes=self._source_node_set.source_nodes_for_group_by_item_queries,
+                    )
+                )
+                + metric_entity_source_nodes
             )
+            candidate_nodes_for_left_side_of_join = candidate_nodes
+            candidate_nodes_for_right_side_of_join = candidate_nodes
+
             default_join_type = SqlJoinType.FULL_OUTER
 
         logger.info(
@@ -1165,7 +1210,7 @@ class DataflowPlanBuilder:
             measure_recipe=measure_recipe,
         )
 
-    def __get_required_and_extraneous_linkable_specs(
+    def _get_required_and_extraneous_linkable_specs(
         self,
         queried_linkable_specs: LinkableSpecSet,
         filter_specs: Sequence[WhereFilterSpec],
@@ -1226,7 +1271,7 @@ class DataflowPlanBuilder:
             )
             logger.info(f"Adjusted time range constraint {cumulative_metric_adjusted_time_constraint}")
 
-        required_linkable_specs, extraneous_linkable_specs = self.__get_required_and_extraneous_linkable_specs(
+        required_linkable_specs, extraneous_linkable_specs = self._get_required_and_extraneous_linkable_specs(
             queried_linkable_specs=queried_linkable_specs,
             filter_specs=metric_input_measure_spec.filter_specs,
             non_additive_dimension_spec=non_additive_dimension_spec,

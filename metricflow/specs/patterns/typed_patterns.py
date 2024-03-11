@@ -6,6 +6,7 @@ from typing import List, Sequence
 from dbt_semantic_interfaces.call_parameter_sets import (
     DimensionCallParameterSet,
     EntityCallParameterSet,
+    MetricCallParameterSet,
     TimeDimensionCallParameterSet,
 )
 from typing_extensions import override
@@ -110,5 +111,31 @@ class EntityPattern(EntityLinkPattern):
                 ),
                 element_name=entity_call_parameter_set.entity_reference.element_name,
                 entity_links=entity_call_parameter_set.entity_path,
+            )
+        )
+
+
+@dataclass(frozen=True)
+class MetricPattern(EntityLinkPattern):
+    """Similar to EntityPathPattern but only matches entities.
+
+    Analogous pattern for Metric() in the object builder naming scheme.
+    """
+
+    @override
+    def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[LinkableInstanceSpec]:
+        spec_set = InstanceSpecSet.from_specs(candidate_specs)
+        return super().match(spec_set.metric_specs)
+
+    @staticmethod
+    def from_call_parameter_set(metric_call_parameter_set: MetricCallParameterSet) -> MetricPattern:  # noqa: D
+        return MetricPattern(
+            parameter_set=EntityLinkPatternParameterSet.from_parameters(
+                fields_to_compare=(
+                    ParameterSetField.ELEMENT_NAME,
+                    ParameterSetField.ENTITY_LINKS,
+                ),
+                element_name=metric_call_parameter_set.metric_reference.element_name,
+                entity_links=metric_call_parameter_set.entity_path,
             )
         )

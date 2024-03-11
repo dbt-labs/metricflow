@@ -1889,3 +1889,24 @@ integration_test:
         ds
     ) b
     ON {{ render_date_sub("a", "ds", 5, TimeGranularity.DAY) }} = b.ds
+---
+integration_test:
+  name: active_listings
+  description: Query a metric that has a filter containing a metric
+  model: SIMPLE_MODEL
+  metrics: ["active_listings"]
+  check_query: |
+    SELECT 1
+---
+integration_test:
+  name: testing_metrics_with_entities
+  description: meh
+  model: SIMPLE_MODEL
+  metrics: ["views_times_booking_value"]
+  group_bys: ["listing"]
+  check_query: |
+    SELECT 1
+
+# how do we determine which entities can be queried with which metrics?
+# how do we determine which entities can be queried with measures in ambiguous group by resolution?
+# can we unify this logic?
