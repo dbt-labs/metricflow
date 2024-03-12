@@ -148,14 +148,8 @@ class DataflowPlanBuilder:
             optimizers=optimizers,
         )
 
-    @log_runtime()
-    def _build_plan(
-        self,
-        query_spec: MetricFlowQuerySpec,
-        output_sql_table: Optional[SqlTable],
-        output_selection_specs: Optional[InstanceSpecSet],
-        optimizers: Sequence[DataflowPlanOptimizer],
-    ) -> DataflowPlan:
+    def _build_query_output_node(self, query_spec: MetricFlowQuerySpec) -> BaseOutput:
+        """Build SQL output node from query inputs. May be used to build query DFP or source node."""
         for metric_spec in query_spec.metric_specs:
             if (
                 len(metric_spec.filter_specs) > 0
@@ -167,13 +161,9 @@ class DataflowPlanBuilder:
                     f"The metric specs in the query spec should not contain any metric modifiers. Got: {metric_spec}"
                 )
 
-        if query_spec.filter_spec_resolution_lookup is None:
-            resolved_spec_lookup = FilterSpecResolutionLookUp.empty_instance()
-        else:
-            resolved_spec_lookup = query_spec.filter_spec_resolution_lookup
-
         filter_spec_factory = WhereSpecFactory(
-            column_association_resolver=self._column_association_resolver, spec_resolution_lookup=resolved_spec_lookup
+            column_association_resolver=self._column_association_resolver,
+            spec_resolution_lookup=query_spec.filter_spec_resolution_lookup,
         )
 
         query_level_filter_specs = tuple(
@@ -185,7 +175,7 @@ class DataflowPlanBuilder:
             )
         )
 
-        metrics_output_node = self._build_metrics_output_node(
+        return self._build_metrics_output_node(
             metric_specs=tuple(
                 MetricSpec(
                     element_name=metric_spec.element_name,
@@ -197,6 +187,16 @@ class DataflowPlanBuilder:
             filter_spec_factory=filter_spec_factory,
             time_range_constraint=query_spec.time_range_constraint,
         )
+
+    @log_runtime()
+    def _build_plan(
+        self,
+        query_spec: MetricFlowQuerySpec,
+        output_sql_table: Optional[SqlTable],
+        output_selection_specs: Optional[InstanceSpecSet],
+        optimizers: Sequence[DataflowPlanOptimizer],
+    ) -> DataflowPlan:
+        metrics_output_node = self._build_query_output_node(query_spec=query_spec)
 
         sink_node = DataflowPlanBuilder.build_sink_node(
             parent_node=metrics_output_node,

@@ -39,6 +39,7 @@ from metricflow.aggregation_properties import AggregationState
 from metricflow.collection_helpers.merger import Mergeable
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
+from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import FilterSpecResolutionLookUp
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_column_type import SqlColumnType
 from metricflow.sql.sql_plan import SqlJoinType
@@ -47,7 +48,6 @@ from metricflow.visitor import VisitorOutputT
 if TYPE_CHECKING:
     from metricflow.model.semantics.metric_lookup import MetricLookup
     from metricflow.protocols.semantics import SemanticModelAccessor
-    from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import FilterSpecResolutionLookUp
 
 
 def hash_items(items: Sequence[SqlColumnType]) -> str:
@@ -780,7 +780,7 @@ class MetricFlowQuerySpec(SerializableDataclass):
     time_range_constraint: Optional[TimeRangeConstraint] = None
     limit: Optional[int] = None
     filter_intersection: Optional[WhereFilterIntersection] = None
-    filter_spec_resolution_lookup: Optional[FilterSpecResolutionLookUp] = None
+    filter_spec_resolution_lookup: FilterSpecResolutionLookUp = FilterSpecResolutionLookUp.empty_instance()
     min_max_only: bool = False
 
     @property

@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Sequence
+from typing import TYPE_CHECKING, Sequence
 
-from metricflow.specs.specs import InstanceSpec
+if TYPE_CHECKING:
+    from metricflow.specs.specs import InstanceSpec
 
 
 class SpecPattern(ABC):
