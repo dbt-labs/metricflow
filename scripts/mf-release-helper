@@ -1,0 +1,215 @@
+#!/bin/sh
+
+# By default, use github cli
+usecli=1
+command=""
+
+usage()
+{
+    echo "Helper script for managing release PR creation and deployment."
+    echo ""
+    echo "Usage: mf-release-helper.sh [OPTIONS] --release <VERSION> COMMAND"
+    echo ""
+    echo "Note - this script requires a full-access API key set to the FOSSA_API_KEY env var."
+    echo ""
+    echo "--release <VERSION> - the semver number of the release. <VERSION> should be of the "
+    echo "                      form \"0.200.0\""
+    echo ""
+    echo "Commands must be one of: pr|tag"
+    echo ""
+    echo "    pr:  creates a branch for the specified VERSION number, and optionally "
+    echo "         submits a draft PR for the change through the GitHub CLI"
+    echo ""
+    echo "    tag:  creates and pushes a tag matching VERSION in order to start the deployment "
+    echo "          process. This should only be done after the release PR is merged."
+    echo ""
+    echo "OPTIONS"
+    echo ""
+    echo ""
+    echo "-h | --help    show this message and quit"
+    echo "--use-web      if set, print instructions instead of cutting a PR via GitHub CLI"
+}
+
+checkrepostate() {
+    repostate=$(git status --porcelain --untracked-files=no)
+    if [ "$repostate" != "" ]
+    then
+        current=$(git branch --show-current)
+        echo "Working tree dirty on branch $current! Abandoning ship!"
+        exit 1
+    fi
+}
+
+assertcanrun() {
+    if [ "$usecli" -eq 1 ]
+    then
+        ghcli=$(which gh)
+        if [ -z "$ghcli" ]
+        then
+            echo "GitHub CLI not installed. See https://cli.github.com/"
+            usage
+            exit 1
+        fi
+    fi
+    checkrepostate
+}
+
+checkoutlatest() {
+    echo "Updating main for MetricFlow repo"
+    echo ""
+    git checkout main
+    git pull
+    checkrepostate
+}
+
+createpr() {
+    prtitle="Release PR for MetricFlow $release"
+    prbody="Update attribution, version, and changelog for $release"
+    branchname="release-$release"
+
+    checkoutlatest
+
+    echo "Cutting release branch $branchname"
+    git checkout -b "$branchname"
+
+    echo "Running FOSSA analyze!"
+    fossa analyze
+
+    echo "Updating attribution from fossa!"
+    fossa report attribution --format markdown > ./attribution.md
+
+    echo "Creating attribution commit"
+    git commit -a -m "Updating attribution from FOSSA"
+
+    echo "Batching and merging changelog entries"
+    changie batch "$release"
+    changie merge
+
+    echo "Committing changelog updates!"
+    git add .
+    git commit -m "Updating changelog"
+
+    echo "Pushing automated commits to remote branch."
+    git push -u origin HEAD
+
+    if [ "$usecli" -eq 1 ]
+    then
+        echo "Creating draft PR, please update with the version change you applied "
+        echo "in the pyproject.toml for the metricflow version."
+        gh pr create -B main -H "$branchname" --title "$prtitle" --body "$prbody" --draft -l "Skip Changelog"
+    else
+        echo "Please add a commit with the version change you applied, then you can "
+        echo "create a PR for the release with title: "
+        echo "$prtitle"
+        echo "and body: "
+        echo "$prbody"
+        echo "by going to this link and filling out the relevant form:"
+        echo "https://github.com/dbt-labs/metricflow/compare/main...$branchname"
+    fi
+}
+
+tagversion() {
+    checkoutlatest
+
+    echo "Creating tag v$release"
+    echo ""
+    git tag v"$release"
+
+    echo "Pushing local changes will result in:"
+    echo ""
+    git push origin --tags --dry-run
+
+    echo "If these changes look good, run "
+    echo "git push origin --tags"
+    echo "Otherwise, run "
+    echo "git tag -d v$release"
+    echo ""
+}
+
+run()
+{
+if [ "$command" = "pr" ]
+then
+    createpr
+elif [ "$command" = "tag" ]
+then
+    tagversion
+else
+    echo "Unrecognized command."
+    usage
+    exit 1
+fi
+
+exit
+
+}
+
+while [ "$1" != "" ]
+do
+      case $1 in
+	  -h | --help)
+	      usage
+	      exit
+	      ;;
+	  --use-web)
+	      usecli=0
+	      ;;
+      --release)
+	      release=$2
+          # Do an extra shift since release is a key/value param
+          shift
+	      ;;
+	  'pr')
+	      command="pr"
+	      ;;
+	  'tag')
+	      command="tag"
+	      ;;
+	  *)
+	      echo "Unknown parameter \"$1\""
+	      usage
+	      exit 1
+	      ;;
+      esac
+      shift
+done
+
+if [ -z "$release" ] || [ "$release" = "pr" ] || [ "$release" = "tag" ]
+then
+    echo ""
+    echo "--release property set to invalid value $release"
+    echo "it should be a semver value like 0.200.0"
+    echo ""
+    exit 1
+fi
+
+if [ -z "$FOSSA_API_KEY" ]
+then
+    echo ""
+    echo "ERROR: FOSSA_API_KEY env var is not set! Run with -h for details!"
+    echo ""
+    exit 1
+fi
+
+reporemote="$(git config --get remote.origin.url)"
+reponame="$(basename -s .git $reporemote)"
+
+if [ "$reponame" = "" ]
+then
+   echo "ERROR: This does not appear to be a git repo! Move to your metricflow checkout!"
+   echo ""
+   exit 1
+elif [ "$reponame" != "metricflow" ]
+then
+    echo "ERROR: Must be in a metricflow repo, but this one is from $reporemote!"
+    echo ""
+    exit 1
+fi
+
+# Move to MetricFlow root
+echo "Moving to MetricFlow root directory from $(pwd)"
+cd "$(git rev-parse --show-toplevel)" || exit 1
+echo "Ready to roll from MetricFlow root $(pwd)"
+
+assertcanrun
+run
