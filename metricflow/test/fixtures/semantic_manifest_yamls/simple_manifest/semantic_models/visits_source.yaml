@@ -14,6 +14,7 @@ semantic_model:
     - name: visits
       expr: 1
       agg: count
+      create_metric: true
     - name: visitors
       expr: user_id
       agg: count_distinct

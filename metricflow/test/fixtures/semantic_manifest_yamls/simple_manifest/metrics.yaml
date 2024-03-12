@@ -599,7 +599,7 @@ metric:
       calculation: conversion_rate
       constant_properties:
         - base_property: session
-          conversion_property: session_id
+          conversion_property: session
 ---
 metric:
   name: bookings_fill_nulls_with_0_without_time_spine
@@ -761,3 +761,12 @@ metric:
   type_params:
     measure: listings
   filter: "{{ Metric('listing__bookings') }} > 2"
+---
+metric:
+  name: visits_per_listing
+  type: ratio
+  type_params:
+    numerator:
+      name: visits
+    denominator:
+      name: listings

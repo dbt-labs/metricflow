@@ -30,5 +30,5 @@ semantic_model:
     - name: user
       type: foreign
       expr: user_id
-    - name: session_id
+    - name: session
       type: foreign

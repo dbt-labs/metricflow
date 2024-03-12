@@ -231,8 +231,8 @@ def filter_not_supported_features(
 @pytest.mark.parametrize(
     "name",
     # CONFIGURED_INTEGRATION_TESTS_REPOSITORY.all_test_case_names,
-    # ["itest_metrics.yaml/testing_metrics_with_entities"],
-    ["itest_metrics.yaml/active_listings"],
+    ["itest_metrics.yaml/testing_metrics_with_entities"],
+    # ["itest_metrics.yaml/active_listings"],
     ids=lambda name: f"name={name}",
 )
 def test_case(

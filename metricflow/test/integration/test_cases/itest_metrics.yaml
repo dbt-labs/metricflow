@@ -1902,8 +1902,8 @@ integration_test:
   name: testing_metrics_with_entities
   description: meh
   model: SIMPLE_MODEL
-  metrics: ["views_times_booking_value"]
-  group_bys: ["listing"]
+  metrics: ["visits"]
+  group_bys: ["session"]
   check_query: |
     SELECT 1
 

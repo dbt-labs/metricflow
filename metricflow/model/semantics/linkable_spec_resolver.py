@@ -425,6 +425,8 @@ class SemanticModelJoinPath:
                         properties=with_properties.union({LinkableElementProperties.ENTITY}),
                     )
                 )
+            # get all metrics that can be queried with this entity and add to the set
+            # how to get those metrics?? figure out how that's resolved in a query & copy that logic
 
         return LinkableElementSet(
             path_key_to_linkable_dimensions={
@@ -807,6 +809,7 @@ class ValidLinkableSpecResolver:
         elements_in_semantic_model = self._get_elements_in_semantic_model(measure_semantic_model)
         metric_time_elements = self._get_metric_time_elements(measure_reference)
         joined_elements = self._get_joined_elements(measure_semantic_model)
+        # TODO: joinable_metrics - get metrics that can be queried with the entities that can join to this model
 
         return LinkableElementSet.merge_by_path_key(
             (
