@@ -1889,3 +1889,11 @@ integration_test:
         ds
     ) b
     ON {{ render_date_sub("a", "ds", 5, TimeGranularity.DAY) }} = b.ds
+---
+integration_test:
+  name: active_listings
+  description: Query a metric that has a filter containing a metric
+  model: SIMPLE_MODEL
+  metrics: ["active_listings"]
+  check_query: |
+    SELECT 1

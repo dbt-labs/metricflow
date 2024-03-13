@@ -224,10 +224,10 @@ def mf_engine_test_fixture_mapping(
     fixture_mapping: Dict[SemanticManifestSetup, MetricFlowEngineTestFixture] = {}
     for semantic_manifest_setup in SemanticManifestSetup:
         with patch_id_generators_helper(semantic_manifest_setup.id_number_space.start_value):
-            try:
-                build_result = load_semantic_manifest(semantic_manifest_setup.semantic_manifest_name, template_mapping)
-            except Exception as e:
-                raise RuntimeError(f"Error while loading semantic manifest: {semantic_manifest_setup}") from e
+            # try:
+            build_result = load_semantic_manifest(semantic_manifest_setup.semantic_manifest_name, template_mapping)
+            # except Exception as e:
+            # raise RuntimeError(f"Error while loading semantic manifest: {semantic_manifest_setup}") from e
 
             fixture_mapping[semantic_manifest_setup] = MetricFlowEngineTestFixture.from_parameters(
                 sql_client, build_result.semantic_manifest
