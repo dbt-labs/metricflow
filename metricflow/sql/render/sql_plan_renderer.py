@@ -67,8 +67,6 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
 
     # The renderer that is used to render the SQL expressions.
     EXPR_RENDERER = DefaultSqlExpressionRenderer()
-    # The amount to indent when formatting SQL
-    INDENT = "  "
 
     def _render_select_columns_section(
         self,
