@@ -4,7 +4,7 @@ import logging
 import time
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Dict, FrozenSet, List, Optional, Sequence, Set, Tuple
+from typing import Dict, FrozenSet, List, Optional, Sequence, Set, Tuple, Union
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols.dimension import Dimension, DimensionType
@@ -96,6 +96,37 @@ class LinkableEntity:
             date_part=None,
         )
 
+    @property
+    def reference(self) -> EntityReference:  # noqa: D
+        return EntityReference(element_name=self.element_name)
+
+
+@dataclass(frozen=True)
+class LinkableMetric:
+    """Describes how a metric can be realized by joining based on entity links."""
+
+    # Does it make sense to have this attribute?
+    semantic_model_origin: SemanticModelReference
+    element_name: str
+    properties: FrozenSet[LinkableElementProperties]
+    entity_links: Tuple[EntityReference, ...]
+    join_path: Tuple[SemanticModelJoinPathElement, ...]
+    # what about joining on dimensions?
+    # Add properties?
+
+    @property
+    def path_key(self) -> ElementPathKey:  # noqa: D
+        return ElementPathKey(
+            element_name=self.element_name,
+            entity_links=self.entity_links,
+            time_granularity=None,
+            date_part=None,
+        )
+
+    @property
+    def reference(self) -> MetricReference:  # noqa: D
+        return MetricReference(element_name=self.element_name)
+
 
 @dataclass(frozen=True)
 class LinkableElementSet:
@@ -117,6 +148,7 @@ class LinkableElementSet:
     # }
     path_key_to_linkable_dimensions: Dict[ElementPathKey, Tuple[LinkableDimension, ...]]
     path_key_to_linkable_entities: Dict[ElementPathKey, Tuple[LinkableEntity, ...]]
+    path_key_to_linkable_metrics: Dict[ElementPathKey, Tuple[LinkableMetric, ...]]
 
     @staticmethod
     def merge_by_path_key(linkable_element_sets: Sequence[LinkableElementSet]) -> LinkableElementSet:
@@ -126,12 +158,15 @@ class LinkableElementSet:
         """
         key_to_linkable_dimensions: Dict[ElementPathKey, List[LinkableDimension]] = defaultdict(list)
         key_to_linkable_entities: Dict[ElementPathKey, List[LinkableEntity]] = defaultdict(list)
+        key_to_linkable_metrics: Dict[ElementPathKey, List[LinkableMetric]] = defaultdict(list)
 
         for linkable_element_set in linkable_element_sets:
             for path_key, linkable_dimensions in linkable_element_set.path_key_to_linkable_dimensions.items():
                 key_to_linkable_dimensions[path_key].extend(linkable_dimensions)
             for path_key, linkable_entities in linkable_element_set.path_key_to_linkable_entities.items():
                 key_to_linkable_entities[path_key].extend(linkable_entities)
+            for path_key, linkable_metrics in linkable_element_set.path_key_to_linkable_metrics.items():
+                key_to_linkable_metrics[path_key].extend(linkable_metrics)
 
         # Convert the dictionaries to use tuples instead of lists.
         return LinkableElementSet(
@@ -141,6 +176,9 @@ class LinkableElementSet:
             path_key_to_linkable_entities={
                 path_key: tuple(entities) for path_key, entities in key_to_linkable_entities.items()
             },
+            path_key_to_linkable_metrics={
+                path_key: tuple(metrics) for path_key, metrics in key_to_linkable_metrics.items()
+            },
         )
 
     @staticmethod
@@ -148,12 +186,11 @@ class LinkableElementSet:
         """Find the intersection of all elements in the sets by path key.
 
         This is useful to figure out the common dimensions that are possible to query with multiple metrics. You would
-        find the LinakbleSpecSet for each metric in the query, then do an intersection of the sets.
+        find the LinkableSpecSet for each metric in the query, then do an intersection of the sets.
         """
         if len(linkable_element_sets) == 0:
             return LinkableElementSet(
-                path_key_to_linkable_dimensions={},
-                path_key_to_linkable_entities={},
+                path_key_to_linkable_dimensions={}, path_key_to_linkable_entities={}, path_key_to_linkable_metrics={}
             )
 
         # Find path keys that are common to all LinkableElementSets.
@@ -171,9 +208,17 @@ class LinkableElementSet:
             ]
         )
 
+        common_linkable_metric_path_keys: Set[ElementPathKey] = set.intersection(
+            *[
+                set(linkable_element_set.path_key_to_linkable_metrics.keys())
+                for linkable_element_set in linkable_element_sets
+            ]
+        )
+
         # Create a new LinkableElementSet that only includes items where the path key is common to all sets.
         join_path_to_linkable_dimensions: Dict[ElementPathKey, Set[LinkableDimension]] = defaultdict(set)
         join_path_to_linkable_entities: Dict[ElementPathKey, Set[LinkableEntity]] = defaultdict(set)
+        join_path_to_linkable_metrics: Dict[ElementPathKey, Set[LinkableMetric]] = defaultdict(set)
 
         for linkable_element_set in linkable_element_sets:
             for path_key, linkable_dimensions in linkable_element_set.path_key_to_linkable_dimensions.items():
@@ -182,6 +227,9 @@ class LinkableElementSet:
             for path_key, linkable_entities in linkable_element_set.path_key_to_linkable_entities.items():
                 if path_key in common_linkable_entity_path_keys:
                     join_path_to_linkable_entities[path_key].update(linkable_entities)
+            for path_key, linkable_metrics in linkable_element_set.path_key_to_linkable_metrics.items():
+                if path_key in common_linkable_metric_path_keys:
+                    join_path_to_linkable_metrics[path_key].update(linkable_metrics)
 
         return LinkableElementSet(
             path_key_to_linkable_dimensions={
@@ -205,6 +253,14 @@ class LinkableElementSet:
                 )
                 for path_key, entities in join_path_to_linkable_entities.items()
             },
+            path_key_to_linkable_metrics={
+                path_key: tuple(
+                    sorted(
+                        metrics, key=lambda linkable_metric: linkable_metric.semantic_model_origin.semantic_model_name
+                    )
+                )
+                for path_key, metrics in join_path_to_linkable_metrics.items()
+            },
         )
 
     def filter(
@@ -221,6 +277,7 @@ class LinkableElementSet:
         """
         key_to_linkable_dimensions: Dict[ElementPathKey, Tuple[LinkableDimension, ...]] = {}
         key_to_linkable_entities: Dict[ElementPathKey, Tuple[LinkableEntity, ...]] = {}
+        key_to_linkable_metrics: Dict[ElementPathKey, Tuple[LinkableMetric, ...]] = {}
 
         for path_key, linkable_dimensions in self.path_key_to_linkable_dimensions.items():
             filtered_linkable_dimensions = tuple(
@@ -250,9 +307,24 @@ class LinkableElementSet:
             if len(filtered_linkable_entities) > 0:
                 key_to_linkable_entities[path_key] = filtered_linkable_entities
 
+        for path_key, linkable_metrics in self.path_key_to_linkable_metrics.items():
+            filtered_linkable_metrics = tuple(
+                linkable_metric
+                for linkable_metric in linkable_metrics
+                if len(linkable_metric.properties.intersection(with_any_of)) > 0
+                and len(linkable_metric.properties.intersection(without_any_of)) == 0
+                and (
+                    len(without_all_of) == 0
+                    or linkable_metric.properties.intersection(without_all_of) != without_all_of
+                )
+            )
+            if len(filtered_linkable_metrics) > 0:
+                key_to_linkable_metrics[path_key] = filtered_linkable_metrics
+
         return LinkableElementSet(
             path_key_to_linkable_dimensions=key_to_linkable_dimensions,
             path_key_to_linkable_entities=key_to_linkable_entities,
+            path_key_to_linkable_metrics=key_to_linkable_metrics,
         )
 
     @property
@@ -298,6 +370,11 @@ class LinkableElementSet:
                 path_key: linkable_entities
                 for path_key, linkable_entities in self.path_key_to_linkable_entities.items()
                 if len(linkable_entities) <= 1
+            },
+            path_key_to_linkable_metrics={
+                path_key: linkable_metrics
+                for path_key, linkable_metrics in self.path_key_to_linkable_metrics.items()
+                if len(linkable_metrics) <= 1
             },
         )
 
@@ -379,12 +456,12 @@ class SemanticModelJoinPath:
         """Given the current path, generate the respective linkable elements from the last semantic model in the path."""
         entity_links = tuple(x.join_on_entity for x in self.path_elements)
 
-        assert len(self.path_elements) > 0
-        semantic_model = semantic_model_accessor.get_by_reference(self.path_elements[-1].semantic_model_reference)
+        semantic_model = semantic_model_accessor.get_by_reference(self.last_semantic_model_reference)
         assert semantic_model
 
         linkable_dimensions: List[LinkableDimension] = []
         linkable_entities: List[LinkableEntity] = []
+        linkable_metrics: List[LinkableMetric] = []
 
         for dimension in semantic_model.dimensions:
             dimension_type = dimension.type
@@ -426,6 +503,17 @@ class SemanticModelJoinPath:
                     )
                 )
 
+        linkable_metrics = [
+            LinkableMetric(
+                element_name=metric.element_name,
+                entity_links=entity_links,
+                join_path=self.path_elements,
+                semantic_model_origin=semantic_model.reference,
+                properties=with_properties,
+            )
+            for metric in self.get_metrics_for_join_path_element(self.last_path_element)
+        ]
+
         return LinkableElementSet(
             path_key_to_linkable_dimensions={
                 linkable_dimension.path_key: (linkable_dimension,) for linkable_dimension in linkable_dimensions
@@ -433,13 +521,20 @@ class SemanticModelJoinPath:
             path_key_to_linkable_entities={
                 linkable_entity.path_key: (linkable_entity,) for linkable_entity in linkable_entities
             },
+            path_key_to_linkable_metrics={
+                linkable_metric.path_key: (linkable_metric,) for linkable_metric in linkable_metrics
+            },
         )
+
+    @property
+    def last_path_element(self) -> SemanticModelJoinPathElement:  # noqa: D
+        assert len(self.path_elements) > 0
+        return self.path_elements[-1]
 
     @property
     def last_semantic_model_reference(self) -> SemanticModelReference:
         """The last semantic model that would be joined in this path."""
-        assert len(self.path_elements) > 0
-        return self.path_elements[-1].semantic_model_reference
+        return self.last_path_element.semantic_model_reference
 
 
 class ValidLinkableSpecResolver:
@@ -479,9 +574,21 @@ class ValidLinkableSpecResolver:
                 self._entity_to_semantic_model[entity.reference.element_name].append(semantic_model)
 
         self._metric_to_linkable_element_sets: Dict[str, List[LinkableElementSet]] = {}
+        self._join_path_elements_to_metrics: Dict[SemanticModelJoinPathElement, Set[MetricReference]] = {}
 
         start_time = time.time()
         for metric in self._semantic_manifest.metrics:
+            metric_reference = MetricReference(metric.name)
+            linkable_element_set_for_metric = self.get_linkable_elements_for_metrics([metric_reference])
+            for linkable_entities in linkable_element_set_for_metric.path_key_to_linkable_entities.values():
+                for linkable_entity in linkable_entities:
+                    join_path_element = SemanticModelJoinPathElement(
+                        semantic_model_reference=linkable_entity.semantic_model_origin,
+                        join_on_entity=linkable_entity.reference,
+                    )
+                    metrics = self._join_path_elements_to_metrics.get(join_path_element, set())
+                    metrics.add(metric_reference)
+                    self._join_path_elements_to_metrics[join_path_element] = metrics
             linkable_sets_for_measure = []
             for measure in metric.measure_references:
                 # Cumulative metrics currently can't be queried by other time granularities.
@@ -611,6 +718,7 @@ class ValidLinkableSpecResolver:
             path_key_to_linkable_entities={
                 linkable_entity.path_key: (linkable_entity,) for linkable_entity in linkable_entities
             },
+            path_key_to_linkable_metrics={},
         )
 
     def _get_semantic_models_with_joinable_entity(
@@ -683,7 +791,7 @@ class ValidLinkableSpecResolver:
             if defined_granularity.is_smaller_than_or_equal(time_granularity)
         )
 
-        # For each of the possible time granularities, create a LinkableDimension for each one.
+        # For each of the possible time granularities, create a LinkableDimension.
         path_key_to_linkable_dimensions: Dict[ElementPathKey, List[LinkableDimension]] = defaultdict(list)
         for time_granularity in possible_metric_time_granularities:
             possible_date_parts: Sequence[Optional[DatePart]] = (
@@ -708,13 +816,15 @@ class ValidLinkableSpecResolver:
                         join_path=(),
                         # Anything that's not at the base time granularity of the measure's aggregation time dimension
                         # should be considered derived.
-                        properties=frozenset({LinkableElementProperties.METRIC_TIME})
-                        if time_granularity is defined_granularity and date_part is None
-                        else frozenset(
-                            {
-                                LinkableElementProperties.METRIC_TIME,
-                                LinkableElementProperties.DERIVED_TIME_GRANULARITY,
-                            }
+                        properties=(
+                            frozenset({LinkableElementProperties.METRIC_TIME})
+                            if time_granularity is defined_granularity and date_part is None
+                            else frozenset(
+                                {
+                                    LinkableElementProperties.METRIC_TIME,
+                                    LinkableElementProperties.DERIVED_TIME_GRANULARITY,
+                                }
+                            )
                         ),
                         time_granularity=time_granularity,
                         date_part=date_part,
@@ -727,6 +837,7 @@ class ValidLinkableSpecResolver:
                 for path_key, linkable_dimensions in path_key_to_linkable_dimensions.items()
             },
             path_key_to_linkable_entities={},
+            path_key_to_linkable_metrics={},
         )
 
     def _get_joined_elements(self, measure_semantic_model: SemanticModel) -> LinkableElementSet:
@@ -763,9 +874,11 @@ class ValidLinkableSpecResolver:
 
         # Create multi-hop elements. At each iteration, we generate the list of valid elements based on the current join
         # path, extend all paths to include the next valid semantic model, then repeat.
-        multi_hop_elements = LinkableElementSet(path_key_to_linkable_dimensions={}, path_key_to_linkable_entities={})
+        multi_hop_elements = LinkableElementSet(
+            path_key_to_linkable_dimensions={}, path_key_to_linkable_entities={}, path_key_to_linkable_metrics={}
+        )
 
-        for i in range(self._max_entity_links - 1):
+        for _ in range(self._max_entity_links - 1):
             new_join_paths: List[SemanticModelJoinPath] = []
             for join_path in join_paths:
                 new_join_paths.extend(
@@ -790,6 +903,10 @@ class ValidLinkableSpecResolver:
                 )
             )
             join_paths = new_join_paths
+        # Refactor this method to be: get all valid join paths (single or multihop), add linkable elements, add metrics
+        # What about joining metrics by dimension? Is that a thing we can do? If so, how? Which dimensions are valid?
+        # TODO: use the folowing to add metrics here!
+        self._join_path_elements_to_metrics[join_path.last_path_element]
 
         return LinkableElementSet.merge_by_path_key((single_hop_elements, multi_hop_elements))
 
@@ -844,8 +961,8 @@ class ValidLinkableSpecResolver:
     def get_linkable_elements_for_metrics(
         self,
         metric_references: Sequence[MetricReference],
-        with_any_of: FrozenSet[LinkableElementProperties],
-        without_any_of: FrozenSet[LinkableElementProperties],
+        with_any_of: FrozenSet[LinkableElementProperties] = LinkableElementProperties.all_properties(),
+        without_any_of: FrozenSet[LinkableElementProperties] = frozenset(),
     ) -> LinkableElementSet:
         """Gets the valid linkable elements that are common to all requested metrics."""
         linkable_element_sets = []

@@ -1,16 +1,13 @@
 from __future__ import annotations
 
-from typing import Optional, Sequence
+from typing import Sequence
 
 from dbt_semantic_interfaces.call_parameter_sets import (
     MetricCallParameterSet,
 )
-from dbt_semantic_interfaces.naming.dundered import DunderedNameFormatter
 from dbt_semantic_interfaces.protocols.protocol_hint import ProtocolHint
 from dbt_semantic_interfaces.protocols.query_interface import QueryInterfaceMetric, QueryInterfaceMetricFactory
-from dbt_semantic_interfaces.references import MetricReference, LinkableElementReference
-from dbt_semantic_interfaces.type_enums import TimeGranularity
-from dbt_semantic_interfaces.type_enums.date_part import DatePart
+from dbt_semantic_interfaces.references import LinkableElementReference, MetricReference
 from typing_extensions import override
 
 from metricflow.errors.errors import InvalidQuerySyntax
