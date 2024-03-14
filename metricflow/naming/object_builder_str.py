@@ -5,10 +5,11 @@ from typing import Optional, Sequence
 from dbt_semantic_interfaces.call_parameter_sets import (
     DimensionCallParameterSet,
     EntityCallParameterSet,
+    MetricCallParameterSet,
     TimeDimensionCallParameterSet,
 )
 from dbt_semantic_interfaces.naming.keywords import DUNDER
-from dbt_semantic_interfaces.references import EntityReference
+from dbt_semantic_interfaces.references import EntityReference, LinkableElementReference
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from typing_extensions import override
@@ -29,6 +30,18 @@ class ObjectBuilderNameConverter:
         initializer_parameter_str = ObjectBuilderNameConverter.initializer_parameter_str(
             element_name=parameter_set.entity_reference.element_name,
             entity_links=parameter_set.entity_path,
+            group_by=(),
+            time_granularity=None,
+            date_part=None,
+        )
+        return f"Entity({initializer_parameter_str})"
+
+    @staticmethod
+    def input_str_from_metric_call_parameter_set(parameter_set: MetricCallParameterSet) -> str:  # noqa: D
+        initializer_parameter_str = ObjectBuilderNameConverter.initializer_parameter_str(
+            element_name=parameter_set.metric_reference.element_name,
+            entity_links=(),
+            group_by=parameter_set.group_by,
             time_granularity=None,
             date_part=None,
         )
@@ -38,6 +51,7 @@ class ObjectBuilderNameConverter:
     def initializer_parameter_str(
         element_name: str,
         entity_links: Sequence[EntityReference],
+        group_by: Sequence[LinkableElementReference],
         time_granularity: Optional[TimeGranularity],
         date_part: Optional[DatePart],
     ) -> str:
@@ -75,6 +89,7 @@ class ObjectBuilderNameConverter:
                 initializer_parameter_str = ObjectBuilderNameConverter.initializer_parameter_str(
                     element_name=entity_spec.element_name,
                     entity_links=entity_spec.entity_links,
+                    group_by=(),
                     time_granularity=None,
                     date_part=None,
                 )
@@ -84,6 +99,7 @@ class ObjectBuilderNameConverter:
                 initializer_parameter_str = ObjectBuilderNameConverter.initializer_parameter_str(
                     element_name=dimension_spec.element_name,
                     entity_links=dimension_spec.entity_links,
+                    group_by=(),
                     time_granularity=None,
                     date_part=None,
                 )
@@ -93,8 +109,19 @@ class ObjectBuilderNameConverter:
                 initializer_parameter_str = ObjectBuilderNameConverter.initializer_parameter_str(
                     element_name=time_dimension_spec.element_name,
                     entity_links=time_dimension_spec.entity_links,
+                    group_by=(),
                     time_granularity=time_dimension_spec.time_granularity,
                     date_part=time_dimension_spec.date_part,
+                )
+                names_to_return.append(f"TimeDimension({initializer_parameter_str})")
+
+            for metric_spec in spec_set.metric_specs:
+                initializer_parameter_str = ObjectBuilderNameConverter.initializer_parameter_str(
+                    element_name=metric_spec.element_name,
+                    entity_links=(),
+                    group_by=(),  # how to get from spec?
+                    time_granularity=None,
+                    date_part=None,
                 )
                 names_to_return.append(f"TimeDimension({initializer_parameter_str})")
 
@@ -116,6 +143,7 @@ class ObjectBuilderNameConverter:
         initializer_parameter_str = ObjectBuilderNameConverter.initializer_parameter_str(
             element_name=parameter_set.dimension_reference.element_name,
             entity_links=parameter_set.entity_path,
+            group_by=(),
             time_granularity=None,
             date_part=None,
         )
@@ -128,6 +156,7 @@ class ObjectBuilderNameConverter:
         initializer_parameter_str = ObjectBuilderNameConverter.initializer_parameter_str(
             element_name=parameter_set.time_dimension_reference.element_name,
             entity_links=parameter_set.entity_path,
+            group_by=(),
             time_granularity=None,
             date_part=None,
         )
