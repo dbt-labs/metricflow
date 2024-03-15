@@ -316,18 +316,18 @@ class SemanticModelLookup(SemanticModelAccessor):
 
     @staticmethod
     @override
-    def entity_links_for_local_elements(semantic_model: SemanticModel) -> Sequence[EntityReference]:
+    def group_by_links_for_local_elements(semantic_model: SemanticModel) -> Sequence[EntityReference]:
         primary_entity_reference = semantic_model.primary_entity_reference
 
-        possible_entity_links = set()
+        possible_group_by_links = set()
         if primary_entity_reference is not None:
-            possible_entity_links.add(primary_entity_reference)
+            possible_group_by_links.add(primary_entity_reference)
 
         for entity in semantic_model.entities:
             if entity.is_linkable_entity_type:
-                possible_entity_links.add(entity.reference)
+                possible_group_by_links.add(entity.reference)
 
-        return sorted(possible_entity_links, key=lambda entity_reference: entity_reference.element_name)
+        return sorted(possible_group_by_links, key=lambda entity_reference: entity_reference.element_name)
 
     def get_element_spec_for_name(self, element_name: str) -> LinkableInstanceSpec:  # noqa: D
         if TimeDimensionReference(element_name=element_name) in self._dimension_ref_to_spec:
@@ -351,15 +351,15 @@ class SemanticModelLookup(SemanticModelAccessor):
         ), f"Expected exactly one semantic model for measure {measure_reference}, but found semantic models {semantic_models}."
         semantic_model = semantic_models[0]
 
-        entity_link = self.resolved_primary_entity(semantic_model)
-        assert entity_link is not None, (
+        group_by_link = self.resolved_primary_entity(semantic_model)
+        assert group_by_link is not None, (
             f"Expected semantic model {semantic_model} to have a primary entity since it has a "
             "measure requiring an agg_time_dimension, but found none.",
         )
 
         return ElementPathKey(
             element_name=agg_time_dimension.element_name,
-            entity_links=(entity_link,),
+            group_by_links=(group_by_link,),
             time_granularity=None,
             date_part=None,
         )
@@ -371,5 +371,5 @@ class SemanticModelLookup(SemanticModelAccessor):
         path_key = self.get_agg_time_dimension_path_key_for_measure(measure_reference)
         return TimeDimensionSpec.generate_possible_specs_for_time_dimension(
             time_dimension_reference=TimeDimensionReference(element_name=path_key.element_name),
-            entity_links=path_key.entity_links,
+            group_by_links=path_key.group_by_links,
         )

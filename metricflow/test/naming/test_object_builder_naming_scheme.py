@@ -22,7 +22,7 @@ def test_input_str(object_builder_naming_scheme: ObjectBuilderNamingScheme) -> N
         object_builder_naming_scheme.input_str(
             DimensionSpec(
                 element_name="country",
-                entity_links=(EntityReference(element_name="booking"), EntityReference(element_name="listing")),
+                group_by_links=(EntityReference(element_name="booking"), EntityReference(element_name="listing")),
             )
         )
         == "Dimension('listing__country', entity_path=['booking'])"
@@ -31,7 +31,7 @@ def test_input_str(object_builder_naming_scheme: ObjectBuilderNamingScheme) -> N
     assert object_builder_naming_scheme.input_str(
         TimeDimensionSpec(
             element_name="creation_time",
-            entity_links=(EntityReference(element_name="booking"), EntityReference(element_name="listing")),
+            group_by_links=(EntityReference(element_name="booking"), EntityReference(element_name="listing")),
             time_granularity=TimeGranularity.MONTH,
             date_part=DatePart.DAY,
         )
@@ -41,7 +41,7 @@ def test_input_str(object_builder_naming_scheme: ObjectBuilderNamingScheme) -> N
         object_builder_naming_scheme.input_str(
             EntitySpec(
                 element_name="user",
-                entity_links=(EntityReference(element_name="booking"), EntityReference(element_name="listing")),
+                group_by_links=(EntityReference(element_name="booking"), EntityReference(element_name="listing")),
             )
         )
         == "Entity('listing__user', entity_path=['booking'])"
@@ -72,7 +72,7 @@ def test_spec_pattern(  # noqa: D
     ) == (
         DimensionSpec(
             element_name="country",
-            entity_links=(
+            group_by_links=(
                 EntityReference(element_name="booking"),
                 EntityReference(element_name="listing"),
             ),
@@ -87,7 +87,7 @@ def test_spec_pattern(  # noqa: D
     ) == (
         TimeDimensionSpec(
             element_name="creation_time",
-            entity_links=(EntityReference("booking"), EntityReference("listing")),
+            group_by_links=(EntityReference("booking"), EntityReference("listing")),
             time_granularity=TimeGranularity.MONTH,
             date_part=DatePart.DAY,
         ),
@@ -104,6 +104,6 @@ def test_spec_pattern(  # noqa: D
     ) == (
         EntitySpec(
             element_name="user",
-            entity_links=(EntityReference(element_name="booking"), EntityReference(element_name="listing")),
+            group_by_links=(EntityReference(element_name="booking"), EntityReference(element_name="listing")),
         ),
     )

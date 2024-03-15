@@ -41,7 +41,7 @@ def test_cyclic_join(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="capacity_latest",
-                    entity_links=(EntityReference(element_name="cyclic_entity"),),
+                    group_by_links=(EntityReference(element_name="cyclic_entity"),),
                 ),
             ),
         )

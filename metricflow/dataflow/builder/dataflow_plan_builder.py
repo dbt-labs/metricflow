@@ -695,7 +695,7 @@ class DataflowPlanBuilder:
     @staticmethod
     def _contains_multihop_linkables(linkable_specs: Sequence[LinkableInstanceSpec]) -> bool:
         """Returns true if any of the linkable specs requires a multi-hop join to realize."""
-        return any(len(x.entity_links) > 1 for x in linkable_specs)
+        return any(len(x.group_by_links) > 1 for x in linkable_specs)
 
     def _get_semantic_model_names_for_measures(self, measures: Sequence[MeasureSpec]) -> Set[str]:
         """Return the names of the semantic models needed to compute the input measures.

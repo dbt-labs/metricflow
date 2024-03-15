@@ -13,13 +13,13 @@ logger = logging.getLogger(__name__)
 def test_comparison_key_excluding_time_grain() -> None:  # noqa: D
     spec0 = TimeDimensionSpec(
         element_name="element0",
-        entity_links=(EntityReference("entity0"),),
+        group_by_links=(EntityReference("entity0"),),
         time_granularity=TimeGranularity.DAY,
     )
 
     spec1 = TimeDimensionSpec(
         element_name="element0",
-        entity_links=(EntityReference("entity0"),),
+        group_by_links=(EntityReference("entity0"),),
         time_granularity=TimeGranularity.MONTH,
     )
     assert spec0.comparison_key(exclude_fields=[]) != spec1.comparison_key(exclude_fields=[])

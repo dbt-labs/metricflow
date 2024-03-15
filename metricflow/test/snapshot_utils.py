@@ -350,10 +350,12 @@ def assert_linkable_element_set_snapshot_equal(  # noqa: D
             rows.append(
                 (
                     # Checking a limited set of fields as the result is large due to the paths in the object.
-                    linkable_dimension.semantic_model_origin.semantic_model_name
-                    if linkable_dimension.semantic_model_origin
-                    else None,
-                    tuple(entity_link.element_name for entity_link in linkable_dimension.entity_links),
+                    (
+                        linkable_dimension.semantic_model_origin.semantic_model_name
+                        if linkable_dimension.semantic_model_origin
+                        else None
+                    ),
+                    tuple(group_by_link.element_name for group_by_link in linkable_dimension.group_by_links),
                     linkable_dimension.element_name,
                     linkable_dimension.time_granularity.name if linkable_dimension.time_granularity is not None else "",
                     linkable_dimension.date_part.name if linkable_dimension.date_part is not None else "",
@@ -369,7 +371,7 @@ def assert_linkable_element_set_snapshot_equal(  # noqa: D
                 (
                     # Checking a limited set of fields as the result is large due to the paths in the object.
                     linkable_entity.semantic_model_origin.semantic_model_name,
-                    tuple(entity_link.element_name for entity_link in linkable_entity.entity_links),
+                    tuple(group_by_link.element_name for group_by_link in linkable_entity.group_by_links),
                     linkable_entity.element_name,
                     "",
                     "",

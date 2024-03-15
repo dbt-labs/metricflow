@@ -16,7 +16,7 @@
                     <!-- include_spec =                                               -->
                     <!--   TimeDimensionSpec(                                         -->
                     <!--     element_name='paid_at',                                  -->
-                    <!--     entity_links=(EntityReference(element_name='booking'),), -->
+                    <!--     group_by_links=(EntityReference(element_name='booking'),), -->
                     <!--     time_granularity=DAY,                                    -->
                     <!--   )                                                          -->
                     <!-- distinct = False -->

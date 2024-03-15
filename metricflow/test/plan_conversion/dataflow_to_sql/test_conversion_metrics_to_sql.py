@@ -29,7 +29,7 @@ def test_conversion_rate(
     """Test conversion metric data flow plan rendering."""
     dimension_spec = DimensionSpec(
         element_name="referrer_id",
-        entity_links=(EntityReference(element_name="visit"),),
+        group_by_links=(EntityReference(element_name="visit"),),
     )
     metric_spec = MetricSpec(element_name="visit_buy_conversion_rate")
 
@@ -60,10 +60,10 @@ def test_conversion_rate_with_window(
     """Test conversion metric with a window data flow plan rendering."""
     dimension_spec = DimensionSpec(
         element_name="referrer_id",
-        entity_links=(EntityReference(element_name="visit"),),
+        group_by_links=(EntityReference(element_name="visit"),),
     )
     metric_time_spec = TimeDimensionSpec(
-        element_name="metric_time", entity_links=(), time_granularity=TimeGranularity.DAY
+        element_name="metric_time", group_by_links=(), time_granularity=TimeGranularity.DAY
     )
     metric_spec = MetricSpec(element_name="visit_buy_conversion_rate_7days")
 
@@ -148,10 +148,10 @@ def test_conversion_rate_with_constant_properties(
     metric_spec = MetricSpec(element_name="visit_buy_conversion_rate_by_session")
     dimension_spec = DimensionSpec(
         element_name="referrer_id",
-        entity_links=(EntityReference(element_name="visit"),),
+        group_by_links=(EntityReference(element_name="visit"),),
     )
     metric_time_spec = TimeDimensionSpec(
-        element_name="metric_time", entity_links=(), time_granularity=TimeGranularity.DAY
+        element_name="metric_time", group_by_links=(), time_granularity=TimeGranularity.DAY
     )
     dataflow_plan = dataflow_plan_builder.build_plan(
         query_spec=MetricFlowQuerySpec(
@@ -181,7 +181,7 @@ def test_conversion_metric_join_to_timespine_and_fill_nulls_with_0(
     """Test conversion metric that joins to time spine and fills nulls with 0."""
     metric_spec = MetricSpec(element_name="visit_buy_conversion_rate_7days_fill_nulls_with_0")
     metric_time_spec = TimeDimensionSpec(
-        element_name="metric_time", entity_links=(), time_granularity=TimeGranularity.DAY
+        element_name="metric_time", group_by_links=(), time_granularity=TimeGranularity.DAY
     )
     dataflow_plan = dataflow_plan_builder.build_plan(
         query_spec=MetricFlowQuerySpec(

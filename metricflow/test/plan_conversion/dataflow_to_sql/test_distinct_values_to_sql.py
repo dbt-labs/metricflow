@@ -25,8 +25,8 @@ def test_dimensions_requiring_join(
 ) -> None:
     """Tests querying 2 dimensions that require a join."""
     dimension_specs = (
-        DimensionSpec(element_name="home_state_latest", entity_links=(EntityReference(element_name="user"),)),
-        DimensionSpec(element_name="is_lux_latest", entity_links=(EntityReference(element_name="listing"),)),
+        DimensionSpec(element_name="home_state_latest", group_by_links=(EntityReference(element_name="user"),)),
+        DimensionSpec(element_name="is_lux_latest", group_by_links=(EntityReference(element_name="listing"),)),
     )
     dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
         query_spec=MetricFlowQuerySpec(dimension_specs=dimension_specs)

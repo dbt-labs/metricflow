@@ -9,7 +9,7 @@ from typing_extensions import override
 from metricflow.query.group_by_item.path_prefixable import PathPrefixable
 from metricflow.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow.specs.patterns.spec_pattern import SpecPattern
-from metricflow.specs.specs import InstanceSpecSet, LinkableInstanceSpec, LinkableSpecSet
+from metricflow.specs.specs import InstanceSpec, InstanceSpecSet, LinkableSpecSet
 
 
 @dataclass(frozen=True)
@@ -29,7 +29,7 @@ class GroupByItemCandidateSet(PathPrefixable):
     error messages, you start analyzing from the leaf node.
     """
 
-    specs: Tuple[LinkableInstanceSpec, ...]
+    specs: Tuple[InstanceSpec, ...]
     measure_paths: Tuple[MetricFlowQueryResolutionPath, ...]
     path_from_leaf_node: MetricFlowQueryResolutionPath
 

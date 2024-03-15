@@ -227,7 +227,7 @@ class SemanticModelJoinEvaluator:
         matching_instances: List[EntityInstance] = []
         for entity_instance in instance_set.entity_instances:
             assert len(entity_instance.defined_from) == 1
-            if len(entity_instance.spec.entity_links) == 0 and entity_instance.spec.reference == entity_reference:
+            if len(entity_instance.spec.group_by_links) == 0 and entity_instance.spec.reference == entity_reference:
                 matching_instances.append(entity_instance)
 
         assert len(matching_instances) == 1, (

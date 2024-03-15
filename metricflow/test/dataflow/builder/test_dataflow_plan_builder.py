@@ -44,7 +44,7 @@ def test_simple_plan(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="is_instant",
-                    entity_links=(EntityReference("booking"),),
+                    group_by_links=(EntityReference("booking"),),
                 ),
             ),
         )
@@ -77,7 +77,7 @@ def test_primary_entity_dimension(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="is_instant",
-                    entity_links=(EntityReference(element_name="booking"),),
+                    group_by_links=(EntityReference(element_name="booking"),),
                 ),
             ),
         )
@@ -110,11 +110,11 @@ def test_joined_plan(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="is_instant",
-                    entity_links=(EntityReference("booking"),),
+                    group_by_links=(EntityReference("booking"),),
                 ),
                 DimensionSpec(
                     element_name="country_latest",
-                    entity_links=(EntityReference(element_name="listing"),),
+                    group_by_links=(EntityReference(element_name="listing"),),
                 ),
             ),
         )
@@ -214,7 +214,7 @@ def test_multiple_metrics_plan(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="is_instant",
-                    entity_links=(EntityReference("booking"),),
+                    group_by_links=(EntityReference("booking"),),
                 ),
             ),
             time_dimension_specs=(MTD_SPEC_DAY,),
@@ -248,7 +248,7 @@ def test_single_semantic_model_ratio_metrics_plan(
             dimension_specs=(
                 DimensionSpec(
                     element_name="country_latest",
-                    entity_links=(EntityReference(element_name="listing"),),
+                    group_by_links=(EntityReference(element_name="listing"),),
                 ),
             ),
             time_dimension_specs=(MTD_SPEC_DAY,),
@@ -282,7 +282,7 @@ def test_multi_semantic_model_ratio_metrics_plan(
             dimension_specs=(
                 DimensionSpec(
                     element_name="country_latest",
-                    entity_links=(EntityReference(element_name="listing"),),
+                    group_by_links=(EntityReference(element_name="listing"),),
                 ),
             ),
             time_dimension_specs=(MTD_SPEC_DAY,),
@@ -316,7 +316,7 @@ def test_multihop_join_plan(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="customer_name",
-                    entity_links=(
+                    group_by_links=(
                         EntityReference(element_name="account_id"),
                         EntityReference(element_name="customer_id"),
                     ),
@@ -441,7 +441,7 @@ def test_multihop_join_plan_ambiguous_dim(  # noqa: D
                 dimension_specs=(
                     DimensionSpec(
                         element_name="home_country",
-                        entity_links=(
+                        group_by_links=(
                             EntityReference(element_name="listing"),
                             EntityReference(element_name="user"),
                         ),
@@ -665,7 +665,7 @@ def test_common_semantic_model(  # noqa: D
             metric_specs=(MetricSpec(element_name="bookings"), MetricSpec(element_name="booking_value")),
             dimension_specs=(
                 DataSet.metric_time_dimension_spec(TimeGranularity.DAY),
-                DimensionSpec(element_name="country_latest", entity_links=(EntityReference("listing"),)),
+                DimensionSpec(element_name="country_latest", group_by_links=(EntityReference("listing"),)),
             ),
         )
     )
@@ -855,7 +855,7 @@ def test_join_to_time_spine_with_non_metric_time(  # noqa: D
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="bookings_fill_nulls_with_0"),),
             time_dimension_specs=(
-                TimeDimensionSpec(element_name="paid_at", entity_links=(EntityReference("booking"),)),
+                TimeDimensionSpec(element_name="paid_at", group_by_links=(EntityReference("booking"),)),
             ),
         )
     )
@@ -932,7 +932,7 @@ def test_min_max_only_categorical(
     dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
         query_spec=MetricFlowQuerySpec(
             dimension_specs=(
-                DimensionSpec(element_name="country_latest", entity_links=(EntityReference(element_name="listing"),)),
+                DimensionSpec(element_name="country_latest", group_by_links=(EntityReference(element_name="listing"),)),
             ),
             min_max_only=True,
         )
@@ -961,7 +961,7 @@ def test_min_max_only_time(
     dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
         query_spec=MetricFlowQuerySpec(
             time_dimension_specs=(
-                TimeDimensionSpec(element_name="paid_at", entity_links=(EntityReference("booking"),)),
+                TimeDimensionSpec(element_name="paid_at", group_by_links=(EntityReference("booking"),)),
             ),
             min_max_only=True,
         )
@@ -1036,8 +1036,8 @@ def test_metric_time_with_other_dimensions(  # noqa: D
         MetricFlowQuerySpec(
             time_dimension_specs=(MTD_SPEC_DAY, MTD_SPEC_MONTH),
             dimension_specs=(
-                DimensionSpec(element_name="home_state_latest", entity_links=(EntityReference("user"),)),
-                DimensionSpec(element_name="is_lux_latest", entity_links=(EntityReference("listing"),)),
+                DimensionSpec(element_name="home_state_latest", group_by_links=(EntityReference("user"),)),
+                DimensionSpec(element_name="is_lux_latest", group_by_links=(EntityReference("listing"),)),
             ),
         )
     )
@@ -1064,7 +1064,9 @@ def test_dimensions_with_time_constraint(  # noqa: D
     dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
         MetricFlowQuerySpec(
             time_dimension_specs=(MTD_SPEC_MONTH,),
-            dimension_specs=(DimensionSpec(element_name="is_lux_latest", entity_links=(EntityReference("listing"),)),),
+            dimension_specs=(
+                DimensionSpec(element_name="is_lux_latest", group_by_links=(EntityReference("listing"),)),
+            ),
             time_range_constraint=TimeRangeConstraint(
                 start_time=datetime.datetime(2020, 1, 1), end_time=datetime.datetime(2020, 1, 3)
             ),
@@ -1096,7 +1098,7 @@ def test_min_max_only_time_year(
             time_dimension_specs=(
                 TimeDimensionSpec(
                     element_name="paid_at",
-                    entity_links=(EntityReference("booking"),),
+                    group_by_links=(EntityReference("booking"),),
                     time_granularity=TimeGranularity.YEAR,
                 ),
             ),

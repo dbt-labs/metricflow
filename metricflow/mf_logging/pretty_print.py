@@ -378,12 +378,12 @@ def mf_pformat(  # type: ignore
     e.g.
         metricflow.specs.DimensionSpec(
             element_name='country',
-            entity_links=()
+            group_by_links=()
         ),
 
     Instead, the below will print something like:
 
-        DimensionSpec(element_name='country', entity_links=())
+        DimensionSpec(element_name='country', group_by_links=())
 
     Also, this simplifies the object representation in some cases (e.g. Enums) and provides options for a more compact
     string. This is an improvement on pformat_big_objects() in dbt-semantic-interfaces to be more compact and easier

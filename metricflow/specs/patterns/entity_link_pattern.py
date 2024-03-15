@@ -24,9 +24,10 @@ class ParameterSetField(Enum):
     """
 
     ELEMENT_NAME = "element_name"
-    ENTITY_LINKS = "entity_links"
+    ENTITY_LINKS = "group_by_links"
     TIME_GRANULARITY = "time_granularity"
     DATE_PART = "date_part"
+    GROUP_BY_LINKS = "group_by_links"
 
     def __lt__(self, other: Any) -> bool:  # type: ignore[misc]
         """Allow for ordering so that a sequence of these can be consistently represented for test snapshots."""
@@ -46,7 +47,7 @@ class EntityLinkPatternParameterSet:
     # The name of the element in the semantic model
     element_name: Optional[str] = None
     # The entities used for joining semantic models.
-    entity_links: Optional[Tuple[EntityReference, ...]] = None
+    group_by_links: Optional[Tuple[EntityReference, ...]] = None
     # Properties of time dimensions to match.
     time_granularity: Optional[TimeGranularity] = None
     date_part: Optional[DatePart] = None
@@ -55,14 +56,14 @@ class EntityLinkPatternParameterSet:
     def from_parameters(  # noqa: D
         fields_to_compare: Sequence[ParameterSetField],
         element_name: Optional[str] = None,
-        entity_links: Optional[Sequence[EntityReference]] = None,
+        group_by_links: Optional[Sequence[EntityReference]] = None,
         time_granularity: Optional[TimeGranularity] = None,
         date_part: Optional[DatePart] = None,
     ) -> EntityLinkPatternParameterSet:
         return EntityLinkPatternParameterSet(
             fields_to_compare=tuple(sorted(fields_to_compare)),
             element_name=element_name,
-            entity_links=tuple(entity_links) if entity_links is not None else None,
+            group_by_links=tuple(group_by_links) if group_by_links is not None else None,
             time_granularity=time_granularity,
             date_part=date_part,
         )
@@ -87,15 +88,15 @@ class EntityLinkPattern(SpecPattern):
 
     parameter_set: EntityLinkPatternParameterSet
 
-    def _match_entity_links(self, candidate_specs: Sequence[LinkableInstanceSpec]) -> Sequence[LinkableInstanceSpec]:
-        assert self.parameter_set.entity_links is not None
-        num_links_to_check = len(self.parameter_set.entity_links)
+    def _match_group_by_links(self, candidate_specs: Sequence[LinkableInstanceSpec]) -> Sequence[LinkableInstanceSpec]:
+        assert self.parameter_set.group_by_links is not None
+        num_links_to_check = len(self.parameter_set.group_by_links)
         matching_specs: Sequence[LinkableInstanceSpec] = tuple(
             candidate_spec
             for candidate_spec in candidate_specs
             if (
-                self.parameter_set.entity_links[-num_links_to_check:]
-                == candidate_spec.entity_links[-num_links_to_check:]
+                self.parameter_set.group_by_links[-num_links_to_check:]
+                == candidate_spec.group_by_links[-num_links_to_check:]
             )
         )
 
@@ -104,8 +105,8 @@ class EntityLinkPattern(SpecPattern):
 
         # If multiple match, then return only the ones with the shortest entity link path. There could be multiple
         # e.g. booking__listing__country and listing__country will match with listing__country.
-        shortest_entity_link_length = min(len(matching_spec.entity_links) for matching_spec in matching_specs)
-        return tuple(spec for spec in matching_specs if len(spec.entity_links) == shortest_entity_link_length)
+        shortest_group_by_link_length = min(len(matching_spec.group_by_links) for matching_spec in matching_specs)
+        return tuple(spec for spec in matching_specs if len(spec.group_by_links) == shortest_group_by_link_length)
 
     @override
     def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[LinkableInstanceSpec]:
@@ -114,7 +115,7 @@ class EntityLinkPattern(SpecPattern):
 
         # Entity links could be a partial match, so it's handled separately.
         if ParameterSetField.ENTITY_LINKS in self.parameter_set.fields_to_compare:
-            filtered_candidate_specs = self._match_entity_links(filtered_candidate_specs)
+            filtered_candidate_specs = self._match_group_by_links(filtered_candidate_specs)
 
         other_keys_to_check = set(
             field_to_compare.value for field_to_compare in self.parameter_set.fields_to_compare

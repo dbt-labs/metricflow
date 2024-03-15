@@ -9,6 +9,7 @@ from dbt_semantic_interfaces.call_parameter_sets import (
     MetricCallParameterSet,
     TimeDimensionCallParameterSet,
 )
+from dbt_semantic_interfaces.references import LinkableElementReference
 from typing_extensions import override
 
 from metricflow.specs.patterns.entity_link_pattern import (
@@ -16,6 +17,7 @@ from metricflow.specs.patterns.entity_link_pattern import (
     EntityLinkPatternParameterSet,
     ParameterSetField,
 )
+from metricflow.specs.patterns.spec_pattern import SpecPattern
 from metricflow.specs.specs import InstanceSpec, InstanceSpecSet, LinkableInstanceSpec
 
 
@@ -43,7 +45,7 @@ class DimensionPattern(EntityLinkPattern):
                     ParameterSetField.ENTITY_LINKS,
                 ),
                 element_name=dimension_call_parameter_set.dimension_reference.element_name,
-                entity_links=dimension_call_parameter_set.entity_path,
+                group_by_links=dimension_call_parameter_set.entity_path,
             )
         )
 
@@ -82,7 +84,7 @@ class TimeDimensionPattern(EntityLinkPattern):
             parameter_set=EntityLinkPatternParameterSet.from_parameters(
                 fields_to_compare=tuple(fields_to_compare),
                 element_name=time_dimension_call_parameter_set.time_dimension_reference.element_name,
-                entity_links=time_dimension_call_parameter_set.entity_path,
+                group_by_links=time_dimension_call_parameter_set.entity_path,
                 time_granularity=time_dimension_call_parameter_set.time_granularity,
                 date_part=time_dimension_call_parameter_set.date_part,
             )
@@ -110,35 +112,53 @@ class EntityPattern(EntityLinkPattern):
                     ParameterSetField.ENTITY_LINKS,
                 ),
                 element_name=entity_call_parameter_set.entity_reference.element_name,
-                entity_links=entity_call_parameter_set.entity_path,
+                group_by_links=entity_call_parameter_set.entity_path,
             )
         )
 
 
 @dataclass(frozen=True)
-class MetricPattern(EntityLinkPattern):
-    """Similar to EntityPathPattern but only matches dimensions / time dimensions.
+class GroupByMetricPatternParameterSet:
+    """Pattern for joining metrics to semantic models so that they can be used in group bys & filters."""
 
-    Analogous pattern for Dimension() in the object builder naming scheme.
-    """
+    # The name of the metric as defined in the semantic manifest.
+    element_name: str
+    # The group bys used for joining metrics to semantic models.
+    group_by_links: Sequence[LinkableElementReference]
+
+    @staticmethod
+    def from_parameters(  # noqa: D
+        element_name: str, group_by_links: Sequence[LinkableElementReference]
+    ) -> GroupByMetricPatternParameterSet:
+        return GroupByMetricPatternParameterSet(element_name=element_name, group_by_links=group_by_links)
+
+
+@dataclass(frozen=True)
+class GroupByMetricPattern(SpecPattern):
+    """A pattern that matches metrics using the group by specifications."""
+
+    parameter_set: GroupByMetricPatternParameterSet
 
     @override
     def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[LinkableInstanceSpec]:
-        spec_set = InstanceSpecSet.from_specs(candidate_specs)
-        return super().match(spec_set.metric_specs)
+        filtered_candidate_specs = InstanceSpecSet.from_specs(candidate_specs).group_by_metric_specs
+
+        matching_specs: List[InstanceSpec] = []
+        for spec in filtered_candidate_specs:
+            if spec.element_name == self.parameter_set.element_name and {
+                # TODO: should these be ordered? tuples instead of sets? Does order matter for matching metrics? thinking no.
+                group_by.element_name
+                for group_by in spec.group_by_links
+            } == {group_by.element_name for group_by in self.parameter_set.group_by_links}:
+                matching_specs.append(spec)
+
+        return matching_specs
 
     @staticmethod
-    def from_call_parameter_set(  # noqa: D
-        metric_call_parameter_set: MetricCallParameterSet,
-    ) -> MetricPattern:
-        return MetricPattern(
-            parameter_set=EntityLinkPatternParameterSet.from_parameters(
-                fields_to_compare=(
-                    ParameterSetField.ELEMENT_NAME,
-                    ParameterSetField.ENTITY_LINKS,
-                    # add group by! new pattern?
-                ),
+    def from_call_parameter_set(metric_call_parameter_set: MetricCallParameterSet) -> GroupByMetricPattern:  # noqa: D
+        return GroupByMetricPattern(
+            parameter_set=GroupByMetricPatternParameterSet.from_parameters(
                 element_name=metric_call_parameter_set.metric_reference.element_name,
-                entity_links=metric_call_parameter_set.group_by,
+                group_by_links=metric_call_parameter_set.group_by,
             )
         )

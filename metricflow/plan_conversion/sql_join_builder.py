@@ -245,7 +245,7 @@ class SqlQueryPlanJoinBuilder:
 
         left_data_set_metric_time_dimension_instances = sorted(
             left_data_set.data_set.metric_time_dimension_instances,
-            key=lambda x: (x.spec.time_granularity.to_int(), len(x.spec.entity_links)),
+            key=lambda x: (x.spec.time_granularity.to_int(), len(x.spec.group_by_links)),
         )
         assert left_data_set_metric_time_dimension_instances, (
             f"Cannot process join to data set with alias {right_data_set.alias} because it has a validity "

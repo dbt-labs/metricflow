@@ -28,7 +28,7 @@ def test_spec_pattern(metric_naming_scheme: MetricNamingScheme) -> None:  # noqa
         MetricSpec(element_name="metric_0"),
         MetricSpec(element_name="metric_1"),
         # Shouldn't happen in practice, but checks to see that only metric specs are matched.
-        DimensionSpec(element_name="metric_0", entity_links=()),
+        DimensionSpec(element_name="metric_0", group_by_links=()),
     )
 
     assert (MetricSpec(element_name="metric_0"),) == tuple(spec_pattern.match(specs))

@@ -102,7 +102,7 @@ class PreJoinNodeProcessor:
                 for time_dimension_instance in node_output_data_set.instance_set.time_dimension_instances:
                     if (
                         time_dimension_instance.spec.reference == metric_time_dimension_reference
-                        and len(time_dimension_instance.spec.entity_links) == 0
+                        and len(time_dimension_instance.spec.group_by_links) == 0
                     ):
                         constrain_time = True
                         break
@@ -130,7 +130,7 @@ class PreJoinNodeProcessor:
             if entity_spec_in_first_node.reference != entity_reference:
                 continue
 
-            if len(entity_spec_in_first_node.entity_links) > 0:
+            if len(entity_spec_in_first_node.group_by_links) > 0:
                 continue
 
             assert (
@@ -153,12 +153,12 @@ class PreJoinNodeProcessor:
         self, desired_linkable_spec: LinkableInstanceSpec, nodes: Sequence[BaseOutput], join_type: SqlJoinType
     ) -> Sequence[MultiHopJoinCandidate]:
         """Assemble nodes representing all possible one-hop joins."""
-        if len(desired_linkable_spec.entity_links) > MAX_JOIN_HOPS:
+        if len(desired_linkable_spec.group_by_links) > MAX_JOIN_HOPS:
             raise NotImplementedError(
                 f"Multi-hop joins with more than {MAX_JOIN_HOPS} entity links not yet supported. "
                 f"Got: {desired_linkable_spec}"
             )
-        if len(desired_linkable_spec.entity_links) != 2:
+        if len(desired_linkable_spec.group_by_links) != 2:
             return ()
 
         multi_hop_join_candidates: List[MultiHopJoinCandidate] = []
@@ -173,11 +173,11 @@ class PreJoinNodeProcessor:
             if not (
                 self._node_contains_entity(
                     node=first_node_that_could_be_joined,
-                    entity_reference=desired_linkable_spec.entity_links[0],
+                    entity_reference=desired_linkable_spec.group_by_links[0],
                 )
                 and self._node_contains_entity(
                     node=first_node_that_could_be_joined,
-                    entity_reference=desired_linkable_spec.entity_links[1],
+                    entity_reference=desired_linkable_spec.group_by_links[1],
                 )
             ):
                 continue
@@ -186,7 +186,7 @@ class PreJoinNodeProcessor:
                 if not (
                     self._node_contains_entity(
                         node=second_node_that_could_be_joined,
-                        entity_reference=desired_linkable_spec.entity_links[1],
+                        entity_reference=desired_linkable_spec.group_by_links[1],
                     )
                 ):
                     continue
@@ -209,7 +209,7 @@ class PreJoinNodeProcessor:
                     continue
 
                 # The first and second nodes are joined by this entity
-                entity_reference_to_join_first_and_second_nodes = desired_linkable_spec.entity_links[1]
+                entity_reference_to_join_first_and_second_nodes = desired_linkable_spec.group_by_links[1]
 
                 if not self._join_evaluator.is_valid_instance_set_join(
                     left_instance_set=data_set_of_first_node_that_could_be_joined.instance_set,
@@ -244,7 +244,7 @@ class PreJoinNodeProcessor:
                                 JoinDescription(
                                     join_node=filtered_joinable_node,
                                     join_on_entity=LinklessEntitySpec.from_reference(
-                                        desired_linkable_spec.entity_links[1]
+                                        desired_linkable_spec.group_by_links[1]
                                     ),
                                     join_on_partition_dimensions=join_on_partition_dimensions,
                                     join_on_partition_time_dimensions=join_on_partition_time_dimensions,
@@ -258,7 +258,7 @@ class PreJoinNodeProcessor:
                             # entity_spec_in_first_node should already not have entity links since we checked
                             # for that, but using this method for type checking.
                             join_second_node_by_entity=LinklessEntitySpec.from_reference(
-                                desired_linkable_spec.entity_links[1]
+                                desired_linkable_spec.group_by_links[1]
                             ),
                         ),
                     )
@@ -309,14 +309,19 @@ class PreJoinNodeProcessor:
         doesn't mean that the node will be useful, but not having common elements definitely means it's not useful.
         """
         relevant_element_names = {x.element_name for x in desired_linkable_specs}.union(
-            {y.element_name for x in desired_linkable_specs for y in x.entity_links}
+            {
+                y.element_name
+                for x in desired_linkable_specs
+                # TODO: fix typing here; use "group_by_links" as name everywhere
+                for y in (x.group_by_links if hasattr(x, "group_by_links") else x.group_by_links)
+            }
         )
 
         # The metric time dimension is used everywhere, so don't count it unless specifically desired in linkable spec
         # that has entity links.
         metric_time_dimension_used_in_linked_spec = any(
             [
-                len(linkable_spec.entity_links) > 0
+                len(linkable_spec.group_by_links) > 0
                 and linkable_spec.element_name == metric_time_dimension_reference.element_name
                 for linkable_spec in desired_linkable_specs
             ]

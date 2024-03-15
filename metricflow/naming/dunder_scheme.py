@@ -73,7 +73,7 @@ class DunderNamingScheme(QueryItemNamingScheme):
             return EntityLinkPattern(
                 parameter_set=EntityLinkPatternParameterSet.from_parameters(
                     element_name=input_str_parts[0],
-                    entity_links=(),
+                    group_by_links=(),
                     time_granularity=time_grain,
                     date_part=None,
                     fields_to_compare=tuple(fields_to_compare),
@@ -93,7 +93,7 @@ class DunderNamingScheme(QueryItemNamingScheme):
                 return EntityLinkPattern(
                     parameter_set=EntityLinkPatternParameterSet.from_parameters(
                         element_name=input_str_parts[0],
-                        entity_links=(),
+                        group_by_links=(),
                         time_granularity=time_grain,
                         date_part=None,
                         fields_to_compare=fields_to_compare,
@@ -103,7 +103,7 @@ class DunderNamingScheme(QueryItemNamingScheme):
             return EntityLinkPattern(
                 parameter_set=EntityLinkPatternParameterSet.from_parameters(
                     element_name=input_str_parts[-2],
-                    entity_links=tuple(EntityReference(entity_name) for entity_name in input_str_parts[:-2]),
+                    group_by_links=tuple(EntityReference(entity_name) for entity_name in input_str_parts[:-2]),
                     time_granularity=time_grain,
                     date_part=None,
                     fields_to_compare=fields_to_compare,
@@ -114,7 +114,7 @@ class DunderNamingScheme(QueryItemNamingScheme):
         return EntityLinkPattern(
             parameter_set=EntityLinkPatternParameterSet.from_parameters(
                 element_name=input_str_parts[-1],
-                entity_links=tuple(EntityReference(entity_name) for entity_name in input_str_parts[:-1]),
+                group_by_links=tuple(EntityReference(entity_name) for entity_name in input_str_parts[:-1]),
                 time_granularity=None,
                 date_part=None,
                 fields_to_compare=fields_to_compare,
@@ -151,7 +151,7 @@ class _DunderNameTransform(InstanceSpecSetTransform[Sequence[str]]):
         names_to_return = []
 
         for time_dimension_spec in spec_set.time_dimension_specs:
-            items = list(entity_link.element_name for entity_link in time_dimension_spec.entity_links) + [
+            items = list(group_by_link.element_name for group_by_link in time_dimension_spec.group_by_links) + [
                 time_dimension_spec.element_name
             ]
             if time_dimension_spec.date_part is not None:
@@ -161,7 +161,7 @@ class _DunderNameTransform(InstanceSpecSetTransform[Sequence[str]]):
             names_to_return.append(DUNDER.join(items))
 
         for other_group_by_item_specs in spec_set.entity_specs + spec_set.dimension_specs:
-            items = list(entity_link.element_name for entity_link in other_group_by_item_specs.entity_links) + [
+            items = list(group_by_link.element_name for group_by_link in other_group_by_item_specs.group_by_links) + [
                 other_group_by_item_specs.element_name
             ]
             names_to_return.append(DUNDER.join(items))

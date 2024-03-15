@@ -35,7 +35,7 @@ class WhereFilterTimeDimension(WhereFilterDimension):
         Important in the Jinja sandbox.
         """
         call_parameter_set = TimeDimensionCallParameterSet(
-            entity_path=self._entity_links,
+            entity_path=self._group_by_links,
             time_dimension_reference=TimeDimensionReference(self._element_name),
             time_granularity=self._time_grain,
             date_part=self._date_part,
@@ -95,8 +95,8 @@ class WhereFilterTimeDimensionFactory(ProtocolHint[QueryInterfaceTimeDimensionFa
             where_filter_location=self._where_filter_location,
             rendered_spec_tracker=self._rendered_spec_tracker,
             element_name=structured_name.element_name,
-            entity_links=tuple(EntityReference(entity_link_name.lower()) for entity_link_name in entity_path)
-            + structured_name.entity_links,
+            group_by_links=tuple(EntityReference(group_by_link_name.lower()) for group_by_link_name in entity_path)
+            + structured_name.group_by_links,
             time_grain=TimeGranularity(time_granularity_name.lower()) if time_granularity_name else None,
             date_part=DatePart(date_part_name.lower()) if date_part_name else None,
         )

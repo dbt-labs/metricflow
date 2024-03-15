@@ -16,7 +16,7 @@
             <!--           dimension_specs=(                         -->
             <!--             DimensionSpec(                          -->
             <!--               element_name='country_latest',        -->
-            <!--               entity_links=(                        -->
+            <!--               group_by_links=(                        -->
             <!--                 EntityReference(                    -->
             <!--                   element_name='listing',           -->
             <!--                 ),                                  -->
@@ -37,7 +37,7 @@
                     <!-- include_spec =                                               -->
                     <!--   DimensionSpec(                                             -->
                     <!--     element_name='is_instant',                               -->
-                    <!--     entity_links=(EntityReference(element_name='booking'),), -->
+                    <!--     group_by_links=(EntityReference(element_name='booking'),), -->
                     <!--   )                                                          -->
                     <!-- distinct = False -->
                     <WhereConstraintNode>
@@ -51,7 +51,7 @@
                         <!--       dimension_specs=(                         -->
                         <!--         DimensionSpec(                          -->
                         <!--           element_name='country_latest',        -->
-                        <!--           entity_links=(                        -->
+                        <!--           group_by_links=(                        -->
                         <!--             EntityReference(                    -->
                         <!--               element_name='listing',           -->
                         <!--             ),                                  -->
@@ -68,12 +68,12 @@
                             <!-- include_spec =                                               -->
                             <!--   DimensionSpec(                                             -->
                             <!--     element_name='is_instant',                               -->
-                            <!--     entity_links=(EntityReference(element_name='booking'),), -->
+                            <!--     group_by_links=(EntityReference(element_name='booking'),), -->
                             <!--   )                                                          -->
                             <!-- include_spec =                                               -->
                             <!--   DimensionSpec(                                             -->
                             <!--     element_name='country_latest',                           -->
-                            <!--     entity_links=(EntityReference(element_name='listing'),), -->
+                            <!--     group_by_links=(EntityReference(element_name='listing'),), -->
                             <!--   )                                                          -->
                             <!-- distinct = False -->
                             <JoinToBaseOutputNode>
@@ -93,7 +93,7 @@
                                     <!-- include_spec =                                               -->
                                     <!--   DimensionSpec(                                             -->
                                     <!--     element_name='is_instant',                               -->
-                                    <!--     entity_links=(EntityReference(element_name='booking'),), -->
+                                    <!--     group_by_links=(EntityReference(element_name='booking'),), -->
                                     <!--   )                                                          -->
                                     <!-- include_spec = LinklessEntitySpec(element_name='listing') -->
                                     <!-- distinct = False -->

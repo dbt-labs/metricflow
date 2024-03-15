@@ -49,7 +49,7 @@ def test_multihop_node(
             dimension_specs=(
                 DimensionSpec(
                     element_name="customer_name",
-                    entity_links=(
+                    group_by_links=(
                         EntityReference(element_name="account_id"),
                         EntityReference(element_name="customer_id"),
                     ),
@@ -110,7 +110,7 @@ def test_partitioned_join(
             dimension_specs=(
                 DimensionSpec(
                     element_name="home_state",
-                    entity_links=(EntityReference(element_name="user"),),
+                    group_by_links=(EntityReference(element_name="user"),),
                 ),
             ),
         )
@@ -140,7 +140,7 @@ def test_limit_rows(  # noqa: D
             time_dimension_specs=(
                 TimeDimensionSpec(
                     element_name="ds",
-                    entity_links=(),
+                    group_by_links=(),
                 ),
             ),
             limit=1,
@@ -200,7 +200,7 @@ def test_local_dimension_using_local_entity(  # noqa: D
             dimension_specs=(
                 DimensionSpec(
                     element_name="country_latest",
-                    entity_links=(EntityReference(element_name="listing"),),
+                    group_by_links=(EntityReference(element_name="listing"),),
                 ),
             ),
         )
@@ -456,7 +456,7 @@ def test_min_max_only_categorical(
             dimension_specs=(
                 DimensionSpec(
                     element_name="country_latest",
-                    entity_links=(EntityReference(element_name="listing"),),
+                    group_by_links=(EntityReference(element_name="listing"),),
                 ),
             ),
             min_max_only=True,
@@ -486,7 +486,7 @@ def test_min_max_only_time(
             time_dimension_specs=(
                 TimeDimensionSpec(
                     element_name="paid_at",
-                    entity_links=(EntityReference("booking"),),
+                    group_by_links=(EntityReference("booking"),),
                     time_granularity=TimeGranularity.DAY,
                 ),
             ),
@@ -517,7 +517,7 @@ def test_min_max_only_time_quarter(
             time_dimension_specs=(
                 TimeDimensionSpec(
                     element_name="paid_at",
-                    entity_links=(EntityReference("booking"),),
+                    group_by_links=(EntityReference("booking"),),
                     time_granularity=TimeGranularity.QUARTER,
                 ),
             ),

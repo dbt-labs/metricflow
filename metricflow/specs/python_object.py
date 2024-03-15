@@ -42,7 +42,7 @@ def parse_object_builder_naming_scheme(group_by_item_name: str) -> GroupByParame
             DimensionOrEntityParameter(
                 name=StructuredLinkableSpecName(
                     element_name=dimension_call_parameter_set.dimension_reference.element_name,
-                    entity_link_names=tuple(
+                    group_by_link_names=tuple(
                         entity_reference.element_name for entity_reference in dimension_call_parameter_set.entity_path
                     ),
                 ).qualified_name
@@ -59,7 +59,7 @@ def parse_object_builder_naming_scheme(group_by_item_name: str) -> GroupByParame
             DimensionOrEntityParameter(
                 name=StructuredLinkableSpecName(
                     element_name=entity_call_parameter_set.entity_reference.element_name,
-                    entity_link_names=tuple(
+                    group_by_link_names=tuple(
                         entity_reference.element_name for entity_reference in entity_call_parameter_set.entity_path
                     ),
                 ).qualified_name
@@ -71,7 +71,7 @@ def parse_object_builder_naming_scheme(group_by_item_name: str) -> GroupByParame
             TimeDimensionParameter(
                 name=StructuredLinkableSpecName(
                     element_name=time_dimension_parameter_set.time_dimension_reference.element_name,
-                    entity_link_names=tuple(
+                    group_by_link_names=tuple(
                         entity_reference.element_name for entity_reference in time_dimension_parameter_set.entity_path
                     ),
                 ).qualified_name,

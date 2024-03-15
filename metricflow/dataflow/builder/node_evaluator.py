@@ -82,7 +82,7 @@ class JoinLinkableInstancesRecipe:
         include_specs: List[LinkableInstanceSpec] = []
         assert all(
             [
-                len(spec.entity_links) > 0
+                len(spec.group_by_links) > 0
                 for spec in self.satisfiable_linkable_specs
                 if not spec.element_name == METRIC_TIME_ELEMENT_NAME
             ]
@@ -90,9 +90,9 @@ class JoinLinkableInstancesRecipe:
 
         include_specs.extend(
             [
-                LinklessEntitySpec.from_reference(spec.entity_links[0])
+                LinklessEntitySpec.from_reference(spec.group_by_links[0])
                 for spec in self.satisfiable_linkable_specs
-                if len(spec.entity_links) > 0
+                if len(spec.group_by_links) > 0
             ]
         )
 
@@ -109,7 +109,7 @@ class JoinLinkableInstancesRecipe:
         # "user_id" and the "country" dimension so that it can be joined to the source node.
         include_specs.extend(
             [
-                spec.without_first_entity_link if len(spec.entity_links) > 0 else spec
+                spec.without_first_group_by_link if len(spec.group_by_links) > 0 else spec
                 for spec in self.satisfiable_linkable_specs
             ]
         )
@@ -220,7 +220,7 @@ class NodeEvaluatorForLinkableInstances:
             for entity_spec_in_right_node in entity_specs_in_right_node:
                 # If an entity has links, what that means and whether it can be used is unclear at the moment,
                 # so skip it.
-                if len(entity_spec_in_right_node.entity_links) > 0:
+                if len(entity_spec_in_right_node.group_by_links) > 0:
                     continue
 
                 entity_instance_in_right_node = None
@@ -272,7 +272,7 @@ class NodeEvaluatorForLinkableInstances:
 
                 satisfiable_linkable_specs = []
                 for needed_linkable_spec in needed_linkable_specs:
-                    if len(needed_linkable_spec.entity_links) == 0:
+                    if len(needed_linkable_spec.group_by_links) == 0:
                         assert (
                             needed_linkable_spec.element_name == METRIC_TIME_ELEMENT_NAME
                         ), "Only metric_time should have 0 entity links."
@@ -288,17 +288,17 @@ class NodeEvaluatorForLinkableInstances:
                     #
                     # Then the data set must contain "device_id__platform", which is realized with
                     #
-                    # required_linkable_spec.remove_first_entity_link()
+                    # required_linkable_spec.remove_first_group_by_link()
                     #
                     # We might also need to check the entity type and see if it's the type of join we're allowing,
                     # but since we're doing all left joins now, it's been left out.
 
                     required_entity_matches_data_set_entity = (
-                        LinklessEntitySpec.from_reference(needed_linkable_spec.entity_links[0])
+                        LinklessEntitySpec.from_reference(needed_linkable_spec.group_by_links[0])
                         == linkless_entity_spec_in_node
                     )
                     needed_linkable_spec_in_node = (
-                        needed_linkable_spec.without_first_entity_link in linkable_specs_in_right_node
+                        needed_linkable_spec.without_first_group_by_link in linkable_specs_in_right_node
                     )
                     if required_entity_matches_data_set_entity and needed_linkable_spec_in_node:
                         satisfiable_linkable_specs.append(needed_linkable_spec)
@@ -406,8 +406,8 @@ class NodeEvaluatorForLinkableInstances:
             is_metric_time = required_linkable_spec.element_name == DataSet.metric_time_dimension_name()
             is_local = required_linkable_spec in data_set_linkable_specs
             is_unjoinable = not is_metric_time and (
-                len(required_linkable_spec.entity_links) == 0
-                or LinklessEntitySpec.from_reference(required_linkable_spec.entity_links[0])
+                len(required_linkable_spec.group_by_links) == 0
+                or LinklessEntitySpec.from_reference(required_linkable_spec.group_by_links[0])
                 not in data_set_linkable_specs
             )
             if is_local:

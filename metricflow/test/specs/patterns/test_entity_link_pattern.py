@@ -30,27 +30,27 @@ def specs() -> Sequence[LinkableInstanceSpec]:  # noqa: D
         MTD_SPEC_YEAR,
         TimeDimensionSpec(
             element_name="creation_time",
-            entity_links=(EntityReference("booking"), EntityReference("listing")),
+            group_by_links=(EntityReference("booking"), EntityReference("listing")),
             time_granularity=TimeGranularity.MONTH,
             date_part=DatePart.YEAR,
         ),
         # Dimensions
         DimensionSpec(
             element_name="country",
-            entity_links=(
+            group_by_links=(
                 EntityReference(element_name="listing"),
                 EntityReference(element_name="user"),
             ),
         ),
-        DimensionSpec(element_name="is_instant", entity_links=(EntityReference(element_name="booking"),)),
+        DimensionSpec(element_name="is_instant", group_by_links=(EntityReference(element_name="booking"),)),
         # Entities
         EntitySpec(
             element_name="listing",
-            entity_links=(EntityReference(element_name="booking"),),
+            group_by_links=(EntityReference(element_name="booking"),),
         ),
         EntitySpec(
             element_name="host",
-            entity_links=(EntityReference(element_name="booking"),),
+            group_by_links=(EntityReference(element_name="booking"),),
         ),
     )
 
@@ -60,7 +60,7 @@ def test_valid_parameter_fields() -> None:
     parameter_set = EntityLinkPatternParameterSet.from_parameters(
         fields_to_compare=(),
         element_name=None,
-        entity_links=None,
+        group_by_links=None,
         time_granularity=None,
         date_part=None,
     )
@@ -73,7 +73,7 @@ def test_dimension_match(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa
     pattern = EntityLinkPattern(
         EntityLinkPatternParameterSet.from_parameters(
             element_name="is_instant",
-            entity_links=(EntityReference(element_name="booking"),),
+            group_by_links=(EntityReference(element_name="booking"),),
             time_granularity=None,
             date_part=None,
             fields_to_compare=(
@@ -84,7 +84,7 @@ def test_dimension_match(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa
     )
 
     assert tuple(pattern.match(specs)) == (
-        DimensionSpec(element_name="is_instant", entity_links=(EntityReference(element_name="booking"),)),
+        DimensionSpec(element_name="is_instant", group_by_links=(EntityReference(element_name="booking"),)),
     )
 
 
@@ -92,7 +92,7 @@ def test_entity_match(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa: D
     pattern = EntityLinkPattern(
         EntityLinkPatternParameterSet.from_parameters(
             element_name="listing",
-            entity_links=(EntityReference(element_name="booking"),),
+            group_by_links=(EntityReference(element_name="booking"),),
             time_granularity=None,
             date_part=None,
             fields_to_compare=(
@@ -103,7 +103,7 @@ def test_entity_match(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa: D
     )
 
     assert tuple(pattern.match(specs)) == (
-        EntitySpec(element_name="listing", entity_links=(EntityReference(element_name="booking"),)),
+        EntitySpec(element_name="listing", group_by_links=(EntityReference(element_name="booking"),)),
     )
 
 
@@ -111,7 +111,7 @@ def test_time_dimension_match(specs: Sequence[LinkableInstanceSpec]) -> None:  #
     pattern = EntityLinkPattern(
         EntityLinkPatternParameterSet.from_parameters(
             element_name=METRIC_TIME_ELEMENT_NAME,
-            entity_links=(),
+            group_by_links=(),
             time_granularity=TimeGranularity.WEEK,
             date_part=None,
             fields_to_compare=(
@@ -129,7 +129,7 @@ def test_time_dimension_match_without_grain_specified(specs: Sequence[LinkableIn
     pattern = EntityLinkPattern(
         EntityLinkPatternParameterSet.from_parameters(
             element_name=METRIC_TIME_ELEMENT_NAME,
-            entity_links=(),
+            group_by_links=(),
             time_granularity=None,
             date_part=None,
             fields_to_compare=(
@@ -151,7 +151,7 @@ def test_time_dimension_date_part_mismatch(specs: Sequence[LinkableInstanceSpec]
     pattern = EntityLinkPattern(
         EntityLinkPatternParameterSet.from_parameters(
             element_name="creation_time",
-            entity_links=None,
+            group_by_links=None,
             time_granularity=None,
             date_part=None,
             fields_to_compare=(
@@ -169,7 +169,7 @@ def test_time_dimension_date_part_match(specs: Sequence[LinkableInstanceSpec]) -
     pattern = EntityLinkPattern(
         EntityLinkPatternParameterSet.from_parameters(
             element_name="creation_time",
-            entity_links=None,
+            group_by_links=None,
             time_granularity=None,
             date_part=DatePart.YEAR,
             fields_to_compare=(
@@ -182,7 +182,7 @@ def test_time_dimension_date_part_match(specs: Sequence[LinkableInstanceSpec]) -
     assert tuple(pattern.match(specs)) == (
         TimeDimensionSpec(
             element_name="creation_time",
-            entity_links=(EntityReference("booking"), EntityReference("listing")),
+            group_by_links=(EntityReference("booking"), EntityReference("listing")),
             time_granularity=TimeGranularity.MONTH,
             date_part=DatePart.YEAR,
         ),

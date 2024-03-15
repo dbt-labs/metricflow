@@ -86,12 +86,12 @@ class SemanticModelToDataSetConverter:
         self,
         semantic_model_name: str,
         dimension: Dimension,
-        entity_links: Tuple[EntityReference, ...],
+        group_by_links: Tuple[EntityReference, ...],
     ) -> DimensionInstance:
         """Create a dimension instance from the dimension object in the model."""
         dimension_spec = DimensionSpec(
             element_name=dimension.reference.element_name,
-            entity_links=entity_links,
+            group_by_links=group_by_links,
         )
         return DimensionInstance(
             associated_columns=(self._column_association_resolver.resolve_spec(dimension_spec),),
@@ -107,7 +107,7 @@ class SemanticModelToDataSetConverter:
     def _create_time_dimension_instance(
         self,
         element_name: str,
-        entity_links: Tuple[EntityReference, ...],
+        group_by_links: Tuple[EntityReference, ...],
         time_granularity: TimeGranularity = DEFAULT_TIME_GRANULARITY,
         date_part: Optional[DatePart] = None,
         semantic_model_name: Optional[str] = None,
@@ -115,7 +115,7 @@ class SemanticModelToDataSetConverter:
         """Create a time dimension instance from the dimension object from a semantic model in the model."""
         time_dimension_spec = TimeDimensionSpec(
             element_name=element_name,
-            entity_links=entity_links,
+            group_by_links=group_by_links,
             time_granularity=time_granularity,
             date_part=date_part,
         )
@@ -124,25 +124,27 @@ class SemanticModelToDataSetConverter:
             associated_columns=(self._column_association_resolver.resolve_spec(time_dimension_spec),),
             spec=time_dimension_spec,
             defined_from=(
-                SemanticModelElementReference(
-                    semantic_model_name=semantic_model_name,
-                    element_name=element_name,
-                ),
-            )
-            if semantic_model_name
-            else (),
+                (
+                    SemanticModelElementReference(
+                        semantic_model_name=semantic_model_name,
+                        element_name=element_name,
+                    ),
+                )
+                if semantic_model_name
+                else ()
+            ),
         )
 
     def _create_entity_instance(
         self,
         semantic_model_name: str,
         entity: Entity,
-        entity_links: Tuple[EntityReference, ...],
+        group_by_links: Tuple[EntityReference, ...],
     ) -> EntityInstance:
         """Create an entity instance from the entity object from a semantic modelin the model."""
         entity_spec = EntitySpec(
             element_name=entity.reference.element_name,
-            entity_links=entity_links,
+            group_by_links=group_by_links,
         )
         return EntityInstance(
             associated_columns=(self._column_association_resolver.resolve_spec(entity_spec),),
@@ -223,7 +225,7 @@ class SemanticModelToDataSetConverter:
         self,
         semantic_model_name: str,
         dimensions: Sequence[Dimension],
-        entity_links: Tuple[EntityReference, ...],
+        group_by_links: Tuple[EntityReference, ...],
         table_alias: str,
     ) -> DimensionConversionResult:
         dimension_instances = []
@@ -240,7 +242,7 @@ class SemanticModelToDataSetConverter:
                 dimension_instance = self._create_dimension_instance(
                     semantic_model_name=semantic_model_name,
                     dimension=dimension,
-                    entity_links=entity_links,
+                    group_by_links=group_by_links,
                 )
                 dimension_instances.append(dimension_instance)
                 select_columns.append(
@@ -254,7 +256,7 @@ class SemanticModelToDataSetConverter:
                     dimension_select_expr=dimension_select_expr,
                     dimension=dimension,
                     semantic_model_name=semantic_model_name,
-                    entity_links=entity_links,
+                    group_by_links=group_by_links,
                 )
                 time_dimension_instances += derived_time_dimension_instances
                 select_columns += time_select_columns
@@ -272,7 +274,7 @@ class SemanticModelToDataSetConverter:
         dimension_select_expr: SqlExpressionNode,
         dimension: Dimension,
         semantic_model_name: str,
-        entity_links: Tuple[EntityReference, ...],
+        group_by_links: Tuple[EntityReference, ...],
     ) -> Tuple[List[TimeDimensionInstance], List[SqlSelectColumn]]:
         """Converts Dimension objects with type TIME into the relevant DataSet columns.
 
@@ -289,7 +291,7 @@ class SemanticModelToDataSetConverter:
         time_dimension_instance = self._create_time_dimension_instance(
             semantic_model_name=semantic_model_name,
             element_name=dimension.reference.element_name,
-            entity_links=entity_links,
+            group_by_links=group_by_links,
             time_granularity=defined_time_granularity,
         )
         time_dimension_instances.append(time_dimension_instance)
@@ -317,7 +319,7 @@ class SemanticModelToDataSetConverter:
             semantic_model_name=semantic_model_name,
             defined_time_granularity=defined_time_granularity,
             element_name=dimension.reference.element_name,
-            entity_links=entity_links,
+            group_by_links=group_by_links,
             dimension_select_expr=dimension_select_expr,
         )
         time_dimension_instances.extend(new_instances)
@@ -328,7 +330,7 @@ class SemanticModelToDataSetConverter:
         self,
         defined_time_granularity: TimeGranularity,
         element_name: str,
-        entity_links: Tuple[EntityReference, ...],
+        group_by_links: Tuple[EntityReference, ...],
         dimension_select_expr: SqlExpressionNode,
         semantic_model_name: Optional[str] = None,
     ) -> Tuple[List[TimeDimensionInstance], List[SqlSelectColumn]]:
@@ -340,7 +342,7 @@ class SemanticModelToDataSetConverter:
                 time_dimension_instance = self._create_time_dimension_instance(
                     semantic_model_name=semantic_model_name,
                     element_name=element_name,
-                    entity_links=entity_links,
+                    group_by_links=group_by_links,
                     time_granularity=time_granularity,
                 )
                 time_dimension_instances.append(time_dimension_instance)
@@ -359,7 +361,7 @@ class SemanticModelToDataSetConverter:
                 time_dimension_instance = self._create_time_dimension_instance(
                     semantic_model_name=semantic_model_name,
                     element_name=element_name,
-                    entity_links=entity_links,
+                    group_by_links=group_by_links,
                     time_granularity=defined_time_granularity,
                     date_part=date_part,
                 )
@@ -385,7 +387,7 @@ class SemanticModelToDataSetConverter:
         self,
         semantic_model_name: str,
         entities: Sequence[Entity],
-        entity_links: Tuple[EntityReference, ...],
+        group_by_links: Tuple[EntityReference, ...],
         table_alias: str,
     ) -> Tuple[Sequence[EntityInstance], Sequence[SqlSelectColumn]]:
         entity_instances = []
@@ -393,13 +395,13 @@ class SemanticModelToDataSetConverter:
         for entity in entities or []:
             # We don't want to create something like user_id__user_id, so skip if the link is the same as the
             # entity.
-            if len(entity_links) == 1 and entity.reference == entity_links[0]:
+            if len(group_by_links) == 1 and entity.reference == group_by_links[0]:
                 continue
 
             entity_instance = self._create_entity_instance(
                 semantic_model_name=semantic_model_name,
                 entity=entity,
-                entity_links=entity_links,
+                group_by_links=group_by_links,
             )
 
             entity_instances.append(entity_instance)
@@ -438,22 +440,22 @@ class SemanticModelToDataSetConverter:
             all_select_columns.extend(select_columns)
 
         # Group by items in the semantic model can be accessed though a subset of the entities defined in the model.
-        possible_entity_links: List[Tuple[EntityReference, ...]] = [
+        possible_group_by_links: List[Tuple[EntityReference, ...]] = [
             (),
         ]
 
-        for entity_link in SemanticModelLookup.entity_links_for_local_elements(semantic_model):
-            possible_entity_links.append((entity_link,))
+        for group_by_link in SemanticModelLookup.group_by_links_for_local_elements(semantic_model):
+            possible_group_by_links.append((group_by_link,))
 
         # Handle dimensions
         conversion_results = [
             self._convert_dimensions(
                 semantic_model_name=semantic_model.name,
                 dimensions=semantic_model.dimensions,
-                entity_links=entity_links,
+                group_by_links=group_by_links,
                 table_alias=from_source_alias,
             )
-            for entity_links in possible_entity_links
+            for group_by_links in possible_group_by_links
         ]
 
         all_dimension_instances.extend(
@@ -481,11 +483,11 @@ class SemanticModelToDataSetConverter:
         )
 
         # Handle entities
-        for entity_links in possible_entity_links:
+        for group_by_links in possible_group_by_links:
             entity_instances, select_columns = self._create_entity_instances(
                 semantic_model_name=semantic_model.name,
                 entities=semantic_model.entities,
-                entity_links=entity_links,
+                group_by_links=group_by_links,
                 table_alias=from_source_alias,
             )
             all_entity_instances.extend(entity_instances)
@@ -528,7 +530,7 @@ class SemanticModelToDataSetConverter:
         select_columns: List[SqlSelectColumn] = []
 
         time_dimension_instance = self._create_time_dimension_instance(
-            element_name=time_column_name, entity_links=(), time_granularity=defined_time_granularity
+            element_name=time_column_name, group_by_links=(), time_granularity=defined_time_granularity
         )
         time_dimension_instances.append(time_dimension_instance)
 
@@ -545,7 +547,7 @@ class SemanticModelToDataSetConverter:
         new_instances, new_columns = self._build_time_dimension_instances_and_columns(
             defined_time_granularity=defined_time_granularity,
             element_name=time_column_name,
-            entity_links=(),
+            group_by_links=(),
             dimension_select_expr=dimension_select_expr,
         )
         time_dimension_instances.extend(new_instances)

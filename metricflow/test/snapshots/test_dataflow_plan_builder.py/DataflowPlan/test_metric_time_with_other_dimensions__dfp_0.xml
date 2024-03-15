@@ -8,9 +8,9 @@
             <!--    "'metric_time__month']")                                                                         -->
             <!-- node_id = NodeId(id_str='pfe_4') -->
             <!-- include_spec =                                                                                          -->
-            <!--   DimensionSpec(element_name='home_state_latest', entity_links=(EntityReference(element_name='user'),)) -->
+            <!--   DimensionSpec(element_name='home_state_latest', group_by_links=(EntityReference(element_name='user'),)) -->
             <!-- include_spec =                                                                                         -->
-            <!--   DimensionSpec(element_name='is_lux_latest', entity_links=(EntityReference(element_name='listing'),)) -->
+            <!--   DimensionSpec(element_name='is_lux_latest', group_by_links=(EntityReference(element_name='listing'),)) -->
             <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
             <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH) -->
             <!-- distinct = True -->

@@ -28,7 +28,13 @@ from dbt_semantic_interfaces.references import (
 
 from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
-from metricflow.specs.specs import LinkableInstanceSpec, MeasureSpec, NonAdditiveDimensionSpec, TimeDimensionSpec
+from metricflow.specs.specs import (
+    InstanceSpec,
+    LinkableInstanceSpec,
+    MeasureSpec,
+    NonAdditiveDimensionSpec,
+    TimeDimensionSpec,
+)
 
 if TYPE_CHECKING:
     from metricflow.model.semantics.linkable_spec_resolver import ElementPathKey
@@ -129,7 +135,7 @@ class SemanticModelAccessor(ABC):
 
     @staticmethod
     @abstractmethod
-    def entity_links_for_local_elements(semantic_model: SemanticModel) -> Sequence[EntityReference]:
+    def group_by_links_for_local_elements(semantic_model: SemanticModel) -> Sequence[EntityReference]:
         """Return the entity prefix that can be used to access dimensions defined in the semantic model."""
         raise NotImplementedError
 
@@ -165,7 +171,7 @@ class MetricAccessor(ABC):
         metric_references: Sequence[MetricReference],
         with_any_property: FrozenSet[LinkableElementProperties] = LinkableElementProperties.all_properties(),
         without_any_property: FrozenSet[LinkableElementProperties] = frozenset(),
-    ) -> Sequence[LinkableInstanceSpec]:
+    ) -> Sequence[InstanceSpec]:
         """Retrieve the matching set of linkable elements common to all metrics requested (intersection)."""
         raise NotImplementedError
 
@@ -206,7 +212,7 @@ class MetricAccessor(ABC):
         measure_reference: MeasureReference,
         with_any_of: Optional[Set[LinkableElementProperties]] = None,
         without_any_of: Optional[Set[LinkableElementProperties]] = None,
-    ) -> Sequence[LinkableInstanceSpec]:
+    ) -> Sequence[InstanceSpec]:
         """Return group-by-items that are possible for a measure."""
         raise NotImplementedError
 
@@ -215,7 +221,7 @@ class MetricAccessor(ABC):
         self,
         with_any_of: Optional[Set[LinkableElementProperties]] = None,
         without_any_of: Optional[Set[LinkableElementProperties]] = None,
-    ) -> Sequence[LinkableInstanceSpec]:
+    ) -> Sequence[InstanceSpec]:
         """Return the possible group-by-items for a dimension values query with no metrics."""
         raise NotImplementedError
 

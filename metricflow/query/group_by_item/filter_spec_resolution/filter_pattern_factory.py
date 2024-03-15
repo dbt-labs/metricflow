@@ -14,7 +14,7 @@ from metricflow.specs.patterns.spec_pattern import SpecPattern
 from metricflow.specs.patterns.typed_patterns import (
     DimensionPattern,
     EntityPattern,
-    MetricPattern,
+    GroupByMetricPattern,
     TimeDimensionPattern,
 )
 
@@ -68,4 +68,4 @@ class DefaultWhereFilterPatternFactory(WhereFilterPatternFactory):
 
     @override
     def create_for_metric_call_parameter_set(self, metric_call_parameter_set: MetricCallParameterSet) -> SpecPattern:
-        return MetricPattern.from_call_parameter_set(metric_call_parameter_set)
+        return GroupByMetricPattern.from_call_parameter_set(metric_call_parameter_set)

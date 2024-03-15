@@ -61,7 +61,7 @@ class ObjectBuilderNamingScheme(QueryItemNamingScheme):
             return DimensionPattern(
                 EntityLinkPatternParameterSet.from_parameters(
                     element_name=dimension_call_parameter_set.dimension_reference.element_name,
-                    entity_links=dimension_call_parameter_set.entity_path,
+                    group_by_links=dimension_call_parameter_set.entity_path,
                     time_granularity=None,
                     date_part=None,
                     fields_to_compare=(
@@ -85,7 +85,7 @@ class ObjectBuilderNamingScheme(QueryItemNamingScheme):
             return TimeDimensionPattern(
                 EntityLinkPatternParameterSet.from_parameters(
                     element_name=time_dimension_call_parameter_set.time_dimension_reference.element_name,
-                    entity_links=time_dimension_call_parameter_set.entity_path,
+                    group_by_links=time_dimension_call_parameter_set.entity_path,
                     time_granularity=time_dimension_call_parameter_set.time_granularity,
                     date_part=time_dimension_call_parameter_set.date_part,
                     fields_to_compare=tuple(fields_to_compare),
@@ -96,7 +96,7 @@ class ObjectBuilderNamingScheme(QueryItemNamingScheme):
             return EntityLinkPattern(
                 EntityLinkPatternParameterSet.from_parameters(
                     element_name=entity_call_parameter_set.entity_reference.element_name,
-                    entity_links=entity_call_parameter_set.entity_path,
+                    group_by_links=entity_call_parameter_set.entity_path,
                     time_granularity=None,
                     date_part=None,
                     fields_to_compare=(

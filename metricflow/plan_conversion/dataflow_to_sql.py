@@ -443,7 +443,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 # data set. The next step would create an instance like "listing__listing__country_latest" without this
                 # filter.
                 right_data_set_instance_set_filtered = FilterLinkableInstancesWithLeadingLink(
-                    entity_link=join_on_entity,
+                    group_by_link=join_on_entity,
                 ).transform(right_data_set.instance_set)
 
                 # After the right data set is joined to the "from" data set, we need to change the links for some of the
@@ -1064,7 +1064,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         for time_dimension_instance in input_data_set.instance_set.time_dimension_instances:
             # The specification for the time dimension to use for aggregation is the local one.
             if (
-                len(time_dimension_instance.spec.entity_links) == 0
+                len(time_dimension_instance.spec.group_by_links) == 0
                 and time_dimension_instance.spec.reference == node.aggregation_time_dimension_reference
             ):
                 matching_time_dimension_instances.append(time_dimension_instance)
@@ -1253,10 +1253,10 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         if node.use_custom_agg_time_dimension:
             agg_time_dimension = node.requested_agg_time_dimension_specs[0]
             agg_time_element_name = agg_time_dimension.element_name
-            agg_time_entity_links: Tuple[EntityReference, ...] = agg_time_dimension.entity_links
+            agg_time_group_by_links: Tuple[EntityReference, ...] = agg_time_dimension.group_by_links
         else:
             agg_time_element_name = METRIC_TIME_ELEMENT_NAME
-            agg_time_entity_links = ()
+            agg_time_group_by_links = ()
 
         # Find the time dimension instances in the parent data set that match the one we want to join with.
         agg_time_dimension_instances: List[TimeDimensionInstance] = []
@@ -1264,7 +1264,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             if (
                 instance.spec.date_part is None  # Ensure we don't join using an instance with date part
                 and instance.spec.element_name == agg_time_element_name
-                and instance.spec.entity_links == agg_time_entity_links
+                and instance.spec.group_by_links == agg_time_group_by_links
             ):
                 agg_time_dimension_instances.append(instance)
 
@@ -1304,7 +1304,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         for time_dimension_instance in parent_data_set.instance_set.time_dimension_instances:
             if (
                 time_dimension_instance.spec.element_name == agg_time_element_name
-                and time_dimension_instance.spec.entity_links == agg_time_entity_links
+                and time_dimension_instance.spec.group_by_links == agg_time_group_by_links
             ):
                 time_dimensions_to_select_from_time_spine += (time_dimension_instance,)
             else:
@@ -1317,7 +1317,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 for time_dimension_instance in parent_data_set.instance_set.time_dimension_instances
                 if not (
                     time_dimension_instance.spec.element_name == agg_time_element_name
-                    and time_dimension_instance.spec.entity_links == agg_time_entity_links
+                    and time_dimension_instance.spec.group_by_links == agg_time_group_by_links
                 )
             ),
             entity_instances=parent_data_set.instance_set.entity_instances,
@@ -1394,7 +1394,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 select_expr = SqlExtractExpression(date_part=time_dimension_spec.date_part, arg=select_expr)
             time_dim_spec = TimeDimensionSpec(
                 element_name=original_time_spine_dim_instance.spec.element_name,
-                entity_links=original_time_spine_dim_instance.spec.entity_links,
+                group_by_links=original_time_spine_dim_instance.spec.group_by_links,
                 time_granularity=time_dimension_spec.time_granularity,
                 date_part=time_dimension_spec.date_part,
                 aggregation_state=original_time_spine_dim_instance.spec.aggregation_state,

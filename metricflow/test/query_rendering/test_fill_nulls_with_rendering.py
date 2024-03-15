@@ -87,7 +87,7 @@ def test_simple_fill_nulls_with_0_with_non_metric_time(  # noqa: D
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="bookings_fill_nulls_with_0"),),
             time_dimension_specs=(
-                TimeDimensionSpec(element_name="paid_at", entity_links=(EntityReference("booking"),)),
+                TimeDimensionSpec(element_name="paid_at", group_by_links=(EntityReference("booking"),)),
             ),
         )
     )
@@ -112,7 +112,7 @@ def test_simple_fill_nulls_with_0_with_categorical_dimension(  # noqa: D
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="bookings_fill_nulls_with_0"),),
-            dimension_specs=(DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),),
+            dimension_specs=(DimensionSpec(element_name="is_instant", group_by_links=(EntityReference("booking"),)),),
         )
     )
 

@@ -43,7 +43,7 @@ class SqlDataSet(DataSet):
         for linkable_instance in self.instance_set.entity_instances:
             if (
                 entity_spec.element_name == linkable_instance.spec.element_name
-                and entity_spec.entity_links == linkable_instance.spec.entity_links
+                and entity_spec.group_by_links == linkable_instance.spec.group_by_links
             ):
                 column_associations_to_return = linkable_instance.associated_columns
                 matching_instances += 1

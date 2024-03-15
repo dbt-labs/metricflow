@@ -41,7 +41,7 @@ def test_cumulative_metric(
             time_dimension_specs=(
                 TimeDimensionSpec(
                     element_name="ds",
-                    entity_links=(),
+                    group_by_links=(),
                     time_granularity=TimeGranularity.DAY,
                 ),
             ),
@@ -79,7 +79,7 @@ def test_cumulative_metric_with_time_constraint(
             time_dimension_specs=(
                 TimeDimensionSpec(
                     element_name="metric_time",
-                    entity_links=(),
+                    group_by_links=(),
                     time_granularity=TimeGranularity.DAY,
                 ),
             ),
@@ -180,7 +180,7 @@ def test_cumulative_metric_no_window(
             time_dimension_specs=(
                 TimeDimensionSpec(
                     element_name="ds",
-                    entity_links=(),
+                    group_by_links=(),
                     time_granularity=TimeGranularity.MONTH,
                 ),
             ),
@@ -243,7 +243,7 @@ def test_cumulative_metric_grain_to_date(
             time_dimension_specs=(
                 TimeDimensionSpec(
                     element_name="ds",
-                    entity_links=(),
+                    group_by_links=(),
                     time_granularity=TimeGranularity.MONTH,
                 ),
             ),
@@ -304,7 +304,7 @@ def test_cumulative_metric_with_agg_time_dimension(
             metric_specs=(MetricSpec(element_name="trailing_2_months_revenue"),),
             dimension_specs=(),
             time_dimension_specs=(
-                TimeDimensionSpec(element_name="ds", entity_links=(EntityReference("revenue_instance"),)),
+                TimeDimensionSpec(element_name="ds", group_by_links=(EntityReference("revenue_instance"),)),
             ),
         )
     )

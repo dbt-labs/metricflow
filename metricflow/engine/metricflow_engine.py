@@ -608,9 +608,9 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                             name=metric_time_name,
                             qualified_name=StructuredLinkableSpecName(
                                 element_name=metric_time_name,
-                                entity_link_names=tuple(
+                                group_by_link_names=tuple(
                                     entity_reference.element_name
-                                    for entity_reference in linkable_dimension.entity_links
+                                    for entity_reference in linkable_dimension.group_by_links
                                 ),
                                 time_granularity=linkable_dimension.time_granularity,
                             ).qualified_name,

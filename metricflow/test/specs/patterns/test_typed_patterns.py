@@ -25,25 +25,25 @@ def specs() -> Sequence[LinkableInstanceSpec]:  # noqa: D
         # Time dimensions
         TimeDimensionSpec(
             element_name="common_name",
-            entity_links=(EntityReference("booking"), EntityReference("listing")),
+            group_by_links=(EntityReference("booking"), EntityReference("listing")),
             time_granularity=TimeGranularity.DAY,
             date_part=None,
         ),
         TimeDimensionSpec(
             element_name="common_name",
-            entity_links=(EntityReference("booking"), EntityReference("listing")),
+            group_by_links=(EntityReference("booking"), EntityReference("listing")),
             time_granularity=TimeGranularity.DAY,
             date_part=DatePart.MONTH,
         ),
         # Dimensions
         DimensionSpec(
             element_name="common_name",
-            entity_links=((EntityReference("booking"), EntityReference("listing"))),
+            group_by_links=((EntityReference("booking"), EntityReference("listing"))),
         ),
         # Entities
         EntitySpec(
             element_name="common_name",
-            entity_links=(EntityReference("booking"), EntityReference("listing")),
+            group_by_links=(EntityReference("booking"), EntityReference("listing")),
         ),
     )
 
@@ -59,17 +59,17 @@ def test_dimension_pattern(specs: Sequence[LinkableInstanceSpec]) -> None:  # no
     assert tuple(pattern.match(specs)) == (
         DimensionSpec(
             element_name="common_name",
-            entity_links=((EntityReference("booking"), EntityReference("listing"))),
+            group_by_links=((EntityReference("booking"), EntityReference("listing"))),
         ),
         TimeDimensionSpec(
             element_name="common_name",
-            entity_links=(EntityReference("booking"), EntityReference("listing")),
+            group_by_links=(EntityReference("booking"), EntityReference("listing")),
             time_granularity=TimeGranularity.DAY,
             date_part=None,
         ),
         TimeDimensionSpec(
             element_name="common_name",
-            entity_links=(EntityReference("booking"), EntityReference("listing")),
+            group_by_links=(EntityReference("booking"), EntityReference("listing")),
             time_granularity=TimeGranularity.DAY,
             date_part=DatePart.MONTH,
         ),
@@ -87,7 +87,7 @@ def test_time_dimension_pattern(specs: Sequence[LinkableInstanceSpec]) -> None: 
     assert tuple(pattern.match(specs)) == (
         TimeDimensionSpec(
             element_name="common_name",
-            entity_links=(EntityReference("booking"), EntityReference("listing")),
+            group_by_links=(EntityReference("booking"), EntityReference("listing")),
             time_granularity=TimeGranularity.DAY,
             date_part=None,
         ),
@@ -106,7 +106,7 @@ def test_time_dimension_pattern_with_date_part(specs: Sequence[LinkableInstanceS
     assert tuple(pattern.match(specs)) == (
         TimeDimensionSpec(
             element_name="common_name",
-            entity_links=(EntityReference("booking"), EntityReference("listing")),
+            group_by_links=(EntityReference("booking"), EntityReference("listing")),
             time_granularity=TimeGranularity.DAY,
             date_part=DatePart.MONTH,
         ),
@@ -124,6 +124,6 @@ def test_entity_pattern(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa:
     assert tuple(pattern.match(specs)) == (
         EntitySpec(
             element_name="common_name",
-            entity_links=(EntityReference("booking"), EntityReference("listing")),
+            group_by_links=(EntityReference("booking"), EntityReference("listing")),
         ),
     )

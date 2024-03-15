@@ -9,7 +9,7 @@
             <!--   OrderBySpec(                                                 -->
             <!--     instance_spec=DimensionSpec(                               -->
             <!--       element_name='is_lux_latest',                            -->
-            <!--       entity_links=(EntityReference(element_name='listing'),), -->
+            <!--       group_by_links=(EntityReference(element_name='listing'),), -->
             <!--     ),                                                         -->
             <!--     descending=True,                                           -->
             <!--   )                                                            -->
@@ -20,12 +20,12 @@
                 <!-- include_spec =                                            -->
                 <!--   DimensionSpec(                                          -->
                 <!--     element_name='home_state_latest',                     -->
-                <!--     entity_links=(EntityReference(element_name='user'),), -->
+                <!--     group_by_links=(EntityReference(element_name='user'),), -->
                 <!--   )                                                       -->
                 <!-- include_spec =                                               -->
                 <!--   DimensionSpec(                                             -->
                 <!--     element_name='is_lux_latest',                            -->
-                <!--     entity_links=(EntityReference(element_name='listing'),), -->
+                <!--     group_by_links=(EntityReference(element_name='listing'),), -->
                 <!--   )                                                          -->
                 <!-- distinct = True -->
                 <WhereConstraintNode>
@@ -39,7 +39,7 @@
                     <!--       dimension_specs=(                         -->
                     <!--         DimensionSpec(                          -->
                     <!--           element_name='country_latest',        -->
-                    <!--           entity_links=(                        -->
+                    <!--           group_by_links=(                        -->
                     <!--             EntityReference(                    -->
                     <!--               element_name='listing',           -->
                     <!--             ),                                  -->

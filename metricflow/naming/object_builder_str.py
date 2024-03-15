@@ -29,7 +29,7 @@ class ObjectBuilderNameConverter:
     def input_str_from_entity_call_parameter_set(parameter_set: EntityCallParameterSet) -> str:  # noqa: D
         initializer_parameter_str = ObjectBuilderNameConverter.initializer_parameter_str(
             element_name=parameter_set.entity_reference.element_name,
-            entity_links=parameter_set.entity_path,
+            group_by_links=parameter_set.entity_path,
             group_by=(),
             time_granularity=None,
             date_part=None,
@@ -40,17 +40,17 @@ class ObjectBuilderNameConverter:
     def input_str_from_metric_call_parameter_set(parameter_set: MetricCallParameterSet) -> str:  # noqa: D
         initializer_parameter_str = ObjectBuilderNameConverter.initializer_parameter_str(
             element_name=parameter_set.metric_reference.element_name,
-            entity_links=(),
+            group_by_links=(),
             group_by=parameter_set.group_by,
             time_granularity=None,
             date_part=None,
         )
-        return f"Entity({initializer_parameter_str})"
+        return f"Metric({initializer_parameter_str})"
 
     @staticmethod
     def initializer_parameter_str(
         element_name: str,
-        entity_links: Sequence[EntityReference],
+        group_by_links: Sequence[EntityReference],
         group_by: Sequence[LinkableElementReference],
         time_granularity: Optional[TimeGranularity],
         date_part: Optional[DatePart],
@@ -60,9 +60,9 @@ class ObjectBuilderNameConverter:
         e.g. `'user__country', time_granularity_name='month'`
         """
         initializer_parameters = []
-        entity_link_names = list(entity_link.element_name for entity_link in entity_links)
-        if len(entity_link_names) > 0:
-            initializer_parameters.append(repr(entity_link_names[-1] + DUNDER + element_name))
+        group_by_link_names = list(group_by_link.element_name for group_by_link in group_by_links)
+        if len(group_by_link_names) > 0:
+            initializer_parameters.append(repr(group_by_link_names[-1] + DUNDER + element_name))
         else:
             initializer_parameters.append(repr(element_name))
         if time_granularity is not None:
@@ -71,8 +71,8 @@ class ObjectBuilderNameConverter:
             )
         if date_part is not None:
             initializer_parameters.append(f"date_part_name={repr(date_part.value)}")
-        if len(entity_link_names) > 1:
-            initializer_parameters.append(f"entity_path={repr(entity_link_names[:-1])}")
+        if len(group_by_link_names) > 1:
+            initializer_parameters.append(f"entity_path={repr(group_by_link_names[:-1])}")
 
         return ", ".join(initializer_parameters)
 
@@ -88,7 +88,7 @@ class ObjectBuilderNameConverter:
             for entity_spec in spec_set.entity_specs:
                 initializer_parameter_str = ObjectBuilderNameConverter.initializer_parameter_str(
                     element_name=entity_spec.element_name,
-                    entity_links=entity_spec.entity_links,
+                    group_by_links=entity_spec.group_by_links,
                     group_by=(),
                     time_granularity=None,
                     date_part=None,
@@ -98,7 +98,7 @@ class ObjectBuilderNameConverter:
             for dimension_spec in spec_set.dimension_specs:
                 initializer_parameter_str = ObjectBuilderNameConverter.initializer_parameter_str(
                     element_name=dimension_spec.element_name,
-                    entity_links=dimension_spec.entity_links,
+                    group_by_links=dimension_spec.group_by_links,
                     group_by=(),
                     time_granularity=None,
                     date_part=None,
@@ -108,7 +108,7 @@ class ObjectBuilderNameConverter:
             for time_dimension_spec in spec_set.time_dimension_specs:
                 initializer_parameter_str = ObjectBuilderNameConverter.initializer_parameter_str(
                     element_name=time_dimension_spec.element_name,
-                    entity_links=time_dimension_spec.entity_links,
+                    group_by_links=time_dimension_spec.group_by_links,
                     group_by=(),
                     time_granularity=time_dimension_spec.time_granularity,
                     date_part=time_dimension_spec.date_part,
@@ -118,7 +118,7 @@ class ObjectBuilderNameConverter:
             for metric_spec in spec_set.metric_specs:
                 initializer_parameter_str = ObjectBuilderNameConverter.initializer_parameter_str(
                     element_name=metric_spec.element_name,
-                    entity_links=(),
+                    group_by_links=(),
                     group_by=(),  # how to get from spec?
                     time_granularity=None,
                     date_part=None,
@@ -142,7 +142,7 @@ class ObjectBuilderNameConverter:
     def input_str_from_dimension_call_parameter_set(parameter_set: DimensionCallParameterSet) -> str:  # noqa: D
         initializer_parameter_str = ObjectBuilderNameConverter.initializer_parameter_str(
             element_name=parameter_set.dimension_reference.element_name,
-            entity_links=parameter_set.entity_path,
+            group_by_links=parameter_set.entity_path,
             group_by=(),
             time_granularity=None,
             date_part=None,
@@ -155,7 +155,7 @@ class ObjectBuilderNameConverter:
     ) -> str:
         initializer_parameter_str = ObjectBuilderNameConverter.initializer_parameter_str(
             element_name=parameter_set.time_dimension_reference.element_name,
-            entity_links=parameter_set.entity_path,
+            group_by_links=parameter_set.entity_path,
             group_by=(),
             time_granularity=None,
             date_part=None,

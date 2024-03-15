@@ -22,7 +22,7 @@ def test_input_str(dunder_naming_scheme: DunderNamingScheme) -> None:  # noqa: D
         dunder_naming_scheme.input_str(
             DimensionSpec(
                 element_name="country",
-                entity_links=(
+                group_by_links=(
                     EntityReference(element_name="booking"),
                     EntityReference(element_name="listing"),
                 ),
@@ -35,7 +35,7 @@ def test_input_str(dunder_naming_scheme: DunderNamingScheme) -> None:  # noqa: D
         dunder_naming_scheme.input_str(
             TimeDimensionSpec(
                 element_name="creation_time",
-                entity_links=(EntityReference(element_name="booking"), EntityReference(element_name="listing")),
+                group_by_links=(EntityReference(element_name="booking"), EntityReference(element_name="listing")),
                 time_granularity=TimeGranularity.MONTH,
                 date_part=DatePart.DAY,
             )
@@ -47,7 +47,7 @@ def test_input_str(dunder_naming_scheme: DunderNamingScheme) -> None:  # noqa: D
         dunder_naming_scheme.input_str(
             TimeDimensionSpec(
                 element_name="creation_time",
-                entity_links=(
+                group_by_links=(
                     EntityReference(element_name="booking"),
                     EntityReference(element_name="listing"),
                 ),
@@ -61,7 +61,7 @@ def test_input_str(dunder_naming_scheme: DunderNamingScheme) -> None:  # noqa: D
         dunder_naming_scheme.input_str(
             EntitySpec(
                 element_name="user",
-                entity_links=(
+                group_by_links=(
                     EntityReference(element_name="booking"),
                     EntityReference(element_name="listing"),
                 ),
@@ -86,7 +86,7 @@ def test_spec_pattern(  # noqa: D
     assert tuple(dunder_naming_scheme.spec_pattern("listing__user__country").match(specs)) == (
         DimensionSpec(
             element_name="country",
-            entity_links=(
+            group_by_links=(
                 EntityReference(element_name="listing"),
                 EntityReference(element_name="user"),
             ),
@@ -102,7 +102,7 @@ def test_spec_pattern(  # noqa: D
     assert tuple(dunder_naming_scheme.spec_pattern("booking__listing__user").match(specs)) == (
         EntitySpec(
             element_name="user",
-            entity_links=(
+            group_by_links=(
                 EntityReference(element_name="booking"),
                 EntityReference(element_name="listing"),
             ),

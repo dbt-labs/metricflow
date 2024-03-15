@@ -42,6 +42,7 @@ class MetricGroupByItemResolutionNode(GroupByItemResolutionNode):
 
     @override
     def accept(self, visitor: GroupByItemResolutionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:
+        print(visitor)
         return visitor.visit_metric_node(self)
 
     @property

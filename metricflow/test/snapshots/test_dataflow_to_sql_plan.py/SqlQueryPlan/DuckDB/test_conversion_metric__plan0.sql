@@ -111,7 +111,7 @@ FROM (
         subq_12.visit__referrer_id
         , subq_12.buys
       FROM (
-        -- Find conversions for EntitySpec(element_name='user', entity_links=()) within the range of count=7 granularity=TimeGranularity.DAY
+        -- Find conversions for EntitySpec(element_name='user', group_by_links=()) within the range of count=7 granularity=TimeGranularity.DAY
         SELECT
           subq_11.visit__referrer_id
           , subq_11.buys

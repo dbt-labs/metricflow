@@ -98,9 +98,9 @@ class DataWarehouseTaskBuilder:
     """Task builder for standard data warehouse validation tasks."""
 
     @staticmethod
-    def _remove_entity_link_specs(specs: Tuple[LinkableInstanceSpecT, ...]) -> Tuple[LinkableInstanceSpecT, ...]:
-        """For the purposes of data warehouse validation, specs with entity_links are unnecesary."""
-        return tuple(spec for spec in specs if not spec.entity_links)
+    def _remove_group_by_link_specs(specs: Tuple[LinkableInstanceSpecT, ...]) -> Tuple[LinkableInstanceSpecT, ...]:
+        """For the purposes of data warehouse validation, specs with group_by_links are unnecesary."""
+        return tuple(spec for spec in specs if not spec.group_by_links)
 
     @staticmethod
     def _semantic_model_nodes(render_tools: QueryRenderingTools, semantic_model: SemanticModel) -> Sequence[BaseOutput]:
@@ -177,7 +177,7 @@ class DataWarehouseTaskBuilder:
             semantic_model_sub_tasks: List[DataWarehouseValidationTask] = []
             dataset = render_tools.converter.create_sql_source_data_set(semantic_model)
 
-            dimension_specs = DataWarehouseTaskBuilder._remove_entity_link_specs(
+            dimension_specs = DataWarehouseTaskBuilder._remove_group_by_link_specs(
                 dataset.instance_set.spec_set.dimension_specs
             )
 
@@ -192,7 +192,7 @@ class DataWarehouseTaskBuilder:
                     )
                 )
 
-            time_dimension_specs = DataWarehouseTaskBuilder._remove_entity_link_specs(
+            time_dimension_specs = DataWarehouseTaskBuilder._remove_group_by_link_specs(
                 dataset.instance_set.spec_set.time_dimension_specs
             )
             for spec in time_dimension_specs:
@@ -272,7 +272,7 @@ class DataWarehouseTaskBuilder:
 
             semantic_model_sub_tasks: List[DataWarehouseValidationTask] = []
             dataset = render_tools.converter.create_sql_source_data_set(semantic_model)
-            semantic_model_specs = DataWarehouseTaskBuilder._remove_entity_link_specs(
+            semantic_model_specs = DataWarehouseTaskBuilder._remove_group_by_link_specs(
                 dataset.instance_set.spec_set.entity_specs
             )
             for spec in semantic_model_specs:

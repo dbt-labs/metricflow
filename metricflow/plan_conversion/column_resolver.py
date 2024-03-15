@@ -12,6 +12,7 @@ from metricflow.specs.column_assoc import (
 from metricflow.specs.specs import (
     DimensionSpec,
     EntitySpec,
+    GroupByMetricSpec,
     InstanceSpec,
     InstanceSpecVisitor,
     MeasureSpec,
@@ -44,7 +45,7 @@ class DunderColumnAssociationResolverVisitor(InstanceSpecVisitor[ColumnAssociati
     def visit_dimension_spec(self, dimension_spec: DimensionSpec) -> ColumnAssociation:  # noqa: D
         return ColumnAssociation(
             column_name=StructuredLinkableSpecName(
-                entity_link_names=tuple(x.element_name for x in dimension_spec.entity_links),
+                group_by_link_names=tuple(x.element_name for x in dimension_spec.group_by_links),
                 element_name=dimension_spec.element_name,
             ).qualified_name,
             single_column_correlation_key=SingleColumnCorrelationKey(),
@@ -52,7 +53,7 @@ class DunderColumnAssociationResolverVisitor(InstanceSpecVisitor[ColumnAssociati
 
     def visit_time_dimension_spec(self, time_dimension_spec: TimeDimensionSpec) -> ColumnAssociation:  # noqa: D
         column_name = StructuredLinkableSpecName(
-            entity_link_names=tuple(x.element_name for x in time_dimension_spec.entity_links),
+            group_by_link_names=tuple(x.element_name for x in time_dimension_spec.group_by_links),
             element_name=time_dimension_spec.element_name,
             time_granularity=time_dimension_spec.time_granularity,
             date_part=time_dimension_spec.date_part,
@@ -71,7 +72,7 @@ class DunderColumnAssociationResolverVisitor(InstanceSpecVisitor[ColumnAssociati
     def visit_entity_spec(self, entity_spec: EntitySpec) -> ColumnAssociation:  # noqa: D
         return ColumnAssociation(
             column_name=StructuredLinkableSpecName(
-                entity_link_names=tuple(x.element_name for x in entity_spec.entity_links),
+                group_by_link_names=tuple(x.element_name for x in entity_spec.group_by_links),
                 element_name=entity_spec.element_name,
             ).qualified_name,
             single_column_correlation_key=SingleColumnCorrelationKey(),
@@ -83,13 +84,26 @@ class DunderColumnAssociationResolverVisitor(InstanceSpecVisitor[ColumnAssociati
             single_column_correlation_key=SingleColumnCorrelationKey(),
         )
 
+    def visit_group_by_metric_spec(self, group_by_metric_spec: GroupByMetricSpec) -> ColumnAssociation:  # noqa: D
+        return ColumnAssociation(
+            # TODO: is this what we want the column names to look like? group_by__group_by__metric_name
+            column_name=StructuredLinkableSpecName(
+                # TODO: rename to group_by_link_names
+                group_by_link_names=tuple(
+                    group_by_link.element_name for group_by_link in group_by_metric_spec.group_by_links
+                ),
+                element_name=group_by_metric_spec.element_name,
+            ).qualified_name,
+            single_column_correlation_key=SingleColumnCorrelationKey(),
+        )
+
 
 class DunderColumnAssociationResolver(ColumnAssociationResolver):
     """Uses a double underscore to map specs to column names.
 
     For example:
 
-    DimensionSpec(element_name='country', entity_links=['listing'])
+    DimensionSpec(element_name='country', group_by_links=['listing'])
 
     ->
 

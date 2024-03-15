@@ -27,12 +27,12 @@ class DimensionSpecResolver:
         call_parameter_set = DimensionCallParameterSet(
             dimension_reference=DimensionReference(element_name=structured_name.element_name),
             entity_path=(
-                tuple(EntityReference(element_name=arg) for arg in entity_path) + structured_name.entity_links
+                tuple(EntityReference(element_name=arg) for arg in entity_path) + structured_name.group_by_links
             ),
         )
         return DimensionSpec(
             element_name=call_parameter_set.dimension_reference.element_name,
-            entity_links=call_parameter_set.entity_path,
+            group_by_links=call_parameter_set.entity_path,
         )
 
     def resolve_time_dimension_spec(
@@ -48,14 +48,14 @@ class DimensionSpecResolver:
             time_dimension_reference=TimeDimensionReference(element_name=structured_name.element_name),
             time_granularity=time_granularity,
             entity_path=(
-                tuple(EntityReference(element_name=arg) for arg in entity_path) + structured_name.entity_links
+                tuple(EntityReference(element_name=arg) for arg in entity_path) + structured_name.group_by_links
             ),
             date_part=date_part,
         )
         assert call_parameter_set in self._call_parameter_sets.time_dimension_call_parameter_sets
         return TimeDimensionSpec(
             element_name=call_parameter_set.time_dimension_reference.element_name,
-            entity_links=call_parameter_set.entity_path,
+            group_by_links=call_parameter_set.entity_path,
             time_granularity=(
                 call_parameter_set.time_granularity
                 # TODO: This should be updated once resolution of unspecified grain is supported.

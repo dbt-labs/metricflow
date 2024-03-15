@@ -196,9 +196,12 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
                 ).linkable_specs
 
             matching_specs = specs_available_for_measure_given_child_metric
-
             for source_spec_pattern in self._source_spec_patterns:
+                print("\n\n", source_spec_pattern)
+                # TODO: WHY IS base time grain pattern in here?
+                print("before:", matching_specs)
                 matching_specs = InstanceSpecSet.from_specs(source_spec_pattern.match(matching_specs)).linkable_specs
+                print("after:", matching_specs)
 
             logger.debug(
                 f"For {node.ui_description}:\n"
@@ -220,13 +223,15 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
                         NoMatchingItemsForMeasure.from_parameters(
                             parent_issues=(),
                             query_resolution_path=current_traversal_path,
-                            input_suggestions=tuple(
-                                self._suggestion_generator.input_suggestions(
-                                    specs_available_for_measure_given_child_metric
+                            input_suggestions=(
+                                tuple(
+                                    self._suggestion_generator.input_suggestions(
+                                        specs_available_for_measure_given_child_metric
+                                    )
                                 )
-                            )
-                            if self._suggestion_generator is not None
-                            else (),
+                                if self._suggestion_generator is not None
+                                else ()
+                            ),
                         )
                     ),
                 )
@@ -368,9 +373,9 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
             return PushDownResult(
                 candidate_set=GroupByItemCandidateSet(
                     specs=tuple(matched_specs),
-                    measure_paths=merged_result_from_parents.candidate_set.measure_paths
-                    if len(matched_specs) > 0
-                    else (),
+                    measure_paths=(
+                        merged_result_from_parents.candidate_set.measure_paths if len(matched_specs) > 0 else ()
+                    ),
                     path_from_leaf_node=current_traversal_path,
                 ),
                 issue_set=MetricFlowQueryResolutionIssueSet.merge_iterable(issue_sets_to_merge),

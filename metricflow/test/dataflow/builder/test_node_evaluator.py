@@ -118,7 +118,7 @@ def test_node_evaluator_with_unjoinable_specs(  # noqa: D
         required_linkable_specs=[
             DimensionSpec(
                 element_name="verification_type",
-                entity_links=(EntityReference(element_name="verification"),),
+                group_by_links=(EntityReference(element_name="verification"),),
             )
         ],
         left_node=bookings_source_node,
@@ -131,7 +131,7 @@ def test_node_evaluator_with_unjoinable_specs(  # noqa: D
         unjoinable_linkable_specs=(
             DimensionSpec(
                 element_name="verification_type",
-                entity_links=(EntityReference(element_name="verification"),),
+                group_by_links=(EntityReference(element_name="verification"),),
             ),
         ),
     )
@@ -146,12 +146,14 @@ def test_node_evaluator_with_local_spec(  # noqa: D
         "bookings_source"
     ]
     evaluation = node_evaluator.evaluate_node(
-        required_linkable_specs=[DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),))],
+        required_linkable_specs=[
+            DimensionSpec(element_name="is_instant", group_by_links=(EntityReference("booking"),))
+        ],
         left_node=bookings_source_node,
         default_join_type=SqlJoinType.LEFT_OUTER,
     )
     assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
-        local_linkable_specs=(DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),),
+        local_linkable_specs=(DimensionSpec(element_name="is_instant", group_by_links=(EntityReference("booking"),)),),
         joinable_linkable_specs=(),
         join_recipes=(),
         unjoinable_linkable_specs=(),
@@ -168,7 +170,7 @@ def test_node_evaluator_with_local_spec_using_primary_entity(  # noqa: D
     ]
     evaluation = node_evaluator.evaluate_node(
         required_linkable_specs=[
-            DimensionSpec(element_name="home_state_latest", entity_links=(EntityReference(element_name="user"),))
+            DimensionSpec(element_name="home_state_latest", group_by_links=(EntityReference(element_name="user"),))
         ],
         left_node=bookings_source_node,
         default_join_type=SqlJoinType.LEFT_OUTER,
@@ -179,7 +181,7 @@ def test_node_evaluator_with_local_spec_using_primary_entity(  # noqa: D
             local_linkable_specs=(
                 DimensionSpec(
                     element_name="home_state_latest",
-                    entity_links=(EntityReference(element_name="user"),),
+                    group_by_links=(EntityReference(element_name="user"),),
                 ),
             ),
             joinable_linkable_specs=(),
@@ -199,14 +201,14 @@ def test_node_evaluator_with_joined_spec(  # noqa: D
     ]
     evaluation = node_evaluator.evaluate_node(
         required_linkable_specs=[
-            DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),
+            DimensionSpec(element_name="is_instant", group_by_links=(EntityReference("booking"),)),
             DimensionSpec(
                 element_name="country_latest",
-                entity_links=(EntityReference(element_name="listing"),),
+                group_by_links=(EntityReference(element_name="listing"),),
             ),
             DimensionSpec(
                 element_name="capacity_latest",
-                entity_links=(EntityReference(element_name="listing"),),
+                group_by_links=(EntityReference(element_name="listing"),),
             ),
         ],
         left_node=bookings_source_node,
@@ -214,15 +216,15 @@ def test_node_evaluator_with_joined_spec(  # noqa: D
     )
 
     assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
-        local_linkable_specs=(DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),),
+        local_linkable_specs=(DimensionSpec(element_name="is_instant", group_by_links=(EntityReference("booking"),)),),
         joinable_linkable_specs=(
             DimensionSpec(
                 element_name="country_latest",
-                entity_links=(EntityReference(element_name="listing"),),
+                group_by_links=(EntityReference(element_name="listing"),),
             ),
             DimensionSpec(
                 element_name="capacity_latest",
-                entity_links=(EntityReference(element_name="listing"),),
+                group_by_links=(EntityReference(element_name="listing"),),
             ),
         ),
         join_recipes=(
@@ -234,11 +236,11 @@ def test_node_evaluator_with_joined_spec(  # noqa: D
                 satisfiable_linkable_specs=[
                     DimensionSpec(
                         element_name="country_latest",
-                        entity_links=(EntityReference(element_name="listing"),),
+                        group_by_links=(EntityReference(element_name="listing"),),
                     ),
                     DimensionSpec(
                         element_name="capacity_latest",
-                        entity_links=(EntityReference(element_name="listing"),),
+                        group_by_links=(EntityReference(element_name="listing"),),
                     ),
                 ],
                 join_on_partition_dimensions=(),
@@ -262,7 +264,7 @@ def test_node_evaluator_with_joined_spec_on_unique_id(  # noqa: D
         required_linkable_specs=[
             DimensionSpec(
                 element_name="company_name",
-                entity_links=(EntityReference(element_name="user"),),
+                group_by_links=(EntityReference(element_name="user"),),
             ),
         ],
         left_node=listings_node,
@@ -274,7 +276,7 @@ def test_node_evaluator_with_joined_spec_on_unique_id(  # noqa: D
         joinable_linkable_specs=(
             DimensionSpec(
                 element_name="company_name",
-                entity_links=(EntityReference(element_name="user"),),
+                group_by_links=(EntityReference(element_name="user"),),
             ),
         ),
         join_recipes=(
@@ -286,7 +288,7 @@ def test_node_evaluator_with_joined_spec_on_unique_id(  # noqa: D
                 satisfiable_linkable_specs=[
                     DimensionSpec(
                         element_name="company_name",
-                        entity_links=(EntityReference(element_name="user"),),
+                        group_by_links=(EntityReference(element_name="user"),),
                     ),
                 ],
                 join_on_partition_dimensions=(),
@@ -310,11 +312,11 @@ def test_node_evaluator_with_multiple_joined_specs(  # noqa: D
         required_linkable_specs=[
             DimensionSpec(
                 element_name="home_state_latest",
-                entity_links=(EntityReference(element_name="user"),),
+                group_by_links=(EntityReference(element_name="user"),),
             ),
             EntitySpec(
                 element_name="user",
-                entity_links=(EntityReference(element_name="listing"),),
+                group_by_links=(EntityReference(element_name="listing"),),
             ),
         ],
         left_node=views_source,
@@ -326,11 +328,11 @@ def test_node_evaluator_with_multiple_joined_specs(  # noqa: D
         joinable_linkable_specs=(
             EntitySpec(
                 element_name="user",
-                entity_links=(EntityReference(element_name="listing"),),
+                group_by_links=(EntityReference(element_name="listing"),),
             ),
             DimensionSpec(
                 element_name="home_state_latest",
-                entity_links=(EntityReference(element_name="user"),),
+                group_by_links=(EntityReference(element_name="user"),),
             ),
         ),
         join_recipes=(
@@ -342,7 +344,7 @@ def test_node_evaluator_with_multiple_joined_specs(  # noqa: D
                 satisfiable_linkable_specs=[
                     EntitySpec(
                         element_name="user",
-                        entity_links=(EntityReference(element_name="listing"),),
+                        group_by_links=(EntityReference(element_name="listing"),),
                     )
                 ],
                 join_on_partition_dimensions=(),
@@ -357,7 +359,7 @@ def test_node_evaluator_with_multiple_joined_specs(  # noqa: D
                 satisfiable_linkable_specs=[
                     DimensionSpec(
                         element_name="home_state_latest",
-                        entity_links=(EntityReference(element_name="user"),),
+                        group_by_links=(EntityReference(element_name="user"),),
                     )
                 ],
                 join_on_partition_dimensions=(),
@@ -381,7 +383,7 @@ def test_node_evaluator_with_multihop_joined_spec(  # noqa: D
     linkable_specs = [
         DimensionSpec(
             element_name="customer_name",
-            entity_links=(
+            group_by_links=(
                 EntityReference(element_name="account_id"),
                 EntityReference(element_name="customer_id"),
             ),
@@ -405,7 +407,7 @@ def test_node_evaluator_with_multihop_joined_spec(  # noqa: D
         joinable_linkable_specs=(
             DimensionSpec(
                 element_name="customer_name",
-                entity_links=(
+                group_by_links=(
                     EntityReference(element_name="account_id"),
                     EntityReference(element_name="customer_id"),
                 ),
@@ -418,7 +420,7 @@ def test_node_evaluator_with_multihop_joined_spec(  # noqa: D
                 satisfiable_linkable_specs=[
                     DimensionSpec(
                         element_name="customer_name",
-                        entity_links=(
+                        group_by_links=(
                             EntityReference(element_name="account_id"),
                             EntityReference(element_name="customer_id"),
                         ),
@@ -428,11 +430,11 @@ def test_node_evaluator_with_multihop_joined_spec(  # noqa: D
                 join_on_partition_time_dimensions=(
                     PartitionTimeDimensionJoinDescription(
                         start_node_time_dimension_spec=TimeDimensionSpec(
-                            element_name="ds_partitioned", entity_links=(), time_granularity=TimeGranularity.DAY
+                            element_name="ds_partitioned", group_by_links=(), time_granularity=TimeGranularity.DAY
                         ),
                         node_to_join_time_dimension_spec=TimeDimensionSpec(
                             element_name="ds_partitioned",
-                            entity_links=(),
+                            group_by_links=(),
                             time_granularity=TimeGranularity.DAY,
                         ),
                     ),
@@ -453,7 +455,7 @@ def test_node_evaluator_with_partition_joined_spec(  # noqa: D
         required_linkable_specs=[
             DimensionSpec(
                 element_name="home_state",
-                entity_links=(EntityReference(element_name="user"),),
+                group_by_links=(EntityReference(element_name="user"),),
             ),
         ],
         left_node=mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
@@ -467,7 +469,7 @@ def test_node_evaluator_with_partition_joined_spec(  # noqa: D
         joinable_linkable_specs=(
             DimensionSpec(
                 element_name="home_state",
-                entity_links=(EntityReference(element_name="user"),),
+                group_by_links=(EntityReference(element_name="user"),),
             ),
         ),
         join_recipes=(
@@ -479,7 +481,7 @@ def test_node_evaluator_with_partition_joined_spec(  # noqa: D
                 satisfiable_linkable_specs=[
                     DimensionSpec(
                         element_name="home_state",
-                        entity_links=(EntityReference(element_name="user"),),
+                        group_by_links=(EntityReference(element_name="user"),),
                     ),
                 ],
                 join_on_partition_dimensions=(),
@@ -487,11 +489,11 @@ def test_node_evaluator_with_partition_joined_spec(  # noqa: D
                     PartitionTimeDimensionJoinDescription(
                         start_node_time_dimension_spec=TimeDimensionSpec(
                             element_name="ds_partitioned",
-                            entity_links=(),
+                            group_by_links=(),
                         ),
                         node_to_join_time_dimension_spec=TimeDimensionSpec(
                             element_name="ds_partitioned",
-                            entity_links=(),
+                            group_by_links=(),
                         ),
                     ),
                 ),
@@ -526,7 +528,7 @@ def test_node_evaluator_with_scd_target(
         required_linkable_specs=[
             DimensionSpec(
                 element_name="is_lux",
-                entity_links=(EntityReference(element_name="listing"),),
+                group_by_links=(EntityReference(element_name="listing"),),
             )
         ],
         left_node=mf_engine_test_fixture_mapping[SemanticManifestSetup.SCD_MANIFEST].read_node_mapping[
@@ -540,7 +542,7 @@ def test_node_evaluator_with_scd_target(
         joinable_linkable_specs=(
             DimensionSpec(
                 element_name="is_lux",
-                entity_links=(EntityReference(element_name="listing"),),
+                group_by_links=(EntityReference(element_name="listing"),),
             ),
         ),
         join_recipes=(
@@ -552,14 +554,14 @@ def test_node_evaluator_with_scd_target(
                 satisfiable_linkable_specs=[
                     DimensionSpec(
                         element_name="is_lux",
-                        entity_links=(EntityReference(element_name="listing"),),
+                        group_by_links=(EntityReference(element_name="listing"),),
                     ),
                 ],
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
                 validity_window=ValidityWindowJoinDescription(
-                    window_start_dimension=TimeDimensionSpec(element_name="window_start", entity_links=()),
-                    window_end_dimension=TimeDimensionSpec(element_name="window_end", entity_links=()),
+                    window_start_dimension=TimeDimensionSpec(element_name="window_start", group_by_links=()),
+                    window_end_dimension=TimeDimensionSpec(element_name="window_end", group_by_links=()),
                 ),
                 join_type=SqlJoinType.LEFT_OUTER,
             ),
@@ -597,7 +599,7 @@ def test_node_evaluator_with_multi_hop_scd_target(
         joinable_linkable_specs=(
             DimensionSpec(
                 element_name="is_confirmed_lux",
-                entity_links=(
+                group_by_links=(
                     EntityReference(element_name="listing"),
                     EntityReference(element_name="lux_listing"),
                 ),
@@ -610,7 +612,7 @@ def test_node_evaluator_with_multi_hop_scd_target(
                 satisfiable_linkable_specs=[
                     DimensionSpec(
                         element_name="is_confirmed_lux",
-                        entity_links=(
+                        group_by_links=(
                             EntityReference(element_name="listing"),
                             EntityReference(element_name="lux_listing"),
                         ),
@@ -620,10 +622,10 @@ def test_node_evaluator_with_multi_hop_scd_target(
                 join_on_partition_time_dimensions=(),
                 validity_window=ValidityWindowJoinDescription(
                     window_start_dimension=TimeDimensionSpec(
-                        element_name="window_start", entity_links=(EntityReference(element_name="lux_listing"),)
+                        element_name="window_start", group_by_links=(EntityReference(element_name="lux_listing"),)
                     ),
                     window_end_dimension=TimeDimensionSpec(
-                        element_name="window_end", entity_links=(EntityReference(element_name="lux_listing"),)
+                        element_name="window_end", group_by_links=(EntityReference(element_name="lux_listing"),)
                     ),
                 ),
                 join_type=SqlJoinType.LEFT_OUTER,
@@ -662,7 +664,7 @@ def test_node_evaluator_with_multi_hop_through_scd(
         joinable_linkable_specs=(
             DimensionSpec(
                 element_name="home_state_latest",
-                entity_links=(
+                group_by_links=(
                     EntityReference(element_name="listing"),
                     EntityReference(element_name="user"),
                 ),
@@ -675,7 +677,7 @@ def test_node_evaluator_with_multi_hop_through_scd(
                 satisfiable_linkable_specs=[
                     DimensionSpec(
                         element_name="home_state_latest",
-                        entity_links=(
+                        group_by_links=(
                             EntityReference(element_name="listing"),
                             EntityReference(element_name="user"),
                         ),
@@ -684,8 +686,8 @@ def test_node_evaluator_with_multi_hop_through_scd(
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
                 validity_window=ValidityWindowJoinDescription(
-                    window_start_dimension=TimeDimensionSpec(element_name="window_start", entity_links=()),
-                    window_end_dimension=TimeDimensionSpec(element_name="window_end", entity_links=()),
+                    window_start_dimension=TimeDimensionSpec(element_name="window_start", group_by_links=()),
+                    window_end_dimension=TimeDimensionSpec(element_name="window_end", group_by_links=()),
                 ),
                 join_type=SqlJoinType.LEFT_OUTER,
             ),
@@ -724,7 +726,7 @@ def test_node_evaluator_with_invalid_multi_hop_scd(
         unjoinable_linkable_specs=(
             DimensionSpec(
                 element_name="account_type",
-                entity_links=(
+                group_by_links=(
                     EntityReference(element_name="listing"),
                     EntityReference(element_name="user"),
                 ),

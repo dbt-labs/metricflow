@@ -86,7 +86,7 @@ def test_dimension_in_filter(  # noqa: D
                 entity_path=(EntityReference("listing"),),
                 dimension_reference=DimensionReference("country_latest"),
             ),
-            resolved_spec=DimensionSpec(element_name="country_latest", entity_links=(EntityReference("listing"),)),
+            resolved_spec=DimensionSpec(element_name="country_latest", group_by_links=(EntityReference("listing"),)),
         ),
     ).create_from_where_filter_intersection(
         filter_location=EXAMPLE_FILTER_LOCATION,
@@ -97,7 +97,7 @@ def test_dimension_in_filter(  # noqa: D
     assert where_filter_spec.where_sql == "listing__country_latest = 'US'"
     assert where_filter_spec.linkable_spec_set == LinkableSpecSet(
         dimension_specs=(
-            DimensionSpec(element_name="country_latest", entity_links=(EntityReference(element_name="listing"),)),
+            DimensionSpec(element_name="country_latest", group_by_links=(EntityReference(element_name="listing"),)),
         ),
         time_dimension_specs=(),
         entity_specs=(),
@@ -117,7 +117,7 @@ def test_dimension_in_filter_with_grain(  # noqa: D
             ),
             resolved_spec=TimeDimensionSpec(
                 element_name="country_latest",
-                entity_links=(EntityReference("listing"),),
+                group_by_links=(EntityReference("listing"),),
                 time_granularity=TimeGranularity.WEEK,
             ),
         ),
@@ -135,7 +135,7 @@ def test_dimension_in_filter_with_grain(  # noqa: D
         time_dimension_specs=(
             TimeDimensionSpec(
                 element_name="country_latest",
-                entity_links=(EntityReference(element_name="listing"),),
+                group_by_links=(EntityReference(element_name="listing"),),
                 time_granularity=TimeGranularity.WEEK,
             ),
         ),
@@ -156,7 +156,7 @@ def test_time_dimension_in_filter(  # noqa: D
             ),
             resolved_spec=TimeDimensionSpec(
                 element_name="created_at",
-                entity_links=(EntityReference("listing"),),
+                group_by_links=(EntityReference("listing"),),
                 time_granularity=TimeGranularity.MONTH,
             ),
         ),
@@ -174,7 +174,7 @@ def test_time_dimension_in_filter(  # noqa: D
         time_dimension_specs=(
             TimeDimensionSpec(
                 element_name="created_at",
-                entity_links=(EntityReference(element_name="listing"),),
+                group_by_links=(EntityReference(element_name="listing"),),
                 time_granularity=TimeGranularity.MONTH,
             ),
         ),
@@ -195,7 +195,7 @@ def test_date_part_in_filter(  # noqa: D
             ),
             resolved_spec=TimeDimensionSpec(
                 element_name="metric_time",
-                entity_links=(),
+                group_by_links=(),
                 time_granularity=TimeGranularity.DAY,
                 date_part=DatePart.YEAR,
             ),
@@ -214,7 +214,7 @@ def test_date_part_in_filter(  # noqa: D
         time_dimension_specs=(
             TimeDimensionSpec(
                 element_name="metric_time",
-                entity_links=(),
+                group_by_links=(),
                 time_granularity=TimeGranularity.DAY,
                 date_part=DatePart.YEAR,
             ),
@@ -244,7 +244,7 @@ def resolved_spec_lookup() -> FilterSpecResolutionLookUp:
                 ),
                 resolved_spec=TimeDimensionSpec(
                     element_name="metric_time",
-                    entity_links=(),
+                    group_by_links=(),
                     time_granularity=TimeGranularity.WEEK,
                     date_part=DatePart.YEAR,
                 ),
@@ -283,7 +283,7 @@ def test_date_part_and_grain_in_filter(  # noqa: D
         time_dimension_specs=(
             TimeDimensionSpec(
                 element_name="metric_time",
-                entity_links=(),
+                group_by_links=(),
                 time_granularity=TimeGranularity.WEEK,
                 date_part=DatePart.YEAR,
             ),
@@ -319,7 +319,7 @@ def test_date_part_less_than_grain_in_filter(  # noqa: D
         time_dimension_specs=(
             TimeDimensionSpec(
                 element_name="metric_time",
-                entity_links=(),
+                group_by_links=(),
                 time_granularity=TimeGranularity.WEEK,
                 date_part=DatePart.DAY,
             ),
@@ -343,7 +343,7 @@ def test_entity_in_filter(  # noqa: D
                 entity_path=(EntityReference("listing"),),
                 entity_reference=EntityReference("user"),
             ),
-            resolved_spec=EntitySpec(element_name="user", entity_links=(EntityReference("listing"),)),
+            resolved_spec=EntitySpec(element_name="user", group_by_links=(EntityReference("listing"),)),
         ),
     ).create_from_where_filter(filter_location=EXAMPLE_FILTER_LOCATION, where_filter=where_filter)
 
@@ -351,7 +351,7 @@ def test_entity_in_filter(  # noqa: D
     assert where_filter_spec.linkable_spec_set == LinkableSpecSet(
         dimension_specs=(),
         time_dimension_specs=(),
-        entity_specs=(EntitySpec(element_name="user", entity_links=(EntityReference(element_name="listing"),)),),
+        entity_specs=(EntitySpec(element_name="user", group_by_links=(EntityReference(element_name="listing"),)),),
     )
 
 
@@ -377,7 +377,7 @@ def test_dimension_time_dimension_parity(column_association_resolver: ColumnAsso
                         where_filter_intersection=PydanticWhereFilterIntersection(where_filters=[where_filter]),
                         resolved_spec=TimeDimensionSpec(
                             element_name=METRIC_TIME_ELEMENT_NAME,
-                            entity_links=(),
+                            group_by_links=(),
                             time_granularity=TimeGranularity.WEEK,
                             date_part=DatePart.YEAR,
                         ),

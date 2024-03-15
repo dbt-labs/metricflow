@@ -16,7 +16,7 @@
                     <!-- include_spec =                                               -->
                     <!--   DimensionSpec(                                             -->
                     <!--     element_name='is_instant',                               -->
-                    <!--     entity_links=(EntityReference(element_name='booking'),), -->
+                    <!--     group_by_links=(EntityReference(element_name='booking'),), -->
                     <!--   )                                                          -->
                     <!-- distinct = False -->
                     <MetricTimeDimensionTransformNode>

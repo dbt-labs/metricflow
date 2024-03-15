@@ -26,6 +26,7 @@ from dbt_semantic_interfaces.protocols import MetricTimeWindow, WhereFilterInter
 from dbt_semantic_interfaces.references import (
     DimensionReference,
     EntityReference,
+    LinkableElementReference,
     MeasureReference,
     MetricReference,
     TimeDimensionReference,
@@ -79,6 +80,10 @@ class InstanceSpecVisitor(Generic[VisitorOutputT], ABC):
 
     @abstractmethod
     def visit_metric_spec(self, metric_spec: MetricSpec) -> VisitorOutputT:  # noqa: D
+        raise NotImplementedError
+
+    @abstractmethod
+    def visit_group_by_metric_spec(self, group_by_metric_spec: GroupByMetricSpec) -> VisitorOutputT:  # noqa: D
         raise NotImplementedError
 
     @abstractmethod
@@ -154,21 +159,21 @@ class MetadataSpec(InstanceSpec):
 class LinkableInstanceSpec(InstanceSpec, ABC):
     """Generally a dimension or entity that may be specified using entity links.
 
-    For example, user_id__country -> LinkableElementSpec(element_name="country", entity_links=["user_id"]
+    For example, user_id__country -> LinkableElementSpec(element_name="country", group_by_links=["user_id"]
 
     See InstanceSpec for the reason behind "type: ignore"
     """
 
     """A list representing the join path of entities to get to this element."""
-    entity_links: Tuple[EntityReference, ...]
+    group_by_links: Tuple[EntityReference, ...]
 
     @property
-    def without_first_entity_link(self: SelfTypeT) -> SelfTypeT:
+    def without_first_group_by_link(self: SelfTypeT) -> SelfTypeT:
         """e.g. user_id__device_id__platform -> device_id__platform."""
         raise NotImplementedError()
 
     @property
-    def without_entity_links(self: SelfTypeT) -> SelfTypeT:  # noqa: D
+    def without_group_by_links(self: SelfTypeT) -> SelfTypeT:  # noqa: D
         """e.g. user_id__device_id__platform -> platform."""
         raise NotImplementedError()
 
@@ -184,44 +189,61 @@ class LinkableInstanceSpec(InstanceSpec, ABC):
     def qualified_name(self) -> str:
         """Return the qualified name of this spec. e.g. "user_id__country"."""
         return StructuredLinkableSpecName(
-            entity_link_names=tuple(x.element_name for x in self.entity_links), element_name=self.element_name
+            group_by_link_names=tuple(x.element_name for x in self.group_by_links), element_name=self.element_name
         ).qualified_name
+
+
+@dataclass(frozen=True)
+class GroupByMetricSpec(InstanceSpec, SerializableDataclass):  # noqa: D
+    group_by_links: Tuple[LinkableElementReference, ...]
+
+    @property
+    def as_spec_set(self) -> InstanceSpecSet:
+        return InstanceSpecSet(group_by_metric_specs=(self,))
+
+    def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+        return visitor.visit_group_by_metric_spec(self)
+
+    @property
+    def without_first_group_by_link(self) -> GroupByMetricSpec:  # noqa: D
+        assert len(self.group_by_links) > 0, f"Spec does not have any group by links: {self}"
+        return GroupByMetricSpec(element_name=self.element_name, group_by_links=self.group_by_links[1:])
 
 
 @dataclass(frozen=True)
 class EntitySpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
     @property
-    def without_first_entity_link(self) -> EntitySpec:  # noqa: D
-        assert len(self.entity_links) > 0, f"Spec does not have any entity links: {self}"
-        return EntitySpec(element_name=self.element_name, entity_links=self.entity_links[1:])
+    def without_first_group_by_link(self) -> EntitySpec:  # noqa: D
+        assert len(self.group_by_links) > 0, f"Spec does not have any entity links: {self}"
+        return EntitySpec(element_name=self.element_name, group_by_links=self.group_by_links[1:])
 
     @property
-    def without_entity_links(self) -> EntitySpec:  # noqa: D
+    def without_group_by_links(self) -> EntitySpec:  # noqa: D
         return LinklessEntitySpec.from_element_name(self.element_name)
 
     @property
     def as_linkless_prefix(self) -> Tuple[EntityReference, ...]:
-        """Creates tuple of linkless entities that could be included in the entity_links of another spec.
+        """Creates tuple of linkless entities that could be included in the group_by_links of another spec.
 
         eg as a prefix to a DimensionSpec's entity links to when a join is occurring via this entity
         """
-        return (EntityReference(element_name=self.element_name),) + self.entity_links
+        return (EntityReference(element_name=self.element_name),) + self.group_by_links
 
     @staticmethod
     def from_name(name: str) -> EntitySpec:  # noqa: D
         structured_name = StructuredLinkableSpecName.from_name(name)
         return EntitySpec(
-            entity_links=tuple(EntityReference(idl) for idl in structured_name.entity_link_names),
+            group_by_links=tuple(EntityReference(idl) for idl in structured_name.group_by_link_names),
             element_name=structured_name.element_name,
         )
 
     def __eq__(self, other: Any) -> bool:  # type: ignore[misc] # noqa: D
         if not isinstance(other, EntitySpec):
             return False
-        return self.element_name == other.element_name and self.entity_links == other.entity_links
+        return self.element_name == other.element_name and self.group_by_links == other.group_by_links
 
     def __hash__(self) -> int:  # noqa: D
-        return hash((self.element_name, self.entity_links))
+        return hash((self.element_name, self.group_by_links))
 
     @property
     def reference(self) -> EntityReference:  # noqa: D
@@ -242,49 +264,49 @@ class LinklessEntitySpec(EntitySpec, SerializableDataclass):
 
     @staticmethod
     def from_element_name(element_name: str) -> LinklessEntitySpec:  # noqa: D
-        return LinklessEntitySpec(element_name=element_name, entity_links=())
+        return LinklessEntitySpec(element_name=element_name, group_by_links=())
 
     def __post_init__(self) -> None:  # noqa: D
-        if len(self.entity_links) > 0:
+        if len(self.group_by_links) > 0:
             raise RuntimeError(f"{self.__class__.__name__} shouldn't have entity links. Got: {self}")
 
     def __eq__(self, other: Any) -> bool:  # type: ignore[misc] # noqa: D
         if not isinstance(other, EntitySpec):
             return False
-        return self.element_name == other.element_name and self.entity_links == other.entity_links
+        return self.element_name == other.element_name and self.group_by_links == other.group_by_links
 
     def __hash__(self) -> int:  # noqa: D
-        return hash((self.element_name, self.entity_links))
+        return hash((self.element_name, self.group_by_links))
 
     @staticmethod
     def from_reference(entity_reference: EntityReference) -> LinklessEntitySpec:  # noqa: D
-        return LinklessEntitySpec(element_name=entity_reference.element_name, entity_links=())
+        return LinklessEntitySpec(element_name=entity_reference.element_name, group_by_links=())
 
 
 @dataclass(frozen=True)
 class DimensionSpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D
     element_name: str
-    entity_links: Tuple[EntityReference, ...]
+    group_by_links: Tuple[EntityReference, ...]
 
     @property
-    def without_first_entity_link(self) -> DimensionSpec:  # noqa: D
-        assert len(self.entity_links) > 0, f"Spec does not have any entity links: {self}"
-        return DimensionSpec(element_name=self.element_name, entity_links=self.entity_links[1:])
+    def without_first_group_by_link(self) -> DimensionSpec:  # noqa: D
+        assert len(self.group_by_links) > 0, f"Spec does not have any entity links: {self}"
+        return DimensionSpec(element_name=self.element_name, group_by_links=self.group_by_links[1:])
 
     @property
-    def without_entity_links(self) -> DimensionSpec:  # noqa: D
-        return DimensionSpec(element_name=self.element_name, entity_links=())
+    def without_group_by_links(self) -> DimensionSpec:  # noqa: D
+        return DimensionSpec(element_name=self.element_name, group_by_links=())
 
     @staticmethod
     def from_linkable(spec: LinkableInstanceSpec) -> DimensionSpec:  # noqa: D
-        return DimensionSpec(element_name=spec.element_name, entity_links=spec.entity_links)
+        return DimensionSpec(element_name=spec.element_name, group_by_links=spec.group_by_links)
 
     @staticmethod
     def from_name(name: str) -> DimensionSpec:
         """Construct from a name e.g. listing__ds__month."""
         parsed_name = StructuredLinkableSpecName.from_name(name)
         return DimensionSpec(
-            entity_links=tuple([EntityReference(idl) for idl in parsed_name.entity_link_names]),
+            group_by_links=tuple([EntityReference(idl) for idl in parsed_name.group_by_link_names]),
             element_name=parsed_name.element_name,
         )
 
@@ -334,7 +356,7 @@ class TimeDimensionSpecComparisonKey:
         # This is a list of field values of TimeDimensionSpec that we should use for comparison.
         spec_field_values_for_comparison: List[
             Union[str, Tuple[EntityReference, ...], TimeGranularity, Optional[DatePart]]
-        ] = [self._source_spec.element_name, self._source_spec.entity_links]
+        ] = [self._source_spec.element_name, self._source_spec.group_by_links]
 
         if TimeDimensionSpecField.TIME_GRANULARITY not in self._excluded_fields:
             spec_field_values_for_comparison.append(self._source_spec.time_granularity)
@@ -374,24 +396,24 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
     aggregation_state: Optional[AggregationState] = None
 
     @property
-    def without_first_entity_link(self) -> TimeDimensionSpec:  # noqa: D
-        assert len(self.entity_links) > 0, f"Spec does not have any entity links: {self}"
+    def without_first_group_by_link(self) -> TimeDimensionSpec:  # noqa: D
+        assert len(self.group_by_links) > 0, f"Spec does not have any entity links: {self}"
         return TimeDimensionSpec(
             element_name=self.element_name,
-            entity_links=self.entity_links[1:],
+            group_by_links=self.group_by_links[1:],
             time_granularity=self.time_granularity,
             date_part=self.date_part,
         )
 
     @property
-    def without_entity_links(self) -> TimeDimensionSpec:  # noqa: D
+    def without_group_by_links(self) -> TimeDimensionSpec:  # noqa: D
         return TimeDimensionSpec.from_name(self.element_name)
 
     @staticmethod
     def from_name(name: str) -> TimeDimensionSpec:  # noqa: D
         structured_name = StructuredLinkableSpecName.from_name(name)
         return TimeDimensionSpec(
-            entity_links=tuple(EntityReference(idl) for idl in structured_name.entity_link_names),
+            group_by_links=tuple(EntityReference(idl) for idl in structured_name.group_by_link_names),
             element_name=structured_name.element_name,
             time_granularity=structured_name.time_granularity or DEFAULT_TIME_GRANULARITY,
         )
@@ -407,7 +429,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
     @property
     def qualified_name(self) -> str:  # noqa: D
         return StructuredLinkableSpecName(
-            entity_link_names=tuple(x.element_name for x in self.entity_links),
+            group_by_link_names=tuple(x.element_name for x in self.group_by_links),
             element_name=self.element_name,
             time_granularity=self.time_granularity,
             date_part=self.date_part,
@@ -416,7 +438,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
     @staticmethod
     def from_reference(reference: TimeDimensionReference) -> TimeDimensionSpec:
         """Initialize from a time dimension reference instance."""
-        return TimeDimensionSpec(entity_links=(), element_name=reference.element_name)
+        return TimeDimensionSpec(group_by_links=(), element_name=reference.element_name)
 
     @property
     @override
@@ -429,7 +451,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
     def with_grain(self, time_granularity: TimeGranularity) -> TimeDimensionSpec:  # noqa: D
         return TimeDimensionSpec(
             element_name=self.element_name,
-            entity_links=self.entity_links,
+            group_by_links=self.group_by_links,
             time_granularity=time_granularity,
             date_part=self.date_part,
             aggregation_state=self.aggregation_state,
@@ -438,7 +460,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
     def with_aggregation_state(self, aggregation_state: AggregationState) -> TimeDimensionSpec:  # noqa: D
         return TimeDimensionSpec(
             element_name=self.element_name,
-            entity_links=self.entity_links,
+            group_by_links=self.group_by_links,
             time_granularity=self.time_granularity,
             date_part=self.date_part,
             aggregation_state=aggregation_state,
@@ -453,7 +475,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
 
     @staticmethod
     def generate_possible_specs_for_time_dimension(
-        time_dimension_reference: TimeDimensionReference, entity_links: Tuple[EntityReference, ...]
+        time_dimension_reference: TimeDimensionReference, group_by_links: Tuple[EntityReference, ...]
     ) -> List[TimeDimensionSpec]:
         """Generate a list of time dimension specs with all combinations of granularity & date part."""
         time_dimension_specs: List[TimeDimensionSpec] = []
@@ -461,7 +483,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
             time_dimension_specs.append(
                 TimeDimensionSpec(
                     element_name=time_dimension_reference.element_name,
-                    entity_links=entity_links,
+                    group_by_links=group_by_links,
                     time_granularity=time_granularity,
                     date_part=None,
                 )
@@ -471,7 +493,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D
                 time_dimension_specs.append(
                     TimeDimensionSpec(
                         element_name=time_dimension_reference.element_name,
-                        entity_links=entity_links,
+                        group_by_links=group_by_links,
                         time_granularity=time_granularity,
                         date_part=date_part,
                     )
@@ -656,6 +678,7 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
     dimension_specs: Tuple[DimensionSpec, ...] = ()
     time_dimension_specs: Tuple[TimeDimensionSpec, ...] = ()
     entity_specs: Tuple[EntitySpec, ...] = ()
+    group_by_metric_specs: Tuple[GroupByMetricSpec, ...] = ()
 
     @property
     def contains_metric_time(self) -> bool:
@@ -700,8 +723,12 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
         )
 
     @property
-    def as_tuple(self) -> Tuple[LinkableInstanceSpec, ...]:  # noqa: D
-        return tuple(itertools.chain(self.dimension_specs, self.time_dimension_specs, self.entity_specs))
+    def as_tuple(self) -> Tuple[InstanceSpec, ...]:  # noqa: D
+        return tuple(
+            itertools.chain(
+                self.dimension_specs, self.time_dimension_specs, self.entity_specs, self.group_by_metric_specs
+            )
+        )
 
     @override
     def merge(self, other: LinkableSpecSet) -> LinkableSpecSet:
@@ -709,6 +736,7 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
             dimension_specs=self.dimension_specs + other.dimension_specs,
             time_dimension_specs=self.time_dimension_specs + other.time_dimension_specs,
             entity_specs=self.entity_specs + other.entity_specs,
+            group_by_metric_specs=self.group_by_metric_specs + other.group_by_metric_specs,
         )
 
     @override
@@ -731,10 +759,15 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
         for entity_spec in self.entity_specs:
             entity_spec_dict[entity_spec] = None
 
+        group_by_metric_spec_dict: Dict[GroupByMetricSpec, None] = {}
+        for group_by_metric in self.group_by_metric_specs:
+            group_by_metric_spec_dict[group_by_metric] = None
+
         return LinkableSpecSet(
             dimension_specs=tuple(dimension_spec_dict.keys()),
             time_dimension_specs=tuple(time_dimension_spec_dict.keys()),
             entity_specs=tuple(entity_spec_dict.keys()),
+            group_by_metric_specs=tuple(group_by_metric_spec_dict.keys()),
         )
 
     def is_subset_of(self, other_set: LinkableSpecSet) -> bool:  # noqa: D
@@ -746,6 +779,7 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
             dimension_specs=self.dimension_specs,
             time_dimension_specs=self.time_dimension_specs,
             entity_specs=self.entity_specs,
+            group_by_metric_specs=self.group_by_metric_specs,
         )
 
     def difference(self, other: LinkableSpecSet) -> LinkableSpecSet:  # noqa: D
@@ -753,6 +787,7 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
             dimension_specs=tuple(set(self.dimension_specs) - set(other.dimension_specs)),
             time_dimension_specs=tuple(set(self.time_dimension_specs) - set(other.time_dimension_specs)),
             entity_specs=tuple(set(self.entity_specs) - set(other.entity_specs)),
+            group_by_metric_specs=tuple(set(self.group_by_metric_specs) - set(other.group_by_metric_specs)),
         )
 
     def __len__(self) -> int:  # noqa: D
@@ -765,6 +800,7 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
             dimension_specs=instance_spec_set.dimension_specs,
             time_dimension_specs=instance_spec_set.time_dimension_specs,
             entity_specs=instance_spec_set.entity_specs,
+            group_by_metric_specs=instance_spec_set.group_by_metric_specs,
         )
 
 
@@ -825,6 +861,7 @@ class InstanceSpecSet(Mergeable, SerializableDataclass):
     measure_specs: Tuple[MeasureSpec, ...] = ()
     dimension_specs: Tuple[DimensionSpec, ...] = ()
     entity_specs: Tuple[EntitySpec, ...] = ()
+    group_by_metric_specs: Tuple[GroupByMetricSpec, ...] = ()
     time_dimension_specs: Tuple[TimeDimensionSpec, ...] = ()
     metadata_specs: Tuple[MetadataSpec, ...] = ()
 
@@ -835,6 +872,7 @@ class InstanceSpecSet(Mergeable, SerializableDataclass):
             measure_specs=self.measure_specs + other.measure_specs,
             dimension_specs=self.dimension_specs + other.dimension_specs,
             entity_specs=self.entity_specs + other.entity_specs,
+            group_by_metric_specs=self.group_by_metric_specs + other.group_by_metric_specs,
             time_dimension_specs=self.time_dimension_specs + other.time_dimension_specs,
             metadata_specs=self.metadata_specs + other.metadata_specs,
         )
@@ -874,18 +912,28 @@ class InstanceSpecSet(Mergeable, SerializableDataclass):
             if entity_spec not in entity_specs_deduped:
                 entity_specs_deduped.append(entity_spec)
 
+        group_by_metric_specs_deduped = []
+        for group_by_metric_spec in self.group_by_metric_specs:
+            if group_by_metric_spec not in group_by_metric_specs_deduped:
+                group_by_metric_specs_deduped.append(group_by_metric_spec)
+
         return InstanceSpecSet(
             metric_specs=tuple(metric_specs_deduped),
             measure_specs=tuple(measure_specs_deduped),
             dimension_specs=tuple(dimension_specs_deduped),
             time_dimension_specs=tuple(time_dimension_specs_deduped),
             entity_specs=tuple(entity_specs_deduped),
+            group_by_metric_specs=tuple(group_by_metric_specs_deduped),
         )
 
     @property
-    def linkable_specs(self) -> Sequence[LinkableInstanceSpec]:
+    def linkable_specs(self) -> Sequence[InstanceSpec]:
         """All linkable specs in this set."""
-        return list(itertools.chain(self.dimension_specs, self.time_dimension_specs, self.entity_specs))
+        return list(
+            itertools.chain(
+                self.dimension_specs, self.time_dimension_specs, self.entity_specs, self.group_by_metric_specs
+            )
+        )
 
     @property
     def all_specs(self) -> Sequence[InstanceSpec]:  # noqa: D
@@ -895,6 +943,7 @@ class InstanceSpecSet(Mergeable, SerializableDataclass):
                 self.dimension_specs,
                 self.time_dimension_specs,
                 self.entity_specs,
+                self.group_by_metric_specs,
                 self.metric_specs,
                 self.metadata_specs,
             )
@@ -940,7 +989,7 @@ class WhereFilterSpec(Mergeable, SerializableDataclass):
             dimension_specs=(
                 DimensionSpec(
                     element_name='country',
-                    entity_links=('listing',),
+                    group_by_links=('listing',),
             ),
         )
     )

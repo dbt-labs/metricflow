@@ -20,33 +20,33 @@ def specs() -> Sequence[LinkableInstanceSpec]:  # noqa: D
         MTD_SPEC_YEAR,
         TimeDimensionSpec(
             element_name="creation_time",
-            entity_links=(EntityReference("booking"), EntityReference("listing")),
+            group_by_links=(EntityReference("booking"), EntityReference("listing")),
             time_granularity=TimeGranularity.MONTH,
             date_part=DatePart.DAY,
         ),
         # Dimensions
         DimensionSpec(
             element_name="country",
-            entity_links=(
+            group_by_links=(
                 EntityReference(element_name="listing"),
                 EntityReference(element_name="user"),
             ),
         ),
         DimensionSpec(
             element_name="country",
-            entity_links=(
+            group_by_links=(
                 EntityReference(element_name="booking"),
                 EntityReference(element_name="listing"),
             ),
         ),
-        DimensionSpec(element_name="is_instant", entity_links=(EntityReference(element_name="booking"),)),
+        DimensionSpec(element_name="is_instant", group_by_links=(EntityReference(element_name="booking"),)),
         # Entities
         EntitySpec(
             element_name="listing",
-            entity_links=(EntityReference(element_name="booking"),),
+            group_by_links=(EntityReference(element_name="booking"),),
         ),
         EntitySpec(
             element_name="user",
-            entity_links=(EntityReference(element_name="booking"), EntityReference(element_name="listing")),
+            group_by_links=(EntityReference(element_name="booking"), EntityReference(element_name="listing")),
         ),
     )

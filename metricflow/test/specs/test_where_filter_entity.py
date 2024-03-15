@@ -20,5 +20,5 @@ def test_descending_cannot_be_set(  # noqa
             where_filter_location=EXAMPLE_FILTER_LOCATION,
             rendered_spec_tracker=RenderedSpecTracker(),
             element_name="customer",
-            entity_links=(),
+            group_by_links=(),
         ).descending(True)

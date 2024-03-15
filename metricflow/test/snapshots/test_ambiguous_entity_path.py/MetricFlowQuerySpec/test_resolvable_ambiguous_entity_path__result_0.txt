@@ -3,7 +3,7 @@ MetricFlowQuerySpec(
   dimension_specs=(
     DimensionSpec(
       element_name='country',
-      entity_links=(EntityReference(element_name='entity_1'), EntityReference(element_name='entity_0')),
+      group_by_links=(EntityReference(element_name='entity_1'), EntityReference(element_name='entity_0')),
     ),
   ),
   filter_intersection=PydanticWhereFilterIntersection(),

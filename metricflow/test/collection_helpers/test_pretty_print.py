@@ -39,7 +39,7 @@ def test_classes() -> None:  # noqa: D
             """\
             TimeDimensionSpec(
               element_name='metric_time',
-              entity_links=(),
+              group_by_links=(),
               time_granularity=DAY,
               date_part=None,
               aggregation_state=None,

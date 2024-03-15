@@ -25,7 +25,7 @@ def simple_model_spec_resolver(  # noqa: D
     return ValidLinkableSpecResolver(
         semantic_manifest=simple_semantic_manifest_lookup.semantic_manifest,
         semantic_model_lookup=simple_semantic_manifest_lookup.semantic_model_lookup,
-        max_entity_links=MAX_JOIN_HOPS,
+        max_group_by_links=MAX_JOIN_HOPS,
     )
 
 
@@ -36,7 +36,7 @@ def cyclic_join_manifest_spec_resolver(  # noqa: D
     return ValidLinkableSpecResolver(
         semantic_manifest=cyclic_join_semantic_manifest_lookup.semantic_manifest,
         semantic_model_lookup=cyclic_join_semantic_manifest_lookup.semantic_model_lookup,
-        max_entity_links=MAX_JOIN_HOPS,
+        max_group_by_links=MAX_JOIN_HOPS,
     )
 
 

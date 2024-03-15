@@ -28,7 +28,7 @@ def test_metric_time_only(
     """Tests querying only metric time."""
     dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
         query_spec=MetricFlowQuerySpec(
-            time_dimension_specs=(TimeDimensionSpec(element_name="metric_time", entity_links=()),),
+            time_dimension_specs=(TimeDimensionSpec(element_name="metric_time", group_by_links=()),),
         ),
     )
 
@@ -53,7 +53,7 @@ def test_metric_time_quarter_alone(  # noqa:D
         query_spec=MetricFlowQuerySpec(
             time_dimension_specs=(
                 TimeDimensionSpec(
-                    element_name="metric_time", entity_links=(), time_granularity=TimeGranularity.QUARTER
+                    element_name="metric_time", group_by_links=(), time_granularity=TimeGranularity.QUARTER
                 ),
             ),
         ),
@@ -80,8 +80,8 @@ def test_metric_time_with_other_dimensions(  # noqa:D
         MetricFlowQuerySpec(
             time_dimension_specs=(MTD_SPEC_DAY,),
             dimension_specs=(
-                DimensionSpec(element_name="home_state_latest", entity_links=(EntityReference("user"),)),
-                DimensionSpec(element_name="is_lux_latest", entity_links=(EntityReference("listing"),)),
+                DimensionSpec(element_name="home_state_latest", group_by_links=(EntityReference("user"),)),
+                DimensionSpec(element_name="is_lux_latest", group_by_links=(EntityReference("listing"),)),
             ),
         )
     )
@@ -107,8 +107,8 @@ def test_dimensions_with_time_constraint(  # noqa:D
         MetricFlowQuerySpec(
             time_dimension_specs=(MTD_SPEC_DAY,),
             dimension_specs=(
-                DimensionSpec(element_name="home_state_latest", entity_links=(EntityReference("user"),)),
-                DimensionSpec(element_name="is_lux_latest", entity_links=(EntityReference("listing"),)),
+                DimensionSpec(element_name="home_state_latest", group_by_links=(EntityReference("user"),)),
+                DimensionSpec(element_name="is_lux_latest", group_by_links=(EntityReference("listing"),)),
             ),
             time_range_constraint=TimeRangeConstraint(
                 start_time=datetime.datetime(2020, 1, 1), end_time=datetime.datetime(2020, 1, 3)

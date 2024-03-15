@@ -17,12 +17,12 @@ class StructuredLinkableSpecName:
     """Parse a qualified name into different parts.
 
     e.g. listing__ds__week ->
-    entity_links: ["listing"]
+    group_by_links: ["listing"]
     element_name: "ds"
     granularity: TimeGranularity.WEEK
     """
 
-    entity_link_names: Tuple[str, ...]
+    group_by_link_names: Tuple[str, ...]
     element_name: str
     time_granularity: Optional[TimeGranularity] = None
     date_part: Optional[DatePart] = None
@@ -34,7 +34,7 @@ class StructuredLinkableSpecName:
 
         # No dunder, e.g. "ds"
         if len(name_parts) == 1:
-            return StructuredLinkableSpecName(entity_link_names=(), element_name=name_parts[0])
+            return StructuredLinkableSpecName(group_by_link_names=(), element_name=name_parts[0])
 
         for date_part in DatePart:
             if name_parts[-1] == StructuredLinkableSpecName.date_part_suffix(date_part=date_part):
@@ -52,18 +52,18 @@ class StructuredLinkableSpecName:
             #  e.g. "ds__month"
             if len(name_parts) == 2:
                 return StructuredLinkableSpecName(
-                    entity_link_names=(), element_name=name_parts[0], time_granularity=associated_granularity
+                    group_by_link_names=(), element_name=name_parts[0], time_granularity=associated_granularity
                 )
             # e.g. "messages__ds__month"
             return StructuredLinkableSpecName(
-                entity_link_names=tuple(name_parts[:-2]),
+                group_by_link_names=tuple(name_parts[:-2]),
                 element_name=name_parts[-2],
                 time_granularity=associated_granularity,
             )
 
         # e.g. "messages__ds"
         else:
-            return StructuredLinkableSpecName(entity_link_names=tuple(name_parts[:-1]), element_name=name_parts[-1])
+            return StructuredLinkableSpecName(group_by_link_names=tuple(name_parts[:-1]), element_name=name_parts[-1])
 
     @property
     def qualified_name(self) -> str:
@@ -71,7 +71,7 @@ class StructuredLinkableSpecName:
 
         If date_part is specified, don't include granularity in qualified_name since it will not impact the result.
         """
-        items = list(self.entity_link_names) + [self.element_name]
+        items = list(self.group_by_link_names) + [self.element_name]
         if self.date_part:
             items.append(self.date_part_suffix(date_part=self.date_part))
         elif self.time_granularity:
@@ -81,8 +81,8 @@ class StructuredLinkableSpecName:
     @property
     def entity_prefix(self) -> Optional[str]:
         """Return the entity prefix. e.g. listing__ds__month -> listing."""
-        if len(self.entity_link_names) > 0:
-            return DUNDER.join(self.entity_link_names)
+        if len(self.group_by_link_names) > 0:
+            return DUNDER.join(self.group_by_link_names)
 
         return None
 
@@ -102,5 +102,5 @@ class StructuredLinkableSpecName:
         in your set for each TimeDimension.
         """
         return StructuredLinkableSpecName(
-            entity_link_names=self.entity_link_names, element_name=self.element_name
+            group_by_link_names=self.group_by_link_names, element_name=self.element_name
         ).qualified_name

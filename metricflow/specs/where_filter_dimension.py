@@ -44,7 +44,7 @@ class WhereFilterDimension(ProtocolHint[QueryInterfaceDimension]):
         where_filter_location: WhereFilterLocation,
         rendered_spec_tracker: RenderedSpecTracker,
         element_name: str,
-        entity_links: Sequence[EntityReference],
+        group_by_links: Sequence[EntityReference],
         time_grain: Optional[TimeGranularity] = None,
         date_part: Optional[DatePart] = None,
     ) -> None:
@@ -53,7 +53,7 @@ class WhereFilterDimension(ProtocolHint[QueryInterfaceDimension]):
         self._where_filter_location = where_filter_location
         self._rendered_spec_tracker = rendered_spec_tracker
         self._element_name = element_name
-        self._entity_links = tuple(entity_links)
+        self._group_by_links = tuple(group_by_links)
         self._time_grain = time_grain
         self._date_part = date_part
 
@@ -65,7 +65,7 @@ class WhereFilterDimension(ProtocolHint[QueryInterfaceDimension]):
             where_filter_location=self._where_filter_location,
             rendered_spec_tracker=self._rendered_spec_tracker,
             element_name=self._element_name,
-            entity_links=self._entity_links,
+            group_by_links=self._group_by_links,
             time_grain=TimeGranularity(time_granularity_name.lower()),
             date_part=self._date_part,
         )
@@ -78,7 +78,7 @@ class WhereFilterDimension(ProtocolHint[QueryInterfaceDimension]):
             where_filter_location=self._where_filter_location,
             rendered_spec_tracker=self._rendered_spec_tracker,
             element_name=self._element_name,
-            entity_links=self._entity_links,
+            group_by_links=self._group_by_links,
             time_grain=self._time_grain,
             date_part=DatePart(date_part_name.lower()),
         )
@@ -95,14 +95,14 @@ class WhereFilterDimension(ProtocolHint[QueryInterfaceDimension]):
         call_parameter_set: Union[TimeDimensionCallParameterSet, DimensionCallParameterSet]
         if self._time_grain is not None or self._date_part is not None:
             call_parameter_set = TimeDimensionCallParameterSet(
-                entity_path=self._entity_links,
+                entity_path=self._group_by_links,
                 time_dimension_reference=TimeDimensionReference(self._element_name),
                 time_granularity=self._time_grain,
                 date_part=self._date_part,
             )
         else:
             call_parameter_set = DimensionCallParameterSet(
-                entity_path=self._entity_links,
+                entity_path=self._group_by_links,
                 dimension_reference=DimensionReference(self._element_name),
             )
 
@@ -150,6 +150,6 @@ class WhereFilterDimensionFactory(ProtocolHint[QueryInterfaceDimensionFactory]):
             where_filter_location=self._where_filter_location,
             rendered_spec_tracker=self._rendered_spec_tracker,
             element_name=structured_name.element_name,
-            entity_links=tuple(EntityReference(entity_link_name.lower()) for entity_link_name in entity_path)
-            + structured_name.entity_links,
+            group_by_links=tuple(EntityReference(group_by_link_name.lower()) for group_by_link_name in entity_path)
+            + structured_name.group_by_links,
         )

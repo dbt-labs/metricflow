@@ -18,7 +18,7 @@ from metricflow.model.semantics.linkable_spec_resolver import (
 from metricflow.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.protocols.semantics import MetricAccessor
-from metricflow.specs.specs import LinkableInstanceSpec, TimeDimensionSpec
+from metricflow.specs.specs import InstanceSpec, TimeDimensionSpec
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +37,7 @@ class MetricLookup(MetricAccessor):  # noqa: D
         self._linkable_spec_resolver = ValidLinkableSpecResolver(
             semantic_manifest=self._semantic_manifest,
             semantic_model_lookup=semantic_model_lookup,
-            max_entity_links=MAX_JOIN_HOPS,
+            max_group_by_links=MAX_JOIN_HOPS,
         )
 
     def element_specs_for_metrics(
@@ -45,7 +45,7 @@ class MetricLookup(MetricAccessor):  # noqa: D
         metric_references: Sequence[MetricReference],
         with_any_property: FrozenSet[LinkableElementProperties] = LinkableElementProperties.all_properties(),
         without_any_property: FrozenSet[LinkableElementProperties] = frozenset(),
-    ) -> Sequence[LinkableInstanceSpec]:
+    ) -> Sequence[InstanceSpec]:
         """Dimensions common to all metrics requested (intersection)."""
         all_linkable_specs = self._linkable_spec_resolver.get_linkable_elements_for_metrics(
             metric_references=metric_references,
@@ -60,7 +60,7 @@ class MetricLookup(MetricAccessor):  # noqa: D
         measure_reference: MeasureReference,
         with_any_of: Optional[Set[LinkableElementProperties]] = None,
         without_any_of: Optional[Set[LinkableElementProperties]] = None,
-    ) -> Sequence[LinkableInstanceSpec]:
+    ) -> Sequence[InstanceSpec]:
         """Return group-by-items that are possible for a measure."""
         frozen_with_any_of = (
             LinkableElementProperties.all_properties() if with_any_of is None else frozenset(with_any_of)
@@ -77,7 +77,7 @@ class MetricLookup(MetricAccessor):  # noqa: D
         self,
         with_any_of: Optional[Set[LinkableElementProperties]] = None,
         without_any_of: Optional[Set[LinkableElementProperties]] = None,
-    ) -> Sequence[LinkableInstanceSpec]:
+    ) -> Sequence[InstanceSpec]:
         """Return the possible group-by-items for a dimension values query with no metrics."""
         frozen_with_any_of = (
             LinkableElementProperties.all_properties() if with_any_of is None else frozenset(with_any_of)
@@ -187,6 +187,6 @@ class MetricLookup(MetricAccessor):  # noqa: D
         path_key = agg_time_dimension_element_path_keys[0]
         valid_agg_time_dimension_specs = TimeDimensionSpec.generate_possible_specs_for_time_dimension(
             time_dimension_reference=TimeDimensionReference(element_name=path_key.element_name),
-            entity_links=path_key.entity_links,
+            group_by_links=path_key.group_by_links,
         )
         return valid_agg_time_dimension_specs

@@ -21,7 +21,7 @@
                     <!-- include_spec =                                               -->
                     <!--   DimensionSpec(                                             -->
                     <!--     element_name='country_latest',                           -->
-                    <!--     entity_links=(EntityReference(element_name='listing'),), -->
+                    <!--     group_by_links=(EntityReference(element_name='listing'),), -->
                     <!--   )                                                          -->
                     <!-- distinct = False -->
                     <JoinToBaseOutputNode>

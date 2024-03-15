@@ -24,7 +24,7 @@
                             <!-- include_spec =                                               -->
                             <!--   DimensionSpec(                                             -->
                             <!--     element_name='country_latest',                           -->
-                            <!--     entity_links=(EntityReference(element_name='listing'),), -->
+                            <!--     group_by_links=(EntityReference(element_name='listing'),), -->
                             <!--   )                                                          -->
                             <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
                             <!-- distinct = False -->
@@ -92,7 +92,7 @@
                             <!-- include_spec =                                               -->
                             <!--   DimensionSpec(                                             -->
                             <!--     element_name='country_latest',                           -->
-                            <!--     entity_links=(EntityReference(element_name='listing'),), -->
+                            <!--     group_by_links=(EntityReference(element_name='listing'),), -->
                             <!--   )                                                          -->
                             <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
                             <!-- distinct = False -->
