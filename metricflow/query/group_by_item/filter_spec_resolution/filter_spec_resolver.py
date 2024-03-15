@@ -240,7 +240,6 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
 
             # If the same metric is present multiple times in a query - there could be duplicates.
             resolved_spec_lookup_so_far = FilterSpecResolutionLookUp.merge_iterable(results_to_merge)
-            print(2, node.where_filter_intersection)
             return resolved_spec_lookup_so_far.merge(
                 self._resolve_specs_for_where_filters(
                     current_node=node,

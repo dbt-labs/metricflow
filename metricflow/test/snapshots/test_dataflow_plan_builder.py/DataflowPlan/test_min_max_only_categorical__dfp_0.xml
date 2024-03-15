@@ -8,11 +8,11 @@
             <FilterElementsNode>
                 <!-- description = "Pass Only Elements: ['listing__country_latest',]" -->
                 <!-- node_id = NodeId(id_str='pfe_0') -->
-                <!-- include_spec =                                               -->
-                <!--   DimensionSpec(                                             -->
-                <!--     element_name='country_latest',                           -->
+                <!-- include_spec =                                                 -->
+                <!--   DimensionSpec(                                               -->
+                <!--     element_name='country_latest',                             -->
                 <!--     group_by_links=(EntityReference(element_name='listing'),), -->
-                <!--   )                                                          -->
+                <!--   )                                                            -->
                 <!-- distinct = True -->
                 <ReadSqlSourceNode>
                     <!-- description = "Read From SemanticModelDataSet('listings_latest')" -->

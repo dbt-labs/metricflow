@@ -30,6 +30,7 @@ from metricflow.dataflow.builder.partitions import (
     PartitionTimeDimensionJoinDescription,
 )
 from metricflow.dataflow.dataflow_plan import BaseOutput
+from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataflow.nodes.join_to_base import JoinDescription, ValidityWindowJoinDescription
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
@@ -264,7 +265,9 @@ class NodeEvaluatorForLinkableInstances:
                     ].semantic_model_reference,
                     on_entity_reference=entity_spec_in_right_node.reference,
                 ):
-                    continue
+                    # Check if it's joining to something pre-aggregated. If so, we can allow the supposed fan-out join.
+                    if not isinstance(right_node, ComputeMetricsNode):
+                        continue
 
                 linkless_entity_spec_in_node = LinklessEntitySpec.from_element_name(
                     entity_spec_in_right_node.element_name
@@ -302,7 +305,12 @@ class NodeEvaluatorForLinkableInstances:
                     )
                     if required_entity_matches_data_set_entity and needed_linkable_spec_in_node:
                         satisfiable_linkable_specs.append(needed_linkable_spec)
-
+                    if isinstance(right_node, ComputeMetricsNode):
+                        print(
+                            "made it here!3",
+                            needed_linkable_spec.without_first_group_by_link,
+                            linkable_specs_in_right_node,
+                        )
                 # If this node can satisfy some linkable specs, it could be useful to join on, so add it to the
                 # candidate list.
                 if len(satisfiable_linkable_specs) > 0:

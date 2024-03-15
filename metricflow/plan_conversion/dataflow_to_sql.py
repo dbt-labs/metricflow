@@ -42,7 +42,12 @@ from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataset.dataset import DataSet
 from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.filters.time_constraint import TimeRangeConstraint
-from metricflow.instances import InstanceSet, MetadataInstance, MetricInstance, TimeDimensionInstance
+from metricflow.instances import (
+    InstanceSet,
+    MetadataInstance,
+    MetricInstance,
+    TimeDimensionInstance,
+)
 from metricflow.mf_logging.formatting import indent
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.instance_converters import (

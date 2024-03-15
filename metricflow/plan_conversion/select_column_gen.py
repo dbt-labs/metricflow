@@ -19,6 +19,7 @@ class SelectColumnSet:
     time_dimension_columns: List[SqlSelectColumn] = field(default_factory=list)
     entity_columns: List[SqlSelectColumn] = field(default_factory=list)
     metadata_columns: List[SqlSelectColumn] = field(default_factory=list)
+    group_by_metric_columns: List[SqlSelectColumn] = field(default_factory=list)
 
     def merge(self, other_set: SelectColumnSet) -> SelectColumnSet:
         """Combine the select columns by type."""
@@ -29,6 +30,7 @@ class SelectColumnSet:
             time_dimension_columns=self.time_dimension_columns + other_set.time_dimension_columns,
             entity_columns=self.entity_columns + other_set.entity_columns,
             metadata_columns=self.metadata_columns + other_set.metadata_columns,
+            group_by_metric_columns=self.group_by_metric_columns + other_set.group_by_metric_columns,
         )
 
     def as_tuple(self) -> Tuple[SqlSelectColumn, ...]:
@@ -40,6 +42,7 @@ class SelectColumnSet:
             + self.dimension_columns
             + self.metric_columns
             + self.measure_columns
+            + self.group_by_metric_columns
             + self.metadata_columns
         )
 
@@ -51,4 +54,5 @@ class SelectColumnSet:
             time_dimension_columns=self.time_dimension_columns,
             entity_columns=self.entity_columns,
             metadata_columns=self.metadata_columns,
+            group_by_metric_columns=self.group_by_metric_columns,
         )

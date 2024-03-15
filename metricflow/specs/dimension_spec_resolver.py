@@ -27,7 +27,7 @@ class DimensionSpecResolver:
         call_parameter_set = DimensionCallParameterSet(
             dimension_reference=DimensionReference(element_name=structured_name.element_name),
             entity_path=(
-                tuple(EntityReference(element_name=arg) for arg in entity_path) + structured_name.group_by_links
+                tuple(EntityReference(element_name=arg) for arg in entity_path) + structured_name.entity_links
             ),
         )
         return DimensionSpec(
@@ -48,7 +48,7 @@ class DimensionSpecResolver:
             time_dimension_reference=TimeDimensionReference(element_name=structured_name.element_name),
             time_granularity=time_granularity,
             entity_path=(
-                tuple(EntityReference(element_name=arg) for arg in entity_path) + structured_name.group_by_links
+                tuple(EntityReference(element_name=arg) for arg in entity_path) + structured_name.entity_links
             ),
             date_part=date_part,
         )

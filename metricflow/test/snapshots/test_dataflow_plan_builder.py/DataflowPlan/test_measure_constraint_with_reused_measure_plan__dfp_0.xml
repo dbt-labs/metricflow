@@ -23,7 +23,7 @@
                     <!--           dimension_specs=(                           -->
                     <!--             DimensionSpec(                            -->
                     <!--               element_name='is_instant',              -->
-                    <!--               group_by_links=(                          -->
+                    <!--               group_by_links=(                        -->
                     <!--                 EntityReference(                      -->
                     <!--                   element_name='booking',             -->
                     <!--                 ),                                    -->
@@ -55,7 +55,7 @@
                                 <!--       dimension_specs=(                  -->
                                 <!--         DimensionSpec(                   -->
                                 <!--           element_name='is_instant',     -->
-                                <!--           group_by_links=(                 -->
+                                <!--           group_by_links=(               -->
                                 <!--             EntityReference(             -->
                                 <!--               element_name='booking',    -->
                                 <!--             ),                           -->
@@ -70,11 +70,11 @@
                                     <!--    "'metric_time__day']")                                          -->
                                     <!-- node_id = NodeId(id_str='pfe_0') -->
                                     <!-- include_spec = MeasureSpec(element_name='booking_value') -->
-                                    <!-- include_spec =                                               -->
-                                    <!--   DimensionSpec(                                             -->
-                                    <!--     element_name='is_instant',                               -->
+                                    <!-- include_spec =                                                 -->
+                                    <!--   DimensionSpec(                                               -->
+                                    <!--     element_name='is_instant',                                 -->
                                     <!--     group_by_links=(EntityReference(element_name='booking'),), -->
-                                    <!--   )                                                          -->
+                                    <!--   )                                                            -->
                                     <!-- include_spec =                                                        -->
                                     <!--   TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
                                     <!-- distinct = False -->

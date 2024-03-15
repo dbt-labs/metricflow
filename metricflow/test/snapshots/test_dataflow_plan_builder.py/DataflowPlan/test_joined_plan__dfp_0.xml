@@ -14,16 +14,16 @@
                     <!--   "Pass Only Elements: ['bookings', 'booking__is_instant', 'listing__country_latest']" -->
                     <!-- node_id = NodeId(id_str='pfe_2') -->
                     <!-- include_spec = MeasureSpec(element_name='bookings') -->
-                    <!-- include_spec =                                               -->
-                    <!--   DimensionSpec(                                             -->
-                    <!--     element_name='is_instant',                               -->
+                    <!-- include_spec =                                                 -->
+                    <!--   DimensionSpec(                                               -->
+                    <!--     element_name='is_instant',                                 -->
                     <!--     group_by_links=(EntityReference(element_name='booking'),), -->
-                    <!--   )                                                          -->
-                    <!-- include_spec =                                               -->
-                    <!--   DimensionSpec(                                             -->
-                    <!--     element_name='country_latest',                           -->
+                    <!--   )                                                            -->
+                    <!-- include_spec =                                                 -->
+                    <!--   DimensionSpec(                                               -->
+                    <!--     element_name='country_latest',                             -->
                     <!--     group_by_links=(EntityReference(element_name='listing'),), -->
-                    <!--   )                                                          -->
+                    <!--   )                                                            -->
                     <!-- distinct = False -->
                     <JoinToBaseOutputNode>
                         <!-- description = 'Join Standard Outputs' -->
@@ -38,11 +38,11 @@
                             <!-- description = "Pass Only Elements: ['bookings', 'booking__is_instant', 'listing']" -->
                             <!-- node_id = NodeId(id_str='pfe_0') -->
                             <!-- include_spec = MeasureSpec(element_name='bookings') -->
-                            <!-- include_spec =                                               -->
-                            <!--   DimensionSpec(                                             -->
-                            <!--     element_name='is_instant',                               -->
+                            <!-- include_spec =                                                 -->
+                            <!--   DimensionSpec(                                               -->
+                            <!--     element_name='is_instant',                                 -->
                             <!--     group_by_links=(EntityReference(element_name='booking'),), -->
-                            <!--   )                                                          -->
+                            <!--   )                                                            -->
                             <!-- include_spec = LinklessEntitySpec(element_name='listing') -->
                             <!-- distinct = False -->
                             <MetricTimeDimensionTransformNode>

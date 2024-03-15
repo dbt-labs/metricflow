@@ -205,6 +205,12 @@ class GroupByMetricSpec(InstanceSpec, SerializableDataclass):  # noqa: D
         return visitor.visit_group_by_metric_spec(self)
 
     @property
+    def qualified_name(self) -> str:
+        return StructuredLinkableSpecName(
+            group_by_link_names=tuple(x.element_name for x in self.group_by_links), element_name=self.element_name
+        ).qualified_name
+
+    @property
     def without_first_group_by_link(self) -> GroupByMetricSpec:  # noqa: D
         assert len(self.group_by_links) > 0, f"Spec does not have any group by links: {self}"
         return GroupByMetricSpec(element_name=self.element_name, group_by_links=self.group_by_links[1:])

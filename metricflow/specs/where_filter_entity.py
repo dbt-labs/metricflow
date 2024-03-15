@@ -110,5 +110,5 @@ class WhereFilterEntityFactory(ProtocolHint[QueryInterfaceEntityFactory]):
             rendered_spec_tracker=self._rendered_spec_tracker,
             element_name=structured_name.element_name,
             group_by_links=tuple(EntityReference(group_by_link_name.lower()) for group_by_link_name in entity_path)
-            + structured_name.group_by_links,
+            + structured_name.entity_links,
         )

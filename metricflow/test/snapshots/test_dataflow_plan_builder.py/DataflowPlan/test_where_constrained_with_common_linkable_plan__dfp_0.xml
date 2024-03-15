@@ -16,7 +16,7 @@
             <!--           dimension_specs=(                         -->
             <!--             DimensionSpec(                          -->
             <!--               element_name='country_latest',        -->
-            <!--               group_by_links=(                        -->
+            <!--               group_by_links=(                      -->
             <!--                 EntityReference(                    -->
             <!--                   element_name='listing',           -->
             <!--                 ),                                  -->
@@ -41,7 +41,7 @@
                     <!--       dimension_specs=(                         -->
                     <!--         DimensionSpec(                          -->
                     <!--           element_name='country_latest',        -->
-                    <!--           group_by_links=(                        -->
+                    <!--           group_by_links=(                      -->
                     <!--             EntityReference(                    -->
                     <!--               element_name='listing',           -->
                     <!--             ),                                  -->
@@ -54,11 +54,11 @@
                         <!-- description = "Pass Only Elements: ['bookings', 'listing__country_latest']" -->
                         <!-- node_id = NodeId(id_str='pfe_2') -->
                         <!-- include_spec = MeasureSpec(element_name='bookings') -->
-                        <!-- include_spec =                                               -->
-                        <!--   DimensionSpec(                                             -->
-                        <!--     element_name='country_latest',                           -->
+                        <!-- include_spec =                                                 -->
+                        <!--   DimensionSpec(                                               -->
+                        <!--     element_name='country_latest',                             -->
                         <!--     group_by_links=(EntityReference(element_name='listing'),), -->
-                        <!--   )                                                          -->
+                        <!--   )                                                            -->
                         <!-- distinct = False -->
                         <JoinToBaseOutputNode>
                             <!-- description = 'Join Standard Outputs' -->

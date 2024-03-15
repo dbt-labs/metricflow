@@ -815,6 +815,23 @@ class DataflowPlanBuilder:
                 measure_specs=set(measure_spec_properties.measure_specs),
                 source_nodes=self._source_node_set.source_nodes_for_metric_queries,
             )
+            # If there are MetricGroupBys in the requested linkable specs, build source nodes to satisfy them.
+            # We do this at query time instead of during usual source node generation because the number of potential
+            # MetricGroupBy source nodes would be extremely large (and potentially slow).
+            for group_by_metric_spec in linkable_spec_set.group_by_metric_specs:
+                # TODO: handle dimensions
+                group_by_metric_source_node = self._build_query_output_node(
+                    # TODO: move this logic into MetricGroupBySpec
+                    MetricFlowQuerySpec(
+                        metric_specs=(MetricSpec(element_name=group_by_metric_spec.element_name),),
+                        entity_specs=tuple(
+                            EntitySpec.from_name(group_by_link.element_name)
+                            for group_by_link in group_by_metric_spec.group_by_links
+                        ),
+                    )
+                )
+                candidate_nodes_for_right_side_of_join += (group_by_metric_source_node,)
+
             default_join_type = SqlJoinType.LEFT_OUTER
         else:
             candidate_nodes_for_right_side_of_join = list(self._source_node_set.source_nodes_for_group_by_item_queries)
@@ -1329,6 +1346,8 @@ class DataflowPlanBuilder:
                 required_linkable_specs.as_spec_set,
             )
 
+            # somehow ensure that group by metrics are in data set before it gets here. so after join to base output.
+            #
             after_join_filtered_node = FilterElementsNode(
                 parent_node=filtered_measures_with_joined_elements, include_specs=specs_to_keep_after_join
             )

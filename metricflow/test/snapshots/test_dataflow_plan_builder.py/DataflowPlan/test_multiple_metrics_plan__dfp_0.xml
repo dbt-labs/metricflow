@@ -16,11 +16,11 @@
                         <!-- description = "Pass Only Elements: ['bookings', 'booking__is_instant', 'metric_time__day']" -->
                         <!-- node_id = NodeId(id_str='pfe_0') -->
                         <!-- include_spec = MeasureSpec(element_name='bookings') -->
-                        <!-- include_spec =                                               -->
-                        <!--   DimensionSpec(                                             -->
-                        <!--     element_name='is_instant',                               -->
+                        <!-- include_spec =                                                 -->
+                        <!--   DimensionSpec(                                               -->
+                        <!--     element_name='is_instant',                                 -->
                         <!--     group_by_links=(EntityReference(element_name='booking'),), -->
-                        <!--   )                                                          -->
+                        <!--   )                                                            -->
                         <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
                         <!-- distinct = False -->
                         <MetricTimeDimensionTransformNode>
@@ -48,11 +48,11 @@
                         <!--   "Pass Only Elements: ['booking_value', 'booking__is_instant', 'metric_time__day']" -->
                         <!-- node_id = NodeId(id_str='pfe_1') -->
                         <!-- include_spec = MeasureSpec(element_name='booking_value') -->
-                        <!-- include_spec =                                               -->
-                        <!--   DimensionSpec(                                             -->
-                        <!--     element_name='is_instant',                               -->
+                        <!-- include_spec =                                                 -->
+                        <!--   DimensionSpec(                                               -->
+                        <!--     element_name='is_instant',                                 -->
                         <!--     group_by_links=(EntityReference(element_name='booking'),), -->
-                        <!--   )                                                          -->
+                        <!--   )                                                            -->
                         <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
                         <!-- distinct = False -->
                         <MetricTimeDimensionTransformNode>

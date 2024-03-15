@@ -197,11 +197,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
 
             matching_specs = specs_available_for_measure_given_child_metric
             for source_spec_pattern in self._source_spec_patterns:
-                print("\n\n", source_spec_pattern)
-                # TODO: WHY IS base time grain pattern in here?
-                print("before:", matching_specs)
                 matching_specs = InstanceSpecSet.from_specs(source_spec_pattern.match(matching_specs)).linkable_specs
-                print("after:", matching_specs)
 
             logger.debug(
                 f"For {node.ui_description}:\n"

@@ -194,7 +194,6 @@ class SemanticModelJoinEvaluator:
                 return None
 
         join_type = SemanticModelEntityJoinType(left_entity.type, right_entity.type)
-
         if join_type in SemanticModelJoinEvaluator._VALID_ENTITY_JOINS:
             return join_type
         elif join_type in SemanticModelJoinEvaluator._INVALID_ENTITY_JOINS:

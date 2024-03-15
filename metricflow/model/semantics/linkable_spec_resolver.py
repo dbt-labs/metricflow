@@ -355,6 +355,8 @@ class LinkableElementSet:
                 )
                 for path_key in self.path_key_to_linkable_entities
             ),
+            # Need this? Can we just use the metric_specs field and not pass group_by_links through?
+            # If so, might be able to remove GroupByMetricSpec class entirely
             group_by_metric_specs=tuple(
                 GroupByMetricSpec(
                     element_name=path_key.element_name,

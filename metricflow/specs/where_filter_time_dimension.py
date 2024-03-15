@@ -96,7 +96,7 @@ class WhereFilterTimeDimensionFactory(ProtocolHint[QueryInterfaceTimeDimensionFa
             rendered_spec_tracker=self._rendered_spec_tracker,
             element_name=structured_name.element_name,
             group_by_links=tuple(EntityReference(group_by_link_name.lower()) for group_by_link_name in entity_path)
-            + structured_name.group_by_links,
+            + structured_name.entity_links,
             time_grain=TimeGranularity(time_granularity_name.lower()) if time_granularity_name else None,
             date_part=DatePart(date_part_name.lower()) if date_part_name else None,
         )

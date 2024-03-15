@@ -18,11 +18,11 @@
                         <!-- node_id = NodeId(id_str='pfe_2') -->
                         <!-- include_spec = MeasureSpec(element_name='bookings') -->
                         <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
-                        <!-- include_spec =                                               -->
-                        <!--   DimensionSpec(                                             -->
-                        <!--     element_name='country_latest',                           -->
+                        <!-- include_spec =                                                 -->
+                        <!--   DimensionSpec(                                               -->
+                        <!--     element_name='country_latest',                             -->
                         <!--     group_by_links=(EntityReference(element_name='listing'),), -->
-                        <!--   )                                                          -->
+                        <!--   )                                                            -->
                         <!-- distinct = False -->
                         <JoinToBaseOutputNode>
                             <!-- description = 'Join Standard Outputs' -->
@@ -85,11 +85,11 @@
                         <!-- node_id = NodeId(id_str='pfe_5') -->
                         <!-- include_spec = MeasureSpec(element_name='booking_value') -->
                         <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
-                        <!-- include_spec =                                               -->
-                        <!--   DimensionSpec(                                             -->
-                        <!--     element_name='country_latest',                           -->
+                        <!-- include_spec =                                                 -->
+                        <!--   DimensionSpec(                                               -->
+                        <!--     element_name='country_latest',                             -->
                         <!--     group_by_links=(EntityReference(element_name='listing'),), -->
-                        <!--   )                                                          -->
+                        <!--   )                                                            -->
                         <!-- distinct = False -->
                         <JoinToBaseOutputNode>
                             <!-- description = 'Join Standard Outputs' -->

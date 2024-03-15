@@ -333,6 +333,7 @@ def test_case(
     )
 
     actual = query_result.result_df
+    assert 0, query_result.sql
 
     expected = sql_client.query(
         jinja2.Template(

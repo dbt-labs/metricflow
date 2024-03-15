@@ -1267,3 +1267,29 @@ def test_offset_to_grain_metric_filter_and_query_have_different_granularities(
         mf_test_session_state=mf_test_session_state,
         dag_graph=dataflow_plan,
     )
+
+
+def test_metric_in_where_filter(
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    query_parser: MetricFlowQueryParser,
+    create_source_tables: bool,
+) -> None:
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("active_listings",),
+    )
+    dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan.text_structure(),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        dag_graph=dataflow_plan,
+    )
