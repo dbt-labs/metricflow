@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import Sequence
 
-import more_itertools
-
 from metricflow.dataset.dataset import DataSet
 from metricflow.instances import (
     InstanceSet,
@@ -106,13 +104,3 @@ class SqlDataSet(DataSet):
             )
 
         return column_associations_to_return[0]
-
-    @property
-    def groupable_column_associations(self) -> Sequence[ColumnAssociation]:
-        """Return a flattened iterable with all groupable column associations for the current data set."""
-        instances = (
-            self.instance_set.entity_instances
-            + self.instance_set.dimension_instances
-            + self.instance_set.time_dimension_instances
-        )
-        return tuple(more_itertools.flatten([instance.associated_columns for instance in instances]))
