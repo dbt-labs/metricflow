@@ -267,7 +267,7 @@ class SqlSelectQueryFromClauseNode(SqlQueryPlanNode):
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D
-        return StaticIdPrefix.SQL_PLAN_TABLE_FROM_CLAUSE_ID_PREFIX
+        return StaticIdPrefix.SQL_PLAN_QUERY_FROM_CLAUSE_ID_PREFIX
 
     @property
     def description(self) -> str:  # noqa: D
