@@ -39,7 +39,7 @@ def test_convert_table_semantic_model_without_measures(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan_id="plan0",
-        select_node=users_data_set.sql_select_node,
+        sql_plan_node=users_data_set.sql_select_node,
         sql_client=sql_client,
     )
 
@@ -74,7 +74,7 @@ def test_convert_table_semantic_model_with_measures(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan_id="plan0",
-        select_node=id_verifications_data_set.sql_select_node,
+        sql_plan_node=id_verifications_data_set.sql_select_node,
         sql_client=sql_client,
     )
 
@@ -94,6 +94,6 @@ def test_convert_query_semantic_model(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan_id="plan0",
-        select_node=bookings_data_set.sql_select_node,
+        sql_plan_node=bookings_data_set.sql_select_node,
         sql_client=sql_client,
     )
