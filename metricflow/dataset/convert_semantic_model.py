@@ -49,7 +49,6 @@ from metricflow.sql.sql_exprs import (
     SqlStringExpression,
 )
 from metricflow.sql.sql_plan import (
-    SqlQueryPlanNode,
     SqlSelectColumn,
     SqlSelectStatementNode,
     SqlTableFromClauseNode,
@@ -492,7 +491,6 @@ class SemanticModelToDataSetConverter:
             all_select_columns.extend(select_columns)
 
         # Generate the "from" clause depending on whether it's an SQL query or an SQL table.
-        from_source: Optional[SqlQueryPlanNode] = None
         from_source = SqlTableFromClauseNode(sql_table=SqlTable.from_string(semantic_model.node_relation.relation_name))
 
         select_statement_node = SqlSelectStatementNode(
