@@ -1,7 +1,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from enum import Enum
 from typing import Optional, Tuple, Union
+
+
+class SqlTableType(Enum):  # noqa: D
+    TABLE = "table"
+    VIEW = "view"
 
 
 @dataclass(frozen=True, order=True)
@@ -11,6 +17,7 @@ class SqlTable:
     schema_name: str
     table_name: str
     db_name: Optional[str] = None
+    table_type: SqlTableType = SqlTableType.TABLE
 
     @staticmethod
     def from_string(sql_str: str) -> SqlTable:  # noqa: D

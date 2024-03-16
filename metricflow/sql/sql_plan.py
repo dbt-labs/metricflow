@@ -8,6 +8,8 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Generic, List, Optional, Sequence, Tuple
 
+from typing_extensions import override
+
 from metricflow.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow.dag.mf_dag import DagId, DagNode, DisplayedProperty, MetricFlowDag, NodeId
 from metricflow.sql.sql_exprs import SqlExpressionNode
@@ -287,6 +289,48 @@ class SqlSelectQueryFromClauseNode(SqlQueryPlanNode):
     @property
     def as_select_node(self) -> Optional[SqlSelectStatementNode]:  # noqa: D
         return None
+
+
+class SqlCreateTableAsNode(SqlQueryPlanNode):
+    """An SQL select query that can go in the FROM clause."""
+
+    def __init__(self, sql_table: SqlTable, parent_node: SqlQueryPlanNode) -> None:  # noqa: D
+        self._sql_table = sql_table
+        self._parent_node = parent_node
+        super().__init__(node_id=self.create_unique_id(), parent_nodes=(self._parent_node,))
+
+    @override
+    def accept(self, visitor: SqlQueryPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:
+        raise NotImplementedError
+
+    @property
+    @override
+    def is_table(self) -> bool:
+        return False
+
+    @property
+    @override
+    def as_select_node(self) -> Optional[SqlSelectStatementNode]:
+        return None
+
+    @property
+    @override
+    def description(self) -> str:
+        return "Create table {self."
+
+    @classmethod
+    @override
+    def id_prefix(cls) -> IdPrefix:
+        return StaticIdPrefix.SQL_PLAN_CREATE_TABLE_AS_ID_PREFIX
+
+    @property
+    def sql_table(self) -> SqlTable:
+        """Return the table that this statement would create."""
+        return self._sql_table
+
+    @property
+    def parent_node(self) -> SqlQueryPlanNode:  # noqa: D
+        return self._parent_node
 
 
 class SqlQueryPlan(MetricFlowDag[SqlQueryPlanNode]):  # noqa: D
