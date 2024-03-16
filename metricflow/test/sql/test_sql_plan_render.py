@@ -17,6 +17,7 @@ from metricflow.sql.sql_exprs import (
     SqlStringExpression,
 )
 from metricflow.sql.sql_plan import (
+    SqlCreateTableAsNode,
     SqlJoinDescription,
     SqlJoinType,
     SqlOrderByDescription,
@@ -24,7 +25,7 @@ from metricflow.sql.sql_plan import (
     SqlSelectStatementNode,
     SqlTableFromClauseNode,
 )
-from metricflow.sql.sql_table import SqlTable
+from metricflow.sql.sql_table import SqlTable, SqlTableType
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.sql.compare_sql_plan import assert_rendered_sql_equal
 
@@ -337,5 +338,57 @@ def test_render_limit(  # noqa: D
             limit=1,
         ),
         plan_id="plan0",
+        sql_client=sql_client,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_render_create_table_as(  # noqa: D
+    request: FixtureRequest,
+    mf_test_session_state: MetricFlowTestSessionState,
+    sql_client: SqlClient,
+) -> None:
+    select_node = SqlSelectStatementNode(
+        description="select_0",
+        select_columns=(
+            SqlSelectColumn(
+                expr=SqlColumnReferenceExpression(col_ref=SqlColumnReference(table_alias="a", column_name="bookings")),
+                column_alias="bookings",
+            ),
+        ),
+        from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
+        from_source_alias="a",
+        joins_descs=(),
+        where=None,
+        group_bys=(),
+        order_bys=(),
+        limit=1,
+    )
+    assert_rendered_sql_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        sql_plan_node=SqlCreateTableAsNode(
+            sql_table=SqlTable(
+                schema_name="schema_name",
+                table_name="table_name",
+                table_type=SqlTableType.TABLE,
+            ),
+            parent_node=select_node,
+        ),
+        plan_id="create_table_as",
+        sql_client=sql_client,
+    )
+    assert_rendered_sql_equal(
+        request=request,
+        mf_test_session_state=mf_test_session_state,
+        sql_plan_node=SqlCreateTableAsNode(
+            sql_table=SqlTable(
+                schema_name="schema_name",
+                table_name="table_name",
+                table_type=SqlTableType.VIEW,
+            ),
+            parent_node=select_node,
+        ),
+        plan_id="create_view_as",
         sql_client=sql_client,
     )

@@ -16,6 +16,7 @@ from metricflow.sql.sql_exprs import (
     SqlLogicalOperator,
 )
 from metricflow.sql.sql_plan import (
+    SqlCreateTableAsNode,
     SqlJoinDescription,
     SqlOrderByDescription,
     SqlQueryPlanNode,
@@ -657,6 +658,12 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
     def visit_query_from_clause_node(self, node: SqlSelectQueryFromClauseNode) -> SqlQueryPlanNode:  # noqa: D
         return node
 
+    def visit_create_table_as_node(self, node: SqlCreateTableAsNode) -> SqlQueryPlanNode:  # noqa: D
+        return SqlCreateTableAsNode(
+            sql_table=node.sql_table,
+            parent_node=node.parent_node.accept(self),
+        )
+
 
 class SqlGroupByRewritingVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
     """Re-writes the GROUP BY to use a SqlColumnAliasReferenceExpression."""
@@ -714,6 +721,12 @@ class SqlGroupByRewritingVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
 
     def visit_query_from_clause_node(self, node: SqlSelectQueryFromClauseNode) -> SqlQueryPlanNode:  # noqa: D
         return node
+
+    def visit_create_table_as_node(self, node: SqlCreateTableAsNode) -> SqlQueryPlanNode:  # noqa: D
+        return SqlCreateTableAsNode(
+            sql_table=node.sql_table,
+            parent_node=node.parent_node.accept(self),
+        )
 
 
 class SqlRewritingSubQueryReducer(SqlQueryPlanOptimizer):

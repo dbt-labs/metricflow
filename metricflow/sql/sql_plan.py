@@ -77,6 +77,10 @@ class SqlQueryPlanNodeVisitor(Generic[VisitorOutputT], ABC):
     def visit_query_from_clause_node(self, node: SqlSelectQueryFromClauseNode) -> VisitorOutputT:  # noqa: D
         raise NotImplementedError
 
+    @abstractmethod
+    def visit_create_table_as_node(self, node: SqlCreateTableAsNode) -> VisitorOutputT:  # noqa: D
+        raise NotImplementedError
+
 
 @dataclass(frozen=True)
 class SqlSelectColumn:
@@ -301,7 +305,7 @@ class SqlCreateTableAsNode(SqlQueryPlanNode):
 
     @override
     def accept(self, visitor: SqlQueryPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:
-        raise NotImplementedError
+        return visitor.visit_create_table_as_node(self)
 
     @property
     @override
