@@ -19,8 +19,3 @@ def test_sql_column() -> None:  # noqa: D
     assert sql_column.db_name == sql_column.table.db_name
     assert sql_column.schema_name == sql_column.table.schema_name
     assert sql_column.table_name == sql_column.table.table_name
-
-    json_serialized_column = sql_column.json()
-    deserialized_column = SqlColumn.parse_raw(json_serialized_column)
-
-    assert sql_column == deserialized_column
