@@ -2,6 +2,9 @@ from __future__ import annotations
 
 from typing import Optional, Sequence
 
+from dbt_semantic_interfaces.references import SemanticModelReference
+from typing_extensions import override
+
 from metricflow.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.dataset.dataset import DataSet
 from metricflow.instances import (
@@ -125,3 +128,8 @@ class SqlDataSet(DataSet):
             )
 
         return column_associations_to_return[0]
+
+    @property
+    @override
+    def semantic_model_reference(self) -> Optional[SemanticModelReference]:
+        return None
