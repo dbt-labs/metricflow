@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import logging
+from abc import ABC, abstractmethod
 from typing import Optional, Sequence
 
-from dbt_semantic_interfaces.references import TimeDimensionReference
+from dbt_semantic_interfaces.references import SemanticModelReference, TimeDimensionReference
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
@@ -14,7 +15,7 @@ from metricflow.specs.specs import TimeDimensionSpec
 logger = logging.getLogger(__name__)
 
 
-class DataSet:
+class DataSet(ABC):
     """Describes a set of data that a source node in the dataflow plan contains."""
 
     def __init__(self, instance_set: InstanceSet) -> None:  # noqa:
@@ -59,6 +60,12 @@ class DataSet:
             time_granularity=time_granularity,
             date_part=date_part,
         )
+
+    @property
+    @abstractmethod
+    def semantic_model_reference(self) -> Optional[SemanticModelReference]:
+        """If this data set was created from a semantic model, return the reference."""
+        raise NotImplementedError
 
     def __repr__(self) -> str:  # noqa: D
         return f"{self.__class__.__name__}()"

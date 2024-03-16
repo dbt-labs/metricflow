@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dbt_semantic_interfaces.references import SemanticModelReference
+from typing_extensions import override
 
 from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.instances import InstanceSet
@@ -23,5 +24,6 @@ class SemanticModelDataSet(SqlDataSet):
         return f"{self.__class__.__name__}({repr(self._semantic_model_reference.semantic_model_name)})"
 
     @property
+    @override
     def semantic_model_reference(self) -> SemanticModelReference:  # noqa: D
         return self._semantic_model_reference
