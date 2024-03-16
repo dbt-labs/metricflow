@@ -422,7 +422,11 @@ class DataflowPlanBuilder:
             descendent_filter_specs=metric_spec.filter_specs,
         )
 
-        logger.info(f"For {metric_spec}, needed measure is:\n" f"{mf_pformat(metric_input_measure_spec)}")
+        logger.info(
+            f"For\n{indent(mf_pformat(metric_spec))}"
+            f"\nneeded measure is:"
+            f"\n{indent(mf_pformat(metric_input_measure_spec))}"
+        )
 
         aggregated_measures_node = self.build_aggregated_measure(
             metric_input_measure_spec=metric_input_measure_spec,
@@ -580,7 +584,7 @@ class DataflowPlanBuilder:
         output_nodes: List[BaseOutput] = []
 
         for metric_spec in metric_specs:
-            logger.info(f"Generating compute metrics node for {metric_spec}")
+            logger.info(f"Generating compute metrics node for:\n{indent(mf_pformat(metric_spec))}")
             self._metric_lookup.get_metric(metric_spec.reference)
 
             output_nodes.append(
