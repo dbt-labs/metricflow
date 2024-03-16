@@ -11,7 +11,6 @@ from metricflow.dataflow.dataflow_plan import (
 )
 from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataframeNode
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
-from metricflow.dataflow.sql_table import SqlTable
 from metricflow.execution.execution_plan import (
     ExecutionPlan,
     ExecutionPlanTask,
@@ -21,6 +20,7 @@ from metricflow.execution.execution_plan import (
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
+from metricflow.sql.sql_table import SqlTable
 
 logger = logging.getLogger(__name__)
 

@@ -21,7 +21,6 @@ from metricflow.dataflow.dataflow_plan import DataflowPlan
 from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import (
     SourceScanOptimizer,
 )
-from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.dataset.dataset import DataSet
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
@@ -54,6 +53,7 @@ from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.query_param_implementations import SavedQueryParameter
 from metricflow.specs.specs import InstanceSpecSet, MetricFlowQuerySpec
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
+from metricflow.sql.sql_table import SqlTable
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
 from metricflow.time.time_source import TimeSource

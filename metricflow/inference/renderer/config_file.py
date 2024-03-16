@@ -9,9 +9,9 @@ from ruamel.yaml import YAML
 from ruamel.yaml.comments import CommentedMap
 from typing_extensions import NotRequired
 
-from metricflow.dataflow.sql_table import SqlTable
 from metricflow.inference.models import InferenceResult, InferenceSignalType
 from metricflow.inference.renderer.base import InferenceRenderer
+from metricflow.sql.sql_table import SqlTable
 
 yaml = YAML()
 

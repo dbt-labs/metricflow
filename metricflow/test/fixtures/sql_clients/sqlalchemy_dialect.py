@@ -9,8 +9,8 @@ from typing import Iterator, Mapping, Optional, Sequence, Set, Union
 import pandas as pd
 import sqlalchemy
 
-from metricflow.dataflow.sql_table import SqlTable
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from metricflow.sql.sql_table import SqlTable
 from metricflow.test.fixtures.sql_clients.base_sql_client_implementation import BaseSqlClientImplementation
 
 logger = logging.getLogger(__name__)

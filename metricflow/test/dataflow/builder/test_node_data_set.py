@@ -10,7 +10,6 @@ from metricflow.aggregation_properties import AggregationState
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinToBaseOutputNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
-from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.instances import (
     InstanceSet,
@@ -26,6 +25,7 @@ from metricflow.specs.specs import (
 )
 from metricflow.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpression
 from metricflow.sql.sql_plan import SqlJoinType, SqlSelectColumn, SqlSelectStatementNode, SqlTableFromClauseNode
+from metricflow.sql.sql_table import SqlTable
 from metricflow.test.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.snapshot_utils import assert_spec_set_snapshot_equal

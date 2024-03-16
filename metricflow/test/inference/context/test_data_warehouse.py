@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from metricflow.dataflow.sql_column import SqlColumn
-from metricflow.dataflow.sql_table import SqlTable
 from metricflow.inference.context.data_warehouse import (
     ColumnProperties,
     DataWarehouseInferenceContext,
     InferenceColumnType,
     TableProperties,
 )
+from metricflow.sql.sql_column import SqlColumn
+from metricflow.sql.sql_table import SqlTable
 
 
 def test_column_properties_is_empty() -> None:

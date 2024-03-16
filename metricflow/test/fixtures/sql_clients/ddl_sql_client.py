@@ -5,8 +5,8 @@ from typing import Optional, Protocol
 
 from pandas import DataFrame
 
-from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.sql.sql_table import SqlTable
 
 
 class SqlClientWithDDLMethods(SqlClient, Protocol):

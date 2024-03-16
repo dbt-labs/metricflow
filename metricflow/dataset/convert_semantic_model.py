@@ -19,7 +19,6 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow.aggregation_properties import AggregationState
 from metricflow.dag.id_prefix import DynamicIdPrefix, StaticIdPrefix
 from metricflow.dag.sequential_id import SequentialIdGenerator
-from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.instances import (
@@ -53,6 +52,7 @@ from metricflow.sql.sql_plan import (
     SqlSelectStatementNode,
     SqlTableFromClauseNode,
 )
+from metricflow.sql.sql_table import SqlTable
 
 logger = logging.getLogger(__name__)
 

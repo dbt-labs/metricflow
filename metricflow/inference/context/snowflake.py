@@ -2,14 +2,14 @@ from __future__ import annotations
 
 import json
 
-from metricflow.dataflow.sql_column import SqlColumn
-from metricflow.dataflow.sql_table import SqlTable
 from metricflow.inference.context.data_warehouse import (
     ColumnProperties,
     DataWarehouseInferenceContextProvider,
     InferenceColumnType,
     TableProperties,
 )
+from metricflow.sql.sql_column import SqlColumn
+from metricflow.sql.sql_table import SqlTable
 
 
 class SnowflakeInferenceContextProvider(DataWarehouseInferenceContextProvider):

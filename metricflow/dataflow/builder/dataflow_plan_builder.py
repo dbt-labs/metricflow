@@ -53,7 +53,6 @@ from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
 from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataframeNode
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOptimizer
-from metricflow.dataflow.sql_table import SqlTable
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
 from metricflow.filters.time_constraint import TimeRangeConstraint
@@ -86,6 +85,7 @@ from metricflow.specs.specs import (
 )
 from metricflow.specs.where_filter_transform import WhereSpecFactory
 from metricflow.sql.sql_plan import SqlJoinType
+from metricflow.sql.sql_table import SqlTable
 
 logger = logging.getLogger(__name__)
 
