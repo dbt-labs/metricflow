@@ -6,10 +6,10 @@ from typing import Set, Union
 import pandas as pd
 import pytest
 
-from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.random_id import random_id
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from metricflow.sql.sql_table import SqlTable
 from metricflow.test.compare_df import assert_dataframes_equal
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods

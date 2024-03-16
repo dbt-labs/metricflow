@@ -4,11 +4,11 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.test_utils import as_datetime
 
-from metricflow.dataflow.sql_table import SqlTable
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowQueryRequest
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.sql.sql_table import SqlTable
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.integration.conftest import IntegrationTestHelpers
 from metricflow.test.snapshot_utils import (

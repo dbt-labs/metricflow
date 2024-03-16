@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from metricflow.dataflow.sql_table import SqlTable
+from metricflow.sql.sql_table import SqlTable
 
 
 def test_sql_table() -> None:  # noqa: D

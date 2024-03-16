@@ -7,8 +7,8 @@ from typing import Optional
 import pandas as pd
 
 from metricflow.cli.dbt_connectors.adapter_backed_client import AdapterBackedSqlClient
-from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_client import SqlEngine
+from metricflow.sql.sql_table import SqlTable
 
 logger = logging.getLogger(__name__)
 

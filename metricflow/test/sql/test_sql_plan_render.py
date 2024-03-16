@@ -6,7 +6,6 @@ from typing import List
 import pytest
 from _pytest.fixtures import FixtureRequest
 
-from metricflow.dataflow.sql_table import SqlTable
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_exprs import (
     SqlAggregateFunctionExpression,
@@ -25,6 +24,7 @@ from metricflow.sql.sql_plan import (
     SqlSelectStatementNode,
     SqlTableFromClauseNode,
 )
+from metricflow.sql.sql_table import SqlTable
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.sql.compare_sql_plan import assert_rendered_sql_equal
 

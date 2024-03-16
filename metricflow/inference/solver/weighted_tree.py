@@ -3,7 +3,6 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import Callable, Dict, List, Optional
 
-from metricflow.dataflow.sql_column import SqlColumn
 from metricflow.inference.models import (
     InferenceResult,
     InferenceSignal,
@@ -12,6 +11,7 @@ from metricflow.inference.models import (
     InferenceSignalType,
 )
 from metricflow.inference.solver.base import InferenceSolver
+from metricflow.sql.sql_column import SqlColumn
 
 NodeWeighterFunction = Callable[[InferenceSignalConfidence], int]
 

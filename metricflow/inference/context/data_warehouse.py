@@ -7,10 +7,10 @@ from datetime import date, datetime
 from enum import Enum
 from typing import Callable, ContextManager, Dict, Generic, Iterator, List, Optional, TypeVar
 
-from metricflow.dataflow.sql_column import SqlColumn
-from metricflow.dataflow.sql_table import SqlTable
 from metricflow.inference.context.base import InferenceContext, InferenceContextProvider
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.sql.sql_column import SqlColumn
+from metricflow.sql.sql_table import SqlTable
 
 T = TypeVar("T", str, int, float, date, datetime)
 

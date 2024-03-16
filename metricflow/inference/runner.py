@@ -8,12 +8,12 @@ from typing import Iterator, List
 
 import more_itertools
 
-from metricflow.dataflow.sql_table import SqlTable
 from metricflow.inference.context.base import InferenceContextProvider
 from metricflow.inference.context.data_warehouse import DataWarehouseInferenceContextProvider
 from metricflow.inference.renderer.base import InferenceRenderer
 from metricflow.inference.rule.base import InferenceRule
 from metricflow.inference.solver.base import InferenceSolver
+from metricflow.sql.sql_table import SqlTable
 
 logger = logging.getLogger(__file__)
 

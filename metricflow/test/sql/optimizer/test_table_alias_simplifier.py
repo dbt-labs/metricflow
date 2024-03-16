@@ -3,7 +3,6 @@ from __future__ import annotations
 import pytest
 from _pytest.fixtures import FixtureRequest
 
-from metricflow.dataflow.sql_table import SqlTable
 from metricflow.sql.optimizer.table_alias_simplifier import SqlTableAliasSimplifier
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer, SqlQueryPlanRenderer
 from metricflow.sql.sql_exprs import (
@@ -19,6 +18,7 @@ from metricflow.sql.sql_plan import (
     SqlSelectStatementNode,
     SqlTableFromClauseNode,
 )
+from metricflow.sql.sql_table import SqlTable
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
 from metricflow.test.sql.compare_sql_plan import assert_default_rendered_sql_equal
 

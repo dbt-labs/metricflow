@@ -4,7 +4,7 @@ from typing import Optional
 
 from dbt_semantic_interfaces.implementations.base import FrozenBaseModel
 
-from metricflow.dataflow.sql_table import SqlTable
+from metricflow.sql.sql_table import SqlTable
 
 
 class SqlColumn(FrozenBaseModel):
