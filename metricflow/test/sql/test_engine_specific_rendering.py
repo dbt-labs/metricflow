@@ -56,7 +56,7 @@ def test_cast_to_timestamp(
     assert_rendered_sql_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        select_node=SqlSelectStatementNode(
+        sql_plan_node=SqlSelectStatementNode(
             description="Test Cast to Timestamp Expression",
             select_columns=tuple(select_columns),
             from_source=from_source,
@@ -90,7 +90,7 @@ def test_generate_uuid(
     assert_rendered_sql_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        select_node=SqlSelectStatementNode(
+        sql_plan_node=SqlSelectStatementNode(
             description="Test Generate UUID Expression",
             select_columns=tuple(select_columns),
             from_source=from_source,
@@ -139,7 +139,7 @@ def test_continuous_percentile_expr(
     assert_rendered_sql_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        select_node=SqlSelectStatementNode(
+        sql_plan_node=SqlSelectStatementNode(
             description="Test Continuous Percentile Expression",
             select_columns=tuple(select_columns),
             from_source=from_source,
@@ -188,7 +188,7 @@ def test_discrete_percentile_expr(
     assert_rendered_sql_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        select_node=SqlSelectStatementNode(
+        sql_plan_node=SqlSelectStatementNode(
             description="Test Discrete Percentile Expression",
             select_columns=tuple(select_columns),
             from_source=from_source,
@@ -237,7 +237,7 @@ def test_approximate_continuous_percentile_expr(
     assert_rendered_sql_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        select_node=SqlSelectStatementNode(
+        sql_plan_node=SqlSelectStatementNode(
             description="Test Approximate Continuous Percentile Expression",
             select_columns=tuple(select_columns),
             from_source=from_source,
@@ -286,7 +286,7 @@ def test_approximate_discrete_percentile_expr(
     assert_rendered_sql_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        select_node=SqlSelectStatementNode(
+        sql_plan_node=SqlSelectStatementNode(
             description="Test Approximate Discrete Percentile Expression",
             select_columns=tuple(select_columns),
             from_source=from_source,

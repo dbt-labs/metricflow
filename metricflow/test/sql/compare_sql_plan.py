@@ -5,7 +5,7 @@ from _pytest.fixtures import FixtureRequest
 from metricflow.dag.mf_dag import DagId
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
-from metricflow.sql.sql_plan import SqlQueryPlan, SqlQueryPlanNode, SqlSelectStatementNode
+from metricflow.sql.sql_plan import SqlQueryPlan, SqlQueryPlanNode
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState, check_sql_engine_snapshot_marker
 from metricflow.test.snapshot_utils import (
     assert_plan_snapshot_text_equal,
@@ -37,11 +37,11 @@ def assert_rendered_sql_equal(  # noqa: D
     request: FixtureRequest,
     mf_test_session_state: MetricFlowTestSessionState,
     plan_id: str,
-    select_node: SqlSelectStatementNode,
+    sql_plan_node: SqlQueryPlanNode,
     sql_client: SqlClient,
 ) -> None:
     """Helper function to render a select statement and compare with the one saved as a file."""
-    sql_query_plan = SqlQueryPlan(render_node=select_node, plan_id=DagId.from_str(plan_id))
+    sql_query_plan = SqlQueryPlan(render_node=sql_plan_node, plan_id=DagId.from_str(plan_id))
 
     assert_rendered_sql_from_plan_equal(
         request=request,

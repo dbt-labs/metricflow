@@ -60,7 +60,7 @@ def test_component_rendering(
     assert_rendered_sql_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        select_node=SqlSelectStatementNode(
+        sql_plan_node=SqlSelectStatementNode(
             description="test0",
             select_columns=tuple(select_columns),
             from_source=from_source,
@@ -91,7 +91,7 @@ def test_component_rendering(
     assert_rendered_sql_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        select_node=SqlSelectStatementNode(
+        sql_plan_node=SqlSelectStatementNode(
             description="test1",
             select_columns=tuple(select_columns),
             from_source=from_source,
@@ -122,7 +122,7 @@ def test_component_rendering(
     assert_rendered_sql_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        select_node=SqlSelectStatementNode(
+        sql_plan_node=SqlSelectStatementNode(
             description="test2",
             select_columns=tuple(select_columns),
             from_source=from_source,
@@ -153,7 +153,7 @@ def test_component_rendering(
     assert_rendered_sql_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        select_node=SqlSelectStatementNode(
+        sql_plan_node=SqlSelectStatementNode(
             description="test3",
             select_columns=tuple(select_columns),
             from_source=from_source,
@@ -178,7 +178,7 @@ def test_component_rendering(
     assert_rendered_sql_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        select_node=SqlSelectStatementNode(
+        sql_plan_node=SqlSelectStatementNode(
             description="test4",
             select_columns=tuple(select_columns),
             from_source=from_source,
@@ -203,7 +203,7 @@ def test_component_rendering(
     assert_rendered_sql_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        select_node=SqlSelectStatementNode(
+        sql_plan_node=SqlSelectStatementNode(
             description="test5",
             select_columns=tuple(select_columns),
             from_source=from_source,
@@ -227,7 +227,7 @@ def test_render_where(  # noqa: D
     assert_rendered_sql_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        select_node=SqlSelectStatementNode(
+        sql_plan_node=SqlSelectStatementNode(
             description="test0",
             select_columns=(
                 SqlSelectColumn(
@@ -268,7 +268,7 @@ def test_render_order_by(  # noqa: D
     assert_rendered_sql_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        select_node=SqlSelectStatementNode(
+        sql_plan_node=SqlSelectStatementNode(
             description="test0",
             select_columns=(
                 SqlSelectColumn(
@@ -318,7 +318,7 @@ def test_render_limit(  # noqa: D
     assert_rendered_sql_equal(
         request=request,
         mf_test_session_state=mf_test_session_state,
-        select_node=SqlSelectStatementNode(
+        sql_plan_node=SqlSelectStatementNode(
             description="test0",
             select_columns=(
                 SqlSelectColumn(
