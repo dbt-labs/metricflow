@@ -1,13 +1,13 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Optional
-
-from dbt_semantic_interfaces.implementations.base import FrozenBaseModel
 
 from metricflow.sql.sql_table import SqlTable
 
 
-class SqlColumn(FrozenBaseModel):
+@dataclass(frozen=True, order=True)
+class SqlColumn:
     """Represents a reference to a SQL column."""
 
     table: SqlTable
