@@ -9,6 +9,7 @@ from metricflow.sql.sql_exprs import (
     SqlExpressionTreeLineage,
 )
 from metricflow.sql.sql_plan import (
+    SqlCreateTableAsNode,
     SqlJoinDescription,
     SqlQueryPlanNode,
     SqlQueryPlanNodeVisitor,
@@ -197,6 +198,12 @@ class SqlColumnPrunerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
     def visit_query_from_clause_node(self, node: SqlSelectQueryFromClauseNode) -> SqlQueryPlanNode:  # noqa: D
         """Pruning cannot be done here since this is an arbitrary user-provided SQL query."""
         return node
+
+    def visit_create_table_as_node(self, node: SqlCreateTableAsNode) -> SqlQueryPlanNode:  # noqa: D
+        return SqlCreateTableAsNode(
+            sql_table=node.sql_table,
+            parent_node=node.parent_node.accept(self),
+        )
 
 
 class SqlColumnPrunerOptimizer(SqlQueryPlanOptimizer):

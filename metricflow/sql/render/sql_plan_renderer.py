@@ -4,6 +4,7 @@ import logging
 import textwrap
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from string import Template
 from typing import List, Optional, Sequence, Tuple
 
 from metricflow.mf_logging.formatting import indent
@@ -15,6 +16,7 @@ from metricflow.sql.render.expr_renderer import (
 from metricflow.sql.render.rendering_constants import SqlRenderingConstants
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_plan import (
+    SqlCreateTableAsNode,
     SqlJoinDescription,
     SqlQueryPlan,
     SqlQueryPlanNode,
@@ -308,6 +310,26 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
         return SqlPlanRenderResult(
             sql=node.select_query.rstrip(),
             bind_parameters=SqlBindParameters(),
+        )
+
+    def visit_create_table_as_node(self, node: SqlCreateTableAsNode) -> SqlPlanRenderResult:  # noqa: D
+        inner_sql_render_result = node.parent_node.accept(self)
+        inner_sql = inner_sql_render_result.sql
+        # Using a substitution since inner_sql can have multiple lines, and then dedent() wouldn't dent due to the
+        # short line.
+        sql = Template(
+            textwrap.dedent(
+                f"""\
+                CREATE {node.sql_table.table_type.value.upper()} {node.sql_table.sql} AS (
+                $inner_sql
+                )
+                """
+            ).rstrip()
+        ).substitute({"inner_sql": indent(inner_sql, indent_prefix=SqlRenderingConstants.INDENT)})
+
+        return SqlPlanRenderResult(
+            sql=sql,
+            bind_parameters=inner_sql_render_result.bind_parameters,
         )
 
     @property

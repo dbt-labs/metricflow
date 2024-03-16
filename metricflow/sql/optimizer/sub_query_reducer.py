@@ -6,6 +6,7 @@ from typing import List, Optional
 from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlQueryPlanOptimizer
 from metricflow.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpression
 from metricflow.sql.sql_plan import (
+    SqlCreateTableAsNode,
     SqlJoinDescription,
     SqlOrderByDescription,
     SqlQueryPlanNode,
@@ -192,6 +193,12 @@ class SqlSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
 
     def visit_query_from_clause_node(self, node: SqlSelectQueryFromClauseNode) -> SqlQueryPlanNode:  # noqa: D
         return node
+
+    def visit_create_table_as_node(self, node: SqlCreateTableAsNode) -> SqlQueryPlanNode:  # noqa: D
+        return SqlCreateTableAsNode(
+            sql_table=node.sql_table,
+            parent_node=node.parent_node.accept(self),
+        )
 
 
 class SqlSubQueryReducer(SqlQueryPlanOptimizer):
