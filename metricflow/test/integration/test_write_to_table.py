@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import textwrap
 
-from metricflow.dataflow.sql_table import SqlTable
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.random_id import random_id
+from metricflow.sql.sql_table import SqlTable
 from metricflow.test.compare_df import assert_dataframes_equal
 from metricflow.test.integration.conftest import IntegrationTestHelpers
 

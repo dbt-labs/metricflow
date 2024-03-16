@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import metricflow.inference.rule.defaults as defaults
-from metricflow.dataflow.sql_column import SqlColumn
-from metricflow.dataflow.sql_table import SqlTable
 from metricflow.inference.context.data_warehouse import (
     ColumnProperties,
     DataWarehouseInferenceContext,
@@ -10,6 +8,8 @@ from metricflow.inference.context.data_warehouse import (
     TableProperties,
 )
 from metricflow.inference.models import InferenceSignalType
+from metricflow.sql.sql_column import SqlColumn
+from metricflow.sql.sql_table import SqlTable
 
 
 def get_column_properties(column_str: str, type: InferenceColumnType, unique: bool) -> ColumnProperties:  # noqa: D

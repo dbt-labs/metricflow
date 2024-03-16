@@ -10,8 +10,8 @@ from typing import Generic, List, Optional, Sequence, Tuple
 
 from metricflow.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow.dag.mf_dag import DagId, DagNode, DisplayedProperty, MetricFlowDag, NodeId
-from metricflow.dataflow.sql_table import SqlTable
 from metricflow.sql.sql_exprs import SqlExpressionNode
+from metricflow.sql.sql_table import SqlTable
 from metricflow.visitor import VisitorOutputT
 
 logger = logging.getLogger(__name__)
