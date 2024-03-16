@@ -42,19 +42,19 @@ class SqlQueryPlanNode(DagNode, ABC):
     @abstractmethod
     def accept(self, visitor: SqlQueryPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:
         """Called when a visitor needs to visit this node."""
-        pass
+        raise NotImplementedError
 
     @property
     @abstractmethod
     def is_table(self) -> bool:
         """Returns whether this node resolves to a table (vs. a query)."""
-        pass
+        raise NotImplementedError
 
     @property
     @abstractmethod
     def as_select_node(self) -> Optional[SqlSelectStatementNode]:
         """If possible, return this as a select statement node."""
-        pass
+        raise NotImplementedError
 
 
 class SqlQueryPlanNodeVisitor(Generic[VisitorOutputT], ABC):
@@ -65,15 +65,15 @@ class SqlQueryPlanNodeVisitor(Generic[VisitorOutputT], ABC):
 
     @abstractmethod
     def visit_select_statement_node(self, node: SqlSelectStatementNode) -> VisitorOutputT:  # noqa: D
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def visit_table_from_clause_node(self, node: SqlTableFromClauseNode) -> VisitorOutputT:  # noqa: D
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def visit_query_from_clause_node(self, node: SqlSelectQueryFromClauseNode) -> VisitorOutputT:  # noqa: D
-        pass
+        raise NotImplementedError
 
 
 @dataclass(frozen=True)
