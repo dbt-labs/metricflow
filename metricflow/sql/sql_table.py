@@ -1,35 +1,16 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Optional, Tuple, Union
 
-from dbt_semantic_interfaces.implementations.base import (
-    FrozenBaseModel,
-    PydanticCustomInputParser,
-    PydanticParseableValueType,
-)
 
-
-class SqlTable(PydanticCustomInputParser, FrozenBaseModel):
+@dataclass(frozen=True, order=True)
+class SqlTable:
     """Represents a reference to a SQL table."""
 
-    db_name: Optional[str] = None
     schema_name: str
     table_name: str
-
-    @classmethod
-    def _from_yaml_value(cls, input: PydanticParseableValueType) -> SqlTable:
-        """Parses a SqlTable from string input found in a user-provided model specification.
-
-        Raises a ValueError on any non-string input, as all user-provided specifications of table entities
-        should be strings conforming to the expectations defined in the from_string method.
-        """
-        if isinstance(input, str):
-            return SqlTable.from_string(input)
-        else:
-            raise ValueError(
-                f"SqlTable inputs from model configs are expected to always be of type string, but got type "
-                f"{type(input)} with value: {input}"
-            )
+    db_name: Optional[str] = None
 
     @staticmethod
     def from_string(sql_str: str) -> SqlTable:  # noqa: D
