@@ -214,7 +214,7 @@ class DataflowPlanBuilder:
                 plan = optimizer.optimize(plan)
                 logger.info(
                     f"After applying {optimizer.__class__.__name__}, the dataflow plan is:\n"
-                    f"{indent(plan.text_structure())}"
+                    f"{indent(plan.structure_text())}"
                 )
             except Exception:
                 logger.exception(f"Got an exception applying {optimizer.__class__.__name__}")
@@ -890,14 +890,14 @@ class DataflowPlanBuilder:
                 if missing_specs:
                     logger.debug(
                         f"Skipping evaluation for:\n"
-                        f"{indent(node.text_structure())}"
+                        f"{indent(node.structure_text())}"
                         f"since it does not have all of the measure specs:\n"
                         f"{indent(mf_pformat(missing_specs))}"
                     )
                     continue
 
             logger.debug(
-                f"Evaluating candidate node for the left side of the join:\n{indent(mf_pformat(node.text_structure()))}"
+                f"Evaluating candidate node for the left side of the join:\n{indent(mf_pformat(node.structure_text()))}"
             )
 
             start_time = time.time()
@@ -910,7 +910,7 @@ class DataflowPlanBuilder:
 
             logger.info(
                 "Evaluation for source node:"
-                + indent(f"\nnode:\n{indent(node.text_structure())}")
+                + indent(f"\nnode:\n{indent(node.structure_text())}")
                 + indent(f"\nevaluation:\n{indent(mf_pformat(evaluation))}")
             )
 
@@ -943,7 +943,7 @@ class DataflowPlanBuilder:
 
             logger.info(
                 "Lowest cost plan is:"
-                + indent(f"\nnode:\n{indent(node_with_lowest_cost_plan.text_structure())}")
+                + indent(f"\nnode:\n{indent(node_with_lowest_cost_plan.structure_text())}")
                 + indent(f"\nevaluation:\n{indent(mf_pformat(evaluation))}")
                 + indent(f"\njoins: {len(node_to_evaluation[node_with_lowest_cost_plan].join_recipes)}")
             )

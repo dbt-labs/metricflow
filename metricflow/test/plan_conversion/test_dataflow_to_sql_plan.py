@@ -519,7 +519,7 @@ def test_compute_metrics_node_simple_expr(
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan.text_structure(),
+        plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
@@ -587,7 +587,7 @@ def test_join_to_time_spine_node_without_offset(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan.text_structure(),
+        plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
@@ -656,7 +656,7 @@ def test_join_to_time_spine_node_with_offset_window(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan.text_structure(),
+        plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
@@ -726,7 +726,7 @@ def test_join_to_time_spine_node_with_offset_to_grain(
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan.text_structure(),
+        plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(

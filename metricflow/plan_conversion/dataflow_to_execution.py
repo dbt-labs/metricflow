@@ -51,7 +51,7 @@ class DataflowToExecutionPlanConverter(SinkNodeVisitor[ConvertToExecutionPlanRes
             sql_engine_type=self._sql_client.sql_engine_type,
             dataflow_plan_node=node,
         )
-        logger.debug(f"Generated SQL query plan is:\n{result.sql_plan.text_structure()}")
+        logger.debug(f"Generated SQL query plan is:\n{result.sql_plan.structure_text()}")
         return result
 
     def _render_sql(self, convert_to_sql_plan_result: ConvertToSqlPlanResult) -> SqlPlanRenderResult:

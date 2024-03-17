@@ -216,7 +216,7 @@ class MetricFlowQueryResolver:
             metric_references=metric_references,
             where_filter_intersection=filter_input.where_filter_intersection,
         )
-        logger.info(f"Resolution DAG is:\n{resolution_dag.text_structure()}")
+        logger.info(f"Resolution DAG is:\n{resolution_dag.structure_text()}")
 
         group_by_item_resolver = GroupByItemResolver(
             manifest_lookup=self._manifest_lookup,

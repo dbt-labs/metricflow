@@ -242,7 +242,7 @@ def assert_execution_plan_text_equal(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=execution_plan,
-        plan_snapshot_text=execution_plan.text_structure(),
+        plan_snapshot_text=execution_plan.structure_text(),
         incomparable_strings_replacement_function=make_schema_replacement_function(
             system_schema=mf_test_session_state.mf_system_schema,
             source_schema=mf_test_session_state.mf_source_schema,
@@ -261,7 +261,7 @@ def assert_dataflow_plan_text_equal(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan.text_structure(),
+        plan_snapshot_text=dataflow_plan.structure_text(),
         incomparable_strings_replacement_function=replace_dataset_id_hash,
         additional_sub_directories_for_snapshots=(sql_client.sql_engine_type.value,),
     )

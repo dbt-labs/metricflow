@@ -51,7 +51,7 @@ def test_cyclic_join(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan.text_structure(),
+        plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(

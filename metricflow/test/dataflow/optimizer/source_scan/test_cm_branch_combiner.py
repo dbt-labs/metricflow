@@ -50,7 +50,7 @@ def test_read_sql_source_combination(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan.text_structure(),
+        plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
@@ -88,7 +88,7 @@ def test_filter_combination(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=dataflow_plan,
-        plan_snapshot_text=dataflow_plan.text_structure(),
+        plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(

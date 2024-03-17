@@ -84,7 +84,7 @@ def assert_sql_plan_text_equal(  # noqa: D
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=sql_query_plan,
-        plan_snapshot_text=sql_query_plan.text_structure(),
+        plan_snapshot_text=sql_query_plan.structure_text(),
         incomparable_strings_replacement_function=make_schema_replacement_function(
             system_schema=mf_test_session_state.mf_system_schema, source_schema=mf_test_session_state.mf_source_schema
         ),

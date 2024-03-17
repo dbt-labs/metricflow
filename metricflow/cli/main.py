@@ -314,7 +314,7 @@ def query(
                             """
                         ),
                         undefined=jinja2.StrictUndefined,
-                    ).render(plan_text=explain_result.dataflow_plan.text_structure()),
+                    ).render(plan_text=explain_result.dataflow_plan.structure_text()),
                     prefix="-- ",
                 )
             )

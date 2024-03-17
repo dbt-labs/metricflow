@@ -692,7 +692,7 @@ class SqlGroupByRewritingVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
                     )
                 )
             else:
-                logger.info(f"Did not find matching select for {group_by} in:\n{indent(node.text_structure())}")
+                logger.info(f"Did not find matching select for {group_by} in:\n{indent(node.structure_text())}")
                 new_group_bys.append(group_by)
 
         return SqlSelectStatementNode(
