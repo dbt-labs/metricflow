@@ -20,7 +20,7 @@ from metricflow.test.table_snapshot.table_snapshots import SqlTableSnapshotHash,
 logger = logging.getLogger(__name__)
 
 
-@dataclass
+@dataclass(frozen=True)
 class MetricFlowTestSessionState:
     """State that is shared between tests during a testing session."""
 
@@ -35,12 +35,6 @@ class MetricFlowTestSessionState:
     display_plans: bool
     # Whether to overwrite any text files that were generated.
     overwrite_snapshots: bool
-    # Number of plans that were displayed to the user.
-    plans_displayed: int
-    # Maximum number of plans to display to the user. If this is exceeded, an exception should be thrown. This is to
-    # help avoid a case where an excessive number of plans are displayed. This could happen if the user accidentally
-    # runs all tests when they were just looking to run one test and visualize the associated plan.
-    max_plans_displayed: int
 
     # The source schema contains tables that are used for running tests. If this is set, a source schema in the SQL
     # is created and persisted between runs. The source schema name includes a hash of the tables that should be in
@@ -155,8 +149,6 @@ def mf_test_session_state(  # noqa: D
         mf_source_schema=mf_source_schema,
         display_plans=bool(request.config.getoption(DISPLAY_PLANS_CLI_FLAG, default=False)),
         overwrite_snapshots=bool(request.config.getoption(OVERWRITE_SNAPSHOTS_CLI_FLAG, default=False)),
-        plans_displayed=0,
-        max_plans_displayed=6,
         use_persistent_source_schema=bool(
             request.config.getoption(USE_PERSISTENT_SOURCE_SCHEMA_CLI_FLAG, default=False)
         ),

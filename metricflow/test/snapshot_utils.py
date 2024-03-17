@@ -203,14 +203,9 @@ def assert_snapshot_text_equal(
         if not mf_test_session_state.overwrite_snapshots:
             logger.warning(f"Not overwriting snapshots, so displaying existing snapshot at {file_path}")
 
-        if mf_test_session_state.plans_displayed >= mf_test_session_state.max_plans_displayed:
-            raise RuntimeError(
-                f"Can't display snapshot - hit limit of "
-                f"{mf_test_session_state.max_plans_displayed} "
-                f"plans displayed."
-            )
+        if len(request.session.items) > 1:
+            raise ValueError("Displaying snapshots is only supported when there's a single item in a testing session.")
         webbrowser.open("file://" + file_path)
-        mf_test_session_state.plans_displayed += 1
 
     # Read the existing plan from the file and compare with the actual plan
     with open(file_path, "r") as snapshot_text_file:
