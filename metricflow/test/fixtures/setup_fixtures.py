@@ -33,6 +33,8 @@ class MetricFlowTestSessionState:
 
     # Whether to display the snapshot associated with a test session in a browser window.
     display_snapshots: bool
+    # Whether to display the graph associated with a test session in a browser window.
+    display_graphs: bool
     # Whether to overwrite any text files that were generated.
     overwrite_snapshots: bool
 
@@ -43,6 +45,7 @@ class MetricFlowTestSessionState:
 
 
 DISPLAY_SNAPSHOTS_CLI_FLAG = "--display-snapshots"
+DISPLAY_GRAPHS_CLI_FLAG = "--display-graphs"
 OVERWRITE_SNAPSHOTS_CLI_FLAG = "--overwrite-snapshots"
 USE_PERSISTENT_SOURCE_SCHEMA_CLI_FLAG = "--use-persistent-source-schema"
 
@@ -50,6 +53,11 @@ USE_PERSISTENT_SOURCE_SCHEMA_CLI_FLAG = "--use-persistent-source-schema"
 def pytest_addoption(parser: _pytest.config.argparsing.Parser) -> None:
     """Add options for running pytest through the CLI."""
     parser.addoption(DISPLAY_SNAPSHOTS_CLI_FLAG, action="store_true", help="Displays snapshots in a browser if set")
+    parser.addoption(
+        DISPLAY_GRAPHS_CLI_FLAG,
+        action="store_true",
+        help="Allow display of graphs in a browser window when triggered in a test",
+    )
     parser.addoption(
         OVERWRITE_SNAPSHOTS_CLI_FLAG,
         action="store_true",
@@ -148,6 +156,7 @@ def mf_test_session_state(  # noqa: D
         mf_system_schema=mf_system_schema,
         mf_source_schema=mf_source_schema,
         display_snapshots=bool(request.config.getoption(DISPLAY_SNAPSHOTS_CLI_FLAG, default=False)),
+        display_graphs=bool(request.config.getoption(DISPLAY_GRAPHS_CLI_FLAG, default=False)),
         overwrite_snapshots=bool(request.config.getoption(OVERWRITE_SNAPSHOTS_CLI_FLAG, default=False)),
         use_persistent_source_schema=bool(
             request.config.getoption(USE_PERSISTENT_SOURCE_SCHEMA_CLI_FLAG, default=False)
