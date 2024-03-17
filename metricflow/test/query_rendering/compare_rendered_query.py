@@ -25,13 +25,13 @@ def convert_and_check(
     TODO: refine interface once file move operations are complete.
     """
     # Run dataflow -> sql conversion without optimizers
-    sql_query_plan = dataflow_to_sql_converter.convert_to_sql_query_plan(
+    conversion_result = dataflow_to_sql_converter.convert_to_sql_query_plan(
         sql_engine_type=sql_client.sql_engine_type,
         dataflow_plan_node=node,
         optimization_level=SqlQueryOptimizationLevel.O0,
         sql_query_plan_id=DagId.from_str("plan0"),
     )
-
+    sql_query_plan = conversion_result.sql_plan
     display_graph_if_requested(
         request=request,
         mf_test_session_state=mf_test_session_state,
@@ -46,13 +46,13 @@ def convert_and_check(
     )
 
     # Run dataflow -> sql conversion with optimizers
-    sql_query_plan = dataflow_to_sql_converter.convert_to_sql_query_plan(
+    conversion_result = dataflow_to_sql_converter.convert_to_sql_query_plan(
         sql_engine_type=sql_client.sql_engine_type,
         dataflow_plan_node=node,
         optimization_level=SqlQueryOptimizationLevel.O4,
         sql_query_plan_id=DagId.from_str("plan0_optimized"),
     )
-
+    sql_query_plan = conversion_result.sql_plan
     display_graph_if_requested(
         request=request,
         mf_test_session_state=mf_test_session_state,

@@ -45,11 +45,11 @@ class DataflowToExecutionPlanConverter(SinkNodeVisitor[ExecutionPlan]):
         self,
         node: DataflowPlanNode,
     ) -> SqlPlanRenderResult:
-        sql_plan = self._sql_plan_converter.convert_to_sql_query_plan(
+        convert_to_sql_plan_result = self._sql_plan_converter.convert_to_sql_query_plan(
             sql_engine_type=self._sql_client.sql_engine_type,
             dataflow_plan_node=node,
         )
-
+        sql_plan = convert_to_sql_plan_result.sql_plan
         logger.debug(f"Generated SQL query plan is:\n{sql_plan.text_structure()}")
         return self._sql_plan_renderer.render_sql_query_plan(sql_plan)
 
