@@ -21,7 +21,17 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
-class MetricFlowTestConfiguration:
+class SnapshotConfiguration:
+    """Configuration for handling snapshots in a test session."""
+
+    # Whether to display the snapshot associated with a test session in a browser window.
+    display_snapshots: bool
+    # Whether to overwrite any text files that were generated.
+    overwrite_snapshots: bool
+
+
+@dataclass(frozen=True)
+class MetricFlowTestConfiguration(SnapshotConfiguration):
     """State that is shared between tests during a testing session."""
 
     sql_engine_url: str
@@ -31,12 +41,8 @@ class MetricFlowTestConfiguration:
     # Where tables for test data sets should be stored.
     mf_source_schema: str
 
-    # Whether to display the snapshot associated with a test session in a browser window.
-    display_snapshots: bool
     # Whether to display the graph associated with a test session in a browser window.
     display_graphs: bool
-    # Whether to overwrite any text files that were generated.
-    overwrite_snapshots: bool
 
     # The source schema contains tables that are used for running tests. If this is set, a source schema in the SQL
     # is created and persisted between runs. The source schema name includes a hash of the tables that should be in
