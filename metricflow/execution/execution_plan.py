@@ -144,7 +144,10 @@ class SelectSqlQueryToDataFrameTask(ExecutionPlanTask):
 
 
 class SelectSqlQueryToTableTask(ExecutionPlanTask):
-    """A task that runs a SELECT and puts that result into a table."""
+    """A task that runs a SELECT and puts that result into a table.
+
+    The provided SQL query is the query that will be run, so it should be a CREATE... or similar.
+    """
 
     def __init__(  # noqa: D
         self,
@@ -180,12 +183,10 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
         start_time = time.time()
         logger.info(f"Dropping table {self._output_table} in case it already exists")
         self._sql_client.execute(f"DROP TABLE IF EXISTS {self._output_table.sql}")
-        logger.info(f"Creating table {self._output_table} using a SELECT query")
-        sql_query = self.sql_query
-        assert sql_query
+        logger.info(f"Creating table {self._output_table} using a query")
         self._sql_client.execute(
-            sql_query.sql_query,
-            sql_bind_parameters=sql_query.bind_parameters,
+            self._sql_query,
+            sql_bind_parameters=self._bind_parameters,
         )
 
         end_time = time.time()
@@ -193,21 +194,7 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
 
     @property
     def sql_query(self) -> Optional[SqlQuery]:  # noqa: D
-        query_text = jinja2.Template(
-            textwrap.dedent(
-                """\
-                CREATE TABLE {{ output_table }} AS (
-                  {{ select_query | indent(2) }}
-                )
-                """
-            ),
-            undefined=jinja2.StrictUndefined,
-        ).render(output_table=self._output_table.sql, select_query=self._sql_query)
-
-        return SqlQuery(
-            sql_query=query_text,
-            bind_parameters=self._bind_parameters,
-        )
+        return SqlQuery(sql_query=self._sql_query, bind_parameters=self._bind_parameters)
 
     def __repr__(self) -> str:  # noqa: D
         return f"{self.__class__.__name__}(sql_query='{self._sql_query}', output_table={self._output_table})"
@@ -216,19 +203,21 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
 class ExecutionPlan(MetricFlowDag[ExecutionPlanTask]):
     """A DAG where the nodes are tasks, and parents represent prerequisite tasks."""
 
-    def __init__(self, leaf_tasks: List[ExecutionPlanTask], dag_id: Optional[DagId] = None) -> None:
+    def __init__(self, leaf_tasks: Sequence[ExecutionPlanTask], dag_id: Optional[DagId] = None) -> None:
         """Constructor.
 
         Args:
             leaf_tasks: The final set of tasks that will run, after task dependencies are finished.
         """
-        super().__init__(dag_id=dag_id or DagId.from_id_prefix(StaticIdPrefix.EXEC_PLAN_PREFIX), sink_nodes=leaf_tasks)
+        super().__init__(
+            dag_id=dag_id or DagId.from_id_prefix(StaticIdPrefix.EXEC_PLAN_PREFIX), sink_nodes=tuple(leaf_tasks)
+        )
 
     @property
     def tasks(self) -> Sequence[ExecutionPlanTask]:
         """Return all tasks in this plan."""
         if len(self.sink_nodes) == 0:
-            return []
+            return ()
 
         def recursively_get_tasks(task: ExecutionPlanTask) -> List[ExecutionPlanTask]:
             tasks_to_return = []
@@ -239,4 +228,4 @@ class ExecutionPlan(MetricFlowDag[ExecutionPlanTask]):
             return tasks_to_return
 
         assert len(self.sink_nodes) == 1
-        return recursively_get_tasks(self.sink_nodes[0])
+        return tuple(recursively_get_tasks(self.sink_nodes[0]))
