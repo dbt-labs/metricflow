@@ -199,7 +199,7 @@ def assert_snapshot_text_equal(
             "to see what's new."
         )
 
-    if mf_test_session_state.display_plans:
+    if mf_test_session_state.display_snapshots:
         if not mf_test_session_state.overwrite_snapshots:
             logger.warning(f"Not overwriting snapshots, so displaying existing snapshot at {file_path}")
 
