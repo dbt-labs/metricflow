@@ -51,11 +51,12 @@ def test_view_sql_generated_at_a_node(
     # Show SQL and spec set at a source node.
     bookings_source_data_set = to_data_set_converter.create_sql_source_data_set(bookings_semantic_model)
     read_source_node = ReadSqlSourceNode(bookings_source_data_set)
-    sql_plan_at_read_node = to_sql_plan_converter.convert_to_sql_query_plan(
+    conversion_result = to_sql_plan_converter.convert_to_sql_query_plan(
         sql_engine_type=sql_client.sql_engine_type,
         dataflow_plan_node=read_source_node,
         optimization_level=SqlQueryOptimizationLevel.O4,
     )
+    sql_plan_at_read_node = conversion_result.sql_plan
     sql_at_read_node = sql_renderer.render_sql_query_plan(sql_plan_at_read_node).sql
     spec_set_at_read_node = node_output_resolver.get_output_data_set(read_source_node).instance_set.spec_set
     logger.info(f"SQL generated at {read_source_node} is:\n\n{sql_at_read_node}")
@@ -75,11 +76,12 @@ def test_view_sql_generated_at_a_node(
             ),
         ),
     )
-    sql_plan_at_filter_elements_node = to_sql_plan_converter.convert_to_sql_query_plan(
+    conversion_result = to_sql_plan_converter.convert_to_sql_query_plan(
         sql_engine_type=sql_client.sql_engine_type,
         dataflow_plan_node=filter_elements_node,
         optimization_level=SqlQueryOptimizationLevel.O4,
     )
+    sql_plan_at_filter_elements_node = conversion_result.sql_plan
     sql_at_filter_elements_node = sql_renderer.render_sql_query_plan(sql_plan_at_filter_elements_node).sql
     spec_set_at_filter_elements_node = node_output_resolver.get_output_data_set(
         filter_elements_node

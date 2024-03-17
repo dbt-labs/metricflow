@@ -45,6 +45,7 @@ from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.instances import InstanceSet, MetadataInstance, MetricInstance, TimeDimensionInstance
 from metricflow.mf_logging.formatting import indent
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow.plan_conversion.convert_to_sql_plan import ConvertToSqlPlanResult
 from metricflow.plan_conversion.instance_converters import (
     AddLinkToLinkableElements,
     AddMetadata,
@@ -181,9 +182,10 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         dataflow_plan_node: DataflowPlanNode,
         optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O4,
         sql_query_plan_id: Optional[DagId] = None,
-    ) -> SqlQueryPlan:
+    ) -> ConvertToSqlPlanResult:
         """Create an SQL query plan that represents the computation up to the given dataflow plan node."""
-        sql_node: SqlQueryPlanNode = dataflow_plan_node.accept(self).sql_node
+        data_set = dataflow_plan_node.accept(self)
+        sql_node: SqlQueryPlanNode = data_set.sql_node
         # TODO: Make this a more generally accessible attribute instead of checking against the
         # BigQuery-ness of the engine
         use_column_alias_in_group_by = sql_engine_type is SqlEngine.BIGQUERY
@@ -198,7 +200,10 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 f"{indent(sql_node.text_structure())}"
             )
 
-        return SqlQueryPlan(render_node=sql_node, plan_id=sql_query_plan_id)
+        return ConvertToSqlPlanResult(
+            instance_set=data_set.instance_set,
+            sql_plan=SqlQueryPlan(render_node=sql_node, plan_id=sql_query_plan_id),
+        )
 
     def _next_unique_table_alias(self) -> str:
         """Return the next unique table alias to use in generating queries."""
