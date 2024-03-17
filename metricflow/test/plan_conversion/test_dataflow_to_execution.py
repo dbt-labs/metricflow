@@ -64,7 +64,7 @@ def test_joined_plan(  # noqa: D
         sql_client=sql_client,
     )
 
-    execution_plan = to_execution_plan_converter.convert_to_execution_plan(dataflow_plan)
+    execution_plan = to_execution_plan_converter.convert_to_execution_plan(dataflow_plan).execution_plan
 
     assert_execution_plan_text_equal(
         request=request,
@@ -101,7 +101,7 @@ def test_small_combined_metrics_plan(  # noqa: D
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
         sql_client=sql_client,
     )
-    execution_plan = to_execution_plan_converter.convert_to_execution_plan(dataflow_plan)
+    execution_plan = to_execution_plan_converter.convert_to_execution_plan(dataflow_plan).execution_plan
 
     assert_execution_plan_text_equal(
         request=request,
@@ -140,7 +140,7 @@ def test_combined_metrics_plan(  # noqa: D
         semantic_manifest_lookup=simple_semantic_manifest_lookup,
         sql_client=sql_client,
     )
-    execution_plan = to_execution_plan_converter.convert_to_execution_plan(dataflow_plan)
+    execution_plan = to_execution_plan_converter.convert_to_execution_plan(dataflow_plan).execution_plan
 
     assert_execution_plan_text_equal(
         request=request,
@@ -185,7 +185,7 @@ def test_multihop_joined_plan(  # noqa: D
         sql_client=sql_client,
     )
 
-    execution_plan = to_execution_plan_converter.convert_to_execution_plan(dataflow_plan)
+    execution_plan = to_execution_plan_converter.convert_to_execution_plan(dataflow_plan).execution_plan
 
     assert_execution_plan_text_equal(
         request=request,
