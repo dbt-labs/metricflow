@@ -40,6 +40,7 @@ from metricflow.model.semantics.linkable_spec_resolver import LinkableDimension
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
+from metricflow.plan_conversion.convert_to_execution_plan import ConvertToExecutionPlanResult
 from metricflow.plan_conversion.dataflow_to_execution import (
     DataflowToExecutionPlanConverter,
 )
@@ -170,21 +171,22 @@ class MetricFlowExplainResult:
 
     query_spec: MetricFlowQuerySpec
     dataflow_plan: DataflowPlan
-    execution_plan: ExecutionPlan
+    convert_to_execution_plan_result: ConvertToExecutionPlanResult
     output_table: Optional[SqlTable] = None
 
     @property
     def rendered_sql(self) -> SqlQuery:
         """Return the SQL query that would be run for the given query."""
-        if len(self.execution_plan.tasks) != 1:
+        execution_plan = self.execution_plan
+        if len(execution_plan.tasks) != 1:
             raise NotImplementedError(
-                f"Multiple tasks in the execution plan not yet supported. Got tasks: {self.execution_plan.tasks}"
+                f"Multiple tasks in the execution plan not yet supported. Got tasks: {execution_plan.tasks}"
             )
 
-        sql_query = self.execution_plan.tasks[0].sql_query
+        sql_query = execution_plan.tasks[0].sql_query
         if not sql_query:
             raise NotImplementedError(
-                f"Execution plan tasks without a SQL query not yet supported. Got tasks: {self.execution_plan.tasks}"
+                f"Execution plan tasks without a SQL query not yet supported. Got tasks: {execution_plan.tasks}"
             )
 
         return sql_query
@@ -202,6 +204,10 @@ class MetricFlowExplainResult:
             ),
             bind_parameters=sql_query.bind_parameters,
         )
+
+    @property
+    def execution_plan(self) -> ExecutionPlan:  # noqa: D
+        return self.convert_to_execution_plan_result.execution_plan
 
 
 class AbstractMetricFlowEngine(ABC):
@@ -404,7 +410,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     def query(self, mf_request: MetricFlowQueryRequest) -> MetricFlowQueryResult:  # noqa: D
         logger.info(f"Starting query request:\n{indent(mf_pformat(mf_request))}")
         explain_result = self._create_execution_plan(mf_request)
-        execution_plan = explain_result.execution_plan
+        execution_plan = explain_result.convert_to_execution_plan_result.execution_plan
 
         if len(execution_plan.tasks) != 1:
             raise NotImplementedError("Multiple tasks not yet supported.")
@@ -496,7 +502,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             (),
         )
         dataflow_plan: Optional[DataflowPlan] = None
-        execution_plan: Optional[ExecutionPlan] = None
+        convert_to_execution_plan_result: Optional[ConvertToExecutionPlanResult] = None
 
         for i, dataflow_plan_optimizer_set in enumerate(dataflow_plan_optimizer_sets_to_try):
             try:
@@ -516,7 +522,10 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                         f"Got tasks: {dataflow_plan.sink_output_nodes}"
                     )
 
-                execution_plan = self._to_execution_plan_converter.convert_to_execution_plan(dataflow_plan)
+                convert_to_execution_plan_result = self._to_execution_plan_converter.convert_to_execution_plan(
+                    dataflow_plan
+                )
+
                 break
             except Exception as e:
                 # Exception even if no optimizers were applied, so propagate the exception up.
@@ -530,12 +539,12 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                     f"{dataflow_plan_optimizer_sets_to_try[i+1]}"
                 )
         assert dataflow_plan is not None
-        assert execution_plan is not None
+        assert convert_to_execution_plan_result is not None
 
         return MetricFlowExplainResult(
             query_spec=query_spec,
             dataflow_plan=dataflow_plan,
-            execution_plan=execution_plan,
+            convert_to_execution_plan_result=convert_to_execution_plan_result,
             output_table=output_table,
         )
 
