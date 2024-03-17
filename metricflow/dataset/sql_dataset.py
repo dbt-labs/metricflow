@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from typing import Sequence
+from typing import Optional, Sequence
 
+from metricflow.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.dataset.dataset import DataSet
 from metricflow.instances import (
     InstanceSet,
@@ -9,6 +10,7 @@ from metricflow.instances import (
 from metricflow.specs.column_assoc import ColumnAssociation
 from metricflow.specs.specs import DimensionSpec, EntitySpec, TimeDimensionSpec
 from metricflow.sql.sql_plan import (
+    SqlQueryPlanNode,
     SqlSelectStatementNode,
 )
 
@@ -16,7 +18,12 @@ from metricflow.sql.sql_plan import (
 class SqlDataSet(DataSet):
     """A metric data set along with the associated SQL query node that can be rendered to get those values."""
 
-    def __init__(self, instance_set: InstanceSet, sql_select_node: SqlSelectStatementNode) -> None:
+    def __init__(
+        self,
+        instance_set: InstanceSet,
+        sql_select_node: Optional[SqlSelectStatementNode] = None,
+        sql_node: Optional[SqlQueryPlanNode] = None,
+    ) -> None:
         """Constructor.
 
         Args:
@@ -24,11 +31,25 @@ class SqlDataSet(DataSet):
             sql_select_node: The SQL that can be rendered to realize the instance set
         """
         self._sql_select_node = sql_select_node
+        self._sql_node = sql_node
+        assert_exactly_one_arg_set(sql_select_node=sql_select_node, sql_node=sql_node)
         super().__init__(instance_set=instance_set)
 
     @property
+    def sql_node(self) -> SqlQueryPlanNode:  # noqa: D
+        node_to_return = self._sql_select_node or self._sql_node
+        if node_to_return is None:
+            raise RuntimeError("This node was not created with a SQL node.")
+        return node_to_return
+
+    @property
     def checked_sql_select_node(self) -> SqlSelectStatementNode:
-        """Return a SELECT node that can be used to read data from the given SQL table or SQL query."""
+        """If applicable, return a SELECT node that can be used to read data from the given SQL table or SQL query.
+
+        Otherwise, an exception is thrown.
+        """
+        if self._sql_select_node is None:
+            raise RuntimeError(f"{self} was created with a SQL node that is not a {SqlSelectStatementNode}")
         return self._sql_select_node
 
     def column_associations_for_entity(
