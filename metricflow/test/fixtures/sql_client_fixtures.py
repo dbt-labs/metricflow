@@ -11,7 +11,7 @@ from dbt.adapters.factory import get_adapter_by_type
 from dbt.cli.main import dbtRunner
 
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState, dbt_project_dir, dialect_from_url
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration, dbt_project_dir, dialect_from_url
 from metricflow.test.fixtures.sql_clients.adapter_backed_ddl_client import AdapterBackedDDLSqlClient
 from metricflow.test.fixtures.sql_clients.common_client import SqlDialect
 from metricflow.test.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
@@ -175,33 +175,35 @@ def make_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithD
 
 
 @pytest.fixture(scope="session")
-def ddl_sql_client(mf_test_session_state: MetricFlowTestSessionState) -> Generator[SqlClientWithDDLMethods, None, None]:
+def ddl_sql_client(
+    mf_test_configuration: MetricFlowTestConfiguration,
+) -> Generator[SqlClientWithDDLMethods, None, None]:
     """Provides a SqlClient with the necessary DDL and data loading methods for test configuration.
 
     This allows us to provide the operations necessary for executing the test suite without exposing those methods in
     MetricFlow's core SqlClient protocol.
     """
     sql_client = make_test_sql_client(
-        url=mf_test_session_state.sql_engine_url,
-        password=mf_test_session_state.sql_engine_password,
-        schema=mf_test_session_state.mf_source_schema,
+        url=mf_test_configuration.sql_engine_url,
+        password=mf_test_configuration.sql_engine_password,
+        schema=mf_test_configuration.mf_source_schema,
     )
-    logger.info(f"Creating schema '{mf_test_session_state.mf_system_schema}'")
-    sql_client.create_schema(mf_test_session_state.mf_system_schema)
-    if mf_test_session_state.mf_system_schema != mf_test_session_state.mf_source_schema:
-        logger.info(f"Creating schema '{mf_test_session_state.mf_source_schema}'")
-        sql_client.create_schema(mf_test_session_state.mf_source_schema)
+    logger.info(f"Creating schema '{mf_test_configuration.mf_system_schema}'")
+    sql_client.create_schema(mf_test_configuration.mf_system_schema)
+    if mf_test_configuration.mf_system_schema != mf_test_configuration.mf_source_schema:
+        logger.info(f"Creating schema '{mf_test_configuration.mf_source_schema}'")
+        sql_client.create_schema(mf_test_configuration.mf_source_schema)
 
     yield sql_client
 
-    logger.info(f"Dropping schema '{mf_test_session_state.mf_system_schema}'")
-    sql_client.drop_schema(mf_test_session_state.mf_system_schema, cascade=True)
+    logger.info(f"Dropping schema '{mf_test_configuration.mf_system_schema}'")
+    sql_client.drop_schema(mf_test_configuration.mf_system_schema, cascade=True)
     if (
-        mf_test_session_state.mf_system_schema != mf_test_session_state.mf_source_schema
-        and not mf_test_session_state.use_persistent_source_schema
+        mf_test_configuration.mf_system_schema != mf_test_configuration.mf_source_schema
+        and not mf_test_configuration.use_persistent_source_schema
     ):
-        logger.info(f"Dropping schema '{mf_test_session_state.mf_source_schema}'")
-        sql_client.drop_schema(mf_test_session_state.mf_source_schema, cascade=True)
+        logger.info(f"Dropping schema '{mf_test_configuration.mf_source_schema}'")
+        sql_client.drop_schema(mf_test_configuration.mf_source_schema, cascade=True)
 
     sql_client.close()
     return None

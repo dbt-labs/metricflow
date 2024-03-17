@@ -26,7 +26,7 @@ from metricflow.sql.sql_plan import (
     SqlTableFromClauseNode,
 )
 from metricflow.sql.sql_table import SqlTable, SqlTableType
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.sql.compare_sql_plan import assert_rendered_sql_equal
 
 logger = logging.getLogger(__name__)
@@ -35,7 +35,7 @@ logger = logging.getLogger(__name__)
 @pytest.mark.sql_engine_snapshot
 def test_component_rendering(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
 ) -> None:
     """Checks that all components of SELECT query are rendered for the 0, 1, >1 component count cases."""
@@ -60,7 +60,7 @@ def test_component_rendering(
 
     assert_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=SqlSelectStatementNode(
             description="test0",
             select_columns=tuple(select_columns),
@@ -91,7 +91,7 @@ def test_component_rendering(
 
     assert_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=SqlSelectStatementNode(
             description="test1",
             select_columns=tuple(select_columns),
@@ -122,7 +122,7 @@ def test_component_rendering(
 
     assert_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=SqlSelectStatementNode(
             description="test2",
             select_columns=tuple(select_columns),
@@ -153,7 +153,7 @@ def test_component_rendering(
 
     assert_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=SqlSelectStatementNode(
             description="test3",
             select_columns=tuple(select_columns),
@@ -178,7 +178,7 @@ def test_component_rendering(
 
     assert_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=SqlSelectStatementNode(
             description="test4",
             select_columns=tuple(select_columns),
@@ -203,7 +203,7 @@ def test_component_rendering(
 
     assert_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=SqlSelectStatementNode(
             description="test5",
             select_columns=tuple(select_columns),
@@ -222,12 +222,12 @@ def test_component_rendering(
 @pytest.mark.sql_engine_snapshot
 def test_render_where(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
 ) -> None:
     assert_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=SqlSelectStatementNode(
             description="test0",
             select_columns=(
@@ -263,12 +263,12 @@ def test_render_where(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_render_order_by(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
 ) -> None:
     assert_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=SqlSelectStatementNode(
             description="test0",
             select_columns=(
@@ -313,12 +313,12 @@ def test_render_order_by(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_render_limit(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
 ) -> None:
     assert_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=SqlSelectStatementNode(
             description="test0",
             select_columns=(
@@ -345,7 +345,7 @@ def test_render_limit(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_render_create_table_as(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
 ) -> None:
     select_node = SqlSelectStatementNode(
@@ -366,7 +366,7 @@ def test_render_create_table_as(  # noqa: D
     )
     assert_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=SqlCreateTableAsNode(
             sql_table=SqlTable(
                 schema_name="schema_name",
@@ -380,7 +380,7 @@ def test_render_create_table_as(  # noqa: D
     )
     assert_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=SqlCreateTableAsNode(
             sql_table=SqlTable(
                 schema_name="schema_name",

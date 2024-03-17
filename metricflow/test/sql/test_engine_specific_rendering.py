@@ -24,14 +24,14 @@ from metricflow.sql.sql_plan import (
     SqlTableFromClauseNode,
 )
 from metricflow.sql.sql_table import SqlTable
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.sql.compare_sql_plan import assert_rendered_sql_equal
 
 
 @pytest.mark.sql_engine_snapshot
 def test_cast_to_timestamp(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
 ) -> None:
     """Tests rendering of the cast to timestamp expression in a query."""
@@ -55,7 +55,7 @@ def test_cast_to_timestamp(
 
     assert_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=SqlSelectStatementNode(
             description="Test Cast to Timestamp Expression",
             select_columns=tuple(select_columns),
@@ -74,7 +74,7 @@ def test_cast_to_timestamp(
 @pytest.mark.sql_engine_snapshot
 def test_generate_uuid(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
 ) -> None:
     """Tests rendering of the generate uuid expression in a query."""
@@ -89,7 +89,7 @@ def test_generate_uuid(
 
     assert_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=SqlSelectStatementNode(
             description="Test Generate UUID Expression",
             select_columns=tuple(select_columns),
@@ -108,7 +108,7 @@ def test_generate_uuid(
 @pytest.mark.sql_engine_snapshot
 def test_continuous_percentile_expr(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
 ) -> None:
     """Tests rendering of the continuous percentile expression in a query."""
@@ -138,7 +138,7 @@ def test_continuous_percentile_expr(
 
     assert_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=SqlSelectStatementNode(
             description="Test Continuous Percentile Expression",
             select_columns=tuple(select_columns),
@@ -157,7 +157,7 @@ def test_continuous_percentile_expr(
 @pytest.mark.sql_engine_snapshot
 def test_discrete_percentile_expr(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
 ) -> None:
     """Tests rendering of the discrete percentile expression in a query."""
@@ -187,7 +187,7 @@ def test_discrete_percentile_expr(
 
     assert_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=SqlSelectStatementNode(
             description="Test Discrete Percentile Expression",
             select_columns=tuple(select_columns),
@@ -206,7 +206,7 @@ def test_discrete_percentile_expr(
 @pytest.mark.sql_engine_snapshot
 def test_approximate_continuous_percentile_expr(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
 ) -> None:
     """Tests rendering of the approximate continuous percentile expression in a query."""
@@ -236,7 +236,7 @@ def test_approximate_continuous_percentile_expr(
 
     assert_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=SqlSelectStatementNode(
             description="Test Approximate Continuous Percentile Expression",
             select_columns=tuple(select_columns),
@@ -255,7 +255,7 @@ def test_approximate_continuous_percentile_expr(
 @pytest.mark.sql_engine_snapshot
 def test_approximate_discrete_percentile_expr(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
 ) -> None:
     """Tests rendering of the approximate discrete percentile expression in a query."""
@@ -285,7 +285,7 @@ def test_approximate_discrete_percentile_expr(
 
     assert_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=SqlSelectStatementNode(
             description="Test Approximate Discrete Percentile Expression",
             select_columns=tuple(select_columns),

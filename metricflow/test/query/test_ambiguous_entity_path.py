@@ -11,7 +11,7 @@ from metricflow.query.group_by_item.filter_spec_resolution.filter_pattern_factor
 )
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.query.query_parser import MetricFlowQueryParser
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.snapshot_utils import assert_object_snapshot_equal, assert_str_snapshot_equal
 
 logger = logging.getLogger(__name__)
@@ -29,7 +29,7 @@ def multi_hop_query_parser(  # noqa: D
 
 def test_resolvable_ambiguous_entity_path(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     multi_hop_query_parser: MetricFlowQueryParser,
 ) -> None:
     query_spec = multi_hop_query_parser.parse_and_validate_query(
@@ -39,7 +39,7 @@ def test_resolvable_ambiguous_entity_path(  # noqa: D
 
     assert_object_snapshot_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         obj_id="result_0",
         obj=query_spec,
     )
@@ -47,7 +47,7 @@ def test_resolvable_ambiguous_entity_path(  # noqa: D
 
 def test_ambiguous_entity_path_resolves_to_shortest_entity_path_item(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     multi_hop_query_parser: MetricFlowQueryParser,
 ) -> None:
     """Tests that 'entity_1__country' resolves to 'entity_1__country' not 'entity_1__entity_0__country'."""
@@ -58,7 +58,7 @@ def test_ambiguous_entity_path_resolves_to_shortest_entity_path_item(
 
     assert_object_snapshot_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         obj_id="result_0",
         obj=query_spec,
     )
@@ -66,7 +66,7 @@ def test_ambiguous_entity_path_resolves_to_shortest_entity_path_item(
 
 def test_non_resolvable_ambiguous_entity_path_due_to_multiple_matches(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     multi_hop_query_parser: MetricFlowQueryParser,
 ) -> None:
     """Tests an input with an ambiguous entity-path that can't be resolved due to multiple matches.
@@ -81,7 +81,7 @@ def test_non_resolvable_ambiguous_entity_path_due_to_multiple_matches(
 
     assert_str_snapshot_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         snapshot_id="result_0",
         snapshot_str=str(e.value),
     )
@@ -89,7 +89,7 @@ def test_non_resolvable_ambiguous_entity_path_due_to_multiple_matches(
 
 def test_non_resolvable_ambiguous_entity_path_due_to_mismatch(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     multi_hop_query_parser: MetricFlowQueryParser,
 ) -> None:
     """Tests an input with an ambiguous entity-path that can't be resolved due to a mismatch between metrics.
@@ -104,7 +104,7 @@ def test_non_resolvable_ambiguous_entity_path_due_to_mismatch(
 
     assert_str_snapshot_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         snapshot_id="result_0",
         snapshot_str=str(e.value),
     )

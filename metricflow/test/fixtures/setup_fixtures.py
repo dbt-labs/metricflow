@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
-class MetricFlowTestSessionState:
+class MetricFlowTestConfiguration:
     """State that is shared between tests during a testing session."""
 
     sql_engine_url: str
@@ -110,11 +110,11 @@ def check_sql_engine_snapshot_marker(request: FixtureRequest) -> None:
 
 
 @pytest.fixture(scope="session")
-def mf_test_session_state(  # noqa: D
+def mf_test_configuration(  # noqa: D
     request: FixtureRequest,
     disable_sql_alchemy_deprecation_warning: None,
     source_table_snapshot_repository: SqlTableSnapshotRepository,
-) -> MetricFlowTestSessionState:
+) -> MetricFlowTestConfiguration:
     engine_url = os.environ.get("MF_SQL_ENGINE_URL")
     assert engine_url is not None, (
         "MF_SQL_ENGINE_URL environment variable has not been set! Are you running in a properly configured "
@@ -166,7 +166,7 @@ def mf_test_session_state(  # noqa: D
     else:
         mf_source_schema = default_source_schema
 
-    return MetricFlowTestSessionState(
+    return MetricFlowTestConfiguration(
         sql_engine_url=engine_url,
         sql_engine_password=engine_password,
         mf_system_schema=mf_system_schema,
@@ -199,7 +199,7 @@ def dbt_project_dir() -> str:
 @pytest.fixture(scope="session", autouse=True)
 def warn_user_about_slow_tests_without_parallelism(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
 ) -> None:
     worker_count_env_var = os.environ.get("PYTEST_XDIST_WORKER_COUNT", "1")
     try:
@@ -211,7 +211,7 @@ def warn_user_about_slow_tests_without_parallelism(  # noqa: D
         ) from e
 
     num_items = len(request.session.items)
-    dialect = dialect_from_url(mf_test_session_state.sql_engine_url)
+    dialect = dialect_from_url(mf_test_configuration.sql_engine_url)
 
     # If already running in parallel or if there's not many test items, no need to print the warning. Picking 10/30 as
     # the thresholds, but not much thought has been put into it.

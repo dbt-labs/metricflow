@@ -36,7 +36,7 @@ from metricflow.sql.sql_exprs import (
     SqlSubtractTimeIntervalExpression,
 )
 from metricflow.test.compare_df import assert_dataframes_equal
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.integration.configured_test_case import (
     CONFIGURED_INTEGRATION_TESTS_REPOSITORY,
     IntegrationTestModel,
@@ -235,7 +235,7 @@ def filter_not_supported_features(
 )
 def test_case(
     name: str,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     simple_semantic_manifest_lookup: SemanticManifestLookup,
     simple_semantic_manifest_lookup_non_ds: SemanticManifestLookup,
     multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
@@ -305,7 +305,7 @@ def test_case(
                 case.where_filter,
                 undefined=jinja2.StrictUndefined,
             ).render(
-                source_schema=mf_test_session_state.mf_source_schema,
+                source_schema=mf_test_configuration.mf_source_schema,
                 render_time_constraint=check_query_helpers.render_time_constraint,
                 render_between_time_constraint=check_query_helpers.render_between_time_constraint,
                 TimeGranularity=TimeGranularity,
@@ -336,7 +336,7 @@ def test_case(
             case.check_query,
             undefined=jinja2.StrictUndefined,
         ).render(
-            source_schema=mf_test_session_state.mf_source_schema,
+            source_schema=mf_test_configuration.mf_source_schema,
             render_time_constraint=check_query_helpers.render_time_constraint,
             render_between_time_constraint=check_query_helpers.render_between_time_constraint,
             TimeGranularity=TimeGranularity,

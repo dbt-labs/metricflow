@@ -12,7 +12,7 @@ from metricflow.model.semantics.linkable_spec_resolver import (
     ValidLinkableSpecResolver,
 )
 from metricflow.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.snapshot_utils import assert_linkable_element_set_snapshot_equal
 
 logger = logging.getLogger(__name__)
@@ -42,12 +42,12 @@ def cyclic_join_manifest_spec_resolver(  # noqa: D
 
 def test_all_properties(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     simple_model_spec_resolver: ValidLinkableSpecResolver,
 ) -> None:
     assert_linkable_element_set_snapshot_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         set_id="result0",
         linkable_element_set=simple_model_spec_resolver.get_linkable_elements_for_metrics(
             metric_references=[MetricReference(element_name="bookings"), MetricReference(element_name="views")],
@@ -59,12 +59,12 @@ def test_all_properties(  # noqa: D
 
 def test_one_property(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     simple_model_spec_resolver: ValidLinkableSpecResolver,
 ) -> None:
     assert_linkable_element_set_snapshot_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         set_id="result0",
         linkable_element_set=simple_model_spec_resolver.get_linkable_elements_for_metrics(
             metric_references=[MetricReference(element_name="bookings"), MetricReference(element_name="views")],
@@ -76,12 +76,12 @@ def test_one_property(  # noqa: D
 
 def test_metric_time_property_for_cumulative_metric(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     simple_model_spec_resolver: ValidLinkableSpecResolver,
 ) -> None:
     assert_linkable_element_set_snapshot_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         set_id="result0",
         linkable_element_set=simple_model_spec_resolver.get_linkable_elements_for_metrics(
             metric_references=[MetricReference(element_name="trailing_2_months_revenue")],
@@ -93,12 +93,12 @@ def test_metric_time_property_for_cumulative_metric(  # noqa: D
 
 def test_metric_time_property_for_derived_metrics(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     simple_model_spec_resolver: ValidLinkableSpecResolver,
 ) -> None:
     assert_linkable_element_set_snapshot_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         set_id="result0",
         linkable_element_set=simple_model_spec_resolver.get_linkable_elements_for_metrics(
             metric_references=[MetricReference(element_name="bookings_per_view")],
@@ -110,12 +110,12 @@ def test_metric_time_property_for_derived_metrics(  # noqa: D
 
 def test_cyclic_join_manifest(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     cyclic_join_manifest_spec_resolver: ValidLinkableSpecResolver,
 ) -> None:
     assert_linkable_element_set_snapshot_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         set_id="result0",
         linkable_element_set=cyclic_join_manifest_spec_resolver.get_linkable_elements_for_metrics(
             metric_references=[MetricReference(element_name="listings")],

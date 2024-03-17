@@ -28,7 +28,7 @@ from metricflow.cli.main import (
 )
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.test.fixtures.cli_fixtures import MetricFlowCliRunner
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.model.example_project_configuration import EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE
 from metricflow.test.snapshot_utils import assert_str_snapshot_equal
 
@@ -167,7 +167,7 @@ def test_list_entities(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
 def test_saved_query(  # noqa: D
     request: FixtureRequest,
     capsys: pytest.CaptureFixture,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     cli_runner: MetricFlowCliRunner,
     sql_client: SqlClient,
 ) -> None:
@@ -180,7 +180,7 @@ def test_saved_query(  # noqa: D
 
     assert_str_snapshot_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         snapshot_id="cli_output",
         snapshot_str=resp.output,
         sql_engine=sql_client.sql_engine_type,
@@ -191,7 +191,7 @@ def test_saved_query(  # noqa: D
 def test_saved_query_with_where(  # noqa: D
     request: FixtureRequest,
     capsys: pytest.CaptureFixture,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     cli_runner: MetricFlowCliRunner,
     sql_client: SqlClient,
 ) -> None:
@@ -211,7 +211,7 @@ def test_saved_query_with_where(  # noqa: D
 
     assert_str_snapshot_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         snapshot_id="cli_output",
         snapshot_str=resp.output,
         sql_engine=sql_client.sql_engine_type,
@@ -222,7 +222,7 @@ def test_saved_query_with_where(  # noqa: D
 def test_saved_query_with_limit(  # noqa: D
     request: FixtureRequest,
     capsys: pytest.CaptureFixture,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     cli_runner: MetricFlowCliRunner,
     sql_client: SqlClient,
 ) -> None:
@@ -242,7 +242,7 @@ def test_saved_query_with_limit(  # noqa: D
 
     assert_str_snapshot_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         snapshot_id="cli_output",
         snapshot_str=resp.output,
         sql_engine=sql_client.sql_engine_type,
@@ -251,7 +251,7 @@ def test_saved_query_with_limit(  # noqa: D
 
 def test_saved_query_explain(  # noqa: D
     capsys: pytest.CaptureFixture,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     cli_runner: MetricFlowCliRunner,
 ) -> None:
     resp = cli_runner.run(
@@ -267,7 +267,7 @@ def test_saved_query_explain(  # noqa: D
 def test_saved_query_with_cumulative_metric(  # noqa: D
     request: FixtureRequest,
     capsys: pytest.CaptureFixture,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     cli_runner: MetricFlowCliRunner,
     sql_client: SqlClient,
 ) -> None:
@@ -287,7 +287,7 @@ def test_saved_query_with_cumulative_metric(  # noqa: D
 
     assert_str_snapshot_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         snapshot_id="cli_output",
         snapshot_str=resp.output,
         sql_engine=sql_client.sql_engine_type,

@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 from metricflow.test.source_schema_tools import create_tables_listed_in_table_snapshot_repository
 from metricflow.test.table_snapshot.table_snapshots import (
@@ -31,7 +31,7 @@ def source_table_snapshot_repository() -> SqlTableSnapshotRepository:  # noqa: D
 
 @pytest.fixture(scope="session", autouse=True)
 def check_time_spine_source(
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     source_table_snapshot_repository: SqlTableSnapshotRepository,
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
@@ -42,7 +42,7 @@ def check_time_spine_source(
     """
     time_spine_source = simple_semantic_manifest_lookup.time_spine_source
     assert (
-        time_spine_source.schema_name == mf_test_session_state.mf_source_schema
+        time_spine_source.schema_name == mf_test_configuration.mf_source_schema
     ), "The time spine source table should be in the source schema"
 
     time_spine_snapshot_candidates = tuple(
@@ -65,7 +65,7 @@ def check_time_spine_source(
 
 @pytest.fixture(scope="session")
 def create_source_tables(
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     ddl_sql_client: SqlClientWithDDLMethods,
     source_table_snapshot_repository: SqlTableSnapshotRepository,
 ) -> None:
@@ -73,7 +73,7 @@ def create_source_tables(
 
     If a table with a given name already exists in the source schema, it's assumed to have the expected schema / data.
     """
-    if mf_test_session_state.use_persistent_source_schema:
+    if mf_test_configuration.use_persistent_source_schema:
         logger.info(
             "This session was configured to use a persistent source schema, so this fixture won't create new tables. "
             "See populate_source_schema() for more details."
@@ -82,6 +82,6 @@ def create_source_tables(
 
     create_tables_listed_in_table_snapshot_repository(
         ddl_sql_client=ddl_sql_client,
-        schema_name=mf_test_session_state.mf_source_schema,
+        schema_name=mf_test_configuration.mf_source_schema,
         table_snapshot_repository=source_table_snapshot_repository,
     )

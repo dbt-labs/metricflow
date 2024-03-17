@@ -18,7 +18,7 @@ from metricflow.model.semantics.linkable_spec_resolver import LinkableElementSet
 from metricflow.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.specs.specs import InstanceSpecSet, LinkableSpecSet
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState, check_sql_engine_snapshot_marker
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration, check_sql_engine_snapshot_marker
 
 logger = logging.getLogger(__name__)
 
@@ -124,7 +124,7 @@ def _exclude_lines_matching_regex(file_contents: str, exclude_line_regex: str) -
 
 def assert_plan_snapshot_text_equal(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     plan: PlanT,
     plan_snapshot_text: str,
     plan_snapshot_file_extension: str = ".xml",
@@ -145,7 +145,7 @@ def assert_plan_snapshot_text_equal(
     """
     assert_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         group_id=plan.__class__.__name__,
         snapshot_id=str(plan.dag_id),
         snapshot_text=plan_snapshot_text,
@@ -158,7 +158,7 @@ def assert_plan_snapshot_text_equal(
 
 def assert_snapshot_text_equal(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     group_id: str,
     snapshot_id: str,
     snapshot_text: str,
@@ -186,7 +186,7 @@ def assert_snapshot_text_equal(
         snapshot_text = snapshot_text + "\n"
 
     # If we are in overwrite mode, make a new plan:
-    if mf_test_session_state.overwrite_snapshots:
+    if mf_test_configuration.overwrite_snapshots:
         # Create parent directory for the plan text files.
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         with open(file_path, "w") as snapshot_text_file:
@@ -199,8 +199,8 @@ def assert_snapshot_text_equal(
             "to see what's new."
         )
 
-    if mf_test_session_state.display_snapshots:
-        if not mf_test_session_state.overwrite_snapshots:
+    if mf_test_configuration.display_snapshots:
+        if not mf_test_configuration.overwrite_snapshots:
             logger.warning(f"Not overwriting snapshots, so displaying existing snapshot at {file_path}")
 
         if len(request.session.items) > 1:
@@ -229,18 +229,18 @@ def assert_snapshot_text_equal(
 
 def assert_execution_plan_text_equal(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
     execution_plan: ExecutionPlan,
 ) -> None:
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=execution_plan,
         plan_snapshot_text=execution_plan.structure_text(),
         incomparable_strings_replacement_function=make_schema_replacement_function(
-            system_schema=mf_test_session_state.mf_system_schema,
-            source_schema=mf_test_session_state.mf_source_schema,
+            system_schema=mf_test_configuration.mf_system_schema,
+            source_schema=mf_test_configuration.mf_source_schema,
         ),
         additional_sub_directories_for_snapshots=(sql_client.sql_engine_type.value,),
     )
@@ -248,13 +248,13 @@ def assert_execution_plan_text_equal(  # noqa: D
 
 def assert_dataflow_plan_text_equal(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan: DataflowPlan,
     sql_client: SqlClient,
 ) -> None:
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
         incomparable_strings_replacement_function=replace_dataset_id_hash,
@@ -264,7 +264,7 @@ def assert_dataflow_plan_text_equal(  # noqa: D
 
 def assert_object_snapshot_equal(  # type: ignore[misc]
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     obj_id: str,
     obj: Any,
     sql_client: Optional[SqlClient] = None,
@@ -275,7 +275,7 @@ def assert_object_snapshot_equal(  # type: ignore[misc]
 
     assert_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         group_id=obj.__class__.__name__,
         snapshot_id=obj_id,
         snapshot_text=mf_pformat(obj),
@@ -286,7 +286,7 @@ def assert_object_snapshot_equal(  # type: ignore[misc]
 
 def assert_sql_snapshot_equal(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     snapshot_id: str,
     sql: str,
     sql_engine: Optional[SqlEngine] = None,
@@ -297,13 +297,13 @@ def assert_sql_snapshot_equal(
 
     assert_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         group_id=sql.__class__.__name__,
         snapshot_id=snapshot_id,
         snapshot_text=sql,
         snapshot_file_extension=".sql",
         incomparable_strings_replacement_function=make_schema_replacement_function(
-            system_schema=mf_test_session_state.mf_system_schema, source_schema=mf_test_session_state.mf_source_schema
+            system_schema=mf_test_configuration.mf_system_schema, source_schema=mf_test_configuration.mf_source_schema
         ),
         exclude_line_regex=_EXCLUDE_TABLE_ALIAS_REGEX,
         additional_sub_directories_for_snapshots=(sql_engine.value,) if sql_engine is not None else (),
@@ -312,7 +312,7 @@ def assert_sql_snapshot_equal(
 
 def assert_str_snapshot_equal(  # type: ignore[misc]
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     snapshot_id: str,
     snapshot_str: str,
     sql_engine: Optional[SqlEngine] = None,
@@ -323,7 +323,7 @@ def assert_str_snapshot_equal(  # type: ignore[misc]
 
     assert_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         group_id=snapshot_str.__class__.__name__,
         snapshot_id=snapshot_id,
         snapshot_text=snapshot_str,
@@ -334,7 +334,7 @@ def assert_str_snapshot_equal(  # type: ignore[misc]
 
 def assert_linkable_element_set_snapshot_equal(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     set_id: str,
     linkable_element_set: LinkableElementSet,
 ) -> None:
@@ -373,31 +373,31 @@ def assert_linkable_element_set_snapshot_equal(  # noqa: D
             )
     assert_str_snapshot_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         snapshot_id=set_id,
         snapshot_str=tabulate.tabulate(headers=headers, tabular_data=sorted(rows)),
     )
 
 
 def assert_spec_set_snapshot_equal(  # noqa: D
-    request: FixtureRequest, mf_test_session_state: MetricFlowTestSessionState, set_id: str, spec_set: InstanceSpecSet
+    request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, set_id: str, spec_set: InstanceSpecSet
 ) -> None:
     assert_object_snapshot_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         obj_id=set_id,
         obj=sorted(spec.qualified_name for spec in spec_set.all_specs),
     )
 
 
 def assert_linkable_spec_set_snapshot_equal(  # noqa: D
-    request: FixtureRequest, mf_test_session_state: MetricFlowTestSessionState, set_id: str, spec_set: LinkableSpecSet
+    request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, set_id: str, spec_set: LinkableSpecSet
 ) -> None:
     # TODO: This will be used in a later PR and this message will be removed.
     naming_scheme = ObjectBuilderNamingScheme()
     assert_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         group_id=spec_set.__class__.__name__,
         snapshot_id=set_id,
         snapshot_text=mf_pformat(sorted(naming_scheme.input_str(spec) for spec in spec_set.as_tuple)),

@@ -5,7 +5,7 @@ from _pytest.fixtures import FixtureRequest
 
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.integration.conftest import IntegrationTestHelpers
 from metricflow.test.snapshot_utils import assert_str_snapshot_equal
 
@@ -13,7 +13,7 @@ from metricflow.test.snapshot_utils import assert_str_snapshot_equal
 @pytest.mark.sql_engine_snapshot
 def test_offset_to_grain_with_single_granularity(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
     it_helpers: IntegrationTestHelpers,
 ) -> None:
@@ -28,7 +28,7 @@ def test_offset_to_grain_with_single_granularity(  # noqa: D
 
     assert_str_snapshot_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         snapshot_id="query_output",
         snapshot_str=query_result.result_df.to_string(),
         sql_engine=sql_client.sql_engine_type,
@@ -38,7 +38,7 @@ def test_offset_to_grain_with_single_granularity(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_offset_to_grain_with_multiple_granularities(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
     it_helpers: IntegrationTestHelpers,
 ) -> None:
@@ -53,7 +53,7 @@ def test_offset_to_grain_with_multiple_granularities(  # noqa: D
 
     assert_str_snapshot_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         snapshot_id="query_output",
         snapshot_str=query_result.result_df.to_string(),
         sql_engine=sql_client.sql_engine_type,

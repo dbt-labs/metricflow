@@ -17,7 +17,7 @@ from metricflow.query.group_by_item.resolution_dag.dag import GroupByItemResolut
 from metricflow.query.group_by_item.resolution_dag.resolution_nodes.metric_resolution_node import (
     MetricGroupByItemResolutionNode,
 )
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.query.group_by_item.conftest import AmbiguousResolutionQueryId
 from metricflow.test.snapshot_utils import assert_object_snapshot_equal
 from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_MONTH, MTD_SPEC_YEAR
@@ -65,7 +65,7 @@ def test_ambiguous_metric_time_in_query(  # noqa: D
 
 def test_unavailable_group_by_item_in_derived_metric_parent(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     naming_scheme: QueryItemNamingScheme,
     ambiguous_resolution_manifest_lookup: SemanticManifestLookup,
     resolution_dags: Dict[AmbiguousResolutionQueryId, GroupByItemResolutionDag],
@@ -85,7 +85,7 @@ def test_unavailable_group_by_item_in_derived_metric_parent(  # noqa: D
 
     assert_object_snapshot_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         obj_id="result",
         obj=result,
     )
@@ -93,7 +93,7 @@ def test_unavailable_group_by_item_in_derived_metric_parent(  # noqa: D
 
 def test_invalid_group_by_item(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     naming_scheme: QueryItemNamingScheme,
     ambiguous_resolution_manifest_lookup: SemanticManifestLookup,
     resolution_dags: Dict[AmbiguousResolutionQueryId, GroupByItemResolutionDag],
@@ -112,7 +112,7 @@ def test_invalid_group_by_item(  # noqa: D
 
     assert_object_snapshot_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         obj_id="result",
         obj=result,
     )
@@ -120,7 +120,7 @@ def test_invalid_group_by_item(  # noqa: D
 
 def test_missing_parent_for_metric(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     naming_scheme: QueryItemNamingScheme,
     ambiguous_resolution_manifest_lookup: SemanticManifestLookup,
 ) -> None:
@@ -142,5 +142,5 @@ def test_missing_parent_for_metric(
     result = group_by_item_resolver.resolve_available_items(metric_node)
 
     assert_object_snapshot_equal(
-        request=request, mf_test_session_state=mf_test_session_state, obj_id="result", obj=result
+        request=request, mf_test_configuration=mf_test_configuration, obj_id="result", obj=result
     )

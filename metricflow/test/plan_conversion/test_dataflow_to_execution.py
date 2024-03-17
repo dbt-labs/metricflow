@@ -17,7 +17,7 @@ from metricflow.specs.specs import (
     TimeDimensionSpec,
 )
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.snapshot_utils import assert_execution_plan_text_equal
 
 
@@ -38,7 +38,7 @@ def make_execution_plan_converter(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_joined_plan(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     simple_semantic_manifest_lookup: SemanticManifestLookup,
     sql_client: SqlClient,
@@ -68,7 +68,7 @@ def test_joined_plan(  # noqa: D
 
     assert_execution_plan_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_client=sql_client,
         execution_plan=execution_plan,
     )
@@ -77,7 +77,7 @@ def test_joined_plan(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_small_combined_metrics_plan(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
     dataflow_plan_builder: DataflowPlanBuilder,
     simple_semantic_manifest_lookup: SemanticManifestLookup,
@@ -105,7 +105,7 @@ def test_small_combined_metrics_plan(  # noqa: D
 
     assert_execution_plan_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_client=sql_client,
         execution_plan=execution_plan,
     )
@@ -114,7 +114,7 @@ def test_small_combined_metrics_plan(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_combined_metrics_plan(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
     dataflow_plan_builder: DataflowPlanBuilder,
     simple_semantic_manifest_lookup: SemanticManifestLookup,
@@ -144,7 +144,7 @@ def test_combined_metrics_plan(  # noqa: D
 
     assert_execution_plan_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_client=sql_client,
         execution_plan=execution_plan,
     )
@@ -153,7 +153,7 @@ def test_combined_metrics_plan(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_multihop_joined_plan(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     multihop_dataflow_plan_builder: DataflowPlanBuilder,
     partitioned_multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
     sql_client: SqlClient,
@@ -189,7 +189,7 @@ def test_multihop_joined_plan(  # noqa: D
 
     assert_execution_plan_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_client=sql_client,
         execution_plan=execution_plan,
     )
