@@ -27,7 +27,7 @@ class SqlDataSet(DataSet):
         super().__init__(instance_set=instance_set)
 
     @property
-    def sql_select_node(self) -> SqlSelectStatementNode:
+    def checked_sql_select_node(self) -> SqlSelectStatementNode:
         """Return a SELECT node that can be used to read data from the given SQL table or SQL query."""
         return self._sql_select_node
 

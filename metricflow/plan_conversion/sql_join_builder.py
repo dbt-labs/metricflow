@@ -214,7 +214,7 @@ class SqlQueryPlanJoinBuilder:
         )
 
         return SqlQueryPlanJoinBuilder.make_column_equality_sql_join_description(
-            right_source_node=right_data_set.data_set.sql_select_node,
+            right_source_node=right_data_set.data_set.checked_sql_select_node,
             left_source_alias=left_data_set.alias,
             right_source_alias=right_data_set.alias,
             column_equality_descriptions=column_equality_descriptions,
@@ -350,7 +350,7 @@ class SqlQueryPlanJoinBuilder:
                 else equality_exprs[0]
             )
             return SqlJoinDescription(
-                right_source=join_data_set.data_set.sql_select_node,
+                right_source=join_data_set.data_set.checked_sql_select_node,
                 right_source_alias=join_data_set.alias,
                 on_condition=on_condition,
                 join_type=join_type,
@@ -361,7 +361,7 @@ class SqlQueryPlanJoinBuilder:
                 for name in column_names
             ]
             return SqlQueryPlanJoinBuilder.make_column_equality_sql_join_description(
-                right_source_node=join_data_set.data_set.sql_select_node,
+                right_source_node=join_data_set.data_set.checked_sql_select_node,
                 left_source_alias=from_data_set.alias,
                 right_source_alias=join_data_set.alias,
                 column_equality_descriptions=column_equality_descriptions,
@@ -494,7 +494,7 @@ class SqlQueryPlanJoinBuilder:
             window=node.window,
         )
         return SqlQueryPlanJoinBuilder.make_column_equality_sql_join_description(
-            right_source_node=conversion_data_set.data_set.sql_select_node,
+            right_source_node=conversion_data_set.data_set.checked_sql_select_node,
             left_source_alias=base_data_set.alias,
             right_source_alias=conversion_data_set.alias,
             column_equality_descriptions=column_equality_descriptions,
@@ -521,7 +521,7 @@ class SqlQueryPlanJoinBuilder:
         )
 
         return SqlJoinDescription(
-            right_source=metric_data_set.data_set.sql_select_node,
+            right_source=metric_data_set.data_set.checked_sql_select_node,
             right_source_alias=metric_data_set.alias,
             on_condition=cumulative_join_condition,
             join_type=SqlJoinType.INNER,
