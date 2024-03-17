@@ -197,7 +197,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             sql_node = optimizer.optimize(sql_node)
             logger.info(
                 f"After applying {optimizer.__class__.__name__}, the SQL query plan is:\n"
-                f"{indent(sql_node.text_structure())}"
+                f"{indent(sql_node.structure_text())}"
             )
 
         return ConvertToSqlPlanResult(

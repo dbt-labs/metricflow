@@ -417,7 +417,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
         task = execution_plan.tasks[0]
 
-        logger.info(f"Sequentially running tasks in:\n" f"{execution_plan.text_structure()}")
+        logger.info(f"Sequentially running tasks in:\n" f"{execution_plan.structure_text()}")
         execution_results = self._executor.execute_plan(execution_plan)
         logger.info("Finished running tasks in execution plan")
 

@@ -111,7 +111,7 @@ class DagNode(ABC):
         """Visit this node."""
         return visitor.visit_node(self)
 
-    def text_structure(self, formatter: MetricFlowDagTextFormatter = MetricFlowDagTextFormatter()) -> str:
+    def structure_text(self, formatter: MetricFlowDagTextFormatter = MetricFlowDagTextFormatter()) -> str:
         """Return a text representation that shows the structure of the DAG component starting from this node."""
         return formatter.dag_component_to_text(self)
 
@@ -193,6 +193,6 @@ class MetricFlowDag(Generic[DagNodeT]):  # noqa: D
     def sink_nodes(self) -> Sequence[DagNodeT]:  # noqa: D
         return self._sink_nodes
 
-    def text_structure(self, formatter: MetricFlowDagTextFormatter = MetricFlowDagTextFormatter()) -> str:
+    def structure_text(self, formatter: MetricFlowDagTextFormatter = MetricFlowDagTextFormatter()) -> str:
         """Return a text representation that shows the structure of this DAG."""
         return formatter.dag_to_text(self)

@@ -29,5 +29,5 @@ def test_snapshot(
         request=request,
         mf_test_session_state=mf_test_session_state,
         plan=resolution_dag,
-        plan_snapshot_text=resolution_dag.text_structure(),
+        plan_snapshot_text=resolution_dag.structure_text(),
     )

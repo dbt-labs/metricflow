@@ -313,9 +313,9 @@ class SourceScanOptimizer(
         logger.log(
             level=self._log_level,
             msg=f"Optimized:\n\n"
-            f"{dataflow_plan.sink_output_node.text_structure()}\n\n"
+            f"{dataflow_plan.sink_output_node.structure_text()}\n\n"
             f"to:\n\n"
-            f"{optimized_result.checked_sink_node.text_structure()}",
+            f"{optimized_result.checked_sink_node.structure_text()}",
         )
 
         if optimized_result.sink_node:
