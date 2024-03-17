@@ -5,17 +5,17 @@ import os
 from _pytest.fixtures import FixtureRequest
 
 from metricflow.dag.dag_visualization import DagGraphT, render_via_graphviz
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.snapshot_utils import snapshot_path_prefix
 
 
 def display_graph_if_requested(
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     request: FixtureRequest,
     dag_graph: DagGraphT,
 ) -> None:
     """Create and display the plan as an SVG, if requested to do so."""
-    if not mf_test_session_state.display_graphs:
+    if not mf_test_configuration.display_graphs:
         return
 
     if len(request.session.items) > 1:

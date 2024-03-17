@@ -20,14 +20,14 @@ from metricflow.specs.specs import (
     MetricFlowQuerySpec,
     MetricSpec,
 )
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.query_rendering.compare_rendered_query import convert_and_check
 
 
 @pytest.mark.sql_engine_snapshot
 def test_simple_join_to_time_spine(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
@@ -41,7 +41,7 @@ def test_simple_join_to_time_spine(  # noqa: D
 
     convert_and_check(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,

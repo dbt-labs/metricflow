@@ -19,7 +19,7 @@ from metricflow.sql.sql_plan import (
     SqlTableFromClauseNode,
 )
 from metricflow.sql.sql_table import SqlTable
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.sql.compare_sql_plan import assert_default_rendered_sql_equal
 
 
@@ -151,20 +151,20 @@ def base_select_statement() -> SqlSelectStatementNode:
 
 def test_table_alias_simplification(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     base_select_statement: SqlSelectStatementNode,
 ) -> None:
     """Tests a case where no pruning should occur."""
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=base_select_statement,
         plan_id="before_alias_simplification",
     )
     simplified_select_node = SqlTableAliasSimplifier().optimize(base_select_statement)
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=simplified_select_node,
         plan_id="after_alias_simplification",
     )

@@ -6,10 +6,10 @@ from metricflow.api.metricflow_client import MetricFlowClient
 from metricflow.engine.models import Dimension, Metric
 from metricflow.random_id import random_id
 from metricflow.sql.sql_table import SqlTable
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 
 
-def test_query(mf_client: MetricFlowClient, mf_test_session_state: MetricFlowTestSessionState) -> None:  # noqa: D
+def test_query(mf_client: MetricFlowClient, mf_test_configuration: MetricFlowTestConfiguration) -> None:  # noqa: D
     result = mf_client.query(
         ["bookings"],
         ["metric_time"],
@@ -24,7 +24,7 @@ def test_query(mf_client: MetricFlowClient, mf_test_session_state: MetricFlowTes
     assert len(result.result_df) == 2
     assert result.result_table is None
 
-    output_table = SqlTable(schema_name=mf_test_session_state.mf_system_schema, table_name=f"test_table_{random_id()}")
+    output_table = SqlTable(schema_name=mf_test_configuration.mf_system_schema, table_name=f"test_table_{random_id()}")
     result = mf_client.query(
         ["bookings"],
         ["metric_time"],
@@ -40,7 +40,7 @@ def test_query(mf_client: MetricFlowClient, mf_test_session_state: MetricFlowTes
     assert result.result_table == output_table
 
 
-def test_explain(mf_client: MetricFlowClient, mf_test_session_state: MetricFlowTestSessionState) -> None:  # noqa: D
+def test_explain(mf_client: MetricFlowClient, mf_test_configuration: MetricFlowTestConfiguration) -> None:  # noqa: D
     result = mf_client.explain(
         ["bookings"],
         ["metric_time"],
@@ -53,7 +53,7 @@ def test_explain(mf_client: MetricFlowClient, mf_test_session_state: MetricFlowT
     assert result.execution_plan
     assert result.output_table is None
 
-    output_table = SqlTable(schema_name=mf_test_session_state.mf_system_schema, table_name=f"test_table_{random_id()}")
+    output_table = SqlTable(schema_name=mf_test_configuration.mf_system_schema, table_name=f"test_table_{random_id()}")
     result = mf_client.explain(
         ["bookings"],
         ["metric_time"],

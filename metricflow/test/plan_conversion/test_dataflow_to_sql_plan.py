@@ -52,7 +52,7 @@ from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_plan import SqlJoinType
 from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
 from metricflow.test.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.snapshot_utils import assert_plan_snapshot_text_equal
 from metricflow.test.sql.compare_sql_plan import assert_rendered_sql_from_plan_equal, assert_sql_plan_text_equal
 from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY
@@ -60,7 +60,7 @@ from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY
 
 def convert_and_check(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
     node: BaseOutput,
@@ -76,19 +76,19 @@ def convert_and_check(
     sql_query_plan = conversion_result.sql_plan
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=sql_query_plan,
     )
 
     assert_sql_plan_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_query_plan=sql_query_plan,
     )
 
     assert_rendered_sql_from_plan_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_query_plan=sql_query_plan,
         sql_client=sql_client,
     )
@@ -103,13 +103,13 @@ def convert_and_check(
     sql_query_plan = conversion_result.sql_plan
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=sql_query_plan,
     )
 
     assert_rendered_sql_from_plan_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_query_plan=sql_query_plan,
         sql_client=sql_client,
     )
@@ -118,7 +118,7 @@ def convert_and_check(
 @pytest.mark.sql_engine_snapshot
 def test_source_node(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
@@ -130,7 +130,7 @@ def test_source_node(  # noqa: D
 
     convert_and_check(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=source_node,
@@ -140,7 +140,7 @@ def test_source_node(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_filter_node(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
@@ -158,7 +158,7 @@ def test_filter_node(  # noqa: D
 
     convert_and_check(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=filter_node,
@@ -168,7 +168,7 @@ def test_filter_node(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_filter_with_where_constraint_node(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     column_association_resolver: ColumnAssociationResolver,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
@@ -206,7 +206,7 @@ def test_filter_with_where_constraint_node(  # noqa: D
 
     convert_and_check(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=where_constraint_node,
@@ -216,7 +216,7 @@ def test_filter_with_where_constraint_node(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_measure_aggregation_node(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
@@ -254,7 +254,7 @@ def test_measure_aggregation_node(  # noqa: D
 
     convert_and_check(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=aggregated_measure_node,
@@ -264,7 +264,7 @@ def test_measure_aggregation_node(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_single_join_node(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
@@ -315,7 +315,7 @@ def test_single_join_node(  # noqa: D
 
     convert_and_check(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=join_node,
@@ -325,7 +325,7 @@ def test_single_join_node(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_multi_join_node(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
@@ -380,7 +380,7 @@ def test_multi_join_node(
 
     convert_and_check(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=join_node,
@@ -390,7 +390,7 @@ def test_multi_join_node(
 @pytest.mark.sql_engine_snapshot
 def test_compute_metrics_node(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
@@ -449,7 +449,7 @@ def test_compute_metrics_node(
 
     convert_and_check(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=compute_metrics_node,
@@ -459,7 +459,7 @@ def test_compute_metrics_node(
 @pytest.mark.sql_engine_snapshot
 def test_compute_metrics_node_simple_expr(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
@@ -517,20 +517,20 @@ def test_compute_metrics_node_simple_expr(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
     convert_and_check(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=compute_metrics_node,
@@ -540,7 +540,7 @@ def test_compute_metrics_node_simple_expr(
 @pytest.mark.sql_engine_snapshot
 def test_join_to_time_spine_node_without_offset(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
@@ -585,20 +585,20 @@ def test_join_to_time_spine_node_without_offset(  # noqa: D
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
     convert_and_check(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=join_to_time_spine_node,
@@ -608,7 +608,7 @@ def test_join_to_time_spine_node_without_offset(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_join_to_time_spine_node_with_offset_window(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
@@ -654,20 +654,20 @@ def test_join_to_time_spine_node_with_offset_window(  # noqa: D
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
     convert_and_check(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=join_to_time_spine_node,
@@ -677,7 +677,7 @@ def test_join_to_time_spine_node_with_offset_window(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_join_to_time_spine_node_with_offset_to_grain(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
@@ -724,20 +724,20 @@ def test_join_to_time_spine_node_with_offset_to_grain(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
     convert_and_check(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=join_to_time_spine_node,
@@ -747,7 +747,7 @@ def test_join_to_time_spine_node_with_offset_to_grain(
 @pytest.mark.sql_engine_snapshot
 def test_compute_metrics_node_ratio_from_single_semantic_model(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
@@ -808,7 +808,7 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
 
     convert_and_check(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=compute_metrics_node,
@@ -818,7 +818,7 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
 @pytest.mark.sql_engine_snapshot
 def test_order_by_node(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
@@ -874,7 +874,7 @@ def test_order_by_node(
 
     convert_and_check(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=order_by_node,
@@ -884,7 +884,7 @@ def test_order_by_node(
 @pytest.mark.sql_engine_snapshot
 def test_semi_additive_join_node(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
@@ -905,7 +905,7 @@ def test_semi_additive_join_node(
 
     convert_and_check(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=semi_additive_join_node,
@@ -915,7 +915,7 @@ def test_semi_additive_join_node(
 @pytest.mark.sql_engine_snapshot
 def test_semi_additive_join_node_with_queried_group_by(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
@@ -939,7 +939,7 @@ def test_semi_additive_join_node_with_queried_group_by(
     )
     convert_and_check(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=semi_additive_join_node,
@@ -949,7 +949,7 @@ def test_semi_additive_join_node_with_queried_group_by(
 @pytest.mark.sql_engine_snapshot
 def test_semi_additive_join_node_with_grouping(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
@@ -974,7 +974,7 @@ def test_semi_additive_join_node_with_grouping(
     )
     convert_and_check(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=semi_additive_join_node,
@@ -984,7 +984,7 @@ def test_semi_additive_join_node_with_grouping(
 @pytest.mark.sql_engine_snapshot
 def test_constrain_time_range_node(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
@@ -1021,7 +1021,7 @@ def test_constrain_time_range_node(
 
     convert_and_check(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=constrain_time_node,
@@ -1031,7 +1031,7 @@ def test_constrain_time_range_node(
 @pytest.mark.sql_engine_snapshot
 def test_compute_metrics_node_ratio_from_multiple_semantic_models(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
@@ -1057,7 +1057,7 @@ def test_compute_metrics_node_ratio_from_multiple_semantic_models(
 
     convert_and_check(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
@@ -1067,7 +1067,7 @@ def test_compute_metrics_node_ratio_from_multiple_semantic_models(
 @pytest.mark.sql_engine_snapshot
 def test_combine_output_node(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
@@ -1117,7 +1117,7 @@ def test_combine_output_node(  # noqa: D
     combine_output_node = CombineAggregatedOutputsNode([aggregated_measure_node, aggregated_measure_node_2])
     convert_and_check(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=combine_output_node,
@@ -1127,7 +1127,7 @@ def test_combine_output_node(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_dimensions_requiring_join(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
@@ -1143,7 +1143,7 @@ def test_dimensions_requiring_join(
 
     convert_and_check(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
@@ -1153,7 +1153,7 @@ def test_dimensions_requiring_join(
 @pytest.mark.sql_engine_snapshot
 def test_dimension_with_joined_where_constraint(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     query_parser: MetricFlowQueryParser,
     dataflow_plan_builder: DataflowPlanBuilder,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
@@ -1169,7 +1169,7 @@ def test_dimension_with_joined_where_constraint(
 
     convert_and_check(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,

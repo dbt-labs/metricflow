@@ -8,7 +8,7 @@ import pytest
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.sql.sql_table import SqlTable
 from metricflow.test.compare_df import assert_dataframes_equal
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.fixtures.table_fixtures import CONFIGURED_SOURCE_TABLE_SNAPSHOT_REPOSITORY
 from metricflow.test.source_schema_tools import get_populate_source_schema_shell_command
 from metricflow.test.table_snapshot.table_snapshots import (
@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
     ids=lambda table_name: f"table_name={table_name}",
 )
 def test_validate_data_in_source_schema(
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
     source_table_snapshot_repository: SqlTableSnapshotRepository,
     table_name: str,
@@ -38,10 +38,10 @@ def test_validate_data_in_source_schema(
     This is useful to run when a persisted source schema is used to validate that the tables were properly created by a
     call to populate_source_schema().
     """
-    if not mf_test_session_state.use_persistent_source_schema:
+    if not mf_test_configuration.use_persistent_source_schema:
         pytest.skip("Skipping as this session is running without the persistent source schema flag.")
 
-    schema_name = mf_test_session_state.mf_source_schema
+    schema_name = mf_test_configuration.mf_source_schema
 
     matching_table_snapshots = tuple(
         table_snapshot

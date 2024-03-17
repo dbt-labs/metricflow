@@ -24,7 +24,7 @@ from metricflow.specs.specs import (
     TimeDimensionSpec,
 )
 from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.snapshot_utils import assert_plan_snapshot_text_equal
 from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_MONTH, MTD_SPEC_QUARTER, MTD_SPEC_WEEK
 
@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 @pytest.mark.sql_engine_snapshot
 def test_simple_plan(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a simple plan getting a metric and a local dimension."""
@@ -52,14 +52,14 @@ def test_simple_plan(  # noqa: D
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
@@ -67,7 +67,7 @@ def test_simple_plan(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_primary_entity_dimension(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a simple plan getting a metric and a local dimension."""
@@ -85,14 +85,14 @@ def test_primary_entity_dimension(  # noqa: D
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
@@ -100,7 +100,7 @@ def test_primary_entity_dimension(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_joined_plan(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a plan getting a measure and a joined dimension."""
@@ -122,14 +122,14 @@ def test_joined_plan(  # noqa: D
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
@@ -137,7 +137,7 @@ def test_joined_plan(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_order_by_plan(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a plan with an order by."""
@@ -160,14 +160,14 @@ def test_order_by_plan(  # noqa: D
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
@@ -175,7 +175,7 @@ def test_order_by_plan(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_limit_rows_plan(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a plan with a limit to the number of rows returned."""
@@ -189,14 +189,14 @@ def test_limit_rows_plan(  # noqa: D
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
@@ -204,7 +204,7 @@ def test_limit_rows_plan(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_multiple_metrics_plan(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a plan to retrieve multiple metrics."""
@@ -223,14 +223,14 @@ def test_multiple_metrics_plan(  # noqa: D
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
@@ -238,7 +238,7 @@ def test_multiple_metrics_plan(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_single_semantic_model_ratio_metrics_plan(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a plan to retrieve a ratio where both measures come from one semantic model."""
@@ -257,14 +257,14 @@ def test_single_semantic_model_ratio_metrics_plan(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
@@ -272,7 +272,7 @@ def test_single_semantic_model_ratio_metrics_plan(
 @pytest.mark.sql_engine_snapshot
 def test_multi_semantic_model_ratio_metrics_plan(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a plan to retrieve a ratio where both measures come from one semantic model."""
@@ -291,14 +291,14 @@ def test_multi_semantic_model_ratio_metrics_plan(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
@@ -306,7 +306,7 @@ def test_multi_semantic_model_ratio_metrics_plan(
 @pytest.mark.sql_engine_snapshot
 def test_multihop_join_plan(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     multihop_dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a plan with an order by."""
@@ -327,14 +327,14 @@ def test_multihop_join_plan(  # noqa: D
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
@@ -342,7 +342,7 @@ def test_multihop_join_plan(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_where_constrained_plan(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     column_association_resolver: ColumnAssociationResolver,
     dataflow_plan_builder: DataflowPlanBuilder,
     query_parser: MetricFlowQueryParser,
@@ -357,14 +357,14 @@ def test_where_constrained_plan(  # noqa: D
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
@@ -372,7 +372,7 @@ def test_where_constrained_plan(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_where_constrained_plan_time_dimension(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     query_parser: MetricFlowQueryParser,
 ) -> None:
@@ -386,14 +386,14 @@ def test_where_constrained_plan_time_dimension(  # noqa: D
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
@@ -401,7 +401,7 @@ def test_where_constrained_plan_time_dimension(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_where_constrained_with_common_linkable_plan(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     column_association_resolver: ColumnAssociationResolver,
     dataflow_plan_builder: DataflowPlanBuilder,
     query_parser: MetricFlowQueryParser,
@@ -416,21 +416,21 @@ def test_where_constrained_with_common_linkable_plan(  # noqa: D
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
 
 @pytest.mark.sql_engine_snapshot
 def test_multihop_join_plan_ambiguous_dim(  # noqa: D
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Checks that an exception is thrown when trying to build a plan with an ambiguous dimension."""
@@ -454,7 +454,7 @@ def test_multihop_join_plan_ambiguous_dim(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_cumulative_metric_with_window(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a plan to compute a cumulative metric."""
@@ -468,14 +468,14 @@ def test_cumulative_metric_with_window(  # noqa: D
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
@@ -483,7 +483,7 @@ def test_cumulative_metric_with_window(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_cumulative_metric_no_window_or_grain_with_metric_time(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -496,14 +496,14 @@ def test_cumulative_metric_no_window_or_grain_with_metric_time(  # noqa: D
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
@@ -511,7 +511,7 @@ def test_cumulative_metric_no_window_or_grain_with_metric_time(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_cumulative_metric_no_window_or_grain_without_metric_time(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -524,14 +524,14 @@ def test_cumulative_metric_no_window_or_grain_without_metric_time(  # noqa: D
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
@@ -539,7 +539,7 @@ def test_cumulative_metric_no_window_or_grain_without_metric_time(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_distinct_values_plan(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     query_parser: MetricFlowQueryParser,
 ) -> None:
@@ -555,14 +555,14 @@ def test_distinct_values_plan(  # noqa: D
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
@@ -570,7 +570,7 @@ def test_distinct_values_plan(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_distinct_values_plan_with_join(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     query_parser: MetricFlowQueryParser,
 ) -> None:
@@ -585,14 +585,14 @@ def test_distinct_values_plan_with_join(  # noqa: D
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
@@ -600,7 +600,7 @@ def test_distinct_values_plan_with_join(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_measure_constraint_plan(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     query_parser: MetricFlowQueryParser,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
@@ -613,14 +613,14 @@ def test_measure_constraint_plan(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
@@ -628,7 +628,7 @@ def test_measure_constraint_plan(
 @pytest.mark.sql_engine_snapshot
 def test_measure_constraint_with_reused_measure_plan(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     query_parser: MetricFlowQueryParser,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
@@ -641,14 +641,14 @@ def test_measure_constraint_with_reused_measure_plan(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
@@ -656,7 +656,7 @@ def test_measure_constraint_with_reused_measure_plan(
 @pytest.mark.sql_engine_snapshot
 def test_common_semantic_model(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a simple plan getting a metric and a local dimension."""
@@ -672,14 +672,14 @@ def test_common_semantic_model(  # noqa: D
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
@@ -687,7 +687,7 @@ def test_common_semantic_model(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_derived_metric_offset_window(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a simple plan getting a metric and a local dimension."""
@@ -700,14 +700,14 @@ def test_derived_metric_offset_window(  # noqa: D
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
@@ -715,7 +715,7 @@ def test_derived_metric_offset_window(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_derived_metric_offset_to_grain(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a simple plan getting a metric and a local dimension."""
@@ -728,14 +728,14 @@ def test_derived_metric_offset_to_grain(  # noqa: D
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
@@ -743,7 +743,7 @@ def test_derived_metric_offset_to_grain(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_derived_metric_offset_with_granularity(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -755,14 +755,14 @@ def test_derived_metric_offset_with_granularity(  # noqa: D
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
@@ -770,7 +770,7 @@ def test_derived_metric_offset_with_granularity(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_derived_offset_cumulative_metric(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -782,21 +782,21 @@ def test_derived_offset_cumulative_metric(  # noqa: D
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
 
 def test_join_to_time_spine_with_metric_time(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -808,21 +808,21 @@ def test_join_to_time_spine_with_metric_time(  # noqa: D
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
 
 def test_join_to_time_spine_derived_metric(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -834,21 +834,21 @@ def test_join_to_time_spine_derived_metric(  # noqa: D
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
 
 def test_join_to_time_spine_with_non_metric_time(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -862,21 +862,21 @@ def test_join_to_time_spine_with_non_metric_time(  # noqa: D
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
 
 def test_dont_join_to_time_spine_if_no_time_dimension_requested(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -885,21 +885,21 @@ def test_dont_join_to_time_spine_if_no_time_dimension_requested(  # noqa: D
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
 
 def test_nested_derived_metric_with_outer_offset(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
@@ -911,21 +911,21 @@ def test_nested_derived_metric_with_outer_offset(  # noqa: D
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
 
 def test_min_max_only_categorical(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a plan to get the min & max distinct values of a categorical dimension."""
@@ -940,21 +940,21 @@ def test_min_max_only_categorical(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
 
 def test_min_max_only_time(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a plan to get the min & max distinct values of a time dimension."""
@@ -969,21 +969,21 @@ def test_min_max_only_time(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
 
 def test_metric_time_only(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
@@ -992,21 +992,21 @@ def test_metric_time_only(  # noqa: D
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
 
 def test_metric_time_quarter(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
@@ -1015,21 +1015,21 @@ def test_metric_time_quarter(  # noqa: D
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
 
 def test_metric_time_with_other_dimensions(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
@@ -1044,21 +1044,21 @@ def test_metric_time_with_other_dimensions(  # noqa: D
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
 
 def test_dimensions_with_time_constraint(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
@@ -1073,21 +1073,21 @@ def test_dimensions_with_time_constraint(  # noqa: D
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
 
 def test_min_max_only_time_year(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a plan to get the min & max distinct values of a time dimension with year granularity."""
@@ -1106,21 +1106,21 @@ def test_min_max_only_time_year(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
 
 def test_min_max_metric_time(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a plan to get the min & max distinct values of metric_time."""
@@ -1133,21 +1133,21 @@ def test_min_max_metric_time(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
 
 def test_min_max_metric_time_week(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a plan to get the min & max distinct values of metric_time with non-default granularity."""
@@ -1160,21 +1160,21 @@ def test_min_max_metric_time_week(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
 
 def test_join_to_time_spine_with_filters(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     query_parser: MetricFlowQueryParser,
     create_source_tables: bool,
@@ -1193,21 +1193,21 @@ def test_join_to_time_spine_with_filters(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
 
 def test_offset_window_metric_filter_and_query_have_different_granularities(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     query_parser: MetricFlowQueryParser,
     create_source_tables: bool,
@@ -1224,21 +1224,21 @@ def test_offset_window_metric_filter_and_query_have_different_granularities(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
 
 def test_offset_to_grain_metric_filter_and_query_have_different_granularities(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     query_parser: MetricFlowQueryParser,
     create_source_tables: bool,
@@ -1255,13 +1255,13 @@ def test_offset_to_grain_metric_filter_and_query_have_different_granularities(
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )

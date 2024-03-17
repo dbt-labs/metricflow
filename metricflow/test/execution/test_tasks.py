@@ -14,7 +14,7 @@ from metricflow.random_id import random_id
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_table import SqlTable
 from metricflow.test.compare_df import assert_dataframes_equal
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 
 
 def test_read_sql_task(sql_client: SqlClient) -> None:  # noqa: D
@@ -37,8 +37,8 @@ def test_read_sql_task(sql_client: SqlClient) -> None:  # noqa: D
     )
 
 
-def test_write_table_task(mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient) -> None:  # noqa: D
-    output_table = SqlTable(schema_name=mf_test_session_state.mf_system_schema, table_name=f"test_table_{random_id()}")
+def test_write_table_task(mf_test_configuration: MetricFlowTestConfiguration, sql_client: SqlClient) -> None:  # noqa: D
+    output_table = SqlTable(schema_name=mf_test_configuration.mf_system_schema, table_name=f"test_table_{random_id()}")
     task = SelectSqlQueryToTableTask(
         sql_client=sql_client,
         sql_query=f"CREATE TABLE {output_table.sql} AS SELECT 1 AS foo",

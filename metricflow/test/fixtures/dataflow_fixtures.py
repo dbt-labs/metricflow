@@ -10,7 +10,7 @@ from metricflow.protocols.sql_client import SqlClient
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.test.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.fixtures.sql_client_fixtures import sql_client  # noqa: F401, F403
 
 """
@@ -84,6 +84,6 @@ def scd_query_parser(  # noqa: D
 
 @pytest.fixture(scope="session")
 def time_spine_source(  # noqa: D
-    sql_client: SqlClient, mf_test_session_state: MetricFlowTestSessionState  # noqa: F811
+    sql_client: SqlClient, mf_test_configuration: MetricFlowTestConfiguration  # noqa: F811
 ) -> TimeSpineSource:
-    return TimeSpineSource(schema_name=mf_test_session_state.mf_source_schema, table_name="mf_time_spine")
+    return TimeSpineSource(schema_name=mf_test_configuration.mf_source_schema, table_name="mf_time_spine")

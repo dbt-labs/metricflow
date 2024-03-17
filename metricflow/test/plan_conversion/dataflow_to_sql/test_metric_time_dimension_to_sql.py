@@ -12,7 +12,7 @@ from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanCon
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.specs.specs import MetricFlowQuerySpec, MetricSpec
 from metricflow.test.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.plan_conversion.test_dataflow_to_sql_plan import convert_and_check
 from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY
 
@@ -20,7 +20,7 @@ from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY
 @pytest.mark.sql_engine_snapshot
 def test_metric_time_dimension_transform_node_using_primary_time(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
@@ -34,7 +34,7 @@ def test_metric_time_dimension_transform_node_using_primary_time(  # noqa: D
     )
     convert_and_check(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=metric_time_dimension_transform_node,
@@ -44,7 +44,7 @@ def test_metric_time_dimension_transform_node_using_primary_time(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_metric_time_dimension_transform_node_using_non_primary_time(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
@@ -59,7 +59,7 @@ def test_metric_time_dimension_transform_node_using_non_primary_time(  # noqa: D
     )
     convert_and_check(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=metric_time_dimension_transform_node,
@@ -69,7 +69,7 @@ def test_metric_time_dimension_transform_node_using_non_primary_time(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_simple_query_with_metric_time_dimension(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
@@ -89,7 +89,7 @@ def test_simple_query_with_metric_time_dimension(
 
     convert_and_check(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=dataflow_plan.sink_output_node.parent_node,

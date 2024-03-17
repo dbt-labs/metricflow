@@ -11,7 +11,7 @@ from metricflow.random_id import random_id
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_table import SqlTable
 from metricflow.test.compare_df import assert_dataframes_equal
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 
 logger = logging.getLogger(__name__)
@@ -50,7 +50,7 @@ def test_select_one_query(sql_client: SqlClient) -> None:  # noqa: D
 
 
 def test_create_table_from_dataframe(  # noqa: D
-    mf_test_session_state: MetricFlowTestSessionState, ddl_sql_client: SqlClientWithDDLMethods
+    mf_test_configuration: MetricFlowTestConfiguration, ddl_sql_client: SqlClientWithDDLMethods
 ) -> None:
     expected_df = pd.DataFrame(
         columns=["int_col", "str_col", "float_col", "bool_col", "time_col"],
@@ -62,7 +62,7 @@ def test_create_table_from_dataframe(  # noqa: D
             (3, None, 1.2, None, "2020-01-04"),  # Test None types for NA conversions
         ],
     )
-    sql_table = SqlTable(schema_name=mf_test_session_state.mf_system_schema, table_name=_random_table())
+    sql_table = SqlTable(schema_name=mf_test_configuration.mf_system_schema, table_name=_random_table())
     ddl_sql_client.create_table_from_dataframe(sql_table=sql_table, df=expected_df)
 
     actual_df = ddl_sql_client.query(f"SELECT * FROM {sql_table.sql}")
@@ -93,8 +93,8 @@ def example_df() -> pd.DataFrame:
     )
 
 
-def test_dry_run(mf_test_session_state: MetricFlowTestSessionState, sql_client: SqlClient) -> None:  # noqa: D
-    test_table = SqlTable(schema_name=mf_test_session_state.mf_system_schema, table_name=_random_table())
+def test_dry_run(mf_test_configuration: MetricFlowTestConfiguration, sql_client: SqlClient) -> None:  # noqa: D
+    test_table = SqlTable(schema_name=mf_test_configuration.mf_system_schema, table_name=_random_table())
 
     stmt = f"CREATE TABLE {test_table.sql} AS SELECT 1 AS foo"
     sql_client.dry_run(stmt)

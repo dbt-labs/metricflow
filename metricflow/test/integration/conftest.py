@@ -10,7 +10,7 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.time.configurable_time_source import ConfigurableTimeSource
 
 
@@ -30,7 +30,7 @@ def it_helpers(  # noqa: D
     create_source_tables: bool,
     simple_semantic_manifest_lookup: SemanticManifestLookup,
     time_spine_source: TimeSpineSource,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
 ) -> IntegrationTestHelpers:
     return IntegrationTestHelpers(
         mf_engine=MetricFlowEngine(
@@ -41,7 +41,7 @@ def it_helpers(  # noqa: D
             ),
             time_source=ConfigurableTimeSource(as_datetime("2020-01-01")),
         ),
-        mf_system_schema=mf_test_session_state.mf_system_schema,
-        source_schema=mf_test_session_state.mf_source_schema,
+        mf_system_schema=mf_test_configuration.mf_system_schema,
+        source_schema=mf_test_configuration.mf_source_schema,
         sql_client=sql_client,
     )

@@ -20,7 +20,7 @@ from metricflow.dataflow.optimizer.source_scan.cm_branch_combiner import (
 from metricflow.specs.specs import InstanceSpecSet, MeasureSpec
 from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
 from metricflow.test.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.snapshot_utils import assert_plan_snapshot_text_equal
 
 
@@ -34,7 +34,7 @@ def make_dataflow_plan(node: BaseOutput) -> DataflowPlan:  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_read_sql_source_combination(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
 ) -> None:
     """Tests combining a single node."""
@@ -48,14 +48,14 @@ def test_read_sql_source_combination(  # noqa: D
     dataflow_plan = make_dataflow_plan(result.combined_branch)
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
@@ -63,7 +63,7 @@ def test_read_sql_source_combination(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_filter_combination(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
 ) -> None:
     """Tests combining a single node."""
@@ -86,13 +86,13 @@ def test_filter_combination(  # noqa: D
     dataflow_plan = make_dataflow_plan(result.combined_branch)
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )

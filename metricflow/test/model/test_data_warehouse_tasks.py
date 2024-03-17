@@ -22,7 +22,7 @@ from metricflow.model.data_warehouse_model_validator import (
 )
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.snapshot_utils import (
     assert_sql_snapshot_equal,
 )
@@ -51,7 +51,7 @@ def test_build_semantic_model_tasks(  # noqa:D
     assert len(tasks) == len(data_warehouse_validation_model.semantic_models)
 
 
-def test_task_runner(sql_client: SqlClient, mf_test_session_state: MetricFlowTestSessionState) -> None:  # noqa: D
+def test_task_runner(sql_client: SqlClient, mf_test_configuration: MetricFlowTestConfiguration) -> None:  # noqa: D
     dw_validator = DataWarehouseModelValidator(sql_client=sql_client)
 
     def good_query() -> Tuple[str, SqlBindParameters]:
@@ -80,7 +80,7 @@ def test_task_runner(sql_client: SqlClient, mf_test_session_state: MetricFlowTes
 def test_validate_semantic_models(  # noqa: D
     dw_backed_warehouse_validation_model: PydanticSemanticManifest,
     sql_client: SqlClient,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
 ) -> None:
     model = deepcopy(dw_backed_warehouse_validation_model)
 
@@ -119,7 +119,7 @@ def test_build_dimension_tasks(  # noqa: D
 def test_validate_dimensions(  # noqa: D
     dw_backed_warehouse_validation_model: PydanticSemanticManifest,
     sql_client: SqlClient,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
 ) -> None:
     model = deepcopy(dw_backed_warehouse_validation_model)
 
@@ -153,7 +153,7 @@ def test_build_entities_tasks(  # noqa: D
 def test_validate_entities(  # noqa: D
     dw_backed_warehouse_validation_model: PydanticSemanticManifest,
     sql_client: SqlClient,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
 ) -> None:
     model = deepcopy(dw_backed_warehouse_validation_model)
 
@@ -187,7 +187,7 @@ def test_build_measure_tasks(  # noqa: D
 def test_validate_measures(  # noqa: D
     dw_backed_warehouse_validation_model: PydanticSemanticManifest,
     sql_client: SqlClient,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
 ) -> None:
     model = deepcopy(dw_backed_warehouse_validation_model)
 
@@ -211,7 +211,7 @@ def test_build_metric_tasks(  # noqa: D
     request: FixtureRequest,
     data_warehouse_validation_model: PydanticSemanticManifest,
     sql_client: SqlClient,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
 ) -> None:
     tasks = DataWarehouseTaskBuilder.gen_metric_tasks(
         manifest=data_warehouse_validation_model,
@@ -222,7 +222,7 @@ def test_build_metric_tasks(  # noqa: D
 
     assert_sql_snapshot_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         snapshot_id="query0",
         sql=query_string,
         sql_engine=sql_client.sql_engine_type,
@@ -232,7 +232,7 @@ def test_build_metric_tasks(  # noqa: D
 def test_validate_metrics(  # noqa: D
     dw_backed_warehouse_validation_model: PydanticSemanticManifest,
     sql_client: SqlClient,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
 ) -> None:
     model = deepcopy(dw_backed_warehouse_validation_model)
     dw_validator = DataWarehouseModelValidator(sql_client=sql_client)

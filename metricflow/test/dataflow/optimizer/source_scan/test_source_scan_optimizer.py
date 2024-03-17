@@ -42,7 +42,7 @@ from metricflow.specs.specs import (
     MetricSpec,
 )
 from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.snapshot_utils import assert_plan_snapshot_text_equal
 
 logger = logging.getLogger(__name__)
@@ -114,7 +114,7 @@ class ReadSqlSourceNodeCounter(DataflowPlanNodeVisitor[int]):
 
 def check_optimization(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     query_spec: MetricFlowQuerySpec,
     expected_num_sources_in_unoptimized: int,
@@ -124,14 +124,14 @@ def check_optimization(  # noqa: D
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=dataflow_plan,
         plan_snapshot_text=dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
 
@@ -143,14 +143,14 @@ def check_optimization(  # noqa: D
 
     assert_plan_snapshot_text_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan=optimized_dataflow_plan,
         plan_snapshot_text=optimized_dataflow_plan.structure_text(),
     )
 
     display_graph_if_requested(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dag_graph=optimized_dataflow_plan,
     )
     assert source_counter.count_source_nodes(optimized_dataflow_plan) == expected_num_sources_in_optimized
@@ -159,7 +159,7 @@ def check_optimization(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_2_metrics_from_1_semantic_model(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests that optimizing the plan for 2 metrics from 2 measure semantic models results in half the number of scans.
@@ -168,7 +168,7 @@ def test_2_metrics_from_1_semantic_model(  # noqa: D
     """
     check_optimization(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="bookings"), MetricSpec(element_name="booking_value")),
@@ -185,13 +185,13 @@ def test_2_metrics_from_1_semantic_model(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_2_metrics_from_2_semantic_models(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests that 2 metrics from the 2 semantic models results in 2 scans."""
     check_optimization(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="bookings"), MetricSpec(element_name="listings")),
@@ -205,13 +205,13 @@ def test_2_metrics_from_2_semantic_models(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_3_metrics_from_2_semantic_models(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests that 3 metrics from the 2 semantic models results in 2 scans."""
     check_optimization(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=MetricFlowQuerySpec(
             metric_specs=(
@@ -229,7 +229,7 @@ def test_3_metrics_from_2_semantic_models(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_constrained_metric_not_combined(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     column_association_resolver: ColumnAssociationResolver,
     dataflow_plan_builder: DataflowPlanBuilder,
     query_parser: MetricFlowQueryParser,
@@ -245,7 +245,7 @@ def test_constrained_metric_not_combined(  # noqa: D
     )
     check_optimization(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
         expected_num_sources_in_unoptimized=2,
@@ -256,7 +256,7 @@ def test_constrained_metric_not_combined(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_derived_metric(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests optimization of a query that use a derived metrics with measures coming from a single semantic model.
@@ -265,7 +265,7 @@ def test_derived_metric(  # noqa: D
     """
     check_optimization(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="non_referred_bookings_pct"),),
@@ -279,7 +279,7 @@ def test_derived_metric(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_nested_derived_metric(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests optimization of a query that use a nested derived metric from a single semantic model.
@@ -289,7 +289,7 @@ def test_nested_derived_metric(  # noqa: D
     """
     check_optimization(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="instant_plus_non_referred_bookings_pct"),),
@@ -303,7 +303,7 @@ def test_nested_derived_metric(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_derived_metric_with_non_derived_metric(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests optimization of queries that use derived metrics and non-derived metrics.
@@ -318,7 +318,7 @@ def test_derived_metric_with_non_derived_metric(  # noqa: D
     """
     check_optimization(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=MetricFlowQuerySpec(
             metric_specs=(
@@ -335,13 +335,13 @@ def test_derived_metric_with_non_derived_metric(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_2_ratio_metrics_from_1_semantic_model(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests that 2 ratio metrics with measures from a 1 semantic model result in 1 scan."""
     check_optimization(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=MetricFlowQuerySpec(
             metric_specs=(
@@ -358,13 +358,13 @@ def test_2_ratio_metrics_from_1_semantic_model(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_duplicate_measures(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     """Tests a case where derived metrics in a query use the same measure (in the same form e.g. filters)."""
     check_optimization(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=MetricFlowQuerySpec(
             metric_specs=(

@@ -23,7 +23,7 @@ from metricflow.sql.sql_plan import (
     SqlTableFromClauseNode,
 )
 from metricflow.sql.sql_table import SqlTable
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.sql.compare_sql_plan import assert_default_rendered_sql_equal
 
 
@@ -172,13 +172,13 @@ def base_select_statement() -> SqlSelectStatementNode:
 
 def test_reduce_sub_query(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     base_select_statement: SqlSelectStatementNode,
 ) -> None:
     """Tests a case where an outer query should be reduced into its inner query with merged LIMIT expressions."""
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=base_select_statement,
         plan_id="before_reducing",
     )
@@ -187,7 +187,7 @@ def test_reduce_sub_query(
 
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=sub_query_reducer.optimize(base_select_statement),
         plan_id="after_reducing",
     )
@@ -343,13 +343,13 @@ def join_select_statement() -> SqlSelectStatementNode:
 
 def test_reduce_join(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     join_select_statement: SqlSelectStatementNode,
 ) -> None:
     """Tests a case where reducing occurs on a JOIN."""
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=join_select_statement,
         plan_id="before_reducing",
     )
@@ -358,7 +358,7 @@ def test_reduce_join(
 
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=sub_query_reducer.optimize(join_select_statement),
         plan_id="after_reducing",
     )
@@ -516,13 +516,13 @@ def colliding_select_statement() -> SqlSelectStatementNode:
 
 def test_colliding_alias(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     colliding_select_statement: SqlSelectStatementNode,
 ) -> None:
     """Tests a case where reducing occurs on a JOIN."""
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=colliding_select_statement,
         plan_id="before_reducing",
     )
@@ -531,7 +531,7 @@ def test_colliding_alias(
 
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=sub_query_reducer.optimize(colliding_select_statement),
         plan_id="after_reducing",
     )
@@ -751,13 +751,13 @@ def reduce_all_join_select_statement() -> SqlSelectStatementNode:
 
 def test_reduce_all_join_sources(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     reduce_all_join_select_statement: SqlSelectStatementNode,
 ) -> None:
     """Tests a case where reducing occurs all all sources on a JOIN."""
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=reduce_all_join_select_statement,
         plan_id="before_reducing",
     )
@@ -766,7 +766,7 @@ def test_reduce_all_join_sources(
 
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=sub_query_reducer.optimize(reduce_all_join_select_statement),
         plan_id="after_reducing",
     )
@@ -894,13 +894,13 @@ def reducing_join_statement() -> SqlSelectStatementNode:
 
 def test_reducing_join_statement(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     reducing_join_statement: SqlSelectStatementNode,
 ) -> None:
     """Tests a case where a join query should not reduced an aggregate."""
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=reducing_join_statement,
         plan_id="before_reducing",
     )
@@ -909,7 +909,7 @@ def test_reducing_join_statement(
 
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=sub_query_reducer.optimize(reducing_join_statement),
         plan_id="after_reducing",
     )
@@ -1037,13 +1037,13 @@ def reducing_join_left_node_statement() -> SqlSelectStatementNode:
 
 def test_reducing_join_left_node_statement(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     reducing_join_left_node_statement: SqlSelectStatementNode,
 ) -> None:
     """Tests a case where a join query should not reduced an aggregate."""
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=reducing_join_left_node_statement,
         plan_id="before_reducing",
     )
@@ -1052,7 +1052,7 @@ def test_reducing_join_left_node_statement(
 
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=sub_query_reducer.optimize(reducing_join_left_node_statement),
         plan_id="after_reducing",
     )
@@ -1060,7 +1060,7 @@ def test_reducing_join_left_node_statement(
 
 def test_rewriting_distinct_select_node_is_not_reduced(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
 ) -> None:
     """Tests to ensure distinct select node doesn't get overwritten."""
     select_node = SqlSelectStatementNode(
@@ -1105,7 +1105,7 @@ def test_rewriting_distinct_select_node_is_not_reduced(
     )
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=select_node,
         plan_id="before_reducing",
     )
@@ -1114,7 +1114,7 @@ def test_rewriting_distinct_select_node_is_not_reduced(
 
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=sub_query_reducer.optimize(select_node),
         plan_id="after_reducing",
     )

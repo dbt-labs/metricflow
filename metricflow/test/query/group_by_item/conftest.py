@@ -16,7 +16,7 @@ from metricflow.naming.naming_scheme import QueryItemNamingScheme
 from metricflow.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
 from metricflow.query.group_by_item.resolution_dag.dag_builder import GroupByItemResolutionDagBuilder
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.query.group_by_item.ambiguous_resolution_query_id import AmbiguousResolutionQueryId
 
 
@@ -37,7 +37,7 @@ def _build_resolution_dag(
 
 @pytest.fixture(scope="session")
 def resolution_dags(
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     ambiguous_resolution_manifest_lookup: SemanticManifestLookup,
 ) -> Dict[AmbiguousResolutionQueryId, GroupByItemResolutionDag]:
     """Return a dict that maps the ID to the resolution DAG for use in test cases."""
