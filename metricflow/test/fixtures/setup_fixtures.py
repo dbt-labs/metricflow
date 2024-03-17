@@ -50,25 +50,41 @@ OVERWRITE_SNAPSHOTS_CLI_FLAG = "--overwrite-snapshots"
 USE_PERSISTENT_SOURCE_SCHEMA_CLI_FLAG = "--use-persistent-source-schema"
 
 
-def pytest_addoption(parser: _pytest.config.argparsing.Parser) -> None:
-    """Add options for running pytest through the CLI."""
+def add_display_snapshots_cli_flag(parser: _pytest.config.argparsing.Parser) -> None:  # noqa: D
     parser.addoption(DISPLAY_SNAPSHOTS_CLI_FLAG, action="store_true", help="Displays snapshots in a browser if set")
-    parser.addoption(
-        DISPLAY_GRAPHS_CLI_FLAG,
-        action="store_true",
-        help="Allow display of graphs in a browser window when triggered in a test",
-    )
+
+
+def add_overwrite_snapshots_cli_flag(parser: _pytest.config.argparsing.Parser) -> None:  # noqa: D
     parser.addoption(
         OVERWRITE_SNAPSHOTS_CLI_FLAG,
         action="store_true",
         help="Overwrites existing snapshots by ones generated during this testing session",
     )
+
+
+def add_display_graphs_cli_flag(parser: _pytest.config.argparsing.Parser) -> None:  # noqa: D
+    parser.addoption(
+        DISPLAY_GRAPHS_CLI_FLAG,
+        action="store_true",
+        help="Allow display of graphs in a browser window when triggered in a test",
+    )
+
+
+def add_use_persistent_source_schema_cli_flag(parser: _pytest.config.argparsing.Parser) -> None:  # noqa: D
     parser.addoption(
         USE_PERSISTENT_SOURCE_SCHEMA_CLI_FLAG,
         action="store_true",
         help="Use a source schema that is persisted between testing sessions. The name of the schema is generated from"
         "a hash of the source data, and the schema is created / populated if it does not exist.",
     )
+
+
+def pytest_addoption(parser: _pytest.config.argparsing.Parser) -> None:
+    """Add options for running pytest through the CLI."""
+    add_overwrite_snapshots_cli_flag(parser)
+    add_display_snapshots_cli_flag(parser)
+    add_display_graphs_cli_flag(parser)
+    add_use_persistent_source_schema_cli_flag(parser)
 
 
 # Name of the pytest marker for tests that generate SQL-engine specific snapshots.
