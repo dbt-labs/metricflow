@@ -27,7 +27,7 @@ from metricflow.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpre
 from metricflow.sql.sql_plan import SqlJoinType, SqlSelectColumn, SqlSelectStatementNode, SqlTableFromClauseNode
 from metricflow.sql.sql_table import SqlTable
 from metricflow.test.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.snapshot_utils import assert_spec_set_snapshot_equal
 
 logger = logging.getLogger(__name__)
@@ -91,7 +91,7 @@ def test_no_parent_node_data_set(
 
 def test_joined_node_data_set(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     simple_semantic_manifest_lookup: SemanticManifestLookup,
     time_spine_source: TimeSpineSource,
@@ -122,7 +122,7 @@ def test_joined_node_data_set(  # noqa: D
 
     assert_spec_set_snapshot_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         set_id="result0",
         spec_set=join_node_output_data_set.instance_set.spec_set,
     )

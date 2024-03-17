@@ -22,7 +22,7 @@ from metricflow.sql.sql_plan import (
     SqlTableFromClauseNode,
 )
 from metricflow.sql.sql_table import SqlTable
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.sql.compare_sql_plan import assert_default_rendered_sql_equal
 
 
@@ -210,21 +210,21 @@ def base_select_statement() -> SqlSelectStatementNode:
 
 def test_no_pruning(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     column_pruner: SqlColumnPrunerOptimizer,
     base_select_statement: SqlSelectStatementNode,
 ) -> None:
     """Tests a case where no pruning should occur."""
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=base_select_statement,
         plan_id="before_pruning",
     )
     column_pruned_select_node = column_pruner.optimize(base_select_statement)
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=column_pruned_select_node,
         plan_id="after_pruning",
     )
@@ -232,7 +232,7 @@ def test_no_pruning(
 
 def test_prune_from_source(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     column_pruner: SqlColumnPrunerOptimizer,
     base_select_statement: SqlSelectStatementNode,
 ) -> None:
@@ -275,7 +275,7 @@ def test_prune_from_source(
 
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=select_statement_with_some_from_source_column_removed,
         plan_id="before_pruning",
     )
@@ -283,7 +283,7 @@ def test_prune_from_source(
     column_pruned_select_node = column_pruner.optimize(select_statement_with_some_from_source_column_removed)
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=column_pruned_select_node,
         plan_id="after_pruning",
     )
@@ -291,7 +291,7 @@ def test_prune_from_source(
 
 def test_prune_joined_source(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     column_pruner: SqlColumnPrunerOptimizer,
     base_select_statement: SqlSelectStatementNode,
 ) -> None:
@@ -334,7 +334,7 @@ def test_prune_joined_source(
 
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=select_statement_with_some_joined_source_column_removed,
         plan_id="before_pruning",
     )
@@ -342,7 +342,7 @@ def test_prune_joined_source(
     column_pruned_select_node = column_pruner.optimize(select_statement_with_some_joined_source_column_removed)
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=column_pruned_select_node,
         plan_id="after_pruning",
     )
@@ -350,7 +350,7 @@ def test_prune_joined_source(
 
 def test_dont_prune_if_in_where(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     column_pruner: SqlColumnPrunerOptimizer,
     base_select_statement: SqlSelectStatementNode,
 ) -> None:
@@ -377,7 +377,7 @@ def test_dont_prune_if_in_where(
 
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=select_statement_with_other_exprs,
         plan_id="before_pruning",
     )
@@ -385,7 +385,7 @@ def test_dont_prune_if_in_where(
     column_pruned_select_node = column_pruner.optimize(select_statement_with_other_exprs)
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=column_pruned_select_node,
         plan_id="after_pruning",
     )
@@ -393,7 +393,7 @@ def test_dont_prune_if_in_where(
 
 def test_dont_prune_with_str_expr(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     column_pruner: SqlColumnPrunerOptimizer,
     base_select_statement: SqlSelectStatementNode,
 ) -> None:
@@ -416,7 +416,7 @@ def test_dont_prune_with_str_expr(
 
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=select_statement_with_other_exprs,
         plan_id="before_pruning",
     )
@@ -424,7 +424,7 @@ def test_dont_prune_with_str_expr(
     column_pruned_select_node = column_pruner.optimize(select_statement_with_other_exprs)
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=column_pruned_select_node,
         plan_id="after_pruning",
     )
@@ -432,7 +432,7 @@ def test_dont_prune_with_str_expr(
 
 def test_prune_with_str_expr(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     column_pruner: SqlColumnPrunerOptimizer,
     base_select_statement: SqlSelectStatementNode,
 ) -> None:
@@ -455,7 +455,7 @@ def test_prune_with_str_expr(
 
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=select_statement_with_other_exprs,
         plan_id="before_pruning",
     )
@@ -463,7 +463,7 @@ def test_prune_with_str_expr(
     column_pruned_select_node = column_pruner.optimize(select_statement_with_other_exprs)
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=column_pruned_select_node,
         plan_id="after_pruning",
     )
@@ -603,14 +603,14 @@ def string_select_statement() -> SqlSelectStatementNode:
 
 def test_prune_str_expr(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     column_pruner: SqlColumnPrunerOptimizer,
     string_select_statement: SqlSelectStatementNode,
 ) -> None:
     """Tests a case where a string expr in a node results in the parent being pruned properly."""
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=string_select_statement,
         plan_id="before_pruning",
     )
@@ -618,7 +618,7 @@ def test_prune_str_expr(
     column_pruned_select_node = column_pruner.optimize(string_select_statement)
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=column_pruned_select_node,
         plan_id="after_pruning",
     )
@@ -731,14 +731,14 @@ def grandparent_pruning_select_statement() -> SqlSelectStatementNode:
 
 def test_prune_grandparents(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     column_pruner: SqlColumnPrunerOptimizer,
     grandparent_pruning_select_statement: SqlQueryPlanNode,
 ) -> None:
     """Tests a case where a string expr in a node prevents the parent from being pruned, but prunes grandparents."""
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=grandparent_pruning_select_statement,
         plan_id="before_pruning",
     )
@@ -746,7 +746,7 @@ def test_prune_grandparents(
     column_pruned_select_node = column_pruner.optimize(grandparent_pruning_select_statement)
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=column_pruned_select_node,
         plan_id="after_pruning",
     )
@@ -876,14 +876,14 @@ def join_grandparent_pruning_select_statement() -> SqlSelectStatementNode:
 
 def test_prune_grandparents_in_join_query(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     column_pruner: SqlColumnPrunerOptimizer,
     join_grandparent_pruning_select_statement: SqlSelectStatementNode,
 ) -> None:
     """Tests pruning grandparents of a join query."""
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=join_grandparent_pruning_select_statement,
         plan_id="before_pruning",
     )
@@ -891,7 +891,7 @@ def test_prune_grandparents_in_join_query(
     column_pruned_select_node = column_pruner.optimize(join_grandparent_pruning_select_statement)
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=column_pruned_select_node,
         plan_id="after_pruning",
     )
@@ -899,7 +899,7 @@ def test_prune_grandparents_in_join_query(
 
 def test_prune_distinct_select(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     column_pruner: SqlColumnPrunerOptimizer,
 ) -> None:
     """Test that distinct select node shouldn't be pruned."""
@@ -945,7 +945,7 @@ def test_prune_distinct_select(
     )
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=select_node,
         plan_id="before_pruning",
     )
@@ -953,7 +953,7 @@ def test_prune_distinct_select(
     column_pruner.optimize(select_node)
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=select_node,
         plan_id="after_pruning",
     )

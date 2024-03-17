@@ -8,7 +8,7 @@ from dbt_semantic_interfaces.test_utils import as_datetime
 
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.integration.conftest import IntegrationTestHelpers
 from metricflow.test.snapshot_utils import assert_str_snapshot_equal
 
@@ -16,7 +16,7 @@ from metricflow.test.snapshot_utils import assert_str_snapshot_equal
 @pytest.mark.sql_engine_snapshot
 def test_simple_cumulative_metric(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
     it_helpers: IntegrationTestHelpers,
 ) -> None:
@@ -34,7 +34,7 @@ def test_simple_cumulative_metric(
 
     assert_str_snapshot_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         snapshot_id="query_output",
         snapshot_str=query_result.result_df.to_string(),
         sql_engine=sql_client.sql_engine_type,
@@ -44,7 +44,7 @@ def test_simple_cumulative_metric(
 @pytest.mark.sql_engine_snapshot
 def test_multiple_cumulative_metrics(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
     it_helpers: IntegrationTestHelpers,
 ) -> None:
@@ -62,7 +62,7 @@ def test_multiple_cumulative_metrics(
 
     assert_str_snapshot_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         snapshot_id="query_output",
         snapshot_str=query_result.result_df.to_string(),
         sql_engine=sql_client.sql_engine_type,
@@ -72,7 +72,7 @@ def test_multiple_cumulative_metrics(
 @pytest.mark.sql_engine_snapshot
 def test_non_additive_cumulative_metric(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
     it_helpers: IntegrationTestHelpers,
 ) -> None:
@@ -90,7 +90,7 @@ def test_non_additive_cumulative_metric(
 
     assert_str_snapshot_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         snapshot_id="query_output",
         snapshot_str=query_result.result_df.to_string(),
         sql_engine=sql_client.sql_engine_type,
@@ -100,7 +100,7 @@ def test_non_additive_cumulative_metric(
 @pytest.mark.sql_engine_snapshot
 def test_grain_to_date_cumulative_metric(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
     it_helpers: IntegrationTestHelpers,
 ) -> None:
@@ -118,7 +118,7 @@ def test_grain_to_date_cumulative_metric(
 
     assert_str_snapshot_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         snapshot_id="query_output",
         snapshot_str=query_result.result_df.to_string(),
         sql_engine=sql_client.sql_engine_type,
@@ -128,7 +128,7 @@ def test_grain_to_date_cumulative_metric(
 @pytest.mark.sql_engine_snapshot
 def test_cumulative_metric_with_non_adjustable_filter(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
     it_helpers: IntegrationTestHelpers,
 ) -> None:
@@ -152,7 +152,7 @@ def test_cumulative_metric_with_non_adjustable_filter(
 
     assert_str_snapshot_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         snapshot_id="query_output",
         snapshot_str=query_result.result_df.to_string(),
         sql_engine=sql_client.sql_engine_type,

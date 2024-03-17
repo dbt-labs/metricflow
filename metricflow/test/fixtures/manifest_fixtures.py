@@ -31,7 +31,7 @@ from metricflow.protocols.sql_client import SqlClient
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.test.fixtures.id_fixtures import IdNumberSpace, patch_id_generators_helper
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.time.configurable_time_source import ConfigurableTimeSource
 
 logger = logging.getLogger(__name__)
@@ -251,9 +251,9 @@ def load_semantic_manifest(
 
 
 @pytest.fixture(scope="session")
-def template_mapping(mf_test_session_state: MetricFlowTestSessionState) -> Dict[str, str]:
+def template_mapping(mf_test_configuration: MetricFlowTestConfiguration) -> Dict[str, str]:
     """Mapping for template variables in the model YAML files."""
-    return {"source_schema": mf_test_session_state.mf_source_schema}
+    return {"source_schema": mf_test_configuration.mf_source_schema}
 
 
 @pytest.fixture(scope="session")

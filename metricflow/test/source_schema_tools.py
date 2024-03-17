@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 
 from metricflow.protocols.sql_client import SqlEngine
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 from metricflow.test.table_snapshot.table_snapshots import (
     SqlTableSnapshotLoader,
@@ -41,7 +41,7 @@ def get_populate_source_schema_shell_command(engine: SqlEngine) -> str:
 
 
 def populate_source_schema(
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     ddl_sql_client: SqlClientWithDDLMethods,
     source_table_snapshot_repository: SqlTableSnapshotRepository,
 ) -> None:
@@ -51,10 +51,10 @@ def populate_source_schema(
     pyproject.toml. However, because the filename does not begin with "test_", it's not normally collected and run. As
     such, all parameters to this function are defined in fixtures.
     """
-    if not mf_test_session_state.use_persistent_source_schema:
+    if not mf_test_configuration.use_persistent_source_schema:
         raise ValueError("This should be run with the flag to enable use of the persistent source schema")
 
-    schema_name = mf_test_session_state.mf_source_schema
+    schema_name = mf_test_configuration.mf_source_schema
 
     logger.info(f"Dropping schema {schema_name}")
     ddl_sql_client.drop_schema(schema_name=schema_name, cascade=True)

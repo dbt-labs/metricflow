@@ -10,7 +10,7 @@ from dbt_semantic_interfaces.test_utils import as_datetime
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.random_id import random_id
 from metricflow.test.compare_df import assert_dataframes_equal
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 from metricflow.test.table_snapshot.table_snapshots import (
     SqlTableColumnDefinition,
@@ -57,7 +57,7 @@ def test_as_df(table_snapshot: SqlTableSnapshot) -> None:
 
 
 def test_load(
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     ddl_sql_client: SqlClientWithDDLMethods,
     table_snapshot: SqlTableSnapshot,
 ) -> None:

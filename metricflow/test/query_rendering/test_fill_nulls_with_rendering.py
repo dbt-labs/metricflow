@@ -23,14 +23,14 @@ from metricflow.specs.specs import (
     MetricSpec,
     TimeDimensionSpec,
 )
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.query_rendering.compare_rendered_query import convert_and_check
 
 
 @pytest.mark.sql_engine_snapshot
 def test_simple_fill_nulls_with_0_metric_time(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
@@ -44,7 +44,7 @@ def test_simple_fill_nulls_with_0_metric_time(  # noqa: D
 
     convert_and_check(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
@@ -54,7 +54,7 @@ def test_simple_fill_nulls_with_0_metric_time(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_simple_fill_nulls_with_0_month(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
@@ -68,7 +68,7 @@ def test_simple_fill_nulls_with_0_month(  # noqa: D
 
     convert_and_check(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
@@ -78,7 +78,7 @@ def test_simple_fill_nulls_with_0_month(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_simple_fill_nulls_with_0_with_non_metric_time(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
@@ -94,7 +94,7 @@ def test_simple_fill_nulls_with_0_with_non_metric_time(  # noqa: D
 
     convert_and_check(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
@@ -104,7 +104,7 @@ def test_simple_fill_nulls_with_0_with_non_metric_time(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_simple_fill_nulls_with_0_with_categorical_dimension(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
@@ -118,7 +118,7 @@ def test_simple_fill_nulls_with_0_with_categorical_dimension(  # noqa: D
 
     convert_and_check(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
@@ -128,7 +128,7 @@ def test_simple_fill_nulls_with_0_with_categorical_dimension(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_simple_fill_nulls_without_time_spine(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
@@ -142,7 +142,7 @@ def test_simple_fill_nulls_without_time_spine(  # noqa: D
 
     convert_and_check(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
@@ -152,7 +152,7 @@ def test_simple_fill_nulls_without_time_spine(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_cumulative_fill_nulls(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
@@ -166,7 +166,7 @@ def test_cumulative_fill_nulls(  # noqa: D
 
     convert_and_check(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
@@ -176,7 +176,7 @@ def test_cumulative_fill_nulls(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_derived_fill_nulls_for_one_input_metric(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
@@ -190,7 +190,7 @@ def test_derived_fill_nulls_for_one_input_metric(  # noqa: D
 
     convert_and_check(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
@@ -200,7 +200,7 @@ def test_derived_fill_nulls_for_one_input_metric(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_join_to_time_spine_with_filters(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
@@ -219,7 +219,7 @@ def test_join_to_time_spine_with_filters(  # noqa: D
 
     convert_and_check(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,

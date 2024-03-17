@@ -19,7 +19,7 @@ from metricflow.sql.sql_plan import (
     SqlTableFromClauseNode,
 )
 from metricflow.sql.sql_table import SqlTable
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.sql.compare_sql_plan import assert_default_rendered_sql_equal
 
 
@@ -133,13 +133,13 @@ def base_select_statement() -> SqlSelectStatementNode:
 
 def test_reduce_sub_query(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     base_select_statement: SqlSelectStatementNode,
 ) -> None:
     """Tests a case where an outer query should be reduced into its inner query with merged LIMIT expressions."""
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=base_select_statement,
         plan_id="before_reducing",
     )
@@ -148,7 +148,7 @@ def test_reduce_sub_query(
 
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=sub_query_reducer.optimize(base_select_statement),
         plan_id="after_reducing",
     )
@@ -247,13 +247,13 @@ def rewrite_order_by_statement() -> SqlSelectStatementNode:
 
 def test_rewrite_order_by_with_a_join_in_parent(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     rewrite_order_by_statement: SqlSelectStatementNode,
 ) -> None:
     """Tests rewriting an order by when the parent has a join."""
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=rewrite_order_by_statement,
         plan_id="before_reducing",
     )
@@ -262,7 +262,7 @@ def test_rewrite_order_by_with_a_join_in_parent(
 
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=sub_query_reducer.optimize(rewrite_order_by_statement),
         plan_id="after_reducing",
     )
@@ -270,7 +270,7 @@ def test_rewrite_order_by_with_a_join_in_parent(
 
 def test_distinct_select_node_is_not_reduced(
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
 ) -> None:
     """Tests to ensure distinct select node doesn't get overwritten."""
     select_node = SqlSelectStatementNode(
@@ -315,7 +315,7 @@ def test_distinct_select_node_is_not_reduced(
     )
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=select_node,
         plan_id="before_reducing",
     )
@@ -324,7 +324,7 @@ def test_distinct_select_node_is_not_reduced(
 
     assert_default_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         sql_plan_node=sub_query_reducer.optimize(select_node),
         plan_id="after_reducing",
     )

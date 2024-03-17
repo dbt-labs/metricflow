@@ -9,7 +9,7 @@ from dbt_semantic_interfaces.references import SemanticModelReference
 
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.test.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.snapshot_utils import assert_spec_set_snapshot_equal
 from metricflow.test.sql.compare_sql_plan import assert_rendered_sql_equal
 
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 @pytest.mark.sql_engine_snapshot
 def test_convert_table_semantic_model_without_measures(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
 ) -> None:
@@ -30,14 +30,14 @@ def test_convert_table_semantic_model_without_measures(  # noqa: D
 
     assert_spec_set_snapshot_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         set_id="result0",
         spec_set=users_data_set.instance_set.spec_set,
     )
     assert users_data_set.semantic_model_reference == SemanticModelReference(semantic_model_name="users_latest")
     assert_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan_id="plan0",
         sql_plan_node=users_data_set.checked_sql_select_node,
         sql_client=sql_client,
@@ -47,7 +47,7 @@ def test_convert_table_semantic_model_without_measures(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_convert_table_semantic_model_with_measures(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
 ) -> None:
@@ -62,7 +62,7 @@ def test_convert_table_semantic_model_with_measures(  # noqa: D
 
     assert_spec_set_snapshot_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         set_id="result0",
         spec_set=id_verifications_data_set.instance_set.spec_set,
     )
@@ -72,7 +72,7 @@ def test_convert_table_semantic_model_with_measures(  # noqa: D
     )
     assert_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan_id="plan0",
         sql_plan_node=id_verifications_data_set.checked_sql_select_node,
         sql_client=sql_client,
@@ -82,7 +82,7 @@ def test_convert_table_semantic_model_with_measures(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_convert_query_semantic_model(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
 ) -> None:
@@ -92,7 +92,7 @@ def test_convert_query_semantic_model(  # noqa: D
 
     assert_rendered_sql_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         plan_id="plan0",
         sql_plan_node=bookings_data_set.checked_sql_select_node,
         sql_client=sql_client,

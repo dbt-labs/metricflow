@@ -33,7 +33,7 @@ from metricflow.sql.sql_exprs import (
     SqlWindowFunctionExpression,
     SqlWindowOrderByArgument,
 )
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.snapshot_utils import assert_str_snapshot_equal
 
 logger = logging.getLogger(__name__)
@@ -258,7 +258,7 @@ def test_between_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> No
 
 def test_window_function_expr(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     default_expr_renderer: DefaultSqlExpressionRenderer,
 ) -> None:
     partition_by_args = (
@@ -322,7 +322,7 @@ def test_window_function_expr(  # noqa: D
 
     assert_str_snapshot_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         snapshot_id="rendered_sql",
         snapshot_str="\n".join(rendered_sql_lines),
     )

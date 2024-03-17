@@ -9,7 +9,7 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_table import SqlTable
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestSessionState
+from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.integration.conftest import IntegrationTestHelpers
 from metricflow.test.snapshot_utils import (
     assert_sql_snapshot_equal,
@@ -19,7 +19,7 @@ from metricflow.test.time.configurable_time_source import ConfigurableTimeSource
 
 @pytest.mark.sql_engine_snapshot
 def test_render_query(  # noqa: D
-    request: FixtureRequest, mf_test_session_state: MetricFlowTestSessionState, it_helpers: IntegrationTestHelpers
+    request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, it_helpers: IntegrationTestHelpers
 ) -> None:
     result = it_helpers.mf_engine.explain(
         MetricFlowQueryRequest.create_with_random_request_id(
@@ -30,7 +30,7 @@ def test_render_query(  # noqa: D
 
     assert_sql_snapshot_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         snapshot_id="query0",
         sql=result.rendered_sql.sql_query,
         sql_engine=it_helpers.sql_client.sql_engine_type,
@@ -39,7 +39,7 @@ def test_render_query(  # noqa: D
 
 @pytest.mark.sql_engine_snapshot
 def test_render_write_to_table_query(  # noqa: D
-    request: FixtureRequest, mf_test_session_state: MetricFlowTestSessionState, it_helpers: IntegrationTestHelpers
+    request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, it_helpers: IntegrationTestHelpers
 ) -> None:
     output_table = SqlTable(schema_name=it_helpers.mf_system_schema, table_name="test_table")
 
@@ -51,7 +51,7 @@ def test_render_write_to_table_query(  # noqa: D
 
     assert_sql_snapshot_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         snapshot_id="query0",
         sql=result.rendered_sql.sql_query,
         sql_engine=it_helpers.sql_client.sql_engine_type,
@@ -61,7 +61,7 @@ def test_render_write_to_table_query(  # noqa: D
 @pytest.mark.sql_engine_snapshot
 def test_id_enumeration(  # noqa: D
     request: FixtureRequest,
-    mf_test_session_state: MetricFlowTestSessionState,
+    mf_test_configuration: MetricFlowTestConfiguration,
     simple_semantic_manifest_lookup: SemanticManifestLookup,
     sql_client: SqlClient,
 ) -> None:
@@ -84,7 +84,7 @@ def test_id_enumeration(  # noqa: D
 
     assert_sql_snapshot_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         snapshot_id="query",
         sql=result.rendered_sql.sql_query,
         sql_engine=sql_client.sql_engine_type,
@@ -100,7 +100,7 @@ def test_id_enumeration(  # noqa: D
 
     assert_sql_snapshot_equal(
         request=request,
-        mf_test_session_state=mf_test_session_state,
+        mf_test_configuration=mf_test_configuration,
         snapshot_id="query",
         sql=result.rendered_sql.sql_query,
         sql_engine=sql_client.sql_engine_type,
