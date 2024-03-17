@@ -148,3 +148,35 @@ def test_pformat_many() -> None:  # noqa: D
         ).rstrip()
         == result
     )
+
+
+def test_pformat_many_with_raw_strings() -> None:  # noqa: D
+    result = mf_pformat_many("Example description:", obj_dict={"object_0": "foo\nbar"}, preserve_raw_strings=True)
+
+    assert (
+        textwrap.dedent(
+            """\
+            Example description:
+
+            object_0:
+              foo
+              bar
+            """
+        ).rstrip()
+        == result
+    )
+
+
+def test_pformat_many_with_strings() -> None:  # noqa: D
+    result = mf_pformat_many("Example description:", obj_dict={"object_0": "foo\nbar"})
+    assert (
+        textwrap.dedent(
+            """\
+            Example description:
+
+            object_0:
+              'foo\\nbar'
+            """
+        ).rstrip()
+        == result
+    )
