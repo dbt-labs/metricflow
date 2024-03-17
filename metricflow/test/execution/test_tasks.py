@@ -41,7 +41,7 @@ def test_write_table_task(mf_test_session_state: MetricFlowTestSessionState, sql
     output_table = SqlTable(schema_name=mf_test_session_state.mf_system_schema, table_name=f"test_table_{random_id()}")
     task = SelectSqlQueryToTableTask(
         sql_client=sql_client,
-        sql_query="SELECT 1 AS foo",
+        sql_query=f"CREATE TABLE {output_table.sql} AS SELECT 1 AS foo",
         bind_parameters=SqlBindParameters(),
         output_table=output_table,
     )
