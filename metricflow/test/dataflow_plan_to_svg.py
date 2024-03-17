@@ -18,6 +18,9 @@ def display_graph_if_requested(
     if not mf_test_session_state.display_plans:
         return
 
+    if len(request.session.items) > 1:
+        raise ValueError("Displaying graphs is only supported when there's a single item in a testing session.")
+
     plan_svg_output_path_prefix = snapshot_path_prefix(
         request=request, snapshot_group=dag_graph.__class__.__name__, snapshot_id=str(dag_graph.dag_id)
     )
@@ -25,9 +28,4 @@ def display_graph_if_requested(
     # Create parent directory since it might not exist
     os.makedirs(os.path.dirname(plan_svg_output_path_prefix), exist_ok=True)
 
-    if mf_test_session_state.plans_displayed >= mf_test_session_state.max_plans_displayed:
-        raise RuntimeError(
-            f"Can't display plan - hit limit of {mf_test_session_state.max_plans_displayed} plans displayed."
-        )
     render_via_graphviz(dag_graph=dag_graph, file_path_without_svg_suffix=plan_svg_output_path_prefix)
-    mf_test_session_state.plans_displayed += 1
