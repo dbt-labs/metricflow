@@ -424,21 +424,32 @@ def mf_pformat_many(  # type: ignore
     include_object_field_names: bool = True,
     include_none_object_fields: bool = False,
     include_empty_object_fields: bool = False,
+    preserve_raw_strings: bool = False,
 ) -> str:
-    """Prints many objects in an indented form."""
+    """Prints many objects in an indented form.
+
+    If preserve_raw_strings is set, and a value of the obj_dict is of type str, then use the value itself, not the
+    representation of the string. e.g. if value="foo", then "foo" instead of "'foo'". Useful for values that contain
+    newlines.
+    """
     lines: List[str] = [description]
     for key, value in obj_dict.items():
+        if preserve_raw_strings and isinstance(value, str):
+            value_str = value
+        else:
+            value_str = mf_pformat(
+                obj=value,
+                max_line_length=max(0, max_line_length - len(indent_prefix)),
+                indent_prefix=indent_prefix,
+                include_object_field_names=include_object_field_names,
+                include_none_object_fields=include_none_object_fields,
+                include_empty_object_fields=include_empty_object_fields,
+            )
+
         item_block_lines = (
             f"{key}:",
             indent(
-                mf_pformat(
-                    obj=value,
-                    max_line_length=max(0, max_line_length - len(indent_prefix)),
-                    indent_prefix=indent_prefix,
-                    include_object_field_names=include_object_field_names,
-                    include_none_object_fields=include_none_object_fields,
-                    include_empty_object_fields=include_empty_object_fields,
-                ),
+                value_str,
                 indent_prefix=indent_prefix,
             ),
         )
