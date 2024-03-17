@@ -18,7 +18,7 @@ from metricflow.dag.mf_dag import DagId
 from metricflow.dag.sequential_id import SequentialIdGenerator
 from metricflow.dataflow.dataflow_plan import (
     BaseOutput,
-    ComputedMetricsOutput,
+    DataflowPlanNode,
     DataflowPlanNodeVisitor,
 )
 from metricflow.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode
@@ -114,6 +114,7 @@ from metricflow.sql.sql_exprs import (
     SqlWindowOrderByArgument,
 )
 from metricflow.sql.sql_plan import (
+    SqlCreateTableAsNode,
     SqlJoinDescription,
     SqlJoinType,
     SqlOrderByDescription,
@@ -177,13 +178,12 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
     def convert_to_sql_query_plan(
         self,
         sql_engine_type: SqlEngine,
-        dataflow_plan_node: Union[BaseOutput, ComputedMetricsOutput],
+        dataflow_plan_node: DataflowPlanNode,
         optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O4,
         sql_query_plan_id: Optional[DagId] = None,
     ) -> SqlQueryPlan:
         """Create an SQL query plan that represents the computation up to the given dataflow plan node."""
-        sql_select_node: SqlQueryPlanNode = dataflow_plan_node.accept(self).checked_sql_select_node
-
+        sql_node: SqlQueryPlanNode = dataflow_plan_node.accept(self).sql_node
         # TODO: Make this a more generally accessible attribute instead of checking against the
         # BigQuery-ness of the engine
         use_column_alias_in_group_by = sql_engine_type is SqlEngine.BIGQUERY
@@ -192,13 +192,13 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             optimization_level, use_column_alias_in_group_by=use_column_alias_in_group_by
         ):
             logger.info(f"Applying optimizer: {optimizer.__class__.__name__}")
-            sql_select_node = optimizer.optimize(sql_select_node)
+            sql_node = optimizer.optimize(sql_node)
             logger.info(
                 f"After applying {optimizer.__class__.__name__}, the SQL query plan is:\n"
-                f"{indent(sql_select_node.text_structure())}"
+                f"{indent(sql_node.text_structure())}"
             )
 
-        return SqlQueryPlan(render_node=sql_select_node, plan_id=sql_query_plan_id)
+        return SqlQueryPlan(render_node=sql_node, plan_id=sql_query_plan_id)
 
     def _next_unique_table_alias(self) -> str:
         """Return the next unique table alias to use in generating queries."""
@@ -786,17 +786,20 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             ),
         )
 
-    def visit_write_to_result_dataframe_node(self, node: WriteToResultDataframeNode) -> SqlDataSet:
-        """This is an operation that can't be represented as an SQL query.
+    def visit_write_to_result_dataframe_node(self, node: WriteToResultDataframeNode) -> SqlDataSet:  # noqa: D
+        # Returning the parent-node SQL as an approximation since you can't write to a dataframe via SQL.
+        return node.parent_node.accept(self)
 
-        Instead, it should be handled in the execution plan as an operation that runs an SQL query and saves it to
-        a dataframe.
-        """
-        raise RuntimeError("This node type is not supported.")
-
-    def visit_write_to_result_table_node(self, node: WriteToResultTableNode) -> SqlDataSet:
-        """Similar to visit_write_to_result_dataframe_node()."""
-        raise RuntimeError("This node type is not supported.")
+    def visit_write_to_result_table_node(self, node: WriteToResultTableNode) -> SqlDataSet:  # noqa: D
+        input_data_set: SqlDataSet = node.parent_node.accept(self)
+        input_instance_set: InstanceSet = input_data_set.instance_set
+        return SqlDataSet(
+            instance_set=input_instance_set,
+            sql_node=SqlCreateTableAsNode(
+                sql_table=node.output_sql_table,
+                parent_node=input_data_set.checked_sql_select_node,
+            ),
+        )
 
     def visit_pass_elements_filter_node(self, node: FilterElementsNode) -> SqlDataSet:
         """Generates the query that realizes the behavior of FilterElementsNode."""
