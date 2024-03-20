@@ -8,9 +8,9 @@ from dbt_semantic_interfaces.test_utils import as_datetime
 
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
-from metricflow.test.integration.conftest import IntegrationTestHelpers
-from metricflow.test.snapshot_utils import assert_str_snapshot_equal
+from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
+from tests.integration.conftest import IntegrationTestHelpers
+from tests.snapshot_utils import assert_str_snapshot_equal
 
 
 @pytest.mark.sql_engine_snapshot

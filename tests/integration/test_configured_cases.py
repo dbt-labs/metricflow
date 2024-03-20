@@ -35,14 +35,14 @@ from metricflow.sql.sql_exprs import (
     SqlStringExpression,
     SqlSubtractTimeIntervalExpression,
 )
-from metricflow.test.compare_df import assert_dataframes_equal
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
-from metricflow.test.integration.configured_test_case import (
+from tests.compare_df import assert_dataframes_equal
+from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
+from tests.integration.configured_test_case import (
     CONFIGURED_INTEGRATION_TESTS_REPOSITORY,
     IntegrationTestModel,
     RequiredDwEngineFeatures,
 )
-from metricflow.test.time.configurable_time_source import (
+from tests.time.configurable_time_source import (
     ConfigurableTimeSource,
 )
 

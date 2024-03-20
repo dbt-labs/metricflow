@@ -9,7 +9,7 @@ from dbt_semantic_interfaces.type_enums.date_part import DatePart
 
 from metricflow.naming.dunder_scheme import DunderNamingScheme
 from metricflow.specs.specs import DimensionSpec, EntitySpec, LinkableInstanceSpec, TimeDimensionSpec
-from metricflow.test.time.metric_time_dimension import MTD_SPEC_MONTH, MTD_SPEC_WEEK, MTD_SPEC_YEAR
+from tests.time.metric_time_dimension import MTD_SPEC_MONTH, MTD_SPEC_WEEK, MTD_SPEC_YEAR
 
 
 @pytest.fixture(scope="session")

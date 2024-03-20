@@ -23,8 +23,8 @@ from metricflow.sql.sql_plan import (
     SqlTableFromClauseNode,
 )
 from metricflow.sql.sql_table import SqlTable
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
-from metricflow.test.sql.compare_sql_plan import assert_default_rendered_sql_equal
+from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
+from tests.sql.compare_sql_plan import assert_default_rendered_sql_equal
 
 
 @pytest.fixture

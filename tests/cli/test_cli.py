@@ -27,10 +27,10 @@ from metricflow.cli.main import (
     validate_configs,
 )
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
-from metricflow.test.fixtures.cli_fixtures import MetricFlowCliRunner
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
-from metricflow.test.model.example_project_configuration import EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE
-from metricflow.test.snapshot_utils import assert_str_snapshot_equal
+from tests.fixtures.cli_fixtures import MetricFlowCliRunner
+from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
+from tests.model.example_project_configuration import EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE
+from tests.snapshot_utils import assert_str_snapshot_equal
 
 logger = logging.getLogger(__name__)
 

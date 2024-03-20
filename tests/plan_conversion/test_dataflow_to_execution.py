@@ -17,8 +17,8 @@ from metricflow.specs.specs import (
     TimeDimensionSpec,
 )
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
-from metricflow.test.snapshot_utils import assert_execution_plan_text_equal
+from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
+from tests.snapshot_utils import assert_execution_plan_text_equal
 
 
 def make_execution_plan_converter(  # noqa: D103

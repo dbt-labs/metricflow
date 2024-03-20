@@ -12,8 +12,8 @@ from metricflow.model.semantics.linkable_spec_resolver import (
     ValidLinkableSpecResolver,
 )
 from metricflow.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
-from metricflow.test.snapshot_utils import assert_linkable_element_set_snapshot_equal
+from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
+from tests.snapshot_utils import assert_linkable_element_set_snapshot_equal
 
 logger = logging.getLogger(__name__)
 

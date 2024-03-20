@@ -7,10 +7,10 @@ from pathlib import Path
 import pytest
 
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
-from metricflow.test.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
-from metricflow.test.source_schema_tools import create_tables_listed_in_table_snapshot_repository
-from metricflow.test.table_snapshot.table_snapshots import (
+from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
+from tests.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
+from tests.source_schema_tools import create_tables_listed_in_table_snapshot_repository
+from tests.table_snapshot.table_snapshots import (
     SqlTableSnapshotRepository,
 )
 

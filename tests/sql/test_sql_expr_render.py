@@ -33,8 +33,8 @@ from metricflow.sql.sql_exprs import (
     SqlWindowFunctionExpression,
     SqlWindowOrderByArgument,
 )
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
-from metricflow.test.snapshot_utils import assert_str_snapshot_equal
+from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
+from tests.snapshot_utils import assert_str_snapshot_equal
 
 logger = logging.getLogger(__name__)
 

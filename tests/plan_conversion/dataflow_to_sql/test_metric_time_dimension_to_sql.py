@@ -11,10 +11,10 @@ from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionT
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.specs.specs import MetricFlowQuerySpec, MetricSpec
-from metricflow.test.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
-from metricflow.test.plan_conversion.test_dataflow_to_sql_plan import convert_and_check
-from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY
+from tests.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
+from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
+from tests.plan_conversion.test_dataflow_to_sql_plan import convert_and_check
+from tests.time.metric_time_dimension import MTD_SPEC_DAY
 
 
 @pytest.mark.sql_engine_snapshot

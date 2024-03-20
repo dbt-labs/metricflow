@@ -7,7 +7,7 @@ import pytest
 from dbt_semantic_interfaces.dataclass_serialization import DataClassDeserializer, DataclassSerializer
 
 from metricflow.instances import InstanceSet
-from metricflow.test.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
+from tests.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 
 logger = logging.getLogger(__name__)
 

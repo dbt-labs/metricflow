@@ -22,8 +22,8 @@ from metricflow.model.data_warehouse_model_validator import (
 )
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
-from metricflow.test.snapshot_utils import (
+from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
+from tests.snapshot_utils import (
     assert_sql_snapshot_equal,
 )
 

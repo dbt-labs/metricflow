@@ -10,8 +10,8 @@ from dbt_semantic_interfaces.references import EntityReference, MeasureReference
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.metric_lookup import MetricLookup
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
-from metricflow.test.snapshot_utils import assert_linkable_element_set_snapshot_equal, assert_object_snapshot_equal
+from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
+from tests.snapshot_utils import assert_linkable_element_set_snapshot_equal, assert_object_snapshot_equal
 
 logger = logging.getLogger(__name__)
 

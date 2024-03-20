@@ -7,7 +7,7 @@ from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup im
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.rendered_spec_tracker import RenderedSpecTracker
 from metricflow.specs.where_filter_entity import WhereFilterEntity
-from metricflow.test.specs.conftest import EXAMPLE_FILTER_LOCATION
+from tests.specs.conftest import EXAMPLE_FILTER_LOCATION
 
 
 def test_descending_cannot_be_set(  # noqa

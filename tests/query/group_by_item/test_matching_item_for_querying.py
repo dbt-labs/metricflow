@@ -17,10 +17,10 @@ from metricflow.query.group_by_item.resolution_dag.dag import GroupByItemResolut
 from metricflow.query.group_by_item.resolution_dag.resolution_nodes.metric_resolution_node import (
     MetricGroupByItemResolutionNode,
 )
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
-from metricflow.test.query.group_by_item.conftest import AmbiguousResolutionQueryId
-from metricflow.test.snapshot_utils import assert_object_snapshot_equal
-from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_MONTH, MTD_SPEC_YEAR
+from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
+from tests.query.group_by_item.conftest import AmbiguousResolutionQueryId
+from tests.snapshot_utils import assert_object_snapshot_equal
+from tests.time.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_MONTH, MTD_SPEC_YEAR
 
 logger = logging.getLogger(__name__)
 

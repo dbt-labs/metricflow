@@ -16,7 +16,7 @@ from metricflow.sql.sql_exprs import (
     SqlFunction,
     SqlPercentileExpression,
 )
-from metricflow.test.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
+from tests.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 
 __SOURCE_TABLE_ALIAS = "a"
 

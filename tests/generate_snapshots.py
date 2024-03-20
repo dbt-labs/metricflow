@@ -48,7 +48,7 @@ from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.implementations.base import FrozenBaseModel
 
 from metricflow.protocols.sql_client import SqlEngine
-from metricflow.test.fixtures.setup_fixtures import SQL_ENGINE_SNAPSHOT_MARKER_NAME
+from tests.fixtures.setup_fixtures import SQL_ENGINE_SNAPSHOT_MARKER_NAME
 
 logger = logging.getLogger(__name__)
 

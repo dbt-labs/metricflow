@@ -8,10 +8,10 @@ from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.references import SemanticModelReference
 
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.test.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
-from metricflow.test.snapshot_utils import assert_spec_set_snapshot_equal
-from metricflow.test.sql.compare_sql_plan import assert_rendered_sql_equal
+from tests.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
+from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
+from tests.snapshot_utils import assert_spec_set_snapshot_equal
+from tests.sql.compare_sql_plan import assert_rendered_sql_equal
 
 logger = logging.getLogger(__name__)
 

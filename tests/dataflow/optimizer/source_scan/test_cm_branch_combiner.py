@@ -18,10 +18,10 @@ from metricflow.dataflow.optimizer.source_scan.cm_branch_combiner import (
     ComputeMetricsBranchCombinerResult,
 )
 from metricflow.specs.specs import InstanceSpecSet, MeasureSpec
-from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
-from metricflow.test.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
-from metricflow.test.snapshot_utils import assert_plan_snapshot_text_equal
+from tests.dataflow_plan_to_svg import display_graph_if_requested
+from tests.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
+from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
+from tests.snapshot_utils import assert_plan_snapshot_text_equal
 
 
 def make_dataflow_plan(node: BaseOutput) -> DataflowPlan:  # noqa: D103

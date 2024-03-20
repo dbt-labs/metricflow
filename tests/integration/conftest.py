@@ -10,8 +10,8 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
-from metricflow.test.time.configurable_time_source import ConfigurableTimeSource
+from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
+from tests.time.configurable_time_source import ConfigurableTimeSource
 
 
 @dataclass(frozen=True)

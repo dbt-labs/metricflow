@@ -14,8 +14,8 @@ from metricflow.specs.specs import (
     MetricSpec,
     TimeDimensionSpec,
 )
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
-from metricflow.test.plan_conversion.test_dataflow_to_sql_plan import convert_and_check
+from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
+from tests.plan_conversion.test_dataflow_to_sql_plan import convert_and_check
 
 
 @pytest.mark.sql_engine_snapshot

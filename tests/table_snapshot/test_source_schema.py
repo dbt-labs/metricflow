@@ -7,11 +7,11 @@ import pytest
 
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.sql.sql_table import SqlTable
-from metricflow.test.compare_df import assert_dataframes_equal
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
-from metricflow.test.fixtures.table_fixtures import CONFIGURED_SOURCE_TABLE_SNAPSHOT_REPOSITORY
-from metricflow.test.source_schema_tools import get_populate_source_schema_shell_command
-from metricflow.test.table_snapshot.table_snapshots import (
+from tests.compare_df import assert_dataframes_equal
+from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
+from tests.fixtures.table_fixtures import CONFIGURED_SOURCE_TABLE_SNAPSHOT_REPOSITORY
+from tests.source_schema_tools import get_populate_source_schema_shell_command
+from tests.table_snapshot.table_snapshots import (
     SqlTableSnapshotRepository,
     TableSnapshotException,
 )

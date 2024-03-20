@@ -18,10 +18,10 @@ from metricflow.protocols.sql_client import SqlClient
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import EntityReference, MetricFlowQuerySpec, MetricSpec, TimeDimensionSpec
-from metricflow.test.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
-from metricflow.test.query_rendering.compare_rendered_query import convert_and_check
-from metricflow.test.time.metric_time_dimension import MTD_SPEC_MONTH
+from tests.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
+from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
+from tests.query_rendering.compare_rendered_query import convert_and_check
+from tests.time.metric_time_dimension import MTD_SPEC_MONTH
 
 
 @pytest.mark.sql_engine_snapshot

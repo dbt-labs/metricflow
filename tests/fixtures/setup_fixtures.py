@@ -14,8 +14,8 @@ from _pytest.fixtures import FixtureRequest
 from sqlalchemy.engine import make_url
 
 from metricflow.random_id import random_id
-from metricflow.test.fixtures.sql_clients.common_client import SqlDialect
-from metricflow.test.table_snapshot.table_snapshots import SqlTableSnapshotHash, SqlTableSnapshotRepository
+from tests.fixtures.sql_clients.common_client import SqlDialect
+from tests.table_snapshot.table_snapshots import SqlTableSnapshotHash, SqlTableSnapshotRepository
 
 logger = logging.getLogger(__name__)
 

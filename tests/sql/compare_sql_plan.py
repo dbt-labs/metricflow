@@ -6,8 +6,8 @@ from metricflow.dag.mf_dag import DagId
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from metricflow.sql.sql_plan import SqlQueryPlan, SqlQueryPlanNode
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration, check_sql_engine_snapshot_marker
-from metricflow.test.snapshot_utils import (
+from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration, check_sql_engine_snapshot_marker
+from tests.snapshot_utils import (
     assert_plan_snapshot_text_equal,
     make_schema_replacement_function,
 )

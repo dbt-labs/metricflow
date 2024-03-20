@@ -10,9 +10,9 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.query.group_by_item.group_by_item_resolver import GroupByItemResolver
 from metricflow.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
 from metricflow.specs.specs import LinkableSpecSet
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
-from metricflow.test.query.group_by_item.conftest import AmbiguousResolutionQueryId
-from metricflow.test.snapshot_utils import assert_linkable_spec_set_snapshot_equal
+from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
+from tests.query.group_by_item.conftest import AmbiguousResolutionQueryId
+from tests.snapshot_utils import assert_linkable_spec_set_snapshot_equal
 
 logger = logging.getLogger(__name__)
 

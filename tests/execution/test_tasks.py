@@ -13,8 +13,8 @@ from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.random_id import random_id
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_table import SqlTable
-from metricflow.test.compare_df import assert_dataframes_equal
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
+from tests.compare_df import assert_dataframes_equal
+from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 
 
 def test_read_sql_task(sql_client: SqlClient) -> None:  # noqa: D103

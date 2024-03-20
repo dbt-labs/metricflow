@@ -16,10 +16,10 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.query.query_parser import MetricFlowQueryParser
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
-from metricflow.test.model.modify.modify_manifest import modify_manifest
-from metricflow.test.model.modify.modify_metric_filter import ModifyMetricFilterTransform
-from metricflow.test.snapshot_utils import assert_str_snapshot_equal
+from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
+from tests.model.modify.modify_manifest import modify_manifest
+from tests.model.modify.modify_metric_filter import ModifyMetricFilterTransform
+from tests.snapshot_utils import assert_str_snapshot_equal
 
 logger = logging.getLogger(__name__)
 

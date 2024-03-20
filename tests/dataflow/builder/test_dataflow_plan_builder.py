@@ -23,10 +23,10 @@ from metricflow.specs.specs import (
     OrderBySpec,
     TimeDimensionSpec,
 )
-from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
-from metricflow.test.snapshot_utils import assert_plan_snapshot_text_equal
-from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_MONTH, MTD_SPEC_QUARTER, MTD_SPEC_WEEK
+from tests.dataflow_plan_to_svg import display_graph_if_requested
+from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
+from tests.snapshot_utils import assert_plan_snapshot_text_equal
+from tests.time.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_MONTH, MTD_SPEC_QUARTER, MTD_SPEC_WEEK
 
 logger = logging.getLogger(__name__)
 

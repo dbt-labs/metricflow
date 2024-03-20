@@ -11,8 +11,8 @@ from metricflow.query.group_by_item.filter_spec_resolution.filter_pattern_factor
 )
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.query.query_parser import MetricFlowQueryParser
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
-from metricflow.test.snapshot_utils import assert_object_snapshot_equal, assert_str_snapshot_equal
+from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
+from tests.snapshot_utils import assert_object_snapshot_equal, assert_str_snapshot_equal
 
 logger = logging.getLogger(__name__)
 

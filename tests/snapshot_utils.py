@@ -18,7 +18,7 @@ from metricflow.model.semantics.linkable_spec_resolver import LinkableElementSet
 from metricflow.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.specs.specs import InstanceSpecSet, LinkableSpecSet
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration, check_sql_engine_snapshot_marker
+from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration, check_sql_engine_snapshot_marker
 
 logger = logging.getLogger(__name__)
 

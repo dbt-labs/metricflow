@@ -29,9 +29,9 @@ from metricflow.specs.specs import (
     MetricSpec,
     TimeDimensionSpec,
 )
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
-from metricflow.test.query_rendering.compare_rendered_query import convert_and_check
-from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_WEEK
+from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
+from tests.query_rendering.compare_rendered_query import convert_and_check
+from tests.time.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_WEEK
 
 
 @pytest.mark.sql_engine_snapshot

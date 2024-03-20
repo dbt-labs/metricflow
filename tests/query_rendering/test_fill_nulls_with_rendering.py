@@ -23,8 +23,8 @@ from metricflow.specs.specs import (
     MetricSpec,
     TimeDimensionSpec,
 )
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
-from metricflow.test.query_rendering.compare_rendered_query import convert_and_check
+from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
+from tests.query_rendering.compare_rendered_query import convert_and_check
 
 
 @pytest.mark.sql_engine_snapshot

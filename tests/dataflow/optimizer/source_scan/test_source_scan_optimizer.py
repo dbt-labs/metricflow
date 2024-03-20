@@ -41,9 +41,9 @@ from metricflow.specs.specs import (
     MetricFlowQuerySpec,
     MetricSpec,
 )
-from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
-from metricflow.test.snapshot_utils import assert_plan_snapshot_text_equal
+from tests.dataflow_plan_to_svg import display_graph_if_requested
+from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
+from tests.snapshot_utils import assert_plan_snapshot_text_equal
 
 logger = logging.getLogger(__name__)
 

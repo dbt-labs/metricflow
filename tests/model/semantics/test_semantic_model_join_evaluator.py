@@ -13,7 +13,7 @@ from metricflow.model.semantics.semantic_model_join_evaluator import (
     SemanticModelJoinEvaluator,
     SemanticModelLink,
 )
-from metricflow.test.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
+from tests.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 
 
 def _get_join_types_for_entity_type(entity_type: EntityType) -> Sequence[SemanticModelEntityJoinType]:

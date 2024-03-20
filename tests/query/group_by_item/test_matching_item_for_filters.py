@@ -12,9 +12,9 @@ from metricflow.naming.naming_scheme import QueryItemNamingScheme
 from metricflow.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow.query.group_by_item.group_by_item_resolver import GroupByItemResolver
 from metricflow.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
-from metricflow.test.query.group_by_item.conftest import AmbiguousResolutionQueryId
-from metricflow.test.snapshot_utils import assert_object_snapshot_equal
+from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
+from tests.query.group_by_item.conftest import AmbiguousResolutionQueryId
+from tests.snapshot_utils import assert_object_snapshot_equal
 
 logger = logging.getLogger(__name__)
 

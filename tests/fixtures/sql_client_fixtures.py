@@ -11,10 +11,10 @@ from dbt.adapters.factory import get_adapter_by_type
 from dbt.cli.main import dbtRunner
 
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration, dbt_project_dir, dialect_from_url
-from metricflow.test.fixtures.sql_clients.adapter_backed_ddl_client import AdapterBackedDDLSqlClient
-from metricflow.test.fixtures.sql_clients.common_client import SqlDialect
-from metricflow.test.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
+from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration, dbt_project_dir, dialect_from_url
+from tests.fixtures.sql_clients.adapter_backed_ddl_client import AdapterBackedDDLSqlClient
+from tests.fixtures.sql_clients.common_client import SqlDialect
+from tests.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 
 logger = logging.getLogger(__name__)
 

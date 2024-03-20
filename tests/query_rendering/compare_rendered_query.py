@@ -1,4 +1,5 @@
 """Centralizes useful functions for comparing two different rendered queries."""
+
 from __future__ import annotations
 
 from _pytest.fixtures import FixtureRequest
@@ -8,9 +9,9 @@ from metricflow.dataflow.dataflow_plan import BaseOutput
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
-from metricflow.test.dataflow_plan_to_svg import display_graph_if_requested
-from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
-from metricflow.test.sql.compare_sql_plan import assert_rendered_sql_from_plan_equal
+from tests.dataflow_plan_to_svg import display_graph_if_requested
+from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
+from tests.sql.compare_sql_plan import assert_rendered_sql_from_plan_equal
 
 
 def convert_and_check(

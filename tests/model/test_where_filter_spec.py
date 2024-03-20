@@ -43,7 +43,7 @@ from metricflow.specs.specs import (
     WhereFilterSpec,
 )
 from metricflow.specs.where_filter_transform import WhereSpecFactory
-from metricflow.test.specs.conftest import EXAMPLE_FILTER_LOCATION
+from tests.specs.conftest import EXAMPLE_FILTER_LOCATION
 
 logger = logging.getLogger(__name__)
 
