@@ -9,7 +9,7 @@ from metricflow.collection_helpers.merger import Mergeable
 
 
 @dataclass(frozen=True)
-class NumberTuple(Mergeable):  # noqa: D
+class NumberTuple(Mergeable):  # noqa: D101
     numbers: Tuple[int, ...] = field(default_factory=tuple)
 
     @override
@@ -22,7 +22,7 @@ class NumberTuple(Mergeable):  # noqa: D
         return NumberTuple()
 
 
-def test_merger() -> None:  # noqa: D
+def test_merger() -> None:  # noqa: D103
     items_to_merge: List[NumberTuple] = [
         NumberTuple(()),
         NumberTuple((1,)),

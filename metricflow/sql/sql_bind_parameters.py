@@ -22,7 +22,7 @@ class SqlBindParameterValue(SerializableDataclass):
     date_value: Optional[datetime.date] = None
     bool_value: Optional[bool] = None
 
-    def __post_init__(self) -> None:  # noqa: D
+    def __post_init__(self) -> None:  # noqa: D105
         assert_exactly_one_arg_set(
             str_value=self.str_value,
             int_value=self.int_value,
@@ -33,7 +33,7 @@ class SqlBindParameterValue(SerializableDataclass):
         )
 
     @property
-    def union_value(self) -> SqlColumnType:  # noqa: D
+    def union_value(self) -> SqlColumnType:  # noqa: D102
         if self.str_value is not None:
             return self.str_value
         elif self.int_value is not None:
@@ -68,7 +68,7 @@ class SqlBindParameterValue(SerializableDataclass):
 
 
 @dataclass(frozen=True)
-class SqlBindParameter(SerializableDataclass):  # noqa: D
+class SqlBindParameter(SerializableDataclass):  # noqa: D101
     key: str
     value: SqlBindParameterValue
 
@@ -119,7 +119,7 @@ class SqlBindParameters(SerializableDataclass):
         return param_dict
 
     @staticmethod
-    def create_from_dict(param_dict: Mapping[str, SqlColumnType]) -> SqlBindParameters:  # noqa: D
+    def create_from_dict(param_dict: Mapping[str, SqlColumnType]) -> SqlBindParameters:  # noqa: D102
         return SqlBindParameters(
             tuple(
                 SqlBindParameter(key=key, value=SqlBindParameterValue.create_from_sql_column_type(value))
@@ -127,5 +127,5 @@ class SqlBindParameters(SerializableDataclass):
             )
         )
 
-    def __eq__(self, other: Any) -> bool:  # type: ignore  # noqa: D
+    def __eq__(self, other: Any) -> bool:  # type: ignore  # noqa: D105
         return isinstance(other, SqlBindParameters) and self.param_dict == other.param_dict

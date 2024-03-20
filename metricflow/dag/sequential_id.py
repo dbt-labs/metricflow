@@ -17,7 +17,7 @@ class SequentialId:
     index: int
 
     @property
-    def str_value(self) -> str:  # noqa: D
+    def str_value(self) -> str:  # noqa: D102
         return f"{self.id_prefix.str_value}_{self.index}"
 
     @override
@@ -33,7 +33,7 @@ class SequentialIdGenerator:
     _prefix_to_next_value: Dict[IdPrefix, int] = {}
 
     @classmethod
-    def create_next_id(cls, id_prefix: IdPrefix) -> SequentialId:  # noqa: D
+    def create_next_id(cls, id_prefix: IdPrefix) -> SequentialId:  # noqa: D102
         with cls._state_lock:
             if id_prefix not in cls._prefix_to_next_value:
                 cls._prefix_to_next_value[id_prefix] = cls._default_start_value

@@ -22,7 +22,7 @@ from metricflow.test.table_snapshot.table_snapshots import (
 
 
 @pytest.fixture
-def table_snapshot() -> SqlTableSnapshot:  # noqa: D
+def table_snapshot() -> SqlTableSnapshot:  # noqa: D103
     rows = (
         ("true", "1", "1.0", "2020-01-02", "hi"),
         ("false", "-1", "-1.0", "2020-03-04 05:06:07", "bye"),

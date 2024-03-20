@@ -25,7 +25,7 @@ class CreateSelectCoalescedColumnsForLinkableSpecs(InstanceSpecSetTransform[Sele
     COALESCE(a.is_instant, b.is_instant) AS is_instant
     """
 
-    def __init__(  # noqa: D
+    def __init__(  # noqa: D107
         self,
         column_association_resolver: ColumnAssociationResolver,
         table_aliases: Sequence[str],
@@ -33,7 +33,7 @@ class CreateSelectCoalescedColumnsForLinkableSpecs(InstanceSpecSetTransform[Sele
         self._column_association_resolver = column_association_resolver
         self._table_aliases = table_aliases
 
-    def transform(self, spec_set: InstanceSpecSet) -> SelectColumnSet:  # noqa: D
+    def transform(self, spec_set: InstanceSpecSet) -> SelectColumnSet:  # noqa: D102
         dimension_columns: List[SqlSelectColumn] = []
         time_dimension_columns: List[SqlSelectColumn] = []
         entity_columns: List[SqlSelectColumn] = []
@@ -76,7 +76,7 @@ class CreateSelectCoalescedColumnsForLinkableSpecs(InstanceSpecSetTransform[Sele
 class SelectOnlyLinkableSpecs(InstanceSpecSetTransform[InstanceSpecSet]):
     """Removes metrics and measures from the spec set."""
 
-    def transform(self, spec_set: InstanceSpecSet) -> InstanceSpecSet:  # noqa: D
+    def transform(self, spec_set: InstanceSpecSet) -> InstanceSpecSet:  # noqa: D102
         return InstanceSpecSet(
             metric_specs=(),
             measure_specs=(),
@@ -92,8 +92,8 @@ class CreateColumnAssociations(InstanceSpecSetTransform[Sequence[ColumnAssociati
     Initial use case is to figure out names of the columns present in the SQL of a WhereFilter.
     """
 
-    def __init__(self, column_association_resolver: ColumnAssociationResolver) -> None:  # noqa: D
+    def __init__(self, column_association_resolver: ColumnAssociationResolver) -> None:  # noqa: D107
         self._column_association_resolver = column_association_resolver
 
-    def transform(self, spec_set: InstanceSpecSet) -> Sequence[ColumnAssociation]:  # noqa: D
+    def transform(self, spec_set: InstanceSpecSet) -> Sequence[ColumnAssociation]:  # noqa: D102
         return tuple(self._column_association_resolver.resolve_spec(spec) for spec in spec_set.all_specs)

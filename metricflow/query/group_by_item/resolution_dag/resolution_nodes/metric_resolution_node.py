@@ -21,7 +21,7 @@ from metricflow.visitor import VisitorOutputT
 class MetricGroupByItemResolutionNode(GroupByItemResolutionNode):
     """Outputs group-by-items relevant to a metric based on the input group-by-items."""
 
-    def __init__(  # noqa: D
+    def __init__(
         self,
         metric_reference: MetricReference,
         metric_input_location: Optional[InputMetricDefinitionLocation],
@@ -70,11 +70,11 @@ class MetricGroupByItemResolutionNode(GroupByItemResolutionNode):
         )
 
     @property
-    def metric_reference(self) -> MetricReference:  # noqa: D
+    def metric_reference(self) -> MetricReference:  # noqa: D102
         return self._metric_reference
 
     @property
-    def metric_input_location(self) -> Optional[InputMetricDefinitionLocation]:  # noqa: D
+    def metric_input_location(self) -> Optional[InputMetricDefinitionLocation]:  # noqa: D102
         return self._metric_input_location
 
     @property

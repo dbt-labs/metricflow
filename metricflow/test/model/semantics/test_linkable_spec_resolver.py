@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 @pytest.fixture
-def simple_model_spec_resolver(  # noqa: D
+def simple_model_spec_resolver(  # noqa: D103
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> ValidLinkableSpecResolver:
     return ValidLinkableSpecResolver(
@@ -30,7 +30,7 @@ def simple_model_spec_resolver(  # noqa: D
 
 
 @pytest.fixture
-def cyclic_join_manifest_spec_resolver(  # noqa: D
+def cyclic_join_manifest_spec_resolver(  # noqa: D103
     cyclic_join_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> ValidLinkableSpecResolver:
     return ValidLinkableSpecResolver(
@@ -40,7 +40,7 @@ def cyclic_join_manifest_spec_resolver(  # noqa: D
     )
 
 
-def test_all_properties(  # noqa: D
+def test_all_properties(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     simple_model_spec_resolver: ValidLinkableSpecResolver,
@@ -57,7 +57,7 @@ def test_all_properties(  # noqa: D
     )
 
 
-def test_one_property(  # noqa: D
+def test_one_property(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     simple_model_spec_resolver: ValidLinkableSpecResolver,
@@ -74,7 +74,7 @@ def test_one_property(  # noqa: D
     )
 
 
-def test_metric_time_property_for_cumulative_metric(  # noqa: D
+def test_metric_time_property_for_cumulative_metric(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     simple_model_spec_resolver: ValidLinkableSpecResolver,
@@ -91,7 +91,7 @@ def test_metric_time_property_for_cumulative_metric(  # noqa: D
     )
 
 
-def test_metric_time_property_for_derived_metrics(  # noqa: D
+def test_metric_time_property_for_derived_metrics(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     simple_model_spec_resolver: ValidLinkableSpecResolver,
@@ -108,7 +108,7 @@ def test_metric_time_property_for_derived_metrics(  # noqa: D
     )
 
 
-def test_cyclic_join_manifest(  # noqa: D
+def test_cyclic_join_manifest(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     cyclic_join_manifest_spec_resolver: ValidLinkableSpecResolver,

@@ -35,13 +35,13 @@ def create_context_with_counts(rows: int, distinct: int, nulls: int) -> DataWare
     )
 
 
-class ExampleLowCardinalityRule(LowCardinalityRatioRule):  # noqa: D
+class ExampleLowCardinalityRule(LowCardinalityRatioRule):  # noqa: D101
     type_node = InferenceSignalType.DIMENSION.CATEGORICAL
     confidence = InferenceSignalConfidence.MEDIUM
     only_applies_to_parent_signal = False
 
 
-def test_column_matcher(warehouse_ctx: DataWarehouseInferenceContext) -> None:  # noqa: D
+def test_column_matcher(warehouse_ctx: DataWarehouseInferenceContext) -> None:  # noqa: D103
     class TestRule(ColumnMatcherRule):
         type_node = InferenceSignalType.DIMENSION.UNKNOWN
         confidence = InferenceSignalConfidence.MEDIUM
@@ -61,7 +61,7 @@ def test_column_matcher(warehouse_ctx: DataWarehouseInferenceContext) -> None:  
     assert not signals[0].only_applies_to_parent
 
 
-def test_low_cardinality_ratio_rule_high_cardinality_doesnt_match() -> None:  # noqa: D
+def test_low_cardinality_ratio_rule_high_cardinality_doesnt_match() -> None:  # noqa: D103
     rule = ExampleLowCardinalityRule(0.1)
     ctx = create_context_with_counts(100, 100, 0)
 
@@ -69,7 +69,7 @@ def test_low_cardinality_ratio_rule_high_cardinality_doesnt_match() -> None:  # 
     assert len(signals) == 0
 
 
-def test_low_cardinality_ratio_rule_low_cardinality_lots_of_nulls_doesnt_match() -> None:  # noqa: D
+def test_low_cardinality_ratio_rule_low_cardinality_lots_of_nulls_doesnt_match() -> None:  # noqa: D103
     rule = ExampleLowCardinalityRule(0.1)
     ctx = create_context_with_counts(100, 2, 99)
 
@@ -77,7 +77,7 @@ def test_low_cardinality_ratio_rule_low_cardinality_lots_of_nulls_doesnt_match()
     assert len(signals) == 0
 
 
-def test_low_cardinality_ratio_rule_low_cardinality_all_nulls_doesnt_match() -> None:  # noqa: D
+def test_low_cardinality_ratio_rule_low_cardinality_all_nulls_doesnt_match() -> None:  # noqa: D103
     rule = ExampleLowCardinalityRule(0.1)
     ctx = create_context_with_counts(100, 1, 100)
 
@@ -85,7 +85,7 @@ def test_low_cardinality_ratio_rule_low_cardinality_all_nulls_doesnt_match() -> 
     assert len(signals) == 0
 
 
-def test_low_cardinality_ratio_rule_low_cardinality_matches() -> None:  # noqa: D
+def test_low_cardinality_ratio_rule_low_cardinality_matches() -> None:  # noqa: D103
     rule = ExampleLowCardinalityRule(0.1)
     ctx = create_context_with_counts(100, 1, 0)
 

@@ -18,7 +18,7 @@ from metricflow.test.time.configurable_time_source import ConfigurableTimeSource
 
 
 @pytest.mark.sql_engine_snapshot
-def test_render_query(  # noqa: D
+def test_render_query(  # noqa: D103
     request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, it_helpers: IntegrationTestHelpers
 ) -> None:
     result = it_helpers.mf_engine.explain(
@@ -38,7 +38,7 @@ def test_render_query(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_render_write_to_table_query(  # noqa: D
+def test_render_write_to_table_query(  # noqa: D103
     request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, it_helpers: IntegrationTestHelpers
 ) -> None:
     output_table = SqlTable(schema_name=it_helpers.mf_system_schema, table_name="test_table")
@@ -59,7 +59,7 @@ def test_render_write_to_table_query(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_id_enumeration(  # noqa: D
+def test_id_enumeration(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     simple_semantic_manifest_lookup: SemanticManifestLookup,

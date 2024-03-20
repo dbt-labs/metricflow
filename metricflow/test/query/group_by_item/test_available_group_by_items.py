@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 @pytest.mark.parametrize("dag_case_id", [case_id.value for case_id in AmbiguousResolutionQueryId])
-def test_available_group_by_items(  # noqa: D
+def test_available_group_by_items(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     ambiguous_resolution_manifest_lookup: SemanticManifestLookup,

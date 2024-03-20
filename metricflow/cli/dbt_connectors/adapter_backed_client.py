@@ -242,7 +242,7 @@ class AdapterBackedSqlClient:
         logger.info(f"Finished running the dry_run in {stop - start:.2f}s")
         return
 
-    def close(self) -> None:  # noqa: D
+    def close(self) -> None:  # noqa: D102
         self._adapter.cancel_open_connections()
 
     def render_bind_parameter_key(self, bind_parameter_key: str) -> str:

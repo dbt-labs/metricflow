@@ -28,7 +28,7 @@ class NoMatchingItemsForMeasure(MetricFlowQueryResolutionIssue):
     suggestions: Tuple[str, ...]
 
     @staticmethod
-    def from_parameters(  # noqa: D
+    def from_parameters(  # noqa: D102
         parent_issues: Sequence[MetricFlowQueryResolutionIssue],
         query_resolution_path: MetricFlowQueryResolutionPath,
         input_suggestions: Sequence[str],

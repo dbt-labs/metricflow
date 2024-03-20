@@ -13,20 +13,20 @@ from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY
 logger = logging.getLogger(__name__)
 
 
-def test_literals() -> None:  # noqa: D
+def test_literals() -> None:  # noqa: D103
     assert mf_pformat(1) == "1"
     assert mf_pformat(1.0) == "1.0"
     assert mf_pformat("foo") == "'foo'"
 
 
-def test_containers() -> None:  # noqa: D
+def test_containers() -> None:  # noqa: D103
     assert mf_pformat((1,)) == "(1,)"
     assert mf_pformat(((1, 2), 3)) == "((1, 2), 3)"
     assert mf_pformat([[1, 2], 3]) == "[[1, 2], 3]"
     assert mf_pformat({"a": ((1, 2), 3), (1, 2): 3}) == "{'a': ((1, 2), 3), (1, 2): 3}"
 
 
-def test_classes() -> None:  # noqa: D
+def test_classes() -> None:  # noqa: D103
     assert "TimeDimensionSpec('metric_time', DAY)" == mf_pformat(
         MTD_SPEC_DAY,
         include_object_field_names=False,
@@ -125,13 +125,13 @@ def test_multi_line_key_value_dict_short_value() -> None:
     )
 
 
-def test_pydantic_model() -> None:  # noqa: D
+def test_pydantic_model() -> None:  # noqa: D103
     assert "PydanticDimension(name='foo', type=CATEGORICAL, is_partition=False)" == mf_pformat(
         PydanticDimension(name="foo", type=DimensionType.CATEGORICAL)
     )
 
 
-def test_pformat_many() -> None:  # noqa: D
+def test_pformat_many() -> None:  # noqa: D103
     result = mf_pformat_many("Example description:", obj_dict={"object_0": (1, 2, 3), "object_1": {4: 5}})
 
     assert (
@@ -150,7 +150,7 @@ def test_pformat_many() -> None:  # noqa: D
     )
 
 
-def test_pformat_many_with_raw_strings() -> None:  # noqa: D
+def test_pformat_many_with_raw_strings() -> None:  # noqa: D103
     result = mf_pformat_many("Example description:", obj_dict={"object_0": "foo\nbar"}, preserve_raw_strings=True)
 
     assert (
@@ -167,7 +167,7 @@ def test_pformat_many_with_raw_strings() -> None:  # noqa: D
     )
 
 
-def test_pformat_many_with_strings() -> None:  # noqa: D
+def test_pformat_many_with_strings() -> None:  # noqa: D103
     result = mf_pformat_many("Example description:", obj_dict={"object_0": "foo\nbar"})
     assert (
         textwrap.dedent(

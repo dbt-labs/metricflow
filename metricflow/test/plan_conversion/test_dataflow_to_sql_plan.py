@@ -116,7 +116,7 @@ def convert_and_check(
 
 
 @pytest.mark.sql_engine_snapshot
-def test_source_node(  # noqa: D
+def test_source_node(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
@@ -138,7 +138,7 @@ def test_source_node(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_filter_node(  # noqa: D
+def test_filter_node(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
@@ -166,7 +166,7 @@ def test_filter_node(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_filter_with_where_constraint_node(  # noqa: D
+def test_filter_with_where_constraint_node(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     column_association_resolver: ColumnAssociationResolver,
@@ -214,7 +214,7 @@ def test_filter_with_where_constraint_node(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_measure_aggregation_node(  # noqa: D
+def test_measure_aggregation_node(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
@@ -262,7 +262,7 @@ def test_measure_aggregation_node(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_single_join_node(  # noqa: D
+def test_single_join_node(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
@@ -538,7 +538,7 @@ def test_compute_metrics_node_simple_expr(
 
 
 @pytest.mark.sql_engine_snapshot
-def test_join_to_time_spine_node_without_offset(  # noqa: D
+def test_join_to_time_spine_node_without_offset(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
@@ -606,7 +606,7 @@ def test_join_to_time_spine_node_without_offset(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_join_to_time_spine_node_with_offset_window(  # noqa: D
+def test_join_to_time_spine_node_with_offset_window(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
@@ -1065,7 +1065,7 @@ def test_compute_metrics_node_ratio_from_multiple_semantic_models(
 
 
 @pytest.mark.sql_engine_snapshot
-def test_combine_output_node(  # noqa: D
+def test_combine_output_node(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,

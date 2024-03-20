@@ -13,7 +13,7 @@ repos:
   # Faster version of flake8 / isort / etc.
   # Uses ruff.toml for configuration.
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: 'v0.0.260'
+    rev: 'v0.3.3'
     hooks:
     - id: ruff
       verbose: true

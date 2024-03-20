@@ -33,7 +33,7 @@ class InferenceSignalNode(ABC):
     on the property that sibling nodes are mutually exclusive in the hierarchy.
     """
 
-    def __init__(self, parent: Optional[InferenceSignalNode], name: str) -> None:  # noqa: D
+    def __init__(self, parent: Optional[InferenceSignalNode], name: str) -> None:  # noqa: D107
         self.name = name
 
         self.parent = parent
@@ -42,7 +42,7 @@ class InferenceSignalNode(ABC):
         if parent is not None:
             parent.children.append(self)
 
-    def __str__(self) -> str:  # noqa: D
+    def __str__(self) -> str:  # noqa: D105
         return f"InferenceSignalNode: {self.name}"
 
     @property
@@ -65,7 +65,7 @@ class InferenceSignalNode(ABC):
 # This is kinda horrible but there's no way of instancing the tree with type safety without
 # hardcoding it. Having some magic that dynamically assigns attributes could work, but then
 # we lose IDE autocompletion and static checking
-class _TreeNodes:  # noqa: D
+class _TreeNodes:
     root = InferenceSignalNode(None, "UNKNOWN")
     id = InferenceSignalNode(root, "IDENTIFIER")
     foreign_id = InferenceSignalNode(id, "FOREIGN_IDENTIFIER")

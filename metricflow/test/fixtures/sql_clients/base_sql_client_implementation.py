@@ -61,7 +61,7 @@ class BaseSqlClientImplementation(ABC, SqlClient):
         logger.info(f"Finished running the query in {stop - start:.2f}s with {df.shape[0]} row(s) returned")
         return df
 
-    def execute(  # noqa: D
+    def execute(  # noqa: D102
         self,
         stmt: str,
         sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
@@ -123,7 +123,7 @@ class BaseSqlClientImplementation(ABC, SqlClient):
         pass
 
     @abstractmethod
-    def create_table_from_dataframe(  # noqa: D
+    def create_table_from_dataframe(  # noqa: D102
         self,
         sql_table: SqlTable,
         df: pd.DataFrame,
@@ -131,13 +131,13 @@ class BaseSqlClientImplementation(ABC, SqlClient):
     ) -> None:
         pass
 
-    def create_schema(self, schema_name: str) -> None:  # noqa: D
+    def create_schema(self, schema_name: str) -> None:  # noqa: D102
         self.execute(f"CREATE SCHEMA IF NOT EXISTS {schema_name}")
 
-    def drop_schema(self, schema_name: str, cascade: bool = True) -> None:  # noqa: D
+    def drop_schema(self, schema_name: str, cascade: bool = True) -> None:  # noqa: D102
         self.execute(f"DROP SCHEMA IF EXISTS {schema_name}{' CASCADE' if cascade else ''}")
 
-    def close(self) -> None:  # noqa: D
+    def close(self) -> None:  # noqa: D102
         pass
 
     def render_bind_parameter_key(self, bind_parameter_key: str) -> str:

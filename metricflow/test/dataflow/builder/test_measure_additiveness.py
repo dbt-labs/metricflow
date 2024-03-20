@@ -6,7 +6,7 @@ from metricflow.dataflow.builder.measure_additiveness import group_measure_specs
 from metricflow.specs.specs import MeasureSpec, NonAdditiveDimensionSpec
 
 
-def test_bucket_measure_specs_by_additiveness() -> None:  # noqa: D
+def test_bucket_measure_specs_by_additiveness() -> None:  # noqa: D103
     # Semi-additive Bucket 1
     measure_1 = MeasureSpec(
         element_name="measure_1",

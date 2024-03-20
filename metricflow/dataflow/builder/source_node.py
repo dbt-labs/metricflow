@@ -38,7 +38,7 @@ class SourceNodeSet:
     time_spine_node: MetricTimeDimensionTransformNode
 
     @property
-    def all_nodes(self) -> Sequence[BaseOutput]:  # noqa: D
+    def all_nodes(self) -> Sequence[BaseOutput]:  # noqa: D102
         return (
             self.source_nodes_for_metric_queries + self.source_nodes_for_group_by_item_queries + (self.time_spine_node,)
         )
@@ -47,7 +47,7 @@ class SourceNodeSet:
 class SourceNodeBuilder:
     """Helps build a `SourceNodeSet` - refer to that class for more details."""
 
-    def __init__(  # noqa: D
+    def __init__(  # noqa: D107
         self,
         column_association_resolver: ColumnAssociationResolver,
         semantic_manifest_lookup: SemanticManifestLookup,

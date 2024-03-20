@@ -45,7 +45,7 @@ class OffsetMetricRequiresMetricTimeIssue(MetricFlowQueryResolutionIssue):
         )
 
     @staticmethod
-    def from_parameters(  # noqa: D
+    def from_parameters(  # noqa: D102
         metric_reference: MetricReference,
         input_metrics: Sequence[MetricInput],
         query_resolution_path: MetricFlowQueryResolutionPath,

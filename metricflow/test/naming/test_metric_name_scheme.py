@@ -9,19 +9,19 @@ from metricflow.specs.specs import DimensionSpec, InstanceSpec, MetricSpec
 
 
 @pytest.fixture(scope="session")
-def metric_naming_scheme() -> MetricNamingScheme:  # noqa: D
+def metric_naming_scheme() -> MetricNamingScheme:  # noqa: D103
     return MetricNamingScheme()
 
 
-def test_input_str(metric_naming_scheme: MetricNamingScheme) -> None:  # noqa: D
+def test_input_str(metric_naming_scheme: MetricNamingScheme) -> None:  # noqa: D103
     assert metric_naming_scheme.input_str(MetricSpec(element_name="example_metric")) == "example_metric"
 
 
-def test_input_follows_scheme(metric_naming_scheme: MetricNamingScheme) -> None:  # noqa: D
+def test_input_follows_scheme(metric_naming_scheme: MetricNamingScheme) -> None:  # noqa: D103
     assert metric_naming_scheme.input_str_follows_scheme("some_metric_name")
 
 
-def test_spec_pattern(metric_naming_scheme: MetricNamingScheme) -> None:  # noqa: D
+def test_spec_pattern(metric_naming_scheme: MetricNamingScheme) -> None:  # noqa: D103
     spec_pattern = metric_naming_scheme.spec_pattern("metric_0")
 
     specs: Sequence[InstanceSpec] = (

@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 
 @pytest.mark.parametrize("dag_case_id", [case_id.value for case_id in AmbiguousResolutionQueryId])
-def test_ambiguous_metric_time_in_query(  # noqa: D
+def test_ambiguous_metric_time_in_query(  # noqa: D103
     ambiguous_resolution_manifest_lookup: SemanticManifestLookup,
     resolution_dags: Dict[AmbiguousResolutionQueryId, GroupByItemResolutionDag],
     dag_case_id: str,
@@ -63,7 +63,7 @@ def test_ambiguous_metric_time_in_query(  # noqa: D
         assert_values_exhausted(case_id)
 
 
-def test_unavailable_group_by_item_in_derived_metric_parent(  # noqa: D
+def test_unavailable_group_by_item_in_derived_metric_parent(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     naming_scheme: QueryItemNamingScheme,
@@ -91,7 +91,7 @@ def test_unavailable_group_by_item_in_derived_metric_parent(  # noqa: D
     )
 
 
-def test_invalid_group_by_item(  # noqa: D
+def test_invalid_group_by_item(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     naming_scheme: QueryItemNamingScheme,

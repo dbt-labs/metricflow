@@ -79,7 +79,7 @@ class MetricFlowQueryParser:
     TODO: Add fuzzy match results.
     """
 
-    def __init__(  # noqa: D
+    def __init__(  # noqa: D107
         self,
         semantic_manifest_lookup: SemanticManifestLookup,
         where_filter_pattern_factory: WhereFilterPatternFactory = DefaultWhereFilterPatternFactory(),

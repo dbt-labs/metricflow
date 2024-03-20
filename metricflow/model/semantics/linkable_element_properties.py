@@ -27,7 +27,7 @@ class LinkableElementProperties(Enum):
     METRIC_TIME = "metric_time"
 
     @staticmethod
-    def all_properties() -> FrozenSet[LinkableElementProperties]:  # noqa: D
+    def all_properties() -> FrozenSet[LinkableElementProperties]:  # noqa: D102
         return frozenset(
             {
                 LinkableElementProperties.LOCAL,

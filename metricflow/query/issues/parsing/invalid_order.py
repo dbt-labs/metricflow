@@ -22,7 +22,7 @@ class InvalidOrderByItemIssue(MetricFlowQueryResolutionIssue):
     order_by_item_input: ResolverInputForOrderByItem
 
     @staticmethod
-    def from_parameters(  # noqa: D
+    def from_parameters(  # noqa: D102
         order_by_item_input: ResolverInputForOrderByItem,
         query_resolution_path: MetricFlowQueryResolutionPath,
     ) -> InvalidOrderByItemIssue:

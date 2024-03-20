@@ -13,7 +13,7 @@ from metricflow.test.snapshot_utils import (
 )
 
 
-def assert_default_rendered_sql_equal(  # noqa: D
+def assert_default_rendered_sql_equal(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     plan_id: str,
@@ -33,7 +33,7 @@ def assert_default_rendered_sql_equal(  # noqa: D
     )
 
 
-def assert_rendered_sql_equal(  # noqa: D
+def assert_rendered_sql_equal(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     plan_id: str,
@@ -75,7 +75,7 @@ def assert_rendered_sql_from_plan_equal(
     )
 
 
-def assert_sql_plan_text_equal(  # noqa: D
+def assert_sql_plan_text_equal(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     sql_query_plan: SqlQueryPlan,

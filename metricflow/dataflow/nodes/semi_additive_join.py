@@ -88,41 +88,41 @@ class SemiAdditiveJoinNode(BaseOutput):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=parent_nodes)
 
     @classmethod
-    def id_prefix(cls) -> IdPrefix:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D102
         return StaticIdPrefix.DATAFLOW_NODE_SEMI_ADDITIVE_JOIN_ID_PREFIX
 
-    def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_semi_additive_join_node(self)
 
     @property
-    def description(self) -> str:  # noqa: D
+    def description(self) -> str:  # noqa: D102
         return f"""Join on {self.agg_by_function.name}({self.time_dimension_spec.element_name}) and {[i.element_name for i in self.entity_specs]} grouping by {self.queried_time_dimension_spec.element_name if self.queried_time_dimension_spec else None}"""
 
     @property
-    def parent_node(self) -> BaseOutput:  # noqa: D
+    def parent_node(self) -> BaseOutput:  # noqa: D102
         return self._parent_node
 
     @property
-    def entity_specs(self) -> Sequence[LinklessEntitySpec]:  # noqa: D
+    def entity_specs(self) -> Sequence[LinklessEntitySpec]:  # noqa: D102
         return self._entity_specs
 
     @property
-    def time_dimension_spec(self) -> TimeDimensionSpec:  # noqa: D
+    def time_dimension_spec(self) -> TimeDimensionSpec:  # noqa: D102
         return self._time_dimension_spec
 
     @property
-    def agg_by_function(self) -> AggregationType:  # noqa: D
+    def agg_by_function(self) -> AggregationType:  # noqa: D102
         return self._agg_by_function
 
     @property
-    def queried_time_dimension_spec(self) -> Optional[TimeDimensionSpec]:  # noqa: D
+    def queried_time_dimension_spec(self) -> Optional[TimeDimensionSpec]:  # noqa: D102
         return self._queried_time_dimension_spec
 
     @property
-    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
         return super().displayed_properties
 
-    def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D
+    def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D102
         if not isinstance(other_node, self.__class__):
             return False
 
@@ -134,7 +134,7 @@ class SemiAdditiveJoinNode(BaseOutput):
             and other_node.queried_time_dimension_spec == self.queried_time_dimension_spec
         )
 
-    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> SemiAdditiveJoinNode:  # noqa: D
+    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> SemiAdditiveJoinNode:  # noqa: D102
         assert len(new_parent_nodes) == 1
 
         return SemiAdditiveJoinNode(

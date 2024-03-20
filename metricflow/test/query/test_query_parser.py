@@ -193,7 +193,7 @@ def revenue_query_parser() -> MetricFlowQueryParser:  # noqa
     return query_parser_from_yaml([EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, revenue_yaml_file])
 
 
-def test_query_parser(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D
+def test_query_parser(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D103
     query_spec = bookings_query_parser.parse_and_validate_query(
         metric_names=["bookings"],
         group_by_names=["booking__is_instant", "listing", MTD],
@@ -220,7 +220,7 @@ def test_query_parser(bookings_query_parser: MetricFlowQueryParser) -> None:  # 
     )
 
 
-def test_query_parser_case_insensitivity(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D
+def test_query_parser_case_insensitivity(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D103
     # String params
     query_spec = bookings_query_parser.parse_and_validate_query(
         metric_names=["BOOKINGS"],
@@ -279,12 +279,12 @@ def test_query_parser_case_insensitivity(bookings_query_parser: MetricFlowQueryP
     )
 
 
-def test_query_parser_invalid_group_by(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D
+def test_query_parser_invalid_group_by(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D103
     with pytest.raises(InvalidQueryException):
         bookings_query_parser.parse_and_validate_query(group_by_names=["random_stuff"])
 
 
-def test_query_parser_with_object_params(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D
+def test_query_parser_with_object_params(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D103
     metric = MetricParameter(name="bookings")
     group_by = (
         DimensionOrEntityParameter("booking__is_instant"),
@@ -342,7 +342,7 @@ def test_order_by_granularity_conversion() -> None:
     ) == query_spec.order_by_specs
 
 
-def test_order_by_granularity_no_conversion(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D
+def test_order_by_granularity_no_conversion(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D103
     query_spec = bookings_query_parser.parse_and_validate_query(
         metric_names=["bookings"], group_by_names=[MTD], order_by_names=[MTD]
     )
@@ -601,7 +601,7 @@ def test_date_part_parsing() -> None:
     )
 
 
-def test_duplicate_metric_query(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D
+def test_duplicate_metric_query(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D103
     with pytest.raises(InvalidQueryException, match="duplicate metrics"):
         bookings_query_parser.parse_and_validate_query(
             metric_names=["bookings", "bookings"],
@@ -609,12 +609,12 @@ def test_duplicate_metric_query(bookings_query_parser: MetricFlowQueryParser) ->
         )
 
 
-def test_no_metrics_or_group_by(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D
+def test_no_metrics_or_group_by(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D103
     with pytest.raises(InvalidQueryException, match="no metrics or group by items"):
         bookings_query_parser.parse_and_validate_query()
 
 
-def test_offset_metric_with_diff_agg_time_dims_error() -> None:  # noqa: D
+def test_offset_metric_with_diff_agg_time_dims_error() -> None:  # noqa: D103
     metrics_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=METRICS_YAML)
     revenue_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=REVENUE_YAML)
     query_parser = query_parser_from_yaml(

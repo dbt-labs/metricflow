@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 class DataSet(ABC):
     """Describes a set of data that a source node in the dataflow plan contains."""
 
-    def __init__(self, instance_set: InstanceSet) -> None:  # noqa:
+    def __init__(self, instance_set: InstanceSet) -> None:  # noqa: D107
         self._instance_set = instance_set
 
     @property
@@ -67,5 +67,5 @@ class DataSet(ABC):
         """If this data set was created from a semantic model, return the reference."""
         raise NotImplementedError
 
-    def __repr__(self) -> str:  # noqa: D
+    def __repr__(self) -> str:  # noqa: D105
         return f"{self.__class__.__name__}()"

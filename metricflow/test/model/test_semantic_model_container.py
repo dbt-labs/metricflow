@@ -17,20 +17,20 @@ logger = logging.getLogger(__name__)
 
 
 @pytest.fixture
-def semantic_model_lookup(simple_semantic_manifest: SemanticManifest) -> SemanticModelLookup:  # Noqa: D
+def semantic_model_lookup(simple_semantic_manifest: SemanticManifest) -> SemanticModelLookup:  # noqa: D103
     return SemanticModelLookup(
         model=simple_semantic_manifest,
     )
 
 
 @pytest.fixture
-def metric_lookup(  # Noqa: D
+def metric_lookup(  # noqa: D103
     simple_semantic_manifest: SemanticManifest, semantic_model_lookup: SemanticModelLookup
 ) -> MetricLookup:
     return MetricLookup(semantic_manifest=simple_semantic_manifest, semantic_model_lookup=semantic_model_lookup)
 
 
-def test_get_names(  # noqa: D
+def test_get_names(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     semantic_model_lookup: SemanticModelLookup,
@@ -47,7 +47,7 @@ def test_get_names(  # noqa: D
     )
 
 
-def test_get_elements(semantic_model_lookup: SemanticModelLookup) -> None:  # noqa: D
+def test_get_elements(semantic_model_lookup: SemanticModelLookup) -> None:  # noqa: D103
     for dimension_reference in semantic_model_lookup.get_dimension_references():
         assert (
             semantic_model_lookup.get_dimension(dimension_reference=dimension_reference).reference
@@ -58,7 +58,7 @@ def test_get_elements(semantic_model_lookup: SemanticModelLookup) -> None:  # no
         assert semantic_model_lookup.get_measure(measure_reference=measure_reference).reference == measure_reference
 
 
-def test_get_semantic_models_for_measure(semantic_model_lookup: SemanticModelLookup) -> None:  # noqa: D
+def test_get_semantic_models_for_measure(semantic_model_lookup: SemanticModelLookup) -> None:  # noqa: D103
     bookings_sources = semantic_model_lookup.get_semantic_models_for_measure(MeasureReference(element_name="bookings"))
     assert len(bookings_sources) == 1
     assert bookings_sources[0].name == "bookings_source"
@@ -72,7 +72,7 @@ def test_get_semantic_models_for_measure(semantic_model_lookup: SemanticModelLoo
     assert listings_sources[0].name == "listings_latest"
 
 
-def test_elements_for_metric(  # noqa: D
+def test_elements_for_metric(  # noqa: D103
     request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, metric_lookup: MetricLookup
 ) -> None:
     assert_object_snapshot_equal(
@@ -94,7 +94,7 @@ def test_elements_for_metric(  # noqa: D
     )
 
 
-def test_local_linked_elements_for_metric(  # noqa: D
+def test_local_linked_elements_for_metric(  # noqa: D103
     request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, metric_lookup: MetricLookup
 ) -> None:
     assert_object_snapshot_equal(
@@ -112,13 +112,13 @@ def test_local_linked_elements_for_metric(  # noqa: D
     )
 
 
-def test_get_semantic_models_for_entity(semantic_model_lookup: SemanticModelLookup) -> None:  # noqa: D
+def test_get_semantic_models_for_entity(semantic_model_lookup: SemanticModelLookup) -> None:  # noqa: D103
     entity_reference = EntityReference(element_name="user")
     linked_semantic_models = semantic_model_lookup.get_semantic_models_for_entity(entity_reference=entity_reference)
     assert len(linked_semantic_models) == 10
 
 
-def test_linkable_set(  # noqa: D
+def test_linkable_set(  # noqa: D103
     request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, metric_lookup: MetricLookup
 ) -> None:
     assert_linkable_element_set_snapshot_equal(
@@ -159,7 +159,7 @@ def test_linkable_set_for_common_dimensions_in_different_models(
     )
 
 
-def test_get_valid_agg_time_dimensions_for_metric(  # noqa: D
+def test_get_valid_agg_time_dimensions_for_metric(  # noqa: D103
     metric_lookup: MetricLookup, semantic_model_lookup: SemanticModelLookup
 ) -> None:
     for metric_name in ["views", "listings", "bookings_per_view"]:
@@ -179,7 +179,7 @@ def test_get_valid_agg_time_dimensions_for_metric(  # noqa: D
             assert len(metric_agg_time_dims) == 0
 
 
-def test_get_agg_time_dimension_specs_for_measure(semantic_model_lookup: SemanticModelLookup) -> None:  # noqa: D
+def test_get_agg_time_dimension_specs_for_measure(semantic_model_lookup: SemanticModelLookup) -> None:  # noqa: D103
     for measure_name in ["bookings", "views", "listings"]:
         measure_reference = MeasureReference(measure_name)
         agg_time_dim_specs = semantic_model_lookup.get_agg_time_dimension_specs_for_measure(measure_reference)

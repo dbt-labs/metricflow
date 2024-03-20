@@ -13,7 +13,7 @@ from metricflow.test.snapshot_utils import assert_str_snapshot_equal
 
 
 @pytest.mark.sql_engine_snapshot
-def test_simple_fill_nulls_with_0_metric_time(  # noqa: D
+def test_simple_fill_nulls_with_0_metric_time(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
@@ -40,7 +40,7 @@ def test_simple_fill_nulls_with_0_metric_time(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_simple_fill_nulls_with_0_month(  # noqa: D
+def test_simple_fill_nulls_with_0_month(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
@@ -67,7 +67,7 @@ def test_simple_fill_nulls_with_0_month(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_simple_join_to_time_spine(  # noqa: D
+def test_simple_join_to_time_spine(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
@@ -94,7 +94,7 @@ def test_simple_join_to_time_spine(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_fill_nulls_with_0_multi_metric_query(  # noqa: D
+def test_fill_nulls_with_0_multi_metric_query(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
@@ -121,7 +121,7 @@ def test_fill_nulls_with_0_multi_metric_query(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_fill_nulls_with_0_multi_metric_query_with_categorical_dimension(  # noqa: D
+def test_fill_nulls_with_0_multi_metric_query_with_categorical_dimension(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,

@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 @pytest.mark.sql_engine_snapshot
-def test_convert_table_semantic_model_without_measures(  # noqa: D
+def test_convert_table_semantic_model_without_measures(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
@@ -45,7 +45,7 @@ def test_convert_table_semantic_model_without_measures(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_convert_table_semantic_model_with_measures(  # noqa: D
+def test_convert_table_semantic_model_with_measures(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
@@ -80,7 +80,7 @@ def test_convert_table_semantic_model_with_measures(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_convert_query_semantic_model(  # noqa: D
+def test_convert_query_semantic_model(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,

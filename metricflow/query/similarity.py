@@ -8,7 +8,7 @@ import rapidfuzz.process
 
 
 @dataclass(frozen=True)
-class ScoredItem:  # noqa: D
+class ScoredItem:  # noqa: D101
     item_str: str
     # fuzz scores from 0..100, and the higher the score, the better the match.
     score: float

@@ -83,7 +83,7 @@ class CreateSelectColumnsForInstances(InstanceSetTransform[SelectColumnSet]):
         self._column_resolver = column_resolver
         self._output_to_input_column_mapping = output_to_input_column_mapping or OrderedDict()
 
-    def transform(self, instance_set: InstanceSet) -> SelectColumnSet:  # noqa: D
+    def transform(self, instance_set: InstanceSet) -> SelectColumnSet:  # noqa: D102
         metric_cols = list(
             chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.metric_instances])
         )
@@ -171,7 +171,7 @@ class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances)
     Also add an output alias that conforms to the alias
     """
 
-    def __init__(  # noqa: D
+    def __init__(  # noqa: D107
         self,
         table_alias: str,
         column_resolver: ColumnAssociationResolver,
@@ -204,7 +204,7 @@ class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances)
 
         return output_columns
 
-    def _make_sql_column_expression_to_aggregate_measure(  # noqa: D
+    def _make_sql_column_expression_to_aggregate_measure(
         self, measure_instance: MeasureInstance, output_measure_spec: MeasureSpec
     ) -> SqlSelectColumn:
         """Convert one measure instance into a SQL column."""
@@ -236,7 +236,7 @@ class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances)
             column_alias=new_column_name_for_aggregated_measure,
         )
 
-    def transform(self, instance_set: InstanceSet) -> SelectColumnSet:  # noqa: D
+    def transform(self, instance_set: InstanceSet) -> SelectColumnSet:  # noqa: D102
         metric_cols = list(
             chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.metric_instances])
         )
@@ -380,10 +380,10 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
     e.g. "country" -> "user_id__country" after a data set has been joined by entity.
     """
 
-    def __init__(self, join_on_entity: LinklessEntitySpec) -> None:  # noqa: D
+    def __init__(self, join_on_entity: LinklessEntitySpec) -> None:  # noqa: D107
         self._join_on_entity = join_on_entity
 
-    def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D
+    def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D102
         assert len(instance_set.metric_instances) == 0, "Can't add links to instance sets with metrics"
         assert len(instance_set.measure_instances) == 0, "Can't add links to instance sets with measures"
 
@@ -460,7 +460,7 @@ class FilterLinkableInstancesWithLeadingLink(InstanceSetTransform[InstanceSet]):
     e.g. Remove "listing__country" if the specified link is "listing".
     """
 
-    def __init__(  # noqa: D
+    def __init__(
         self,
         entity_link: LinklessEntitySpec,
     ) -> None:
@@ -471,13 +471,13 @@ class FilterLinkableInstancesWithLeadingLink(InstanceSetTransform[InstanceSet]):
         """
         self._entity_link = entity_link
 
-    def _should_pass(self, linkable_spec: LinkableInstanceSpec) -> bool:  # noqa: D
+    def _should_pass(self, linkable_spec: LinkableInstanceSpec) -> bool:
         return (
             len(linkable_spec.entity_links) == 0
             or LinklessEntitySpec.from_reference(linkable_spec.entity_links[0]) != self._entity_link
         )
 
-    def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D
+    def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D102
         # Normal to not filter anything if the instance set has no instances with links.
         filtered_dimension_instances = tuple(x for x in instance_set.dimension_instances if self._should_pass(x.spec))
         filtered_time_dimension_instances = tuple(
@@ -499,7 +499,7 @@ class FilterLinkableInstancesWithLeadingLink(InstanceSetTransform[InstanceSet]):
 class FilterElements(InstanceSetTransform[InstanceSet]):
     """Return an instance set with the elements that don't match any of the pass specs removed."""
 
-    def __init__(  # noqa: D
+    def __init__(
         self,
         include_specs: Optional[InstanceSpecSet] = None,
         exclude_specs: Optional[InstanceSpecSet] = None,
@@ -514,7 +514,7 @@ class FilterElements(InstanceSetTransform[InstanceSet]):
         self._include_specs = include_specs
         self._exclude_specs = exclude_specs
 
-    def _should_pass(self, element_spec: InstanceSpec) -> bool:  # noqa: D
+    def _should_pass(self, element_spec: InstanceSpec) -> bool:
         # TODO: Use better matching function
         if self._include_specs:
             return any(x == element_spec for x in self._include_specs.all_specs)
@@ -522,7 +522,7 @@ class FilterElements(InstanceSetTransform[InstanceSet]):
             return not any(x == element_spec for x in self._exclude_specs.all_specs)
         assert False
 
-    def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D
+    def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D102
         # Sanity check to make sure the specs are in the instance set
 
         if self._include_specs:
@@ -566,7 +566,7 @@ class ChangeMeasureAggregationState(InstanceSetTransform[InstanceSet]):
         """
         self._aggregation_state_changes = aggregation_state_changes
 
-    def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D
+    def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D102
         for measure_instance in instance_set.measure_instances:
             assert measure_instance.aggregation_state in self._aggregation_state_changes, (
                 f"Aggregation state: {measure_instance.aggregation_state} not handled in change dict: "
@@ -623,7 +623,7 @@ class UpdateMeasureFillNullsWith(InstanceSetTransform[InstanceSet]):
 
         return tuple(updated_instances)
 
-    def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D
+    def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D102
         return InstanceSet(
             measure_instances=self._update_fill_nulls_with(instance_set.measure_instances),
             dimension_instances=instance_set.dimension_instances,
@@ -677,7 +677,7 @@ class AliasAggregatedMeasures(InstanceSetTransform[InstanceSet]):
 
         return tuple(aliased_instances)
 
-    def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D
+    def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D102
         return InstanceSet(
             measure_instances=self._alias_measure_instances(instance_set.measure_instances),
             dimension_instances=instance_set.dimension_instances,
@@ -691,10 +691,10 @@ class AliasAggregatedMeasures(InstanceSetTransform[InstanceSet]):
 class AddMetrics(InstanceSetTransform[InstanceSet]):
     """Adds the given metric instances to the instance set."""
 
-    def __init__(self, metric_instances: List[MetricInstance]) -> None:  # noqa: D
+    def __init__(self, metric_instances: List[MetricInstance]) -> None:  # noqa: D107
         self._metric_instances = metric_instances
 
-    def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D
+    def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D102
         return InstanceSet(
             measure_instances=instance_set.measure_instances,
             dimension_instances=instance_set.dimension_instances,
@@ -708,7 +708,7 @@ class AddMetrics(InstanceSetTransform[InstanceSet]):
 class RemoveMeasures(InstanceSetTransform[InstanceSet]):
     """Remove measures from the instance set."""
 
-    def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D
+    def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D102
         return InstanceSet(
             measure_instances=(),
             dimension_instances=instance_set.dimension_instances,
@@ -722,7 +722,7 @@ class RemoveMeasures(InstanceSetTransform[InstanceSet]):
 class RemoveMetrics(InstanceSetTransform[InstanceSet]):
     """Remove metrics from the instance set."""
 
-    def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D
+    def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D102
         return InstanceSet(
             measure_instances=instance_set.measure_instances,
             dimension_instances=instance_set.dimension_instances,
@@ -754,7 +754,7 @@ class CreateSqlColumnReferencesForInstances(InstanceSetTransform[Tuple[SqlColumn
         self._table_alias = table_alias
         self._column_resolver = column_resolver
 
-    def transform(self, instance_set: InstanceSet) -> Tuple[SqlColumnReferenceExpression, ...]:  # noqa: D
+    def transform(self, instance_set: InstanceSet) -> Tuple[SqlColumnReferenceExpression, ...]:  # noqa: D102
         column_names = [
             self._column_resolver.resolve_spec(spec).column_name for spec in instance_set.spec_set.all_specs
         ]
@@ -776,7 +776,7 @@ class CreateSelectColumnForCombineOutputNode(InstanceSetTransform[SelectColumnSe
     come from the given table alias.
     """
 
-    def __init__(  # noqa: D
+    def __init__(  # noqa: D107
         self,
         table_alias: str,
         column_resolver: ColumnAssociationResolver,
@@ -811,9 +811,7 @@ class CreateSelectColumnForCombineOutputNode(InstanceSetTransform[SelectColumnSe
             column_alias=column_name,
         )
 
-    def _create_select_columns_for_metrics(
-        self, metric_instances: Tuple[MetricInstance, ...]
-    ) -> List[SqlSelectColumn]:  # noqa: D
+    def _create_select_columns_for_metrics(self, metric_instances: Tuple[MetricInstance, ...]) -> List[SqlSelectColumn]:
         select_columns: List[SqlSelectColumn] = []
         for metric_instance in metric_instances:
             metric_reference = MetricReference(element_name=metric_instance.defined_from.metric_name)
@@ -826,7 +824,7 @@ class CreateSelectColumnForCombineOutputNode(InstanceSetTransform[SelectColumnSe
             )
         return select_columns
 
-    def _create_select_columns_for_measures(  # noqa: D
+    def _create_select_columns_for_measures(
         self, measure_instances: Tuple[MeasureInstance, ...]
     ) -> List[SqlSelectColumn]:
         select_columns: List[SqlSelectColumn] = []
@@ -837,7 +835,7 @@ class CreateSelectColumnForCombineOutputNode(InstanceSetTransform[SelectColumnSe
             )
         return select_columns
 
-    def transform(self, instance_set: InstanceSet) -> SelectColumnSet:  # noqa: D
+    def transform(self, instance_set: InstanceSet) -> SelectColumnSet:  # noqa: D102
         return SelectColumnSet(
             metric_columns=self._create_select_columns_for_metrics(instance_set.metric_instances),
             measure_columns=self._create_select_columns_for_measures(instance_set.measure_instances),
@@ -874,10 +872,10 @@ class ChangeAssociatedColumns(InstanceSetTransform[InstanceSet]):
             DimensionInstance(column_name="is_lux_latest")
     """
 
-    def __init__(self, column_association_resolver: ColumnAssociationResolver) -> None:  # noqa: D
+    def __init__(self, column_association_resolver: ColumnAssociationResolver) -> None:  # noqa: D107
         self._column_association_resolver = column_association_resolver
 
-    def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D
+    def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D102
         output_measure_instances = []
         for input_measure_instance in instance_set.measure_instances:
             output_measure_instances.append(
@@ -953,10 +951,10 @@ class ChangeAssociatedColumns(InstanceSetTransform[InstanceSet]):
 class ConvertToMetadata(InstanceSetTransform[InstanceSet]):
     """Removes all instances from old instance set and replaces them with a set of metadata instances."""
 
-    def __init__(self, metadata_instances: Sequence[MetadataInstance]) -> None:  # noqa: D
+    def __init__(self, metadata_instances: Sequence[MetadataInstance]) -> None:  # noqa: D107
         self._metadata_instances = metadata_instances
 
-    def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D
+    def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D102
         return InstanceSet(
             metadata_instances=tuple(self._metadata_instances),
         )
@@ -987,10 +985,10 @@ def create_select_columns_for_instance_sets(
 class AddMetadata(InstanceSetTransform[InstanceSet]):
     """Adds the given metric instances to the instance set."""
 
-    def __init__(self, metadata_instances: Sequence[MetadataInstance]) -> None:  # noqa: D
+    def __init__(self, metadata_instances: Sequence[MetadataInstance]) -> None:  # noqa: D107
         self._metadata_instances = metadata_instances
 
-    def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D
+    def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D102
         return InstanceSet(
             measure_instances=instance_set.measure_instances,
             dimension_instances=instance_set.dimension_instances,

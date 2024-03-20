@@ -18,7 +18,7 @@ from metricflow.visitor import VisitorOutputT
 class NoMetricsGroupByItemSourceNode(GroupByItemResolutionNode):
     """Outputs group-by-items that can be queried without any metrics."""
 
-    def __init__(self) -> None:  # noqa: D
+    def __init__(self) -> None:  # noqa: D107
         super().__init__()
 
     @override

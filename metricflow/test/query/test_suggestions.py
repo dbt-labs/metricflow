@@ -24,7 +24,7 @@ from metricflow.test.snapshot_utils import assert_str_snapshot_equal
 logger = logging.getLogger(__name__)
 
 
-def test_suggestions_for_group_by_item(  # noqa: D
+def test_suggestions_for_group_by_item(  # noqa: D103
     request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, query_parser: MetricFlowQueryParser
 ) -> None:
     with pytest.raises(InvalidQueryException) as e:
@@ -38,7 +38,7 @@ def test_suggestions_for_group_by_item(  # noqa: D
     )
 
 
-def test_suggestions_for_metric(  # noqa: D
+def test_suggestions_for_metric(  # noqa: D103
     request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, query_parser: MetricFlowQueryParser
 ) -> None:
     with pytest.raises(InvalidQueryException) as e:
@@ -52,7 +52,7 @@ def test_suggestions_for_metric(  # noqa: D
     )
 
 
-def test_suggestions_for_multiple_metrics(  # noqa: D
+def test_suggestions_for_multiple_metrics(  # noqa: D103
     request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, query_parser: MetricFlowQueryParser
 ) -> None:
     with pytest.raises(InvalidQueryException) as e:
@@ -66,7 +66,7 @@ def test_suggestions_for_multiple_metrics(  # noqa: D
     )
 
 
-def test_suggestions_for_defined_where_filter(  # noqa: D
+def test_suggestions_for_defined_where_filter(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     simple_semantic_manifest: PydanticSemanticManifest,

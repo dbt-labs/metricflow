@@ -325,7 +325,7 @@ def test_foreign_target_instance_set_join_validation(
     )
 
 
-def test_get_joinable_semantic_models_single_hop(  # noqa: D
+def test_get_joinable_semantic_models_single_hop(  # noqa: D103
     partitioned_multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     semantic_model_reference = SemanticModelReference(semantic_model_name="account_month_txns")
@@ -352,7 +352,7 @@ def test_get_joinable_semantic_models_single_hop(  # noqa: D
     )
 
 
-def test_get_joinable_semantic_models_multi_hop(  # noqa: D
+def test_get_joinable_semantic_models_multi_hop(  # noqa: D103
     partitioned_multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     semantic_model_reference = SemanticModelReference(semantic_model_name="account_month_txns")

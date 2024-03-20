@@ -8,7 +8,7 @@ from metricflow.protocols.sql_client import SqlClient
 from metricflow.time.time_constants import ISO8601_PYTHON_TS_FORMAT
 
 
-def test_date_spine_date_range(  # noqa: D
+def test_date_spine_date_range(  # noqa: D103
     sql_client: SqlClient,
     simple_semantic_manifest_lookup: SemanticManifestLookup,
     create_source_tables: None,

@@ -17,7 +17,7 @@ class MetricFlowQueryResolutionPath(PathPrefixable):
     resolution_path_nodes: Tuple[GroupByItemResolutionNode, ...]
 
     @staticmethod
-    def empty_instance() -> MetricFlowQueryResolutionPath:  # noqa: D
+    def empty_instance() -> MetricFlowQueryResolutionPath:  # noqa: D102
         return MetricFlowQueryResolutionPath(
             resolution_path_nodes=(),
         )
@@ -28,7 +28,7 @@ class MetricFlowQueryResolutionPath(PathPrefixable):
         return self.resolution_path_nodes[-1]
 
     @property
-    def ui_description(self) -> str:  # noqa: D
+    def ui_description(self) -> str:  # noqa: D102
         if len(self.resolution_path_nodes) == 0:
             return "[Empty Path]"
         descriptions = tuple(f"[Resolve {path_node.ui_description}]" for path_node in self.resolution_path_nodes)

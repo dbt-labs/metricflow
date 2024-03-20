@@ -24,7 +24,7 @@ from metricflow.test.query_rendering.compare_rendered_query import convert_and_c
 
 
 @pytest.mark.sql_engine_snapshot
-def test_simple_query_with_date_part(  # noqa: D
+def test_simple_query_with_date_part(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -50,7 +50,7 @@ def test_simple_query_with_date_part(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_simple_query_with_multiple_date_parts(  # noqa: D
+def test_simple_query_with_multiple_date_parts(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -81,7 +81,7 @@ def test_simple_query_with_multiple_date_parts(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_offset_window_with_date_part(  # noqa: D
+def test_offset_window_with_date_part(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,

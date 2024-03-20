@@ -121,7 +121,7 @@ class CLIContext:
         return results
 
     @property
-    def mf(self) -> MetricFlowEngine:  # noqa: D
+    def mf(self) -> MetricFlowEngine:  # noqa: D102
         if self._mf is None:
             self._mf = MetricFlowEngine(
                 semantic_manifest_lookup=self.semantic_manifest_lookup,
@@ -135,7 +135,7 @@ class CLIContext:
         self._semantic_manifest_lookup = SemanticManifestLookup(self.semantic_manifest)
 
     @property
-    def semantic_manifest_lookup(self) -> SemanticManifestLookup:  # noqa: D
+    def semantic_manifest_lookup(self) -> SemanticManifestLookup:  # noqa: D102
         if self._semantic_manifest_lookup is None:
             self._build_semantic_manifest_lookup()
         assert self._semantic_manifest_lookup is not None

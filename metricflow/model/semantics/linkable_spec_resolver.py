@@ -63,7 +63,7 @@ class LinkableDimension:
     date_part: Optional[DatePart]
 
     @property
-    def path_key(self) -> ElementPathKey:  # noqa: D
+    def path_key(self) -> ElementPathKey:  # noqa: D102
         return ElementPathKey(
             element_name=self.element_name,
             entity_links=self.entity_links,
@@ -72,7 +72,7 @@ class LinkableDimension:
         )
 
     @property
-    def reference(self) -> DimensionReference:  # noqa: D
+    def reference(self) -> DimensionReference:  # noqa: D102
         return DimensionReference(element_name=self.element_name)
 
 
@@ -88,7 +88,7 @@ class LinkableEntity:
     join_path: Tuple[SemanticModelJoinPathElement, ...]
 
     @property
-    def path_key(self) -> ElementPathKey:  # noqa: D
+    def path_key(self) -> ElementPathKey:  # noqa: D102
         return ElementPathKey(
             element_name=self.element_name,
             entity_links=self.entity_links,
@@ -256,7 +256,7 @@ class LinkableElementSet:
         )
 
     @property
-    def as_spec_set(self) -> LinkableSpecSet:  # noqa: D
+    def as_spec_set(self) -> LinkableSpecSet:  # noqa: D102
         return LinkableSpecSet(
             dimension_specs=tuple(
                 DimensionSpec(
@@ -532,7 +532,7 @@ class ValidLinkableSpecResolver:
 
         logger.info(f"Building valid group-by-item indexes took: {time.time() - start_time:.2f}s")
 
-    def _get_semantic_model_for_measure(self, measure_reference: MeasureReference) -> SemanticModel:  # noqa: D
+    def _get_semantic_model_for_measure(self, measure_reference: MeasureReference) -> SemanticModel:
         semantic_models_where_measure_was_found = []
         for semantic_model in self._semantic_models:
             if any([x.reference.element_name == measure_reference.element_name for x in semantic_model.measures]):
@@ -708,13 +708,15 @@ class ValidLinkableSpecResolver:
                         join_path=(),
                         # Anything that's not at the base time granularity of the measure's aggregation time dimension
                         # should be considered derived.
-                        properties=frozenset({LinkableElementProperties.METRIC_TIME})
-                        if time_granularity is defined_granularity and date_part is None
-                        else frozenset(
-                            {
-                                LinkableElementProperties.METRIC_TIME,
-                                LinkableElementProperties.DERIVED_TIME_GRANULARITY,
-                            }
+                        properties=(
+                            frozenset({LinkableElementProperties.METRIC_TIME})
+                            if time_granularity is defined_granularity and date_part is None
+                            else frozenset(
+                                {
+                                    LinkableElementProperties.METRIC_TIME,
+                                    LinkableElementProperties.DERIVED_TIME_GRANULARITY,
+                                }
+                            )
                         ),
                         time_granularity=time_granularity,
                         date_part=date_part,

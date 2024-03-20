@@ -85,7 +85,7 @@ def convert_to_datetime(datetime_str: Optional[str]) -> Optional[dt.datetime]:
         raise click.BadParameter("must be valid iso8601 timestamp")
 
 
-def parse_comma_separated_inputs(value: Optional[str]) -> Optional[List[str]]:  # noqa: D
+def parse_comma_separated_inputs(value: Optional[str]) -> Optional[List[str]]:  # noqa: D103
     # If comma exist, explode this into a list and return
     if value is None:
         return None

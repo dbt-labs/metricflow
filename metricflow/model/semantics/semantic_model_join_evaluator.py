@@ -70,7 +70,7 @@ class SemanticModelJoinEvaluator:
         SemanticModelEntityJoinType(left_entity_type=EntityType.NATURAL, right_entity_type=EntityType.NATURAL),
     )
 
-    def __init__(self, semantic_model_lookup: SemanticModelAccessor) -> None:  # noqa: D
+    def __init__(self, semantic_model_lookup: SemanticModelAccessor) -> None:  # noqa: D107
         self._semantic_model_lookup = semantic_model_lookup
 
     def get_joinable_semantic_models(

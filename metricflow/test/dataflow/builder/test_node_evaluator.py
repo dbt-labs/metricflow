@@ -59,7 +59,7 @@ def make_multihop_node_evaluator(
     source_node_set: SourceNodeSet,
     semantic_manifest_lookup_with_multihop_links: SemanticManifestLookup,
     desired_linkable_specs: Sequence[LinkableInstanceSpec],
-) -> NodeEvaluatorForLinkableInstances:  # noqa: D
+) -> NodeEvaluatorForLinkableInstances:
     """Return a node evaluator using the nodes in multihop_semantic_model_name_to_nodes."""
     node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver = DataflowPlanNodeOutputDataSetResolver(
         column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup_with_multihop_links),
@@ -92,7 +92,7 @@ def make_multihop_node_evaluator(
     )
 
 
-def test_node_evaluator_with_no_linkable_specs(  # noqa: D
+def test_node_evaluator_with_no_linkable_specs(  # noqa: D103
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     node_evaluator: NodeEvaluatorForLinkableInstances,
 ) -> None:
@@ -107,7 +107,7 @@ def test_node_evaluator_with_no_linkable_specs(  # noqa: D
     )
 
 
-def test_node_evaluator_with_unjoinable_specs(  # noqa: D
+def test_node_evaluator_with_unjoinable_specs(  # noqa: D103
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     node_evaluator: NodeEvaluatorForLinkableInstances,
 ) -> None:
@@ -137,7 +137,7 @@ def test_node_evaluator_with_unjoinable_specs(  # noqa: D
     )
 
 
-def test_node_evaluator_with_local_spec(  # noqa: D
+def test_node_evaluator_with_local_spec(
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     node_evaluator: NodeEvaluatorForLinkableInstances,
 ) -> None:
@@ -158,7 +158,7 @@ def test_node_evaluator_with_local_spec(  # noqa: D
     )
 
 
-def test_node_evaluator_with_local_spec_using_primary_entity(  # noqa: D
+def test_node_evaluator_with_local_spec_using_primary_entity(
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     node_evaluator: NodeEvaluatorForLinkableInstances,
 ) -> None:
@@ -189,7 +189,7 @@ def test_node_evaluator_with_local_spec_using_primary_entity(  # noqa: D
     )
 
 
-def test_node_evaluator_with_joined_spec(  # noqa: D
+def test_node_evaluator_with_joined_spec(
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     node_evaluator: NodeEvaluatorForLinkableInstances,
 ) -> None:
@@ -250,7 +250,7 @@ def test_node_evaluator_with_joined_spec(  # noqa: D
     )
 
 
-def test_node_evaluator_with_joined_spec_on_unique_id(  # noqa: D
+def test_node_evaluator_with_joined_spec_on_unique_id(
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     node_evaluator: NodeEvaluatorForLinkableInstances,
 ) -> None:
@@ -298,7 +298,7 @@ def test_node_evaluator_with_joined_spec_on_unique_id(  # noqa: D
     )
 
 
-def test_node_evaluator_with_multiple_joined_specs(  # noqa: D
+def test_node_evaluator_with_multiple_joined_specs(
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     node_evaluator: NodeEvaluatorForLinkableInstances,
 ) -> None:
@@ -369,7 +369,7 @@ def test_node_evaluator_with_multiple_joined_specs(  # noqa: D
     )
 
 
-def test_node_evaluator_with_multihop_joined_spec(  # noqa: D
+def test_node_evaluator_with_multihop_joined_spec(
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     partitioned_multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
@@ -444,7 +444,7 @@ def test_node_evaluator_with_multihop_joined_spec(  # noqa: D
     )
 
 
-def test_node_evaluator_with_partition_joined_spec(  # noqa: D
+def test_node_evaluator_with_partition_joined_spec(
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     node_evaluator: NodeEvaluatorForLinkableInstances,
 ) -> None:

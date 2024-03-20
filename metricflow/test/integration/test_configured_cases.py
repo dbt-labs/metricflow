@@ -52,7 +52,7 @@ logger = logging.getLogger(__name__)
 class CheckQueryHelpers:
     """Functions that can be used to help render check queries in integration tests."""
 
-    def __init__(self, sql_client: SqlClient) -> None:  # noqa:D
+    def __init__(self, sql_client: SqlClient) -> None:  # noqa: D107
         self._sql_client = sql_client
 
     def render_time_constraint(
@@ -301,29 +301,31 @@ def test_case(
             limit=case.limit,
             time_constraint_start=parser.parse(case.time_constraint[0]) if case.time_constraint else None,
             time_constraint_end=parser.parse(case.time_constraint[1]) if case.time_constraint else None,
-            where_constraint=jinja2.Template(
-                case.where_filter,
-                undefined=jinja2.StrictUndefined,
-            ).render(
-                source_schema=mf_test_configuration.mf_source_schema,
-                render_time_constraint=check_query_helpers.render_time_constraint,
-                render_between_time_constraint=check_query_helpers.render_between_time_constraint,
-                TimeGranularity=TimeGranularity,
-                DatePart=DatePart,
-                render_date_sub=check_query_helpers.render_date_sub,
-                render_date_trunc=check_query_helpers.render_date_trunc,
-                render_extract=check_query_helpers.render_extract,
-                render_percentile_expr=check_query_helpers.render_percentile_expr,
-                mf_time_spine_source=semantic_manifest_lookup.time_spine_source.spine_table.sql,
-                double_data_type_name=check_query_helpers.double_data_type_name,
-                render_dimension_template=check_query_helpers.render_dimension_template,
-                render_entity_template=check_query_helpers.render_entity_template,
-                render_time_dimension_template=check_query_helpers.render_time_dimension_template,
-                generate_random_uuid=check_query_helpers.generate_random_uuid,
-                cast_to_ts=check_query_helpers.cast_to_ts,
-            )
-            if case.where_filter
-            else None,
+            where_constraint=(
+                jinja2.Template(
+                    case.where_filter,
+                    undefined=jinja2.StrictUndefined,
+                ).render(
+                    source_schema=mf_test_configuration.mf_source_schema,
+                    render_time_constraint=check_query_helpers.render_time_constraint,
+                    render_between_time_constraint=check_query_helpers.render_between_time_constraint,
+                    TimeGranularity=TimeGranularity,
+                    DatePart=DatePart,
+                    render_date_sub=check_query_helpers.render_date_sub,
+                    render_date_trunc=check_query_helpers.render_date_trunc,
+                    render_extract=check_query_helpers.render_extract,
+                    render_percentile_expr=check_query_helpers.render_percentile_expr,
+                    mf_time_spine_source=semantic_manifest_lookup.time_spine_source.spine_table.sql,
+                    double_data_type_name=check_query_helpers.double_data_type_name,
+                    render_dimension_template=check_query_helpers.render_dimension_template,
+                    render_entity_template=check_query_helpers.render_entity_template,
+                    render_time_dimension_template=check_query_helpers.render_time_dimension_template,
+                    generate_random_uuid=check_query_helpers.generate_random_uuid,
+                    cast_to_ts=check_query_helpers.cast_to_ts,
+                )
+                if case.where_filter
+                else None
+            ),
             order_by_names=case.order_bys,
             min_max_only=case.min_max_only,
         )

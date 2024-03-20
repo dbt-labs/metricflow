@@ -32,7 +32,7 @@ class InputToIssueSetMapping(Mergeable, Sized):
     items: Tuple[InputToIssueSetMappingItem, ...]
 
     @property
-    def has_issues(self) -> bool:  # noqa: D
+    def has_issues(self) -> bool:  # noqa: D102
         return any(item.issue_set.has_issues for item in self.items)
 
     @property
@@ -52,7 +52,7 @@ class InputToIssueSetMapping(Mergeable, Sized):
         )
 
     @staticmethod
-    def from_one_item(  # noqa: D
+    def from_one_item(  # noqa: D102
         resolver_input: MetricFlowQueryResolverInput, issue_set: MetricFlowQueryResolutionIssueSet
     ) -> InputToIssueSetMapping:
         return InputToIssueSetMapping(
@@ -92,5 +92,5 @@ class MetricFlowQueryResolution:
         return self.query_spec
 
     @property
-    def has_errors(self) -> bool:  # noqa: D
+    def has_errors(self) -> bool:  # noqa: D102
         return self.input_to_issue_set.has_issues or self.filter_spec_lookup.has_errors

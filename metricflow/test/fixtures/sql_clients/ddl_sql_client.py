@@ -42,6 +42,6 @@ class SqlClientWithDDLMethods(SqlClient, Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    def drop_schema(self, schema_name: str, cascade: bool) -> None:  # noqa: D
+    def drop_schema(self, schema_name: str, cascade: bool) -> None:
         """Drop the given schema if it exists. If cascade is set, drop the tables in the schema first."""
         raise NotImplementedError

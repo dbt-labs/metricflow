@@ -11,14 +11,14 @@ logger = logging.getLogger(__name__)
 
 
 @pytest.fixture
-def telemetry_reporter() -> TelemetryReporter:  # noqa: D
+def telemetry_reporter() -> TelemetryReporter:  # noqa: D103
     reporter = TelemetryReporter(report_levels_higher_or_equal_to=TelemetryLevel.USAGE)
     reporter.add_python_log_handler()
     reporter.add_test_handler()
     return reporter
 
 
-def test_function_call(telemetry_reporter: TelemetryReporter) -> None:  # noqa: D
+def test_function_call(telemetry_reporter: TelemetryReporter) -> None:  # noqa: D103
     @log_call(telemetry_reporter=telemetry_reporter, module_name=__name__)
     def test_function() -> str:
         return "foo"
@@ -36,7 +36,7 @@ def test_function_call(telemetry_reporter: TelemetryReporter) -> None:  # noqa: 
     assert end_event.runtime > 0
 
 
-def test_function_exception(telemetry_reporter: TelemetryReporter) -> None:  # noqa: D
+def test_function_exception(telemetry_reporter: TelemetryReporter) -> None:  # noqa: D103
     with pytest.raises(ValueError):
 
         @log_call(telemetry_reporter=telemetry_reporter, module_name=__name__)
@@ -58,7 +58,7 @@ def test_function_exception(telemetry_reporter: TelemetryReporter) -> None:  # n
     assert end_event.runtime > 0
 
 
-def test_telemetry_off() -> None:  # noqa: D
+def test_telemetry_off() -> None:  # noqa: D103
     reporter = TelemetryReporter(report_levels_higher_or_equal_to=TelemetryLevel.OFF)
     reporter.add_python_log_handler()
     reporter.add_test_handler()

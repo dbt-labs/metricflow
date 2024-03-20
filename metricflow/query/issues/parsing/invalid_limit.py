@@ -19,9 +19,9 @@ class InvalidLimitIssue(MetricFlowQueryResolutionIssue):
     limit: int
 
     @staticmethod
-    def from_parameters(  # noqa: D
+    def from_parameters(  # noqa: D102
         limit: int, query_resolution_path: MetricFlowQueryResolutionPath
-    ) -> InvalidLimitIssue:
+    ) -> InvalidLimitIssue:  # noqa: D102
         return InvalidLimitIssue(
             issue_type=MetricFlowQueryIssueType.ERROR,
             parent_issues=(),

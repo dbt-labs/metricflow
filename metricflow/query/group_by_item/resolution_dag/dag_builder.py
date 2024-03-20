@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 class GroupByItemResolutionDagBuilder:
     """Builds a GroupByItemResolutionDag that can be used to resolve group-by-item specs from spec patterns."""
 
-    def __init__(self, manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D
+    def __init__(self, manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D107
         self._manifest_lookup = manifest_lookup
 
     def _build_dag_component_for_metric(

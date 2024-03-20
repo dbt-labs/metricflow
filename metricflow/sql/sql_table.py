@@ -5,7 +5,7 @@ from enum import Enum
 from typing import Optional, Tuple, Union
 
 
-class SqlTableType(Enum):  # noqa: D
+class SqlTableType(Enum):  # noqa: D101
     TABLE = "table"
     VIEW = "view"
 
@@ -20,7 +20,7 @@ class SqlTable:
     table_type: SqlTableType = SqlTableType.TABLE
 
     @staticmethod
-    def from_string(sql_str: str) -> SqlTable:  # noqa: D
+    def from_string(sql_str: str) -> SqlTable:  # noqa: D102
         sql_str_split = sql_str.split(".")
         if len(sql_str_split) == 2:
             return SqlTable(schema_name=sql_str_split[0], table_name=sql_str_split[1])

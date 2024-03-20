@@ -43,7 +43,7 @@ def test_multithread_dag_to_text() -> None:
         ),
     )
 
-    def _run_mf_pformat() -> None:  # noqa: D
+    def _run_mf_pformat() -> None:
         current_thread = threading.current_thread()
         logger.debug(f"In {current_thread} - Starting .dag_to_text()")
         # Sleep a little bit so that all threads are likely to be running simultaneously.

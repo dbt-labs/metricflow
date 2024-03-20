@@ -36,7 +36,7 @@ class JoinDescription:
 
     validity_window: Optional[ValidityWindowJoinDescription] = None
 
-    def __post_init__(self) -> None:  # noqa: D
+    def __post_init__(self) -> None:  # noqa: D105
         if self.join_on_entity is None and self.join_type != SqlJoinType.CROSS_JOIN:
             raise RuntimeError("`join_on_entity` is required unless using CROSS JOIN.")
 
@@ -67,32 +67,32 @@ class JoinToBaseOutputNode(BaseOutput):
         super().__init__(node_id=node_id or self.create_unique_id(), parent_nodes=parent_nodes)
 
     @classmethod
-    def id_prefix(cls) -> IdPrefix:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D102
         return StaticIdPrefix.DATAFLOW_NODE_JOIN_TO_STANDARD_OUTPUT_ID_PREFIX
 
-    def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_join_to_base_output_node(self)
 
     @property
-    def description(self) -> str:  # noqa: D
+    def description(self) -> str:  # noqa: D102
         return """Join Standard Outputs"""
 
     @property
-    def left_node(self) -> BaseOutput:  # noqa: D
+    def left_node(self) -> BaseOutput:  # noqa: D102
         return self._left_node
 
     @property
-    def join_targets(self) -> Sequence[JoinDescription]:  # noqa: D
+    def join_targets(self) -> Sequence[JoinDescription]:  # noqa: D102
         return self._join_targets
 
     @property
-    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
         return tuple(super().displayed_properties) + tuple(
             DisplayedProperty(f"join{i}_for_node_id_{join_description.join_node.node_id}", join_description)
             for i, join_description in enumerate(self._join_targets)
         )
 
-    def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D
+    def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D102
         if not isinstance(other_node, self.__class__) or len(self.join_targets) != len(other_node.join_targets):
             return False
 
@@ -108,7 +108,7 @@ class JoinToBaseOutputNode(BaseOutput):
                 return False
         return True
 
-    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> JoinToBaseOutputNode:  # noqa: D
+    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> JoinToBaseOutputNode:  # noqa: D102
         assert len(new_parent_nodes) > 1
         new_left_node = new_parent_nodes[0]
         new_join_nodes = new_parent_nodes[1:]

@@ -30,7 +30,7 @@ def format_with_first_or_last(time_granularity: TimeGranularity) -> bool:
     return time_granularity in [TimeGranularity.MONTH, TimeGranularity.QUARTER, TimeGranularity.YEAR]
 
 
-def is_period_start(time_granularity: TimeGranularity, date: Union[pd.Timestamp, date]) -> bool:  # noqa: D
+def is_period_start(time_granularity: TimeGranularity, date: Union[pd.Timestamp, date]) -> bool:  # noqa: D103
     pd_date = pd.Timestamp(date)
 
     if time_granularity is TimeGranularity.DAY:
@@ -47,7 +47,7 @@ def is_period_start(time_granularity: TimeGranularity, date: Union[pd.Timestamp,
         assert_values_exhausted(time_granularity)
 
 
-def is_period_end(time_granularity: TimeGranularity, date: Union[pd.Timestamp, date]) -> bool:  # noqa: D
+def is_period_end(time_granularity: TimeGranularity, date: Union[pd.Timestamp, date]) -> bool:  # noqa: D103
     pd_date = pd.Timestamp(date)
 
     if time_granularity is TimeGranularity.DAY:
@@ -64,7 +64,7 @@ def is_period_end(time_granularity: TimeGranularity, date: Union[pd.Timestamp, d
         assert_values_exhausted(time_granularity)
 
 
-def period_begin_offset(  # noqa: D
+def period_begin_offset(  # noqa: D103
     time_granularity: TimeGranularity,
 ) -> Union[pd.offsets.MonthBegin, pd.offsets.QuarterBegin, pd.offsets.Week, pd.offsets.YearBegin]:
     if time_granularity is TimeGranularity.DAY:
@@ -81,7 +81,7 @@ def period_begin_offset(  # noqa: D
         assert_values_exhausted(time_granularity)
 
 
-def period_end_offset(  # noqa: D
+def period_end_offset(  # noqa: D103
     time_granularity: TimeGranularity,
 ) -> Union[pd.offsets.MonthEnd, pd.offsets.QuarterEnd, pd.offsets.Week, pd.offsets.YearEnd]:
     if time_granularity is TimeGranularity.DAY:
@@ -164,6 +164,6 @@ class ISOWeekDay(ExtendedEnum):
         return self.value - 1
 
 
-def string_to_time_granularity(s: str) -> TimeGranularity:  # noqa: D
+def string_to_time_granularity(s: str) -> TimeGranularity:  # noqa: D103
     values = {item.value: item for item in TimeGranularity}
     return values[s]

@@ -37,7 +37,7 @@ class NoCommonItemsInParents(MetricFlowQueryResolutionIssue):
     parent_candidate_sets: Tuple[GroupByItemCandidateSet, ...]
 
     @staticmethod
-    def from_parameters(  # noqa: D
+    def from_parameters(  # noqa: D102
         query_resolution_path: MetricFlowQueryResolutionPath,
         parent_node_to_candidate_set: Dict[GroupByItemResolutionNode, GroupByItemCandidateSet],
         parent_issues: Sequence[MetricFlowQueryResolutionIssue],

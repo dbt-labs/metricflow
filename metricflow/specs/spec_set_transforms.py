@@ -8,7 +8,7 @@ from metricflow.specs.specs import InstanceSpecSet, InstanceSpecSetTransform
 class ToElementNameSet(InstanceSpecSetTransform[Set[str]]):
     """Gets all element names for all specs in the set."""
 
-    def transform(self, spec_set: InstanceSpecSet) -> Set[str]:  # noqa: D
+    def transform(self, spec_set: InstanceSpecSet) -> Set[str]:  # noqa: D102
         return (
             {x.element_name for x in spec_set.metric_specs}
             .union({x.element_name for x in spec_set.measure_specs})

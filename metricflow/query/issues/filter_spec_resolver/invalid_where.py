@@ -23,7 +23,7 @@ class WhereFilterParsingIssue(MetricFlowQueryResolutionIssue):
     parse_exception: Exception
 
     @staticmethod
-    def from_parameters(  # noqa: D
+    def from_parameters(  # noqa: D102
         where_filter: WhereFilter,
         parse_exception: Exception,
         query_resolution_path: MetricFlowQueryResolutionPath,

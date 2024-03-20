@@ -57,7 +57,7 @@ class AvailableGroupByItemsResolution:
 class GroupByItemResolver:
     """Resolves group-by items for potentially ambiguous inputs that are specified in queries / filters."""
 
-    def __init__(  # noqa: D
+    def __init__(  # noqa: D107
         self,
         manifest_lookup: SemanticManifestLookup,
         resolution_dag: GroupByItemResolutionDag,

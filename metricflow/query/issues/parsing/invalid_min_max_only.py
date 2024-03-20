@@ -19,7 +19,7 @@ class InvalidMinMaxOnlyIssue(MetricFlowQueryResolutionIssue):
     min_max_only: bool
 
     @staticmethod
-    def from_parameters(  # noqa: D
+    def from_parameters(  # noqa: D102
         min_max_only: bool, query_resolution_path: MetricFlowQueryResolutionPath
     ) -> InvalidMinMaxOnlyIssue:
         return InvalidMinMaxOnlyIssue(

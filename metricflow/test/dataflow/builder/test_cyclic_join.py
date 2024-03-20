@@ -23,13 +23,13 @@ logger = logging.getLogger(__name__)
 
 
 @pytest.fixture
-def cyclic_join_manifest_dataflow_plan_builder(  # noqa: D
+def cyclic_join_manifest_dataflow_plan_builder(  # noqa: D103
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture]
 ) -> DataflowPlanBuilder:
     return mf_engine_test_fixture_mapping[SemanticManifestSetup.CYCLIC_JOIN_MANIFEST].dataflow_plan_builder
 
 
-def test_cyclic_join(  # noqa: D
+def test_cyclic_join(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     cyclic_join_manifest_dataflow_plan_builder: DataflowPlanBuilder,

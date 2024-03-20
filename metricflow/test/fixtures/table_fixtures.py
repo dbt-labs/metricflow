@@ -25,7 +25,7 @@ CONFIGURED_SOURCE_TABLE_SNAPSHOT_REPOSITORY = SqlTableSnapshotRepository(
 
 
 @pytest.fixture(scope="session")
-def source_table_snapshot_repository() -> SqlTableSnapshotRepository:  # noqa: D
+def source_table_snapshot_repository() -> SqlTableSnapshotRepository:  # noqa: D103
     return CONFIGURED_SOURCE_TABLE_SNAPSHOT_REPOSITORY
 
 

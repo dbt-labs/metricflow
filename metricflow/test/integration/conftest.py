@@ -25,7 +25,7 @@ class IntegrationTestHelpers:
 
 
 @pytest.fixture
-def it_helpers(  # noqa: D
+def it_helpers(  # noqa: D103
     sql_client: SqlClient,
     create_source_tables: bool,
     simple_semantic_manifest_lookup: SemanticManifestLookup,

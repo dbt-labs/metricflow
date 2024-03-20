@@ -23,10 +23,10 @@ from metricflow.specs.specs import LinkableInstanceSpec, TimeDimensionSpec
 logger = logging.getLogger(__name__)
 
 
-class MetricLookup(MetricAccessor):  # noqa: D
-    def __init__(  # noqa: D
+class MetricLookup(MetricAccessor):  # noqa: D101
+    def __init__(  # noqa: D107
         self, semantic_manifest: SemanticManifest, semantic_model_lookup: SemanticModelLookup
-    ) -> None:
+    ) -> None:  # noqa: D107
         self._semantic_manifest = semantic_manifest
         self._metrics: Dict[MetricReference, Metric] = {}
         self._semantic_model_lookup = semantic_model_lookup
@@ -104,7 +104,7 @@ class MetricLookup(MetricAccessor):  # noqa: D
             without_any_of=without_any_property,
         )
 
-    def get_metrics(self, metric_references: Sequence[MetricReference]) -> Sequence[Metric]:  # noqa: D
+    def get_metrics(self, metric_references: Sequence[MetricReference]) -> Sequence[Metric]:  # noqa: D102
         res = []
         for metric_reference in metric_references:
             if metric_reference not in self._metrics:
@@ -116,10 +116,10 @@ class MetricLookup(MetricAccessor):  # noqa: D
         return res
 
     @property
-    def metric_references(self) -> Sequence[MetricReference]:  # noqa: D
+    def metric_references(self) -> Sequence[MetricReference]:  # noqa: D102
         return list(self._metrics.keys())
 
-    def get_metric(self, metric_reference: MetricReference) -> Metric:  # noqa:D
+    def get_metric(self, metric_reference: MetricReference) -> Metric:  # noqa: D102
         if metric_reference not in self._metrics:
             raise MetricNotFoundError(f"Unable to find metric `{metric_reference}`. Perhaps it has not been registered")
         return self._metrics[metric_reference]
@@ -136,9 +136,9 @@ class MetricLookup(MetricAccessor):  # noqa: D
                 )
         self._metrics[metric_reference] = metric
 
-    def configured_input_measure_for_metric(  # noqa: D
+    def configured_input_measure_for_metric(  # noqa: D102
         self, metric_reference: MetricReference
-    ) -> Optional[MetricInputMeasure]:
+    ) -> Optional[MetricInputMeasure]:  # noqa: D102
         metric = self.get_metric(metric_reference=metric_reference)
         if metric.type is MetricType.CUMULATIVE or metric.type is MetricType.SIMPLE:
             assert len(metric.input_measures) == 1, "Simple and cumulative metrics should have one input measure."

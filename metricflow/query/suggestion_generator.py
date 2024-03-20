@@ -25,7 +25,7 @@ class QueryItemSuggestionGenerator:
     # grains. Some additional thought is needed to tweak this as the base grain may not be the best suggestion.
     GROUP_BY_ITEM_CANDIDATE_FILTERS: Tuple[SpecPattern, ...] = (BaseTimeGrainPattern(), NoneDatePartPattern())
 
-    def __init__(  # noqa: D
+    def __init__(  # noqa: D107
         self, input_naming_scheme: QueryItemNamingScheme, input_str: str, candidate_filters: Sequence[SpecPattern]
     ) -> None:
         self._input_naming_scheme = input_naming_scheme

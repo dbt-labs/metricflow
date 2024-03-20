@@ -24,7 +24,7 @@ from metricflow.test.sql.compare_sql_plan import assert_default_rendered_sql_equ
 
 
 @pytest.fixture
-def sql_plan_renderer() -> SqlQueryPlanRenderer:  # noqa: D
+def sql_plan_renderer() -> SqlQueryPlanRenderer:  # noqa: D103
     return DefaultSqlQueryPlanRenderer()
 
 

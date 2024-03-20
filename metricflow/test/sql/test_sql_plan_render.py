@@ -220,7 +220,7 @@ def test_component_rendering(
 
 
 @pytest.mark.sql_engine_snapshot
-def test_render_where(  # noqa: D
+def test_render_where(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
@@ -261,7 +261,7 @@ def test_render_where(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_render_order_by(  # noqa: D
+def test_render_order_by(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
@@ -311,7 +311,7 @@ def test_render_order_by(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_render_limit(  # noqa: D
+def test_render_limit(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
@@ -343,7 +343,7 @@ def test_render_limit(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_render_create_table_as(  # noqa: D
+def test_render_create_table_as(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,

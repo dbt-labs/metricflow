@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 class ExecutionResults:
     """Stores the results from executing the tasks in an execution plan."""
 
-    def __init__(self) -> None:  # noqa: D
+    def __init__(self) -> None:  # noqa: D107
         # Dict from the task to the result.
         self._results: OrderedDict[NodeId, TaskExecutionResult] = OrderedDict()
 
@@ -28,11 +28,11 @@ class ExecutionResults:
         """Returns true if any of the tasks had an error."""
         return any([len(result.errors) > 0 for node_id, result in self._results.items()])
 
-    def get_result(self, task_id: NodeId) -> TaskExecutionResult:  # noqa: D
+    def get_result(self, task_id: NodeId) -> TaskExecutionResult:  # noqa: D102
         assert task_id in self._results
         return self._results[task_id]
 
-    def all_results(self) -> Dict[NodeId, TaskExecutionResult]:  # noqa: D
+    def all_results(self) -> Dict[NodeId, TaskExecutionResult]:  # noqa: D102
         return self._results
 
 
@@ -40,7 +40,7 @@ class ExecutionPlanExecutor(ABC):
     """Runs the tasks in an execution plan."""
 
     @abstractmethod
-    def execute_plan(self, plan: ExecutionPlan) -> ExecutionResults:  # noqa: D
+    def execute_plan(self, plan: ExecutionPlan) -> ExecutionResults:  # noqa: D102
         pass
 
 
@@ -72,7 +72,7 @@ class SequentialPlanExecutor(ExecutionPlanExecutor):
             else:
                 logger.info(f"Task ID: {current_task.node_id} exited unexpectedly")
 
-    def execute_plan(self, plan: ExecutionPlan) -> ExecutionResults:  # noqa: D
+    def execute_plan(self, plan: ExecutionPlan) -> ExecutionResults:  # noqa: D102
         results = ExecutionResults()
 
         for leaf_node in plan.sink_nodes:

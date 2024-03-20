@@ -10,13 +10,13 @@ class CustomerFacingSemanticException(Exception):
     pass
 
 
-class UnableToSatisfyQueryError(CustomerFacingSemanticException):  # noqa:D
-    def __init__(self, error_name: str, context: Optional[Dict[str, str]] = None) -> None:  # noqa:D
+class UnableToSatisfyQueryError(CustomerFacingSemanticException):  # noqa: D101
+    def __init__(self, error_name: str, context: Optional[Dict[str, str]] = None) -> None:
         """Context will be printed as list of items when this is converted to a string."""
         self.error_name = error_name
         self._context = context
 
-    def __str__(self) -> str:  # noqa:D
+    def __str__(self) -> str:  # noqa: D105
         error_lines = ["Unable To Satisfy Query Error: " + self.error_name]
         if self._context:
             for key, value in self._context.items():
@@ -25,23 +25,23 @@ class UnableToSatisfyQueryError(CustomerFacingSemanticException):  # noqa:D
         return "\n".join(error_lines)
 
 
-class SemanticException(Exception):  # noqa:D
+class SemanticException(Exception):  # noqa: D101
     pass
 
 
-class DuplicateMetricError(SemanticException):  # noqa:D
+class DuplicateMetricError(SemanticException):  # noqa: D101
     pass
 
 
-class MetricNotFoundError(SemanticException, KeyError):  # noqa:D
+class MetricNotFoundError(SemanticException, KeyError):  # noqa: D101
     pass
 
 
-class NonExistentMeasureError(SemanticException):  # noqa:D
+class NonExistentMeasureError(SemanticException):  # noqa: D101
     pass
 
 
-class InvalidSemanticModelError(SemanticException):  # noqa:D
+class InvalidSemanticModelError(SemanticException):  # noqa: D101
     pass
 
 
@@ -54,7 +54,7 @@ class ExecutionException(Exception):
 class ModelCreationException(Exception):
     """Exception to represent errors related to the building a model."""
 
-    def __init__(self, msg: str = "") -> None:  # noqa: D
+    def __init__(self, msg: str = "") -> None:  # noqa: D107
         error_msg = "An error occurred when attempting to build the semantic model"
         if msg:
             error_msg += f"\n{msg}"
@@ -80,5 +80,5 @@ class UnknownMetricLinkingError(ValueError):
 class InvalidQuerySyntax(Exception):
     """Raised when query syntax is invalid. Primarily used in the where clause."""
 
-    def __init__(self, msg: str) -> None:  # noqa: D
+    def __init__(self, msg: str) -> None:  # noqa: D107
         super().__init__(msg)

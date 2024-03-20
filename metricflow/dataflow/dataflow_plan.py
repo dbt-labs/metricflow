@@ -81,7 +81,7 @@ class DataflowPlanNode(DagNode, Visitable, ABC):
         raise NotImplementedError
 
     @property
-    def node_type(self) -> Type:  # noqa: D
+    def node_type(self) -> Type:  # noqa: D102
         # TODO: Remove.
         return self.__class__
 
@@ -95,77 +95,77 @@ class DataflowPlanNodeVisitor(Generic[VisitorOutputT], ABC):
     """
 
     @abstractmethod
-    def visit_source_node(self, node: ReadSqlSourceNode) -> VisitorOutputT:  # noqa: D
+    def visit_source_node(self, node: ReadSqlSourceNode) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_join_to_base_output_node(self, node: JoinToBaseOutputNode) -> VisitorOutputT:  # noqa: D
+    def visit_join_to_base_output_node(self, node: JoinToBaseOutputNode) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_aggregate_measures_node(self, node: AggregateMeasuresNode) -> VisitorOutputT:  # noqa: D
+    def visit_aggregate_measures_node(self, node: AggregateMeasuresNode) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_compute_metrics_node(self, node: ComputeMetricsNode) -> VisitorOutputT:  # noqa: D
+    def visit_compute_metrics_node(self, node: ComputeMetricsNode) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_order_by_limit_node(self, node: OrderByLimitNode) -> VisitorOutputT:  # noqa: D
+    def visit_order_by_limit_node(self, node: OrderByLimitNode) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_where_constraint_node(self, node: WhereConstraintNode) -> VisitorOutputT:  # noqa: D
+    def visit_where_constraint_node(self, node: WhereConstraintNode) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_write_to_result_dataframe_node(self, node: WriteToResultDataframeNode) -> VisitorOutputT:  # noqa: D
+    def visit_write_to_result_dataframe_node(self, node: WriteToResultDataframeNode) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_write_to_result_table_node(self, node: WriteToResultTableNode) -> VisitorOutputT:  # noqa: D
+    def visit_write_to_result_table_node(self, node: WriteToResultTableNode) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_pass_elements_filter_node(self, node: FilterElementsNode) -> VisitorOutputT:  # noqa: D
+    def visit_pass_elements_filter_node(self, node: FilterElementsNode) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_combine_aggregated_outputs_node(self, node: CombineAggregatedOutputsNode) -> VisitorOutputT:  # noqa: D
+    def visit_combine_aggregated_outputs_node(self, node: CombineAggregatedOutputsNode) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_constrain_time_range_node(self, node: ConstrainTimeRangeNode) -> VisitorOutputT:  # noqa: D
+    def visit_constrain_time_range_node(self, node: ConstrainTimeRangeNode) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_join_over_time_range_node(self, node: JoinOverTimeRangeNode) -> VisitorOutputT:  # noqa: D
+    def visit_join_over_time_range_node(self, node: JoinOverTimeRangeNode) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_semi_additive_join_node(self, node: SemiAdditiveJoinNode) -> VisitorOutputT:  # noqa: D
+    def visit_semi_additive_join_node(self, node: SemiAdditiveJoinNode) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_metric_time_dimension_transform_node(  # noqa: D
+    def visit_metric_time_dimension_transform_node(  # noqa: D102
         self, node: MetricTimeDimensionTransformNode
-    ) -> VisitorOutputT:
+    ) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode) -> VisitorOutputT:  # noqa: D
+    def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_min_max_node(self, node: MinMaxNode) -> VisitorOutputT:  # noqa: D
+    def visit_min_max_node(self, node: MinMaxNode) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_add_generated_uuid_column_node(self, node: AddGeneratedUuidColumnNode) -> VisitorOutputT:  # noqa: D
+    def visit_add_generated_uuid_column_node(self, node: AddGeneratedUuidColumnNode) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_join_conversion_events_node(self, node: JoinConversionEventsNode) -> VisitorOutputT:  # noqa: D
+    def visit_join_conversion_events_node(self, node: JoinConversionEventsNode) -> VisitorOutputT:  # noqa: D102
         pass
 
 
@@ -197,11 +197,11 @@ class SinkNodeVisitor(Generic[VisitorOutputT], ABC):
     """Similar to DataflowPlanNodeVisitor, but only for sink nodes."""
 
     @abstractmethod
-    def visit_write_to_result_dataframe_node(self, node: WriteToResultDataframeNode) -> VisitorOutputT:  # noqa: D
+    def visit_write_to_result_dataframe_node(self, node: WriteToResultDataframeNode) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_write_to_result_table_node(self, node: WriteToResultTableNode) -> VisitorOutputT:  # noqa: D
+    def visit_write_to_result_table_node(self, node: WriteToResultTableNode) -> VisitorOutputT:  # noqa: D102
         pass
 
 
@@ -209,19 +209,19 @@ class SinkOutput(DataflowPlanNode, ABC):
     """A node where incoming data goes out of the graph."""
 
     @abstractmethod
-    def accept_sink_node_visitor(self, visitor: SinkNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+    def accept_sink_node_visitor(self, visitor: SinkNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         pass
 
     @property
     @abstractmethod
-    def parent_node(self) -> BaseOutput:  # noqa: D
+    def parent_node(self) -> BaseOutput:  # noqa: D102
         pass
 
 
 class DataflowPlan(MetricFlowDag[SinkOutput]):
     """Describes the flow of metric data as it goes from source nodes to sink nodes in the graph."""
 
-    def __init__(self, sink_output_nodes: Sequence[SinkOutput], plan_id: Optional[DagId] = None) -> None:  # noqa: D
+    def __init__(self, sink_output_nodes: Sequence[SinkOutput], plan_id: Optional[DagId] = None) -> None:  # noqa: D107
         if len(sink_output_nodes) == 0:
             raise RuntimeError("Can't create a dataflow plan without sink node(s).")
         self._sink_output_nodes = tuple(sink_output_nodes)
@@ -231,10 +231,10 @@ class DataflowPlan(MetricFlowDag[SinkOutput]):
         )
 
     @property
-    def sink_output_nodes(self) -> Sequence[SinkOutput]:  # noqa: D
+    def sink_output_nodes(self) -> Sequence[SinkOutput]:  # noqa: D102
         return self._sink_output_nodes
 
     @property
-    def sink_output_node(self) -> SinkOutput:  # noqa: D
+    def sink_output_node(self) -> SinkOutput:  # noqa: D102
         assert len(self._sink_output_nodes) == 1, f"Only 1 sink node supported. Got: {self._sink_output_nodes}"
         return self._sink_output_nodes[0]

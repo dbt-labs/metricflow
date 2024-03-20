@@ -59,7 +59,7 @@ class PushDownResult:
     # The issues seen so far while pushing down the result / resolving the ambiguity.
     issue_set: MetricFlowQueryResolutionIssueSet
 
-    def __post_init__(self) -> None:  # noqa: D
+    def __post_init__(self) -> None:  # noqa: D105
         # If there are no errors, there should be a candidate spec in each candidate set.
         # If there are errors, there shouldn't be any candidate sets.
         assert (not self.issue_set.has_errors and not self.candidate_set.is_empty) or (
@@ -93,7 +93,7 @@ class PushDownResult:
 class DagTraversalPathTracker:
     """Helps track the path traveled by a visitor through the nodes in a group-by-tem resolution DAG."""
 
-    def __init__(self) -> None:  # noqa: D
+    def __init__(self) -> None:  # noqa: D107
         self._current_path: List[GroupByItemResolutionNode] = []
 
     @contextmanager
@@ -121,7 +121,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
     parents, the candidates from each parent are intersected and passed to the child node.
     """
 
-    def __init__(  # noqa: D
+    def __init__(
         self,
         manifest_lookup: SemanticManifestLookup,
         suggestion_generator: Optional[QueryItemSuggestionGenerator],
@@ -220,13 +220,15 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
                         NoMatchingItemsForMeasure.from_parameters(
                             parent_issues=(),
                             query_resolution_path=current_traversal_path,
-                            input_suggestions=tuple(
-                                self._suggestion_generator.input_suggestions(
-                                    specs_available_for_measure_given_child_metric
+                            input_suggestions=(
+                                tuple(
+                                    self._suggestion_generator.input_suggestions(
+                                        specs_available_for_measure_given_child_metric
+                                    )
                                 )
-                            )
-                            if self._suggestion_generator is not None
-                            else (),
+                                if self._suggestion_generator is not None
+                                else ()
+                            ),
                         )
                     ),
                 )
@@ -368,9 +370,9 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
             return PushDownResult(
                 candidate_set=GroupByItemCandidateSet(
                     specs=tuple(matched_specs),
-                    measure_paths=merged_result_from_parents.candidate_set.measure_paths
-                    if len(matched_specs) > 0
-                    else (),
+                    measure_paths=(
+                        merged_result_from_parents.candidate_set.measure_paths if len(matched_specs) > 0 else ()
+                    ),
                     path_from_leaf_node=current_traversal_path,
                 ),
                 issue_set=MetricFlowQueryResolutionIssueSet.merge_iterable(issue_sets_to_merge),

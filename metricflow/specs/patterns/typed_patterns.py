@@ -32,7 +32,7 @@ class DimensionPattern(EntityLinkPattern):
         return super().match(filtered_specs)
 
     @staticmethod
-    def from_call_parameter_set(  # noqa: D
+    def from_call_parameter_set(  # noqa: D102
         dimension_call_parameter_set: DimensionCallParameterSet,
     ) -> DimensionPattern:
         return DimensionPattern(
@@ -101,7 +101,7 @@ class EntityPattern(EntityLinkPattern):
         return super().match(spec_set.entity_specs)
 
     @staticmethod
-    def from_call_parameter_set(entity_call_parameter_set: EntityCallParameterSet) -> EntityPattern:  # noqa: D
+    def from_call_parameter_set(entity_call_parameter_set: EntityCallParameterSet) -> EntityPattern:  # noqa: D102
         return EntityPattern(
             parameter_set=EntityLinkPatternParameterSet.from_parameters(
                 fields_to_compare=(

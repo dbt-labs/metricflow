@@ -23,7 +23,7 @@ class NoParentCandidates(MetricFlowQueryResolutionIssue):
     """
 
     @staticmethod
-    def from_parameters(  # noqa: D
+    def from_parameters(  # noqa: D102
         query_resolution_path: MetricFlowQueryResolutionPath,
     ) -> NoParentCandidates:
         return NoParentCandidates(

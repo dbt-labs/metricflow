@@ -81,7 +81,7 @@ class LowCardinalityRatioRule(ColumnMatcherRule):
 
     match_reason = "Column has low cardinality"
 
-    def match_column(self, props: ColumnProperties) -> bool:  # noqa: D
+    def match_column(self, props: ColumnProperties) -> bool:  # noqa: D102
         denom = props.row_count - props.null_count
 
         # undefined ratio

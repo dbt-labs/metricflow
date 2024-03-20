@@ -89,7 +89,7 @@ class TaskExecutionResult:
 class SelectSqlQueryToDataFrameTask(ExecutionPlanTask):
     """A task that runs a SELECT and puts that result into a dataframe."""
 
-    def __init__(  # noqa: D
+    def __init__(  # noqa: D107
         self,
         sql_client: SqlClient,
         sql_query: str,
@@ -102,22 +102,22 @@ class SelectSqlQueryToDataFrameTask(ExecutionPlanTask):
         super().__init__(task_id=self.create_unique_id(), parent_nodes=parent_nodes or [])
 
     @classmethod
-    def id_prefix(cls) -> IdPrefix:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D102
         return StaticIdPrefix.EXEC_NODE_READ_SQL_QUERY
 
     @property
-    def description(self) -> str:  # noqa: D
+    def description(self) -> str:  # noqa: D102
         return "Run a query and write the results to a data frame"
 
     @property
-    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
         return tuple(super().displayed_properties) + (DisplayedProperty(key="sql_query", value=self._sql_query),)
 
     @property
-    def bind_parameters(self) -> SqlBindParameters:  # noqa: D
+    def bind_parameters(self) -> SqlBindParameters:  # noqa: D102
         return self._bind_parameters
 
-    def execute(self) -> TaskExecutionResult:  # noqa: D
+    def execute(self) -> TaskExecutionResult:  # noqa: D102
         start_time = time.time()
 
         df = self._sql_client.query(
@@ -131,13 +131,13 @@ class SelectSqlQueryToDataFrameTask(ExecutionPlanTask):
         )
 
     @property
-    def sql_query(self) -> Optional[SqlQuery]:  # noqa: D
+    def sql_query(self) -> Optional[SqlQuery]:  # noqa: D102
         return SqlQuery(
             sql_query=self._sql_query,
             bind_parameters=self._bind_parameters,
         )
 
-    def __repr__(self) -> str:  # noqa: D
+    def __repr__(self) -> str:  # noqa: D105
         return f"{self.__class__.__name__}(sql_query='{self._sql_query}')"
 
 
@@ -147,7 +147,7 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
     The provided SQL query is the query that will be run, so it should be a CREATE... or similar.
     """
 
-    def __init__(  # noqa: D
+    def __init__(  # noqa: D107
         self,
         sql_client: SqlClient,
         sql_query: str,
@@ -162,22 +162,22 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
         super().__init__(task_id=self.create_unique_id(), parent_nodes=parent_nodes or [])
 
     @classmethod
-    def id_prefix(cls) -> IdPrefix:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D102
         return StaticIdPrefix.EXEC_NODE_WRITE_TO_TABLE
 
     @property
-    def description(self) -> str:  # noqa: D
+    def description(self) -> str:  # noqa: D102
         return "Run a query and write the results to a table"
 
     @property
-    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
         return tuple(super().displayed_properties) + (
             DisplayedProperty(key="sql_query", value=self._sql_query),
             DisplayedProperty(key="output_table", value=self._output_table),
             DisplayedProperty(key="bind_parameters", value=self._bind_parameters),
         )
 
-    def execute(self) -> TaskExecutionResult:  # noqa: D
+    def execute(self) -> TaskExecutionResult:  # noqa: D102
         start_time = time.time()
         logger.info(f"Dropping table {self._output_table} in case it already exists")
         self._sql_client.execute(f"DROP TABLE IF EXISTS {self._output_table.sql}")
@@ -191,10 +191,10 @@ class SelectSqlQueryToTableTask(ExecutionPlanTask):
         return TaskExecutionResult(start_time=start_time, end_time=end_time, sql=self._sql_query)
 
     @property
-    def sql_query(self) -> Optional[SqlQuery]:  # noqa: D
+    def sql_query(self) -> Optional[SqlQuery]:  # noqa: D102
         return SqlQuery(sql_query=self._sql_query, bind_parameters=self._bind_parameters)
 
-    def __repr__(self) -> str:  # noqa: D
+    def __repr__(self) -> str:  # noqa: D105
         return f"{self.__class__.__name__}(sql_query='{self._sql_query}', output_table={self._output_table})"
 
 

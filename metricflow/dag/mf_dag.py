@@ -36,11 +36,11 @@ class NodeId:
 
     id_str: str
 
-    def __repr__(self) -> str:  # noqa: D
+    def __repr__(self) -> str:  # noqa: D105
         return self.id_str
 
     @staticmethod
-    def create_unique(id_prefix: IdPrefix) -> NodeId:  # noqa: D
+    def create_unique(id_prefix: IdPrefix) -> NodeId:  # noqa: D102
         return NodeId(str(SequentialIdGenerator.create_next_id(id_prefix)))
 
 
@@ -48,14 +48,14 @@ class DagNodeVisitor(Generic[VisitorOutputT], ABC):
     """An object that can be used to visit the nodes of a DAG graph."""
 
     @abstractmethod
-    def visit_node(self, node: DagNode) -> VisitorOutputT:  # noqa: D
+    def visit_node(self, node: DagNode) -> VisitorOutputT:  # noqa: D102
         pass
 
 
 class DagNode(ABC):
     """A node in a DAG. These should be immutable."""
 
-    def __init__(self, node_id: NodeId) -> None:  # noqa: D
+    def __init__(self, node_id: NodeId) -> None:  # noqa: D107
         self._node_id = node_id
 
     @property
@@ -87,10 +87,10 @@ class DagNode(ABC):
 
     @property
     @abstractmethod
-    def parent_nodes(self) -> Sequence[DagNode]:  # noqa: D
+    def parent_nodes(self) -> Sequence[DagNode]:  # noqa: D102
         pass
 
-    def __repr__(self) -> str:  # noqa: D
+    def __repr__(self) -> str:  # noqa: D105
         return f"{self.__class__.__name__}(node_id={self.node_id})"
 
     @classmethod
@@ -162,7 +162,7 @@ class DagId:
 
     id_str: str
 
-    def __str__(self) -> str:  # noqa: D
+    def __str__(self) -> str:  # noqa: D105
         return self.id_str
 
     @staticmethod
@@ -171,26 +171,26 @@ class DagId:
         return DagId(id_str)
 
     @staticmethod
-    def from_id_prefix(id_prefix: IdPrefix) -> DagId:  # noqa: D
+    def from_id_prefix(id_prefix: IdPrefix) -> DagId:  # noqa: D102
         return DagId(id_str=SequentialIdGenerator.create_next_id(id_prefix).str_value)
 
 
 DagNodeT = TypeVar("DagNodeT", bound=DagNode)
 
 
-class MetricFlowDag(Generic[DagNodeT]):  # noqa: D
+class MetricFlowDag(Generic[DagNodeT]):
     """Represents a directed acyclic graph. The sink nodes will have the connected components."""
 
-    def __init__(self, dag_id: DagId, sink_nodes: Sequence[DagNodeT]):  # noqa: D
+    def __init__(self, dag_id: DagId, sink_nodes: Sequence[DagNodeT]):  # noqa: D107
         self._dag_id = dag_id
         self._sink_nodes = tuple(sink_nodes)
 
     @property
-    def dag_id(self) -> DagId:  # noqa: D
+    def dag_id(self) -> DagId:  # noqa: D102
         return self._dag_id
 
     @property
-    def sink_nodes(self) -> Sequence[DagNodeT]:  # noqa: D
+    def sink_nodes(self) -> Sequence[DagNodeT]:  # noqa: D102
         return self._sink_nodes
 
     def structure_text(self, formatter: MetricFlowDagTextFormatter = MetricFlowDagTextFormatter()) -> str:

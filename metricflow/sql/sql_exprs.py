@@ -24,7 +24,7 @@ from metricflow.visitor import Visitable, VisitorOutputT
 class SqlExpressionNode(DagNode, Visitable, ABC):
     """An SQL expression like my_table.my_column, CONCAT(a, b) or 1 + 1 that evaluates to a value."""
 
-    def __init__(self, node_id: NodeId, parent_nodes: List[SqlExpressionNode]) -> None:  # noqa: D
+    def __init__(self, node_id: NodeId, parent_nodes: List[SqlExpressionNode]) -> None:  # noqa: D107
         self._parent_nodes = parent_nodes
         super().__init__(node_id=node_id)
 
@@ -58,7 +58,7 @@ class SqlExpressionNode(DagNode, Visitable, ABC):
         return SqlBindParameters()
 
     @property
-    def parent_nodes(self) -> Sequence[SqlExpressionNode]:  # noqa: D
+    def parent_nodes(self) -> Sequence[SqlExpressionNode]:  # noqa: D102
         return self._parent_nodes
 
     @property
@@ -91,7 +91,7 @@ class SqlExpressionNode(DagNode, Visitable, ABC):
         """Returns all nodes in the paths from this node to the root nodes."""
         pass
 
-    def _parents_match(self, other: SqlExpressionNode) -> bool:  # noqa: D
+    def _parents_match(self, other: SqlExpressionNode) -> bool:
         return all(x == y for x, y in itertools.zip_longest(self.parent_nodes, other.parent_nodes))
 
     @abstractmethod
@@ -124,29 +124,29 @@ class SqlExpressionTreeLineage:
         )
 
     @property
-    def contains_string_exprs(self) -> bool:  # noqa: D
+    def contains_string_exprs(self) -> bool:  # noqa: D102
         return len(self.string_exprs) > 0
 
     @property
-    def contains_column_alias_exprs(self) -> bool:  # noqa: D
+    def contains_column_alias_exprs(self) -> bool:  # noqa: D102
         return len(self.column_alias_reference_exprs) > 0
 
     @property
-    def contains_ambiguous_exprs(self) -> bool:  # noqa: D
+    def contains_ambiguous_exprs(self) -> bool:  # noqa: D102
         return self.contains_string_exprs or self.contains_column_alias_exprs
 
     @property
-    def contains_aggregate_exprs(self) -> bool:  # noqa: D
+    def contains_aggregate_exprs(self) -> bool:  # noqa: D102
         return any(x.is_aggregate_function for x in self.function_exprs)
 
 
 class SqlColumnReplacements:
     """When re-writing column references in expressions, this storing the mapping."""
 
-    def __init__(self, column_replacements: Dict[SqlColumnReference, SqlExpressionNode]) -> None:  # noqa: D
+    def __init__(self, column_replacements: Dict[SqlColumnReference, SqlExpressionNode]) -> None:  # noqa: D107
         self._column_replacements = column_replacements
 
-    def get_replacement(self, column_reference: SqlColumnReference) -> Optional[SqlExpressionNode]:  # noqa: D
+    def get_replacement(self, column_reference: SqlColumnReference) -> Optional[SqlExpressionNode]:  # noqa: D102
         return self._column_replacements.get(column_reference)
 
 
@@ -157,75 +157,77 @@ class SqlExpressionNodeVisitor(Generic[VisitorOutputT], ABC):
     """
 
     @abstractmethod
-    def visit_string_expr(self, node: SqlStringExpression) -> VisitorOutputT:  # noqa: D
+    def visit_string_expr(self, node: SqlStringExpression) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_column_reference_expr(self, node: SqlColumnReferenceExpression) -> VisitorOutputT:  # noqa: D
+    def visit_column_reference_expr(self, node: SqlColumnReferenceExpression) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_column_alias_reference_expr(self, node: SqlColumnAliasReferenceExpression) -> VisitorOutputT:  # noqa: D
+    def visit_column_alias_reference_expr(  # noqa: D102
+        self, node: SqlColumnAliasReferenceExpression
+    ) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_comparison_expr(self, node: SqlComparisonExpression) -> VisitorOutputT:  # noqa: D
+    def visit_comparison_expr(self, node: SqlComparisonExpression) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_function_expr(self, node: SqlAggregateFunctionExpression) -> VisitorOutputT:  # noqa: D
+    def visit_function_expr(self, node: SqlAggregateFunctionExpression) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_percentile_expr(self, node: SqlPercentileExpression) -> VisitorOutputT:  # noqa: D
+    def visit_percentile_expr(self, node: SqlPercentileExpression) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_null_expr(self, node: SqlNullExpression) -> VisitorOutputT:  # noqa: D
+    def visit_null_expr(self, node: SqlNullExpression) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_logical_expr(self, node: SqlLogicalExpression) -> VisitorOutputT:  # noqa: D
+    def visit_logical_expr(self, node: SqlLogicalExpression) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_string_literal_expr(self, node: SqlStringLiteralExpression) -> VisitorOutputT:  # noqa: D
+    def visit_string_literal_expr(self, node: SqlStringLiteralExpression) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_is_null_expr(self, node: SqlIsNullExpression) -> VisitorOutputT:  # noqa: D
+    def visit_is_null_expr(self, node: SqlIsNullExpression) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_cast_to_timestamp_expr(self, node: SqlCastToTimestampExpression) -> VisitorOutputT:  # noqa: D
+    def visit_cast_to_timestamp_expr(self, node: SqlCastToTimestampExpression) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_date_trunc_expr(self, node: SqlDateTruncExpression) -> VisitorOutputT:  # noqa: D
+    def visit_date_trunc_expr(self, node: SqlDateTruncExpression) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_extract_expr(self, node: SqlExtractExpression) -> VisitorOutputT:  # noqa: D
+    def visit_extract_expr(self, node: SqlExtractExpression) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_time_delta_expr(self, node: SqlSubtractTimeIntervalExpression) -> VisitorOutputT:  # noqa: D
+    def visit_time_delta_expr(self, node: SqlSubtractTimeIntervalExpression) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_ratio_computation_expr(self, node: SqlRatioComputationExpression) -> VisitorOutputT:  # noqa: D
+    def visit_ratio_computation_expr(self, node: SqlRatioComputationExpression) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_between_expr(self, node: SqlBetweenExpression) -> VisitorOutputT:  # noqa: D
+    def visit_between_expr(self, node: SqlBetweenExpression) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_window_function_expr(self, node: SqlWindowFunctionExpression) -> VisitorOutputT:  # noqa: D
+    def visit_window_function_expr(self, node: SqlWindowFunctionExpression) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
-    def visit_generate_uuid_expr(self, node: SqlGenerateUuidExpression) -> VisitorOutputT:  # noqa: D
+    def visit_generate_uuid_expr(self, node: SqlGenerateUuidExpression) -> VisitorOutputT:  # noqa: D102
         pass
 
 
@@ -260,40 +262,40 @@ class SqlStringExpression(SqlExpressionNode):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[])
 
     @classmethod
-    def id_prefix(cls) -> IdPrefix:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D102
         return StaticIdPrefix.SQL_EXPR_STRING_ID_PREFIX
 
-    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_string_expr(self)
 
     @property
-    def description(self) -> str:  # noqa: D
+    def description(self) -> str:  # noqa: D102
         return f"String SQL Expression: {self._sql_expr}"
 
     @property
-    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
         return tuple(super().displayed_properties) + (DisplayedProperty("sql_expr", self._sql_expr),)
 
     @property
-    def sql_expr(self) -> str:  # noqa: D
+    def sql_expr(self) -> str:  # noqa: D102
         return self._sql_expr
 
     @property
-    def requires_parenthesis(self) -> bool:  # noqa: D
+    def requires_parenthesis(self) -> bool:  # noqa: D102
         return self._requires_parenthesis
 
     @property
-    def bind_parameters(self) -> SqlBindParameters:  # noqa: D
+    def bind_parameters(self) -> SqlBindParameters:  # noqa: D102
         return self._bind_parameters
 
     @property
-    def used_columns(self) -> Optional[Tuple[str, ...]]:  # noqa: D
+    def used_columns(self) -> Optional[Tuple[str, ...]]:  # noqa: D102
         return self._used_columns
 
-    def __repr__(self) -> str:  # noqa: D
+    def __repr__(self) -> str:  # noqa: D105
         return f"{self.__class__.__name__}(node_id={self.node_id} sql_expr={self.sql_expr})"
 
-    def rewrite(  # noqa: D
+    def rewrite(  # noqa: D102
         self,
         column_replacements: Optional[SqlColumnReplacements] = None,
         should_render_table_alias: Optional[bool] = None,
@@ -303,10 +305,10 @@ class SqlStringExpression(SqlExpressionNode):
         return self
 
     @property
-    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D
+    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D102
         return SqlExpressionTreeLineage(string_exprs=(self,))
 
-    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D
+    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D102
         if not isinstance(other, SqlStringExpression):
             return False
         return (
@@ -324,41 +326,41 @@ class SqlStringExpression(SqlExpressionNode):
 class SqlStringLiteralExpression(SqlExpressionNode):
     """A string literal like 'foo'. It shouldn't include delimiters as it should be added during rendering."""
 
-    def __init__(self, literal_value: str) -> None:  # noqa: D
+    def __init__(self, literal_value: str) -> None:  # noqa: D107
         self._literal_value = literal_value
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[])
 
     @classmethod
-    def id_prefix(cls) -> IdPrefix:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D102
         return StaticIdPrefix.SQL_EXPR_STRING_LITERAL_PREFIX
 
-    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_string_literal_expr(self)
 
     @property
-    def description(self) -> str:  # noqa: D
+    def description(self) -> str:  # noqa: D102
         return f"String Literal: {self._literal_value}"
 
     @property
-    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
         return tuple(super().displayed_properties) + (DisplayedProperty("value", self._literal_value),)
 
     @property
-    def literal_value(self) -> str:  # noqa: D
+    def literal_value(self) -> str:  # noqa: D102
         return self._literal_value
 
     @property
-    def requires_parenthesis(self) -> bool:  # noqa: D
+    def requires_parenthesis(self) -> bool:  # noqa: D102
         return False
 
     @property
-    def bind_parameters(self) -> SqlBindParameters:  # noqa: D
+    def bind_parameters(self) -> SqlBindParameters:  # noqa: D102
         return SqlBindParameters()
 
-    def __repr__(self) -> str:  # noqa: D
+    def __repr__(self) -> str:  # noqa: D105
         return f"{self.__class__.__name__}(node_id={self.node_id}, literal_value={self.literal_value})"
 
-    def rewrite(  # noqa: D
+    def rewrite(  # noqa: D102
         self,
         column_replacements: Optional[SqlColumnReplacements] = None,
         should_render_table_alias: Optional[bool] = None,
@@ -366,10 +368,10 @@ class SqlStringLiteralExpression(SqlExpressionNode):
         return self
 
     @property
-    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D
+    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D102
         return SqlExpressionTreeLineage(other_exprs=(self,))
 
-    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D
+    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D102
         if not isinstance(other, SqlStringLiteralExpression):
             return False
         return self.literal_value == other.literal_value
@@ -402,33 +404,33 @@ class SqlColumnReferenceExpression(SqlExpressionNode):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[])
 
     @classmethod
-    def id_prefix(cls) -> IdPrefix:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D102
         return StaticIdPrefix.SQL_EXPR_COLUMN_REFERENCE_ID_PREFIX
 
-    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_column_reference_expr(self)
 
     @property
-    def col_ref(self) -> SqlColumnReference:  # noqa: D
+    def col_ref(self) -> SqlColumnReference:  # noqa: D102
         return self._col_ref
 
     @property
-    def description(self) -> str:  # noqa: D
+    def description(self) -> str:  # noqa: D102
         return f"Column: {self.col_ref}"
 
     @property
-    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
         return tuple(super().displayed_properties) + (DisplayedProperty("col_ref", self.col_ref),)
 
     @property
-    def requires_parenthesis(self) -> bool:  # noqa: D
+    def requires_parenthesis(self) -> bool:  # noqa: D102
         return False
 
     @property
-    def as_column_reference_expression(self) -> Optional[SqlColumnReferenceExpression]:  # noqa:
+    def as_column_reference_expression(self) -> Optional[SqlColumnReferenceExpression]:  # noqa: D102
         return self
 
-    def rewrite(  # noqa: D
+    def rewrite(  # noqa: D102
         self,
         column_replacements: Optional[SqlColumnReplacements] = None,
         should_render_table_alias: Optional[bool] = None,
@@ -463,14 +465,14 @@ class SqlColumnReferenceExpression(SqlExpressionNode):
         )
 
     @property
-    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D
+    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D102
         return SqlExpressionTreeLineage(column_reference_exprs=(self,))
 
     @property
-    def should_render_table_alias(self) -> bool:  # noqa: D
+    def should_render_table_alias(self) -> bool:  # noqa: D102
         return self._should_render_table_alias
 
-    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D
+    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D102
         if not isinstance(other, SqlColumnReferenceExpression):
             return False
         return self.col_ref == other.col_ref
@@ -485,38 +487,38 @@ class SqlColumnAliasReferenceExpression(SqlExpressionNode):
     ambiguities.
     """
 
-    def __init__(self, column_alias: str) -> None:  # noqa: D
+    def __init__(self, column_alias: str) -> None:  # noqa: D107
         self._column_alias = column_alias
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[])
 
     @classmethod
-    def id_prefix(cls) -> IdPrefix:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D102
         return StaticIdPrefix.SQL_EXPR_COLUMN_REFERENCE_ID_PREFIX
 
-    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_column_alias_reference_expr(self)
 
     @property
-    def column_alias(self) -> str:  # noqa: D
+    def column_alias(self) -> str:  # noqa: D102
         return self._column_alias
 
     @property
-    def description(self) -> str:  # noqa: D
+    def description(self) -> str:  # noqa: D102
         return f"Unqualified Column: {self._column_alias}"
 
     @property
-    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
         return tuple(super().displayed_properties) + (DisplayedProperty("column_alias", self.column_alias),)
 
     @property
-    def requires_parenthesis(self) -> bool:  # noqa: D
+    def requires_parenthesis(self) -> bool:  # noqa: D102
         return False
 
     @property
-    def as_column_reference_expression(self) -> Optional[SqlColumnReferenceExpression]:  # noqa:
+    def as_column_reference_expression(self) -> Optional[SqlColumnReferenceExpression]:  # noqa: D102
         return None
 
-    def rewrite(  # noqa: D
+    def rewrite(  # noqa: D102
         self,
         column_replacements: Optional[SqlColumnReplacements] = None,
         should_render_table_alias: Optional[bool] = None,
@@ -526,16 +528,16 @@ class SqlColumnAliasReferenceExpression(SqlExpressionNode):
         return self
 
     @property
-    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D
+    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D102
         return SqlExpressionTreeLineage(column_alias_reference_exprs=(self,))
 
-    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D
+    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D102
         if not isinstance(other, SqlColumnAliasReferenceExpression):
             return False
         return self.column_alias == other.column_alias
 
 
-class SqlComparison(Enum):  # noqa: D
+class SqlComparison(Enum):  # noqa: D101
     LESS_THAN = "<"
     GREATER_THAN = ">"
     LESS_THAN_OR_EQUALS = "<="
@@ -563,26 +565,26 @@ class SqlComparisonExpression(SqlExpressionNode):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[self._left_expr, self._right_expr])
 
     @classmethod
-    def id_prefix(cls) -> IdPrefix:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D102
         return StaticIdPrefix.SQL_EXPR_COMPARISON_ID_PREFIX
 
-    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_comparison_expr(self)
 
     @property
-    def left_expr(self) -> SqlExpressionNode:  # noqa: D
+    def left_expr(self) -> SqlExpressionNode:  # noqa: D102
         return self._left_expr
 
     @property
-    def right_expr(self) -> SqlExpressionNode:  # noqa: D
+    def right_expr(self) -> SqlExpressionNode:  # noqa: D102
         return self._right_expr
 
     @property
-    def description(self) -> str:  # noqa: D
+    def description(self) -> str:  # noqa: D102
         return f"{self._comparison.value} Expression"
 
     @property
-    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
         return tuple(super().displayed_properties) + (
             DisplayedProperty("left_expr", self.left_expr),
             DisplayedProperty("comparison", self.comparison.value),
@@ -590,14 +592,14 @@ class SqlComparisonExpression(SqlExpressionNode):
         )
 
     @property
-    def requires_parenthesis(self) -> bool:  # noqa: D
+    def requires_parenthesis(self) -> bool:  # noqa: D102
         return True
 
     @property
-    def comparison(self) -> SqlComparison:  # noqa: D
+    def comparison(self) -> SqlComparison:  # noqa: D102
         return self._comparison
 
-    def rewrite(  # noqa: D
+    def rewrite(  # noqa: D102
         self,
         column_replacements: Optional[SqlColumnReplacements] = None,
         should_render_table_alias: Optional[bool] = None,
@@ -609,12 +611,12 @@ class SqlComparisonExpression(SqlExpressionNode):
         )
 
     @property
-    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D
+    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D102
         return SqlExpressionTreeLineage.combine(
             tuple(x.lineage for x in self.parent_nodes) + (SqlExpressionTreeLineage(other_exprs=(self,)),)
         )
 
-    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D
+    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D102
         if not isinstance(other, SqlComparisonExpression):
             return False
         return self.comparison == other.comparison and self._parents_match(other)
@@ -755,22 +757,22 @@ class SqlAggregateFunctionExpression(SqlFunctionExpression):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=sql_function_args)
 
     @classmethod
-    def id_prefix(cls) -> IdPrefix:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D102
         return StaticIdPrefix.SQL_EXPR_FUNCTION_ID_PREFIX
 
     @property
-    def requires_parenthesis(self) -> bool:  # noqa: D
+    def requires_parenthesis(self) -> bool:  # noqa: D102
         return False
 
-    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_function_expr(self)
 
     @property
-    def description(self) -> str:  # noqa: D
+    def description(self) -> str:  # noqa: D102
         return f"{self._sql_function.value} Expression"
 
     @property
-    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
         return (
             tuple(super().displayed_properties)
             + (DisplayedProperty("function", self.sql_function),)
@@ -778,17 +780,17 @@ class SqlAggregateFunctionExpression(SqlFunctionExpression):
         )
 
     @property
-    def sql_function(self) -> SqlFunction:  # noqa: D
+    def sql_function(self) -> SqlFunction:  # noqa: D102
         return self._sql_function
 
     @property
-    def sql_function_args(self) -> List[SqlExpressionNode]:  # noqa: D
+    def sql_function_args(self) -> List[SqlExpressionNode]:  # noqa: D102
         return self._sql_function_args
 
-    def __repr__(self) -> str:  # noqa: D
+    def __repr__(self) -> str:  # noqa: D105
         return f"{self.__class__.__name__}(node_id={self.node_id}, sql_function={self.sql_function.name})"
 
-    def rewrite(  # noqa: D
+    def rewrite(  # noqa: D102
         self,
         column_replacements: Optional[SqlColumnReplacements] = None,
         should_render_table_alias: Optional[bool] = None,
@@ -801,16 +803,16 @@ class SqlAggregateFunctionExpression(SqlFunctionExpression):
         )
 
     @property
-    def is_aggregate_function(self) -> bool:  # noqa: D
+    def is_aggregate_function(self) -> bool:  # noqa: D102
         return True
 
     @property
-    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D
+    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D102
         return SqlExpressionTreeLineage.combine(
             tuple(x.lineage for x in self.parent_nodes) + (SqlExpressionTreeLineage(function_exprs=(self,)),)
         )
 
-    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D
+    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D102
         if not isinstance(other, SqlAggregateFunctionExpression):
             return False
         return self.sql_function == other.sql_function and self._parents_match(other)
@@ -878,40 +880,40 @@ class SqlPercentileExpression(SqlFunctionExpression):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[order_by_arg])
 
     @classmethod
-    def id_prefix(cls) -> IdPrefix:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D102
         return StaticIdPrefix.SQL_EXPR_PERCENTILE_ID_PREFIX
 
     @property
-    def requires_parenthesis(self) -> bool:  # noqa: D
+    def requires_parenthesis(self) -> bool:  # noqa: D102
         return False
 
     @property
-    def order_by_arg(self) -> SqlExpressionNode:  # noqa: D
+    def order_by_arg(self) -> SqlExpressionNode:  # noqa: D102
         return self._order_by_arg
 
     @property
-    def percentile_args(self) -> SqlPercentileExpressionArgument:  # noqa: D
+    def percentile_args(self) -> SqlPercentileExpressionArgument:  # noqa: D102
         return self._percentile_args
 
-    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_percentile_expr(self)
 
     @property
-    def description(self) -> str:  # noqa: D
+    def description(self) -> str:  # noqa: D102
         return f"{self._percentile_args.function_type.value} Percentile({self._percentile_args.percentile}) Expression"
 
     @property
-    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
         return (
             tuple(super().displayed_properties)
             + (DisplayedProperty("argument", self._order_by_arg),)
             + (DisplayedProperty("percentile_args", self._percentile_args),)
         )
 
-    def __repr__(self) -> str:  # noqa: D
+    def __repr__(self) -> str:  # noqa: D105
         return f"{self.__class__.__name__}(node_id={self.node_id}, percentile={self._percentile_args.percentile}, function_type={self._percentile_args.function_type.value})"
 
-    def rewrite(  # noqa: D
+    def rewrite(  # noqa: D102
         self,
         column_replacements: Optional[SqlColumnReplacements] = None,
         should_render_table_alias: Optional[bool] = None,
@@ -922,16 +924,16 @@ class SqlPercentileExpression(SqlFunctionExpression):
         )
 
     @property
-    def is_aggregate_function(self) -> bool:  # noqa: D
+    def is_aggregate_function(self) -> bool:  # noqa: D102
         return True
 
     @property
-    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D
+    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D102
         return SqlExpressionTreeLineage.combine(
             tuple(x.lineage for x in self.parent_nodes) + (SqlExpressionTreeLineage(function_exprs=(self,)),)
         )
 
-    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D
+    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D102
         if not isinstance(other, SqlPercentileExpression):
             return False
         return self._percentile_args == other._percentile_args and self._parents_match(other)
@@ -1000,22 +1002,22 @@ class SqlWindowFunctionExpression(SqlFunctionExpression):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=parent_nodes)
 
     @classmethod
-    def id_prefix(cls) -> IdPrefix:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D102
         return StaticIdPrefix.SQL_EXPR_WINDOW_FUNCTION_ID_PREFIX
 
     @property
-    def requires_parenthesis(self) -> bool:  # noqa: D
+    def requires_parenthesis(self) -> bool:  # noqa: D102
         return False
 
-    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_window_function_expr(self)
 
     @property
-    def description(self) -> str:  # noqa: D
+    def description(self) -> str:  # noqa: D102
         return f"{self._sql_function.value} Window Function Expression"
 
     @property
-    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
         return (
             tuple(super().displayed_properties)
             + (DisplayedProperty("function", self.sql_function),)
@@ -1025,29 +1027,29 @@ class SqlWindowFunctionExpression(SqlFunctionExpression):
         )
 
     @property
-    def sql_function(self) -> SqlWindowFunction:  # noqa: D
+    def sql_function(self) -> SqlWindowFunction:  # noqa: D102
         return self._sql_function
 
     @property
-    def sql_function_args(self) -> Sequence[SqlExpressionNode]:  # noqa: D
+    def sql_function_args(self) -> Sequence[SqlExpressionNode]:  # noqa: D102
         return self._sql_function_args
 
     @property
-    def partition_by_args(self) -> Sequence[SqlExpressionNode]:  # noqa: D
+    def partition_by_args(self) -> Sequence[SqlExpressionNode]:  # noqa: D102
         return self._partition_by_args
 
     @property
-    def order_by_args(self) -> Sequence[SqlWindowOrderByArgument]:  # noqa: D
+    def order_by_args(self) -> Sequence[SqlWindowOrderByArgument]:  # noqa: D102
         return self._order_by_args
 
     @property
-    def is_aggregate_function(self) -> bool:  # noqa: D
+    def is_aggregate_function(self) -> bool:  # noqa: D102
         return False
 
-    def __repr__(self) -> str:  # noqa: D
+    def __repr__(self) -> str:  # noqa: D105
         return f"{self.__class__.__name__}(node_id={self.node_id}, sql_function={self.sql_function.name})"
 
-    def rewrite(  # noqa: D
+    def rewrite(  # noqa: D102
         self,
         column_replacements: Optional[SqlColumnReplacements] = None,
         should_render_table_alias: Optional[bool] = None,
@@ -1071,12 +1073,12 @@ class SqlWindowFunctionExpression(SqlFunctionExpression):
         )
 
     @property
-    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D
+    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D102
         return SqlExpressionTreeLineage.combine(
             tuple(x.lineage for x in self.parent_nodes) + (SqlExpressionTreeLineage(function_exprs=(self,)),)
         )
 
-    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D
+    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D102
         if not isinstance(other, SqlWindowFunctionExpression):
             return False
         return (
@@ -1089,25 +1091,25 @@ class SqlWindowFunctionExpression(SqlFunctionExpression):
 class SqlNullExpression(SqlExpressionNode):
     """Represents NULL."""
 
-    def __init__(self) -> None:  # noqa: D
+    def __init__(self) -> None:  # noqa: D107
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[])
 
     @classmethod
-    def id_prefix(cls) -> IdPrefix:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D102
         return StaticIdPrefix.SQL_EXPR_NULL_PREFIX
 
     @property
-    def requires_parenthesis(self) -> bool:  # noqa: D
+    def requires_parenthesis(self) -> bool:  # noqa: D102
         return False
 
-    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_null_expr(self)
 
     @property
-    def description(self) -> str:  # noqa: D
+    def description(self) -> str:  # noqa: D102
         return "NULL Expression"
 
-    def rewrite(  # noqa: D
+    def rewrite(  # noqa: D102
         self,
         column_replacements: Optional[SqlColumnReplacements] = None,
         should_render_table_alias: Optional[bool] = None,
@@ -1115,10 +1117,10 @@ class SqlNullExpression(SqlExpressionNode):
         return self
 
     @property
-    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D
+    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D102
         return SqlExpressionTreeLineage(other_exprs=(self,))
 
-    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D
+    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D102
         return isinstance(other, SqlNullExpression)
 
 
@@ -1135,34 +1137,34 @@ class SqlLogicalOperator(Enum):
 class SqlLogicalExpression(SqlExpressionNode):
     """A logical expression like "a AND b AND c"."""
 
-    def __init__(self, operator: SqlLogicalOperator, args: Tuple[SqlExpressionNode, ...]) -> None:  # noqa: D
+    def __init__(self, operator: SqlLogicalOperator, args: Tuple[SqlExpressionNode, ...]) -> None:  # noqa: D107
         self._operator = operator
         super().__init__(node_id=self.create_unique_id(), parent_nodes=list(args))
 
     @classmethod
-    def id_prefix(cls) -> IdPrefix:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D102
         return StaticIdPrefix.SQL_EXPR_LOGICAL_OPERATOR_PREFIX
 
     @property
-    def requires_parenthesis(self) -> bool:  # noqa: D
+    def requires_parenthesis(self) -> bool:  # noqa: D102
         return True
 
-    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_logical_expr(self)
 
     @property
-    def description(self) -> str:  # noqa: D
+    def description(self) -> str:  # noqa: D102
         return f"Logical Operator {self._operator.value}"
 
     @property
-    def args(self) -> Sequence[SqlExpressionNode]:  # noqa: D
+    def args(self) -> Sequence[SqlExpressionNode]:  # noqa: D102
         return self.parent_nodes
 
     @property
-    def operator(self) -> SqlLogicalOperator:  # noqa: D
+    def operator(self) -> SqlLogicalOperator:  # noqa: D102
         return self._operator
 
-    def rewrite(  # noqa: D
+    def rewrite(  # noqa: D102
         self,
         column_replacements: Optional[SqlColumnReplacements] = None,
         should_render_table_alias: Optional[bool] = None,
@@ -1173,12 +1175,12 @@ class SqlLogicalExpression(SqlExpressionNode):
         )
 
     @property
-    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D
+    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D102
         return SqlExpressionTreeLineage.combine(
             tuple(x.lineage for x in self.parent_nodes) + (SqlExpressionTreeLineage(other_exprs=(self,)),)
         )
 
-    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D
+    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D102
         if not isinstance(other, SqlLogicalExpression):
             return False
         return self.operator == other.operator and self._parents_match(other)
@@ -1187,30 +1189,30 @@ class SqlLogicalExpression(SqlExpressionNode):
 class SqlIsNullExpression(SqlExpressionNode):
     """An IS NULL expression like "foo IS NULL"."""
 
-    def __init__(self, arg: SqlExpressionNode) -> None:  # noqa: D
+    def __init__(self, arg: SqlExpressionNode) -> None:  # noqa: D107
         self._arg = arg
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[arg])
 
     @classmethod
-    def id_prefix(cls) -> IdPrefix:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D102
         return StaticIdPrefix.SQL_EXPR_IS_NULL_PREFIX
 
     @property
-    def requires_parenthesis(self) -> bool:  # noqa: D
+    def requires_parenthesis(self) -> bool:  # noqa: D102
         return True
 
-    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_is_null_expr(self)
 
     @property
-    def description(self) -> str:  # noqa: D
+    def description(self) -> str:  # noqa: D102
         return "IS NULL Expression"
 
     @property
-    def arg(self) -> SqlExpressionNode:  # noqa: D
+    def arg(self) -> SqlExpressionNode:  # noqa: D102
         return self._arg
 
-    def rewrite(  # noqa: D
+    def rewrite(  # noqa: D102
         self,
         column_replacements: Optional[SqlColumnReplacements] = None,
         should_render_table_alias: Optional[bool] = None,
@@ -1218,10 +1220,10 @@ class SqlIsNullExpression(SqlExpressionNode):
         return SqlIsNullExpression(arg=self.arg.rewrite(column_replacements, should_render_table_alias))
 
     @property
-    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D
+    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D102
         return SqlExpressionTreeLineage.combine([self.arg.lineage, SqlExpressionTreeLineage(other_exprs=(self,))])
 
-    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D
+    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D102
         if not isinstance(other, SqlIsNullExpression):
             return False
         return self._parents_match(other)
@@ -1236,7 +1238,7 @@ class SqlSubtractTimeIntervalExpression(SqlExpressionNode):
     value.
     """
 
-    def __init__(  # noqa: D
+    def __init__(  # noqa: D107
         self,
         arg: SqlExpressionNode,
         count: int,
@@ -1248,33 +1250,33 @@ class SqlSubtractTimeIntervalExpression(SqlExpressionNode):
         self._arg = arg
 
     @classmethod
-    def id_prefix(cls) -> IdPrefix:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D102
         return StaticIdPrefix.SQL_EXPR_SUBTRACT_TIME_INTERVAL_PREFIX
 
     @property
-    def requires_parenthesis(self) -> bool:  # noqa: D
+    def requires_parenthesis(self) -> bool:  # noqa: D102
         return False
 
-    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_time_delta_expr(self)
 
     @property
-    def description(self) -> str:  # noqa: D
+    def description(self) -> str:  # noqa: D102
         return "Time delta"
 
     @property
-    def arg(self) -> SqlExpressionNode:  # noqa: D
+    def arg(self) -> SqlExpressionNode:  # noqa: D102
         return self._arg
 
     @property
-    def count(self) -> int:  # noqa: D
+    def count(self) -> int:  # noqa: D102
         return self._count
 
     @property
-    def granularity(self) -> TimeGranularity:  # noqa: D
+    def granularity(self) -> TimeGranularity:  # noqa: D102
         return self._time_granularity
 
-    def rewrite(  # noqa: D
+    def rewrite(  # noqa: D102
         self,
         column_replacements: Optional[SqlColumnReplacements] = None,
         should_render_table_alias: Optional[bool] = None,
@@ -1286,12 +1288,12 @@ class SqlSubtractTimeIntervalExpression(SqlExpressionNode):
         )
 
     @property
-    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D
+    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D102
         return SqlExpressionTreeLineage.combine(
             tuple(x.lineage for x in self.parent_nodes) + (SqlExpressionTreeLineage(other_exprs=(self,)),)
         )
 
-    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D
+    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D102
         if not isinstance(other, SqlSubtractTimeIntervalExpression):
             return False
         return self.count == other.count and self.granularity == other.granularity and self._parents_match(other)
@@ -1300,30 +1302,30 @@ class SqlSubtractTimeIntervalExpression(SqlExpressionNode):
 class SqlCastToTimestampExpression(SqlExpressionNode):
     """Cast to the timestamp type like CAST('2020-01-01' AS TIMESTAMP)."""
 
-    def __init__(self, arg: SqlExpressionNode) -> None:  # noqa: D
+    def __init__(self, arg: SqlExpressionNode) -> None:  # noqa: D107
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[arg])
 
     @classmethod
-    def id_prefix(cls) -> IdPrefix:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D102
         return StaticIdPrefix.SQL_EXPR_CAST_TO_TIMESTAMP_PREFIX
 
     @property
-    def requires_parenthesis(self) -> bool:  # noqa: D
+    def requires_parenthesis(self) -> bool:  # noqa: D102
         return False
 
-    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_cast_to_timestamp_expr(self)
 
     @property
-    def description(self) -> str:  # noqa: D
+    def description(self) -> str:  # noqa: D102
         return "Cast to Timestamp"
 
     @property
-    def arg(self) -> SqlExpressionNode:  # noqa: D
+    def arg(self) -> SqlExpressionNode:  # noqa: D102
         assert len(self.parent_nodes) == 1
         return self.parent_nodes[0]
 
-    def rewrite(  # noqa: D
+    def rewrite(  # noqa: D102
         self,
         column_replacements: Optional[SqlColumnReplacements] = None,
         should_render_table_alias: Optional[bool] = None,
@@ -1331,12 +1333,12 @@ class SqlCastToTimestampExpression(SqlExpressionNode):
         return SqlCastToTimestampExpression(arg=self.arg.rewrite(column_replacements, should_render_table_alias))
 
     @property
-    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D
+    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D102
         return SqlExpressionTreeLineage.combine(
             tuple(x.lineage for x in self.parent_nodes) + (SqlExpressionTreeLineage(other_exprs=(self,)),)
         )
 
-    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D
+    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D102
         if not isinstance(other, SqlCastToTimestampExpression):
             return False
         return self._parents_match(other)
@@ -1356,30 +1358,30 @@ class SqlDateTruncExpression(SqlExpressionNode):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[arg])
 
     @classmethod
-    def id_prefix(cls) -> IdPrefix:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D102
         return StaticIdPrefix.SQL_EXPR_DATE_TRUNC
 
     @property
-    def requires_parenthesis(self) -> bool:  # noqa: D
+    def requires_parenthesis(self) -> bool:  # noqa: D102
         return False
 
-    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_date_trunc_expr(self)
 
     @property
-    def description(self) -> str:  # noqa: D
+    def description(self) -> str:  # noqa: D102
         return f"DATE_TRUNC() to {self.time_granularity}"
 
     @property
-    def time_granularity(self) -> TimeGranularity:  # noqa: D
+    def time_granularity(self) -> TimeGranularity:  # noqa: D102
         return self._time_granularity
 
     @property
-    def arg(self) -> SqlExpressionNode:  # noqa: D
+    def arg(self) -> SqlExpressionNode:  # noqa: D102
         assert len(self.parent_nodes) == 1
         return self.parent_nodes[0]
 
-    def rewrite(  # noqa: D
+    def rewrite(  # noqa: D102
         self,
         column_replacements: Optional[SqlColumnReplacements] = None,
         should_render_table_alias: Optional[bool] = None,
@@ -1389,12 +1391,12 @@ class SqlDateTruncExpression(SqlExpressionNode):
         )
 
     @property
-    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D
+    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D102
         return SqlExpressionTreeLineage.combine(
             tuple(x.lineage for x in self.parent_nodes) + (SqlExpressionTreeLineage(other_exprs=(self,)),)
         )
 
-    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D
+    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D102
         if not isinstance(other, SqlDateTruncExpression):
             return False
         return self.time_granularity == other.time_granularity and self._parents_match(other)
@@ -1414,30 +1416,30 @@ class SqlExtractExpression(SqlExpressionNode):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[arg])
 
     @classmethod
-    def id_prefix(cls) -> IdPrefix:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D102
         return StaticIdPrefix.SQL_EXPR_EXTRACT
 
     @property
-    def requires_parenthesis(self) -> bool:  # noqa: D
+    def requires_parenthesis(self) -> bool:  # noqa: D102
         return False
 
-    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_extract_expr(self)
 
     @property
-    def description(self) -> str:  # noqa: D
+    def description(self) -> str:  # noqa: D102
         return f"Extract {self.date_part.name}"
 
     @property
-    def date_part(self) -> DatePart:  # noqa: D
+    def date_part(self) -> DatePart:  # noqa: D102
         return self._date_part
 
     @property
-    def arg(self) -> SqlExpressionNode:  # noqa: D
+    def arg(self) -> SqlExpressionNode:  # noqa: D102
         assert len(self.parent_nodes) == 1
         return self.parent_nodes[0]
 
-    def rewrite(  # noqa: D
+    def rewrite(  # noqa: D102
         self,
         column_replacements: Optional[SqlColumnReplacements] = None,
         should_render_table_alias: Optional[bool] = None,
@@ -1447,12 +1449,12 @@ class SqlExtractExpression(SqlExpressionNode):
         )
 
     @property
-    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D
+    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D102
         return SqlExpressionTreeLineage.combine(
             tuple(x.lineage for x in self.parent_nodes) + (SqlExpressionTreeLineage(other_exprs=(self,)),)
         )
 
-    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D
+    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D102
         if not isinstance(other, SqlExtractExpression):
             return False
         return self.date_part == other.date_part and self._parents_match(other)
@@ -1479,29 +1481,29 @@ class SqlRatioComputationExpression(SqlExpressionNode):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[numerator, denominator])
 
     @classmethod
-    def id_prefix(cls) -> IdPrefix:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D102
         return StaticIdPrefix.SQL_EXPR_RATIO_COMPUTATION
 
     @property
-    def requires_parenthesis(self) -> bool:  # noqa: D
+    def requires_parenthesis(self) -> bool:  # noqa: D102
         return False
 
-    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_ratio_computation_expr(self)
 
     @property
-    def description(self) -> str:  # noqa: D
+    def description(self) -> str:  # noqa: D102
         return "Divide numerator by denominator, with appropriate casting"
 
     @property
-    def numerator(self) -> SqlExpressionNode:  # noqa: D
+    def numerator(self) -> SqlExpressionNode:  # noqa: D102
         return self._numerator
 
     @property
-    def denominator(self) -> SqlExpressionNode:  # noqa: D
+    def denominator(self) -> SqlExpressionNode:  # noqa: D102
         return self._denominator
 
-    def rewrite(  # noqa: D
+    def rewrite(  # noqa: D102
         self,
         column_replacements: Optional[SqlColumnReplacements] = None,
         should_render_table_alias: Optional[bool] = None,
@@ -1512,12 +1514,12 @@ class SqlRatioComputationExpression(SqlExpressionNode):
         )
 
     @property
-    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D
+    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D102
         return SqlExpressionTreeLineage.combine(
             tuple(x.lineage for x in self.parent_nodes) + (SqlExpressionTreeLineage(other_exprs=(self,)),)
         )
 
-    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D
+    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D102
         if not isinstance(other, SqlRatioComputationExpression):
             return False
         return self._parents_match(other)
@@ -1526,7 +1528,7 @@ class SqlRatioComputationExpression(SqlExpressionNode):
 class SqlBetweenExpression(SqlExpressionNode):
     """A BETWEEN clause like `column BETWEEN val1 AND val2`."""
 
-    def __init__(  # noqa: D
+    def __init__(  # noqa: D107
         self, column_arg: SqlExpressionNode, start_expr: SqlExpressionNode, end_expr: SqlExpressionNode
     ) -> None:
         self._column_arg = column_arg
@@ -1535,33 +1537,33 @@ class SqlBetweenExpression(SqlExpressionNode):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[column_arg, start_expr, end_expr])
 
     @classmethod
-    def id_prefix(cls) -> IdPrefix:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D102
         return StaticIdPrefix.SQL_EXPR_BETWEEN_PREFIX
 
     @property
-    def requires_parenthesis(self) -> bool:  # noqa: D
+    def requires_parenthesis(self) -> bool:  # noqa: D102
         return False
 
-    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_between_expr(self)
 
     @property
-    def description(self) -> str:  # noqa: D
+    def description(self) -> str:  # noqa: D102
         return "BETWEEN operator"
 
     @property
-    def column_arg(self) -> SqlExpressionNode:  # noqa: D
+    def column_arg(self) -> SqlExpressionNode:  # noqa: D102
         return self._column_arg
 
     @property
-    def start_expr(self) -> SqlExpressionNode:  # noqa: D
+    def start_expr(self) -> SqlExpressionNode:  # noqa: D102
         return self._start_expr
 
     @property
-    def end_expr(self) -> SqlExpressionNode:  # noqa: D
+    def end_expr(self) -> SqlExpressionNode:  # noqa: D102
         return self._end_expr
 
-    def rewrite(  # noqa: D
+    def rewrite(  # noqa: D102
         self,
         column_replacements: Optional[SqlColumnReplacements] = None,
         should_render_table_alias: Optional[bool] = None,
@@ -1573,12 +1575,12 @@ class SqlBetweenExpression(SqlExpressionNode):
         )
 
     @property
-    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D
+    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D102
         return SqlExpressionTreeLineage.combine(
             tuple(x.lineage for x in self.parent_nodes) + (SqlExpressionTreeLineage(other_exprs=(self,)),)
         )
 
-    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D
+    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D102
         if not isinstance(other, SqlBetweenExpression):
             return False
         return self._parents_match(other)
@@ -1587,36 +1589,36 @@ class SqlBetweenExpression(SqlExpressionNode):
 class SqlGenerateUuidExpression(SqlExpressionNode):
     """Renders a sql to generate a random uuid, is non-deterministic.."""
 
-    def __init__(self) -> None:  # noqa: D
+    def __init__(self) -> None:  # noqa: D107
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[])
 
     @classmethod
-    def id_prefix(cls) -> IdPrefix:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D102
         return StaticIdPrefix.SQL_EXPR_GENERATE_UUID_PREFIX
 
-    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: SqlExpressionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_generate_uuid_expr(self)
 
     @property
-    def description(self) -> str:  # noqa: D
+    def description(self) -> str:  # noqa: D102
         return "Generate a universally unique identifier"
 
     @property
-    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
         return super().displayed_properties
 
     @property
-    def requires_parenthesis(self) -> bool:  # noqa: D
+    def requires_parenthesis(self) -> bool:  # noqa: D102
         return False
 
     @property
-    def bind_parameters(self) -> SqlBindParameters:  # noqa: D
+    def bind_parameters(self) -> SqlBindParameters:  # noqa: D102
         return SqlBindParameters()
 
-    def __repr__(self) -> str:  # noqa: D
+    def __repr__(self) -> str:  # noqa: D105
         return f"{self.__class__.__name__}(node_id={self.node_id})"
 
-    def rewrite(  # noqa: D
+    def rewrite(  # noqa: D102
         self,
         column_replacements: Optional[SqlColumnReplacements] = None,
         should_render_table_alias: Optional[bool] = None,
@@ -1624,8 +1626,8 @@ class SqlGenerateUuidExpression(SqlExpressionNode):
         return self
 
     @property
-    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D
+    def lineage(self) -> SqlExpressionTreeLineage:  # noqa: D102
         return SqlExpressionTreeLineage(other_exprs=(self,))
 
-    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D
+    def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D102
         return False

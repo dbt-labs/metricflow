@@ -63,7 +63,7 @@ class WhereFilterSpecResolver:
     The concrete specs for the group-by-items are returned in a lookup.
     """
 
-    def __init__(  # noqa: D
+    def __init__(  # noqa: D107
         self,
         manifest_lookup: SemanticManifestLookup,
         resolution_dag: GroupByItemResolutionDag,
@@ -96,7 +96,7 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
     collected and returned in a lookup object.
     """
 
-    def __init__(  # noqa: D
+    def __init__(
         self, manifest_lookup: SemanticManifestLookup, spec_pattern_factory: WhereFilterPatternFactory
     ) -> None:
         self._manifest_lookup = manifest_lookup

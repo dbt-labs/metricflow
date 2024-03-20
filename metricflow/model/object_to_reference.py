@@ -25,21 +25,21 @@ class ObjectToReference:
     """
 
     @staticmethod
-    def from_semantic_model(semantic_model: SemanticModel) -> SemanticModelReference:  # noqa: D
+    def from_semantic_model(semantic_model: SemanticModel) -> SemanticModelReference:  # noqa: D102
         return SemanticModelReference(semantic_model_name=semantic_model.name)
 
     @staticmethod
-    def from_measure(measure: Measure) -> MeasureReference:  # noqa: D
+    def from_measure(measure: Measure) -> MeasureReference:  # noqa: D102
         return MeasureReference(element_name=measure.name)
 
     @staticmethod
-    def from_entity(entity: Entity) -> EntityReference:  # noqa: D
+    def from_entity(entity: Entity) -> EntityReference:  # noqa: D102
         return EntityReference(element_name=entity.name)
 
     @staticmethod
-    def from_metric(metric: Metric) -> MetricReference:  # noqa: D
+    def from_metric(metric: Metric) -> MetricReference:  # noqa: D102
         return MetricReference(element_name=metric.name)
 
     @staticmethod
-    def from_dimension(dimension: Dimension) -> DimensionReference:  # noqa: D
+    def from_dimension(dimension: Dimension) -> DimensionReference:  # noqa: D102
         return DimensionReference(element_name=dimension.name)

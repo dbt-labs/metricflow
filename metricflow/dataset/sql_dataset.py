@@ -39,7 +39,7 @@ class SqlDataSet(DataSet):
         super().__init__(instance_set=instance_set)
 
     @property
-    def sql_node(self) -> SqlQueryPlanNode:  # noqa: D
+    def sql_node(self) -> SqlQueryPlanNode:  # noqa: D102
         node_to_return = self._sql_select_node or self._sql_node
         if node_to_return is None:
             raise RuntimeError("This node was not created with a SQL node.")

@@ -16,7 +16,7 @@ from metricflow.sql.sql_column import SqlColumn
 from metricflow.sql.sql_table import SqlTable
 
 
-def test_column_type_conversion() -> None:  # noqa: D
+def test_column_type_conversion() -> None:  # noqa: D103
     ctx_provider = SnowflakeInferenceContextProvider(client=MagicMock(), tables=[])
 
     # known snowflake types

@@ -60,7 +60,7 @@ class TableProperties:
     table: SqlTable
     columns: Dict[SqlColumn, ColumnProperties] = field(default_factory=lambda: {}, init=False)
 
-    def __post_init__(self, column_props: List[ColumnProperties]) -> None:  # noqa: D
+    def __post_init__(self, column_props: List[ColumnProperties]) -> None:  # noqa: D105
         for col in column_props:
             self.columns[col.column] = col
 
@@ -74,7 +74,7 @@ class DataWarehouseInferenceContext(InferenceContext):
     tables: Dict[SqlTable, TableProperties] = field(default_factory=lambda: {}, init=False)
     columns: Dict[SqlColumn, ColumnProperties] = field(default_factory=lambda: {}, init=False)
 
-    def __post_init__(self, table_props: List[TableProperties]) -> None:  # noqa: D
+    def __post_init__(self, table_props: List[TableProperties]) -> None:  # noqa: D105
         for stats in table_props:
             self.tables[stats.table] = stats
             for column in stats.columns.values():

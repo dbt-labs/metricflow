@@ -16,11 +16,11 @@ from metricflow.sql.sql_table import SqlTable
 yaml = YAML()
 
 
-class RenderedTimeColumnConfigTypeParams(TypedDict):  # noqa: D
+class RenderedTimeColumnConfigTypeParams(TypedDict):  # noqa: D101
     time_granularity: Literal["day"]
 
 
-class RenderedColumnConfig(TypedDict):  # noqa: D
+class RenderedColumnConfig(TypedDict):  # noqa: D101
     name: str
     type: str
     type_params: NotRequired[RenderedTimeColumnConfigTypeParams]

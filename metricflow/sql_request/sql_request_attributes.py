@@ -12,5 +12,5 @@ class SqlRequestId:
 
     id_str: str
 
-    def __repr__(self) -> str:  # noqa: D
+    def __repr__(self) -> str:  # noqa: D105
         return self.id_str

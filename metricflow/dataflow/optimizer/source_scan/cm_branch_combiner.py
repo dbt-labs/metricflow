@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
-class ComputeMetricsBranchCombinerResult:  # noqa: D
+class ComputeMetricsBranchCombinerResult:  # noqa: D101
     # Perhaps adding more metadata about how nodes got combined would be useful.
     # If combined_branch is None, it means combination could not occur.
     combined_branch: Optional[BaseOutput] = None
@@ -45,7 +45,7 @@ class ComputeMetricsBranchCombinerResult:  # noqa: D
         return self.combined_branch is not None
 
     @property
-    def checked_combined_branch(self) -> BaseOutput:  # noqa: D
+    def checked_combined_branch(self) -> BaseOutput:  # noqa: D102
         assert self.combined_branch is not None
         return self.combined_branch
 
@@ -125,7 +125,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
     is propagated up to the result at the root node.
     """
 
-    def __init__(self, left_branch_node: BaseOutput) -> None:  # noqa: D
+    def __init__(self, left_branch_node: BaseOutput) -> None:  # noqa: D107
         self._current_left_node: DataflowPlanNode = left_branch_node
         self._log_level = logging.DEBUG
 
@@ -185,7 +185,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
 
         return combined_parents
 
-    def _default_handler(self, current_right_node: BaseOutput) -> ComputeMetricsBranchCombinerResult:  # noqa: D
+    def _default_handler(self, current_right_node: BaseOutput) -> ComputeMetricsBranchCombinerResult:
         combined_parent_nodes = self._combine_parent_branches(current_right_node)
         if combined_parent_nodes is None:
             return ComputeMetricsBranchCombinerResult()
@@ -208,19 +208,19 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         )
         return ComputeMetricsBranchCombinerResult()
 
-    def visit_source_node(self, node: ReadSqlSourceNode) -> ComputeMetricsBranchCombinerResult:  # noqa: D
+    def visit_source_node(self, node: ReadSqlSourceNode) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
-    def visit_join_to_base_output_node(  # noqa: D
+    def visit_join_to_base_output_node(  # noqa: D102
         self, node: JoinToBaseOutputNode
-    ) -> ComputeMetricsBranchCombinerResult:
+    ) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
-    def visit_aggregate_measures_node(  # noqa: D
+    def visit_aggregate_measures_node(  # noqa: D102
         self, node: AggregateMeasuresNode
-    ) -> ComputeMetricsBranchCombinerResult:
+    ) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
         self._log_visit_node_type(node)
         current_right_node = node
 
@@ -269,7 +269,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         )
         return ComputeMetricsBranchCombinerResult(combined_node)
 
-    def visit_compute_metrics_node(self, node: ComputeMetricsNode) -> ComputeMetricsBranchCombinerResult:  # noqa: D
+    def visit_compute_metrics_node(self, node: ComputeMetricsNode) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
         current_right_node = node
         self._log_visit_node_type(current_right_node)
         combined_parent_nodes = self._combine_parent_branches(current_right_node)
@@ -316,29 +316,31 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         )
         return ComputeMetricsBranchCombinerResult()
 
-    def visit_order_by_limit_node(self, node: OrderByLimitNode) -> ComputeMetricsBranchCombinerResult:  # noqa: D
+    def visit_order_by_limit_node(self, node: OrderByLimitNode) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._handle_unsupported_node(node)
 
-    def visit_where_constraint_node(self, node: WhereConstraintNode) -> ComputeMetricsBranchCombinerResult:  # noqa: D
+    def visit_where_constraint_node(  # noqa: D102
+        self, node: WhereConstraintNode
+    ) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
-    def visit_write_to_result_dataframe_node(  # noqa: D
+    def visit_write_to_result_dataframe_node(  # noqa: D102
         self, node: WriteToResultDataframeNode
     ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._handle_unsupported_node(node)
 
-    def visit_write_to_result_table_node(  # noqa: D
+    def visit_write_to_result_table_node(  # noqa: D102
         self, node: WriteToResultTableNode
-    ) -> ComputeMetricsBranchCombinerResult:
+    ) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._handle_unsupported_node(node)
 
-    def visit_pass_elements_filter_node(  # noqa: D
+    def visit_pass_elements_filter_node(  # noqa: D102
         self, node: FilterElementsNode
-    ) -> ComputeMetricsBranchCombinerResult:
+    ) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
         self._log_visit_node_type(node)
 
         current_right_node = node
@@ -382,52 +384,54 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         )
         return ComputeMetricsBranchCombinerResult(combined_node)
 
-    def visit_combine_aggregated_outputs_node(  # noqa: D
+    def visit_combine_aggregated_outputs_node(  # noqa: D102
         self, node: CombineAggregatedOutputsNode
     ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._handle_unsupported_node(node)
 
-    def visit_constrain_time_range_node(  # noqa: D
+    def visit_constrain_time_range_node(  # noqa: D102
         self, node: ConstrainTimeRangeNode
-    ) -> ComputeMetricsBranchCombinerResult:
+    ) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
-    def visit_join_over_time_range_node(  # noqa: D
+    def visit_join_over_time_range_node(  # noqa: D102
         self, node: JoinOverTimeRangeNode
-    ) -> ComputeMetricsBranchCombinerResult:
+    ) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
-    def visit_semi_additive_join_node(  # noqa: D
+    def visit_semi_additive_join_node(  # noqa: D102
         self, node: SemiAdditiveJoinNode
-    ) -> ComputeMetricsBranchCombinerResult:
+    ) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
-    def visit_metric_time_dimension_transform_node(  # noqa: D
+    def visit_metric_time_dimension_transform_node(  # noqa: D102
         self, node: MetricTimeDimensionTransformNode
     ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
-    def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode) -> ComputeMetricsBranchCombinerResult:  # noqa: D
+    def visit_join_to_time_spine_node(  # noqa: D102
+        self, node: JoinToTimeSpineNode
+    ) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
-    def visit_add_generated_uuid_column_node(  # noqa: D
+    def visit_add_generated_uuid_column_node(  # noqa: D102
         self, node: AddGeneratedUuidColumnNode
     ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
-    def visit_join_conversion_events_node(  # noqa: D
+    def visit_join_conversion_events_node(  # noqa: D102
         self, node: JoinConversionEventsNode
-    ) -> ComputeMetricsBranchCombinerResult:
+    ) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
-    def visit_min_max_node(self, node: MinMaxNode) -> ComputeMetricsBranchCombinerResult:  # noqa: D
+    def visit_min_max_node(self, node: MinMaxNode) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._default_handler(node)

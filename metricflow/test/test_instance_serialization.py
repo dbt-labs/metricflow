@@ -13,16 +13,16 @@ logger = logging.getLogger(__name__)
 
 
 @pytest.fixture
-def serializer() -> DataclassSerializer:  # noqa: D
+def serializer() -> DataclassSerializer:  # noqa: D103
     return DataclassSerializer()
 
 
 @pytest.fixture
-def deserializer() -> DataClassDeserializer:  # noqa: D
+def deserializer() -> DataClassDeserializer:  # noqa: D103
     return DataClassDeserializer()
 
 
-def test_serialization(  # noqa: D
+def test_serialization(  # noqa: D103
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     serializer: DataclassSerializer,
     deserializer: DataClassDeserializer,

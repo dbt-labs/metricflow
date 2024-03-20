@@ -22,7 +22,7 @@ class InvalidMetricIssue(MetricFlowQueryResolutionIssue):
     metric_suggestions: Tuple[str, ...]
 
     @staticmethod
-    def from_parameters(  # noqa: D
+    def from_parameters(  # noqa: D102
         metric_suggestions: Sequence[str],
         query_resolution_path: MetricFlowQueryResolutionPath,
     ) -> InvalidMetricIssue:

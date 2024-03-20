@@ -52,54 +52,54 @@ class JoinConversionEventsNode(BaseOutput):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=(base_node, conversion_node))
 
     @classmethod
-    def id_prefix(cls) -> IdPrefix:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D102
         return StaticIdPrefix.DATAFLOW_NODE_JOIN_CONVERSION_EVENTS_PREFIX
 
-    def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_join_conversion_events_node(self)
 
     @property
-    def base_node(self) -> DataflowPlanNode:  # noqa: D
+    def base_node(self) -> DataflowPlanNode:  # noqa: D102
         return self._base_node
 
     @property
-    def conversion_node(self) -> DataflowPlanNode:  # noqa: D
+    def conversion_node(self) -> DataflowPlanNode:  # noqa: D102
         return self._conversion_node
 
     @property
-    def conversion_measure_spec(self) -> MeasureSpec:  # noqa: D
+    def conversion_measure_spec(self) -> MeasureSpec:  # noqa: D102
         return self._conversion_measure_spec
 
     @property
-    def base_time_dimension_spec(self) -> TimeDimensionSpec:  # noqa: D
+    def base_time_dimension_spec(self) -> TimeDimensionSpec:  # noqa: D102
         return self._base_time_dimension_spec
 
     @property
-    def conversion_time_dimension_spec(self) -> TimeDimensionSpec:  # noqa: D
+    def conversion_time_dimension_spec(self) -> TimeDimensionSpec:  # noqa: D102
         return self._conversion_time_dimension_spec
 
     @property
-    def unique_identifier_keys(self) -> Sequence[InstanceSpec]:  # noqa: D
+    def unique_identifier_keys(self) -> Sequence[InstanceSpec]:  # noqa: D102
         return self._unique_identifier_keys
 
     @property
-    def entity_spec(self) -> EntitySpec:  # noqa: D
+    def entity_spec(self) -> EntitySpec:  # noqa: D102
         return self._entity_spec
 
     @property
-    def window(self) -> Optional[MetricTimeWindow]:  # noqa: D
+    def window(self) -> Optional[MetricTimeWindow]:  # noqa: D102
         return self._window
 
     @property
-    def constant_properties(self) -> Optional[Sequence[ConstantPropertySpec]]:  # noqa: D
+    def constant_properties(self) -> Optional[Sequence[ConstantPropertySpec]]:  # noqa: D102
         return self._constant_properties
 
     @property
-    def description(self) -> str:  # noqa: D
+    def description(self) -> str:  # noqa: D102
         return f"Find conversions for {self.entity_spec.qualified_name} within the range of {f'{self.window.count} {self.window.granularity.value}' if self.window else 'INF'}"
 
     @property
-    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
         return (
             tuple(super().displayed_properties)
             + (
@@ -115,7 +115,7 @@ class JoinConversionEventsNode(BaseOutput):
             )
         )
 
-    def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D
+    def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D102
         return (
             isinstance(other_node, self.__class__)
             and other_node.base_time_dimension_spec == self.base_time_dimension_spec
@@ -127,7 +127,7 @@ class JoinConversionEventsNode(BaseOutput):
             and other_node.constant_properties == self.constant_properties
         )
 
-    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> JoinConversionEventsNode:  # noqa: D
+    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> JoinConversionEventsNode:  # noqa: D102
         assert len(new_parent_nodes) == 2
         return JoinConversionEventsNode(
             base_node=new_parent_nodes[0],

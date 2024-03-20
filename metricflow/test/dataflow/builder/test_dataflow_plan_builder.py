@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 
 
 @pytest.mark.sql_engine_snapshot
-def test_simple_plan(  # noqa: D
+def test_simple_plan(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -65,7 +65,7 @@ def test_simple_plan(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_primary_entity_dimension(  # noqa: D
+def test_primary_entity_dimension(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -98,7 +98,7 @@ def test_primary_entity_dimension(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_joined_plan(  # noqa: D
+def test_joined_plan(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -135,7 +135,7 @@ def test_joined_plan(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_order_by_plan(  # noqa: D
+def test_order_by_plan(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -173,7 +173,7 @@ def test_order_by_plan(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_limit_rows_plan(  # noqa: D
+def test_limit_rows_plan(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -202,7 +202,7 @@ def test_limit_rows_plan(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_multiple_metrics_plan(  # noqa: D
+def test_multiple_metrics_plan(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -304,7 +304,7 @@ def test_multi_semantic_model_ratio_metrics_plan(
 
 
 @pytest.mark.sql_engine_snapshot
-def test_multihop_join_plan(  # noqa: D
+def test_multihop_join_plan(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     multihop_dataflow_plan_builder: DataflowPlanBuilder,
@@ -340,7 +340,7 @@ def test_multihop_join_plan(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_where_constrained_plan(  # noqa: D
+def test_where_constrained_plan(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     column_association_resolver: ColumnAssociationResolver,
@@ -370,7 +370,7 @@ def test_where_constrained_plan(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_where_constrained_plan_time_dimension(  # noqa: D
+def test_where_constrained_plan_time_dimension(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -399,7 +399,7 @@ def test_where_constrained_plan_time_dimension(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_where_constrained_with_common_linkable_plan(  # noqa: D
+def test_where_constrained_with_common_linkable_plan(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     column_association_resolver: ColumnAssociationResolver,
@@ -429,7 +429,7 @@ def test_where_constrained_with_common_linkable_plan(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_multihop_join_plan_ambiguous_dim(  # noqa: D
+def test_multihop_join_plan_ambiguous_dim(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
@@ -452,7 +452,7 @@ def test_multihop_join_plan_ambiguous_dim(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_cumulative_metric_with_window(  # noqa: D
+def test_cumulative_metric_with_window(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -481,7 +481,7 @@ def test_cumulative_metric_with_window(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_cumulative_metric_no_window_or_grain_with_metric_time(  # noqa: D
+def test_cumulative_metric_no_window_or_grain_with_metric_time(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -509,7 +509,7 @@ def test_cumulative_metric_no_window_or_grain_with_metric_time(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_cumulative_metric_no_window_or_grain_without_metric_time(  # noqa: D
+def test_cumulative_metric_no_window_or_grain_without_metric_time(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -537,7 +537,7 @@ def test_cumulative_metric_no_window_or_grain_without_metric_time(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_distinct_values_plan(  # noqa: D
+def test_distinct_values_plan(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -568,7 +568,7 @@ def test_distinct_values_plan(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_distinct_values_plan_with_join(  # noqa: D
+def test_distinct_values_plan_with_join(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -654,7 +654,7 @@ def test_measure_constraint_with_reused_measure_plan(
 
 
 @pytest.mark.sql_engine_snapshot
-def test_common_semantic_model(  # noqa: D
+def test_common_semantic_model(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -685,7 +685,7 @@ def test_common_semantic_model(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_derived_metric_offset_window(  # noqa: D
+def test_derived_metric_offset_window(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -713,7 +713,7 @@ def test_derived_metric_offset_window(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_derived_metric_offset_to_grain(  # noqa: D
+def test_derived_metric_offset_to_grain(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -741,7 +741,7 @@ def test_derived_metric_offset_to_grain(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_derived_metric_offset_with_granularity(  # noqa: D
+def test_derived_metric_offset_with_granularity(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -768,7 +768,7 @@ def test_derived_metric_offset_with_granularity(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_derived_offset_cumulative_metric(  # noqa: D
+def test_derived_offset_cumulative_metric(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -794,7 +794,7 @@ def test_derived_offset_cumulative_metric(  # noqa: D
     )
 
 
-def test_join_to_time_spine_with_metric_time(  # noqa: D
+def test_join_to_time_spine_with_metric_time(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -820,7 +820,7 @@ def test_join_to_time_spine_with_metric_time(  # noqa: D
     )
 
 
-def test_join_to_time_spine_derived_metric(  # noqa: D
+def test_join_to_time_spine_derived_metric(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -846,7 +846,7 @@ def test_join_to_time_spine_derived_metric(  # noqa: D
     )
 
 
-def test_join_to_time_spine_with_non_metric_time(  # noqa: D
+def test_join_to_time_spine_with_non_metric_time(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -874,7 +874,7 @@ def test_join_to_time_spine_with_non_metric_time(  # noqa: D
     )
 
 
-def test_dont_join_to_time_spine_if_no_time_dimension_requested(  # noqa: D
+def test_dont_join_to_time_spine_if_no_time_dimension_requested(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -897,7 +897,7 @@ def test_dont_join_to_time_spine_if_no_time_dimension_requested(  # noqa: D
     )
 
 
-def test_nested_derived_metric_with_outer_offset(  # noqa: D
+def test_nested_derived_metric_with_outer_offset(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -981,7 +981,7 @@ def test_min_max_only_time(
     )
 
 
-def test_metric_time_only(  # noqa: D
+def test_metric_time_only(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -1004,7 +1004,7 @@ def test_metric_time_only(  # noqa: D
     )
 
 
-def test_metric_time_quarter(  # noqa: D
+def test_metric_time_quarter(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -1027,7 +1027,7 @@ def test_metric_time_quarter(  # noqa: D
     )
 
 
-def test_metric_time_with_other_dimensions(  # noqa: D
+def test_metric_time_with_other_dimensions(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -1056,7 +1056,7 @@ def test_metric_time_with_other_dimensions(  # noqa: D
     )
 
 
-def test_dimensions_with_time_constraint(  # noqa: D
+def test_dimensions_with_time_constraint(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,

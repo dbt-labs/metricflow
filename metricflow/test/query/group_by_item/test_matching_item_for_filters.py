@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 @pytest.mark.parametrize("dag_case_id", [case_id.value for case_id in AmbiguousResolutionQueryId])
-def test_ambiguous_metric_time_in_query_filter(  # noqa: D
+def test_ambiguous_metric_time_in_query_filter(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     naming_scheme: QueryItemNamingScheme,

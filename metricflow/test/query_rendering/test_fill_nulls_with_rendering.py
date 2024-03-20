@@ -28,7 +28,7 @@ from metricflow.test.query_rendering.compare_rendered_query import convert_and_c
 
 
 @pytest.mark.sql_engine_snapshot
-def test_simple_fill_nulls_with_0_metric_time(  # noqa: D
+def test_simple_fill_nulls_with_0_metric_time(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -52,7 +52,7 @@ def test_simple_fill_nulls_with_0_metric_time(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_simple_fill_nulls_with_0_month(  # noqa: D
+def test_simple_fill_nulls_with_0_month(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -76,7 +76,7 @@ def test_simple_fill_nulls_with_0_month(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_simple_fill_nulls_with_0_with_non_metric_time(  # noqa: D
+def test_simple_fill_nulls_with_0_with_non_metric_time(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -102,7 +102,7 @@ def test_simple_fill_nulls_with_0_with_non_metric_time(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_simple_fill_nulls_with_0_with_categorical_dimension(  # noqa: D
+def test_simple_fill_nulls_with_0_with_categorical_dimension(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -126,7 +126,7 @@ def test_simple_fill_nulls_with_0_with_categorical_dimension(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_simple_fill_nulls_without_time_spine(  # noqa: D
+def test_simple_fill_nulls_without_time_spine(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -150,7 +150,7 @@ def test_simple_fill_nulls_without_time_spine(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_cumulative_fill_nulls(  # noqa: D
+def test_cumulative_fill_nulls(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -174,7 +174,7 @@ def test_cumulative_fill_nulls(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_derived_fill_nulls_for_one_input_metric(  # noqa: D
+def test_derived_fill_nulls_for_one_input_metric(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -198,7 +198,7 @@ def test_derived_fill_nulls_for_one_input_metric(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_join_to_time_spine_with_filters(  # noqa: D
+def test_join_to_time_spine_with_filters(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
