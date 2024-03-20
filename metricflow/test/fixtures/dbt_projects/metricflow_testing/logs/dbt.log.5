@@ -1,0 +1,2130 @@
+[0m16:29:47.355897 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__0uim5sf7, now MetricFlow_request_mf_rid__t05xu1nx)
+[0m16:29:47.356925 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__t05xu1nx"
+[0m16:29:47.357211 [debug] [MainThread]: On MetricFlow_request_mf_rid__t05xu1nx: BEGIN
+[0m16:29:47.357445 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:47.357787 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:47.358029 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__t05xu1nx"
+[0m16:29:47.358292 [debug] [MainThread]: On MetricFlow_request_mf_rid__t05xu1nx: -- Constrain Output with WHERE
+-- Aggregate Measures
+-- Compute Metrics via Expressions
+-- Order By ['revenue_instance__ds__day']
+SELECT
+  revenue_instance__ds__day
+  , SUM(txn_revenue) AS trailing_2_months_revenue
+FROM (
+  -- Join Self Over Time Range
+  -- Pass Only Elements: ['txn_revenue', 'revenue_instance__ds__day']
+  SELECT
+    subq_3.ds AS revenue_instance__ds__day
+    , revenue_src_10000.revenue AS txn_revenue
+  FROM *****.mf_time_spine subq_3
+  INNER JOIN
+    *****.fct_revenue revenue_src_10000
+  ON
+    (
+      DATE_TRUNC('day', revenue_src_10000.created_at) <= subq_3.ds
+    ) AND (
+      DATE_TRUNC('day', revenue_src_10000.created_at) > subq_3.ds - INTERVAL 2 month
+    )
+) subq_5
+WHERE CAST(revenue_instance__ds__day AS TIMESTAMP) >= CAST('2020-03-05' AS TIMESTAMP) AND CAST(revenue_instance__ds__day AS TIMESTAMP) < CAST('2021-01-05' AS TIMESTAMP)
+GROUP BY
+  revenue_instance__ds__day
+ORDER BY revenue_instance__ds__day
+[0m16:29:47.359488 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:47.361050 [debug] [MainThread]: On MetricFlow_request_mf_rid__t05xu1nx: ROLLBACK
+[0m16:29:47.362908 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__t05xu1nx'
+[0m16:29:47.363194 [debug] [MainThread]: On MetricFlow_request_mf_rid__t05xu1nx: Close
+[0m16:29:47.365685 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__t05xu1nx, now MetricFlow_request_mf_rid__1om0361x)
+[0m16:29:47.366010 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__1om0361x"
+[0m16:29:47.366264 [debug] [MainThread]: On MetricFlow_request_mf_rid__1om0361x: BEGIN
+[0m16:29:47.366499 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:47.372562 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:47.373026 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__1om0361x"
+[0m16:29:47.373324 [debug] [MainThread]: On MetricFlow_request_mf_rid__1om0361x: SELECT
+  SUM(b.txn_revenue) as trailing_2_months_revenue
+  , a.ds AS revenue_instance__ds__day
+FROM (
+  SELECT ds
+  FROM *****.mf_time_spine
+  WHERE CAST(ds AS TIMESTAMP) >= CAST('2020-01-05' AS TIMESTAMP) AND CAST(ds AS TIMESTAMP) < CAST('2021-01-05' AS TIMESTAMP)
+) a
+INNER JOIN (
+  SELECT
+    revenue as txn_revenue
+    , created_at AS ds
+  FROM *****.fct_revenue
+) b
+ON b.ds <= a.ds AND b.ds > a.ds - INTERVAL 2 month
+WHERE CAST(a.ds AS TIMESTAMP) >= CAST('2020-03-05' AS TIMESTAMP) AND CAST(a.ds AS TIMESTAMP) < CAST('2021-01-05' AS TIMESTAMP)
+GROUP BY a.ds
+ORDER BY a.ds
+[0m16:29:47.374572 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:47.377689 [debug] [MainThread]: On MetricFlow_request_mf_rid__1om0361x: ROLLBACK
+[0m16:29:47.378096 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__1om0361x'
+[0m16:29:47.378381 [debug] [MainThread]: On MetricFlow_request_mf_rid__1om0361x: Close
+[0m16:29:47.896652 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__1om0361x, now MetricFlow_request_mf_rid__1v86h4ah)
+[0m16:29:47.897099 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__1v86h4ah"
+[0m16:29:47.897348 [debug] [MainThread]: On MetricFlow_request_mf_rid__1v86h4ah: BEGIN
+[0m16:29:47.897584 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:47.897987 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:47.898311 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__1v86h4ah"
+[0m16:29:47.898673 [debug] [MainThread]: On MetricFlow_request_mf_rid__1v86h4ah: -- Join Standard Outputs
+-- Pass Only Elements: ['views', 'user__home_state_latest', 'listing__is_lux_latest']
+-- Aggregate Measures
+-- Compute Metrics via Expressions
+SELECT
+  users_latest_src_10000.home_state_latest AS user__home_state_latest
+  , listings_latest_src_10000.is_lux AS listing__is_lux_latest
+  , SUM(subq_2.views) AS views
+FROM (
+  -- Read Elements From Semantic Model 'views_source'
+  -- Metric Time Dimension 'ds'
+  -- Pass Only Elements: ['views', 'user', 'listing']
+  SELECT
+    listing_id AS listing
+    , user_id AS user
+    , 1 AS views
+  FROM *****.fct_views views_source_src_10000
+) subq_2
+LEFT OUTER JOIN
+  *****.dim_users_latest users_latest_src_10000
+ON
+  subq_2.user = users_latest_src_10000.user_id
+LEFT OUTER JOIN
+  *****.dim_listings_latest listings_latest_src_10000
+ON
+  subq_2.listing = listings_latest_src_10000.listing_id
+GROUP BY
+  users_latest_src_10000.home_state_latest
+  , listings_latest_src_10000.is_lux
+[0m16:29:47.900267 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:47.902806 [debug] [MainThread]: On MetricFlow_request_mf_rid__1v86h4ah: ROLLBACK
+[0m16:29:47.903248 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__1v86h4ah'
+[0m16:29:47.903506 [debug] [MainThread]: On MetricFlow_request_mf_rid__1v86h4ah: Close
+[0m16:29:47.908525 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__1v86h4ah, now MetricFlow_request_mf_rid__d1b0t0ad)
+[0m16:29:47.908884 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__d1b0t0ad"
+[0m16:29:47.909132 [debug] [MainThread]: On MetricFlow_request_mf_rid__d1b0t0ad: BEGIN
+[0m16:29:47.909373 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:47.909705 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:47.909953 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__d1b0t0ad"
+[0m16:29:47.911096 [debug] [MainThread]: On MetricFlow_request_mf_rid__d1b0t0ad: SELECT
+  SUM(1) AS views
+  , u.home_state_latest AS user__home_state_latest
+  , l.is_lux AS listing__is_lux_latest
+FROM *****.fct_views v
+LEFT OUTER JOIN *****.dim_listings_latest l
+  ON l.listing_id = v.listing_id
+LEFT OUTER JOIN *****.dim_users_latest u
+  ON u.user_id = v.user_id
+GROUP BY
+  u.home_state_latest
+  , l.is_lux
+[0m16:29:47.912197 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:47.913172 [debug] [MainThread]: On MetricFlow_request_mf_rid__d1b0t0ad: ROLLBACK
+[0m16:29:47.913512 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__d1b0t0ad'
+[0m16:29:47.913760 [debug] [MainThread]: On MetricFlow_request_mf_rid__d1b0t0ad: Close
+[0m16:29:48.105350 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__d1b0t0ad, now MetricFlow_request_mf_rid__isuudlz8)
+[0m16:29:48.105757 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__isuudlz8"
+[0m16:29:48.106010 [debug] [MainThread]: On MetricFlow_request_mf_rid__isuudlz8: BEGIN
+[0m16:29:48.106273 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:48.106650 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:48.106887 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__isuudlz8"
+[0m16:29:48.107128 [debug] [MainThread]: On MetricFlow_request_mf_rid__isuudlz8: -- Read Elements From Semantic Model 'bookings_source'
+-- Metric Time Dimension 'ds'
+-- Pass Only Elements: ['booking_value', 'listing']
+-- Aggregate Measures
+-- Compute Metrics via Expressions
+SELECT
+  listing_id AS listing
+  , SUM(booking_value) AS booking_value
+FROM *****.fct_bookings bookings_source_src_10000
+GROUP BY
+  listing_id
+[0m16:29:48.108040 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:48.108962 [debug] [MainThread]: On MetricFlow_request_mf_rid__isuudlz8: ROLLBACK
+[0m16:29:48.109296 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__isuudlz8'
+[0m16:29:48.109534 [debug] [MainThread]: On MetricFlow_request_mf_rid__isuudlz8: Close
+[0m16:29:48.111097 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__isuudlz8, now MetricFlow_request_mf_rid__a6x1tkvm)
+[0m16:29:48.113032 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__a6x1tkvm"
+[0m16:29:48.113364 [debug] [MainThread]: On MetricFlow_request_mf_rid__a6x1tkvm: BEGIN
+[0m16:29:48.113606 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:48.113946 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:48.114187 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__a6x1tkvm"
+[0m16:29:48.114419 [debug] [MainThread]: On MetricFlow_request_mf_rid__a6x1tkvm: SELECT
+  SUM(booking_value) AS booking_value
+  , listing_id AS listing
+FROM *****.fct_bookings
+GROUP BY
+  listing_id
+[0m16:29:48.115658 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:48.118418 [debug] [MainThread]: On MetricFlow_request_mf_rid__a6x1tkvm: ROLLBACK
+[0m16:29:48.119402 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__a6x1tkvm'
+[0m16:29:48.120313 [debug] [MainThread]: On MetricFlow_request_mf_rid__a6x1tkvm: Close
+[0m16:29:48.331488 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__a6x1tkvm, now MetricFlow_request_mf_rid__zo0n8fsn)
+[0m16:29:48.331904 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__zo0n8fsn"
+[0m16:29:48.332156 [debug] [MainThread]: On MetricFlow_request_mf_rid__zo0n8fsn: BEGIN
+[0m16:29:48.332387 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:48.332757 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:48.332987 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__zo0n8fsn"
+[0m16:29:48.333225 [debug] [MainThread]: On MetricFlow_request_mf_rid__zo0n8fsn: -- Read Elements From Semantic Model 'bookings_source'
+-- Metric Time Dimension 'ds'
+-- Pass Only Elements: ['booking_value', 'metric_time__day', 'listing']
+-- Aggregate Measures
+-- Compute Metrics via Expressions
+SELECT
+  DATE_TRUNC('day', ds) AS metric_time__day
+  , listing_id AS listing
+  , SUM(booking_value) AS booking_value
+FROM *****.fct_bookings bookings_source_src_10000
+GROUP BY
+  DATE_TRUNC('day', ds)
+  , listing_id
+[0m16:29:48.334020 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:48.335009 [debug] [MainThread]: On MetricFlow_request_mf_rid__zo0n8fsn: ROLLBACK
+[0m16:29:48.335325 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__zo0n8fsn'
+[0m16:29:48.335556 [debug] [MainThread]: On MetricFlow_request_mf_rid__zo0n8fsn: Close
+[0m16:29:48.337079 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__zo0n8fsn, now MetricFlow_request_mf_rid__w5kaadlb)
+[0m16:29:48.337351 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__w5kaadlb"
+[0m16:29:48.337581 [debug] [MainThread]: On MetricFlow_request_mf_rid__w5kaadlb: BEGIN
+[0m16:29:48.337798 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:48.338097 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:48.338319 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__w5kaadlb"
+[0m16:29:48.338543 [debug] [MainThread]: On MetricFlow_request_mf_rid__w5kaadlb: SELECT
+  SUM(booking_value) AS booking_value
+  , ds AS metric_time__day
+  , listing_id AS listing
+FROM *****.fct_bookings
+GROUP BY
+  listing_id
+  , ds
+[0m16:29:48.339208 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:48.340180 [debug] [MainThread]: On MetricFlow_request_mf_rid__w5kaadlb: ROLLBACK
+[0m16:29:48.340480 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__w5kaadlb'
+[0m16:29:48.340719 [debug] [MainThread]: On MetricFlow_request_mf_rid__w5kaadlb: Close
+[0m16:29:48.655654 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__w5kaadlb, now MetricFlow_request_mf_rid__un3ws8ov)
+[0m16:29:48.656348 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__un3ws8ov"
+[0m16:29:48.657180 [debug] [MainThread]: On MetricFlow_request_mf_rid__un3ws8ov: BEGIN
+[0m16:29:48.659547 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:48.659949 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:48.660203 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__un3ws8ov"
+[0m16:29:48.660467 [debug] [MainThread]: On MetricFlow_request_mf_rid__un3ws8ov: -- Join Standard Outputs
+-- Pass Only Elements: ['views', 'user__home_state_latest', 'listing']
+-- Aggregate Measures
+-- Compute Metrics via Expressions
+SELECT
+  subq_2.listing AS listing
+  , users_latest_src_10000.home_state_latest AS user__home_state_latest
+  , SUM(subq_2.views) AS views
+FROM (
+  -- Read Elements From Semantic Model 'views_source'
+  -- Metric Time Dimension 'ds'
+  -- Pass Only Elements: ['views', 'listing', 'user']
+  SELECT
+    listing_id AS listing
+    , user_id AS user
+    , 1 AS views
+  FROM *****.fct_views views_source_src_10000
+) subq_2
+LEFT OUTER JOIN
+  *****.dim_users_latest users_latest_src_10000
+ON
+  subq_2.user = users_latest_src_10000.user_id
+GROUP BY
+  subq_2.listing
+  , users_latest_src_10000.home_state_latest
+[0m16:29:48.661336 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:48.662236 [debug] [MainThread]: On MetricFlow_request_mf_rid__un3ws8ov: ROLLBACK
+[0m16:29:48.663282 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__un3ws8ov'
+[0m16:29:48.663992 [debug] [MainThread]: On MetricFlow_request_mf_rid__un3ws8ov: Close
+[0m16:29:48.665908 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__un3ws8ov, now MetricFlow_request_mf_rid__42wsh5tc)
+[0m16:29:48.666265 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__42wsh5tc"
+[0m16:29:48.667168 [debug] [MainThread]: On MetricFlow_request_mf_rid__42wsh5tc: BEGIN
+[0m16:29:48.667505 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:48.667974 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:48.668269 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__42wsh5tc"
+[0m16:29:48.668525 [debug] [MainThread]: On MetricFlow_request_mf_rid__42wsh5tc: SELECT
+  SUM(1) AS views
+  , u.home_state_latest AS user__home_state_latest
+  , v.listing_id AS listing
+FROM *****.fct_views v
+LEFT OUTER JOIN *****.dim_listings_latest l
+  ON l.listing_id = v.listing_id
+LEFT OUTER JOIN *****.dim_users_latest u
+  ON u.user_id = v.user_id
+GROUP BY
+  v.listing_id
+  , u.home_state_latest
+[0m16:29:48.670027 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:48.671376 [debug] [MainThread]: On MetricFlow_request_mf_rid__42wsh5tc: ROLLBACK
+[0m16:29:48.673561 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__42wsh5tc'
+[0m16:29:48.674065 [debug] [MainThread]: On MetricFlow_request_mf_rid__42wsh5tc: Close
+[0m16:29:48.840367 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__42wsh5tc, now MetricFlow_request_mf_rid__4xmeuzm5)
+[0m16:29:48.840807 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__4xmeuzm5"
+[0m16:29:48.841071 [debug] [MainThread]: On MetricFlow_request_mf_rid__4xmeuzm5: BEGIN
+[0m16:29:48.841303 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:48.841671 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:48.841903 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__4xmeuzm5"
+[0m16:29:48.842145 [debug] [MainThread]: On MetricFlow_request_mf_rid__4xmeuzm5: -- Aggregate Measures
+-- Compute Metrics via Expressions
+SELECT
+  verification__ds__day
+  , metric_time__day
+  , SUM(identity_verifications) AS identity_verifications
+FROM (
+  -- Read Elements From Semantic Model 'id_verifications'
+  -- Metric Time Dimension 'ds'
+  -- Pass Only Elements: ['identity_verifications', 'metric_time__day', 'verification__ds__day']
+  SELECT
+    DATE_TRUNC('day', ds) AS verification__ds__day
+    , DATE_TRUNC('day', ds) AS metric_time__day
+    , 1 AS identity_verifications
+  FROM *****.fct_id_verifications id_verifications_src_10000
+) subq_2
+GROUP BY
+  verification__ds__day
+  , metric_time__day
+[0m16:29:48.842754 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:48.843558 [debug] [MainThread]: On MetricFlow_request_mf_rid__4xmeuzm5: ROLLBACK
+[0m16:29:48.843879 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__4xmeuzm5'
+[0m16:29:48.844107 [debug] [MainThread]: On MetricFlow_request_mf_rid__4xmeuzm5: Close
+[0m16:29:48.845587 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__4xmeuzm5, now MetricFlow_request_mf_rid__scvs84is)
+[0m16:29:48.845870 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__scvs84is"
+[0m16:29:48.846106 [debug] [MainThread]: On MetricFlow_request_mf_rid__scvs84is: BEGIN
+[0m16:29:48.846340 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:48.846641 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:48.846865 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__scvs84is"
+[0m16:29:48.847091 [debug] [MainThread]: On MetricFlow_request_mf_rid__scvs84is: SELECT
+  SUM(1) AS identity_verifications
+  , ds AS metric_time__day
+  , ds AS verification__ds__day
+FROM *****.fct_id_verifications
+GROUP BY
+  ds
+[0m16:29:48.849545 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:48.851277 [debug] [MainThread]: On MetricFlow_request_mf_rid__scvs84is: ROLLBACK
+[0m16:29:48.851633 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__scvs84is'
+[0m16:29:48.851884 [debug] [MainThread]: On MetricFlow_request_mf_rid__scvs84is: Close
+[0m16:29:49.074969 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__scvs84is, now MetricFlow_request_mf_rid__nv1ldisd)
+[0m16:29:49.075382 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__nv1ldisd"
+[0m16:29:49.075637 [debug] [MainThread]: On MetricFlow_request_mf_rid__nv1ldisd: BEGIN
+[0m16:29:49.075871 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:49.076241 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:49.076470 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__nv1ldisd"
+[0m16:29:49.076727 [debug] [MainThread]: On MetricFlow_request_mf_rid__nv1ldisd: -- Join Standard Outputs
+-- Pass Only Elements: ['identity_verifications', 'user__home_state', 'metric_time__day']
+-- Aggregate Measures
+-- Compute Metrics via Expressions
+SELECT
+  subq_2.metric_time__day AS metric_time__day
+  , users_ds_source_src_10000.home_state AS user__home_state
+  , SUM(subq_2.identity_verifications) AS identity_verifications
+FROM (
+  -- Read Elements From Semantic Model 'id_verifications'
+  -- Metric Time Dimension 'ds'
+  -- Pass Only Elements: ['identity_verifications', 'metric_time__day', 'ds_partitioned__day', 'user']
+  SELECT
+    DATE_TRUNC('day', ds_partitioned) AS ds_partitioned__day
+    , DATE_TRUNC('day', ds) AS metric_time__day
+    , user_id AS user
+    , 1 AS identity_verifications
+  FROM *****.fct_id_verifications id_verifications_src_10000
+) subq_2
+LEFT OUTER JOIN
+  *****.dim_users users_ds_source_src_10000
+ON
+  (
+    subq_2.user = users_ds_source_src_10000.user_id
+  ) AND (
+    subq_2.ds_partitioned__day = DATE_TRUNC('day', users_ds_source_src_10000.ds_partitioned)
+  )
+GROUP BY
+  subq_2.metric_time__day
+  , users_ds_source_src_10000.home_state
+[0m16:29:49.078728 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:49.080130 [debug] [MainThread]: On MetricFlow_request_mf_rid__nv1ldisd: ROLLBACK
+[0m16:29:49.080517 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__nv1ldisd'
+[0m16:29:49.080766 [debug] [MainThread]: On MetricFlow_request_mf_rid__nv1ldisd: Close
+[0m16:29:49.082448 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__nv1ldisd, now MetricFlow_request_mf_rid__k80v0k28)
+[0m16:29:49.083131 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__k80v0k28"
+[0m16:29:49.083418 [debug] [MainThread]: On MetricFlow_request_mf_rid__k80v0k28: BEGIN
+[0m16:29:49.083675 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:49.084413 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:49.084914 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__k80v0k28"
+[0m16:29:49.085192 [debug] [MainThread]: On MetricFlow_request_mf_rid__k80v0k28: SELECT
+  SUM(1) AS identity_verifications
+  , u.home_state AS user__home_state
+  , v.ds AS metric_time__day
+FROM *****.fct_id_verifications v
+LEFT OUTER JOIN *****.dim_users u
+  ON u.user_id = v.user_id
+  AND u.ds = v.ds
+GROUP BY
+  v.ds
+  , u.home_state
+[0m16:29:49.086324 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:49.087266 [debug] [MainThread]: On MetricFlow_request_mf_rid__k80v0k28: ROLLBACK
+[0m16:29:49.087586 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__k80v0k28'
+[0m16:29:49.088379 [debug] [MainThread]: On MetricFlow_request_mf_rid__k80v0k28: Close
+[0m16:29:49.184652 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__k80v0k28, now MetricFlow_request_mf_rid__4orzmx7a)
+[0m16:29:49.185065 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__4orzmx7a"
+[0m16:29:49.185314 [debug] [MainThread]: On MetricFlow_request_mf_rid__4orzmx7a: BEGIN
+[0m16:29:49.185549 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:49.185914 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:49.186211 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__4orzmx7a"
+[0m16:29:49.186446 [debug] [MainThread]: On MetricFlow_request_mf_rid__4orzmx7a: -- Read Elements From Semantic Model 'users_ds_source'
+-- Pass Only Elements: ['user__home_state',]
+SELECT
+  home_state AS user__home_state
+FROM *****.dim_users users_ds_source_src_10000
+GROUP BY
+  home_state
+[0m16:29:49.187064 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:49.187859 [debug] [MainThread]: On MetricFlow_request_mf_rid__4orzmx7a: ROLLBACK
+[0m16:29:49.188175 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__4orzmx7a'
+[0m16:29:49.188411 [debug] [MainThread]: On MetricFlow_request_mf_rid__4orzmx7a: Close
+[0m16:29:49.189920 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__4orzmx7a, now MetricFlow_request_mf_rid__mi45wz8s)
+[0m16:29:49.190336 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__mi45wz8s"
+[0m16:29:49.190577 [debug] [MainThread]: On MetricFlow_request_mf_rid__mi45wz8s: BEGIN
+[0m16:29:49.190808 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:49.191173 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:49.191404 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__mi45wz8s"
+[0m16:29:49.191631 [debug] [MainThread]: On MetricFlow_request_mf_rid__mi45wz8s: SELECT
+  u.home_state AS user__home_state
+FROM *****.dim_users u
+GROUP BY
+  u.home_state
+[0m16:29:49.192246 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:49.193049 [debug] [MainThread]: On MetricFlow_request_mf_rid__mi45wz8s: ROLLBACK
+[0m16:29:49.193346 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__mi45wz8s'
+[0m16:29:49.193573 [debug] [MainThread]: On MetricFlow_request_mf_rid__mi45wz8s: Close
+[0m16:29:49.287443 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__mi45wz8s, now MetricFlow_request_mf_rid__vsxl1h0f)
+[0m16:29:49.288068 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__vsxl1h0f"
+[0m16:29:49.289363 [debug] [MainThread]: On MetricFlow_request_mf_rid__vsxl1h0f: BEGIN
+[0m16:29:49.290118 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:49.290559 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:49.290810 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__vsxl1h0f"
+[0m16:29:49.291055 [debug] [MainThread]: On MetricFlow_request_mf_rid__vsxl1h0f: -- Read Elements From Semantic Model 'users_ds_source'
+-- Pass Only Elements: ['user__home_state', 'user__ds__day']
+SELECT
+  DATE_TRUNC('day', ds) AS user__ds__day
+  , home_state AS user__home_state
+FROM *****.dim_users users_ds_source_src_10000
+GROUP BY
+  DATE_TRUNC('day', ds)
+  , home_state
+[0m16:29:49.291792 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:49.292698 [debug] [MainThread]: On MetricFlow_request_mf_rid__vsxl1h0f: ROLLBACK
+[0m16:29:49.293008 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__vsxl1h0f'
+[0m16:29:49.293238 [debug] [MainThread]: On MetricFlow_request_mf_rid__vsxl1h0f: Close
+[0m16:29:49.294771 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__vsxl1h0f, now MetricFlow_request_mf_rid__8denarmv)
+[0m16:29:49.295066 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__8denarmv"
+[0m16:29:49.295302 [debug] [MainThread]: On MetricFlow_request_mf_rid__8denarmv: BEGIN
+[0m16:29:49.299069 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:49.299584 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:49.299839 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__8denarmv"
+[0m16:29:49.300080 [debug] [MainThread]: On MetricFlow_request_mf_rid__8denarmv: SELECT
+  u.home_state AS user__home_state
+  , u.ds AS user__ds__day
+FROM *****.dim_users u
+GROUP BY
+  u.ds
+  , u.home_state
+[0m16:29:49.300814 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:49.302595 [debug] [MainThread]: On MetricFlow_request_mf_rid__8denarmv: ROLLBACK
+[0m16:29:49.302924 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__8denarmv'
+[0m16:29:49.303158 [debug] [MainThread]: On MetricFlow_request_mf_rid__8denarmv: Close
+[0m16:29:49.545512 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__8denarmv, now MetricFlow_request_mf_rid__47t4zaz7)
+[0m16:29:49.545969 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__47t4zaz7"
+[0m16:29:49.546233 [debug] [MainThread]: On MetricFlow_request_mf_rid__47t4zaz7: BEGIN
+[0m16:29:49.546468 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:49.546850 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:49.547086 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__47t4zaz7"
+[0m16:29:49.547325 [debug] [MainThread]: On MetricFlow_request_mf_rid__47t4zaz7: -- Join Standard Outputs
+-- Pass Only Elements: ['user__home_state_latest', 'listing__is_lux_latest']
+SELECT
+  listings_latest_src_10000.is_lux AS listing__is_lux_latest
+  , users_latest_src_10000.home_state_latest AS user__home_state_latest
+FROM *****.dim_listings_latest listings_latest_src_10000
+FULL OUTER JOIN
+  *****.dim_users_latest users_latest_src_10000
+ON
+  listings_latest_src_10000.user_id = users_latest_src_10000.user_id
+GROUP BY
+  listings_latest_src_10000.is_lux
+  , users_latest_src_10000.home_state_latest
+[0m16:29:49.548791 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:49.549823 [debug] [MainThread]: On MetricFlow_request_mf_rid__47t4zaz7: ROLLBACK
+[0m16:29:49.550150 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__47t4zaz7'
+[0m16:29:49.550384 [debug] [MainThread]: On MetricFlow_request_mf_rid__47t4zaz7: Close
+[0m16:29:49.552060 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__47t4zaz7, now MetricFlow_request_mf_rid__bdhrlzci)
+[0m16:29:49.552412 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__bdhrlzci"
+[0m16:29:49.552658 [debug] [MainThread]: On MetricFlow_request_mf_rid__bdhrlzci: BEGIN
+[0m16:29:49.552886 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:49.553256 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:49.553486 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__bdhrlzci"
+[0m16:29:49.553718 [debug] [MainThread]: On MetricFlow_request_mf_rid__bdhrlzci: SELECT
+  u.home_state_latest AS user__home_state_latest
+, l.is_lux AS listing__is_lux_latest
+FROM *****.dim_listings_latest l
+FULL OUTER JOIN *****.dim_users_latest u
+  ON u.user_id = l.user_id
+GROUP BY
+  u.home_state_latest
+  , l.is_lux
+[0m16:29:49.555060 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:49.562157 [debug] [MainThread]: On MetricFlow_request_mf_rid__bdhrlzci: ROLLBACK
+[0m16:29:49.562623 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__bdhrlzci'
+[0m16:29:49.562877 [debug] [MainThread]: On MetricFlow_request_mf_rid__bdhrlzci: Close
+[0m16:29:49.643445 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__bdhrlzci, now MetricFlow_request_mf_rid__t825moxw)
+[0m16:29:49.643854 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__t825moxw"
+[0m16:29:49.644832 [debug] [MainThread]: On MetricFlow_request_mf_rid__t825moxw: BEGIN
+[0m16:29:49.645591 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:49.645985 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:49.646309 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__t825moxw"
+[0m16:29:49.646600 [debug] [MainThread]: On MetricFlow_request_mf_rid__t825moxw: -- Read Elements From Semantic Model 'id_verifications'
+-- Pass Only Elements: ['verification__ds__day',]
+SELECT
+  DATE_TRUNC('day', ds) AS verification__ds__day
+FROM *****.fct_id_verifications id_verifications_src_10000
+GROUP BY
+  DATE_TRUNC('day', ds)
+[0m16:29:49.647155 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:49.648249 [debug] [MainThread]: On MetricFlow_request_mf_rid__t825moxw: ROLLBACK
+[0m16:29:49.648602 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__t825moxw'
+[0m16:29:49.648846 [debug] [MainThread]: On MetricFlow_request_mf_rid__t825moxw: Close
+[0m16:29:49.650378 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__t825moxw, now MetricFlow_request_mf_rid__ht2o7u2x)
+[0m16:29:49.650679 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__ht2o7u2x"
+[0m16:29:49.650920 [debug] [MainThread]: On MetricFlow_request_mf_rid__ht2o7u2x: BEGIN
+[0m16:29:49.652249 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:49.653970 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:49.655645 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__ht2o7u2x"
+[0m16:29:49.656306 [debug] [MainThread]: On MetricFlow_request_mf_rid__ht2o7u2x: SELECT
+  v.ds as verification__ds__day
+FROM *****.fct_id_verifications v
+GROUP BY
+  v.ds
+[0m16:29:49.657121 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:49.658009 [debug] [MainThread]: On MetricFlow_request_mf_rid__ht2o7u2x: ROLLBACK
+[0m16:29:49.658347 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__ht2o7u2x'
+[0m16:29:49.658593 [debug] [MainThread]: On MetricFlow_request_mf_rid__ht2o7u2x: Close
+[0m16:29:49.854972 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__ht2o7u2x, now MetricFlow_request_mf_rid__xnfnm6xf)
+[0m16:29:49.855379 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__xnfnm6xf"
+[0m16:29:49.855628 [debug] [MainThread]: On MetricFlow_request_mf_rid__xnfnm6xf: BEGIN
+[0m16:29:49.855878 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:49.856252 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:49.856484 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__xnfnm6xf"
+[0m16:29:49.856748 [debug] [MainThread]: On MetricFlow_request_mf_rid__xnfnm6xf: -- Join Standard Outputs
+-- Pass Only Elements: ['identity_verifications', 'user__home_state', 'verification__ds_partitioned__day']
+-- Aggregate Measures
+-- Compute Metrics via Expressions
+SELECT
+  subq_2.verification__ds_partitioned__day AS verification__ds_partitioned__day
+  , users_ds_source_src_10000.home_state AS user__home_state
+  , SUM(subq_2.identity_verifications) AS identity_verifications
+FROM (
+  -- Read Elements From Semantic Model 'id_verifications'
+  -- Metric Time Dimension 'ds'
+  -- Pass Only Elements: ['identity_verifications', 'verification__ds_partitioned__day', 'ds_partitioned__day', 'user']
+  SELECT
+    DATE_TRUNC('day', ds_partitioned) AS ds_partitioned__day
+    , DATE_TRUNC('day', ds_partitioned) AS verification__ds_partitioned__day
+    , user_id AS user
+    , 1 AS identity_verifications
+  FROM *****.fct_id_verifications id_verifications_src_10000
+) subq_2
+LEFT OUTER JOIN
+  *****.dim_users users_ds_source_src_10000
+ON
+  (
+    subq_2.user = users_ds_source_src_10000.user_id
+  ) AND (
+    subq_2.ds_partitioned__day = DATE_TRUNC('day', users_ds_source_src_10000.ds_partitioned)
+  )
+GROUP BY
+  subq_2.verification__ds_partitioned__day
+  , users_ds_source_src_10000.home_state
+[0m16:29:49.858443 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:49.862969 [debug] [MainThread]: On MetricFlow_request_mf_rid__xnfnm6xf: ROLLBACK
+[0m16:29:49.863423 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__xnfnm6xf'
+[0m16:29:49.863675 [debug] [MainThread]: On MetricFlow_request_mf_rid__xnfnm6xf: Close
+[0m16:29:49.865840 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__xnfnm6xf, now MetricFlow_request_mf_rid__n1iaox7s)
+[0m16:29:49.866201 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__n1iaox7s"
+[0m16:29:49.866441 [debug] [MainThread]: On MetricFlow_request_mf_rid__n1iaox7s: BEGIN
+[0m16:29:49.866667 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:49.867020 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:49.867248 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__n1iaox7s"
+[0m16:29:49.867482 [debug] [MainThread]: On MetricFlow_request_mf_rid__n1iaox7s: SELECT
+  SUM(1) AS identity_verifications
+  , fct.ds_partitioned AS verification__ds_partitioned__day
+  , dim.home_state AS user__home_state
+FROM *****.fct_id_verifications fct
+LEFT OUTER JOIN *****.dim_users dim
+  ON fct.user_id = dim.user_id
+    AND fct.ds_partitioned = dim.ds_partitioned
+GROUP BY
+  fct.ds_partitioned
+  , dim.home_state
+[0m16:29:49.868712 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:49.869817 [debug] [MainThread]: On MetricFlow_request_mf_rid__n1iaox7s: ROLLBACK
+[0m16:29:49.870197 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__n1iaox7s'
+[0m16:29:49.870450 [debug] [MainThread]: On MetricFlow_request_mf_rid__n1iaox7s: Close
+[0m16:29:50.078876 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__n1iaox7s, now MetricFlow_request_mf_rid__7215bvsv)
+[0m16:29:50.079308 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__7215bvsv"
+[0m16:29:50.079568 [debug] [MainThread]: On MetricFlow_request_mf_rid__7215bvsv: BEGIN
+[0m16:29:50.079807 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:50.080196 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:50.080439 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__7215bvsv"
+[0m16:29:50.080696 [debug] [MainThread]: On MetricFlow_request_mf_rid__7215bvsv: -- Join Standard Outputs
+-- Pass Only Elements: ['identity_verifications', 'user__home_state_latest']
+-- Aggregate Measures
+-- Compute Metrics via Expressions
+SELECT
+  users_latest_src_10000.home_state_latest AS user__home_state_latest
+  , SUM(subq_2.identity_verifications) AS identity_verifications
+FROM (
+  -- Read Elements From Semantic Model 'id_verifications'
+  -- Metric Time Dimension 'ds'
+  -- Pass Only Elements: ['identity_verifications', 'user']
+  SELECT
+    user_id AS user
+    , 1 AS identity_verifications
+  FROM *****.fct_id_verifications id_verifications_src_10000
+) subq_2
+LEFT OUTER JOIN
+  *****.dim_users_latest users_latest_src_10000
+ON
+  subq_2.user = users_latest_src_10000.user_id
+GROUP BY
+  users_latest_src_10000.home_state_latest
+[0m16:29:50.081905 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:50.088152 [debug] [MainThread]: On MetricFlow_request_mf_rid__7215bvsv: ROLLBACK
+[0m16:29:50.088711 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__7215bvsv'
+[0m16:29:50.089169 [debug] [MainThread]: On MetricFlow_request_mf_rid__7215bvsv: Close
+[0m16:29:50.090924 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__7215bvsv, now MetricFlow_request_mf_rid__6b7x2234)
+[0m16:29:50.091233 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__6b7x2234"
+[0m16:29:50.091477 [debug] [MainThread]: On MetricFlow_request_mf_rid__6b7x2234: BEGIN
+[0m16:29:50.091706 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:50.092062 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:50.092289 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__6b7x2234"
+[0m16:29:50.092520 [debug] [MainThread]: On MetricFlow_request_mf_rid__6b7x2234: SELECT
+  SUM(1) AS identity_verifications
+  , dim.home_state_latest AS user__home_state_latest
+FROM *****.fct_id_verifications fct
+LEFT OUTER JOIN *****.dim_users_latest dim
+  ON fct.user_id = dim.user_id
+GROUP BY
+  dim.home_state_latest
+[0m16:29:50.093464 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:50.094267 [debug] [MainThread]: On MetricFlow_request_mf_rid__6b7x2234: ROLLBACK
+[0m16:29:50.094573 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__6b7x2234'
+[0m16:29:50.094803 [debug] [MainThread]: On MetricFlow_request_mf_rid__6b7x2234: Close
+[0m16:29:50.337127 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__6b7x2234, now MetricFlow_request_mf_rid__emwn34b6)
+[0m16:29:50.339531 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__emwn34b6"
+[0m16:29:50.339822 [debug] [MainThread]: On MetricFlow_request_mf_rid__emwn34b6: BEGIN
+[0m16:29:50.340074 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:50.340535 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:50.340909 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__emwn34b6"
+[0m16:29:50.341320 [debug] [MainThread]: On MetricFlow_request_mf_rid__emwn34b6: -- Join Standard Outputs
+-- Pass Only Elements: ['identity_verifications', 'user__home_state', 'verification__ds_partitioned__day']
+-- Aggregate Measures
+-- Compute Metrics via Expressions
+SELECT
+  subq_5.verification__ds_partitioned__day AS verification__ds_partitioned__day
+  , users_ds_source_src_10000.home_state AS user__home_state
+  , SUM(subq_5.identity_verifications) AS identity_verifications
+FROM (
+  -- Read Elements From Semantic Model 'id_verifications'
+  -- Metric Time Dimension 'ds'
+  -- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-01T00:00:00]
+  -- Pass Only Elements: ['identity_verifications', 'verification__ds_partitioned__day', 'ds_partitioned__day', 'user']
+  SELECT
+    DATE_TRUNC('day', ds_partitioned) AS ds_partitioned__day
+    , DATE_TRUNC('day', ds_partitioned) AS verification__ds_partitioned__day
+    , user_id AS user
+    , 1 AS identity_verifications
+  FROM *****.fct_id_verifications id_verifications_src_10000
+  WHERE DATE_TRUNC('day', ds) BETWEEN '2020-01-01' AND '2020-01-01'
+) subq_5
+LEFT OUTER JOIN
+  *****.dim_users users_ds_source_src_10000
+ON
+  (
+    subq_5.user = users_ds_source_src_10000.user_id
+  ) AND (
+    subq_5.ds_partitioned__day = DATE_TRUNC('day', users_ds_source_src_10000.ds_partitioned)
+  )
+GROUP BY
+  subq_5.verification__ds_partitioned__day
+  , users_ds_source_src_10000.home_state
+[0m16:29:50.347169 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:50.352418 [debug] [MainThread]: On MetricFlow_request_mf_rid__emwn34b6: ROLLBACK
+[0m16:29:50.353831 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__emwn34b6'
+[0m16:29:50.355210 [debug] [MainThread]: On MetricFlow_request_mf_rid__emwn34b6: Close
+[0m16:29:50.357412 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__emwn34b6, now MetricFlow_request_mf_rid__7eitr4dn)
+[0m16:29:50.357767 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__7eitr4dn"
+[0m16:29:50.358019 [debug] [MainThread]: On MetricFlow_request_mf_rid__7eitr4dn: BEGIN
+[0m16:29:50.358251 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:50.359279 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:50.359556 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__7eitr4dn"
+[0m16:29:50.359815 [debug] [MainThread]: On MetricFlow_request_mf_rid__7eitr4dn: SELECT
+  SUM(1) AS identity_verifications
+  , fct.ds_partitioned AS verification__ds_partitioned__day
+  , dim.home_state AS user__home_state
+FROM *****.fct_id_verifications fct
+LEFT OUTER JOIN *****.dim_users dim
+  ON fct.user_id = dim.user_id
+    AND fct.ds_partitioned = dim.ds_partitioned
+    WHERE CAST(fct.ds_partitioned AS TIMESTAMP) >= CAST('2020-01-01' AS TIMESTAMP) AND CAST(fct.ds_partitioned AS TIMESTAMP) < CAST('2020-01-02' AS TIMESTAMP)
+GROUP BY
+  fct.ds_partitioned
+  , dim.home_state
+[0m16:29:50.360861 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:50.361793 [debug] [MainThread]: On MetricFlow_request_mf_rid__7eitr4dn: ROLLBACK
+[0m16:29:50.362108 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__7eitr4dn'
+[0m16:29:50.362341 [debug] [MainThread]: On MetricFlow_request_mf_rid__7eitr4dn: Close
+[0m16:29:50.631257 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__7eitr4dn, now MetricFlow_request_mf_rid__0hm2cemw)
+[0m16:29:50.631698 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__0hm2cemw"
+[0m16:29:50.631950 [debug] [MainThread]: On MetricFlow_request_mf_rid__0hm2cemw: BEGIN
+[0m16:29:50.632185 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:50.632549 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:50.632778 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__0hm2cemw"
+[0m16:29:50.633295 [debug] [MainThread]: On MetricFlow_request_mf_rid__0hm2cemw: -- Join Standard Outputs
+-- Pass Only Elements: ['bookings', 'listing__capacity', 'metric_time__day']
+-- Aggregate Measures
+-- Compute Metrics via Expressions
+SELECT
+  subq_2.metric_time__day AS metric_time__day
+  , listings_src_10000.capacity AS listing__capacity
+  , SUM(subq_2.bookings) AS bookings
+FROM (
+  -- Read Elements From Semantic Model 'bookings_source'
+  -- Metric Time Dimension 'ds'
+  -- Pass Only Elements: ['bookings', 'metric_time__day', 'listing']
+  SELECT
+    DATE_TRUNC('day', ds) AS metric_time__day
+    , listing_id AS listing
+    , 1 AS bookings
+  FROM *****.fct_bookings bookings_source_src_10000
+) subq_2
+LEFT OUTER JOIN
+  *****.dim_listings listings_src_10000
+ON
+  (
+    subq_2.listing = listings_src_10000.listing_id
+  ) AND (
+    (
+      subq_2.metric_time__day >= listings_src_10000.active_from
+    ) AND (
+      (
+        subq_2.metric_time__day < listings_src_10000.active_to
+      ) OR (
+        listings_src_10000.active_to IS NULL
+      )
+    )
+  )
+GROUP BY
+  subq_2.metric_time__day
+  , listings_src_10000.capacity
+[0m16:29:50.637414 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:50.639585 [debug] [MainThread]: On MetricFlow_request_mf_rid__0hm2cemw: ROLLBACK
+[0m16:29:50.639973 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__0hm2cemw'
+[0m16:29:50.640247 [debug] [MainThread]: On MetricFlow_request_mf_rid__0hm2cemw: Close
+[0m16:29:50.643380 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__0hm2cemw, now MetricFlow_request_mf_rid__ca8enl5e)
+[0m16:29:50.643716 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__ca8enl5e"
+[0m16:29:50.643965 [debug] [MainThread]: On MetricFlow_request_mf_rid__ca8enl5e: BEGIN
+[0m16:29:50.644873 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:50.646370 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:50.646927 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__ca8enl5e"
+[0m16:29:50.647202 [debug] [MainThread]: On MetricFlow_request_mf_rid__ca8enl5e: SELECT
+  a.ds AS metric_time__day
+  , b.capacity AS listing__capacity
+  , SUM(1) AS bookings
+FROM *****.fct_bookings a
+LEFT OUTER JOIN *****.dim_listings b
+ON a.listing_id = b.listing_id
+  AND a.ds >= b.active_from AND (a.ds < b.active_to OR b.active_to is NULL)
+GROUP BY
+  capacity, ds
+[0m16:29:50.648569 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:50.650771 [debug] [MainThread]: On MetricFlow_request_mf_rid__ca8enl5e: ROLLBACK
+[0m16:29:50.651135 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__ca8enl5e'
+[0m16:29:50.651377 [debug] [MainThread]: On MetricFlow_request_mf_rid__ca8enl5e: Close
+[0m16:29:50.894910 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__ca8enl5e, now MetricFlow_request_mf_rid__0f9f38dc)
+[0m16:29:50.895315 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__0f9f38dc"
+[0m16:29:50.895571 [debug] [MainThread]: On MetricFlow_request_mf_rid__0f9f38dc: BEGIN
+[0m16:29:50.895807 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:50.896171 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:50.896474 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__0f9f38dc"
+[0m16:29:50.896747 [debug] [MainThread]: On MetricFlow_request_mf_rid__0f9f38dc: -- Constrain Output with WHERE
+-- Pass Only Elements: ['bookings', 'booking__is_instant', 'metric_time__day']
+-- Aggregate Measures
+-- Compute Metrics via Expressions
+SELECT
+  metric_time__day
+  , booking__is_instant
+  , SUM(bookings) AS family_bookings
+FROM (
+  -- Join Standard Outputs
+  -- Pass Only Elements: ['bookings', 'booking__is_instant', 'listing__capacity', 'metric_time__day']
+  SELECT
+    subq_2.metric_time__day AS metric_time__day
+    , subq_2.booking__is_instant AS booking__is_instant
+    , listings_src_10000.capacity AS listing__capacity
+    , subq_2.bookings AS bookings
+  FROM (
+    -- Read Elements From Semantic Model 'bookings_source'
+    -- Metric Time Dimension 'ds'
+    -- Pass Only Elements: ['bookings', 'booking__is_instant', 'metric_time__day', 'listing']
+    SELECT
+      DATE_TRUNC('day', ds) AS metric_time__day
+      , listing_id AS listing
+      , is_instant AS booking__is_instant
+      , 1 AS bookings
+    FROM *****.fct_bookings bookings_source_src_10000
+  ) subq_2
+  LEFT OUTER JOIN
+    *****.dim_listings listings_src_10000
+  ON
+    (
+      subq_2.listing = listings_src_10000.listing_id
+    ) AND (
+      (
+        subq_2.metric_time__day >= listings_src_10000.active_from
+      ) AND (
+        (
+          subq_2.metric_time__day < listings_src_10000.active_to
+        ) OR (
+          listings_src_10000.active_to IS NULL
+        )
+      )
+    )
+) subq_6
+WHERE listing__capacity > 2
+GROUP BY
+  metric_time__day
+  , booking__is_instant
+[0m16:29:50.910415 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:50.916893 [debug] [MainThread]: On MetricFlow_request_mf_rid__0f9f38dc: ROLLBACK
+[0m16:29:50.917331 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__0f9f38dc'
+[0m16:29:50.917596 [debug] [MainThread]: On MetricFlow_request_mf_rid__0f9f38dc: Close
+[0m16:29:50.919253 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__0f9f38dc, now MetricFlow_request_mf_rid__ckdd189w)
+[0m16:29:50.919534 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__ckdd189w"
+[0m16:29:50.919771 [debug] [MainThread]: On MetricFlow_request_mf_rid__ckdd189w: BEGIN
+[0m16:29:50.919995 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:50.920393 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:50.920681 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__ckdd189w"
+[0m16:29:50.920926 [debug] [MainThread]: On MetricFlow_request_mf_rid__ckdd189w: SELECT
+  a.ds AS metric_time__day
+  , a.is_instant AS booking__is_instant
+  , SUM(1) AS family_bookings
+FROM *****.fct_bookings a
+LEFT OUTER JOIN *****.dim_listings b
+ON a.listing_id = b.listing_id
+  AND a.ds >= b.active_from AND (a.ds < b.active_to OR b.active_to is NULL)
+WHERE b.capacity >= 3
+GROUP BY
+  is_instant
+  , ds
+[0m16:29:50.925737 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:50.926810 [debug] [MainThread]: On MetricFlow_request_mf_rid__ckdd189w: ROLLBACK
+[0m16:29:50.927136 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__ckdd189w'
+[0m16:29:50.927373 [debug] [MainThread]: On MetricFlow_request_mf_rid__ckdd189w: Close
+[0m16:29:51.194114 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__ckdd189w, now MetricFlow_request_mf_rid__xafcwaxo)
+[0m16:29:51.194515 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__xafcwaxo"
+[0m16:29:51.194775 [debug] [MainThread]: On MetricFlow_request_mf_rid__xafcwaxo: BEGIN
+[0m16:29:51.195010 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:51.195365 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:51.195598 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__xafcwaxo"
+[0m16:29:51.195866 [debug] [MainThread]: On MetricFlow_request_mf_rid__xafcwaxo: -- Constrain Output with WHERE
+-- Aggregate Measures
+-- Compute Metrics via Expressions
+SELECT
+  metric_time__day
+  , booking__is_instant
+  , listing__is_lux
+  , SUM(bookings) AS potentially_lux_bookings
+FROM (
+  -- Join Standard Outputs
+  -- Pass Only Elements: ['bookings', 'booking__is_instant', 'listing__is_lux', 'metric_time__day']
+  SELECT
+    subq_2.metric_time__day AS metric_time__day
+    , subq_2.booking__is_instant AS booking__is_instant
+    , listings_src_10000.is_lux AS listing__is_lux
+    , subq_2.bookings AS bookings
+  FROM (
+    -- Read Elements From Semantic Model 'bookings_source'
+    -- Metric Time Dimension 'ds'
+    -- Pass Only Elements: ['bookings', 'booking__is_instant', 'metric_time__day', 'listing']
+    SELECT
+      DATE_TRUNC('day', ds) AS metric_time__day
+      , listing_id AS listing
+      , is_instant AS booking__is_instant
+      , 1 AS bookings
+    FROM *****.fct_bookings bookings_source_src_10000
+  ) subq_2
+  LEFT OUTER JOIN
+    *****.dim_listings listings_src_10000
+  ON
+    (
+      subq_2.listing = listings_src_10000.listing_id
+    ) AND (
+      (
+        subq_2.metric_time__day >= listings_src_10000.active_from
+      ) AND (
+        (
+          subq_2.metric_time__day < listings_src_10000.active_to
+        ) OR (
+          listings_src_10000.active_to IS NULL
+        )
+      )
+    )
+) subq_6
+WHERE listing__is_lux OR listing__is_lux IS NULL
+GROUP BY
+  metric_time__day
+  , booking__is_instant
+  , listing__is_lux
+[0m16:29:51.197370 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:51.203844 [debug] [MainThread]: On MetricFlow_request_mf_rid__xafcwaxo: ROLLBACK
+[0m16:29:51.204889 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__xafcwaxo'
+[0m16:29:51.205792 [debug] [MainThread]: On MetricFlow_request_mf_rid__xafcwaxo: Close
+[0m16:29:51.209865 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__xafcwaxo, now MetricFlow_request_mf_rid__6x0zlzzv)
+[0m16:29:51.210209 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__6x0zlzzv"
+[0m16:29:51.210461 [debug] [MainThread]: On MetricFlow_request_mf_rid__6x0zlzzv: BEGIN
+[0m16:29:51.210695 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:51.211171 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:51.211407 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__6x0zlzzv"
+[0m16:29:51.211649 [debug] [MainThread]: On MetricFlow_request_mf_rid__6x0zlzzv: SELECT
+  a.ds AS metric_time__day
+  , a.is_instant AS booking__is_instant
+  , b.is_lux AS listing__is_lux
+  , SUM(1) AS potentially_lux_bookings
+FROM *****.fct_bookings a
+LEFT OUTER JOIN *****.dim_listings b
+ON a.listing_id = b.listing_id
+  AND a.ds >= b.active_from AND (a.ds < b.active_to OR b.active_to is NULL)
+WHERE b.is_lux OR b.is_lux IS NULL
+GROUP BY
+  is_instant
+  , ds
+  , is_lux
+[0m16:29:51.212691 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:51.215626 [debug] [MainThread]: On MetricFlow_request_mf_rid__6x0zlzzv: ROLLBACK
+[0m16:29:51.216798 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__6x0zlzzv'
+[0m16:29:51.217482 [debug] [MainThread]: On MetricFlow_request_mf_rid__6x0zlzzv: Close
+[0m16:29:51.637859 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__6x0zlzzv, now MetricFlow_request_mf_rid__19v0o5fv)
+[0m16:29:51.638303 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__19v0o5fv"
+[0m16:29:51.638557 [debug] [MainThread]: On MetricFlow_request_mf_rid__19v0o5fv: BEGIN
+[0m16:29:51.638793 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:51.639160 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:51.639391 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__19v0o5fv"
+[0m16:29:51.639669 [debug] [MainThread]: On MetricFlow_request_mf_rid__19v0o5fv: -- Join Standard Outputs
+-- Pass Only Elements: ['bookings', 'listing__is_lux', 'listing__user__home_state_latest', 'metric_time__day']
+-- Aggregate Measures
+-- Compute Metrics via Expressions
+SELECT
+  subq_13.metric_time__day AS metric_time__day
+  , subq_18.is_lux AS listing__is_lux
+  , subq_18.user__home_state_latest AS listing__user__home_state_latest
+  , SUM(subq_13.bookings) AS bookings
+FROM (
+  -- Read Elements From Semantic Model 'bookings_source'
+  -- Metric Time Dimension 'ds'
+  -- Pass Only Elements: ['bookings', 'metric_time__day', 'listing']
+  SELECT
+    DATE_TRUNC('day', ds) AS metric_time__day
+    , listing_id AS listing
+    , 1 AS bookings
+  FROM *****.fct_bookings bookings_source_src_10000
+) subq_13
+LEFT OUTER JOIN (
+  -- Join Standard Outputs
+  -- Pass Only Elements: ['is_lux', 'user__home_state_latest', 'window_start__day', 'window_end__day', 'listing', 'listing']
+  SELECT
+    listings_src_10000.active_from AS window_start__day
+    , listings_src_10000.active_to AS window_end__day
+    , listings_src_10000.listing_id AS listing
+    , listings_src_10000.is_lux AS is_lux
+    , users_latest_src_10000.home_state_latest AS user__home_state_latest
+  FROM *****.dim_listings listings_src_10000
+  LEFT OUTER JOIN
+    *****.dim_users_latest users_latest_src_10000
+  ON
+    listings_src_10000.user_id = users_latest_src_10000.user_id
+) subq_18
+ON
+  (
+    subq_13.listing = subq_18.listing
+  ) AND (
+    (
+      subq_13.metric_time__day >= subq_18.window_start__day
+    ) AND (
+      (
+        subq_13.metric_time__day < subq_18.window_end__day
+      ) OR (
+        subq_18.window_end__day IS NULL
+      )
+    )
+  )
+GROUP BY
+  subq_13.metric_time__day
+  , subq_18.is_lux
+  , subq_18.user__home_state_latest
+[0m16:29:51.643447 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:51.644580 [debug] [MainThread]: On MetricFlow_request_mf_rid__19v0o5fv: ROLLBACK
+[0m16:29:51.644900 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__19v0o5fv'
+[0m16:29:51.645144 [debug] [MainThread]: On MetricFlow_request_mf_rid__19v0o5fv: Close
+[0m16:29:51.646872 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__19v0o5fv, now MetricFlow_request_mf_rid__h4d149a7)
+[0m16:29:51.647164 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__h4d149a7"
+[0m16:29:51.647396 [debug] [MainThread]: On MetricFlow_request_mf_rid__h4d149a7: BEGIN
+[0m16:29:51.647617 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:51.647934 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:51.648156 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__h4d149a7"
+[0m16:29:51.648391 [debug] [MainThread]: On MetricFlow_request_mf_rid__h4d149a7: SELECT
+  a.ds AS metric_time__day
+  , b.is_lux AS listing__is_lux
+  , c.home_state_latest AS listing__user__home_state_latest
+  , SUM(1) AS bookings
+FROM *****.fct_bookings a
+LEFT OUTER JOIN *****.dim_listings b
+ON a.listing_id = b.listing_id
+    AND a.ds >= b.active_from AND (a.ds < b.active_to OR b.active_to is NULL)
+LEFT OUTER JOIN *****.dim_users_latest c
+ON b.user_id = c.user_id
+GROUP BY
+  a.ds
+  , b.is_lux
+  , c.home_state_latest
+[0m16:29:51.651032 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:51.652351 [debug] [MainThread]: On MetricFlow_request_mf_rid__h4d149a7: ROLLBACK
+[0m16:29:51.652664 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__h4d149a7'
+[0m16:29:51.652901 [debug] [MainThread]: On MetricFlow_request_mf_rid__h4d149a7: Close
+[0m16:29:52.091268 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__h4d149a7, now MetricFlow_request_mf_rid__1rurbxre)
+[0m16:29:52.091740 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__1rurbxre"
+[0m16:29:52.092014 [debug] [MainThread]: On MetricFlow_request_mf_rid__1rurbxre: BEGIN
+[0m16:29:52.092261 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:52.092673 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:52.092924 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__1rurbxre"
+[0m16:29:52.093209 [debug] [MainThread]: On MetricFlow_request_mf_rid__1rurbxre: -- Join Standard Outputs
+-- Pass Only Elements: ['bookings', 'listing__user__home_state_latest', 'metric_time__day']
+-- Aggregate Measures
+-- Compute Metrics via Expressions
+SELECT
+  subq_13.metric_time__day AS metric_time__day
+  , subq_18.user__home_state_latest AS listing__user__home_state_latest
+  , SUM(subq_13.bookings) AS bookings
+FROM (
+  -- Read Elements From Semantic Model 'bookings_source'
+  -- Metric Time Dimension 'ds'
+  -- Pass Only Elements: ['bookings', 'metric_time__day', 'listing']
+  SELECT
+    DATE_TRUNC('day', ds) AS metric_time__day
+    , listing_id AS listing
+    , 1 AS bookings
+  FROM *****.fct_bookings bookings_source_src_10000
+) subq_13
+LEFT OUTER JOIN (
+  -- Join Standard Outputs
+  -- Pass Only Elements: ['user__home_state_latest', 'window_start__day', 'window_end__day', 'listing']
+  SELECT
+    listings_src_10000.active_from AS window_start__day
+    , listings_src_10000.active_to AS window_end__day
+    , listings_src_10000.listing_id AS listing
+    , users_latest_src_10000.home_state_latest AS user__home_state_latest
+  FROM *****.dim_listings listings_src_10000
+  LEFT OUTER JOIN
+    *****.dim_users_latest users_latest_src_10000
+  ON
+    listings_src_10000.user_id = users_latest_src_10000.user_id
+) subq_18
+ON
+  (
+    subq_13.listing = subq_18.listing
+  ) AND (
+    (
+      subq_13.metric_time__day >= subq_18.window_start__day
+    ) AND (
+      (
+        subq_13.metric_time__day < subq_18.window_end__day
+      ) OR (
+        subq_18.window_end__day IS NULL
+      )
+    )
+  )
+GROUP BY
+  subq_13.metric_time__day
+  , subq_18.user__home_state_latest
+[0m16:29:52.094719 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:52.095844 [debug] [MainThread]: On MetricFlow_request_mf_rid__1rurbxre: ROLLBACK
+[0m16:29:52.096240 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__1rurbxre'
+[0m16:29:52.096487 [debug] [MainThread]: On MetricFlow_request_mf_rid__1rurbxre: Close
+[0m16:29:52.098373 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__1rurbxre, now MetricFlow_request_mf_rid__lwt132n1)
+[0m16:29:52.098724 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__lwt132n1"
+[0m16:29:52.098979 [debug] [MainThread]: On MetricFlow_request_mf_rid__lwt132n1: BEGIN
+[0m16:29:52.099213 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:52.099599 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:52.099852 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__lwt132n1"
+[0m16:29:52.100103 [debug] [MainThread]: On MetricFlow_request_mf_rid__lwt132n1: SELECT
+  a.ds AS metric_time__day
+  , c.home_state_latest AS listing__user__home_state_latest
+  , SUM(1) AS bookings
+FROM *****.fct_bookings a
+LEFT OUTER JOIN *****.dim_listings b
+ON a.listing_id = b.listing_id
+    AND a.ds >= b.active_from AND (a.ds < b.active_to OR b.active_to is NULL)
+LEFT OUTER JOIN *****.dim_users_latest c
+ON b.user_id = c.user_id
+GROUP BY
+  a.ds
+  , c.home_state_latest
+[0m16:29:52.101364 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:52.102424 [debug] [MainThread]: On MetricFlow_request_mf_rid__lwt132n1: ROLLBACK
+[0m16:29:52.102773 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__lwt132n1'
+[0m16:29:52.103012 [debug] [MainThread]: On MetricFlow_request_mf_rid__lwt132n1: Close
+[0m16:29:52.358603 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__lwt132n1, now MetricFlow_request_mf_rid__u2xik4rk)
+[0m16:29:52.358968 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__u2xik4rk"
+[0m16:29:52.359220 [debug] [MainThread]: On MetricFlow_request_mf_rid__u2xik4rk: BEGIN
+[0m16:29:52.359452 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:52.359768 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:52.360007 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__u2xik4rk"
+[0m16:29:52.360287 [debug] [MainThread]: On MetricFlow_request_mf_rid__u2xik4rk: -- Join Standard Outputs
+-- Pass Only Elements: ['bookings', 'listing__lux_listing__is_confirmed_lux', 'metric_time__day']
+-- Aggregate Measures
+-- Compute Metrics via Expressions
+SELECT
+  subq_5.metric_time__day AS metric_time__day
+  , subq_10.lux_listing__is_confirmed_lux AS listing__lux_listing__is_confirmed_lux
+  , SUM(subq_5.bookings) AS bookings
+FROM (
+  -- Read Elements From Semantic Model 'bookings_source'
+  -- Metric Time Dimension 'ds'
+  -- Pass Only Elements: ['bookings', 'metric_time__day', 'listing']
+  SELECT
+    DATE_TRUNC('day', ds) AS metric_time__day
+    , listing_id AS listing
+    , 1 AS bookings
+  FROM *****.fct_bookings bookings_source_src_10000
+) subq_5
+LEFT OUTER JOIN (
+  -- Join Standard Outputs
+  -- Pass Only Elements: ['lux_listing__is_confirmed_lux', 'lux_listing__window_start__day', 'lux_listing__window_end__day', 'listing']
+  SELECT
+    lux_listings_src_10000.valid_from AS lux_listing__window_start__day
+    , lux_listings_src_10000.valid_to AS lux_listing__window_end__day
+    , lux_listing_mapping_src_10000.listing_id AS listing
+    , lux_listings_src_10000.is_confirmed_lux AS lux_listing__is_confirmed_lux
+  FROM *****.dim_lux_listing_id_mapping lux_listing_mapping_src_10000
+  LEFT OUTER JOIN
+    *****.dim_lux_listings lux_listings_src_10000
+  ON
+    lux_listing_mapping_src_10000.lux_listing_id = lux_listings_src_10000.lux_listing_id
+) subq_10
+ON
+  (
+    subq_5.listing = subq_10.listing
+  ) AND (
+    (
+      subq_5.metric_time__day >= subq_10.lux_listing__window_start__day
+    ) AND (
+      (
+        subq_5.metric_time__day < subq_10.lux_listing__window_end__day
+      ) OR (
+        subq_10.lux_listing__window_end__day IS NULL
+      )
+    )
+  )
+GROUP BY
+  subq_5.metric_time__day
+  , subq_10.lux_listing__is_confirmed_lux
+[0m16:29:52.362807 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:52.365411 [debug] [MainThread]: On MetricFlow_request_mf_rid__u2xik4rk: ROLLBACK
+[0m16:29:52.365800 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__u2xik4rk'
+[0m16:29:52.366050 [debug] [MainThread]: On MetricFlow_request_mf_rid__u2xik4rk: Close
+[0m16:29:52.368125 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__u2xik4rk, now MetricFlow_request_mf_rid__1fra1wxf)
+[0m16:29:52.368546 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__1fra1wxf"
+[0m16:29:52.368915 [debug] [MainThread]: On MetricFlow_request_mf_rid__1fra1wxf: BEGIN
+[0m16:29:52.369162 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:52.369505 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:52.369745 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__1fra1wxf"
+[0m16:29:52.370007 [debug] [MainThread]: On MetricFlow_request_mf_rid__1fra1wxf: SELECT
+  a.ds AS metric_time__day
+  , c.is_confirmed_lux AS listing__lux_listing__is_confirmed_lux
+  , SUM(1) AS bookings
+FROM *****.fct_bookings a
+LEFT OUTER JOIN *****.dim_lux_listing_id_mapping b
+ON a.listing_id = b.listing_id
+LEFT OUTER JOIN *****.dim_lux_listings c
+ON b.lux_listing_id = c.lux_listing_id
+    AND a.ds >= c.valid_from AND (a.ds < c.valid_to OR c.valid_to is NULL)
+GROUP BY
+  a.ds
+  , c.is_confirmed_lux
+[0m16:29:52.372455 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:52.373817 [debug] [MainThread]: On MetricFlow_request_mf_rid__1fra1wxf: ROLLBACK
+[0m16:29:52.374499 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__1fra1wxf'
+[0m16:29:52.374761 [debug] [MainThread]: On MetricFlow_request_mf_rid__1fra1wxf: Close
+[0m16:29:52.587125 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__1fra1wxf, now MetricFlow_request_mf_rid__hix8kc06)
+[0m16:29:52.587603 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__hix8kc06"
+[0m16:29:52.587882 [debug] [MainThread]: On MetricFlow_request_mf_rid__hix8kc06: BEGIN
+[0m16:29:52.588131 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:52.588531 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:52.588771 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__hix8kc06"
+[0m16:29:52.589036 [debug] [MainThread]: On MetricFlow_request_mf_rid__hix8kc06: -- Join on MAX(ds) and ['user'] grouping by None
+-- Pass Only Elements: ['current_account_balance_by_user', 'user']
+-- Aggregate Measures
+-- Compute Metrics via Expressions
+SELECT
+  subq_2.user AS user
+  , SUM(subq_2.current_account_balance_by_user) AS current_account_balance_by_user
+FROM (
+  -- Read Elements From Semantic Model 'accounts_source'
+  -- Metric Time Dimension 'ds'
+  -- Pass Only Elements: ['current_account_balance_by_user', 'ds__day', 'user']
+  SELECT
+    DATE_TRUNC('day', ds) AS ds__day
+    , user_id AS user
+    , account_balance AS current_account_balance_by_user
+  FROM *****.fct_accounts accounts_source_src_10000
+) subq_2
+INNER JOIN (
+  -- Read Elements From Semantic Model 'accounts_source'
+  -- Metric Time Dimension 'ds'
+  -- Pass Only Elements: ['current_account_balance_by_user', 'ds__day', 'user']
+  -- Filter row on MAX(ds__day)
+  SELECT
+    user_id AS user
+    , MAX(DATE_TRUNC('day', ds)) AS ds__day__complete
+  FROM *****.fct_accounts accounts_source_src_10000
+  GROUP BY
+    user_id
+) subq_4
+ON
+  (
+    subq_2.ds__day = subq_4.ds__day__complete
+  ) AND (
+    subq_2.user = subq_4.user
+  )
+GROUP BY
+  subq_2.user
+[0m16:29:52.590627 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:52.591667 [debug] [MainThread]: On MetricFlow_request_mf_rid__hix8kc06: ROLLBACK
+[0m16:29:52.592035 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__hix8kc06'
+[0m16:29:52.592278 [debug] [MainThread]: On MetricFlow_request_mf_rid__hix8kc06: Close
+[0m16:29:52.594057 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__hix8kc06, now MetricFlow_request_mf_rid__5c3sviwx)
+[0m16:29:52.594421 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__5c3sviwx"
+[0m16:29:52.594669 [debug] [MainThread]: On MetricFlow_request_mf_rid__5c3sviwx: BEGIN
+[0m16:29:52.594901 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:52.595265 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:52.595498 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__5c3sviwx"
+[0m16:29:52.595740 [debug] [MainThread]: On MetricFlow_request_mf_rid__5c3sviwx: SELECT
+  a.user AS user
+  , SUM(a.current_account_balance_by_user) AS current_account_balance_by_user
+FROM (
+  SELECT
+    ds
+    , user_id AS user
+    , account_balance AS current_account_balance_by_user
+  FROM *****.fct_accounts
+) a
+INNER JOIN (
+  SELECT
+    user_id AS user
+    , MAX(ds) AS ds
+  FROM *****.fct_accounts
+  GROUP BY
+    user_id
+) b
+ON
+  a.ds = b.ds AND a.user = b.user
+GROUP BY
+  a.user
+[0m16:29:52.597138 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:52.598072 [debug] [MainThread]: On MetricFlow_request_mf_rid__5c3sviwx: ROLLBACK
+[0m16:29:52.598396 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__5c3sviwx'
+[0m16:29:52.598637 [debug] [MainThread]: On MetricFlow_request_mf_rid__5c3sviwx: Close
+[0m16:29:52.775527 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__5c3sviwx, now MetricFlow_request_mf_rid__7bmxtk0i)
+[0m16:29:52.775936 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__7bmxtk0i"
+[0m16:29:52.776188 [debug] [MainThread]: On MetricFlow_request_mf_rid__7bmxtk0i: BEGIN
+[0m16:29:52.776423 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:52.776767 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:52.777001 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__7bmxtk0i"
+[0m16:29:52.777266 [debug] [MainThread]: On MetricFlow_request_mf_rid__7bmxtk0i: -- Join on MAX(ds) and ['user'] grouping by metric_time
+-- Pass Only Elements: ['current_account_balance_by_user', 'metric_time__week']
+-- Aggregate Measures
+-- Compute Metrics via Expressions
+SELECT
+  subq_2.metric_time__week AS metric_time__week
+  , SUM(subq_2.current_account_balance_by_user) AS current_account_balance_by_user
+FROM (
+  -- Read Elements From Semantic Model 'accounts_source'
+  -- Metric Time Dimension 'ds'
+  -- Pass Only Elements: ['current_account_balance_by_user', 'metric_time__week', 'ds__day', 'user']
+  SELECT
+    DATE_TRUNC('day', ds) AS ds__day
+    , DATE_TRUNC('week', ds) AS metric_time__week
+    , user_id AS user
+    , account_balance AS current_account_balance_by_user
+  FROM *****.fct_accounts accounts_source_src_10000
+) subq_2
+INNER JOIN (
+  -- Read Elements From Semantic Model 'accounts_source'
+  -- Metric Time Dimension 'ds'
+  -- Pass Only Elements: ['current_account_balance_by_user', 'metric_time__week', 'ds__day', 'user']
+  -- Filter row on MAX(ds__day)
+  SELECT
+    user_id AS user
+    , DATE_TRUNC('week', ds) AS metric_time__week
+    , MAX(DATE_TRUNC('day', ds)) AS ds__day__complete
+  FROM *****.fct_accounts accounts_source_src_10000
+  GROUP BY
+    user_id
+    , DATE_TRUNC('week', ds)
+) subq_4
+ON
+  (
+    subq_2.ds__day = subq_4.ds__day__complete
+  ) AND (
+    subq_2.user = subq_4.user
+  )
+GROUP BY
+  subq_2.metric_time__week
+[0m16:29:52.780122 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:52.782935 [debug] [MainThread]: On MetricFlow_request_mf_rid__7bmxtk0i: ROLLBACK
+[0m16:29:52.783303 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__7bmxtk0i'
+[0m16:29:52.783554 [debug] [MainThread]: On MetricFlow_request_mf_rid__7bmxtk0i: Close
+[0m16:29:52.785792 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__7bmxtk0i, now MetricFlow_request_mf_rid__dnk0hn0e)
+[0m16:29:52.786092 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__dnk0hn0e"
+[0m16:29:52.786335 [debug] [MainThread]: On MetricFlow_request_mf_rid__dnk0hn0e: BEGIN
+[0m16:29:52.786568 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:52.786918 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:52.787154 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__dnk0hn0e"
+[0m16:29:52.787401 [debug] [MainThread]: On MetricFlow_request_mf_rid__dnk0hn0e: SELECT
+  a.metric_time__week
+  , SUM(a.current_account_balance_by_user) AS current_account_balance_by_user
+FROM (
+  SELECT
+    ds
+    , DATE_TRUNC('week', CAST(ds AS TIMESTAMP)) AS metric_time__week
+    , user_id AS user
+    , account_balance AS current_account_balance_by_user
+  FROM *****.fct_accounts
+) a
+INNER JOIN (
+  SELECT
+    user_id AS user
+    , DATE_TRUNC('week', CAST(ds AS TIMESTAMP)) AS metric_time__week
+    , MAX(ds) AS ds
+  FROM *****.fct_accounts
+  GROUP BY
+    DATE_TRUNC('week', CAST(ds AS TIMESTAMP))
+    , user_id
+) b
+ON
+  a.ds = b.ds AND a.user = b.user
+GROUP BY
+  a.metric_time__week
+[0m16:29:52.789236 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:52.791885 [debug] [MainThread]: On MetricFlow_request_mf_rid__dnk0hn0e: ROLLBACK
+[0m16:29:52.792266 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__dnk0hn0e'
+[0m16:29:52.792512 [debug] [MainThread]: On MetricFlow_request_mf_rid__dnk0hn0e: Close
+[0m16:29:52.971200 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__dnk0hn0e, now MetricFlow_request_mf_rid__zm140tu0)
+[0m16:29:52.971631 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__zm140tu0"
+[0m16:29:52.971891 [debug] [MainThread]: On MetricFlow_request_mf_rid__zm140tu0: BEGIN
+[0m16:29:52.972135 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:52.972495 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:52.972731 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__zm140tu0"
+[0m16:29:52.972998 [debug] [MainThread]: On MetricFlow_request_mf_rid__zm140tu0: -- Join on MIN(ds) and [] grouping by metric_time
+-- Pass Only Elements: ['total_account_balance_first_day', 'metric_time__day']
+-- Aggregate Measures
+-- Compute Metrics via Expressions
+SELECT
+  subq_2.metric_time__day AS metric_time__day
+  , SUM(subq_2.total_account_balance_first_day) AS total_account_balance_first_day
+FROM (
+  -- Read Elements From Semantic Model 'accounts_source'
+  -- Metric Time Dimension 'ds'
+  -- Pass Only Elements: ['total_account_balance_first_day', 'metric_time__day', 'ds__day']
+  SELECT
+    DATE_TRUNC('day', ds) AS ds__day
+    , DATE_TRUNC('day', ds) AS metric_time__day
+    , account_balance AS total_account_balance_first_day
+  FROM *****.fct_accounts accounts_source_src_10000
+) subq_2
+INNER JOIN (
+  -- Read Elements From Semantic Model 'accounts_source'
+  -- Metric Time Dimension 'ds'
+  -- Pass Only Elements: ['total_account_balance_first_day', 'metric_time__day', 'ds__day']
+  -- Filter row on MIN(ds__day)
+  SELECT
+    DATE_TRUNC('day', ds) AS metric_time__day
+    , MIN(DATE_TRUNC('day', ds)) AS ds__day__complete
+  FROM *****.fct_accounts accounts_source_src_10000
+  GROUP BY
+    DATE_TRUNC('day', ds)
+) subq_4
+ON
+  subq_2.ds__day = subq_4.ds__day__complete
+GROUP BY
+  subq_2.metric_time__day
+[0m16:29:52.975183 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:52.976163 [debug] [MainThread]: On MetricFlow_request_mf_rid__zm140tu0: ROLLBACK
+[0m16:29:52.976548 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__zm140tu0'
+[0m16:29:52.976810 [debug] [MainThread]: On MetricFlow_request_mf_rid__zm140tu0: Close
+[0m16:29:52.978930 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__zm140tu0, now MetricFlow_request_mf_rid__5uuf061b)
+[0m16:29:52.980816 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__5uuf061b"
+[0m16:29:52.982774 [debug] [MainThread]: On MetricFlow_request_mf_rid__5uuf061b: BEGIN
+[0m16:29:52.983500 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:52.984524 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:52.985262 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__5uuf061b"
+[0m16:29:52.987185 [debug] [MainThread]: On MetricFlow_request_mf_rid__5uuf061b: SELECT
+  a.ds AS metric_time__day
+  , SUM(a.total_account_balance_first_day) AS total_account_balance_first_day
+FROM (
+  SELECT
+    ds
+    , account_balance AS total_account_balance_first_day
+  FROM *****.fct_accounts
+) a
+INNER JOIN (
+  SELECT
+    MIN(ds) AS ds
+    , DATE_TRUNC('day', CAST(ds AS TIMESTAMP)) AS metric_time__day
+  FROM *****.fct_accounts
+  GROUP BY
+    DATE_TRUNC('day', CAST(ds AS TIMESTAMP))
+) b
+ON
+  a.ds = b.ds
+GROUP BY
+  a.ds
+[0m16:29:52.989912 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:52.991535 [debug] [MainThread]: On MetricFlow_request_mf_rid__5uuf061b: ROLLBACK
+[0m16:29:52.992071 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__5uuf061b'
+[0m16:29:52.992330 [debug] [MainThread]: On MetricFlow_request_mf_rid__5uuf061b: Close
+[0m16:29:53.265711 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__5uuf061b, now MetricFlow_request_mf_rid__vl75b6vz)
+[0m16:29:53.266128 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__vl75b6vz"
+[0m16:29:53.266384 [debug] [MainThread]: On MetricFlow_request_mf_rid__vl75b6vz: BEGIN
+[0m16:29:53.266617 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:53.266982 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:53.267214 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__vl75b6vz"
+[0m16:29:53.267501 [debug] [MainThread]: On MetricFlow_request_mf_rid__vl75b6vz: -- Join on MAX(ds) and ['user'] grouping by None
+-- Pass Only Elements: ['current_account_balance_by_user', 'user']
+-- Aggregate Measures
+-- Compute Metrics via Expressions
+SELECT
+  subq_7.user AS user
+  , SUM(subq_7.current_account_balance_by_user) AS current_account_balance_by_user
+FROM (
+  -- Constrain Output with WHERE
+  SELECT
+    ds__day
+    , subq_6.user
+    , current_account_balance_by_user
+  FROM (
+    -- Join Standard Outputs
+    -- Pass Only Elements: ['current_account_balance_by_user', 'user__home_state_latest', 'ds__day', 'user']
+    SELECT
+      DATE_TRUNC('day', accounts_source_src_10000.ds) AS ds__day
+      , accounts_source_src_10000.user_id AS user
+      , users_latest_src_10000.home_state_latest AS user__home_state_latest
+      , accounts_source_src_10000.account_balance AS current_account_balance_by_user
+    FROM *****.fct_accounts accounts_source_src_10000
+    LEFT OUTER JOIN
+      *****.dim_users_latest users_latest_src_10000
+    ON
+      accounts_source_src_10000.user_id = users_latest_src_10000.user_id
+  ) subq_6
+  WHERE user__home_state_latest = 'CA'
+) subq_7
+INNER JOIN (
+  -- Constrain Output with WHERE
+  -- Filter row on MAX(ds__day)
+  SELECT
+    subq_6.user
+    , MAX(ds__day) AS ds__day__complete
+  FROM (
+    -- Join Standard Outputs
+    -- Pass Only Elements: ['current_account_balance_by_user', 'user__home_state_latest', 'ds__day', 'user']
+    SELECT
+      DATE_TRUNC('day', accounts_source_src_10000.ds) AS ds__day
+      , accounts_source_src_10000.user_id AS user
+      , users_latest_src_10000.home_state_latest AS user__home_state_latest
+    FROM *****.fct_accounts accounts_source_src_10000
+    LEFT OUTER JOIN
+      *****.dim_users_latest users_latest_src_10000
+    ON
+      accounts_source_src_10000.user_id = users_latest_src_10000.user_id
+  ) subq_6
+  WHERE user__home_state_latest = 'CA'
+  GROUP BY
+    subq_6.user
+) subq_9
+ON
+  (
+    subq_7.ds__day = subq_9.ds__day__complete
+  ) AND (
+    subq_7.user = subq_9.user
+  )
+GROUP BY
+  subq_7.user
+[0m16:29:53.272836 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:53.274308 [debug] [MainThread]: On MetricFlow_request_mf_rid__vl75b6vz: ROLLBACK
+[0m16:29:53.275325 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__vl75b6vz'
+[0m16:29:53.275643 [debug] [MainThread]: On MetricFlow_request_mf_rid__vl75b6vz: Close
+[0m16:29:53.277653 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__vl75b6vz, now MetricFlow_request_mf_rid__t6wivmls)
+[0m16:29:53.278052 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__t6wivmls"
+[0m16:29:53.278300 [debug] [MainThread]: On MetricFlow_request_mf_rid__t6wivmls: BEGIN
+[0m16:29:53.278543 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:53.278906 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:53.279137 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__t6wivmls"
+[0m16:29:53.279388 [debug] [MainThread]: On MetricFlow_request_mf_rid__t6wivmls: SELECT
+  e.user AS user
+  , SUM(e.current_account_balance_by_user) AS current_account_balance_by_user
+FROM (
+  SELECT
+    c.user AS user
+    , d.home_state_latest AS user__home_state_latest
+    , c.current_account_balance_by_user AS current_account_balance_by_user
+  FROM (
+    SELECT
+      a.user AS user
+      , a.current_account_balance_by_user AS current_account_balance_by_user
+    FROM (
+      SELECT
+        ds
+        , user_id AS user
+        , account_balance AS current_account_balance_by_user
+      FROM *****.fct_accounts
+    ) a
+    INNER JOIN (
+      SELECT
+        user_id AS user
+        , MAX(ds) AS ds
+      FROM *****.fct_accounts
+      GROUP BY
+        user_id
+    ) b
+    ON
+      a.ds = b.ds AND a.user = b.user
+  ) c
+  LEFT OUTER JOIN
+    *****.dim_users_latest d
+  ON
+    c.user = d.user_id
+) e
+WHERE user__home_state_latest = 'CA'
+GROUP BY
+  e.user
+[0m16:29:53.281420 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:53.282377 [debug] [MainThread]: On MetricFlow_request_mf_rid__t6wivmls: ROLLBACK
+[0m16:29:53.282685 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__t6wivmls'
+[0m16:29:53.282916 [debug] [MainThread]: On MetricFlow_request_mf_rid__t6wivmls: Close
+[0m16:29:53.485088 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__t6wivmls, now MetricFlow_request_mf_rid__rk7c0b4x)
+[0m16:29:53.485503 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__rk7c0b4x"
+[0m16:29:53.485755 [debug] [MainThread]: On MetricFlow_request_mf_rid__rk7c0b4x: BEGIN
+[0m16:29:53.485990 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:53.486358 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:53.486588 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__rk7c0b4x"
+[0m16:29:53.486850 [debug] [MainThread]: On MetricFlow_request_mf_rid__rk7c0b4x: -- Join on MIN(ds) and [] grouping by metric_time
+-- Pass Only Elements: ['total_account_balance_first_day', 'metric_time__week']
+-- Aggregate Measures
+-- Compute Metrics via Expressions
+SELECT
+  subq_2.metric_time__week AS metric_time__week
+  , SUM(subq_2.total_account_balance_first_day) AS total_account_balance_first_day
+FROM (
+  -- Read Elements From Semantic Model 'accounts_source'
+  -- Metric Time Dimension 'ds'
+  -- Pass Only Elements: ['total_account_balance_first_day', 'metric_time__week', 'ds__day']
+  SELECT
+    DATE_TRUNC('day', ds) AS ds__day
+    , DATE_TRUNC('week', ds) AS metric_time__week
+    , account_balance AS total_account_balance_first_day
+  FROM *****.fct_accounts accounts_source_src_10000
+) subq_2
+INNER JOIN (
+  -- Read Elements From Semantic Model 'accounts_source'
+  -- Metric Time Dimension 'ds'
+  -- Pass Only Elements: ['total_account_balance_first_day', 'metric_time__week', 'ds__day']
+  -- Filter row on MIN(ds__day)
+  SELECT
+    DATE_TRUNC('week', ds) AS metric_time__week
+    , MIN(DATE_TRUNC('day', ds)) AS ds__day__complete
+  FROM *****.fct_accounts accounts_source_src_10000
+  GROUP BY
+    DATE_TRUNC('week', ds)
+) subq_4
+ON
+  subq_2.ds__day = subq_4.ds__day__complete
+GROUP BY
+  subq_2.metric_time__week
+[0m16:29:53.495941 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:53.499166 [debug] [MainThread]: On MetricFlow_request_mf_rid__rk7c0b4x: ROLLBACK
+[0m16:29:53.500154 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__rk7c0b4x'
+[0m16:29:53.501030 [debug] [MainThread]: On MetricFlow_request_mf_rid__rk7c0b4x: Close
+[0m16:29:53.503439 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__rk7c0b4x, now MetricFlow_request_mf_rid__4uz672ux)
+[0m16:29:53.503748 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__4uz672ux"
+[0m16:29:53.503991 [debug] [MainThread]: On MetricFlow_request_mf_rid__4uz672ux: BEGIN
+[0m16:29:53.504221 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:53.504702 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:53.504940 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__4uz672ux"
+[0m16:29:53.505184 [debug] [MainThread]: On MetricFlow_request_mf_rid__4uz672ux: SELECT
+  a.metric_time__week
+  , SUM(a.total_account_balance_first_day) AS total_account_balance_first_day
+FROM (
+  SELECT
+    ds
+    , DATE_TRUNC('week', CAST(ds AS TIMESTAMP)) AS metric_time__week
+    , account_balance AS total_account_balance_first_day
+  FROM *****.fct_accounts
+) a
+INNER JOIN (
+  SELECT
+    MIN(ds) AS ds
+    , DATE_TRUNC('week', CAST(ds AS TIMESTAMP)) AS metric_time__week
+  FROM *****.fct_accounts
+  GROUP BY
+    DATE_TRUNC('week', CAST(ds AS TIMESTAMP))
+) b
+ON
+  a.ds = b.ds
+GROUP BY
+  a.metric_time__week
+[0m16:29:53.505987 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:53.507649 [debug] [MainThread]: On MetricFlow_request_mf_rid__4uz672ux: ROLLBACK
+[0m16:29:53.508405 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__4uz672ux'
+[0m16:29:53.508675 [debug] [MainThread]: On MetricFlow_request_mf_rid__4uz672ux: Close
+[0m16:29:53.876390 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__4uz672ux, now MetricFlow_request_mf_rid__hsobomlt)
+[0m16:29:53.876827 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__hsobomlt"
+[0m16:29:53.877216 [debug] [MainThread]: On MetricFlow_request_mf_rid__hsobomlt: BEGIN
+[0m16:29:53.877453 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:53.877817 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:53.878052 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__hsobomlt"
+[0m16:29:53.878329 [debug] [MainThread]: On MetricFlow_request_mf_rid__hsobomlt: -- Join on MAX(ds) and ['user'] grouping by None
+-- Pass Only Elements: ['current_account_balance_by_user', 'user']
+-- Aggregate Measures
+-- Compute Metrics via Expressions
+SELECT
+  subq_3.user AS user
+  , SUM(subq_3.current_account_balance_by_user) AS current_account_balance_by_user
+FROM (
+  -- Constrain Output with WHERE
+  SELECT
+    ds__day
+    , subq_2.user
+    , current_account_balance_by_user
+  FROM (
+    -- Read Elements From Semantic Model 'accounts_source'
+    -- Metric Time Dimension 'ds'
+    -- Pass Only Elements: ['current_account_balance_by_user', 'account__account_type', 'ds__day', 'user']
+    SELECT
+      DATE_TRUNC('day', ds) AS ds__day
+      , user_id AS user
+      , account_type AS account__account_type
+      , account_balance AS current_account_balance_by_user
+    FROM *****.fct_accounts accounts_source_src_10000
+  ) subq_2
+  WHERE account__account_type = 'savings'
+) subq_3
+INNER JOIN (
+  -- Constrain Output with WHERE
+  -- Filter row on MAX(ds__day)
+  SELECT
+    subq_2.user
+    , MAX(ds__day) AS ds__day__complete
+  FROM (
+    -- Read Elements From Semantic Model 'accounts_source'
+    -- Metric Time Dimension 'ds'
+    -- Pass Only Elements: ['current_account_balance_by_user', 'account__account_type', 'ds__day', 'user']
+    SELECT
+      DATE_TRUNC('day', ds) AS ds__day
+      , user_id AS user
+      , account_type AS account__account_type
+    FROM *****.fct_accounts accounts_source_src_10000
+  ) subq_2
+  WHERE account__account_type = 'savings'
+  GROUP BY
+    subq_2.user
+) subq_5
+ON
+  (
+    subq_3.ds__day = subq_5.ds__day__complete
+  ) AND (
+    subq_3.user = subq_5.user
+  )
+GROUP BY
+  subq_3.user
+[0m16:29:53.879758 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:53.880636 [debug] [MainThread]: On MetricFlow_request_mf_rid__hsobomlt: ROLLBACK
+[0m16:29:53.880940 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__hsobomlt'
+[0m16:29:53.881170 [debug] [MainThread]: On MetricFlow_request_mf_rid__hsobomlt: Close
+[0m16:29:53.882766 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__hsobomlt, now MetricFlow_request_mf_rid__kbmc7vv2)
+[0m16:29:53.883061 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__kbmc7vv2"
+[0m16:29:53.883293 [debug] [MainThread]: On MetricFlow_request_mf_rid__kbmc7vv2: BEGIN
+[0m16:29:53.883524 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:53.883819 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:53.884050 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__kbmc7vv2"
+[0m16:29:53.884292 [debug] [MainThread]: On MetricFlow_request_mf_rid__kbmc7vv2: SELECT
+  b.user AS user
+  , SUM(b.current_account_balance_by_user) AS current_account_balance_by_user
+FROM (
+  SELECT
+    ds
+    , a.user
+    , current_account_balance_by_user
+  FROM (
+    SELECT
+      ds
+      , user_id AS user
+      , account_type
+      , account_balance AS current_account_balance_by_user
+    FROM *****.fct_accounts
+  ) a
+  WHERE account_type = 'savings'
+) b
+INNER JOIN (
+  SELECT
+    c.user
+    , MAX(ds) AS ds__complete
+  FROM (
+    SELECT
+      ds
+      , user_id AS user
+      , account_type
+    FROM *****.fct_accounts
+  ) c
+  WHERE account_type = 'savings'
+  GROUP BY
+    c.user
+) d
+ON
+  (b.ds = d.ds__complete) AND (b.user = d.user)
+GROUP BY
+  b.user
+[0m16:29:53.887348 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:53.899421 [debug] [MainThread]: On MetricFlow_request_mf_rid__kbmc7vv2: ROLLBACK
+[0m16:29:53.899870 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__kbmc7vv2'
+[0m16:29:53.900122 [debug] [MainThread]: On MetricFlow_request_mf_rid__kbmc7vv2: Close
+[0m16:29:54.102700 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__kbmc7vv2, now MetricFlow_request_mf_rid__wc19irsr)
+[0m16:29:54.103188 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__wc19irsr"
+[0m16:29:54.103467 [debug] [MainThread]: On MetricFlow_request_mf_rid__wc19irsr: BEGIN
+[0m16:29:54.103716 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:54.104138 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:54.104401 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__wc19irsr"
+[0m16:29:54.104691 [debug] [MainThread]: On MetricFlow_request_mf_rid__wc19irsr: -- Join on MIN(ds) and [] grouping by None
+-- Pass Only Elements: ['total_account_balance_first_day', 'account__account_type']
+-- Aggregate Measures
+-- Compute Metrics via Expressions
+SELECT
+  subq_3.account__account_type AS account__account_type
+  , SUM(subq_3.total_account_balance_first_day) AS total_account_balance_first_day
+FROM (
+  -- Constrain Output with WHERE
+  SELECT
+    ds__day
+    , account__account_type
+    , total_account_balance_first_day
+  FROM (
+    -- Read Elements From Semantic Model 'accounts_source'
+    -- Metric Time Dimension 'ds'
+    -- Pass Only Elements: ['total_account_balance_first_day', 'account__account_type', 'account__ds__day', 'ds__day']
+    SELECT
+      DATE_TRUNC('day', ds) AS ds__day
+      , DATE_TRUNC('day', ds) AS account__ds__day
+      , account_type AS account__account_type
+      , account_balance AS total_account_balance_first_day
+    FROM *****.fct_accounts accounts_source_src_10000
+  ) subq_2
+  WHERE account__ds__day >= CAST('2020-01-03' AS TIMESTAMP)
+) subq_3
+INNER JOIN (
+  -- Constrain Output with WHERE
+  -- Filter row on MIN(ds__day)
+  SELECT
+    MIN(ds__day) AS ds__day__complete
+  FROM (
+    -- Read Elements From Semantic Model 'accounts_source'
+    -- Metric Time Dimension 'ds'
+    -- Pass Only Elements: ['total_account_balance_first_day', 'account__account_type', 'account__ds__day', 'ds__day']
+    SELECT
+      DATE_TRUNC('day', ds) AS ds__day
+      , DATE_TRUNC('day', ds) AS account__ds__day
+    FROM *****.fct_accounts accounts_source_src_10000
+  ) subq_2
+  WHERE account__ds__day >= CAST('2020-01-03' AS TIMESTAMP)
+) subq_5
+ON
+  subq_3.ds__day = subq_5.ds__day__complete
+GROUP BY
+  subq_3.account__account_type
+[0m16:29:54.107586 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:54.109048 [debug] [MainThread]: On MetricFlow_request_mf_rid__wc19irsr: ROLLBACK
+[0m16:29:54.109472 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__wc19irsr'
+[0m16:29:54.109728 [debug] [MainThread]: On MetricFlow_request_mf_rid__wc19irsr: Close
+[0m16:29:54.111730 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__wc19irsr, now MetricFlow_request_mf_rid__fubmird7)
+[0m16:29:54.112047 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__fubmird7"
+[0m16:29:54.112290 [debug] [MainThread]: On MetricFlow_request_mf_rid__fubmird7: BEGIN
+[0m16:29:54.112520 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:54.112883 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:54.113117 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__fubmird7"
+[0m16:29:54.113364 [debug] [MainThread]: On MetricFlow_request_mf_rid__fubmird7: SELECT
+  b.account_type AS account__account_type
+  , SUM(b.total_account_balance_first_day) AS total_account_balance_first_day
+FROM (
+  SELECT
+    ds
+    , account_type
+    , total_account_balance_first_day
+  FROM (
+    SELECT
+      ds
+      , account_type
+      , account_balance AS total_account_balance_first_day
+    FROM *****.fct_accounts
+  ) a
+  WHERE ds >= CAST('2020-01-03' AS TIMESTAMP)
+) b
+INNER JOIN (
+  SELECT
+    MIN(ds) AS ds__complete
+  FROM (
+    SELECT
+      ds
+    FROM *****.fct_accounts
+  ) c
+  WHERE ds >= CAST('2020-01-03' AS TIMESTAMP)
+) d
+ON
+  b.ds = d.ds__complete
+GROUP BY
+  b.account_type
+[0m16:29:54.114674 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:54.115561 [debug] [MainThread]: On MetricFlow_request_mf_rid__fubmird7: ROLLBACK
+[0m16:29:54.115897 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__fubmird7'
+[0m16:29:54.116131 [debug] [MainThread]: On MetricFlow_request_mf_rid__fubmird7: Close
+[0m16:29:54.323260 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__fubmird7, now MetricFlow_request_mf_rid__k5blxcc4)
+[0m16:29:54.323691 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__k5blxcc4"
+[0m16:29:54.323939 [debug] [MainThread]: On MetricFlow_request_mf_rid__k5blxcc4: BEGIN
+[0m16:29:54.324166 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:54.324525 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:54.324754 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__k5blxcc4"
+[0m16:29:54.324988 [debug] [MainThread]: On MetricFlow_request_mf_rid__k5blxcc4: -- Read Elements From Semantic Model 'bookings_source'
+-- Metric Time Dimension 'ds'
+-- Pass Only Elements: ['booking_value', 'booking__is_instant']
+-- Aggregate Measures
+-- Compute Metrics via Expressions
+SELECT
+  is_instant AS booking__is_instant
+  , SUM(booking_value) AS booking_value
+FROM *****.fct_bookings bookings_source_src_10000
+GROUP BY
+  is_instant
+[0m16:29:54.325638 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:54.326439 [debug] [MainThread]: On MetricFlow_request_mf_rid__k5blxcc4: ROLLBACK
+[0m16:29:54.326743 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__k5blxcc4'
+[0m16:29:54.326975 [debug] [MainThread]: On MetricFlow_request_mf_rid__k5blxcc4: Close
+[0m16:29:54.329249 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__k5blxcc4, now MetricFlow_request_mf_rid__vv0rnubc)
+[0m16:29:54.330407 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__vv0rnubc"
+[0m16:29:54.331471 [debug] [MainThread]: On MetricFlow_request_mf_rid__vv0rnubc: BEGIN
+[0m16:29:54.332271 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:54.334172 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:54.334538 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__vv0rnubc"
+[0m16:29:54.334790 [debug] [MainThread]: On MetricFlow_request_mf_rid__vv0rnubc: SELECT
+  SUM(booking_value) AS booking_value
+  , is_instant AS booking__is_instant
+FROM *****.fct_bookings
+GROUP BY
+  is_instant
+[0m16:29:54.335426 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:54.336204 [debug] [MainThread]: On MetricFlow_request_mf_rid__vv0rnubc: ROLLBACK
+[0m16:29:54.336497 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__vv0rnubc'
+[0m16:29:54.336726 [debug] [MainThread]: On MetricFlow_request_mf_rid__vv0rnubc: Close
+[0m16:29:54.557841 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__vv0rnubc, now MetricFlow_request_mf_rid__wrfdez5h)
+[0m16:29:54.558286 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__wrfdez5h"
+[0m16:29:54.558553 [debug] [MainThread]: On MetricFlow_request_mf_rid__wrfdez5h: BEGIN
+[0m16:29:54.558792 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:54.559189 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:54.559430 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__wrfdez5h"
+[0m16:29:54.559676 [debug] [MainThread]: On MetricFlow_request_mf_rid__wrfdez5h: -- Read Elements From Semantic Model 'bookings_source'
+-- Metric Time Dimension 'ds'
+-- Constrain Time Range to [2000-01-01T00:00:00, 1900-01-01T00:00:00]
+-- Pass Only Elements: ['booking_value', 'metric_time__day']
+-- Aggregate Measures
+-- Compute Metrics via Expressions
+SELECT
+  DATE_TRUNC('day', ds) AS metric_time__day
+  , SUM(booking_value) AS booking_value
+FROM *****.fct_bookings bookings_source_src_10000
+WHERE DATE_TRUNC('day', ds) BETWEEN '2000-01-01' AND '1900-01-01'
+GROUP BY
+  DATE_TRUNC('day', ds)
+[0m16:29:54.563088 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:54.566395 [debug] [MainThread]: On MetricFlow_request_mf_rid__wrfdez5h: ROLLBACK
+[0m16:29:54.567569 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__wrfdez5h'
+[0m16:29:54.567868 [debug] [MainThread]: On MetricFlow_request_mf_rid__wrfdez5h: Close
+[0m16:29:54.570055 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__wrfdez5h, now MetricFlow_request_mf_rid__8uftaahx)
+[0m16:29:54.570359 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__8uftaahx"
+[0m16:29:54.570605 [debug] [MainThread]: On MetricFlow_request_mf_rid__8uftaahx: BEGIN
+[0m16:29:54.570852 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:54.571183 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:54.571413 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__8uftaahx"
+[0m16:29:54.571645 [debug] [MainThread]: On MetricFlow_request_mf_rid__8uftaahx: SELECT
+  SUM(booking_value) AS booking_value
+  , ds AS metric_time__day
+FROM *****.fct_bookings
+GROUP BY
+  ds
+limit 0
+[0m16:29:54.572007 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:54.572723 [debug] [MainThread]: On MetricFlow_request_mf_rid__8uftaahx: ROLLBACK
+[0m16:29:54.573013 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__8uftaahx'
+[0m16:29:54.573245 [debug] [MainThread]: On MetricFlow_request_mf_rid__8uftaahx: Close
+[0m16:29:54.821517 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__8uftaahx, now MetricFlow_request_mf_rid__ht42n3da)
+[0m16:29:54.823535 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__ht42n3da"
+[0m16:29:54.823993 [debug] [MainThread]: On MetricFlow_request_mf_rid__ht42n3da: BEGIN
+[0m16:29:54.824260 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:54.824675 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:54.825502 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__ht42n3da"
+[0m16:29:54.827505 [debug] [MainThread]: On MetricFlow_request_mf_rid__ht42n3da: -- Read Elements From Semantic Model 'bookings_source'
+-- Metric Time Dimension 'ds'
+-- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-01T00:00:00]
+-- Pass Only Elements: ['booking_value', 'metric_time__day']
+-- Aggregate Measures
+-- Compute Metrics via Expressions
+SELECT
+  DATE_TRUNC('day', ds) AS metric_time__day
+  , SUM(booking_value) AS booking_value
+FROM *****.fct_bookings bookings_source_src_10000
+WHERE DATE_TRUNC('day', ds) BETWEEN '2020-01-01' AND '2020-01-01'
+GROUP BY
+  DATE_TRUNC('day', ds)
+[0m16:29:54.830294 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:54.832666 [debug] [MainThread]: On MetricFlow_request_mf_rid__ht42n3da: ROLLBACK
+[0m16:29:54.833126 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__ht42n3da'
+[0m16:29:54.833378 [debug] [MainThread]: On MetricFlow_request_mf_rid__ht42n3da: Close
+[0m16:29:54.835174 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__ht42n3da, now MetricFlow_request_mf_rid__b096dhzf)
+[0m16:29:54.835504 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__b096dhzf"
+[0m16:29:54.835755 [debug] [MainThread]: On MetricFlow_request_mf_rid__b096dhzf: BEGIN
+[0m16:29:54.836001 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:54.836384 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:54.836638 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__b096dhzf"
+[0m16:29:54.836877 [debug] [MainThread]: On MetricFlow_request_mf_rid__b096dhzf: SELECT
+  SUM(booking_value) AS booking_value
+  , ds AS metric_time__day
+FROM *****.fct_bookings
+WHERE ds BETWEEN CAST('2020-01-01' AS TIMESTAMP) AND CAST('2020-01-01' AS TIMESTAMP)
+GROUP BY
+  ds
+[0m16:29:54.837722 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:54.838633 [debug] [MainThread]: On MetricFlow_request_mf_rid__b096dhzf: ROLLBACK
+[0m16:29:54.838983 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__b096dhzf'
+[0m16:29:54.839221 [debug] [MainThread]: On MetricFlow_request_mf_rid__b096dhzf: Close
+[0m16:29:55.027552 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__b096dhzf, now MetricFlow_request_mf_rid__4v9oz85r)
+[0m16:29:55.027952 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__4v9oz85r"
+[0m16:29:55.028207 [debug] [MainThread]: On MetricFlow_request_mf_rid__4v9oz85r: BEGIN
+[0m16:29:55.028444 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:55.028813 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:55.029050 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__4v9oz85r"
+[0m16:29:55.029299 [debug] [MainThread]: On MetricFlow_request_mf_rid__4v9oz85r: -- Join Standard Outputs
+-- Pass Only Elements: ['listings', 'user__company_name']
+-- Aggregate Measures
+-- Compute Metrics via Expressions
+SELECT
+  companies_src_10000.company_name AS user__company_name
+  , SUM(subq_2.listings) AS listings
+FROM (
+  -- Read Elements From Semantic Model 'listings_latest'
+  -- Metric Time Dimension 'ds'
+  -- Pass Only Elements: ['listings', 'user']
+  SELECT
+    user_id AS user
+    , 1 AS listings
+  FROM *****.dim_listings_latest listings_latest_src_10000
+) subq_2
+LEFT OUTER JOIN
+  *****.dim_companies companies_src_10000
+ON
+  subq_2.user = companies_src_10000.user_id
+GROUP BY
+  companies_src_10000.company_name
+[0m16:29:55.030173 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:55.032282 [debug] [MainThread]: On MetricFlow_request_mf_rid__4v9oz85r: ROLLBACK
+[0m16:29:55.032683 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__4v9oz85r'
+[0m16:29:55.032966 [debug] [MainThread]: On MetricFlow_request_mf_rid__4v9oz85r: Close
+[0m16:29:55.034621 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__4v9oz85r, now MetricFlow_request_mf_rid__ru9ewilr)
+[0m16:29:55.034936 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__ru9ewilr"
+[0m16:29:55.035174 [debug] [MainThread]: On MetricFlow_request_mf_rid__ru9ewilr: BEGIN
+[0m16:29:55.035401 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:55.035739 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:55.035967 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__ru9ewilr"
+[0m16:29:55.036196 [debug] [MainThread]: On MetricFlow_request_mf_rid__ru9ewilr: SELECT
+  SUM(1) AS listings
+  , b.company_name AS user__company_name
+FROM *****.dim_listings_latest a
+LEFT OUTER JOIN *****.dim_companies b
+ON a.user_id = b.user_id
+GROUP BY
+  2
+[0m16:29:55.037451 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:55.039909 [debug] [MainThread]: On MetricFlow_request_mf_rid__ru9ewilr: ROLLBACK
+[0m16:29:55.040830 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__ru9ewilr'
+[0m16:29:55.041344 [debug] [MainThread]: On MetricFlow_request_mf_rid__ru9ewilr: Close
+[0m16:29:55.049793 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__ru9ewilr, now MetricFlow_request_mf_rid__25ts0x42)
+[0m16:29:55.050140 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__25ts0x42"
+[0m16:29:55.050385 [debug] [MainThread]: On MetricFlow_request_mf_rid__25ts0x42: BEGIN
+[0m16:29:55.050617 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:55.050981 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:55.051211 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__25ts0x42"
+[0m16:29:55.051437 [debug] [MainThread]: On MetricFlow_request_mf_rid__25ts0x42:         SELECT
+            MIN(ds)
+            , MAX(ds)
+        FROM *****.mf_time_spine
+        
+[0m16:29:55.051890 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:55.052645 [debug] [MainThread]: On MetricFlow_request_mf_rid__25ts0x42: ROLLBACK
+[0m16:29:55.052942 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__25ts0x42'
+[0m16:29:55.053170 [debug] [MainThread]: On MetricFlow_request_mf_rid__25ts0x42: Close
+[0m16:29:57.973685 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__25ts0x42, now MetricFlow_request_mf_rid__aelikclv)
+[0m16:29:57.974060 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__aelikclv"
+[0m16:29:57.974309 [debug] [MainThread]: On MetricFlow_request_mf_rid__aelikclv: BEGIN
+[0m16:29:57.974544 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:57.974874 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:57.975104 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__aelikclv"
+[0m16:29:57.975328 [debug] [MainThread]: On MetricFlow_request_mf_rid__aelikclv: SELECT DATE_TRUNC('quarter', CAST('2015-02-22' AS TIMESTAMP))
+[0m16:29:57.975645 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:57.976410 [debug] [MainThread]: On MetricFlow_request_mf_rid__aelikclv: ROLLBACK
+[0m16:29:57.976701 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__aelikclv'
+[0m16:29:57.976931 [debug] [MainThread]: On MetricFlow_request_mf_rid__aelikclv: Close
+[0m16:29:57.979752 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__aelikclv, now MetricFlow_request_mf_rid__li8cw7r6)
+[0m16:29:57.980089 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__li8cw7r6"
+[0m16:29:57.980335 [debug] [MainThread]: On MetricFlow_request_mf_rid__li8cw7r6: BEGIN
+[0m16:29:57.980567 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:57.980907 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:57.981139 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__li8cw7r6"
+[0m16:29:57.981813 [debug] [MainThread]: On MetricFlow_request_mf_rid__li8cw7r6: SELECT DATE_TRUNC('quarter', CAST('2015-06-30' AS TIMESTAMP))
+[0m16:29:57.982300 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:57.983202 [debug] [MainThread]: On MetricFlow_request_mf_rid__li8cw7r6: ROLLBACK
+[0m16:29:57.983543 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__li8cw7r6'
+[0m16:29:57.983797 [debug] [MainThread]: On MetricFlow_request_mf_rid__li8cw7r6: Close
+[0m16:29:57.985962 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__li8cw7r6, now MetricFlow_request_mf_rid__z8um1ss1)
+[0m16:29:57.986285 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__z8um1ss1"
+[0m16:29:57.986529 [debug] [MainThread]: On MetricFlow_request_mf_rid__z8um1ss1: BEGIN
+[0m16:29:57.986761 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:57.987108 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:57.987339 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__z8um1ss1"
+[0m16:29:57.987564 [debug] [MainThread]: On MetricFlow_request_mf_rid__z8um1ss1: SELECT DATE_TRUNC('week', CAST('2023-09-01' AS TIMESTAMP))
+[0m16:29:57.988032 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:57.988758 [debug] [MainThread]: On MetricFlow_request_mf_rid__z8um1ss1: ROLLBACK
+[0m16:29:57.989052 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__z8um1ss1'
+[0m16:29:57.989282 [debug] [MainThread]: On MetricFlow_request_mf_rid__z8um1ss1: Close
+[0m16:29:57.992102 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__z8um1ss1, now MetricFlow_request_mf_rid__f4saozsw)
+[0m16:29:57.992454 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__f4saozsw"
+[0m16:29:57.992709 [debug] [MainThread]: On MetricFlow_request_mf_rid__f4saozsw: BEGIN
+[0m16:29:57.992946 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:57.993319 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:57.993565 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__f4saozsw"
+[0m16:29:57.993805 [debug] [MainThread]: On MetricFlow_request_mf_rid__f4saozsw: SELECT EXTRACT(year FROM CAST('2014-12-30' AS TIMESTAMP))
+[0m16:29:57.995073 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:57.995933 [debug] [MainThread]: On MetricFlow_request_mf_rid__f4saozsw: ROLLBACK
+[0m16:29:57.996247 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__f4saozsw'
+[0m16:29:57.996489 [debug] [MainThread]: On MetricFlow_request_mf_rid__f4saozsw: Close
+[0m16:29:58.001008 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__f4saozsw, now MetricFlow_request_mf_rid__istiukv7)
+[0m16:29:58.001332 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__istiukv7"
+[0m16:29:58.001576 [debug] [MainThread]: On MetricFlow_request_mf_rid__istiukv7: BEGIN
+[0m16:29:58.001802 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:58.002126 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:58.002356 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__istiukv7"
+[0m16:29:58.002581 [debug] [MainThread]: On MetricFlow_request_mf_rid__istiukv7: SELECT EXTRACT(quarter FROM CAST('2015-07-01' AS TIMESTAMP))
+[0m16:29:58.002896 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:58.003633 [debug] [MainThread]: On MetricFlow_request_mf_rid__istiukv7: ROLLBACK
+[0m16:29:58.003921 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__istiukv7'
+[0m16:29:58.004148 [debug] [MainThread]: On MetricFlow_request_mf_rid__istiukv7: Close
+[0m16:29:58.007478 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__istiukv7, now MetricFlow_request_mf_rid__nb3cwwmn)
+[0m16:29:58.007818 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__nb3cwwmn"
+[0m16:29:58.008083 [debug] [MainThread]: On MetricFlow_request_mf_rid__nb3cwwmn: BEGIN
+[0m16:29:58.008326 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:58.008642 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:58.008872 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__nb3cwwmn"
+[0m16:29:58.009097 [debug] [MainThread]: On MetricFlow_request_mf_rid__nb3cwwmn: SELECT EXTRACT(doy FROM CAST('2014-12-30' AS TIMESTAMP))
+[0m16:29:58.009411 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:58.010151 [debug] [MainThread]: On MetricFlow_request_mf_rid__nb3cwwmn: ROLLBACK
+[0m16:29:58.010441 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__nb3cwwmn'
+[0m16:29:58.010673 [debug] [MainThread]: On MetricFlow_request_mf_rid__nb3cwwmn: Close
+[0m16:29:58.013758 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__nb3cwwmn, now MetricFlow_request_mf_rid__anml5l5d)
+[0m16:29:58.014075 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__anml5l5d"
+[0m16:29:58.014320 [debug] [MainThread]: On MetricFlow_request_mf_rid__anml5l5d: BEGIN
+[0m16:29:58.014553 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:58.014855 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:58.015085 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__anml5l5d"
+[0m16:29:58.015309 [debug] [MainThread]: On MetricFlow_request_mf_rid__anml5l5d: SELECT EXTRACT(isodow FROM CAST('2023-08-31' AS TIMESTAMP))
+[0m16:29:58.015625 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:58.016340 [debug] [MainThread]: On MetricFlow_request_mf_rid__anml5l5d: ROLLBACK
+[0m16:29:58.016633 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__anml5l5d'
+[0m16:29:58.016860 [debug] [MainThread]: On MetricFlow_request_mf_rid__anml5l5d: Close
+[0m16:29:58.020824 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__anml5l5d, now MetricFlow_request_mf_rid__cxkminw3)
+[0m16:29:58.021142 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__cxkminw3"
+[0m16:29:58.021391 [debug] [MainThread]: On MetricFlow_request_mf_rid__cxkminw3: BEGIN
+[0m16:29:58.021617 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:58.021930 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:58.022610 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__cxkminw3"
+[0m16:29:58.022842 [debug] [MainThread]: On MetricFlow_request_mf_rid__cxkminw3: SELECT EXTRACT(isodow FROM CAST('2023-09-02' AS TIMESTAMP))
+[0m16:29:58.023189 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:58.023919 [debug] [MainThread]: On MetricFlow_request_mf_rid__cxkminw3: ROLLBACK
+[0m16:29:58.024215 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__cxkminw3'
+[0m16:29:58.024446 [debug] [MainThread]: On MetricFlow_request_mf_rid__cxkminw3: Close
+[0m16:29:58.027033 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__cxkminw3, now MetricFlow_request_mf_rid__dtuxdww0)
+[0m16:29:58.027350 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__dtuxdww0"
+[0m16:29:58.027593 [debug] [MainThread]: On MetricFlow_request_mf_rid__dtuxdww0: BEGIN
+[0m16:29:58.027821 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:58.028129 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:58.028363 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__dtuxdww0"
+[0m16:29:58.028588 [debug] [MainThread]: On MetricFlow_request_mf_rid__dtuxdww0: SELECT 1
+[0m16:29:58.028867 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:58.029595 [debug] [MainThread]: On MetricFlow_request_mf_rid__dtuxdww0: ROLLBACK
+[0m16:29:58.029886 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__dtuxdww0'
+[0m16:29:58.030115 [debug] [MainThread]: On MetricFlow_request_mf_rid__dtuxdww0: Close
+[0m16:29:58.030563 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__dtuxdww0, now MetricFlow_request_mf_rid__e5lihuez)
+[0m16:29:58.030815 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__e5lihuez"
+[0m16:29:58.031043 [debug] [MainThread]: On MetricFlow_request_mf_rid__e5lihuez: BEGIN
+[0m16:29:58.031259 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:58.031532 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:58.031756 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__e5lihuez"
+[0m16:29:58.031977 [debug] [MainThread]: On MetricFlow_request_mf_rid__e5lihuez: this is garbage
+[0m16:29:58.034081 [debug] [MainThread]: On MetricFlow_request_mf_rid__e5lihuez: ROLLBACK
+[0m16:29:58.035523 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__e5lihuez'
+[0m16:29:58.035824 [debug] [MainThread]: On MetricFlow_request_mf_rid__e5lihuez: Close
+[0m16:29:58.039155 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__e5lihuez, now MetricFlow_dry_run_request_mf_rid__1rfd6673)
+[0m16:29:58.039475 [debug] [MainThread]: Using duckdb connection "MetricFlow_dry_run_request_mf_rid__1rfd6673"
+[0m16:29:58.039723 [debug] [MainThread]: On MetricFlow_dry_run_request_mf_rid__1rfd6673: BEGIN
+[0m16:29:58.039956 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:58.040269 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:58.040500 [debug] [MainThread]: Using duckdb connection "MetricFlow_dry_run_request_mf_rid__1rfd6673"
+[0m16:29:58.040731 [debug] [MainThread]: On MetricFlow_dry_run_request_mf_rid__1rfd6673: EXPLAIN CREATE TABLE *****.test_table_ax07wbm0 AS SELECT 1 AS foo
+[0m16:29:58.041175 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:58.041785 [debug] [MainThread]: On MetricFlow_dry_run_request_mf_rid__1rfd6673: ROLLBACK
+[0m16:29:58.042086 [debug] [MainThread]: Failed to rollback 'MetricFlow_dry_run_request_mf_rid__1rfd6673'
+[0m16:29:58.042316 [debug] [MainThread]: On MetricFlow_dry_run_request_mf_rid__1rfd6673: Close
+[0m16:29:58.042634 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_dry_run_request_mf_rid__1rfd6673, now MetricFlow_request_mf_rid__zvl6653s)
+[0m16:29:58.042881 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__zvl6653s"
+[0m16:29:58.043105 [debug] [MainThread]: On MetricFlow_request_mf_rid__zvl6653s: BEGIN
+[0m16:29:58.043322 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:58.043624 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:58.043849 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__zvl6653s"
+[0m16:29:58.044074 [debug] [MainThread]: On MetricFlow_request_mf_rid__zvl6653s: SELECT * FROM *****.test_table_ax07wbm0
+[0m16:29:58.058091 [debug] [MainThread]: On MetricFlow_request_mf_rid__zvl6653s: ROLLBACK
+[0m16:29:58.058730 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__zvl6653s'
+[0m16:29:58.058993 [debug] [MainThread]: On MetricFlow_request_mf_rid__zvl6653s: Close
+[0m16:29:58.104717 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__zvl6653s, now MetricFlow_request_mf_rid__ricrudui)
+[0m16:29:58.105110 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__ricrudui"
+[0m16:29:58.105360 [debug] [MainThread]: On MetricFlow_request_mf_rid__ricrudui: BEGIN
+[0m16:29:58.105593 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:58.105943 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:58.106182 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__ricrudui"
+[0m16:29:58.106412 [debug] [MainThread]: On MetricFlow_request_mf_rid__ricrudui: DROP SCHEMA IF EXISTS ***** CASCADE
+[0m16:29:58.107015 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:58.107617 [debug] [MainThread]: On MetricFlow_request_mf_rid__ricrudui: COMMIT
+[0m16:29:58.107864 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__ricrudui"
+[0m16:29:58.108115 [debug] [MainThread]: On MetricFlow_request_mf_rid__ricrudui: COMMIT
+[0m16:29:58.109041 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:58.109296 [debug] [MainThread]: On MetricFlow_request_mf_rid__ricrudui: Close

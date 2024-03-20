@@ -78,6 +78,10 @@ class InstanceSpecVisitor(Generic[VisitorOutputT], ABC):
         raise NotImplementedError
 
     @abstractmethod
+    def visit_group_by_metric_spec(self, group_by_metric_spec: GroupByMetricSpec) -> VisitorOutputT:  # noqa: D102
+        raise NotImplementedError
+
+    @abstractmethod
     def visit_metric_spec(self, metric_spec: MetricSpec) -> VisitorOutputT:  # noqa: D102
         raise NotImplementedError
 
@@ -234,6 +238,48 @@ class EntitySpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D101
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_entity_spec(self)
+
+
+@dataclass(frozen=True)
+class GroupByMetricSpec(LinkableInstanceSpec, SerializableDataclass):
+    """Metric used in group by or where filter."""
+
+    @property
+    def without_first_entity_link(self) -> GroupByMetricSpec:  # noqa: D
+        assert len(self.entity_links) > 0, f"Spec does not have any entity links: {self}"
+        return GroupByMetricSpec(element_name=self.element_name, entity_links=self.entity_links[1:])
+
+    @property
+    def without_entity_links(self) -> GroupByMetricSpec:  # noqa: D
+        return GroupByMetricSpec(element_name=self.element_name, entity_links=())
+
+    @staticmethod
+    def from_name(name: str) -> GroupByMetricSpec:  # noqa: D
+        structured_name = StructuredLinkableSpecName.from_name(name)
+        return GroupByMetricSpec(
+            entity_links=tuple(EntityReference(idl) for idl in structured_name.entity_link_names),
+            element_name=structured_name.element_name,
+        )
+
+    def __eq__(self, other: Any) -> bool:  # type: ignore[misc] # noqa: D
+        if not isinstance(other, GroupByMetricSpec):
+            return False
+        return self.element_name == other.element_name and self.entity_links == other.entity_links
+
+    def __hash__(self) -> int:  # noqa: D
+        return hash((self.element_name, self.entity_links))
+
+    @property
+    def reference(self) -> MetricReference:  # noqa: D
+        return MetricReference(element_name=self.element_name)
+
+    @property
+    @override
+    def as_spec_set(self) -> InstanceSpecSet:
+        return InstanceSpecSet(group_by_metric_specs=(self,))
+
+    def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+        return visitor.visit_group_by_metric_spec(self)
 
 
 @dataclass(frozen=True)
@@ -656,6 +702,7 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
     dimension_specs: Tuple[DimensionSpec, ...] = ()
     time_dimension_specs: Tuple[TimeDimensionSpec, ...] = ()
     entity_specs: Tuple[EntitySpec, ...] = ()
+    group_by_metric_specs: Tuple[GroupByMetricSpec, ...] = ()
 
     @property
     def contains_metric_time(self) -> bool:
@@ -701,7 +748,11 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
 
     @property
     def as_tuple(self) -> Tuple[LinkableInstanceSpec, ...]:  # noqa: D102
-        return tuple(itertools.chain(self.dimension_specs, self.time_dimension_specs, self.entity_specs))
+        return tuple(
+            itertools.chain(
+                self.dimension_specs, self.time_dimension_specs, self.entity_specs, self.group_by_metric_specs
+            )
+        )
 
     @override
     def merge(self, other: LinkableSpecSet) -> LinkableSpecSet:
@@ -709,6 +760,7 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
             dimension_specs=self.dimension_specs + other.dimension_specs,
             time_dimension_specs=self.time_dimension_specs + other.time_dimension_specs,
             entity_specs=self.entity_specs + other.entity_specs,
+            group_by_metric_specs=self.group_by_metric_specs + other.group_by_metric_specs,
         )
 
     @override
@@ -731,10 +783,15 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
         for entity_spec in self.entity_specs:
             entity_spec_dict[entity_spec] = None
 
+        group_by_metric_spec_dict: Dict[GroupByMetricSpec, None] = {}
+        for group_by_metric in self.group_by_metric_specs:
+            group_by_metric_spec_dict[group_by_metric] = None
+
         return LinkableSpecSet(
             dimension_specs=tuple(dimension_spec_dict.keys()),
             time_dimension_specs=tuple(time_dimension_spec_dict.keys()),
             entity_specs=tuple(entity_spec_dict.keys()),
+            group_by_metric_specs=tuple(group_by_metric_spec_dict.keys()),
         )
 
     def is_subset_of(self, other_set: LinkableSpecSet) -> bool:  # noqa: D102
@@ -746,6 +803,7 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
             dimension_specs=self.dimension_specs,
             time_dimension_specs=self.time_dimension_specs,
             entity_specs=self.entity_specs,
+            group_by_metric_specs=self.group_by_metric_specs,
         )
 
     def difference(self, other: LinkableSpecSet) -> LinkableSpecSet:  # noqa: D102
@@ -753,6 +811,7 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
             dimension_specs=tuple(set(self.dimension_specs) - set(other.dimension_specs)),
             time_dimension_specs=tuple(set(self.time_dimension_specs) - set(other.time_dimension_specs)),
             entity_specs=tuple(set(self.entity_specs) - set(other.entity_specs)),
+            group_by_metric_specs=tuple(set(self.group_by_metric_specs) - set(other.group_by_metric_specs)),
         )
 
     def __len__(self) -> int:  # noqa: D105
@@ -765,6 +824,7 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
             dimension_specs=instance_spec_set.dimension_specs,
             time_dimension_specs=instance_spec_set.time_dimension_specs,
             entity_specs=instance_spec_set.entity_specs,
+            group_by_metric_specs=instance_spec_set.group_by_metric_specs,
         )
 
 
@@ -776,6 +836,7 @@ class MetricFlowQuerySpec(SerializableDataclass):
     dimension_specs: Tuple[DimensionSpec, ...] = ()
     entity_specs: Tuple[EntitySpec, ...] = ()
     time_dimension_specs: Tuple[TimeDimensionSpec, ...] = ()
+    group_by_metric_specs: Tuple[GroupByMetricSpec, ...] = ()
     order_by_specs: Tuple[OrderBySpec, ...] = ()
     time_range_constraint: Optional[TimeRangeConstraint] = None
     limit: Optional[int] = None
@@ -789,6 +850,7 @@ class MetricFlowQuerySpec(SerializableDataclass):
             dimension_specs=self.dimension_specs,
             time_dimension_specs=self.time_dimension_specs,
             entity_specs=self.entity_specs,
+            group_by_metric_specs=self.group_by_metric_specs,
         )
 
     def with_time_range_constraint(self, time_range_constraint: Optional[TimeRangeConstraint]) -> MetricFlowQuerySpec:
@@ -798,6 +860,7 @@ class MetricFlowQuerySpec(SerializableDataclass):
             dimension_specs=self.dimension_specs,
             entity_specs=self.entity_specs,
             time_dimension_specs=self.time_dimension_specs,
+            group_by_metric_specs=self.group_by_metric_specs,
             order_by_specs=self.order_by_specs,
             time_range_constraint=time_range_constraint,
             limit=self.limit,
@@ -826,6 +889,7 @@ class InstanceSpecSet(Mergeable, SerializableDataclass):
     dimension_specs: Tuple[DimensionSpec, ...] = ()
     entity_specs: Tuple[EntitySpec, ...] = ()
     time_dimension_specs: Tuple[TimeDimensionSpec, ...] = ()
+    group_by_metric_specs: Tuple[GroupByMetricSpec, ...] = ()
     metadata_specs: Tuple[MetadataSpec, ...] = ()
 
     @override
@@ -835,6 +899,7 @@ class InstanceSpecSet(Mergeable, SerializableDataclass):
             measure_specs=self.measure_specs + other.measure_specs,
             dimension_specs=self.dimension_specs + other.dimension_specs,
             entity_specs=self.entity_specs + other.entity_specs,
+            group_by_metric_specs=self.group_by_metric_specs + other.group_by_metric_specs,
             time_dimension_specs=self.time_dimension_specs + other.time_dimension_specs,
             metadata_specs=self.metadata_specs + other.metadata_specs,
         )
@@ -874,18 +939,28 @@ class InstanceSpecSet(Mergeable, SerializableDataclass):
             if entity_spec not in entity_specs_deduped:
                 entity_specs_deduped.append(entity_spec)
 
+        group_by_metric_specs_deduped = []
+        for group_by_metric_spec in self.group_by_metric_specs:
+            if group_by_metric_spec not in group_by_metric_specs_deduped:
+                group_by_metric_specs_deduped.append(group_by_metric_spec)
+
         return InstanceSpecSet(
             metric_specs=tuple(metric_specs_deduped),
             measure_specs=tuple(measure_specs_deduped),
             dimension_specs=tuple(dimension_specs_deduped),
             time_dimension_specs=tuple(time_dimension_specs_deduped),
             entity_specs=tuple(entity_specs_deduped),
+            group_by_metric_specs=tuple(group_by_metric_specs_deduped),
         )
 
     @property
     def linkable_specs(self) -> Sequence[LinkableInstanceSpec]:
         """All linkable specs in this set."""
-        return list(itertools.chain(self.dimension_specs, self.time_dimension_specs, self.entity_specs))
+        return list(
+            itertools.chain(
+                self.dimension_specs, self.time_dimension_specs, self.entity_specs, self.group_by_metric_specs
+            )
+        )
 
     @property
     def all_specs(self) -> Sequence[InstanceSpec]:  # noqa: D102
@@ -895,6 +970,7 @@ class InstanceSpecSet(Mergeable, SerializableDataclass):
                 self.dimension_specs,
                 self.time_dimension_specs,
                 self.entity_specs,
+                self.group_by_metric_specs,
                 self.metric_specs,
                 self.metadata_specs,
             )
