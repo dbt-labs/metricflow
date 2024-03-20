@@ -110,7 +110,10 @@ exclude = [
   ".gitignore",
   ".pre-commit-config.yaml",
   "CONTRIBUTING.md",
-  "MAKEFILE",
+  "Makefile",
+  "/dbt-metricflow",
+  "/local-data-warehouses",
+  "/scripts",
   "/tests",
 ]
 
