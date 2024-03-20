@@ -25,6 +25,8 @@ class LinkableElementProperties(Enum):
     ENTITY = "entity"
     # See metric_time in DataSet
     METRIC_TIME = "metric_time"
+    # Refers to a metric, not a dimension.
+    METRIC = "metric"
 
     @staticmethod
     def all_properties() -> FrozenSet[LinkableElementProperties]:  # noqa: D102
