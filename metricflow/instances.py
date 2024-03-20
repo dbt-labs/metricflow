@@ -14,6 +14,7 @@ from metricflow.specs.column_assoc import ColumnAssociation
 from metricflow.specs.specs import (
     DimensionSpec,
     EntitySpec,
+    GroupByMetricSpec,
     InstanceSpec,
     InstanceSpecSet,
     MeasureSpec,
@@ -103,6 +104,12 @@ class EntityInstance(MdoInstance[EntitySpec], SemanticModelElementInstance):  # 
 
 
 @dataclass(frozen=True)
+class GroupByMetricInstance(MdoInstance[GroupByMetricSpec]):  # noqa: D101
+    associated_columns: Tuple[ColumnAssociation, ...]
+    spec: GroupByMetricSpec
+
+
+@dataclass(frozen=True)
 class MetricInstance(MdoInstance[MetricSpec], SerializableDataclass):  # noqa: D101
     associated_columns: Tuple[ColumnAssociation, ...]
     spec: MetricSpec
@@ -143,6 +150,7 @@ class InstanceSet(SerializableDataclass):
     dimension_instances: Tuple[DimensionInstance, ...] = ()
     time_dimension_instances: Tuple[TimeDimensionInstance, ...] = ()
     entity_instances: Tuple[EntityInstance, ...] = ()
+    group_by_metric_instances: Tuple[GroupByMetricInstance, ...] = ()
     metric_instances: Tuple[MetricInstance, ...] = ()
     metadata_instances: Tuple[MetadataInstance, ...] = ()
 
@@ -159,6 +167,7 @@ class InstanceSet(SerializableDataclass):
         dimension_instances: List[DimensionInstance] = []
         time_dimension_instances: List[TimeDimensionInstance] = []
         entity_instances: List[EntityInstance] = []
+        group_by_metric_instances: List[GroupByMetricInstance] = []
         metric_instances: List[MetricInstance] = []
         metadata_instances: List[MetadataInstance] = []
 
@@ -175,6 +184,9 @@ class InstanceSet(SerializableDataclass):
             for entity_instance in instance_set.entity_instances:
                 if entity_instance.spec not in {x.spec for x in entity_instances}:
                     entity_instances.append(entity_instance)
+            for group_by_metric_instance in instance_set.group_by_metric_instances:
+                if group_by_metric_instance.spec not in {x.spec for x in group_by_metric_instances}:
+                    group_by_metric_instances.append(group_by_metric_instance)
             for metric_instance in instance_set.metric_instances:
                 if metric_instance.spec not in {x.spec for x in metric_instances}:
                     metric_instances.append(metric_instance)
@@ -187,6 +199,7 @@ class InstanceSet(SerializableDataclass):
             dimension_instances=tuple(dimension_instances),
             time_dimension_instances=tuple(time_dimension_instances),
             entity_instances=tuple(entity_instances),
+            group_by_metric_instances=tuple(group_by_metric_instances),
             metric_instances=tuple(metric_instances),
             metadata_instances=tuple(metadata_instances),
         )
@@ -198,6 +211,7 @@ class InstanceSet(SerializableDataclass):
             dimension_specs=tuple(x.spec for x in self.dimension_instances),
             time_dimension_specs=tuple(x.spec for x in self.time_dimension_instances),
             entity_specs=tuple(x.spec for x in self.entity_instances),
+            group_by_metric_specs=tuple(x.spec for x in self.group_by_metric_instances),
             metric_specs=tuple(x.spec for x in self.metric_instances),
             metadata_specs=tuple(x.spec for x in self.metadata_instances),
         )
