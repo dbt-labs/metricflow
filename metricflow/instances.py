@@ -104,9 +104,10 @@ class EntityInstance(MdoInstance[EntitySpec], SemanticModelElementInstance):  # 
 
 
 @dataclass(frozen=True)
-class GroupByMetricInstance(MdoInstance[GroupByMetricSpec]):  # noqa: D101
+class GroupByMetricInstance(MdoInstance[GroupByMetricSpec], SerializableDataclass):  # noqa: D101
     associated_columns: Tuple[ColumnAssociation, ...]
     spec: GroupByMetricSpec
+    defined_from: MetricModelReference
 
 
 @dataclass(frozen=True)
