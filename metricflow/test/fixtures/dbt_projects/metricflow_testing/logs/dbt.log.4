@@ -1,0 +1,2328 @@
+[0m16:29:47.374090 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__4knfnxs7, now MetricFlow_request_mf_rid__4n9m99f9)
+[0m16:29:47.374963 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__4n9m99f9"
+[0m16:29:47.375225 [debug] [MainThread]: On MetricFlow_request_mf_rid__4n9m99f9: BEGIN
+[0m16:29:47.375463 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:47.375799 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:47.376033 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__4n9m99f9"
+[0m16:29:47.376279 [debug] [MainThread]: On MetricFlow_request_mf_rid__4n9m99f9: -- Read Elements From Semantic Model 'bookings_monthly_source'
+-- Metric Time Dimension 'monthly_ds'
+-- Constrain Time Range to [2020-01-01T00:00:00, 2020-02-29T00:00:00]
+-- Pass Only Elements: ['bookings_monthly', 'metric_time__month']
+-- Aggregate Measures
+-- Compute Metrics via Expressions
+SELECT
+  DATE_TRUNC('month', ds) AS metric_time__month
+  , SUM(bookings_monthly) AS bookings_monthly
+FROM *****.fct_bookings_extended_monthly bookings_monthly_source_src_10000
+WHERE DATE_TRUNC('month', ds) BETWEEN '2020-01-01' AND '2020-02-29'
+GROUP BY
+  DATE_TRUNC('month', ds)
+[0m16:29:47.376844 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:47.380477 [debug] [MainThread]: On MetricFlow_request_mf_rid__4n9m99f9: ROLLBACK
+[0m16:29:47.380827 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__4n9m99f9'
+[0m16:29:47.381081 [debug] [MainThread]: On MetricFlow_request_mf_rid__4n9m99f9: Close
+[0m16:29:47.382867 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__4n9m99f9, now MetricFlow_request_mf_rid__1xirtzfx)
+[0m16:29:47.383157 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__1xirtzfx"
+[0m16:29:47.383395 [debug] [MainThread]: On MetricFlow_request_mf_rid__1xirtzfx: BEGIN
+[0m16:29:47.383624 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:47.383948 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:47.384181 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__1xirtzfx"
+[0m16:29:47.384417 [debug] [MainThread]: On MetricFlow_request_mf_rid__1xirtzfx: SELECT
+  SUM(bookings_monthly) AS bookings_monthly
+  , ds AS metric_time__month
+FROM *****.fct_bookings_extended_monthly
+WHERE CAST(ds AS TIMESTAMP) >= CAST('2020-01-01' AS TIMESTAMP) AND CAST(ds AS TIMESTAMP) < CAST('2020-03-01' AS TIMESTAMP)
+GROUP BY
+  ds
+[0m16:29:47.385073 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:47.385887 [debug] [MainThread]: On MetricFlow_request_mf_rid__1xirtzfx: ROLLBACK
+[0m16:29:47.386183 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__1xirtzfx'
+[0m16:29:47.386441 [debug] [MainThread]: On MetricFlow_request_mf_rid__1xirtzfx: Close
+[0m16:29:47.488131 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__1xirtzfx, now MetricFlow_request_mf_rid__vvr13ill)
+[0m16:29:47.488539 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__vvr13ill"
+[0m16:29:47.488804 [debug] [MainThread]: On MetricFlow_request_mf_rid__vvr13ill: BEGIN
+[0m16:29:47.489043 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:47.489427 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:47.489678 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__vvr13ill"
+[0m16:29:47.489935 [debug] [MainThread]: On MetricFlow_request_mf_rid__vvr13ill: -- Aggregate Measures
+-- Compute Metrics via Expressions
+SELECT
+  metric_time__week
+  , SUM(bookings) AS bookings
+FROM (
+  -- Read Elements From Semantic Model 'extended_bookings_source'
+  -- Metric Time Dimension 'ds'
+  -- Constrain Time Range to [2020-01-13T00:00:00, 2020-01-26T00:00:00]
+  -- Pass Only Elements: ['bookings', 'metric_time__week']
+  SELECT
+    DATE_TRUNC('week', ds) AS metric_time__week
+    , 1 AS bookings
+  FROM *****.fct_bookings_extended extended_bookings_source_src_10000
+  WHERE DATE_TRUNC('day', ds) BETWEEN '2020-01-13' AND '2020-01-26'
+) subq_5
+GROUP BY
+  metric_time__week
+[0m16:29:47.490640 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:47.491522 [debug] [MainThread]: On MetricFlow_request_mf_rid__vvr13ill: ROLLBACK
+[0m16:29:47.491896 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__vvr13ill'
+[0m16:29:47.492677 [debug] [MainThread]: On MetricFlow_request_mf_rid__vvr13ill: Close
+[0m16:29:47.501995 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__vvr13ill, now MetricFlow_request_mf_rid__1csdmo99)
+[0m16:29:47.503101 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__1csdmo99"
+[0m16:29:47.504467 [debug] [MainThread]: On MetricFlow_request_mf_rid__1csdmo99: BEGIN
+[0m16:29:47.505474 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:47.505887 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:47.506209 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__1csdmo99"
+[0m16:29:47.506565 [debug] [MainThread]: On MetricFlow_request_mf_rid__1csdmo99: SELECT
+  SUM(booking) AS bookings
+  , DATE_TRUNC('week', CAST(ds AS TIMESTAMP)) AS metric_time__week
+FROM *****.fct_bookings_extended
+WHERE CAST(ds AS TIMESTAMP) >= CAST('2020-01-13' AS TIMESTAMP) AND CAST(ds AS TIMESTAMP) < CAST('2020-01-27' AS TIMESTAMP)
+GROUP BY
+  DATE_TRUNC('week', CAST(ds AS TIMESTAMP))
+[0m16:29:47.507213 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:47.508085 [debug] [MainThread]: On MetricFlow_request_mf_rid__1csdmo99: ROLLBACK
+[0m16:29:47.508424 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__1csdmo99'
+[0m16:29:47.508661 [debug] [MainThread]: On MetricFlow_request_mf_rid__1csdmo99: Close
+[0m16:29:47.690132 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__1csdmo99, now MetricFlow_request_mf_rid__29k714ol)
+[0m16:29:47.690553 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__29k714ol"
+[0m16:29:47.690820 [debug] [MainThread]: On MetricFlow_request_mf_rid__29k714ol: BEGIN
+[0m16:29:47.691054 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:47.691420 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:47.691657 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__29k714ol"
+[0m16:29:47.691940 [debug] [MainThread]: On MetricFlow_request_mf_rid__29k714ol: -- Aggregate Measures
+-- Compute Metrics via Expressions
+SELECT
+  metric_time__month
+  , SUM(bookings) AS bookings
+FROM (
+  -- Read Elements From Semantic Model 'extended_bookings_source'
+  -- Metric Time Dimension 'ds'
+  -- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-31T00:00:00]
+  -- Pass Only Elements: ['bookings', 'metric_time__month']
+  SELECT
+    DATE_TRUNC('month', ds) AS metric_time__month
+    , 1 AS bookings
+  FROM *****.fct_bookings_extended extended_bookings_source_src_10000
+  WHERE DATE_TRUNC('day', ds) BETWEEN '2020-01-01' AND '2020-01-31'
+) subq_5
+GROUP BY
+  metric_time__month
+[0m16:29:47.692600 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:47.693409 [debug] [MainThread]: On MetricFlow_request_mf_rid__29k714ol: ROLLBACK
+[0m16:29:47.693717 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__29k714ol'
+[0m16:29:47.693957 [debug] [MainThread]: On MetricFlow_request_mf_rid__29k714ol: Close
+[0m16:29:47.696372 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__29k714ol, now MetricFlow_request_mf_rid__z9x0idr0)
+[0m16:29:47.696710 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__z9x0idr0"
+[0m16:29:47.696957 [debug] [MainThread]: On MetricFlow_request_mf_rid__z9x0idr0: BEGIN
+[0m16:29:47.697188 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:47.697561 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:47.699500 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__z9x0idr0"
+[0m16:29:47.699819 [debug] [MainThread]: On MetricFlow_request_mf_rid__z9x0idr0: SELECT
+  SUM(booking) AS bookings
+  , DATE_TRUNC('month', CAST(ds AS TIMESTAMP)) AS metric_time__month
+FROM *****.fct_bookings_extended
+WHERE CAST(ds AS TIMESTAMP) >= CAST('2020-01-01' AS TIMESTAMP) AND CAST(ds AS TIMESTAMP) < CAST('2020-02-01' AS TIMESTAMP)
+GROUP BY
+  DATE_TRUNC('month', CAST(ds AS TIMESTAMP))
+[0m16:29:47.700558 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:47.701492 [debug] [MainThread]: On MetricFlow_request_mf_rid__z9x0idr0: ROLLBACK
+[0m16:29:47.701863 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__z9x0idr0'
+[0m16:29:47.702110 [debug] [MainThread]: On MetricFlow_request_mf_rid__z9x0idr0: Close
+[0m16:29:47.891928 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__z9x0idr0, now MetricFlow_request_mf_rid__dvet7502)
+[0m16:29:47.892340 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__dvet7502"
+[0m16:29:47.892593 [debug] [MainThread]: On MetricFlow_request_mf_rid__dvet7502: BEGIN
+[0m16:29:47.892827 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:47.893204 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:47.893437 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__dvet7502"
+[0m16:29:47.893712 [debug] [MainThread]: On MetricFlow_request_mf_rid__dvet7502: -- Combine Aggregated Outputs
+SELECT
+  COALESCE(subq_9.metric_time__month, subq_15.metric_time__month) AS metric_time__month
+  , MAX(subq_9.bookings_monthly) AS bookings_monthly
+  , MAX(subq_15.bookings) AS bookings
+FROM (
+  -- Read Elements From Semantic Model 'bookings_monthly_source'
+  -- Metric Time Dimension 'monthly_ds'
+  -- Constrain Time Range to [2020-01-01T00:00:00, 2020-02-29T00:00:00]
+  -- Pass Only Elements: ['bookings_monthly', 'metric_time__month']
+  -- Aggregate Measures
+  -- Compute Metrics via Expressions
+  SELECT
+    DATE_TRUNC('month', ds) AS metric_time__month
+    , SUM(bookings_monthly) AS bookings_monthly
+  FROM *****.fct_bookings_extended_monthly bookings_monthly_source_src_10000
+  WHERE DATE_TRUNC('month', ds) BETWEEN '2020-01-01' AND '2020-02-29'
+  GROUP BY
+    DATE_TRUNC('month', ds)
+) subq_9
+FULL OUTER JOIN (
+  -- Aggregate Measures
+  -- Compute Metrics via Expressions
+  SELECT
+    metric_time__month
+    , SUM(bookings) AS bookings
+  FROM (
+    -- Read Elements From Semantic Model 'extended_bookings_source'
+    -- Metric Time Dimension 'ds'
+    -- Constrain Time Range to [2020-01-01T00:00:00, 2020-02-29T00:00:00]
+    -- Pass Only Elements: ['bookings', 'metric_time__month']
+    SELECT
+      DATE_TRUNC('month', ds) AS metric_time__month
+      , 1 AS bookings
+    FROM *****.fct_bookings_extended extended_bookings_source_src_10000
+    WHERE DATE_TRUNC('day', ds) BETWEEN '2020-01-01' AND '2020-02-29'
+  ) subq_13
+  GROUP BY
+    metric_time__month
+) subq_15
+ON
+  subq_9.metric_time__month = subq_15.metric_time__month
+GROUP BY
+  COALESCE(subq_9.metric_time__month, subq_15.metric_time__month)
+[0m16:29:47.902936 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:47.904284 [debug] [MainThread]: On MetricFlow_request_mf_rid__dvet7502: ROLLBACK
+[0m16:29:47.904759 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__dvet7502'
+[0m16:29:47.905029 [debug] [MainThread]: On MetricFlow_request_mf_rid__dvet7502: Close
+[0m16:29:47.907667 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__dvet7502, now MetricFlow_request_mf_rid__fdso6ot3)
+[0m16:29:47.907978 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__fdso6ot3"
+[0m16:29:47.908232 [debug] [MainThread]: On MetricFlow_request_mf_rid__fdso6ot3: BEGIN
+[0m16:29:47.908465 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:47.908881 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:47.909134 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__fdso6ot3"
+[0m16:29:47.909389 [debug] [MainThread]: On MetricFlow_request_mf_rid__fdso6ot3: SELECT
+  SUM(bookings_monthly) as bookings_monthly
+  , SUM(bookings) as bookings
+  , ds AS metric_time__month
+FROM (
+  SELECT
+    a.bookings_monthly
+    , b.bookings
+    , COALESCE(a.ds, b.ds) AS ds
+  FROM (
+    SELECT
+      SUM(bookings_monthly) AS bookings_monthly
+      , ds
+    FROM *****.fct_bookings_extended_monthly
+    WHERE
+      CAST(ds AS TIMESTAMP) >= CAST('2020-01-01' AS TIMESTAMP) AND CAST(ds AS TIMESTAMP) < CAST('2020-03-01' AS TIMESTAMP)
+    GROUP BY ds
+  ) a
+  FULL OUTER JOIN (
+    SELECT
+      SUM(booking) AS bookings
+      , DATE_TRUNC('month', CAST(ds AS TIMESTAMP)) AS ds
+    FROM *****.fct_bookings_extended
+    WHERE
+      CAST(ds AS TIMESTAMP) >= CAST('2020-01-01' AS TIMESTAMP) AND CAST(ds AS TIMESTAMP) < CAST('2020-03-01' AS TIMESTAMP)
+    GROUP BY DATE_TRUNC('month', CAST(ds AS TIMESTAMP))
+  ) b
+  ON a.ds = b.ds
+  ) c
+GROUP BY
+  ds
+[0m16:29:47.911013 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:47.911966 [debug] [MainThread]: On MetricFlow_request_mf_rid__fdso6ot3: ROLLBACK
+[0m16:29:47.912296 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__fdso6ot3'
+[0m16:29:47.912530 [debug] [MainThread]: On MetricFlow_request_mf_rid__fdso6ot3: Close
+[0m16:29:48.158222 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__fdso6ot3, now MetricFlow_request_mf_rid__dbn0344i)
+[0m16:29:48.159283 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__dbn0344i"
+[0m16:29:48.159830 [debug] [MainThread]: On MetricFlow_request_mf_rid__dbn0344i: BEGIN
+[0m16:29:48.160106 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:48.160471 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:48.160716 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__dbn0344i"
+[0m16:29:48.161024 [debug] [MainThread]: On MetricFlow_request_mf_rid__dbn0344i: -- Combine Aggregated Outputs
+SELECT
+  COALESCE(subq_13.listing__ds__day, subq_23.listing__ds__day) AS listing__ds__day
+  , MAX(subq_13.bookings_monthly) AS bookings_monthly
+  , MAX(subq_23.bookings) AS bookings
+FROM (
+  -- Join Standard Outputs
+  -- Pass Only Elements: ['bookings_monthly', 'listing__ds__day']
+  -- Aggregate Measures
+  -- Compute Metrics via Expressions
+  SELECT
+    DATE_TRUNC('day', listings_extended_source_src_10000.listing_creation_ds) AS listing__ds__day
+    , SUM(subq_7.bookings_monthly) AS bookings_monthly
+  FROM (
+    -- Read Elements From Semantic Model 'bookings_monthly_source'
+    -- Metric Time Dimension 'monthly_ds'
+    -- Constrain Time Range to [2020-01-01T00:00:00, 2020-02-29T00:00:00]
+    -- Pass Only Elements: ['bookings_monthly', 'listing']
+    SELECT
+      listing_id AS listing
+      , bookings_monthly
+    FROM *****.fct_bookings_extended_monthly bookings_monthly_source_src_10000
+    WHERE DATE_TRUNC('month', ds) BETWEEN '2020-01-01' AND '2020-02-29'
+  ) subq_7
+  LEFT OUTER JOIN
+    *****.dim_listings_extended listings_extended_source_src_10000
+  ON
+    subq_7.listing = listings_extended_source_src_10000.listing_id
+  GROUP BY
+    DATE_TRUNC('day', listings_extended_source_src_10000.listing_creation_ds)
+) subq_13
+FULL OUTER JOIN (
+  -- Join Standard Outputs
+  -- Pass Only Elements: ['bookings', 'listing__ds__day']
+  -- Aggregate Measures
+  -- Compute Metrics via Expressions
+  SELECT
+    DATE_TRUNC('day', listings_extended_source_src_10000.listing_creation_ds) AS listing__ds__day
+    , SUM(subq_17.bookings) AS bookings
+  FROM (
+    -- Read Elements From Semantic Model 'extended_bookings_source'
+    -- Metric Time Dimension 'ds'
+    -- Constrain Time Range to [2020-01-01T00:00:00, 2020-02-29T00:00:00]
+    -- Pass Only Elements: ['bookings', 'listing']
+    SELECT
+      listing_id AS listing
+      , 1 AS bookings
+    FROM *****.fct_bookings_extended extended_bookings_source_src_10000
+    WHERE DATE_TRUNC('day', ds) BETWEEN '2020-01-01' AND '2020-02-29'
+  ) subq_17
+  LEFT OUTER JOIN
+    *****.dim_listings_extended listings_extended_source_src_10000
+  ON
+    subq_17.listing = listings_extended_source_src_10000.listing_id
+  GROUP BY
+    DATE_TRUNC('day', listings_extended_source_src_10000.listing_creation_ds)
+) subq_23
+ON
+  subq_13.listing__ds__day = subq_23.listing__ds__day
+GROUP BY
+  COALESCE(subq_13.listing__ds__day, subq_23.listing__ds__day)
+[0m16:29:48.163273 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:48.167704 [debug] [MainThread]: On MetricFlow_request_mf_rid__dbn0344i: ROLLBACK
+[0m16:29:48.168098 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__dbn0344i'
+[0m16:29:48.168339 [debug] [MainThread]: On MetricFlow_request_mf_rid__dbn0344i: Close
+[0m16:29:48.173832 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__dbn0344i, now MetricFlow_request_mf_rid__mkrvkm82)
+[0m16:29:48.174194 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__mkrvkm82"
+[0m16:29:48.174441 [debug] [MainThread]: On MetricFlow_request_mf_rid__mkrvkm82: BEGIN
+[0m16:29:48.174930 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:48.176337 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:48.177147 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__mkrvkm82"
+[0m16:29:48.178197 [debug] [MainThread]: On MetricFlow_request_mf_rid__mkrvkm82: SELECT
+  a.bookings_monthly AS bookings_monthly
+  , b.bookings AS bookings
+  , COALESCE(a.listing__ds__day, b.listing__ds__day) AS listing__ds__day
+FROM (
+  SELECT
+    SUM(bookings_monthly) AS bookings_monthly
+    , l.listing_creation_ds AS listing__ds__day
+  FROM *****.fct_bookings_extended_monthly b
+  LEFT OUTER JOIN *****.dim_listings_extended l
+  ON b.listing_id = l.listing_id
+  WHERE
+    CAST(ds AS TIMESTAMP) >= CAST('2020-01-01' AS TIMESTAMP) AND CAST(ds AS TIMESTAMP) < CAST('2020-03-01' AS TIMESTAMP)
+  GROUP BY 2
+) a
+FULL OUTER JOIN (
+  SELECT
+    SUM(booking) AS bookings
+    , l.listing_creation_ds AS listing__ds__day
+  FROM *****.fct_bookings_extended b
+  LEFT OUTER JOIN *****.dim_listings_extended l
+  ON b.listing_id = l.listing_id
+  WHERE
+    CAST(ds AS TIMESTAMP) >= CAST('2020-01-01' AS TIMESTAMP) AND CAST(ds AS TIMESTAMP) < CAST('2020-03-01' AS TIMESTAMP)
+  GROUP BY 2
+) b
+ON a.listing__ds__day = b.listing__ds__day
+[0m16:29:48.184437 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:48.188446 [debug] [MainThread]: On MetricFlow_request_mf_rid__mkrvkm82: ROLLBACK
+[0m16:29:48.188840 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__mkrvkm82'
+[0m16:29:48.189114 [debug] [MainThread]: On MetricFlow_request_mf_rid__mkrvkm82: Close
+[0m16:29:48.562918 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__mkrvkm82, now MetricFlow_request_mf_rid__xil158t2)
+[0m16:29:48.563367 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__xil158t2"
+[0m16:29:48.563618 [debug] [MainThread]: On MetricFlow_request_mf_rid__xil158t2: BEGIN
+[0m16:29:48.563850 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:48.564218 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:48.564449 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__xil158t2"
+[0m16:29:48.564701 [debug] [MainThread]: On MetricFlow_request_mf_rid__xil158t2: -- Compute Metrics via Expressions
+SELECT
+  metric_time__day
+  , COALESCE(bookings, 0) AS bookings_fill_nulls_with_0
+FROM (
+  -- Join to Time Spine Dataset
+  SELECT
+    subq_5.ds AS metric_time__day
+    , subq_3.bookings AS bookings
+  FROM *****.mf_time_spine subq_5
+  LEFT OUTER JOIN (
+    -- Aggregate Measures
+    SELECT
+      metric_time__day
+      , SUM(bookings) AS bookings
+    FROM (
+      -- Read Elements From Semantic Model 'bookings_source'
+      -- Metric Time Dimension 'ds'
+      -- Pass Only Elements: ['bookings', 'metric_time__day']
+      SELECT
+        DATE_TRUNC('day', ds) AS metric_time__day
+        , 1 AS bookings
+      FROM *****.fct_bookings bookings_source_src_10000
+    ) subq_2
+    GROUP BY
+      metric_time__day
+  ) subq_3
+  ON
+    subq_5.ds = subq_3.metric_time__day
+) subq_6
+[0m16:29:48.565504 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:48.671684 [debug] [MainThread]: On MetricFlow_request_mf_rid__xil158t2: ROLLBACK
+[0m16:29:48.672211 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__xil158t2'
+[0m16:29:48.672484 [debug] [MainThread]: On MetricFlow_request_mf_rid__xil158t2: Close
+[0m16:29:48.679567 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__xil158t2, now MetricFlow_request_mf_rid__o1cia1sx)
+[0m16:29:48.679917 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__o1cia1sx"
+[0m16:29:48.680156 [debug] [MainThread]: On MetricFlow_request_mf_rid__o1cia1sx: BEGIN
+[0m16:29:48.680384 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:48.680719 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:48.680955 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__o1cia1sx"
+[0m16:29:48.681193 [debug] [MainThread]: On MetricFlow_request_mf_rid__o1cia1sx: SELECT
+  subq_5.ds AS metric_time__day
+  , COALESCE(subq_3.bookings, 0) AS bookings_fill_nulls_with_0
+FROM *****.mf_time_spine subq_5
+LEFT OUTER JOIN (
+  SELECT
+    DATE_TRUNC('day', CAST(ds AS TIMESTAMP)) AS metric_time__day
+    , SUM(1) AS bookings
+  FROM *****.fct_bookings bookings_source_src_1
+  GROUP BY 1
+) subq_3
+ON subq_5.ds = subq_3.metric_time__day
+[0m16:29:48.681805 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:48.780083 [debug] [MainThread]: On MetricFlow_request_mf_rid__o1cia1sx: ROLLBACK
+[0m16:29:48.780521 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__o1cia1sx'
+[0m16:29:48.780769 [debug] [MainThread]: On MetricFlow_request_mf_rid__o1cia1sx: Close
+[0m16:29:52.339004 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__o1cia1sx, now MetricFlow_request_mf_rid__4nvlnsbn)
+[0m16:29:52.339477 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__4nvlnsbn"
+[0m16:29:52.339727 [debug] [MainThread]: On MetricFlow_request_mf_rid__4nvlnsbn: BEGIN
+[0m16:29:52.339963 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:52.340340 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:52.340574 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__4nvlnsbn"
+[0m16:29:52.340842 [debug] [MainThread]: On MetricFlow_request_mf_rid__4nvlnsbn: -- Compute Metrics via Expressions
+SELECT
+  metric_time__month
+  , COALESCE(bookings, 0) AS bookings_fill_nulls_with_0
+FROM (
+  -- Join to Time Spine Dataset
+  SELECT
+    subq_4.metric_time__month AS metric_time__month
+    , subq_3.bookings AS bookings
+  FROM (
+    -- Time Spine
+    SELECT
+      DATE_TRUNC('month', ds) AS metric_time__month
+    FROM *****.mf_time_spine subq_5
+    GROUP BY
+      DATE_TRUNC('month', ds)
+  ) subq_4
+  LEFT OUTER JOIN (
+    -- Aggregate Measures
+    SELECT
+      metric_time__month
+      , SUM(bookings) AS bookings
+    FROM (
+      -- Read Elements From Semantic Model 'bookings_source'
+      -- Metric Time Dimension 'ds'
+      -- Pass Only Elements: ['bookings', 'metric_time__month']
+      SELECT
+        DATE_TRUNC('month', ds) AS metric_time__month
+        , 1 AS bookings
+      FROM *****.fct_bookings bookings_source_src_10000
+    ) subq_2
+    GROUP BY
+      metric_time__month
+  ) subq_3
+  ON
+    subq_4.metric_time__month = subq_3.metric_time__month
+) subq_6
+[0m16:29:52.346755 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:52.353842 [debug] [MainThread]: On MetricFlow_request_mf_rid__4nvlnsbn: ROLLBACK
+[0m16:29:52.354281 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__4nvlnsbn'
+[0m16:29:52.354534 [debug] [MainThread]: On MetricFlow_request_mf_rid__4nvlnsbn: Close
+[0m16:29:52.356795 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__4nvlnsbn, now MetricFlow_request_mf_rid__l7duzno1)
+[0m16:29:52.357359 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__l7duzno1"
+[0m16:29:52.357638 [debug] [MainThread]: On MetricFlow_request_mf_rid__l7duzno1: BEGIN
+[0m16:29:52.357936 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:52.358417 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:52.358678 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__l7duzno1"
+[0m16:29:52.358937 [debug] [MainThread]: On MetricFlow_request_mf_rid__l7duzno1: SELECT
+  subq_4.metric_time__month AS metric_time__month
+  , COALESCE(subq_3.bookings, 0) AS bookings_fill_nulls_with_0
+FROM (
+  SELECT
+    DATE_TRUNC('month', CAST(ds AS TIMESTAMP)) AS metric_time__month
+  FROM *****.mf_time_spine subq_5
+  GROUP BY 1
+) subq_4
+LEFT OUTER JOIN (
+  SELECT
+    DATE_TRUNC('month', CAST(ds AS TIMESTAMP)) AS metric_time__month
+    , SUM(1) AS bookings
+  FROM *****.fct_bookings bookings_source_src_1
+  GROUP BY 1
+) subq_3
+ON subq_4.metric_time__month = subq_3.metric_time__month
+[0m16:29:52.360227 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:52.365709 [debug] [MainThread]: On MetricFlow_request_mf_rid__l7duzno1: ROLLBACK
+[0m16:29:52.366084 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__l7duzno1'
+[0m16:29:52.366333 [debug] [MainThread]: On MetricFlow_request_mf_rid__l7duzno1: Close
+[0m16:29:52.677864 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__l7duzno1, now MetricFlow_request_mf_rid__s7w0owdx)
+[0m16:29:52.678323 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__s7w0owdx"
+[0m16:29:52.678588 [debug] [MainThread]: On MetricFlow_request_mf_rid__s7w0owdx: BEGIN
+[0m16:29:52.678830 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:52.679229 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:52.679474 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__s7w0owdx"
+[0m16:29:52.679725 [debug] [MainThread]: On MetricFlow_request_mf_rid__s7w0owdx: -- Compute Metrics via Expressions
+SELECT
+  booking__paid_at__day
+  , COALESCE(bookings, 0) AS bookings_fill_nulls_with_0
+FROM (
+  -- Aggregate Measures
+  SELECT
+    booking__paid_at__day
+    , SUM(bookings) AS bookings
+  FROM (
+    -- Read Elements From Semantic Model 'bookings_source'
+    -- Metric Time Dimension 'ds'
+    -- Pass Only Elements: ['bookings', 'booking__paid_at__day']
+    SELECT
+      DATE_TRUNC('day', paid_at) AS booking__paid_at__day
+      , 1 AS bookings
+    FROM *****.fct_bookings bookings_source_src_10000
+  ) subq_2
+  GROUP BY
+    booking__paid_at__day
+) subq_3
+[0m16:29:52.680350 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:52.681236 [debug] [MainThread]: On MetricFlow_request_mf_rid__s7w0owdx: ROLLBACK
+[0m16:29:52.681565 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__s7w0owdx'
+[0m16:29:52.681798 [debug] [MainThread]: On MetricFlow_request_mf_rid__s7w0owdx: Close
+[0m16:29:52.683708 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__s7w0owdx, now MetricFlow_request_mf_rid__5btdfuwo)
+[0m16:29:52.684067 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__5btdfuwo"
+[0m16:29:52.684324 [debug] [MainThread]: On MetricFlow_request_mf_rid__5btdfuwo: BEGIN
+[0m16:29:52.684553 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:52.684898 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:52.685130 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__5btdfuwo"
+[0m16:29:52.685366 [debug] [MainThread]: On MetricFlow_request_mf_rid__5btdfuwo: SELECT
+  DATE_TRUNC('day', CAST(paid_at AS TIMESTAMP)) AS booking__paid_at__day
+  , COALESCE(SUM(1), 0) AS bookings_fill_nulls_with_0
+FROM *****.fct_bookings bookings_source_src_1
+GROUP BY
+  1
+[0m16:29:52.685918 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:52.686773 [debug] [MainThread]: On MetricFlow_request_mf_rid__5btdfuwo: ROLLBACK
+[0m16:29:52.687109 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__5btdfuwo'
+[0m16:29:52.687341 [debug] [MainThread]: On MetricFlow_request_mf_rid__5btdfuwo: Close
+[0m16:29:52.924861 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__5btdfuwo, now MetricFlow_request_mf_rid__xmlzo4b5)
+[0m16:29:52.925266 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__xmlzo4b5"
+[0m16:29:52.925511 [debug] [MainThread]: On MetricFlow_request_mf_rid__xmlzo4b5: BEGIN
+[0m16:29:52.925739 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:52.926103 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:52.926331 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__xmlzo4b5"
+[0m16:29:52.926579 [debug] [MainThread]: On MetricFlow_request_mf_rid__xmlzo4b5: -- Compute Metrics via Expressions
+SELECT
+  booking__ds__day
+  , COALESCE(bookings, 0) AS bookings_fill_nulls_with_0
+FROM (
+  -- Join to Time Spine Dataset
+  SELECT
+    subq_5.ds AS booking__ds__day
+    , subq_3.bookings AS bookings
+  FROM *****.mf_time_spine subq_5
+  LEFT OUTER JOIN (
+    -- Aggregate Measures
+    SELECT
+      booking__ds__day
+      , SUM(bookings) AS bookings
+    FROM (
+      -- Read Elements From Semantic Model 'bookings_source'
+      -- Metric Time Dimension 'ds'
+      -- Pass Only Elements: ['bookings', 'booking__ds__day']
+      SELECT
+        DATE_TRUNC('day', ds) AS booking__ds__day
+        , 1 AS bookings
+      FROM *****.fct_bookings bookings_source_src_10000
+    ) subq_2
+    GROUP BY
+      booking__ds__day
+  ) subq_3
+  ON
+    subq_5.ds = subq_3.booking__ds__day
+) subq_6
+[0m16:29:52.931153 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:53.070158 [debug] [MainThread]: On MetricFlow_request_mf_rid__xmlzo4b5: ROLLBACK
+[0m16:29:53.071981 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__xmlzo4b5'
+[0m16:29:53.072300 [debug] [MainThread]: On MetricFlow_request_mf_rid__xmlzo4b5: Close
+[0m16:29:53.080692 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__xmlzo4b5, now MetricFlow_request_mf_rid__8b3bbzid)
+[0m16:29:53.081043 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__8b3bbzid"
+[0m16:29:53.081291 [debug] [MainThread]: On MetricFlow_request_mf_rid__8b3bbzid: BEGIN
+[0m16:29:53.081520 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:53.082332 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:53.082705 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__8b3bbzid"
+[0m16:29:53.082960 [debug] [MainThread]: On MetricFlow_request_mf_rid__8b3bbzid: SELECT
+  subq_5.ds AS booking__ds__day
+  , COALESCE(subq_3.bookings, 0) AS bookings_fill_nulls_with_0
+FROM *****.mf_time_spine subq_5
+LEFT OUTER JOIN (
+  SELECT
+    DATE_TRUNC('day', CAST(ds AS TIMESTAMP)) AS booking__ds__day
+    , SUM(1) AS bookings
+  FROM *****.fct_bookings bookings_source_src_1
+  GROUP BY 1
+) subq_3
+ON subq_5.ds = subq_3.booking__ds__day
+[0m16:29:53.083699 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:53.178411 [debug] [MainThread]: On MetricFlow_request_mf_rid__8b3bbzid: ROLLBACK
+[0m16:29:53.178881 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__8b3bbzid'
+[0m16:29:53.179131 [debug] [MainThread]: On MetricFlow_request_mf_rid__8b3bbzid: Close
+[0m16:29:56.601505 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__8b3bbzid, now MetricFlow_request_mf_rid__vnzrtxr9)
+[0m16:29:56.602187 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__vnzrtxr9"
+[0m16:29:56.602474 [debug] [MainThread]: On MetricFlow_request_mf_rid__vnzrtxr9: BEGIN
+[0m16:29:56.602728 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:56.603113 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:56.603354 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__vnzrtxr9"
+[0m16:29:56.603597 [debug] [MainThread]: On MetricFlow_request_mf_rid__vnzrtxr9: -- Compute Metrics via Expressions
+SELECT
+  booking__is_instant
+  , COALESCE(bookings, 0) AS bookings_fill_nulls_with_0
+FROM (
+  -- Aggregate Measures
+  SELECT
+    booking__is_instant
+    , SUM(bookings) AS bookings
+  FROM (
+    -- Read Elements From Semantic Model 'bookings_source'
+    -- Metric Time Dimension 'ds'
+    -- Pass Only Elements: ['bookings', 'booking__is_instant']
+    SELECT
+      is_instant AS booking__is_instant
+      , 1 AS bookings
+    FROM *****.fct_bookings bookings_source_src_10000
+  ) subq_2
+  GROUP BY
+    booking__is_instant
+) subq_3
+[0m16:29:56.604268 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:56.605496 [debug] [MainThread]: On MetricFlow_request_mf_rid__vnzrtxr9: ROLLBACK
+[0m16:29:56.605856 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__vnzrtxr9'
+[0m16:29:56.606113 [debug] [MainThread]: On MetricFlow_request_mf_rid__vnzrtxr9: Close
+[0m16:29:56.607620 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__vnzrtxr9, now MetricFlow_request_mf_rid__6wevstwr)
+[0m16:29:56.607937 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__6wevstwr"
+[0m16:29:56.608198 [debug] [MainThread]: On MetricFlow_request_mf_rid__6wevstwr: BEGIN
+[0m16:29:56.608427 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:56.608780 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:56.609018 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__6wevstwr"
+[0m16:29:56.609250 [debug] [MainThread]: On MetricFlow_request_mf_rid__6wevstwr: SELECT
+  is_instant AS booking__is_instant
+  , COALESCE(SUM(1), 0) AS bookings_fill_nulls_with_0
+FROM *****.fct_bookings bookings_source_src_1
+GROUP BY 1
+[0m16:29:56.611722 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:56.612826 [debug] [MainThread]: On MetricFlow_request_mf_rid__6wevstwr: ROLLBACK
+[0m16:29:56.613164 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__6wevstwr'
+[0m16:29:56.613401 [debug] [MainThread]: On MetricFlow_request_mf_rid__6wevstwr: Close
+[0m16:29:56.963943 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__6wevstwr, now MetricFlow_request_mf_rid__exc82o19)
+[0m16:29:56.964365 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__exc82o19"
+[0m16:29:56.964626 [debug] [MainThread]: On MetricFlow_request_mf_rid__exc82o19: BEGIN
+[0m16:29:56.964871 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:56.965249 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:56.965491 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__exc82o19"
+[0m16:29:56.965746 [debug] [MainThread]: On MetricFlow_request_mf_rid__exc82o19: -- Join to Time Spine Dataset
+-- Compute Metrics via Expressions
+SELECT
+  subq_5.ds AS metric_time__day
+  , subq_3.bookings AS bookings_join_to_time_spine
+FROM *****.mf_time_spine subq_5
+LEFT OUTER JOIN (
+  -- Aggregate Measures
+  SELECT
+    metric_time__day
+    , SUM(bookings) AS bookings
+  FROM (
+    -- Read Elements From Semantic Model 'bookings_source'
+    -- Metric Time Dimension 'ds'
+    -- Pass Only Elements: ['bookings', 'metric_time__day']
+    SELECT
+      DATE_TRUNC('day', ds) AS metric_time__day
+      , 1 AS bookings
+    FROM *****.fct_bookings bookings_source_src_10000
+  ) subq_2
+  GROUP BY
+    metric_time__day
+) subq_3
+ON
+  subq_5.ds = subq_3.metric_time__day
+[0m16:29:56.966469 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:57.076493 [debug] [MainThread]: On MetricFlow_request_mf_rid__exc82o19: ROLLBACK
+[0m16:29:57.076994 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__exc82o19'
+[0m16:29:57.077959 [debug] [MainThread]: On MetricFlow_request_mf_rid__exc82o19: Close
+[0m16:29:57.086765 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__exc82o19, now MetricFlow_request_mf_rid__bo1urh12)
+[0m16:29:57.087152 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__bo1urh12"
+[0m16:29:57.087405 [debug] [MainThread]: On MetricFlow_request_mf_rid__bo1urh12: BEGIN
+[0m16:29:57.087639 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:57.088006 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:57.088234 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__bo1urh12"
+[0m16:29:57.088471 [debug] [MainThread]: On MetricFlow_request_mf_rid__bo1urh12: SELECT
+  subq_5.ds AS metric_time__day
+  , subq_3.bookings AS bookings_join_to_time_spine
+FROM *****.mf_time_spine subq_5
+LEFT JOIN (
+  SELECT
+    DATE_TRUNC('day', CAST(ds AS TIMESTAMP)) AS metric_time__day
+    , SUM(1) AS bookings
+  FROM *****.fct_bookings bookings_source_src_1
+  GROUP BY
+    1
+) subq_3
+ON
+  subq_5.ds = subq_3.metric_time__day
+[0m16:29:57.089183 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:57.179085 [debug] [MainThread]: On MetricFlow_request_mf_rid__bo1urh12: ROLLBACK
+[0m16:29:57.179731 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__bo1urh12'
+[0m16:29:57.180168 [debug] [MainThread]: On MetricFlow_request_mf_rid__bo1urh12: Close
+[0m16:29:59.455155 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__bo1urh12, now MetricFlow_request_mf_rid__k5dzmb3i)
+[0m16:29:59.455610 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__k5dzmb3i"
+[0m16:29:59.455869 [debug] [MainThread]: On MetricFlow_request_mf_rid__k5dzmb3i: BEGIN
+[0m16:29:59.456102 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:59.456522 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:59.456757 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__k5dzmb3i"
+[0m16:29:59.457003 [debug] [MainThread]: On MetricFlow_request_mf_rid__k5dzmb3i: -- Compute Metrics via Expressions
+SELECT
+  metric_time__day
+  , COALESCE(bookings, 0) AS bookings_fill_nulls_with_0_without_time_spine
+FROM (
+  -- Aggregate Measures
+  SELECT
+    metric_time__day
+    , SUM(bookings) AS bookings
+  FROM (
+    -- Read Elements From Semantic Model 'bookings_source'
+    -- Metric Time Dimension 'ds'
+    -- Pass Only Elements: ['bookings', 'metric_time__day']
+    SELECT
+      DATE_TRUNC('day', ds) AS metric_time__day
+      , 1 AS bookings
+    FROM *****.fct_bookings bookings_source_src_10000
+  ) subq_2
+  GROUP BY
+    metric_time__day
+) subq_3
+[0m16:29:59.457576 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:59.458422 [debug] [MainThread]: On MetricFlow_request_mf_rid__k5dzmb3i: ROLLBACK
+[0m16:29:59.458742 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__k5dzmb3i'
+[0m16:29:59.458970 [debug] [MainThread]: On MetricFlow_request_mf_rid__k5dzmb3i: Close
+[0m16:29:59.460690 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__k5dzmb3i, now MetricFlow_request_mf_rid__we74kh9u)
+[0m16:29:59.460960 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__we74kh9u"
+[0m16:29:59.461190 [debug] [MainThread]: On MetricFlow_request_mf_rid__we74kh9u: BEGIN
+[0m16:29:59.461405 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:59.461702 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:59.461926 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__we74kh9u"
+[0m16:29:59.462149 [debug] [MainThread]: On MetricFlow_request_mf_rid__we74kh9u: SELECT
+  DATE_TRUNC('day', CAST(ds AS TIMESTAMP)) AS metric_time__day
+  , COALESCE(SUM(1), 0) AS bookings_fill_nulls_with_0_without_time_spine
+FROM *****.fct_bookings bookings_source_src_1
+GROUP BY 1
+[0m16:29:59.462626 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:59.463374 [debug] [MainThread]: On MetricFlow_request_mf_rid__we74kh9u: ROLLBACK
+[0m16:29:59.463646 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__we74kh9u'
+[0m16:29:59.463861 [debug] [MainThread]: On MetricFlow_request_mf_rid__we74kh9u: Close
+[0m16:29:59.597342 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__we74kh9u, now MetricFlow_request_mf_rid__z5id9tku)
+[0m16:29:59.597816 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__z5id9tku"
+[0m16:29:59.598079 [debug] [MainThread]: On MetricFlow_request_mf_rid__z5id9tku: BEGIN
+[0m16:29:59.598305 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:59.598621 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:59.598844 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__z5id9tku"
+[0m16:29:59.599094 [debug] [MainThread]: On MetricFlow_request_mf_rid__z5id9tku: -- Compute Metrics via Expressions
+SELECT
+  metric_time__day
+  , COALESCE(bookers, 0) AS every_two_days_bookers_fill_nulls_with_0
+FROM (
+  -- Join to Time Spine Dataset
+  SELECT
+    subq_8.ds AS metric_time__day
+    , subq_6.bookers AS bookers
+  FROM *****.mf_time_spine subq_8
+  LEFT OUTER JOIN (
+    -- Join Self Over Time Range
+    -- Pass Only Elements: ['bookers', 'metric_time__day']
+    -- Aggregate Measures
+    SELECT
+      subq_3.ds AS metric_time__day
+      , COUNT(DISTINCT bookings_source_src_10000.guest_id) AS bookers
+    FROM *****.mf_time_spine subq_3
+    INNER JOIN
+      *****.fct_bookings bookings_source_src_10000
+    ON
+      (
+        DATE_TRUNC('day', bookings_source_src_10000.ds) <= subq_3.ds
+      ) AND (
+        DATE_TRUNC('day', bookings_source_src_10000.ds) > subq_3.ds - INTERVAL 2 day
+      )
+    GROUP BY
+      subq_3.ds
+  ) subq_6
+  ON
+    subq_8.ds = subq_6.metric_time__day
+) subq_9
+[0m16:29:59.603817 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:59.679903 [debug] [MainThread]: On MetricFlow_request_mf_rid__z5id9tku: ROLLBACK
+[0m16:29:59.680385 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__z5id9tku'
+[0m16:29:59.680627 [debug] [MainThread]: On MetricFlow_request_mf_rid__z5id9tku: Close
+[0m16:29:59.688042 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__z5id9tku, now MetricFlow_request_mf_rid__9hiri1el)
+[0m16:29:59.688470 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__9hiri1el"
+[0m16:29:59.688727 [debug] [MainThread]: On MetricFlow_request_mf_rid__9hiri1el: BEGIN
+[0m16:29:59.688952 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:29:59.689304 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:59.689529 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__9hiri1el"
+[0m16:29:59.689766 [debug] [MainThread]: On MetricFlow_request_mf_rid__9hiri1el: SELECT
+  subq_8.ds AS metric_time__day
+  , COALESCE(subq_6.bookers, 0) AS every_two_days_bookers_fill_nulls_with_0
+FROM *****.mf_time_spine subq_8
+LEFT JOIN (
+  SELECT
+    subq_3.ds AS metric_time__day
+    , COUNT(DISTINCT bookings_source_src_1.guest_id) AS bookers
+  FROM *****.mf_time_spine subq_3
+  INNER JOIN
+    *****.fct_bookings bookings_source_src_1
+  ON (DATE_TRUNC('day', CAST(bookings_source_src_1.ds AS TIMESTAMP)) <= subq_3.ds)
+    AND (DATE_TRUNC('day', CAST(bookings_source_src_1.ds AS TIMESTAMP)) > subq_3.ds - INTERVAL 2 day)
+  GROUP BY
+    subq_3.ds
+) subq_6
+ON subq_8.ds = subq_6.metric_time__day
+[0m16:29:59.694011 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:29:59.866053 [debug] [MainThread]: On MetricFlow_request_mf_rid__9hiri1el: ROLLBACK
+[0m16:29:59.866557 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__9hiri1el'
+[0m16:29:59.866795 [debug] [MainThread]: On MetricFlow_request_mf_rid__9hiri1el: Close
+[0m16:30:02.633899 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__9hiri1el, now MetricFlow_request_mf_rid__k344ie25)
+[0m16:30:02.634371 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__k344ie25"
+[0m16:30:02.634622 [debug] [MainThread]: On MetricFlow_request_mf_rid__k344ie25: BEGIN
+[0m16:30:02.634847 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:30:02.635251 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:02.635536 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__k344ie25"
+[0m16:30:02.635843 [debug] [MainThread]: On MetricFlow_request_mf_rid__k344ie25: -- Compute Metrics via Expressions
+SELECT
+  metric_time__day
+  , bookings_fill_nulls_with_0 - bookings_2_weeks_ago AS bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset
+FROM (
+  -- Combine Aggregated Outputs
+  SELECT
+    COALESCE(subq_7.metric_time__day, subq_15.metric_time__day) AS metric_time__day
+    , COALESCE(MAX(subq_7.bookings_fill_nulls_with_0), 0) AS bookings_fill_nulls_with_0
+    , MAX(subq_15.bookings_2_weeks_ago) AS bookings_2_weeks_ago
+  FROM (
+    -- Compute Metrics via Expressions
+    SELECT
+      metric_time__day
+      , COALESCE(bookings, 0) AS bookings_fill_nulls_with_0
+    FROM (
+      -- Join to Time Spine Dataset
+      SELECT
+        subq_5.ds AS metric_time__day
+        , subq_3.bookings AS bookings
+      FROM *****.mf_time_spine subq_5
+      LEFT OUTER JOIN (
+        -- Aggregate Measures
+        SELECT
+          metric_time__day
+          , SUM(bookings) AS bookings
+        FROM (
+          -- Read Elements From Semantic Model 'bookings_source'
+          -- Metric Time Dimension 'ds'
+          -- Pass Only Elements: ['bookings', 'metric_time__day']
+          SELECT
+            DATE_TRUNC('day', ds) AS metric_time__day
+            , 1 AS bookings
+          FROM *****.fct_bookings bookings_source_src_10000
+        ) subq_2
+        GROUP BY
+          metric_time__day
+      ) subq_3
+      ON
+        subq_5.ds = subq_3.metric_time__day
+    ) subq_6
+  ) subq_7
+  FULL OUTER JOIN (
+    -- Join to Time Spine Dataset
+    -- Pass Only Elements: ['bookings', 'metric_time__day']
+    -- Aggregate Measures
+    -- Compute Metrics via Expressions
+    SELECT
+      subq_11.ds AS metric_time__day
+      , SUM(subq_9.bookings) AS bookings_2_weeks_ago
+    FROM *****.mf_time_spine subq_11
+    INNER JOIN (
+      -- Read Elements From Semantic Model 'bookings_source'
+      -- Metric Time Dimension 'ds'
+      SELECT
+        DATE_TRUNC('day', ds) AS metric_time__day
+        , 1 AS bookings
+      FROM *****.fct_bookings bookings_source_src_10000
+    ) subq_9
+    ON
+      subq_11.ds - INTERVAL 14 day = subq_9.metric_time__day
+    GROUP BY
+      subq_11.ds
+  ) subq_15
+  ON
+    subq_7.metric_time__day = subq_15.metric_time__day
+  GROUP BY
+    COALESCE(subq_7.metric_time__day, subq_15.metric_time__day)
+) subq_16
+[0m16:30:02.638400 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:02.707972 [debug] [MainThread]: On MetricFlow_request_mf_rid__k344ie25: ROLLBACK
+[0m16:30:02.708448 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__k344ie25'
+[0m16:30:02.708685 [debug] [MainThread]: On MetricFlow_request_mf_rid__k344ie25: Close
+[0m16:30:02.714949 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__k344ie25, now MetricFlow_request_mf_rid__m8h7k4fo)
+[0m16:30:02.715263 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__m8h7k4fo"
+[0m16:30:02.715492 [debug] [MainThread]: On MetricFlow_request_mf_rid__m8h7k4fo: BEGIN
+[0m16:30:02.715711 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:30:02.716057 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:02.716273 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__m8h7k4fo"
+[0m16:30:02.716526 [debug] [MainThread]: On MetricFlow_request_mf_rid__m8h7k4fo: SELECT
+  metric_time__day
+  , bookings_fill_nulls_with_0 - bookings_2_weeks_ago AS bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset
+FROM (
+  SELECT
+    subq_7.metric_time__day
+    , COALESCE(MAX(subq_7.bookings_fill_nulls_with_0), 0) AS bookings_fill_nulls_with_0
+    , subq_15.bookings_2_weeks_ago AS bookings_2_weeks_ago
+  FROM (
+    SELECT
+      subq_5.ds AS metric_time__day
+      , COALESCE(subq_3.bookings, 0) AS bookings_fill_nulls_with_0
+    FROM *****.mf_time_spine subq_5
+    LEFT JOIN (
+      SELECT
+        DATE_TRUNC('day', CAST(ds AS TIMESTAMP)) AS metric_time__day
+        , SUM(1) AS bookings
+      FROM *****.fct_bookings bookings_source_src_1
+      GROUP BY
+        1
+    ) subq_3
+    ON subq_5.ds = subq_3.metric_time__day
+  ) subq_7
+  FULL OUTER JOIN (
+    SELECT
+      subq_11.ds AS metric_time__day
+      , SUM(subq_9.bookings) AS bookings_2_weeks_ago
+    FROM *****.mf_time_spine subq_11
+    INNER JOIN (
+      SELECT
+        DATE_TRUNC('day', CAST(ds AS TIMESTAMP)) AS metric_time__day
+        , 1 AS bookings
+      FROM *****.fct_bookings bookings_source_src_1
+    ) subq_9
+    ON subq_11.ds - INTERVAL 14 day = subq_9.metric_time__day
+    GROUP BY subq_11.ds
+  ) subq_15
+  ON subq_7.metric_time__day = subq_15.metric_time__day
+  GROUP BY 1, 3
+) subq_16
+[0m16:30:02.719143 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:02.788380 [debug] [MainThread]: On MetricFlow_request_mf_rid__m8h7k4fo: ROLLBACK
+[0m16:30:02.788780 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__m8h7k4fo'
+[0m16:30:02.789005 [debug] [MainThread]: On MetricFlow_request_mf_rid__m8h7k4fo: Close
+[0m16:30:04.971599 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__m8h7k4fo, now MetricFlow_request_mf_rid__astxeico)
+[0m16:30:04.972016 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__astxeico"
+[0m16:30:04.972260 [debug] [MainThread]: On MetricFlow_request_mf_rid__astxeico: BEGIN
+[0m16:30:04.972485 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:30:04.972847 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:04.973079 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__astxeico"
+[0m16:30:04.973339 [debug] [MainThread]: On MetricFlow_request_mf_rid__astxeico: -- Combine Aggregated Outputs
+SELECT
+  COALESCE(subq_7.metric_time__day, subq_12.metric_time__day) AS metric_time__day
+  , COALESCE(MAX(subq_7.bookings_fill_nulls_with_0), 0) AS bookings_fill_nulls_with_0
+  , MAX(subq_12.views) AS views
+FROM (
+  -- Compute Metrics via Expressions
+  SELECT
+    metric_time__day
+    , COALESCE(bookings, 0) AS bookings_fill_nulls_with_0
+  FROM (
+    -- Join to Time Spine Dataset
+    SELECT
+      subq_5.ds AS metric_time__day
+      , subq_3.bookings AS bookings
+    FROM *****.mf_time_spine subq_5
+    LEFT OUTER JOIN (
+      -- Aggregate Measures
+      SELECT
+        metric_time__day
+        , SUM(bookings) AS bookings
+      FROM (
+        -- Read Elements From Semantic Model 'bookings_source'
+        -- Metric Time Dimension 'ds'
+        -- Pass Only Elements: ['bookings', 'metric_time__day']
+        SELECT
+          DATE_TRUNC('day', ds) AS metric_time__day
+          , 1 AS bookings
+        FROM *****.fct_bookings bookings_source_src_10000
+      ) subq_2
+      GROUP BY
+        metric_time__day
+    ) subq_3
+    ON
+      subq_5.ds = subq_3.metric_time__day
+  ) subq_6
+) subq_7
+FULL OUTER JOIN (
+  -- Aggregate Measures
+  -- Compute Metrics via Expressions
+  SELECT
+    metric_time__day
+    , SUM(views) AS views
+  FROM (
+    -- Read Elements From Semantic Model 'views_source'
+    -- Metric Time Dimension 'ds'
+    -- Pass Only Elements: ['views', 'metric_time__day']
+    SELECT
+      DATE_TRUNC('day', ds) AS metric_time__day
+      , 1 AS views
+    FROM *****.fct_views views_source_src_10000
+  ) subq_10
+  GROUP BY
+    metric_time__day
+) subq_12
+ON
+  subq_7.metric_time__day = subq_12.metric_time__day
+GROUP BY
+  COALESCE(subq_7.metric_time__day, subq_12.metric_time__day)
+[0m16:30:04.975259 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:05.171965 [debug] [MainThread]: On MetricFlow_request_mf_rid__astxeico: ROLLBACK
+[0m16:30:05.172415 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__astxeico'
+[0m16:30:05.172656 [debug] [MainThread]: On MetricFlow_request_mf_rid__astxeico: Close
+[0m16:30:05.180130 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__astxeico, now MetricFlow_request_mf_rid__9c61efks)
+[0m16:30:05.180459 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__9c61efks"
+[0m16:30:05.180693 [debug] [MainThread]: On MetricFlow_request_mf_rid__9c61efks: BEGIN
+[0m16:30:05.180914 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:30:05.181262 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:05.181483 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__9c61efks"
+[0m16:30:05.181731 [debug] [MainThread]: On MetricFlow_request_mf_rid__9c61efks: SELECT
+  COALESCE(subq_7.metric_time__day, subq_12.metric_time__day) AS metric_time__day
+  , COALESCE(MAX(subq_7.bookings_fill_nulls_with_0), 0) AS bookings_fill_nulls_with_0
+  , MAX(subq_12.views) AS views
+FROM (
+  SELECT
+    subq_5.ds AS metric_time__day
+    , COALESCE(subq_3.bookings, 0) AS bookings_fill_nulls_with_0
+  FROM *****.mf_time_spine subq_5
+  LEFT OUTER JOIN (
+    SELECT
+      DATE_TRUNC('day', CAST(ds AS TIMESTAMP)) AS metric_time__day
+      , SUM(1) AS bookings
+    FROM *****.fct_bookings bookings_source_src_1
+    GROUP BY 1
+  ) subq_3
+  ON subq_5.ds = subq_3.metric_time__day
+) subq_7
+FULL OUTER JOIN (
+  SELECT
+    DATE_TRUNC('day', CAST(ds AS TIMESTAMP)) AS metric_time__day
+    , SUM(1) AS views
+  FROM *****.fct_views views_source_src_9
+  GROUP BY 1
+) subq_12
+ON subq_7.metric_time__day = subq_12.metric_time__day
+GROUP BY COALESCE(subq_7.metric_time__day, subq_12.metric_time__day)
+[0m16:30:05.183692 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:05.292033 [debug] [MainThread]: On MetricFlow_request_mf_rid__9c61efks: ROLLBACK
+[0m16:30:05.292552 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__9c61efks'
+[0m16:30:05.292807 [debug] [MainThread]: On MetricFlow_request_mf_rid__9c61efks: Close
+[0m16:30:08.413851 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__9c61efks, now MetricFlow_request_mf_rid__ktdfo3vu)
+[0m16:30:08.414289 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__ktdfo3vu"
+[0m16:30:08.414531 [debug] [MainThread]: On MetricFlow_request_mf_rid__ktdfo3vu: BEGIN
+[0m16:30:08.414749 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:30:08.415107 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:08.415334 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__ktdfo3vu"
+[0m16:30:08.415645 [debug] [MainThread]: On MetricFlow_request_mf_rid__ktdfo3vu: -- Combine Aggregated Outputs
+SELECT
+  COALESCE(subq_17.metric_time__day, subq_22.metric_time__day) AS metric_time__day
+  , MAX(subq_17.bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset) AS bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset
+  , MAX(subq_22.booking_value) AS booking_value
+FROM (
+  -- Compute Metrics via Expressions
+  SELECT
+    metric_time__day
+    , bookings_fill_nulls_with_0 - bookings_2_weeks_ago AS bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset
+  FROM (
+    -- Combine Aggregated Outputs
+    SELECT
+      COALESCE(subq_7.metric_time__day, subq_15.metric_time__day) AS metric_time__day
+      , COALESCE(MAX(subq_7.bookings_fill_nulls_with_0), 0) AS bookings_fill_nulls_with_0
+      , MAX(subq_15.bookings_2_weeks_ago) AS bookings_2_weeks_ago
+    FROM (
+      -- Compute Metrics via Expressions
+      SELECT
+        metric_time__day
+        , COALESCE(bookings, 0) AS bookings_fill_nulls_with_0
+      FROM (
+        -- Join to Time Spine Dataset
+        SELECT
+          subq_5.ds AS metric_time__day
+          , subq_3.bookings AS bookings
+        FROM *****.mf_time_spine subq_5
+        LEFT OUTER JOIN (
+          -- Aggregate Measures
+          SELECT
+            metric_time__day
+            , SUM(bookings) AS bookings
+          FROM (
+            -- Read Elements From Semantic Model 'bookings_source'
+            -- Metric Time Dimension 'ds'
+            -- Pass Only Elements: ['bookings', 'metric_time__day']
+            SELECT
+              DATE_TRUNC('day', ds) AS metric_time__day
+              , 1 AS bookings
+            FROM *****.fct_bookings bookings_source_src_10000
+          ) subq_2
+          GROUP BY
+            metric_time__day
+        ) subq_3
+        ON
+          subq_5.ds = subq_3.metric_time__day
+      ) subq_6
+    ) subq_7
+    FULL OUTER JOIN (
+      -- Join to Time Spine Dataset
+      -- Pass Only Elements: ['bookings', 'metric_time__day']
+      -- Aggregate Measures
+      -- Compute Metrics via Expressions
+      SELECT
+        subq_11.ds AS metric_time__day
+        , SUM(subq_9.bookings) AS bookings_2_weeks_ago
+      FROM *****.mf_time_spine subq_11
+      INNER JOIN (
+        -- Read Elements From Semantic Model 'bookings_source'
+        -- Metric Time Dimension 'ds'
+        SELECT
+          DATE_TRUNC('day', ds) AS metric_time__day
+          , 1 AS bookings
+        FROM *****.fct_bookings bookings_source_src_10000
+      ) subq_9
+      ON
+        subq_11.ds - INTERVAL 14 day = subq_9.metric_time__day
+      GROUP BY
+        subq_11.ds
+    ) subq_15
+    ON
+      subq_7.metric_time__day = subq_15.metric_time__day
+    GROUP BY
+      COALESCE(subq_7.metric_time__day, subq_15.metric_time__day)
+  ) subq_16
+) subq_17
+FULL OUTER JOIN (
+  -- Read Elements From Semantic Model 'bookings_source'
+  -- Metric Time Dimension 'ds'
+  -- Pass Only Elements: ['booking_value', 'metric_time__day']
+  -- Aggregate Measures
+  -- Compute Metrics via Expressions
+  SELECT
+    DATE_TRUNC('day', ds) AS metric_time__day
+    , SUM(booking_value) AS booking_value
+  FROM *****.fct_bookings bookings_source_src_10000
+  GROUP BY
+    DATE_TRUNC('day', ds)
+) subq_22
+ON
+  subq_17.metric_time__day = subq_22.metric_time__day
+GROUP BY
+  COALESCE(subq_17.metric_time__day, subq_22.metric_time__day)
+[0m16:30:08.418877 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:08.510730 [debug] [MainThread]: On MetricFlow_request_mf_rid__ktdfo3vu: ROLLBACK
+[0m16:30:08.511235 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__ktdfo3vu'
+[0m16:30:08.511481 [debug] [MainThread]: On MetricFlow_request_mf_rid__ktdfo3vu: Close
+[0m16:30:08.518430 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__ktdfo3vu, now MetricFlow_request_mf_rid__mzzskslm)
+[0m16:30:08.518726 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__mzzskslm"
+[0m16:30:08.518954 [debug] [MainThread]: On MetricFlow_request_mf_rid__mzzskslm: BEGIN
+[0m16:30:08.519170 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:30:08.519534 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:08.519779 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__mzzskslm"
+[0m16:30:08.520072 [debug] [MainThread]: On MetricFlow_request_mf_rid__mzzskslm: SELECT
+  COALESCE(subq_17.metric_time__day, subq_22.metric_time__day) AS metric_time__day
+  , MAX(subq_17.bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset) AS bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset
+  , MAX(subq_22.booking_value) AS booking_value
+FROM (
+  SELECT
+    metric_time__day
+    , bookings_fill_nulls_with_0 - bookings_2_weeks_ago AS bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset
+  FROM (
+    SELECT
+      COALESCE(subq_7.metric_time__day, subq_15.metric_time__day) AS metric_time__day
+      , COALESCE(MAX(subq_7.bookings_fill_nulls_with_0), 0) AS bookings_fill_nulls_with_0
+      , MAX(subq_15.bookings_2_weeks_ago) AS bookings_2_weeks_ago
+    FROM (
+      SELECT
+        metric_time__day
+        , COALESCE(bookings, 0) AS bookings_fill_nulls_with_0
+      FROM (
+        SELECT
+          subq_5.ds AS metric_time__day
+          , subq_3.bookings AS bookings
+        FROM *****.mf_time_spine subq_5
+        LEFT OUTER JOIN (
+          SELECT
+            DATE_TRUNC('day', CAST(ds AS TIMESTAMP)) AS metric_time__day
+            , SUM(1) AS bookings
+          FROM *****.fct_bookings bookings_source_src_1
+          GROUP BY 1
+        ) subq_3
+        ON subq_5.ds = subq_3.metric_time__day
+      ) subq_6
+    ) subq_7
+    FULL OUTER JOIN (
+      SELECT
+        subq_11.ds AS metric_time__day
+        , SUM(subq_9.bookings) AS bookings_2_weeks_ago
+      FROM *****.mf_time_spine subq_11
+      INNER JOIN (
+        SELECT
+          DATE_TRUNC('day', CAST(ds AS TIMESTAMP)) AS metric_time__day
+          , 1 AS bookings
+        FROM *****.fct_bookings bookings_source_src_1
+      ) subq_9
+      ON subq_11.ds - INTERVAL 14 day = subq_9.metric_time__day
+      GROUP BY subq_11.ds
+    ) subq_15
+    ON subq_7.metric_time__day = subq_15.metric_time__day
+    GROUP BY COALESCE(subq_7.metric_time__day, subq_15.metric_time__day)
+  ) subq_16
+) subq_17
+FULL OUTER JOIN (
+  SELECT
+    DATE_TRUNC('day', CAST(ds AS TIMESTAMP)) AS metric_time__day
+    , SUM(booking_value) AS booking_value
+  FROM *****.fct_bookings bookings_source_src_1
+  GROUP BY DATE_TRUNC('day', CAST(ds AS TIMESTAMP))
+) subq_22
+ON subq_17.metric_time__day = subq_22.metric_time__day
+GROUP BY COALESCE(subq_17.metric_time__day, subq_22.metric_time__day)
+[0m16:30:08.523296 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:08.614767 [debug] [MainThread]: On MetricFlow_request_mf_rid__mzzskslm: ROLLBACK
+[0m16:30:08.615229 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__mzzskslm'
+[0m16:30:08.615467 [debug] [MainThread]: On MetricFlow_request_mf_rid__mzzskslm: Close
+[0m16:30:11.176670 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__mzzskslm, now MetricFlow_request_mf_rid__44wde4mt)
+[0m16:30:11.177111 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__44wde4mt"
+[0m16:30:11.177349 [debug] [MainThread]: On MetricFlow_request_mf_rid__44wde4mt: BEGIN
+[0m16:30:11.177570 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:30:11.177948 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:11.178169 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__44wde4mt"
+[0m16:30:11.178467 [debug] [MainThread]: On MetricFlow_request_mf_rid__44wde4mt: -- Combine Aggregated Outputs
+SELECT
+  COALESCE(subq_9.metric_time__day, subq_19.metric_time__day) AS metric_time__day
+  , COALESCE(subq_9.listing__is_lux_latest, subq_19.listing__is_lux_latest) AS listing__is_lux_latest
+  , COALESCE(MAX(subq_9.bookings_fill_nulls_with_0_without_time_spine), 0) AS bookings_fill_nulls_with_0_without_time_spine
+  , MAX(subq_19.views) AS views
+FROM (
+  -- Compute Metrics via Expressions
+  SELECT
+    metric_time__day
+    , listing__is_lux_latest
+    , COALESCE(bookings, 0) AS bookings_fill_nulls_with_0_without_time_spine
+  FROM (
+    -- Join Standard Outputs
+    -- Pass Only Elements: ['bookings', 'listing__is_lux_latest', 'metric_time__day']
+    -- Aggregate Measures
+    SELECT
+      subq_2.metric_time__day AS metric_time__day
+      , listings_latest_src_10000.is_lux AS listing__is_lux_latest
+      , SUM(subq_2.bookings) AS bookings
+    FROM (
+      -- Read Elements From Semantic Model 'bookings_source'
+      -- Metric Time Dimension 'ds'
+      -- Pass Only Elements: ['bookings', 'metric_time__day', 'listing']
+      SELECT
+        DATE_TRUNC('day', ds) AS metric_time__day
+        , listing_id AS listing
+        , 1 AS bookings
+      FROM *****.fct_bookings bookings_source_src_10000
+    ) subq_2
+    LEFT OUTER JOIN
+      *****.dim_listings_latest listings_latest_src_10000
+    ON
+      subq_2.listing = listings_latest_src_10000.listing_id
+    GROUP BY
+      subq_2.metric_time__day
+      , listings_latest_src_10000.is_lux
+  ) subq_8
+) subq_9
+FULL OUTER JOIN (
+  -- Join Standard Outputs
+  -- Pass Only Elements: ['views', 'listing__is_lux_latest', 'metric_time__day']
+  -- Aggregate Measures
+  -- Compute Metrics via Expressions
+  SELECT
+    subq_12.metric_time__day AS metric_time__day
+    , listings_latest_src_10000.is_lux AS listing__is_lux_latest
+    , SUM(subq_12.views) AS views
+  FROM (
+    -- Read Elements From Semantic Model 'views_source'
+    -- Metric Time Dimension 'ds'
+    -- Pass Only Elements: ['views', 'metric_time__day', 'listing']
+    SELECT
+      DATE_TRUNC('day', ds) AS metric_time__day
+      , listing_id AS listing
+      , 1 AS views
+    FROM *****.fct_views views_source_src_10000
+  ) subq_12
+  LEFT OUTER JOIN
+    *****.dim_listings_latest listings_latest_src_10000
+  ON
+    subq_12.listing = listings_latest_src_10000.listing_id
+  GROUP BY
+    subq_12.metric_time__day
+    , listings_latest_src_10000.is_lux
+) subq_19
+ON
+  (
+    subq_9.listing__is_lux_latest = subq_19.listing__is_lux_latest
+  ) AND (
+    subq_9.metric_time__day = subq_19.metric_time__day
+  )
+GROUP BY
+  COALESCE(subq_9.metric_time__day, subq_19.metric_time__day)
+  , COALESCE(subq_9.listing__is_lux_latest, subq_19.listing__is_lux_latest)
+[0m16:30:11.180480 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:11.181923 [debug] [MainThread]: On MetricFlow_request_mf_rid__44wde4mt: ROLLBACK
+[0m16:30:11.182265 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__44wde4mt'
+[0m16:30:11.182497 [debug] [MainThread]: On MetricFlow_request_mf_rid__44wde4mt: Close
+[0m16:30:11.184617 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__44wde4mt, now MetricFlow_request_mf_rid__rh6uo4ms)
+[0m16:30:11.184886 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__rh6uo4ms"
+[0m16:30:11.185112 [debug] [MainThread]: On MetricFlow_request_mf_rid__rh6uo4ms: BEGIN
+[0m16:30:11.185325 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:30:11.185617 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:11.185839 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__rh6uo4ms"
+[0m16:30:11.186101 [debug] [MainThread]: On MetricFlow_request_mf_rid__rh6uo4ms: SELECT
+  COALESCE(subq_9.metric_time__day, subq_19.metric_time__day) AS metric_time__day
+  , COALESCE(subq_9.listing__is_lux_latest, subq_19.listing__is_lux_latest) AS listing__is_lux_latest
+  , COALESCE(MAX(subq_9.bookings_fill_nulls_with_0_without_time_spine), 0) AS bookings_fill_nulls_with_0_without_time_spine
+  , MAX(subq_19.views) AS views
+FROM (
+  SELECT
+    subq_2.metric_time__day AS metric_time__day
+    , listings_latest_src_4.is_lux AS listing__is_lux_latest
+    , COALESCE(SUM(subq_2.bookings), 0) AS bookings_fill_nulls_with_0_without_time_spine
+  FROM (
+    SELECT
+      DATE_TRUNC('day', CAST(ds AS TIMESTAMP)) AS metric_time__day
+      , listing_id AS listing
+      , 1 AS bookings
+    FROM *****.fct_bookings bookings_source_src_1
+  ) subq_2
+  LEFT OUTER JOIN
+    *****.dim_listings_latest listings_latest_src_4
+  ON subq_2.listing = listings_latest_src_4.listing_id
+  GROUP BY subq_2.metric_time__day, listings_latest_src_4.is_lux
+) subq_9
+FULL OUTER JOIN (
+  SELECT
+    subq_12.metric_time__day AS metric_time__day
+    , listings_latest_src_4.is_lux AS listing__is_lux_latest
+    , SUM(subq_12.views) AS views
+  FROM (
+    SELECT
+      DATE_TRUNC('day', CAST(ds AS TIMESTAMP)) AS metric_time__day
+      , listing_id AS listing
+      , 1 AS views
+    FROM *****.fct_views views_source_src_9
+  ) subq_12
+  LEFT OUTER JOIN
+    *****.dim_listings_latest listings_latest_src_4
+  ON subq_12.listing = listings_latest_src_4.listing_id
+  GROUP BY subq_12.metric_time__day, listings_latest_src_4.is_lux
+) subq_19
+ON (subq_9.listing__is_lux_latest = subq_19.listing__is_lux_latest)
+  AND (subq_9.metric_time__day = subq_19.metric_time__day)
+GROUP BY
+  COALESCE(subq_9.metric_time__day, subq_19.metric_time__day)
+  , COALESCE(subq_9.listing__is_lux_latest, subq_19.listing__is_lux_latest)
+[0m16:30:11.187815 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:11.189086 [debug] [MainThread]: On MetricFlow_request_mf_rid__rh6uo4ms: ROLLBACK
+[0m16:30:11.189393 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__rh6uo4ms'
+[0m16:30:11.189639 [debug] [MainThread]: On MetricFlow_request_mf_rid__rh6uo4ms: Close
+[0m16:30:11.455843 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__rh6uo4ms, now MetricFlow_request_mf_rid__1o6nsbe8)
+[0m16:30:11.456269 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__1o6nsbe8"
+[0m16:30:11.456513 [debug] [MainThread]: On MetricFlow_request_mf_rid__1o6nsbe8: BEGIN
+[0m16:30:11.456747 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:30:11.457109 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:11.457333 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__1o6nsbe8"
+[0m16:30:11.457586 [debug] [MainThread]: On MetricFlow_request_mf_rid__1o6nsbe8: -- Compute Metrics via Expressions
+SELECT
+  metric_time__day
+  , 2 * bookings_offset_once AS bookings_offset_twice
+FROM (
+  -- Join to Time Spine Dataset
+  SELECT
+    subq_10.ds AS metric_time__day
+    , subq_8.bookings_offset_once AS bookings_offset_once
+  FROM *****.mf_time_spine subq_10
+  INNER JOIN (
+    -- Compute Metrics via Expressions
+    SELECT
+      metric_time__day
+      , 2 * bookings AS bookings_offset_once
+    FROM (
+      -- Join to Time Spine Dataset
+      -- Pass Only Elements: ['bookings', 'metric_time__day']
+      -- Aggregate Measures
+      -- Compute Metrics via Expressions
+      SELECT
+        subq_3.ds AS metric_time__day
+        , SUM(subq_1.bookings) AS bookings
+      FROM *****.mf_time_spine subq_3
+      INNER JOIN (
+        -- Read Elements From Semantic Model 'bookings_source'
+        -- Metric Time Dimension 'ds'
+        SELECT
+          DATE_TRUNC('day', ds) AS metric_time__day
+          , 1 AS bookings
+        FROM *****.fct_bookings bookings_source_src_10000
+      ) subq_1
+      ON
+        subq_3.ds - INTERVAL 5 day = subq_1.metric_time__day
+      GROUP BY
+        subq_3.ds
+    ) subq_7
+  ) subq_8
+  ON
+    subq_10.ds - INTERVAL 2 day = subq_8.metric_time__day
+) subq_11
+[0m16:30:11.459364 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:11.460600 [debug] [MainThread]: On MetricFlow_request_mf_rid__1o6nsbe8: ROLLBACK
+[0m16:30:11.460946 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__1o6nsbe8'
+[0m16:30:11.461176 [debug] [MainThread]: On MetricFlow_request_mf_rid__1o6nsbe8: Close
+[0m16:30:11.463585 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__1o6nsbe8, now MetricFlow_request_mf_rid__4mbbl5a9)
+[0m16:30:11.463876 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__4mbbl5a9"
+[0m16:30:11.464105 [debug] [MainThread]: On MetricFlow_request_mf_rid__4mbbl5a9: BEGIN
+[0m16:30:11.464319 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:30:11.464604 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:11.464834 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__4mbbl5a9"
+[0m16:30:11.465071 [debug] [MainThread]: On MetricFlow_request_mf_rid__4mbbl5a9: SELECT
+  subq_9.ds AS metric_time__day
+  , 2 * bookings_offset_once AS bookings_offset_twice
+FROM *****.mf_time_spine subq_9
+INNER JOIN (
+  SELECT
+    metric_time__day
+    , 2 * bookings AS bookings_offset_once
+  FROM (
+    SELECT
+      subq_3.ds AS metric_time__day
+      , SUM(subq_1.bookings) AS bookings
+    FROM *****.mf_time_spine subq_3
+    INNER JOIN (
+      SELECT
+        DATE_TRUNC('day', CAST(ds AS TIMESTAMP)) AS metric_time__day
+        , 1 AS bookings
+      FROM *****.fct_bookings bookings_source_src_1
+    ) subq_1
+    ON
+      subq_3.ds - INTERVAL 5 day = subq_1.metric_time__day
+    GROUP BY
+      subq_3.ds
+  ) subq_7
+) subq_8
+ON
+  subq_9.ds - INTERVAL 2 day = subq_8.metric_time__day
+[0m16:30:11.466641 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:11.467533 [debug] [MainThread]: On MetricFlow_request_mf_rid__4mbbl5a9: ROLLBACK
+[0m16:30:11.467820 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__4mbbl5a9'
+[0m16:30:11.468051 [debug] [MainThread]: On MetricFlow_request_mf_rid__4mbbl5a9: Close
+[0m16:30:11.848879 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__4mbbl5a9, now MetricFlow_request_mf_rid__il0xf6d5)
+[0m16:30:11.849866 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__il0xf6d5"
+[0m16:30:11.850149 [debug] [MainThread]: On MetricFlow_request_mf_rid__il0xf6d5: BEGIN
+[0m16:30:11.850381 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:30:11.850743 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:11.850966 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__il0xf6d5"
+[0m16:30:11.851241 [debug] [MainThread]: On MetricFlow_request_mf_rid__il0xf6d5: -- Compute Metrics via Expressions
+SELECT
+  metric_time__day
+  , booking_fees - booking_fees_start_of_month AS booking_fees_since_start_of_month
+FROM (
+  -- Combine Aggregated Outputs
+  SELECT
+    COALESCE(subq_8.metric_time__day, subq_14.metric_time__day) AS metric_time__day
+    , MAX(subq_8.booking_fees_start_of_month) AS booking_fees_start_of_month
+    , MAX(subq_14.booking_fees) AS booking_fees
+  FROM (
+    -- Join to Time Spine Dataset
+    SELECT
+      subq_7.ds AS metric_time__day
+      , subq_5.booking_fees_start_of_month AS booking_fees_start_of_month
+    FROM *****.mf_time_spine subq_7
+    INNER JOIN (
+      -- Compute Metrics via Expressions
+      SELECT
+        metric_time__day
+        , booking_value * 0.05 AS booking_fees_start_of_month
+      FROM (
+        -- Read Elements From Semantic Model 'bookings_source'
+        -- Metric Time Dimension 'ds'
+        -- Pass Only Elements: ['booking_value', 'metric_time__day']
+        -- Aggregate Measures
+        -- Compute Metrics via Expressions
+        SELECT
+          DATE_TRUNC('day', ds) AS metric_time__day
+          , SUM(booking_value) AS booking_value
+        FROM *****.fct_bookings bookings_source_src_10000
+        GROUP BY
+          DATE_TRUNC('day', ds)
+      ) subq_4
+    ) subq_5
+    ON
+      DATE_TRUNC('month', subq_7.ds) = subq_5.metric_time__day
+  ) subq_8
+  FULL OUTER JOIN (
+    -- Compute Metrics via Expressions
+    SELECT
+      metric_time__day
+      , booking_value * 0.05 AS booking_fees
+    FROM (
+      -- Read Elements From Semantic Model 'bookings_source'
+      -- Metric Time Dimension 'ds'
+      -- Pass Only Elements: ['booking_value', 'metric_time__day']
+      -- Aggregate Measures
+      -- Compute Metrics via Expressions
+      SELECT
+        DATE_TRUNC('day', ds) AS metric_time__day
+        , SUM(booking_value) AS booking_value
+      FROM *****.fct_bookings bookings_source_src_10000
+      GROUP BY
+        DATE_TRUNC('day', ds)
+    ) subq_13
+  ) subq_14
+  ON
+    subq_8.metric_time__day = subq_14.metric_time__day
+  GROUP BY
+    COALESCE(subq_8.metric_time__day, subq_14.metric_time__day)
+) subq_15
+[0m16:30:11.852930 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:11.854488 [debug] [MainThread]: On MetricFlow_request_mf_rid__il0xf6d5: ROLLBACK
+[0m16:30:11.854812 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__il0xf6d5'
+[0m16:30:11.855040 [debug] [MainThread]: On MetricFlow_request_mf_rid__il0xf6d5: Close
+[0m16:30:11.857673 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__il0xf6d5, now MetricFlow_request_mf_rid__nbh99tho)
+[0m16:30:11.857947 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__nbh99tho"
+[0m16:30:11.858169 [debug] [MainThread]: On MetricFlow_request_mf_rid__nbh99tho: BEGIN
+[0m16:30:11.858379 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:30:11.858671 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:11.858885 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__nbh99tho"
+[0m16:30:11.859141 [debug] [MainThread]: On MetricFlow_request_mf_rid__nbh99tho: SELECT
+  metric_time__day
+  , booking_fees - booking_fees_start_of_month AS booking_fees_since_start_of_month
+FROM (
+  SELECT
+    COALESCE(subq_8.metric_time__day, subq_14.metric_time__day) AS metric_time__day
+    , MAX(subq_8.booking_fees_start_of_month) AS booking_fees_start_of_month
+    , MAX(subq_14.booking_fees) AS booking_fees
+  FROM (
+    SELECT
+      subq_7.ds AS metric_time__day
+      , subq_5.booking_fees_start_of_month AS booking_fees_start_of_month
+    FROM *****.mf_time_spine subq_7
+    INNER JOIN (
+      SELECT
+        metric_time__day
+        , booking_value * 0.05 AS booking_fees_start_of_month
+      FROM (
+        SELECT
+          DATE_TRUNC('day', CAST(ds AS TIMESTAMP)) AS metric_time__day
+          , SUM(booking_value) AS booking_value
+        FROM *****.fct_bookings bookings_source_src_1
+        GROUP BY
+          DATE_TRUNC('day', CAST(ds AS TIMESTAMP))
+      ) subq_4
+    ) subq_5
+    ON
+      DATE_TRUNC('month', CAST(subq_7.ds AS TIMESTAMP)) = subq_5.metric_time__day
+  ) subq_8
+  FULL OUTER JOIN (
+    SELECT
+      metric_time__day
+      , booking_value * 0.05 AS booking_fees
+    FROM (
+      SELECT
+        DATE_TRUNC('day', CAST(ds AS TIMESTAMP)) AS metric_time__day
+        , SUM(booking_value) AS booking_value
+      FROM *****.fct_bookings bookings_source_src_1
+      GROUP BY
+        DATE_TRUNC('day', CAST(ds AS TIMESTAMP))
+    ) subq_13
+  ) subq_14
+  ON
+    subq_8.metric_time__day = subq_14.metric_time__day
+  GROUP BY
+    COALESCE(subq_8.metric_time__day, subq_14.metric_time__day)
+) subq_15
+[0m16:30:11.860679 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:11.861942 [debug] [MainThread]: On MetricFlow_request_mf_rid__nbh99tho: ROLLBACK
+[0m16:30:11.862244 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__nbh99tho'
+[0m16:30:11.862470 [debug] [MainThread]: On MetricFlow_request_mf_rid__nbh99tho: Close
+[0m16:30:12.143676 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__nbh99tho, now MetricFlow_request_mf_rid__ld0o579o)
+[0m16:30:12.144105 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__ld0o579o"
+[0m16:30:12.144348 [debug] [MainThread]: On MetricFlow_request_mf_rid__ld0o579o: BEGIN
+[0m16:30:12.144571 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:30:12.144953 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:12.145179 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__ld0o579o"
+[0m16:30:12.145438 [debug] [MainThread]: On MetricFlow_request_mf_rid__ld0o579o: -- Compute Metrics via Expressions
+SELECT
+  metric_time__day
+  , 2 * bookings_offset_once AS bookings_offset_twice
+FROM (
+  -- Constrain Output with WHERE
+  SELECT
+    metric_time__day
+    , bookings_offset_once
+  FROM (
+    -- Join to Time Spine Dataset
+    SELECT
+      subq_10.ds AS metric_time__day
+      , subq_8.bookings_offset_once AS bookings_offset_once
+    FROM *****.mf_time_spine subq_10
+    INNER JOIN (
+      -- Compute Metrics via Expressions
+      SELECT
+        metric_time__day
+        , 2 * bookings AS bookings_offset_once
+      FROM (
+        -- Join to Time Spine Dataset
+        -- Pass Only Elements: ['bookings', 'metric_time__day']
+        -- Aggregate Measures
+        -- Compute Metrics via Expressions
+        SELECT
+          subq_3.ds AS metric_time__day
+          , SUM(subq_1.bookings) AS bookings
+        FROM *****.mf_time_spine subq_3
+        INNER JOIN (
+          -- Read Elements From Semantic Model 'bookings_source'
+          -- Metric Time Dimension 'ds'
+          SELECT
+            DATE_TRUNC('day', ds) AS metric_time__day
+            , 1 AS bookings
+          FROM *****.fct_bookings bookings_source_src_10000
+        ) subq_1
+        ON
+          subq_3.ds - INTERVAL 5 day = subq_1.metric_time__day
+        GROUP BY
+          subq_3.ds
+      ) subq_7
+    ) subq_8
+    ON
+      subq_10.ds - INTERVAL 2 day = subq_8.metric_time__day
+  ) subq_11
+  WHERE CAST(metric_time__day AS TIMESTAMP) >= CAST('2020-01-08' AS TIMESTAMP) AND CAST(metric_time__day AS TIMESTAMP) < CAST('2020-01-10' AS TIMESTAMP)
+) subq_12
+[0m16:30:12.147146 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:12.148100 [debug] [MainThread]: On MetricFlow_request_mf_rid__ld0o579o: ROLLBACK
+[0m16:30:12.148431 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__ld0o579o'
+[0m16:30:12.148656 [debug] [MainThread]: On MetricFlow_request_mf_rid__ld0o579o: Close
+[0m16:30:12.151094 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__ld0o579o, now MetricFlow_request_mf_rid__mfrrxs29)
+[0m16:30:12.151354 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__mfrrxs29"
+[0m16:30:12.151582 [debug] [MainThread]: On MetricFlow_request_mf_rid__mfrrxs29: BEGIN
+[0m16:30:12.151797 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:30:12.152076 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:12.152291 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__mfrrxs29"
+[0m16:30:12.152534 [debug] [MainThread]: On MetricFlow_request_mf_rid__mfrrxs29: SELECT
+  subq_9.ds AS metric_time__day
+  , 2 * bookings_offset_once AS bookings_offset_twice
+FROM *****.mf_time_spine subq_9
+INNER JOIN (
+  SELECT
+    metric_time__day
+    , 2 * bookings AS bookings_offset_once
+  FROM (
+    SELECT
+      subq_3.ds AS metric_time__day
+      , SUM(subq_1.bookings) AS bookings
+    FROM *****.mf_time_spine subq_3
+    INNER JOIN (
+      SELECT
+        DATE_TRUNC('day', CAST(ds AS TIMESTAMP)) AS metric_time__day
+        , 1 AS bookings
+      FROM *****.fct_bookings bookings_source_src_1
+    ) subq_1
+    ON
+      subq_3.ds - INTERVAL 5 day = subq_1.metric_time__day
+    GROUP BY
+      subq_3.ds
+  ) subq_7
+) subq_8
+ON
+  subq_9.ds - INTERVAL 2 day = subq_8.metric_time__day
+WHERE CAST(subq_9.ds AS TIMESTAMP) >= CAST('2020-01-08' AS TIMESTAMP) AND CAST(subq_9.ds AS TIMESTAMP) < CAST('2020-01-10' AS TIMESTAMP)
+[0m16:30:12.153992 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:12.155053 [debug] [MainThread]: On MetricFlow_request_mf_rid__mfrrxs29: ROLLBACK
+[0m16:30:12.155398 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__mfrrxs29'
+[0m16:30:12.155628 [debug] [MainThread]: On MetricFlow_request_mf_rid__mfrrxs29: Close
+[0m16:30:12.421029 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__mfrrxs29, now MetricFlow_request_mf_rid__43r9r9xw)
+[0m16:30:12.421427 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__43r9r9xw"
+[0m16:30:12.421674 [debug] [MainThread]: On MetricFlow_request_mf_rid__43r9r9xw: BEGIN
+[0m16:30:12.421898 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:30:12.422283 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:12.422507 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__43r9r9xw"
+[0m16:30:12.422766 [debug] [MainThread]: On MetricFlow_request_mf_rid__43r9r9xw: -- Compute Metrics via Expressions
+SELECT
+  metric_time__day
+  , 2 * bookings_offset_once AS bookings_offset_twice
+FROM (
+  -- Join to Time Spine Dataset
+  SELECT
+    subq_9.metric_time__day AS metric_time__day
+    , subq_8.bookings_offset_once AS bookings_offset_once
+  FROM (
+    -- Time Spine
+    SELECT
+      ds AS metric_time__day
+    FROM *****.mf_time_spine subq_10
+    WHERE ds BETWEEN '2020-01-08' AND '2020-01-09'
+  ) subq_9
+  INNER JOIN (
+    -- Compute Metrics via Expressions
+    SELECT
+      metric_time__day
+      , 2 * bookings AS bookings_offset_once
+    FROM (
+      -- Join to Time Spine Dataset
+      -- Pass Only Elements: ['bookings', 'metric_time__day']
+      -- Aggregate Measures
+      -- Compute Metrics via Expressions
+      SELECT
+        subq_3.ds AS metric_time__day
+        , SUM(subq_1.bookings) AS bookings
+      FROM *****.mf_time_spine subq_3
+      INNER JOIN (
+        -- Read Elements From Semantic Model 'bookings_source'
+        -- Metric Time Dimension 'ds'
+        SELECT
+          DATE_TRUNC('day', ds) AS metric_time__day
+          , 1 AS bookings
+        FROM *****.fct_bookings bookings_source_src_10000
+      ) subq_1
+      ON
+        subq_3.ds - INTERVAL 5 day = subq_1.metric_time__day
+      GROUP BY
+        subq_3.ds
+    ) subq_7
+  ) subq_8
+  ON
+    subq_9.metric_time__day - INTERVAL 2 day = subq_8.metric_time__day
+) subq_11
+[0m16:30:12.424383 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:12.425312 [debug] [MainThread]: On MetricFlow_request_mf_rid__43r9r9xw: ROLLBACK
+[0m16:30:12.425619 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__43r9r9xw'
+[0m16:30:12.425855 [debug] [MainThread]: On MetricFlow_request_mf_rid__43r9r9xw: Close
+[0m16:30:12.428315 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__43r9r9xw, now MetricFlow_request_mf_rid__1xsofrzd)
+[0m16:30:12.428578 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__1xsofrzd"
+[0m16:30:12.428812 [debug] [MainThread]: On MetricFlow_request_mf_rid__1xsofrzd: BEGIN
+[0m16:30:12.429029 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:30:12.429310 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:12.429524 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__1xsofrzd"
+[0m16:30:12.429757 [debug] [MainThread]: On MetricFlow_request_mf_rid__1xsofrzd: SELECT
+  subq_9.ds AS metric_time__day
+  , 2 * bookings_offset_once AS bookings_offset_twice
+FROM *****.mf_time_spine subq_9
+INNER JOIN (
+  SELECT
+    metric_time__day
+    , 2 * bookings AS bookings_offset_once
+  FROM (
+    SELECT
+      subq_3.ds AS metric_time__day
+      , SUM(subq_1.bookings) AS bookings
+    FROM *****.mf_time_spine subq_3
+    INNER JOIN (
+      SELECT
+        DATE_TRUNC('day', CAST(ds AS TIMESTAMP)) AS metric_time__day
+        , 1 AS bookings
+      FROM *****.fct_bookings bookings_source_src_1
+    ) subq_1
+    ON
+      subq_3.ds - INTERVAL 5 day = subq_1.metric_time__day
+    GROUP BY
+      subq_3.ds
+  ) subq_7
+) subq_8
+ON
+  subq_9.ds - INTERVAL 2 day = subq_8.metric_time__day
+WHERE CAST(subq_9.ds AS TIMESTAMP) >= CAST('2020-01-08' AS TIMESTAMP) AND CAST(subq_9.ds AS TIMESTAMP) < CAST('2020-01-10' AS TIMESTAMP)
+[0m16:30:12.431126 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:12.431962 [debug] [MainThread]: On MetricFlow_request_mf_rid__1xsofrzd: ROLLBACK
+[0m16:30:12.432227 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__1xsofrzd'
+[0m16:30:12.432440 [debug] [MainThread]: On MetricFlow_request_mf_rid__1xsofrzd: Close
+[0m16:30:12.641668 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__1xsofrzd, now MetricFlow_request_mf_rid__thrx1fo9)
+[0m16:30:12.642042 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__thrx1fo9"
+[0m16:30:12.642281 [debug] [MainThread]: On MetricFlow_request_mf_rid__thrx1fo9: BEGIN
+[0m16:30:12.642501 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:30:12.642867 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:12.643085 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__thrx1fo9"
+[0m16:30:12.643327 [debug] [MainThread]: On MetricFlow_request_mf_rid__thrx1fo9: -- Compute Metrics via Expressions
+SELECT
+  metric_time__day
+  , bookings_5_days_ago AS bookings_5_day_lag
+FROM (
+  -- Join to Time Spine Dataset
+  -- Pass Only Elements: ['bookings', 'metric_time__day']
+  -- Aggregate Measures
+  -- Compute Metrics via Expressions
+  SELECT
+    subq_2.metric_time__day AS metric_time__day
+    , SUM(subq_1.bookings) AS bookings_5_days_ago
+  FROM (
+    -- Time Spine
+    SELECT
+      ds AS metric_time__day
+    FROM *****.mf_time_spine subq_3
+    WHERE ds BETWEEN '2019-12-19' AND '2020-01-02'
+  ) subq_2
+  INNER JOIN (
+    -- Read Elements From Semantic Model 'bookings_source'
+    -- Metric Time Dimension 'ds'
+    SELECT
+      DATE_TRUNC('day', ds) AS metric_time__day
+      , 1 AS bookings
+    FROM *****.fct_bookings bookings_source_src_10000
+  ) subq_1
+  ON
+    subq_2.metric_time__day - INTERVAL 5 day = subq_1.metric_time__day
+  GROUP BY
+    subq_2.metric_time__day
+) subq_7
+[0m16:30:12.644414 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:12.645353 [debug] [MainThread]: On MetricFlow_request_mf_rid__thrx1fo9: ROLLBACK
+[0m16:30:12.645649 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__thrx1fo9'
+[0m16:30:12.645864 [debug] [MainThread]: On MetricFlow_request_mf_rid__thrx1fo9: Close
+[0m16:30:12.648023 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__thrx1fo9, now MetricFlow_request_mf_rid__l63tkel1)
+[0m16:30:12.648279 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__l63tkel1"
+[0m16:30:12.648509 [debug] [MainThread]: On MetricFlow_request_mf_rid__l63tkel1: BEGIN
+[0m16:30:12.648733 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:30:12.649011 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:12.649227 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__l63tkel1"
+[0m16:30:12.649459 [debug] [MainThread]: On MetricFlow_request_mf_rid__l63tkel1: SELECT
+  metric_time__day
+  , bookings_5_days_ago AS bookings_5_day_lag
+FROM (
+  SELECT
+    subq_3.metric_time__day AS metric_time__day
+    , SUM(subq_2.bookings) AS bookings_5_days_ago
+  FROM (
+    SELECT
+      ds AS metric_time__day
+    FROM *****.mf_time_spine
+    WHERE CAST(ds AS TIMESTAMP) >= CAST('2019-12-19' AS TIMESTAMP) AND CAST(ds AS TIMESTAMP) < CAST('2020-01-03' AS TIMESTAMP)
+  ) subq_3
+  INNER JOIN (
+    SELECT
+      DATE_TRUNC('day', CAST(ds AS TIMESTAMP)) AS metric_time__day
+      , 1 AS bookings
+    FROM *****.fct_bookings
+  ) subq_2
+  ON subq_3.metric_time__day - INTERVAL 5 day = subq_2.metric_time__day
+  GROUP BY subq_3.metric_time__day
+)
+[0m16:30:12.650326 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:12.651371 [debug] [MainThread]: On MetricFlow_request_mf_rid__l63tkel1: ROLLBACK
+[0m16:30:12.651724 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__l63tkel1'
+[0m16:30:12.651966 [debug] [MainThread]: On MetricFlow_request_mf_rid__l63tkel1: Close
+[0m16:30:12.886932 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__l63tkel1, now MetricFlow_request_mf_rid__db4t8o0i)
+[0m16:30:12.887313 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__db4t8o0i"
+[0m16:30:12.887556 [debug] [MainThread]: On MetricFlow_request_mf_rid__db4t8o0i: BEGIN
+[0m16:30:12.887779 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:30:12.888131 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:12.888350 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__db4t8o0i"
+[0m16:30:12.888606 [debug] [MainThread]: On MetricFlow_request_mf_rid__db4t8o0i: -- Compute Metrics via Expressions
+SELECT
+  metric_time__day
+  , every_2_days_bookers_2_days_ago AS every_2_days_bookers_2_days_ago
+FROM (
+  -- Join to Time Spine Dataset
+  -- Pass Only Elements: ['bookers', 'metric_time__day']
+  -- Constrain Time Range to [2019-12-19T00:00:00, 2020-01-02T00:00:00]
+  -- Aggregate Measures
+  -- Compute Metrics via Expressions
+  SELECT
+    subq_5.metric_time__day AS metric_time__day
+    , COUNT(DISTINCT subq_4.bookers) AS every_2_days_bookers_2_days_ago
+  FROM (
+    -- Time Spine
+    SELECT
+      ds AS metric_time__day
+    FROM *****.mf_time_spine subq_6
+    WHERE ds BETWEEN '2019-12-19' AND '2020-01-02'
+  ) subq_5
+  INNER JOIN (
+    -- Join Self Over Time Range
+    SELECT
+      subq_3.ds AS metric_time__day
+      , bookings_source_src_10000.guest_id AS bookers
+    FROM *****.mf_time_spine subq_3
+    INNER JOIN
+      *****.fct_bookings bookings_source_src_10000
+    ON
+      (
+        DATE_TRUNC('day', bookings_source_src_10000.ds) <= subq_3.ds
+      ) AND (
+        DATE_TRUNC('day', bookings_source_src_10000.ds) > subq_3.ds - INTERVAL 2 day
+      )
+  ) subq_4
+  ON
+    subq_5.metric_time__day - INTERVAL 2 day = subq_4.metric_time__day
+  WHERE subq_5.metric_time__day BETWEEN '2019-12-19' AND '2020-01-02'
+  GROUP BY
+    subq_5.metric_time__day
+) subq_11
+[0m16:30:12.892775 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:12.893773 [debug] [MainThread]: On MetricFlow_request_mf_rid__db4t8o0i: ROLLBACK
+[0m16:30:12.894081 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__db4t8o0i'
+[0m16:30:12.894302 [debug] [MainThread]: On MetricFlow_request_mf_rid__db4t8o0i: Close
+[0m16:30:12.896859 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__db4t8o0i, now MetricFlow_request_mf_rid__in75z53a)
+[0m16:30:12.897132 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__in75z53a"
+[0m16:30:12.897357 [debug] [MainThread]: On MetricFlow_request_mf_rid__in75z53a: BEGIN
+[0m16:30:12.897566 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:30:12.897853 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:12.898068 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__in75z53a"
+[0m16:30:12.898298 [debug] [MainThread]: On MetricFlow_request_mf_rid__in75z53a: SELECT
+  subq_5.metric_time__day AS metric_time__day
+  , COUNT(DISTINCT subq_4.bookers) AS every_2_days_bookers_2_days_ago
+FROM (
+  SELECT
+    ds AS metric_time__day
+  FROM *****.mf_time_spine subq_6
+  WHERE ds BETWEEN CAST('2019-12-19' AS TIMESTAMP) AND CAST('2020-01-02' AS TIMESTAMP)
+) subq_5
+INNER JOIN (
+  SELECT
+    subq_3.ds AS metric_time__day
+    , b.guest_id AS bookers
+  FROM *****.mf_time_spine subq_3
+  INNER JOIN
+    *****.fct_bookings b
+  ON (DATE_TRUNC('day', CAST(b.ds AS TIMESTAMP)) <= subq_3.ds)
+    AND (DATE_TRUNC('day', CAST(b.ds AS TIMESTAMP)) > subq_3.ds - INTERVAL 2 day)
+) subq_4
+ON subq_5.metric_time__day - INTERVAL 2 day = subq_4.metric_time__day
+GROUP BY subq_5.metric_time__day
+[0m16:30:12.902195 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:12.903332 [debug] [MainThread]: On MetricFlow_request_mf_rid__in75z53a: ROLLBACK
+[0m16:30:12.903646 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__in75z53a'
+[0m16:30:12.903874 [debug] [MainThread]: On MetricFlow_request_mf_rid__in75z53a: Close
+[0m16:30:13.198912 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__in75z53a, now MetricFlow_request_mf_rid__2x6o45c5)
+[0m16:30:13.199328 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__2x6o45c5"
+[0m16:30:13.199567 [debug] [MainThread]: On MetricFlow_request_mf_rid__2x6o45c5: BEGIN
+[0m16:30:13.199791 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:30:13.200148 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:13.200372 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__2x6o45c5"
+[0m16:30:13.200637 [debug] [MainThread]: On MetricFlow_request_mf_rid__2x6o45c5: -- Compute Metrics via Expressions
+SELECT
+  metric_time__day
+  , 2 * bookings_offset_once AS bookings_offset_twice
+FROM (
+  -- Constrain Output with WHERE
+  -- Pass Only Elements: ['metric_time__day', 'bookings_offset_once']
+  SELECT
+    metric_time__day
+    , bookings_offset_once
+  FROM (
+    -- Join to Time Spine Dataset
+    SELECT
+      subq_10.ds AS metric_time__day
+      , subq_8.booking__is_instant AS booking__is_instant
+      , subq_8.bookings_offset_once AS bookings_offset_once
+    FROM *****.mf_time_spine subq_10
+    INNER JOIN (
+      -- Compute Metrics via Expressions
+      SELECT
+        metric_time__day
+        , booking__is_instant
+        , 2 * bookings AS bookings_offset_once
+      FROM (
+        -- Join to Time Spine Dataset
+        -- Pass Only Elements: ['bookings', 'booking__is_instant', 'metric_time__day']
+        -- Aggregate Measures
+        -- Compute Metrics via Expressions
+        SELECT
+          subq_3.ds AS metric_time__day
+          , subq_1.booking__is_instant AS booking__is_instant
+          , SUM(subq_1.bookings) AS bookings
+        FROM *****.mf_time_spine subq_3
+        INNER JOIN (
+          -- Read Elements From Semantic Model 'bookings_source'
+          -- Metric Time Dimension 'ds'
+          SELECT
+            DATE_TRUNC('day', ds) AS metric_time__day
+            , is_instant AS booking__is_instant
+            , 1 AS bookings
+          FROM *****.fct_bookings bookings_source_src_10000
+        ) subq_1
+        ON
+          subq_3.ds - INTERVAL 5 day = subq_1.metric_time__day
+        GROUP BY
+          subq_3.ds
+          , subq_1.booking__is_instant
+      ) subq_7
+    ) subq_8
+    ON
+      subq_10.ds - INTERVAL 2 day = subq_8.metric_time__day
+  ) subq_11
+  WHERE booking__is_instant
+) subq_13
+[0m16:30:13.202375 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:13.203356 [debug] [MainThread]: On MetricFlow_request_mf_rid__2x6o45c5: ROLLBACK
+[0m16:30:13.203681 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__2x6o45c5'
+[0m16:30:13.203908 [debug] [MainThread]: On MetricFlow_request_mf_rid__2x6o45c5: Close
+[0m16:30:13.206281 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__2x6o45c5, now MetricFlow_request_mf_rid__13zk87al)
+[0m16:30:13.206556 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__13zk87al"
+[0m16:30:13.206788 [debug] [MainThread]: On MetricFlow_request_mf_rid__13zk87al: BEGIN
+[0m16:30:13.207005 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:30:13.207323 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:13.207536 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__13zk87al"
+[0m16:30:13.207781 [debug] [MainThread]: On MetricFlow_request_mf_rid__13zk87al: SELECT
+  metric_time__day
+  , 2 * bookings_offset_once AS bookings_offset_twice
+FROM (
+  SELECT
+    metric_time__day
+    , bookings_offset_once
+  FROM (
+    SELECT
+      subq_10.ds AS metric_time__day
+      , subq_8.booking__is_instant AS booking__is_instant
+      , subq_8.bookings_offset_once AS bookings_offset_once
+    FROM *****.mf_time_spine subq_10
+    INNER JOIN (
+      SELECT
+        metric_time__day
+        , booking__is_instant
+        , 2 * bookings AS bookings_offset_once
+      FROM (
+        SELECT
+          subq_3.ds AS metric_time__day
+          , subq_1.booking__is_instant AS booking__is_instant
+          , SUM(subq_1.bookings) AS bookings
+        FROM *****.mf_time_spine subq_3
+        INNER JOIN (
+          SELECT
+            DATE_TRUNC('day', CAST(ds AS TIMESTAMP)) AS metric_time__day
+            , is_instant AS booking__is_instant
+            , 1 AS bookings
+          FROM *****.fct_bookings
+        ) subq_1
+        ON subq_3.ds - INTERVAL 5 day = subq_1.metric_time__day
+        GROUP BY
+          subq_3.ds
+          , subq_1.booking__is_instant
+      ) subq_7
+    ) subq_8
+    ON subq_10.ds - INTERVAL 2 day = subq_8.metric_time__day
+  ) subq_11
+  WHERE booking__is_instant
+)
+[0m16:30:13.209537 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:13.210370 [debug] [MainThread]: On MetricFlow_request_mf_rid__13zk87al: ROLLBACK
+[0m16:30:13.210657 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__13zk87al'
+[0m16:30:13.210881 [debug] [MainThread]: On MetricFlow_request_mf_rid__13zk87al: Close
+[0m16:30:13.537871 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__13zk87al, now MetricFlow_request_mf_rid__1av606lw)
+[0m16:30:13.538327 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__1av606lw"
+[0m16:30:13.538569 [debug] [MainThread]: On MetricFlow_request_mf_rid__1av606lw: BEGIN
+[0m16:30:13.538794 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:30:13.539164 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:13.539392 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__1av606lw"
+[0m16:30:13.539660 [debug] [MainThread]: On MetricFlow_request_mf_rid__1av606lw: -- Compute Metrics via Expressions
+SELECT
+  booking__ds__day
+  , bookings - bookings_2_weeks_ago AS bookings_growth_2_weeks
+FROM (
+  -- Combine Aggregated Outputs
+  SELECT
+    COALESCE(subq_4.booking__ds__day, subq_12.booking__ds__day) AS booking__ds__day
+    , MAX(subq_4.bookings) AS bookings
+    , MAX(subq_12.bookings_2_weeks_ago) AS bookings_2_weeks_ago
+  FROM (
+    -- Aggregate Measures
+    -- Compute Metrics via Expressions
+    SELECT
+      booking__ds__day
+      , SUM(bookings) AS bookings
+    FROM (
+      -- Read Elements From Semantic Model 'bookings_source'
+      -- Metric Time Dimension 'ds'
+      -- Pass Only Elements: ['bookings', 'booking__ds__day']
+      SELECT
+        DATE_TRUNC('day', ds) AS booking__ds__day
+        , 1 AS bookings
+      FROM *****.fct_bookings bookings_source_src_10000
+    ) subq_2
+    GROUP BY
+      booking__ds__day
+  ) subq_4
+  FULL OUTER JOIN (
+    -- Join to Time Spine Dataset
+    -- Pass Only Elements: ['bookings', 'booking__ds__day']
+    -- Aggregate Measures
+    -- Compute Metrics via Expressions
+    SELECT
+      subq_8.ds AS booking__ds__day
+      , SUM(subq_6.bookings) AS bookings_2_weeks_ago
+    FROM *****.mf_time_spine subq_8
+    INNER JOIN (
+      -- Read Elements From Semantic Model 'bookings_source'
+      -- Metric Time Dimension 'ds'
+      SELECT
+        DATE_TRUNC('day', ds) AS booking__ds__day
+        , 1 AS bookings
+      FROM *****.fct_bookings bookings_source_src_10000
+    ) subq_6
+    ON
+      subq_8.ds - INTERVAL 14 day = subq_6.booking__ds__day
+    GROUP BY
+      subq_8.ds
+  ) subq_12
+  ON
+    subq_4.booking__ds__day = subq_12.booking__ds__day
+  GROUP BY
+    COALESCE(subq_4.booking__ds__day, subq_12.booking__ds__day)
+) subq_13
+[0m16:30:13.541330 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:13.542507 [debug] [MainThread]: On MetricFlow_request_mf_rid__1av606lw: ROLLBACK
+[0m16:30:13.542870 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__1av606lw'
+[0m16:30:13.543133 [debug] [MainThread]: On MetricFlow_request_mf_rid__1av606lw: Close
+[0m16:30:13.545127 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__1av606lw, now MetricFlow_request_mf_rid__3iinnik7)
+[0m16:30:13.545393 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__3iinnik7"
+[0m16:30:13.545618 [debug] [MainThread]: On MetricFlow_request_mf_rid__3iinnik7: BEGIN
+[0m16:30:13.545829 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:30:13.546113 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:13.546326 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__3iinnik7"
+[0m16:30:13.546558 [debug] [MainThread]: On MetricFlow_request_mf_rid__3iinnik7: SELECT
+  COALESCE(a.booking__ds__day, b.booking__ds__day) AS booking__ds__day
+  , bookings - bookings_2_weeks_ago AS bookings_growth_2_weeks
+FROM (
+  SELECT
+    ds AS booking__ds__day
+    , SUM(1) AS bookings
+  FROM *****.fct_bookings
+  GROUP BY
+    ds
+) a
+FULL OUTER JOIN (
+  SELECT
+    c.ds AS booking__ds__day
+    , d.bookings_2_weeks_ago AS bookings_2_weeks_ago
+  FROM *****.mf_time_spine c
+  INNER JOIN (
+    SELECT
+      ds AS booking__ds__day
+      , SUM(1) AS bookings_2_weeks_ago
+    FROM *****.fct_bookings
+    GROUP BY
+      ds
+  ) d
+  ON C.ds - INTERVAL 14 day = d.booking__ds__day
+) b
+ON a.booking__ds__day = b.booking__ds__day
+[0m16:30:13.547689 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:13.548740 [debug] [MainThread]: On MetricFlow_request_mf_rid__3iinnik7: ROLLBACK
+[0m16:30:13.549040 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__3iinnik7'
+[0m16:30:13.549257 [debug] [MainThread]: On MetricFlow_request_mf_rid__3iinnik7: Close
+[0m16:30:13.852811 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__3iinnik7, now MetricFlow_request_mf_rid__udf3i948)
+[0m16:30:13.853236 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__udf3i948"
+[0m16:30:13.853477 [debug] [MainThread]: On MetricFlow_request_mf_rid__udf3i948: BEGIN
+[0m16:30:13.853703 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:30:13.854059 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:13.854282 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__udf3i948"
+[0m16:30:13.854546 [debug] [MainThread]: On MetricFlow_request_mf_rid__udf3i948: -- Compute Metrics via Expressions
+SELECT
+  booking__ds__day
+  , bookings - bookings_at_start_of_month AS bookings_growth_since_start_of_month
+FROM (
+  -- Combine Aggregated Outputs
+  SELECT
+    COALESCE(subq_4.booking__ds__day, subq_12.booking__ds__day) AS booking__ds__day
+    , MAX(subq_4.bookings) AS bookings
+    , MAX(subq_12.bookings_at_start_of_month) AS bookings_at_start_of_month
+  FROM (
+    -- Aggregate Measures
+    -- Compute Metrics via Expressions
+    SELECT
+      booking__ds__day
+      , SUM(bookings) AS bookings
+    FROM (
+      -- Read Elements From Semantic Model 'bookings_source'
+      -- Metric Time Dimension 'ds'
+      -- Pass Only Elements: ['bookings', 'booking__ds__day']
+      SELECT
+        DATE_TRUNC('day', ds) AS booking__ds__day
+        , 1 AS bookings
+      FROM *****.fct_bookings bookings_source_src_10000
+    ) subq_2
+    GROUP BY
+      booking__ds__day
+  ) subq_4
+  FULL OUTER JOIN (
+    -- Join to Time Spine Dataset
+    -- Pass Only Elements: ['bookings', 'booking__ds__day']
+    -- Aggregate Measures
+    -- Compute Metrics via Expressions
+    SELECT
+      subq_8.ds AS booking__ds__day
+      , SUM(subq_6.bookings) AS bookings_at_start_of_month
+    FROM *****.mf_time_spine subq_8
+    INNER JOIN (
+      -- Read Elements From Semantic Model 'bookings_source'
+      -- Metric Time Dimension 'ds'
+      SELECT
+        DATE_TRUNC('day', ds) AS booking__ds__day
+        , 1 AS bookings
+      FROM *****.fct_bookings bookings_source_src_10000
+    ) subq_6
+    ON
+      DATE_TRUNC('month', subq_8.ds) = subq_6.booking__ds__day
+    GROUP BY
+      subq_8.ds
+  ) subq_12
+  ON
+    subq_4.booking__ds__day = subq_12.booking__ds__day
+  GROUP BY
+    COALESCE(subq_4.booking__ds__day, subq_12.booking__ds__day)
+) subq_13
+[0m16:30:13.856290 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:13.857948 [debug] [MainThread]: On MetricFlow_request_mf_rid__udf3i948: ROLLBACK
+[0m16:30:13.858294 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__udf3i948'
+[0m16:30:13.858526 [debug] [MainThread]: On MetricFlow_request_mf_rid__udf3i948: Close
+[0m16:30:13.860598 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__udf3i948, now MetricFlow_request_mf_rid__txw1fsni)
+[0m16:30:13.860873 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__txw1fsni"
+[0m16:30:13.861106 [debug] [MainThread]: On MetricFlow_request_mf_rid__txw1fsni: BEGIN
+[0m16:30:13.861325 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:30:13.861634 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:13.861851 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__txw1fsni"
+[0m16:30:13.862085 [debug] [MainThread]: On MetricFlow_request_mf_rid__txw1fsni: SELECT
+  COALESCE(a.booking__ds__day, b.booking__ds__day) AS booking__ds__day
+  , bookings - bookings_at_start_of_month AS bookings_growth_since_start_of_month
+FROM (
+  SELECT
+    ds AS booking__ds__day
+    , SUM(1) AS bookings
+  FROM *****.fct_bookings
+  GROUP BY
+    ds
+) a
+FULL OUTER JOIN (
+  SELECT
+    c.ds AS booking__ds__day
+    , d.bookings_at_start_of_month AS bookings_at_start_of_month
+  FROM *****.mf_time_spine c
+  INNER JOIN (
+    SELECT
+      ds AS booking__ds__day
+      , SUM(1) AS bookings_at_start_of_month
+    FROM *****.fct_bookings
+    GROUP BY
+      ds
+  ) d
+  ON DATE_TRUNC('month', CAST(c.ds AS TIMESTAMP)) = d.booking__ds__day
+) b
+ON a.booking__ds__day = b.booking__ds__day
+[0m16:30:13.863443 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:13.864622 [debug] [MainThread]: On MetricFlow_request_mf_rid__txw1fsni: ROLLBACK
+[0m16:30:13.864902 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__txw1fsni'
+[0m16:30:13.865126 [debug] [MainThread]: On MetricFlow_request_mf_rid__txw1fsni: Close
+[0m16:30:14.138414 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__txw1fsni, now MetricFlow_request_mf_rid__s8o0k10u)
+[0m16:30:14.138876 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__s8o0k10u"
+[0m16:30:14.139125 [debug] [MainThread]: On MetricFlow_request_mf_rid__s8o0k10u: BEGIN
+[0m16:30:14.139357 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:30:14.139733 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:14.139960 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__s8o0k10u"
+[0m16:30:14.140211 [debug] [MainThread]: On MetricFlow_request_mf_rid__s8o0k10u: -- Compute Metrics via Expressions
+SELECT
+  booking__ds__day
+  , 2 * bookings_offset_once AS bookings_offset_twice
+FROM (
+  -- Join to Time Spine Dataset
+  SELECT
+    subq_10.ds AS booking__ds__day
+    , subq_8.bookings_offset_once AS bookings_offset_once
+  FROM *****.mf_time_spine subq_10
+  INNER JOIN (
+    -- Compute Metrics via Expressions
+    SELECT
+      booking__ds__day
+      , 2 * bookings AS bookings_offset_once
+    FROM (
+      -- Join to Time Spine Dataset
+      -- Pass Only Elements: ['bookings', 'booking__ds__day']
+      -- Aggregate Measures
+      -- Compute Metrics via Expressions
+      SELECT
+        subq_3.ds AS booking__ds__day
+        , SUM(subq_1.bookings) AS bookings
+      FROM *****.mf_time_spine subq_3
+      INNER JOIN (
+        -- Read Elements From Semantic Model 'bookings_source'
+        -- Metric Time Dimension 'ds'
+        SELECT
+          DATE_TRUNC('day', ds) AS booking__ds__day
+          , 1 AS bookings
+        FROM *****.fct_bookings bookings_source_src_10000
+      ) subq_1
+      ON
+        subq_3.ds - INTERVAL 5 day = subq_1.booking__ds__day
+      GROUP BY
+        subq_3.ds
+    ) subq_7
+  ) subq_8
+  ON
+    subq_10.ds - INTERVAL 2 day = subq_8.booking__ds__day
+) subq_11
+[0m16:30:14.142008 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:14.143034 [debug] [MainThread]: On MetricFlow_request_mf_rid__s8o0k10u: ROLLBACK
+[0m16:30:14.143350 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__s8o0k10u'
+[0m16:30:14.143571 [debug] [MainThread]: On MetricFlow_request_mf_rid__s8o0k10u: Close
+[0m16:30:14.145875 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__s8o0k10u, now MetricFlow_request_mf_rid__l5rvroli)
+[0m16:30:14.146146 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__l5rvroli"
+[0m16:30:14.146377 [debug] [MainThread]: On MetricFlow_request_mf_rid__l5rvroli: BEGIN
+[0m16:30:14.146589 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:30:14.146873 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:14.147093 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__l5rvroli"
+[0m16:30:14.147327 [debug] [MainThread]: On MetricFlow_request_mf_rid__l5rvroli: SELECT
+  subq_9.ds AS booking__ds__day
+  , 2 * bookings_offset_once AS bookings_offset_twice
+FROM *****.mf_time_spine subq_9
+INNER JOIN (
+  SELECT
+    booking__ds__day
+    , 2 * bookings AS bookings_offset_once
+  FROM (
+    SELECT
+      subq_3.ds AS booking__ds__day
+      , SUM(subq_1.bookings) AS bookings
+    FROM *****.mf_time_spine subq_3
+    INNER JOIN (
+      SELECT
+        DATE_TRUNC('day', CAST(ds AS TIMESTAMP)) AS booking__ds__day
+        , 1 AS bookings
+      FROM *****.fct_bookings bookings_source_src_1
+    ) subq_1
+    ON
+      subq_3.ds - INTERVAL 5 day = subq_1.booking__ds__day
+    GROUP BY
+      subq_3.ds
+  ) subq_7
+) subq_8
+ON
+  subq_9.ds - INTERVAL 2 day = subq_8.booking__ds__day
+[0m16:30:14.148790 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:14.149618 [debug] [MainThread]: On MetricFlow_request_mf_rid__l5rvroli: ROLLBACK
+[0m16:30:14.149890 [debug] [MainThread]: Failed to rollback 'MetricFlow_request_mf_rid__l5rvroli'
+[0m16:30:14.150108 [debug] [MainThread]: On MetricFlow_request_mf_rid__l5rvroli: Close
+[0m16:30:14.158354 [debug] [MainThread]: Re-using an available connection from the pool (formerly MetricFlow_request_mf_rid__l5rvroli, now MetricFlow_request_mf_rid__0ik1vbx7)
+[0m16:30:14.158715 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__0ik1vbx7"
+[0m16:30:14.158991 [debug] [MainThread]: On MetricFlow_request_mf_rid__0ik1vbx7: BEGIN
+[0m16:30:14.159220 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m16:30:14.159548 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:14.159774 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__0ik1vbx7"
+[0m16:30:14.159995 [debug] [MainThread]: On MetricFlow_request_mf_rid__0ik1vbx7: DROP SCHEMA IF EXISTS ***** CASCADE
+[0m16:30:14.160578 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:14.161119 [debug] [MainThread]: On MetricFlow_request_mf_rid__0ik1vbx7: COMMIT
+[0m16:30:14.161349 [debug] [MainThread]: Using duckdb connection "MetricFlow_request_mf_rid__0ik1vbx7"
+[0m16:30:14.161561 [debug] [MainThread]: On MetricFlow_request_mf_rid__0ik1vbx7: COMMIT
+[0m16:30:14.162780 [debug] [MainThread]: SQL status: OK in 0.0 seconds
+[0m16:30:14.163017 [debug] [MainThread]: On MetricFlow_request_mf_rid__0ik1vbx7: Close

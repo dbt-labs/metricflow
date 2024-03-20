@@ -12,6 +12,7 @@ from metricflow.specs.column_assoc import (
 from metricflow.specs.specs import (
     DimensionSpec,
     EntitySpec,
+    GroupByMetricSpec,
     InstanceSpec,
     InstanceSpecVisitor,
     MeasureSpec,
@@ -73,6 +74,15 @@ class DunderColumnAssociationResolverVisitor(InstanceSpecVisitor[ColumnAssociati
             column_name=StructuredLinkableSpecName(
                 entity_link_names=tuple(x.element_name for x in entity_spec.entity_links),
                 element_name=entity_spec.element_name,
+            ).qualified_name,
+            single_column_correlation_key=SingleColumnCorrelationKey(),
+        )
+
+    def visit_group_by_metric_spec(self, group_by_metric_spec: GroupByMetricSpec) -> ColumnAssociation:  # noqa: D102
+        return ColumnAssociation(
+            column_name=StructuredLinkableSpecName(
+                entity_link_names=tuple(x.element_name for x in group_by_metric_spec.entity_links),
+                element_name=group_by_metric_spec.element_name,
             ).qualified_name,
             single_column_correlation_key=SingleColumnCorrelationKey(),
         )
