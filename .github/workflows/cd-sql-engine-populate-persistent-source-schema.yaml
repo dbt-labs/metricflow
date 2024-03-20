@@ -15,7 +15,7 @@ on:
 
 env:
   # Unclear on how to make 'Reload Test Data in SQL Engines' a constant here as it does not work here.
-  PYTHON_VERSION: "3.8"
+  PYTHON_VERSION: "3.9"
   ADDITIONAL_PYTEST_OPTIONS: "--log-cli-level info"
 
 jobs:
