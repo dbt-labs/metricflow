@@ -24,5 +24,5 @@ to access the PostgreSQL instance.
 export MF_SQL_ENGINE_URL="postgresql://metricflow@localhost:5432/metricflow"
 export MF_SQL_ENGINE_PASSWORD="metricflowing"
 
-poetry run pytest metricflow/test/
+poetry run pytest tests/
 ```

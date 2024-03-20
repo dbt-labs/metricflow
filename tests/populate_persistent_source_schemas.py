@@ -36,7 +36,7 @@ def populate_schemas(test_configuration: MetricFlowTestConfiguration) -> None:  
         hatch_env = f"{engine_name}-env"
         run_command(
             f"hatch -v run {hatch_env}:pytest -vv --log-cli-level info --use-persistent-source-schema "
-            "metricflow/test/source_schema_tools.py::populate_source_schema"
+            "tests/source_schema_tools.py::populate_source_schema"
         )
     else:
         assert_values_exhausted(test_configuration.engine)
