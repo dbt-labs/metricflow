@@ -100,7 +100,7 @@ def snapshot_path_prefix(
     # Default to where this is defined, but use more appropriate directories if found.
     test_directory_root_index = -1
     for i, path_item in enumerate(test_file_path_items):
-        if path_item in ("test", "metricflow", "metricflow_extensions"):
+        if path_item in ("tests", "metricflow"):
             test_directory_root_index = i + 1
 
     path_to_store_snapshots = os.sep.join(test_file_path_items[:test_directory_root_index])
