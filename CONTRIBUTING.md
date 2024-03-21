@@ -34,20 +34,20 @@ When running any one of the hatch commands, the environment is automatically set
 
 1. Run some tests to make sure things happen:
     - Run the full test suite: `make test`
-    - Run a subset of tests based on path: `hatch run dev-env:pytest metricflow/test/plan_conversion`
-    - Run a subset of tests based on test name substring: `hatch run dev-env:pytest -k "query" metricflow/test`
+    - Run a subset of tests based on path: `hatch run dev-env:pytest tests/plan_conversion`
+    - Run a subset of tests based on test name substring: `hatch run dev-env:pytest -k "query" tests`
 2. Now you may wish to break some tests. Make some local changes and run the relevant tests again and see if you broke them!
     - Working with integration tests
-        - These tests are driven by a set of test configs in [metricflow/test/integration/test_cases](metricflow/test/integration/test_cases/). They compare the output of a MetricFlow query against the output of a similar SQL query.
-        - These tests all run on consistent input data, which is [created in the target warehouse via setup fixtures](metricflow/test/fixtures/table_fixtures.py).
-            - Modify the [test inputs](https://github.com/dbt-labs/metricflow/tree/main/metricflow/test/fixtures/source_table_snapshots) for one of the test models if you are looking to test boundary cases involving things like repeated rows of data.
+        - These tests are driven by a set of test configs in [tests/integration/test_cases](tests/integration/test_cases/). They compare the output of a MetricFlow query against the output of a similar SQL query.
+        - These tests all run on consistent input data, which is [created in the target warehouse via setup fixtures](tests/fixtures/table_fixtures.py).
+            - Modify the [test inputs](https://github.com/dbt-labs/metricflow/tree/main/tests/fixtures/source_table_snapshots) for one of the test models if you are looking to test boundary cases involving things like repeated rows of data.
         - Let's break a test!
-            - Change a SQL query inside of [metricflow/test/integration/test_cases/itest_simple.yaml](metricflow/test/integration/test_cases/itest_simple.yaml)
-            - Run the test case: `hatch run dev-env:pytest -k "itest_simple" metricflow/test/integration`. Did it fail?
+            - Change a SQL query inside of [tests/integration/test_cases/itest_simple.yaml](tests/integration/test_cases/itest_simple.yaml)
+            - Run the test case: `hatch run dev-env:pytest -k "itest_simple" tests/integration`. Did it fail?
     - Working with module and component tests
         - These are generally laid out in a similar hierarchy to the main package.
         - Let's try them out:
-            - Run the [dataflow plan to sql plan conversion tests](metricflow/test/plan_conversion/test_dataflow_to_sql_plan.py): `hatch run dev-env:pytest metricflow/test/plan_conversion/test_dataflow_to_sql_plan.py`.
+            - Run the [dataflow plan to sql plan conversion tests](tests/plan_conversion/test_dataflow_to_sql_plan.py): `hatch run dev-env:pytest tests/plan_conversion/test_dataflow_to_sql_plan.py`.
             - Modify something in the [dataflow to sql plan converter logic](metricflow/plan_conversion/dataflow_to_sql.py). I like to throw exceptions just to make sure things blow up.
             - Run the test again. Did anything break?
     - Remember to clean up when you're done playing with the tests!
