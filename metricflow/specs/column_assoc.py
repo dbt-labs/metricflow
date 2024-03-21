@@ -22,10 +22,10 @@ class SingleColumnCorrelationKey(ColumnCorrelationKey, SerializableDataclass):
     # Pydantic throws an error during serialization if a dataclass has no fields.
     PYDANTIC_BUG_WORKAROUND: bool = True
 
-    def __eq__(self, other: Any) -> bool:  # type: ignore[misc] # noqa: D
+    def __eq__(self, other: Any) -> bool:  # type: ignore[misc]  # noqa: D105
         return isinstance(other, SingleColumnCorrelationKey)
 
-    def __hash__(self) -> int:  # noqa: D
+    def __hash__(self) -> int:  # noqa: D105
         return hash(self.__class__.__name__)
 
 
@@ -40,7 +40,7 @@ class ColumnAssociation(SerializableDataclass):
     single_column_correlation_key: SingleColumnCorrelationKey
 
     @property
-    def column_correlation_key(self) -> ColumnCorrelationKey:  # noqa: D
+    def column_correlation_key(self) -> ColumnCorrelationKey:  # noqa: D102
         return self.single_column_correlation_key
 
 
@@ -62,5 +62,5 @@ class ColumnAssociationResolver(ABC):
     """
 
     @abstractmethod
-    def resolve_spec(self, spec: InstanceSpec) -> ColumnAssociation:  # noqa: D
+    def resolve_spec(self, spec: InstanceSpec) -> ColumnAssociation:  # noqa: D102
         raise NotImplementedError

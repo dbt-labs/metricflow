@@ -76,7 +76,7 @@ class FakeCLIContext(CLIContext):
 
 
 @pytest.fixture
-def cli_context(  # noqa: D
+def cli_context(  # noqa: D103
     sql_client: SqlClient,
     simple_semantic_manifest: SemanticManifest,
     create_source_tables: bool,
@@ -101,12 +101,12 @@ def cli_context(  # noqa: D
 class MetricFlowCliRunner(CliRunner):
     """Custom CliRunner class to handle passing context."""
 
-    def __init__(self, cli_context: CLIContext, project_path: str) -> None:  # noqa: D
+    def __init__(self, cli_context: CLIContext, project_path: str) -> None:  # noqa: D107
         self.cli_context = cli_context
         self.project_path = project_path
         super().__init__()
 
-    def run(self, cli: click.BaseCommand, args: Optional[Sequence[str]] = None) -> Result:  # noqa: D
+    def run(self, cli: click.BaseCommand, args: Optional[Sequence[str]] = None) -> Result:  # noqa: D102
         current_dir = os.getcwd()
         os.chdir(self.project_path)
         result = super().invoke(cli, args, obj=self.cli_context)
@@ -115,5 +115,5 @@ class MetricFlowCliRunner(CliRunner):
 
 
 @pytest.fixture
-def cli_runner(cli_context: CLIContext) -> MetricFlowCliRunner:  # noqa: D
+def cli_runner(cli_context: CLIContext) -> MetricFlowCliRunner:  # noqa: D103
     return MetricFlowCliRunner(cli_context=cli_context, project_path=dbt_project_dir())

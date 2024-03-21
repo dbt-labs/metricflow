@@ -24,7 +24,7 @@ from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.snapshot_utils import assert_plan_snapshot_text_equal
 
 
-def make_dataflow_plan(node: BaseOutput) -> DataflowPlan:  # noqa: D
+def make_dataflow_plan(node: BaseOutput) -> DataflowPlan:  # noqa: D103
     return DataflowPlan(
         sink_output_nodes=[WriteToResultDataframeNode(node)],
         plan_id=DagId.from_id_prefix(StaticIdPrefix.OPTIMIZED_DATAFLOW_PLAN_PREFIX),
@@ -32,7 +32,7 @@ def make_dataflow_plan(node: BaseOutput) -> DataflowPlan:  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_read_sql_source_combination(  # noqa: D
+def test_read_sql_source_combination(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
@@ -61,7 +61,7 @@ def test_read_sql_source_combination(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_filter_combination(  # noqa: D
+def test_filter_combination(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],

@@ -22,7 +22,7 @@ class MetricExcludesDatePartIssue(MetricFlowQueryResolutionIssue):
     candidate_specs: Tuple[LinkableInstanceSpec, ...]
 
     @staticmethod
-    def from_parameters(  # noqa: D
+    def from_parameters(  # noqa: D102
         parent_issues: Sequence[MetricFlowQueryResolutionIssue],
         query_resolution_path: MetricFlowQueryResolutionPath,
         candidate_specs: Sequence[LinkableInstanceSpec],

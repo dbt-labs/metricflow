@@ -75,7 +75,7 @@ class SqlClient(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    def close(self) -> None:  # noqa: D
+    def close(self) -> None:
         """Close the connections / engines used by this client."""
         raise NotImplementedError
 

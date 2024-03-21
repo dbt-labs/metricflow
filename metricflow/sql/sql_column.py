@@ -25,21 +25,21 @@ class SqlColumn:
         return SqlColumn(table=table, column_name=column_name)
 
     @staticmethod
-    def from_string(sql_str: str) -> SqlColumn:  # noqa: D
+    def from_string(sql_str: str) -> SqlColumn:  # noqa: D102
         table_str, column_name = sql_str.rsplit(".", 1)
         table = SqlTable.from_string(table_str)
         return SqlColumn(table=table, column_name=column_name)
 
     @property
-    def db_name(self) -> Optional[str]:  # noqa: D
+    def db_name(self) -> Optional[str]:  # noqa: D102
         return self.table.db_name
 
     @property
-    def schema_name(self) -> str:  # noqa: D
+    def schema_name(self) -> str:  # noqa: D102
         return self.table.schema_name
 
     @property
-    def table_name(self) -> str:  # noqa: D
+    def table_name(self) -> str:  # noqa: D102
         return self.table.table_name
 
     @property
@@ -47,5 +47,5 @@ class SqlColumn:
         """Return the snippet that can be used for use in SQL queries."""
         return f"{self.table.sql}.{self.column_name}"
 
-    def __repr__(self) -> str:  # noqa: D
+    def __repr__(self) -> str:  # noqa: D105
         return f"SqlColumn(full_name={self.sql})"

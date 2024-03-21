@@ -13,11 +13,11 @@ from metricflow.test.time.metric_time_dimension import MTD_SPEC_MONTH, MTD_SPEC_
 
 
 @pytest.fixture(scope="session")
-def dunder_naming_scheme() -> DunderNamingScheme:  # noqa: D
+def dunder_naming_scheme() -> DunderNamingScheme:  # noqa: D103
     return DunderNamingScheme()
 
 
-def test_input_str(dunder_naming_scheme: DunderNamingScheme) -> None:  # noqa: D
+def test_input_str(dunder_naming_scheme: DunderNamingScheme) -> None:  # noqa: D103
     assert (
         dunder_naming_scheme.input_str(
             DimensionSpec(
@@ -71,7 +71,7 @@ def test_input_str(dunder_naming_scheme: DunderNamingScheme) -> None:  # noqa: D
     )
 
 
-def test_input_follows_scheme(dunder_naming_scheme: DunderNamingScheme) -> None:  # noqa: D
+def test_input_follows_scheme(dunder_naming_scheme: DunderNamingScheme) -> None:  # noqa: D103
     assert dunder_naming_scheme.input_str_follows_scheme("listing__country")
     assert dunder_naming_scheme.input_str_follows_scheme("listing__creation_time__month")
     assert dunder_naming_scheme.input_str_follows_scheme("booking__listing")
@@ -80,9 +80,9 @@ def test_input_follows_scheme(dunder_naming_scheme: DunderNamingScheme) -> None:
     assert not dunder_naming_scheme.input_str_follows_scheme("TimeDimension('metric_time')")
 
 
-def test_spec_pattern(  # noqa: D
+def test_spec_pattern(  # noqa: D103
     dunder_naming_scheme: DunderNamingScheme, specs: Sequence[LinkableInstanceSpec]
-) -> None:
+) -> None:  # noqa: D103
     assert tuple(dunder_naming_scheme.spec_pattern("listing__user__country").match(specs)) == (
         DimensionSpec(
             element_name="country",

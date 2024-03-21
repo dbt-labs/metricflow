@@ -54,65 +54,65 @@ class ReadSqlSourceNodeCounter(DataflowPlanNodeVisitor[int]):
     def _sum_parents(self, node: DataflowPlanNode) -> int:
         return sum(parent_node.accept(self) for parent_node in node.parent_nodes)
 
-    def visit_source_node(self, node: ReadSqlSourceNode) -> int:  # noqa: D
+    def visit_source_node(self, node: ReadSqlSourceNode) -> int:  # noqa: D102
         return 1
 
-    def visit_join_to_base_output_node(self, node: JoinToBaseOutputNode) -> int:  # noqa: D
+    def visit_join_to_base_output_node(self, node: JoinToBaseOutputNode) -> int:  # noqa: D102
         return self._sum_parents(node)
 
-    def visit_aggregate_measures_node(self, node: AggregateMeasuresNode) -> int:  # noqa: D
+    def visit_aggregate_measures_node(self, node: AggregateMeasuresNode) -> int:  # noqa: D102
         return self._sum_parents(node)
 
-    def visit_compute_metrics_node(self, node: ComputeMetricsNode) -> int:  # noqa: D
+    def visit_compute_metrics_node(self, node: ComputeMetricsNode) -> int:  # noqa: D102
         return self._sum_parents(node)
 
-    def visit_order_by_limit_node(self, node: OrderByLimitNode) -> int:  # noqa: D
+    def visit_order_by_limit_node(self, node: OrderByLimitNode) -> int:  # noqa: D102
         return self._sum_parents(node)
 
-    def visit_where_constraint_node(self, node: WhereConstraintNode) -> int:  # noqa: D
+    def visit_where_constraint_node(self, node: WhereConstraintNode) -> int:  # noqa: D102
         return self._sum_parents(node)
 
-    def visit_write_to_result_dataframe_node(self, node: WriteToResultDataframeNode) -> int:  # noqa: D
+    def visit_write_to_result_dataframe_node(self, node: WriteToResultDataframeNode) -> int:  # noqa: D102
         return self._sum_parents(node)
 
-    def visit_write_to_result_table_node(self, node: WriteToResultTableNode) -> int:  # noqa: D
+    def visit_write_to_result_table_node(self, node: WriteToResultTableNode) -> int:  # noqa: D102
         return self._sum_parents(node)
 
-    def visit_pass_elements_filter_node(self, node: FilterElementsNode) -> int:  # noqa: D
+    def visit_pass_elements_filter_node(self, node: FilterElementsNode) -> int:  # noqa: D102
         return self._sum_parents(node)
 
-    def visit_combine_aggregated_outputs_node(self, node: CombineAggregatedOutputsNode) -> int:  # noqa: D
+    def visit_combine_aggregated_outputs_node(self, node: CombineAggregatedOutputsNode) -> int:  # noqa: D102
         return self._sum_parents(node)
 
-    def visit_constrain_time_range_node(self, node: ConstrainTimeRangeNode) -> int:  # noqa: D
+    def visit_constrain_time_range_node(self, node: ConstrainTimeRangeNode) -> int:  # noqa: D102
         return self._sum_parents(node)
 
-    def visit_join_over_time_range_node(self, node: JoinOverTimeRangeNode) -> int:  # noqa: D
+    def visit_join_over_time_range_node(self, node: JoinOverTimeRangeNode) -> int:  # noqa: D102
         return self._sum_parents(node)
 
-    def visit_semi_additive_join_node(self, node: SemiAdditiveJoinNode) -> int:  # noqa: D
+    def visit_semi_additive_join_node(self, node: SemiAdditiveJoinNode) -> int:  # noqa: D102
         return self._sum_parents(node)
 
-    def visit_metric_time_dimension_transform_node(self, node: MetricTimeDimensionTransformNode) -> int:  # noqa: D
+    def visit_metric_time_dimension_transform_node(self, node: MetricTimeDimensionTransformNode) -> int:  # noqa: D102
         return self._sum_parents(node)
 
-    def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode) -> int:  # noqa: D
+    def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode) -> int:  # noqa: D102
         return self._sum_parents(node)
 
-    def visit_min_max_node(self, node: MinMaxNode) -> int:  # noqa: D
+    def visit_min_max_node(self, node: MinMaxNode) -> int:  # noqa: D102
         return self._sum_parents(node)
 
     def visit_add_generated_uuid_column_node(self, node: AddGeneratedUuidColumnNode) -> int:  # noqa :D
         return self._sum_parents(node)
 
-    def visit_join_conversion_events_node(self, node: JoinConversionEventsNode) -> int:  # noqa: D
+    def visit_join_conversion_events_node(self, node: JoinConversionEventsNode) -> int:  # noqa: D102
         return self._sum_parents(node)
 
-    def count_source_nodes(self, dataflow_plan: DataflowPlan) -> int:  # noqa: D
+    def count_source_nodes(self, dataflow_plan: DataflowPlan) -> int:  # noqa: D102
         return dataflow_plan.sink_output_node.accept(self)
 
 
-def check_optimization(  # noqa: D
+def check_optimization(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -157,7 +157,7 @@ def check_optimization(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_2_metrics_from_1_semantic_model(  # noqa: D
+def test_2_metrics_from_1_semantic_model(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -183,7 +183,7 @@ def test_2_metrics_from_1_semantic_model(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_2_metrics_from_2_semantic_models(  # noqa: D
+def test_2_metrics_from_2_semantic_models(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -203,7 +203,7 @@ def test_2_metrics_from_2_semantic_models(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_3_metrics_from_2_semantic_models(  # noqa: D
+def test_3_metrics_from_2_semantic_models(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -227,7 +227,7 @@ def test_3_metrics_from_2_semantic_models(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_constrained_metric_not_combined(  # noqa: D
+def test_constrained_metric_not_combined(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     column_association_resolver: ColumnAssociationResolver,
@@ -254,7 +254,7 @@ def test_constrained_metric_not_combined(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_derived_metric(  # noqa: D
+def test_derived_metric(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -277,7 +277,7 @@ def test_derived_metric(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_nested_derived_metric(  # noqa: D
+def test_nested_derived_metric(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -301,7 +301,7 @@ def test_nested_derived_metric(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_derived_metric_with_non_derived_metric(  # noqa: D
+def test_derived_metric_with_non_derived_metric(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -333,7 +333,7 @@ def test_derived_metric_with_non_derived_metric(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_2_ratio_metrics_from_1_semantic_model(  # noqa: D
+def test_2_ratio_metrics_from_1_semantic_model(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -356,7 +356,7 @@ def test_2_ratio_metrics_from_1_semantic_model(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_duplicate_measures(  # noqa: D
+def test_duplicate_measures(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,

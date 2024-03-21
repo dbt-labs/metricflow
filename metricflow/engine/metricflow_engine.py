@@ -117,7 +117,7 @@ class MetricFlowQueryRequest:
     query_type: MetricFlowQueryType = MetricFlowQueryType.METRIC
 
     @staticmethod
-    def create_with_random_request_id(  # noqa: D
+    def create_with_random_request_id(  # noqa: D102
         saved_query_name: Optional[str] = None,
         metric_names: Optional[Sequence[str]] = None,
         metrics: Optional[Sequence[MetricQueryParameter]] = None,
@@ -155,7 +155,7 @@ class MetricFlowQueryRequest:
 
 
 @dataclass(frozen=True)
-class MetricFlowQueryResult:  # noqa: D
+class MetricFlowQueryResult:
     """The result of a query and context on how it was generated."""
 
     query_spec: MetricFlowQuerySpec
@@ -206,7 +206,7 @@ class MetricFlowExplainResult:
         )
 
     @property
-    def execution_plan(self) -> ExecutionPlan:  # noqa: D
+    def execution_plan(self) -> ExecutionPlan:  # noqa: D102
         return self.convert_to_execution_plan_result.execution_plan
 
 
@@ -290,7 +290,7 @@ class AbstractMetricFlowEngine(ABC):
         pass
 
     @abstractmethod
-    def explain_get_dimension_values(  # noqa: D
+    def explain_get_dimension_values(
         self,
         metric_names: Optional[List[str]] = None,
         metrics: Optional[Sequence[MetricQueryParameter]] = None,
@@ -407,7 +407,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         )
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-    def query(self, mf_request: MetricFlowQueryRequest) -> MetricFlowQueryResult:  # noqa: D
+    def query(self, mf_request: MetricFlowQueryRequest) -> MetricFlowQueryResult:  # noqa: D102
         logger.info(f"Starting query request:\n{indent(mf_pformat(mf_request))}")
         explain_result = self._create_execution_plan(mf_request)
         execution_plan = explain_result.convert_to_execution_plan_result.execution_plan
@@ -549,10 +549,10 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         )
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-    def explain(self, mf_request: MetricFlowQueryRequest) -> MetricFlowExplainResult:  # noqa: D
+    def explain(self, mf_request: MetricFlowQueryRequest) -> MetricFlowExplainResult:  # noqa: D102
         return self._create_execution_plan(mf_request)
 
-    def get_measures_for_metrics(self, metric_names: List[str]) -> List[Measure]:  # noqa: D
+    def get_measures_for_metrics(self, metric_names: List[str]) -> List[Measure]:  # noqa: D102
         metrics = self._semantic_manifest_lookup.metric_lookup.get_metrics(
             metric_references=[MetricReference(element_name=metric_name) for metric_name in metric_names]
         )
@@ -578,7 +578,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 )
         return list(measures)
 
-    def simple_dimensions_for_metrics(  # noqa: D
+    def simple_dimensions_for_metrics(  # noqa: D102
         self,
         metric_names: List[str],
         without_any_property: Sequence[LinkableElementProperties] = (
@@ -652,7 +652,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                     )
         return sorted(dimensions, key=lambda dimension: dimension.qualified_name)
 
-    def entities_for_metrics(self, metric_names: List[str]) -> List[Entity]:  # noqa: D
+    def entities_for_metrics(self, metric_names: List[str]) -> List[Entity]:  # noqa: D102
         path_key_to_linkable_entities = (
             self._semantic_manifest_lookup.metric_lookup.linkable_set_for_metrics(
                 metric_references=[MetricReference(element_name=mname) for mname in metric_names],
@@ -685,7 +685,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         return entities
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-    def list_metrics(self) -> List[Metric]:  # noqa: D
+    def list_metrics(self) -> List[Metric]:  # noqa: D102
         metric_references = self._semantic_manifest_lookup.metric_lookup.metric_references
         metrics = self._semantic_manifest_lookup.metric_lookup.get_metrics(metric_references)
         return [
@@ -697,14 +697,14 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         ]
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-    def list_saved_queries(self) -> List[SavedQuery]:  # noqa: D
+    def list_saved_queries(self) -> List[SavedQuery]:  # noqa: D102
         return [
             SavedQuery.from_pydantic(saved_query)
             for saved_query in self._semantic_manifest_lookup.semantic_manifest.saved_queries
         ]
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-    def get_dimension_values(  # noqa: D
+    def get_dimension_values(  # noqa: D102
         self,
         metric_names: List[str],
         get_group_by_values: str,
@@ -739,7 +739,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         return sorted([str(val) for val in dim_vals])
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-    def explain_get_dimension_values(  # noqa: D
+    def explain_get_dimension_values(  # noqa: D102
         self,
         metric_names: Optional[List[str]] = None,
         metrics: Optional[Sequence[MetricQueryParameter]] = None,

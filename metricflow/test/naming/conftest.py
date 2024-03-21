@@ -12,7 +12,7 @@ from metricflow.test.time.metric_time_dimension import MTD_SPEC_MONTH, MTD_SPEC_
 
 
 @pytest.fixture(scope="session")
-def specs() -> Sequence[LinkableInstanceSpec]:  # noqa: D
+def specs() -> Sequence[LinkableInstanceSpec]:  # noqa: D103
     return (
         # Time dimensions
         MTD_SPEC_WEEK,

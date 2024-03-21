@@ -58,7 +58,7 @@ class JoinToTimeSpineNode(BaseOutput, ABC):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=(self._parent_node,))
 
     @classmethod
-    def id_prefix(cls) -> IdPrefix:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D102
         return StaticIdPrefix.DATAFLOW_NODE_JOIN_TO_TIME_SPINE_ID_PREFIX
 
     @property
@@ -91,15 +91,15 @@ class JoinToTimeSpineNode(BaseOutput, ABC):
         """Join type to use when joining to time spine."""
         return self._join_type
 
-    def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_join_to_time_spine_node(self)
 
     @property
-    def description(self) -> str:  # noqa: D
+    def description(self) -> str:  # noqa: D102
         return """Join to Time Spine Dataset"""
 
     @property
-    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
         return tuple(super().displayed_properties) + (
             DisplayedProperty("requested_agg_time_dimension_specs", self._requested_agg_time_dimension_specs),
             DisplayedProperty("use_custom_agg_time_dimension", self._use_custom_agg_time_dimension),
@@ -110,10 +110,10 @@ class JoinToTimeSpineNode(BaseOutput, ABC):
         )
 
     @property
-    def parent_node(self) -> BaseOutput:  # noqa: D
+    def parent_node(self) -> BaseOutput:  # noqa: D102
         return self._parent_node
 
-    def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D
+    def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D102
         return (
             isinstance(other_node, self.__class__)
             and other_node.time_range_constraint == self.time_range_constraint
@@ -124,7 +124,7 @@ class JoinToTimeSpineNode(BaseOutput, ABC):
             and other_node.join_type == self.join_type
         )
 
-    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> JoinToTimeSpineNode:  # noqa: D
+    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> JoinToTimeSpineNode:  # noqa: D102
         assert len(new_parent_nodes) == 1
         return JoinToTimeSpineNode(
             parent_node=new_parent_nodes[0],

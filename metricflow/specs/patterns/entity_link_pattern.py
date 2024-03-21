@@ -52,7 +52,7 @@ class EntityLinkPatternParameterSet:
     date_part: Optional[DatePart] = None
 
     @staticmethod
-    def from_parameters(  # noqa: D
+    def from_parameters(  # noqa: D102
         fields_to_compare: Sequence[ParameterSetField],
         element_name: Optional[str] = None,
         entity_links: Optional[Sequence[EntityReference]] = None,

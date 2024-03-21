@@ -30,7 +30,7 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
     * Derived metrics with an offset time.g
     """
 
-    def __init__(self, manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D
+    def __init__(self, manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D107
         super().__init__(manifest_lookup=manifest_lookup)
 
         self._metric_time_specs = tuple(

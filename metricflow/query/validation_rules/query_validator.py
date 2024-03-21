@@ -33,7 +33,7 @@ from metricflow.query.validation_rules.metric_time_requirements import MetricTim
 class PostResolutionQueryValidator:
     """Runs query validation rules after query resolution is complete."""
 
-    def __init__(self, manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D
+    def __init__(self, manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D107
         self._manifest_lookup = manifest_lookup
         self._validation_rules = (
             MetricTimeQueryValidationRule(self._manifest_lookup),
@@ -55,7 +55,7 @@ class PostResolutionQueryValidator:
 class _PostResolutionQueryValidationVisitor(GroupByItemResolutionNodeVisitor[MetricFlowQueryResolutionIssueSet]):
     """Visitor that runs the validation rule when it visits a metric."""
 
-    def __init__(  # noqa: D
+    def __init__(
         self,
         resolver_input_for_query: ResolverInputForQuery,
         validation_rules: Sequence[PostResolutionQueryValidationRule],

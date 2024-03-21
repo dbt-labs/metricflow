@@ -41,13 +41,13 @@ class TimeDimensionParameter(ProtocolHint[TimeDimensionQueryParameter]):
     grain: Optional[TimeGranularity] = None
     date_part: Optional[DatePart] = None
 
-    def __post_init__(self) -> None:  # noqa: D
+    def __post_init__(self) -> None:  # noqa: D105
         parsed_name = StructuredLinkableSpecName.from_name(self.name)
         if parsed_name.time_granularity:
             raise ValueError("Must use object syntax for `grain` parameter if `date_part` is requested.")
 
     @property
-    def query_resolver_input(self) -> ResolverInputForGroupByItem:  # noqa: D
+    def query_resolver_input(self) -> ResolverInputForGroupByItem:  # noqa: D102
         fields_to_compare = [
             ParameterSetField.ELEMENT_NAME,
             ParameterSetField.ENTITY_LINKS,
@@ -87,7 +87,7 @@ class DimensionOrEntityParameter(ProtocolHint[DimensionOrEntityQueryParameter]):
         return self
 
     @property
-    def query_resolver_input(self) -> ResolverInputForGroupByItem:  # noqa: D
+    def query_resolver_input(self) -> ResolverInputForGroupByItem:  # noqa: D102
         name_structure = StructuredLinkableSpecName.from_name(self.name.lower())
 
         return ResolverInputForGroupByItem(
@@ -116,7 +116,7 @@ class MetricParameter:
     name: str
 
     @property
-    def query_resolver_input(self) -> ResolverInputForMetric:  # noqa: D
+    def query_resolver_input(self) -> ResolverInputForMetric:  # noqa: D102
         naming_scheme = MetricNamingScheme()
         return ResolverInputForMetric(
             input_obj=self,
@@ -133,7 +133,7 @@ class OrderByParameter:
     descending: bool = False
 
     @property
-    def query_resolver_input(self) -> ResolverInputForOrderByItem:  # noqa: D
+    def query_resolver_input(self) -> ResolverInputForOrderByItem:  # noqa: D102
         return ResolverInputForOrderByItem(
             input_obj=self,
             possible_inputs=(self.order_by.query_resolver_input,),

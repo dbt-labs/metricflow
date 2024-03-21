@@ -33,7 +33,7 @@ class GroupByItemCandidateSet(PathPrefixable):
     measure_paths: Tuple[MetricFlowQueryResolutionPath, ...]
     path_from_leaf_node: MetricFlowQueryResolutionPath
 
-    def __post_init__(self) -> None:  # noqa: D
+    def __post_init__(self) -> None:  # noqa: D105
         # If there are no specs, there shouldn't be any measure paths.
         assert (len(self.specs) > 0 and len(self.measure_paths) > 0) or (
             len(self.specs) == 0 and len(self.measure_paths) == 0
@@ -62,15 +62,15 @@ class GroupByItemCandidateSet(PathPrefixable):
         )
 
     @property
-    def is_empty(self) -> bool:  # noqa: D
+    def is_empty(self) -> bool:  # noqa: D102
         return len(self.specs) == 0
 
     @property
-    def num_candidates(self) -> int:  # noqa: D
+    def num_candidates(self) -> int:  # noqa: D102
         return len(self.specs)
 
     @staticmethod
-    def empty_instance() -> GroupByItemCandidateSet:  # noqa: D
+    def empty_instance() -> GroupByItemCandidateSet:  # noqa: D102
         return GroupByItemCandidateSet(
             specs=(), measure_paths=(), path_from_leaf_node=MetricFlowQueryResolutionPath.empty_instance()
         )

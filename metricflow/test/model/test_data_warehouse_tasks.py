@@ -44,14 +44,14 @@ def dw_backed_warehouse_validation_model(
     return data_warehouse_validation_model
 
 
-def test_build_semantic_model_tasks(  # noqa:D
+def test_build_semantic_model_tasks(  # noqa: D103
     data_warehouse_validation_model: PydanticSemanticManifest,
 ) -> None:
     tasks = DataWarehouseTaskBuilder.gen_semantic_model_tasks(manifest=data_warehouse_validation_model)
     assert len(tasks) == len(data_warehouse_validation_model.semantic_models)
 
 
-def test_task_runner(sql_client: SqlClient, mf_test_configuration: MetricFlowTestConfiguration) -> None:  # noqa: D
+def test_task_runner(sql_client: SqlClient, mf_test_configuration: MetricFlowTestConfiguration) -> None:  # noqa: D103
     dw_validator = DataWarehouseModelValidator(sql_client=sql_client)
 
     def good_query() -> Tuple[str, SqlBindParameters]:
@@ -77,7 +77,7 @@ def test_task_runner(sql_client: SqlClient, mf_test_configuration: MetricFlowTes
     assert err_msg_bad in issues.errors[0].message
 
 
-def test_validate_semantic_models(  # noqa: D
+def test_validate_semantic_models(  # noqa: D103
     dw_backed_warehouse_validation_model: PydanticSemanticManifest,
     sql_client: SqlClient,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -102,7 +102,7 @@ def test_validate_semantic_models(  # noqa: D
     assert "Unable to access semantic model `test_semantic_model2`" in issues.all_issues[0].message
 
 
-def test_build_dimension_tasks(  # noqa: D
+def test_build_dimension_tasks(  # noqa: D103
     data_warehouse_validation_model: PydanticSemanticManifest,
     sql_client: SqlClient,
 ) -> None:
@@ -116,7 +116,7 @@ def test_build_dimension_tasks(  # noqa: D
     assert len(tasks[0].on_fail_subtasks) == 12
 
 
-def test_validate_dimensions(  # noqa: D
+def test_validate_dimensions(  # noqa: D103
     dw_backed_warehouse_validation_model: PydanticSemanticManifest,
     sql_client: SqlClient,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -138,7 +138,7 @@ def test_validate_dimensions(  # noqa: D
     assert len(issues.all_issues) == 2
 
 
-def test_build_entities_tasks(  # noqa: D
+def test_build_entities_tasks(  # noqa: D103
     data_warehouse_validation_model: PydanticSemanticManifest,
     sql_client: SqlClient,
 ) -> None:
@@ -150,7 +150,7 @@ def test_build_entities_tasks(  # noqa: D
     assert len(tasks[0].on_fail_subtasks) == 1  # a sub task for each entity on the semantic model
 
 
-def test_validate_entities(  # noqa: D
+def test_validate_entities(  # noqa: D103
     dw_backed_warehouse_validation_model: PydanticSemanticManifest,
     sql_client: SqlClient,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -172,7 +172,7 @@ def test_validate_entities(  # noqa: D
     assert len(issues.all_issues) == 2
 
 
-def test_build_measure_tasks(  # noqa: D
+def test_build_measure_tasks(  # noqa: D103
     data_warehouse_validation_model: PydanticSemanticManifest,
     sql_client: SqlClient,
 ) -> None:
@@ -184,7 +184,7 @@ def test_build_measure_tasks(  # noqa: D
     assert len(tasks[0].on_fail_subtasks) == 1  # a sub task for each measure on the semantic model
 
 
-def test_validate_measures(  # noqa: D
+def test_validate_measures(  # noqa: D103
     dw_backed_warehouse_validation_model: PydanticSemanticManifest,
     sql_client: SqlClient,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -207,7 +207,7 @@ def test_validate_measures(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_build_metric_tasks(  # noqa: D
+def test_build_metric_tasks(  # noqa: D103
     request: FixtureRequest,
     data_warehouse_validation_model: PydanticSemanticManifest,
     sql_client: SqlClient,
@@ -229,7 +229,7 @@ def test_build_metric_tasks(  # noqa: D
     )
 
 
-def test_validate_metrics(  # noqa: D
+def test_validate_metrics(  # noqa: D103
     dw_backed_warehouse_validation_model: PydanticSemanticManifest,
     sql_client: SqlClient,
     mf_test_configuration: MetricFlowTestConfiguration,

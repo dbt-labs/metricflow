@@ -55,7 +55,7 @@ class DataflowPlanNodeOutputDataSetResolver(DataflowToSqlQueryPlanConverter):
     another class to have better separation of concerns.
     """
 
-    def __init__(  # noqa: D
+    def __init__(  # noqa: D107
         self,
         column_association_resolver: ColumnAssociationResolver,
         semantic_manifest_lookup: SemanticManifestLookup,
@@ -67,7 +67,7 @@ class DataflowPlanNodeOutputDataSetResolver(DataflowToSqlQueryPlanConverter):
             semantic_manifest_lookup=semantic_manifest_lookup,
         )
 
-    def get_output_data_set(self, node: DataflowPlanNode) -> SqlDataSet:  # noqa: D
+    def get_output_data_set(self, node: DataflowPlanNode) -> SqlDataSet:
         """Cached since this will be called repeatedly during the computation of multiple metrics.
 
         # TODO: The cache needs to be pruned, but has not yet been an issue.

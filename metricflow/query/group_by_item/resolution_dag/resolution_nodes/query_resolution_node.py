@@ -24,7 +24,7 @@ from metricflow.visitor import VisitorOutputT
 class QueryGroupByItemResolutionNode(GroupByItemResolutionNode):
     """Output the group-by-items relevant to the query and based on the inputs."""
 
-    def __init__(  # noqa: D
+    def __init__(  # noqa: D107
         self,
         parent_nodes: Sequence[Union[MetricGroupByItemResolutionNode, NoMetricsGroupByItemSourceNode]],
         metrics_in_query: Sequence[MetricReference],
@@ -85,7 +85,7 @@ class QueryGroupByItemResolutionNode(GroupByItemResolutionNode):
         return properties
 
     @property
-    def where_filter_intersection(self) -> WhereFilterIntersection:  # noqa: D
+    def where_filter_intersection(self) -> WhereFilterIntersection:  # noqa: D102
         return self._where_filter_intersection
 
     @property

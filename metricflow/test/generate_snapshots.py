@@ -36,6 +36,7 @@ export MF_TEST_ENGINE_CREDENTIALS=$(cat <<EOF
 EOF
 )
 """
+
 from __future__ import annotations
 
 import logging
@@ -55,18 +56,18 @@ logger = logging.getLogger(__name__)
 TEST_DIRECTORY = "metricflow/test"
 
 
-class MetricFlowTestCredentialSet(FrozenBaseModel):  # noqa: D
+class MetricFlowTestCredentialSet(FrozenBaseModel):  # noqa: D101
     engine_url: Optional[str]
     engine_password: Optional[str]
 
 
 @dataclass(frozen=True)
-class MetricFlowTestConfiguration:  # noqa: D
+class MetricFlowTestConfiguration:  # noqa: D101
     engine: SqlEngine
     credential_set: MetricFlowTestCredentialSet
 
 
-class MetricFlowTestCredentialSetForAllEngines(FrozenBaseModel):  # noqa: D
+class MetricFlowTestCredentialSetForAllEngines(FrozenBaseModel):  # noqa: D101
     duck_db: MetricFlowTestCredentialSet
     redshift: MetricFlowTestCredentialSet
     snowflake: MetricFlowTestCredentialSet
@@ -76,7 +77,7 @@ class MetricFlowTestCredentialSetForAllEngines(FrozenBaseModel):  # noqa: D
     trino: MetricFlowTestCredentialSet
 
     @property
-    def as_configurations(self) -> Sequence[MetricFlowTestConfiguration]:  # noqa: D
+    def as_configurations(self) -> Sequence[MetricFlowTestConfiguration]:  # noqa: D102
         return (
             MetricFlowTestConfiguration(
                 engine=SqlEngine.DUCKDB,
@@ -109,7 +110,7 @@ class MetricFlowTestCredentialSetForAllEngines(FrozenBaseModel):  # noqa: D
         )
 
 
-def run_command(command: str) -> None:  # noqa: D
+def run_command(command: str) -> None:  # noqa: D103
     logger.info(f"Running command {command}")
     return_code = os.system(command)
     if return_code != 0:
@@ -134,7 +135,7 @@ def set_engine_env_variables(test_configuration: MetricFlowTestConfiguration) ->
         os.environ["MF_SQL_ENGINE_PASSWORD"] = test_configuration.credential_set.engine_password
 
 
-def run_tests(test_configuration: MetricFlowTestConfiguration) -> None:  # noqa: D
+def run_tests(test_configuration: MetricFlowTestConfiguration) -> None:  # noqa: D103
     set_engine_env_variables(test_configuration)
 
     if test_configuration.engine is SqlEngine.DUCKDB:
@@ -165,7 +166,7 @@ def run_tests(test_configuration: MetricFlowTestConfiguration) -> None:  # noqa:
         assert_values_exhausted(test_configuration.engine)
 
 
-def run_cli(function_to_run: Callable) -> None:  # noqa: D
+def run_cli(function_to_run: Callable) -> None:  # noqa: D103
     # Setup logging.
     dev_format = "%(asctime)s %(levelname)s %(filename)s:%(lineno)d [%(threadName)s] - %(message)s"
     logging.basicConfig(level=logging.INFO, format=dev_format)

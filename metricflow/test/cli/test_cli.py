@@ -38,7 +38,7 @@ logger = logging.getLogger(__name__)
 # TODO: Use snapshots to compare CLI output for all tests here.
 
 
-def test_query(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
+def test_query(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D103
     resp = cli_runner.run(query, args=["--metrics", "bookings", "--group-by", "metric_time"])
     # case insensitive matches are needed for snowflake due to the capitalization thing
     engine_is_snowflake = cli_runner.cli_context.sql_client.sql_engine_type is SqlEngine.SNOWFLAKE
@@ -46,21 +46,21 @@ def test_query(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
     assert resp.exit_code == 0
 
 
-def test_list_dimensions(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
+def test_list_dimensions(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D103
     resp = cli_runner.run(dimensions, args=["--metrics", "bookings"])
 
     assert "ds" in resp.output
     assert resp.exit_code == 0
 
 
-def test_list_metrics(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
+def test_list_metrics(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D103
     resp = cli_runner.run(metrics)
 
     assert "bookings_per_listing: listing__capacity_latest" in resp.output
     assert resp.exit_code == 0
 
 
-def test_get_dimension_values(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
+def test_get_dimension_values(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D103
     resp = cli_runner.run(dimension_values, args=["--metrics", "bookings", "--dimension", "booking__is_instant"])
 
     actual_output_lines = sorted(resp.output.split("\n"))
@@ -132,7 +132,7 @@ def test_validate_configs(cli_context: CLIContext) -> None:
         dummy_project.unlink()
 
 
-def test_health_checks(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
+def test_health_checks(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D103
     resp = cli_runner.run(health_checks)
 
     assert "SELECT 1: Success!" in resp.output
@@ -155,7 +155,7 @@ def test_tutorial_message(cli_runner: MetricFlowCliRunner) -> None:
     assert "dbt seed" in resp.output
 
 
-def test_list_entities(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
+def test_list_entities(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D103
     # Disabling capsys to resolve error "ValueError: I/O operation on closed file". Better solution TBD.
     resp = cli_runner.run(entities, args=["--metrics", "bookings"])
 
@@ -164,7 +164,7 @@ def test_list_entities(cli_runner: MetricFlowCliRunner) -> None:  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_saved_query(  # noqa: D
+def test_saved_query(  # noqa: D103
     request: FixtureRequest,
     capsys: pytest.CaptureFixture,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -188,7 +188,7 @@ def test_saved_query(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_saved_query_with_where(  # noqa: D
+def test_saved_query_with_where(  # noqa: D103
     request: FixtureRequest,
     capsys: pytest.CaptureFixture,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -219,7 +219,7 @@ def test_saved_query_with_where(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_saved_query_with_limit(  # noqa: D
+def test_saved_query_with_limit(  # noqa: D103
     request: FixtureRequest,
     capsys: pytest.CaptureFixture,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -249,7 +249,7 @@ def test_saved_query_with_limit(  # noqa: D
     )
 
 
-def test_saved_query_explain(  # noqa: D
+def test_saved_query_explain(  # noqa: D103
     capsys: pytest.CaptureFixture,
     mf_test_configuration: MetricFlowTestConfiguration,
     cli_runner: MetricFlowCliRunner,
@@ -264,7 +264,7 @@ def test_saved_query_explain(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_saved_query_with_cumulative_metric(  # noqa: D
+def test_saved_query_with_cumulative_metric(  # noqa: D103
     request: FixtureRequest,
     capsys: pytest.CaptureFixture,
     mf_test_configuration: MetricFlowTestConfiguration,

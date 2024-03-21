@@ -52,33 +52,33 @@ class JoinOverTimeRangeNode(BaseOutput):
         super().__init__(node_id=node_id or self.create_unique_id(), parent_nodes=parent_nodes)
 
     @classmethod
-    def id_prefix(cls) -> IdPrefix:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D102
         return StaticIdPrefix.DATAFLOW_NODE_JOIN_SELF_OVER_TIME_RANGE_ID_PREFIX
 
-    def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_join_over_time_range_node(self)
 
     @property
-    def grain_to_date(self) -> Optional[TimeGranularity]:  # noqa: D
+    def grain_to_date(self) -> Optional[TimeGranularity]:  # noqa: D102
         return self._grain_to_date
 
     @property
-    def description(self) -> str:  # noqa: D
+    def description(self) -> str:  # noqa: D102
         return """Join Self Over Time Range"""
 
     @property
-    def parent_node(self) -> BaseOutput:  # noqa: D
+    def parent_node(self) -> BaseOutput:  # noqa: D102
         return self._parent_node
 
     @property
-    def window(self) -> Optional[MetricTimeWindow]:  # noqa: D
+    def window(self) -> Optional[MetricTimeWindow]:  # noqa: D102
         return self._window
 
     @property
-    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
         return super().displayed_properties
 
-    def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D
+    def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D102
         return (
             isinstance(other_node, self.__class__)
             and other_node.grain_to_date == self.grain_to_date
@@ -86,7 +86,7 @@ class JoinOverTimeRangeNode(BaseOutput):
             and other_node.time_range_constraint == self.time_range_constraint
         )
 
-    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> JoinOverTimeRangeNode:  # noqa: D
+    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> JoinOverTimeRangeNode:  # noqa: D102
         assert len(new_parent_nodes) == 1
         return JoinOverTimeRangeNode(
             parent_node=new_parent_nodes[0],

@@ -27,7 +27,7 @@ class GroupByItemResolutionNode(DagNode, Visitable, ABC):
     See GroupByItemResolutionDag for more details.
     """
 
-    def __init__(self) -> None:  # noqa: D
+    def __init__(self) -> None:  # noqa: D107
         super().__init__(node_id=NodeId.create_unique(self.__class__.id_prefix()))
 
     @abstractmethod
@@ -43,7 +43,7 @@ class GroupByItemResolutionNode(DagNode, Visitable, ABC):
 
     @property
     @abstractmethod
-    def parent_nodes(self) -> Sequence[GroupByItemResolutionNode]:  # noqa: D
+    def parent_nodes(self) -> Sequence[GroupByItemResolutionNode]:  # noqa: D102
         raise NotImplementedError
 
 
@@ -51,17 +51,17 @@ class GroupByItemResolutionNodeVisitor(Generic[VisitorOutputT], ABC):
     """Visitor for traversing GroupByItemResolutionNodes."""
 
     @abstractmethod
-    def visit_measure_node(self, node: MeasureGroupByItemSourceNode) -> VisitorOutputT:  # noqa: D
+    def visit_measure_node(self, node: MeasureGroupByItemSourceNode) -> VisitorOutputT:  # noqa: D102
         raise NotImplementedError
 
     @abstractmethod
-    def visit_no_metrics_query_node(self, node: NoMetricsGroupByItemSourceNode) -> VisitorOutputT:  # noqa: D
+    def visit_no_metrics_query_node(self, node: NoMetricsGroupByItemSourceNode) -> VisitorOutputT:  # noqa: D102
         raise NotImplementedError
 
     @abstractmethod
-    def visit_metric_node(self, node: MetricGroupByItemResolutionNode) -> VisitorOutputT:  # noqa: D
+    def visit_metric_node(self, node: MetricGroupByItemResolutionNode) -> VisitorOutputT:  # noqa: D102
         raise NotImplementedError
 
     @abstractmethod
-    def visit_query_node(self, node: QueryGroupByItemResolutionNode) -> VisitorOutputT:  # noqa: D
+    def visit_query_node(self, node: QueryGroupByItemResolutionNode) -> VisitorOutputT:  # noqa: D102
         raise NotImplementedError

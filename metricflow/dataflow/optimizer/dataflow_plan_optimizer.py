@@ -9,5 +9,5 @@ class DataflowPlanOptimizer(ABC):
     """Converts one dataflow plan into another dataflow plan that is more optimal in some way (e.g. performance)."""
 
     @abstractmethod
-    def optimize(self, dataflow_plan: DataflowPlan) -> DataflowPlan:  # noqa: D
+    def optimize(self, dataflow_plan: DataflowPlan) -> DataflowPlan:  # noqa: D102
         raise NotImplementedError

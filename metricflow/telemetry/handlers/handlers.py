@@ -37,14 +37,14 @@ class TelemetryHandler(ABC):
 class ToMemoryTelemetryHandler(TelemetryHandler):
     """Records telemetry events to memory for testing purposes."""
 
-    def __init__(self) -> None:  # noqa: D
+    def __init__(self) -> None:  # noqa: D107
         self._payloads: List[TelemetryPayload] = []
 
-    def _write_log(self, client_id: str, payload: PayloadType) -> None:  # noqa: D
+    def _write_log(self, client_id: str, payload: PayloadType) -> None:
         pass
 
     @property
-    def payloads(self) -> Sequence[TelemetryPayload]:  # noqa: D
+    def payloads(self) -> Sequence[TelemetryPayload]:  # noqa: D102
         return self._payloads
 
     def log(

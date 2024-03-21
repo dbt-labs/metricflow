@@ -35,7 +35,7 @@ def make_schema_replacement_function(system_schema: str, source_schema: str) -> 
     """Generates a function to replace schema names in test outputs."""
 
     # The schema of the warehouse used in tests changes from run to run, so don't compare those.
-    def replacement_function(text: str) -> str:  # noqa: D
+    def replacement_function(text: str) -> str:
         # Replace with a string of the same length so that indents are preserved.
         text = text.replace(source_schema, PLACEHOLDER_CHAR_FOR_INCOMPARABLE_STRINGS * len(source_schema))
         # Same with the MetricFlow system schema.
@@ -227,7 +227,7 @@ def assert_snapshot_text_equal(
             assert False, f"Snapshot from {file_path} does not match. Diff from expected to actual:\n" + "\n".join(diff)
 
 
-def assert_execution_plan_text_equal(  # noqa: D
+def assert_execution_plan_text_equal(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
@@ -246,7 +246,7 @@ def assert_execution_plan_text_equal(  # noqa: D
     )
 
 
-def assert_dataflow_plan_text_equal(  # noqa: D
+def assert_dataflow_plan_text_equal(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan: DataflowPlan,
@@ -332,7 +332,7 @@ def assert_str_snapshot_equal(  # type: ignore[misc]
     )
 
 
-def assert_linkable_element_set_snapshot_equal(  # noqa: D
+def assert_linkable_element_set_snapshot_equal(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     set_id: str,
@@ -345,9 +345,11 @@ def assert_linkable_element_set_snapshot_equal(  # noqa: D
             rows.append(
                 (
                     # Checking a limited set of fields as the result is large due to the paths in the object.
-                    linkable_dimension.semantic_model_origin.semantic_model_name
-                    if linkable_dimension.semantic_model_origin
-                    else None,
+                    (
+                        linkable_dimension.semantic_model_origin.semantic_model_name
+                        if linkable_dimension.semantic_model_origin
+                        else None
+                    ),
                     tuple(entity_link.element_name for entity_link in linkable_dimension.entity_links),
                     linkable_dimension.element_name,
                     linkable_dimension.time_granularity.name if linkable_dimension.time_granularity is not None else "",
@@ -379,7 +381,7 @@ def assert_linkable_element_set_snapshot_equal(  # noqa: D
     )
 
 
-def assert_spec_set_snapshot_equal(  # noqa: D
+def assert_spec_set_snapshot_equal(  # noqa: D103
     request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, set_id: str, spec_set: InstanceSpecSet
 ) -> None:
     assert_object_snapshot_equal(
@@ -390,7 +392,7 @@ def assert_spec_set_snapshot_equal(  # noqa: D
     )
 
 
-def assert_linkable_spec_set_snapshot_equal(  # noqa: D
+def assert_linkable_spec_set_snapshot_equal(  # noqa: D103
     request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, set_id: str, spec_set: LinkableSpecSet
 ) -> None:
     # TODO: This will be used in a later PR and this message will be removed.

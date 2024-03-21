@@ -19,7 +19,7 @@ class StringInputParsingIssue(MetricFlowQueryResolutionIssue):
     input_str: str
 
     @staticmethod
-    def from_parameters(input_str: str) -> StringInputParsingIssue:  # noqa: D
+    def from_parameters(input_str: str) -> StringInputParsingIssue:  # noqa: D102
         return StringInputParsingIssue(
             issue_type=MetricFlowQueryIssueType.ERROR,
             parent_issues=(),

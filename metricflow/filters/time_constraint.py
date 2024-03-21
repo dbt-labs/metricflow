@@ -21,7 +21,7 @@ class TimeRangeConstraint(SerializableDataclass):
     start_time: datetime.datetime
     end_time: datetime.datetime
 
-    def __post_init__(self) -> None:  # noqa: D
+    def __post_init__(self) -> None:  # noqa: D105
         if self.start_time > self.end_time:
             logger.warning(f"start_time must not be > end_time. start_time={self.start_time} end_time={self.end_time}")
 
@@ -32,11 +32,11 @@ class TimeRangeConstraint(SerializableDataclass):
             raise RuntimeError(f"end_time={self.end_time} exceeds the limits of {TimeRangeConstraint.ALL_TIME_END()}")
 
     @staticmethod
-    def ALL_TIME_BEGIN() -> datetime.datetime:  # noqa: D
+    def ALL_TIME_BEGIN() -> datetime.datetime:  # noqa: D102
         return datetime.datetime(2000, 1, 1)
 
     @staticmethod
-    def ALL_TIME_END() -> datetime.datetime:  # noqa: D
+    def ALL_TIME_END() -> datetime.datetime:  # noqa: D102
         return datetime.datetime(2040, 12, 31)
 
     @staticmethod
@@ -88,19 +88,19 @@ class TimeRangeConstraint(SerializableDataclass):
             end_time=self.end_time,
         )
 
-    def is_subset_of(self, other: TimeRangeConstraint) -> bool:  # noqa: D
+    def is_subset_of(self, other: TimeRangeConstraint) -> bool:  # noqa: D102
         return self.start_time >= other.start_time and self.end_time <= other.end_time
 
-    def __str__(self) -> str:  # noqa: D
+    def __str__(self) -> str:  # noqa: D105
         return f"[{self.start_time.isoformat()}, {self.end_time.isoformat()}]"
 
-    def __repr__(self) -> str:  # noqa: D
+    def __repr__(self) -> str:  # noqa: D105
         return (
             f"{self.__class__.__name__}(start_time='{self.start_time.isoformat()}', "
             f"end_time='{self.end_time.isoformat()}')"
         )
 
-    def intersection(self, other: TimeRangeConstraint) -> TimeRangeConstraint:  # noqa: D
+    def intersection(self, other: TimeRangeConstraint) -> TimeRangeConstraint:  # noqa: D102
         # self is completely before the other
         if self.end_time < other.start_time:
             return TimeRangeConstraint.empty_time()

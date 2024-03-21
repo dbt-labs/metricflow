@@ -89,11 +89,11 @@ class SemanticManifestSetup(Enum):
     )
 
     @property
-    def id_number_space(self) -> IdNumberSpace:  # noqa: D
+    def id_number_space(self) -> IdNumberSpace:  # noqa: D102
         return self.value.id_number_space
 
     @property
-    def semantic_manifest_name(self) -> str:  # noqa: D
+    def semantic_manifest_name(self) -> str:  # noqa: D102
         return self.value.semantic_manifest_name
 
 
@@ -114,7 +114,7 @@ class MetricFlowEngineTestFixture:
     _node_output_resolver: DataflowPlanNodeOutputDataSetResolver
 
     @staticmethod
-    def from_parameters(  # noqa: D
+    def from_parameters(  # noqa: D102
         sql_client: SqlClient, semantic_manifest: PydanticSemanticManifest
     ) -> MetricFlowEngineTestFixture:
         semantic_manifest_lookup = SemanticManifestLookup(semantic_manifest)
@@ -257,21 +257,21 @@ def template_mapping(mf_test_configuration: MetricFlowTestConfiguration) -> Dict
 
 
 @pytest.fixture(scope="session")
-def simple_semantic_manifest_lookup_non_ds(  # noqa: D
+def simple_semantic_manifest_lookup_non_ds(  # noqa: D103
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture]
 ) -> SemanticManifestLookup:
     return mf_engine_test_fixture_mapping[SemanticManifestSetup.NON_SM_MANIFEST].semantic_manifest_lookup
 
 
 @pytest.fixture(scope="session")
-def simple_semantic_manifest_lookup(  # noqa: D
+def simple_semantic_manifest_lookup(  # noqa: D103
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture]
 ) -> SemanticManifestLookup:
     return mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].semantic_manifest_lookup
 
 
 @pytest.fixture(scope="session")
-def partitioned_multi_hop_join_semantic_manifest_lookup(  # noqa: D
+def partitioned_multi_hop_join_semantic_manifest_lookup(  # noqa: D103
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture]
 ) -> SemanticManifestLookup:
     return mf_engine_test_fixture_mapping[
@@ -280,7 +280,7 @@ def partitioned_multi_hop_join_semantic_manifest_lookup(  # noqa: D
 
 
 @pytest.fixture(scope="session")
-def multi_hop_join_semantic_manifest_lookup(  # noqa: D
+def multi_hop_join_semantic_manifest_lookup(  # noqa: D103
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture]
 ) -> SemanticManifestLookup:
     return mf_engine_test_fixture_mapping[SemanticManifestSetup.MULTI_HOP_JOIN_MANIFEST].semantic_manifest_lookup
@@ -295,7 +295,7 @@ def simple_semantic_manifest(
 
 
 @pytest.fixture(scope="session")
-def extended_date_semantic_manifest_lookup(  # noqa: D
+def extended_date_semantic_manifest_lookup(  # noqa: D103
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture]
 ) -> SemanticManifestLookup:
     return mf_engine_test_fixture_mapping[SemanticManifestSetup.EXTENDED_DATE_MANIFEST].semantic_manifest_lookup
@@ -334,21 +334,21 @@ def ambiguous_resolution_manifest(
 
 
 @pytest.fixture(scope="session")
-def ambiguous_resolution_manifest_lookup(  # noqa: D
+def ambiguous_resolution_manifest_lookup(  # noqa: D103
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture]
 ) -> SemanticManifestLookup:
     return mf_engine_test_fixture_mapping[SemanticManifestSetup.AMBIGUOUS_RESOLUTION_MANIFEST].semantic_manifest_lookup
 
 
 @pytest.fixture(scope="session")
-def simple_multi_hop_join_manifest(  # noqa: D
+def simple_multi_hop_join_manifest(  # noqa: D103
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture]
 ) -> PydanticSemanticManifest:
     return mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MULTI_HOP_JOIN_MANIFEST].semantic_manifest
 
 
 @pytest.fixture(scope="session")
-def simple_multi_hop_join_manifest_lookup(  # noqa: D
+def simple_multi_hop_join_manifest_lookup(
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture]
 ) -> SemanticManifestLookup:
     """Manifest used to test ambiguous resolution of group-by-items."""

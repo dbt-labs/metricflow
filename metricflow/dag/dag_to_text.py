@@ -1,4 +1,5 @@
 """Functions to help generate a text representation of a DAG."""
+
 from __future__ import annotations
 
 import logging
@@ -26,7 +27,7 @@ class MaxWidthTracker:
     76.
     """
 
-    def __init__(self, max_width: int) -> None:  # noqa: D
+    def __init__(self, max_width: int) -> None:  # noqa: D107
         self._current_max_width = max_width
 
     @contextmanager
@@ -38,7 +39,7 @@ class MaxWidthTracker:
         self._current_max_width = previous_max_width
 
     @property
-    def current_max_width(self) -> int:  # noqa: D
+    def current_max_width(self) -> int:  # noqa: D102
         return self._current_max_width
 
 
@@ -70,7 +71,7 @@ class MetricFlowDagTextFormatter:
         self._thread_local_data = threading.local()
 
     @property
-    def _max_width_tracker(self) -> MaxWidthTracker:  # noqa: D
+    def _max_width_tracker(self) -> MaxWidthTracker:
         if not hasattr(self._thread_local_data, "max_width_tracker"):
             self._thread_local_data.max_width_tracker = MaxWidthTracker(self._max_width)
         return self._thread_local_data.max_width_tracker

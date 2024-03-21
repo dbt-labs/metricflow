@@ -24,7 +24,7 @@ class MultipleMatchIssue(MetricFlowQueryResolutionIssue):
     candidate_set: GroupByItemCandidateSet
 
     @staticmethod
-    def from_parameters(  # noqa: D
+    def from_parameters(  # noqa: D102
         query_resolution_path: MetricFlowQueryResolutionPath,
         candidate_set: GroupByItemCandidateSet,
         parent_issues: Sequence[MetricFlowQueryResolutionIssue],

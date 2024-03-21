@@ -10,7 +10,7 @@ from metricflow.specs.specs import TimeDimensionSpec, TimeDimensionSpecField
 logger = logging.getLogger(__name__)
 
 
-def test_comparison_key_excluding_time_grain() -> None:  # noqa: D
+def test_comparison_key_excluding_time_grain() -> None:  # noqa: D103
     spec0 = TimeDimensionSpec(
         element_name="element0",
         entity_links=(EntityReference("entity0"),),

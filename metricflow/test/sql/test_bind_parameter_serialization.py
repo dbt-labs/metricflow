@@ -7,16 +7,16 @@ from metricflow.sql.sql_bind_parameters import SqlBindParameter, SqlBindParamete
 
 
 @pytest.fixture
-def serializer() -> DataclassSerializer:  # noqa: D
+def serializer() -> DataclassSerializer:  # noqa: D103
     return DataclassSerializer()
 
 
 @pytest.fixture
-def deserializer() -> DataClassDeserializer:  # noqa: D
+def deserializer() -> DataClassDeserializer:  # noqa: D103
     return DataClassDeserializer()
 
 
-def test_serialization(  # noqa: D
+def test_serialization(  # noqa: D103
     serializer: DataclassSerializer,
     deserializer: DataClassDeserializer,
 ) -> None:

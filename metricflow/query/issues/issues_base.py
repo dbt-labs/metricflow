@@ -55,7 +55,7 @@ class MetricFlowQueryResolutionIssueSet(Mergeable, PathPrefixable, Sized):
     issues: Tuple[MetricFlowQueryResolutionIssue, ...] = ()
 
     @override
-    def merge(self, other: MetricFlowQueryResolutionIssueSet) -> MetricFlowQueryResolutionIssueSet:  # noqa: D
+    def merge(self, other: MetricFlowQueryResolutionIssueSet) -> MetricFlowQueryResolutionIssueSet:
         return MetricFlowQueryResolutionIssueSet(issues=tuple(self.issues) + tuple(other.issues))
 
     @override
@@ -64,11 +64,11 @@ class MetricFlowQueryResolutionIssueSet(Mergeable, PathPrefixable, Sized):
         return MetricFlowQueryResolutionIssueSet()
 
     @property
-    def errors(self) -> Sequence[MetricFlowQueryResolutionIssue]:  # noqa: D
+    def errors(self) -> Sequence[MetricFlowQueryResolutionIssue]:  # noqa: D102
         return tuple(issue for issue in self.issues if issue.issue_type is MetricFlowQueryIssueType.ERROR)
 
     @property
-    def has_errors(self) -> bool:  # noqa: D
+    def has_errors(self) -> bool:  # noqa: D102
         return len(self.errors) > 0
 
     def add_issue(self, issue: MetricFlowQueryResolutionIssue) -> MetricFlowQueryResolutionIssueSet:
@@ -81,7 +81,9 @@ class MetricFlowQueryResolutionIssueSet(Mergeable, PathPrefixable, Sized):
         return MetricFlowQueryResolutionIssueSet(issues=(issue,))
 
     @staticmethod
-    def from_issues(issues: Sequence[MetricFlowQueryResolutionIssue]) -> MetricFlowQueryResolutionIssueSet:  # noqa: D
+    def from_issues(  # noqa: D102
+        issues: Sequence[MetricFlowQueryResolutionIssue],
+    ) -> MetricFlowQueryResolutionIssueSet:  # noqa: D102
         return MetricFlowQueryResolutionIssueSet(issues=tuple(issues))
 
     @override
@@ -91,7 +93,7 @@ class MetricFlowQueryResolutionIssueSet(Mergeable, PathPrefixable, Sized):
         )
 
     @property
-    def has_issues(self) -> bool:  # noqa: D
+    def has_issues(self) -> bool:  # noqa: D102
         return len(self.issues) > 0
 
     @override

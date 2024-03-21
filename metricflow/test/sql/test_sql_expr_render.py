@@ -40,17 +40,17 @@ logger = logging.getLogger(__name__)
 
 
 @pytest.fixture
-def default_expr_renderer() -> DefaultSqlExpressionRenderer:  # noqa: D
+def default_expr_renderer() -> DefaultSqlExpressionRenderer:  # noqa: D103
     return DefaultSqlExpressionRenderer()
 
 
-def test_str_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D
+def test_str_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D103
     actual = default_expr_renderer.render_sql_expr(SqlStringExpression("a + b")).sql
     expected = "a + b"
     assert actual == expected
 
 
-def test_col_ref_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D
+def test_col_ref_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D103
     actual = default_expr_renderer.render_sql_expr(
         SqlColumnReferenceExpression(SqlColumnReference("my_table", "my_col"))
     ).sql
@@ -58,7 +58,7 @@ def test_col_ref_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> No
     assert actual == expected
 
 
-def test_comparison_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D
+def test_comparison_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D103
     actual = default_expr_renderer.render_sql_expr(
         SqlComparisonExpression(
             left_expr=SqlColumnReferenceExpression(SqlColumnReference("my_table", "my_col")),
@@ -69,7 +69,7 @@ def test_comparison_expr(default_expr_renderer: DefaultSqlExpressionRenderer) ->
     assert actual == "my_table.my_col = (a + b)"
 
 
-def test_require_parenthesis(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D
+def test_require_parenthesis(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D103
     actual = default_expr_renderer.render_sql_expr(
         SqlComparisonExpression(
             left_expr=SqlColumnReferenceExpression(SqlColumnReference("a", "booking_value")),
@@ -81,7 +81,7 @@ def test_require_parenthesis(default_expr_renderer: DefaultSqlExpressionRenderer
     assert actual == "a.booking_value > 100"
 
 
-def test_function_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D
+def test_function_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D103
     actual = default_expr_renderer.render_sql_expr(
         SqlAggregateFunctionExpression(
             sql_function=SqlFunction.SUM,
@@ -109,7 +109,7 @@ def test_distinct_agg_expr(default_expr_renderer: DefaultSqlExpressionRenderer) 
     assert actual == "COUNT(DISTINCT my_table.a, my_table.b)"
 
 
-def test_nested_function_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D
+def test_nested_function_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D103
     actual = default_expr_renderer.render_sql_expr(
         SqlAggregateFunctionExpression(
             sql_function=SqlFunction.CONCAT,
@@ -128,12 +128,12 @@ def test_nested_function_expr(default_expr_renderer: DefaultSqlExpressionRendere
     assert actual == "CONCAT(my_table.a, CONCAT(my_table.b, my_table.c))"
 
 
-def test_null_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D
+def test_null_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D103
     actual = default_expr_renderer.render_sql_expr(SqlNullExpression()).sql
     assert actual == "NULL"
 
 
-def test_and_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D
+def test_and_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D103
     actual = default_expr_renderer.render_sql_expr(
         SqlLogicalExpression(
             operator=SqlLogicalOperator.AND,
@@ -153,7 +153,7 @@ def test_and_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None: 
     )
 
 
-def test_long_and_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D
+def test_long_and_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D103
     actual = default_expr_renderer.render_sql_expr(
         SqlLogicalExpression(
             operator=SqlLogicalOperator.AND,
@@ -180,33 +180,33 @@ def test_long_and_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> N
     )
 
 
-def test_string_literal_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D
+def test_string_literal_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D103
     actual = default_expr_renderer.render_sql_expr(SqlStringLiteralExpression("foo")).sql
     assert actual == "'foo'"
 
 
-def test_is_null_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D
+def test_is_null_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D103
     actual = default_expr_renderer.render_sql_expr(
         SqlIsNullExpression(SqlStringExpression("foo", requires_parenthesis=False))
     ).sql
     assert actual == "foo IS NULL"
 
 
-def test_date_trunc_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D
+def test_date_trunc_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D103
     actual = default_expr_renderer.render_sql_expr(
         SqlDateTruncExpression(time_granularity=TimeGranularity.MONTH, arg=SqlStringExpression("ds"))
     ).sql
     assert actual == "DATE_TRUNC('month', ds)"
 
 
-def test_extract_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D
+def test_extract_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D103
     actual = default_expr_renderer.render_sql_expr(
         SqlExtractExpression(date_part=DatePart.DOY, arg=SqlStringExpression("ds"))
     ).sql
     assert actual == "EXTRACT(doy FROM ds)"
 
 
-def test_ratio_computation_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D
+def test_ratio_computation_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D103
     actual = default_expr_renderer.render_sql_expr(
         SqlRatioComputationExpression(
             numerator=SqlAggregateFunctionExpression(
@@ -218,7 +218,7 @@ def test_ratio_computation_expr(default_expr_renderer: DefaultSqlExpressionRende
     assert actual == "CAST(SUM(1) AS DOUBLE) / CAST(NULLIF(a.divide_by_me, 0) AS DOUBLE)"
 
 
-def test_expr_rewrite(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D
+def test_expr_rewrite(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D103
     expr = SqlLogicalExpression(
         operator=SqlLogicalOperator.AND,
         args=(
@@ -237,7 +237,7 @@ def test_expr_rewrite(default_expr_renderer: DefaultSqlExpressionRenderer) -> No
     assert default_expr_renderer.render_sql_expr(expr_rewritten).sql == "foo AND bar"
 
 
-def test_between_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D
+def test_between_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> None:  # noqa: D103
     actual = default_expr_renderer.render_sql_expr(
         SqlBetweenExpression(
             column_arg=SqlColumnReferenceExpression(SqlColumnReference("a", "col0")),
@@ -256,7 +256,7 @@ def test_between_expr(default_expr_renderer: DefaultSqlExpressionRenderer) -> No
     assert actual == "a.col0 BETWEEN CAST('2020-01-01' AS TIMESTAMP) AND CAST('2020-01-10' AS TIMESTAMP)"
 
 
-def test_window_function_expr(  # noqa: D
+def test_window_function_expr(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     default_expr_renderer: DefaultSqlExpressionRenderer,

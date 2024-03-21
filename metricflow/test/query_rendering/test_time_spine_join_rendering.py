@@ -25,7 +25,7 @@ from metricflow.test.query_rendering.compare_rendered_query import convert_and_c
 
 
 @pytest.mark.sql_engine_snapshot
-def test_simple_join_to_time_spine(  # noqa: D
+def test_simple_join_to_time_spine(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,

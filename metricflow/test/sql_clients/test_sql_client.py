@@ -21,7 +21,7 @@ def _random_table() -> str:
     return f"test_table_{random_id()}"
 
 
-def _select_x_as_y(x: int = 1, y: str = "y") -> str:  # noqa: D
+def _select_x_as_y(x: int = 1, y: str = "y") -> str:
     return f"SELECT {x} AS {y}"
 
 
@@ -38,18 +38,18 @@ def _check_1col(df: pd.DataFrame, col: str = "y", vals: Set[Union[int, str]] = {
     assert set(df[col]) == vals
 
 
-def test_query(sql_client: SqlClient) -> None:  # noqa: D
+def test_query(sql_client: SqlClient) -> None:  # noqa: D103
     df = sql_client.query(_select_x_as_y())
     _check_1col(df)
 
 
-def test_select_one_query(sql_client: SqlClient) -> None:  # noqa: D
+def test_select_one_query(sql_client: SqlClient) -> None:  # noqa: D103
     sql_client.query("SELECT 1")
     with pytest.raises(Exception):
         sql_client.query("this is garbage")
 
 
-def test_create_table_from_dataframe(  # noqa: D
+def test_create_table_from_dataframe(  # noqa: D103
     mf_test_configuration: MetricFlowTestConfiguration, ddl_sql_client: SqlClientWithDDLMethods
 ) -> None:
     expected_df = pd.DataFrame(
@@ -93,7 +93,7 @@ def example_df() -> pd.DataFrame:
     )
 
 
-def test_dry_run(mf_test_configuration: MetricFlowTestConfiguration, sql_client: SqlClient) -> None:  # noqa: D
+def test_dry_run(mf_test_configuration: MetricFlowTestConfiguration, sql_client: SqlClient) -> None:  # noqa: D103
     test_table = SqlTable(schema_name=mf_test_configuration.mf_system_schema, table_name=_random_table())
 
     stmt = f"CREATE TABLE {test_table.sql} AS SELECT 1 AS foo"
@@ -112,7 +112,7 @@ def test_dry_run(mf_test_configuration: MetricFlowTestConfiguration, sql_client:
     ), f"Expected an exception about table {match} not found, but got `{exception_message}`"
 
 
-def test_dry_run_of_bad_query_raises_exception(sql_client: SqlClient) -> None:  # noqa: D
+def test_dry_run_of_bad_query_raises_exception(sql_client: SqlClient) -> None:  # noqa: D103
     bad_stmt = "SELECT bad_col"
     # Tests that a bad query raises an exception. Different engines may raise different exceptions e.g.
     # ProgrammingError, OperationalError, google.api_core.exceptions.BadRequest, etc.
@@ -120,14 +120,14 @@ def test_dry_run_of_bad_query_raises_exception(sql_client: SqlClient) -> None:  
         sql_client.dry_run(bad_stmt)
 
 
-def test_update_params_with_same_item() -> None:  # noqa: D
+def test_update_params_with_same_item() -> None:  # noqa: D103
     bind_params0 = SqlBindParameters.create_from_dict({"key": "value"})
     bind_params1 = SqlBindParameters.create_from_dict({"key": "value"})
 
     bind_params0.combine(bind_params1)
 
 
-def test_update_params_with_same_key_different_values() -> None:  # noqa: D
+def test_update_params_with_same_key_different_values() -> None:  # noqa: D103
     bind_params0 = SqlBindParameters.create_from_dict(({"key": "value0"}))
     bind_params1 = SqlBindParameters.create_from_dict(({"key": "value1"}))
 

@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 @pytest.fixture(scope="session")
-def specs() -> Sequence[LinkableInstanceSpec]:  # noqa: D
+def specs() -> Sequence[LinkableInstanceSpec]:  # noqa: D103
     return (
         # Time dimensions
         MTD_SPEC_WEEK,
@@ -69,7 +69,7 @@ def test_valid_parameter_fields() -> None:
         assert spec_field.value in parameter_set_dict, f"{spec_field} is not a valid field for {parameter_set}"
 
 
-def test_dimension_match(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa: D
+def test_dimension_match(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa: D103
     pattern = EntityLinkPattern(
         EntityLinkPatternParameterSet.from_parameters(
             element_name="is_instant",
@@ -88,7 +88,7 @@ def test_dimension_match(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa
     )
 
 
-def test_entity_match(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa: D
+def test_entity_match(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa: D103
     pattern = EntityLinkPattern(
         EntityLinkPatternParameterSet.from_parameters(
             element_name="listing",
@@ -107,7 +107,7 @@ def test_entity_match(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa: D
     )
 
 
-def test_time_dimension_match(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa: D
+def test_time_dimension_match(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa: D103
     pattern = EntityLinkPattern(
         EntityLinkPatternParameterSet.from_parameters(
             element_name=METRIC_TIME_ELEMENT_NAME,
@@ -125,7 +125,7 @@ def test_time_dimension_match(specs: Sequence[LinkableInstanceSpec]) -> None:  #
     assert tuple(pattern.match(specs)) == (MTD_SPEC_WEEK,)
 
 
-def test_time_dimension_match_without_grain_specified(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa: D
+def test_time_dimension_match_without_grain_specified(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa: D103
     pattern = EntityLinkPattern(
         EntityLinkPatternParameterSet.from_parameters(
             element_name=METRIC_TIME_ELEMENT_NAME,

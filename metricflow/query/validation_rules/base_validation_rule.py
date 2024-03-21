@@ -15,7 +15,7 @@ from metricflow.query.resolver_inputs.query_resolver_inputs import ResolverInput
 class PostResolutionQueryValidationRule(ABC):
     """A validation rule that runs after all query inputs have been resolved to specs."""
 
-    def __init__(self, manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D
+    def __init__(self, manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D107
         self._manifest_lookup = manifest_lookup
 
     def _get_metric(self, metric_reference: MetricReference) -> Metric:

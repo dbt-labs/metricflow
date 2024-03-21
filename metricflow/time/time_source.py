@@ -11,5 +11,5 @@ class TimeSource(ABC):
     """
 
     @abstractmethod
-    def get_time(self) -> datetime:  # noqa: D
+    def get_time(self) -> datetime:  # noqa: D102
         pass

@@ -89,7 +89,7 @@ def test_no_parent_node_data_set(
     assert resolver.get_output_data_set(node).instance_set == data_set.instance_set
 
 
-def test_joined_node_data_set(  # noqa: D
+def test_joined_node_data_set(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],

@@ -36,7 +36,7 @@ class OrderByLimitNode(ComputedMetricsOutput):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=(self._parent_node,))
 
     @classmethod
-    def id_prefix(cls) -> IdPrefix:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D102
         return StaticIdPrefix.DATAFLOW_NODE_ORDER_BY_LIMIT_ID_PREFIX
 
     @property
@@ -49,17 +49,17 @@ class OrderByLimitNode(ComputedMetricsOutput):
         """The number of rows to limit by."""
         return self._limit
 
-    def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_order_by_limit_node(self)
 
     @property
-    def description(self) -> str:  # noqa: D
+    def description(self) -> str:  # noqa: D102
         return f"Order By {[order_by_spec.instance_spec.qualified_name for order_by_spec in self._order_by_specs]}" + (
             f" Limit {self._limit}" if self.limit else ""
         )
 
     @property
-    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
         return (
             tuple(super().displayed_properties)
             + tuple(DisplayedProperty("order_by_spec", order_by_spec) for order_by_spec in self._order_by_specs)
@@ -67,17 +67,17 @@ class OrderByLimitNode(ComputedMetricsOutput):
         )
 
     @property
-    def parent_node(self) -> Union[BaseOutput, ComputedMetricsOutput]:  # noqa: D
+    def parent_node(self) -> Union[BaseOutput, ComputedMetricsOutput]:  # noqa: D102
         return self._parent_node
 
-    def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D
+    def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D102
         return (
             isinstance(other_node, self.__class__)
             and other_node.order_by_specs == self.order_by_specs
             and other_node.limit == self.limit
         )
 
-    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> OrderByLimitNode:  # noqa: D
+    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> OrderByLimitNode:  # noqa: D102
         assert len(new_parent_nodes) == 1
 
         return OrderByLimitNode(

@@ -34,7 +34,7 @@ class AnyEntityByNameRule(ColumnMatcherRule):
     only_applies_to_parent_signal = False
     match_reason = "Column name ends with `id`"
 
-    def match_column(self, props: ColumnProperties) -> bool:  # noqa: D
+    def match_column(self, props: ColumnProperties) -> bool:  # noqa: D102
         return props.column.column_name.lower().endswith("id")
 
 
@@ -52,7 +52,7 @@ class PrimaryEntityByNameRule(ColumnMatcherRule):
     only_applies_to_parent_signal = False
     match_reason = "Column name matches `(table_name?)(_?)id`"
 
-    def match_column(self, props: ColumnProperties) -> bool:  # noqa: D
+    def match_column(self, props: ColumnProperties) -> bool:  # noqa: D102
         col_lower = props.column.column_name.lower()
         table_lower = props.column.table_name.lower().rstrip("s")
 
@@ -73,7 +73,7 @@ class UniqueEntityByDistinctCountRule(ColumnMatcherRule):
     only_applies_to_parent_signal = True
     match_reason = "The values in the column are unique"
 
-    def match_column(self, props: ColumnProperties) -> bool:  # noqa: D
+    def match_column(self, props: ColumnProperties) -> bool:  # noqa: D102
         return props.distinct_row_count == props.row_count
 
 
@@ -104,7 +104,7 @@ class TimeDimensionByTimeTypeRule(ColumnMatcherRule):
     only_applies_to_parent_signal = False
     match_reason = "Column type is time (TIME, DATE, DATETIME, TIMESTAMP)"
 
-    def match_column(self, props: ColumnProperties) -> bool:  # noqa: D
+    def match_column(self, props: ColumnProperties) -> bool:  # noqa: D102
         return props.type == InferenceColumnType.DATETIME
 
 
@@ -119,7 +119,7 @@ class PrimaryTimeDimensionByNameRule(ColumnMatcherRule):
     only_applies_to_parent_signal = False
     match_reason = "Column name is either of 'ds', 'created_at', 'created_date' or 'created_time'"
 
-    def match_column(self, props: ColumnProperties) -> bool:  # noqa: D
+    def match_column(self, props: ColumnProperties) -> bool:  # noqa: D102
         return props.column.column_name in ["ds", "created_at", "created_date", "created_time"]
 
 
@@ -129,7 +129,7 @@ class PrimaryTimeDimensionIfOnlyTimeRule(InferenceRule):
     It will always produce DIMENSION.PRIMARY_TIME signal with VERY_HIGH confidence.
     """
 
-    def process(self, warehouse: DataWarehouseInferenceContext) -> List[InferenceSignal]:  # noqa: D
+    def process(self, warehouse: DataWarehouseInferenceContext) -> List[InferenceSignal]:  # noqa: D102
         signals: List[InferenceSignal] = []
         for table_props in warehouse.tables.values():
             time_cols = [
@@ -159,7 +159,7 @@ class CategoricalDimensionByBooleanTypeRule(ColumnMatcherRule):
     only_applies_to_parent_signal = False
     match_reason = "Column type is BOOLEAN"
 
-    def match_column(self, props: ColumnProperties) -> bool:  # noqa: D
+    def match_column(self, props: ColumnProperties) -> bool:  # noqa: D102
         return props.type == InferenceColumnType.BOOLEAN
 
 
@@ -192,7 +192,7 @@ class CategoricalDimensionByStringTypeRule(ColumnMatcherRule):
     only_applies_to_parent_signal = True
     match_reason = "Column type is STRING"
 
-    def match_column(self, props: ColumnProperties) -> bool:  # noqa: D
+    def match_column(self, props: ColumnProperties) -> bool:  # noqa: D102
         return props.type == InferenceColumnType.STRING
 
 
@@ -207,7 +207,7 @@ class CategoricalDimensionByIntegerTypeRule(ColumnMatcherRule):
     only_applies_to_parent_signal = True
     match_reason = "Column type is INTEGER"
 
-    def match_column(self, props: ColumnProperties) -> bool:  # noqa: D
+    def match_column(self, props: ColumnProperties) -> bool:  # noqa: D102
         return props.type == InferenceColumnType.INTEGER
 
 
@@ -238,7 +238,7 @@ class MeasureByRealTypeRule(ColumnMatcherRule):
     only_applies_to_parent_signal = False
     match_reason = "Column type is real (FLOAT, DOUBLE, DOUBLE PRECISION)"
 
-    def match_column(self, props: ColumnProperties) -> bool:  # noqa: D
+    def match_column(self, props: ColumnProperties) -> bool:  # noqa: D102
         return props.type == InferenceColumnType.FLOAT
 
 
@@ -253,7 +253,7 @@ class MeasureByIntegerTypeRule(ColumnMatcherRule):
     only_applies_to_parent_signal = True
     match_reason = "Column type is INTEGER"
 
-    def match_column(self, props: ColumnProperties) -> bool:  # noqa: D
+    def match_column(self, props: ColumnProperties) -> bool:  # noqa: D102
         return props.type == InferenceColumnType.INTEGER
 
 

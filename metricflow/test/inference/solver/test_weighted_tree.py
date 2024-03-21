@@ -8,7 +8,7 @@ column = SqlColumn.from_string("db.schema.table.col")
 solver = WeightedTypeTreeInferenceSolver()
 
 
-def test_empty_signals_return_unknown() -> None:  # noqa: D
+def test_empty_signals_return_unknown() -> None:  # noqa: D103
     result = solver.solve_column(column, [])
 
     assert result.type_node == InferenceSignalType.UNKNOWN

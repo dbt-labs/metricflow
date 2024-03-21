@@ -17,11 +17,11 @@ class DedupeMetricInputMeasuresRule(ProtocolHint[SemanticManifestTransformRule[P
     """
 
     @override
-    def _implements_protocol(self) -> SemanticManifestTransformRule[PydanticSemanticManifest]:  # noqa: D
+    def _implements_protocol(self) -> SemanticManifestTransformRule[PydanticSemanticManifest]:
         return self
 
     @staticmethod
-    def transform_model(semantic_manifest: PydanticSemanticManifest) -> PydanticSemanticManifest:  # noqa: D
+    def transform_model(semantic_manifest: PydanticSemanticManifest) -> PydanticSemanticManifest:  # noqa: D102
         for metric in semantic_manifest.metrics:
             metric.type_params.input_measures = list(dict.fromkeys(metric.input_measures).keys())
         return semantic_manifest

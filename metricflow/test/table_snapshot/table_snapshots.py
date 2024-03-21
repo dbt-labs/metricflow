@@ -29,11 +29,11 @@ class SqlTableSnapshotHash:
     str_value: str
 
     @staticmethod
-    def create_from_hashes(hashes: Sequence[SqlTableSnapshotHash]) -> SqlTableSnapshotHash:  # noqa: D
+    def create_from_hashes(hashes: Sequence[SqlTableSnapshotHash]) -> SqlTableSnapshotHash:  # noqa: D102
         return SqlTableSnapshotHash(hash_items(tuple(one_hash.str_value for one_hash in hashes)))
 
 
-class SqlTableColumnType(Enum):  # noqa: D
+class SqlTableColumnType(Enum):  # noqa: D101
     STRING = "STRING"
     TIME = "TIME"
     FLOAT = "FLOAT"
@@ -45,14 +45,14 @@ class SqlTableColumnDefinition(FrozenBaseModel):
     """Pydantic class to help parse column definitions in a table snapshots that are defined in YAML."""
 
     # Pydantic feature to throw errors on extra fields.
-    class Config:  # noqa: D
+    class Config:  # noqa: D106
         extra = "forbid"
 
     name: str
     type: SqlTableColumnType
 
 
-class SqlTableSnapshotTypeException(Exception):  # noqa: D
+class SqlTableSnapshotTypeException(Exception):  # noqa: D101
     pass
 
 
@@ -60,7 +60,7 @@ class SqlTableSnapshot(FrozenBaseModel):
     """Pydantic class to help parse table snapshots that are defined in YAML."""
 
     # Pydantic feature to throw errors on extra fields.
-    class Config:  # noqa: D
+    class Config:  # noqa: D106
         extra = "forbid"
 
     table_name: str
@@ -81,7 +81,7 @@ class SqlTableSnapshot(FrozenBaseModel):
         )
 
     @staticmethod
-    def _parse_bool_str(bool_str: str) -> bool:  # noqa: D
+    def _parse_bool_str(bool_str: str) -> bool:
         if bool_str.lower() == "false":
             return False
         elif bool_str.lower() == "true":
@@ -90,7 +90,7 @@ class SqlTableSnapshot(FrozenBaseModel):
             raise RuntimeError(f"Invalid string representation of a boolean: {bool_str}")
 
     @property
-    def as_df(self) -> pd.DataFrame:  # noqa: D
+    def as_df(self) -> pd.DataFrame:
         """Return this snapshot as represented by an equivalent dataframe."""
         # In the YAML files, all values are strings, but they need to be converted to defined type so that it can be
         # properly represented in a dataframe
@@ -125,11 +125,11 @@ class SqlTableSnapshot(FrozenBaseModel):
 class SqlTableSnapshotLoader:
     """Loads a snapshot of a table into the SQL engine."""
 
-    def __init__(self, ddl_sql_client: SqlClientWithDDLMethods, schema_name: str) -> None:  # noqa: D
+    def __init__(self, ddl_sql_client: SqlClientWithDDLMethods, schema_name: str) -> None:  # noqa: D107
         self._ddl_sql_client = ddl_sql_client
         self._schema_name = schema_name
 
-    def load(self, table_snapshot: SqlTableSnapshot) -> None:  # noqa: D
+    def load(self, table_snapshot: SqlTableSnapshot) -> None:  # noqa: D102
         sql_table = SqlTable(schema_name=self._schema_name, table_name=table_snapshot.table_name)
 
         self._ddl_sql_client.create_table_from_dataframe(
@@ -140,11 +140,11 @@ class SqlTableSnapshotLoader:
         )
 
 
-class TableSnapshotException(Exception):  # noqa: D
+class TableSnapshotException(Exception):  # noqa: D101
     pass
 
 
-class TableSnapshotParseException(TableSnapshotException):  # noqa: D
+class TableSnapshotParseException(TableSnapshotException):  # noqa: D101
     pass
 
 
@@ -214,7 +214,7 @@ class SqlTableSnapshotRepository:
         return results
 
     @staticmethod
-    def _find_all_yaml_file_paths(directory: Path) -> Sequence[Path]:  # noqa: D
+    def _find_all_yaml_file_paths(directory: Path) -> Sequence[Path]:
         """Recursively search through the given directory for YAML files."""
         yaml_file_paths = []
 
@@ -226,7 +226,7 @@ class SqlTableSnapshotRepository:
         return sorted(yaml_file_paths)
 
     @property
-    def table_snapshots(self) -> Sequence[SqlTableSnapshot]:  # noqa: D
+    def table_snapshots(self) -> Sequence[SqlTableSnapshot]:  # noqa: D102
         # tuple(self._table_snapshots.values()) shows a type warning
         return sorted(
             tuple(table_snapshot for table_snapshot in self._table_snapshots.values()),

@@ -117,7 +117,7 @@ class MeasureSpecProperties:
 class DataflowPlanBuilder:
     """Builds a dataflow plan to satisfy a given query."""
 
-    def __init__(  # noqa: D
+    def __init__(  # noqa: D107
         self,
         source_node_set: SourceNodeSet,
         semantic_manifest_lookup: SemanticManifestLookup,

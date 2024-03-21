@@ -25,7 +25,7 @@ class ObjectBuilderNameConverter:
     """
 
     @staticmethod
-    def input_str_from_entity_call_parameter_set(parameter_set: EntityCallParameterSet) -> str:  # noqa: D
+    def input_str_from_entity_call_parameter_set(parameter_set: EntityCallParameterSet) -> str:  # noqa: D102
         initializer_parameter_str = ObjectBuilderNameConverter.initializer_parameter_str(
             element_name=parameter_set.entity_reference.element_name,
             entity_links=parameter_set.entity_path,
@@ -101,7 +101,7 @@ class ObjectBuilderNameConverter:
             return names_to_return
 
     @staticmethod
-    def input_str_from_spec(instance_spec: InstanceSpec) -> str:  # noqa: D
+    def input_str_from_spec(instance_spec: InstanceSpec) -> str:  # noqa: D102
         names = ObjectBuilderNameConverter._ObjectBuilderNameTransform().transform(
             InstanceSpecSet.from_specs((instance_spec,))
         )
@@ -112,7 +112,7 @@ class ObjectBuilderNameConverter:
         return names[0]
 
     @staticmethod
-    def input_str_from_dimension_call_parameter_set(parameter_set: DimensionCallParameterSet) -> str:  # noqa: D
+    def input_str_from_dimension_call_parameter_set(parameter_set: DimensionCallParameterSet) -> str:  # noqa: D102
         initializer_parameter_str = ObjectBuilderNameConverter.initializer_parameter_str(
             element_name=parameter_set.dimension_reference.element_name,
             entity_links=parameter_set.entity_path,
@@ -122,7 +122,7 @@ class ObjectBuilderNameConverter:
         return f"Dimension({initializer_parameter_str})"
 
     @staticmethod
-    def input_str_from_time_dimension_call_parameter_set(  # noqa: D
+    def input_str_from_time_dimension_call_parameter_set(  # noqa: D102
         parameter_set: TimeDimensionCallParameterSet,
     ) -> str:
         initializer_parameter_str = ObjectBuilderNameConverter.initializer_parameter_str(

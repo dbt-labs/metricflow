@@ -23,7 +23,7 @@ class MetricQueryParameter(Protocol):
         raise NotImplementedError
 
     @property
-    def query_resolver_input(self) -> ResolverInputForMetric:  # noqa: D
+    def query_resolver_input(self) -> ResolverInputForMetric:  # noqa: D102
         raise NotImplementedError
 
 
@@ -37,12 +37,12 @@ class DimensionOrEntityQueryParameter(Protocol):
         raise NotImplementedError
 
     @property
-    def query_resolver_input(self) -> ResolverInputForGroupByItem:  # noqa: D
+    def query_resolver_input(self) -> ResolverInputForGroupByItem:  # noqa: D102
         raise NotImplementedError
 
 
 @runtime_checkable
-class TimeDimensionQueryParameter(Protocol):  # noqa: D
+class TimeDimensionQueryParameter(Protocol):  # noqa: D101
     @property
     def name(self) -> str:
         """The name of the item."""
@@ -59,7 +59,7 @@ class TimeDimensionQueryParameter(Protocol):  # noqa: D
         raise NotImplementedError
 
     @property
-    def query_resolver_input(self) -> ResolverInputForGroupByItem:  # noqa: D
+    def query_resolver_input(self) -> ResolverInputForGroupByItem:  # noqa: D102
         raise NotImplementedError
 
 
@@ -81,7 +81,7 @@ class OrderByQueryParameter(Protocol):
         raise NotImplementedError
 
     @property
-    def query_resolver_input(self) -> ResolverInputForOrderByItem:  # noqa: D
+    def query_resolver_input(self) -> ResolverInputForOrderByItem:  # noqa: D102
         raise NotImplementedError
 
 
@@ -89,5 +89,5 @@ class SavedQueryParameter(Protocol):
     """Name of the saved query to execute."""
 
     @property
-    def name(self) -> str:  # noqa: D
+    def name(self) -> str:  # noqa: D102
         raise NotImplementedError

@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 @pytest.fixture(scope="session")
-def specs() -> Sequence[LinkableInstanceSpec]:  # noqa: D
+def specs() -> Sequence[LinkableInstanceSpec]:  # noqa: D103
     return (
         # Time dimensions
         TimeDimensionSpec(
@@ -48,7 +48,7 @@ def specs() -> Sequence[LinkableInstanceSpec]:  # noqa: D
     )
 
 
-def test_dimension_pattern(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa: D
+def test_dimension_pattern(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa: D103
     pattern = DimensionPattern.from_call_parameter_set(
         DimensionCallParameterSet(
             entity_path=(EntityReference("booking"), EntityReference("listing")),
@@ -76,7 +76,7 @@ def test_dimension_pattern(specs: Sequence[LinkableInstanceSpec]) -> None:  # no
     )
 
 
-def test_time_dimension_pattern(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa: D
+def test_time_dimension_pattern(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa: D103
     pattern = TimeDimensionPattern.from_call_parameter_set(
         TimeDimensionCallParameterSet(
             entity_path=(EntityReference("booking"), EntityReference("listing")),
@@ -94,7 +94,7 @@ def test_time_dimension_pattern(specs: Sequence[LinkableInstanceSpec]) -> None: 
     )
 
 
-def test_time_dimension_pattern_with_date_part(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa: D
+def test_time_dimension_pattern_with_date_part(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa: D103
     pattern = TimeDimensionPattern.from_call_parameter_set(
         TimeDimensionCallParameterSet(
             entity_path=(EntityReference("booking"), EntityReference("listing")),
@@ -113,7 +113,7 @@ def test_time_dimension_pattern_with_date_part(specs: Sequence[LinkableInstanceS
     )
 
 
-def test_entity_pattern(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa: D
+def test_entity_pattern(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa: D103
     pattern = EntityPattern.from_call_parameter_set(
         EntityCallParameterSet(
             entity_path=(EntityReference("booking"), EntityReference("listing")),

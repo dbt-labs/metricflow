@@ -17,7 +17,7 @@ class ModifyInputMetricFilterTransform(SemanticManifestTransformRule[PydanticSem
     This is useful for programmatically generating different manifests to create different test cases.
     """
 
-    def __init__(  # noqa: D
+    def __init__(  # noqa: D107
         self,
         metric_reference: MetricReference,
         where_filter_intersection: PydanticWhereFilterIntersection,

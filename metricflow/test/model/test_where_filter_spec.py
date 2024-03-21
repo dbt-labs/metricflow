@@ -76,7 +76,7 @@ def create_where_filter_intersection(sql_template: str) -> WhereFilterIntersecti
     return PydanticWhereFilterIntersection(where_filters=[PydanticWhereFilter(where_sql_template=sql_template)])
 
 
-def test_dimension_in_filter(  # noqa: D
+def test_dimension_in_filter(  # noqa: D103
     column_association_resolver: ColumnAssociationResolver,
 ) -> None:
     where_filter_specs = WhereSpecFactory(
@@ -104,7 +104,7 @@ def test_dimension_in_filter(  # noqa: D
     )
 
 
-def test_dimension_in_filter_with_grain(  # noqa: D
+def test_dimension_in_filter_with_grain(  # noqa: D103
     column_association_resolver: ColumnAssociationResolver,
 ) -> None:
     where_filter_specs = WhereSpecFactory(
@@ -143,7 +143,7 @@ def test_dimension_in_filter_with_grain(  # noqa: D
     )
 
 
-def test_time_dimension_in_filter(  # noqa: D
+def test_time_dimension_in_filter(  # noqa: D103
     column_association_resolver: ColumnAssociationResolver,
 ) -> None:
     where_filter_specs = WhereSpecFactory(
@@ -182,7 +182,7 @@ def test_time_dimension_in_filter(  # noqa: D
     )
 
 
-def test_date_part_in_filter(  # noqa: D
+def test_date_part_in_filter(  # noqa: D103
     column_association_resolver: ColumnAssociationResolver,
 ) -> None:
     where_filter_specs = WhereSpecFactory(
@@ -265,7 +265,7 @@ def resolved_spec_lookup() -> FilterSpecResolutionLookUp:
         ("{{ Dimension('metric_time').grain('WEEK').date_part('year') }} = '2020'"),
     ),
 )
-def test_date_part_and_grain_in_filter(  # noqa: D
+def test_date_part_and_grain_in_filter(  # noqa: D103
     column_association_resolver: ColumnAssociationResolver,
     resolved_spec_lookup: FilterSpecResolutionLookUp,
     where_sql: str,
@@ -301,7 +301,7 @@ def test_date_part_and_grain_in_filter(  # noqa: D
         ("{{ Dimension('metric_time').grain('WEEK').date_part('day') }} = '2020'"),
     ),
 )
-def test_date_part_less_than_grain_in_filter(  # noqa: D
+def test_date_part_less_than_grain_in_filter(  # noqa: D103
     column_association_resolver: ColumnAssociationResolver,
     resolved_spec_lookup: FilterSpecResolutionLookUp,
     where_sql: str,
@@ -328,7 +328,7 @@ def test_date_part_less_than_grain_in_filter(  # noqa: D
     )
 
 
-def test_entity_in_filter(  # noqa: D
+def test_entity_in_filter(  # noqa: D103
     column_association_resolver: ColumnAssociationResolver,
     resolved_spec_lookup: FilterSpecResolutionLookUp,
 ) -> None:

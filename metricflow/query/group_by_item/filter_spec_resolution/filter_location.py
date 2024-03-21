@@ -21,13 +21,13 @@ class WhereFilterLocation:
     # These should be sorted for consistency in comparisons.
     metric_references: Tuple[MetricReference, ...]
 
-    def __post_init__(self) -> None:  # noqa: D
+    def __post_init__(self) -> None:  # noqa: D105
         assert is_sorted(self.metric_references)
 
     @staticmethod
-    def for_query(metric_references: Sequence[MetricReference]) -> WhereFilterLocation:  # noqa: D
+    def for_query(metric_references: Sequence[MetricReference]) -> WhereFilterLocation:  # noqa: D102
         return WhereFilterLocation(metric_references=tuple(sorted(metric_references)))
 
     @staticmethod
-    def for_metric(metric_reference: MetricReference) -> WhereFilterLocation:  # noqa: D
+    def for_metric(metric_reference: MetricReference) -> WhereFilterLocation:  # noqa: D102
         return WhereFilterLocation(metric_references=(metric_reference,))

@@ -42,7 +42,7 @@ def test_metric_time_only(
 
 
 @pytest.mark.sql_engine_snapshot
-def test_metric_time_quarter_alone(  # noqa:D
+def test_metric_time_quarter_alone(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -69,7 +69,7 @@ def test_metric_time_quarter_alone(  # noqa:D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_metric_time_with_other_dimensions(  # noqa:D
+def test_metric_time_with_other_dimensions(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -96,7 +96,7 @@ def test_metric_time_with_other_dimensions(  # noqa:D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_dimensions_with_time_constraint(  # noqa:D
+def test_dimensions_with_time_constraint(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,

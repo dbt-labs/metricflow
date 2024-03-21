@@ -13,11 +13,11 @@ from metricflow.test.time.metric_time_dimension import MTD_SPEC_MONTH, MTD_SPEC_
 
 
 @pytest.fixture(scope="session")
-def object_builder_naming_scheme() -> ObjectBuilderNamingScheme:  # noqa: D
+def object_builder_naming_scheme() -> ObjectBuilderNamingScheme:  # noqa: D103
     return ObjectBuilderNamingScheme()
 
 
-def test_input_str(object_builder_naming_scheme: ObjectBuilderNamingScheme) -> None:  # noqa: D
+def test_input_str(object_builder_naming_scheme: ObjectBuilderNamingScheme) -> None:  # noqa: D103
     assert (
         object_builder_naming_scheme.input_str(
             DimensionSpec(
@@ -48,7 +48,7 @@ def test_input_str(object_builder_naming_scheme: ObjectBuilderNamingScheme) -> N
     )
 
 
-def test_input_follows_scheme(object_builder_naming_scheme: ObjectBuilderNamingScheme) -> None:  # noqa: D
+def test_input_follows_scheme(object_builder_naming_scheme: ObjectBuilderNamingScheme) -> None:  # noqa: D103
     assert object_builder_naming_scheme.input_str_follows_scheme(
         "Dimension('listing__country', entity_path=['booking'])"
     )
@@ -64,7 +64,7 @@ def test_input_follows_scheme(object_builder_naming_scheme: ObjectBuilderNamingS
     assert not object_builder_naming_scheme.input_str_follows_scheme("NotADimension('listing__country')")
 
 
-def test_spec_pattern(  # noqa: D
+def test_spec_pattern(  # noqa: D103
     object_builder_naming_scheme: ObjectBuilderNamingScheme, specs: Sequence[LinkableInstanceSpec]
 ) -> None:
     assert tuple(

@@ -1,4 +1,5 @@
 """These tests rely on the pytest tmp_path factory fixture."""
+
 from __future__ import annotations
 
 import os
@@ -14,12 +15,12 @@ from metricflow.sql.sql_column import SqlColumn
 yaml = YAML()
 
 
-def test_no_overwrite_with_existing_dir(tmpdir: Path) -> None:  # noqa: D
+def test_no_overwrite_with_existing_dir(tmpdir: Path) -> None:  # noqa: D103
     with pytest.raises(ValueError):
         ConfigFileRenderer(tmpdir, False)
 
 
-def test_dir_path_is_file(tmpdir: Path) -> None:  # noqa: D
+def test_dir_path_is_file(tmpdir: Path) -> None:  # noqa: D103
     file_path = os.path.join(tmpdir, "file.txt")
     with open(file_path, "w") as f:
         f.write("file contents!")
@@ -28,7 +29,7 @@ def test_dir_path_is_file(tmpdir: Path) -> None:  # noqa: D
         ConfigFileRenderer(file_path, False)
 
 
-def test_render_configs(tmpdir: Path) -> None:  # noqa: D
+def test_render_configs(tmpdir: Path) -> None:  # noqa: D103
     inference_results = [
         InferenceResult(
             column=SqlColumn.from_string("db.schema.test_table.id"),

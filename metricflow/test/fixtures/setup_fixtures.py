@@ -56,11 +56,11 @@ OVERWRITE_SNAPSHOTS_CLI_FLAG = "--overwrite-snapshots"
 USE_PERSISTENT_SOURCE_SCHEMA_CLI_FLAG = "--use-persistent-source-schema"
 
 
-def add_display_snapshots_cli_flag(parser: _pytest.config.argparsing.Parser) -> None:  # noqa: D
+def add_display_snapshots_cli_flag(parser: _pytest.config.argparsing.Parser) -> None:  # noqa: D103
     parser.addoption(DISPLAY_SNAPSHOTS_CLI_FLAG, action="store_true", help="Displays snapshots in a browser if set")
 
 
-def add_overwrite_snapshots_cli_flag(parser: _pytest.config.argparsing.Parser) -> None:  # noqa: D
+def add_overwrite_snapshots_cli_flag(parser: _pytest.config.argparsing.Parser) -> None:  # noqa: D103
     parser.addoption(
         OVERWRITE_SNAPSHOTS_CLI_FLAG,
         action="store_true",
@@ -68,7 +68,7 @@ def add_overwrite_snapshots_cli_flag(parser: _pytest.config.argparsing.Parser) -
     )
 
 
-def add_display_graphs_cli_flag(parser: _pytest.config.argparsing.Parser) -> None:  # noqa: D
+def add_display_graphs_cli_flag(parser: _pytest.config.argparsing.Parser) -> None:  # noqa: D103
     parser.addoption(
         DISPLAY_GRAPHS_CLI_FLAG,
         action="store_true",
@@ -76,7 +76,7 @@ def add_display_graphs_cli_flag(parser: _pytest.config.argparsing.Parser) -> Non
     )
 
 
-def add_use_persistent_source_schema_cli_flag(parser: _pytest.config.argparsing.Parser) -> None:  # noqa: D
+def add_use_persistent_source_schema_cli_flag(parser: _pytest.config.argparsing.Parser) -> None:  # noqa: D103
     parser.addoption(
         USE_PERSISTENT_SOURCE_SCHEMA_CLI_FLAG,
         action="store_true",
@@ -116,7 +116,7 @@ def check_sql_engine_snapshot_marker(request: FixtureRequest) -> None:
 
 
 @pytest.fixture(scope="session")
-def mf_test_configuration(  # noqa: D
+def mf_test_configuration(  # noqa: D103
     request: FixtureRequest,
     disable_sql_alchemy_deprecation_warning: None,
     source_table_snapshot_repository: SqlTableSnapshotRepository,
@@ -203,7 +203,7 @@ def dbt_project_dir() -> str:
 
 
 @pytest.fixture(scope="session", autouse=True)
-def warn_user_about_slow_tests_without_parallelism(  # noqa: D
+def warn_user_about_slow_tests_without_parallelism(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
 ) -> None:

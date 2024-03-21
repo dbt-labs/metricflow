@@ -38,7 +38,7 @@ class CumulativeMetricRequiresMetricTimeIssue(MetricFlowQueryResolutionIssue):
         )
 
     @staticmethod
-    def from_parameters(  # noqa: D
+    def from_parameters(  # noqa: D102
         metric_reference: MetricReference, query_resolution_path: MetricFlowQueryResolutionPath
     ) -> CumulativeMetricRequiresMetricTimeIssue:
         return CumulativeMetricRequiresMetricTimeIssue(

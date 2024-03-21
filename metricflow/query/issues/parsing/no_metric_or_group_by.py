@@ -20,7 +20,7 @@ class NoMetricOrGroupByIssue(MetricFlowQueryResolutionIssue):
     resolver_input_for_query: ResolverInputForQuery
 
     @staticmethod
-    def from_parameters(  # noqa: D
+    def from_parameters(  # noqa: D102
         resolver_input_for_query: ResolverInputForQuery, query_resolution_path: MetricFlowQueryResolutionPath
     ) -> NoMetricOrGroupByIssue:
         return NoMetricOrGroupByIssue(

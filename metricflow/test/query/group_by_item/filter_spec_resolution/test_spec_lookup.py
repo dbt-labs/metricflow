@@ -3,6 +3,7 @@
 This currently only tests filters in the query, but filters can be in other locations. Those will be tested later in
 more detail through the query parser.
 """
+
 from __future__ import annotations
 
 import logging
@@ -40,7 +41,7 @@ from metricflow.test.snapshot_utils import assert_str_snapshot_equal
 logger = logging.getLogger(__name__)
 
 
-def assert_spec_lookup_snapshot_equal(  # noqa: D
+def assert_spec_lookup_snapshot_equal(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     spec_lookup: FilterSpecResolutionLookUp,
@@ -54,7 +55,7 @@ def assert_spec_lookup_snapshot_equal(  # noqa: D
 
 
 @pytest.mark.parametrize("dag_case_id", [case_id.value for case_id in AmbiguousResolutionQueryId])
-def test_filter_spec_resolution(  # noqa: D
+def test_filter_spec_resolution(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     naming_scheme: QueryItemNamingScheme,
@@ -78,7 +79,7 @@ def test_filter_spec_resolution(  # noqa: D
     )
 
 
-def check_resolution_with_filter(  # noqa: D
+def check_resolution_with_filter(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     semantic_manifest: PydanticSemanticManifest,
@@ -120,7 +121,7 @@ def check_resolution_with_filter(  # noqa: D
     )
 
 
-def test_filter_resolution_for_valid_metric_filter(  # noqa: D
+def test_filter_resolution_for_valid_metric_filter(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     ambiguous_resolution_manifest: PydanticSemanticManifest,
@@ -147,7 +148,7 @@ def test_filter_resolution_for_valid_metric_filter(  # noqa: D
     )
 
 
-def test_filter_resolution_for_invalid_metric_filter(  # noqa: D
+def test_filter_resolution_for_invalid_metric_filter(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     ambiguous_resolution_manifest: PydanticSemanticManifest,
@@ -174,7 +175,7 @@ def test_filter_resolution_for_invalid_metric_filter(  # noqa: D
     )
 
 
-def test_filter_resolution_for_valid_metric_input_filter(  # noqa: D
+def test_filter_resolution_for_valid_metric_input_filter(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     ambiguous_resolution_manifest: PydanticSemanticManifest,
@@ -201,7 +202,7 @@ def test_filter_resolution_for_valid_metric_input_filter(  # noqa: D
     )
 
 
-def test_filter_resolution_for_invalid_metric_input_filter(  # noqa: D
+def test_filter_resolution_for_invalid_metric_input_filter(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     ambiguous_resolution_manifest: PydanticSemanticManifest,

@@ -59,7 +59,7 @@ class QueryRenderingTools:
     time_spine_source: TimeSpineSource
     plan_converter: DataflowToSqlQueryPlanConverter
 
-    def __init__(self, manifest: SemanticManifest) -> None:  # noqa: D
+    def __init__(self, manifest: SemanticManifest) -> None:  # noqa: D107
         self.semantic_manifest_lookup = SemanticManifestLookup(semantic_manifest=manifest)
         self.source_node_builder = SourceNodeBuilder(
             column_association_resolver=DunderColumnAssociationResolver(self.semantic_manifest_lookup),
@@ -412,9 +412,7 @@ class DataWarehouseTaskBuilder:
         return tasks
 
     @staticmethod
-    def _gen_metric_task_query_and_params(
-        metric: Metric, mf_engine: MetricFlowEngine
-    ) -> Tuple[str, SqlBindParameters]:  # noqa: D
+    def _gen_metric_task_query_and_params(metric: Metric, mf_engine: MetricFlowEngine) -> Tuple[str, SqlBindParameters]:
         mf_query = MetricFlowQueryRequest.create_with_random_request_id(
             metric_names=[metric.name], group_by_names=[DataSet.metric_time_dimension_name()]
         )
@@ -456,7 +454,7 @@ class DataWarehouseModelValidator:
     them (assuming the manifest has passed these validations before use).
     """
 
-    def __init__(self, sql_client: SqlClient) -> None:  # noqa: D
+    def __init__(self, sql_client: SqlClient) -> None:  # noqa: D107
         self._sql_client = sql_client
 
     def run_tasks(

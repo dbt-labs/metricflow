@@ -181,7 +181,7 @@ class MetricAccessor(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_metric(self, metric_reference: MetricReference) -> Metric:  # noqa:D
+    def get_metric(self, metric_reference: MetricReference) -> Metric:  # noqa: D102
         raise NotImplementedError
 
     @abstractmethod

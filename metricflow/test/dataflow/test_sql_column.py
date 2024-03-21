@@ -4,7 +4,7 @@ from metricflow.sql.sql_column import SqlColumn
 from metricflow.sql.sql_table import SqlTable
 
 
-def test_sql_column() -> None:  # noqa: D
+def test_sql_column() -> None:  # noqa: D103
     sql_column = SqlColumn(
         table=SqlTable(db_name="test_db", schema_name="test_schema", table_name="test_table"), column_name="test_column"
     )

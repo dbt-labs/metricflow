@@ -10,28 +10,28 @@ from metricflow.visitor import VisitorOutputT
 class MinMaxNode(BaseOutput):
     """Calculate the min and max of a single instance data set."""
 
-    def __init__(self, parent_node: BaseOutput) -> None:  # noqa: D
+    def __init__(self, parent_node: BaseOutput) -> None:  # noqa: D107
         self._parent_node = parent_node
         super().__init__(node_id=self.create_unique_id(), parent_nodes=(parent_node,))
 
     @classmethod
-    def id_prefix(cls) -> IdPrefix:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D102
         return StaticIdPrefix.DATAFLOW_NODE_MIN_MAX_ID_PREFIX
 
-    def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_min_max_node(self)
 
     @property
-    def description(self) -> str:  # noqa: D
+    def description(self) -> str:  # noqa: D102
         return "Calculate min and max"
 
     @property
-    def parent_node(self) -> BaseOutput:  # noqa: D
+    def parent_node(self) -> BaseOutput:  # noqa: D102
         return self._parent_node
 
-    def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D
+    def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D102
         return isinstance(other_node, self.__class__)
 
-    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> MinMaxNode:  # noqa: D
+    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> MinMaxNode:  # noqa: D102
         assert len(new_parent_nodes) == 1
         return MinMaxNode(parent_node=new_parent_nodes[0])

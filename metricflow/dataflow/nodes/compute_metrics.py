@@ -17,7 +17,7 @@ from metricflow.visitor import VisitorOutputT
 class ComputeMetricsNode(ComputedMetricsOutput):
     """A node that computes metrics from input measures. Dimensions / entities are passed through."""
 
-    def __init__(self, parent_node: BaseOutput, metric_specs: Sequence[MetricSpec]) -> None:  # noqa: D
+    def __init__(self, parent_node: BaseOutput, metric_specs: Sequence[MetricSpec]) -> None:
         """Constructor.
 
         Args:
@@ -29,32 +29,32 @@ class ComputeMetricsNode(ComputedMetricsOutput):
         super().__init__(node_id=self.create_unique_id(), parent_nodes=(self._parent_node,))
 
     @classmethod
-    def id_prefix(cls) -> IdPrefix:  # noqa: D
+    def id_prefix(cls) -> IdPrefix:  # noqa: D102
         return StaticIdPrefix.DATAFLOW_NODE_COMPUTE_METRICS_ID_PREFIX
 
     @property
-    def metric_specs(self) -> Sequence[MetricSpec]:  # noqa: D
+    def metric_specs(self) -> Sequence[MetricSpec]:
         """The metric instances that this node is supposed to compute and should have in the output."""
         return self._metric_specs
 
-    def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_compute_metrics_node(self)
 
     @property
-    def description(self) -> str:  # noqa: D
+    def description(self) -> str:  # noqa: D102
         return """Compute Metrics via Expressions"""
 
     @property
-    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D
+    def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
         return tuple(super().displayed_properties) + tuple(
             DisplayedProperty("metric_spec", metric_spec) for metric_spec in self._metric_specs
         )
 
     @property
-    def parent_node(self) -> BaseOutput:  # noqa: D
+    def parent_node(self) -> BaseOutput:  # noqa: D102
         return self._parent_node
 
-    def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D
+    def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D102
         if not isinstance(other_node, self.__class__):
             return False
 
@@ -63,7 +63,7 @@ class ComputeMetricsNode(ComputedMetricsOutput):
 
         return isinstance(other_node, self.__class__) and other_node.metric_specs == self.metric_specs
 
-    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> ComputeMetricsNode:  # noqa: D
+    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> ComputeMetricsNode:  # noqa: D102
         assert len(new_parent_nodes) == 1
         return ComputeMetricsNode(
             parent_node=new_parent_nodes[0],

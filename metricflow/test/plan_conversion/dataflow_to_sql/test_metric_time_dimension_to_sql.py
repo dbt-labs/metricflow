@@ -18,7 +18,7 @@ from metricflow.test.time.metric_time_dimension import MTD_SPEC_DAY
 
 
 @pytest.mark.sql_engine_snapshot
-def test_metric_time_dimension_transform_node_using_primary_time(  # noqa: D
+def test_metric_time_dimension_transform_node_using_primary_time(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
@@ -42,7 +42,7 @@ def test_metric_time_dimension_transform_node_using_primary_time(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_metric_time_dimension_transform_node_using_non_primary_time(  # noqa: D
+def test_metric_time_dimension_transform_node_using_non_primary_time(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,

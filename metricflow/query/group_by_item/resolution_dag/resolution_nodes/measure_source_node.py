@@ -17,7 +17,7 @@ from metricflow.visitor import VisitorOutputT
 class MeasureGroupByItemSourceNode(GroupByItemResolutionNode):
     """Outputs group-by-items for a measure."""
 
-    def __init__(  # noqa: D
+    def __init__(
         self,
         measure_reference: MeasureReference,
         child_metric_reference: MetricReference,
@@ -66,7 +66,7 @@ class MeasureGroupByItemSourceNode(GroupByItemResolutionNode):
         )
 
     @property
-    def measure_reference(self) -> MeasureReference:  # noqa: D
+    def measure_reference(self) -> MeasureReference:  # noqa: D102
         return self._measure_reference
 
     @property

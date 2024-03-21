@@ -33,7 +33,7 @@ class RequiredDwEngineFeatures(Enum):
     APPROXIMATE_CONTINUOUS_PERCENTILE_AGGREGATION = "APPROXIMATE_CONTINUOUS_PERCENTILE_AGGREGATION"
     APPROXIMATE_DISCRETE_PERCENTILE_AGGREGATION = "APPROXIMATE_DISCRETE_PERCENTILE_AGGREGATION"
 
-    def __repr__(self) -> str:  # noqa: D
+    def __repr__(self) -> str:  # noqa: D105
         return f"{self.__class__.__name__}.{self.name}"
 
 
@@ -41,7 +41,7 @@ class ConfiguredIntegrationTestCase(FrozenBaseModel):
     """Integration test case parsed from YAML files."""
 
     # Pydantic feature to throw errors on extra fields.
-    class Config:  # noqa: D
+    class Config:  # noqa: D106
         extra = "forbid"
 
     # Name of the test.
@@ -133,7 +133,7 @@ class ConfiguredIntegrationTestCaseRepository:
         return results
 
     @staticmethod
-    def _find_all_yaml_file_paths(directory: str) -> Sequence[str]:  # noqa: D
+    def _find_all_yaml_file_paths(directory: str) -> Sequence[str]:
         """Recursively search through the given directory for YAML files."""
         test_case_file_paths = []
 

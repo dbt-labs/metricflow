@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 @pytest.fixture
-def multi_hop_query_parser(  # noqa: D
+def multi_hop_query_parser(  # noqa: D103
     simple_multi_hop_join_manifest_lookup: SemanticManifestLookup,
 ) -> MetricFlowQueryParser:
     return MetricFlowQueryParser(
@@ -27,7 +27,7 @@ def multi_hop_query_parser(  # noqa: D
     )
 
 
-def test_resolvable_ambiguous_entity_path(  # noqa: D
+def test_resolvable_ambiguous_entity_path(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     multi_hop_query_parser: MetricFlowQueryParser,

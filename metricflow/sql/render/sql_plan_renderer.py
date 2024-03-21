@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
-class SqlPlanRenderResult:  # noqa: D
+class SqlPlanRenderResult:  # noqa: D101
     # The SQL string that could be run.
     sql: str
     # The execution parameters that should be specified along with the SQL str to execute()
@@ -41,15 +41,15 @@ class SqlPlanRenderResult:  # noqa: D
 class SqlQueryPlanRenderer(SqlQueryPlanNodeVisitor[SqlPlanRenderResult], ABC):
     """Renders SQL plans to a string."""
 
-    def _render_node(self, node: SqlQueryPlanNode) -> SqlPlanRenderResult:  # noqa: D
+    def _render_node(self, node: SqlQueryPlanNode) -> SqlPlanRenderResult:
         return node.accept(self)
 
-    def render_sql_query_plan(self, sql_query_plan: SqlQueryPlan) -> SqlPlanRenderResult:  # noqa: D
+    def render_sql_query_plan(self, sql_query_plan: SqlQueryPlan) -> SqlPlanRenderResult:  # noqa: D102
         return self._render_node(sql_query_plan.render_node)
 
     @property
     @abstractmethod
-    def expr_renderer(self) -> SqlExpressionRenderer:  # noqa: D
+    def expr_renderer(self) -> SqlExpressionRenderer:
         """Return the renderer that this uses to render expressions."""
         pass
 
@@ -223,7 +223,7 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
 
         return "\n".join(group_by_section_lines), params
 
-    def visit_select_statement_node(self, node: SqlSelectStatementNode) -> SqlPlanRenderResult:  # noqa: D
+    def visit_select_statement_node(self, node: SqlSelectStatementNode) -> SqlPlanRenderResult:  # noqa: D102
         # Keep track of all execution parameters for all expressions
         combined_params = SqlBindParameters()
 
@@ -300,19 +300,19 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
             bind_parameters=combined_params,
         )
 
-    def visit_table_from_clause_node(self, node: SqlTableFromClauseNode) -> SqlPlanRenderResult:  # noqa: D
+    def visit_table_from_clause_node(self, node: SqlTableFromClauseNode) -> SqlPlanRenderResult:  # noqa: D102
         return SqlPlanRenderResult(
             sql=node.sql_table.sql,
             bind_parameters=SqlBindParameters(),
         )
 
-    def visit_query_from_clause_node(self, node: SqlSelectQueryFromClauseNode) -> SqlPlanRenderResult:  # noqa: D
+    def visit_query_from_clause_node(self, node: SqlSelectQueryFromClauseNode) -> SqlPlanRenderResult:  # noqa: D102
         return SqlPlanRenderResult(
             sql=node.select_query.rstrip(),
             bind_parameters=SqlBindParameters(),
         )
 
-    def visit_create_table_as_node(self, node: SqlCreateTableAsNode) -> SqlPlanRenderResult:  # noqa: D
+    def visit_create_table_as_node(self, node: SqlCreateTableAsNode) -> SqlPlanRenderResult:  # noqa: D102
         inner_sql_render_result = node.parent_node.accept(self)
         inner_sql = inner_sql_render_result.sql
         # Using a substitution since inner_sql can have multiple lines, and then dedent() wouldn't dent due to the

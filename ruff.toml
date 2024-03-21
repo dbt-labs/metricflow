@@ -1,5 +1,5 @@
 # Enable pycodestyle (`E`) and Pyflakes (`F`) codes by default.
-select = [
+lint.select = [
     # Pyflakes
     "F",
     # Pycodestyle
@@ -10,7 +10,7 @@ select = [
     # isort
     "I",
 ]
-ignore = [
+lint.ignore = [
     # TODO: Fix these.
     # Lines longer than line-length. This is generally handled by Black.
     "E501",
@@ -32,12 +32,12 @@ ignore = [
 ]
 
 # Allow autofix for all enabled rules (when `--fix`) is provided.
-fixable = [
+lint.fixable = [
     "A", "B", "C", "D", "E", "F", "G", "I", "N", "Q", "S", "T", "W", "ANN", "ARG", "BLE", "COM", "DJ", "DTZ", "EM",
     "ERA", "EXE", "FBT", "ICN", "INP", "ISC", "NPY", "PD", "PGH", "PIE", "PL", "PT", "PTH", "PYI", "RET", "RSE", "RUF",
     "SIM", "SLF", "TCH", "TID", "TRY", "UP", "YTT"
 ]
-unfixable = []
+lint.unfixable = []
 
 # Exclude a variety of commonly ignored directories.
 exclude = [
@@ -67,17 +67,17 @@ exclude = [
 line-length = 120
 
 # Allow unused variables when underscore-prefixed.
-dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+lint.dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
 # Assume Python 3.8, the lowest version that MF supports.
 target-version = "py38"
 
-[mccabe]
+[lint.mccabe]
 # Unlike Flake8, default to a complexity level of 10.
 max-complexity = 10
 
-[pydocstyle]
+[lint.pydocstyle]
 convention = "google"
 
-[isort]
+[lint.isort]
 required-imports = ["from __future__ import annotations"]

@@ -173,7 +173,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         self._time_spine_source = semantic_manifest_lookup.time_spine_source
 
     @property
-    def column_association_resolver(self) -> ColumnAssociationResolver:  # noqa: D
+    def column_association_resolver(self) -> ColumnAssociationResolver:  # noqa: D102
         return self._column_association_resolver
 
     def convert_to_sql_query_plan(
@@ -749,7 +749,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             )
         return metric_expr
 
-    def visit_order_by_limit_node(self, node: OrderByLimitNode) -> SqlDataSet:  # noqa: D
+    def visit_order_by_limit_node(self, node: OrderByLimitNode) -> SqlDataSet:  # noqa: D102
         from_data_set: SqlDataSet = node.parent_node.accept(self)
         output_instance_set = from_data_set.instance_set
         from_data_set_alias = self._next_unique_table_alias()
@@ -791,11 +791,11 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             ),
         )
 
-    def visit_write_to_result_dataframe_node(self, node: WriteToResultDataframeNode) -> SqlDataSet:  # noqa: D
+    def visit_write_to_result_dataframe_node(self, node: WriteToResultDataframeNode) -> SqlDataSet:  # noqa: D102
         # Returning the parent-node SQL as an approximation since you can't write to a dataframe via SQL.
         return node.parent_node.accept(self)
 
-    def visit_write_to_result_table_node(self, node: WriteToResultTableNode) -> SqlDataSet:  # noqa: D
+    def visit_write_to_result_table_node(self, node: WriteToResultTableNode) -> SqlDataSet:  # noqa: D102
         input_data_set: SqlDataSet = node.parent_node.accept(self)
         input_instance_set: InstanceSet = input_data_set.instance_set
         return SqlDataSet(
@@ -1254,7 +1254,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             ),
         )
 
-    def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode) -> SqlDataSet:  # noqa: D
+    def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode) -> SqlDataSet:  # noqa: D102
         parent_data_set = node.parent_node.accept(self)
         parent_alias = self._next_unique_table_alias()
 
@@ -1432,7 +1432,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             ),
         )
 
-    def visit_min_max_node(self, node: MinMaxNode) -> SqlDataSet:  # noqa: D
+    def visit_min_max_node(self, node: MinMaxNode) -> SqlDataSet:  # noqa: D102
         parent_data_set = node.parent_node.accept(self)
         parent_table_alias = self._next_unique_table_alias()
         assert (

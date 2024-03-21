@@ -10,26 +10,26 @@ from metricflow.test.fixtures.manifest_fixtures import MetricFlowEngineTestFixtu
 
 
 @pytest.fixture
-def default_sql_plan_renderer() -> SqlQueryPlanRenderer:  # noqa: D
+def default_sql_plan_renderer() -> SqlQueryPlanRenderer:  # noqa: D103
     return DefaultSqlQueryPlanRenderer()
 
 
 @pytest.fixture(scope="session")
-def dataflow_to_sql_converter(  # noqa: D
+def dataflow_to_sql_converter(  # noqa: D103
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture]
 ) -> DataflowToSqlQueryPlanConverter:
     return mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].dataflow_to_sql_converter
 
 
 @pytest.fixture(scope="session")
-def extended_date_dataflow_to_sql_converter(  # noqa: D
+def extended_date_dataflow_to_sql_converter(  # noqa: D103
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture]
 ) -> DataflowToSqlQueryPlanConverter:
     return mf_engine_test_fixture_mapping[SemanticManifestSetup.EXTENDED_DATE_MANIFEST].dataflow_to_sql_converter
 
 
 @pytest.fixture(scope="session")
-def multihop_dataflow_to_sql_converter(  # noqa: D
+def multihop_dataflow_to_sql_converter(  # noqa: D103
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture]
 ) -> DataflowToSqlQueryPlanConverter:
     return mf_engine_test_fixture_mapping[
@@ -38,7 +38,7 @@ def multihop_dataflow_to_sql_converter(  # noqa: D
 
 
 @pytest.fixture(scope="session")
-def scd_dataflow_to_sql_converter(  # noqa: D
+def scd_dataflow_to_sql_converter(  # noqa: D103
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture]
 ) -> DataflowToSqlQueryPlanConverter:
     return mf_engine_test_fixture_mapping[SemanticManifestSetup.SCD_MANIFEST].dataflow_to_sql_converter

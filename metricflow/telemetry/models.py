@@ -45,7 +45,7 @@ class FunctionStartEvent(TelemetryEvent, FrozenBaseModel):
     function_name: str
 
     @staticmethod
-    def create(  # noqa: D
+    def create(  # noqa: D102
         event_time: datetime.datetime,
         level_name: str,
         invocation_id: str,
@@ -73,7 +73,7 @@ class FunctionEndEvent(TelemetryEvent, FrozenBaseModel):
     exception_trace: Optional[str] = None
 
     @staticmethod
-    def create(  # noqa: D
+    def create(  # noqa: D102
         event_time: datetime.datetime,
         level_name: str,
         invocation_id: str,

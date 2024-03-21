@@ -21,7 +21,7 @@ class DuplicateMetricIssue(MetricFlowQueryResolutionIssue):
     duplicate_metric_references: Tuple[MetricReference, ...]
 
     @staticmethod
-    def from_parameters(  # noqa: D
+    def from_parameters(  # noqa: D102
         duplicate_metric_references: Sequence[MetricReference],
         query_resolution_path: MetricFlowQueryResolutionPath,
     ) -> DuplicateMetricIssue:

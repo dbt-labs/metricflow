@@ -28,7 +28,7 @@ class GroupByItemResolutionDag(MetricFlowDag[GroupByItemResolutionNode]):
     realize limitations appropriate to that node.
     """
 
-    def __init__(self, sink_node: ResolutionDagSinkNode) -> None:  # noqa: D
+    def __init__(self, sink_node: ResolutionDagSinkNode) -> None:  # noqa: D107
         super().__init__(
             dag_id=DagId.from_id_prefix(StaticIdPrefix.GROUP_BY_ITEM_RESOLUTION_DAG),
             sink_nodes=[sink_node],
@@ -36,5 +36,5 @@ class GroupByItemResolutionDag(MetricFlowDag[GroupByItemResolutionNode]):
         self._sink_node = sink_node
 
     @property
-    def sink_node(self) -> ResolutionDagSinkNode:  # noqa: D
+    def sink_node(self) -> ResolutionDagSinkNode:  # noqa: D102
         return self._sink_node

@@ -62,27 +62,27 @@ class NoOpInferenceProgressReporter(InferenceProgressReporter):
 
     @staticmethod
     @contextlib.contextmanager
-    def warehouse() -> Iterator[None]:  # noqa: D
+    def warehouse() -> Iterator[None]:  # noqa: D102
         yield
 
     @staticmethod
     @contextlib.contextmanager
-    def table(table: SqlTable, index: int, total: int) -> Iterator[None]:  # noqa: D
+    def table(table: SqlTable, index: int, total: int) -> Iterator[None]:  # noqa: D102
         yield
 
     @staticmethod
     @contextlib.contextmanager
-    def rules() -> Iterator[None]:  # noqa: D
+    def rules() -> Iterator[None]:  # noqa: D102
         yield
 
     @staticmethod
     @contextlib.contextmanager
-    def solver() -> Iterator[None]:  # noqa: D
+    def solver() -> Iterator[None]:  # noqa: D102
         yield
 
     @staticmethod
     @contextlib.contextmanager
-    def renderers() -> Iterator[None]:  # noqa: D
+    def renderers() -> Iterator[None]:  # noqa: D102
         yield
 
 

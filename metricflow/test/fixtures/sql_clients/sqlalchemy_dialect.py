@@ -19,12 +19,12 @@ logger = logging.getLogger(__name__)
 class SqlAlchemySqlClient(BaseSqlClientImplementation, ABC):
     """Base class for to create DBClients for engines supported by SQLAlchemy."""
 
-    def __init__(self, engine: sqlalchemy.engine.Engine) -> None:  # noqa: D
+    def __init__(self, engine: sqlalchemy.engine.Engine) -> None:  # noqa: D107
         self._engine = engine
         super().__init__()
 
     @staticmethod
-    def build_engine_url(  # noqa: D
+    def build_engine_url(  # noqa: D102
         dialect: str,
         database: str,
         username: str,
@@ -45,7 +45,7 @@ class SqlAlchemySqlClient(BaseSqlClientImplementation, ABC):
         )
 
     @staticmethod
-    def create_engine(  # noqa: D
+    def create_engine(  # noqa: D102
         dialect: str,
         port: int,
         database: str,
@@ -102,12 +102,12 @@ class SqlAlchemySqlClient(BaseSqlClientImplementation, ABC):
         with self._engine_connection(self._engine) as conn:
             conn.execute(sqlalchemy.text(stmt), bind_params.param_dict)
 
-    def _engine_specific_dry_run_implementation(self, stmt: str, bind_params: SqlBindParameters) -> None:  # noqa: D
+    def _engine_specific_dry_run_implementation(self, stmt: str, bind_params: SqlBindParameters) -> None:
         with self._engine_connection(self._engine) as conn:
             s = "EXPLAIN " + stmt
             conn.execute(sqlalchemy.text(s), bind_params.param_dict)
 
-    def create_table_from_dataframe(  # noqa: D
+    def create_table_from_dataframe(  # noqa: D102
         self, sql_table: SqlTable, df: pd.DataFrame, chunk_size: Optional[int] = None
     ) -> None:
         logger.info(f"Creating table '{sql_table.sql}' from a DataFrame with {df.shape[0]} row(s)")

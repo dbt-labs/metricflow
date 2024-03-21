@@ -11,7 +11,7 @@ class RenderedSpecTracker:
     This is useful for constructing a WhereFilterSpec as it includes a list of specs required by the filter.
     """
 
-    def __init__(self) -> None:  # noqa: D
+    def __init__(self) -> None:  # noqa: D107
         self._rendered_specs: List[LinkableInstanceSpec] = []
 
     def record_rendered_spec(self, spec: LinkableInstanceSpec) -> None:

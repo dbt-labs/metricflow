@@ -111,7 +111,7 @@ class ResolveMetricOrGroupByItemsResult:
 class MetricFlowQueryResolver:
     """Resolves inputs to a query (e.g. metrics, group by items into concrete specs."""
 
-    def __init__(  # noqa: D
+    def __init__(  # noqa: D107
         self,
         manifest_lookup: SemanticManifestLookup,
         where_filter_pattern_factory: WhereFilterPatternFactory,

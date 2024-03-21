@@ -27,12 +27,12 @@ from metricflow.test.sql.compare_sql_plan import assert_default_rendered_sql_equ
 
 
 @pytest.fixture
-def column_pruner() -> SqlColumnPrunerOptimizer:  # noqa: D
+def column_pruner() -> SqlColumnPrunerOptimizer:  # noqa: D103
     return SqlColumnPrunerOptimizer()
 
 
 @pytest.fixture
-def sql_plan_renderer() -> SqlQueryPlanRenderer:  # noqa: D
+def sql_plan_renderer() -> SqlQueryPlanRenderer:  # noqa: D103
     return DefaultSqlQueryPlanRenderer()
 
 

@@ -11,7 +11,7 @@ from metricflow.test.snapshot_utils import assert_str_snapshot_equal
 
 
 @pytest.mark.sql_engine_snapshot
-def test_offset_to_grain_with_single_granularity(  # noqa: D
+def test_offset_to_grain_with_single_granularity(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
@@ -36,7 +36,7 @@ def test_offset_to_grain_with_single_granularity(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_offset_to_grain_with_multiple_granularities(  # noqa: D
+def test_offset_to_grain_with_multiple_granularities(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,

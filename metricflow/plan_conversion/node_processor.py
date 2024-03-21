@@ -76,7 +76,7 @@ class PreJoinNodeProcessor:
 
     """
 
-    def __init__(  # noqa: D
+    def __init__(  # noqa: D107
         self,
         semantic_model_lookup: SemanticModelAccessor,
         node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver,

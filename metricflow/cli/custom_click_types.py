@@ -1,4 +1,5 @@
 """This module contains custom helper click types."""
+
 from __future__ import annotations
 
 from typing import Any, Callable, Dict, Generic, List, Optional, Sequence, Tuple, TypeVar
@@ -50,9 +51,9 @@ class SequenceParamType(click.ParamType, Generic[T]):
 
         super().__init__(*args, **kwargs)
 
-    def convert(  # noqa: D
+    def convert(  # noqa: D102
         self, value: str, param: Optional[click.Parameter], ctx: Optional[click.Context]
-    ) -> Sequence[T]:
+    ) -> Sequence[T]:  # noqa: D102
         if len(value) == 0:
             if self.min_length > 0:
                 self.fail(
@@ -124,7 +125,7 @@ class MutuallyExclusiveOption(click.Option):
 
         super(MutuallyExclusiveOption, self).__init__(*args, **kwargs)
 
-    def handle_parse_result(  # type: ignore # noqa: D
+    def handle_parse_result(  # type: ignore  # noqa: D102
         self, ctx: click.Context, opts: Dict[str, Any], args: List[str]
     ) -> Tuple[Any, List[str]]:
         mutually_exclusive_opts_present = len(self.mutually_exclusive.intersection(opts)) > 0

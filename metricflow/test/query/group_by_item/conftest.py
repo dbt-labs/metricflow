@@ -99,5 +99,5 @@ def resolution_dags(
 
 
 @pytest.fixture(scope="session")
-def naming_scheme() -> QueryItemNamingScheme:  # noqa: D
+def naming_scheme() -> QueryItemNamingScheme:  # noqa: D103
     return ObjectBuilderNamingScheme()

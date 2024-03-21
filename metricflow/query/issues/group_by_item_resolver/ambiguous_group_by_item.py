@@ -24,7 +24,7 @@ class AmbiguousGroupByItemIssue(MetricFlowQueryResolutionIssue):
     candidate_set: GroupByItemCandidateSet
 
     @staticmethod
-    def from_parameters(  # noqa: D
+    def from_parameters(  # noqa: D102
         candidate_set: GroupByItemCandidateSet,
         query_resolution_path: MetricFlowQueryResolutionPath,
     ) -> AmbiguousGroupByItemIssue:

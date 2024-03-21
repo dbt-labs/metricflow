@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 class DuplicateMetricValidationRule(PostResolutionQueryValidationRule):
     """Validates that a query does not include the same metric multiple times."""
 
-    def __init__(self, manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D
+    def __init__(self, manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D107
         super().__init__(manifest_lookup=manifest_lookup)
 
     @override

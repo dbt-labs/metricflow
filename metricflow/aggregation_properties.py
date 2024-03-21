@@ -65,5 +65,5 @@ class AggregationState(Enum):
     PARTIAL = "PARTIAL"
     COMPLETE = "COMPLETE"
 
-    def __repr__(self) -> str:  # noqa: D
+    def __repr__(self) -> str:  # noqa: D105
         return f"{self.__class__.__name__}.{self.name}"

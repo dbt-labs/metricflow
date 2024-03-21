@@ -40,13 +40,13 @@ class FilterSpecResolutionLookUp(Mergeable):
     non_parsable_resolutions: Tuple[NonParsableFilterResolution, ...]
 
     @property
-    def has_errors(self) -> bool:  # noqa: D
+    def has_errors(self) -> bool:  # noqa: D102
         return any(
             non_parsable_resolution.issue_set.has_errors for non_parsable_resolution in self.non_parsable_resolutions
         ) or any(spec_resolution.issue_set.has_errors for spec_resolution in self.spec_resolutions)
 
     @property
-    def has_issues(self) -> bool:  # noqa: D
+    def has_issues(self) -> bool:  # noqa: D102
         return any(
             non_parsable_resolution.issue_set.has_issues for non_parsable_resolution in self.non_parsable_resolutions
         ) or any(spec_resolution.issue_set.has_issues for spec_resolution in self.spec_resolutions)
@@ -132,7 +132,7 @@ class ResolvedSpecLookUpKey:
     call_parameter_set: CallParameterSet
 
     @staticmethod
-    def from_parameters(  # noqa: D
+    def from_parameters(  # noqa: D102
         filter_location: WhereFilterLocation, call_parameter_set: CallParameterSet
     ) -> ResolvedSpecLookUpKey:
         return ResolvedSpecLookUpKey(
@@ -141,7 +141,7 @@ class ResolvedSpecLookUpKey:
         )
 
     @staticmethod
-    def for_metric_filter(  # noqa: D
+    def for_metric_filter(
         metric_reference: MetricReference, call_parameter_set: CallParameterSet
     ) -> ResolvedSpecLookUpKey:
         """Create a key related to a filter in a metric definition."""
@@ -153,7 +153,7 @@ class ResolvedSpecLookUpKey:
         )
 
     @staticmethod
-    def for_query_filter(  # noqa: D
+    def for_query_filter(
         metrics_in_query: Sequence[MetricReference], call_parameter_set: CallParameterSet
     ) -> ResolvedSpecLookUpKey:
         """Create a key related to a filter for a query."""

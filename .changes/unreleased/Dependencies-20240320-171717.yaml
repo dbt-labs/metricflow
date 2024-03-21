@@ -1,0 +1,6 @@
+kind: Dependencies
+body: Update Ruff to 0.3.3
+time: 2024-03-20T17:17:17.779847-07:00
+custom:
+  Author: tlento
+  Issue: "769"

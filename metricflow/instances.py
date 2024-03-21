@@ -54,7 +54,7 @@ class MdoInstance(ABC, Generic[SpecT]):
 
 
 @dataclass(frozen=True)
-class SemanticModelElementInstance(SerializableDataclass):  # noqa: D
+class SemanticModelElementInstance(SerializableDataclass):  # noqa: D101
     # This instance is derived from something defined in a semantic model.
     defined_from: Tuple[SemanticModelElementReference, ...]
 
@@ -78,39 +78,39 @@ class SemanticModelElementInstance(SerializableDataclass):  # noqa: D
 
 
 @dataclass(frozen=True)
-class MeasureInstance(MdoInstance[MeasureSpec], SemanticModelElementInstance):  # noqa: D
+class MeasureInstance(MdoInstance[MeasureSpec], SemanticModelElementInstance):  # noqa: D101
     associated_columns: Tuple[ColumnAssociation, ...]
     spec: MeasureSpec
     aggregation_state: AggregationState
 
 
 @dataclass(frozen=True)
-class DimensionInstance(MdoInstance[DimensionSpec], SemanticModelElementInstance):  # noqa: D
+class DimensionInstance(MdoInstance[DimensionSpec], SemanticModelElementInstance):  # noqa: D101
     associated_columns: Tuple[ColumnAssociation, ...]
     spec: DimensionSpec
 
 
 @dataclass(frozen=True)
-class TimeDimensionInstance(MdoInstance[TimeDimensionSpec], SemanticModelElementInstance):  # noqa: D
+class TimeDimensionInstance(MdoInstance[TimeDimensionSpec], SemanticModelElementInstance):  # noqa: D101
     associated_columns: Tuple[ColumnAssociation, ...]
     spec: TimeDimensionSpec
 
 
 @dataclass(frozen=True)
-class EntityInstance(MdoInstance[EntitySpec], SemanticModelElementInstance):  # noqa: D
+class EntityInstance(MdoInstance[EntitySpec], SemanticModelElementInstance):  # noqa: D101
     associated_columns: Tuple[ColumnAssociation, ...]
     spec: EntitySpec
 
 
 @dataclass(frozen=True)
-class MetricInstance(MdoInstance[MetricSpec], SerializableDataclass):  # noqa: D
+class MetricInstance(MdoInstance[MetricSpec], SerializableDataclass):  # noqa: D101
     associated_columns: Tuple[ColumnAssociation, ...]
     spec: MetricSpec
     defined_from: MetricModelReference
 
 
 @dataclass(frozen=True)
-class MetadataInstance(MdoInstance[MetadataSpec], SerializableDataclass):  # noqa: D
+class MetadataInstance(MdoInstance[MetadataSpec], SerializableDataclass):  # noqa: D101
     associated_columns: Tuple[ColumnAssociation, ...]
     spec: MetadataSpec
 
@@ -128,7 +128,7 @@ class InstanceSetTransform(Generic[TransformOutputT], ABC):
     """
 
     @abstractmethod
-    def transform(self, instance_set: InstanceSet) -> TransformOutputT:  # noqa: D
+    def transform(self, instance_set: InstanceSet) -> TransformOutputT:  # noqa: D102
         pass
 
 
@@ -146,7 +146,7 @@ class InstanceSet(SerializableDataclass):
     metric_instances: Tuple[MetricInstance, ...] = ()
     metadata_instances: Tuple[MetadataInstance, ...] = ()
 
-    def transform(self, transform_function: InstanceSetTransform[TransformOutputT]) -> TransformOutputT:  # noqa: D
+    def transform(self, transform_function: InstanceSetTransform[TransformOutputT]) -> TransformOutputT:  # noqa: D102
         return transform_function.transform(self)
 
     @staticmethod
@@ -192,7 +192,7 @@ class InstanceSet(SerializableDataclass):
         )
 
     @property
-    def spec_set(self) -> InstanceSpecSet:  # noqa: D
+    def spec_set(self) -> InstanceSpecSet:  # noqa: D102
         return InstanceSpecSet(
             measure_specs=tuple(x.spec for x in self.measure_instances),
             dimension_specs=tuple(x.spec for x in self.dimension_instances),

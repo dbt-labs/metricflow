@@ -56,7 +56,7 @@ _telemetry_reporter.add_python_log_handler()
 @error_if_not_in_dbt_project
 @pass_config
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-def cli(cfg: CLIContext, verbose: bool) -> None:  # noqa: D
+def cli(cfg: CLIContext, verbose: bool) -> None:  # noqa: D103
     # Some HTTP logging callback somewhere is failing to close its SSL connections correctly.
     # For now, filter those warnings so they don't pop up in CLI stderr
     # note - this should be addressed as adapter connection issues might produce these as well
@@ -358,7 +358,7 @@ def query(
 @cli.group()
 @pass_config
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-def list(cfg: CLIContext) -> None:  # noqa: D
+def list(cfg: CLIContext) -> None:
     """Retrieve metadata values about metrics/dimensions/entities/dimension values."""
 
 
@@ -535,7 +535,7 @@ def dimension_values(
 
 def _print_issues(
     issues: SemanticManifestValidationResults, show_non_blocking: bool = False, verbose: bool = False
-) -> None:  # noqa: D
+) -> None:
     for issue in issues.errors:
         print(f"• {issue.as_cli_formatted_str(verbose=verbose)}")
     if show_non_blocking:

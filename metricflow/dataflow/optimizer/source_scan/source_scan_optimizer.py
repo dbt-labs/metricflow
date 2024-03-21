@@ -41,17 +41,17 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
-class OptimizeBranchResult:  # noqa: D
+class OptimizeBranchResult:  # noqa: D101
     base_output_node: Optional[BaseOutput] = None
     sink_node: Optional[SinkOutput] = None
 
     @property
-    def checked_base_output(self) -> BaseOutput:  # noqa: D
+    def checked_base_output(self) -> BaseOutput:  # noqa: D102
         assert self.base_output_node, f"Expected the result of traversal to produce a {BaseOutput}"
         return self.base_output_node
 
     @property
-    def checked_sink_node(self) -> SinkOutput:  # noqa: D
+    def checked_sink_node(self) -> SinkOutput:  # noqa: D102
         assert self.sink_node, f"Expected the result of traversal to produce a {SinkOutput}"
         return self.sink_node
 
@@ -119,7 +119,7 @@ class SourceScanOptimizer(
     parents.
     """
 
-    def __init__(self) -> None:  # noqa: D
+    def __init__(self) -> None:  # noqa: D107
         self._log_level = logging.DEBUG
 
     def _log_visit_node_type(self, node: DataflowPlanNode) -> None:
@@ -149,19 +149,19 @@ class SourceScanOptimizer(
             sink_node=node.with_new_parents(tuple(x.checked_base_output for x in optimized_parents))
         )
 
-    def visit_source_node(self, node: ReadSqlSourceNode) -> OptimizeBranchResult:  # noqa: D
+    def visit_source_node(self, node: ReadSqlSourceNode) -> OptimizeBranchResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)
 
-    def visit_join_to_base_output_node(self, node: JoinToBaseOutputNode) -> OptimizeBranchResult:  # noqa: D
+    def visit_join_to_base_output_node(self, node: JoinToBaseOutputNode) -> OptimizeBranchResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)
 
-    def visit_aggregate_measures_node(self, node: AggregateMeasuresNode) -> OptimizeBranchResult:  # noqa: D
+    def visit_aggregate_measures_node(self, node: AggregateMeasuresNode) -> OptimizeBranchResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)
 
-    def visit_compute_metrics_node(self, node: ComputeMetricsNode) -> OptimizeBranchResult:  # noqa: D
+    def visit_compute_metrics_node(self, node: ComputeMetricsNode) -> OptimizeBranchResult:  # noqa: D102
         self._log_visit_node_type(node)
         # Run the optimizer on the parent branch to handle derived metrics, which are defined recursively in the DAG.
         optimized_parent_result: OptimizeBranchResult = node.parent_node.accept(self)
@@ -175,23 +175,25 @@ class SourceScanOptimizer(
 
         return OptimizeBranchResult(base_output_node=node)
 
-    def visit_order_by_limit_node(self, node: OrderByLimitNode) -> OptimizeBranchResult:  # noqa: D
+    def visit_order_by_limit_node(self, node: OrderByLimitNode) -> OptimizeBranchResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)
 
-    def visit_where_constraint_node(self, node: WhereConstraintNode) -> OptimizeBranchResult:  # noqa: D
+    def visit_where_constraint_node(self, node: WhereConstraintNode) -> OptimizeBranchResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)
 
-    def visit_write_to_result_dataframe_node(self, node: WriteToResultDataframeNode) -> OptimizeBranchResult:  # noqa: D
+    def visit_write_to_result_dataframe_node(  # noqa: D102
+        self, node: WriteToResultDataframeNode
+    ) -> OptimizeBranchResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._default_sink_node_handler(node)
 
-    def visit_write_to_result_table_node(self, node: WriteToResultTableNode) -> OptimizeBranchResult:  # noqa: D
+    def visit_write_to_result_table_node(self, node: WriteToResultTableNode) -> OptimizeBranchResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._default_sink_node_handler(node)
 
-    def visit_pass_elements_filter_node(self, node: FilterElementsNode) -> OptimizeBranchResult:  # noqa: D
+    def visit_pass_elements_filter_node(self, node: FilterElementsNode) -> OptimizeBranchResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)
 
@@ -232,9 +234,9 @@ class SourceScanOptimizer(
             )
         return results
 
-    def visit_combine_aggregated_outputs_node(  # noqa: D
+    def visit_combine_aggregated_outputs_node(  # noqa: D102
         self, node: CombineAggregatedOutputsNode
-    ) -> OptimizeBranchResult:
+    ) -> OptimizeBranchResult:  # noqa: D102
         self._log_visit_node_type(node)
         # The parent node of the CombineAggregatedOutputsNode can be either ComputeMetricsNodes or CombineAggregatedOutputsNodes
 
@@ -271,9 +273,11 @@ class SourceScanOptimizer(
             # Otherwise, replaced the branch with the one that was combined in combined_parent_branches
             else:
                 combined_parent_branches = [
-                    branch_combination_result.left_branch
-                    if branch_combination_result.combined_branch is None
-                    else branch_combination_result.combined_branch
+                    (
+                        branch_combination_result.left_branch
+                        if branch_combination_result.combined_branch is None
+                        else branch_combination_result.combined_branch
+                    )
                     for branch_combination_result in combination_results
                 ]
 
@@ -289,25 +293,25 @@ class SourceScanOptimizer(
             base_output_node=CombineAggregatedOutputsNode(parent_nodes=combined_parent_branches)
         )
 
-    def visit_constrain_time_range_node(self, node: ConstrainTimeRangeNode) -> OptimizeBranchResult:  # noqa: D
+    def visit_constrain_time_range_node(self, node: ConstrainTimeRangeNode) -> OptimizeBranchResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)
 
-    def visit_join_over_time_range_node(self, node: JoinOverTimeRangeNode) -> OptimizeBranchResult:  # noqa: D
+    def visit_join_over_time_range_node(self, node: JoinOverTimeRangeNode) -> OptimizeBranchResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)
 
-    def visit_semi_additive_join_node(self, node: SemiAdditiveJoinNode) -> OptimizeBranchResult:  # noqa: D
+    def visit_semi_additive_join_node(self, node: SemiAdditiveJoinNode) -> OptimizeBranchResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)
 
-    def visit_metric_time_dimension_transform_node(  # noqa: D
+    def visit_metric_time_dimension_transform_node(  # noqa: D102
         self, node: MetricTimeDimensionTransformNode
     ) -> OptimizeBranchResult:
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)
 
-    def optimize(self, dataflow_plan: DataflowPlan) -> DataflowPlan:  # noqa: D
+    def optimize(self, dataflow_plan: DataflowPlan) -> DataflowPlan:  # noqa: D102
         optimized_result: OptimizeBranchResult = dataflow_plan.sink_output_node.accept(self)
 
         logger.log(
@@ -328,18 +332,20 @@ class SourceScanOptimizer(
             sink_output_nodes=[dataflow_plan.sink_output_node],
         )
 
-    def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode) -> OptimizeBranchResult:  # noqa: D
+    def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode) -> OptimizeBranchResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)
 
-    def visit_add_generated_uuid_column_node(self, node: AddGeneratedUuidColumnNode) -> OptimizeBranchResult:  # noqa: D
+    def visit_add_generated_uuid_column_node(  # noqa: D102
+        self, node: AddGeneratedUuidColumnNode
+    ) -> OptimizeBranchResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)
 
-    def visit_join_conversion_events_node(self, node: JoinConversionEventsNode) -> OptimizeBranchResult:  # noqa: D
+    def visit_join_conversion_events_node(self, node: JoinConversionEventsNode) -> OptimizeBranchResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)
 
-    def visit_min_max_node(self, node: MinMaxNode) -> OptimizeBranchResult:  # noqa: D
+    def visit_min_max_node(self, node: MinMaxNode) -> OptimizeBranchResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)

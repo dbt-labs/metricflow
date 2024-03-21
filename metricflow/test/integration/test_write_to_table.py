@@ -10,7 +10,7 @@ from metricflow.test.compare_df import assert_dataframes_equal
 from metricflow.test.integration.conftest import IntegrationTestHelpers
 
 
-def test_write_to_table(it_helpers: IntegrationTestHelpers) -> None:  # noqa: D
+def test_write_to_table(it_helpers: IntegrationTestHelpers) -> None:  # noqa: D103
     output_table = SqlTable(schema_name=it_helpers.mf_system_schema, table_name=f"test_table_{random_id()}")
     try:
         it_helpers.mf_engine.query(

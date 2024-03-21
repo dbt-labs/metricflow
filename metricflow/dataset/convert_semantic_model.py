@@ -78,7 +78,7 @@ class SemanticModelToDataSetConverter:
     # Regex for inferring whether an expression for an element is a column reference.
     _SQL_IDENTIFIER_REGEX = re.compile("^[a-zA-Z_][a-zA-Z_0-9]*$")
 
-    def __init__(self, column_association_resolver: ColumnAssociationResolver) -> None:  # noqa: D
+    def __init__(self, column_association_resolver: ColumnAssociationResolver) -> None:  # noqa: D107
         self._column_association_resolver = column_association_resolver
 
     def _create_dimension_instance(
@@ -123,13 +123,15 @@ class SemanticModelToDataSetConverter:
             associated_columns=(self._column_association_resolver.resolve_spec(time_dimension_spec),),
             spec=time_dimension_spec,
             defined_from=(
-                SemanticModelElementReference(
-                    semantic_model_name=semantic_model_name,
-                    element_name=element_name,
-                ),
-            )
-            if semantic_model_name
-            else (),
+                (
+                    SemanticModelElementReference(
+                        semantic_model_name=semantic_model_name,
+                        element_name=element_name,
+                    ),
+                )
+                if semantic_model_name
+                else ()
+            ),
         )
 
     def _create_entity_instance(

@@ -17,21 +17,21 @@ class WhereFilterPatternFactory(ABC):
     """Interface that defines how spec patterns should be generated for the group-by-items specified in filters."""
 
     @abstractmethod
-    def create_for_dimension_call_parameter_set(  # noqa: D
+    def create_for_dimension_call_parameter_set(  # noqa: D102
         self, dimension_call_parameter_set: DimensionCallParameterSet
     ) -> SpecPattern:
         raise NotImplementedError
 
     @abstractmethod
-    def create_for_time_dimension_call_parameter_set(  # noqa: D
+    def create_for_time_dimension_call_parameter_set(  # noqa: D102
         self, time_dimension_call_parameter_set: TimeDimensionCallParameterSet
     ) -> SpecPattern:
         raise NotImplementedError
 
     @abstractmethod
-    def create_for_entity_call_parameter_set(  # noqa: D
+    def create_for_entity_call_parameter_set(  # noqa: D102
         self, entity_call_parameter_set: EntityCallParameterSet
-    ) -> SpecPattern:
+    ) -> SpecPattern:  # noqa: D102
         raise NotImplementedError
 
 

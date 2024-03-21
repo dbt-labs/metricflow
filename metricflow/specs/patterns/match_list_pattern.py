@@ -14,7 +14,7 @@ class MatchListSpecPattern(SpecPattern):
     This is useful for filtering possible group-by-items to ones valid for a query.
     """
 
-    def __init__(self, listed_specs: Sequence[InstanceSpec]) -> None:  # noqa: D
+    def __init__(self, listed_specs: Sequence[InstanceSpec]) -> None:  # noqa: D107
         self._listed_specs = set(listed_specs)
 
     @override

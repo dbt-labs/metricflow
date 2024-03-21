@@ -17,7 +17,7 @@ from metricflow.test.compare_df import assert_dataframes_equal
 from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 
 
-def test_read_sql_task(sql_client: SqlClient) -> None:  # noqa: D
+def test_read_sql_task(sql_client: SqlClient) -> None:  # noqa: D103
     task = SelectSqlQueryToDataFrameTask(sql_client, "SELECT 1 AS foo", SqlBindParameters())
     execution_plan = ExecutionPlan(leaf_tasks=[task], dag_id=DagId.from_str("plan0"))
 
@@ -37,7 +37,9 @@ def test_read_sql_task(sql_client: SqlClient) -> None:  # noqa: D
     )
 
 
-def test_write_table_task(mf_test_configuration: MetricFlowTestConfiguration, sql_client: SqlClient) -> None:  # noqa: D
+def test_write_table_task(  # noqa: D103
+    mf_test_configuration: MetricFlowTestConfiguration, sql_client: SqlClient
+) -> None:  # noqa: D103
     output_table = SqlTable(schema_name=mf_test_configuration.mf_system_schema, table_name=f"test_table_{random_id()}")
     task = SelectSqlQueryToTableTask(
         sql_client=sql_client,

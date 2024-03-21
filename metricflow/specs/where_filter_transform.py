@@ -20,14 +20,14 @@ from metricflow.sql.sql_bind_parameters import SqlBindParameters
 logger = logging.getLogger(__name__)
 
 
-class RenderSqlTemplateException(Exception):  # noqa: D
+class RenderSqlTemplateException(Exception):  # noqa: D101
     pass
 
 
 class WhereSpecFactory:
     """Renders the SQL template in the WhereFilter and converts it to a WhereFilterSpec."""
 
-    def __init__(  # noqa: D
+    def __init__(  # noqa: D107
         self,
         column_association_resolver: ColumnAssociationResolver,
         spec_resolution_lookup: FilterSpecResolutionLookUp,
@@ -35,7 +35,7 @@ class WhereSpecFactory:
         self._column_association_resolver = column_association_resolver
         self._spec_resolution_lookup = spec_resolution_lookup
 
-    def create_from_where_filter(  # noqa: D
+    def create_from_where_filter(  # noqa: D102
         self,
         filter_location: WhereFilterLocation,
         where_filter: WhereFilter,
@@ -45,7 +45,7 @@ class WhereSpecFactory:
             filter_intersection=PydanticWhereFilterIntersection(where_filters=[where_filter]),
         )[0]
 
-    def create_from_where_filter_intersection(  # noqa: D
+    def create_from_where_filter_intersection(  # noqa: D102
         self,
         filter_location: WhereFilterLocation,
         filter_intersection: Optional[WhereFilterIntersection],

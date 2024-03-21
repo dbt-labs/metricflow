@@ -21,7 +21,7 @@ from metricflow.test.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from metricflow.test.snapshot_utils import assert_execution_plan_text_equal
 
 
-def make_execution_plan_converter(  # noqa: D
+def make_execution_plan_converter(  # noqa: D103
     semantic_manifest_lookup: SemanticManifestLookup,
     sql_client: SqlClient,
 ) -> DataflowToExecutionPlanConverter:
@@ -36,7 +36,7 @@ def make_execution_plan_converter(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_joined_plan(  # noqa: D
+def test_joined_plan(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -75,7 +75,7 @@ def test_joined_plan(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_small_combined_metrics_plan(  # noqa: D
+def test_small_combined_metrics_plan(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
@@ -112,7 +112,7 @@ def test_small_combined_metrics_plan(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_combined_metrics_plan(  # noqa: D
+def test_combined_metrics_plan(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
@@ -151,7 +151,7 @@ def test_combined_metrics_plan(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_multihop_joined_plan(  # noqa: D
+def test_multihop_joined_plan(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     multihop_dataflow_plan_builder: DataflowPlanBuilder,

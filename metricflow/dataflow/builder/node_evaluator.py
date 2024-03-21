@@ -71,7 +71,7 @@ class JoinLinkableInstancesRecipe:
 
     validity_window: Optional[ValidityWindowJoinDescription] = None
 
-    def __post_init__(self) -> None:  # noqa: D
+    def __post_init__(self) -> None:  # noqa: D105
         if self.join_on_entity is None and self.join_type != SqlJoinType.CROSS_JOIN:
             raise RuntimeError("`join_on_entity` is required unless using CROSS JOIN.")
 

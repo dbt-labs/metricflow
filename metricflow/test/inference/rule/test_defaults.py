@@ -12,7 +12,7 @@ from metricflow.sql.sql_column import SqlColumn
 from metricflow.sql.sql_table import SqlTable
 
 
-def get_column_properties(column_str: str, type: InferenceColumnType, unique: bool) -> ColumnProperties:  # noqa: D
+def get_column_properties(column_str: str, type: InferenceColumnType, unique: bool) -> ColumnProperties:  # noqa: D103
     return ColumnProperties(
         column=SqlColumn.from_string(column_str),
         type=type,
@@ -25,7 +25,7 @@ def get_column_properties(column_str: str, type: InferenceColumnType, unique: bo
     )
 
 
-def test_any_entity_by_name_matcher() -> None:  # noqa: D
+def test_any_entity_by_name_matcher() -> None:  # noqa: D103
     assert defaults.AnyEntityByNameRule().match_column(
         get_column_properties("db.schema.table.id", InferenceColumnType.INTEGER, True)
     )
@@ -43,7 +43,7 @@ def test_any_entity_by_name_matcher() -> None:  # noqa: D
     )
 
 
-def test_primary_entity_by_name_matcher() -> None:  # noqa: D
+def test_primary_entity_by_name_matcher() -> None:  # noqa: D103
     assert defaults.PrimaryEntityByNameRule().match_column(
         get_column_properties("db.schema.table.id", InferenceColumnType.INTEGER, True)
     )
@@ -70,7 +70,7 @@ def test_primary_entity_by_name_matcher() -> None:  # noqa: D
     )
 
 
-def test_unique_entity_by_distinct_count_matcher() -> None:  # noqa: D
+def test_unique_entity_by_distinct_count_matcher() -> None:  # noqa: D103
     assert defaults.UniqueEntityByDistinctCountRule().match_column(
         get_column_properties("db.schema.table.unique_id", InferenceColumnType.INTEGER, True)
     )
@@ -79,7 +79,7 @@ def test_unique_entity_by_distinct_count_matcher() -> None:  # noqa: D
     )
 
 
-def test_time_dimension_by_time_type_matcher() -> None:  # noqa: D
+def test_time_dimension_by_time_type_matcher() -> None:  # noqa: D103
     assert defaults.TimeDimensionByTimeTypeRule().match_column(
         get_column_properties("db.schema.table.time", InferenceColumnType.DATETIME, True)
     )
@@ -101,7 +101,7 @@ def test_time_dimension_by_time_type_matcher() -> None:  # noqa: D
     )
 
 
-def test_primary_time_dimension_by_name_matcher() -> None:  # noqa: D
+def test_primary_time_dimension_by_name_matcher() -> None:  # noqa: D103
     assert defaults.PrimaryTimeDimensionByNameRule().match_column(
         get_column_properties("db.schema.table.ds", InferenceColumnType.DATETIME, True)
     )
@@ -116,7 +116,7 @@ def test_primary_time_dimension_by_name_matcher() -> None:  # noqa: D
     )
 
 
-def test_primary_time_dimension_if_only_time_rule() -> None:  # noqa: D
+def test_primary_time_dimension_if_only_time_rule() -> None:  # noqa: D103
     table = SqlTable.from_string("db.schema.table")
     single_time_col_warehouse = DataWarehouseInferenceContext(
         table_props=[
@@ -150,7 +150,7 @@ def test_primary_time_dimension_if_only_time_rule() -> None:  # noqa: D
     assert len(many_time_col_signals) == 0
 
 
-def test_categorical_dimension_by_boolean_type_matcher() -> None:  # noqa: D
+def test_categorical_dimension_by_boolean_type_matcher() -> None:  # noqa: D103
     assert defaults.CategoricalDimensionByBooleanTypeRule().match_column(
         get_column_properties("db.schema.table.dim", InferenceColumnType.BOOLEAN, True)
     )
@@ -159,7 +159,7 @@ def test_categorical_dimension_by_boolean_type_matcher() -> None:  # noqa: D
     )
 
 
-def test_categorical_dimension_by_string_type_matcher() -> None:  # noqa: D
+def test_categorical_dimension_by_string_type_matcher() -> None:  # noqa: D103
     assert defaults.CategoricalDimensionByStringTypeRule().match_column(
         get_column_properties("db.schema.table.dim", InferenceColumnType.STRING, True)
     )
@@ -168,7 +168,7 @@ def test_categorical_dimension_by_string_type_matcher() -> None:  # noqa: D
     )
 
 
-def test_categorical_dimension_by_string__and_cardinality_type_matcher() -> None:  # noqa: D
+def test_categorical_dimension_by_string__and_cardinality_type_matcher() -> None:
     """Tests the composite of string type and cardinality below supplied threshold.
 
     Since the helper cardinality ratio is always either 1 or 0.9, the cardinality thresholds are set to either above
@@ -187,7 +187,7 @@ def test_categorical_dimension_by_string__and_cardinality_type_matcher() -> None
     )
 
 
-def test_categorical_dimension_by_integer_type_matcher() -> None:  # noqa: D
+def test_categorical_dimension_by_integer_type_matcher() -> None:  # noqa: D103
     assert defaults.CategoricalDimensionByIntegerTypeRule().match_column(
         get_column_properties("db.schema.table.dim", InferenceColumnType.INTEGER, True)
     )
@@ -196,7 +196,7 @@ def test_categorical_dimension_by_integer_type_matcher() -> None:  # noqa: D
     )
 
 
-def test_measure_by_real_type_matcher() -> None:  # noqa: D
+def test_measure_by_real_type_matcher() -> None:  # noqa: D103
     assert defaults.MeasureByRealTypeRule().match_column(
         get_column_properties("db.schema.table.measure", InferenceColumnType.FLOAT, True)
     )
@@ -217,7 +217,7 @@ def test_measure_by_real_type_matcher() -> None:  # noqa: D
     )
 
 
-def test_measure_by_integer_type_matcher() -> None:  # noqa: D
+def test_measure_by_integer_type_matcher() -> None:  # noqa: D103
     assert defaults.MeasureByIntegerTypeRule().match_column(
         get_column_properties("db.schema.table.measure", InferenceColumnType.INTEGER, True)
     )

@@ -126,7 +126,7 @@ def test_partitioned_join(
 
 
 @pytest.mark.sql_engine_snapshot
-def test_limit_rows(  # noqa: D
+def test_limit_rows(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -157,7 +157,7 @@ def test_limit_rows(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_distinct_values(  # noqa: D
+def test_distinct_values(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     query_parser: MetricFlowQueryParser,
@@ -187,7 +187,7 @@ def test_distinct_values(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_local_dimension_using_local_entity(  # noqa: D
+def test_local_dimension_using_local_entity(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -216,7 +216,7 @@ def test_local_dimension_using_local_entity(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_measure_constraint(  # noqa: D
+def test_measure_constraint(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     query_parser: MetricFlowQueryParser,
@@ -240,7 +240,7 @@ def test_measure_constraint(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_measure_constraint_with_reused_measure(  # noqa: D
+def test_measure_constraint_with_reused_measure(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     query_parser: MetricFlowQueryParser,
@@ -264,7 +264,7 @@ def test_measure_constraint_with_reused_measure(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_measure_constraint_with_single_expr_and_alias(  # noqa: D
+def test_measure_constraint_with_single_expr_and_alias(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     query_parser: MetricFlowQueryParser,
@@ -370,7 +370,7 @@ def test_multi_hop_to_scd_dimension(
 
 
 @pytest.mark.sql_engine_snapshot
-def test_multiple_metrics_no_dimensions(  # noqa: D
+def test_multiple_metrics_no_dimensions(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -396,7 +396,7 @@ def test_multiple_metrics_no_dimensions(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_metric_with_measures_from_multiple_sources_no_dimensions(  # noqa: D
+def test_metric_with_measures_from_multiple_sources_no_dimensions(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -419,7 +419,7 @@ def test_metric_with_measures_from_multiple_sources_no_dimensions(  # noqa: D
 
 
 @pytest.mark.sql_engine_snapshot
-def test_common_semantic_model(  # noqa: D
+def test_common_semantic_model(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,

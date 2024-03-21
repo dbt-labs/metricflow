@@ -111,7 +111,7 @@ class SqlColumnPrunerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
             distinct=node.distinct,
         )
 
-    def visit_select_statement_node(self, node: SqlSelectStatementNode) -> SqlQueryPlanNode:  # noqa: D
+    def visit_select_statement_node(self, node: SqlSelectStatementNode) -> SqlQueryPlanNode:  # noqa: D102
         # Remove columns that are not needed from this SELECT statement because the parent SELECT statement doesn't
         # need them. However, keep columns that are in group bys because that changes the meaning of the query.
         # Similarly, if this node is a distinct select node, keep all columns as it may return a different result set.
@@ -191,15 +191,15 @@ class SqlColumnPrunerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
             distinct=node.distinct,
         )
 
-    def visit_table_from_clause_node(self, node: SqlTableFromClauseNode) -> SqlQueryPlanNode:  # noqa: D
+    def visit_table_from_clause_node(self, node: SqlTableFromClauseNode) -> SqlQueryPlanNode:
         """This node is effectively a FROM statement inside a SELECT statement node, so pruning cannot apply."""
         return node
 
-    def visit_query_from_clause_node(self, node: SqlSelectQueryFromClauseNode) -> SqlQueryPlanNode:  # noqa: D
+    def visit_query_from_clause_node(self, node: SqlSelectQueryFromClauseNode) -> SqlQueryPlanNode:
         """Pruning cannot be done here since this is an arbitrary user-provided SQL query."""
         return node
 
-    def visit_create_table_as_node(self, node: SqlCreateTableAsNode) -> SqlQueryPlanNode:  # noqa: D
+    def visit_create_table_as_node(self, node: SqlCreateTableAsNode) -> SqlQueryPlanNode:  # noqa: D102
         return SqlCreateTableAsNode(
             sql_table=node.sql_table,
             parent_node=node.parent_node.accept(self),
@@ -209,7 +209,7 @@ class SqlColumnPrunerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
 class SqlColumnPrunerOptimizer(SqlQueryPlanOptimizer):
     """Removes unnecessary columns in the SELECT clauses."""
 
-    def optimize(self, node: SqlQueryPlanNode) -> SqlQueryPlanNode:  # noqa: D
+    def optimize(self, node: SqlQueryPlanNode) -> SqlQueryPlanNode:  # noqa: D102
         # Can't prune columns without knowing the structure of the query.
         if not node.as_select_node:
             return node

@@ -18,7 +18,7 @@ class NoMatchingItemsForNoMetricsQuery(MetricFlowQueryResolutionIssue):
     """Describes an issue with the query where there are no matching items for a no-metrics / distinct values query."""
 
     @staticmethod
-    def from_parameters(  # noqa: D
+    def from_parameters(  # noqa: D102
         parent_issues: Sequence[MetricFlowQueryResolutionIssue],
         query_resolution_path: MetricFlowQueryResolutionPath,
     ) -> NoMatchingItemsForNoMetricsQuery:
