@@ -373,6 +373,21 @@ def assert_linkable_element_set_snapshot_equal(  # noqa: D103
                     sorted(linkable_element_property.name for linkable_element_property in linkable_entity.properties),
                 )
             )
+
+    for linkable_metric_iterable in linkable_element_set.path_key_to_linkable_metrics.values():
+        for linkable_metric in linkable_metric_iterable:
+            rows.append(
+                (
+                    # Checking a limited set of fields as the result is large due to the paths in the object.
+                    linkable_metric.join_by_semantic_model.semantic_model_name,
+                    tuple(entity_link.element_name for entity_link in linkable_entity.entity_links),
+                    linkable_metric.element_name,
+                    "",
+                    "",
+                    sorted(linkable_element_property.name for linkable_element_property in linkable_metric.properties),
+                )
+            )
+
     assert_str_snapshot_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,

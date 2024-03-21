@@ -4,11 +4,13 @@ import logging
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.references import MetricReference
+from dbt_semantic_interfaces.references import EntityReference, MetricReference, SemanticModelReference
 
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.linkable_spec_resolver import (
+    SemanticModelJoinPath,
+    SemanticModelJoinPathElement,
     ValidLinkableSpecResolver,
 )
 from metricflow.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
@@ -121,5 +123,51 @@ def test_cyclic_join_manifest(  # noqa: D103
             metric_references=[MetricReference(element_name="listings")],
             with_any_of=LinkableElementProperties.all_properties(),
             without_any_of=frozenset(),
+        ),
+    )
+
+
+def test_create_linkable_element_set_from_join_path(  # noqa: D
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    simple_model_spec_resolver: ValidLinkableSpecResolver,
+) -> None:
+    assert_linkable_element_set_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        set_id="result0",
+        linkable_element_set=simple_model_spec_resolver.create_linkable_element_set_from_join_path(
+            join_path=SemanticModelJoinPath(
+                path_elements=(
+                    SemanticModelJoinPathElement(
+                        semantic_model_reference=SemanticModelReference("listings_latest"),
+                        join_on_entity=EntityReference("listing"),
+                    ),
+                )
+            ),
+            with_properties=frozenset({LinkableElementProperties.JOINED}),
+        ),
+    )
+
+
+def test_create_linkable_element_set_from_join_path_multi_hop(  # noqa: D
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    simple_model_spec_resolver: ValidLinkableSpecResolver,
+) -> None:
+    assert_linkable_element_set_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        set_id="result0",
+        linkable_element_set=simple_model_spec_resolver.create_linkable_element_set_from_join_path(
+            join_path=SemanticModelJoinPath(
+                path_elements=(
+                    SemanticModelJoinPathElement(
+                        semantic_model_reference=SemanticModelReference("listings_latest"),
+                        join_on_entity=EntityReference("listing"),
+                    ),
+                )
+            ),
+            with_properties=frozenset({LinkableElementProperties.JOINED, LinkableElementProperties.MULTI_HOP}),
         ),
     )

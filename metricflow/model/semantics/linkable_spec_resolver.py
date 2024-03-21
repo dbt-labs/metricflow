@@ -650,7 +650,6 @@ class ValidLinkableSpecResolver:
             path_key_to_linkable_entities={
                 linkable_entity.path_key: (linkable_entity,) for linkable_entity in linkable_entities
             },
-            # TODO: add metrics
             path_key_to_linkable_metrics={},
         )
 
