@@ -14,12 +14,10 @@ from typing import Callable, List, Optional, Sequence
 
 import click
 import jinja2
-import pandas as pd
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 from dbt_semantic_interfaces.validations.validator_helpers import SemanticManifestValidationResults
 from halo import Halo
-from packaging.version import parse
 from update_checker import UpdateChecker
 
 import metricflow.cli.custom_click_types as click_custom
@@ -343,11 +341,7 @@ def query(
             df.to_csv(csv, index=False)  # type: ignore
             click.echo(f"🖨 Successfully written query output to {csv.name}")
         else:
-            # NOTE: remove `to_string` if no pandas dependency is < 1.1.0
-            if parse(pd.__version__) >= parse("1.1.0"):
-                click.echo(df.to_markdown(index=False, floatfmt=f".{decimals}f"))
-            else:
-                click.echo(df.to_string(index=False, float_format=lambda x: format(x, f".{decimals}f")))
+            click.echo(df.to_markdown(index=False, floatfmt=f".{decimals}f"))
 
         if display_plans:
             temp_path = tempfile.mkdtemp()
