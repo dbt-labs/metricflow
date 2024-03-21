@@ -1017,7 +1017,7 @@ class ValidLinkableSpecResolver:
                 entity_links=entity_links,
                 join_path=join_path.path_elements,
                 join_by_semantic_model=semantic_model.reference,
-                properties=with_properties,
+                properties=with_properties.union({LinkableElementProperties.METRIC}),
             )
             for metric in self._joinable_metrics_for_semantic_models.get(join_path.last_semantic_model_reference, set())
         ]
