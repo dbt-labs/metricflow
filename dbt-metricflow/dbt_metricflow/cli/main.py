@@ -642,9 +642,7 @@ def validate_configs(
     ).validate_semantic_manifest(semantic_manifest)
 
     if not model_issues.has_blocking_issues:
-        semantic_spinner.succeed(
-            f"🎉 Successfully validated the semantics of built manifest ({model_issues.summary()})"
-        )
+        semantic_spinner.succeed(f"🎉 Successfully validated the semantics of built manifest ({model_issues.summary()})")
     else:
         semantic_spinner.fail(
             f"Breaking issues found when checking semantics of built manifest ({model_issues.summary()})"
