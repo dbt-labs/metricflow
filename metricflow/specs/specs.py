@@ -245,32 +245,32 @@ class GroupByMetricSpec(LinkableInstanceSpec, SerializableDataclass):
     """Metric used in group by or where filter."""
 
     @property
-    def without_first_entity_link(self) -> GroupByMetricSpec:  # noqa: D
+    def without_first_entity_link(self) -> GroupByMetricSpec:  # noqa: D102
         assert len(self.entity_links) > 0, f"Spec does not have any entity links: {self}"
         return GroupByMetricSpec(element_name=self.element_name, entity_links=self.entity_links[1:])
 
     @property
-    def without_entity_links(self) -> GroupByMetricSpec:  # noqa: D
+    def without_entity_links(self) -> GroupByMetricSpec:  # noqa: D102
         return GroupByMetricSpec(element_name=self.element_name, entity_links=())
 
     @staticmethod
-    def from_name(name: str) -> GroupByMetricSpec:  # noqa: D
+    def from_name(name: str) -> GroupByMetricSpec:  # noqa: D102
         structured_name = StructuredLinkableSpecName.from_name(name)
         return GroupByMetricSpec(
             entity_links=tuple(EntityReference(idl) for idl in structured_name.entity_link_names),
             element_name=structured_name.element_name,
         )
 
-    def __eq__(self, other: Any) -> bool:  # type: ignore[misc] # noqa: D
+    def __eq__(self, other: Any) -> bool:  # type: ignore[misc] # noqa: D105
         if not isinstance(other, GroupByMetricSpec):
             return False
         return self.element_name == other.element_name and self.entity_links == other.entity_links
 
-    def __hash__(self) -> int:  # noqa: D
+    def __hash__(self) -> int:  # noqa: D105
         return hash((self.element_name, self.entity_links))
 
     @property
-    def reference(self) -> MetricReference:  # noqa: D
+    def reference(self) -> MetricReference:  # noqa: D102
         return MetricReference(element_name=self.element_name)
 
     @property
@@ -278,7 +278,7 @@ class GroupByMetricSpec(LinkableInstanceSpec, SerializableDataclass):
     def as_spec_set(self) -> InstanceSpecSet:
         return InstanceSpecSet(group_by_metric_specs=(self,))
 
-    def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D
+    def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_group_by_metric_spec(self)
 
 
