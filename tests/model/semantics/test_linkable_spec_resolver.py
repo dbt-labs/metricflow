@@ -127,7 +127,7 @@ def test_cyclic_join_manifest(  # noqa: D103
     )
 
 
-def test_create_linkable_element_set_from_join_path(  # noqa: D
+def test_create_linkable_element_set_from_join_path(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     simple_model_spec_resolver: ValidLinkableSpecResolver,
@@ -150,7 +150,7 @@ def test_create_linkable_element_set_from_join_path(  # noqa: D
     )
 
 
-def test_create_linkable_element_set_from_join_path_multi_hop(  # noqa: D
+def test_create_linkable_element_set_from_join_path_multi_hop(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     simple_model_spec_resolver: ValidLinkableSpecResolver,

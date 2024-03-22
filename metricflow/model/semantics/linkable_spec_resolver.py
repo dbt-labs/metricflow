@@ -98,7 +98,7 @@ class LinkableEntity:
         )
 
     @property
-    def reference(self) -> EntityReference:  # noqa: D
+    def reference(self) -> EntityReference:  # noqa: D102
         return EntityReference(element_name=self.element_name)
 
 
@@ -114,7 +114,7 @@ class LinkableMetric:
     join_path: Tuple[SemanticModelJoinPathElement, ...]
 
     @property
-    def path_key(self) -> ElementPathKey:  # noqa: D
+    def path_key(self) -> ElementPathKey:  # noqa: D102
         return ElementPathKey(
             element_name=self.element_name,
             entity_links=self.entity_links,
@@ -123,7 +123,7 @@ class LinkableMetric:
         )
 
     @property
-    def reference(self) -> MetricReference:  # noqa: D
+    def reference(self) -> MetricReference:  # noqa: D102
         return MetricReference(element_name=self.element_name)
 
 
@@ -459,7 +459,7 @@ class SemanticModelJoinPath:
     path_elements: Tuple[SemanticModelJoinPathElement, ...]
 
     @property
-    def last_path_element(self) -> SemanticModelJoinPathElement:  # noqa: D
+    def last_path_element(self) -> SemanticModelJoinPathElement:  # noqa: D102
         assert len(self.path_elements) > 0
         return self.path_elements[-1]
 
