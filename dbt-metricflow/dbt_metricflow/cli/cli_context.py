@@ -7,8 +7,8 @@ from typing import Dict, Optional
 
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 
-from metricflow.cli.dbt_connectors.adapter_backed_client import AdapterBackedSqlClient
-from metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts, dbtProjectMetadata
+from dbt_metricflow.cli.dbt_connectors.adapter_backed_client import AdapterBackedSqlClient
+from dbt_metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts, dbtProjectMetadata
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.protocols.sql_client import SqlClient

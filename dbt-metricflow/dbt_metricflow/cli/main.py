@@ -20,15 +20,15 @@ from dbt_semantic_interfaces.validations.validator_helpers import SemanticManife
 from halo import Halo
 from update_checker import UpdateChecker
 
-import metricflow.cli.custom_click_types as click_custom
-from metricflow.cli import PACKAGE_NAME
-from metricflow.cli.cli_context import CLIContext
-from metricflow.cli.constants import DEFAULT_RESULT_DECIMAL_PLACES, MAX_LIST_OBJECT_ELEMENTS
-from metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts
-from metricflow.cli.tutorial import (
+import dbt_metricflow.cli.custom_click_types as click_custom
+from dbt_metricflow.cli import PACKAGE_NAME
+from dbt_metricflow.cli.cli_context import CLIContext
+from dbt_metricflow.cli.constants import DEFAULT_RESULT_DECIMAL_PLACES, MAX_LIST_OBJECT_ELEMENTS
+from dbt_metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts
+from dbt_metricflow.cli.tutorial import (
     dbtMetricFlowTutorialHelper,
 )
-from metricflow.cli.utils import (
+from dbt_metricflow.cli.utils import (
     dbt_project_file_exists,
     error_if_not_in_dbt_project,
     exception_handler,
@@ -642,7 +642,9 @@ def validate_configs(
     ).validate_semantic_manifest(semantic_manifest)
 
     if not model_issues.has_blocking_issues:
-        semantic_spinner.succeed(f"🎉 Successfully validated the semantics of built manifest ({model_issues.summary()})")
+        semantic_spinner.succeed(
+            f"🎉 Successfully validated the semantics of built manifest ({model_issues.summary()})"
+        )
     else:
         semantic_spinner.fail(
             f"Breaking issues found when checking semantics of built manifest ({model_issues.summary()})"

@@ -1,0 +1,6 @@
+kind: Breaking Changes
+body: Move MetricFlow CLI to dbt-metricflow package
+time: 2024-03-22T10:23:34.027621-07:00
+custom:
+  Author: tlento
+  Issue: "1090"

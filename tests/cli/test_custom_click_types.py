@@ -4,7 +4,7 @@ import click
 import pytest
 from click.testing import CliRunner
 
-from metricflow.cli.custom_click_types import MutuallyExclusiveOption, SequenceParamType
+from dbt_metricflow.cli.custom_click_types import MutuallyExclusiveOption, SequenceParamType
 
 
 def test_check_min_length() -> None:
