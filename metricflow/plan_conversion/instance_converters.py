@@ -20,6 +20,7 @@ from metricflow.dataflow.nodes.join_to_base import ValidityWindowJoinDescription
 from metricflow.instances import (
     DimensionInstance,
     EntityInstance,
+    GroupByMetricInstance,
     InstanceSet,
     InstanceSetTransform,
     MdoInstance,
@@ -35,6 +36,7 @@ from metricflow.specs.specs import (
     DimensionSpec,
     EntityReference,
     EntitySpec,
+    GroupByMetricSpec,
     InstanceSpec,
     InstanceSpecSet,
     LinkableInstanceSpec,
@@ -102,12 +104,16 @@ class CreateSelectColumnsForInstances(InstanceSetTransform[SelectColumnSet]):
         metadata_cols = list(
             chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.metadata_instances])
         )
+        group_by_metric_cols = list(
+            chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.group_by_metric_instances])
+        )
         return SelectColumnSet(
             metric_columns=metric_cols,
             measure_columns=measure_cols,
             dimension_columns=dimension_cols,
             time_dimension_columns=time_dimension_cols,
             entity_columns=entity_cols,
+            group_by_metric_columns=group_by_metric_cols,
             metadata_columns=metadata_cols,
         )
 
@@ -254,12 +260,16 @@ class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances)
         metadata_cols = list(
             chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.metadata_instances])
         )
+        group_by_metric_cols = list(
+            chain.from_iterable([self._make_sql_column_expression(x) for x in instance_set.group_by_metric_instances])
+        )
         return SelectColumnSet(
             metric_columns=metric_cols,
             measure_columns=measure_cols,
             dimension_columns=dimension_cols,
             time_dimension_columns=time_dimension_cols,
             entity_columns=entity_cols,
+            group_by_metric_columns=group_by_metric_cols,
             metadata_columns=metadata_cols,
         )
 
@@ -444,11 +454,28 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
                 )
             )
 
+        # Handle group by metric instances
+        group_by_metric_instances_with_additional_link = []
+        for group_by_metric_instance in instance_set.group_by_metric_instances:
+            # The new group by metric spec should include the join on entity.
+            transformed_group_by_metric_spec_from_right = GroupByMetricSpec(
+                element_name=group_by_metric_instance.spec.element_name,
+                entity_links=self._join_on_entity.as_linkless_prefix + group_by_metric_instance.spec.entity_links,
+            )
+            group_by_metric_instances_with_additional_link.append(
+                GroupByMetricInstance(
+                    associated_columns=group_by_metric_instance.associated_columns,
+                    defined_from=group_by_metric_instance.defined_from,
+                    spec=transformed_group_by_metric_spec_from_right,
+                )
+            )
+
         return InstanceSet(
             measure_instances=(),
             dimension_instances=tuple(dimension_instances_with_additional_link),
             time_dimension_instances=tuple(time_dimension_instances_with_additional_link),
             entity_instances=tuple(entity_instances_with_additional_link),
+            group_by_metric_instances=tuple(group_by_metric_instances_with_additional_link),
             metric_instances=(),
             metadata_instances=(),
         )
@@ -484,12 +511,16 @@ class FilterLinkableInstancesWithLeadingLink(InstanceSetTransform[InstanceSet]):
             x for x in instance_set.time_dimension_instances if self._should_pass(x.spec)
         )
         filtered_entity_instances = tuple(x for x in instance_set.entity_instances if self._should_pass(x.spec))
+        filtered_group_by_metric_instances = tuple(
+            x for x in instance_set.group_by_metric_instances if self._should_pass(x.spec)
+        )
 
         output = InstanceSet(
             measure_instances=instance_set.measure_instances,
             dimension_instances=filtered_dimension_instances,
             time_dimension_instances=filtered_time_dimension_instances,
             entity_instances=filtered_entity_instances,
+            group_by_metric_instances=filtered_group_by_metric_instances,
             metric_instances=instance_set.metric_instances,
             metadata_instances=instance_set.metadata_instances,
         )
@@ -549,6 +580,9 @@ class FilterElements(InstanceSetTransform[InstanceSet]):
                 x for x in instance_set.time_dimension_instances if self._should_pass(x.spec)
             ),
             entity_instances=tuple(x for x in instance_set.entity_instances if self._should_pass(x.spec)),
+            group_by_metric_instances=tuple(
+                x for x in instance_set.group_by_metric_instances if self._should_pass(x.spec)
+            ),
             metric_instances=tuple(x for x in instance_set.metric_instances if self._should_pass(x.spec)),
             metadata_instances=tuple(x for x in instance_set.metadata_instances if self._should_pass(x.spec)),
         )
@@ -588,6 +622,7 @@ class ChangeMeasureAggregationState(InstanceSetTransform[InstanceSet]):
             dimension_instances=instance_set.dimension_instances,
             time_dimension_instances=instance_set.time_dimension_instances,
             entity_instances=instance_set.entity_instances,
+            group_by_metric_instances=instance_set.group_by_metric_instances,
             metric_instances=instance_set.metric_instances,
             metadata_instances=instance_set.metadata_instances,
         )
@@ -629,6 +664,7 @@ class UpdateMeasureFillNullsWith(InstanceSetTransform[InstanceSet]):
             dimension_instances=instance_set.dimension_instances,
             time_dimension_instances=instance_set.time_dimension_instances,
             entity_instances=instance_set.entity_instances,
+            group_by_metric_instances=instance_set.group_by_metric_instances,
             metric_instances=instance_set.metric_instances,
             metadata_instances=instance_set.metadata_instances,
         )
@@ -683,6 +719,7 @@ class AliasAggregatedMeasures(InstanceSetTransform[InstanceSet]):
             dimension_instances=instance_set.dimension_instances,
             time_dimension_instances=instance_set.time_dimension_instances,
             entity_instances=instance_set.entity_instances,
+            group_by_metric_instances=instance_set.group_by_metric_instances,
             metric_instances=instance_set.metric_instances,
             metadata_instances=instance_set.metadata_instances,
         )
@@ -700,7 +737,26 @@ class AddMetrics(InstanceSetTransform[InstanceSet]):
             dimension_instances=instance_set.dimension_instances,
             time_dimension_instances=instance_set.time_dimension_instances,
             entity_instances=instance_set.entity_instances,
+            group_by_metric_instances=instance_set.group_by_metric_instances,
             metric_instances=instance_set.metric_instances + tuple(self._metric_instances),
+            metadata_instances=instance_set.metadata_instances,
+        )
+
+
+class AddGroupByMetrics(InstanceSetTransform[InstanceSet]):
+    """Adds the given metric instances to the instance set."""
+
+    def __init__(self, group_by_metric_instances: List[GroupByMetricInstance]) -> None:  # noqa: D107
+        self._group_by_metric_instances = group_by_metric_instances
+
+    def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D102
+        return InstanceSet(
+            measure_instances=instance_set.measure_instances,
+            dimension_instances=instance_set.dimension_instances,
+            time_dimension_instances=instance_set.time_dimension_instances,
+            entity_instances=instance_set.entity_instances,
+            group_by_metric_instances=instance_set.group_by_metric_instances + tuple(self._group_by_metric_instances),
+            metric_instances=instance_set.metric_instances,
             metadata_instances=instance_set.metadata_instances,
         )
 
@@ -714,6 +770,7 @@ class RemoveMeasures(InstanceSetTransform[InstanceSet]):
             dimension_instances=instance_set.dimension_instances,
             time_dimension_instances=instance_set.time_dimension_instances,
             entity_instances=instance_set.entity_instances,
+            group_by_metric_instances=instance_set.group_by_metric_instances,
             metric_instances=instance_set.metric_instances,
             metadata_instances=instance_set.metadata_instances,
         )
@@ -728,6 +785,7 @@ class RemoveMetrics(InstanceSetTransform[InstanceSet]):
             dimension_instances=instance_set.dimension_instances,
             time_dimension_instances=instance_set.time_dimension_instances,
             entity_instances=instance_set.entity_instances,
+            group_by_metric_instances=instance_set.group_by_metric_instances,
             metric_instances=(),
             metadata_instances=instance_set.metadata_instances,
         )
@@ -938,11 +996,23 @@ class ChangeAssociatedColumns(InstanceSetTransform[InstanceSet]):
                 )
             )
 
+        output_group_by_metric_instances = []
+        for input_group_by_metric_instance in instance_set.group_by_metric_instances:
+            output_group_by_metric_instances.append(
+                GroupByMetricInstance(
+                    associated_columns=(
+                        self._column_association_resolver.resolve_spec(input_group_by_metric_instance.spec),
+                    ),
+                    spec=input_group_by_metric_instance.spec,
+                    defined_from=input_group_by_metric_instance.defined_from,
+                )
+            )
         return InstanceSet(
             measure_instances=tuple(output_measure_instances),
             dimension_instances=tuple(output_dimension_instances),
             time_dimension_instances=tuple(output_time_dimension_instances),
             entity_instances=tuple(output_entity_instances),
+            group_by_metric_instances=tuple(output_group_by_metric_instances),
             metric_instances=tuple(output_metric_instances),
             metadata_instances=tuple(output_metadata_instances),
         )
@@ -994,6 +1064,7 @@ class AddMetadata(InstanceSetTransform[InstanceSet]):
             dimension_instances=instance_set.dimension_instances,
             time_dimension_instances=instance_set.time_dimension_instances,
             entity_instances=instance_set.entity_instances,
+            group_by_metric_instances=instance_set.group_by_metric_instances,
             metric_instances=instance_set.metric_instances,
             metadata_instances=instance_set.metadata_instances + tuple(self._metadata_instances),
         )
