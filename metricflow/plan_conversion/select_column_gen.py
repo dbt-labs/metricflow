@@ -18,6 +18,7 @@ class SelectColumnSet:
     dimension_columns: List[SqlSelectColumn] = field(default_factory=list)
     time_dimension_columns: List[SqlSelectColumn] = field(default_factory=list)
     entity_columns: List[SqlSelectColumn] = field(default_factory=list)
+    group_by_metric_columns: List[SqlSelectColumn] = field(default_factory=list)
     metadata_columns: List[SqlSelectColumn] = field(default_factory=list)
 
     def merge(self, other_set: SelectColumnSet) -> SelectColumnSet:
@@ -28,6 +29,7 @@ class SelectColumnSet:
             dimension_columns=self.dimension_columns + other_set.dimension_columns,
             time_dimension_columns=self.time_dimension_columns + other_set.time_dimension_columns,
             entity_columns=self.entity_columns + other_set.entity_columns,
+            group_by_metric_columns=self.group_by_metric_columns + other_set.group_by_metric_columns,
             metadata_columns=self.metadata_columns + other_set.metadata_columns,
         )
 
@@ -38,6 +40,7 @@ class SelectColumnSet:
             self.time_dimension_columns
             + self.entity_columns
             + self.dimension_columns
+            + self.group_by_metric_columns
             + self.metric_columns
             + self.measure_columns
             + self.metadata_columns
@@ -50,5 +53,6 @@ class SelectColumnSet:
             dimension_columns=self.dimension_columns,
             time_dimension_columns=self.time_dimension_columns,
             entity_columns=self.entity_columns,
+            group_by_metric_columns=self.group_by_metric_columns,
             metadata_columns=self.metadata_columns,
         )
