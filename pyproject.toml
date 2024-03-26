@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "metricflow"
-version = "0.205.0.dev0"
+version = "0.206.0.dev0"
 description = "Translates a simple metric definition into reusable SQL and executes it against the SQL engine of your choice."
 readme = "README.md"
 requires-python = ">=3.8,<3.12"
@@ -27,7 +27,7 @@ classifiers = [
 dependencies = [
   "Jinja2>=3.1.3",
   "PyYAML>=6.0, <7.0.0",
-  "dbt-semantic-interfaces>=0.4.2, <0.5.0",
+  "dbt-semantic-interfaces>=0.5.1, <0.6.0",
   "graphviz>=0.18.2, <0.21",
   "more-itertools>=8.10.0, <10.2.0",
   "pandas>=1.5.0, <1.6.0",
@@ -56,12 +56,18 @@ dev-packages = [
   "types-tabulate",
 
   # Test and CLI development dependencies.
+  # These should generally match what's in dbt-metricflow/pyproject.toml, but may
+  # diverge during upgrade phases or for other reasons
+  #
+  # Note we do not currently depend on dbt-core because updates across minor version
+  # boundaries cause problems with tests against future versions of dbt-semantic-interfaces.
+  # In future we will refine this packaging to depend on stable dbt-adapter interfaces in
+  # the development builds, but those packages do not yet support all of our needs so we
+  # hack around the problem with editable pre-installs in the various dev environments.
+  # Note this only works because we don't use the dbt packages for anything other than
+  # managing warehouse connections and dispatching queries, so this is not a pattern
+  # anyone else should be emulating even as a short-term hack.
 
-  # This should generally match what's in dbt-metricflow/pyproject.toml, but may
-  # diverge during upgrade phases
-  "dbt-core>=1.7.4, <1.8.0",
-
-  # These need to match the ones in dbt-metricflow/pyproject.toml
   "halo>=0.0.31, <0.1.0",
   "update-checker>=0.18.0, <0.19.0",
 
@@ -77,34 +83,6 @@ sql-client-packages = [
 ]
 trino-sql-client-packages = [
   "trino>=0.327.0, <0.328.0",
-]
-
-dbt-postgres = [
-  "dbt-postgres>=1.7.0, <1.8.0",
-]
-
-dbt-bigquery = [
-  "dbt-bigquery>=1.7.0, <1.8.0",
-]
-
-dbt-databricks = [
-  "dbt-databricks>=1.7.0, <1.8.0",
-]
-
-dbt-redshift = [
-  "dbt-redshift>=1.7.0, <1.8.0",
-]
-
-dbt-snowflake = [
-  "dbt-snowflake>=1.7.0, <1.8.0",
-]
-
-dbt-duckdb = [
-  "dbt-duckdb>=1.7.0, <1.8.0",
-]
-
-dbt-trino = [
-  "dbt-trino>=1.7.0, <1.8.0",
 ]
 
 [tool.hatch.build.targets.sdist]
@@ -134,13 +112,12 @@ exclude = [
 description = "Environment for development. Includes a DuckDB-backed client."
 
 pre-install-commands = [
-  "pip install -e ./dbt-metricflow"
+  "pip install -e ./dbt-metricflow[duckdb]"
 ]
 
 features = [
   "dev-packages",
   "sql-client-packages",
-  "dbt-duckdb",
 ]
 
 [tool.hatch.envs.dev-env.env-vars]
@@ -156,12 +133,11 @@ MF_TEST_ADAPTER_TYPE="postgres"
 description = "Dev environment for working with Postgres adapter"
 
 pre-install-commands = [
-  "pip install -e ./dbt-metricflow"
+  "pip install -e ./dbt-metricflow[postgres]"
 ]
 
 features = [
   "dev-packages",
-  "dbt-postgres",
   "sql-client-packages",
 ]
 
@@ -175,12 +151,11 @@ MF_TEST_ADAPTER_TYPE="bigquery"
 description = "Dev environment for working with the BigQuery adapter"
 
 pre-install-commands = [
-  "pip install -e ./dbt-metricflow"
+  "pip install -e ./dbt-metricflow[bigquery]"
 ]
 
 features = [
   "dev-packages",
-  "dbt-bigquery",
   "sql-client-packages",
 ]
 
@@ -191,12 +166,11 @@ MF_TEST_ADAPTER_TYPE="databricks"
 description = "Dev environment for working with the Databricks adapter"
 
 pre-install-commands = [
-  "pip install -e ./dbt-metricflow"
+  "pip install -e ./dbt-metricflow[databricks]"
 ]
 
 features = [
   "dev-packages",
-  "dbt-databricks",
   "sql-client-packages",
 ]
 
@@ -207,12 +181,11 @@ MF_TEST_ADAPTER_TYPE="redshift"
 description = "Dev environment for working with the Redshift adapter"
 
 pre-install-commands = [
-  "pip install -e ./dbt-metricflow"
+  "pip install -e ./dbt-metricflow[redshift]"
 ]
 
 features = [
   "dev-packages",
-  "dbt-redshift",
   "sql-client-packages",
 ]
 
@@ -223,12 +196,11 @@ MF_TEST_ADAPTER_TYPE="snowflake"
 description = "Dev environment for working with Snowflake adapter"
 
 pre-install-commands = [
-  "pip install -e ./dbt-metricflow"
+  "pip install -e ./dbt-metricflow[snowflake]"
 ]
 
 features = [
   "dev-packages",
-  "dbt-snowflake",
   "sql-client-packages",
 ]
 
@@ -241,12 +213,11 @@ DBT_ENV_SECRET_CATALOG="memory"
 description = "Dev environment for working with the Trino adapter"
 
 pre-install-commands = [
-  "pip install -e ./dbt-metricflow"
+  "pip install -e ./dbt-metricflow[trino]"
 ]
 
 features = [
   "dev-packages",
-  "dbt-trino",
   "sql-client-packages",
   "trino-sql-client-packages",
 ]
