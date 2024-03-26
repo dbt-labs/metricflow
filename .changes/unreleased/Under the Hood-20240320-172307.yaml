@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Clean up files included in MetricFlow package distribution
+time: 2024-03-20T17:23:07.114845-07:00
+custom:
+  Author: tlento
+  Issue: "1092"
