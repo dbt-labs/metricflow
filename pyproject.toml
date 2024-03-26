@@ -27,11 +27,8 @@ classifiers = [
 dependencies = [
   "Jinja2>=3.1.3",
   "PyYAML>=6.0, <7.0.0",
-  "click>=7.1.2",
-  "dbt-core>=1.7.0, <1.8.0",
   "dbt-semantic-interfaces>=0.4.2, <0.5.0",
   "graphviz>=0.18.2, <0.21",
-  "halo>=0.0.31, <0.1.0",
   "more-itertools>=8.10.0, <10.2.0",
   "pandas>=1.5.0, <1.6.0",
   "pydantic>=1.10.0, <1.11.0",
@@ -40,28 +37,36 @@ dependencies = [
   "ruamel.yaml>=0.17.21, <0.18.0",
   "tabulate>=0.8.9",
   "typing_extensions>=4.4, <5.0",
-  "update-checker>=0.18.0, <0.19.0",
 ]
 
 [project.urls]
 Documentation = "https://transform.co/metricflow"
 "Source Code" = "https://github.com/transform-data/metricflow"
 
-[project.scripts]
-mf = 'metricflow.cli.main:cli'
-
 [project.optional-dependencies]
 dev-packages = [
+  # Developer tools
   "mypy>=1.7.0, <1.8.0",
   "pre-commit>=3.2.2, <3.3.0",
-  # Bug with mypy: https://github.com/pallets/click/issues/2558#issuecomment-1656546003
-  "click>=8.1.6",
   "pytest-mock>=3.7.0, <3.8.0",
   "pytest-xdist>=3.2.1, <3.3.0",
   "pytest>=7.1.1, < 7.2.0",
   "types-PyYAML",
   "types-python-dateutil",
   "types-tabulate",
+
+  # Test and CLI development dependencies.
+
+  # This should generally match what's in dbt-metricflow/pyproject.toml, but may
+  # diverge during upgrade phases
+  "dbt-core>=1.7.4, <1.8.0",
+
+  # These need to match the ones in dbt-metricflow/pyproject.toml
+  "halo>=0.0.31, <0.1.0",
+  "update-checker>=0.18.0, <0.19.0",
+
+  # Bug with mypy: https://github.com/pallets/click/issues/2558#issuecomment-1656546003
+  "click>=8.1.6",
 ]
 
 # These are currently separate for ease of removal, but due to the way Python
@@ -117,8 +122,21 @@ exclude = [
   "/tests",
 ]
 
+
+# Environment setup
+# Due to our current wonky package organization, we need to do an editable install
+# of dbt-metricflow in every test running environment in order for the tests to work.
+# In theory we can install the adapter extra for dbt-metricflow and rely on that, but
+# for ease of managing versioning through upgrade phases we retain the explicit
+# dependencies on the specific adapter versions defined here.
+
 [tool.hatch.envs.dev-env]
 description = "Environment for development. Includes a DuckDB-backed client."
+
+pre-install-commands = [
+  "pip install -e ./dbt-metricflow"
+]
+
 features = [
   "dev-packages",
   "sql-client-packages",
@@ -136,6 +154,11 @@ MF_TEST_ADAPTER_TYPE="postgres"
 
 [tool.hatch.envs.postgres-env]
 description = "Dev environment for working with Postgres adapter"
+
+pre-install-commands = [
+  "pip install -e ./dbt-metricflow"
+]
+
 features = [
   "dev-packages",
   "dbt-postgres",
@@ -150,6 +173,11 @@ MF_TEST_ADAPTER_TYPE="bigquery"
 
 [tool.hatch.envs.bigquery-env]
 description = "Dev environment for working with the BigQuery adapter"
+
+pre-install-commands = [
+  "pip install -e ./dbt-metricflow"
+]
+
 features = [
   "dev-packages",
   "dbt-bigquery",
@@ -161,6 +189,11 @@ MF_TEST_ADAPTER_TYPE="databricks"
 
 [tool.hatch.envs.databricks-env]
 description = "Dev environment for working with the Databricks adapter"
+
+pre-install-commands = [
+  "pip install -e ./dbt-metricflow"
+]
+
 features = [
   "dev-packages",
   "dbt-databricks",
@@ -172,6 +205,11 @@ MF_TEST_ADAPTER_TYPE="redshift"
 
 [tool.hatch.envs.redshift-env]
 description = "Dev environment for working with the Redshift adapter"
+
+pre-install-commands = [
+  "pip install -e ./dbt-metricflow"
+]
+
 features = [
   "dev-packages",
   "dbt-redshift",
@@ -183,6 +221,11 @@ MF_TEST_ADAPTER_TYPE="snowflake"
 
 [tool.hatch.envs.snowflake-env]
 description = "Dev environment for working with Snowflake adapter"
+
+pre-install-commands = [
+  "pip install -e ./dbt-metricflow"
+]
+
 features = [
   "dev-packages",
   "dbt-snowflake",
@@ -196,6 +239,11 @@ DBT_ENV_SECRET_CATALOG="memory"
 
 [tool.hatch.envs.trino-env]
 description = "Dev environment for working with the Trino adapter"
+
+pre-install-commands = [
+  "pip install -e ./dbt-metricflow"
+]
+
 features = [
   "dev-packages",
   "dbt-trino",

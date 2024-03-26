@@ -62,7 +62,7 @@ body:
           - **OS**: Ubuntu 20.04
           - **Python**: 3.9.12 (`python3 --version`)
           - **dbt**: 1.1.1 (`dbt --version`)
-          - **metricflow**: 0.14.1 
+          - **metricflow**: 0.14.1
       value: |
         - OS:
         - Python:

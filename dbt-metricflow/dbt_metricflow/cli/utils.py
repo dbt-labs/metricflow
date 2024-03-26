@@ -10,8 +10,8 @@ from typing import Any, Callable, List, Optional
 import click
 from dateutil.parser import parse
 
-import metricflow.cli.custom_click_types as click_custom
-from metricflow.cli.cli_context import CLIContext
+import dbt_metricflow.cli.custom_click_types as click_custom
+from dbt_metricflow.cli.cli_context import CLIContext
 
 logger = logging.getLogger(__name__)
 

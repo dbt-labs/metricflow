@@ -6,7 +6,7 @@ from typing import Optional
 
 import pandas as pd
 
-from metricflow.cli.dbt_connectors.adapter_backed_client import AdapterBackedSqlClient
+from dbt_metricflow.cli.dbt_connectors.adapter_backed_client import AdapterBackedSqlClient
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.sql.sql_table import SqlTable
 

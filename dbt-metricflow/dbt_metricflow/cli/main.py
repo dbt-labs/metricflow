@@ -14,23 +14,21 @@ from typing import Callable, List, Optional, Sequence
 
 import click
 import jinja2
-import pandas as pd
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 from dbt_semantic_interfaces.validations.validator_helpers import SemanticManifestValidationResults
 from halo import Halo
-from packaging.version import parse
 from update_checker import UpdateChecker
 
-import metricflow.cli.custom_click_types as click_custom
-from metricflow.cli import PACKAGE_NAME
-from metricflow.cli.cli_context import CLIContext
-from metricflow.cli.constants import DEFAULT_RESULT_DECIMAL_PLACES, MAX_LIST_OBJECT_ELEMENTS
-from metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts
-from metricflow.cli.tutorial import (
+import dbt_metricflow.cli.custom_click_types as click_custom
+from dbt_metricflow.cli import PACKAGE_NAME
+from dbt_metricflow.cli.cli_context import CLIContext
+from dbt_metricflow.cli.constants import DEFAULT_RESULT_DECIMAL_PLACES, MAX_LIST_OBJECT_ELEMENTS
+from dbt_metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts
+from dbt_metricflow.cli.tutorial import (
     dbtMetricFlowTutorialHelper,
 )
-from metricflow.cli.utils import (
+from dbt_metricflow.cli.utils import (
     dbt_project_file_exists,
     error_if_not_in_dbt_project,
     exception_handler,
@@ -343,11 +341,7 @@ def query(
             df.to_csv(csv, index=False)  # type: ignore
             click.echo(f"🖨 Successfully written query output to {csv.name}")
         else:
-            # NOTE: remove `to_string` if no pandas dependency is < 1.1.0
-            if parse(pd.__version__) >= parse("1.1.0"):
-                click.echo(df.to_markdown(index=False, floatfmt=f".{decimals}f"))
-            else:
-                click.echo(df.to_string(index=False, float_format=lambda x: format(x, f".{decimals}f")))
+            click.echo(df.to_markdown(index=False, floatfmt=f".{decimals}f"))
 
         if display_plans:
             temp_path = tempfile.mkdtemp()
