@@ -14,6 +14,7 @@ from metricflow.specs.rendered_spec_tracker import RenderedSpecTracker
 from metricflow.specs.specs import LinkableSpecSet, WhereFilterSpec
 from metricflow.specs.where_filter_dimension import WhereFilterDimensionFactory
 from metricflow.specs.where_filter_entity import WhereFilterEntityFactory
+from metricflow.specs.where_filter_metric import WhereFilterMetricFactory
 from metricflow.specs.where_filter_time_dimension import WhereFilterTimeDimensionFactory
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 
@@ -75,6 +76,12 @@ class WhereSpecFactory:
                 where_filter_location=filter_location,
                 rendered_spec_tracker=rendered_spec_tracker,
             )
+            metric_factory = WhereFilterMetricFactory(
+                column_association_resolver=self._column_association_resolver,
+                spec_resolution_lookup=self._spec_resolution_lookup,
+                where_filter_location=filter_location,
+                rendered_spec_tracker=rendered_spec_tracker,
+            )
             try:
                 # If there was an error with the template, it should have been caught while resolving the specs for
                 # the filters during query resolution.
@@ -83,6 +90,7 @@ class WhereSpecFactory:
                         "Dimension": dimension_factory.create,
                         "TimeDimension": time_dimension_factory.create,
                         "Entity": entity_factory.create,
+                        "Metric": metric_factory.create,
                     }
                 )
             except (jinja2.exceptions.UndefinedError, jinja2.exceptions.TemplateSyntaxError) as e:
