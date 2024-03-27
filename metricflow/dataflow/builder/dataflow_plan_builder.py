@@ -148,7 +148,9 @@ class DataflowPlanBuilder:
             optimizers=optimizers,
         )
 
-    def _build_query_output_node(self, query_spec: MetricFlowQuerySpec) -> BaseOutput:
+    def _build_query_output_node(
+        self, query_spec: MetricFlowQuerySpec, for_group_by_source_node: bool = False
+    ) -> BaseOutput:
         """Build SQL output node from query inputs. May be used to build query DFP or source node."""
         for metric_spec in query_spec.metric_specs:
             if (
@@ -186,6 +188,7 @@ class DataflowPlanBuilder:
             queried_linkable_specs=query_spec.linkable_specs,
             filter_spec_factory=filter_spec_factory,
             time_range_constraint=query_spec.time_range_constraint,
+            for_group_by_source_node=for_group_by_source_node,
         )
 
     @log_runtime()
@@ -346,6 +349,7 @@ class DataflowPlanBuilder:
         queried_linkable_specs: LinkableSpecSet,
         filter_spec_factory: WhereSpecFactory,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
+        for_group_by_source_node: bool = False,
     ) -> ComputeMetricsNode:
         """Builds a compute metric node for a conversion metric."""
         metric_reference = metric_spec.reference
@@ -380,6 +384,7 @@ class DataflowPlanBuilder:
         return self.build_computed_metrics_node(
             metric_spec=metric_spec,
             aggregated_measures_node=aggregated_measures_node,
+            for_group_by_source_node=for_group_by_source_node,
         )
 
     def _build_base_metric_output_node(
@@ -388,6 +393,7 @@ class DataflowPlanBuilder:
         queried_linkable_specs: LinkableSpecSet,
         filter_spec_factory: WhereSpecFactory,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
+        for_group_by_source_node: bool = False,
     ) -> ComputeMetricsNode:
         """Builds a node to compute a metric that is not defined from other metrics."""
         metric_reference = metric_spec.reference
@@ -436,6 +442,7 @@ class DataflowPlanBuilder:
         return self.build_computed_metrics_node(
             metric_spec=metric_spec,
             aggregated_measures_node=aggregated_measures_node,
+            for_group_by_source_node=for_group_by_source_node,
         )
 
     def _build_derived_metric_output_node(
@@ -444,6 +451,7 @@ class DataflowPlanBuilder:
         queried_linkable_specs: LinkableSpecSet,
         filter_spec_factory: WhereSpecFactory,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
+        for_group_by_source_node: bool = False,
     ) -> BaseOutput:
         """Builds a node to compute a metric defined from other metrics."""
         metric = self._metric_lookup.get_metric(metric_spec.reference)
@@ -498,7 +506,9 @@ class DataflowPlanBuilder:
         parent_node = (
             parent_nodes[0] if len(parent_nodes) == 1 else CombineAggregatedOutputsNode(parent_nodes=parent_nodes)
         )
-        output_node: BaseOutput = ComputeMetricsNode(parent_node=parent_node, metric_specs=[metric_spec])
+        output_node: BaseOutput = ComputeMetricsNode(
+            parent_node=parent_node, metric_specs=[metric_spec], for_group_by_source_node=for_group_by_source_node
+        )
 
         # For ratio / derived metrics with time offset, apply offset & where constraint after metric computation.
         if metric_spec.has_time_offset:
@@ -536,6 +546,7 @@ class DataflowPlanBuilder:
         queried_linkable_specs: LinkableSpecSet,
         filter_spec_factory: WhereSpecFactory,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
+        for_group_by_source_node: bool = False,
     ) -> BaseOutput:
         """Builds a node to compute a metric of any type."""
         metric = self._metric_lookup.get_metric(metric_spec.reference)
@@ -546,6 +557,7 @@ class DataflowPlanBuilder:
                 queried_linkable_specs=queried_linkable_specs,
                 filter_spec_factory=filter_spec_factory,
                 time_range_constraint=time_range_constraint,
+                for_group_by_source_node=for_group_by_source_node,
             )
 
         elif metric.type is MetricType.RATIO or metric.type is MetricType.DERIVED:
@@ -554,6 +566,7 @@ class DataflowPlanBuilder:
                 queried_linkable_specs=queried_linkable_specs,
                 filter_spec_factory=filter_spec_factory,
                 time_range_constraint=time_range_constraint,
+                for_group_by_source_node=for_group_by_source_node,
             )
         elif metric.type is MetricType.CONVERSION:
             return self._build_conversion_metric_output_node(
@@ -561,6 +574,7 @@ class DataflowPlanBuilder:
                 queried_linkable_specs=queried_linkable_specs,
                 filter_spec_factory=filter_spec_factory,
                 time_range_constraint=time_range_constraint,
+                for_group_by_source_node=for_group_by_source_node,
             )
 
         assert_values_exhausted(metric.type)
@@ -571,6 +585,7 @@ class DataflowPlanBuilder:
         queried_linkable_specs: LinkableSpecSet,
         filter_spec_factory: WhereSpecFactory,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
+        for_group_by_source_node: bool = False,
     ) -> BaseOutput:
         """Builds a node that computes all requested metrics.
 
@@ -593,6 +608,7 @@ class DataflowPlanBuilder:
                     queried_linkable_specs=queried_linkable_specs,
                     filter_spec_factory=filter_spec_factory,
                     time_range_constraint=time_range_constraint,
+                    for_group_by_source_node=for_group_by_source_node,
                 )
             )
 
@@ -727,7 +743,7 @@ class DataflowPlanBuilder:
 
     def _select_source_nodes_with_measures(
         self, measure_specs: Set[MeasureSpec], source_nodes: Sequence[BaseOutput]
-    ) -> Sequence[BaseOutput]:
+    ) -> List[BaseOutput]:
         nodes = []
         measure_specs_set = set(measure_specs)
         for source_node in source_nodes:
@@ -811,20 +827,33 @@ class DataflowPlanBuilder:
         time_range_constraint: Optional[TimeRangeConstraint] = None,
     ) -> Optional[DataflowRecipe]:
         linkable_specs = linkable_spec_set.as_tuple
-        candidate_nodes_for_left_side_of_join: Sequence[BaseOutput]
-        candidate_nodes_for_right_side_of_join: Sequence[BaseOutput]
+        candidate_nodes_for_left_side_of_join: List[BaseOutput] = []
+        candidate_nodes_for_right_side_of_join: List[BaseOutput] = []
+
+        # If there are MetricGroupBys in the requested linkable specs, build source nodes to satisfy them.
+        # We do this at query time instead of during usual source node generation because the number of potential
+        # MetricGroupBy source nodes could be extremely large (and potentially slow).
+        candidate_nodes_for_right_side_of_join += [
+            self._build_query_output_node(
+                query_spec=group_by_metric_spec.query_spec_for_source_node, for_group_by_source_node=True
+            )
+            for group_by_metric_spec in linkable_spec_set.group_by_metric_specs
+        ]
+
         if measure_spec_properties:
-            candidate_nodes_for_right_side_of_join = self._source_node_set.source_nodes_for_metric_queries
-            candidate_nodes_for_left_side_of_join = self._select_source_nodes_with_measures(
+            candidate_nodes_for_right_side_of_join += self._source_node_set.source_nodes_for_metric_queries
+            candidate_nodes_for_left_side_of_join += self._select_source_nodes_with_measures(
                 measure_specs=set(measure_spec_properties.measure_specs),
                 source_nodes=self._source_node_set.source_nodes_for_metric_queries,
             )
             default_join_type = SqlJoinType.LEFT_OUTER
         else:
-            candidate_nodes_for_right_side_of_join = list(self._source_node_set.source_nodes_for_group_by_item_queries)
-            candidate_nodes_for_left_side_of_join = self._select_source_nodes_with_linkable_specs(
-                linkable_specs=linkable_spec_set,
-                source_nodes=self._source_node_set.source_nodes_for_group_by_item_queries,
+            candidate_nodes_for_right_side_of_join += list(self._source_node_set.source_nodes_for_group_by_item_queries)
+            candidate_nodes_for_left_side_of_join += list(
+                self._select_source_nodes_with_linkable_specs(
+                    linkable_specs=linkable_spec_set,
+                    source_nodes=self._source_node_set.source_nodes_for_group_by_item_queries,
+                )
             )
             default_join_type = SqlJoinType.FULL_OUTER
 
@@ -840,10 +869,12 @@ class DataflowPlanBuilder:
             node_data_set_resolver=self._node_data_set_resolver,
         )
         if time_range_constraint:
-            candidate_nodes_for_left_side_of_join = node_processor.add_time_range_constraint(
-                source_nodes=candidate_nodes_for_left_side_of_join,
-                metric_time_dimension_reference=self._metric_time_dimension_reference,
-                time_range_constraint=time_range_constraint,
+            candidate_nodes_for_left_side_of_join = list(
+                node_processor.add_time_range_constraint(
+                    source_nodes=candidate_nodes_for_left_side_of_join,
+                    metric_time_dimension_reference=self._metric_time_dimension_reference,
+                    time_range_constraint=time_range_constraint,
+                )
             )
 
         candidate_nodes_for_right_side_of_join = node_processor.remove_unnecessary_nodes(
@@ -978,11 +1009,13 @@ class DataflowPlanBuilder:
         self,
         metric_spec: MetricSpec,
         aggregated_measures_node: Union[AggregateMeasuresNode, BaseOutput],
+        for_group_by_source_node: bool = False,
     ) -> ComputeMetricsNode:
         """Builds a ComputeMetricsNode from aggregated measures."""
         return ComputeMetricsNode(
             parent_node=aggregated_measures_node,
             metric_specs=[metric_spec],
+            for_group_by_source_node=for_group_by_source_node,
         )
 
     def _build_input_measure_specs_for_conversion_metric(

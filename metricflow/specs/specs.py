@@ -281,6 +281,14 @@ class GroupByMetricSpec(LinkableInstanceSpec, SerializableDataclass):
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_group_by_metric_spec(self)
 
+    @property
+    def query_spec_for_source_node(self) -> MetricFlowQuerySpec:
+        """Query spec that can be used to build a source node for this spec in the DFP."""
+        return MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name=self.element_name),),
+            entity_specs=tuple(EntitySpec.from_name(entity_link.element_name) for entity_link in self.entity_links),
+        )
+
 
 @dataclass(frozen=True)
 class LinklessEntitySpec(EntitySpec, SerializableDataclass):
