@@ -7,14 +7,25 @@ import pytest
 from dbt_semantic_interfaces.call_parameter_sets import (
     DimensionCallParameterSet,
     EntityCallParameterSet,
+    MetricCallParameterSet,
     TimeDimensionCallParameterSet,
 )
-from dbt_semantic_interfaces.references import DimensionReference, EntityReference, TimeDimensionReference
+from dbt_semantic_interfaces.references import (
+    DimensionReference,
+    EntityReference,
+    MetricReference,
+    TimeDimensionReference,
+)
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 
-from metricflow.specs.patterns.typed_patterns import DimensionPattern, EntityPattern, TimeDimensionPattern
-from metricflow.specs.specs import DimensionSpec, EntitySpec, LinkableInstanceSpec, TimeDimensionSpec
+from metricflow.specs.patterns.typed_patterns import (
+    DimensionPattern,
+    EntityPattern,
+    GroupByMetricPattern,
+    TimeDimensionPattern,
+)
+from metricflow.specs.specs import DimensionSpec, EntitySpec, GroupByMetricSpec, LinkableInstanceSpec, TimeDimensionSpec
 
 logger = logging.getLogger(__name__)
 
@@ -44,6 +55,11 @@ def specs() -> Sequence[LinkableInstanceSpec]:  # noqa: D103
         EntitySpec(
             element_name="common_name",
             entity_links=(EntityReference("booking"), EntityReference("listing")),
+        ),
+        # Group by metrics
+        GroupByMetricSpec(
+            element_name="bookings",
+            entity_links=(EntityReference(element_name="listing"),),
         ),
     )
 
@@ -125,5 +141,21 @@ def test_entity_pattern(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa:
         EntitySpec(
             element_name="common_name",
             entity_links=(EntityReference("booking"), EntityReference("listing")),
+        ),
+    )
+
+
+def test_group_by_metric_pattern(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa: D103
+    pattern = GroupByMetricPattern.from_call_parameter_set(
+        MetricCallParameterSet(
+            group_by=(EntityReference("listing"),),
+            metric_reference=MetricReference(element_name="bookings"),
+        )
+    )
+
+    assert tuple(pattern.match(specs)) == (
+        GroupByMetricSpec(
+            element_name="bookings",
+            entity_links=(EntityReference("listing"),),
         ),
     )

@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Optional, Sequence, Tuple, Union
 from dbt_semantic_interfaces.call_parameter_sets import (
     DimensionCallParameterSet,
     EntityCallParameterSet,
+    MetricCallParameterSet,
     TimeDimensionCallParameterSet,
 )
 from dbt_semantic_interfaces.protocols import WhereFilterIntersection
@@ -177,7 +178,9 @@ class FilterSpecResolution:
     object_builder_str: str
 
 
-CallParameterSet = Union[DimensionCallParameterSet, TimeDimensionCallParameterSet, EntityCallParameterSet]
+CallParameterSet = Union[
+    DimensionCallParameterSet, TimeDimensionCallParameterSet, EntityCallParameterSet, MetricCallParameterSet
+]
 
 
 @dataclass(frozen=True)

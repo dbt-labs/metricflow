@@ -4,11 +4,10 @@ import itertools
 import logging
 from typing import List, Sequence
 
-from dbt_semantic_interfaces.call_parameter_sets import (
-    FilterCallParameterSets,
-)
+from dbt_semantic_interfaces.call_parameter_sets import FilterCallParameterSets, MetricCallParameterSet
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
 from dbt_semantic_interfaces.protocols import WhereFilter, WhereFilterIntersection
+from dbt_semantic_interfaces.references import EntityReference
 from typing_extensions import override
 
 from metricflow.mf_logging.runtime import log_runtime
@@ -133,6 +132,14 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
                     )
                 )
             ),
+            metric_call_parameter_sets=tuple(
+                dict.fromkeys(
+                    itertools.chain.from_iterable(
+                        filter_call_parameter_sets.metric_call_parameter_sets
+                        for filter_call_parameter_sets in filter_call_parameter_sets_sequence
+                    )
+                )
+            ),
         )
 
     def _map_filter_parameter_sets_to_pattern(
@@ -180,6 +187,26 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
                     ),
                     spec_pattern=self._spec_pattern_factory.create_for_entity_call_parameter_set(
                         entity_call_parameter_set
+                    ),
+                )
+            )
+        for metric_call_parameter_set in filter_call_parameter_sets.metric_call_parameter_sets:
+            # Convert LinkableElementReferences to EntityReferences. Will need to support dimensions later.
+            updated_metric_call_parameter_set = MetricCallParameterSet(
+                metric_reference=metric_call_parameter_set.metric_reference,
+                group_by=tuple(
+                    EntityReference(element_name=group_by_ref.element_name)
+                    for group_by_ref in metric_call_parameter_set.group_by
+                ),
+            )
+            patterns_in_filter.append(
+                PatternAssociationForWhereFilterGroupByItem(
+                    call_parameter_set=updated_metric_call_parameter_set,
+                    object_builder_str=ObjectBuilderNameConverter.input_str_from_metric_call_parameter_set(
+                        metric_call_parameter_set
+                    ),
+                    spec_pattern=self._spec_pattern_factory.create_for_metric_call_parameter_set(
+                        metric_call_parameter_set
                     ),
                 )
             )

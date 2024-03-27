@@ -15,7 +15,7 @@ from metricflow.specs.patterns.entity_link_pattern import (
     EntityLinkPatternParameterSet,
     ParameterSetField,
 )
-from metricflow.specs.specs import DimensionSpec, EntitySpec, LinkableInstanceSpec, TimeDimensionSpec
+from metricflow.specs.specs import DimensionSpec, EntitySpec, GroupByMetricSpec, LinkableInstanceSpec, TimeDimensionSpec
 from tests.time.metric_time_dimension import MTD_SPEC_MONTH, MTD_SPEC_WEEK, MTD_SPEC_YEAR
 
 logger = logging.getLogger(__name__)
@@ -51,6 +51,11 @@ def specs() -> Sequence[LinkableInstanceSpec]:  # noqa: D103
         EntitySpec(
             element_name="host",
             entity_links=(EntityReference(element_name="booking"),),
+        ),
+        # Group by metrics
+        GroupByMetricSpec(
+            element_name="bookings",
+            entity_links=(EntityReference(element_name="listing"),),
         ),
     )
 
@@ -104,6 +109,25 @@ def test_entity_match(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa: D
 
     assert tuple(pattern.match(specs)) == (
         EntitySpec(element_name="listing", entity_links=(EntityReference(element_name="booking"),)),
+    )
+
+
+def test_group_by_metric_match(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa: D103
+    pattern = EntityLinkPattern(
+        EntityLinkPatternParameterSet.from_parameters(
+            element_name="bookings",
+            entity_links=(EntityReference(element_name="listing"),),
+            time_granularity=None,
+            date_part=None,
+            fields_to_compare=(
+                ParameterSetField.ELEMENT_NAME,
+                ParameterSetField.ENTITY_LINKS,
+            ),
+        )
+    )
+
+    assert tuple(pattern.match(specs)) == (
+        GroupByMetricSpec(element_name="bookings", entity_links=(EntityReference(element_name="listing"),)),
     )
 
 
