@@ -1,0 +1,6 @@
+kind: Dependencies
+body: Update dbt-semantic-interfaces minimum version to 0.5.1
+time: 2024-03-26T14:59:35.881451-07:00
+custom:
+  Author: tlento
+  Issue: "1104"
