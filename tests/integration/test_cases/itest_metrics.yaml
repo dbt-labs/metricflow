@@ -1889,3 +1889,23 @@ integration_test:
         ds
     ) b
     ON {{ render_date_sub("a", "ds", 5, TimeGranularity.DAY) }} = b.ds
+---
+integration_test:
+  name: query_with_metric_in_where_filter
+  description: Tests a query with a metric in the where filter
+  model: SIMPLE_MODEL
+  metrics: ["listings"]
+  where_filter: "{{ render_metric_template('bookings', ['listing']) }} > 2"
+  check_query: |
+    SELECT 1
+---
+integration_test:
+  name: active_listings
+  description: Query a metric that has a filter containing a metric
+  model: SIMPLE_MODEL
+  metrics: ["active_listings"]
+  check_query: |
+    SELECT 1
+
+# TODO: multiple metric filters; multiple metrics in one filter; all of these tests for distinct values queries
+# TODO: tests for other types of metrics in filter - derived, cumulative, conversion

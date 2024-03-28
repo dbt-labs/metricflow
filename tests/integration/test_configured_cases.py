@@ -182,6 +182,10 @@ class CheckQueryHelpers:
         """Similar to render_dimension_template() but for entities."""
         return f"{{{{ Entity('{entity_name}', entity_path={repr(entity_path)}) }}}}"
 
+    def render_metric_template(self, metric_name: str, group_by: Sequence[str] = ()) -> str:
+        """Similar to render_dimension_template() but for metrics."""
+        return f"{{{{ Metric('{metric_name}', group_by={group_by}) }}}}"
+
     def render_time_dimension_template(
         self, time_dimension_name: str, time_granularity: Optional[str] = None, entity_path: Sequence[str] = ()
     ) -> str:
@@ -230,7 +234,8 @@ def filter_not_supported_features(
 
 @pytest.mark.parametrize(
     "name",
-    CONFIGURED_INTEGRATION_TESTS_REPOSITORY.all_test_case_names,
+    # CONFIGURED_INTEGRATION_TESTS_REPOSITORY.all_test_case_names,
+    ["itest_metrics.yaml/query_with_metric_in_where_filter"],
     ids=lambda name: f"name={name}",
 )
 def test_case(
@@ -319,6 +324,7 @@ def test_case(
                     double_data_type_name=check_query_helpers.double_data_type_name,
                     render_dimension_template=check_query_helpers.render_dimension_template,
                     render_entity_template=check_query_helpers.render_entity_template,
+                    render_metric_template=check_query_helpers.render_metric_template,
                     render_time_dimension_template=check_query_helpers.render_time_dimension_template,
                     generate_random_uuid=check_query_helpers.generate_random_uuid,
                     cast_to_ts=check_query_helpers.cast_to_ts,

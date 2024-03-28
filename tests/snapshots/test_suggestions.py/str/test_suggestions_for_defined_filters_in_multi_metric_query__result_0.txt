@@ -3,6 +3,35 @@ Got errors while resolving the query.
 Error #1:
   Message:
 
+    The given input is ambiguous and can't be resolved. The input could match:
+
+      [
+        "TimeDimension('booking__paid_at', 'day')",
+        "TimeDimension('booking__paid_at', 'month')",
+        "TimeDimension('booking__paid_at', 'quarter')",
+        "TimeDimension('booking__paid_at', 'week')",
+        "TimeDimension('booking__paid_at', 'year')",
+      ]
+
+  Query Input:
+
+    WhereFilter(
+      ["{{ TimeDimension('booking__paid_at') }} > '2020-01-01'",]
+    )
+    Filter Path:
+      [Resolve Query(['bookings', 'listings'])]
+        -> [Resolve Metric('bookings')]
+    Object Builder Input:
+      TimeDimension('booking__paid_at')
+
+  Issue Location:
+
+    [Resolve Query(['bookings', 'listings'])]
+      -> [Resolve Metric('bookings')]
+
+Error #2:
+  Message:
+
     The given input does not match any of the available group-by-items for
     Measure('listings'). Common issues are:
 

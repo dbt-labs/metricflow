@@ -416,7 +416,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         )
 
     def visit_join_to_base_output_node(self, node: JoinToBaseOutputNode) -> SqlDataSet:
-        """Generates the query that realizes the behavior of the JoinToStandardOutputNode."""
+        """Generates the query that realizes the behavior of the JoinToBaseOutputNode."""
         # Keep a mapping between the table aliases that would be used in the query and the MDO instances in that source.
         # e.g. when building "FROM from_table a JOIN right_table b", the value for key "a" would be the instances in
         # "from_table"
@@ -737,7 +737,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             else AddMetrics(metric_instances)
         )
         output_instance_set = output_instance_set.transform(transform_func)
-
+        print("output instances:", output_instance_set)
         combined_select_column_set = non_metric_select_column_set.merge(
             SelectColumnSet(metric_columns=metric_select_columns)
         )
@@ -831,6 +831,9 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
     def visit_pass_elements_filter_node(self, node: FilterElementsNode) -> SqlDataSet:
         """Generates the query that realizes the behavior of FilterElementsNode."""
         from_data_set: SqlDataSet = node.parent_node.accept(self)
+        # print("parent node:", node.parent_node, from_data_set.instance_set)
+        if isinstance(node.parent_node, ComputeMetricsNode):
+            print("parent node:", node.parent_node.for_group_by_source_node)
         output_instance_set = from_data_set.instance_set.transform(FilterElements(node.include_specs))
         from_data_set_alias = self._next_unique_table_alias()
 
@@ -1119,9 +1122,9 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                     spec=metric_time_dimension_spec,
                 )
             )
-            output_column_to_input_column[
-                metric_time_dimension_column_association.column_name
-            ] = matching_time_dimension_instance.associated_column.column_name
+            output_column_to_input_column[metric_time_dimension_column_association.column_name] = (
+                matching_time_dimension_instance.associated_column.column_name
+            )
 
         output_instance_set = InstanceSet(
             measure_instances=tuple(output_measure_instances),
@@ -1364,11 +1367,11 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             and len(time_spine_dataset.checked_sql_select_node.select_columns) == 1
         ), "Time spine dataset not configured properly. Expected exactly one column."
         original_time_spine_dim_instance = time_spine_dataset.instance_set.time_dimension_instances[0]
-        time_spine_column_select_expr: Union[
-            SqlColumnReferenceExpression, SqlDateTruncExpression
-        ] = SqlColumnReferenceExpression(
-            SqlColumnReference(
-                table_alias=time_spine_alias, column_name=original_time_spine_dim_instance.spec.qualified_name
+        time_spine_column_select_expr: Union[SqlColumnReferenceExpression, SqlDateTruncExpression] = (
+            SqlColumnReferenceExpression(
+                SqlColumnReference(
+                    table_alias=time_spine_alias, column_name=original_time_spine_dim_instance.spec.qualified_name
+                )
             )
         )
 
