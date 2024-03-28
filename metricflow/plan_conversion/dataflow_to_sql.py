@@ -42,11 +42,18 @@ from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataset.dataset import DataSet
 from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.filters.time_constraint import TimeRangeConstraint
-from metricflow.instances import InstanceSet, MetadataInstance, MetricInstance, TimeDimensionInstance
+from metricflow.instances import (
+    GroupByMetricInstance,
+    InstanceSet,
+    MetadataInstance,
+    MetricInstance,
+    TimeDimensionInstance,
+)
 from metricflow.mf_logging.formatting import indent
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.convert_to_sql_plan import ConvertToSqlPlanResult
 from metricflow.plan_conversion.instance_converters import (
+    AddGroupByMetrics,
     AddLinkToLinkableElements,
     AddMetadata,
     AddMetrics,
@@ -82,6 +89,7 @@ from metricflow.plan_conversion.time_spine import TIME_SPINE_DATA_SET_DESCRIPTIO
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.specs.column_assoc import ColumnAssociation, ColumnAssociationResolver, SingleColumnCorrelationKey
 from metricflow.specs.specs import (
+    GroupByMetricSpec,
     InstanceSpecSet,
     MeasureSpec,
     MetadataSpec,
@@ -601,6 +609,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         # Add select columns that would compute the metrics to the select columns.
         metric_select_columns = []
         metric_instances = []
+        group_by_metric_instances = []
         for metric_spec in node.metric_specs:
             metric = self._metric_lookup.get_metric(metric_spec.reference)
 
@@ -714,7 +723,20 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                     spec=metric_spec,
                 )
             )
-        output_instance_set = output_instance_set.transform(AddMetrics(metric_instances))
+            group_by_metric_instances.append(
+                GroupByMetricInstance(
+                    associated_columns=(output_column_association,),
+                    defined_from=MetricModelReference(metric_name=metric_spec.element_name),
+                    spec=GroupByMetricSpec(element_name=metric_spec.element_name, entity_links=()),
+                )
+            )
+
+        transform_func = (
+            AddGroupByMetrics(group_by_metric_instances)
+            if node.for_group_by_source_node
+            else AddMetrics(metric_instances)
+        )
+        output_instance_set = output_instance_set.transform(transform_func)
 
         combined_select_column_set = non_metric_select_column_set.merge(
             SelectColumnSet(metric_columns=metric_select_columns)
