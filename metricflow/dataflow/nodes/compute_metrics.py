@@ -55,9 +55,12 @@ class ComputeMetricsNode(ComputedMetricsOutput):
 
     @property
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
-        return tuple(super().displayed_properties) + tuple(
+        displayed_properties = tuple(super().displayed_properties) + tuple(
             DisplayedProperty("metric_spec", metric_spec) for metric_spec in self._metric_specs
         )
+        if self.for_group_by_source_node:
+            displayed_properties += (DisplayedProperty("for_group_by_source_node", self.for_group_by_source_node),)
+        return displayed_properties
 
     @property
     def parent_node(self) -> BaseOutput:  # noqa: D102
