@@ -30,6 +30,7 @@ from metricflow.dataflow.builder.partitions import (
     PartitionTimeDimensionJoinDescription,
 )
 from metricflow.dataflow.dataflow_plan import BaseOutput
+from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataflow.nodes.join_to_base import JoinDescription, ValidityWindowJoinDescription
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
@@ -264,7 +265,10 @@ class NodeEvaluatorForLinkableInstances:
                     ].semantic_model_reference,
                     on_entity_reference=entity_spec_in_right_node.reference,
                 ):
-                    continue
+                    # If joining to ComputeMetricsNode, the right node is pre-aggregated.
+                    # Since we currently only allow one entity on GroupByMetric, this won't fan out.
+                    if not isinstance(right_node, ComputeMetricsNode):
+                        continue
 
                 linkless_entity_spec_in_node = LinklessEntitySpec.from_element_name(
                     entity_spec_in_right_node.element_name

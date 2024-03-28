@@ -137,7 +137,7 @@ class GroupByItemResolver:
             manifest_lookup=self._manifest_lookup,
             source_spec_patterns=(
                 spec_pattern,
-                BaseTimeGrainPattern(),
+                BaseTimeGrainPattern(only_apply_for_metric_time=True),
             ),
             suggestion_generator=suggestion_generator,
         )
