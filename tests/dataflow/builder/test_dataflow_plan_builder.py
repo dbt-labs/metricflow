@@ -1265,3 +1265,57 @@ def test_offset_to_grain_metric_filter_and_query_have_different_granularities(
         mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
+
+
+def test_metric_in_query_where_filter(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    query_parser: MetricFlowQueryParser,
+    create_source_tables: bool,
+) -> None:
+    """Test querying a metric that has a metric in its where filter."""
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("listings",), where_constraint_str="{{ Metric('bookings', ['listing'])}} > 2"
+    )
+    dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan.structure_text(),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dag_graph=dataflow_plan,
+    )
+
+
+def test_metric_in_metric_where_filter(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    query_parser: MetricFlowQueryParser,
+    create_source_tables: bool,
+) -> None:
+    """Test querying a metric that has a metric in its where filter."""
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("active_listings",),
+    )
+    dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan.structure_text(),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dag_graph=dataflow_plan,
+    )
