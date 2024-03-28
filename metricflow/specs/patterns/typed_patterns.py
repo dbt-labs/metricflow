@@ -6,8 +6,10 @@ from typing import List, Sequence
 from dbt_semantic_interfaces.call_parameter_sets import (
     DimensionCallParameterSet,
     EntityCallParameterSet,
+    MetricCallParameterSet,
     TimeDimensionCallParameterSet,
 )
+from dbt_semantic_interfaces.references import EntityReference
 from typing_extensions import override
 
 from metricflow.specs.patterns.entity_link_pattern import (
@@ -110,5 +112,33 @@ class EntityPattern(EntityLinkPattern):
                 ),
                 element_name=entity_call_parameter_set.entity_reference.element_name,
                 entity_links=entity_call_parameter_set.entity_path,
+            )
+        )
+
+
+@dataclass(frozen=True)
+class GroupByMetricPattern(EntityLinkPattern):
+    """A pattern that matches metrics using the group by specifications."""
+
+    @override
+    def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[LinkableInstanceSpec]:
+        spec_set = InstanceSpecSet.from_specs(candidate_specs)
+        return super().match(spec_set.group_by_metric_specs)
+
+    @staticmethod
+    def from_call_parameter_set(  # noqa: D102
+        metric_call_parameter_set: MetricCallParameterSet,
+    ) -> GroupByMetricPattern:
+        return GroupByMetricPattern(
+            parameter_set=EntityLinkPatternParameterSet.from_parameters(
+                fields_to_compare=(
+                    ParameterSetField.ELEMENT_NAME,
+                    ParameterSetField.ENTITY_LINKS,
+                ),
+                element_name=metric_call_parameter_set.metric_reference.element_name,
+                entity_links=tuple(
+                    EntityReference(element_name=group_by_ref.element_name)
+                    for group_by_ref in metric_call_parameter_set.group_by
+                ),
             )
         )

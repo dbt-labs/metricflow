@@ -8,7 +8,7 @@ from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 
 from metricflow.naming.object_builder_scheme import ObjectBuilderNamingScheme
-from metricflow.specs.specs import DimensionSpec, EntitySpec, LinkableInstanceSpec, TimeDimensionSpec
+from metricflow.specs.specs import DimensionSpec, EntitySpec, GroupByMetricSpec, LinkableInstanceSpec, TimeDimensionSpec
 from tests.time.metric_time_dimension import MTD_SPEC_MONTH, MTD_SPEC_WEEK, MTD_SPEC_YEAR
 
 
@@ -45,6 +45,16 @@ def test_input_str(object_builder_naming_scheme: ObjectBuilderNamingScheme) -> N
             )
         )
         == "Entity('listing__user', entity_path=['booking'])"
+    )
+
+    assert (
+        object_builder_naming_scheme.input_str(
+            GroupByMetricSpec(
+                element_name="bookings",
+                entity_links=(EntityReference(element_name="listing"),),
+            )
+        )
+        == "Metric('bookings', group_by=['listing'])"
     )
 
 
@@ -106,4 +116,10 @@ def test_spec_pattern(  # noqa: D103
             element_name="user",
             entity_links=(EntityReference(element_name="booking"), EntityReference(element_name="listing")),
         ),
+    )
+
+    assert tuple(
+        object_builder_naming_scheme.spec_pattern("Metric('bookings', group_by=['listing'])").match(specs)
+    ) == (
+        GroupByMetricSpec(element_name="bookings", entity_links=(EntityReference(element_name="listing"),)),
     )

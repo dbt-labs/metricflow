@@ -9,6 +9,7 @@ from dbt_semantic_interfaces.call_parameter_sets import (
 )
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
 from dbt_semantic_interfaces.parsing.where_filter.where_filter_parser import WhereFilterParser
+from dbt_semantic_interfaces.references import EntityReference
 from typing_extensions import override
 
 from metricflow.naming.naming_scheme import QueryItemNamingScheme
@@ -30,7 +31,7 @@ logger = logging.getLogger(__name__)
 class ObjectBuilderNamingScheme(QueryItemNamingScheme):
     """A naming scheme using a builder syntax like Dimension('metric_time').grain('day')."""
 
-    _NAME_REGEX = re.compile(r"\A(Dimension|TimeDimension|Entity)\(.*\)\Z")
+    _NAME_REGEX = re.compile(r"\A(Dimension|TimeDimension|Entity|Metric)\(.*\)\Z")
 
     @override
     def input_str(self, instance_spec: InstanceSpec) -> Optional[str]:
@@ -53,6 +54,7 @@ class ObjectBuilderNamingScheme(QueryItemNamingScheme):
             len(call_parameter_sets.dimension_call_parameter_sets)
             + len(call_parameter_sets.time_dimension_call_parameter_sets)
             + len(call_parameter_sets.entity_call_parameter_sets)
+            + len(call_parameter_sets.metric_call_parameter_sets)
         )
         if num_parameter_sets != 1:
             raise ValueError(f"Did not find exactly 1 call parameter set. Got: {num_parameter_sets}")
@@ -106,6 +108,23 @@ class ObjectBuilderNamingScheme(QueryItemNamingScheme):
                 )
             )
 
+        for metric_call_parameter_set in call_parameter_sets.metric_call_parameter_sets:
+            return EntityLinkPattern(
+                EntityLinkPatternParameterSet.from_parameters(
+                    element_name=metric_call_parameter_set.metric_reference.element_name,
+                    entity_links=tuple(
+                        EntityReference(element_name=group_by_ref.element_name)
+                        for group_by_ref in metric_call_parameter_set.group_by
+                    ),
+                    time_granularity=None,
+                    date_part=None,
+                    fields_to_compare=(
+                        ParameterSetField.ELEMENT_NAME,
+                        ParameterSetField.ENTITY_LINKS,
+                    ),
+                )
+            )
+
         raise RuntimeError("There should have been a return associated with one of the CallParameterSets.")
 
     @override
@@ -118,6 +137,7 @@ class ObjectBuilderNamingScheme(QueryItemNamingScheme):
                 len(call_parameter_sets.dimension_call_parameter_sets)
                 + len(call_parameter_sets.time_dimension_call_parameter_sets)
                 + len(call_parameter_sets.entity_call_parameter_sets)
+                + len(call_parameter_sets.metric_call_parameter_sets)
             ) == 1
             return return_value
         except ParseWhereFilterException:
