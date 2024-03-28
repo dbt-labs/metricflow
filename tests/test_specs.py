@@ -9,6 +9,7 @@ from metricflow.specs.specs import (
     DimensionSpec,
     EntityReference,
     EntitySpec,
+    GroupByMetricSpec,
     InstanceSpec,
     InstanceSpecSet,
     LinkableInstanceSpec,
@@ -140,6 +141,12 @@ def spec_set() -> InstanceSpecSet:  # noqa: D103
                 entity_links=(EntityReference(element_name="listing_id"),),
             ),
         ),
+        group_by_metric_specs=(
+            GroupByMetricSpec(
+                element_name="bookings",
+                entity_links=(EntityReference(element_name="listing_id"),),
+            ),
+        ),
     )
 
 
@@ -153,6 +160,10 @@ def test_spec_set_linkable_specs(spec_set: InstanceSpecSet) -> None:  # noqa: D1
         ),
         EntitySpec(
             element_name="user_id",
+            entity_links=(EntityReference(element_name="listing_id"),),
+        ),
+        GroupByMetricSpec(
+            element_name="bookings",
             entity_links=(EntityReference(element_name="listing_id"),),
         ),
     }
@@ -172,6 +183,10 @@ def test_spec_set_all_specs(spec_set: InstanceSpecSet) -> None:  # noqa: D103
         ),
         EntitySpec(
             element_name="user_id",
+            entity_links=(EntityReference(element_name="listing_id"),),
+        ),
+        GroupByMetricSpec(
+            element_name="bookings",
             entity_links=(EntityReference(element_name="listing_id"),),
         ),
     }
