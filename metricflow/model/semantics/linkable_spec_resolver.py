@@ -195,26 +195,16 @@ class LinkableElementSet:
             )
 
         # Find path keys that are common to all LinkableElementSets.
-        common_linkable_dimension_path_keys: Set[ElementPathKey] = set.intersection(
-            *[
-                set(linkable_element_set.path_key_to_linkable_dimensions.keys())
-                for linkable_element_set in linkable_element_sets
-            ]
-        )
-
-        common_linkable_entity_path_keys: Set[ElementPathKey] = set.intersection(
-            *[
-                set(linkable_element_set.path_key_to_linkable_entities.keys())
-                for linkable_element_set in linkable_element_sets
-            ]
-        )
-
-        common_linkable_metric_path_keys: Set[ElementPathKey] = set.intersection(
-            *[
-                set(linkable_element_set.path_key_to_linkable_metrics.keys())
-                for linkable_element_set in linkable_element_sets
-            ]
-        )
+        dimension_path_keys: List[Set[ElementPathKey]] = []
+        entity_path_keys: List[Set[ElementPathKey]] = []
+        metric_path_keys: List[Set[ElementPathKey]] = []
+        for linkable_element_set in linkable_element_sets:
+            dimension_path_keys.append(set(linkable_element_set.path_key_to_linkable_dimensions.keys()))
+            entity_path_keys.append(set(linkable_element_set.path_key_to_linkable_entities.keys()))
+            metric_path_keys.append(set(linkable_element_set.path_key_to_linkable_metrics.keys()))
+        common_linkable_dimension_path_keys = set.intersection(*dimension_path_keys) if dimension_path_keys else set()
+        common_linkable_entity_path_keys = set.intersection(*entity_path_keys) if entity_path_keys else set()
+        common_linkable_metric_path_keys = set.intersection(*metric_path_keys) if metric_path_keys else set()
 
         # Create a new LinkableElementSet that only includes items where the path key is common to all sets.
         join_path_to_linkable_dimensions: Dict[ElementPathKey, Set[LinkableDimension]] = defaultdict(set)
