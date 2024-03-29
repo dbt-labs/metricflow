@@ -1,0 +1,6 @@
+kind: Features
+body: Allow metrics in filters for metrics and metric queries.
+time: 2024-03-29T16:00:54.387728-07:00
+custom:
+  Author: courtneyholcomb
+  Issue: "740"
