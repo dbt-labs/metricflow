@@ -80,7 +80,10 @@ class BaseTimeGrainPattern(SpecPattern):
             matched_time_dimension_specs.append(spec_key_to_specs[spec_key][0].with_grain(min(time_grains)))
 
         matching_specs: Sequence[LinkableInstanceSpec] = (
-            spec_set.dimension_specs + tuple(matched_time_dimension_specs) + spec_set.entity_specs
+            spec_set.dimension_specs
+            + tuple(matched_time_dimension_specs)
+            + spec_set.entity_specs
+            + spec_set.group_by_metric_specs
         )
 
         return matching_specs
