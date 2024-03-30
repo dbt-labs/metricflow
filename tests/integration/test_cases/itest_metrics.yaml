@@ -1915,7 +1915,7 @@ integration_test:
           , SUM(1) AS bookings
         FROM {{ source_schema }}.fct_bookings
         GROUP BY
-          listing
+          listing_id
       ) subq_12
       ON
         subq_6.listing = subq_12.listing
@@ -1946,7 +1946,7 @@ integration_test:
           , SUM(1) AS bookings
         FROM {{ source_schema }}.fct_bookings
         GROUP BY
-          listing
+          listing_id
       ) subq_12
       ON
         subq_6.listing = subq_12.listing
