@@ -640,9 +640,7 @@ class DataflowPlanBuilder:
             )
 
             query_level_filter_specs = filter_spec_factory.create_from_where_filter_intersection(
-                filter_location=WhereFilterLocation.for_query(
-                    tuple(metric_spec.reference for metric_spec in query_spec.metric_specs)
-                ),
+                filter_location=WhereFilterLocation.for_query(metric_references=tuple()),
                 filter_intersection=query_spec.filter_intersection,
             )
 
