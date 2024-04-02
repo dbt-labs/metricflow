@@ -5,6 +5,7 @@ from typing import Optional, Sequence
 from dbt_semantic_interfaces.call_parameter_sets import (
     DimensionCallParameterSet,
     EntityCallParameterSet,
+    MetricCallParameterSet,
     TimeDimensionCallParameterSet,
 )
 from dbt_semantic_interfaces.naming.keywords import DUNDER
@@ -29,15 +30,30 @@ class ObjectBuilderNameConverter:
         initializer_parameter_str = ObjectBuilderNameConverter.initializer_parameter_str(
             element_name=parameter_set.entity_reference.element_name,
             entity_links=parameter_set.entity_path,
+            group_by=(),
             time_granularity=None,
             date_part=None,
         )
         return f"Entity({initializer_parameter_str})"
 
     @staticmethod
+    def input_str_from_metric_call_parameter_set(parameter_set: MetricCallParameterSet) -> str:  # noqa: D102
+        initializer_parameter_str = ObjectBuilderNameConverter.initializer_parameter_str(
+            element_name=parameter_set.metric_reference.element_name,
+            entity_links=(),
+            group_by=tuple(
+                EntityReference(element_name=group_by_ref.element_name) for group_by_ref in parameter_set.group_by
+            ),
+            time_granularity=None,
+            date_part=None,
+        )
+        return f"Metric({initializer_parameter_str})"
+
+    @staticmethod
     def initializer_parameter_str(
         element_name: str,
         entity_links: Sequence[EntityReference],
+        group_by: Sequence[EntityReference],
         time_granularity: Optional[TimeGranularity],
         date_part: Optional[DatePart],
     ) -> str:
@@ -59,6 +75,8 @@ class ObjectBuilderNameConverter:
             initializer_parameters.append(f"date_part_name={repr(date_part.value)}")
         if len(entity_link_names) > 1:
             initializer_parameters.append(f"entity_path={repr(entity_link_names[:-1])}")
+        if group_by:
+            initializer_parameters.append(f"group_by={[group_by_ref.element_name for group_by_ref in group_by]}")
 
         return ", ".join(initializer_parameters)
 
@@ -67,7 +85,13 @@ class ObjectBuilderNameConverter:
 
         @override
         def transform(self, spec_set: InstanceSpecSet) -> Sequence[str]:
-            assert len(spec_set.entity_specs) + len(spec_set.dimension_specs) + len(spec_set.time_dimension_specs) == 1
+            assert (
+                len(spec_set.entity_specs)
+                + len(spec_set.dimension_specs)
+                + len(spec_set.time_dimension_specs)
+                + len(spec_set.group_by_metric_specs)
+                == 1
+            )
 
             names_to_return = []
 
@@ -75,6 +99,7 @@ class ObjectBuilderNameConverter:
                 initializer_parameter_str = ObjectBuilderNameConverter.initializer_parameter_str(
                     element_name=entity_spec.element_name,
                     entity_links=entity_spec.entity_links,
+                    group_by=(),
                     time_granularity=None,
                     date_part=None,
                 )
@@ -84,6 +109,7 @@ class ObjectBuilderNameConverter:
                 initializer_parameter_str = ObjectBuilderNameConverter.initializer_parameter_str(
                     element_name=dimension_spec.element_name,
                     entity_links=dimension_spec.entity_links,
+                    group_by=(),
                     time_granularity=None,
                     date_part=None,
                 )
@@ -93,10 +119,21 @@ class ObjectBuilderNameConverter:
                 initializer_parameter_str = ObjectBuilderNameConverter.initializer_parameter_str(
                     element_name=time_dimension_spec.element_name,
                     entity_links=time_dimension_spec.entity_links,
+                    group_by=(),
                     time_granularity=time_dimension_spec.time_granularity,
                     date_part=time_dimension_spec.date_part,
                 )
                 names_to_return.append(f"TimeDimension({initializer_parameter_str})")
+
+            for group_by_metric_spec in spec_set.group_by_metric_specs:
+                initializer_parameter_str = ObjectBuilderNameConverter.initializer_parameter_str(
+                    element_name=group_by_metric_spec.element_name,
+                    entity_links=(),
+                    group_by=group_by_metric_spec.entity_links,
+                    time_granularity=None,
+                    date_part=None,
+                )
+                names_to_return.append(f"Metric({initializer_parameter_str})")
 
             return names_to_return
 
@@ -116,6 +153,7 @@ class ObjectBuilderNameConverter:
         initializer_parameter_str = ObjectBuilderNameConverter.initializer_parameter_str(
             element_name=parameter_set.dimension_reference.element_name,
             entity_links=parameter_set.entity_path,
+            group_by=(),
             time_granularity=None,
             date_part=None,
         )
@@ -128,6 +166,7 @@ class ObjectBuilderNameConverter:
         initializer_parameter_str = ObjectBuilderNameConverter.initializer_parameter_str(
             element_name=parameter_set.time_dimension_reference.element_name,
             entity_links=parameter_set.entity_path,
+            group_by=(),
             time_granularity=None,
             date_part=None,
         )

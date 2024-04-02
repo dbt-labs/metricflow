@@ -6,6 +6,7 @@ import pytest
 from dbt_semantic_interfaces.call_parameter_sets import (
     DimensionCallParameterSet,
     EntityCallParameterSet,
+    MetricCallParameterSet,
     TimeDimensionCallParameterSet,
 )
 from dbt_semantic_interfaces.implementations.filters.where_filter import (
@@ -37,6 +38,7 @@ from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
     DimensionSpec,
     EntitySpec,
+    GroupByMetricSpec,
     LinkableInstanceSpec,
     LinkableSpecSet,
     TimeDimensionSpec,
@@ -101,6 +103,7 @@ def test_dimension_in_filter(  # noqa: D103
         ),
         time_dimension_specs=(),
         entity_specs=(),
+        group_by_metric_specs=(),
     )
 
 
@@ -140,6 +143,7 @@ def test_dimension_in_filter_with_grain(  # noqa: D103
             ),
         ),
         entity_specs=(),
+        group_by_metric_specs=(),
     )
 
 
@@ -179,6 +183,7 @@ def test_time_dimension_in_filter(  # noqa: D103
             ),
         ),
         entity_specs=(),
+        group_by_metric_specs=(),
     )
 
 
@@ -220,6 +225,7 @@ def test_date_part_in_filter(  # noqa: D103
             ),
         ),
         entity_specs=(),
+        group_by_metric_specs=(),
     )
 
 
@@ -289,6 +295,7 @@ def test_date_part_and_grain_in_filter(  # noqa: D103
             ),
         ),
         entity_specs=(),
+        group_by_metric_specs=(),
     )
 
 
@@ -325,6 +332,7 @@ def test_date_part_less_than_grain_in_filter(  # noqa: D103
             ),
         ),
         entity_specs=(),
+        group_by_metric_specs=(),
     )
 
 
@@ -352,6 +360,34 @@ def test_entity_in_filter(  # noqa: D103
         dimension_specs=(),
         time_dimension_specs=(),
         entity_specs=(EntitySpec(element_name="user", entity_links=(EntityReference(element_name="listing"),)),),
+        group_by_metric_specs=(),
+    )
+
+
+def test_metric_in_filter(  # noqa: D103
+    column_association_resolver: ColumnAssociationResolver,
+    resolved_spec_lookup: FilterSpecResolutionLookUp,
+) -> None:
+    where_filter = PydanticWhereFilter(where_sql_template="{{ Metric('bookings', group_by=['listing']) }} > 2")
+
+    group_by_metric_spec = GroupByMetricSpec(element_name="bookings", entity_links=(EntityReference("listing"),))
+    where_filter_spec = WhereSpecFactory(
+        column_association_resolver=column_association_resolver,
+        spec_resolution_lookup=create_spec_lookup(
+            call_parameter_set=MetricCallParameterSet(
+                group_by=(EntityReference("listing"),),
+                metric_reference=MetricReference("bookings"),
+            ),
+            resolved_spec=group_by_metric_spec,
+        ),
+    ).create_from_where_filter(filter_location=EXAMPLE_FILTER_LOCATION, where_filter=where_filter)
+
+    assert where_filter_spec.where_sql == "listing__bookings > 2"
+    assert where_filter_spec.linkable_spec_set == LinkableSpecSet(
+        dimension_specs=(),
+        time_dimension_specs=(),
+        entity_specs=(),
+        group_by_metric_specs=(group_by_metric_spec,),
     )
 
 
