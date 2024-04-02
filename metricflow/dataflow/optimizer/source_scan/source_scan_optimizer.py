@@ -170,6 +170,7 @@ class SourceScanOptimizer(
                 base_output_node=ComputeMetricsNode(
                     parent_node=optimized_parent_result.base_output_node,
                     metric_specs=node.metric_specs,
+                    for_group_by_source_node=node.for_group_by_source_node,
                 )
             )
 

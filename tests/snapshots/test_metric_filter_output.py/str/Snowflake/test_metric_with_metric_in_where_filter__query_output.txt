@@ -1,0 +1,7 @@
+               LISTING  ACTIVE_LISTINGS  BOOKINGS
+0             l2718281              1.0        15
+1             l3141592              1.0        15
+2             l5948301              1.0         7
+3  l8912456-incomplete              1.0         3
+4  l9658588-incomplete              1.0         3
+5      no_such_listing              NaN         3

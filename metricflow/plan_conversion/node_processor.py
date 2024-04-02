@@ -302,7 +302,7 @@ class PreJoinNodeProcessor:
         nodes: Sequence[BaseOutput],
         metric_time_dimension_reference: TimeDimensionReference,
         time_spine_node: MetricTimeDimensionTransformNode,
-    ) -> Sequence[BaseOutput]:
+    ) -> List[BaseOutput]:
         """Filters out many of the nodes that can't possibly be useful for joins to obtain the desired linkable specs.
 
         A simple filter is to remove any nodes that don't share a common element with the query. Having a common element

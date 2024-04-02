@@ -1,5 +1,6 @@
 Semantic Model    Entity Links    Name                                                      Time Granularity    Date Part    Properties
 ----------------  --------------  --------------------------------------------------------  ------------------  -----------  ---------------------------------------------------
+listings_latest   ('listing',)    active_listings                                                                            ['JOINED', 'METRIC', 'MULTI_HOP']
 listings_latest   ('listing',)    approximate_continuous_booking_value_p99                                                   ['JOINED', 'METRIC', 'MULTI_HOP']
 listings_latest   ('listing',)    approximate_discrete_booking_value_p99                                                     ['JOINED', 'METRIC', 'MULTI_HOP']
 listings_latest   ('listing',)    average_booking_value                                                                      ['JOINED', 'METRIC', 'MULTI_HOP']
