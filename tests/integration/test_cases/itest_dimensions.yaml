@@ -352,7 +352,7 @@ integration_test:
           listing_id AS listing
           , SUM(1) AS bookings
         FROM {{ source_schema }}.fct_bookings
-        GROUP BY listing
+        GROUP BY listing_id
       ) a
       ON l.listing_id = a.listing
     )
