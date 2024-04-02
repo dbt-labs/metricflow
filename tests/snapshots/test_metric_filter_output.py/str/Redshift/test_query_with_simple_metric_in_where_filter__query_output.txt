@@ -1,0 +1,4 @@
+    listing  listings  bookings
+0  l2718281         1        15
+1  l3141592         1        15
+2  l5948301         1         7
