@@ -280,7 +280,7 @@ class PreJoinNodeProcessor:
         desired_linkable_specs: Sequence[LinkableInstanceSpec],
         nodes: Sequence[BaseOutput],
         join_type: SqlJoinType,
-    ) -> List[BaseOutput]:
+    ) -> Sequence[BaseOutput]:
         """Assemble nodes representing all possible one-hop joins."""
         all_multi_hop_join_candidates: List[MultiHopJoinCandidate] = []
         lineage_for_all_multi_hop_join_candidates: Set[MultiHopJoinCandidateLineage] = set()

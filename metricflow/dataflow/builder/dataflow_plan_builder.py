@@ -743,7 +743,7 @@ class DataflowPlanBuilder:
 
     def _select_source_nodes_with_measures(
         self, measure_specs: Set[MeasureSpec], source_nodes: Sequence[BaseOutput]
-    ) -> List[BaseOutput]:
+    ) -> Sequence[BaseOutput]:
         nodes = []
         measure_specs_set = set(measure_specs)
         for source_node in source_nodes:
@@ -888,10 +888,12 @@ class DataflowPlanBuilder:
             f"nodes for the right side of the join"
         )
         if DataflowPlanBuilder._contains_multihop_linkables(linkable_specs):
-            candidate_nodes_for_right_side_of_join = node_processor.add_multi_hop_joins(
-                desired_linkable_specs=linkable_specs,
-                nodes=candidate_nodes_for_right_side_of_join,
-                join_type=default_join_type,
+            candidate_nodes_for_right_side_of_join = list(
+                node_processor.add_multi_hop_joins(
+                    desired_linkable_specs=linkable_specs,
+                    nodes=candidate_nodes_for_right_side_of_join,
+                    join_type=default_join_type,
+                )
             )
             logger.info(
                 f"After adding multi-hop nodes, there are {len(candidate_nodes_for_right_side_of_join)} candidate "

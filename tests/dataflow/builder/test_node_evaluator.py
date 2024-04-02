@@ -78,10 +78,12 @@ def make_multihop_node_evaluator(
         time_spine_node=source_node_set.time_spine_node,
     )
 
-    nodes_available_for_joins = node_processor.add_multi_hop_joins(
-        desired_linkable_specs=desired_linkable_specs,
-        nodes=nodes_available_for_joins,
-        join_type=SqlJoinType.LEFT_OUTER,
+    nodes_available_for_joins = list(
+        node_processor.add_multi_hop_joins(
+            desired_linkable_specs=desired_linkable_specs,
+            nodes=nodes_available_for_joins,
+            join_type=SqlJoinType.LEFT_OUTER,
+        )
     )
 
     return NodeEvaluatorForLinkableInstances(
