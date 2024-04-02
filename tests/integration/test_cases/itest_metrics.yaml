@@ -1898,28 +1898,16 @@ integration_test:
   where_filter: "{{ render_metric_template('bookings', ['listing']) }} > 2"
   check_query: |
     SELECT
-      SUM(listings) AS listings
-    FROM (
+      SUM(1) AS listings
+    FROM {{ source_schema }}.dim_listings_latest a
+    LEFT OUTER JOIN (
       SELECT
-        subq_12.bookings AS listing__bookings
-        , subq_6.listings AS listings
-      FROM (
-        SELECT
-          listing_id AS listing
-          , 1 AS listings
-        FROM {{ source_schema }}.dim_listings_latest
-      ) subq_6
-      LEFT OUTER JOIN (
-        SELECT
-          listing_id AS listing
-          , SUM(1) AS bookings
-        FROM {{ source_schema }}.fct_bookings
-        GROUP BY
-          listing_id
-      ) subq_12
-      ON
-        subq_6.listing = subq_12.listing
-    ) subq_14
+        listing_id
+        , SUM(1) AS listing__bookings
+      FROM {{ source_schema }}.fct_bookings
+      GROUP BY listing_id
+    ) b
+    ON a.listing_id = b.listing_id
     WHERE listing__bookings > 2
 ---
 integration_test:
@@ -1929,28 +1917,16 @@ integration_test:
   metrics: ["active_listings"]
   check_query: |
     SELECT
-      SUM(listings) AS active_listings
-    FROM (
+      SUM(1) AS active_listings
+    FROM {{ source_schema }}.dim_listings_latest a
+    LEFT OUTER JOIN (
       SELECT
-        subq_12.bookings AS listing__bookings
-        , subq_6.listings AS listings
-      FROM (
-        SELECT
-          listing_id AS listing
-          , 1 AS listings
-        FROM {{ source_schema }}.dim_listings_latest
-      ) subq_6
-      LEFT OUTER JOIN (
-        SELECT
-          listing_id AS listing
-          , SUM(1) AS bookings
-        FROM {{ source_schema }}.fct_bookings
-        GROUP BY
-          listing_id
-      ) subq_12
-      ON
-        subq_6.listing = subq_12.listing
-    ) subq_14
+        listing_id
+        , SUM(1) AS listing__bookings
+      FROM {{ source_schema }}.fct_bookings
+      GROUP BY listing_id
+    ) b
+    ON a.listing_id = b.listing_id
     WHERE listing__bookings > 2
 ---
 integration_test:
@@ -1961,56 +1937,35 @@ integration_test:
   where_filter: "{{ render_metric_template('views_times_booking_value', ['listing']) }} > 2"
   check_query: |
     SELECT
-      SUM(listings) AS listings
-    FROM (
+      SUM(1) AS listings
+    FROM {{ source_schema }}.dim_listings_latest a
+    LEFT OUTER JOIN (
       SELECT
-        subq_26.views_times_booking_value AS listing__views_times_booking_value
-        , subq_13.listings AS listings
+        listing_id
+        , booking_value * views AS listing__views_times_booking_value
       FROM (
         SELECT
-          listing_id AS listing
-          , 1 AS listings
-        FROM {{ source_schema }}.dim_listings_latest
-      ) subq_13
-      LEFT OUTER JOIN (
-        SELECT
-          listing
-          , booking_value * views AS views_times_booking_value
+          COALESCE(b.listing_id, c.listing_id) AS listing_id
+          , MAX(b.booking_value) AS booking_value
+          , MAX(c.views) AS views
         FROM (
           SELECT
-            COALESCE(subq_18.listing, subq_23.listing) AS listing
-            , MAX(subq_18.booking_value) AS booking_value
-            , MAX(subq_23.views) AS views
-          FROM (
-            SELECT
-              listing_id AS listing
-              , SUM(booking_value) AS booking_value
-            FROM {{ source_schema }}.fct_bookings
-            GROUP BY
-              listing_id
-          ) subq_18
-          FULL OUTER JOIN (
-            SELECT
-              listing
-              , SUM(views) AS views
-            FROM (
-              SELECT
-                listing_id AS listing
-                , 1 AS views
-              FROM {{ source_schema }}.fct_views
-            ) subq_21
-            GROUP BY
-              listing
-          ) subq_23
-          ON
-            subq_18.listing = subq_23.listing
-          GROUP BY
-            COALESCE(subq_18.listing, subq_23.listing)
-        ) subq_24
-      ) subq_26
-      ON
-        subq_13.listing = subq_26.listing
-    ) subq_28
+            listing_id
+            , SUM(booking_value) AS booking_value
+          FROM {{ source_schema }}.fct_bookings
+          GROUP BY listing_id
+        ) b
+        FULL OUTER JOIN (
+          SELECT
+            listing_id
+            , SUM(1) AS views
+          FROM {{ source_schema }}.fct_views
+          GROUP BY listing_id
+        ) c
+        ON b.listing_id = c.listing_id
+        GROUP BY COALESCE(b.listing_id, c.listing_id)
+      )
+    ) d ON a.listing_id = d.listing_id
     WHERE listing__views_times_booking_value > 2
 ---
 integration_test:
@@ -2021,35 +1976,21 @@ integration_test:
   where_filter: "{{ render_metric_template('bookings_per_booker', ['listing']) }} > 2"
   check_query: |
     SELECT
-      SUM(listings) AS listings
+      SUM(1) AS listings
     FROM (
       SELECT
-        CAST(subq_18.bookings AS {{ double_data_type_name }}) / CAST(NULLIF(subq_18.bookers, 0) AS {{ double_data_type_name }}) AS listing__bookings_per_booker
-        , subq_13.listings AS listings
-      FROM (
-        SELECT
-          listing_id AS listing
-          , 1 AS listings
-        FROM {{ source_schema }}.dim_listings_latest
-      ) subq_13
+        CAST(b.bookings AS {{ double_data_type_name }}) / CAST(NULLIF(b.bookers, 0) AS {{ double_data_type_name }}) AS listing__bookings_per_booker
+      FROM {{ source_schema }}.dim_listings_latest a
       LEFT OUTER JOIN (
         SELECT
-          listing
-          , SUM(bookings) AS bookings
-          , COUNT(DISTINCT bookers) AS bookers
-        FROM (
-          SELECT
-            listing_id AS listing
-            , 1 AS bookings
-            , guest_id AS bookers
-          FROM {{ source_schema }}.fct_bookings
-        ) subq_16
-        GROUP BY
-          listing
-      ) subq_18
-      ON
-        subq_13.listing = subq_18.listing
-    ) subq_22
+          listing_id
+          , SUM(1) AS bookings
+          , COUNT(DISTINCT guest_id) AS bookers
+        FROM {{ source_schema }}.fct_bookings
+        GROUP BY listing_id
+      ) b
+      ON a.listing_id = b.listing_id
+    )
     WHERE listing__bookings_per_booker > 2
 ---
 integration_test:
@@ -2060,28 +2001,19 @@ integration_test:
   where_filter: "{{ render_metric_template('revenue_all_time', ['user']) }} > 2"
   check_query: |
     SELECT
-      SUM(listings) AS listings
+      SUM(1) AS listings
     FROM (
       SELECT
-        subq_12.revenue_all_time AS user__revenue_all_time
-        , subq_6.listings AS listings
-      FROM (
-        SELECT
-          user_id AS user
-          , 1 AS listings
-        FROM {{ source_schema }}.dim_listings_latest
-      ) subq_6
+        b.revenue_all_time AS user__revenue_all_time
+      FROM {{ source_schema }}.dim_listings_latest a
       LEFT OUTER JOIN (
         SELECT
-          user_id AS user
-          , SUM(revenue) AS revenue_all_time
-        FROM {{ source_schema }}.fct_revenue revenue_src_10000
-        GROUP BY
           user_id
-      ) subq_12
-      ON
-        subq_6.user = subq_12.user
-    ) subq_14
+          , SUM(revenue) AS revenue_all_time
+        FROM {{ source_schema }}.fct_revenue
+        GROUP BY user_id
+      ) b ON a.user_id = b.user_id
+    )
     WHERE user__revenue_all_time > 2
 ---
 integration_test:
@@ -2092,42 +2024,26 @@ integration_test:
   where_filter: "{{ render_metric_template('bookings', ['listing']) }} > 2 AND {{ render_metric_template('bookers', ['listing']) }} > 1"
   check_query: |
     SELECT
-      SUM(listings) AS listings
+      SUM(1) AS listings
     FROM (
       SELECT
-        subq_16.bookings AS listing__bookings
-        , subq_22.bookers AS listing__bookers
-        , subq_10.listings AS listings
-      FROM (
-        SELECT
-          listing_id AS listing
-          , 1 AS listings
-        FROM {{ source_schema }}.dim_listings_latest
-      ) subq_10
+        b.bookings AS listing__bookings
+        , c.bookers AS listing__bookers
+      FROM {{ source_schema }}.dim_listings_latest a
       LEFT OUTER JOIN (
         SELECT
-          listing
-          , SUM(bookings) AS bookings
-        FROM (
-          SELECT
-            listing_id AS listing
-            , 1 AS bookings
-          FROM {{ source_schema }}.fct_bookings
-        ) subq_13
-        GROUP BY
-          listing
-      ) subq_16
-      ON
-        subq_10.listing = subq_16.listing
+          listing_id
+          , SUM(1) AS bookings
+        FROM {{ source_schema }}.fct_bookings
+        GROUP BY listing_id
+      ) b
+      ON a.listing_id = b.listing_id
       LEFT OUTER JOIN (
         SELECT
-          listing_id AS listing
+          listing_id
           , COUNT(DISTINCT guest_id) AS bookers
         FROM {{ source_schema }}.fct_bookings
-        GROUP BY
-          listing_id
-      ) subq_22
-      ON
-        subq_10.listing = subq_22.listing
-    ) subq_24
+        GROUP BY listing_id
+      ) c ON a.listing_id = c.listing_id
+    )
     WHERE listing__bookings > 2 AND listing__bookers > 1
