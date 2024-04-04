@@ -18,8 +18,8 @@ from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.test_helpers import ConfigurableTimeSource
 from tests.fixtures.setup_fixtures import dbt_project_dir
-from tests.time.configurable_time_source import ConfigurableTimeSource
 
 
 class FakeCLIContext(CLIContext):

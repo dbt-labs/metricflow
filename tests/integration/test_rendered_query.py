@@ -9,12 +9,12 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_table import SqlTable
+from metricflow.test_helpers import ConfigurableTimeSource
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.integration.conftest import IntegrationTestHelpers
 from tests.snapshot_utils import (
     assert_sql_snapshot_equal,
 )
-from tests.time.configurable_time_source import ConfigurableTimeSource
 
 
 @pytest.mark.sql_engine_snapshot
