@@ -30,9 +30,9 @@ from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanCon
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.specs.column_assoc import ColumnAssociationResolver
+from metricflow.test_helpers import ConfigurableTimeSource
 from tests.fixtures.id_fixtures import IdNumberSpace, patch_id_generators_helper
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
-from tests.time.configurable_time_source import ConfigurableTimeSource
 
 logger = logging.getLogger(__name__)
 

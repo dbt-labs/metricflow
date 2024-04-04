@@ -4,7 +4,6 @@ import datetime
 import logging
 import os
 import warnings
-from dataclasses import dataclass
 from pathlib import Path
 
 import _pytest.config
@@ -14,58 +13,24 @@ from _pytest.fixtures import FixtureRequest
 from sqlalchemy.engine import make_url
 
 from metricflow.random_id import random_id
+from metricflow.test_helpers import (
+    DISPLAY_SNAPSHOTS_CLI_FLAG,
+    OVERWRITE_SNAPSHOTS_CLI_FLAG,
+    MetricFlowTestConfiguration,
+    add_display_snapshots_cli_flag,
+    add_overwrite_snapshots_cli_flag,
+)
 from tests.fixtures.sql_clients.common_client import SqlDialect
 from tests.table_snapshot.table_snapshots import SqlTableSnapshotHash, SqlTableSnapshotRepository
 
 logger = logging.getLogger(__name__)
 
 
-@dataclass(frozen=True)
-class SnapshotConfiguration:
-    """Configuration for handling snapshots in a test session."""
-
-    # Whether to display the snapshot associated with a test session in a browser window.
-    display_snapshots: bool
-    # Whether to overwrite any text files that were generated.
-    overwrite_snapshots: bool
+# from metricflow.test.time.configurable_time_source import ConfigurableTimeSource
 
 
-@dataclass(frozen=True)
-class MetricFlowTestConfiguration(SnapshotConfiguration):
-    """State that is shared between tests during a testing session."""
-
-    sql_engine_url: str
-    sql_engine_password: str
-    # Where MF system tables should be stored.
-    mf_system_schema: str
-    # Where tables for test data sets should be stored.
-    mf_source_schema: str
-
-    # Whether to display the graph associated with a test session in a browser window.
-    display_graphs: bool
-
-    # The source schema contains tables that are used for running tests. If this is set, a source schema in the SQL
-    # is created and persisted between runs. The source schema name includes a hash of the tables that should be in
-    # the schema, so
-    use_persistent_source_schema: bool
-
-
-DISPLAY_SNAPSHOTS_CLI_FLAG = "--display-snapshots"
 DISPLAY_GRAPHS_CLI_FLAG = "--display-graphs"
-OVERWRITE_SNAPSHOTS_CLI_FLAG = "--overwrite-snapshots"
 USE_PERSISTENT_SOURCE_SCHEMA_CLI_FLAG = "--use-persistent-source-schema"
-
-
-def add_display_snapshots_cli_flag(parser: _pytest.config.argparsing.Parser) -> None:  # noqa: D103
-    parser.addoption(DISPLAY_SNAPSHOTS_CLI_FLAG, action="store_true", help="Displays snapshots in a browser if set")
-
-
-def add_overwrite_snapshots_cli_flag(parser: _pytest.config.argparsing.Parser) -> None:  # noqa: D103
-    parser.addoption(
-        OVERWRITE_SNAPSHOTS_CLI_FLAG,
-        action="store_true",
-        help="Overwrites existing snapshots by ones generated during this testing session",
-    )
 
 
 def add_display_graphs_cli_flag(parser: _pytest.config.argparsing.Parser) -> None:  # noqa: D103

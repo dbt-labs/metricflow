@@ -35,15 +35,15 @@ from metricflow.sql.sql_exprs import (
     SqlStringExpression,
     SqlSubtractTimeIntervalExpression,
 )
+from metricflow.test_helpers import (
+    ConfigurableTimeSource,
+)
 from tests.compare_df import assert_dataframes_equal
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.integration.configured_test_case import (
     CONFIGURED_INTEGRATION_TESTS_REPOSITORY,
     IntegrationTestModel,
     RequiredDwEngineFeatures,
-)
-from tests.time.configurable_time_source import (
-    ConfigurableTimeSource,
 )
 
 logger = logging.getLogger(__name__)
