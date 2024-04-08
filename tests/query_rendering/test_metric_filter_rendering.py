@@ -175,4 +175,31 @@ def test_query_with_multiple_metrics_in_filter(
     )
 
 
-# TODO: tests for filters with conversion metrics + cumulative metrics with window/grain, distinct values queries with metric filters
+@pytest.mark.sql_engine_snapshot
+def test_filter_by_metric_in_same_semantic_model_as_queried_metric(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    sql_client: SqlClient,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    query_parser: MetricFlowQueryParser,
+) -> None:
+    """Tests a query with a simple metric in the query-level where filter."""
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookers",),
+        where_constraint=PydanticWhereFilter(
+            where_sql_template="{{ Metric('booking_value', ['guest']) }} > 1.00",
+        ),
+    )
+    dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
+
+    convert_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+# TODO: tests for filters with conversion metrics
