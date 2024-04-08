@@ -38,5 +38,6 @@ class LinkableElementProperties(Enum):
                 LinkableElementProperties.MULTI_HOP,
                 LinkableElementProperties.DERIVED_TIME_GRANULARITY,
                 LinkableElementProperties.METRIC_TIME,
+                LinkableElementProperties.METRIC,
             }
         )
