@@ -1,0 +1,6 @@
+kind: Fixes
+body: Enable filtering by metrics in the same semantic model as queried metrics.
+time: 2024-04-08T12:39:54.142472-07:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1115"
