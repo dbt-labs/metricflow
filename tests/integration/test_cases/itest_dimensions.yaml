@@ -332,4 +332,15 @@ integration_test:
       GROUP BY
         {{ render_date_trunc("v.ds", TimeGranularity.MONTH) }}
     )
-# TODO: add test case for range of metric time values
+---
+integration_test:
+  name: min_max_metric_time
+  description: Get min and max of metric_time
+  model: SIMPLE_MODEL
+  group_bys: ["metric_time"]
+  min_max_only: true
+  check_query: |
+    SELECT
+      MIN({{ render_date_trunc('ds', TimeGranularity.DAY) }}) AS metric_time__day__min
+      , MAX({{ render_date_trunc('ds', TimeGranularity.DAY) }}) AS metric_time__day__max
+    FROM {{ source_schema }}.mf_time_spine
