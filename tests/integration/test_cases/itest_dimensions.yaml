@@ -347,7 +347,7 @@ integration_test:
 ---
 integration_test:
   name: distinct_values_query_with_metric_filter
-  description: Query withought metrics using a metric filter
+  description: Query without metrics using a metric filter
   model: SIMPLE_MODEL
   group_bys: ["listing"]
   where_filter: "{{ render_metric_template('bookings', ['listing']) }} > 2"
