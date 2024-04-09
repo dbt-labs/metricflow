@@ -5,8 +5,9 @@ from typing import Sequence
 from dbt_semantic_interfaces.call_parameter_sets import (
     MetricCallParameterSet,
 )
-from dbt_semantic_interfaces.parsing.where_filter.where_filter_entity import WhereFilterMetric, WhereFilterMetricFactory
+from dbt_semantic_interfaces.parsing.where_filter.where_filter_entity import WhereFilterMetricFactory
 from dbt_semantic_interfaces.references import EntityReference
+from typing_extensions import override
 
 from metricflow.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
@@ -67,6 +68,7 @@ class MFWhereFilterMetricFactory(WhereFilterMetricFactory):
     Each call to `create` adds a MetricSpec to metric_specs.
     """
 
+    @override
     def __init__(  # noqa
         self,
         column_association_resolver: ColumnAssociationResolver,
@@ -80,6 +82,7 @@ class MFWhereFilterMetricFactory(WhereFilterMetricFactory):
         self._where_filter_location = where_filter_location
         self._rendered_spec_tracker = rendered_spec_tracker
 
+    @override
     def create(self, metric_name: str, group_by: Sequence[str] = ()) -> WhereFilterMetric:
         """Create a WhereFilterMetric."""
         # Parent method builds metric_call_parameter_sets & stores on class for future use.
