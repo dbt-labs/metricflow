@@ -257,7 +257,7 @@ class DataflowPlanBuilder:
             )
         if conversion_measure_recipe is None:
             raise UnableToSatisfyQueryError(
-                f"Unable to build dataflow plan for measure: {conversion_measure_spec.measure_spec}"
+                f"Unable to build dataflow plan for conversion measure: {conversion_measure_spec.measure_spec}"
             )
 
         # Gets the aggregated opportunities
