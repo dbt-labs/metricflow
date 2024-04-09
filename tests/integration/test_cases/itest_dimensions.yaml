@@ -334,6 +334,18 @@ integration_test:
     )
 ---
 integration_test:
+  name: min_max_metric_time
+  description: Get min and max of metric_time
+  model: SIMPLE_MODEL
+  group_bys: ["metric_time"]
+  min_max_only: true
+  check_query: |
+    SELECT
+      MIN({{ render_date_trunc('ds', TimeGranularity.DAY) }}) AS metric_time__day__min
+      , MAX({{ render_date_trunc('ds', TimeGranularity.DAY) }}) AS metric_time__day__max
+    FROM {{ source_schema }}.mf_time_spine
+---
+integration_test:
   name: distinct_values_query_with_metric_filter
   description: Query withought metrics using a metric filter
   model: SIMPLE_MODEL
@@ -358,4 +370,3 @@ integration_test:
     )
     WHERE listing__bookings > 2
     GROUP BY listing
-# TODO: add test case for range of metric time values
