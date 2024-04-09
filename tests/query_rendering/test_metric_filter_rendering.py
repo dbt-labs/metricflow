@@ -202,4 +202,31 @@ def test_filter_by_metric_in_same_semantic_model_as_queried_metric(
     )
 
 
+@pytest.mark.sql_engine_snapshot
+def test_distinct_values_query_with_metric_filter(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    sql_client: SqlClient,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    query_parser: MetricFlowQueryParser,
+) -> None:
+    """Tests a distinct values query with a metric in the query-level where filter."""
+    query_spec = query_parser.parse_and_validate_query(
+        group_by_names=("listing",),
+        where_constraint=PydanticWhereFilter(
+            where_sql_template="{{ Metric('bookings', ['listing']) }} > 2",
+        ),
+    )
+    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(query_spec)
+
+    convert_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
 # TODO: tests for filters with conversion metrics

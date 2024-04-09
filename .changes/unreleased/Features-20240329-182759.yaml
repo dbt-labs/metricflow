@@ -1,0 +1,6 @@
+kind: Features
+body: Enable metric filters for distinct values queries.
+time: 2024-03-29T18:27:59.807712-07:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1107"

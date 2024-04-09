@@ -548,16 +548,44 @@ class ValidLinkableSpecResolver:
                     metrics.add(metric_reference)
                     self._joinable_metrics_for_semantic_models[semantic_model_reference] = metrics
 
-        # If no metrics are specified, the query interface supports distinct dimension values from a single semantic
-        # model.
-        linkable_element_sets_to_merge: List[LinkableElementSet] = []
-
+        # If no metrics are specified, the query interface supports querying distinct values for dimensions, entities,
+        # and group by metrics.
+        linkable_element_sets_for_no_metrics_queries: List[LinkableElementSet] = []
         for semantic_model in semantic_manifest.semantic_models:
-            linkable_element_sets_to_merge.append(self._get_elements_in_semantic_model(semantic_model))
+            linkable_element_sets_for_no_metrics_queries.append(self._get_elements_in_semantic_model(semantic_model))
+            joinable_metrics = self._joinable_metrics_for_semantic_models.get(semantic_model.reference, set())
+            for entity in semantic_model.entities:
+                linkable_metrics_set = LinkableElementSet(
+                    path_key_to_linkable_dimensions={},
+                    path_key_to_linkable_entities={},
+                    path_key_to_linkable_metrics={
+                        ElementPathKey(
+                            element_name=metric.element_name,
+                            entity_links=(entity.reference,),
+                            time_granularity=None,
+                            date_part=None,
+                        ): (
+                            LinkableMetric(
+                                element_name=metric.element_name,
+                                entity_links=(entity.reference,),
+                                join_path=(
+                                    SemanticModelJoinPathElement(
+                                        semantic_model_reference=semantic_model.reference,
+                                        join_on_entity=entity.reference,
+                                    ),
+                                ),
+                                join_by_semantic_model=semantic_model.reference,
+                                properties=frozenset({LinkableElementProperties.METRIC}),
+                            ),
+                        )
+                        for metric in joinable_metrics
+                    },
+                )
+                linkable_element_sets_for_no_metrics_queries.append(linkable_metrics_set)
 
         metric_time_elements_for_no_metrics = self._get_metric_time_elements(measure_reference=None)
         self._no_metric_linkable_element_set = LinkableElementSet.merge_by_path_key(
-            linkable_element_sets_to_merge + [metric_time_elements_for_no_metrics]
+            linkable_element_sets_for_no_metrics_queries + [metric_time_elements_for_no_metrics]
         )
 
         logger.info(f"Building valid group-by-item indexes took: {time.time() - start_time:.2f}s")
