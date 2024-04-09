@@ -253,11 +253,11 @@ class DataflowPlanBuilder:
         logger.info(f"Recipe for conversion measure aggregation:\n{mf_pformat(conversion_measure_recipe)}")
         if base_measure_recipe is None:
             raise UnableToSatisfyQueryError(
-                f"Recipe not found for measure spec: {base_measure_spec.measure_spec} and linkable specs: {base_required_linkable_specs}"
+                f"Unable to join all items in request. Measure: {base_measure_spec.measure_spec}; Specs to join: {base_required_linkable_specs}"
             )
         if conversion_measure_recipe is None:
             raise UnableToSatisfyQueryError(
-                f"Recipe not found for measure spec: {conversion_measure_spec.measure_spec}"
+                f"Unable to build dataflow plan for conversion measure: {conversion_measure_spec.measure_spec}"
             )
 
         # Gets the aggregated opportunities
@@ -653,7 +653,7 @@ class DataflowPlanBuilder:
             linkable_spec_set=required_linkable_specs, time_range_constraint=query_spec.time_range_constraint
         )
         if not dataflow_recipe:
-            raise UnableToSatisfyQueryError(f"Recipe not found for linkable specs: {required_linkable_specs}")
+            raise UnableToSatisfyQueryError(f"Unable to join all items in request: {required_linkable_specs}")
 
         output_node = dataflow_recipe.source_node
         if dataflow_recipe.join_targets:
@@ -1300,9 +1300,8 @@ class DataflowPlanBuilder:
         logger.info(f"Using recipe:\n{indent(mf_pformat(measure_recipe))}")
 
         if measure_recipe is None:
-            # TODO: Improve for better user understandability.
             raise UnableToSatisfyQueryError(
-                f"Recipe not found for measure spec: {measure_spec} and linkable specs: {required_linkable_specs}"
+                f"Unable to join all items in request. Measure: {measure_spec.element_name}; Specs to join: {required_linkable_specs}"
             )
 
         queried_agg_time_dimension_specs = queried_linkable_specs.included_agg_time_dimension_specs_for_measure(
