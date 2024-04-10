@@ -828,7 +828,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             ),
         )
 
-    def visit_pass_elements_filter_node(self, node: FilterElementsNode) -> SqlDataSet:
+    def visit_filter_elements_node(self, node: FilterElementsNode) -> SqlDataSet:
         """Generates the query that realizes the behavior of FilterElementsNode."""
         from_data_set: SqlDataSet = node.parent_node.accept(self)
         output_instance_set = from_data_set.instance_set.transform(FilterElements(node.include_specs))
