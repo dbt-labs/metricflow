@@ -184,7 +184,7 @@ integration_test:
         , u.home_state_latest AS user__home_state_latest
       FROM {{ source_schema }}.dim_listings_latest l
       FULL OUTER JOIN {{ source_schema }}.dim_users_latest u ON l.user_id = u.user_id
-    )
+    ) outer_subq
     WHERE listing__country_latest = 'us'
     GROUP BY user__home_state_latest
 ---
@@ -295,7 +295,7 @@ integration_test:
       FROM {{ source_schema }}.dim_users u
       GROUP BY
         u.home_state
-    )
+    ) outer_subq
 ---
 integration_test:
   name: min_max_only_time
@@ -313,7 +313,7 @@ integration_test:
       FROM {{ source_schema }}.fct_id_verifications v
       GROUP BY
         v.ds
-    )
+    ) outer_subq
 ---
 integration_test:
   name: min_max_only_time_month
@@ -331,7 +331,7 @@ integration_test:
       FROM {{ source_schema }}.fct_id_verifications v
       GROUP BY
         {{ render_date_trunc("v.ds", TimeGranularity.MONTH) }}
-    )
+    ) outer_subq
 ---
 integration_test:
   name: min_max_metric_time
@@ -367,6 +367,6 @@ integration_test:
         GROUP BY listing_id
       ) a
       ON l.listing_id = a.listing
-    )
+    ) outer_subq
     WHERE listing__bookings > 2
     GROUP BY listing
