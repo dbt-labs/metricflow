@@ -41,7 +41,7 @@ class FilterElementsNode(BaseOutput):
         return self._distinct
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
-        return visitor.visit_pass_elements_filter_node(self)
+        return visitor.visit_filter_elements_node(self)
 
     @property
     def description(self) -> str:  # noqa: D102

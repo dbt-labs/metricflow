@@ -127,7 +127,7 @@ class DataflowPlanNodeVisitor(Generic[VisitorOutputT], ABC):
         pass
 
     @abstractmethod
-    def visit_pass_elements_filter_node(self, node: FilterElementsNode) -> VisitorOutputT:  # noqa: D102
+    def visit_filter_elements_node(self, node: FilterElementsNode) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod

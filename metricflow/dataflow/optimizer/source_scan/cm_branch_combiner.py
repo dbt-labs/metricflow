@@ -338,7 +338,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         self._log_visit_node_type(node)
         return self._handle_unsupported_node(node)
 
-    def visit_pass_elements_filter_node(  # noqa: D102
+    def visit_filter_elements_node(  # noqa: D102
         self, node: FilterElementsNode
     ) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
         self._log_visit_node_type(node)
