@@ -66,7 +66,6 @@ class MetricLookup(MetricAccessor):  # noqa: D101
             LinkableElementProperties.all_properties() if with_any_of is None else frozenset(with_any_of)
         )
         frozen_without_any_of = frozenset() if without_any_of is None else frozenset(without_any_of)
-
         return self._linkable_spec_resolver.get_linkable_element_set_for_measure(
             measure_reference=measure_reference,
             with_any_of=frozen_with_any_of,

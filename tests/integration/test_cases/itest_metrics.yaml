@@ -2047,3 +2047,11 @@ integration_test:
       ) c ON a.listing_id = c.listing_id
     )
     WHERE listing__bookings > 2 AND listing__bookers > 1
+---
+integration_test:
+  name: testy_test
+  description: Query with multiple metrics in the where filter
+  model: SIMPLE_MODEL
+  metrics: ["activated_users"]
+  check_query: |
+    SELECT 1

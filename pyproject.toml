@@ -40,7 +40,7 @@ dependencies = [
 ]
 
 [project.urls]
-Documentation = "https://transform.co/metricflow"
+Documentation = "https://transform.co/metricflow" # TODO: update
 "Source Code" = "https://github.com/transform-data/metricflow"
 
 [project.optional-dependencies]

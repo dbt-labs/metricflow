@@ -1,0 +1,9 @@
+
+metric:
+  name: activated_users
+  label: Active IDE Users
+  type: simple
+  type_params:
+    measure: users
+  filter: |
+    {{ Metric('ide_sessions', group_by=['user'])}} < 10

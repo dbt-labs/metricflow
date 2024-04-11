@@ -67,33 +67,33 @@
             <!--     expr=SqlColumnReferenceExpression(node_id=cr_21), -->
             <!--     column_alias='metric_time__extract_doy',          -->
             <!--   )                                                   -->
-            <!-- from_source = SqlSelectStatementNode(node_id=ss_28012) -->
+            <!-- from_source = SqlSelectStatementNode(node_id=ss_28014) -->
             <!-- where = None -->
             <!-- distinct = False -->
             <SqlSelectStatementNode>
                 <!-- description = 'Time Spine' -->
-                <!-- node_id = NodeId(id_str='ss_28012') -->
-                <!-- col0 = SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28170), column_alias='ds__day') -->
-                <!-- col1 = SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28171), column_alias='ds__week') -->
-                <!-- col2 = SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28172), column_alias='ds__month') -->
-                <!-- col3 = SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28173), column_alias='ds__quarter') -->
-                <!-- col4 = SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28174), column_alias='ds__year') -->
+                <!-- node_id = NodeId(id_str='ss_28014') -->
+                <!-- col0 = SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28190), column_alias='ds__day') -->
+                <!-- col1 = SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28191), column_alias='ds__week') -->
+                <!-- col2 = SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28192), column_alias='ds__month') -->
+                <!-- col3 = SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28193), column_alias='ds__quarter') -->
+                <!-- col4 = SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28194), column_alias='ds__year') -->
                 <!-- col5 =                                                                                          -->
-                <!--   SqlSelectColumn(expr=SqlExtractExpression(node_id=ex_28204), column_alias='ds__extract_year') -->
+                <!--   SqlSelectColumn(expr=SqlExtractExpression(node_id=ex_28228), column_alias='ds__extract_year') -->
                 <!-- col6 =                                                                                             -->
-                <!--   SqlSelectColumn(expr=SqlExtractExpression(node_id=ex_28205), column_alias='ds__extract_quarter') -->
+                <!--   SqlSelectColumn(expr=SqlExtractExpression(node_id=ex_28229), column_alias='ds__extract_quarter') -->
                 <!-- col7 =                                                                                           -->
-                <!--   SqlSelectColumn(expr=SqlExtractExpression(node_id=ex_28206), column_alias='ds__extract_month') -->
-                <!-- col8 = SqlSelectColumn(expr=SqlExtractExpression(node_id=ex_28207), column_alias='ds__extract_day') -->
-                <!-- col9 = SqlSelectColumn(expr=SqlExtractExpression(node_id=ex_28208), column_alias='ds__extract_dow') -->
+                <!--   SqlSelectColumn(expr=SqlExtractExpression(node_id=ex_28230), column_alias='ds__extract_month') -->
+                <!-- col8 = SqlSelectColumn(expr=SqlExtractExpression(node_id=ex_28231), column_alias='ds__extract_day') -->
+                <!-- col9 = SqlSelectColumn(expr=SqlExtractExpression(node_id=ex_28232), column_alias='ds__extract_dow') -->
                 <!-- col10 =                                                                                        -->
-                <!--   SqlSelectColumn(expr=SqlExtractExpression(node_id=ex_28209), column_alias='ds__extract_doy') -->
-                <!-- from_source = SqlTableFromClauseNode(node_id=tfc_28012) -->
+                <!--   SqlSelectColumn(expr=SqlExtractExpression(node_id=ex_28233), column_alias='ds__extract_doy') -->
+                <!-- from_source = SqlTableFromClauseNode(node_id=tfc_28014) -->
                 <!-- where = None -->
                 <!-- distinct = False -->
                 <SqlTableFromClauseNode>
                     <!-- description = 'Read from ***************************.mf_time_spine' -->
-                    <!-- node_id = NodeId(id_str='tfc_28012') -->
+                    <!-- node_id = NodeId(id_str='tfc_28014') -->
                     <!-- table_id = '***************************.mf_time_spine' -->
                 </SqlTableFromClauseNode>
             </SqlSelectStatementNode>

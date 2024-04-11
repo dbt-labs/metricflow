@@ -1,0 +1,21 @@
+
+semantic_model:
+  name: users_model_test
+  node_relation:
+    schema_name: $source_schema
+    alias: fct_bookings
+  defaults:
+    agg_time_dimension: created_at
+  entities:
+    - name: user_id
+      type: primary
+  measures:
+    - name: users
+      agg: count_distinct
+      expr: user_id
+      create_metric: true
+  dimensions:
+    - name: created_at
+      type: time
+      type_params:
+        time_granularity: day

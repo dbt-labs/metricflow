@@ -16,11 +16,11 @@
                     <!-- distinct = False -->
                     <MetricTimeDimensionTransformNode>
                         <!-- description = "Metric Time Dimension 'ds'" -->
-                        <!-- node_id = NodeId(id_str='sma_28007') -->
+                        <!-- node_id = NodeId(id_str='sma_28008') -->
                         <!-- aggregation_time_dimension = 'ds' -->
                         <ReadSqlSourceNode>
                             <!-- description = "Read From SemanticModelDataSet('revenue')" -->
-                            <!-- node_id = NodeId(id_str='rss_28020') -->
+                            <!-- node_id = NodeId(id_str='rss_28023') -->
                             <!-- data_set = SemanticModelDataSet('revenue') -->
                         </ReadSqlSourceNode>
                     </MetricTimeDimensionTransformNode>

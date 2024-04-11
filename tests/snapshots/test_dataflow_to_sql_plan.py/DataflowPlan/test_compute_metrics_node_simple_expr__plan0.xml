@@ -38,7 +38,7 @@
                         <!-- distinct = False -->
                         <ReadSqlSourceNode>
                             <!-- description = "Read From SemanticModelDataSet('listings_latest')" -->
-                            <!-- node_id = NodeId(id_str='rss_28005') -->
+                            <!-- node_id = NodeId(id_str='rss_28006') -->
                             <!-- data_set = SemanticModelDataSet('listings_latest') -->
                         </ReadSqlSourceNode>
                     </FilterElementsNode>

@@ -1,0 +1,25 @@
+
+semantic_model:
+  name: int_cloud_develop_requests
+  node_relation:
+    schema_name: $source_schema
+    alias: fct_bookings
+  defaults:
+    agg_time_dimension: created_at
+  entities:
+    - name: develop_request
+      type: primary
+      expr: listing_id # does it matter if it's FK? example was PK
+    - name: user_id
+      type: foreign
+      expr: guest_id
+  measures:
+    - name: ide_sessions
+      agg: count
+      expr: listing_id
+      create_metric: true
+  dimensions:
+    - name: created_at
+      type: time
+      type_params:
+        time_granularity: day
