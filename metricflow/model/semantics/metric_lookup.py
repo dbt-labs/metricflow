@@ -18,7 +18,7 @@ from metricflow.model.semantics.linkable_spec_resolver import (
 from metricflow.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.protocols.semantics import MetricAccessor
-from metricflow.specs.specs import LinkableInstanceSpec, TimeDimensionSpec
+from metricflow.specs.specs import TimeDimensionSpec
 
 logger = logging.getLogger(__name__)
 
@@ -45,13 +45,13 @@ class MetricLookup(MetricAccessor):
             max_entity_links=MAX_JOIN_HOPS,
         )
 
-    def group_by_item_specs_for_measure(
+    def linkable_elements_for_measure(
         self,
         measure_reference: MeasureReference,
         with_any_of: Optional[Set[LinkableElementProperties]] = None,
         without_any_of: Optional[Set[LinkableElementProperties]] = None,
-    ) -> Sequence[LinkableInstanceSpec]:
-        """Return group-by-items that are possible for a measure."""
+    ) -> LinkableElementSet:
+        """Return the set of linkable elements reachable from a given measure."""
         frozen_with_any_of = (
             LinkableElementProperties.all_properties() if with_any_of is None else frozenset(with_any_of)
         )
@@ -61,25 +61,23 @@ class MetricLookup(MetricAccessor):
             measure_reference=measure_reference,
             with_any_of=frozen_with_any_of,
             without_any_of=frozen_without_any_of,
-        ).as_spec_set.as_tuple
+        )
 
-    def group_by_item_specs_for_no_metrics_query(
+    def linkable_elements_for_no_metrics_query(
         self,
         with_any_of: Optional[Set[LinkableElementProperties]] = None,
         without_any_of: Optional[Set[LinkableElementProperties]] = None,
-    ) -> Sequence[LinkableInstanceSpec]:
-        """Return the possible group-by-items for a dimension values query with no metrics."""
+    ) -> LinkableElementSet:
+        """Return the reachable linkable elements for a dimension values query with no metrics."""
         frozen_with_any_of = (
             LinkableElementProperties.all_properties() if with_any_of is None else frozenset(with_any_of)
         )
         frozen_without_any_of = frozenset() if without_any_of is None else frozenset(without_any_of)
 
-        all_linkable_specs = self._linkable_spec_resolver.get_linkable_elements_for_distinct_values_query(
+        return self._linkable_spec_resolver.get_linkable_elements_for_distinct_values_query(
             with_any_of=frozen_with_any_of,
             without_any_of=frozen_without_any_of,
-        ).as_spec_set
-
-        return sorted(all_linkable_specs.as_tuple, key=lambda x: x.qualified_name)
+        )
 
     def linkable_elements_for_metrics(
         self,
