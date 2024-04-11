@@ -1682,7 +1682,7 @@ integration_test:
       ) subq_2
       ON {{ render_date_sub("subq_3", "metric_time__day", 5, TimeGranularity.DAY) }} = subq_2.metric_time__day
       GROUP BY subq_3.metric_time__day
-    )
+    ) outer_subq
 ---
 integration_test:
   name: cumulative_time_offset_metric_with_time_constraint
@@ -1762,7 +1762,7 @@ integration_test:
         ON {{ render_date_sub("subq_10", "ds", 2, TimeGranularity.DAY) }} = subq_8.metric_time__day
       ) subq_11
       WHERE booking__is_instant
-    )
+    ) outer_subq
 ---
 integration_test:
   name: offset_window_with_agg_time_dim
@@ -1964,7 +1964,7 @@ integration_test:
         ) c
         ON b.listing_id = c.listing_id
         GROUP BY COALESCE(b.listing_id, c.listing_id)
-      )
+      ) inner_from_subq
     ) d ON a.listing_id = d.listing_id
     WHERE listing__views_times_booking_value > 2
 ---
@@ -1990,7 +1990,7 @@ integration_test:
         GROUP BY listing_id
       ) b
       ON a.listing_id = b.listing_id
-    )
+    ) outer_subq
     WHERE listing__bookings_per_booker > 2
 ---
 integration_test:
@@ -2013,7 +2013,7 @@ integration_test:
         FROM {{ source_schema }}.fct_revenue
         GROUP BY user_id
       ) b ON a.user_id = b.user_id
-    )
+    ) outer_subq
     WHERE user__revenue_all_time > 2
 ---
 integration_test:
@@ -2045,5 +2045,5 @@ integration_test:
         FROM {{ source_schema }}.fct_bookings
         GROUP BY listing_id
       ) c ON a.listing_id = c.listing_id
-    )
+    ) outer_subq
     WHERE listing__bookings > 2 AND listing__bookers > 1
