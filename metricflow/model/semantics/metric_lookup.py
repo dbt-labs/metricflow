@@ -45,21 +45,6 @@ class MetricLookup(MetricAccessor):
             max_entity_links=MAX_JOIN_HOPS,
         )
 
-    def element_specs_for_metrics(
-        self,
-        metric_references: Sequence[MetricReference],
-        with_any_property: FrozenSet[LinkableElementProperties] = LinkableElementProperties.all_properties(),
-        without_any_property: FrozenSet[LinkableElementProperties] = frozenset(),
-    ) -> Sequence[LinkableInstanceSpec]:
-        """Dimensions common to all metrics requested (intersection)."""
-        all_linkable_specs = self._linkable_spec_resolver.get_linkable_elements_for_metrics(
-            metric_references=metric_references,
-            with_any_of=with_any_property,
-            without_any_of=without_any_property,
-        ).as_spec_set
-
-        return sorted(all_linkable_specs.as_tuple, key=lambda x: x.qualified_name)
-
     def group_by_item_specs_for_measure(
         self,
         measure_reference: MeasureReference,
@@ -96,13 +81,13 @@ class MetricLookup(MetricAccessor):
 
         return sorted(all_linkable_specs.as_tuple, key=lambda x: x.qualified_name)
 
-    def linkable_set_for_metrics(
+    def linkable_elements_for_metrics(
         self,
         metric_references: Sequence[MetricReference],
         with_any_property: FrozenSet[LinkableElementProperties] = LinkableElementProperties.all_properties(),
         without_any_property: FrozenSet[LinkableElementProperties] = frozenset(),
     ) -> LinkableElementSet:
-        """Similar to element_specs_for_metrics(), but as a set with more context."""
+        """Retrieve the matching set of linkable elements common to all metrics requested (intersection)."""
         return self._linkable_spec_resolver.get_linkable_elements_for_metrics(
             metric_references=metric_references,
             with_any_of=with_any_property,

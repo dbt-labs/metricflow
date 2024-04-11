@@ -72,43 +72,20 @@ def test_get_semantic_models_for_measure(semantic_model_lookup: SemanticModelLoo
     assert listings_sources[0].name == "listings_latest"
 
 
-def test_elements_for_metric(  # noqa: D103
-    request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, metric_lookup: MetricLookup
-) -> None:
-    assert_object_snapshot_equal(
-        request=request,
-        mf_test_configuration=mf_test_configuration,
-        obj_id="result0",
-        obj=tuple(
-            spec.qualified_name
-            for spec in metric_lookup.element_specs_for_metrics(
-                [MetricReference(element_name="views")],
-                without_any_property=frozenset(
-                    {
-                        LinkableElementProperties.DERIVED_TIME_GRANULARITY,
-                        LinkableElementProperties.METRIC_TIME,
-                    }
-                ),
-            )
-        ),
-    )
-
-
 def test_local_linked_elements_for_metric(  # noqa: D103
     request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, metric_lookup: MetricLookup
 ) -> None:
+    linkable_elements = metric_lookup.linkable_elements_for_metrics(
+        [MetricReference(element_name="listings")],
+        with_any_property=frozenset({LinkableElementProperties.LOCAL_LINKED}),
+        without_any_property=frozenset({LinkableElementProperties.DERIVED_TIME_GRANULARITY}),
+    )
+    sorted_specs = sorted(linkable_elements.as_spec_set.as_tuple, key=lambda x: x.qualified_name)
     assert_object_snapshot_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,
         obj_id="result0",
-        obj=tuple(
-            spec.qualified_name
-            for spec in metric_lookup.element_specs_for_metrics(
-                [MetricReference(element_name="listings")],
-                with_any_property=frozenset({LinkableElementProperties.LOCAL_LINKED}),
-                without_any_property=frozenset({LinkableElementProperties.DERIVED_TIME_GRANULARITY}),
-            )
-        ),
+        obj=tuple(spec.qualified_name for spec in sorted_specs),
     )
 
 
@@ -118,14 +95,14 @@ def test_get_semantic_models_for_entity(semantic_model_lookup: SemanticModelLook
     assert len(linked_semantic_models) == 10
 
 
-def test_linkable_set(  # noqa: D103
+def test_linkable_elements_for_metrics(  # noqa: D103
     request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, metric_lookup: MetricLookup
 ) -> None:
     assert_linkable_element_set_snapshot_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,
         set_id="result0",
-        linkable_element_set=metric_lookup.linkable_set_for_metrics(
+        linkable_element_set=metric_lookup.linkable_elements_for_metrics(
             (MetricReference(element_name="views"),),
             without_any_property=frozenset(
                 {
@@ -148,7 +125,7 @@ def test_linkable_set_for_common_dimensions_in_different_models(
         request=request,
         mf_test_configuration=mf_test_configuration,
         set_id="result0",
-        linkable_element_set=metric_lookup.linkable_set_for_metrics(
+        linkable_element_set=metric_lookup.linkable_elements_for_metrics(
             (MetricReference(element_name="bookings_per_view"),),
             without_any_property=frozenset(
                 {

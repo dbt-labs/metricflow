@@ -31,7 +31,7 @@ from metricflow.model.semantics.linkable_element_properties import LinkableEleme
 from metricflow.specs.specs import LinkableInstanceSpec, MeasureSpec, NonAdditiveDimensionSpec, TimeDimensionSpec
 
 if TYPE_CHECKING:
-    from metricflow.model.semantics.linkable_spec_resolver import ElementPathKey
+    from metricflow.model.semantics.linkable_spec_resolver import ElementPathKey, LinkableElementSet
 
 
 class SemanticModelAccessor(ABC):
@@ -154,12 +154,12 @@ class MetricAccessor(ABC):
     """
 
     @abstractmethod
-    def element_specs_for_metrics(
+    def linkable_elements_for_metrics(
         self,
         metric_references: Sequence[MetricReference],
         with_any_property: FrozenSet[LinkableElementProperties] = LinkableElementProperties.all_properties(),
         without_any_property: FrozenSet[LinkableElementProperties] = frozenset(),
-    ) -> Sequence[LinkableInstanceSpec]:
+    ) -> LinkableElementSet:
         """Retrieve the matching set of linkable elements common to all metrics requested (intersection)."""
         raise NotImplementedError
 
