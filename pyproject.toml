@@ -40,8 +40,8 @@ dependencies = [
 ]
 
 [project.urls]
-Documentation = "https://transform.co/metricflow"
-"Source Code" = "https://github.com/transform-data/metricflow"
+Documentation = "https://docs.getdbt.com/docs/build/about-metricflow"
+"Source Code" = "https://github.com/dbt-labs/metricflow"
 
 [project.optional-dependencies]
 dev-packages = [
