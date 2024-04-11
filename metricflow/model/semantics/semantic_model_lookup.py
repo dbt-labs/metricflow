@@ -41,27 +41,31 @@ logger = logging.getLogger(__name__)
 
 
 class SemanticModelLookup(SemanticModelAccessor):
-    """Tracks semantic information for semantic model held in a set of SemanticModelContainers.
+    """Tracks semantic information for semantic models held in a set of SemanticModelContainers.
 
-    This implements both the SemanticModelAccessors protocol, the interface type we use throughout the codebase.
+    This implements the SemanticModelAccessors protocol, the interface type we use throughout the codebase.
     That interface prevents unwanted calls to methods for adding semantic models to the container.
     """
 
-    def __init__(  # noqa: D107
+    def __init__(
         self,
         model: SemanticManifest,
     ) -> None:
-        self._model = model
+        """Initializer.
+
+        Args:
+            model: the semantic manifest used for loading semantic model definitions
+        """
         self._measure_index: Dict[MeasureReference, List[SemanticModel]] = {}
-        self._measure_aggs: Dict[
-            MeasureReference, AggregationType
-        ] = {}  # maps measures to their one consistent aggregation
+        self._measure_aggs: Dict[MeasureReference, AggregationType] = {}
         self._measure_agg_time_dimension: Dict[MeasureReference, TimeDimensionReference] = {}
         self._measure_non_additive_dimension_specs: Dict[MeasureReference, NonAdditiveDimensionSpec] = {}
         self._dimension_index: Dict[DimensionReference, List[SemanticModel]] = {}
-        self._linkable_reference_index: Dict[LinkableElementReference, List[SemanticModel]] = {}
+        self._linkable_reference_index: Dict[
+            LinkableElementReference, List[SemanticModel]
+        ] = {}  # TODO: Unused, remove.
         self._entity_index: Dict[EntityReference, List[SemanticModel]] = {}
-        self._semantic_model_names: Set[str] = set()
+        self._semantic_model_names: Set[str] = set()  # TODO: never populated!
 
         self._dimension_ref_to_spec: Dict[DimensionReference, DimensionSpec] = {}
         self._entity_ref_to_spec: Dict[EntityReference, EntitySpec] = {}
@@ -71,7 +75,7 @@ class SemanticModelLookup(SemanticModelAccessor):
         ] = {}
 
         self._semantic_model_reference_to_semantic_model: Dict[SemanticModelReference, SemanticModel] = {}
-        for semantic_model in sorted(self._model.semantic_models, key=lambda semantic_model: semantic_model.name):
+        for semantic_model in sorted(model.semantic_models, key=lambda semantic_model: semantic_model.name):
             self._add_semantic_model(semantic_model)
 
     def get_dimension_references(self) -> Sequence[DimensionReference]:  # noqa: D102
@@ -145,7 +149,6 @@ class SemanticModelLookup(SemanticModelAccessor):
     def get_entity_references(self) -> Sequence[EntityReference]:  # noqa: D102
         return list(self._entity_index.keys())
 
-    # DSC interface
     def get_semantic_models_for_measure(  # noqa: D102
         self, measure_reference: MeasureReference
     ) -> Sequence[SemanticModel]:  # noqa: D102
