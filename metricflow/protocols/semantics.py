@@ -109,12 +109,6 @@ class SemanticModelAccessor(ABC):
         """Retrieve the semantic model object matching the input semantic model reference, if any."""
         raise NotImplementedError
 
-    @property
-    @abstractmethod
-    def semantic_model_references(self) -> Sequence[SemanticModelReference]:
-        """Return all SemanticModelReference objects associated with the semantic models in the collection."""
-        raise NotImplementedError
-
     @abstractmethod
     def get_aggregation_time_dimensions_with_measures(
         self, semantic_model_reference: SemanticModelReference

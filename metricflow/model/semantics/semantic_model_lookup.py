@@ -61,11 +61,7 @@ class SemanticModelLookup(SemanticModelAccessor):
         self._measure_agg_time_dimension: Dict[MeasureReference, TimeDimensionReference] = {}
         self._measure_non_additive_dimension_specs: Dict[MeasureReference, NonAdditiveDimensionSpec] = {}
         self._dimension_index: Dict[DimensionReference, List[SemanticModel]] = {}
-        self._linkable_reference_index: Dict[
-            LinkableElementReference, List[SemanticModel]
-        ] = {}  # TODO: Unused, remove.
         self._entity_index: Dict[EntityReference, List[SemanticModel]] = {}
-        self._semantic_model_names: Set[str] = set()  # TODO: never populated!
 
         self._dimension_ref_to_spec: Dict[DimensionReference, DimensionSpec] = {}
         self._entity_ref_to_spec: Dict[EntityReference, EntitySpec] = {}
@@ -248,7 +244,6 @@ class SemanticModelLookup(SemanticModelAccessor):
         for dim in semantic_model.dimensions:
             semantic_models_for_dimension = self._dimension_index.get(dim.reference, []) + [semantic_model]
             self._dimension_index[dim.reference] = semantic_models_for_dimension
-            self._linkable_reference_index[dim.reference] = semantic_models_for_dimension
 
             self._dimension_ref_to_spec[dim.time_dimension_reference or dim.reference] = (
                 TimeDimensionSpec.from_name(dim.name)
@@ -259,16 +254,10 @@ class SemanticModelLookup(SemanticModelAccessor):
         for entity in semantic_model.entities:
             semantic_models_for_entity = self._entity_index.get(entity.reference, []) + [semantic_model]
             self._entity_index[entity.reference] = semantic_models_for_entity
-            self._linkable_reference_index[entity.reference] = semantic_models_for_entity
 
             self._entity_ref_to_spec[entity.reference] = EntitySpec.from_name(entity.name)
 
         self._semantic_model_reference_to_semantic_model[semantic_model.reference] = semantic_model
-
-    @property
-    def semantic_model_references(self) -> Sequence[SemanticModelReference]:  # noqa: D102
-        semantic_model_names_sorted = sorted(self._semantic_model_names)
-        return tuple(SemanticModelReference(semantic_model_name=x) for x in semantic_model_names_sorted)
 
     def get_aggregation_time_dimensions_with_measures(
         self, semantic_model_reference: SemanticModelReference
