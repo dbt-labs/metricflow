@@ -112,7 +112,6 @@ class MetricFlowQueryRequest:
     order_by_names: Optional[Sequence[str]] = None
     order_by: Optional[Sequence[OrderByQueryParameter]] = None
     min_max_only: bool = False
-    output_table: Optional[str] = None
     sql_optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O4
     query_type: MetricFlowQueryType = MetricFlowQueryType.METRIC
 
@@ -129,7 +128,6 @@ class MetricFlowQueryRequest:
         where_constraint: Optional[str] = None,
         order_by_names: Optional[Sequence[str]] = None,
         order_by: Optional[Sequence[OrderByQueryParameter]] = None,
-        output_table: Optional[str] = None,
         sql_optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O4,
         query_type: MetricFlowQueryType = MetricFlowQueryType.METRIC,
         min_max_only: bool = False,
@@ -147,7 +145,6 @@ class MetricFlowQueryRequest:
             where_constraint=where_constraint,
             order_by_names=order_by_names,
             order_by=order_by,
-            output_table=output_table,
             sql_optimization_level=sql_optimization_level,
             query_type=query_type,
             min_max_only=min_max_only,
@@ -483,10 +480,6 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             )
         logger.info(f"Query spec is:\n{mf_pformat(query_spec)}")
 
-        output_table: Optional[SqlTable] = None
-        if mf_query_request.output_table is not None:
-            output_table = SqlTable.from_string(mf_query_request.output_table)
-
         output_selection_specs: Optional[InstanceSpecSet] = None
         if mf_query_request.query_type == MetricFlowQueryType.DIMENSION_VALUES:
             # Filter result by dimension columns if it's a dimension values query
@@ -500,7 +493,6 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         if query_spec.metric_specs:
             dataflow_plan = self._dataflow_plan_builder.build_plan(
                 query_spec=query_spec,
-                output_sql_table=output_table,
                 output_selection_specs=output_selection_specs,
                 optimizers=(SourceScanOptimizer(),),
             )
@@ -519,7 +511,6 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             query_spec=query_spec,
             dataflow_plan=dataflow_plan,
             convert_to_execution_plan_result=convert_to_execution_plan_result,
-            output_table=output_table,
         )
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)

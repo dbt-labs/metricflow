@@ -8,7 +8,6 @@ from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowQuer
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.sql.sql_table import SqlTable
 from metricflow.test_helpers import ConfigurableTimeSource
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.integration.conftest import IntegrationTestHelpers
@@ -25,27 +24,6 @@ def test_render_query(  # noqa: D103
         MetricFlowQueryRequest.create_with_random_request_id(
             metric_names=["bookings"],
             group_by_names=["metric_time"],
-        )
-    )
-
-    assert_sql_snapshot_equal(
-        request=request,
-        mf_test_configuration=mf_test_configuration,
-        snapshot_id="query0",
-        sql=result.rendered_sql.sql_query,
-        sql_engine=it_helpers.sql_client.sql_engine_type,
-    )
-
-
-@pytest.mark.sql_engine_snapshot
-def test_render_write_to_table_query(  # noqa: D103
-    request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, it_helpers: IntegrationTestHelpers
-) -> None:
-    output_table = SqlTable(schema_name=it_helpers.mf_system_schema, table_name="test_table")
-
-    result = it_helpers.mf_engine.explain(
-        MetricFlowQueryRequest.create_with_random_request_id(
-            metric_names=["bookings"], group_by_names=["metric_time"], output_table=output_table.sql
         )
     )
 
