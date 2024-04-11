@@ -46,8 +46,8 @@ class ElementPathKey:
 
     element_name: str
     entity_links: Tuple[EntityReference, ...]
-    time_granularity: Optional[TimeGranularity]
-    date_part: Optional[DatePart]
+    time_granularity: Optional[TimeGranularity] = None
+    date_part: Optional[DatePart] = None
 
 
 @dataclass(frozen=True)
@@ -90,12 +90,7 @@ class LinkableEntity:
 
     @property
     def path_key(self) -> ElementPathKey:  # noqa: D102
-        return ElementPathKey(
-            element_name=self.element_name,
-            entity_links=self.entity_links,
-            time_granularity=None,
-            date_part=None,
-        )
+        return ElementPathKey(element_name=self.element_name, entity_links=self.entity_links)
 
     @property
     def reference(self) -> EntityReference:  # noqa: D102
@@ -115,12 +110,7 @@ class LinkableMetric:
 
     @property
     def path_key(self) -> ElementPathKey:  # noqa: D102
-        return ElementPathKey(
-            element_name=self.element_name,
-            entity_links=self.entity_links,
-            time_granularity=None,
-            date_part=None,
-        )
+        return ElementPathKey(element_name=self.element_name, entity_links=self.entity_links)
 
     @property
     def reference(self) -> MetricReference:  # noqa: D102
@@ -559,12 +549,7 @@ class ValidLinkableSpecResolver:
                     path_key_to_linkable_dimensions={},
                     path_key_to_linkable_entities={},
                     path_key_to_linkable_metrics={
-                        ElementPathKey(
-                            element_name=metric.element_name,
-                            entity_links=(entity.reference,),
-                            time_granularity=None,
-                            date_part=None,
-                        ): (
+                        ElementPathKey(element_name=metric.element_name, entity_links=(entity.reference,)): (
                             LinkableMetric(
                                 element_name=metric.element_name,
                                 entity_links=(entity.reference,),

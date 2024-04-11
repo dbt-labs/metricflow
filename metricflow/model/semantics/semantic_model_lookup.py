@@ -359,12 +359,7 @@ class SemanticModelLookup(SemanticModelAccessor):
             "measure requiring an agg_time_dimension, but found none.",
         )
 
-        return ElementPathKey(
-            element_name=agg_time_dimension.element_name,
-            entity_links=(entity_link,),
-            time_granularity=None,
-            date_part=None,
-        )
+        return ElementPathKey(element_name=agg_time_dimension.element_name, entity_links=(entity_link,))
 
     def get_agg_time_dimension_specs_for_measure(
         self, measure_reference: MeasureReference
