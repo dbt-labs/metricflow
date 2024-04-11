@@ -448,6 +448,14 @@ class SemanticModelJoinPath:
         """The last semantic model that would be joined in this path."""
         return self.last_path_element.semantic_model_reference
 
+    @property
+    def last_entity_link(self) -> EntityReference:  # noqa: D102
+        return self.last_path_element.join_on_entity
+
+    @property
+    def entity_links(self) -> Tuple[EntityReference, ...]:  # noqa: D102
+        return tuple(path_element.join_on_entity for path_element in self.path_elements)
+
 
 class ValidLinkableSpecResolver:
     """Figures out what linkable specs are valid for a given metric.
