@@ -114,6 +114,42 @@ def test_linkable_elements_for_metrics(  # noqa: D103
     )
 
 
+def test_linkable_elements_for_measure(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    metric_lookup: MetricLookup,
+) -> None:
+    """Tests extracting linkable elements for a given measure input."""
+    assert_linkable_element_set_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        set_id="result0",
+        linkable_element_set=metric_lookup.linkable_elements_for_measure(
+            measure_reference=MeasureReference(element_name="listings"),
+        ),
+    )
+
+
+def test_linkable_elements_for_no_metrics_query(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    metric_lookup: MetricLookup,
+) -> None:
+    """Tests extracting linkable elements for a dimension values query with no metrics."""
+    linkable_elements = metric_lookup.linkable_elements_for_no_metrics_query(
+        without_any_of={
+            LinkableElementProperties.DERIVED_TIME_GRANULARITY,
+        }
+    )
+    sorted_specs = sorted(linkable_elements.as_spec_set.as_tuple, key=lambda x: x.qualified_name)
+    assert_object_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        obj_id="result0",
+        obj=tuple(spec.qualified_name for spec in sorted_specs),
+    )
+
+
 def test_linkable_set_for_common_dimensions_in_different_models(
     request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, metric_lookup: MetricLookup
 ) -> None:

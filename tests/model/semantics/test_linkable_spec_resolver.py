@@ -178,24 +178,6 @@ def test_create_linkable_element_set_from_join_path_multi_hop(  # noqa: D103
     )
 
 
-def test_get_linkable_element_set_for_measure(
-    request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
-    simple_model_spec_resolver: ValidLinkableSpecResolver,
-) -> None:
-    """Tests extracting linkable elements for a given measure input."""
-    assert_linkable_element_set_snapshot_equal(
-        request=request,
-        mf_test_configuration=mf_test_configuration,
-        set_id="result0",
-        linkable_element_set=simple_model_spec_resolver.get_linkable_element_set_for_measure(
-            measure_reference=MeasureReference(element_name="listings"),
-            with_any_of=LinkableElementProperties.all_properties(),
-            without_any_of=frozenset({}),
-        ),
-    )
-
-
 def test_linkable_element_set_as_spec_set(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
