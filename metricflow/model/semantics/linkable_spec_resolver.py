@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import time
 from collections import defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Dict, FrozenSet, List, Optional, Sequence, Set, Tuple
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
@@ -135,9 +135,9 @@ class LinkableElementSet:
     #       semantic_model_origin="listings_latest_source",
     #   )
     # }
-    path_key_to_linkable_dimensions: Dict[ElementPathKey, Tuple[LinkableDimension, ...]]
-    path_key_to_linkable_entities: Dict[ElementPathKey, Tuple[LinkableEntity, ...]]
-    path_key_to_linkable_metrics: Dict[ElementPathKey, Tuple[LinkableMetric, ...]]
+    path_key_to_linkable_dimensions: Dict[ElementPathKey, Tuple[LinkableDimension, ...]] = field(default_factory=dict)
+    path_key_to_linkable_entities: Dict[ElementPathKey, Tuple[LinkableEntity, ...]] = field(default_factory=dict)
+    path_key_to_linkable_metrics: Dict[ElementPathKey, Tuple[LinkableMetric, ...]] = field(default_factory=dict)
 
     @staticmethod
     def merge_by_path_key(linkable_element_sets: Sequence[LinkableElementSet]) -> LinkableElementSet:
@@ -178,11 +178,7 @@ class LinkableElementSet:
         find the LinkableSpecSet for each metric in the query, then do an intersection of the sets.
         """
         if len(linkable_element_sets) == 0:
-            return LinkableElementSet(
-                path_key_to_linkable_dimensions={},
-                path_key_to_linkable_entities={},
-                path_key_to_linkable_metrics={},
-            )
+            return LinkableElementSet()
 
         # Find path keys that are common to all LinkableElementSets.
         dimension_path_keys: List[Set[ElementPathKey]] = []
@@ -554,8 +550,6 @@ class ValidLinkableSpecResolver:
             joinable_metrics = self._joinable_metrics_for_semantic_models.get(semantic_model.reference, set())
             for entity in semantic_model.entities:
                 linkable_metrics_set = LinkableElementSet(
-                    path_key_to_linkable_dimensions={},
-                    path_key_to_linkable_entities={},
                     path_key_to_linkable_metrics={
                         ElementPathKey(element_name=metric.element_name, entity_links=(entity.reference,)): (
                             LinkableMetric(
@@ -612,8 +606,6 @@ class ValidLinkableSpecResolver:
                     )
                 )
         return LinkableElementSet(
-            path_key_to_linkable_dimensions={},
-            path_key_to_linkable_entities={},
             path_key_to_linkable_metrics={
                 linkable_metric.path_key: (linkable_metric,) for linkable_metric in linkable_metrics
             },
@@ -683,7 +675,6 @@ class ValidLinkableSpecResolver:
             path_key_to_linkable_entities={
                 linkable_entity.path_key: (linkable_entity,) for linkable_entity in linkable_entities
             },
-            path_key_to_linkable_metrics={},
         )
 
     def _get_semantic_models_with_joinable_entity(
@@ -800,9 +791,7 @@ class ValidLinkableSpecResolver:
             path_key_to_linkable_dimensions={
                 path_key: tuple(linkable_dimensions)
                 for path_key, linkable_dimensions in path_key_to_linkable_dimensions.items()
-            },
-            path_key_to_linkable_entities={},
-            path_key_to_linkable_metrics={},
+            }
         )
 
     def _get_joined_elements(self, measure_semantic_model: SemanticModel) -> LinkableElementSet:
@@ -839,9 +828,7 @@ class ValidLinkableSpecResolver:
 
         # Create multi-hop elements. At each iteration, we generate the list of valid elements based on the current join
         # path, extend all paths to include the next valid semantic model, then repeat.
-        multi_hop_elements = LinkableElementSet(
-            path_key_to_linkable_dimensions={}, path_key_to_linkable_entities={}, path_key_to_linkable_metrics={}
-        )
+        multi_hop_elements = LinkableElementSet()
 
         for _ in range(self._max_entity_links - 1):
             new_join_paths: List[SemanticModelJoinPath] = []
