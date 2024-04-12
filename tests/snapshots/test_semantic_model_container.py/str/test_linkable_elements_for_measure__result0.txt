@@ -142,7 +142,6 @@ listings_latest      ('listing',)    ds                                         
 listings_latest      ('listing',)    ds                                                        YEAR                             ['DERIVED_TIME_GRANULARITY', 'LOCAL']
 listings_latest      ('listing',)    ds                                                        YEAR                YEAR         ['DERIVED_TIME_GRANULARITY', 'LOCAL']
 listings_latest      ('listing',)    is_lux_latest                                                                              ['LOCAL']
-listings_latest      ('listing',)    listing                                                                                    ['ENTITY', 'LOCAL']
 listings_latest      ('listing',)    user                                                                                       ['ENTITY', 'LOCAL']
 listings_latest      ('user',)       active_listings                                                                            ['METRIC']
 listings_latest      ('user',)       active_listings                                                                            ['METRIC']
