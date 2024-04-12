@@ -44,7 +44,7 @@ def test_join_type_coverage() -> None:
     and triggering a test failure for types which are handled in a non-exhaustive fashion
     """
     all_join_types = set(
-        SemanticModelJoinEvaluator._INVALID_ENTITY_JOINS + SemanticModelJoinEvaluator._VALID_ENTITY_JOINS
+        SemanticModelJoinEvaluator._FAN_OUT_ENTITY_JOINS + SemanticModelJoinEvaluator._VALID_ENTITY_JOINS
     )
     for entity_type in EntityType:
         join_types = _get_join_types_for_entity_type(entity_type=entity_type)
