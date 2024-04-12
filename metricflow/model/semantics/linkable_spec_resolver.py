@@ -697,10 +697,12 @@ class ValidLinkableSpecResolver:
         self,
         left_semantic_model_reference: SemanticModelReference,
         entity_reference: EntityReference,
-    ) -> Sequence[SemanticModel]:
+    ) -> Tuple[Sequence[SemanticModel], Sequence[SemanticModel]]:
+        """Find all semantic models that contain this entity, split into those with valid vs. invalid joins."""
         # May switch to non-cached implementation.
         semantic_models = self._entity_to_semantic_model[entity_reference.element_name]
-        valid_semantic_models = []
+        semantic_models_with_valid_join = []
+        semantic_models_with_fan_out_join = []
 
         for semantic_model in semantic_models:
             if self._join_evaluator.is_valid_semantic_model_join(
@@ -708,8 +710,11 @@ class ValidLinkableSpecResolver:
                 right_semantic_model_reference=semantic_model.reference,
                 on_entity_reference=entity_reference,
             ):
-                valid_semantic_models.append(semantic_model)
-        return valid_semantic_models
+                semantic_models_with_valid_join.append(semantic_model)
+            else:
+                semantic_models_with_fan_out_join.append(semantic_model)
+
+        return semantic_models_with_valid_join, semantic_models_with_fan_out_join
 
     @staticmethod
     def _get_time_granularity_for_dimension(
@@ -818,7 +823,7 @@ class ValidLinkableSpecResolver:
         # Create single-hop elements
         join_paths = []
         for entity in measure_semantic_model.entities:
-            semantic_models = self._get_semantic_models_joinable_to_entity(
+            semantic_models, _ = self._get_semantic_models_joinable_to_entity(
                 left_semantic_model_reference=measure_semantic_model.reference,
                 entity_reference=entity.reference,
             )
@@ -971,7 +976,7 @@ class ValidLinkableSpecResolver:
             if entity_reference in set(x.join_on_entity for x in current_join_path.path_elements):
                 continue
 
-            semantic_models_that_can_be_joined = self._get_semantic_models_joinable_to_entity(
+            semantic_models_that_can_be_joined, _ = self._get_semantic_models_joinable_to_entity(
                 left_semantic_model_reference=last_semantic_model_in_path.reference,
                 entity_reference=entity.reference,
             )
