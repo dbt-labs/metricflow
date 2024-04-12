@@ -152,13 +152,13 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
         """Push the group-by-item specs that are available to the measure and match the source patterns to the child."""
         with self._path_from_start_node_tracker.track_node_visit(node) as current_traversal_path:
             logger.info(f"Handling {node.ui_description}")
-            specs_available_for_measure: Sequence[LinkableInstanceSpec] = tuple(
-                self._semantic_manifest_lookup.metric_lookup.group_by_item_specs_for_measure(
-                    measure_reference=node.measure_reference,
-                    with_any_of=self._with_any_property,
-                    without_any_of=self._without_any_property,
-                )
-            )
+            specs_available_for_measure: Sequence[
+                LinkableInstanceSpec
+            ] = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_measure(
+                measure_reference=node.measure_reference,
+                with_any_of=self._with_any_property,
+                without_any_of=self._without_any_property,
+            ).as_spec_set.as_tuple
 
             # The following is needed to handle limitation of cumulative metrics. Filtering could be done at the measure
             # node, but doing it here makes it a little easier to generate the error message.
@@ -405,9 +405,11 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
         with self._path_from_start_node_tracker.track_node_visit(node) as current_traversal_path:
             logger.info(f"Handling {node.ui_description}")
             # This is a case for distinct dimension values from semantic models.
-            candidate_specs = self._semantic_manifest_lookup.metric_lookup.group_by_item_specs_for_no_metrics_query()
+            candidate_elements = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_no_metrics_query()
 
-            matching_specs = candidate_specs
+            matching_specs: Sequence[LinkableInstanceSpec] = tuple(
+                sorted(candidate_elements.as_spec_set.as_tuple, key=lambda x: x.qualified_name)
+            )
             for pattern_to_apply in self._source_spec_patterns:
                 matching_specs = InstanceSpecSet.from_specs(pattern_to_apply.match(matching_specs)).linkable_specs
 

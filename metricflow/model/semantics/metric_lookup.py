@@ -18,50 +18,40 @@ from metricflow.model.semantics.linkable_spec_resolver import (
 from metricflow.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.protocols.semantics import MetricAccessor
-from metricflow.specs.specs import LinkableInstanceSpec, TimeDimensionSpec
+from metricflow.specs.specs import TimeDimensionSpec
 
 logger = logging.getLogger(__name__)
 
 
-class MetricLookup(MetricAccessor):  # noqa: D101
-    def __init__(  # noqa: D107
-        self, semantic_manifest: SemanticManifest, semantic_model_lookup: SemanticModelLookup
-    ) -> None:  # noqa: D107
-        self._semantic_manifest = semantic_manifest
+class MetricLookup(MetricAccessor):
+    """Tracks semantic information for metrics by linking them to semantic models."""
+
+    def __init__(self, semantic_manifest: SemanticManifest, semantic_model_lookup: SemanticModelLookup) -> None:
+        """Initializer.
+
+        Args:
+            semantic_manifest: used to fetch and load the metrics and initialize the linkable spec resolver
+            semantic_model_lookup: provides access to semantic model metadata for various lookup operations
+        """
         self._metrics: Dict[MetricReference, Metric] = {}
         self._semantic_model_lookup = semantic_model_lookup
 
-        for metric in self._semantic_manifest.metrics:
+        for metric in semantic_manifest.metrics:
             self.add_metric(metric)
 
         self._linkable_spec_resolver = ValidLinkableSpecResolver(
-            semantic_manifest=self._semantic_manifest,
+            semantic_manifest=semantic_manifest,
             semantic_model_lookup=semantic_model_lookup,
             max_entity_links=MAX_JOIN_HOPS,
         )
 
-    def element_specs_for_metrics(
-        self,
-        metric_references: Sequence[MetricReference],
-        with_any_property: FrozenSet[LinkableElementProperties] = LinkableElementProperties.all_properties(),
-        without_any_property: FrozenSet[LinkableElementProperties] = frozenset(),
-    ) -> Sequence[LinkableInstanceSpec]:
-        """Dimensions common to all metrics requested (intersection)."""
-        all_linkable_specs = self._linkable_spec_resolver.get_linkable_elements_for_metrics(
-            metric_references=metric_references,
-            with_any_of=with_any_property,
-            without_any_of=without_any_property,
-        ).as_spec_set
-
-        return sorted(all_linkable_specs.as_tuple, key=lambda x: x.qualified_name)
-
-    def group_by_item_specs_for_measure(
+    def linkable_elements_for_measure(
         self,
         measure_reference: MeasureReference,
         with_any_of: Optional[Set[LinkableElementProperties]] = None,
         without_any_of: Optional[Set[LinkableElementProperties]] = None,
-    ) -> Sequence[LinkableInstanceSpec]:
-        """Return group-by-items that are possible for a measure."""
+    ) -> LinkableElementSet:
+        """Return the set of linkable elements reachable from a given measure."""
         frozen_with_any_of = (
             LinkableElementProperties.all_properties() if with_any_of is None else frozenset(with_any_of)
         )
@@ -71,33 +61,31 @@ class MetricLookup(MetricAccessor):  # noqa: D101
             measure_reference=measure_reference,
             with_any_of=frozen_with_any_of,
             without_any_of=frozen_without_any_of,
-        ).as_spec_set.as_tuple
+        )
 
-    def group_by_item_specs_for_no_metrics_query(
+    def linkable_elements_for_no_metrics_query(
         self,
         with_any_of: Optional[Set[LinkableElementProperties]] = None,
         without_any_of: Optional[Set[LinkableElementProperties]] = None,
-    ) -> Sequence[LinkableInstanceSpec]:
-        """Return the possible group-by-items for a dimension values query with no metrics."""
+    ) -> LinkableElementSet:
+        """Return the reachable linkable elements for a dimension values query with no metrics."""
         frozen_with_any_of = (
             LinkableElementProperties.all_properties() if with_any_of is None else frozenset(with_any_of)
         )
         frozen_without_any_of = frozenset() if without_any_of is None else frozenset(without_any_of)
 
-        all_linkable_specs = self._linkable_spec_resolver.get_linkable_elements_for_distinct_values_query(
+        return self._linkable_spec_resolver.get_linkable_elements_for_distinct_values_query(
             with_any_of=frozen_with_any_of,
             without_any_of=frozen_without_any_of,
-        ).as_spec_set
+        )
 
-        return sorted(all_linkable_specs.as_tuple, key=lambda x: x.qualified_name)
-
-    def linkable_set_for_metrics(
+    def linkable_elements_for_metrics(
         self,
         metric_references: Sequence[MetricReference],
         with_any_property: FrozenSet[LinkableElementProperties] = LinkableElementProperties.all_properties(),
         without_any_property: FrozenSet[LinkableElementProperties] = frozenset(),
     ) -> LinkableElementSet:
-        """Similar to element_specs_for_metrics(), but as a set with more context."""
+        """Retrieve the matching set of linkable elements common to all metrics requested (intersection)."""
         return self._linkable_spec_resolver.get_linkable_elements_for_metrics(
             metric_references=metric_references,
             with_any_of=with_any_property,

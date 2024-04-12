@@ -31,7 +31,7 @@ from metricflow.model.semantics.linkable_element_properties import LinkableEleme
 from metricflow.specs.specs import LinkableInstanceSpec, MeasureSpec, NonAdditiveDimensionSpec, TimeDimensionSpec
 
 if TYPE_CHECKING:
-    from metricflow.model.semantics.linkable_spec_resolver import ElementPathKey
+    from metricflow.model.semantics.linkable_spec_resolver import ElementPathKey, LinkableElementSet
 
 
 class SemanticModelAccessor(ABC):
@@ -109,12 +109,6 @@ class SemanticModelAccessor(ABC):
         """Retrieve the semantic model object matching the input semantic model reference, if any."""
         raise NotImplementedError
 
-    @property
-    @abstractmethod
-    def semantic_model_references(self) -> Sequence[SemanticModelReference]:
-        """Return all SemanticModelReference objects associated with the semantic models in the collection."""
-        raise NotImplementedError
-
     @abstractmethod
     def get_aggregation_time_dimensions_with_measures(
         self, semantic_model_reference: SemanticModelReference
@@ -160,12 +154,12 @@ class MetricAccessor(ABC):
     """
 
     @abstractmethod
-    def element_specs_for_metrics(
+    def linkable_elements_for_metrics(
         self,
         metric_references: Sequence[MetricReference],
         with_any_property: FrozenSet[LinkableElementProperties] = LinkableElementProperties.all_properties(),
         without_any_property: FrozenSet[LinkableElementProperties] = frozenset(),
-    ) -> Sequence[LinkableInstanceSpec]:
+    ) -> LinkableElementSet:
         """Retrieve the matching set of linkable elements common to all metrics requested (intersection)."""
         raise NotImplementedError
 
@@ -201,22 +195,22 @@ class MetricAccessor(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def group_by_item_specs_for_measure(
+    def linkable_elements_for_measure(
         self,
         measure_reference: MeasureReference,
         with_any_of: Optional[Set[LinkableElementProperties]] = None,
         without_any_of: Optional[Set[LinkableElementProperties]] = None,
-    ) -> Sequence[LinkableInstanceSpec]:
-        """Return group-by-items that are possible for a measure."""
+    ) -> LinkableElementSet:
+        """Return the set of linkable elements reachable from a given measure."""
         raise NotImplementedError
 
     @abstractmethod
-    def group_by_item_specs_for_no_metrics_query(
+    def linkable_elements_for_no_metrics_query(
         self,
         with_any_of: Optional[Set[LinkableElementProperties]] = None,
         without_any_of: Optional[Set[LinkableElementProperties]] = None,
-    ) -> Sequence[LinkableInstanceSpec]:
-        """Return the possible group-by-items for a dimension values query with no metrics."""
+    ) -> LinkableElementSet:
+        """Return the possible linkable elements for a dimension values query with no metrics."""
         raise NotImplementedError
 
     @abstractmethod
