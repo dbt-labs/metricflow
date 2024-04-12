@@ -1032,7 +1032,7 @@ class ValidLinkableSpecResolver:
                         semantic_model_origin=semantic_model.reference,
                         dimension=dimension,
                         entity_links=entity_links,
-                        join_path=(),
+                        join_path=join_path.path_elements,
                         with_properties=with_properties,
                     )
                 )
