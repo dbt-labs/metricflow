@@ -1,0 +1,6 @@
+kind: Fixes
+body: Remove redundant entity names like 'listing__listing' from suggested group bys.
+time: 2024-04-11T19:16:11.285726-07:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1130"
