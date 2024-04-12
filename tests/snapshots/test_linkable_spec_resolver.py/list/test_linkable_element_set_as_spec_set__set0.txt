@@ -92,7 +92,6 @@
   'listing__instant_plus_non_referred_bookings_pct',
   'listing__is_lux_latest',
   'listing__largest_listing',
-  'listing__listing',
   'listing__listings',
   'listing__lux_booking_fraction_of_max_value',
   'listing__lux_booking_value_rate_expr',

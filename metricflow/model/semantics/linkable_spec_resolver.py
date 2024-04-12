@@ -629,6 +629,9 @@ class ValidLinkableSpecResolver:
                 )
             )
             for entity_link in self._semantic_model_lookup.entity_links_for_local_elements(semantic_model):
+                # Avoid creating "booking_id__booking_id"
+                if entity_link == entity.reference:
+                    continue
                 linkable_entities.append(
                     LinkableEntity(
                         semantic_model_origin=semantic_model.reference,
