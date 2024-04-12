@@ -961,7 +961,7 @@ class ValidLinkableSpecResolver:
             entity_reference = entity.reference
 
             # Don't create cycles in the join path by joining on the same entity.
-            if entity_reference in set(x.join_on_entity for x in current_join_path.path_elements):
+            if entity_reference in current_join_path.entity_links:
                 continue
 
             semantic_models_that_can_be_joined, _ = self._get_semantic_models_joinable_to_entity(
@@ -1001,7 +1001,6 @@ class ValidLinkableSpecResolver:
 
         linkable_dimensions: List[LinkableDimension] = []
         linkable_entities: List[LinkableEntity] = []
-        linkable_metrics: List[LinkableMetric] = []
 
         for dimension in semantic_model.dimensions:
             dimension_type = dimension.type
@@ -1044,16 +1043,9 @@ class ValidLinkableSpecResolver:
                     )
                 )
 
-        for metric_reference in self._joinable_metrics_for_entities[join_path.last_entity_link]:
-            linkable_metrics.append(
-                LinkableMetric(
-                    element_name=metric_reference.element_name,
-                    entity_links=join_path.entity_links,
-                    properties=with_properties.union({LinkableElementProperties.METRIC}),
-                    join_by_semantic_model=semantic_model.reference,
-                    join_path=join_path.path_elements,
-                )
-            )
+        linkable_metrics = self._create_linkable_metrics_from_join_path(
+            join_path=join_path, with_properties=with_properties
+        )
 
         return LinkableElementSet(
             path_key_to_linkable_dimensions={
@@ -1066,3 +1058,19 @@ class ValidLinkableSpecResolver:
                 linkable_metric.path_key: (linkable_metric,) for linkable_metric in linkable_metrics
             },
         )
+
+    def _create_linkable_metrics_from_join_path(
+        self,
+        join_path: SemanticModelJoinPath,
+        with_properties: FrozenSet[LinkableElementProperties],
+    ) -> Sequence[LinkableMetric]:
+        return [
+            LinkableMetric(
+                element_name=metric_reference.element_name,
+                entity_links=join_path.entity_links,
+                properties=with_properties.union({LinkableElementProperties.METRIC}),
+                join_path=join_path.path_elements,
+                join_by_semantic_model=join_path.last_semantic_model_reference,
+            )
+            for metric_reference in self._joinable_metrics_for_entities[join_path.last_entity_link]
+        ]
