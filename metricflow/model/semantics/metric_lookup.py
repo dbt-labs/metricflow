@@ -23,19 +23,24 @@ from metricflow.specs.specs import LinkableInstanceSpec, TimeDimensionSpec
 logger = logging.getLogger(__name__)
 
 
-class MetricLookup(MetricAccessor):  # noqa: D101
-    def __init__(  # noqa: D107
-        self, semantic_manifest: SemanticManifest, semantic_model_lookup: SemanticModelLookup
-    ) -> None:  # noqa: D107
-        self._semantic_manifest = semantic_manifest
+class MetricLookup(MetricAccessor):
+    """Tracks semantic information for metrics by linking them to semantic models."""
+
+    def __init__(self, semantic_manifest: SemanticManifest, semantic_model_lookup: SemanticModelLookup) -> None:
+        """Initializer.
+
+        Args:
+            semantic_manifest: used to fetch and load the metrics and initialize the linkable spec resolver
+            semantic_model_lookup: provides access to semantic model metadata for various lookup operations
+        """
         self._metrics: Dict[MetricReference, Metric] = {}
         self._semantic_model_lookup = semantic_model_lookup
 
-        for metric in self._semantic_manifest.metrics:
+        for metric in semantic_manifest.metrics:
             self.add_metric(metric)
 
         self._linkable_spec_resolver = ValidLinkableSpecResolver(
-            semantic_manifest=self._semantic_manifest,
+            semantic_manifest=semantic_manifest,
             semantic_model_lookup=semantic_model_lookup,
             max_entity_links=MAX_JOIN_HOPS,
         )

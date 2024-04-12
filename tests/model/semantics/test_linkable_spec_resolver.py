@@ -4,7 +4,12 @@ import logging
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.references import EntityReference, MetricReference, SemanticModelReference
+from dbt_semantic_interfaces.references import (
+    EntityReference,
+    MeasureReference,
+    MetricReference,
+    SemanticModelReference,
+)
 
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
@@ -15,7 +20,7 @@ from metricflow.model.semantics.linkable_spec_resolver import (
 )
 from metricflow.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
-from tests.snapshot_utils import assert_linkable_element_set_snapshot_equal
+from tests.snapshot_utils import assert_linkable_element_set_snapshot_equal, assert_spec_set_snapshot_equal
 
 logger = logging.getLogger(__name__)
 
@@ -170,4 +175,47 @@ def test_create_linkable_element_set_from_join_path_multi_hop(  # noqa: D103
             ),
             with_properties=frozenset({LinkableElementProperties.JOINED, LinkableElementProperties.MULTI_HOP}),
         ),
+    )
+
+
+def test_get_linkable_element_set_for_measure(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    simple_model_spec_resolver: ValidLinkableSpecResolver,
+) -> None:
+    """Tests extracting linkable elements for a given measure input."""
+    assert_linkable_element_set_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        set_id="result0",
+        linkable_element_set=simple_model_spec_resolver.get_linkable_element_set_for_measure(
+            measure_reference=MeasureReference(element_name="listings"),
+            with_any_of=LinkableElementProperties.all_properties(),
+            without_any_of=frozenset({}),
+        ),
+    )
+
+
+def test_linkable_element_set_as_spec_set(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    simple_model_spec_resolver: ValidLinkableSpecResolver,
+) -> None:
+    """Tests extracting linkable elements for a given measure input and converting them into a spec set.
+
+    Note assert_spec_set_snapshot_equal relies on an InstanceSpecSet, not a LinkableSpecSet, so we have to
+    double up on the .as_spec_set calls here. Yes, this is lazy. No, I don't care to make another helper to
+    do snapshot comparisons on LinkableSpecSets.
+    """
+    linkable_spec_set = simple_model_spec_resolver.get_linkable_element_set_for_measure(
+        MeasureReference(element_name="listings"),
+        with_any_of=LinkableElementProperties.all_properties(),
+        without_any_of=frozenset({}),
+    ).as_spec_set
+
+    assert_spec_set_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        set_id="set0",
+        spec_set=linkable_spec_set.as_spec_set,
     )
