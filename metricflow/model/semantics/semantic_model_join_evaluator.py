@@ -60,7 +60,7 @@ class SemanticModelJoinEvaluator:
         SemanticModelEntityJoinType(left_entity_type=EntityType.NATURAL, right_entity_type=EntityType.UNIQUE),
     )
 
-    _INVALID_ENTITY_JOINS = (
+    _FAN_OUT_ENTITY_JOINS = (
         SemanticModelEntityJoinType(left_entity_type=EntityType.PRIMARY, right_entity_type=EntityType.FOREIGN),
         SemanticModelEntityJoinType(left_entity_type=EntityType.UNIQUE, right_entity_type=EntityType.FOREIGN),
         SemanticModelEntityJoinType(left_entity_type=EntityType.FOREIGN, right_entity_type=EntityType.FOREIGN),
@@ -197,7 +197,7 @@ class SemanticModelJoinEvaluator:
 
         if join_type in SemanticModelJoinEvaluator._VALID_ENTITY_JOINS:
             return join_type
-        elif join_type in SemanticModelJoinEvaluator._INVALID_ENTITY_JOINS:
+        elif join_type in SemanticModelJoinEvaluator._FAN_OUT_ENTITY_JOINS:
             return None
 
         raise RuntimeError(f"Join type not handled: {join_type}")
