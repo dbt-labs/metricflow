@@ -39,11 +39,7 @@ logger = logging.getLogger(__name__)
 
 
 class SemanticModelLookup:
-    """Tracks semantic information for semantic models held in a set of SemanticModelContainers.
-
-    This implements the SemanticModelLookups protocol, the interface type we use throughout the codebase.
-    That interface prevents unwanted calls to methods for adding semantic models to the container.
-    """
+    """Tracks semantic information for semantic models held in a set of SemanticModelContainers."""
 
     def __init__(
         self,
