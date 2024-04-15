@@ -34,7 +34,7 @@ from metricflow.mf_logging.formatting import indent
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.model.semantics.linkable_element_properties import (
-    LinkableElementProperties,
+    LinkableElementProperty,
 )
 from metricflow.model.semantics.linkable_spec_resolver import LinkableDimension
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
@@ -228,7 +228,7 @@ class AbstractMetricFlowEngine(ABC):
 
     @abstractmethod
     def simple_dimensions_for_metrics(
-        self, metric_names: List[str], without_any_property: Sequence[LinkableElementProperties]
+        self, metric_names: List[str], without_any_property: Sequence[LinkableElementProperty]
     ) -> List[Dimension]:
         """Retrieves a list of all common dimensions for metric_names.
 
@@ -546,10 +546,10 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     def simple_dimensions_for_metrics(  # noqa: D102
         self,
         metric_names: List[str],
-        without_any_property: Sequence[LinkableElementProperties] = (
-            LinkableElementProperties.ENTITY,
-            LinkableElementProperties.DERIVED_TIME_GRANULARITY,
-            LinkableElementProperties.LOCAL_LINKED,
+        without_any_property: Sequence[LinkableElementProperty] = (
+            LinkableElementProperty.ENTITY,
+            LinkableElementProperty.DERIVED_TIME_GRANULARITY,
+            LinkableElementProperty.LOCAL_LINKED,
         ),
     ) -> List[Dimension]:
         path_key_to_linkable_dimensions = (
@@ -570,10 +570,10 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 if linkable_dimension.date_part is not None:
                     continue
 
-                if LinkableElementProperties.METRIC_TIME in linkable_dimension.properties:
+                if LinkableElementProperty.METRIC_TIME in linkable_dimension.properties:
                     metric_time_name = DataSet.metric_time_dimension_name()
                     assert linkable_dimension.element_name == metric_time_name, (
-                        f"{linkable_dimension} has the {LinkableElementProperties.METRIC_TIME}, but the name does not"
+                        f"{linkable_dimension} has the {LinkableElementProperty.METRIC_TIME}, but the name does not"
                         f"match."
                     )
 
@@ -623,7 +623,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 metric_references=[MetricReference(element_name=mname) for mname in metric_names],
                 with_any_property=frozenset(
                     {
-                        LinkableElementProperties.ENTITY,
+                        LinkableElementProperty.ENTITY,
                     }
                 ),
             )

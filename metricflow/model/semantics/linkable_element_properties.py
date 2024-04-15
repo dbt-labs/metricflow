@@ -4,7 +4,7 @@ from enum import Enum
 from typing import FrozenSet
 
 
-class LinkableElementProperties(Enum):
+class LinkableElementProperty(Enum):
     """The properties associated with a valid linkable element.
 
     Local means an element that is defined within the same semantic model as the measure. This definition is used
@@ -29,15 +29,15 @@ class LinkableElementProperties(Enum):
     METRIC = "metric"
 
     @staticmethod
-    def all_properties() -> FrozenSet[LinkableElementProperties]:  # noqa: D102
+    def all_properties() -> FrozenSet[LinkableElementProperty]:  # noqa: D102
         return frozenset(
             {
-                LinkableElementProperties.LOCAL,
-                LinkableElementProperties.LOCAL_LINKED,
-                LinkableElementProperties.JOINED,
-                LinkableElementProperties.MULTI_HOP,
-                LinkableElementProperties.DERIVED_TIME_GRANULARITY,
-                LinkableElementProperties.METRIC_TIME,
-                LinkableElementProperties.METRIC,
+                LinkableElementProperty.LOCAL,
+                LinkableElementProperty.LOCAL_LINKED,
+                LinkableElementProperty.JOINED,
+                LinkableElementProperty.MULTI_HOP,
+                LinkableElementProperty.DERIVED_TIME_GRANULARITY,
+                LinkableElementProperty.METRIC_TIME,
+                LinkableElementProperty.METRIC,
             }
         )
