@@ -374,6 +374,36 @@ class SemanticModelJoinPathElement:
     join_on_entity: EntityReference
 
 
+@dataclass(frozen=True)
+class MetricSubqueryJoinPathElement:
+    """Describes joining a metric subquery by the given entity."""
+
+    metric_reference: MetricReference
+    join_on_entity: EntityReference
+
+
+@dataclass(frozen=True)
+class MetricSubqueryJoinPath:
+    """Describes how to join to a metric subquery.
+
+    Starts with semantic model join path, if exists. Always ends with metric subquery join path.
+    """
+
+    metric_subquery_join_path_element: MetricSubqueryJoinPathElement
+    semantic_model_join_path: Optional[SemanticModelJoinPath] = None
+
+    @property
+    def entity_links(self) -> Tuple[EntityReference, ...]:  # noqa: D102
+        return (self.semantic_model_join_path.entity_links if self.semantic_model_join_path else ()) + (
+            self.metric_subquery_join_path_element.join_on_entity,
+        )
+
+    @property
+    def last_semantic_model_reference(self) -> Optional[SemanticModelReference]:
+        """The last semantic model that would be joined in this path (if exists) before joining to metric."""
+        return self.semantic_model_join_path.last_semantic_model_reference if self.semantic_model_join_path else None
+
+
 def _generate_linkable_time_dimensions(
     semantic_model_origin: SemanticModelReference,
     dimension: Dimension,
