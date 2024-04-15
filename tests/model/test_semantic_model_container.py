@@ -58,18 +58,15 @@ def test_get_elements(semantic_model_lookup: SemanticModelLookup) -> None:  # no
         assert semantic_model_lookup.get_measure(measure_reference=measure_reference).reference == measure_reference
 
 
-def test_get_semantic_models_for_measure(semantic_model_lookup: SemanticModelLookup) -> None:  # noqa: D103
-    bookings_sources = semantic_model_lookup.get_semantic_models_for_measure(MeasureReference(element_name="bookings"))
-    assert len(bookings_sources) == 1
-    assert bookings_sources[0].name == "bookings_source"
+def test_get_semantic_model_for_measure(semantic_model_lookup: SemanticModelLookup) -> None:  # noqa: D103
+    bookings_source = semantic_model_lookup.get_semantic_model_for_measure(MeasureReference(element_name="bookings"))
+    assert bookings_source.name == "bookings_source"
 
-    views_sources = semantic_model_lookup.get_semantic_models_for_measure(MeasureReference(element_name="views"))
-    assert len(views_sources) == 1
-    assert views_sources[0].name == "views_source"
+    views_source = semantic_model_lookup.get_semantic_model_for_measure(MeasureReference(element_name="views"))
+    assert views_source.name == "views_source"
 
-    listings_sources = semantic_model_lookup.get_semantic_models_for_measure(MeasureReference(element_name="listings"))
-    assert len(listings_sources) == 1
-    assert listings_sources[0].name == "listings_latest"
+    listings_source = semantic_model_lookup.get_semantic_model_for_measure(MeasureReference(element_name="listings"))
+    assert listings_source.name == "listings_latest"
 
 
 def test_local_linked_elements_for_metric(  # noqa: D103

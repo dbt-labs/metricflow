@@ -50,7 +50,7 @@ class SemanticModelLookup:
         Args:
             model: the semantic manifest used for loading semantic model definitions
         """
-        self._measure_index: Dict[MeasureReference, List[SemanticModel]] = {}
+        self._measure_index: Dict[MeasureReference, SemanticModel] = {}
         self._measure_aggs: Dict[MeasureReference, AggregationType] = {}
         self._measure_agg_time_dimension: Dict[MeasureReference, TimeDimensionReference] = {}
         self._measure_non_additive_dimension_specs: Dict[MeasureReference, NonAdditiveDimensionSpec] = {}
@@ -133,23 +133,21 @@ class SemanticModelLookup:
         if measure_reference not in self._measure_index:
             raise ValueError(f"Could not find measure with name ({measure_reference}) in configured semantic models")
 
-        # Measures should be unique across semantic models.
-        semantic_models = self._measure_index[measure_reference]
-        assert (
-            len(semantic_models) == 1
-        ), f"Expected exactly 1 semantic model for measure {measure_reference}, but found semantic models {semantic_models}."
-
         return SemanticModelLookup.get_measure_from_semantic_model(
-            semantic_model=semantic_models[0], measure_reference=measure_reference
+            semantic_model=self.get_semantic_model_for_measure(measure_reference), measure_reference=measure_reference
         )
 
     def get_entity_references(self) -> Sequence[EntityReference]:
         """Retrieve all entity references from the collection of semantic models."""
         return list(self._entity_index.keys())
 
-    def get_semantic_models_for_measure(self, measure_reference: MeasureReference) -> Sequence[SemanticModel]:
-        """Retrieve semantic model where the measure is defined."""
-        return self._measure_index.get(measure_reference, [])
+    def get_semantic_model_for_measure(self, measure_reference: MeasureReference) -> SemanticModel:  # noqa: D102
+        semantic_model = self._measure_index.get(measure_reference)
+        assert semantic_model, (
+            f"Semantic model not found for meeasure: {measure_reference}. "
+            f"This indicates either internal misconfiguration or that the measure does not exist."
+        )
+        return semantic_model
 
     def get_agg_time_dimension_for_measure(self, measure_reference: MeasureReference) -> TimeDimensionReference:
         """Retrieves the aggregate time dimension that is associated with the measure reference.
@@ -198,7 +196,7 @@ class SemanticModelLookup:
 
         for measure in semantic_model.measures:
             self._measure_aggs[measure.reference] = measure.agg
-            self._measure_index[measure.reference] = self._measure_index.get(measure.reference, []) + [semantic_model]
+            self._measure_index[measure.reference] = semantic_model
             agg_time_dimension_reference = semantic_model.checked_agg_time_dimension_for_measure(measure.reference)
 
             matching_dimensions = tuple(
@@ -344,12 +342,7 @@ class SemanticModelLookup:
 
         # A measure's agg_time_dimension is required to be in the same semantic model as the measure,
         # so we can assume the same semantic model for both measure and dimension.
-        semantic_models = self.get_semantic_models_for_measure(measure_reference)
-        assert (
-            len(semantic_models) == 1
-        ), f"Expected exactly one semantic model for measure {measure_reference}, but found semantic models {semantic_models}."
-        semantic_model = semantic_models[0]
-
+        semantic_model = self.get_semantic_model_for_measure(measure_reference)
         entity_link = self.resolved_primary_entity(semantic_model)
         assert entity_link is not None, (
             f"Expected semantic model {semantic_model} to have a primary entity since it has a "
