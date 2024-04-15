@@ -720,12 +720,9 @@ class DataflowPlanBuilder:
 
         This is a temporary method for use in assertion boundaries while we implement support for multiple semantic models
         """
-        semantic_model_names: Set[str] = set()
-        for measure in measures:
-            semantic_model_names = semantic_model_names.union(
-                {d.name for d in self._semantic_model_lookup.get_semantic_models_for_measure(measure.reference)}
-            )
-        return semantic_model_names
+        return {
+            self._semantic_model_lookup.get_semantic_model_for_measure(measure.reference).name for measure in measures
+        }
 
     def _sort_by_suitability(self, nodes: Sequence[BaseOutput]) -> Sequence[BaseOutput]:
         """Sort nodes by the number of linkable specs.
