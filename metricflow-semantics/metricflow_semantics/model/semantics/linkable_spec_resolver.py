@@ -330,19 +330,19 @@ class ValidLinkableSpecResolver:
             },
         )
 
-    def _get_semantic_models_with_joinable_entity(
+    def _get_semantic_models_with_valid_join(
         self,
         left_semantic_model_reference: SemanticModelReference,
-        entity_reference: EntityReference,
+        join_by_entity_reference: EntityReference,
     ) -> Sequence[SemanticModel]:
         # May switch to non-cached implementation.
-        semantic_models = self._entity_to_semantic_model[entity_reference.element_name]
+        semantic_models = self._entity_to_semantic_model[join_by_entity_reference.element_name]
         valid_semantic_models = []
         for semantic_model in semantic_models:
             if self._join_evaluator.is_valid_semantic_model_join(
                 left_semantic_model_reference=left_semantic_model_reference,
                 right_semantic_model_reference=semantic_model.reference,
-                on_entity_reference=entity_reference,
+                on_entity_reference=join_by_entity_reference,
             ):
                 valid_semantic_models.append(semantic_model)
         return valid_semantic_models
@@ -454,9 +454,9 @@ class ValidLinkableSpecResolver:
         # Create single-hop elements
         join_paths = []
         for entity in measure_semantic_model.entities:
-            semantic_models = self._get_semantic_models_with_joinable_entity(
+            semantic_models = self._get_semantic_models_with_valid_join(
                 left_semantic_model_reference=measure_semantic_model.reference,
-                entity_reference=entity.reference,
+                join_by_entity_reference=entity.reference,
             )
             for semantic_model in semantic_models:
                 if semantic_model.name == measure_semantic_model.name:
@@ -600,9 +600,9 @@ class ValidLinkableSpecResolver:
             if entity_reference in set(x.join_on_entity for x in current_join_path.path_elements):
                 continue
 
-            semantic_models_that_can_be_joined = self._get_semantic_models_with_joinable_entity(
+            semantic_models_that_can_be_joined = self._get_semantic_models_with_valid_join(
                 left_semantic_model_reference=last_semantic_model_in_path.reference,
-                entity_reference=entity.reference,
+                join_by_entity_reference=entity.reference,
             )
             for semantic_model in semantic_models_that_can_be_joined:
                 # Don't create cycles in the join path by repeating a semantic model in the path.
