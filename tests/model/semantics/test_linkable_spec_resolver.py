@@ -12,7 +12,7 @@ from dbt_semantic_interfaces.references import (
 )
 
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
+from metricflow.model.semantics.linkable_element_properties import LinkableElementProperty
 from metricflow.model.semantics.linkable_spec_resolver import (
     SemanticModelJoinPath,
     SemanticModelJoinPathElement,
@@ -58,7 +58,7 @@ def test_all_properties(  # noqa: D103
         set_id="result0",
         linkable_element_set=simple_model_spec_resolver.get_linkable_elements_for_metrics(
             metric_references=[MetricReference(element_name="bookings"), MetricReference(element_name="views")],
-            with_any_of=LinkableElementProperties.all_properties(),
+            with_any_of=LinkableElementProperty.all_properties(),
             without_any_of=frozenset({}),
         ),
     )
@@ -75,7 +75,7 @@ def test_one_property(  # noqa: D103
         set_id="result0",
         linkable_element_set=simple_model_spec_resolver.get_linkable_elements_for_metrics(
             metric_references=[MetricReference(element_name="bookings"), MetricReference(element_name="views")],
-            with_any_of=frozenset({LinkableElementProperties.LOCAL}),
+            with_any_of=frozenset({LinkableElementProperty.LOCAL}),
             without_any_of=frozenset(),
         ),
     )
@@ -92,7 +92,7 @@ def test_metric_time_property_for_cumulative_metric(  # noqa: D103
         set_id="result0",
         linkable_element_set=simple_model_spec_resolver.get_linkable_elements_for_metrics(
             metric_references=[MetricReference(element_name="trailing_2_months_revenue")],
-            with_any_of=frozenset({LinkableElementProperties.METRIC_TIME}),
+            with_any_of=frozenset({LinkableElementProperty.METRIC_TIME}),
             without_any_of=frozenset(),
         ),
     )
@@ -109,7 +109,7 @@ def test_metric_time_property_for_derived_metrics(  # noqa: D103
         set_id="result0",
         linkable_element_set=simple_model_spec_resolver.get_linkable_elements_for_metrics(
             metric_references=[MetricReference(element_name="bookings_per_view")],
-            with_any_of=frozenset({LinkableElementProperties.METRIC_TIME}),
+            with_any_of=frozenset({LinkableElementProperty.METRIC_TIME}),
             without_any_of=frozenset(),
         ),
     )
@@ -126,7 +126,7 @@ def test_cyclic_join_manifest(  # noqa: D103
         set_id="result0",
         linkable_element_set=cyclic_join_manifest_spec_resolver.get_linkable_elements_for_metrics(
             metric_references=[MetricReference(element_name="listings")],
-            with_any_of=LinkableElementProperties.all_properties(),
+            with_any_of=LinkableElementProperty.all_properties(),
             without_any_of=frozenset(),
         ),
     )
@@ -150,7 +150,7 @@ def test_create_linkable_element_set_from_join_path(  # noqa: D103
                     ),
                 )
             ),
-            with_properties=frozenset({LinkableElementProperties.JOINED}),
+            with_properties=frozenset({LinkableElementProperty.JOINED}),
         ),
     )
 
@@ -173,7 +173,7 @@ def test_create_linkable_element_set_from_join_path_multi_hop(  # noqa: D103
                     ),
                 )
             ),
-            with_properties=frozenset({LinkableElementProperties.JOINED, LinkableElementProperties.MULTI_HOP}),
+            with_properties=frozenset({LinkableElementProperty.JOINED, LinkableElementProperty.MULTI_HOP}),
         ),
     )
 
@@ -191,7 +191,7 @@ def test_linkable_element_set_as_spec_set(
     """
     linkable_spec_set = simple_model_spec_resolver.get_linkable_element_set_for_measure(
         MeasureReference(element_name="listings"),
-        with_any_of=LinkableElementProperties.all_properties(),
+        with_any_of=LinkableElementProperty.all_properties(),
         without_any_of=frozenset({}),
     ).as_spec_set
 

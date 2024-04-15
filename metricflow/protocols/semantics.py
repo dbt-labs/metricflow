@@ -27,7 +27,7 @@ from dbt_semantic_interfaces.references import (
 )
 
 from metricflow.model.semantics.element_group import ElementGrouper
-from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
+from metricflow.model.semantics.linkable_element_properties import LinkableElementProperty
 from metricflow.specs.specs import LinkableInstanceSpec, MeasureSpec, NonAdditiveDimensionSpec, TimeDimensionSpec
 
 if TYPE_CHECKING:
@@ -157,8 +157,8 @@ class MetricAccessor(ABC):
     def linkable_elements_for_metrics(
         self,
         metric_references: Sequence[MetricReference],
-        with_any_property: FrozenSet[LinkableElementProperties] = LinkableElementProperties.all_properties(),
-        without_any_property: FrozenSet[LinkableElementProperties] = frozenset(),
+        with_any_property: FrozenSet[LinkableElementProperty] = LinkableElementProperty.all_properties(),
+        without_any_property: FrozenSet[LinkableElementProperty] = frozenset(),
     ) -> LinkableElementSet:
         """Retrieve the matching set of linkable elements common to all metrics requested (intersection)."""
         raise NotImplementedError
@@ -198,8 +198,8 @@ class MetricAccessor(ABC):
     def linkable_elements_for_measure(
         self,
         measure_reference: MeasureReference,
-        with_any_of: Optional[Set[LinkableElementProperties]] = None,
-        without_any_of: Optional[Set[LinkableElementProperties]] = None,
+        with_any_of: Optional[Set[LinkableElementProperty]] = None,
+        without_any_of: Optional[Set[LinkableElementProperty]] = None,
     ) -> LinkableElementSet:
         """Return the set of linkable elements reachable from a given measure."""
         raise NotImplementedError
@@ -207,8 +207,8 @@ class MetricAccessor(ABC):
     @abstractmethod
     def linkable_elements_for_no_metrics_query(
         self,
-        with_any_of: Optional[Set[LinkableElementProperties]] = None,
-        without_any_of: Optional[Set[LinkableElementProperties]] = None,
+        with_any_of: Optional[Set[LinkableElementProperty]] = None,
+        without_any_of: Optional[Set[LinkableElementProperty]] = None,
     ) -> LinkableElementSet:
         """Return the possible linkable elements for a dimension values query with no metrics."""
         raise NotImplementedError

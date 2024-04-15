@@ -9,7 +9,7 @@ from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import MeasureReference, MetricReference, TimeDimensionReference
 
 from metricflow.errors.errors import DuplicateMetricError, MetricNotFoundError, NonExistentMeasureError
-from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
+from metricflow.model.semantics.linkable_element_properties import LinkableElementProperty
 from metricflow.model.semantics.linkable_spec_resolver import (
     ElementPathKey,
     LinkableElementSet,
@@ -48,13 +48,11 @@ class MetricLookup(MetricAccessor):
     def linkable_elements_for_measure(
         self,
         measure_reference: MeasureReference,
-        with_any_of: Optional[Set[LinkableElementProperties]] = None,
-        without_any_of: Optional[Set[LinkableElementProperties]] = None,
+        with_any_of: Optional[Set[LinkableElementProperty]] = None,
+        without_any_of: Optional[Set[LinkableElementProperty]] = None,
     ) -> LinkableElementSet:
         """Return the set of linkable elements reachable from a given measure."""
-        frozen_with_any_of = (
-            LinkableElementProperties.all_properties() if with_any_of is None else frozenset(with_any_of)
-        )
+        frozen_with_any_of = LinkableElementProperty.all_properties() if with_any_of is None else frozenset(with_any_of)
         frozen_without_any_of = frozenset() if without_any_of is None else frozenset(without_any_of)
 
         return self._linkable_spec_resolver.get_linkable_element_set_for_measure(
@@ -65,13 +63,11 @@ class MetricLookup(MetricAccessor):
 
     def linkable_elements_for_no_metrics_query(
         self,
-        with_any_of: Optional[Set[LinkableElementProperties]] = None,
-        without_any_of: Optional[Set[LinkableElementProperties]] = None,
+        with_any_of: Optional[Set[LinkableElementProperty]] = None,
+        without_any_of: Optional[Set[LinkableElementProperty]] = None,
     ) -> LinkableElementSet:
         """Return the reachable linkable elements for a dimension values query with no metrics."""
-        frozen_with_any_of = (
-            LinkableElementProperties.all_properties() if with_any_of is None else frozenset(with_any_of)
-        )
+        frozen_with_any_of = LinkableElementProperty.all_properties() if with_any_of is None else frozenset(with_any_of)
         frozen_without_any_of = frozenset() if without_any_of is None else frozenset(without_any_of)
 
         return self._linkable_spec_resolver.get_linkable_elements_for_distinct_values_query(
@@ -82,8 +78,8 @@ class MetricLookup(MetricAccessor):
     def linkable_elements_for_metrics(
         self,
         metric_references: Sequence[MetricReference],
-        with_any_property: FrozenSet[LinkableElementProperties] = LinkableElementProperties.all_properties(),
-        without_any_property: FrozenSet[LinkableElementProperties] = frozenset(),
+        with_any_property: FrozenSet[LinkableElementProperty] = LinkableElementProperty.all_properties(),
+        without_any_property: FrozenSet[LinkableElementProperty] = frozenset(),
     ) -> LinkableElementSet:
         """Retrieve the matching set of linkable elements common to all metrics requested (intersection)."""
         return self._linkable_spec_resolver.get_linkable_elements_for_metrics(

@@ -12,7 +12,7 @@ from typing_extensions import override
 from metricflow.mf_logging.formatting import indent
 from metricflow.mf_logging.pretty_print import mf_pformat, mf_pformat_many
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
+from metricflow.model.semantics.linkable_element_properties import LinkableElementProperty
 from metricflow.query.group_by_item.candidate_push_down.group_by_item_candidate import GroupByItemCandidateSet
 from metricflow.query.group_by_item.resolution_dag.resolution_nodes.base_node import (
     GroupByItemResolutionNode,
@@ -126,8 +126,8 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
         manifest_lookup: SemanticManifestLookup,
         suggestion_generator: Optional[QueryItemSuggestionGenerator],
         source_spec_patterns: Sequence[SpecPattern] = (),
-        with_any_property: Optional[Set[LinkableElementProperties]] = None,
-        without_any_property: Optional[Set[LinkableElementProperties]] = None,
+        with_any_property: Optional[Set[LinkableElementProperty]] = None,
+        without_any_property: Optional[Set[LinkableElementProperty]] = None,
     ) -> None:
         """Initializer.
 
@@ -138,7 +138,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
             source_spec_patterns: The patterns to apply to the specs available at the measure nodes.
             with_any_property: Only consider group-by-items with these properties from the measure nodes.
             without_any_property:  Only consider group-by-items without any of these properties (see
-            LinkableElementProperties).
+            LinkableElementProperty).
         """
         self._semantic_manifest_lookup = manifest_lookup
         self._source_spec_patterns = tuple(source_spec_patterns)

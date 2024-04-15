@@ -24,7 +24,7 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnknownMetricLinkingError
 from metricflow.mf_logging.pretty_print import mf_pformat
-from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
+from metricflow.model.semantics.linkable_element_properties import LinkableElementProperty
 from metricflow.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
 from metricflow.protocols.semantics import SemanticModelAccessor
 from metricflow.specs.specs import (
@@ -59,7 +59,7 @@ class LinkableDimension:
     element_name: str
     entity_links: Tuple[EntityReference, ...]
     join_path: Tuple[SemanticModelJoinPathElement, ...]
-    properties: FrozenSet[LinkableElementProperties]
+    properties: FrozenSet[LinkableElementProperty]
     time_granularity: Optional[TimeGranularity]
     date_part: Optional[DatePart]
 
@@ -84,7 +84,7 @@ class LinkableEntity:
     # The semantic model where this entity was defined.
     semantic_model_origin: SemanticModelReference
     element_name: str
-    properties: FrozenSet[LinkableElementProperties]
+    properties: FrozenSet[LinkableElementProperty]
     entity_links: Tuple[EntityReference, ...]
     join_path: Tuple[SemanticModelJoinPathElement, ...]
 
@@ -105,7 +105,7 @@ class LinkableMetric:
     join_by_semantic_model: SemanticModelReference
     # TODO: Enable joining by dimension
     entity_links: Tuple[EntityReference, ...]
-    properties: FrozenSet[LinkableElementProperties]
+    properties: FrozenSet[LinkableElementProperty]
     join_path: Tuple[SemanticModelJoinPathElement, ...]
 
     @property
@@ -242,9 +242,9 @@ class LinkableElementSet:
 
     def filter(
         self,
-        with_any_of: FrozenSet[LinkableElementProperties],
-        without_any_of: FrozenSet[LinkableElementProperties] = frozenset(),
-        without_all_of: FrozenSet[LinkableElementProperties] = frozenset(),
+        with_any_of: FrozenSet[LinkableElementProperty],
+        without_any_of: FrozenSet[LinkableElementProperty] = frozenset(),
+        without_all_of: FrozenSet[LinkableElementProperty] = frozenset(),
     ) -> LinkableElementSet:
         """Filter elements in the set.
 
@@ -376,7 +376,7 @@ def _generate_linkable_time_dimensions(
     dimension: Dimension,
     entity_links: Tuple[EntityReference, ...],
     join_path: Sequence[SemanticModelJoinPathElement],
-    with_properties: FrozenSet[LinkableElementProperties],
+    with_properties: FrozenSet[LinkableElementProperty],
 ) -> Sequence[LinkableDimension]:
     """Generates different versions of the given dimension, but at other valid time granularities."""
     linkable_dimensions = []
@@ -389,7 +389,7 @@ def _generate_linkable_time_dimensions(
             continue
         properties = set(with_properties)
         if time_granularity != defined_time_granularity:
-            properties.add(LinkableElementProperties.DERIVED_TIME_GRANULARITY)
+            properties.add(LinkableElementProperty.DERIVED_TIME_GRANULARITY)
 
         linkable_dimensions.append(
             LinkableDimension(
@@ -500,12 +500,12 @@ class ValidLinkableSpecResolver:
                 if metric.type is MetricType.CUMULATIVE:
                     linkable_sets_for_measure.append(
                         self._get_linkable_element_set_for_measure(measure).filter(
-                            with_any_of=LinkableElementProperties.all_properties(),
+                            with_any_of=LinkableElementProperty.all_properties(),
                             # Use filter() here becasue `without_all_of` param is only available on that method.
                             without_all_of=frozenset(
                                 {
-                                    LinkableElementProperties.METRIC_TIME,
-                                    LinkableElementProperties.DERIVED_TIME_GRANULARITY,
+                                    LinkableElementProperty.METRIC_TIME,
+                                    LinkableElementProperty.DERIVED_TIME_GRANULARITY,
                                 }
                             ),
                         )
@@ -562,7 +562,7 @@ class ValidLinkableSpecResolver:
                                     ),
                                 ),
                                 join_by_semantic_model=semantic_model.reference,
-                                properties=frozenset({LinkableElementProperties.METRIC}),
+                                properties=frozenset({LinkableElementProperty.METRIC}),
                             ),
                         )
                         for metric in joinable_metrics
@@ -601,7 +601,7 @@ class ValidLinkableSpecResolver:
                         element_name=metric_ref.element_name,
                         join_by_semantic_model=semantic_model.reference,
                         entity_links=(entity_link,),
-                        properties=frozenset({LinkableElementProperties.METRIC}),
+                        properties=frozenset({LinkableElementProperty.METRIC}),
                         join_path=(),
                     )
                 )
@@ -625,7 +625,7 @@ class ValidLinkableSpecResolver:
                     element_name=entity.reference.element_name,
                     entity_links=(),
                     join_path=(),
-                    properties=frozenset({LinkableElementProperties.LOCAL, LinkableElementProperties.ENTITY}),
+                    properties=frozenset({LinkableElementProperty.LOCAL, LinkableElementProperty.ENTITY}),
                 )
             )
             for entity_link in self._semantic_model_lookup.entity_links_for_local_elements(semantic_model):
@@ -638,12 +638,12 @@ class ValidLinkableSpecResolver:
                         element_name=entity.reference.element_name,
                         entity_links=(entity_link,),
                         join_path=(),
-                        properties=frozenset({LinkableElementProperties.LOCAL, LinkableElementProperties.ENTITY}),
+                        properties=frozenset({LinkableElementProperty.LOCAL, LinkableElementProperty.ENTITY}),
                     )
                 )
 
         for entity_link in self._semantic_model_lookup.entity_links_for_local_elements(semantic_model):
-            dimension_properties = frozenset({LinkableElementProperties.LOCAL})
+            dimension_properties = frozenset({LinkableElementProperty.LOCAL})
             for dimension in semantic_model.dimensions:
                 dimension_type = dimension.type
                 if dimension_type is DimensionType.CATEGORICAL:
@@ -776,12 +776,12 @@ class ValidLinkableSpecResolver:
                         # Anything that's not at the base time granularity of the measure's aggregation time dimension
                         # should be considered derived.
                         properties=(
-                            frozenset({LinkableElementProperties.METRIC_TIME})
+                            frozenset({LinkableElementProperty.METRIC_TIME})
                             if time_granularity is defined_granularity and date_part is None
                             else frozenset(
                                 {
-                                    LinkableElementProperties.METRIC_TIME,
-                                    LinkableElementProperties.DERIVED_TIME_GRANULARITY,
+                                    LinkableElementProperty.METRIC_TIME,
+                                    LinkableElementProperty.DERIVED_TIME_GRANULARITY,
                                 }
                             )
                         ),
@@ -823,7 +823,7 @@ class ValidLinkableSpecResolver:
             [
                 self.create_linkable_element_set_from_join_path(
                     join_path=join_path,
-                    with_properties=frozenset({LinkableElementProperties.JOINED}),
+                    with_properties=frozenset({LinkableElementProperty.JOINED}),
                 )
                 for join_path in join_paths
             ]
@@ -850,9 +850,7 @@ class ValidLinkableSpecResolver:
                 + tuple(
                     self.create_linkable_element_set_from_join_path(
                         join_path=new_join_path,
-                        with_properties=frozenset(
-                            {LinkableElementProperties.JOINED, LinkableElementProperties.MULTI_HOP}
-                        ),
+                        with_properties=frozenset({LinkableElementProperty.JOINED, LinkableElementProperty.MULTI_HOP}),
                     )
                     for new_join_path in new_join_paths
                 )
@@ -864,8 +862,8 @@ class ValidLinkableSpecResolver:
     def _get_linkable_element_set_for_measure(
         self,
         measure_reference: MeasureReference,
-        with_any_of: FrozenSet[LinkableElementProperties] = LinkableElementProperties.all_properties(),
-        without_any_of: FrozenSet[LinkableElementProperties] = frozenset(),
+        with_any_of: FrozenSet[LinkableElementProperty] = LinkableElementProperty.all_properties(),
+        without_any_of: FrozenSet[LinkableElementProperty] = frozenset(),
     ) -> LinkableElementSet:
         """See get_linkable_element_set_for_measure()."""
         measure_semantic_model = self._get_semantic_model_for_measure(measure_reference)
@@ -890,8 +888,8 @@ class ValidLinkableSpecResolver:
     def get_linkable_element_set_for_measure(
         self,
         measure_reference: MeasureReference,
-        with_any_of: FrozenSet[LinkableElementProperties],
-        without_any_of: FrozenSet[LinkableElementProperties],
+        with_any_of: FrozenSet[LinkableElementProperty],
+        without_any_of: FrozenSet[LinkableElementProperty],
     ) -> LinkableElementSet:
         """Get the valid linkable elements for the given measure."""
         return self._get_linkable_element_set_for_measure(
@@ -902,8 +900,8 @@ class ValidLinkableSpecResolver:
 
     def get_linkable_elements_for_distinct_values_query(
         self,
-        with_any_of: FrozenSet[LinkableElementProperties],
-        without_any_of: FrozenSet[LinkableElementProperties],
+        with_any_of: FrozenSet[LinkableElementProperty],
+        without_any_of: FrozenSet[LinkableElementProperty],
     ) -> LinkableElementSet:
         """Returns queryable items for a distinct group-by-item values query.
 
@@ -914,8 +912,8 @@ class ValidLinkableSpecResolver:
     def get_linkable_elements_for_metrics(
         self,
         metric_references: Sequence[MetricReference],
-        with_any_of: FrozenSet[LinkableElementProperties] = LinkableElementProperties.all_properties(),
-        without_any_of: FrozenSet[LinkableElementProperties] = frozenset(),
+        with_any_of: FrozenSet[LinkableElementProperty] = LinkableElementProperty.all_properties(),
+        without_any_of: FrozenSet[LinkableElementProperty] = frozenset(),
     ) -> LinkableElementSet:
         """Gets the valid linkable elements that are common to all requested metrics."""
         linkable_element_sets = []
@@ -983,7 +981,7 @@ class ValidLinkableSpecResolver:
     def create_linkable_element_set_from_join_path(
         self,
         join_path: SemanticModelJoinPath,
-        with_properties: FrozenSet[LinkableElementProperties],
+        with_properties: FrozenSet[LinkableElementProperty],
     ) -> LinkableElementSet:
         """Given the current path, generate the respective linkable elements from the last semantic model in the path."""
         entity_links = tuple(x.join_on_entity for x in join_path.path_elements)
@@ -1031,7 +1029,7 @@ class ValidLinkableSpecResolver:
                         element_name=entity.reference.element_name,
                         entity_links=entity_links,
                         join_path=join_path.path_elements,
-                        properties=with_properties.union({LinkableElementProperties.ENTITY}),
+                        properties=with_properties.union({LinkableElementProperty.ENTITY}),
                     )
                 )
 
@@ -1041,7 +1039,7 @@ class ValidLinkableSpecResolver:
                 entity_links=entity_links,
                 join_path=join_path.path_elements,
                 join_by_semantic_model=semantic_model.reference,
-                properties=with_properties.union({LinkableElementProperties.METRIC}),
+                properties=with_properties.union({LinkableElementProperty.METRIC}),
             )
             for metric in self._joinable_metrics_for_semantic_models.get(join_path.last_semantic_model_reference, set())
         ]

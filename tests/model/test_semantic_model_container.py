@@ -7,7 +7,7 @@ from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import EntityReference, MeasureReference, MetricReference
 
-from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
+from metricflow.model.semantics.linkable_element_properties import LinkableElementProperty
 from metricflow.model.semantics.metric_lookup import MetricLookup
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
@@ -77,8 +77,8 @@ def test_local_linked_elements_for_metric(  # noqa: D103
 ) -> None:
     linkable_elements = metric_lookup.linkable_elements_for_metrics(
         [MetricReference(element_name="listings")],
-        with_any_property=frozenset({LinkableElementProperties.LOCAL_LINKED}),
-        without_any_property=frozenset({LinkableElementProperties.DERIVED_TIME_GRANULARITY}),
+        with_any_property=frozenset({LinkableElementProperty.LOCAL_LINKED}),
+        without_any_property=frozenset({LinkableElementProperty.DERIVED_TIME_GRANULARITY}),
     )
     sorted_specs = sorted(linkable_elements.as_spec_set.as_tuple, key=lambda x: x.qualified_name)
     assert_object_snapshot_equal(
@@ -106,8 +106,8 @@ def test_linkable_elements_for_metrics(  # noqa: D103
             (MetricReference(element_name="views"),),
             without_any_property=frozenset(
                 {
-                    LinkableElementProperties.DERIVED_TIME_GRANULARITY,
-                    LinkableElementProperties.METRIC_TIME,
+                    LinkableElementProperty.DERIVED_TIME_GRANULARITY,
+                    LinkableElementProperty.METRIC_TIME,
                 }
             ),
         ),
@@ -138,7 +138,7 @@ def test_linkable_elements_for_no_metrics_query(
     """Tests extracting linkable elements for a dimension values query with no metrics."""
     linkable_elements = metric_lookup.linkable_elements_for_no_metrics_query(
         without_any_of={
-            LinkableElementProperties.DERIVED_TIME_GRANULARITY,
+            LinkableElementProperty.DERIVED_TIME_GRANULARITY,
         }
     )
     sorted_specs = sorted(linkable_elements.as_spec_set.as_tuple, key=lambda x: x.qualified_name)
@@ -165,7 +165,7 @@ def test_linkable_set_for_common_dimensions_in_different_models(
             (MetricReference(element_name="bookings_per_view"),),
             without_any_property=frozenset(
                 {
-                    LinkableElementProperties.DERIVED_TIME_GRANULARITY,
+                    LinkableElementProperty.DERIVED_TIME_GRANULARITY,
                 }
             ),
         ),
