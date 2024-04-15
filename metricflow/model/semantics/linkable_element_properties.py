@@ -4,7 +4,6 @@ from enum import Enum
 from typing import FrozenSet
 
 
-# TODO: should be singular name
 class LinkableElementProperties(Enum):
     """The properties associated with a valid linkable element.
 
