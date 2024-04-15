@@ -618,8 +618,6 @@ class ValidLinkableSpecResolver:
         with_properties: FrozenSet[LinkableElementProperty],
     ) -> LinkableElementSet:
         """Given the current path, generate the respective linkable elements from the last semantic model in the path."""
-        entity_links = tuple(x.join_on_entity for x in join_path.path_elements)
-
         semantic_model = self._semantic_model_lookup.get_by_reference(join_path.last_semantic_model_reference)
         assert semantic_model
 
@@ -634,7 +632,7 @@ class ValidLinkableSpecResolver:
                         semantic_model_origin=semantic_model.reference,
                         element_name=dimension.reference.element_name,
                         dimension_type=DimensionType.CATEGORICAL,
-                        entity_links=entity_links,
+                        entity_links=join_path.entity_links,
                         join_path=join_path.path_elements,
                         properties=with_properties,
                         time_granularity=None,
@@ -646,7 +644,7 @@ class ValidLinkableSpecResolver:
                     _generate_linkable_time_dimensions(
                         semantic_model_origin=semantic_model.reference,
                         dimension=dimension,
-                        entity_links=entity_links,
+                        entity_links=join_path.entity_links,
                         join_path=join_path.path_elements,
                         with_properties=with_properties,
                     )
@@ -656,12 +654,12 @@ class ValidLinkableSpecResolver:
 
         for entity in semantic_model.entities:
             # Avoid creating "booking_id__booking_id"
-            if entity.reference != entity_links[-1]:
+            if entity.reference != join_path.last_entity_link:
                 linkable_entities.append(
                     LinkableEntity(
                         semantic_model_origin=semantic_model.reference,
                         element_name=entity.reference.element_name,
-                        entity_links=entity_links,
+                        entity_links=join_path.entity_links,
                         join_path=join_path.path_elements,
                         properties=with_properties.union({LinkableElementProperty.ENTITY}),
                     )
