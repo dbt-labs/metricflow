@@ -43,7 +43,7 @@ from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.integration.configured_test_case import (
     CONFIGURED_INTEGRATION_TESTS_REPOSITORY,
     IntegrationTestModel,
-    RequiredDwEngineFeatures,
+    RequiredDwEngineFeature,
 )
 
 logger = logging.getLogger(__name__)
@@ -202,27 +202,27 @@ class CheckQueryHelpers:
 
 
 def filter_not_supported_features(
-    sql_client: SqlClient, required_features: Tuple[RequiredDwEngineFeatures, ...]
-) -> Sequence[RequiredDwEngineFeatures]:
+    sql_client: SqlClient, required_features: Tuple[RequiredDwEngineFeature, ...]
+) -> Sequence[RequiredDwEngineFeature]:
     """Given a list of required features, return a list of features not supported by the given SQLClient."""
-    not_supported_features: List[RequiredDwEngineFeatures] = []
+    not_supported_features: List[RequiredDwEngineFeature] = []
     for required_feature in required_features:
-        if required_feature is RequiredDwEngineFeatures.CONTINUOUS_PERCENTILE_AGGREGATION:
+        if required_feature is RequiredDwEngineFeature.CONTINUOUS_PERCENTILE_AGGREGATION:
             if not sql_client.sql_query_plan_renderer.expr_renderer.can_render_percentile_function(
                 SqlPercentileFunctionType.CONTINUOUS
             ):
                 not_supported_features.append(required_feature)
-        elif required_feature is RequiredDwEngineFeatures.DISCRETE_PERCENTILE_AGGREGATION:
+        elif required_feature is RequiredDwEngineFeature.DISCRETE_PERCENTILE_AGGREGATION:
             if not sql_client.sql_query_plan_renderer.expr_renderer.can_render_percentile_function(
                 SqlPercentileFunctionType.DISCRETE
             ):
                 not_supported_features.append(required_feature)
-        elif required_feature is RequiredDwEngineFeatures.APPROXIMATE_CONTINUOUS_PERCENTILE_AGGREGATION:
+        elif required_feature is RequiredDwEngineFeature.APPROXIMATE_CONTINUOUS_PERCENTILE_AGGREGATION:
             if not sql_client.sql_query_plan_renderer.expr_renderer.can_render_percentile_function(
                 SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS
             ):
                 not_supported_features.append(required_feature)
-        elif required_feature is RequiredDwEngineFeatures.APPROXIMATE_DISCRETE_PERCENTILE_AGGREGATION:
+        elif required_feature is RequiredDwEngineFeature.APPROXIMATE_DISCRETE_PERCENTILE_AGGREGATION:
             if not sql_client.sql_query_plan_renderer.expr_renderer.can_render_percentile_function(
                 SqlPercentileFunctionType.APPROXIMATE_DISCRETE
             ):
