@@ -15,7 +15,6 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperty
 from metricflow.model.semantics.linkable_spec_resolver import (
     SemanticModelJoinPath,
-    SemanticModelJoinPathElement,
     ValidLinkableSpecResolver,
 )
 from metricflow.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
@@ -142,13 +141,9 @@ def test_create_linkable_element_set_from_join_path(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         set_id="result0",
         linkable_element_set=simple_model_spec_resolver.create_linkable_element_set_from_join_path(
-            join_path=SemanticModelJoinPath(
-                path_elements=(
-                    SemanticModelJoinPathElement(
-                        semantic_model_reference=SemanticModelReference("listings_latest"),
-                        join_on_entity=EntityReference("listing"),
-                    ),
-                )
+            join_path=SemanticModelJoinPath.from_single_element(
+                semantic_model_reference=SemanticModelReference("listings_latest"),
+                join_on_entity=EntityReference("listing"),
             ),
             with_properties=frozenset({LinkableElementProperty.JOINED}),
         ),
@@ -165,13 +160,9 @@ def test_create_linkable_element_set_from_join_path_multi_hop(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         set_id="result0",
         linkable_element_set=simple_model_spec_resolver.create_linkable_element_set_from_join_path(
-            join_path=SemanticModelJoinPath(
-                path_elements=(
-                    SemanticModelJoinPathElement(
-                        semantic_model_reference=SemanticModelReference("listings_latest"),
-                        join_on_entity=EntityReference("listing"),
-                    ),
-                )
+            join_path=SemanticModelJoinPath.from_single_element(
+                semantic_model_reference=SemanticModelReference("listings_latest"),
+                join_on_entity=EntityReference("listing"),
             ),
             with_properties=frozenset({LinkableElementProperty.JOINED, LinkableElementProperty.MULTI_HOP}),
         ),
