@@ -25,12 +25,15 @@ from dbt_semantic_interfaces.references import (
 from dbt_semantic_interfaces.type_enums import DimensionType
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantics.linkable_element import (
     ElementPathKey,
     LinkableDimension,
     LinkableElementType,
     LinkableEntity,
     LinkableMetric,
+    MetricSubqueryJoinPath,
+    MetricSubqueryJoinPathElement,
 )
 from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
@@ -524,11 +527,13 @@ def test_metric_in_filter(  # noqa: D103
                         date_part=None,
                     ): (
                         LinkableMetric(
-                            join_by_semantic_model=SemanticModelReference("bookings"),
-                            element_name="bookings",
-                            entity_links=(EntityReference("listing"),),
-                            join_path=(),
-                            properties=frozenset(),
+                            properties=frozenset({LinkableElementProperty.METRIC, LinkableElementProperty.JOINED}),
+                            join_path=MetricSubqueryJoinPath(
+                                metric_subquery_join_path_element=MetricSubqueryJoinPathElement(
+                                    metric_reference=MetricReference("bookings"),
+                                    join_on_entity=EntityReference("listing"),
+                                )
+                            ),
                         ),
                     )
                 }
