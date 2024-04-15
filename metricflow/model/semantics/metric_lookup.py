@@ -6,7 +6,12 @@ from typing import Dict, FrozenSet, Optional, Sequence, Set
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols.metric import Metric, MetricInputMeasure, MetricType
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.references import MeasureReference, MetricReference, TimeDimensionReference
+from dbt_semantic_interfaces.references import (
+    EntityReference,
+    MeasureReference,
+    MetricReference,
+    TimeDimensionReference,
+)
 
 from metricflow.errors.errors import DuplicateMetricError, MetricNotFoundError, NonExistentMeasureError
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
@@ -178,3 +183,7 @@ class MetricLookup(MetricAccessor):
             entity_links=path_key.entity_links,
         )
         return valid_agg_time_dimension_specs
+
+    def get_joinable_metrics_for_entity(self, entity_reference: EntityReference) -> Set[MetricReference]:
+        """Get the metrics that are joinable to this entity."""
+        return self._linkable_spec_resolver.get_joinable_metrics_for_entity(entity_reference)
