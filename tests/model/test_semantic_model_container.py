@@ -8,6 +8,10 @@ from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import EntityReference, MeasureReference, MetricReference
 
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
+from metricflow.model.semantics.linkable_spec_resolver import (
+    LinkableMetric,
+    SemanticModelJoinPathElement,
+)
 from metricflow.model.semantics.metric_lookup import MetricLookup
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
@@ -130,6 +134,7 @@ def test_linkable_elements_for_measure(
     )
 
 
+# TODO: test linkable metrics here
 def test_linkable_elements_for_no_metrics_query(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -199,3 +204,92 @@ def test_get_agg_time_dimension_specs_for_measure(semantic_model_lookup: Semanti
         agg_time_dim_reference = semantic_model_lookup.get_agg_time_dimension_for_measure(measure_reference)
         for spec in agg_time_dim_specs:
             assert spec.reference == agg_time_dim_reference
+
+
+def test_linkable_metrics_for_measure(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    metric_lookup: MetricLookup,
+    semantic_model_lookup: SemanticModelLookup,
+) -> None:
+    measure_reference = MeasureReference(element_name="listings")
+
+    linkable_metrics = {
+        linkable_metric
+        for linkable_metric_tuple in metric_lookup.linkable_elements_for_measure(
+            measure_reference=measure_reference
+        ).path_key_to_linkable_metrics.values()
+        for linkable_metric in linkable_metric_tuple
+    }
+    print("num::", len(linkable_metrics))
+
+    # TODO: make this method singular
+    semantic_models = semantic_model_lookup.get_semantic_models_for_measure(measure_reference)
+    assert len(semantic_models) == 1
+    measure_semantic_model = semantic_models[0]
+
+    already_seen = set()
+
+    # Check for all expected "local" metrics - joinable to measure's semantic model
+    for local_entity in measure_semantic_model.entities:
+        local_metrics = metric_lookup.get_joinable_metrics_for_entity(local_entity.reference)
+        for local_metric in local_metrics:
+            local_entity_links = (local_entity.reference,)
+            local_join_path = (  # no join path
+                SemanticModelJoinPathElement(
+                    semantic_model_reference=measure_semantic_model.reference, join_on_entity=local_entity.reference
+                ),
+            )
+            expected_local_linkable_metric = LinkableMetric(
+                element_name=local_metric.element_name,
+                join_by_semantic_model=measure_semantic_model.reference,
+                entity_links=local_entity_links,
+                properties=frozenset({LinkableElementProperties.METRIC}),
+                join_path=local_join_path,
+            )
+            if expected_local_linkable_metric in linkable_metrics or expected_local_linkable_metric in already_seen:
+                print("found local:", local_entity_links, expected_local_linkable_metric.element_name)
+                already_seen.add(expected_local_linkable_metric)
+                linkable_metrics.remove(expected_local_linkable_metric)
+            else:
+                print("didn't find local:", local_entity_links, expected_local_linkable_metric.element_name)
+
+        # Check for all expected "single-hop" metrics
+        for single_hop_semantic_model in semantic_model_lookup.get_semantic_models_for_entity(local_entity.reference):
+            for single_hop_entity in single_hop_semantic_model.entities:
+                if single_hop_entity.reference == local_entity.reference:
+                    continue
+                single_hop_metrics = metric_lookup.linkable_spec_resolver.get_joinable_metrics_for_entity(
+                    single_hop_entity.reference
+                )
+                for single_hop_metric in single_hop_metrics:
+                    expected_single_hop_linkable_metric = LinkableMetric(
+                        element_name=single_hop_metric.element_name,
+                        join_by_semantic_model=single_hop_semantic_model.reference,
+                        entity_links=(single_hop_entity.reference,),  # should local links be included here? HUH.
+                        properties=frozenset({LinkableElementProperties.METRIC, LinkableElementProperties.JOINED}),
+                        join_path=local_join_path
+                        + (
+                            SemanticModelJoinPathElement(
+                                semantic_model_reference=single_hop_semantic_model.reference,
+                                join_on_entity=single_hop_entity.reference,
+                            ),
+                        ),
+                    )
+                    if (
+                        expected_single_hop_linkable_metric in linkable_metrics
+                        or expected_single_hop_linkable_metric in already_seen
+                    ):
+                        print("found single hop:", local_entity_links, expected_single_hop_linkable_metric.element_name)
+                        already_seen.add(expected_single_hop_linkable_metric)
+                        linkable_metrics.remove(expected_single_hop_linkable_metric)
+                    else:
+                        print(
+                            "didn't find single hop:",
+                            (single_hop_entity.reference,),
+                            expected_single_hop_linkable_metric.element_name,
+                        )
+
+    # Check that we didn't return any unexpected linkable metrics.
+    # LinkableMetric(element_name='booking_value_sub_instant_add_10', join_by_semantic_model=SemanticModelReference(semantic_model_name='visits_source'), entity_links=(EntityReference(element_name='user'),), properties=frozenset({<LinkableElementProperties.JOINED: 'joined'>, <LinkableElementProperties.METRIC: 'metric'>}), join_path=(SemanticModelJoinPathElement(semantic_model_reference=SemanticModelReference(semantic_model_name='visits_source'), join_on_entity=EntityReference(element_name='user')),))
+    assert len(linkable_metrics) == 0, f"Didn't find linkable metrics: {linkable_metrics}"

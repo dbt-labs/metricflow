@@ -101,20 +101,27 @@ class LinkableEntity:
 class LinkableMetric:
     """Describes how a metric can be realized by joining based on entity links."""
 
-    element_name: str
-    join_by_semantic_model: SemanticModelReference
-    # TODO: Enable joining by dimension
-    entity_links: Tuple[EntityReference, ...]
     properties: FrozenSet[LinkableElementProperties]
-    join_path: Tuple[SemanticModelJoinPathElement, ...]
+    join_path: MetricSubqueryJoinPath
+
+    def __post_init__(self) -> None:  # noqa: D105
+        assert {LinkableElementProperties.METRIC, LinkableElementProperties.JOINED}.issubset(self.properties)
+
+    @property
+    def element_name(self) -> str:  # noqa: D102
+        return self.reference.element_name
 
     @property
     def path_key(self) -> ElementPathKey:  # noqa: D102
-        return ElementPathKey(element_name=self.element_name, entity_links=self.entity_links)
+        return ElementPathKey(element_name=self.element_name, entity_links=self.join_path.entity_links)
 
     @property
     def reference(self) -> MetricReference:  # noqa: D102
-        return MetricReference(element_name=self.element_name)
+        return self.join_path.metric_subquery_join_path_element.metric_reference
+
+    @property
+    def join_by_semantic_model(self) -> Optional[SemanticModelReference]:  # noqa: D102
+        return self.join_path.last_semantic_model_reference
 
 
 @dataclass(frozen=True)
@@ -231,11 +238,7 @@ class LinkableElementSet:
                 for path_key, entities in join_path_to_linkable_entities.items()
             },
             path_key_to_linkable_metrics={
-                path_key: tuple(
-                    sorted(
-                        metrics, key=lambda linkable_metric: linkable_metric.join_by_semantic_model.semantic_model_name
-                    )
-                )
+                path_key: tuple(sorted(metrics, key=lambda linkable_metric: linkable_metric.element_name))
                 for path_key, metrics in join_path_to_linkable_metrics.items()
             },
         )
@@ -365,9 +368,17 @@ class LinkableElementSet:
 
 @dataclass(frozen=True)
 class SemanticModelJoinPathElement:
-    """Describes joining a semantic model by the given entity."""
+    """Describes joining to a semantic model by the given entity."""
 
     semantic_model_reference: SemanticModelReference
+    join_on_entity: EntityReference
+
+
+@dataclass(frozen=True)
+class MetricSubqueryJoinPathElement:
+    """Describes joining to a metric subquery by the given entity."""
+
+    metric_reference: MetricReference
     join_on_entity: EntityReference
 
 
@@ -419,6 +430,28 @@ def _generate_linkable_time_dimensions(
                 )
 
     return linkable_dimensions
+
+
+@dataclass(frozen=True)
+class MetricSubqueryJoinPath:
+    """Describes how to join to a metric subquery.
+
+    Starts with semantic model join path, if exists. Always ends with metric subquery join path.
+    """
+
+    metric_subquery_join_path_element: MetricSubqueryJoinPathElement
+    semantic_model_join_path: Optional[SemanticModelJoinPath] = None
+
+    @property
+    def entity_links(self) -> Tuple[EntityReference, ...]:  # noqa: D102
+        return (self.semantic_model_join_path.entity_links if self.semantic_model_join_path else ()) + (
+            self.metric_subquery_join_path_element.join_on_entity,
+        )
+
+    @property
+    def last_semantic_model_reference(self) -> Optional[SemanticModelReference]:
+        """The last semantic model that would be joined in this path (if exists) before joining to metric."""
+        return self.semantic_model_join_path.last_semantic_model_reference if self.semantic_model_join_path else None
 
 
 @dataclass(frozen=True)
@@ -490,7 +523,7 @@ class ValidLinkableSpecResolver:
                 self._entity_to_semantic_model[entity.reference.element_name].append(semantic_model)
 
         self._metric_to_linkable_element_sets: Dict[str, List[LinkableElementSet]] = {}
-        self._joinable_metrics_for_semantic_models: Dict[SemanticModelReference, Set[MetricReference]] = {}
+        self._joinable_metrics_for_entities: Dict[EntityReference, Set[MetricReference]] = defaultdict(set)
 
         start_time = time.time()
         for metric in self._semantic_manifest.metrics:
@@ -537,38 +570,16 @@ class ValidLinkableSpecResolver:
             linkable_element_set_for_metric = self.get_linkable_elements_for_metrics([metric_reference])
             for linkable_entities in linkable_element_set_for_metric.path_key_to_linkable_entities.values():
                 for linkable_entity in linkable_entities:
-                    semantic_model_reference = linkable_entity.semantic_model_origin
-                    metrics = self._joinable_metrics_for_semantic_models.get(semantic_model_reference, set())
-                    metrics.add(metric_reference)
-                    self._joinable_metrics_for_semantic_models[semantic_model_reference] = metrics
+                    self._joinable_metrics_for_entities[linkable_entity.reference].add(metric_reference)
 
         # If no metrics are specified, the query interface supports querying distinct values for dimensions, entities,
         # and group by metrics.
         linkable_element_sets_for_no_metrics_queries: List[LinkableElementSet] = []
         for semantic_model in semantic_manifest.semantic_models:
             linkable_element_sets_for_no_metrics_queries.append(self._get_elements_in_semantic_model(semantic_model))
-            joinable_metrics = self._joinable_metrics_for_semantic_models.get(semantic_model.reference, set())
-            for entity in semantic_model.entities:
-                linkable_metrics_set = LinkableElementSet(
-                    path_key_to_linkable_metrics={
-                        ElementPathKey(element_name=metric.element_name, entity_links=(entity.reference,)): (
-                            LinkableMetric(
-                                element_name=metric.element_name,
-                                entity_links=(entity.reference,),
-                                join_path=(
-                                    SemanticModelJoinPathElement(
-                                        semantic_model_reference=semantic_model.reference,
-                                        join_on_entity=entity.reference,
-                                    ),
-                                ),
-                                join_by_semantic_model=semantic_model.reference,
-                                properties=frozenset({LinkableElementProperties.METRIC}),
-                            ),
-                        )
-                        for metric in joinable_metrics
-                    },
-                )
-                linkable_element_sets_for_no_metrics_queries.append(linkable_metrics_set)
+            linkable_element_sets_for_no_metrics_queries.append(
+                self._get_joinable_metrics_for_semantic_model(semantic_model)
+            )
 
         metric_time_elements_for_no_metrics = self._get_metric_time_elements(measure_reference=None)
         self._no_metric_linkable_element_set = LinkableElementSet.merge_by_path_key(
@@ -592,24 +603,33 @@ class ValidLinkableSpecResolver:
             )
         return semantic_models_where_measure_was_found[0]
 
-    def _get_joinable_metrics_for_semantic_model(self, semantic_model: SemanticModel) -> LinkableElementSet:
-        linkable_metrics = []
-        for metric_ref in self._joinable_metrics_for_semantic_models.get(semantic_model.reference, set()):
-            for entity_link in [entity.reference for entity in semantic_model.entities]:
-                linkable_metrics.append(
-                    LinkableMetric(
-                        element_name=metric_ref.element_name,
-                        join_by_semantic_model=semantic_model.reference,
-                        entity_links=(entity_link,),
-                        properties=frozenset({LinkableElementProperties.METRIC}),
-                        join_path=(),
-                    )
+    def _get_joinable_metrics_for_semantic_model(
+        self, semantic_model: SemanticModel, using_join_path: Optional[SemanticModelJoinPath] = None
+    ) -> LinkableElementSet:
+        properties = frozenset({LinkableElementProperties.METRIC, LinkableElementProperties.JOINED})
+        if using_join_path:
+            assert (
+                semantic_model.reference == using_join_path.last_semantic_model_reference
+            ), "Last join path element should match semantic model when building LinkableMetrics."
+            properties.union(frozenset({LinkableElementProperties.MULTI_HOP}))
+
+        path_key_to_linkable_metrics: Dict[ElementPathKey, Tuple[LinkableMetric, ...]] = {}
+        for entity_reference in [entity.reference for entity in semantic_model.entities]:
+            if using_join_path and entity_reference in using_join_path.entity_links:
+                continue
+            for metric_reference in self._joinable_metrics_for_entities[entity_reference]:
+                linkable_metric = LinkableMetric(
+                    properties=properties,
+                    join_path=MetricSubqueryJoinPath(
+                        metric_subquery_join_path_element=MetricSubqueryJoinPathElement(
+                            metric_reference=metric_reference, join_on_entity=entity_reference
+                        ),
+                        semantic_model_join_path=using_join_path,
+                    ),
                 )
-        return LinkableElementSet(
-            path_key_to_linkable_metrics={
-                linkable_metric.path_key: (linkable_metric,) for linkable_metric in linkable_metrics
-            },
-        )
+                path_key_to_linkable_metrics[linkable_metric.path_key] = (linkable_metric,)
+
+        return LinkableElementSet(path_key_to_linkable_metrics=path_key_to_linkable_metrics)
 
     def _get_elements_in_semantic_model(self, semantic_model: SemanticModel) -> LinkableElementSet:
         """Gets the elements in the semantic model, without requiring any joins.
@@ -680,7 +700,7 @@ class ValidLinkableSpecResolver:
             },
         )
 
-    def _get_semantic_models_with_joinable_entity(
+    def _get_semantic_models_joinable_to_entity(
         self,
         left_semantic_model_reference: SemanticModelReference,
         entity_reference: EntityReference,
@@ -688,6 +708,7 @@ class ValidLinkableSpecResolver:
         # May switch to non-cached implementation.
         semantic_models = self._entity_to_semantic_model[entity_reference.element_name]
         valid_semantic_models = []
+
         for semantic_model in semantic_models:
             if self._join_evaluator.is_valid_semantic_model_join(
                 left_semantic_model_reference=left_semantic_model_reference,
@@ -802,7 +823,7 @@ class ValidLinkableSpecResolver:
         # Create single-hop elements
         join_paths = []
         for entity in measure_semantic_model.entities:
-            semantic_models = self._get_semantic_models_with_joinable_entity(
+            semantic_models = self._get_semantic_models_joinable_to_entity(
                 left_semantic_model_reference=measure_semantic_model.reference,
                 entity_reference=entity.reference,
             )
@@ -841,7 +862,6 @@ class ValidLinkableSpecResolver:
                         measure_semantic_model=measure_semantic_model, current_join_path=join_path
                     )
                 )
-
             if len(new_join_paths) == 0:
                 break
 
@@ -954,7 +974,7 @@ class ValidLinkableSpecResolver:
             if entity_reference in set(x.join_on_entity for x in current_join_path.path_elements):
                 continue
 
-            semantic_models_that_can_be_joined = self._get_semantic_models_with_joinable_entity(
+            semantic_models_that_can_be_joined = self._get_semantic_models_joinable_to_entity(
                 left_semantic_model_reference=last_semantic_model_in_path.reference,
                 entity_reference=entity.reference,
             )
@@ -986,14 +1006,11 @@ class ValidLinkableSpecResolver:
         with_properties: FrozenSet[LinkableElementProperties],
     ) -> LinkableElementSet:
         """Given the current path, generate the respective linkable elements from the last semantic model in the path."""
-        entity_links = tuple(x.join_on_entity for x in join_path.path_elements)
-
         semantic_model = self._semantic_model_lookup.get_by_reference(join_path.last_semantic_model_reference)
         assert semantic_model
 
         linkable_dimensions: List[LinkableDimension] = []
         linkable_entities: List[LinkableEntity] = []
-        linkable_metrics: List[LinkableMetric] = []
 
         for dimension in semantic_model.dimensions:
             dimension_type = dimension.type
@@ -1002,7 +1019,7 @@ class ValidLinkableSpecResolver:
                     LinkableDimension(
                         semantic_model_origin=semantic_model.reference,
                         element_name=dimension.reference.element_name,
-                        entity_links=entity_links,
+                        entity_links=join_path.entity_links,
                         join_path=join_path.path_elements,
                         properties=with_properties,
                         time_granularity=None,
@@ -1014,7 +1031,7 @@ class ValidLinkableSpecResolver:
                     _generate_linkable_time_dimensions(
                         semantic_model_origin=semantic_model.reference,
                         dimension=dimension,
-                        entity_links=entity_links,
+                        entity_links=join_path.entity_links,
                         join_path=join_path.path_elements,
                         with_properties=with_properties,
                     )
@@ -1024,27 +1041,17 @@ class ValidLinkableSpecResolver:
 
         for entity in semantic_model.entities:
             # Avoid creating "booking_id__booking_id"
-            if entity.reference != entity_links[-1]:
+            # TODO: we are getting the above - figure out why
+            if entity.reference != join_path.last_entity_link:
                 linkable_entities.append(
                     LinkableEntity(
                         semantic_model_origin=semantic_model.reference,
                         element_name=entity.reference.element_name,
-                        entity_links=entity_links,
+                        entity_links=join_path.entity_links,
                         join_path=join_path.path_elements,
                         properties=with_properties.union({LinkableElementProperties.ENTITY}),
                     )
                 )
-
-        linkable_metrics = [
-            LinkableMetric(
-                element_name=metric.element_name,
-                entity_links=entity_links,
-                join_path=join_path.path_elements,
-                join_by_semantic_model=semantic_model.reference,
-                properties=with_properties.union({LinkableElementProperties.METRIC}),
-            )
-            for metric in self._joinable_metrics_for_semantic_models.get(join_path.last_semantic_model_reference, set())
-        ]
 
         return LinkableElementSet(
             path_key_to_linkable_dimensions={
@@ -1053,7 +1060,7 @@ class ValidLinkableSpecResolver:
             path_key_to_linkable_entities={
                 linkable_entity.path_key: (linkable_entity,) for linkable_entity in linkable_entities
             },
-            path_key_to_linkable_metrics={
-                linkable_metric.path_key: (linkable_metric,) for linkable_metric in linkable_metrics
-            },
+            path_key_to_linkable_metrics=self._get_joinable_metrics_for_semantic_model(
+                semantic_model=semantic_model, using_join_path=join_path
+            ).path_key_to_linkable_metrics,
         )
