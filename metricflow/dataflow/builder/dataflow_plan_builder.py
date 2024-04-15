@@ -715,15 +715,6 @@ class DataflowPlanBuilder:
         """Returns true if any of the linkable specs requires a multi-hop join to realize."""
         return any(len(x.entity_links) > 1 for x in linkable_specs)
 
-    def _get_semantic_model_names_for_measures(self, measures: Sequence[MeasureSpec]) -> Set[str]:
-        """Return the names of the semantic models needed to compute the input measures.
-
-        This is a temporary method for use in assertion boundaries while we implement support for multiple semantic models
-        """
-        return {
-            self._semantic_model_lookup.get_semantic_model_for_measure(measure.reference).name for measure in measures
-        }
-
     def _sort_by_suitability(self, nodes: Sequence[BaseOutput]) -> Sequence[BaseOutput]:
         """Sort nodes by the number of linkable specs.
 
@@ -791,12 +782,16 @@ class DataflowPlanBuilder:
         """Ensures that the group of MeasureSpecs has the same non_additive_dimension_spec and agg_time_dimension."""
         if len(measure_specs) == 0:
             raise ValueError("Cannot build MeasureParametersForRecipe when given an empty sequence of measure_specs.")
-        semantic_models = self._get_semantic_model_names_for_measures(measure_specs)
-        if len(semantic_models) > 1:
+        semantic_model_names = {
+            self._semantic_model_lookup.get_semantic_model_for_measure(measure.reference).name
+            for measure in measure_specs
+        }
+        if len(semantic_model_names) > 1:
             raise ValueError(
                 f"Cannot find common properties for measures {measure_specs} coming from multiple "
-                f"semantic models: {semantic_models}. This suggests the measure_specs were not correctly filtered."
+                f"semantic models: {semantic_model_names}. This suggests the measure_specs were not correctly filtered."
             )
+        semantic_model_name = semantic_model_names.pop()
 
         agg_time_dimension = self._semantic_model_lookup.get_agg_time_dimension_for_measure(measure_specs[0].reference)
         non_additive_dimension_spec = measure_specs[0].non_additive_dimension_spec
@@ -810,7 +805,7 @@ class DataflowPlanBuilder:
                 raise ValueError(f"measure_specs {measure_specs} do not have the same agg_time_dimension.")
         return MeasureSpecProperties(
             measure_specs=measure_specs,
-            semantic_model_name=semantic_models.pop(),
+            semantic_model_name=semantic_model_name,
             agg_time_dimension=agg_time_dimension,
             non_additive_dimension_spec=non_additive_dimension_spec,
         )
