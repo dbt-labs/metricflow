@@ -204,8 +204,6 @@ def test_get_agg_time_dimension_specs_for_measure(semantic_model_lookup: Semanti
 
 
 def test_linkable_metrics_for_measure(  # noqa: D103
-    request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
     metric_lookup: MetricLookup,
     semantic_model_lookup: SemanticModelLookup,
 ) -> None:
@@ -218,7 +216,6 @@ def test_linkable_metrics_for_measure(  # noqa: D103
         ).path_key_to_linkable_metrics.values()
         for linkable_metric in linkable_metric_tuple
     }
-    print("num::", len(actual_metrics))
 
     semantic_models = semantic_model_lookup.get_semantic_models_for_measure(measure_reference)
     assert len(semantic_models) == 1
@@ -226,7 +223,6 @@ def test_linkable_metrics_for_measure(  # noqa: D103
 
     already_seen = set()
 
-    # Check for all single-hop metrics
     expected_single_hop_metrics = [
         linkable_metric
         for linkable_metrics in metric_lookup._linkable_spec_resolver.get_joinable_metrics_for_semantic_model(
@@ -243,24 +239,24 @@ def test_linkable_metrics_for_measure(  # noqa: D103
 
     expected_multi_hop_metrics = []
     for entity in measure_semantic_model.entities:
-        next_semantic_models = metric_lookup._linkable_spec_resolver._get_semantic_models_joinable_to_entity(
-            left_semantic_model_reference=measure_semantic_model.reference, entity_reference=entity.reference
-        )
+        next_semantic_models = metric_lookup._linkable_spec_resolver._entity_to_semantic_model[entity.name]
         for next_semantic_model in next_semantic_models:
-            expected_multi_hop_metrics += [
-                linkable_metric
-                for linkable_metrics in metric_lookup._linkable_spec_resolver.get_joinable_metrics_for_semantic_model(
-                    semantic_model=next_semantic_model,
-                    using_join_path=SemanticModelJoinPath(
-                        (
-                            SemanticModelJoinPathElement(
-                                semantic_model_reference=next_semantic_model.reference, join_on_entity=entity.reference
-                            ),
-                        )
+            if next_semantic_model.name == measure_semantic_model.name:
+                continue
+            # TODO: use SemanticModelJoinPath.from_single_element when merged
+            join_path = SemanticModelJoinPath(
+                (
+                    SemanticModelJoinPathElement(
+                        semantic_model_reference=next_semantic_model.reference, join_on_entity=entity.reference
                     ),
-                ).path_key_to_linkable_metrics.values()
-                for linkable_metric in linkable_metrics
-            ]
+                )
+            )
+            for linkable_metrics in metric_lookup._linkable_spec_resolver.get_joinable_metrics_for_semantic_model(
+                semantic_model=next_semantic_model,
+                using_join_path=join_path,
+            ).path_key_to_linkable_metrics.values():
+                for linkable_metric in linkable_metrics:
+                    expected_multi_hop_metrics.append(linkable_metric)
 
     for expected_metric in expected_multi_hop_metrics:
         assert expected_metric in actual_metrics
@@ -269,5 +265,4 @@ def test_linkable_metrics_for_measure(  # noqa: D103
         actual_metrics.remove(expected_metric)
 
     # Check that we didn't return any unexpected linkable metrics.
-    # LinkableMetric(element_name='booking_value_sub_instant_add_10', join_by_semantic_model=SemanticModelReference(semantic_model_name='visits_source'), entity_links=(EntityReference(element_name='user'),), properties=frozenset({<LinkableElementProperties.JOINED: 'joined'>, <LinkableElementProperties.METRIC: 'metric'>}), join_path=(SemanticModelJoinPathElement(semantic_model_reference=SemanticModelReference(semantic_model_name='visits_source'), join_on_entity=EntityReference(element_name='user')),))
     assert len(actual_metrics) == 0, f"Didn't find linkable metrics: {actual_metrics}"
