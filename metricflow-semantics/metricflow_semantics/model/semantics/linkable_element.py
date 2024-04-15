@@ -263,3 +263,17 @@ class SemanticModelJoinPath:
     @property
     def entity_links(self) -> Tuple[EntityReference, ...]:  # noqa: D102
         return tuple(path_element.join_on_entity for path_element in self.path_elements)
+
+    @staticmethod
+    def from_single_element(
+        semantic_model_reference: SemanticModelReference, join_on_entity: EntityReference
+    ) -> SemanticModelJoinPath:
+        """Build SemanticModelJoinPath with just one join path element."""
+        return SemanticModelJoinPath(
+            path_elements=(
+                SemanticModelJoinPathElement(
+                    semantic_model_reference=semantic_model_reference,
+                    join_on_entity=join_on_entity,
+                ),
+            )
+        )
