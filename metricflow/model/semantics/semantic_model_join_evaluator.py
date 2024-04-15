@@ -12,7 +12,7 @@ from dbt_semantic_interfaces.references import (
 
 from metricflow.instances import EntityInstance, InstanceSet
 from metricflow.mf_logging.pretty_print import mf_pformat
-from metricflow.protocols.semantics import SemanticModelAccessor
+from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 
 MAX_JOIN_HOPS = 2
 
@@ -70,7 +70,7 @@ class SemanticModelJoinEvaluator:
         SemanticModelEntityJoinType(left_entity_type=EntityType.NATURAL, right_entity_type=EntityType.NATURAL),
     )
 
-    def __init__(self, semantic_model_lookup: SemanticModelAccessor) -> None:  # noqa: D107
+    def __init__(self, semantic_model_lookup: SemanticModelLookup) -> None:  # noqa: D107
         self._semantic_model_lookup = semantic_model_lookup
 
     def get_joinable_semantic_models(

@@ -20,14 +20,12 @@ from dbt_semantic_interfaces.references import (
 )
 from dbt_semantic_interfaces.type_enums import DimensionType, EntityType
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
-from typing_extensions import override
 
 from metricflow.errors.errors import InvalidSemanticModelError
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.semantics.linkable_spec_resolver import ElementPathKey
 from metricflow.model.spec_converters import MeasureConverter
-from metricflow.protocols.semantics import SemanticModelAccessor
 from metricflow.specs.specs import (
     DimensionSpec,
     EntitySpec,
@@ -40,10 +38,10 @@ from metricflow.specs.specs import (
 logger = logging.getLogger(__name__)
 
 
-class SemanticModelLookup(SemanticModelAccessor):
+class SemanticModelLookup:
     """Tracks semantic information for semantic models held in a set of SemanticModelContainers.
 
-    This implements the SemanticModelAccessors protocol, the interface type we use throughout the codebase.
+    This implements the SemanticModelLookups protocol, the interface type we use throughout the codebase.
     That interface prevents unwanted calls to methods for adding semantic models to the container.
     """
 
@@ -74,7 +72,8 @@ class SemanticModelLookup(SemanticModelAccessor):
         for semantic_model in sorted(model.semantic_models, key=lambda semantic_model: semantic_model.name):
             self._add_semantic_model(semantic_model)
 
-    def get_dimension_references(self) -> Sequence[DimensionReference]:  # noqa: D102
+    def get_dimension_references(self) -> Sequence[DimensionReference]:
+        """Retrieve all dimension references from the collection of semantic models."""
         return tuple(self._dimension_index.keys())
 
     @staticmethod
@@ -110,11 +109,16 @@ class SemanticModelLookup(SemanticModelAccessor):
         return self.get_dimension(dimension_reference=time_dimension_reference.dimension_reference())
 
     @property
-    def measure_references(self) -> Sequence[MeasureReference]:  # noqa: D102
+    def measure_references(self) -> Sequence[MeasureReference]:
+        """Return all measure references from the collection of semantic models."""
         return list(self._measure_index.keys())
 
     @property
-    def non_additive_dimension_specs_by_measure(self) -> Dict[MeasureReference, NonAdditiveDimensionSpec]:  # noqa: D102
+    def non_additive_dimension_specs_by_measure(self) -> Dict[MeasureReference, NonAdditiveDimensionSpec]:
+        """Return a mapping from all semi-additive measures to their corresponding non additive dimension parameters.
+
+        This includes all measures with non-additive dimension parameters, if any, from the collection of semantic models.
+        """
         return self._measure_non_additive_dimension_specs
 
     @staticmethod
@@ -128,7 +132,8 @@ class SemanticModelLookup(SemanticModelAccessor):
             f"No dimension with name ({measure_reference.element_name}) in semantic_model with name ({semantic_model.name})"
         )
 
-    def get_measure(self, measure_reference: MeasureReference) -> Measure:  # noqa: D102
+    def get_measure(self, measure_reference: MeasureReference) -> Measure:
+        """Retrieve the measure model object associated with the measure reference."""
         if measure_reference not in self._measure_index:
             raise ValueError(f"Could not find measure with name ({measure_reference}) in configured semantic models")
 
@@ -142,20 +147,24 @@ class SemanticModelLookup(SemanticModelAccessor):
             semantic_model=semantic_models[0], measure_reference=measure_reference
         )
 
-    def get_entity_references(self) -> Sequence[EntityReference]:  # noqa: D102
+    def get_entity_references(self) -> Sequence[EntityReference]:
+        """Retrieve all entity references from the collection of semantic models."""
         return list(self._entity_index.keys())
 
-    def get_semantic_models_for_measure(  # noqa: D102
-        self, measure_reference: MeasureReference
-    ) -> Sequence[SemanticModel]:  # noqa: D102
+    def get_semantic_models_for_measure(self, measure_reference: MeasureReference) -> Sequence[SemanticModel]:
+        """Retrieve semantic model where the measure is defined."""
         return self._measure_index.get(measure_reference, [])
 
-    def get_agg_time_dimension_for_measure(  # noqa: D102
-        self, measure_reference: MeasureReference
-    ) -> TimeDimensionReference:  # noqa: D102
+    def get_agg_time_dimension_for_measure(self, measure_reference: MeasureReference) -> TimeDimensionReference:
+        """Retrieves the aggregate time dimension that is associated with the measure reference.
+
+        This is the time dimension along which the measure will be aggregated when a metric built on this measure
+        is queried with metric_time.
+        """
         return self._measure_agg_time_dimension[measure_reference]
 
-    def get_entity_in_semantic_model(self, ref: SemanticModelElementReference) -> Optional[Entity]:  # noqa: D102
+    def get_entity_in_semantic_model(self, ref: SemanticModelElementReference) -> Optional[Entity]:
+        """Retrieve the entity matching the element -> semantic model mapping, if any."""
         semantic_model = self.get_by_reference(ref.semantic_model_reference)
         if not semantic_model:
             return None
@@ -166,9 +175,8 @@ class SemanticModelLookup(SemanticModelAccessor):
 
         return None
 
-    def get_by_reference(  # noqa: D102
-        self, semantic_model_reference: SemanticModelReference
-    ) -> Optional[SemanticModel]:  # noqa: D102
+    def get_by_reference(self, semantic_model_reference: SemanticModelReference) -> Optional[SemanticModel]:
+        """Retrieve the semantic model object matching the input semantic model reference, if any."""
         return self._semantic_model_reference_to_semantic_model.get(semantic_model_reference)
 
     def _add_semantic_model(self, semantic_model: SemanticModel) -> None:
@@ -309,8 +317,8 @@ class SemanticModelLookup(SemanticModelAccessor):
         return None
 
     @staticmethod
-    @override
     def entity_links_for_local_elements(semantic_model: SemanticModel) -> Sequence[EntityReference]:
+        """Return the entity prefix that can be used to access dimensions defined in the semantic model."""
         primary_entity_reference = semantic_model.primary_entity_reference
 
         possible_entity_links = set()
@@ -323,7 +331,8 @@ class SemanticModelLookup(SemanticModelAccessor):
 
         return sorted(possible_entity_links, key=lambda entity_reference: entity_reference.element_name)
 
-    def get_element_spec_for_name(self, element_name: str) -> LinkableInstanceSpec:  # noqa: D102
+    def get_element_spec_for_name(self, element_name: str) -> LinkableInstanceSpec:
+        """Returns the spec for the given name of a linkable element (dimension or entity)."""
         if TimeDimensionReference(element_name=element_name) in self._dimension_ref_to_spec:
             return self._dimension_ref_to_spec[TimeDimensionReference(element_name=element_name)]
         elif DimensionReference(element_name=element_name) in self._dimension_ref_to_spec:

@@ -29,8 +29,9 @@ from metricflow.instances import (
     MetricInstance,
     TimeDimensionInstance,
 )
+from metricflow.model.semantics.metric_lookup import MetricLookup
+from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
-from metricflow.protocols.semantics import MetricAccessor, SemanticModelAccessor
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
     DimensionSpec,
@@ -181,7 +182,7 @@ class CreateSelectColumnsWithMeasuresAggregated(CreateSelectColumnsForInstances)
         self,
         table_alias: str,
         column_resolver: ColumnAssociationResolver,
-        semantic_model_lookup: SemanticModelAccessor,
+        semantic_model_lookup: SemanticModelLookup,
         metric_input_measure_specs: Sequence[MetricInputMeasureSpec],
     ) -> None:
         self._semantic_model_lookup = semantic_model_lookup
@@ -292,8 +293,8 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
     an SCD source, and extracting validity window information accordingly.
     """
 
-    def __init__(self, semantic_model_lookup: SemanticModelAccessor) -> None:
-        """Initializer. The SemanticModelAccessor is needed for getting the original model definition."""
+    def __init__(self, semantic_model_lookup: SemanticModelLookup) -> None:
+        """Initializer. The SemanticModelLookup is needed for getting the original model definition."""
         self._semantic_model_lookup = semantic_model_lookup
 
     def _get_validity_window_dimensions_for_semantic_model(
@@ -838,7 +839,7 @@ class CreateSelectColumnForCombineOutputNode(InstanceSetTransform[SelectColumnSe
         self,
         table_alias: str,
         column_resolver: ColumnAssociationResolver,
-        metric_lookup: MetricAccessor,
+        metric_lookup: MetricLookup,
     ) -> None:
         self._table_alias = table_alias
         self._column_resolver = column_resolver

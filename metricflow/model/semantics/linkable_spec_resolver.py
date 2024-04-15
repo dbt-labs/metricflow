@@ -26,7 +26,7 @@ from metricflow.errors.errors import UnknownMetricLinkingError
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
-from metricflow.protocols.semantics import SemanticModelAccessor
+from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.specs.specs import (
     DEFAULT_TIME_GRANULARITY,
     DimensionSpec,
@@ -462,7 +462,7 @@ class ValidLinkableSpecResolver:
     def __init__(
         self,
         semantic_manifest: SemanticManifest,
-        semantic_model_lookup: SemanticModelAccessor,
+        semantic_model_lookup: SemanticModelLookup,
         max_entity_links: int,
     ) -> None:
         """Constructor.

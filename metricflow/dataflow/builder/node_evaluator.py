@@ -39,8 +39,8 @@ from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.instances import InstanceSet
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
+from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
-from metricflow.protocols.semantics import SemanticModelAccessor
 from metricflow.specs.specs import InstanceSpecSet, LinkableInstanceSpec, LinkableSpecSet, LinklessEntitySpec
 from metricflow.sql.sql_plan import SqlJoinType
 
@@ -159,7 +159,7 @@ class NodeEvaluatorForLinkableInstances:
 
     def __init__(
         self,
-        semantic_model_lookup: SemanticModelAccessor,
+        semantic_model_lookup: SemanticModelLookup,
         nodes_available_for_joins: Sequence[BaseOutput],
         node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver,
         time_spine_node: MetricTimeDimensionTransformNode,

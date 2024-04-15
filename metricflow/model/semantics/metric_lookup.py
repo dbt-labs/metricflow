@@ -17,13 +17,12 @@ from metricflow.model.semantics.linkable_spec_resolver import (
 )
 from metricflow.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
-from metricflow.protocols.semantics import MetricAccessor
 from metricflow.specs.specs import TimeDimensionSpec
 
 logger = logging.getLogger(__name__)
 
 
-class MetricLookup(MetricAccessor):
+class MetricLookup:
     """Tracks semantic information for metrics by linking them to semantic models."""
 
     def __init__(self, semantic_manifest: SemanticManifest, semantic_model_lookup: SemanticModelLookup) -> None:

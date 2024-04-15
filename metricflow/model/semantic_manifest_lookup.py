@@ -9,7 +9,6 @@ from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantics.metric_lookup import MetricLookup
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.plan_conversion.time_spine import TimeSpineSource
-from metricflow.protocols.semantics import SemanticModelAccessor
 from metricflow.sql.sql_table import SqlTable
 
 logger = logging.getLogger(__name__)
@@ -28,7 +27,7 @@ class SemanticManifestLookup:
         return self._semantic_manifest
 
     @property
-    def semantic_model_lookup(self) -> SemanticModelAccessor:  # noqa: D102
+    def semantic_model_lookup(self) -> SemanticModelLookup:  # noqa: D102
         return self._semantic_model_lookup
 
     @property
