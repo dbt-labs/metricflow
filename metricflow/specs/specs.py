@@ -47,7 +47,7 @@ from metricflow.visitor import VisitorOutputT
 
 if TYPE_CHECKING:
     from metricflow.model.semantics.metric_lookup import MetricLookup
-    from metricflow.protocols.semantics import SemanticModelAccessor
+    from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 
 
 def hash_items(items: Sequence[SqlColumnType]) -> str:
@@ -732,7 +732,7 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
         return queried_agg_time_dimension_specs
 
     def included_agg_time_dimension_specs_for_measure(
-        self, measure_reference: MeasureReference, semantic_model_lookup: SemanticModelAccessor
+        self, measure_reference: MeasureReference, semantic_model_lookup: SemanticModelLookup
     ) -> List[TimeDimensionSpec]:
         """Get the time dims included that are valid agg time dimensions for the specified measure."""
         queried_metric_time_specs = list(self.metric_time_specs)

@@ -17,13 +17,12 @@ from metricflow.model.semantics.linkable_spec_resolver import (
 )
 from metricflow.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
-from metricflow.protocols.semantics import MetricAccessor
 from metricflow.specs.specs import TimeDimensionSpec
 
 logger = logging.getLogger(__name__)
 
 
-class MetricLookup(MetricAccessor):
+class MetricLookup:
     """Tracks semantic information for metrics by linking them to semantic models."""
 
     def __init__(self, semantic_manifest: SemanticManifest, semantic_model_lookup: SemanticModelLookup) -> None:
@@ -37,7 +36,7 @@ class MetricLookup(MetricAccessor):
         self._semantic_model_lookup = semantic_model_lookup
 
         for metric in semantic_manifest.metrics:
-            self.add_metric(metric)
+            self._add_metric(metric)
 
         self._linkable_spec_resolver = ValidLinkableSpecResolver(
             semantic_manifest=semantic_manifest,
@@ -108,7 +107,7 @@ class MetricLookup(MetricAccessor):
             raise MetricNotFoundError(f"Unable to find metric `{metric_reference}`. Perhaps it has not been registered")
         return self._metrics[metric_reference]
 
-    def add_metric(self, metric: Metric) -> None:
+    def _add_metric(self, metric: Metric) -> None:
         """Add metric, validating presence of required measures."""
         metric_reference = MetricReference(element_name=metric.name)
         if metric_reference in self._metrics:

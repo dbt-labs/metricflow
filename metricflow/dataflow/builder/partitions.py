@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from typing import List, Sequence, Tuple
 
 from metricflow.dataset.dataset import DataSet
-from metricflow.protocols.semantics import SemanticModelAccessor
+from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.specs.specs import (
     DimensionSpec,
     InstanceSpecSet,
@@ -33,7 +33,7 @@ class PartitionTimeDimensionJoinDescription:
 class PartitionJoinResolver:
     """When joining data sets, this class helps to figure out the necessary partition specs to join on."""
 
-    def __init__(self, semantic_model_lookup: SemanticModelAccessor) -> None:  # noqa: D107
+    def __init__(self, semantic_model_lookup: SemanticModelLookup) -> None:  # noqa: D107
         self._semantic_model_lookup = semantic_model_lookup
 
     def _get_partitions(self, spec_set: InstanceSpecSet) -> PartitionSpecSet:

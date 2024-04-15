@@ -18,7 +18,7 @@ from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionT
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS, SemanticModelJoinEvaluator
-from metricflow.protocols.semantics import SemanticModelAccessor
+from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.specs.spec_set_transforms import ToElementNameSet
 from metricflow.specs.specs import InstanceSpecSet, LinkableInstanceSpec, LinklessEntitySpec
 from metricflow.sql.sql_plan import SqlJoinType
@@ -78,7 +78,7 @@ class PreJoinNodeProcessor:
 
     def __init__(  # noqa: D107
         self,
-        semantic_model_lookup: SemanticModelAccessor,
+        semantic_model_lookup: SemanticModelLookup,
         node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver,
     ):
         self._node_data_set_resolver = node_data_set_resolver
