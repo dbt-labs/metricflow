@@ -25,7 +25,7 @@ class IntegrationTestModel(Enum):
     SCD_MODEL = "SCD_MODEL"
 
 
-class RequiredDwEngineFeatures(Enum):
+class RequiredDwEngineFeature(Enum):
     """Required features that are needed in the DW engine for the test to run."""
 
     CONTINUOUS_PERCENTILE_AGGREGATION = "CONTINUOUS_PERCENTILE_AGGREGATION"
@@ -56,7 +56,7 @@ class ConfiguredIntegrationTestCase(FrozenBaseModel):
     group_by_objs: Tuple[Dict, ...] = ()
     order_bys: Tuple[str, ...] = ()
     # The required features in the DW engine for the test to complete.
-    required_features: Tuple[RequiredDwEngineFeatures, ...] = ()
+    required_features: Tuple[RequiredDwEngineFeature, ...] = ()
     # Whether to check the order of the rows / columns.
     check_order: bool = False
     allow_empty: bool = False
