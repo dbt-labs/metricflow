@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, Optional
+from typing import TYPE_CHECKING, Dict, List, Optional
 
 from dbt_semantic_interfaces.protocols.entity import EntityType
 from dbt_semantic_interfaces.references import (
@@ -12,7 +12,9 @@ from dbt_semantic_interfaces.references import (
 
 from metricflow.instances import EntityInstance, InstanceSet
 from metricflow.mf_logging.pretty_print import mf_pformat
-from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
+
+if TYPE_CHECKING:
+    from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 
 MAX_JOIN_HOPS = 2
 

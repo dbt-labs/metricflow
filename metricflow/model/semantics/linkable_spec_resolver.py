@@ -4,7 +4,7 @@ import logging
 import time
 from collections import defaultdict
 from dataclasses import dataclass, field
-from typing import Dict, FrozenSet, List, Optional, Sequence, Set, Tuple
+from typing import TYPE_CHECKING, Dict, FrozenSet, List, Optional, Sequence, Set, Tuple
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols.dimension import Dimension, DimensionType
@@ -26,7 +26,6 @@ from metricflow.errors.errors import UnknownMetricLinkingError
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperties
 from metricflow.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
-from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.specs.specs import (
     DEFAULT_TIME_GRANULARITY,
     DimensionSpec,
@@ -36,6 +35,10 @@ from metricflow.specs.specs import (
     LinkableSpecSet,
     TimeDimensionSpec,
 )
+
+if TYPE_CHECKING:
+    from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
+
 
 logger = logging.getLogger(__name__)
 
