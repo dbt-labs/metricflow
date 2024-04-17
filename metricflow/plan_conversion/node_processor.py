@@ -8,9 +8,7 @@ from dbt_semantic_interfaces.references import EntityReference, TimeDimensionRef
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.partitions import PartitionJoinResolver
-from metricflow.dataflow.dataflow_plan import (
-    BaseOutput,
-)
+from metricflow.dataflow.dataflow_plan import BaseOutput
 from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinToBaseOutputNode

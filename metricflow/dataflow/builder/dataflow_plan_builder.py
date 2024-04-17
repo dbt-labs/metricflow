@@ -168,6 +168,7 @@ class DataflowPlanBuilder:
             spec_resolution_lookup=query_spec.filter_spec_resolution_lookup,
         )
 
+        # Here is where we somehow figure out the join required to get to multi-hop entity
         query_level_filter_specs = tuple(
             filter_spec_factory.create_from_where_filter_intersection(
                 filter_location=WhereFilterLocation.for_query(
@@ -867,6 +868,7 @@ class DataflowPlanBuilder:
                 )
             )
 
+        # Getting removed here?
         candidate_nodes_for_right_side_of_join = node_processor.remove_unnecessary_nodes(
             desired_linkable_specs=linkable_specs,
             nodes=candidate_nodes_for_right_side_of_join,
