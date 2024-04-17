@@ -1,0 +1,6 @@
+kind: Fixes
+body: Refactor group by resolution for group by metrics.
+time: 2024-04-16T20:26:00.637184-07:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1139"
