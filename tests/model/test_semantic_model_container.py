@@ -8,6 +8,7 @@ from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import EntityReference, MeasureReference, MetricReference
 
 from metricflow.model.semantics.linkable_element_properties import LinkableElementProperty
+from metricflow.model.semantics.linkable_spec_resolver import SemanticModelJoinPath
 from metricflow.model.semantics.metric_lookup import MetricLookup
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
@@ -196,3 +197,78 @@ def test_get_agg_time_dimension_specs_for_measure(semantic_model_lookup: Semanti
         agg_time_dim_reference = semantic_model_lookup.get_agg_time_dimension_for_measure(measure_reference)
         for spec in agg_time_dim_specs:
             assert spec.reference == agg_time_dim_reference
+
+
+def test_linkable_metrics_for_semantic_model(  # noqa: D103
+    metric_lookup: MetricLookup,
+    semantic_model_lookup: SemanticModelLookup,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    request: FixtureRequest,
+) -> None:
+    measure_reference = MeasureReference(element_name="listings")
+    measure_semantic_model = semantic_model_lookup.get_semantic_model_for_measure(measure_reference)
+    assert_linkable_element_set_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        set_id="result0",
+        linkable_element_set=metric_lookup._linkable_spec_resolver._get_all_linkable_metrics_for_semantic_model(
+            measure_semantic_model
+        ),
+    )
+
+
+def test_linkable_metrics_for_measure(  # noqa: D103
+    metric_lookup: MetricLookup, semantic_model_lookup: SemanticModelLookup
+) -> None:
+    measure_reference = MeasureReference(element_name="listings")
+    measure_semantic_model = semantic_model_lookup.get_semantic_model_for_measure(measure_reference)
+
+    actual_metrics = {
+        linkable_metric
+        for linkable_metric_tuple in metric_lookup.linkable_elements_for_measure(
+            measure_reference=measure_reference
+        ).path_key_to_linkable_metrics.values()
+        for linkable_metric in linkable_metric_tuple
+    }
+    already_seen = set()
+
+    expected_single_hop_metrics = [
+        linkable_metric
+        for linkable_metrics in metric_lookup._linkable_spec_resolver.get_metrics_directly_joinable_to_semantic_model(
+            semantic_model=measure_semantic_model
+        ).path_key_to_linkable_metrics.values()
+        for linkable_metric in linkable_metrics
+    ]
+
+    for expected_metric in expected_single_hop_metrics:
+        assert expected_metric in actual_metrics
+        assert expected_metric not in already_seen
+        already_seen.add(expected_metric)
+        actual_metrics.remove(expected_metric)
+
+    expected_multi_hop_metrics = []
+    for entity in measure_semantic_model.entities:
+        next_semantic_models = metric_lookup._linkable_spec_resolver._entity_to_semantic_model[entity.name]
+        for next_semantic_model in next_semantic_models:
+            if next_semantic_model.name == measure_semantic_model.name:
+                continue
+            join_path = SemanticModelJoinPath.from_single_element(
+                semantic_model_reference=next_semantic_model.reference, join_on_entity=entity.reference
+            )
+            for (
+                linkable_metrics
+            ) in metric_lookup._linkable_spec_resolver.get_metrics_directly_joinable_to_semantic_model(
+                semantic_model=next_semantic_model,
+                using_join_path=join_path,
+            ).path_key_to_linkable_metrics.values():
+                for linkable_metric in linkable_metrics:
+                    expected_multi_hop_metrics.append(linkable_metric)
+
+    for expected_metric in expected_multi_hop_metrics:
+        assert expected_metric in actual_metrics
+        assert expected_metric not in already_seen
+        already_seen.add(expected_metric)
+        actual_metrics.remove(expected_metric)
+
+    # Check that we didn't return any unexpected linkable metrics.
+    assert len(actual_metrics) == 0, f"Didn't find linkable metrics: {actual_metrics}"
