@@ -630,9 +630,12 @@ class ValidLinkableSpecResolver:
         """Get the set of linkable metrics that can be joined to this semantic model."""
         properties = frozenset({LinkableElementProperty.METRIC, LinkableElementProperty.JOINED})
         if using_join_path:
-            assert (
-                semantic_model.reference == using_join_path.last_semantic_model_reference
-            ), "Last join path element should match semantic model when building LinkableMetrics."
+            assert semantic_model.reference == using_join_path.last_semantic_model_reference, (
+                "Last join path element should match semantic model when building LinkableMetrics. "
+                f"Got semantic model: {semantic_model.reference.semantic_model_name}; "
+                f"last join path element: {using_join_path.last_semantic_model_reference.semantic_model_name}",
+            )
+            # TODO: confirm that this is what we internally consider multi-hop
             properties = properties.union(frozenset({LinkableElementProperty.MULTI_HOP}))
 
         path_key_to_linkable_metrics: Dict[ElementPathKey, Tuple[LinkableMetric, ...]] = {}
@@ -657,6 +660,7 @@ class ValidLinkableSpecResolver:
         """Gets the elements in the semantic model, without requiring any joins.
 
         Elements related to metric_time are handled separately in _get_metric_time_elements().
+        Linkable metrics are not considered local to the semantic model since they always require a join.
         """
         linkable_dimensions = []
         linkable_entities = []
