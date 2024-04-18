@@ -599,7 +599,7 @@ class ValidLinkableSpecResolver:
         for semantic_model in semantic_manifest.semantic_models:
             linkable_element_sets_for_no_metrics_queries.append(self._get_elements_in_semantic_model(semantic_model))
             linkable_element_sets_for_no_metrics_queries.append(
-                self.get_joinable_metrics_for_semantic_model(semantic_model)
+                self._get_joinable_metrics_for_semantic_model(semantic_model)
             )
 
         metric_time_elements_for_no_metrics = self._get_metric_time_elements(measure_reference=None)
@@ -624,7 +624,7 @@ class ValidLinkableSpecResolver:
             )
         return semantic_models_where_measure_was_found[0]
 
-    def get_joinable_metrics_for_semantic_model(
+    def _get_joinable_metrics_for_semantic_model(
         self, semantic_model: SemanticModel, using_join_path: Optional[SemanticModelJoinPath] = None
     ) -> LinkableElementSet:
         """Get the set of linkable metrics that can be joined to this semantic model."""
