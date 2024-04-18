@@ -26,10 +26,27 @@ def semantic_model_lookup(simple_semantic_manifest: SemanticManifest) -> Semanti
 
 
 @pytest.fixture
+def multi_hop_semantic_model_lookup(  # noqa: D103
+    multi_hop_join_semantic_manifest: SemanticManifest,
+) -> SemanticModelLookup:
+    return SemanticModelLookup(model=multi_hop_join_semantic_manifest)
+
+
+@pytest.fixture
 def metric_lookup(  # noqa: D103
     simple_semantic_manifest: SemanticManifest, semantic_model_lookup: SemanticModelLookup
 ) -> MetricLookup:
     return MetricLookup(semantic_manifest=simple_semantic_manifest, semantic_model_lookup=semantic_model_lookup)
+
+
+@pytest.fixture
+def multi_hop_metric_lookup(  # noqa: D103
+    multi_hop_join_semantic_manifest: SemanticManifest, multi_hop_semantic_model_lookup: SemanticModelLookup
+) -> MetricLookup:
+    return MetricLookup(
+        semantic_manifest=multi_hop_join_semantic_manifest,
+        semantic_model_lookup=multi_hop_semantic_model_lookup,
+    )
 
 
 def test_get_names(  # noqa: D103
@@ -125,6 +142,22 @@ def test_linkable_elements_for_measure(
         set_id="result0",
         linkable_element_set=metric_lookup.linkable_elements_for_measure(
             measure_reference=MeasureReference(element_name="listings"),
+        ),
+    )
+
+
+def test_linkable_elements_for_measure_multi_hop_model(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    multi_hop_metric_lookup: MetricLookup,
+) -> None:
+    """Tests extracting linkable elements for a given measure input."""
+    assert_linkable_element_set_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        set_id="result0",
+        linkable_element_set=multi_hop_metric_lookup.linkable_elements_for_measure(
+            measure_reference=MeasureReference(element_name="txn_count"),
         ),
     )
 
