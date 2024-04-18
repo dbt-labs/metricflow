@@ -454,13 +454,7 @@ class ValidLinkableSpecResolver:
                     )
                 )
         single_hop_elements = LinkableElementSet.merge_by_path_key(
-            [
-                self.create_linkable_element_set_from_join_path(
-                    join_path=join_path,
-                    with_properties=frozenset({LinkableElementProperty.JOINED}),
-                )
-                for join_path in join_paths
-            ]
+            [self.create_linkable_element_set_from_join_path(join_path) for join_path in join_paths]
         )
 
         # Create multi-hop elements. At each iteration, we generate the list of valid elements based on the current join
@@ -482,11 +476,7 @@ class ValidLinkableSpecResolver:
             multi_hop_elements = LinkableElementSet.merge_by_path_key(
                 (multi_hop_elements,)
                 + tuple(
-                    self.create_linkable_element_set_from_join_path(
-                        join_path=new_join_path,
-                        with_properties=frozenset({LinkableElementProperty.JOINED, LinkableElementProperty.MULTI_HOP}),
-                    )
-                    for new_join_path in new_join_paths
+                    self.create_linkable_element_set_from_join_path(new_join_path) for new_join_path in new_join_paths
                 )
             )
             join_paths = new_join_paths
@@ -503,7 +493,7 @@ class ValidLinkableSpecResolver:
         measure_semantic_model = self._get_semantic_model_for_measure(measure_reference)
 
         elements_in_semantic_model = self._get_elements_in_semantic_model(measure_semantic_model)
-        metrics_linked_to_semantic_model = self.get_joinable_metrics_for_semantic_model(measure_semantic_model)
+        metrics_linked_to_semantic_model = self._get_joinable_metrics_for_semantic_model(measure_semantic_model)
         metric_time_elements = self._get_metric_time_elements(measure_reference)
         joined_elements = self._get_joined_elements(measure_semantic_model)
 
@@ -615,9 +605,12 @@ class ValidLinkableSpecResolver:
     def create_linkable_element_set_from_join_path(
         self,
         join_path: SemanticModelJoinPath,
-        with_properties: FrozenSet[LinkableElementProperty],
     ) -> LinkableElementSet:
         """Given the current path, generate the respective linkable elements from the last semantic model in the path."""
+        properties = frozenset({LinkableElementProperty.JOINED})
+        if len(join_path.path_elements) > 1:
+            properties = properties.union({LinkableElementProperty.MULTI_HOP})
+
         semantic_model = self._semantic_model_lookup.get_by_reference(join_path.last_semantic_model_reference)
         assert semantic_model
 
@@ -634,7 +627,7 @@ class ValidLinkableSpecResolver:
                         dimension_type=DimensionType.CATEGORICAL,
                         entity_links=join_path.entity_links,
                         join_path=join_path.path_elements,
-                        properties=with_properties,
+                        properties=properties,
                         time_granularity=None,
                         date_part=None,
                     )
@@ -646,7 +639,7 @@ class ValidLinkableSpecResolver:
                         dimension=dimension,
                         entity_links=join_path.entity_links,
                         join_path=join_path.path_elements,
-                        with_properties=with_properties,
+                        with_properties=properties,
                     )
                 )
             else:
@@ -661,7 +654,7 @@ class ValidLinkableSpecResolver:
                         element_name=entity.reference.element_name,
                         entity_links=join_path.entity_links,
                         join_path=join_path.path_elements,
-                        properties=with_properties.union({LinkableElementProperty.ENTITY}),
+                        properties=properties.union({LinkableElementProperty.ENTITY}),
                     )
                 )
 
@@ -672,7 +665,7 @@ class ValidLinkableSpecResolver:
             path_key_to_linkable_entities={
                 linkable_entity.path_key: (linkable_entity,) for linkable_entity in linkable_entities
             },
-            path_key_to_linkable_metrics=self.get_joinable_metrics_for_semantic_model(
+            path_key_to_linkable_metrics=self._get_joinable_metrics_for_semantic_model(
                 semantic_model=semantic_model, using_join_path=join_path
             ).path_key_to_linkable_metrics,
         )
