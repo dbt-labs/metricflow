@@ -1018,7 +1018,6 @@ class ValidLinkableSpecResolver:
 
         linkable_dimensions: List[LinkableDimension] = []
         linkable_entities: List[LinkableEntity] = []
-        linkable_metrics: List[LinkableMetric] = []
 
         for dimension in semantic_model.dimensions:
             dimension_type = dimension.type
@@ -1060,17 +1059,6 @@ class ValidLinkableSpecResolver:
                     )
                 )
 
-        linkable_metrics = [
-            LinkableMetric(
-                element_name=metric.element_name,
-                entity_links=join_path.entity_links,
-                join_path=join_path.path_elements,
-                join_by_semantic_model=semantic_model.reference,
-                properties=properties.union({LinkableElementProperty.METRIC}),
-            )
-            for metric in self._joinable_metrics_for_semantic_models.get(join_path.last_semantic_model_reference, set())
-        ]
-
         return LinkableElementSet(
             path_key_to_linkable_dimensions={
                 linkable_dimension.path_key: (linkable_dimension,) for linkable_dimension in linkable_dimensions
@@ -1078,7 +1066,7 @@ class ValidLinkableSpecResolver:
             path_key_to_linkable_entities={
                 linkable_entity.path_key: (linkable_entity,) for linkable_entity in linkable_entities
             },
-            path_key_to_linkable_metrics={
-                linkable_metric.path_key: (linkable_metric,) for linkable_metric in linkable_metrics
-            },
+            path_key_to_linkable_metrics=self._get_joinable_metrics_for_semantic_model(
+                semantic_model=semantic_model, using_join_path=join_path
+            ).path_key_to_linkable_metrics,
         )
