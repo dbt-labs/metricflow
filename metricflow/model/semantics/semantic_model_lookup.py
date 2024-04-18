@@ -24,7 +24,7 @@ from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from metricflow.errors.errors import InvalidSemanticModelError
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantics.element_group import ElementGrouper
-from metricflow.model.semantics.linkable_spec_resolver import ElementPathKey
+from metricflow.model.semantics.linkable_element import ElementPathKey
 from metricflow.model.spec_converters import MeasureConverter
 from metricflow.specs.specs import (
     DimensionSpec,
