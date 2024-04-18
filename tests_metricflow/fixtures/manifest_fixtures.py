@@ -276,6 +276,14 @@ def simple_semantic_manifest(
 
 
 @pytest.fixture(scope="session")
+def multi_hop_join_semantic_manifest(
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture]
+) -> PydanticSemanticManifest:
+    """Model used for many tests."""
+    return mf_engine_test_fixture_mapping[SemanticManifestSetup.MULTI_HOP_JOIN_MANIFEST].semantic_manifest
+
+
+@pytest.fixture(scope="session")
 def extended_date_semantic_manifest_lookup(  # noqa: D103
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture]
 ) -> SemanticManifestLookup:
