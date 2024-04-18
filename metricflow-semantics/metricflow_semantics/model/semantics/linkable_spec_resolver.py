@@ -137,6 +137,7 @@ class ValidLinkableSpecResolver:
                 self._entity_to_semantic_model[entity.reference.element_name].append(semantic_model)
 
         self._metric_to_linkable_element_sets: Dict[str, List[LinkableElementSet]] = {}
+        self._joinable_metrics_for_entities: Dict[EntityReference, Set[MetricReference]] = defaultdict(set)
 
         start_time = time.time()
         for metric in self._semantic_manifest.metrics:
@@ -178,7 +179,6 @@ class ValidLinkableSpecResolver:
             self._metric_to_linkable_element_sets[metric.name] = linkable_sets_for_measure
 
         # This loop must happen after the one above so that _metric_to_linkable_element_sets is populated.
-        self._joinable_metrics_for_entities: Dict[EntityReference, Set[MetricReference]] = defaultdict(set)
         for metric in self._semantic_manifest.metrics:
             metric_reference = MetricReference(metric.name)
             linkable_element_set_for_metric = self.get_linkable_elements_for_metrics([metric_reference])
