@@ -21,17 +21,6 @@ class LinkableElementSet:
     TODO: There are similarities with LinkableSpecSet - consider consolidation.
     """
 
-    # Dictionaries that map the path key to context on the dimension
-    #
-    # For example:
-    # {
-    #   "listing__country_latest": (
-    #     LinkableDimension(
-    #       element_name="country_latest",
-    #       entity_links=("listing",),
-    #       semantic_model_origin="listings_latest_source",
-    #   )
-    # }
     path_key_to_linkable_dimensions: Dict[ElementPathKey, Tuple[LinkableDimension, ...]] = field(default_factory=dict)
     path_key_to_linkable_entities: Dict[ElementPathKey, Tuple[LinkableEntity, ...]] = field(default_factory=dict)
     path_key_to_linkable_metrics: Dict[ElementPathKey, Tuple[LinkableMetric, ...]] = field(default_factory=dict)
@@ -54,7 +43,6 @@ class LinkableElementSet:
             for path_key, linkable_metrics in linkable_element_set.path_key_to_linkable_metrics.items():
                 key_to_linkable_metrics[path_key].extend(linkable_metrics)
 
-        # Convert the dictionaries to use tuples instead of lists.
         return LinkableElementSet(
             path_key_to_linkable_dimensions={
                 path_key: tuple(dimensions) for path_key, dimensions in key_to_linkable_dimensions.items()
