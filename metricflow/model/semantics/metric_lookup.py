@@ -9,8 +9,7 @@ from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import MeasureReference, MetricReference, TimeDimensionReference
 
 from metricflow.errors.errors import DuplicateMetricError, MetricNotFoundError, NonExistentMeasureError
-from metricflow.model.semantics.linkable_element import ElementPathKey
-from metricflow.model.semantics.linkable_element_properties import LinkableElementProperty
+from metricflow.model.semantics.linkable_element import ElementPathKey, LinkableElementProperty
 from metricflow.model.semantics.linkable_spec_resolver import (
     LinkableElementSet,
     ValidLinkableSpecResolver,

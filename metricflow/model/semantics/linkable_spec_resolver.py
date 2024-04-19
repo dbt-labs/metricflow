@@ -26,12 +26,12 @@ from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantics.linkable_element import (
     ElementPathKey,
     LinkableDimension,
+    LinkableElementProperty,
     LinkableEntity,
     LinkableMetric,
     SemanticModelJoinPath,
     SemanticModelJoinPathElement,
 )
-from metricflow.model.semantics.linkable_element_properties import LinkableElementProperty
 from metricflow.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
 from metricflow.specs.specs import (
     DEFAULT_TIME_GRANULARITY,
