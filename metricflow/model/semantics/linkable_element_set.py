@@ -8,6 +8,7 @@ from metricflow.model.semantics.linkable_element import (
     ElementPathKey,
     LinkableDimension,
     LinkableElementProperty,
+    LinkableElementType,
     LinkableEntity,
     LinkableMetric,
 )
@@ -198,7 +199,7 @@ class LinkableElementSet:
                     entity_links=path_key.entity_links,
                 )
                 for path_key in self.path_key_to_linkable_dimensions.keys()
-                if not path_key.time_granularity
+                if path_key.element_type is LinkableElementType.DIMENSION
             ),
             time_dimension_specs=tuple(
                 TimeDimensionSpec(
@@ -208,7 +209,7 @@ class LinkableElementSet:
                     date_part=path_key.date_part,
                 )
                 for path_key in self.path_key_to_linkable_dimensions.keys()
-                if path_key.time_granularity
+                if path_key.element_type is LinkableElementType.TIME_DIMENSION and path_key.time_granularity
             ),
             entity_specs=tuple(
                 EntitySpec(

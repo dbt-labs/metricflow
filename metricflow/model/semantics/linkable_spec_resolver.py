@@ -26,6 +26,7 @@ from metricflow.model.semantics.linkable_element import (
     ElementPathKey,
     LinkableDimension,
     LinkableElementProperty,
+    LinkableElementType,
     LinkableEntity,
     LinkableMetric,
     SemanticModelJoinPath,
@@ -69,6 +70,7 @@ def _generate_linkable_time_dimensions(
             LinkableDimension(
                 semantic_model_origin=semantic_model_origin,
                 element_name=dimension.reference.element_name,
+                dimension_type=DimensionType.TIME,
                 entity_links=entity_links,
                 join_path=tuple(join_path),
                 time_granularity=time_granularity,
@@ -84,6 +86,7 @@ def _generate_linkable_time_dimensions(
                     LinkableDimension(
                         semantic_model_origin=semantic_model_origin,
                         element_name=dimension.reference.element_name,
+                        dimension_type=DimensionType.TIME,
                         entity_links=entity_links,
                         join_path=tuple(join_path),
                         time_granularity=time_granularity,
@@ -193,7 +196,11 @@ class ValidLinkableSpecResolver:
             for entity in semantic_model.entities:
                 linkable_metrics_set = LinkableElementSet(
                     path_key_to_linkable_metrics={
-                        ElementPathKey(element_name=metric.element_name, entity_links=(entity.reference,)): (
+                        ElementPathKey(
+                            element_name=metric.element_name,
+                            element_type=LinkableElementType.METRIC,
+                            entity_links=(entity.reference,),
+                        ): (
                             LinkableMetric(
                                 element_name=metric.element_name,
                                 entity_links=(entity.reference,),
@@ -293,6 +300,7 @@ class ValidLinkableSpecResolver:
                         LinkableDimension(
                             semantic_model_origin=semantic_model.reference,
                             element_name=dimension.reference.element_name,
+                            dimension_type=DimensionType.CATEGORICAL,
                             entity_links=(entity_link,),
                             join_path=(),
                             properties=dimension_properties,
@@ -405,6 +413,7 @@ class ValidLinkableSpecResolver:
             for date_part in possible_date_parts:
                 path_key = ElementPathKey(
                     element_name=DataSet.metric_time_dimension_name(),
+                    element_type=LinkableElementType.TIME_DIMENSION,
                     entity_links=(),
                     time_granularity=time_granularity,
                     date_part=date_part,
@@ -413,6 +422,7 @@ class ValidLinkableSpecResolver:
                     LinkableDimension(
                         semantic_model_origin=measure_semantic_model.reference if measure_semantic_model else None,
                         element_name=DataSet.metric_time_dimension_name(),
+                        dimension_type=DimensionType.TIME,
                         entity_links=(),
                         join_path=(),
                         # Anything that's not at the base time granularity of the measure's aggregation time dimension
@@ -642,6 +652,7 @@ class ValidLinkableSpecResolver:
                     LinkableDimension(
                         semantic_model_origin=semantic_model.reference,
                         element_name=dimension.reference.element_name,
+                        dimension_type=DimensionType.CATEGORICAL,
                         entity_links=entity_links,
                         join_path=join_path.path_elements,
                         properties=with_properties,
