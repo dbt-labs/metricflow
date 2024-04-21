@@ -6,10 +6,10 @@ from typing import Dict, FrozenSet, Optional, Sequence, Set
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols.metric import Metric, MetricInputMeasure, MetricType
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.references import MeasureReference, MetricReference, TimeDimensionReference
+from dbt_semantic_interfaces.references import MeasureReference, MetricReference
 
 from metricflow.errors.errors import DuplicateMetricError, MetricNotFoundError, NonExistentMeasureError
-from metricflow.model.semantics.linkable_element import ElementPathKey, LinkableElementProperty
+from metricflow.model.semantics.linkable_element import LinkableElementProperty
 from metricflow.model.semantics.linkable_element_set import LinkableElementSet
 from metricflow.model.semantics.linkable_spec_resolver import (
     ValidLinkableSpecResolver,
@@ -144,31 +144,34 @@ class MetricLookup:
                         return True
         return False
 
-    def _get_agg_time_dimension_path_keys_for_metric(
+    def _get_agg_time_dimension_specs_for_metric(
         self, metric_reference: MetricReference
-    ) -> Sequence[ElementPathKey]:
+    ) -> Sequence[TimeDimensionSpec]:
         """Retrieves the aggregate time dimensions associated with the metric's measures."""
         metric = self.get_metric(metric_reference)
-        path_keys = set()
+        specs: Set[TimeDimensionSpec] = set()
         for input_measure in metric.input_measures:
-            path_key = self._semantic_model_lookup.get_agg_time_dimension_path_key_for_measure(
+            time_dimension_specs = self._semantic_model_lookup.get_agg_time_dimension_specs_for_measure(
                 measure_reference=input_measure.measure_reference
             )
-            path_keys.add(path_key)
-        return list(path_keys)
+            specs.update(time_dimension_specs)
+        return list(specs)
 
     def get_valid_agg_time_dimensions_for_metric(
         self, metric_reference: MetricReference
     ) -> Sequence[TimeDimensionSpec]:
         """Get the agg time dimension specs that can be used in place of metric time for this metric, if applicable."""
-        agg_time_dimension_element_path_keys = self._get_agg_time_dimension_path_keys_for_metric(metric_reference)
-        if len(agg_time_dimension_element_path_keys) != 1:
+        agg_time_dimension_specs = self._get_agg_time_dimension_specs_for_metric(metric_reference)
+        distinct_agg_time_dimension_identifiers = set(
+            [(spec.reference, spec.entity_links) for spec in agg_time_dimension_specs]
+        )
+        if len(distinct_agg_time_dimension_identifiers) != 1:
             # If the metric's input measures have different agg_time_dimensions, user must use metric_time.
             return []
 
-        path_key = agg_time_dimension_element_path_keys[0]
+        agg_time_dimension_reference, agg_time_dimension_entity_links = distinct_agg_time_dimension_identifiers.pop()
         valid_agg_time_dimension_specs = TimeDimensionSpec.generate_possible_specs_for_time_dimension(
-            time_dimension_reference=TimeDimensionReference(element_name=path_key.element_name),
-            entity_links=path_key.entity_links,
+            time_dimension_reference=agg_time_dimension_reference,
+            entity_links=agg_time_dimension_entity_links,
         )
         return valid_agg_time_dimension_specs
