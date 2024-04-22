@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Optional, Sequence
+from typing import List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimensionTypeParams
 from dbt_semantic_interfaces.protocols.dimension import (
@@ -28,9 +28,8 @@ from dbt_semantic_interfaces.transformations.add_input_metric_measures import Ad
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.entity_type import EntityType
 
-from metricflow.model.semantics.linkable_spec_resolver import ElementPathKey
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
-from metricflow.specs.specs import DimensionSpec
+from metricflow.specs.specs import DimensionSpec, EntityReference
 
 
 @dataclass(frozen=True)
@@ -85,16 +84,15 @@ class Dimension:
     label: Optional[str] = None
 
     @classmethod
-    def from_pydantic(cls, pydantic_dimension: SemanticManifestDimension, path_key: ElementPathKey) -> Dimension:
+    def from_pydantic(
+        cls, pydantic_dimension: SemanticManifestDimension, entity_links: Tuple[EntityReference, ...]
+    ) -> Dimension:
         """Build from pydantic Dimension and entity_key."""
-        qualified_name = DimensionSpec(
-            element_name=path_key.element_name,
-            entity_links=path_key.entity_links,
-        ).qualified_name
+        qualified_name = DimensionSpec(element_name=pydantic_dimension.name, entity_links=entity_links).qualified_name
         parsed_type_params: Optional[DimensionTypeParams] = None
         if pydantic_dimension.type_params:
             parsed_type_params = PydanticDimensionTypeParams(
-                time_granularity=path_key.time_granularity,
+                time_granularity=pydantic_dimension.type_params.time_granularity,
                 validity_params=pydantic_dimension.type_params.validity_params,
             )
         return cls(

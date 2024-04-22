@@ -218,13 +218,8 @@ class SemanticModelLookup:
                     f"Aggregation time dimension does not have a time granularity set: {agg_time_dimension}"
                 )
 
-            primary_entity = SemanticModelLookup.resolved_primary_entity(semantic_model)
-
-            if primary_entity is None:
-                raise RuntimeError(
-                    f"The semantic model should have a primary entity since there are dimensions, but it does not. "
-                    f"Semantic model is:\n{mf_pformat(semantic_model)}"
-                )
+            # TODO: do we need this here? This should be handled in validations
+            self.get_primary_entity_else_error(semantic_model)
 
             self._semantic_model_to_aggregation_time_dimensions[semantic_model.reference].add_value(
                 key=TimeDimensionReference(
@@ -261,6 +256,21 @@ class SemanticModelLookup:
 
         self._semantic_model_reference_to_semantic_model[semantic_model.reference] = semantic_model
 
+    def get_primary_entity_else_error(self, semantic_model: SemanticModel) -> EntityReference:
+        """Get primary entity from semantic model and error if it doesn't exist.
+
+        If there are dimensions in the semantic model, there must be a primary entity. If there are measures, we can
+        also assume there must be a primary entity because measures are required to have an `agg_time_dimension`
+        defined in the same semantic model.
+        """
+        primary_entity = SemanticModelLookup.resolved_primary_entity(semantic_model)
+        if primary_entity is None:
+            raise RuntimeError(
+                f"The semantic model should have a primary entity since there are dimensions, but it does not. "
+                f"Semantic model is:\n{mf_pformat(semantic_model)}"
+            )
+        return primary_entity
+
     def get_aggregation_time_dimensions_with_measures(
         self, semantic_model_reference: SemanticModelReference
     ) -> ElementGrouper[TimeDimensionReference, MeasureSpec]:
@@ -273,6 +283,10 @@ class SemanticModelLookup:
     def get_semantic_models_for_entity(self, entity_reference: EntityReference) -> Set[SemanticModel]:
         """Return all semantic models associated with an entity reference."""
         return set(self._entity_index.get(entity_reference, []))
+
+    def get_semantic_models_for_dimension(self, dimension_reference: DimensionReference) -> Set[SemanticModel]:
+        """Return all semantic models associated with a dimension reference."""
+        return set(self._dimension_index.get(dimension_reference, []))
 
     @staticmethod
     def get_entity_from_semantic_model(
@@ -343,12 +357,7 @@ class SemanticModelLookup:
         # A measure's agg_time_dimension is required to be in the same semantic model as the measure,
         # so we can assume the same semantic model for both measure and dimension.
         semantic_model = self.get_semantic_model_for_measure(measure_reference)
-        entity_link = self.resolved_primary_entity(semantic_model)
-        assert entity_link is not None, (
-            f"Expected semantic model {semantic_model} to have a primary entity since it has a "
-            "measure requiring an agg_time_dimension, but found none.",
-        )
-
+        entity_link = self.get_primary_entity_else_error(semantic_model)
         return ElementPathKey(element_name=agg_time_dimension.element_name, entity_links=(entity_link,))
 
     def get_agg_time_dimension_specs_for_measure(

@@ -311,6 +311,11 @@ class AbstractMetricFlowEngine(ABC):
         """
         pass
 
+    @abstractmethod
+    def list_dimensions(self) -> List[Dimension]:
+        """List all dimensions in the semantic manifest."""
+        pass
+
 
 class MetricFlowEngine(AbstractMetricFlowEngine):
     """Main entry point for queries.
@@ -612,10 +617,28 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                                 semantic_model=semantic_model,
                                 dimension_reference=linkable_dimension.reference,
                             ),
-                            path_key=path_key,
+                            entity_links=path_key.entity_links,
                         )
                     )
         return sorted(dimensions, key=lambda dimension: dimension.qualified_name)
+
+    def list_dimensions(self) -> List[Dimension]:  # noqa: D102
+        """Get full dimension object for all dimensions in the semantic manifest."""
+        semantic_model_lookup = self._semantic_manifest_lookup.semantic_model_lookup
+
+        dimensions: List[Dimension] = []
+        for dimension_reference in semantic_model_lookup.get_dimension_references():
+            for semantic_model in semantic_model_lookup.get_semantic_models_for_dimension(dimension_reference):
+                dimensions.append(
+                    Dimension.from_pydantic(
+                        pydantic_dimension=semantic_model_lookup.get_dimension_from_semantic_model(
+                            semantic_model=semantic_model, dimension_reference=dimension_reference
+                        ),
+                        entity_links=(semantic_model_lookup.get_primary_entity_else_error(semantic_model),),
+                    )
+                )
+
+        return dimensions
 
     def entities_for_metrics(self, metric_names: List[str]) -> List[Entity]:  # noqa: D102
         path_key_to_linkable_entities = (

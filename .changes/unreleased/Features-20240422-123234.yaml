@@ -1,0 +1,6 @@
+kind: Features
+body: List all dimensions for the semantic manifest.
+time: 2024-04-22T12:32:34.824739-07:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1142"
