@@ -168,6 +168,7 @@ class DataflowPlanBuilder:
             spec_resolution_lookup=query_spec.filter_spec_resolution_lookup,
         )
 
+        # Here is where we somehow figure out the join required to get to multi-hop entity
         query_level_filter_specs = tuple(
             filter_spec_factory.create_from_where_filter_intersection(
                 filter_location=WhereFilterLocation.for_query(
@@ -817,6 +818,7 @@ class DataflowPlanBuilder:
         time_range_constraint: Optional[TimeRangeConstraint] = None,
     ) -> Optional[DataflowRecipe]:
         linkable_specs = linkable_spec_set.as_tuple
+
         candidate_nodes_for_left_side_of_join: List[BaseOutput] = []
         candidate_nodes_for_right_side_of_join: List[BaseOutput] = []
 
@@ -867,12 +869,15 @@ class DataflowPlanBuilder:
                 )
             )
 
+        # Getting removed here?
+        print("nodes before:", candidate_nodes_for_right_side_of_join)
         candidate_nodes_for_right_side_of_join = node_processor.remove_unnecessary_nodes(
             desired_linkable_specs=linkable_specs,
             nodes=candidate_nodes_for_right_side_of_join,
             metric_time_dimension_reference=self._metric_time_dimension_reference,
             time_spine_node=self._source_node_set.time_spine_node,
         )
+        print("nodes after:", candidate_nodes_for_right_side_of_join)
         logger.info(
             f"After removing unnecessary nodes, there are {len(candidate_nodes_for_right_side_of_join)} candidate "
             f"nodes for the right side of the join"
@@ -1259,6 +1264,7 @@ class DataflowPlanBuilder:
             filter_specs=metric_input_measure_spec.filter_specs,
             non_additive_dimension_spec=non_additive_dimension_spec,
         )
+        print("required extraneous:", required_linkable_specs, extraneous_linkable_specs)
 
         before_aggregation_time_spine_join_description = (
             metric_input_measure_spec.before_aggregation_time_spine_join_description

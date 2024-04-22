@@ -13,7 +13,7 @@ from tests.query_rendering.compare_rendered_query import convert_and_check
 
 
 @pytest.mark.sql_engine_snapshot
-def test_query_with_simple_metric_in_where_filter(
+def test_query_with_simple_metric_in_where_filter_single_hop(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -37,6 +37,58 @@ def test_query_with_simple_metric_in_where_filter(
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_query_with_simple_metric_in_where_filter_multi_hop(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    sql_client: SqlClient,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    query_parser: MetricFlowQueryParser,
+) -> None:
+    """Tests a query with a simple metric in the query-level where filter."""
+    # TODO: group by reso needs to be able to parse user__company
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("listings",),
+        where_constraint=PydanticWhereFilter(
+            where_sql_template="{{ Metric('instant_bookings', ['company']) }} > 2",
+        ),
+    )
+    dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
+
+    convert_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+# @pytest.mark.sql_engine_snapshot
+# def test_testy_test(
+#     request: FixtureRequest,
+#     mf_test_configuration: MetricFlowTestConfiguration,
+#     dataflow_plan_builder: DataflowPlanBuilder,
+#     sql_client: SqlClient,
+#     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+#     query_parser: MetricFlowQueryParser,
+# ) -> None:
+#     """Tests a query with a simple metric in the query-level where filter."""
+#     query_spec = query_parser.parse_and_validate_query(
+#         metric_names=("instant_bookings",), group_by_names=("listing__user__company",)
+#     )
+#     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
+
+#     convert_and_check(
+#         request=request,
+#         mf_test_configuration=mf_test_configuration,
+#         dataflow_to_sql_converter=dataflow_to_sql_converter,
+#         sql_client=sql_client,
+#         node=dataflow_plan.sink_output_nodes[0].parent_node,
+#     )
 
 
 @pytest.mark.sql_engine_snapshot
@@ -227,6 +279,3 @@ def test_distinct_values_query_with_metric_filter(
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
     )
-
-
-# TODO: tests for filters with conversion metrics
