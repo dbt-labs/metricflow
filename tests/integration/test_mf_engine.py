@@ -14,5 +14,5 @@ def test_list_dimensions(  # noqa: D103
         request=request,
         mf_test_configuration=mf_test_configuration,
         obj_id="result0",
-        obj=sorted(it_helpers.mf_engine.list_dimensions(), key=lambda dim: dim.qualified_name),
+        obj=sorted([dim.qualified_name for dim in it_helpers.mf_engine.list_dimensions()]),
     )
