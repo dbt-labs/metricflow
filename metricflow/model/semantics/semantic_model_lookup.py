@@ -284,6 +284,10 @@ class SemanticModelLookup:
         """Return all semantic models associated with an entity reference."""
         return set(self._entity_index.get(entity_reference, []))
 
+    def get_semantic_models_for_dimension(self, dimension_reference: DimensionReference) -> Set[SemanticModel]:
+        """Return all semantic models associated with a dimension reference."""
+        return set(self._dimension_index.get(dimension_reference, []))
+
     @staticmethod
     def get_entity_from_semantic_model(
         semantic_model: SemanticModel, entity_reference: LinkableElementReference
