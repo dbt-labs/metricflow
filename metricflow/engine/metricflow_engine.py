@@ -612,7 +612,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                                 semantic_model=semantic_model,
                                 dimension_reference=linkable_dimension.reference,
                             ),
-                            path_key=path_key,
+                            entity_links=path_key.entity_links,
                         )
                     )
         return sorted(dimensions, key=lambda dimension: dimension.qualified_name)
