@@ -24,13 +24,13 @@ import pytest
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.semantics.time.time_granularity import TimeGranularity
 from metricflow.sql.sql_exprs import (
     SqlCastToTimestampExpression,
     SqlDateTruncExpression,
     SqlExtractExpression,
     SqlStringLiteralExpression,
 )
-from metricflow.time.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
 

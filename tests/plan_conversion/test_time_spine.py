@@ -5,7 +5,7 @@ from pandas import DataFrame
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.time.time_constants import ISO8601_PYTHON_TS_FORMAT
+from metricflow.semantics.time.time_constants import ISO8601_PYTHON_TS_FORMAT
 
 
 def test_date_spine_date_range(  # noqa: D103

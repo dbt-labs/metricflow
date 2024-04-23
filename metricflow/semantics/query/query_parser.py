@@ -60,7 +60,7 @@ from metricflow.semantics.specs.spec_classes import (
     MetricFlowQuerySpec,
     TimeDimensionSpec,
 )
-from metricflow.time.time_granularity import (
+from metricflow.semantics.time.time_granularity import (
     adjust_to_end_of_period,
     adjust_to_start_of_period,
     is_period_end,

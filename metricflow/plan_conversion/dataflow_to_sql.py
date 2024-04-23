@@ -100,6 +100,7 @@ from metricflow.semantics.specs.spec_classes import (
     MetricSpec,
     TimeDimensionSpec,
 )
+from metricflow.semantics.time.time_constants import ISO8601_PYTHON_FORMAT
 from metricflow.sql.optimizer.optimization_levels import (
     SqlQueryOptimizationLevel,
     SqlQueryOptimizerConfiguration,
@@ -137,7 +138,6 @@ from metricflow.sql.sql_plan import (
     SqlSelectStatementNode,
     SqlTableFromClauseNode,
 )
-from metricflow.time.time_constants import ISO8601_PYTHON_FORMAT
 
 logger = logging.getLogger(__name__)
 

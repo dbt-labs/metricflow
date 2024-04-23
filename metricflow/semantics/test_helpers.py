@@ -11,7 +11,7 @@ from typing import Callable, List, Optional, Tuple
 
 import _pytest.fixtures
 
-from metricflow.time.time_source import TimeSource
+from metricflow.semantics.time.time_source import TimeSource
 
 logger = logging.getLogger(__name__)
 
