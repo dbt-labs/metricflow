@@ -4,12 +4,12 @@ import logging
 
 from typing_extensions import override
 
+from metricflow.execution.convert_to_execution_plan import ConvertToExecutionPlanResult
 from metricflow.execution.execution_plan import (
     ExecutionPlan,
     SelectSqlQueryToDataFrameTask,
     SelectSqlQueryToTableTask,
 )
-from metricflow.plan_conversion.convert_to_execution_plan import ConvertToExecutionPlanResult
 from metricflow.plan_conversion.convert_to_sql_plan import ConvertToSqlPlanResult
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient

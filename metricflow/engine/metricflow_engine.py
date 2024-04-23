@@ -16,15 +16,15 @@ from dbt_semantic_interfaces.type_enums import DimensionType
 from metricflow.engine.models import Dimension, Entity, Measure, Metric, SavedQuery
 from metricflow.engine.time_source import ServerTimeSource
 from metricflow.errors.error_classes import ExecutionException
+from metricflow.execution.convert_to_execution_plan import ConvertToExecutionPlanResult
+from metricflow.execution.dataflow_to_execution import (
+    DataflowToExecutionPlanConverter,
+)
 from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
 from metricflow.execution.executor import SequentialPlanExecutor
 from metricflow.mf_logging.formatting import indent
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
-from metricflow.plan_conversion.convert_to_execution_plan import ConvertToExecutionPlanResult
-from metricflow.plan_conversion.dataflow_to_execution import (
-    DataflowToExecutionPlanConverter,
-)
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.query_parameter import GroupByParameter, MetricQueryParameter, OrderByQueryParameter
 from metricflow.protocols.sql_client import SqlClient
