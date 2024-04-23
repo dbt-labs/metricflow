@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import pytest
 
-from metricflow.errors.error_classes import InvalidQuerySyntax
 from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import FilterSpecResolutionLookUp
+from metricflow.semantics.errors.error_classes import InvalidQuerySyntax
 from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow.semantics.specs.rendered_spec_tracker import RenderedSpecTracker
 from metricflow.semantics.specs.where_filter_entity import WhereFilterEntity

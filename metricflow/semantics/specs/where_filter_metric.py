@@ -10,12 +10,12 @@ from dbt_semantic_interfaces.protocols.query_interface import QueryInterfaceMetr
 from dbt_semantic_interfaces.references import EntityReference, LinkableElementReference, MetricReference
 from typing_extensions import override
 
-from metricflow.errors.error_classes import InvalidQuerySyntax
 from metricflow.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
     FilterSpecResolutionLookUp,
     ResolvedSpecLookUpKey,
 )
+from metricflow.semantics.errors.error_classes import InvalidQuerySyntax
 from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow.semantics.specs.rendered_spec_tracker import RenderedSpecTracker
 

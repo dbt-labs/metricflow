@@ -15,7 +15,6 @@ from dbt_semantic_interfaces.type_enums import DimensionType
 
 from metricflow.engine.models import Dimension, Entity, Measure, Metric, SavedQuery
 from metricflow.engine.time_source import ServerTimeSource
-from metricflow.errors.error_classes import ExecutionException
 from metricflow.execution.convert_to_execution_plan import ConvertToExecutionPlanResult
 from metricflow.execution.dataflow_to_execution import (
     DataflowToExecutionPlanConverter,
@@ -40,6 +39,7 @@ from metricflow.semantics.dataflow.optimizer.source_scan.source_scan_optimizer i
 from metricflow.semantics.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.semantics.dataset.dataset_classes import DataSet
 from metricflow.semantics.dataset.semantic_model_adapter import SemanticModelDataSet
+from metricflow.semantics.errors.error_classes import ExecutionException
 from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.semantics.model.semantics.linkable_element import (

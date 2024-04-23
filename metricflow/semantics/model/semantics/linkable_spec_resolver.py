@@ -19,9 +19,9 @@ from dbt_semantic_interfaces.type_enums import MetricType
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
-from metricflow.errors.error_classes import UnknownMetricLinkingError
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.semantics.dataset.dataset_classes import DataSet
+from metricflow.semantics.errors.error_classes import UnknownMetricLinkingError
 from metricflow.semantics.model.semantics.linkable_element import (
     ElementPathKey,
     LinkableDimension,
