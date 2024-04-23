@@ -10,7 +10,7 @@ from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 
-from metricflow.specs.patterns.entity_link_pattern import (
+from metricflow.semantics.specs.patterns.entity_link_pattern import (
     EntityLinkPattern,
     EntityLinkPatternParameterSet,
     ParameterSetField,

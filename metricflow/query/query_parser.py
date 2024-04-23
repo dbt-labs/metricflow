@@ -52,8 +52,8 @@ from metricflow.query.resolver_inputs.query_resolver_inputs import (
     ResolverInputForQueryLevelWhereFilterIntersection,
 )
 from metricflow.semantics.specs.patterns.base_time_grain import BaseTimeGrainPattern
-from metricflow.specs.patterns.metric_time_pattern import MetricTimePattern
-from metricflow.specs.patterns.none_date_part import NoneDatePartPattern
+from metricflow.semantics.specs.patterns.metric_time_pattern import MetricTimePattern
+from metricflow.semantics.specs.patterns.none_date_part import NoneDatePartPattern
 from metricflow.specs.spec_classes import (
     InstanceSpec,
     InstanceSpecSet,

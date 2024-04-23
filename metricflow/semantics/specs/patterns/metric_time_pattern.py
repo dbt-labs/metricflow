@@ -5,7 +5,7 @@ from typing import Sequence
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from typing_extensions import override
 
-from metricflow.specs.patterns.spec_pattern import SpecPattern
+from metricflow.semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow.specs.spec_classes import (
     InstanceSpec,
     InstanceSpecSet,

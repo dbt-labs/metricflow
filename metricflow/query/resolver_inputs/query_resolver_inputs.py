@@ -18,8 +18,8 @@ from metricflow.naming.naming_scheme import QueryItemNamingScheme
 from metricflow.protocols.query_parameter import GroupByParameter, MetricQueryParameter, OrderByQueryParameter
 from metricflow.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow.query.resolver_inputs.base_resolver_inputs import InputPatternDescription, MetricFlowQueryResolverInput
-from metricflow.specs.patterns.metric_pattern import MetricSpecPattern
-from metricflow.specs.patterns.spec_pattern import SpecPattern
+from metricflow.semantics.specs.patterns.metric_pattern import MetricSpecPattern
+from metricflow.semantics.specs.patterns.spec_pattern import SpecPattern
 
 
 @dataclass(frozen=True)

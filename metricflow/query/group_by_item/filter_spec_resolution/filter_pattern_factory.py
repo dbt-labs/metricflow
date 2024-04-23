@@ -10,8 +10,8 @@ from dbt_semantic_interfaces.call_parameter_sets import (
 )
 from typing_extensions import override
 
-from metricflow.specs.patterns.spec_pattern import SpecPattern
-from metricflow.specs.patterns.typed_patterns import (
+from metricflow.semantics.specs.patterns.spec_pattern import SpecPattern
+from metricflow.semantics.specs.patterns.typed_patterns import (
     DimensionPattern,
     EntityPattern,
     GroupByMetricPattern,

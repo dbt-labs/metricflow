@@ -23,7 +23,7 @@ from metricflow.query.resolver_inputs.query_resolver_inputs import (
     ResolverInputForMetric,
     ResolverInputForOrderByItem,
 )
-from metricflow.specs.patterns.entity_link_pattern import (
+from metricflow.semantics.specs.patterns.entity_link_pattern import (
     EntityLinkPattern,
     EntityLinkPatternParameterSet,
     ParameterSetField,

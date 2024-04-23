@@ -19,7 +19,7 @@ from dbt_semantic_interfaces.references import (
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 
-from metricflow.specs.patterns.typed_patterns import (
+from metricflow.semantics.specs.patterns.typed_patterns import (
     DimensionPattern,
     EntityPattern,
     GroupByMetricPattern,

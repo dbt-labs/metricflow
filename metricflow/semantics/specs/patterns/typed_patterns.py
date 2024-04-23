@@ -12,7 +12,7 @@ from dbt_semantic_interfaces.call_parameter_sets import (
 from dbt_semantic_interfaces.references import EntityReference
 from typing_extensions import override
 
-from metricflow.specs.patterns.entity_link_pattern import (
+from metricflow.semantics.specs.patterns.entity_link_pattern import (
     EntityLinkPattern,
     EntityLinkPatternParameterSet,
     ParameterSetField,

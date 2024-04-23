@@ -14,13 +14,13 @@ from typing_extensions import override
 
 from metricflow.naming.naming_scheme import QueryItemNamingScheme
 from metricflow.naming.object_builder_str import ObjectBuilderNameConverter
-from metricflow.specs.patterns.entity_link_pattern import (
+from metricflow.semantics.specs.patterns.entity_link_pattern import (
     EntityLinkPattern,
     EntityLinkPatternParameterSet,
     ParameterSetField,
 )
-from metricflow.specs.patterns.spec_pattern import SpecPattern
-from metricflow.specs.patterns.typed_patterns import DimensionPattern, TimeDimensionPattern
+from metricflow.semantics.specs.patterns.spec_pattern import SpecPattern
+from metricflow.semantics.specs.patterns.typed_patterns import DimensionPattern, TimeDimensionPattern
 from metricflow.specs.spec_classes import (
     InstanceSpec,
 )

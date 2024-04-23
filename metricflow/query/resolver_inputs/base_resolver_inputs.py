@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from metricflow.naming.naming_scheme import QueryItemNamingScheme
-from metricflow.specs.patterns.spec_pattern import SpecPattern
+from metricflow.semantics.specs.patterns.spec_pattern import SpecPattern
 
 
 @dataclass(frozen=True)

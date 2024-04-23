@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Optional
 
-from metricflow.specs.patterns.spec_pattern import SpecPattern
+from metricflow.semantics.specs.patterns.spec_pattern import SpecPattern
 
 if TYPE_CHECKING:
     from metricflow.specs.spec_classes import InstanceSpec

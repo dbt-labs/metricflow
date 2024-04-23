@@ -21,7 +21,7 @@ from metricflow.query.group_by_item.filter_spec_resolution.filter_location impor
 from metricflow.query.group_by_item.path_prefixable import PathPrefixable
 from metricflow.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow.query.issues.issues_base import MetricFlowQueryResolutionIssueSet
-from metricflow.specs.patterns.spec_pattern import SpecPattern
+from metricflow.semantics.specs.patterns.spec_pattern import SpecPattern
 
 if TYPE_CHECKING:
     from metricflow.specs.spec_classes import LinkableInstanceSpec
