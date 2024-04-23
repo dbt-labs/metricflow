@@ -6,9 +6,9 @@ import threading
 import time
 from typing import List
 
-from metricflow.dag.dag_to_text import MetricFlowDagTextFormatter
-from metricflow.dag.mf_dag import DagId
 from metricflow.mf_logging.formatting import indent
+from metricflow.semantics.dag.dag_to_text import MetricFlowDagTextFormatter
+from metricflow.semantics.dag.mf_dag import DagId
 from metricflow.sql.sql_exprs import (
     SqlStringExpression,
 )

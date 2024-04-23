@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 import pytest
 
-from metricflow.dag.sequential_id import SequentialIdGenerator
+from metricflow.semantics.dag.sequential_id import SequentialIdGenerator
 
 
 @dataclass(frozen=True)

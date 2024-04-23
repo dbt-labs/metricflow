@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import Union
 
-from metricflow.dag.id_prefix import StaticIdPrefix
-from metricflow.dag.mf_dag import DagId, MetricFlowDag
 from metricflow.query.group_by_item.resolution_dag.resolution_nodes.base_node import GroupByItemResolutionNode
 from metricflow.query.group_by_item.resolution_dag.resolution_nodes.metric_resolution_node import (
     MetricGroupByItemResolutionNode,
@@ -11,6 +9,8 @@ from metricflow.query.group_by_item.resolution_dag.resolution_nodes.metric_resol
 from metricflow.query.group_by_item.resolution_dag.resolution_nodes.query_resolution_node import (
     QueryGroupByItemResolutionNode,
 )
+from metricflow.semantics.dag.id_prefix import StaticIdPrefix
+from metricflow.semantics.dag.mf_dag import DagId, MetricFlowDag
 
 ResolutionDagSinkNode = Union[QueryGroupByItemResolutionNode, MetricGroupByItemResolutionNode]
 

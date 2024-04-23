@@ -7,8 +7,8 @@ import typing
 from abc import ABC, abstractmethod
 from typing import Generic, Optional, Sequence, Type, TypeVar
 
-from metricflow.dag.id_prefix import StaticIdPrefix
-from metricflow.dag.mf_dag import DagId, DagNode, MetricFlowDag, NodeId
+from metricflow.semantics.dag.id_prefix import StaticIdPrefix
+from metricflow.semantics.dag.mf_dag import DagId, DagNode, MetricFlowDag, NodeId
 from metricflow.visitor import Visitable, VisitorOutputT
 
 if typing.TYPE_CHECKING:

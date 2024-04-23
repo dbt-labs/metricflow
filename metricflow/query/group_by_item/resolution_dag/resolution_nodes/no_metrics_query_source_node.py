@@ -4,7 +4,6 @@ from typing import Sequence
 
 from typing_extensions import override
 
-from metricflow.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow.query.group_by_item.resolution_dag.resolution_nodes.base_node import (
     GroupByItemResolutionNode,
     GroupByItemResolutionNodeVisitor,
@@ -12,6 +11,7 @@ from metricflow.query.group_by_item.resolution_dag.resolution_nodes.base_node im
 from metricflow.query.group_by_item.resolution_dag.resolution_nodes.metric_resolution_node import (
     MetricGroupByItemResolutionNode,
 )
+from metricflow.semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow.visitor import VisitorOutputT
 
 

@@ -6,7 +6,7 @@ from typing import Dict
 
 from typing_extensions import override
 
-from metricflow.dag.id_prefix import IdPrefix
+from metricflow.semantics.dag.id_prefix import IdPrefix
 
 
 @dataclass(frozen=True)

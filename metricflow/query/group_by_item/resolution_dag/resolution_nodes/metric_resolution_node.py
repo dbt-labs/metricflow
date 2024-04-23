@@ -5,8 +5,6 @@ from typing import Optional, Sequence, Union
 from dbt_semantic_interfaces.references import MetricReference
 from typing_extensions import Self, override
 
-from metricflow.dag.id_prefix import IdPrefix, StaticIdPrefix
-from metricflow.dag.mf_dag import DisplayedProperty
 from metricflow.query.group_by_item.resolution_dag.input_metric_location import InputMetricDefinitionLocation
 from metricflow.query.group_by_item.resolution_dag.resolution_nodes.base_node import (
     GroupByItemResolutionNode,
@@ -15,6 +13,8 @@ from metricflow.query.group_by_item.resolution_dag.resolution_nodes.base_node im
 from metricflow.query.group_by_item.resolution_dag.resolution_nodes.measure_source_node import (
     MeasureGroupByItemSourceNode,
 )
+from metricflow.semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
+from metricflow.semantics.dag.mf_dag import DisplayedProperty
 from metricflow.visitor import VisitorOutputT
 
 

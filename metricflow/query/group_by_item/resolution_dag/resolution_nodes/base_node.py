@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Generic, Sequence
 
-from metricflow.dag.mf_dag import DagNode, NodeId
+from metricflow.semantics.dag.mf_dag import DagNode, NodeId
 from metricflow.visitor import Visitable, VisitorOutputT
 
 if TYPE_CHECKING:

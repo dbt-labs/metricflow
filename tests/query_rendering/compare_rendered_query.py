@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from _pytest.fixtures import FixtureRequest
 
-from metricflow.dag.mf_dag import DagId
 from metricflow.dataflow.dataflow_plan import BaseOutput
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.semantics.dag.mf_dag import DagId
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from tests.dataflow_plan_to_svg import display_graph_if_requested
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration

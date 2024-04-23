@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import Sequence
 
-from metricflow.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow.dataflow.dataflow_plan import (
     BaseOutput,
     DataflowPlanNode,
@@ -10,6 +9,7 @@ from metricflow.dataflow.dataflow_plan import (
     SinkNodeVisitor,
     SinkOutput,
 )
+from metricflow.semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow.visitor import VisitorOutputT
 
 

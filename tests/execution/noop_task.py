@@ -4,13 +4,13 @@ import logging
 import time
 from typing import Optional, Sequence
 
-from metricflow.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow.execution.execution_plan import (
     ExecutionPlanTask,
     SqlQuery,
     TaskExecutionError,
     TaskExecutionResult,
 )
+from metricflow.semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 
 logger = logging.getLogger(__name__)
 

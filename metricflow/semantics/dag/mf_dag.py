@@ -11,9 +11,9 @@ from typing import Any, Generic, Sequence, TypeVar
 
 import jinja2
 
-from metricflow.dag.dag_to_text import MetricFlowDagTextFormatter
-from metricflow.dag.id_prefix import IdPrefix
-from metricflow.dag.sequential_id import SequentialIdGenerator
+from metricflow.semantics.dag.dag_to_text import MetricFlowDagTextFormatter
+from metricflow.semantics.dag.id_prefix import IdPrefix
+from metricflow.semantics.dag.sequential_id import SequentialIdGenerator
 from metricflow.visitor import VisitorOutputT
 
 logger = logging.getLogger(__name__)

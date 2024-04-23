@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from metricflow.dag.mf_dag import DagId
 from metricflow.execution.execution_plan import ExecutionPlan
 from metricflow.execution.executor import SequentialPlanExecutor
+from metricflow.semantics.dag.mf_dag import DagId
 from tests.execution.noop_task import NoOpExecutionPlanTask
 
 

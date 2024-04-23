@@ -5,8 +5,6 @@ from typing import Mapping
 import pytest
 from _pytest.fixtures import FixtureRequest
 
-from metricflow.dag.id_prefix import StaticIdPrefix
-from metricflow.dag.mf_dag import DagId
 from metricflow.dataflow.dataflow_plan import (
     BaseOutput,
     DataflowPlan,
@@ -17,6 +15,8 @@ from metricflow.dataflow.optimizer.source_scan.cm_branch_combiner import (
     ComputeMetricsBranchCombiner,
     ComputeMetricsBranchCombinerResult,
 )
+from metricflow.semantics.dag.id_prefix import StaticIdPrefix
+from metricflow.semantics.dag.mf_dag import DagId
 from metricflow.semantics.specs.spec_classes import InstanceSpecSet, MeasureSpec
 from tests.dataflow_plan_to_svg import display_graph_if_requested
 from tests.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup

@@ -13,9 +13,6 @@ from dbt_semantic_interfaces.type_enums.conversion_calculation_type import Conve
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 
 from metricflow.aggregation_properties import AggregationState
-from metricflow.dag.id_prefix import StaticIdPrefix
-from metricflow.dag.mf_dag import DagId
-from metricflow.dag.sequential_id import SequentialIdGenerator
 from metricflow.dataflow.dataflow_plan import (
     BaseOutput,
     DataflowPlanNode,
@@ -85,6 +82,9 @@ from metricflow.plan_conversion.sql_join_builder import (
 )
 from metricflow.plan_conversion.time_spine import TIME_SPINE_DATA_SET_DESCRIPTION, TimeSpineSource
 from metricflow.protocols.sql_client import SqlEngine
+from metricflow.semantics.dag.id_prefix import StaticIdPrefix
+from metricflow.semantics.dag.mf_dag import DagId
+from metricflow.semantics.dag.sequential_id import SequentialIdGenerator
 from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.semantics.specs.column_assoc import (

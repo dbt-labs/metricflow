@@ -15,8 +15,8 @@ from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
-from metricflow.dag.id_prefix import IdPrefix, StaticIdPrefix
-from metricflow.dag.mf_dag import DagNode, DisplayedProperty, NodeId
+from metricflow.semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
+from metricflow.semantics.dag.mf_dag import DagNode, DisplayedProperty, NodeId
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.visitor import Visitable, VisitorOutputT
 

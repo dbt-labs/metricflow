@@ -7,11 +7,11 @@ from typing import Any, Callable, Optional, Tuple, TypeVar
 import tabulate
 from _pytest.fixtures import FixtureRequest
 
-from metricflow.dag.mf_dag import MetricFlowDag
 from metricflow.dataflow.dataflow_plan import DataflowPlan
 from metricflow.execution.execution_plan import ExecutionPlan
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
+from metricflow.semantics.dag.mf_dag import MetricFlowDag
 from metricflow.semantics.model.semantics.linkable_spec_resolver import LinkableElementSet
 from metricflow.semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow.semantics.specs.spec_classes import InstanceSpecSet, LinkableSpecSet

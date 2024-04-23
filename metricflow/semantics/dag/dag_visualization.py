@@ -6,8 +6,8 @@ from typing import TypeVar
 
 import graphviz
 
-from metricflow.dag.mf_dag import DagNode, MetricFlowDag
 from metricflow.random_id import random_id
+from metricflow.semantics.dag.mf_dag import DagNode, MetricFlowDag
 
 logger = logging.getLogger(__name__)
 DagNodeT = TypeVar("DagNodeT", bound=DagNode)

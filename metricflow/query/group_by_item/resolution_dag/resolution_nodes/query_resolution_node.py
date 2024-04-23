@@ -6,8 +6,6 @@ from dbt_semantic_interfaces.protocols import WhereFilterIntersection
 from dbt_semantic_interfaces.references import MetricReference
 from typing_extensions import override
 
-from metricflow.dag.id_prefix import IdPrefix, StaticIdPrefix
-from metricflow.dag.mf_dag import DisplayedProperty
 from metricflow.query.group_by_item.resolution_dag.resolution_nodes.base_node import (
     GroupByItemResolutionNode,
     GroupByItemResolutionNodeVisitor,
@@ -18,6 +16,8 @@ from metricflow.query.group_by_item.resolution_dag.resolution_nodes.metric_resol
 from metricflow.query.group_by_item.resolution_dag.resolution_nodes.no_metrics_query_source_node import (
     NoMetricsGroupByItemSourceNode,
 )
+from metricflow.semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
+from metricflow.semantics.dag.mf_dag import DisplayedProperty
 from metricflow.visitor import VisitorOutputT
 
 

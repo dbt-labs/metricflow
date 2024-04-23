@@ -4,7 +4,7 @@ import os
 
 from _pytest.fixtures import FixtureRequest
 
-from metricflow.dag.dag_visualization import DagGraphT, render_via_graphviz
+from metricflow.semantics.dag.dag_visualization import DagGraphT, render_via_graphviz
 from metricflow.test_helpers import snapshot_path_prefix
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 
