@@ -12,7 +12,7 @@ from metricflow.instances import (
 from metricflow.semantics.dataset.dataset_classes import DataSet
 from metricflow.semantics.specs.column_assoc import ColumnAssociation
 from metricflow.semantics.specs.spec_classes import DimensionSpec, EntitySpec, TimeDimensionSpec
-from metricflow.sql.sql_plan import (
+from metricflow.semantics.sql.sql_plan import (
     SqlQueryPlanNode,
     SqlSelectStatementNode,
 )

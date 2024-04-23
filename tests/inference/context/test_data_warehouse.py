@@ -6,8 +6,8 @@ from metricflow.inference.context.data_warehouse import (
     InferenceColumnType,
     TableProperties,
 )
-from metricflow.sql.sql_column import SqlColumn
-from metricflow.sql.sql_table import SqlTable
+from metricflow.semantics.sql.sql_column import SqlColumn
+from metricflow.semantics.sql.sql_table import SqlTable
 
 
 def test_column_properties_is_empty() -> None:

@@ -6,7 +6,7 @@ from typing import Dict, List, TextIO
 
 from metricflow.inference.models import InferenceResult
 from metricflow.inference.renderer.base import InferenceRenderer
-from metricflow.sql.sql_table import SqlTable
+from metricflow.semantics.sql.sql_table import SqlTable
 
 
 class StreamInferenceRenderer(InferenceRenderer):

@@ -14,15 +14,15 @@ from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.random_id import random_id
 from metricflow.semantics.errors.error_classes import SqlBindParametersNotSupportedError
 from metricflow.semantics.protocols.sql_client import SqlEngine
-from metricflow.sql.render.big_query import BigQuerySqlQueryPlanRenderer
-from metricflow.sql.render.databricks import DatabricksSqlQueryPlanRenderer
-from metricflow.sql.render.duckdb_renderer import DuckDbSqlQueryPlanRenderer
-from metricflow.sql.render.postgres import PostgresSQLSqlQueryPlanRenderer
-from metricflow.sql.render.redshift import RedshiftSqlQueryPlanRenderer
-from metricflow.sql.render.snowflake import SnowflakeSqlQueryPlanRenderer
-from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
-from metricflow.sql.render.trino import TrinoSqlQueryPlanRenderer
-from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from metricflow.semantics.sql.render.big_query import BigQuerySqlQueryPlanRenderer
+from metricflow.semantics.sql.render.databricks import DatabricksSqlQueryPlanRenderer
+from metricflow.semantics.sql.render.duckdb_renderer import DuckDbSqlQueryPlanRenderer
+from metricflow.semantics.sql.render.postgres import PostgresSQLSqlQueryPlanRenderer
+from metricflow.semantics.sql.render.redshift import RedshiftSqlQueryPlanRenderer
+from metricflow.semantics.sql.render.snowflake import SnowflakeSqlQueryPlanRenderer
+from metricflow.semantics.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
+from metricflow.semantics.sql.render.trino import TrinoSqlQueryPlanRenderer
+from metricflow.semantics.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql_request.sql_request_attributes import SqlRequestId
 
 logger = logging.getLogger(__name__)

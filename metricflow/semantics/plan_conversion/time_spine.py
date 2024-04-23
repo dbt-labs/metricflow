@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
-from metricflow.sql.sql_table import SqlTable
+from metricflow.semantics.sql.sql_table import SqlTable
 
 logger = logging.getLogger(__name__)
 

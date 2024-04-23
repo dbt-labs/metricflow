@@ -46,7 +46,7 @@ from metricflow.semantics.specs.spec_classes import (
     MetricInputMeasureSpec,
     TimeDimensionSpec,
 )
-from metricflow.sql.sql_exprs import (
+from metricflow.semantics.sql.sql_exprs import (
     SqlAggregateFunctionExpression,
     SqlColumnReference,
     SqlColumnReferenceExpression,
@@ -55,7 +55,7 @@ from metricflow.sql.sql_exprs import (
     SqlFunctionExpression,
     SqlStringExpression,
 )
-from metricflow.sql.sql_plan import (
+from metricflow.semantics.sql.sql_plan import (
     SqlSelectColumn,
 )
 

@@ -53,8 +53,8 @@ from metricflow.semantics.query.query_parser import MetricFlowQueryParser
 from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow.semantics.specs.query_param_implementations import SavedQueryParameter
 from metricflow.semantics.specs.spec_classes import InstanceSpecSet, MetricFlowQuerySpec
-from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
-from metricflow.sql.sql_table import SqlTable
+from metricflow.semantics.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
+from metricflow.semantics.sql.sql_table import SqlTable
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
 from metricflow.time.time_source import TimeSource

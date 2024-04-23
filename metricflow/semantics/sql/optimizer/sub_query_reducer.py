@@ -3,9 +3,9 @@ from __future__ import annotations
 import logging
 from typing import List, Optional
 
-from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlQueryPlanOptimizer
-from metricflow.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpression
-from metricflow.sql.sql_plan import (
+from metricflow.semantics.sql.optimizer.sql_query_plan_optimizer import SqlQueryPlanOptimizer
+from metricflow.semantics.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpression
+from metricflow.semantics.sql.sql_plan import (
     SqlCreateTableAsNode,
     SqlJoinDescription,
     SqlOrderByDescription,

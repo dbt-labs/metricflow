@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 from metricflow.execution.execution_plan import ExecutionPlan
 from metricflow.semantics.plan_conversion.convert_to_sql_plan import ConvertToSqlPlanResult
-from metricflow.sql.render.sql_plan_renderer import SqlPlanRenderResult
+from metricflow.semantics.sql.render.sql_plan_renderer import SqlPlanRenderResult
 
 
 @dataclass(frozen=True)

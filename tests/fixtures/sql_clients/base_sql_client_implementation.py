@@ -13,8 +13,8 @@ from metricflow.random_id import random_id
 from metricflow.semantics.protocols.sql_client import (
     SqlClient,
 )
-from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.sql.sql_table import SqlTable
+from metricflow.semantics.sql.sql_bind_parameters import SqlBindParameters
+from metricflow.semantics.sql.sql_table import SqlTable
 from metricflow.sql_request.sql_request_attributes import SqlRequestId
 
 logger = logging.getLogger(__name__)

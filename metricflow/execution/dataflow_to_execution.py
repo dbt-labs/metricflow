@@ -20,7 +20,7 @@ from metricflow.semantics.dataflow.nodes.write_to_table import WriteToResultTabl
 from metricflow.semantics.plan_conversion.convert_to_sql_plan import ConvertToSqlPlanResult
 from metricflow.semantics.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.semantics.protocols.sql_client import SqlClient
-from metricflow.sql.render.sql_plan_renderer import SqlPlanRenderResult, SqlQueryPlanRenderer
+from metricflow.semantics.sql.render.sql_plan_renderer import SqlPlanRenderResult, SqlQueryPlanRenderer
 
 logger = logging.getLogger(__name__)
 

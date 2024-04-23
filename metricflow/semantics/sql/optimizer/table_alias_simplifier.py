@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import logging
 
-from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlQueryPlanOptimizer
-from metricflow.sql.sql_plan import (
+from metricflow.semantics.sql.optimizer.sql_query_plan_optimizer import SqlQueryPlanOptimizer
+from metricflow.semantics.sql.sql_plan import (
     SqlCreateTableAsNode,
     SqlJoinDescription,
     SqlOrderByDescription,

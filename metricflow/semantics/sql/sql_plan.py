@@ -12,8 +12,8 @@ from typing_extensions import override
 
 from metricflow.semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow.semantics.dag.mf_dag import DagId, DagNode, DisplayedProperty, MetricFlowDag, NodeId
-from metricflow.sql.sql_exprs import SqlExpressionNode
-from metricflow.sql.sql_table import SqlTable
+from metricflow.semantics.sql.sql_exprs import SqlExpressionNode
+from metricflow.semantics.sql.sql_table import SqlTable
 from metricflow.visitor import VisitorOutputT
 
 logger = logging.getLogger(__name__)

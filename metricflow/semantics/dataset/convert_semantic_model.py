@@ -39,7 +39,7 @@ from metricflow.semantics.specs.spec_classes import (
     EntitySpec,
     TimeDimensionSpec,
 )
-from metricflow.sql.sql_exprs import (
+from metricflow.semantics.sql.sql_exprs import (
     SqlColumnReference,
     SqlColumnReferenceExpression,
     SqlDateTruncExpression,
@@ -47,12 +47,12 @@ from metricflow.sql.sql_exprs import (
     SqlExtractExpression,
     SqlStringExpression,
 )
-from metricflow.sql.sql_plan import (
+from metricflow.semantics.sql.sql_plan import (
     SqlSelectColumn,
     SqlSelectStatementNode,
     SqlTableFromClauseNode,
 )
-from metricflow.sql.sql_table import SqlTable
+from metricflow.semantics.sql.sql_table import SqlTable
 
 logger = logging.getLogger(__name__)
 

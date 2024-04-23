@@ -9,8 +9,8 @@ from typing import Callable, ContextManager, Dict, Generic, Iterator, List, Opti
 
 from metricflow.inference.context.base import InferenceContext, InferenceContextProvider
 from metricflow.semantics.protocols.sql_client import SqlClient
-from metricflow.sql.sql_column import SqlColumn
-from metricflow.sql.sql_table import SqlTable
+from metricflow.semantics.sql.sql_column import SqlColumn
+from metricflow.semantics.sql.sql_table import SqlTable
 
 T = TypeVar("T", str, int, float, date, datetime)
 

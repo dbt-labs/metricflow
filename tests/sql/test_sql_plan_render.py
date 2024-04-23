@@ -7,7 +7,7 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 
 from metricflow.semantics.protocols.sql_client import SqlClient
-from metricflow.sql.sql_exprs import (
+from metricflow.semantics.sql.sql_exprs import (
     SqlAggregateFunctionExpression,
     SqlColumnReference,
     SqlColumnReferenceExpression,
@@ -16,7 +16,7 @@ from metricflow.sql.sql_exprs import (
     SqlFunction,
     SqlStringExpression,
 )
-from metricflow.sql.sql_plan import (
+from metricflow.semantics.sql.sql_plan import (
     SqlCreateTableAsNode,
     SqlJoinDescription,
     SqlJoinType,
@@ -25,7 +25,7 @@ from metricflow.sql.sql_plan import (
     SqlSelectStatementNode,
     SqlTableFromClauseNode,
 )
-from metricflow.sql.sql_table import SqlTable, SqlTableType
+from metricflow.semantics.sql.sql_table import SqlTable, SqlTableType
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.sql.compare_sql_plan import assert_rendered_sql_equal
 

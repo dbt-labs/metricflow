@@ -9,11 +9,16 @@ from typing import List
 from metricflow.mf_logging.formatting import indent
 from metricflow.semantics.dag.dag_to_text import MetricFlowDagTextFormatter
 from metricflow.semantics.dag.mf_dag import DagId
-from metricflow.sql.sql_exprs import (
+from metricflow.semantics.sql.sql_exprs import (
     SqlStringExpression,
 )
-from metricflow.sql.sql_plan import SqlQueryPlan, SqlSelectColumn, SqlSelectStatementNode, SqlTableFromClauseNode
-from metricflow.sql.sql_table import SqlTable
+from metricflow.semantics.sql.sql_plan import (
+    SqlQueryPlan,
+    SqlSelectColumn,
+    SqlSelectStatementNode,
+    SqlTableFromClauseNode,
+)
+from metricflow.semantics.sql.sql_table import SqlTable
 
 logger = logging.getLogger(__name__)
 

@@ -10,7 +10,7 @@ from metricflow.semantics.dataflow.dataflow_plan import (
     SinkNodeVisitor,
     SinkOutput,
 )
-from metricflow.sql.sql_table import SqlTable
+from metricflow.semantics.sql.sql_table import SqlTable
 from metricflow.visitor import VisitorOutputT
 
 

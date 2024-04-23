@@ -4,7 +4,7 @@ import logging
 from dataclasses import dataclass, field
 from typing import List, Tuple
 
-from metricflow.sql.sql_plan import SqlSelectColumn
+from metricflow.semantics.sql.sql_plan import SqlSelectColumn
 
 logger = logging.getLogger(__name__)
 

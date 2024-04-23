@@ -23,9 +23,14 @@ from metricflow.semantics.specs.spec_classes import (
     LinklessEntitySpec,
     MeasureSpec,
 )
-from metricflow.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpression
-from metricflow.sql.sql_plan import SqlJoinType, SqlSelectColumn, SqlSelectStatementNode, SqlTableFromClauseNode
-from metricflow.sql.sql_table import SqlTable
+from metricflow.semantics.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpression
+from metricflow.semantics.sql.sql_plan import (
+    SqlJoinType,
+    SqlSelectColumn,
+    SqlSelectStatementNode,
+    SqlTableFromClauseNode,
+)
+from metricflow.semantics.sql.sql_table import SqlTable
 from tests.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.snapshot_utils import assert_spec_set_snapshot_equal

@@ -22,7 +22,7 @@ from metricflow.semantics.plan_conversion.column_resolver import (
 from metricflow.semantics.protocols.query_parameter import DimensionOrEntityQueryParameter
 from metricflow.semantics.protocols.sql_client import SqlClient
 from metricflow.semantics.specs.query_param_implementations import DimensionOrEntityParameter, TimeDimensionParameter
-from metricflow.sql.sql_exprs import (
+from metricflow.semantics.sql.sql_exprs import (
     SqlCastToTimestampExpression,
     SqlColumnReference,
     SqlColumnReferenceExpression,

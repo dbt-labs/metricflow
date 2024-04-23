@@ -21,7 +21,7 @@ from metricflow.semantics.model.data_warehouse_model_validator import (
     DataWarehouseValidationTask,
 )
 from metricflow.semantics.protocols.sql_client import SqlClient
-from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from metricflow.semantics.sql.sql_bind_parameters import SqlBindParameters
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.snapshot_utils import (
     assert_sql_snapshot_equal,

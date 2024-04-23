@@ -10,7 +10,7 @@ from ruamel.yaml import YAML
 
 from metricflow.inference.models import InferenceResult, InferenceSignalType
 from metricflow.inference.renderer.config_file import ConfigFileRenderer
-from metricflow.sql.sql_column import SqlColumn
+from metricflow.semantics.sql.sql_column import SqlColumn
 
 yaml = YAML()
 

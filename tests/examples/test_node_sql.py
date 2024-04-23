@@ -17,8 +17,8 @@ from metricflow.semantics.plan_conversion.column_resolver import DunderColumnAss
 from metricflow.semantics.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.semantics.protocols.sql_client import SqlClient
 from metricflow.semantics.specs.spec_classes import InstanceSpecSet, TimeDimensionReference, TimeDimensionSpec
-from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
-from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
+from metricflow.semantics.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
+from metricflow.semantics.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 
 logger = logging.getLogger(__name__)
 

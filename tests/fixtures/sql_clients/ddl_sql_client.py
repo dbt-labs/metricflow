@@ -6,7 +6,7 @@ from typing import Optional, Protocol
 from pandas import DataFrame
 
 from metricflow.semantics.protocols.sql_client import SqlClient
-from metricflow.sql.sql_table import SqlTable
+from metricflow.semantics.sql.sql_table import SqlTable
 
 
 class SqlClientWithDDLMethods(SqlClient, Protocol):

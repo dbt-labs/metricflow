@@ -13,7 +13,7 @@ from metricflow.inference.context.data_warehouse import DataWarehouseInferenceCo
 from metricflow.inference.renderer.base import InferenceRenderer
 from metricflow.inference.rule.base import InferenceRule
 from metricflow.inference.solver.base import InferenceSolver
-from metricflow.sql.sql_table import SqlTable
+from metricflow.semantics.sql.sql_table import SqlTable
 
 logger = logging.getLogger(__file__)
 

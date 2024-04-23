@@ -8,7 +8,7 @@ from metricflow.semantics.dag.mf_dag import DagId
 from metricflow.semantics.dataflow.dataflow_plan import BaseOutput
 from metricflow.semantics.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.semantics.protocols.sql_client import SqlClient
-from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
+from metricflow.semantics.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from tests.dataflow_plan_to_svg import display_graph_if_requested
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.sql.compare_sql_plan import assert_rendered_sql_from_plan_equal

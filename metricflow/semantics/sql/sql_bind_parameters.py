@@ -8,7 +8,7 @@ from typing import Any, Mapping, Optional, Tuple
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 
 from metricflow.assert_one_arg import assert_exactly_one_arg_set
-from metricflow.sql.sql_column_type import SqlColumnType
+from metricflow.semantics.sql.sql_column_type import SqlColumnType
 
 
 @dataclass(frozen=True)

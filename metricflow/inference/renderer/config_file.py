@@ -11,7 +11,7 @@ from typing_extensions import NotRequired
 
 from metricflow.inference.models import InferenceResult, InferenceSignalType
 from metricflow.inference.renderer.base import InferenceRenderer
-from metricflow.sql.sql_table import SqlTable
+from metricflow.semantics.sql.sql_table import SqlTable
 
 yaml = YAML()
 

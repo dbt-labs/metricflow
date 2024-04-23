@@ -42,9 +42,9 @@ from metricflow.semantics.naming.linkable_spec_name import StructuredLinkableSpe
 from metricflow.semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
     FilterSpecResolutionLookUp,
 )
-from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.sql.sql_column_type import SqlColumnType
-from metricflow.sql.sql_plan import SqlJoinType
+from metricflow.semantics.sql.sql_bind_parameters import SqlBindParameters
+from metricflow.semantics.sql.sql_column_type import SqlColumnType
+from metricflow.semantics.sql.sql_plan import SqlJoinType
 from metricflow.visitor import VisitorOutputT
 
 if TYPE_CHECKING:

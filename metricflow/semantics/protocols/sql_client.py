@@ -6,8 +6,8 @@ from typing import Protocol
 
 from pandas import DataFrame
 
-from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
-from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from metricflow.semantics.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
+from metricflow.semantics.sql.sql_bind_parameters import SqlBindParameters
 
 
 class SqlEngine(Enum):

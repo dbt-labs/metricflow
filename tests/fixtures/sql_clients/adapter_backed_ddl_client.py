@@ -8,7 +8,7 @@ import pandas as pd
 
 from dbt_metricflow.cli.dbt_connectors.adapter_backed_client import AdapterBackedSqlClient
 from metricflow.semantics.protocols.sql_client import SqlEngine
-from metricflow.sql.sql_table import SqlTable
+from metricflow.semantics.sql.sql_table import SqlTable
 
 logger = logging.getLogger(__name__)
 

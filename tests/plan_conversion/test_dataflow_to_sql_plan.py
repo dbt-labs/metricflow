@@ -47,9 +47,9 @@ from metricflow.semantics.specs.spec_classes import (
     TimeDimensionSpec,
     WhereFilterSpec,
 )
-from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
-from metricflow.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.sql.sql_plan import SqlJoinType
+from metricflow.semantics.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
+from metricflow.semantics.sql.sql_bind_parameters import SqlBindParameters
+from metricflow.semantics.sql.sql_plan import SqlJoinType
 from tests.dataflow_plan_to_svg import display_graph_if_requested
 from tests.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
