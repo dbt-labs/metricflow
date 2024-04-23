@@ -7,9 +7,9 @@ from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
+from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.semantics.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow.semantics.specs.spec_classes import DimensionSpec, MetricFlowQuerySpec, TimeDimensionSpec
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration

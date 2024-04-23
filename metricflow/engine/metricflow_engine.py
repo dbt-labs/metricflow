@@ -13,6 +13,13 @@ from dbt_semantic_interfaces.implementations.filters.where_filter import Pydanti
 from dbt_semantic_interfaces.references import EntityReference, MeasureReference, MetricReference
 from dbt_semantic_interfaces.type_enums import DimensionType
 
+from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
+from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
+from metricflow.dataflow.builder.source_node import SourceNodeBuilder
+from metricflow.dataflow.dataflow_plan import DataflowPlan
+from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import (
+    SourceScanOptimizer,
+)
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
@@ -28,13 +35,6 @@ from metricflow.plan_conversion.column_resolver import DunderColumnAssociationRe
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.semantics.dag.sequential_id import SequentialIdGenerator
-from metricflow.semantics.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from metricflow.semantics.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
-from metricflow.semantics.dataflow.builder.source_node import SourceNodeBuilder
-from metricflow.semantics.dataflow.dataflow_plan import DataflowPlan
-from metricflow.semantics.dataflow.optimizer.source_scan.source_scan_optimizer import (
-    SourceScanOptimizer,
-)
 from metricflow.semantics.errors.error_classes import ExecutionException
 from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow.semantics.mf_logging.formatting import indent

@@ -9,8 +9,8 @@ from dbt_semantic_interfaces.implementations.filters.where_filter import Pydanti
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
+from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataset.dataset_classes import DataSet
-from metricflow.semantics.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.semantics.errors.error_classes import UnableToSatisfyQueryError
 from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow.semantics.query.query_parser import MetricFlowQueryParser

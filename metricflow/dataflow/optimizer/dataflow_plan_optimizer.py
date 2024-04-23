@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from metricflow.semantics.dataflow.dataflow_plan import DataflowPlan
+from metricflow.dataflow.dataflow_plan import DataflowPlan
 
 
 class DataflowPlanOptimizer(ABC):

@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from typing import Sequence, Union
 
-from metricflow.semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
-from metricflow.semantics.dataflow.dataflow_plan import (
+from metricflow.dataflow.dataflow_plan import (
     BaseOutput,
     ComputedMetricsOutput,
     DataflowPlanNode,
     DataflowPlanNodeVisitor,
 )
+from metricflow.semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow.semantics.visitor import VisitorOutputT
 
 
