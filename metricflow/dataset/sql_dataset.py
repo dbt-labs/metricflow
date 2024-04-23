@@ -11,7 +11,7 @@ from metricflow.instances import (
     InstanceSet,
 )
 from metricflow.specs.column_assoc import ColumnAssociation
-from metricflow.specs.specs import DimensionSpec, EntitySpec, TimeDimensionSpec
+from metricflow.specs.spec_classes import DimensionSpec, EntitySpec, TimeDimensionSpec
 from metricflow.sql.sql_plan import (
     SqlQueryPlanNode,
     SqlSelectStatementNode,

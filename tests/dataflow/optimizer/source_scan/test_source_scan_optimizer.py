@@ -35,7 +35,7 @@ from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import Sour
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.specs.specs import (
+from metricflow.specs.spec_classes import (
     DimensionSpec,
     EntityReference,
     MetricFlowQuerySpec,

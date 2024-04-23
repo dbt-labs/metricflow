@@ -11,7 +11,7 @@ from dbt_semantic_interfaces.references import MetricModelReference, SemanticMod
 
 from metricflow.aggregation_properties import AggregationState
 from metricflow.specs.column_assoc import ColumnAssociation
-from metricflow.specs.specs import (
+from metricflow.specs.spec_classes import (
     DimensionSpec,
     EntitySpec,
     GroupByMetricSpec,

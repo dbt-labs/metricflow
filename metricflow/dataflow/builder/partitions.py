@@ -6,7 +6,7 @@ from typing import List, Sequence, Tuple
 
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
-from metricflow.specs.specs import (
+from metricflow.specs.spec_classes import (
     DimensionSpec,
     InstanceSpecSet,
     PartitionSpecSet,

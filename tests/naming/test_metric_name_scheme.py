@@ -5,7 +5,7 @@ from typing import Sequence
 import pytest
 
 from metricflow.naming.metric_scheme import MetricNamingScheme
-from metricflow.specs.specs import DimensionSpec, InstanceSpec, MetricSpec
+from metricflow.specs.spec_classes import DimensionSpec, InstanceSpec, MetricSpec
 
 
 @pytest.fixture(scope="session")

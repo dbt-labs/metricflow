@@ -24,7 +24,7 @@ from metricflow.specs.query_param_implementations import (
     OrderByParameter,
     TimeDimensionParameter,
 )
-from metricflow.specs.specs import (
+from metricflow.specs.spec_classes import (
     DimensionSpec,
     EntitySpec,
     MetricSpec,

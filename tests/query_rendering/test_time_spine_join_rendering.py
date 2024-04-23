@@ -16,7 +16,7 @@ from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilde
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.specs.specs import (
+from metricflow.specs.spec_classes import (
     MetricFlowQuerySpec,
     MetricSpec,
 )

@@ -48,7 +48,7 @@ from metricflow.query.resolver_inputs.query_resolver_inputs import (
 from metricflow.query.suggestion_generator import QueryItemSuggestionGenerator
 from metricflow.query.validation_rules.query_validator import PostResolutionQueryValidator
 from metricflow.specs.patterns.match_list_pattern import MatchListSpecPattern
-from metricflow.specs.specs import (
+from metricflow.specs.spec_classes import (
     InstanceSpec,
     LinkableInstanceSpec,
     LinkableSpecSet,

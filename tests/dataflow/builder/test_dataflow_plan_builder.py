@@ -15,7 +15,7 @@ from metricflow.errors.error_classes import UnableToSatisfyQueryError
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.specs.specs import (
+from metricflow.specs.spec_classes import (
     DimensionSpec,
     EntityReference,
     MetricFlowQuerySpec,

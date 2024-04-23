@@ -19,7 +19,7 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.specs.column_assoc import ColumnAssociation, SingleColumnCorrelationKey
-from metricflow.specs.specs import (
+from metricflow.specs.spec_classes import (
     LinklessEntitySpec,
     MeasureSpec,
 )

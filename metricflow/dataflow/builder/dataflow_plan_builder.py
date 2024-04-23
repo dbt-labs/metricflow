@@ -64,7 +64,7 @@ from metricflow.plan_conversion.node_processor import PreJoinNodeProcessor
 from metricflow.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import FilterSpecResolutionLookUp
 from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.specs.specs import (
+from metricflow.specs.spec_classes import (
     ConstantPropertySpec,
     CumulativeMeasureDescription,
     EntitySpec,

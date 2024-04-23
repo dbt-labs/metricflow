@@ -41,7 +41,7 @@ from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
-from metricflow.specs.specs import InstanceSpecSet, LinkableInstanceSpec, LinkableSpecSet, LinklessEntitySpec
+from metricflow.specs.spec_classes import InstanceSpecSet, LinkableInstanceSpec, LinkableSpecSet, LinklessEntitySpec
 from metricflow.sql.sql_plan import SqlJoinType
 
 logger = logging.getLogger(__name__)

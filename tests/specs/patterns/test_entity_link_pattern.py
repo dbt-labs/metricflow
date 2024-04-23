@@ -15,7 +15,13 @@ from metricflow.specs.patterns.entity_link_pattern import (
     EntityLinkPatternParameterSet,
     ParameterSetField,
 )
-from metricflow.specs.specs import DimensionSpec, EntitySpec, GroupByMetricSpec, LinkableInstanceSpec, TimeDimensionSpec
+from metricflow.specs.spec_classes import (
+    DimensionSpec,
+    EntitySpec,
+    GroupByMetricSpec,
+    LinkableInstanceSpec,
+    TimeDimensionSpec,
+)
 from tests.time.metric_time_dimension import MTD_SPEC_MONTH, MTD_SPEC_WEEK, MTD_SPEC_YEAR
 
 logger = logging.getLogger(__name__)

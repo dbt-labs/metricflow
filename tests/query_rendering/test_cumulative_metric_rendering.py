@@ -17,7 +17,7 @@ from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanCon
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.specs.specs import EntityReference, MetricFlowQuerySpec, MetricSpec, TimeDimensionSpec
+from metricflow.specs.spec_classes import EntityReference, MetricFlowQuerySpec, MetricSpec, TimeDimensionSpec
 from tests.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.query_rendering.compare_rendered_query import convert_and_check

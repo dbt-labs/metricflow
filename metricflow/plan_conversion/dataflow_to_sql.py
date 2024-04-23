@@ -88,7 +88,7 @@ from metricflow.plan_conversion.sql_join_builder import (
 from metricflow.plan_conversion.time_spine import TIME_SPINE_DATA_SET_DESCRIPTION, TimeSpineSource
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.specs.column_assoc import ColumnAssociation, ColumnAssociationResolver, SingleColumnCorrelationKey
-from metricflow.specs.specs import (
+from metricflow.specs.spec_classes import (
     GroupByMetricSpec,
     InstanceSpecSet,
     MeasureSpec,

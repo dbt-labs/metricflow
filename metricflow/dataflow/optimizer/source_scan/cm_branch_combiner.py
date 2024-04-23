@@ -28,7 +28,7 @@ from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
 from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataframeNode
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataflow.optimizer.source_scan.matching_linkable_specs import MatchingLinkableSpecsTransform
-from metricflow.specs.specs import MetricSpec
+from metricflow.specs.spec_classes import MetricSpec
 
 logger = logging.getLogger(__name__)
 

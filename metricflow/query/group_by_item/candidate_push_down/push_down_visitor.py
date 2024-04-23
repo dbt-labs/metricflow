@@ -45,7 +45,7 @@ from metricflow.query.suggestion_generator import QueryItemSuggestionGenerator
 from metricflow.specs.patterns.base_time_grain import BaseTimeGrainPattern
 from metricflow.specs.patterns.none_date_part import NoneDatePartPattern
 from metricflow.specs.patterns.spec_pattern import SpecPattern
-from metricflow.specs.specs import InstanceSpecSet, LinkableInstanceSpec
+from metricflow.specs.spec_classes import InstanceSpecSet, LinkableInstanceSpec
 
 logger = logging.getLogger(__name__)
 

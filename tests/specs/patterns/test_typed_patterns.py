@@ -25,7 +25,13 @@ from metricflow.specs.patterns.typed_patterns import (
     GroupByMetricPattern,
     TimeDimensionPattern,
 )
-from metricflow.specs.specs import DimensionSpec, EntitySpec, GroupByMetricSpec, LinkableInstanceSpec, TimeDimensionSpec
+from metricflow.specs.spec_classes import (
+    DimensionSpec,
+    EntitySpec,
+    GroupByMetricSpec,
+    LinkableInstanceSpec,
+    TimeDimensionSpec,
+)
 
 logger = logging.getLogger(__name__)
 

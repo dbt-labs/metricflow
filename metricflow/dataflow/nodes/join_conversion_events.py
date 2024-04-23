@@ -7,7 +7,7 @@ from dbt_semantic_interfaces.protocols import MetricTimeWindow
 from metricflow.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow.dag.mf_dag import DisplayedProperty
 from metricflow.dataflow.dataflow_plan import BaseOutput, DataflowPlanNode, DataflowPlanNodeVisitor
-from metricflow.specs.specs import ConstantPropertySpec, EntitySpec, InstanceSpec, MeasureSpec, TimeDimensionSpec
+from metricflow.specs.spec_classes import ConstantPropertySpec, EntitySpec, InstanceSpec, MeasureSpec, TimeDimensionSpec
 from metricflow.visitor import VisitorOutputT
 
 

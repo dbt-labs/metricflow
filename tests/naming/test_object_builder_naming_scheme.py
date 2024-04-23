@@ -8,7 +8,13 @@ from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 
 from metricflow.naming.object_builder_scheme import ObjectBuilderNamingScheme
-from metricflow.specs.specs import DimensionSpec, EntitySpec, GroupByMetricSpec, LinkableInstanceSpec, TimeDimensionSpec
+from metricflow.specs.spec_classes import (
+    DimensionSpec,
+    EntitySpec,
+    GroupByMetricSpec,
+    LinkableInstanceSpec,
+    TimeDimensionSpec,
+)
 from tests.time.metric_time_dimension import MTD_SPEC_MONTH, MTD_SPEC_WEEK, MTD_SPEC_YEAR
 
 

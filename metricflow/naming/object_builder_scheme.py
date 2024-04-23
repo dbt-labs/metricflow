@@ -21,7 +21,7 @@ from metricflow.specs.patterns.entity_link_pattern import (
 )
 from metricflow.specs.patterns.spec_pattern import SpecPattern
 from metricflow.specs.patterns.typed_patterns import DimensionPattern, TimeDimensionPattern
-from metricflow.specs.specs import (
+from metricflow.specs.spec_classes import (
     InstanceSpec,
 )
 

@@ -14,7 +14,7 @@ from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from typing_extensions import override
 
-from metricflow.specs.specs import InstanceSpec, InstanceSpecSet, InstanceSpecSetTransform
+from metricflow.specs.spec_classes import InstanceSpec, InstanceSpecSet, InstanceSpecSetTransform
 
 
 class ObjectBuilderNameConverter:

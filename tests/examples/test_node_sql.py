@@ -16,7 +16,7 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.specs.specs import InstanceSpecSet, TimeDimensionReference, TimeDimensionSpec
+from metricflow.specs.spec_classes import InstanceSpecSet, TimeDimensionReference, TimeDimensionSpec
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 

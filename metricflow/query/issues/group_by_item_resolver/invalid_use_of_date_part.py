@@ -12,7 +12,7 @@ from metricflow.query.issues.issues_base import (
     MetricFlowQueryResolutionIssue,
 )
 from metricflow.query.resolver_inputs.base_resolver_inputs import MetricFlowQueryResolverInput
-from metricflow.specs.specs import LinkableInstanceSpec
+from metricflow.specs.spec_classes import LinkableInstanceSpec
 
 
 @dataclass(frozen=True)

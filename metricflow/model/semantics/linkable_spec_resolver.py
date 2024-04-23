@@ -34,7 +34,7 @@ from metricflow.model.semantics.linkable_element import (
 )
 from metricflow.model.semantics.linkable_element_set import LinkableElementSet
 from metricflow.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
-from metricflow.specs.specs import (
+from metricflow.specs.spec_classes import (
     DEFAULT_TIME_GRANULARITY,
     EntityReference,
 )

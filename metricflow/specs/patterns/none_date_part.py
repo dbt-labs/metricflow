@@ -5,7 +5,7 @@ from typing import List, Sequence
 from typing_extensions import override
 
 from metricflow.specs.patterns.spec_pattern import SpecPattern
-from metricflow.specs.specs import (
+from metricflow.specs.spec_classes import (
     InstanceSpec,
     InstanceSpecSet,
     LinkableInstanceSpec,

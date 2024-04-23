@@ -35,7 +35,7 @@ from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup im
 from metricflow.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow.query.issues.issues_base import MetricFlowQueryResolutionIssueSet
 from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.specs.specs import (
+from metricflow.specs.spec_classes import (
     DimensionSpec,
     EntitySpec,
     GroupByMetricSpec,

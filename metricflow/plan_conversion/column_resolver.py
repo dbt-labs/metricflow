@@ -9,7 +9,7 @@ from metricflow.specs.column_assoc import (
     ColumnAssociationResolver,
     SingleColumnCorrelationKey,
 )
-from metricflow.specs.specs import (
+from metricflow.specs.spec_classes import (
     DimensionSpec,
     EntitySpec,
     GroupByMetricSpec,

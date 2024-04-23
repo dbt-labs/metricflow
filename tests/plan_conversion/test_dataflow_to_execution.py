@@ -9,7 +9,7 @@ from metricflow.plan_conversion.column_resolver import DunderColumnAssociationRe
 from metricflow.plan_conversion.dataflow_to_execution import DataflowToExecutionPlanConverter
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.specs.specs import (
+from metricflow.specs.spec_classes import (
     DimensionSpec,
     EntityReference,
     MetricFlowQuerySpec,

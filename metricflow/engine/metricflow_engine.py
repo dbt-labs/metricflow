@@ -52,7 +52,7 @@ from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.random_id import random_id
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.query_param_implementations import SavedQueryParameter
-from metricflow.specs.specs import InstanceSpecSet, MetricFlowQuerySpec
+from metricflow.specs.spec_classes import InstanceSpecSet, MetricFlowQuerySpec
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.sql.sql_table import SqlTable
 from metricflow.telemetry.models import TelemetryLevel

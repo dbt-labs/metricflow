@@ -11,7 +11,7 @@ from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup im
 from metricflow.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
 from metricflow.query.issues.issues_base import MetricFlowQueryResolutionIssueSet
 from metricflow.query.resolver_inputs.base_resolver_inputs import MetricFlowQueryResolverInput
-from metricflow.specs.specs import MetricFlowQuerySpec
+from metricflow.specs.spec_classes import MetricFlowQuerySpec
 
 
 @dataclass(frozen=True)

@@ -25,7 +25,7 @@ from metricflow.errors.error_classes import InvalidSemanticModelError
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantics.element_group import ElementGrouper
 from metricflow.model.spec_converters import MeasureConverter
-from metricflow.specs.specs import (
+from metricflow.specs.spec_classes import (
     DimensionSpec,
     EntitySpec,
     LinkableInstanceSpec,

@@ -9,7 +9,7 @@ from typing_extensions import override
 from metricflow.query.group_by_item.path_prefixable import PathPrefixable
 from metricflow.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow.specs.patterns.spec_pattern import SpecPattern
-from metricflow.specs.specs import InstanceSpecSet, LinkableInstanceSpec, LinkableSpecSet
+from metricflow.specs.spec_classes import InstanceSpecSet, LinkableInstanceSpec, LinkableSpecSet
 
 
 @dataclass(frozen=True)

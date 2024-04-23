@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from dbt_semantic_interfaces.protocols.measure import Measure
 
-from metricflow.specs.specs import (
+from metricflow.specs.spec_classes import (
     MeasureSpec,
     NonAdditiveDimensionSpec,
 )

@@ -9,7 +9,7 @@ from metricflow.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow.dag.mf_dag import DisplayedProperty, NodeId
 from metricflow.dataflow.dataflow_plan import BaseOutput, DataflowPlanNode, DataflowPlanNodeVisitor
 from metricflow.filters.time_constraint import TimeRangeConstraint
-from metricflow.specs.specs import TimeDimensionSpec
+from metricflow.specs.spec_classes import TimeDimensionSpec
 from metricflow.visitor import VisitorOutputT
 
 
