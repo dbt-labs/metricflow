@@ -8,9 +8,9 @@ from metricflow.execution.execution_plan import (
     SelectSqlQueryToTableTask,
 )
 from metricflow.execution.executor import SequentialPlanExecutor
-from metricflow.semantics.random_id import random_id
 from metricflow.semantics.dag.mf_dag import DagId
 from metricflow.semantics.protocols.sql_client import SqlClient, SqlEngine
+from metricflow.semantics.random_id import random_id
 from metricflow.semantics.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.semantics.sql.sql_table import SqlTable
 from tests.compare_df import assert_dataframes_equal

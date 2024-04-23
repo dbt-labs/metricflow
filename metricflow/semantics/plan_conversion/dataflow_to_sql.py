@@ -12,15 +12,8 @@ from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.conversion_calculation_type import ConversionCalculationType
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 
-from metricflow.semantics.aggregation_properties import AggregationState
-from metricflow.semantics.instances import (
-    GroupByMetricInstance,
-    InstanceSet,
-    MetadataInstance,
-    MetricInstance,
-    TimeDimensionInstance,
-)
 from metricflow.mf_logging.formatting import indent
+from metricflow.semantics.aggregation_properties import AggregationState
 from metricflow.semantics.dag.id_prefix import StaticIdPrefix
 from metricflow.semantics.dag.mf_dag import DagId
 from metricflow.semantics.dag.sequential_id import SequentialIdGenerator
@@ -50,6 +43,13 @@ from metricflow.semantics.dataflow.nodes.write_to_table import WriteToResultTabl
 from metricflow.semantics.dataset.dataset_classes import DataSet
 from metricflow.semantics.dataset.sql_dataset import SqlDataSet
 from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
+from metricflow.semantics.instances import (
+    GroupByMetricInstance,
+    InstanceSet,
+    MetadataInstance,
+    MetricInstance,
+    TimeDimensionInstance,
+)
 from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.semantics.plan_conversion.convert_to_sql_plan import ConvertToSqlPlanResult
 from metricflow.semantics.plan_conversion.instance_converters import (

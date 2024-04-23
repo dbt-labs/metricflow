@@ -36,7 +36,7 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
 
 from metricflow.semantics.aggregation_properties import AggregationState
-from metricflow.collection_helpers.merger import Mergeable
+from metricflow.semantics.collection_helpers.merger import Mergeable
 from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow.semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
