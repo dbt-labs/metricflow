@@ -12,8 +12,8 @@ from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSe
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.references import MetricReference
 
+from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.semantics.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.semantics.query.query_exceptions import InvalidQueryException
 from metricflow.semantics.query.query_parser import MetricFlowQueryParser
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration

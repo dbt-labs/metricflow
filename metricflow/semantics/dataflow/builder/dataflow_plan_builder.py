@@ -22,6 +22,7 @@ from dbt_semantic_interfaces.references import (
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 
+from metricflow.plan_conversion.node_processor import PreJoinNodeProcessor
 from metricflow.semantics.dag.id_prefix import StaticIdPrefix
 from metricflow.semantics.dag.mf_dag import DagId
 from metricflow.semantics.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
@@ -60,7 +61,6 @@ from metricflow.semantics.mf_logging.formatting import indent
 from metricflow.semantics.mf_logging.pretty_print import mf_pformat
 from metricflow.semantics.mf_logging.runtime import log_runtime
 from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.semantics.plan_conversion.node_processor import PreJoinNodeProcessor
 from metricflow.semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow.semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
     FilterSpecResolutionLookUp,

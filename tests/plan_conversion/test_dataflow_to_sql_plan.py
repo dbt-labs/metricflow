@@ -10,6 +10,7 @@ from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
+from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.semantics.dag.mf_dag import DagId
 from metricflow.semantics.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
@@ -30,7 +31,6 @@ from metricflow.semantics.dataflow.nodes.semi_additive_join import SemiAdditiveJ
 from metricflow.semantics.dataflow.nodes.where_filter import WhereConstraintNode
 from metricflow.semantics.dataflow.nodes.write_to_dataframe import WriteToResultDataframeNode
 from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
-from metricflow.semantics.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.semantics.query.query_parser import MetricFlowQueryParser
 from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow.semantics.specs.spec_classes import (

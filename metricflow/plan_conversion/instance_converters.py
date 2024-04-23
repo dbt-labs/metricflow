@@ -14,6 +14,7 @@ from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from more_itertools import bucket
 
+from metricflow.plan_conversion.select_column_gen import SelectColumnSet
 from metricflow.semantics.aggregation_properties import AggregationState
 from metricflow.semantics.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.semantics.dataflow.nodes.join_to_base import ValidityWindowJoinDescription
@@ -31,7 +32,6 @@ from metricflow.semantics.instances import (
 )
 from metricflow.semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow.semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
-from metricflow.semantics.plan_conversion.select_column_gen import SelectColumnSet
 from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow.semantics.specs.spec_classes import (
     DimensionSpec,

@@ -23,6 +23,7 @@ from typing import List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 
+from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
 from metricflow.semantics.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.semantics.dataflow.builder.partitions import (
     PartitionDimensionJoinDescription,
@@ -40,7 +41,6 @@ from metricflow.semantics.instances import InstanceSet
 from metricflow.semantics.mf_logging.pretty_print import mf_pformat
 from metricflow.semantics.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
 from metricflow.semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
-from metricflow.semantics.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
 from metricflow.semantics.specs.spec_classes import (
     InstanceSpecSet,
     LinkableInstanceSpec,

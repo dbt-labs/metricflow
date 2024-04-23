@@ -6,6 +6,8 @@ from typing import Mapping
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.references import SemanticModelElementReference
 
+from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
+from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.semantics.aggregation_properties import AggregationState
 from metricflow.semantics.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.semantics.dataflow.nodes.join_to_base import JoinDescription, JoinToBaseOutputNode
@@ -16,8 +18,6 @@ from metricflow.semantics.instances import (
     MeasureInstance,
 )
 from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.semantics.plan_conversion.column_resolver import DunderColumnAssociationResolver
-from metricflow.semantics.plan_conversion.time_spine import TimeSpineSource
 from metricflow.semantics.specs.column_assoc import ColumnAssociation, SingleColumnCorrelationKey
 from metricflow.semantics.specs.spec_classes import (
     LinklessEntitySpec,

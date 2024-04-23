@@ -6,13 +6,13 @@ from typing import List, Optional, Sequence, Tuple
 from dbt_semantic_interfaces.protocols.metric import MetricTimeWindow
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
+from metricflow.plan_conversion.sql_expression_builders import make_coalesced_expr
 from metricflow.semantics.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.semantics.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
 from metricflow.semantics.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
 from metricflow.semantics.dataflow.nodes.join_to_base import JoinDescription
 from metricflow.semantics.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
 from metricflow.semantics.dataset.sql_dataset import SqlDataSet
-from metricflow.semantics.plan_conversion.sql_expression_builders import make_coalesced_expr
 from metricflow.sql.sql_exprs import (
     SqlColumnReference,
     SqlColumnReferenceExpression,
