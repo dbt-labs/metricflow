@@ -12,7 +12,6 @@ from typing_extensions import override
 
 from metricflow.mf_logging.runtime import log_runtime
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.naming.object_builder_str import ObjectBuilderNameConverter
 from metricflow.query.group_by_item.candidate_push_down.push_down_visitor import DagTraversalPathTracker
 from metricflow.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow.query.group_by_item.filter_spec_resolution.filter_pattern_factory import WhereFilterPatternFactory
@@ -45,6 +44,7 @@ from metricflow.query.issues.filter_spec_resolver.invalid_where import WhereFilt
 from metricflow.query.issues.issues_base import (
     MetricFlowQueryResolutionIssueSet,
 )
+from metricflow.semantics.naming.object_builder_str import ObjectBuilderNameConverter
 
 logger = logging.getLogger(__name__)
 

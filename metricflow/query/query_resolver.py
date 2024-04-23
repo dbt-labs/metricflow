@@ -9,7 +9,6 @@ from dbt_semantic_interfaces.references import MetricReference
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.mf_logging.runtime import log_runtime
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.naming.metric_scheme import MetricNamingScheme
 from metricflow.query.group_by_item.filter_spec_resolution.filter_pattern_factory import WhereFilterPatternFactory
 from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import FilterSpecResolutionLookUp
 from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_resolver import (
@@ -47,6 +46,7 @@ from metricflow.query.resolver_inputs.query_resolver_inputs import (
 )
 from metricflow.query.suggestion_generator import QueryItemSuggestionGenerator
 from metricflow.query.validation_rules.query_validator import PostResolutionQueryValidator
+from metricflow.semantics.naming.metric_scheme import MetricNamingScheme
 from metricflow.semantics.specs.patterns.match_list_pattern import MatchListSpecPattern
 from metricflow.semantics.specs.spec_classes import (
     InstanceSpec,

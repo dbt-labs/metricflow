@@ -28,7 +28,7 @@ from dbt_semantic_interfaces.transformations.add_input_metric_measures import Ad
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.entity_type import EntityType
 
-from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
+from metricflow.semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.semantics.specs.spec_classes import DimensionSpec, EntityReference
 
 

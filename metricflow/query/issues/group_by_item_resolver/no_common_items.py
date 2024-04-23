@@ -7,7 +7,6 @@ from typing_extensions import override
 
 from metricflow.mf_logging.formatting import indent
 from metricflow.mf_logging.pretty_print import mf_pformat
-from metricflow.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow.query.group_by_item.candidate_push_down.group_by_item_candidate import GroupByItemCandidateSet
 from metricflow.query.group_by_item.resolution_dag.resolution_nodes.base_node import GroupByItemResolutionNode
 from metricflow.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
@@ -16,6 +15,7 @@ from metricflow.query.issues.issues_base import (
     MetricFlowQueryResolutionIssue,
 )
 from metricflow.query.resolver_inputs.base_resolver_inputs import MetricFlowQueryResolverInput
+from metricflow.semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
 
 
 @dataclass(frozen=True)

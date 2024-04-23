@@ -12,7 +12,6 @@ from dbt_semantic_interfaces.type_enums import TimeGranularity
 from metricflow.mf_logging.formatting import indent
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow.query.group_by_item.candidate_push_down.push_down_visitor import (
     PushDownResult,
     _PushDownGroupByItemCandidatesVisitor,
@@ -24,6 +23,7 @@ from metricflow.query.issues.issues_base import (
     MetricFlowQueryResolutionIssueSet,
 )
 from metricflow.query.suggestion_generator import QueryItemSuggestionGenerator
+from metricflow.semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow.semantics.specs.patterns.base_time_grain import BaseTimeGrainPattern
 from metricflow.semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow.semantics.specs.patterns.typed_patterns import TimeDimensionPattern

@@ -12,8 +12,8 @@ from dbt_semantic_interfaces.parsing.where_filter.where_filter_parser import Whe
 from dbt_semantic_interfaces.references import EntityReference
 from typing_extensions import override
 
-from metricflow.naming.naming_scheme import QueryItemNamingScheme
-from metricflow.naming.object_builder_str import ObjectBuilderNameConverter
+from metricflow.semantics.naming.naming_scheme import QueryItemNamingScheme
+from metricflow.semantics.naming.object_builder_str import ObjectBuilderNameConverter
 from metricflow.semantics.specs.patterns.entity_link_pattern import (
     EntityLinkPattern,
     EntityLinkPatternParameterSet,

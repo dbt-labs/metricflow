@@ -9,7 +9,7 @@ from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from typing_extensions import override
 
-from metricflow.naming.naming_scheme import QueryItemNamingScheme
+from metricflow.semantics.naming.naming_scheme import QueryItemNamingScheme
 from metricflow.semantics.specs.patterns.entity_link_pattern import (
     EntityLinkPattern,
     EntityLinkPatternParameterSet,

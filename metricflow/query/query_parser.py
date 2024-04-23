@@ -20,9 +20,6 @@ from metricflow.mf_logging.formatting import indent
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.mf_logging.runtime import log_runtime
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.naming.dunder_scheme import DunderNamingScheme
-from metricflow.naming.metric_scheme import MetricNamingScheme
-from metricflow.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow.protocols.query_parameter import (
     GroupByParameter,
     MetricQueryParameter,
@@ -51,6 +48,9 @@ from metricflow.query.resolver_inputs.query_resolver_inputs import (
     ResolverInputForQuery,
     ResolverInputForQueryLevelWhereFilterIntersection,
 )
+from metricflow.semantics.naming.dunder_scheme import DunderNamingScheme
+from metricflow.semantics.naming.metric_scheme import MetricNamingScheme
+from metricflow.semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow.semantics.specs.patterns.base_time_grain import BaseTimeGrainPattern
 from metricflow.semantics.specs.patterns.metric_time_pattern import MetricTimePattern
 from metricflow.semantics.specs.patterns.none_date_part import NoneDatePartPattern

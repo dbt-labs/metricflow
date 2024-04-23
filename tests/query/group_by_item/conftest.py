@@ -12,10 +12,10 @@ from dbt_semantic_interfaces.protocols import WhereFilterIntersection
 from dbt_semantic_interfaces.references import MetricReference
 
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.naming.naming_scheme import QueryItemNamingScheme
-from metricflow.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
 from metricflow.query.group_by_item.resolution_dag.dag_builder import GroupByItemResolutionDagBuilder
+from metricflow.semantics.naming.naming_scheme import QueryItemNamingScheme
+from metricflow.semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.query.group_by_item.ambiguous_resolution_query_id import AmbiguousResolutionQueryId
 

@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Optional
 
-from metricflow.naming.naming_scheme import QueryItemNamingScheme
+from metricflow.semantics.naming.naming_scheme import QueryItemNamingScheme
 from metricflow.semantics.specs.patterns.spec_pattern import SpecPattern
 
 

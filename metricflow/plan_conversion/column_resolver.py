@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.naming.linkable_spec_name import DUNDER, StructuredLinkableSpecName
+from metricflow.semantics.naming.linkable_spec_name import DUNDER, StructuredLinkableSpecName
 from metricflow.semantics.specs.column_assoc import (
     ColumnAssociation,
     ColumnAssociationResolver,

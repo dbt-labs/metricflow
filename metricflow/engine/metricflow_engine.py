@@ -38,7 +38,6 @@ from metricflow.model.semantics.linkable_element import (
     LinkableElementProperty,
 )
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
-from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.convert_to_execution_plan import ConvertToExecutionPlanResult
 from metricflow.plan_conversion.dataflow_to_execution import (
@@ -50,6 +49,7 @@ from metricflow.protocols.sql_client import SqlClient
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.random_id import random_id
+from metricflow.semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow.semantics.specs.query_param_implementations import SavedQueryParameter
 from metricflow.semantics.specs.spec_classes import InstanceSpecSet, MetricFlowQuerySpec
