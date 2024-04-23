@@ -8,8 +8,8 @@ from metricflow.inference.context.data_warehouse import (
     TableProperties,
 )
 from metricflow.inference.models import InferenceSignalType
-from metricflow.semantics.sql.sql_column import SqlColumn
-from metricflow.semantics.sql.sql_table import SqlTable
+from metricflow.sql.sql_column import SqlColumn
+from metricflow.sql.sql_table import SqlTable
 
 
 def get_column_properties(column_str: str, type: InferenceColumnType, unique: bool) -> ColumnProperties:  # noqa: D103

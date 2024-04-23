@@ -100,11 +100,11 @@ from metricflow.semantics.specs.spec_classes import (
     MetricSpec,
     TimeDimensionSpec,
 )
-from metricflow.semantics.sql.optimizer.optimization_levels import (
+from metricflow.sql.optimizer.optimization_levels import (
     SqlQueryOptimizationLevel,
     SqlQueryOptimizerConfiguration,
 )
-from metricflow.semantics.sql.sql_exprs import (
+from metricflow.sql.sql_exprs import (
     SqlAggregateFunctionExpression,
     SqlBetweenExpression,
     SqlColumnReference,
@@ -126,7 +126,7 @@ from metricflow.semantics.sql.sql_exprs import (
     SqlWindowFunctionExpression,
     SqlWindowOrderByArgument,
 )
-from metricflow.semantics.sql.sql_plan import (
+from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
     SqlJoinDescription,
     SqlJoinType,

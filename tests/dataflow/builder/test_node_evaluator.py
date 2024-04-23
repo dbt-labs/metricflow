@@ -27,7 +27,7 @@ from metricflow.semantics.specs.spec_classes import (
     LinklessEntitySpec,
     TimeDimensionSpec,
 )
-from metricflow.semantics.sql.sql_plan import SqlJoinType
+from metricflow.sql.sql_plan import SqlJoinType
 from tests.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 
 logger = logging.getLogger(__name__)

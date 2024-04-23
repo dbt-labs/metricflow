@@ -3,22 +3,22 @@ from __future__ import annotations
 import pytest
 from _pytest.fixtures import FixtureRequest
 
-from metricflow.semantics.sql.optimizer.table_alias_simplifier import SqlTableAliasSimplifier
-from metricflow.semantics.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer, SqlQueryPlanRenderer
-from metricflow.semantics.sql.sql_exprs import (
+from metricflow.sql.optimizer.table_alias_simplifier import SqlTableAliasSimplifier
+from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer, SqlQueryPlanRenderer
+from metricflow.sql.sql_exprs import (
     SqlColumnReference,
     SqlColumnReferenceExpression,
     SqlComparison,
     SqlComparisonExpression,
 )
-from metricflow.semantics.sql.sql_plan import (
+from metricflow.sql.sql_plan import (
     SqlJoinDescription,
     SqlJoinType,
     SqlSelectColumn,
     SqlSelectStatementNode,
     SqlTableFromClauseNode,
 )
-from metricflow.semantics.sql.sql_table import SqlTable
+from metricflow.sql.sql_table import SqlTable
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.sql.compare_sql_plan import assert_default_rendered_sql_equal
 

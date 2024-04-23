@@ -9,8 +9,8 @@ from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
-from metricflow.semantics.sql.render.expr_renderer import DefaultSqlExpressionRenderer
-from metricflow.semantics.sql.sql_exprs import (
+from metricflow.sql.render.expr_renderer import DefaultSqlExpressionRenderer
+from metricflow.sql.sql_exprs import (
     SqlAggregateFunctionExpression,
     SqlBetweenExpression,
     SqlCastToTimestampExpression,

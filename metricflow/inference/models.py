@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import List, Optional
 
-from metricflow.semantics.sql.sql_column import SqlColumn
+from metricflow.sql.sql_column import SqlColumn
 
 
 class InferenceSignalConfidence(Enum):

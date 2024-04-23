@@ -8,14 +8,14 @@ from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
 
-from metricflow.semantics.sql.render.expr_renderer import (
+from metricflow.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,
     SqlExpressionRenderer,
     SqlExpressionRenderResult,
 )
-from metricflow.semantics.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
-from metricflow.semantics.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.semantics.sql.sql_exprs import (
+from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
+from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from metricflow.sql.sql_exprs import (
     SqlBetweenExpression,
     SqlGenerateUuidExpression,
     SqlPercentileExpression,

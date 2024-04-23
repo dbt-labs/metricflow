@@ -13,9 +13,9 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
 
 from metricflow.semantics.mf_logging.formatting import indent
-from metricflow.semantics.sql.render.rendering_constants import SqlRenderingConstants
-from metricflow.semantics.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.semantics.sql.sql_exprs import (
+from metricflow.sql.render.rendering_constants import SqlRenderingConstants
+from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from metricflow.sql.sql_exprs import (
     SqlAggregateFunctionExpression,
     SqlBetweenExpression,
     SqlCastToTimestampExpression,
@@ -39,7 +39,7 @@ from metricflow.semantics.sql.sql_exprs import (
     SqlSubtractTimeIntervalExpression,
     SqlWindowFunctionExpression,
 )
-from metricflow.semantics.sql.sql_plan import SqlSelectColumn
+from metricflow.sql.sql_plan import SqlSelectColumn
 
 logger = logging.getLogger(__name__)
 

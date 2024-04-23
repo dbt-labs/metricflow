@@ -3,11 +3,11 @@ from __future__ import annotations
 from enum import Enum
 from typing import Sequence
 
-from metricflow.semantics.sql.optimizer.column_pruner import SqlColumnPrunerOptimizer
-from metricflow.semantics.sql.optimizer.rewriting_sub_query_reducer import SqlRewritingSubQueryReducer
-from metricflow.semantics.sql.optimizer.sql_query_plan_optimizer import SqlQueryPlanOptimizer
-from metricflow.semantics.sql.optimizer.sub_query_reducer import SqlSubQueryReducer
-from metricflow.semantics.sql.optimizer.table_alias_simplifier import SqlTableAliasSimplifier
+from metricflow.sql.optimizer.column_pruner import SqlColumnPrunerOptimizer
+from metricflow.sql.optimizer.rewriting_sub_query_reducer import SqlRewritingSubQueryReducer
+from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlQueryPlanOptimizer
+from metricflow.sql.optimizer.sub_query_reducer import SqlSubQueryReducer
+from metricflow.sql.optimizer.table_alias_simplifier import SqlTableAliasSimplifier
 
 
 class SqlQueryOptimizationLevel(Enum):

@@ -10,8 +10,8 @@ from metricflow.semantics.dataflow.dataflow_plan import (
     SinkNodeVisitor,
     SinkOutput,
 )
-from metricflow.semantics.sql.sql_table import SqlTable
 from metricflow.semantics.visitor import VisitorOutputT
+from metricflow.sql.sql_table import SqlTable
 
 
 class WriteToResultTableNode(SinkOutput):

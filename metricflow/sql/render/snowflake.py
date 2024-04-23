@@ -3,26 +3,26 @@ from __future__ import annotations
 from typing import Collection
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from typing_extensions import override
 
-from metricflow.semantics.sql.render.expr_renderer import (
+from metricflow.semantics.errors.error_classes import UnsupportedEngineFeatureError
+from metricflow.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,
     SqlExpressionRenderer,
     SqlExpressionRenderResult,
 )
-from metricflow.semantics.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
-from metricflow.semantics.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.semantics.sql.sql_exprs import (
+from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
+from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from metricflow.sql.sql_exprs import (
     SqlGenerateUuidExpression,
     SqlPercentileExpression,
     SqlPercentileFunctionType,
-    SqlSubtractTimeIntervalExpression,
 )
 
 
-class DuckDbSqlExpressionRenderer(DefaultSqlExpressionRenderer):
-    """Expression renderer for the DuckDB engine."""
+class SnowflakeSqlExpressionRenderer(DefaultSqlExpressionRenderer):
+    """Expression renderer for the Snowflake engine."""
 
     @property
     @override
@@ -34,31 +34,22 @@ class DuckDbSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         }
 
     @override
-    def visit_time_delta_expr(self, node: SqlSubtractTimeIntervalExpression) -> SqlExpressionRenderResult:
-        """Render time delta expression for DuckDB, which requires slightly different syntax from other engines."""
-        arg_rendered = node.arg.accept(self)
+    def render_date_part(self, date_part: DatePart) -> str:
+        if date_part is DatePart.DOW:
+            return "dayofweekiso"
 
-        count = node.count
-        granularity = node.granularity
-        if granularity == TimeGranularity.QUARTER:
-            granularity = TimeGranularity.MONTH
-            count *= 3
-
-        return SqlExpressionRenderResult(
-            sql=f"{arg_rendered.sql} - INTERVAL {count} {granularity.value}",
-            bind_parameters=arg_rendered.bind_parameters,
-        )
+        return super().render_date_part(date_part)
 
     @override
     def visit_generate_uuid_expr(self, node: SqlGenerateUuidExpression) -> SqlExpressionRenderResult:
         return SqlExpressionRenderResult(
-            sql="GEN_RANDOM_UUID()",
+            sql="UUID_STRING()",
             bind_parameters=SqlBindParameters(),
         )
 
     @override
     def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:
-        """Render a percentile expression for DuckDB."""
+        """Render a percentile expression for Snowflake."""
         arg_rendered = self.render_sql_expr(node.order_by_arg)
         params = arg_rendered.bind_parameters
         percentile = node.percentile_args.percentile
@@ -69,12 +60,12 @@ class DuckDbSqlExpressionRenderer(DefaultSqlExpressionRenderer):
             function_str = "PERCENTILE_DISC"
         elif node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS:
             return SqlExpressionRenderResult(
-                sql=f"approx_quantile({arg_rendered.sql}, {percentile})",
+                sql=f"APPROX_PERCENTILE({arg_rendered.sql}, {percentile})",
                 bind_parameters=params,
             )
         elif node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_DISCRETE:
-            raise RuntimeError(
-                "Approximate discrete percentile aggregatew not supported for DuckDB. Set "
+            raise UnsupportedEngineFeatureError(
+                "Approximate discrete percentile aggregate not supported for Snowflake. Set "
                 + "use_discrete_percentile and/or use_approximate_percentile to false in all percentile measures."
             )
         else:
@@ -86,10 +77,10 @@ class DuckDbSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         )
 
 
-class DuckDbSqlQueryPlanRenderer(DefaultSqlQueryPlanRenderer):
-    """Plan renderer for the DuckDB engine."""
+class SnowflakeSqlQueryPlanRenderer(DefaultSqlQueryPlanRenderer):
+    """Plan renderer for the Snowflake engine."""
 
-    EXPR_RENDERER = DuckDbSqlExpressionRenderer()
+    EXPR_RENDERER = SnowflakeSqlExpressionRenderer()
 
     @property
     @override

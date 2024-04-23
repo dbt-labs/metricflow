@@ -8,8 +8,8 @@ from metricflow.inference.context.data_warehouse import (
     InferenceColumnType,
     TableProperties,
 )
-from metricflow.semantics.sql.sql_column import SqlColumn
-from metricflow.semantics.sql.sql_table import SqlTable
+from metricflow.sql.sql_column import SqlColumn
+from metricflow.sql.sql_table import SqlTable
 
 
 @pytest.fixture

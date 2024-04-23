@@ -16,7 +16,7 @@ from metricflow.semantics.specs.spec_classes import (
     MetricSpec,
     TimeDimensionSpec,
 )
-from metricflow.semantics.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
+from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.snapshot_utils import assert_execution_plan_text_equal
 

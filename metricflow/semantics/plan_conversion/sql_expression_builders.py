@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import List, Sequence
 
-from metricflow.semantics.sql.sql_exprs import (
+from metricflow.sql.sql_exprs import (
     SqlAggregateFunctionExpression,
     SqlColumnReference,
     SqlColumnReferenceExpression,

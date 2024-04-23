@@ -18,7 +18,7 @@ from metricflow.semantics.specs.where_filter_dimension import WhereFilterDimensi
 from metricflow.semantics.specs.where_filter_entity import WhereFilterEntityFactory
 from metricflow.semantics.specs.where_filter_metric import WhereFilterMetricFactory
 from metricflow.semantics.specs.where_filter_time_dimension import WhereFilterTimeDimensionFactory
-from metricflow.semantics.sql.sql_bind_parameters import SqlBindParameters
+from metricflow.sql.sql_bind_parameters import SqlBindParameters
 
 logger = logging.getLogger(__name__)
 

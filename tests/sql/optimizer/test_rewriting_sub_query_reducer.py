@@ -3,8 +3,8 @@ from __future__ import annotations
 import pytest
 from _pytest.fixtures import FixtureRequest
 
-from metricflow.semantics.sql.optimizer.rewriting_sub_query_reducer import SqlRewritingSubQueryReducer
-from metricflow.semantics.sql.sql_exprs import (
+from metricflow.sql.optimizer.rewriting_sub_query_reducer import SqlRewritingSubQueryReducer
+from metricflow.sql.sql_exprs import (
     SqlAggregateFunctionExpression,
     SqlColumnReference,
     SqlColumnReferenceExpression,
@@ -14,7 +14,7 @@ from metricflow.semantics.sql.sql_exprs import (
     SqlStringExpression,
     SqlStringLiteralExpression,
 )
-from metricflow.semantics.sql.sql_plan import (
+from metricflow.sql.sql_plan import (
     SqlJoinDescription,
     SqlJoinType,
     SqlOrderByDescription,
@@ -22,7 +22,7 @@ from metricflow.semantics.sql.sql_plan import (
     SqlSelectStatementNode,
     SqlTableFromClauseNode,
 )
-from metricflow.semantics.sql.sql_table import SqlTable
+from metricflow.sql.sql_table import SqlTable
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.sql.compare_sql_plan import assert_default_rendered_sql_equal
 

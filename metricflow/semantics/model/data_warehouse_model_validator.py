@@ -42,7 +42,7 @@ from metricflow.semantics.plan_conversion.dataflow_to_sql import DataflowToSqlQu
 from metricflow.semantics.plan_conversion.time_spine import TimeSpineSource
 from metricflow.semantics.protocols.sql_client import SqlClient
 from metricflow.semantics.specs.spec_classes import InstanceSpecSet, LinkableInstanceSpec, MeasureSpec
-from metricflow.semantics.sql.sql_bind_parameters import SqlBindParameters
+from metricflow.sql.sql_bind_parameters import SqlBindParameters
 
 
 @dataclass

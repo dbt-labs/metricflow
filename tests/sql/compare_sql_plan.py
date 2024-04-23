@@ -4,8 +4,8 @@ from _pytest.fixtures import FixtureRequest
 
 from metricflow.semantics.dag.mf_dag import DagId
 from metricflow.semantics.protocols.sql_client import SqlClient
-from metricflow.semantics.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
-from metricflow.semantics.sql.sql_plan import SqlQueryPlan, SqlQueryPlanNode
+from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
+from metricflow.sql.sql_plan import SqlQueryPlan, SqlQueryPlanNode
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration, check_sql_engine_snapshot_marker
 from tests.snapshot_utils import (
     assert_plan_snapshot_text_equal,

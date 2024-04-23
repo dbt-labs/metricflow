@@ -9,7 +9,7 @@ from metricflow.semantics.specs.spec_classes import (
     InstanceSpecSet,
     InstanceSpecSetTransform,
 )
-from metricflow.semantics.sql.sql_plan import SqlSelectColumn
+from metricflow.sql.sql_plan import SqlSelectColumn
 
 
 class CreateSelectCoalescedColumnsForLinkableSpecs(InstanceSpecSetTransform[SelectColumnSet]):

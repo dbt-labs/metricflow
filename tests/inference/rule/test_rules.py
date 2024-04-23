@@ -8,8 +8,8 @@ from metricflow.inference.context.data_warehouse import (
 )
 from metricflow.inference.models import InferenceSignalConfidence, InferenceSignalType
 from metricflow.inference.rule.rules import ColumnMatcherRule, LowCardinalityRatioRule
-from metricflow.semantics.sql.sql_column import SqlColumn
-from metricflow.semantics.sql.sql_table import SqlTable
+from metricflow.sql.sql_column import SqlColumn
+from metricflow.sql.sql_table import SqlTable
 
 
 def create_context_with_counts(rows: int, distinct: int, nulls: int) -> DataWarehouseInferenceContext:

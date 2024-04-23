@@ -11,7 +11,7 @@ from metricflow.inference.models import (
     InferenceSignalType,
 )
 from metricflow.inference.solver.base import InferenceSolver
-from metricflow.semantics.sql.sql_column import SqlColumn
+from metricflow.sql.sql_column import SqlColumn
 
 NodeWeighterFunction = Callable[[InferenceSignalConfidence], int]
 

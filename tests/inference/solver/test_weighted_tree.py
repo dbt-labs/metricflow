@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from metricflow.inference.models import InferenceSignal, InferenceSignalConfidence, InferenceSignalType
 from metricflow.inference.solver.weighted_tree import WeightedTypeTreeInferenceSolver
-from metricflow.semantics.sql.sql_column import SqlColumn
+from metricflow.sql.sql_column import SqlColumn
 
 column = SqlColumn.from_string("db.schema.table.col")
 solver = WeightedTypeTreeInferenceSolver()

@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import List
 
 from metricflow.inference.models import InferenceResult, InferenceSignal
-from metricflow.semantics.sql.sql_column import SqlColumn
+from metricflow.sql.sql_column import SqlColumn
 
 
 class InferenceSolver(ABC):

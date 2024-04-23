@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional
 
-from metricflow.semantics.sql.sql_table import SqlTable
+from metricflow.sql.sql_table import SqlTable
 
 
 @dataclass(frozen=True, order=True)

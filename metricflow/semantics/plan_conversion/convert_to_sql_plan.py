@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from metricflow.semantics.instances import InstanceSet
-from metricflow.semantics.sql.sql_plan import SqlQueryPlan
+from metricflow.sql.sql_plan import SqlQueryPlan
 
 
 @dataclass(frozen=True)

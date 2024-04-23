@@ -4,11 +4,11 @@ import logging
 from collections import defaultdict
 from typing import Dict, List, Set, Tuple
 
-from metricflow.semantics.sql.optimizer.sql_query_plan_optimizer import SqlQueryPlanOptimizer
-from metricflow.semantics.sql.sql_exprs import (
+from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlQueryPlanOptimizer
+from metricflow.sql.sql_exprs import (
     SqlExpressionTreeLineage,
 )
-from metricflow.semantics.sql.sql_plan import (
+from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
     SqlJoinDescription,
     SqlQueryPlanNode,

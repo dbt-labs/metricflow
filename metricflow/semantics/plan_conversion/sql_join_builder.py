@@ -13,7 +13,7 @@ from metricflow.semantics.dataflow.nodes.join_to_base import JoinDescription
 from metricflow.semantics.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
 from metricflow.semantics.dataset.sql_dataset import SqlDataSet
 from metricflow.semantics.plan_conversion.sql_expression_builders import make_coalesced_expr
-from metricflow.semantics.sql.sql_exprs import (
+from metricflow.sql.sql_exprs import (
     SqlColumnReference,
     SqlColumnReferenceExpression,
     SqlComparison,
@@ -24,7 +24,7 @@ from metricflow.semantics.sql.sql_exprs import (
     SqlLogicalOperator,
     SqlSubtractTimeIntervalExpression,
 )
-from metricflow.semantics.sql.sql_plan import SqlExpressionNode, SqlJoinDescription, SqlJoinType, SqlSelectStatementNode
+from metricflow.sql.sql_plan import SqlExpressionNode, SqlJoinDescription, SqlJoinType, SqlSelectStatementNode
 
 
 @dataclass(frozen=True)

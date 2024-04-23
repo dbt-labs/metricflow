@@ -22,7 +22,10 @@ from metricflow.semantics.plan_conversion.column_resolver import (
 from metricflow.semantics.protocols.query_parameter import DimensionOrEntityQueryParameter
 from metricflow.semantics.protocols.sql_client import SqlClient
 from metricflow.semantics.specs.query_param_implementations import DimensionOrEntityParameter, TimeDimensionParameter
-from metricflow.semantics.sql.sql_exprs import (
+from metricflow.semantics.test_helpers import (
+    ConfigurableTimeSource,
+)
+from metricflow.sql.sql_exprs import (
     SqlCastToTimestampExpression,
     SqlColumnReference,
     SqlColumnReferenceExpression,
@@ -34,9 +37,6 @@ from metricflow.semantics.sql.sql_exprs import (
     SqlPercentileFunctionType,
     SqlStringExpression,
     SqlSubtractTimeIntervalExpression,
-)
-from metricflow.semantics.test_helpers import (
-    ConfigurableTimeSource,
 )
 from tests.compare_df import assert_dataframes_equal
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration

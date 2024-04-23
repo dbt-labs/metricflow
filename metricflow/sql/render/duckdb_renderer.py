@@ -6,15 +6,14 @@ from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
 
-from metricflow.semantics.errors.error_classes import UnsupportedEngineFeatureError
-from metricflow.semantics.sql.render.expr_renderer import (
+from metricflow.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,
     SqlExpressionRenderer,
     SqlExpressionRenderResult,
 )
-from metricflow.semantics.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
-from metricflow.semantics.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.semantics.sql.sql_exprs import (
+from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
+from metricflow.sql.sql_bind_parameters import SqlBindParameters
+from metricflow.sql.sql_exprs import (
     SqlGenerateUuidExpression,
     SqlPercentileExpression,
     SqlPercentileFunctionType,
@@ -22,23 +21,21 @@ from metricflow.semantics.sql.sql_exprs import (
 )
 
 
-class PostgresSqlExpressionRenderer(DefaultSqlExpressionRenderer):
-    """Expression renderer for the PostgreSQL engine."""
-
-    @property
-    @override
-    def double_data_type(self) -> str:
-        """Custom double data type for the PostgreSQL engine."""
-        return "DOUBLE PRECISION"
+class DuckDbSqlExpressionRenderer(DefaultSqlExpressionRenderer):
+    """Expression renderer for the DuckDB engine."""
 
     @property
     @override
     def supported_percentile_function_types(self) -> Collection[SqlPercentileFunctionType]:
-        return {SqlPercentileFunctionType.CONTINUOUS, SqlPercentileFunctionType.DISCRETE}
+        return {
+            SqlPercentileFunctionType.CONTINUOUS,
+            SqlPercentileFunctionType.DISCRETE,
+            SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS,
+        }
 
     @override
     def visit_time_delta_expr(self, node: SqlSubtractTimeIntervalExpression) -> SqlExpressionRenderResult:
-        """Render time delta operations for PostgreSQL, which needs custom support for quarterly granularity."""
+        """Render time delta expression for DuckDB, which requires slightly different syntax from other engines."""
         arg_rendered = node.arg.accept(self)
 
         count = node.count
@@ -46,8 +43,9 @@ class PostgresSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         if granularity == TimeGranularity.QUARTER:
             granularity = TimeGranularity.MONTH
             count *= 3
+
         return SqlExpressionRenderResult(
-            sql=f"{arg_rendered.sql} - MAKE_INTERVAL({granularity.value}s => {count})",
+            sql=f"{arg_rendered.sql} - INTERVAL {count} {granularity.value}",
             bind_parameters=arg_rendered.bind_parameters,
         )
 
@@ -60,7 +58,7 @@ class PostgresSqlExpressionRenderer(DefaultSqlExpressionRenderer):
 
     @override
     def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:
-        """Render a percentile expression for Postgres."""
+        """Render a percentile expression for DuckDB."""
         arg_rendered = self.render_sql_expr(node.order_by_arg)
         params = arg_rendered.bind_parameters
         percentile = node.percentile_args.percentile
@@ -70,14 +68,14 @@ class PostgresSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         elif node.percentile_args.function_type is SqlPercentileFunctionType.DISCRETE:
             function_str = "PERCENTILE_DISC"
         elif node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS:
-            raise UnsupportedEngineFeatureError(
-                "Approximate continuous percentile aggregate not supported for Postgres. Set "
-                + "use_approximate_percentile to false in all percentile measures."
+            return SqlExpressionRenderResult(
+                sql=f"approx_quantile({arg_rendered.sql}, {percentile})",
+                bind_parameters=params,
             )
         elif node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_DISCRETE:
-            raise UnsupportedEngineFeatureError(
-                "Approximate discrete percentile aggregate not supported for Postgres. Set "
-                + "use_approximate_percentile to false in all percentile measures."
+            raise RuntimeError(
+                "Approximate discrete percentile aggregatew not supported for DuckDB. Set "
+                + "use_discrete_percentile and/or use_approximate_percentile to false in all percentile measures."
             )
         else:
             assert_values_exhausted(node.percentile_args.function_type)
@@ -88,10 +86,10 @@ class PostgresSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         )
 
 
-class PostgresSQLSqlQueryPlanRenderer(DefaultSqlQueryPlanRenderer):
-    """Plan renderer for the PostgreSQL engine."""
+class DuckDbSqlQueryPlanRenderer(DefaultSqlQueryPlanRenderer):
+    """Plan renderer for the DuckDB engine."""
 
-    EXPR_RENDERER = PostgresSqlExpressionRenderer()
+    EXPR_RENDERER = DuckDbSqlExpressionRenderer()
 
     @property
     @override

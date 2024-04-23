@@ -5,8 +5,8 @@ from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple
 
 from metricflow.semantics.mf_logging.formatting import indent
-from metricflow.semantics.sql.optimizer.sql_query_plan_optimizer import SqlQueryPlanOptimizer
-from metricflow.semantics.sql.sql_exprs import (
+from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlQueryPlanOptimizer
+from metricflow.sql.sql_exprs import (
     SqlColumnAliasReferenceExpression,
     SqlColumnReference,
     SqlColumnReplacements,
@@ -15,7 +15,7 @@ from metricflow.semantics.sql.sql_exprs import (
     SqlLogicalExpression,
     SqlLogicalOperator,
 )
-from metricflow.semantics.sql.sql_plan import (
+from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
     SqlJoinDescription,
     SqlOrderByDescription,

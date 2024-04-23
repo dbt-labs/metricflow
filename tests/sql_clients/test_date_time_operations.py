@@ -24,7 +24,7 @@ import pytest
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 
 from metricflow.semantics.protocols.sql_client import SqlClient
-from metricflow.semantics.sql.sql_exprs import (
+from metricflow.sql.sql_exprs import (
     SqlCastToTimestampExpression,
     SqlDateTruncExpression,
     SqlExtractExpression,
