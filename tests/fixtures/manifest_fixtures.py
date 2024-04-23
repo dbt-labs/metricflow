@@ -163,6 +163,7 @@ class MetricFlowEngineTestFixture:
             semantic_manifest_lookup=self.semantic_manifest_lookup,
             node_output_resolver=self._node_output_resolver.copy(),
             column_association_resolver=self.column_association_resolver,
+            query_parser=self.query_parser,
         )
 
     @staticmethod

@@ -54,7 +54,9 @@ from metricflow.query.resolver_inputs.query_resolver_inputs import (
 from metricflow.specs.patterns.base_time_grain import BaseTimeGrainPattern
 from metricflow.specs.patterns.metric_time_pattern import MetricTimePattern
 from metricflow.specs.patterns.none_date_part import NoneDatePartPattern
+from metricflow.specs.query_param_implementations import DimensionOrEntityParameter, MetricParameter
 from metricflow.specs.specs import (
+    GroupByMetricSpec,
     InstanceSpec,
     InstanceSpecSet,
     MetricFlowQuerySpec,
@@ -511,3 +513,12 @@ class MetricFlowQueryParser:
             return query_spec.with_time_range_constraint(time_constraint)
 
         return query_spec
+
+    def build_query_spec_for_group_by_metric_source_node(
+        self, group_by_metric_spec: GroupByMetricSpec
+    ) -> MetricFlowQuerySpec:
+        """Query spec that can be used to build a source node for this spec in the DFP."""
+        return self.parse_and_validate_query(
+            metrics=(MetricParameter(group_by_metric_spec.reference.element_name),),
+            group_by=(DimensionOrEntityParameter(group_by_metric_spec.entity_spec.qualified_name),),
+        )

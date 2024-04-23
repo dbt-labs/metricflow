@@ -253,6 +253,11 @@ class GroupByMetricSpec(LinkableInstanceSpec, SerializableDataclass):
     def without_entity_links(self) -> GroupByMetricSpec:  # noqa: D102
         return GroupByMetricSpec(element_name=self.element_name, entity_links=())
 
+    @property
+    def last_entity_link(self) -> EntityReference:  # noqa: D102
+        assert len(self.entity_links) > 0, f"Spec does not have any entity links: {self}"
+        return self.entity_links[-1]
+
     @staticmethod
     def from_name(name: str) -> GroupByMetricSpec:  # noqa: D102
         structured_name = StructuredLinkableSpecName.from_name(name)
@@ -260,6 +265,11 @@ class GroupByMetricSpec(LinkableInstanceSpec, SerializableDataclass):
             entity_links=tuple(EntityReference(idl) for idl in structured_name.entity_link_names),
             element_name=structured_name.element_name,
         )
+
+    @property
+    def entity_spec(self) -> EntitySpec:
+        """Entity that the metric will be grouped by on aggregation."""
+        return EntitySpec(element_name=self.last_entity_link.element_name, entity_links=self.entity_links[:-1])
 
     def __eq__(self, other: Any) -> bool:  # type: ignore[misc] # noqa: D105
         if not isinstance(other, GroupByMetricSpec):
@@ -280,14 +290,6 @@ class GroupByMetricSpec(LinkableInstanceSpec, SerializableDataclass):
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_group_by_metric_spec(self)
-
-    @property
-    def query_spec_for_source_node(self) -> MetricFlowQuerySpec:
-        """Query spec that can be used to build a source node for this spec in the DFP."""
-        return MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name=self.element_name),),
-            entity_specs=tuple(EntitySpec.from_name(entity_link.element_name) for entity_link in self.entity_links),
-        )
 
 
 @dataclass(frozen=True)
