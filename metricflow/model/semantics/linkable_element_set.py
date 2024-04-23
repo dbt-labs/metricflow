@@ -8,6 +8,7 @@ from metricflow.model.semantics.linkable_element import (
     ElementPathKey,
     LinkableDimension,
     LinkableElementProperty,
+    LinkableElementType,
     LinkableEntity,
     LinkableMetric,
 )
@@ -21,17 +22,6 @@ class LinkableElementSet:
     TODO: There are similarities with LinkableSpecSet - consider consolidation.
     """
 
-    # Dictionaries that map the path key to context on the dimension
-    #
-    # For example:
-    # {
-    #   "listing__country_latest": (
-    #     LinkableDimension(
-    #       element_name="country_latest",
-    #       entity_links=("listing",),
-    #       semantic_model_origin="listings_latest_source",
-    #   )
-    # }
     path_key_to_linkable_dimensions: Dict[ElementPathKey, Tuple[LinkableDimension, ...]] = field(default_factory=dict)
     path_key_to_linkable_entities: Dict[ElementPathKey, Tuple[LinkableEntity, ...]] = field(default_factory=dict)
     path_key_to_linkable_metrics: Dict[ElementPathKey, Tuple[LinkableMetric, ...]] = field(default_factory=dict)
@@ -40,7 +30,10 @@ class LinkableElementSet:
     def merge_by_path_key(linkable_element_sets: Sequence[LinkableElementSet]) -> LinkableElementSet:
         """Combine multiple sets together by the path key.
 
-        If there are elements with the same join key, those elements will be categorized as ambiguous.
+        If there are elements with the same join key and different element(s) in the tuple of values,
+        those elements will be categorized as ambiguous.
+        Note this does not deduplicate values, so there may be unambiguous merged sets that appear to have
+        multiple values if all one does is a simple length check.
         """
         key_to_linkable_dimensions: Dict[ElementPathKey, List[LinkableDimension]] = defaultdict(list)
         key_to_linkable_entities: Dict[ElementPathKey, List[LinkableEntity]] = defaultdict(list)
@@ -54,7 +47,6 @@ class LinkableElementSet:
             for path_key, linkable_metrics in linkable_element_set.path_key_to_linkable_metrics.items():
                 key_to_linkable_metrics[path_key].extend(linkable_metrics)
 
-        # Convert the dictionaries to use tuples instead of lists.
         return LinkableElementSet(
             path_key_to_linkable_dimensions={
                 path_key: tuple(dimensions) for path_key, dimensions in key_to_linkable_dimensions.items()
@@ -70,6 +62,11 @@ class LinkableElementSet:
     @staticmethod
     def intersection_by_path_key(linkable_element_sets: Sequence[LinkableElementSet]) -> LinkableElementSet:
         """Find the intersection of all elements in the sets by path key.
+
+        This will return the intersection of all path keys defined in the sets, but the union of elements associated
+        with each path key. In other words, it filters out path keys (i.e., linkable specs) that are not referenced
+        in every set in the input sequence, but it preserves all of the various potentially ambiguous LinkableElement
+        instances associated with the path keys that remain.
 
         This is useful to figure out the common dimensions that are possible to query with multiple metrics. You would
         find the LinkableSpecSet for each metric in the query, then do an intersection of the sets.
@@ -210,7 +207,7 @@ class LinkableElementSet:
                     entity_links=path_key.entity_links,
                 )
                 for path_key in self.path_key_to_linkable_dimensions.keys()
-                if not path_key.time_granularity
+                if path_key.element_type is LinkableElementType.DIMENSION
             ),
             time_dimension_specs=tuple(
                 TimeDimensionSpec(
@@ -220,7 +217,7 @@ class LinkableElementSet:
                     date_part=path_key.date_part,
                 )
                 for path_key in self.path_key_to_linkable_dimensions.keys()
-                if path_key.time_granularity
+                if path_key.element_type is LinkableElementType.TIME_DIMENSION and path_key.time_granularity
             ),
             entity_specs=tuple(
                 EntitySpec(
