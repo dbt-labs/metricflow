@@ -24,13 +24,13 @@ from metricflow.instances import (
     MeasureInstance,
     TimeDimensionInstance,
 )
-from metricflow.plan_conversion.time_spine import TIME_SPINE_DATA_SET_DESCRIPTION, TimeSpineSource
 from metricflow.semantics.dag.id_prefix import DynamicIdPrefix, StaticIdPrefix
 from metricflow.semantics.dag.sequential_id import SequentialIdGenerator
 from metricflow.semantics.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.semantics.dataset.sql_dataset import SqlDataSet
 from metricflow.semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.semantics.model.spec_converters import MeasureConverter
+from metricflow.semantics.plan_conversion.time_spine import TIME_SPINE_DATA_SET_DESCRIPTION, TimeSpineSource
 from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow.semantics.specs.spec_classes import (
     DEFAULT_TIME_GRANULARITY,

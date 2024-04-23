@@ -3,13 +3,13 @@ from __future__ import annotations
 from typing import Mapping
 
 from metricflow.instances import InstanceSet
-from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
-from metricflow.plan_conversion.instance_converters import (
+from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow.semantics.plan_conversion.column_resolver import DunderColumnAssociationResolver
+from metricflow.semantics.plan_conversion.instance_converters import (
     CreateSelectColumnsWithMeasuresAggregated,
     FilterElements,
 )
-from metricflow.plan_conversion.select_column_gen import SelectColumnSet
-from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow.semantics.plan_conversion.select_column_gen import SelectColumnSet
 from metricflow.semantics.specs.spec_classes import InstanceSpecSet, MeasureSpec, MetricInputMeasureSpec
 from metricflow.sql.sql_exprs import (
     SqlAggregateFunctionExpression,

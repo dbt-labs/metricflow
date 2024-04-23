@@ -28,10 +28,10 @@ from metricflow.instances import (
     MetricInstance,
     TimeDimensionInstance,
 )
-from metricflow.plan_conversion.select_column_gen import SelectColumnSet
 from metricflow.semantics.dataflow.nodes.join_to_base import ValidityWindowJoinDescription
 from metricflow.semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow.semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
+from metricflow.semantics.plan_conversion.select_column_gen import SelectColumnSet
 from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow.semantics.specs.spec_classes import (
     DimensionSpec,

@@ -48,7 +48,7 @@ When running any one of the hatch commands, the environment is automatically set
         - These are generally laid out in a similar hierarchy to the main package.
         - Let's try them out:
             - Run the [dataflow plan to sql plan conversion tests](tests/plan_conversion/test_dataflow_to_sql_plan.py): `hatch run dev-env:pytest tests/plan_conversion/test_dataflow_to_sql_plan.py`.
-            - Modify something in the [dataflow to sql plan converter logic](metricflow/plan_conversion/dataflow_to_sql.py). I like to throw exceptions just to make sure things blow up.
+            - Modify something in the [dataflow to sql plan converter logic](metricflow/semantics/plan_conversion/dataflow_to_sql.py). I like to throw exceptions just to make sure things blow up.
             - Run the test again. Did anything break?
     - Remember to clean up when you're done playing with the tests!
 3. Make changes to the codebase and verify them through further testing, including test runs against other warehouse engines.

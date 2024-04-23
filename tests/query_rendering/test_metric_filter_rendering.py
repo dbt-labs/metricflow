@@ -4,10 +4,10 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
 
-from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.semantics.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
+from metricflow.semantics.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.query_rendering.compare_rendered_query import convert_and_check
 
