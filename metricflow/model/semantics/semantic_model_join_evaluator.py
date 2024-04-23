@@ -226,17 +226,16 @@ class SemanticModelJoinEvaluator:
         entity_reference: EntityReference,
     ) -> SemanticModelReference:
         """Return the semantic model where the entity was defined in the instance set."""
-        matching_instances: List[EntityInstance] = []
+        matching_entity_instances: List[EntityInstance] = []
         for entity_instance in instance_set.entity_instances:
-            assert len(entity_instance.defined_from) == 1
             if len(entity_instance.spec.entity_links) == 0 and entity_instance.spec.reference == entity_reference:
-                matching_instances.append(entity_instance)
+                matching_entity_instances.append(entity_instance)
 
-        assert len(matching_instances) == 1, (
-            f"Not exactly 1 matching entity instances found: {matching_instances} for {entity_reference} in "
+        assert len(matching_entity_instances) == 1, (
+            f"Not exactly 1 matching entity instances found: {matching_entity_instances} for {entity_reference} in "
             f"{mf_pformat(instance_set)}"
         )
-        return matching_instances[0].origin_semantic_model_reference.semantic_model_reference
+        return matching_entity_instances[0].checked_origin_semantic_model_reference.semantic_model_reference
 
     def is_valid_instance_set_join(
         self,

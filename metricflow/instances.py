@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Generic, List, Tuple, TypeVar
+from typing import Generic, List, Optional, Tuple, TypeVar
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.references import MetricModelReference, SemanticModelElementReference
@@ -56,26 +56,19 @@ class MdoInstance(ABC, Generic[SpecT]):
 
 @dataclass(frozen=True)
 class SemanticModelElementInstance(SerializableDataclass):  # noqa: D101
-    # This instance is derived from something defined in a semantic model.
-    defined_from: Tuple[SemanticModelElementReference, ...]
+    origin_semantic_model_reference: Optional[SemanticModelElementReference]
 
     @property
-    def origin_semantic_model_reference(self) -> SemanticModelElementReference:
-        """Property to grab the element reference pointing to the origin semantic model for this element instance.
+    def checked_origin_semantic_model_reference(self) -> SemanticModelElementReference:
+        """Get origin_semantic_model_reference, error if it doesn't exist.
 
-        By convention this is the zeroth element in the Tuple. At this time these tuples are always of exactly
-        length 1, so the simple assertions here work.
-
-        TODO: make this a required input value, rather than a derived property on these objects
+        Mostly used for type-checking simplification.
         """
-        if len(self.defined_from) != 1:
+        if self.origin_semantic_model_reference is None:
             raise ValueError(
-                f"SemanticModelElementInstances should have exactly one entry in the `defined_from` property, because "
-                f"otherwise there is no way to ensure that the first element is always the origin semantic model! Found "
-                f"{len(self.defined_from)} elements in this particular instance: {self.defined_from}."
+                f"Expected origin_semantic_model_reference for SemanticModelElementInstance, but found none. Instance: {self}"
             )
-
-        return self.defined_from[0]
+        return self.origin_semantic_model_reference
 
 
 @dataclass(frozen=True)

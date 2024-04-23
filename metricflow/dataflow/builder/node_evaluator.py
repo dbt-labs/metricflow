@@ -233,17 +233,10 @@ class NodeEvaluatorForLinkableInstances:
                 if entity_instance_in_right_node is None:
                     raise RuntimeError(f"Could not find entity instance with name ({entity_spec_in_right_node})")
 
-                assert (
-                    len(entity_instance_in_right_node.defined_from) == 1
-                ), f"Did not get exactly 1 defined_from in {entity_instance_in_right_node}"
-
-                entity_in_right_node = self._semantic_model_lookup.get_entity_in_semantic_model(
-                    entity_instance_in_right_node.defined_from[0]
-                )
+                element_reference = entity_instance_in_right_node.checked_origin_semantic_model_reference
+                entity_in_right_node = self._semantic_model_lookup.get_entity_in_semantic_model(element_reference)
                 if entity_in_right_node is None:
-                    raise RuntimeError(
-                        f"Invalid SemanticModelElementReference {entity_instance_in_right_node.defined_from[0]}"
-                    )
+                    raise RuntimeError(f"Invalid SemanticModelElementReference {element_reference}")
 
                 entity_instance_in_left_node = None
                 for instance in left_node_instance_set.entity_instances:
@@ -255,14 +248,9 @@ class NodeEvaluatorForLinkableInstances:
                     # The right node can have a superset of entities.
                     continue
 
-                assert len(entity_instance_in_left_node.defined_from) == 1
-                assert len(entity_instance_in_right_node.defined_from) == 1
-
                 if not self._join_evaluator.is_valid_semantic_model_join(
-                    left_semantic_model_reference=entity_instance_in_left_node.defined_from[0].semantic_model_reference,
-                    right_semantic_model_reference=entity_instance_in_right_node.defined_from[
-                        0
-                    ].semantic_model_reference,
+                    left_semantic_model_reference=entity_instance_in_left_node.checked_origin_semantic_model_reference.semantic_model_reference,
+                    right_semantic_model_reference=entity_instance_in_right_node.checked_origin_semantic_model_reference.semantic_model_reference,
                     on_entity_reference=entity_spec_in_right_node.reference,
                 ):
                     # If joining to ComputeMetricsNode, the right node is pre-aggregated.

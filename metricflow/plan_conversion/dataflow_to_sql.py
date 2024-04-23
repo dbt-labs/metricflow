@@ -230,7 +230,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         day.
         """
         time_spine_instance = TimeDimensionInstance(
-            defined_from=agg_time_dimension_instance.defined_from,
+            origin_semantic_model_reference=agg_time_dimension_instance.origin_semantic_model_reference,
             associated_columns=(
                 ColumnAssociation(
                     column_name=agg_time_dimension_column_name,
@@ -1077,11 +1077,11 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         output_measure_instances = []
         for measure_instance in input_data_set.instance_set.measure_instances:
             semantic_model = self._semantic_model_lookup.get_by_reference(
-                semantic_model_reference=measure_instance.origin_semantic_model_reference.semantic_model_reference
+                semantic_model_reference=measure_instance.checked_origin_semantic_model_reference.semantic_model_reference
             )
             assert semantic_model is not None, (
                 f"{measure_instance} was defined from "
-                f"{measure_instance.origin_semantic_model_reference.semantic_model_reference}, but that can't be found"
+                f"{measure_instance.checked_origin_semantic_model_reference.semantic_model_reference}, but that can't be found"
             )
             aggregation_time_dimension_for_measure = semantic_model.checked_agg_time_dimension_for_measure(
                 measure_reference=measure_instance.spec.reference
@@ -1090,7 +1090,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 output_measure_instances.append(measure_instance)
 
         # Find time dimension instances that refer to the same dimension as the one specified in the node.
-        matching_time_dimension_instances = []
+        matching_time_dimension_instances: List[TimeDimensionInstance] = []
         for time_dimension_instance in input_data_set.instance_set.time_dimension_instances:
             # The specification for the time dimension to use for aggregation is the local one.
             if (
@@ -1114,7 +1114,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             )
             output_time_dimension_instances.append(
                 TimeDimensionInstance(
-                    defined_from=matching_time_dimension_instance.defined_from,
+                    origin_semantic_model_reference=matching_time_dimension_instance.origin_semantic_model_reference,
                     associated_columns=(self._column_association_resolver.resolve_spec(metric_time_dimension_spec),),
                     spec=metric_time_dimension_spec,
                 )
@@ -1430,7 +1430,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 aggregation_state=original_time_spine_dim_instance.spec.aggregation_state,
             )
             time_spine_dim_instance = TimeDimensionInstance(
-                defined_from=original_time_spine_dim_instance.defined_from,
+                origin_semantic_model_reference=original_time_spine_dim_instance.origin_semantic_model_reference,
                 associated_columns=(self._column_association_resolver.resolve_spec(time_dim_spec),),
                 spec=time_dim_spec,
             )

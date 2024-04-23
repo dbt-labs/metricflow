@@ -133,17 +133,10 @@ class PreJoinNodeProcessor:
             if len(entity_spec_in_first_node.entity_links) > 0:
                 continue
 
-            assert (
-                len(entity_instance_in_first_node.defined_from) == 1
-            ), "Multiple items in defined_from not yet supported"
-
-            entity = self._semantic_model_lookup.get_entity_in_semantic_model(
-                entity_instance_in_first_node.defined_from[0]
-            )
+            element_reference = entity_instance_in_first_node.checked_origin_semantic_model_reference
+            entity = self._semantic_model_lookup.get_entity_in_semantic_model(element_reference)
             if entity is None:
-                raise RuntimeError(
-                    f"Invalid SemanticModelElementReference {entity_instance_in_first_node.defined_from[0]}"
-                )
+                raise RuntimeError(f"Invalid SemanticModelElementReference {element_reference}")
 
             return True
 
