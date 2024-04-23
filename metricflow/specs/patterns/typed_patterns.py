@@ -12,6 +12,7 @@ from dbt_semantic_interfaces.call_parameter_sets import (
 from dbt_semantic_interfaces.references import EntityReference
 from typing_extensions import override
 
+from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.specs.patterns.entity_link_pattern import (
     EntityLinkPattern,
     EntityLinkPatternParameterSet,
@@ -129,6 +130,19 @@ class GroupByMetricPattern(EntityLinkPattern):
     def from_call_parameter_set(  # noqa: D102
         metric_call_parameter_set: MetricCallParameterSet,
     ) -> GroupByMetricPattern:
+        # This looks hacky because the typing for the interface does not match the implementation, but that's temporary!
+        # This will get a lot less hacky once we enable multiple entities and dimensions in the group by.
+        if len(metric_call_parameter_set.group_by) != 1:
+            raise RuntimeError(
+                "Currently only one group by item is allowed for Metric filters. "
+                "This should have been caught by validations."
+            )
+        group_by = metric_call_parameter_set.group_by[0]
+        structured_name = StructuredLinkableSpecName.from_name(group_by.element_name)
+        entity_links = tuple(
+            EntityReference(entity_name)
+            for entity_name in (structured_name.entity_link_names + (structured_name.element_name,))
+        )
         return GroupByMetricPattern(
             parameter_set=EntityLinkPatternParameterSet.from_parameters(
                 fields_to_compare=(
@@ -136,9 +150,6 @@ class GroupByMetricPattern(EntityLinkPattern):
                     ParameterSetField.ENTITY_LINKS,
                 ),
                 element_name=metric_call_parameter_set.metric_reference.element_name,
-                entity_links=tuple(
-                    EntityReference(element_name=group_by_ref.element_name)
-                    for group_by_ref in metric_call_parameter_set.group_by
-                ),
+                entity_links=entity_links,
             )
         )
