@@ -41,7 +41,6 @@ from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataframeN
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.dataset.sql_dataset import SqlDataSet
-from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.instances import (
     GroupByMetricInstance,
     InstanceSet,
@@ -87,6 +86,7 @@ from metricflow.plan_conversion.sql_join_builder import (
 )
 from metricflow.plan_conversion.time_spine import TIME_SPINE_DATA_SET_DESCRIPTION, TimeSpineSource
 from metricflow.protocols.sql_client import SqlEngine
+from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow.semantics.specs.column_assoc import (
     ColumnAssociation,
     ColumnAssociationResolver,

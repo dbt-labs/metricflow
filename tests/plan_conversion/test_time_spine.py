@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from pandas import DataFrame
 
-from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow.time.time_constants import ISO8601_PYTHON_TS_FORMAT
 
 

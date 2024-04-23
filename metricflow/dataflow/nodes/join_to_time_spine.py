@@ -9,7 +9,7 @@ from dbt_semantic_interfaces.type_enums import TimeGranularity
 from metricflow.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow.dag.mf_dag import DisplayedProperty
 from metricflow.dataflow.dataflow_plan import BaseOutput, DataflowPlanNode, DataflowPlanNodeVisitor
-from metricflow.filters.time_constraint import TimeRangeConstraint
+from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow.semantics.specs.spec_classes import TimeDimensionSpec
 from metricflow.sql.sql_plan import SqlJoinType
 from metricflow.visitor import VisitorOutputT

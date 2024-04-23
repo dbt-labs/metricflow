@@ -29,7 +29,6 @@ from metricflow.engine.time_source import ServerTimeSource
 from metricflow.errors.error_classes import ExecutionException
 from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
 from metricflow.execution.executor import SequentialPlanExecutor
-from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.mf_logging.formatting import indent
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
@@ -49,6 +48,7 @@ from metricflow.protocols.sql_client import SqlClient
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.random_id import random_id
+from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow.semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow.semantics.specs.query_param_implementations import SavedQueryParameter
