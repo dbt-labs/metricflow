@@ -7,11 +7,11 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 
-from metricflow.query.group_by_item.group_by_item_resolver import GroupByItemResolver
-from metricflow.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
 from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.semantics.naming.naming_scheme import QueryItemNamingScheme
 from metricflow.semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
+from metricflow.semantics.query.group_by_item.group_by_item_resolver import GroupByItemResolver
+from metricflow.semantics.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.query.group_by_item.conftest import AmbiguousResolutionQueryId
 from tests.snapshot_utils import assert_object_snapshot_equal

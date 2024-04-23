@@ -37,9 +37,11 @@ from typing_extensions import override
 
 from metricflow.aggregation_properties import AggregationState
 from metricflow.collection_helpers.merger import Mergeable
-from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import FilterSpecResolutionLookUp
 from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow.semantics.naming.linkable_spec_name import StructuredLinkableSpecName
+from metricflow.semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
+    FilterSpecResolutionLookUp,
+)
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_column_type import SqlColumnType
 from metricflow.sql.sql_plan import SqlJoinType

@@ -7,7 +7,6 @@ from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
-from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.semantics.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.semantics.dataflow.dataflow_plan import (
     DataflowPlan,
@@ -34,6 +33,7 @@ from metricflow.semantics.dataflow.nodes.write_to_dataframe import WriteToResult
 from metricflow.semantics.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.semantics.dataflow.optimizer.source_scan.source_scan_optimizer import SourceScanOptimizer
 from metricflow.semantics.dataset.dataset_classes import DataSet
+from metricflow.semantics.query.query_parser import MetricFlowQueryParser
 from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow.semantics.specs.spec_classes import (
     DimensionSpec,

@@ -25,8 +25,6 @@ from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowRese
 from metricflow.mf_logging.formatting import indent
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.mf_logging.runtime import log_runtime
-from metricflow.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
-from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import FilterSpecResolutionLookUp
 from metricflow.semantics.dag.id_prefix import StaticIdPrefix
 from metricflow.semantics.dag.mf_dag import DagId
 from metricflow.semantics.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
@@ -63,6 +61,10 @@ from metricflow.semantics.errors.error_classes import UnableToSatisfyQueryError
 from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.semantics.plan_conversion.node_processor import PreJoinNodeProcessor
+from metricflow.semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
+from metricflow.semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
+    FilterSpecResolutionLookUp,
+)
 from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow.semantics.specs.spec_classes import (
     ConstantPropertySpec,

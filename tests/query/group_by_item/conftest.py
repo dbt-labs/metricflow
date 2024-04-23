@@ -11,11 +11,11 @@ from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.protocols import WhereFilterIntersection
 from dbt_semantic_interfaces.references import MetricReference
 
-from metricflow.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
-from metricflow.query.group_by_item.resolution_dag.dag_builder import GroupByItemResolutionDagBuilder
 from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.semantics.naming.naming_scheme import QueryItemNamingScheme
 from metricflow.semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
+from metricflow.semantics.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
+from metricflow.semantics.query.group_by_item.resolution_dag.dag_builder import GroupByItemResolutionDagBuilder
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.query.group_by_item.ambiguous_resolution_query_id import AmbiguousResolutionQueryId
 

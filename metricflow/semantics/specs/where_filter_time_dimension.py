@@ -15,12 +15,12 @@ from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from typing_extensions import override
 
-from metricflow.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
-from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
+from metricflow.semantics.errors.error_classes import InvalidQuerySyntax
+from metricflow.semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
+from metricflow.semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
     FilterSpecResolutionLookUp,
     ResolvedSpecLookUpKey,
 )
-from metricflow.semantics.errors.error_classes import InvalidQuerySyntax
 from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow.semantics.specs.rendered_spec_tracker import RenderedSpecTracker
 from metricflow.semantics.specs.where_filter_dimension import WhereFilterDimension

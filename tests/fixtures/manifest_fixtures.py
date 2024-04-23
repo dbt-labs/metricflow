@@ -18,7 +18,6 @@ from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 
 from metricflow.engine.metricflow_engine import MetricFlowEngine
-from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.semantics.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.semantics.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.semantics.dataflow.builder.source_node import SourceNodeBuilder, SourceNodeSet
@@ -29,6 +28,7 @@ from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifest
 from metricflow.semantics.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.semantics.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.semantics.protocols.sql_client import SqlClient
+from metricflow.semantics.query.query_parser import MetricFlowQueryParser
 from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow.test_helpers import ConfigurableTimeSource
 from tests.fixtures.id_fixtures import IdNumberSpace, patch_id_generators_helper

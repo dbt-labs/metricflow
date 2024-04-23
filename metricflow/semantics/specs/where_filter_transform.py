@@ -7,8 +7,10 @@ import jinja2
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
 from dbt_semantic_interfaces.protocols import WhereFilter, WhereFilterIntersection
 
-from metricflow.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
-from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import FilterSpecResolutionLookUp
+from metricflow.semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
+from metricflow.semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
+    FilterSpecResolutionLookUp,
+)
 from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow.semantics.specs.rendered_spec_tracker import RenderedSpecTracker
 from metricflow.semantics.specs.spec_classes import LinkableSpecSet, WhereFilterSpec

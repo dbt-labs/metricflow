@@ -24,16 +24,16 @@ from dbt_semantic_interfaces.references import (
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
-from metricflow.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
-from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
+from metricflow.semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
+from metricflow.semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
+from metricflow.semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
     CallParameterSet,
     FilterSpecResolution,
     FilterSpecResolutionLookUp,
     ResolvedSpecLookUpKey,
 )
-from metricflow.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
-from metricflow.query.issues.issues_base import MetricFlowQueryResolutionIssueSet
-from metricflow.semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
+from metricflow.semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
+from metricflow.semantics.query.issues.issues_base import MetricFlowQueryResolutionIssueSet
 from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow.semantics.specs.spec_classes import (
     DimensionSpec,

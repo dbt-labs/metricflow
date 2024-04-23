@@ -6,7 +6,7 @@ from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 
 if TYPE_CHECKING:
-    from metricflow.query.resolver_inputs.query_resolver_inputs import (
+    from metricflow.semantics.query.resolver_inputs.query_resolver_inputs import (
         ResolverInputForGroupByItem,
         ResolverInputForMetric,
         ResolverInputForOrderByItem,

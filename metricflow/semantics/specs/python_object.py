@@ -5,9 +5,9 @@ from typing import List
 from dbt_semantic_interfaces.call_parameter_sets import ParseWhereFilterException
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
 
-from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.semantics.protocols.query_parameter import GroupByParameter
+from metricflow.semantics.query.query_exceptions import InvalidQueryException
 from metricflow.semantics.specs.query_param_implementations import DimensionOrEntityParameter, TimeDimensionParameter
 
 

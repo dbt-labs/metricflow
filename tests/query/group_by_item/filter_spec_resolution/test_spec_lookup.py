@@ -21,16 +21,16 @@ from dbt_semantic_interfaces.references import MetricReference
 from dbt_semantic_interfaces.transformations.transform_rule import SemanticManifestTransformRule
 
 from metricflow.mf_logging.pretty_print import mf_pformat
-from metricflow.query.group_by_item.filter_spec_resolution.filter_pattern_factory import (
-    DefaultWhereFilterPatternFactory,
-)
-from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
-    FilterSpecResolutionLookUp,
-)
-from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_resolver import WhereFilterSpecResolver
-from metricflow.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
 from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.semantics.naming.naming_scheme import QueryItemNamingScheme
+from metricflow.semantics.query.group_by_item.filter_spec_resolution.filter_pattern_factory import (
+    DefaultWhereFilterPatternFactory,
+)
+from metricflow.semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
+    FilterSpecResolutionLookUp,
+)
+from metricflow.semantics.query.group_by_item.filter_spec_resolution.filter_spec_resolver import WhereFilterSpecResolver
+from metricflow.semantics.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.model.modify.modify_input_metric_filter import ModifyInputMetricFilterTransform
 from tests.model.modify.modify_manifest import modify_manifest
