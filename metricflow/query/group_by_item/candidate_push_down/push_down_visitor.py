@@ -42,7 +42,7 @@ from metricflow.query.issues.issues_base import (
     MetricFlowQueryResolutionIssueSet,
 )
 from metricflow.query.suggestion_generator import QueryItemSuggestionGenerator
-from metricflow.specs.patterns.base_time_grain import BaseTimeGrainPattern
+from metricflow.semantics.specs.patterns.base_time_grain import BaseTimeGrainPattern
 from metricflow.specs.patterns.none_date_part import NoneDatePartPattern
 from metricflow.specs.patterns.spec_pattern import SpecPattern
 from metricflow.specs.spec_classes import InstanceSpecSet, LinkableInstanceSpec

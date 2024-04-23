@@ -5,7 +5,7 @@ from typing import Sequence, Tuple
 
 from metricflow.naming.naming_scheme import QueryItemNamingScheme
 from metricflow.query.similarity import top_fuzzy_matches
-from metricflow.specs.patterns.base_time_grain import BaseTimeGrainPattern
+from metricflow.semantics.specs.patterns.base_time_grain import BaseTimeGrainPattern
 from metricflow.specs.patterns.none_date_part import NoneDatePartPattern
 from metricflow.specs.patterns.spec_pattern import SpecPattern
 from metricflow.specs.spec_classes import InstanceSpec
