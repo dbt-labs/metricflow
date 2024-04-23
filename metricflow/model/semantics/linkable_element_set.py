@@ -30,7 +30,10 @@ class LinkableElementSet:
     def merge_by_path_key(linkable_element_sets: Sequence[LinkableElementSet]) -> LinkableElementSet:
         """Combine multiple sets together by the path key.
 
-        If there are elements with the same join key, those elements will be categorized as ambiguous.
+        If there are elements with the same join key and different element(s) in the tuple of values,
+        those elements will be categorized as ambiguous.
+        Note this does not deduplicate values, so there may be unambiguous merged sets that appear to have
+        multiple values if all one does is a simple length check.
         """
         key_to_linkable_dimensions: Dict[ElementPathKey, List[LinkableDimension]] = defaultdict(list)
         key_to_linkable_entities: Dict[ElementPathKey, List[LinkableEntity]] = defaultdict(list)
@@ -59,6 +62,11 @@ class LinkableElementSet:
     @staticmethod
     def intersection_by_path_key(linkable_element_sets: Sequence[LinkableElementSet]) -> LinkableElementSet:
         """Find the intersection of all elements in the sets by path key.
+
+        This will return the intersection of all path keys defined in the sets, but the union of elements associated
+        with each path key. In other words, it filters out path keys (i.e., linkable specs) that are not referenced
+        in every set in the input sequence, but it preserves all of the various potentially ambiguous LinkableElement
+        instances associated with the path keys that remain.
 
         This is useful to figure out the common dimensions that are possible to query with multiple metrics. You would
         find the LinkableSpecSet for each metric in the query, then do an intersection of the sets.
