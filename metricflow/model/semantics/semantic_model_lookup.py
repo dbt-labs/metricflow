@@ -24,7 +24,6 @@ from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from metricflow.errors.errors import InvalidSemanticModelError
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantics.element_group import ElementGrouper
-from metricflow.model.semantics.linkable_element import ElementPathKey
 from metricflow.model.spec_converters import MeasureConverter
 from metricflow.specs.specs import (
     DimensionSpec,
@@ -350,22 +349,20 @@ class SemanticModelLookup:
         else:
             raise ValueError(f"Unable to find linkable element {element_name} in manifest")
 
-    def get_agg_time_dimension_path_key_for_measure(self, measure_reference: MeasureReference) -> ElementPathKey:
-        """Get the agg time dimension associated with the measure."""
-        agg_time_dimension = self.get_agg_time_dimension_for_measure(measure_reference)
-
-        # A measure's agg_time_dimension is required to be in the same semantic model as the measure,
-        # so we can assume the same semantic model for both measure and dimension.
-        semantic_model = self.get_semantic_model_for_measure(measure_reference)
-        entity_link = self.get_primary_entity_else_error(semantic_model)
-        return ElementPathKey(element_name=agg_time_dimension.element_name, entity_links=(entity_link,))
-
     def get_agg_time_dimension_specs_for_measure(
         self, measure_reference: MeasureReference
     ) -> Sequence[TimeDimensionSpec]:
         """Get the agg time dimension specs that can be used in place of metric time for this measure."""
-        path_key = self.get_agg_time_dimension_path_key_for_measure(measure_reference)
+        agg_time_dimension = self.get_agg_time_dimension_for_measure(measure_reference)
+        # A measure's agg_time_dimension is required to be in the same semantic model as the measure,
+        # so we can assume the same semantic model for both measure and dimension.
+        semantic_model = self.get_semantic_model_for_measure(measure_reference)
+        entity_link = self.resolved_primary_entity(semantic_model)
+        assert entity_link is not None, (
+            f"Expected semantic model {semantic_model} to have a primary entity since it has a "
+            "measure requiring an agg_time_dimension, but found none.",
+        )
         return TimeDimensionSpec.generate_possible_specs_for_time_dimension(
-            time_dimension_reference=TimeDimensionReference(element_name=path_key.element_name),
-            entity_links=path_key.entity_links,
+            time_dimension_reference=agg_time_dimension,
+            entity_links=(entity_link,),
         )
