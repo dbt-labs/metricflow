@@ -382,11 +382,16 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         )
         node_output_resolver.cache_output_data_sets(source_node_set.all_nodes)
 
+        self._query_parser = query_parser or MetricFlowQueryParser(
+            semantic_manifest_lookup=self._semantic_manifest_lookup,
+        )
+
         self._dataflow_plan_builder = DataflowPlanBuilder(
             source_node_set=source_node_set,
             semantic_manifest_lookup=self._semantic_manifest_lookup,
             column_association_resolver=self._column_association_resolver,
             node_output_resolver=node_output_resolver,
+            query_parser=self._query_parser,
         )
         self._to_sql_query_plan_converter = DataflowToSqlQueryPlanConverter(
             column_association_resolver=self._column_association_resolver,
@@ -398,10 +403,6 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             sql_client=sql_client,
         )
         self._executor = SequentialPlanExecutor()
-
-        self._query_parser = query_parser or MetricFlowQueryParser(
-            semantic_manifest_lookup=self._semantic_manifest_lookup,
-        )
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def query(self, mf_request: MetricFlowQueryRequest) -> MetricFlowQueryResult:  # noqa: D102
