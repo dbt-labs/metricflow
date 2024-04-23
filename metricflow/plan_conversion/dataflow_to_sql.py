@@ -12,6 +12,8 @@ from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.conversion_calculation_type import ConversionCalculationType
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 
+from metricflow.dataset.dataset_classes import DataSet
+from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.convert_to_sql_plan import ConvertToSqlPlanResult
 from metricflow.plan_conversion.instance_converters import (
     AddGroupByMetrics,
@@ -75,8 +77,6 @@ from metricflow.semantics.dataflow.nodes.semi_additive_join import SemiAdditiveJ
 from metricflow.semantics.dataflow.nodes.where_filter import WhereConstraintNode
 from metricflow.semantics.dataflow.nodes.write_to_dataframe import WriteToResultDataframeNode
 from metricflow.semantics.dataflow.nodes.write_to_table import WriteToResultTableNode
-from metricflow.semantics.dataset.dataset_classes import DataSet
-from metricflow.semantics.dataset.sql_dataset import SqlDataSet
 from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow.semantics.instances import (
     GroupByMetricInstance,

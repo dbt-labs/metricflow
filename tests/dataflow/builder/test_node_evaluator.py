@@ -6,6 +6,7 @@ from typing import Mapping, Sequence
 import pytest
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
+from metricflow.dataset.dataset_classes import DataSet
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.node_processor import PreJoinNodeProcessor
 from metricflow.semantics.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
@@ -17,7 +18,6 @@ from metricflow.semantics.dataflow.builder.node_evaluator import (
 from metricflow.semantics.dataflow.builder.partitions import PartitionTimeDimensionJoinDescription
 from metricflow.semantics.dataflow.builder.source_node import SourceNodeSet
 from metricflow.semantics.dataflow.nodes.join_to_base import ValidityWindowJoinDescription
-from metricflow.semantics.dataset.dataset_classes import DataSet
 from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.semantics.specs.spec_classes import (
     DimensionSpec,

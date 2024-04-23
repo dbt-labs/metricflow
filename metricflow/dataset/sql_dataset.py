@@ -5,8 +5,8 @@ from typing import Optional, Sequence
 from dbt_semantic_interfaces.references import SemanticModelReference
 from typing_extensions import override
 
+from metricflow.dataset.dataset_classes import DataSet
 from metricflow.semantics.assert_one_arg import assert_exactly_one_arg_set
-from metricflow.semantics.dataset.dataset_classes import DataSet
 from metricflow.semantics.instances import (
     InstanceSet,
 )

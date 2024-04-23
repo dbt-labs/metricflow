@@ -17,6 +17,8 @@ from dbt_semantic_interfaces.protocols import SemanticModel
 from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 
+from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
+from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
@@ -25,8 +27,6 @@ from metricflow.semantics.dataflow.builder.dataflow_plan_builder import Dataflow
 from metricflow.semantics.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.semantics.dataflow.builder.source_node import SourceNodeBuilder, SourceNodeSet
 from metricflow.semantics.dataflow.nodes.read_sql_source import ReadSqlSourceNode
-from metricflow.semantics.dataset.convert_semantic_model import SemanticModelToDataSetConverter
-from metricflow.semantics.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.semantics.query.query_parser import MetricFlowQueryParser
 from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver

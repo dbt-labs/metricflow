@@ -5,13 +5,13 @@ from typing import List, Sequence, Tuple
 
 from dbt_semantic_interfaces.references import TimeDimensionReference
 
+from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
+from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.semantics.dataflow.dataflow_plan import (
     BaseOutput,
 )
 from metricflow.semantics.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.semantics.dataflow.nodes.read_sql_source import ReadSqlSourceNode
-from metricflow.semantics.dataset.convert_semantic_model import SemanticModelToDataSetConverter
-from metricflow.semantics.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
 

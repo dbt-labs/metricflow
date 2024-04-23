@@ -6,13 +6,13 @@ from typing import Mapping
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.references import SemanticModelElementReference
 
+from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.semantics.aggregation_properties import AggregationState
 from metricflow.semantics.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.semantics.dataflow.nodes.join_to_base import JoinDescription, JoinToBaseOutputNode
 from metricflow.semantics.dataflow.nodes.read_sql_source import ReadSqlSourceNode
-from metricflow.semantics.dataset.sql_dataset import SqlDataSet
 from metricflow.semantics.instances import (
     InstanceSet,
     MeasureInstance,

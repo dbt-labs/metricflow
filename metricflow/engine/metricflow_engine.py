@@ -13,6 +13,9 @@ from dbt_semantic_interfaces.implementations.filters.where_filter import Pydanti
 from dbt_semantic_interfaces.references import EntityReference, MeasureReference, MetricReference
 from dbt_semantic_interfaces.type_enums import DimensionType
 
+from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
+from metricflow.dataset.dataset_classes import DataSet
+from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.engine.models import Dimension, Entity, Measure, Metric, SavedQuery
 from metricflow.engine.time_source import ServerTimeSource
 from metricflow.execution.convert_to_execution_plan import ConvertToExecutionPlanResult
@@ -32,9 +35,6 @@ from metricflow.semantics.dataflow.dataflow_plan import DataflowPlan
 from metricflow.semantics.dataflow.optimizer.source_scan.source_scan_optimizer import (
     SourceScanOptimizer,
 )
-from metricflow.semantics.dataset.convert_semantic_model import SemanticModelToDataSetConverter
-from metricflow.semantics.dataset.dataset_classes import DataSet
-from metricflow.semantics.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.semantics.errors.error_classes import ExecutionException
 from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow.semantics.mf_logging.formatting import indent
