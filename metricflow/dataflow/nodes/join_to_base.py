@@ -10,7 +10,7 @@ from metricflow.dataflow.builder.partitions import (
     PartitionTimeDimensionJoinDescription,
 )
 from metricflow.dataflow.dataflow_plan import BaseOutput, DataflowPlanNode, DataflowPlanNodeVisitor
-from metricflow.specs.spec_classes import LinklessEntitySpec, TimeDimensionSpec
+from metricflow.semantics.specs.spec_classes import LinklessEntitySpec, TimeDimensionSpec
 from metricflow.sql.sql_plan import SqlJoinType
 from metricflow.visitor import VisitorOutputT
 

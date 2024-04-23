@@ -17,7 +17,7 @@ from metricflow.dataflow.optimizer.source_scan.cm_branch_combiner import (
     ComputeMetricsBranchCombiner,
     ComputeMetricsBranchCombinerResult,
 )
-from metricflow.specs.spec_classes import InstanceSpecSet, MeasureSpec
+from metricflow.semantics.specs.spec_classes import InstanceSpecSet, MeasureSpec
 from tests.dataflow_plan_to_svg import display_graph_if_requested
 from tests.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration

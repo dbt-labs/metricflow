@@ -10,7 +10,7 @@ from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilde
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.specs.spec_classes import MetricFlowQuerySpec, MetricSpec
+from metricflow.semantics.specs.spec_classes import MetricFlowQuerySpec, MetricSpec
 from tests.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.plan_conversion.test_dataflow_to_sql_plan import convert_and_check

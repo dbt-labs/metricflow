@@ -10,8 +10,8 @@ from metricflow.dataset.dataset_classes import DataSet
 from metricflow.instances import (
     InstanceSet,
 )
+from metricflow.semantics.specs.spec_classes import DimensionSpec, EntitySpec, TimeDimensionSpec
 from metricflow.specs.column_assoc import ColumnAssociation
-from metricflow.specs.spec_classes import DimensionSpec, EntitySpec, TimeDimensionSpec
 from metricflow.sql.sql_plan import (
     SqlQueryPlanNode,
     SqlSelectStatementNode,

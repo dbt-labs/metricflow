@@ -4,11 +4,11 @@ from typing import List, Sequence
 
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
 from metricflow.plan_conversion.sql_expression_builders import make_coalesced_expr
-from metricflow.specs.column_assoc import ColumnAssociation, ColumnAssociationResolver
-from metricflow.specs.spec_classes import (
+from metricflow.semantics.specs.spec_classes import (
     InstanceSpecSet,
     InstanceSpecSetTransform,
 )
+from metricflow.specs.column_assoc import ColumnAssociation, ColumnAssociationResolver
 from metricflow.sql.sql_plan import SqlSelectColumn
 
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from metricflow.specs.spec_classes import InstanceSpecSet, InstanceSpecSetTransform
+from metricflow.semantics.specs.spec_classes import InstanceSpecSet, InstanceSpecSetTransform
 
 
 class MatchingLinkableSpecsTransform(InstanceSpecSetTransform[bool]):

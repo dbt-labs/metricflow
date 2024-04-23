@@ -8,7 +8,7 @@ from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 
 from metricflow.naming.object_builder_scheme import ObjectBuilderNamingScheme
-from metricflow.specs.spec_classes import (
+from metricflow.semantics.specs.spec_classes import (
     DimensionSpec,
     EntitySpec,
     GroupByMetricSpec,

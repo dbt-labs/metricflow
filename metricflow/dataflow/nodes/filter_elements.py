@@ -6,7 +6,7 @@ from metricflow.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow.dag.mf_dag import DisplayedProperty
 from metricflow.dataflow.dataflow_plan import BaseOutput, DataflowPlanNode, DataflowPlanNodeVisitor
 from metricflow.mf_logging.pretty_print import mf_pformat
-from metricflow.specs.spec_classes import InstanceSpecSet
+from metricflow.semantics.specs.spec_classes import InstanceSpecSet
 from metricflow.visitor import VisitorOutputT
 
 

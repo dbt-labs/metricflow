@@ -5,7 +5,7 @@ from typing import Sequence
 from typing_extensions import override
 
 from metricflow.semantics.specs.patterns.spec_pattern import SpecPattern
-from metricflow.specs.spec_classes import InstanceSpec
+from metricflow.semantics.specs.spec_classes import InstanceSpec
 
 
 class MatchListSpecPattern(SpecPattern):

@@ -32,8 +32,7 @@ from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.query.query_parser import MetricFlowQueryParser
-from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.specs.spec_classes import (
+from metricflow.semantics.specs.spec_classes import (
     DimensionSpec,
     InstanceSpecSet,
     LinkableSpecSet,
@@ -47,6 +46,7 @@ from metricflow.specs.spec_classes import (
     TimeDimensionSpec,
     WhereFilterSpec,
 )
+from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_plan import SqlJoinType

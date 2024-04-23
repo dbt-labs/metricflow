@@ -6,7 +6,7 @@ from typing import Any
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 
-from metricflow.specs.spec_classes import InstanceSpec
+from metricflow.semantics.specs.spec_classes import InstanceSpec
 
 
 class ColumnCorrelationKey(ABC):

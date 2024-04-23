@@ -27,7 +27,7 @@ from metricflow.query.suggestion_generator import QueryItemSuggestionGenerator
 from metricflow.semantics.specs.patterns.base_time_grain import BaseTimeGrainPattern
 from metricflow.semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow.semantics.specs.patterns.typed_patterns import TimeDimensionPattern
-from metricflow.specs.spec_classes import LinkableInstanceSpec, LinkableSpecSet
+from metricflow.semantics.specs.spec_classes import LinkableInstanceSpec, LinkableSpecSet
 
 logger = logging.getLogger(__name__)
 

@@ -15,11 +15,11 @@ from metricflow.naming.dunder_scheme import DunderNamingScheme
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.query.query_parser import MetricFlowQueryParser
-from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.specs.spec_classes import (
+from metricflow.semantics.specs.spec_classes import (
     MetricFlowQuerySpec,
     MetricSpec,
 )
+from metricflow.specs.column_assoc import ColumnAssociationResolver
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.query_rendering.compare_rendered_query import convert_and_check
 from tests.time.metric_time_dimension import (

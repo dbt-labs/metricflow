@@ -25,7 +25,7 @@ from metricflow.semantics.specs.patterns.typed_patterns import (
     GroupByMetricPattern,
     TimeDimensionPattern,
 )
-from metricflow.specs.spec_classes import (
+from metricflow.semantics.specs.spec_classes import (
     DimensionSpec,
     EntitySpec,
     GroupByMetricSpec,

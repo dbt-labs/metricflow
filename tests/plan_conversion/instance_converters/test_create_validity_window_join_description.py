@@ -9,7 +9,7 @@ from metricflow.dataflow.nodes.join_to_base import ValidityWindowJoinDescription
 from metricflow.instances import InstanceSet
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
-from metricflow.specs.spec_classes import TimeDimensionSpec
+from metricflow.semantics.specs.spec_classes import TimeDimensionSpec
 from tests.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 
 

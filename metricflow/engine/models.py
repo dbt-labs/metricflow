@@ -29,7 +29,7 @@ from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.entity_type import EntityType
 
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
-from metricflow.specs.spec_classes import DimensionSpec, EntityReference
+from metricflow.semantics.specs.spec_classes import DimensionSpec, EntityReference
 
 
 @dataclass(frozen=True)

@@ -19,7 +19,7 @@ from metricflow.dataset.dataset_classes import DataSet
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.node_processor import PreJoinNodeProcessor
-from metricflow.specs.spec_classes import (
+from metricflow.semantics.specs.spec_classes import (
     DimensionSpec,
     EntityReference,
     EntitySpec,

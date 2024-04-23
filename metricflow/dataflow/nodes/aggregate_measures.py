@@ -5,7 +5,7 @@ from typing import Sequence, Tuple
 
 from metricflow.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow.dataflow.dataflow_plan import BaseOutput, DataflowPlanNode, DataflowPlanNodeVisitor
-from metricflow.specs.spec_classes import MetricInputMeasureSpec
+from metricflow.semantics.specs.spec_classes import MetricInputMeasureSpec
 from metricflow.visitor import VisitorOutputT
 
 

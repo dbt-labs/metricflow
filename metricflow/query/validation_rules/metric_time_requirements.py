@@ -18,7 +18,7 @@ from metricflow.query.issues.parsing.cumulative_metric_requires_metric_time impo
 from metricflow.query.issues.parsing.offset_metric_requires_metric_time import OffsetMetricRequiresMetricTimeIssue
 from metricflow.query.resolver_inputs.query_resolver_inputs import ResolverInputForQuery
 from metricflow.query.validation_rules.base_validation_rule import PostResolutionQueryValidationRule
-from metricflow.specs.spec_classes import TimeDimensionSpec
+from metricflow.semantics.specs.spec_classes import TimeDimensionSpec
 
 
 class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):

@@ -10,7 +10,7 @@ from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,
     DataflowPlanNodeVisitor,
 )
-from metricflow.specs.spec_classes import OrderBySpec
+from metricflow.semantics.specs.spec_classes import OrderBySpec
 from metricflow.visitor import VisitorOutputT
 
 

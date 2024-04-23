@@ -14,8 +14,7 @@ from metricflow.dataset.dataset_classes import DataSet
 from metricflow.errors.error_classes import UnableToSatisfyQueryError
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.query.query_parser import MetricFlowQueryParser
-from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.specs.spec_classes import (
+from metricflow.semantics.specs.spec_classes import (
     DimensionSpec,
     EntityReference,
     MetricFlowQuerySpec,
@@ -23,6 +22,7 @@ from metricflow.specs.spec_classes import (
     OrderBySpec,
     TimeDimensionSpec,
 )
+from metricflow.specs.column_assoc import ColumnAssociationResolver
 from tests.dataflow_plan_to_svg import display_graph_if_requested
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.snapshot_utils import assert_plan_snapshot_text_equal

@@ -17,7 +17,7 @@ from metricflow.semantics.specs.patterns.entity_link_pattern import (
     EntityLinkPatternParameterSet,
     ParameterSetField,
 )
-from metricflow.specs.spec_classes import InstanceSpec, InstanceSpecSet, LinkableInstanceSpec
+from metricflow.semantics.specs.spec_classes import InstanceSpec, InstanceSpecSet, LinkableInstanceSpec
 
 
 @dataclass(frozen=True)

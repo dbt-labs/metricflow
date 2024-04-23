@@ -32,8 +32,7 @@ from metricflow.instances import (
 from metricflow.model.semantics.metric_lookup import MetricLookup
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
-from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.specs.spec_classes import (
+from metricflow.semantics.specs.spec_classes import (
     DimensionSpec,
     EntityReference,
     EntitySpec,
@@ -46,6 +45,7 @@ from metricflow.specs.spec_classes import (
     MetricInputMeasureSpec,
     TimeDimensionSpec,
 )
+from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.sql.sql_exprs import (
     SqlAggregateFunctionExpression,
     SqlColumnReference,

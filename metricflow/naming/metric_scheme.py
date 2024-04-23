@@ -7,7 +7,7 @@ from typing_extensions import override
 
 from metricflow.naming.naming_scheme import QueryItemNamingScheme
 from metricflow.semantics.specs.patterns.metric_pattern import MetricSpecPattern
-from metricflow.specs.spec_classes import (
+from metricflow.semantics.specs.spec_classes import (
     InstanceSpec,
     InstanceSpecSet,
 )

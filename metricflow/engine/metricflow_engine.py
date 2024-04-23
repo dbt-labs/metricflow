@@ -50,9 +50,9 @@ from metricflow.protocols.sql_client import SqlClient
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.random_id import random_id
+from metricflow.semantics.specs.spec_classes import InstanceSpecSet, MetricFlowQuerySpec
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.query_param_implementations import SavedQueryParameter
-from metricflow.specs.spec_classes import InstanceSpecSet, MetricFlowQuerySpec
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.sql.sql_table import SqlTable
 from metricflow.telemetry.models import TelemetryLevel

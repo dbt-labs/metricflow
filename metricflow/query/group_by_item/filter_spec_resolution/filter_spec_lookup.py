@@ -24,7 +24,7 @@ from metricflow.query.issues.issues_base import MetricFlowQueryResolutionIssueSe
 from metricflow.semantics.specs.patterns.spec_pattern import SpecPattern
 
 if TYPE_CHECKING:
-    from metricflow.specs.spec_classes import LinkableInstanceSpec
+    from metricflow.semantics.specs.spec_classes import LinkableInstanceSpec
 
 logger = logging.getLogger(__name__)
 

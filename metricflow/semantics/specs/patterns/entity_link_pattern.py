@@ -12,7 +12,7 @@ from more_itertools import is_sorted
 from typing_extensions import override
 
 from metricflow.semantics.specs.patterns.spec_pattern import SpecPattern
-from metricflow.specs.spec_classes import InstanceSpec, InstanceSpecSet, LinkableInstanceSpec
+from metricflow.semantics.specs.spec_classes import InstanceSpec, InstanceSpecSet, LinkableInstanceSpec
 
 logger = logging.getLogger(__name__)
 

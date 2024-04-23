@@ -18,11 +18,11 @@ from metricflow.instances import (
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource
-from metricflow.specs.column_assoc import ColumnAssociation, SingleColumnCorrelationKey
-from metricflow.specs.spec_classes import (
+from metricflow.semantics.specs.spec_classes import (
     LinklessEntitySpec,
     MeasureSpec,
 )
+from metricflow.specs.column_assoc import ColumnAssociation, SingleColumnCorrelationKey
 from metricflow.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpression
 from metricflow.sql.sql_plan import SqlJoinType, SqlSelectColumn, SqlSelectStatementNode, SqlTableFromClauseNode
 from metricflow.sql.sql_table import SqlTable
