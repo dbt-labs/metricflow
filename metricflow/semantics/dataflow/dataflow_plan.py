@@ -9,7 +9,7 @@ from typing import Generic, Optional, Sequence, Type, TypeVar
 
 from metricflow.semantics.dag.id_prefix import StaticIdPrefix
 from metricflow.semantics.dag.mf_dag import DagId, DagNode, MetricFlowDag, NodeId
-from metricflow.visitor import Visitable, VisitorOutputT
+from metricflow.semantics.visitor import Visitable, VisitorOutputT
 
 if typing.TYPE_CHECKING:
     from metricflow.semantics.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode

@@ -8,7 +8,7 @@ from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowQuer
 from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.semantics.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.semantics.protocols.sql_client import SqlClient
-from metricflow.test_helpers import ConfigurableTimeSource
+from metricflow.semantics.test_helpers import ConfigurableTimeSource
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.integration.conftest import IntegrationTestHelpers
 from tests.snapshot_utils import (

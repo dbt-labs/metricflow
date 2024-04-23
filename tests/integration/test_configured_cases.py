@@ -35,7 +35,7 @@ from metricflow.semantics.sql.sql_exprs import (
     SqlStringExpression,
     SqlSubtractTimeIntervalExpression,
 )
-from metricflow.test_helpers import (
+from metricflow.semantics.test_helpers import (
     ConfigurableTimeSource,
 )
 from tests.compare_df import assert_dataframes_equal

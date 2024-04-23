@@ -15,7 +15,7 @@ from metricflow.semantics.query.group_by_item.resolution_dag.resolution_nodes.ba
 from metricflow.semantics.query.group_by_item.resolution_dag.resolution_nodes.measure_source_node import (
     MeasureGroupByItemSourceNode,
 )
-from metricflow.visitor import VisitorOutputT
+from metricflow.semantics.visitor import VisitorOutputT
 
 
 class MetricGroupByItemResolutionNode(GroupByItemResolutionNode):

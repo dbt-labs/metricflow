@@ -30,7 +30,7 @@ from metricflow.semantics.plan_conversion.dataflow_to_sql import DataflowToSqlQu
 from metricflow.semantics.protocols.sql_client import SqlClient
 from metricflow.semantics.query.query_parser import MetricFlowQueryParser
 from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
-from metricflow.test_helpers import ConfigurableTimeSource
+from metricflow.semantics.test_helpers import ConfigurableTimeSource
 from tests.fixtures.id_fixtures import IdNumberSpace, patch_id_generators_helper
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 

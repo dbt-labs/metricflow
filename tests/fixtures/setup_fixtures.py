@@ -12,8 +12,8 @@ import sqlalchemy.util
 from _pytest.fixtures import FixtureRequest
 from sqlalchemy.engine import make_url
 
-from metricflow.random_id import random_id
-from metricflow.test_helpers import (
+from metricflow.semantics.random_id import random_id
+from metricflow.semantics.test_helpers import (
     DISPLAY_SNAPSHOTS_CLI_FLAG,
     OVERWRITE_SNAPSHOTS_CLI_FLAG,
     MetricFlowTestConfiguration,

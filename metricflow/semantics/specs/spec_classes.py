@@ -35,7 +35,7 @@ from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
 
-from metricflow.aggregation_properties import AggregationState
+from metricflow.semantics.aggregation_properties import AggregationState
 from metricflow.collection_helpers.merger import Mergeable
 from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow.semantics.naming.linkable_spec_name import StructuredLinkableSpecName
@@ -45,7 +45,7 @@ from metricflow.semantics.query.group_by_item.filter_spec_resolution.filter_spec
 from metricflow.semantics.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.semantics.sql.sql_column_type import SqlColumnType
 from metricflow.semantics.sql.sql_plan import SqlJoinType
-from metricflow.visitor import VisitorOutputT
+from metricflow.semantics.visitor import VisitorOutputT
 
 if TYPE_CHECKING:
     from metricflow.semantics.model.semantics.metric_lookup import MetricLookup

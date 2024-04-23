@@ -12,7 +12,7 @@ from metricflow.semantics.dataflow.builder.partitions import (
 from metricflow.semantics.dataflow.dataflow_plan import BaseOutput, DataflowPlanNode, DataflowPlanNodeVisitor
 from metricflow.semantics.specs.spec_classes import LinklessEntitySpec, TimeDimensionSpec
 from metricflow.semantics.sql.sql_plan import SqlJoinType
-from metricflow.visitor import VisitorOutputT
+from metricflow.semantics.visitor import VisitorOutputT
 
 
 @dataclass(frozen=True)

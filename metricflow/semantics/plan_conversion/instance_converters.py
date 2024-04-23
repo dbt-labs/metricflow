@@ -14,9 +14,9 @@ from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from more_itertools import bucket
 
-from metricflow.aggregation_properties import AggregationState
-from metricflow.assert_one_arg import assert_exactly_one_arg_set
-from metricflow.instances import (
+from metricflow.semantics.aggregation_properties import AggregationState
+from metricflow.semantics.assert_one_arg import assert_exactly_one_arg_set
+from metricflow.semantics.instances import (
     DimensionInstance,
     EntityInstance,
     GroupByMetricInstance,

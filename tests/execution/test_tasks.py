@@ -8,7 +8,7 @@ from metricflow.execution.execution_plan import (
     SelectSqlQueryToTableTask,
 )
 from metricflow.execution.executor import SequentialPlanExecutor
-from metricflow.random_id import random_id
+from metricflow.semantics.random_id import random_id
 from metricflow.semantics.dag.mf_dag import DagId
 from metricflow.semantics.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.semantics.sql.sql_bind_parameters import SqlBindParameters

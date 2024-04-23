@@ -3,7 +3,7 @@ from __future__ import annotations
 from dbt_semantic_interfaces.references import SemanticModelReference
 from typing_extensions import override
 
-from metricflow.instances import InstanceSet
+from metricflow.semantics.instances import InstanceSet
 from metricflow.semantics.dataset.sql_dataset import SqlDataSet
 from metricflow.semantics.sql.sql_plan import SqlSelectStatementNode
 

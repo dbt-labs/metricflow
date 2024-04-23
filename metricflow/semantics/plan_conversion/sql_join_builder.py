@@ -6,7 +6,7 @@ from typing import List, Optional, Sequence, Tuple
 from dbt_semantic_interfaces.protocols.metric import MetricTimeWindow
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
-from metricflow.assert_one_arg import assert_exactly_one_arg_set
+from metricflow.semantics.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.semantics.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
 from metricflow.semantics.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
 from metricflow.semantics.dataflow.nodes.join_to_base import JoinDescription

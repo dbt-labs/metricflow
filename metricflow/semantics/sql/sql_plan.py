@@ -14,7 +14,7 @@ from metricflow.semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow.semantics.dag.mf_dag import DagId, DagNode, DisplayedProperty, MetricFlowDag, NodeId
 from metricflow.semantics.sql.sql_exprs import SqlExpressionNode
 from metricflow.semantics.sql.sql_table import SqlTable
-from metricflow.visitor import VisitorOutputT
+from metricflow.semantics.visitor import VisitorOutputT
 
 logger = logging.getLogger(__name__)
 

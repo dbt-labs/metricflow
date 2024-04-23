@@ -10,7 +10,7 @@ from dbt_semantic_interfaces.references import (
     SemanticModelReference,
 )
 
-from metricflow.instances import EntityInstance, InstanceSet
+from metricflow.semantics.instances import EntityInstance, InstanceSet
 from metricflow.mf_logging.pretty_print import mf_pformat
 
 if TYPE_CHECKING:

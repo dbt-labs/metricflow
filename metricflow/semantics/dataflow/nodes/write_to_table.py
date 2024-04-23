@@ -11,7 +11,7 @@ from metricflow.semantics.dataflow.dataflow_plan import (
     SinkOutput,
 )
 from metricflow.semantics.sql.sql_table import SqlTable
-from metricflow.visitor import VisitorOutputT
+from metricflow.semantics.visitor import VisitorOutputT
 
 
 class WriteToResultTableNode(SinkOutput):

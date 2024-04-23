@@ -10,7 +10,7 @@ from metricflow.semantics.dataflow.dataflow_plan import (
     SinkNodeVisitor,
     SinkOutput,
 )
-from metricflow.visitor import VisitorOutputT
+from metricflow.semantics.visitor import VisitorOutputT
 
 
 class WriteToResultDataframeNode(SinkOutput):

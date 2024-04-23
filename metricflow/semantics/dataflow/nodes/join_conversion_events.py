@@ -14,7 +14,7 @@ from metricflow.semantics.specs.spec_classes import (
     MeasureSpec,
     TimeDimensionSpec,
 )
-from metricflow.visitor import VisitorOutputT
+from metricflow.semantics.visitor import VisitorOutputT
 
 
 class JoinConversionEventsNode(BaseOutput):

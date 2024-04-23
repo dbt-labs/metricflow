@@ -13,7 +13,7 @@ from metricflow.semantics.dag.mf_dag import DagId, DagNode, DisplayedProperty, M
 from metricflow.semantics.protocols.sql_client import SqlClient
 from metricflow.semantics.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.semantics.sql.sql_table import SqlTable
-from metricflow.visitor import Visitable
+from metricflow.semantics.visitor import Visitable
 
 logger = logging.getLogger(__name__)
 

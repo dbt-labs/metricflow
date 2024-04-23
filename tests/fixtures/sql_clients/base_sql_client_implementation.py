@@ -9,7 +9,7 @@ import pandas as pd
 
 from metricflow.mf_logging.formatting import indent
 from metricflow.mf_logging.pretty_print import mf_pformat
-from metricflow.random_id import random_id
+from metricflow.semantics.random_id import random_id
 from metricflow.semantics.protocols.sql_client import (
     SqlClient,
 )

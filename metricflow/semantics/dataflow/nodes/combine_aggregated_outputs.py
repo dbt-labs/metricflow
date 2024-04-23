@@ -9,7 +9,7 @@ from metricflow.semantics.dataflow.dataflow_plan import (
     DataflowPlanNode,
     DataflowPlanNodeVisitor,
 )
-from metricflow.visitor import VisitorOutputT
+from metricflow.semantics.visitor import VisitorOutputT
 
 
 class CombineAggregatedOutputsNode(ComputedMetricsOutput):

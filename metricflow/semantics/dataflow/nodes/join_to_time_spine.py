@@ -12,7 +12,7 @@ from metricflow.semantics.dataflow.dataflow_plan import BaseOutput, DataflowPlan
 from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow.semantics.specs.spec_classes import TimeDimensionSpec
 from metricflow.semantics.sql.sql_plan import SqlJoinType
-from metricflow.visitor import VisitorOutputT
+from metricflow.semantics.visitor import VisitorOutputT
 
 
 class JoinToTimeSpineNode(BaseOutput, ABC):

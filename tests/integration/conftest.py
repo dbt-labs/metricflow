@@ -10,7 +10,7 @@ from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifest
 from metricflow.semantics.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.semantics.plan_conversion.time_spine import TimeSpineSource
 from metricflow.semantics.protocols.sql_client import SqlClient
-from metricflow.test_helpers import ConfigurableTimeSource
+from metricflow.semantics.test_helpers import ConfigurableTimeSource
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 
 

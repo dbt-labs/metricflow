@@ -7,7 +7,7 @@ from metricflow.semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow.semantics.dag.mf_dag import DisplayedProperty
 from metricflow.semantics.dataflow.dataflow_plan import BaseOutput, DataflowPlanNode, DataflowPlanNodeVisitor
 from metricflow.semantics.specs.spec_classes import InstanceSpecSet
-from metricflow.visitor import VisitorOutputT
+from metricflow.semantics.visitor import VisitorOutputT
 
 
 class FilterElementsNode(BaseOutput):

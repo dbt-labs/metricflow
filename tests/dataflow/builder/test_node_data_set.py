@@ -6,8 +6,8 @@ from typing import Mapping
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.references import SemanticModelElementReference
 
-from metricflow.aggregation_properties import AggregationState
-from metricflow.instances import (
+from metricflow.semantics.aggregation_properties import AggregationState
+from metricflow.semantics.instances import (
     InstanceSet,
     MeasureInstance,
 )

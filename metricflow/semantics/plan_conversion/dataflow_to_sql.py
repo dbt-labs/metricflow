@@ -12,8 +12,8 @@ from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.conversion_calculation_type import ConversionCalculationType
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 
-from metricflow.aggregation_properties import AggregationState
-from metricflow.instances import (
+from metricflow.semantics.aggregation_properties import AggregationState
+from metricflow.semantics.instances import (
     GroupByMetricInstance,
     InstanceSet,
     MetadataInstance,

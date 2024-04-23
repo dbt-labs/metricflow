@@ -7,7 +7,7 @@ import pandas as pd
 import pytest
 from dbt_semantic_interfaces.test_utils import as_datetime
 
-from metricflow.random_id import random_id
+from metricflow.semantics.random_id import random_id
 from metricflow.semantics.protocols.sql_client import SqlEngine
 from tests.compare_df import assert_dataframes_equal
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration

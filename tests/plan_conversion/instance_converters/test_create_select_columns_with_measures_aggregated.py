@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Mapping
 
-from metricflow.instances import InstanceSet
+from metricflow.semantics.instances import InstanceSet
 from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.semantics.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.semantics.plan_conversion.instance_converters import (

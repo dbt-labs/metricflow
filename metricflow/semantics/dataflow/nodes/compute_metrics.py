@@ -11,7 +11,7 @@ from metricflow.semantics.dataflow.dataflow_plan import (
     DataflowPlanNodeVisitor,
 )
 from metricflow.semantics.specs.spec_classes import MetricSpec
-from metricflow.visitor import VisitorOutputT
+from metricflow.semantics.visitor import VisitorOutputT
 
 
 class ComputeMetricsNode(ComputedMetricsOutput):

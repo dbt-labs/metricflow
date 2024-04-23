@@ -6,7 +6,7 @@ from typing import TypeVar
 
 import graphviz
 
-from metricflow.random_id import random_id
+from metricflow.semantics.random_id import random_id
 from metricflow.semantics.dag.mf_dag import DagNode, MetricFlowDag
 
 logger = logging.getLogger(__name__)

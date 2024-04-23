@@ -7,7 +7,7 @@ from dbt_semantic_interfaces.references import TimeDimensionReference
 from metricflow.semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow.semantics.dag.mf_dag import DisplayedProperty
 from metricflow.semantics.dataflow.dataflow_plan import BaseOutput, DataflowPlanNode, DataflowPlanNodeVisitor
-from metricflow.visitor import VisitorOutputT
+from metricflow.semantics.visitor import VisitorOutputT
 
 
 class MetricTimeDimensionTransformNode(BaseOutput):

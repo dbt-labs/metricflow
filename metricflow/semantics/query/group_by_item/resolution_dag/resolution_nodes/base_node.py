@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Generic, Sequence
 
 from metricflow.semantics.dag.mf_dag import DagNode, NodeId
-from metricflow.visitor import Visitable, VisitorOutputT
+from metricflow.semantics.visitor import Visitable, VisitorOutputT
 
 if TYPE_CHECKING:
     from metricflow.semantics.query.group_by_item.resolution_dag.resolution_nodes.measure_source_node import (

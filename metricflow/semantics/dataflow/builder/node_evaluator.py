@@ -23,7 +23,7 @@ from typing import List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 
-from metricflow.instances import InstanceSet
+from metricflow.semantics.instances import InstanceSet
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.semantics.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.semantics.dataflow.builder.partitions import (
