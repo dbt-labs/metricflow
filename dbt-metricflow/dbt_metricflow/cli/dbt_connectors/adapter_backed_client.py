@@ -9,7 +9,7 @@ from dbt.adapters.base.impl import BaseAdapter
 from dbt.exceptions import DbtDatabaseError
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 
-from metricflow.errors.errors import SqlBindParametersNotSupportedError
+from metricflow.errors.error_classes import SqlBindParametersNotSupportedError
 from metricflow.mf_logging.formatting import indent
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.protocols.sql_client import SqlEngine

@@ -8,7 +8,7 @@ from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
 
-from metricflow.errors.errors import UnsupportedEngineFeatureError
+from metricflow.errors.error_classes import UnsupportedEngineFeatureError
 from metricflow.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,
     SqlExpressionRenderer,

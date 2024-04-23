@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from metricflow.errors.errors import InvalidQuerySyntax
+from metricflow.errors.error_classes import InvalidQuerySyntax
 from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import FilterSpecResolutionLookUp
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.rendered_spec_tracker import RenderedSpecTracker

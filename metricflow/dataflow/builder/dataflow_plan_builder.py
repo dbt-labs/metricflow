@@ -54,7 +54,7 @@ from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataframeN
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOptimizer
 from metricflow.dataset.dataset import DataSet
-from metricflow.errors.errors import UnableToSatisfyQueryError
+from metricflow.errors.error_classes import UnableToSatisfyQueryError
 from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.mf_logging.formatting import indent
 from metricflow.mf_logging.pretty_print import mf_pformat

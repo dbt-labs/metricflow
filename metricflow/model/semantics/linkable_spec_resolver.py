@@ -20,7 +20,7 @@ from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.dataset.dataset import DataSet
-from metricflow.errors.errors import UnknownMetricLinkingError
+from metricflow.errors.error_classes import UnknownMetricLinkingError
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantics.linkable_element import (
     ElementPathKey,
