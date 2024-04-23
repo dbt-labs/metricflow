@@ -30,6 +30,7 @@ from dbt_semantic_interfaces.validations.validator_helpers import (
 )
 
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
+from metricflow.protocols.sql_client import SqlClient
 from metricflow.semantics.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.semantics.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.semantics.dataflow.dataflow_plan import BaseOutput
@@ -40,7 +41,6 @@ from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifest
 from metricflow.semantics.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.semantics.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.semantics.plan_conversion.time_spine import TimeSpineSource
-from metricflow.semantics.protocols.sql_client import SqlClient
 from metricflow.semantics.specs.spec_classes import InstanceSpecSet, LinkableInstanceSpec, MeasureSpec
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 

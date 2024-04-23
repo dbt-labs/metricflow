@@ -7,7 +7,7 @@ from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.test_utils import as_datetime
 
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest
-from metricflow.semantics.protocols.sql_client import SqlClient
+from metricflow.protocols.sql_client import SqlClient
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.integration.conftest import IntegrationTestHelpers
 from tests.snapshot_utils import assert_str_snapshot_equal

@@ -6,7 +6,7 @@ from typing import Set, Union
 import pandas as pd
 import pytest
 
-from metricflow.semantics.protocols.sql_client import SqlClient, SqlEngine
+from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.semantics.random_id import random_id
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_table import SqlTable

@@ -7,7 +7,7 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.references import SemanticModelReference
 
-from metricflow.semantics.protocols.sql_client import SqlClient
+from metricflow.protocols.sql_client import SqlClient
 from tests.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.snapshot_utils import assert_spec_set_snapshot_equal

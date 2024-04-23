@@ -5,7 +5,7 @@ import warnings
 
 import pytest
 
-from metricflow.semantics.protocols.sql_client import SqlClient, SqlEngine
+from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.sql.sql_table import SqlTable
 from tests.compare_df import assert_dataframes_equal
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration

@@ -12,6 +12,7 @@ from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.conversion_calculation_type import ConversionCalculationType
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 
+from metricflow.protocols.sql_client import SqlEngine
 from metricflow.semantics.aggregation_properties import AggregationState
 from metricflow.semantics.dag.id_prefix import StaticIdPrefix
 from metricflow.semantics.dag.mf_dag import DagId
@@ -86,7 +87,6 @@ from metricflow.semantics.plan_conversion.sql_join_builder import (
     SqlQueryPlanJoinBuilder,
 )
 from metricflow.semantics.plan_conversion.time_spine import TIME_SPINE_DATA_SET_DESCRIPTION, TimeSpineSource
-from metricflow.semantics.protocols.sql_client import SqlEngine
 from metricflow.semantics.specs.column_assoc import (
     ColumnAssociation,
     ColumnAssociationResolver,

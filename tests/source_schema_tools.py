@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 
-from metricflow.semantics.protocols.sql_client import SqlEngine
+from metricflow.protocols.sql_client import SqlEngine
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 from tests.table_snapshot.table_snapshots import (

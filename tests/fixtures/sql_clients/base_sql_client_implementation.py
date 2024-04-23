@@ -7,11 +7,11 @@ from typing import Optional
 
 import pandas as pd
 
-from metricflow.semantics.mf_logging.formatting import indent
-from metricflow.semantics.mf_logging.pretty_print import mf_pformat
-from metricflow.semantics.protocols.sql_client import (
+from metricflow.protocols.sql_client import (
     SqlClient,
 )
+from metricflow.semantics.mf_logging.formatting import indent
+from metricflow.semantics.mf_logging.pretty_print import mf_pformat
 from metricflow.semantics.random_id import random_id
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_table import SqlTable

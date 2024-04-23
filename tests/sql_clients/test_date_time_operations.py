@@ -23,7 +23,7 @@ import pandas as pd
 import pytest
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 
-from metricflow.semantics.protocols.sql_client import SqlClient
+from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_exprs import (
     SqlCastToTimestampExpression,
     SqlDateTruncExpression,

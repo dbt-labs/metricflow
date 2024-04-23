@@ -7,7 +7,7 @@ import os
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 
-from metricflow.semantics.protocols.sql_client import SqlEngine
+from metricflow.protocols.sql_client import SqlEngine
 from tests.generate_snapshots import (
     MetricFlowTestConfiguration,
     run_cli,

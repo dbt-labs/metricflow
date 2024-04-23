@@ -21,6 +21,7 @@ from metricflow.execution.dataflow_to_execution import (
 )
 from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
 from metricflow.execution.executor import SequentialPlanExecutor
+from metricflow.protocols.sql_client import SqlClient
 from metricflow.semantics.dag.sequential_id import SequentialIdGenerator
 from metricflow.semantics.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.semantics.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
@@ -46,7 +47,6 @@ from metricflow.semantics.naming.linkable_spec_name import StructuredLinkableSpe
 from metricflow.semantics.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.semantics.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.semantics.protocols.query_parameter import GroupByParameter, MetricQueryParameter, OrderByQueryParameter
-from metricflow.semantics.protocols.sql_client import SqlClient
 from metricflow.semantics.query.query_exceptions import InvalidQueryException
 from metricflow.semantics.query.query_parser import MetricFlowQueryParser
 from metricflow.semantics.random_id import random_id

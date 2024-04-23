@@ -6,7 +6,7 @@ from typing import List
 import pytest
 from _pytest.fixtures import FixtureRequest
 
-from metricflow.semantics.protocols.sql_client import SqlClient
+from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_exprs import (
     SqlAggregateFunctionExpression,
     SqlColumnReference,
