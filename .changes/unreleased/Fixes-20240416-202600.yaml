@@ -1,5 +1,5 @@
 kind: Fixes
-body: Refactor group by resolution for group by metrics.
+body: Refactor group by resolution for metric filters to allow options that were previously excluded inadvertently.
 time: 2024-04-16T20:26:00.637184-07:00
 custom:
   Author: courtneyholcomb
