@@ -15,7 +15,7 @@ from metricflow.dataflow.builder.node_evaluator import (
 from metricflow.dataflow.builder.partitions import PartitionTimeDimensionJoinDescription
 from metricflow.dataflow.builder.source_node import SourceNodeSet
 from metricflow.dataflow.nodes.join_to_base import ValidityWindowJoinDescription
-from metricflow.dataset.dataset import DataSet
+from metricflow.dataset.dataset_classes import DataSet
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.node_processor import PreJoinNodeProcessor
