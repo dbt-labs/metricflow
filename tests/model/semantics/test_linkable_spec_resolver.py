@@ -12,10 +12,12 @@ from dbt_semantic_interfaces.references import (
 )
 
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.model.semantics.linkable_element_properties import LinkableElementProperty
-from metricflow.model.semantics.linkable_spec_resolver import (
+from metricflow.model.semantics.linkable_element import (
+    LinkableElementProperty,
     SemanticModelJoinPath,
     SemanticModelJoinPathElement,
+)
+from metricflow.model.semantics.linkable_spec_resolver import (
     ValidLinkableSpecResolver,
 )
 from metricflow.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS

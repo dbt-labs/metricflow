@@ -33,10 +33,10 @@ from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.mf_logging.formatting import indent
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.model.semantics.linkable_element_properties import (
+from metricflow.model.semantics.linkable_element import (
+    LinkableDimension,
     LinkableElementProperty,
 )
-from metricflow.model.semantics.linkable_spec_resolver import LinkableDimension
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver

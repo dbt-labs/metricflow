@@ -11,7 +11,7 @@ from metricflow.dag.mf_dag import MetricFlowDag
 from metricflow.dataflow.dataflow_plan import DataflowPlan
 from metricflow.execution.execution_plan import ExecutionPlan
 from metricflow.mf_logging.pretty_print import mf_pformat
-from metricflow.model.semantics.linkable_spec_resolver import LinkableElementSet
+from metricflow.model.semantics.linkable_element_set import LinkableElementSet
 from metricflow.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.specs.specs import InstanceSpecSet, LinkableSpecSet
