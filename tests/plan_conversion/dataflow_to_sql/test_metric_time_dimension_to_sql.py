@@ -6,10 +6,10 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.references import TimeDimensionReference
 
-from metricflow.protocols.sql_client import SqlClient
 from metricflow.semantics.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.semantics.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.semantics.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
+from metricflow.semantics.protocols.sql_client import SqlClient
 from metricflow.semantics.specs.spec_classes import MetricFlowQuerySpec, MetricSpec
 from tests.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration

@@ -23,8 +23,6 @@ from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
 from metricflow.execution.executor import SequentialPlanExecutor
 from metricflow.mf_logging.formatting import indent
 from metricflow.mf_logging.pretty_print import mf_pformat
-from metricflow.protocols.query_parameter import GroupByParameter, MetricQueryParameter, OrderByQueryParameter
-from metricflow.protocols.sql_client import SqlClient
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.random_id import random_id
@@ -50,6 +48,8 @@ from metricflow.semantics.model.semantics.semantic_model_lookup import SemanticM
 from metricflow.semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.semantics.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.semantics.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
+from metricflow.semantics.protocols.query_parameter import GroupByParameter, MetricQueryParameter, OrderByQueryParameter
+from metricflow.semantics.protocols.sql_client import SqlClient
 from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow.semantics.specs.query_param_implementations import SavedQueryParameter
 from metricflow.semantics.specs.spec_classes import InstanceSpecSet, MetricFlowQuerySpec

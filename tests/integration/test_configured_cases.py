@@ -15,12 +15,12 @@ from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowQueryRequest
-from metricflow.protocols.query_parameter import DimensionOrEntityQueryParameter
-from metricflow.protocols.sql_client import SqlClient
 from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.semantics.plan_conversion.column_resolver import (
     DunderColumnAssociationResolver,
 )
+from metricflow.semantics.protocols.query_parameter import DimensionOrEntityQueryParameter
+from metricflow.semantics.protocols.sql_client import SqlClient
 from metricflow.semantics.specs.query_param_implementations import DimensionOrEntityParameter, TimeDimensionParameter
 from metricflow.sql.sql_exprs import (
     SqlCastToTimestampExpression,

@@ -10,7 +10,7 @@ import sqlalchemy
 from dbt.adapters.factory import get_adapter_by_type
 from dbt.cli.main import dbtRunner
 
-from metricflow.protocols.sql_client import SqlClient
+from metricflow.semantics.protocols.sql_client import SqlClient
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration, dbt_project_dir, dialect_from_url
 from tests.fixtures.sql_clients.adapter_backed_ddl_client import AdapterBackedDDLSqlClient
 from tests.fixtures.sql_clients.common_client import SqlDialect

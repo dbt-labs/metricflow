@@ -17,12 +17,6 @@ from metricflow.assert_one_arg import assert_at_most_one_arg_set
 from metricflow.mf_logging.formatting import indent
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.mf_logging.runtime import log_runtime
-from metricflow.protocols.query_parameter import (
-    GroupByParameter,
-    MetricQueryParameter,
-    OrderByQueryParameter,
-    SavedQueryParameter,
-)
 from metricflow.query.group_by_item.filter_spec_resolution.filter_pattern_factory import (
     DefaultWhereFilterPatternFactory,
     WhereFilterPatternFactory,
@@ -51,6 +45,12 @@ from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifest
 from metricflow.semantics.naming.dunder_scheme import DunderNamingScheme
 from metricflow.semantics.naming.metric_scheme import MetricNamingScheme
 from metricflow.semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
+from metricflow.semantics.protocols.query_parameter import (
+    GroupByParameter,
+    MetricQueryParameter,
+    OrderByQueryParameter,
+    SavedQueryParameter,
+)
 from metricflow.semantics.specs.patterns.base_time_grain import BaseTimeGrainPattern
 from metricflow.semantics.specs.patterns.metric_time_pattern import MetricTimePattern
 from metricflow.semantics.specs.patterns.none_date_part import NoneDatePartPattern

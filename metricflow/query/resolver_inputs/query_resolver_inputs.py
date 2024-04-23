@@ -13,11 +13,11 @@ from typing_extensions import override
 
 from metricflow.mf_logging.formatting import indent
 from metricflow.mf_logging.pretty_print import mf_pformat
-from metricflow.protocols.query_parameter import GroupByParameter, MetricQueryParameter, OrderByQueryParameter
 from metricflow.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow.query.resolver_inputs.base_resolver_inputs import InputPatternDescription, MetricFlowQueryResolverInput
 from metricflow.semantics.naming.metric_scheme import MetricNamingScheme
 from metricflow.semantics.naming.naming_scheme import QueryItemNamingScheme
+from metricflow.semantics.protocols.query_parameter import GroupByParameter, MetricQueryParameter, OrderByQueryParameter
 from metricflow.semantics.specs.patterns.metric_pattern import MetricSpecPattern
 from metricflow.semantics.specs.patterns.spec_pattern import SpecPattern
 

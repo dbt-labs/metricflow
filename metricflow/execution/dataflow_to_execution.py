@@ -10,7 +10,6 @@ from metricflow.execution.execution_plan import (
     SelectSqlQueryToDataFrameTask,
     SelectSqlQueryToTableTask,
 )
-from metricflow.protocols.sql_client import SqlClient
 from metricflow.semantics.dataflow.dataflow_plan import (
     DataflowPlan,
     DataflowPlanNode,
@@ -20,6 +19,7 @@ from metricflow.semantics.dataflow.nodes.write_to_dataframe import WriteToResult
 from metricflow.semantics.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.semantics.plan_conversion.convert_to_sql_plan import ConvertToSqlPlanResult
 from metricflow.semantics.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
+from metricflow.semantics.protocols.sql_client import SqlClient
 from metricflow.sql.render.sql_plan_renderer import SqlPlanRenderResult, SqlQueryPlanRenderer
 
 logger = logging.getLogger(__name__)

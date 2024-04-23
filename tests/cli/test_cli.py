@@ -26,7 +26,7 @@ from dbt_metricflow.cli.main import (
     tutorial,
     validate_configs,
 )
-from metricflow.protocols.sql_client import SqlClient, SqlEngine
+from metricflow.semantics.protocols.sql_client import SqlClient, SqlEngine
 from tests.fixtures.cli_fixtures import MetricFlowCliRunner
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.model.example_project_configuration import EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE

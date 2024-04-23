@@ -7,7 +7,6 @@ from dbt_semantic_interfaces.references import SemanticModelReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.mf_logging.pretty_print import mf_pformat
-from metricflow.protocols.sql_client import SqlClient
 from metricflow.semantics.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.semantics.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.semantics.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
@@ -16,6 +15,7 @@ from metricflow.semantics.dataset.convert_semantic_model import SemanticModelToD
 from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.semantics.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.semantics.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
+from metricflow.semantics.protocols.sql_client import SqlClient
 from metricflow.semantics.specs.spec_classes import InstanceSpecSet, TimeDimensionReference, TimeDimensionSpec
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer

@@ -9,12 +9,6 @@ from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
 
-from metricflow.protocols.query_parameter import (
-    DimensionOrEntityQueryParameter,
-    InputOrderByParameter,
-    TimeDimensionQueryParameter,
-)
-from metricflow.protocols.query_parameter import SavedQueryParameter as SavedQueryParameterProtocol
 from metricflow.query.resolver_inputs.query_resolver_inputs import (
     ResolverInputForGroupByItem,
     ResolverInputForMetric,
@@ -23,6 +17,12 @@ from metricflow.query.resolver_inputs.query_resolver_inputs import (
 from metricflow.semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.semantics.naming.metric_scheme import MetricNamingScheme
 from metricflow.semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
+from metricflow.semantics.protocols.query_parameter import (
+    DimensionOrEntityQueryParameter,
+    InputOrderByParameter,
+    TimeDimensionQueryParameter,
+)
+from metricflow.semantics.protocols.query_parameter import SavedQueryParameter as SavedQueryParameterProtocol
 from metricflow.semantics.specs.patterns.entity_link_pattern import (
     EntityLinkPattern,
     EntityLinkPatternParameterSet,

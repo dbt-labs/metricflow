@@ -21,7 +21,6 @@ from metricflow.instances import (
     TimeDimensionInstance,
 )
 from metricflow.mf_logging.formatting import indent
-from metricflow.protocols.sql_client import SqlEngine
 from metricflow.semantics.dag.id_prefix import StaticIdPrefix
 from metricflow.semantics.dag.mf_dag import DagId
 from metricflow.semantics.dag.sequential_id import SequentialIdGenerator
@@ -87,6 +86,7 @@ from metricflow.semantics.plan_conversion.sql_join_builder import (
     SqlQueryPlanJoinBuilder,
 )
 from metricflow.semantics.plan_conversion.time_spine import TIME_SPINE_DATA_SET_DESCRIPTION, TimeSpineSource
+from metricflow.semantics.protocols.sql_client import SqlEngine
 from metricflow.semantics.specs.column_assoc import (
     ColumnAssociation,
     ColumnAssociationResolver,
