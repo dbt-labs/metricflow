@@ -56,8 +56,10 @@ from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import (
 from metricflow_semantics.specs.patterns.base_time_grain import BaseTimeGrainPattern
 from metricflow_semantics.specs.patterns.metric_time_pattern import MetricTimePattern
 from metricflow_semantics.specs.patterns.none_date_part import NoneDatePartPattern
+from metricflow_semantics.specs.query_param_implementations import DimensionOrEntityParameter, MetricParameter
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.spec_classes import (
+    GroupByMetricSpec,
     InstanceSpec,
     TimeDimensionSpec,
 )
@@ -522,6 +524,15 @@ class MetricFlowQueryParser:
         return ParseQueryResult(
             query_spec=query_spec,
             queried_semantic_models=query_resolution.queried_semantic_models,
+        )
+
+    def build_query_spec_for_group_by_metric_source_node(
+        self, group_by_metric_spec: GroupByMetricSpec
+    ) -> MetricFlowQuerySpec:
+        """Query spec that can be used to build a source node for this spec in the DFP."""
+        return self.parse_and_validate_query(
+            metrics=(MetricParameter(group_by_metric_spec.reference.element_name),),
+            group_by=(DimensionOrEntityParameter(group_by_metric_spec.entity_spec.qualified_name),),
         )
 
 

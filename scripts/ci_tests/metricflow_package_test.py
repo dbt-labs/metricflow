@@ -11,6 +11,7 @@ from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from dbt_semantic_interfaces.protocols import SemanticManifest, SemanticModel
 from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
@@ -148,12 +149,14 @@ def log_dataflow_plan() -> None:  # noqa: D103
         semantic_manifest_lookup=semantic_manifest_lookup,
     )
     node_output_resolver.cache_output_data_sets(source_node_set.all_nodes)
+    query_parser = MetricFlowQueryParser(semantic_manifest_lookup=semantic_manifest_lookup)
 
     dataflow_plan_builder = DataflowPlanBuilder(
         source_node_set=source_node_set,
         semantic_manifest_lookup=semantic_manifest_lookup,
         node_output_resolver=node_output_resolver,
         column_association_resolver=column_association_resolver,
+        query_parser=query_parser,
     )
 
     dataflow_plan = dataflow_plan_builder.build_plan(

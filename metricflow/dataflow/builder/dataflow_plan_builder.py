@@ -33,6 +33,7 @@ from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_loca
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
     FilterSpecResolutionLookUp,
 )
+from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
@@ -40,7 +41,6 @@ from metricflow_semantics.specs.spec_classes import (
     ConstantPropertySpec,
     CumulativeMeasureDescription,
     EntitySpec,
-    GroupByMetricSpec,
     JoinToTimeSpineDescription,
     LinkableInstanceSpec,
     LinklessEntitySpec,
@@ -126,6 +126,7 @@ class DataflowPlanBuilder:
         semantic_manifest_lookup: SemanticManifestLookup,
         node_output_resolver: DataflowPlanNodeOutputDataSetResolver,
         column_association_resolver: ColumnAssociationResolver,
+        query_parser: MetricFlowQueryParser,
     ) -> None:
         self._semantic_model_lookup = semantic_manifest_lookup.semantic_model_lookup
         self._metric_lookup = semantic_manifest_lookup.metric_lookup
@@ -133,6 +134,7 @@ class DataflowPlanBuilder:
         self._source_node_set = source_node_set
         self._column_association_resolver = column_association_resolver
         self._node_data_set_resolver = node_output_resolver
+        self._query_parser = query_parser
 
     def build_plan(
         self,
@@ -813,14 +815,6 @@ class DataflowPlanBuilder:
             non_additive_dimension_spec=non_additive_dimension_spec,
         )
 
-    def _query_spec_for_source_node(self, group_by_metric_spec: GroupByMetricSpec) -> MetricFlowQuerySpec:
-        return MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name=group_by_metric_spec.element_name),),
-            entity_specs=tuple(
-                EntitySpec.from_name(entity_link.element_name) for entity_link in group_by_metric_spec.entity_links
-            ),
-        )
-
     def _find_dataflow_recipe(
         self,
         linkable_spec_set: LinkableSpecSet,
@@ -836,7 +830,8 @@ class DataflowPlanBuilder:
         # MetricGroupBy source nodes could be extremely large (and potentially slow).
         candidate_nodes_for_right_side_of_join += [
             self._build_query_output_node(
-                query_spec=self._query_spec_for_source_node(group_by_metric_spec), for_group_by_source_node=True
+                query_spec=self._query_parser.build_query_spec_for_group_by_metric_source_node(group_by_metric_spec),
+                for_group_by_source_node=True,
             )
             for group_by_metric_spec in linkable_spec_set.group_by_metric_specs
         ]
