@@ -33,13 +33,13 @@ from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputData
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import BaseOutput
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
-from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
-from metricflow.dataset.dataset_classes import DataSet
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.semantics.dataset.convert_semantic_model import SemanticModelToDataSetConverter
+from metricflow.semantics.dataset.dataset_classes import DataSet
 from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.semantics.specs.spec_classes import InstanceSpecSet, LinkableInstanceSpec, MeasureSpec
 from metricflow.sql.sql_bind_parameters import SqlBindParameters

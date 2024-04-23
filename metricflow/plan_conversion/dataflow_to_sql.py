@@ -36,8 +36,6 @@ from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
 from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
 from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataframeNode
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
-from metricflow.dataset.dataset_classes import DataSet
-from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.instances import (
     GroupByMetricInstance,
     InstanceSet,
@@ -85,6 +83,8 @@ from metricflow.protocols.sql_client import SqlEngine
 from metricflow.semantics.dag.id_prefix import StaticIdPrefix
 from metricflow.semantics.dag.mf_dag import DagId
 from metricflow.semantics.dag.sequential_id import SequentialIdGenerator
+from metricflow.semantics.dataset.dataset_classes import DataSet
+from metricflow.semantics.dataset.sql_dataset import SqlDataSet
 from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.semantics.specs.column_assoc import (

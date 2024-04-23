@@ -11,8 +11,8 @@ from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEvent
 from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
 from metricflow.dataflow.nodes.join_to_base import JoinDescription
 from metricflow.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
-from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.sql_expression_builders import make_coalesced_expr
+from metricflow.semantics.dataset.sql_dataset import SqlDataSet
 from metricflow.sql.sql_exprs import (
     SqlColumnReference,
     SqlColumnReferenceExpression,

@@ -51,7 +51,6 @@ from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
 from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataframeNode
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOptimizer
-from metricflow.dataset.dataset_classes import DataSet
 from metricflow.errors.error_classes import UnableToSatisfyQueryError
 from metricflow.mf_logging.formatting import indent
 from metricflow.mf_logging.pretty_print import mf_pformat
@@ -61,6 +60,7 @@ from metricflow.query.group_by_item.filter_spec_resolution.filter_location impor
 from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import FilterSpecResolutionLookUp
 from metricflow.semantics.dag.id_prefix import StaticIdPrefix
 from metricflow.semantics.dag.mf_dag import DagId
+from metricflow.semantics.dataset.dataset_classes import DataSet
 from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver

@@ -10,8 +10,8 @@ from metricflow.dataflow.dataflow_plan import (
 )
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
-from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
-from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
+from metricflow.semantics.dataset.convert_semantic_model import SemanticModelToDataSetConverter
+from metricflow.semantics.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
 

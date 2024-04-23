@@ -4,7 +4,7 @@ from collections import OrderedDict
 from dataclasses import dataclass
 from typing import List, Sequence, Tuple
 
-from metricflow.dataset.dataset_classes import DataSet
+from metricflow.semantics.dataset.dataset_classes import DataSet
 from metricflow.semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.semantics.specs.spec_classes import (
     DimensionSpec,

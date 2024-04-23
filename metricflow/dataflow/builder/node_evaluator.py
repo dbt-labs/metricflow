@@ -34,11 +34,11 @@ from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataflow.nodes.join_to_base import JoinDescription, ValidityWindowJoinDescription
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
-from metricflow.dataset.dataset_classes import DataSet
-from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.instances import InstanceSet
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
+from metricflow.semantics.dataset.dataset_classes import DataSet
+from metricflow.semantics.dataset.sql_dataset import SqlDataSet
 from metricflow.semantics.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
 from metricflow.semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.semantics.specs.spec_classes import (

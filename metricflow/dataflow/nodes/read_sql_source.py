@@ -6,9 +6,9 @@ from typing import Sequence
 import jinja2
 
 from metricflow.dataflow.dataflow_plan import BaseOutput, DataflowPlanNode, DataflowPlanNodeVisitor
-from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow.semantics.dag.mf_dag import DisplayedProperty
+from metricflow.semantics.dataset.sql_dataset import SqlDataSet
 from metricflow.visitor import VisitorOutputT
 
 

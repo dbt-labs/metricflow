@@ -5,9 +5,9 @@ from typing import TYPE_CHECKING, Dict, Optional, Sequence
 from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,
 )
-from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.mf_logging.runtime import log_block_runtime
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
+from metricflow.semantics.dataset.sql_dataset import SqlDataSet
 from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
 
 if TYPE_CHECKING:
