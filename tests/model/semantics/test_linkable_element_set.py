@@ -469,7 +469,8 @@ def test_only_unique_path_keys() -> None:
     unique_path_keys = base_set.only_unique_path_keys
 
     assert unique_path_keys.path_key_to_linkable_dimensions == {
-        _time_dimension.path_key: (_time_dimension,)
+        _categorical_dimension.path_key: (_categorical_dimension,),
+        _time_dimension.path_key: (_time_dimension,),
     }, "Got an unexpected value for unique dimensions sets!"
     assert unique_path_keys.path_key_to_linkable_entities == {
         _base_entity.path_key: (_base_entity,)
