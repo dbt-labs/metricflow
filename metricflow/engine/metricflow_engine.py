@@ -55,9 +55,9 @@ from metricflow.semantics.specs.query_param_implementations import SavedQueryPar
 from metricflow.semantics.specs.spec_classes import InstanceSpecSet, MetricFlowQuerySpec
 from metricflow.semantics.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.semantics.sql.sql_table import SqlTable
+from metricflow.semantics.time.time_source import TimeSource
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
-from metricflow.time.time_source import TimeSource
 
 logger = logging.getLogger(__name__)
 _telemetry_reporter = TelemetryReporter(report_levels_higher_or_equal_to=TelemetryLevel.USAGE)
