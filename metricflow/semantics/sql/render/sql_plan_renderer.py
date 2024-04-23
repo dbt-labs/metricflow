@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from string import Template
 from typing import List, Optional, Sequence, Tuple
 
-from metricflow.mf_logging.formatting import indent
+from metricflow.semantics.mf_logging.formatting import indent
 from metricflow.semantics.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,
     SqlExpressionRenderer,

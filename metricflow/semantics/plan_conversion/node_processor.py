@@ -6,7 +6,7 @@ from typing import List, Optional, Sequence, Set
 
 from dbt_semantic_interfaces.references import EntityReference, TimeDimensionReference
 
-from metricflow.mf_logging.pretty_print import mf_pformat
+from metricflow.semantics.mf_logging.pretty_print import mf_pformat
 from metricflow.semantics.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.semantics.dataflow.builder.partitions import PartitionJoinResolver
 from metricflow.semantics.dataflow.dataflow_plan import (

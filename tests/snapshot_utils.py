@@ -8,7 +8,7 @@ import tabulate
 from _pytest.fixtures import FixtureRequest
 
 from metricflow.execution.execution_plan import ExecutionPlan
-from metricflow.mf_logging.pretty_print import mf_pformat
+from metricflow.semantics.mf_logging.pretty_print import mf_pformat
 from metricflow.semantics.dag.mf_dag import MetricFlowDag
 from metricflow.semantics.dataflow.dataflow_plan import DataflowPlan
 from metricflow.semantics.model.semantics.linkable_spec_resolver import LinkableElementSet

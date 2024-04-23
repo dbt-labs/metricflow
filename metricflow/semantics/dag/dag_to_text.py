@@ -14,7 +14,7 @@ import jinja2
 if typing.TYPE_CHECKING:
     from metricflow.semantics.dag.mf_dag import DagNode, DagNodeT, DisplayedProperty, MetricFlowDag
 
-from metricflow.mf_logging.pretty_print import mf_pformat
+from metricflow.semantics.mf_logging.pretty_print import mf_pformat
 
 logger = logging.getLogger(__name__)
 

@@ -14,7 +14,7 @@ from dbt.config.runtime import load_profile, load_project
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from typing_extensions import Self
 
-from metricflow.mf_logging.pretty_print import mf_pformat
+from metricflow.semantics.mf_logging.pretty_print import mf_pformat
 from metricflow.semantics.errors.error_classes import ModelCreationException
 from metricflow.semantics.model.dbt_manifest_parser import parse_manifest_from_dbt_generated_manifest
 

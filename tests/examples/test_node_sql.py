@@ -6,7 +6,7 @@ import pytest
 from dbt_semantic_interfaces.references import SemanticModelReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
-from metricflow.mf_logging.pretty_print import mf_pformat
+from metricflow.semantics.mf_logging.pretty_print import mf_pformat
 from metricflow.semantics.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.semantics.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.semantics.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode

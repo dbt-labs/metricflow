@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Dict, Optional, Sequence
 
-from metricflow.mf_logging.runtime import log_block_runtime
+from metricflow.semantics.mf_logging.runtime import log_block_runtime
 from metricflow.semantics.dataflow.dataflow_plan import (
     DataflowPlanNode,
 )

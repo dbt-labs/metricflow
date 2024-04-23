@@ -10,7 +10,7 @@ from dbt_semantic_interfaces.protocols import WhereFilter, WhereFilterIntersecti
 from dbt_semantic_interfaces.references import EntityReference
 from typing_extensions import override
 
-from metricflow.mf_logging.runtime import log_runtime
+from metricflow.semantics.mf_logging.runtime import log_runtime
 from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.semantics.naming.object_builder_str import ObjectBuilderNameConverter
 from metricflow.semantics.query.group_by_item.candidate_push_down.push_down_visitor import DagTraversalPathTracker

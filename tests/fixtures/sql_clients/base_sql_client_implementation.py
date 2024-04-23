@@ -7,8 +7,8 @@ from typing import Optional
 
 import pandas as pd
 
-from metricflow.mf_logging.formatting import indent
-from metricflow.mf_logging.pretty_print import mf_pformat
+from metricflow.semantics.mf_logging.formatting import indent
+from metricflow.semantics.mf_logging.pretty_print import mf_pformat
 from metricflow.semantics.protocols.sql_client import (
     SqlClient,
 )

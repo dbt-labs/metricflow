@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from dbt_semantic_interfaces.protocols import WhereFilter
 from typing_extensions import override
 
-from metricflow.mf_logging.formatting import indent
+from metricflow.semantics.mf_logging.formatting import indent
 from metricflow.semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow.semantics.query.issues.issues_base import (
     MetricFlowQueryIssueType,
