@@ -34,13 +34,13 @@ from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import SourceScanOptimizer
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.query.query_parser import MetricFlowQueryParser
+from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow.semantics.specs.spec_classes import (
     DimensionSpec,
     EntityReference,
     MetricFlowQuerySpec,
     MetricSpec,
 )
-from metricflow.specs.column_assoc import ColumnAssociationResolver
 from tests.dataflow_plan_to_svg import display_graph_if_requested
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.snapshot_utils import assert_plan_snapshot_text_equal

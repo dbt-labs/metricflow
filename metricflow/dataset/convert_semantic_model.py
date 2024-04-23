@@ -31,6 +31,7 @@ from metricflow.instances import (
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.model.spec_converters import MeasureConverter
 from metricflow.plan_conversion.time_spine import TIME_SPINE_DATA_SET_DESCRIPTION, TimeSpineSource
+from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow.semantics.specs.spec_classes import (
     DEFAULT_TIME_GRANULARITY,
     DimensionSpec,
@@ -38,7 +39,6 @@ from metricflow.semantics.specs.spec_classes import (
     EntitySpec,
     TimeDimensionSpec,
 )
-from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.sql.sql_exprs import (
     SqlColumnReference,
     SqlColumnReferenceExpression,

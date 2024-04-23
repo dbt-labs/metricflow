@@ -87,6 +87,11 @@ from metricflow.plan_conversion.sql_join_builder import (
 )
 from metricflow.plan_conversion.time_spine import TIME_SPINE_DATA_SET_DESCRIPTION, TimeSpineSource
 from metricflow.protocols.sql_client import SqlEngine
+from metricflow.semantics.specs.column_assoc import (
+    ColumnAssociation,
+    ColumnAssociationResolver,
+    SingleColumnCorrelationKey,
+)
 from metricflow.semantics.specs.spec_classes import (
     GroupByMetricSpec,
     InstanceSpecSet,
@@ -95,7 +100,6 @@ from metricflow.semantics.specs.spec_classes import (
     MetricSpec,
     TimeDimensionSpec,
 )
-from metricflow.specs.column_assoc import ColumnAssociation, ColumnAssociationResolver, SingleColumnCorrelationKey
 from metricflow.sql.optimizer.optimization_levels import (
     SqlQueryOptimizationLevel,
     SqlQueryOptimizerConfiguration,

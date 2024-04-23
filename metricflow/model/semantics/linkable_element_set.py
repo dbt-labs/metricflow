@@ -12,7 +12,7 @@ from metricflow.model.semantics.linkable_element import (
     LinkableEntity,
     LinkableMetric,
 )
-from metricflow.specs.spec_classes import (
+from metricflow.semantics.specs.spec_classes import (
     DimensionSpec,
     EntitySpec,
     GroupByMetricSpec,

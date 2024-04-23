@@ -21,7 +21,7 @@ from metricflow.plan_conversion.column_resolver import (
 )
 from metricflow.protocols.query_parameter import DimensionOrEntityQueryParameter
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.specs.query_param_implementations import DimensionOrEntityParameter, TimeDimensionParameter
+from metricflow.semantics.specs.query_param_implementations import DimensionOrEntityParameter, TimeDimensionParameter
 from metricflow.sql.sql_exprs import (
     SqlCastToTimestampExpression,
     SqlColumnReference,

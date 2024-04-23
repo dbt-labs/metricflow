@@ -18,18 +18,18 @@ from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.query.query_parser import MetricFlowQueryParser
+from metricflow.semantics.specs.query_param_implementations import (
+    DimensionOrEntityParameter,
+    MetricParameter,
+    OrderByParameter,
+    TimeDimensionParameter,
+)
 from metricflow.semantics.specs.spec_classes import (
     DimensionSpec,
     EntitySpec,
     MetricSpec,
     OrderBySpec,
     TimeDimensionSpec,
-)
-from metricflow.specs.query_param_implementations import (
-    DimensionOrEntityParameter,
-    MetricParameter,
-    OrderByParameter,
-    TimeDimensionParameter,
 )
 from tests.model.example_project_configuration import EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE
 from tests.time.metric_time_dimension import MTD

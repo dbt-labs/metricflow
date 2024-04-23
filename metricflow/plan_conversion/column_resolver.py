@@ -4,6 +4,11 @@ import logging
 
 from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.naming.linkable_spec_name import DUNDER, StructuredLinkableSpecName
+from metricflow.semantics.specs.column_assoc import (
+    ColumnAssociation,
+    ColumnAssociationResolver,
+    SingleColumnCorrelationKey,
+)
 from metricflow.semantics.specs.spec_classes import (
     DimensionSpec,
     EntitySpec,
@@ -14,11 +19,6 @@ from metricflow.semantics.specs.spec_classes import (
     MetadataSpec,
     MetricSpec,
     TimeDimensionSpec,
-)
-from metricflow.specs.column_assoc import (
-    ColumnAssociation,
-    ColumnAssociationResolver,
-    SingleColumnCorrelationKey,
 )
 
 logger = logging.getLogger(__name__)

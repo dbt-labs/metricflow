@@ -29,7 +29,7 @@ from metricflow.plan_conversion.column_resolver import DunderColumnAssociationRe
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.query.query_parser import MetricFlowQueryParser
-from metricflow.specs.column_assoc import ColumnAssociationResolver
+from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow.test_helpers import ConfigurableTimeSource
 from tests.fixtures.id_fixtures import IdNumberSpace, patch_id_generators_helper
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration

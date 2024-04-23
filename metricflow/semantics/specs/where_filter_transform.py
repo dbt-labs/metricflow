@@ -9,13 +9,13 @@ from dbt_semantic_interfaces.protocols import WhereFilter, WhereFilterIntersecti
 
 from metricflow.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import FilterSpecResolutionLookUp
+from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
+from metricflow.semantics.specs.rendered_spec_tracker import RenderedSpecTracker
 from metricflow.semantics.specs.spec_classes import LinkableSpecSet, WhereFilterSpec
-from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.specs.rendered_spec_tracker import RenderedSpecTracker
-from metricflow.specs.where_filter_dimension import WhereFilterDimensionFactory
-from metricflow.specs.where_filter_entity import WhereFilterEntityFactory
-from metricflow.specs.where_filter_metric import WhereFilterMetricFactory
-from metricflow.specs.where_filter_time_dimension import WhereFilterTimeDimensionFactory
+from metricflow.semantics.specs.where_filter_dimension import WhereFilterDimensionFactory
+from metricflow.semantics.specs.where_filter_entity import WhereFilterEntityFactory
+from metricflow.semantics.specs.where_filter_metric import WhereFilterMetricFactory
+from metricflow.semantics.specs.where_filter_time_dimension import WhereFilterTimeDimensionFactory
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 
 logger = logging.getLogger(__name__)

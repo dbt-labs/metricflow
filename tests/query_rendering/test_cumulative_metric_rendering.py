@@ -16,8 +16,8 @@ from metricflow.filters.time_constraint import TimeRangeConstraint
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.query.query_parser import MetricFlowQueryParser
+from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow.semantics.specs.spec_classes import EntityReference, MetricFlowQuerySpec, MetricSpec, TimeDimensionSpec
-from metricflow.specs.column_assoc import ColumnAssociationResolver
 from tests.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.query_rendering.compare_rendered_query import convert_and_check

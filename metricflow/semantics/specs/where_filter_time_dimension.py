@@ -21,9 +21,9 @@ from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup im
     FilterSpecResolutionLookUp,
     ResolvedSpecLookUpKey,
 )
-from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.specs.rendered_spec_tracker import RenderedSpecTracker
-from metricflow.specs.where_filter_dimension import WhereFilterDimension
+from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
+from metricflow.semantics.specs.rendered_spec_tracker import RenderedSpecTracker
+from metricflow.semantics.specs.where_filter_dimension import WhereFilterDimension
 
 
 class WhereFilterTimeDimension(WhereFilterDimension):

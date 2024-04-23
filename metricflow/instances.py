@@ -10,6 +10,7 @@ from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclas
 from dbt_semantic_interfaces.references import MetricModelReference, SemanticModelElementReference
 
 from metricflow.aggregation_properties import AggregationState
+from metricflow.semantics.specs.column_assoc import ColumnAssociation
 from metricflow.semantics.specs.spec_classes import (
     DimensionSpec,
     EntitySpec,
@@ -21,7 +22,6 @@ from metricflow.semantics.specs.spec_classes import (
     MetricSpec,
     TimeDimensionSpec,
 )
-from metricflow.specs.column_assoc import ColumnAssociation
 
 # Type for the specification used in the instance.
 SpecT = TypeVar("SpecT", bound=InstanceSpec)

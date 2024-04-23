@@ -20,7 +20,7 @@ from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS, SemanticModelJoinEvaluator
 from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.semantics.specs.spec_classes import InstanceSpecSet, LinkableInstanceSpec, LinklessEntitySpec
-from metricflow.specs.spec_set_transforms import ToElementNameSet
+from metricflow.semantics.specs.spec_set_transforms import ToElementNameSet
 from metricflow.sql.sql_plan import SqlJoinType
 
 logger = logging.getLogger(__name__)

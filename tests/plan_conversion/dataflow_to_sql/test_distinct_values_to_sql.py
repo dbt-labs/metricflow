@@ -9,8 +9,8 @@ from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilde
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.query.query_parser import MetricFlowQueryParser
+from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow.semantics.specs.spec_classes import DimensionSpec, MetricFlowQuerySpec
-from metricflow.specs.column_assoc import ColumnAssociationResolver
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.plan_conversion.test_dataflow_to_sql_plan import convert_and_check
 

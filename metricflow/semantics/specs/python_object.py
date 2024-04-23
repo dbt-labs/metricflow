@@ -8,7 +8,7 @@ from dbt_semantic_interfaces.implementations.filters.where_filter import Pydanti
 from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.protocols.query_parameter import GroupByParameter
 from metricflow.query.query_exceptions import InvalidQueryException
-from metricflow.specs.query_param_implementations import DimensionOrEntityParameter, TimeDimensionParameter
+from metricflow.semantics.specs.query_param_implementations import DimensionOrEntityParameter, TimeDimensionParameter
 
 
 def parse_object_builder_naming_scheme(group_by_item_name: str) -> GroupByParameter:

@@ -63,6 +63,7 @@ from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.node_processor import PreJoinNodeProcessor
 from metricflow.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import FilterSpecResolutionLookUp
+from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow.semantics.specs.spec_classes import (
     ConstantPropertySpec,
     CumulativeMeasureDescription,
@@ -82,8 +83,7 @@ from metricflow.semantics.specs.spec_classes import (
     TimeDimensionSpec,
     WhereFilterSpec,
 )
-from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.specs.where_filter_transform import WhereSpecFactory
+from metricflow.semantics.specs.where_filter_transform import WhereSpecFactory
 from metricflow.sql.sql_plan import SqlJoinType
 from metricflow.sql.sql_table import SqlTable
 
