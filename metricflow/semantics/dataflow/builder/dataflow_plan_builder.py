@@ -22,11 +22,6 @@ from dbt_semantic_interfaces.references import (
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 
-from metricflow.dataflow.dataflow_plan import (
-    BaseOutput,
-    DataflowPlan,
-    SinkOutput,
-)
 from metricflow.errors.error_classes import UnableToSatisfyQueryError
 from metricflow.mf_logging.formatting import indent
 from metricflow.mf_logging.pretty_print import mf_pformat
@@ -43,6 +38,11 @@ from metricflow.semantics.dataflow.builder.node_evaluator import (
     NodeEvaluatorForLinkableInstances,
 )
 from metricflow.semantics.dataflow.builder.source_node import SourceNodeSet
+from metricflow.semantics.dataflow.dataflow_plan import (
+    BaseOutput,
+    DataflowPlan,
+    SinkOutput,
+)
 from metricflow.semantics.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode
 from metricflow.semantics.dataflow.nodes.aggregate_measures import AggregateMeasuresNode
 from metricflow.semantics.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode

@@ -6,12 +6,12 @@ from typing import List, Optional, Sequence, Set
 
 from dbt_semantic_interfaces.references import EntityReference, TimeDimensionReference
 
-from metricflow.dataflow.dataflow_plan import (
-    BaseOutput,
-)
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.semantics.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.semantics.dataflow.builder.partitions import PartitionJoinResolver
+from metricflow.semantics.dataflow.dataflow_plan import (
+    BaseOutput,
+)
 from metricflow.semantics.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
 from metricflow.semantics.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.semantics.dataflow.nodes.join_to_base import JoinDescription, JoinToBaseOutputNode

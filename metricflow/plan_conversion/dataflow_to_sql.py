@@ -13,11 +13,6 @@ from dbt_semantic_interfaces.type_enums.conversion_calculation_type import Conve
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 
 from metricflow.aggregation_properties import AggregationState
-from metricflow.dataflow.dataflow_plan import (
-    BaseOutput,
-    DataflowPlanNode,
-    DataflowPlanNodeVisitor,
-)
 from metricflow.instances import (
     GroupByMetricInstance,
     InstanceSet,
@@ -65,6 +60,11 @@ from metricflow.protocols.sql_client import SqlEngine
 from metricflow.semantics.dag.id_prefix import StaticIdPrefix
 from metricflow.semantics.dag.mf_dag import DagId
 from metricflow.semantics.dag.sequential_id import SequentialIdGenerator
+from metricflow.semantics.dataflow.dataflow_plan import (
+    BaseOutput,
+    DataflowPlanNode,
+    DataflowPlanNodeVisitor,
+)
 from metricflow.semantics.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode
 from metricflow.semantics.dataflow.nodes.aggregate_measures import AggregateMeasuresNode
 from metricflow.semantics.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode

@@ -10,15 +10,15 @@ from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
-from metricflow.dataflow.dataflow_plan import (
-    BaseOutput,
-    DataflowPlan,
-)
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.semantics.dag.mf_dag import DagId
 from metricflow.semantics.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
+from metricflow.semantics.dataflow.dataflow_plan import (
+    BaseOutput,
+    DataflowPlan,
+)
 from metricflow.semantics.dataflow.nodes.aggregate_measures import AggregateMeasuresNode
 from metricflow.semantics.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
 from metricflow.semantics.dataflow.nodes.compute_metrics import ComputeMetricsNode

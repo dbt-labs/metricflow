@@ -4,7 +4,7 @@ import logging
 from dataclasses import dataclass
 from typing import List, Optional, Sequence
 
-from metricflow.dataflow.dataflow_plan import (
+from metricflow.semantics.dataflow.dataflow_plan import (
     BaseOutput,
     DataflowPlanNode,
     DataflowPlanNodeVisitor,

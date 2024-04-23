@@ -7,13 +7,13 @@ from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
-from metricflow.dataflow.dataflow_plan import (
+from metricflow.query.query_parser import MetricFlowQueryParser
+from metricflow.semantics.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
+from metricflow.semantics.dataflow.dataflow_plan import (
     DataflowPlan,
     DataflowPlanNode,
     DataflowPlanNodeVisitor,
 )
-from metricflow.query.query_parser import MetricFlowQueryParser
-from metricflow.semantics.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.semantics.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode
 from metricflow.semantics.dataflow.nodes.aggregate_measures import AggregateMeasuresNode
 from metricflow.semantics.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode

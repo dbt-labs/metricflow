@@ -5,7 +5,7 @@ from typing import List, Sequence, Tuple
 
 from dbt_semantic_interfaces.references import TimeDimensionReference
 
-from metricflow.dataflow.dataflow_plan import (
+from metricflow.semantics.dataflow.dataflow_plan import (
     BaseOutput,
 )
 from metricflow.semantics.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode

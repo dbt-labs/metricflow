@@ -5,12 +5,12 @@ from typing import Mapping
 import pytest
 from _pytest.fixtures import FixtureRequest
 
-from metricflow.dataflow.dataflow_plan import (
+from metricflow.semantics.dag.id_prefix import StaticIdPrefix
+from metricflow.semantics.dag.mf_dag import DagId
+from metricflow.semantics.dataflow.dataflow_plan import (
     BaseOutput,
     DataflowPlan,
 )
-from metricflow.semantics.dag.id_prefix import StaticIdPrefix
-from metricflow.semantics.dag.mf_dag import DagId
 from metricflow.semantics.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.semantics.dataflow.nodes.write_to_dataframe import WriteToResultDataframeNode
 from metricflow.semantics.dataflow.optimizer.source_scan.cm_branch_combiner import (

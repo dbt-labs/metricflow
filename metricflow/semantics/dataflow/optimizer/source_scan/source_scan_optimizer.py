@@ -4,15 +4,15 @@ import logging
 from dataclasses import dataclass
 from typing import List, Optional, Sequence
 
-from metricflow.dataflow.dataflow_plan import (
+from metricflow.semantics.dag.id_prefix import StaticIdPrefix
+from metricflow.semantics.dag.mf_dag import DagId
+from metricflow.semantics.dataflow.dataflow_plan import (
     BaseOutput,
     DataflowPlan,
     DataflowPlanNode,
     DataflowPlanNodeVisitor,
     SinkOutput,
 )
-from metricflow.semantics.dag.id_prefix import StaticIdPrefix
-from metricflow.semantics.dag.mf_dag import DagId
 from metricflow.semantics.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode
 from metricflow.semantics.dataflow.nodes.aggregate_measures import AggregateMeasuresNode
 from metricflow.semantics.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
