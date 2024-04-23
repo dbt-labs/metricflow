@@ -14,7 +14,7 @@ from metricflow.instances import EntityInstance, InstanceSet
 from metricflow.mf_logging.pretty_print import mf_pformat
 
 if TYPE_CHECKING:
-    from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
+    from metricflow.semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 
 MAX_JOIN_HOPS = 2
 

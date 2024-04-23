@@ -38,9 +38,9 @@ from metricflow.dataset.dataset_classes import DataSet
 from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.instances import InstanceSet
 from metricflow.mf_logging.pretty_print import mf_pformat
-from metricflow.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
-from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
+from metricflow.semantics.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
+from metricflow.semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.semantics.specs.spec_classes import (
     InstanceSpecSet,
     LinkableInstanceSpec,

@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from dbt_semantic_interfaces.protocols import MetricInput
 from dbt_semantic_interfaces.references import MetricReference
 
-from metricflow.model.semantics.metric_lookup import MetricLookup
+from metricflow.semantics.model.semantics.metric_lookup import MetricLookup
 
 
 @dataclass(frozen=True)

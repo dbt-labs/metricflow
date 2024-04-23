@@ -28,9 +28,9 @@ from metricflow.instances import (
     MeasureInstance,
     TimeDimensionInstance,
 )
-from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
-from metricflow.model.spec_converters import MeasureConverter
 from metricflow.plan_conversion.time_spine import TIME_SPINE_DATA_SET_DESCRIPTION, TimeSpineSource
+from metricflow.semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
+from metricflow.semantics.model.spec_converters import MeasureConverter
 from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow.semantics.specs.spec_classes import (
     DEFAULT_TIME_GRANULARITY,

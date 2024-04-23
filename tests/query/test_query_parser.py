@@ -14,10 +14,10 @@ from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 
-from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
+from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.semantics.specs.query_param_implementations import (
     DimensionOrEntityParameter,
     MetricParameter,

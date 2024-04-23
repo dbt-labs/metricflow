@@ -4,7 +4,6 @@ from typing import Sequence
 
 from typing_extensions import override
 
-from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.query.group_by_item.candidate_push_down.push_down_visitor import DagTraversalPathTracker
 from metricflow.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
 from metricflow.query.group_by_item.resolution_dag.resolution_nodes.base_node import (
@@ -28,6 +27,7 @@ from metricflow.query.resolver_inputs.query_resolver_inputs import ResolverInput
 from metricflow.query.validation_rules.base_validation_rule import PostResolutionQueryValidationRule
 from metricflow.query.validation_rules.duplicate_metric import DuplicateMetricValidationRule
 from metricflow.query.validation_rules.metric_time_requirements import MetricTimeQueryValidationRule
+from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 
 
 class PostResolutionQueryValidator:

@@ -15,9 +15,9 @@ from metricflow.instances import (
     InstanceSet,
     MeasureInstance,
 )
-from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.time_spine import TimeSpineSource
+from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.semantics.specs.column_assoc import ColumnAssociation, SingleColumnCorrelationKey
 from metricflow.semantics.specs.spec_classes import (
     LinklessEntitySpec,

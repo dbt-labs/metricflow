@@ -11,8 +11,6 @@ from typing_extensions import override
 
 from metricflow.mf_logging.formatting import indent
 from metricflow.mf_logging.pretty_print import mf_pformat, mf_pformat_many
-from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.model.semantics.linkable_element import LinkableElementProperty
 from metricflow.query.group_by_item.candidate_push_down.group_by_item_candidate import GroupByItemCandidateSet
 from metricflow.query.group_by_item.resolution_dag.resolution_nodes.base_node import (
     GroupByItemResolutionNode,
@@ -42,6 +40,8 @@ from metricflow.query.issues.issues_base import (
     MetricFlowQueryResolutionIssueSet,
 )
 from metricflow.query.suggestion_generator import QueryItemSuggestionGenerator
+from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow.semantics.model.semantics.linkable_element import LinkableElementProperty
 from metricflow.semantics.specs.patterns.base_time_grain import BaseTimeGrainPattern
 from metricflow.semantics.specs.patterns.none_date_part import NoneDatePartPattern
 from metricflow.semantics.specs.patterns.spec_pattern import SpecPattern

@@ -12,10 +12,10 @@ from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionT
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.mf_logging.pretty_print import mf_pformat
-from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.semantics.specs.spec_classes import InstanceSpecSet, TimeDimensionReference, TimeDimensionSpec
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer

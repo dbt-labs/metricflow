@@ -17,7 +17,6 @@ from metricflow.assert_one_arg import assert_at_most_one_arg_set
 from metricflow.mf_logging.formatting import indent
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.mf_logging.runtime import log_runtime
-from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.protocols.query_parameter import (
     GroupByParameter,
     MetricQueryParameter,
@@ -48,6 +47,7 @@ from metricflow.query.resolver_inputs.query_resolver_inputs import (
 )
 from metricflow.semantics.filters.merge_where import merge_to_single_where_filter
 from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
+from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.semantics.naming.dunder_scheme import DunderNamingScheme
 from metricflow.semantics.naming.metric_scheme import MetricNamingScheme
 from metricflow.semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme

@@ -6,10 +6,10 @@ from typing import Sequence
 from dbt_semantic_interfaces.protocols import Metric, WhereFilterIntersection
 from dbt_semantic_interfaces.references import MetricReference
 
-from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow.query.issues.issues_base import MetricFlowQueryResolutionIssueSet
 from metricflow.query.resolver_inputs.query_resolver_inputs import ResolverInputForQuery
+from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 
 
 class PostResolutionQueryValidationRule(ABC):

@@ -9,13 +9,13 @@ from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import MeasureReference, MetricReference
 
 from metricflow.errors.error_classes import DuplicateMetricError, MetricNotFoundError, NonExistentMeasureError
-from metricflow.model.semantics.linkable_element import LinkableElementProperty
-from metricflow.model.semantics.linkable_element_set import LinkableElementSet
-from metricflow.model.semantics.linkable_spec_resolver import (
+from metricflow.semantics.model.semantics.linkable_element import LinkableElementProperty
+from metricflow.semantics.model.semantics.linkable_element_set import LinkableElementSet
+from metricflow.semantics.model.semantics.linkable_spec_resolver import (
     ValidLinkableSpecResolver,
 )
-from metricflow.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
-from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
+from metricflow.semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
+from metricflow.semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.semantics.specs.spec_classes import TimeDimensionSpec
 
 logger = logging.getLogger(__name__)

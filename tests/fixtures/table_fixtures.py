@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 from tests.source_schema_tools import create_tables_listed_in_table_snapshot_repository

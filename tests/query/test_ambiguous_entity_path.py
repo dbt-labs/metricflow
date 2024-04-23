@@ -5,12 +5,12 @@ import logging
 import pytest
 from _pytest.fixtures import FixtureRequest
 
-from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.query.group_by_item.filter_spec_resolution.filter_pattern_factory import (
     DefaultWhereFilterPatternFactory,
 )
 from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.query.query_parser import MetricFlowQueryParser
+from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.snapshot_utils import assert_object_snapshot_equal, assert_str_snapshot_equal
 

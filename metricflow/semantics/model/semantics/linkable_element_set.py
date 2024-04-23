@@ -4,7 +4,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import Dict, FrozenSet, List, Sequence, Set, Tuple
 
-from metricflow.model.semantics.linkable_element import (
+from metricflow.semantics.model.semantics.linkable_element import (
     ElementPathKey,
     LinkableDimension,
     LinkableElementProperty,

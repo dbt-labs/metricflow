@@ -7,12 +7,12 @@ from dbt_semantic_interfaces.protocols import WhereFilterIntersection
 from dbt_semantic_interfaces.references import MetricReference
 from typing_extensions import override
 
-from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow.query.issues.issues_base import MetricFlowQueryResolutionIssueSet
 from metricflow.query.issues.parsing.duplicate_metric import DuplicateMetricIssue
 from metricflow.query.resolver_inputs.query_resolver_inputs import ResolverInputForQuery
 from metricflow.query.validation_rules.base_validation_rule import PostResolutionQueryValidationRule
+from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 
 logger = logging.getLogger(__name__)
 

@@ -16,9 +16,9 @@ from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinToBaseOutputNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.mf_logging.pretty_print import mf_pformat
-from metricflow.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS, SemanticModelJoinEvaluator
-from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
+from metricflow.semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS, SemanticModelJoinEvaluator
+from metricflow.semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.semantics.specs.spec_classes import InstanceSpecSet, LinkableInstanceSpec, LinklessEntitySpec
 from metricflow.semantics.specs.spec_set_transforms import ToElementNameSet
 from metricflow.sql.sql_plan import SqlJoinType

@@ -9,7 +9,6 @@ from dbt_semantic_interfaces.references import MetricReference, TimeDimensionRef
 from dbt_semantic_interfaces.type_enums import MetricType
 from typing_extensions import override
 
-from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow.query.issues.issues_base import MetricFlowQueryResolutionIssueSet
 from metricflow.query.issues.parsing.cumulative_metric_requires_metric_time import (
@@ -18,6 +17,7 @@ from metricflow.query.issues.parsing.cumulative_metric_requires_metric_time impo
 from metricflow.query.issues.parsing.offset_metric_requires_metric_time import OffsetMetricRequiresMetricTimeIssue
 from metricflow.query.resolver_inputs.query_resolver_inputs import ResolverInputForQuery
 from metricflow.query.validation_rules.base_validation_rule import PostResolutionQueryValidationRule
+from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.semantics.specs.spec_classes import TimeDimensionSpec
 
 

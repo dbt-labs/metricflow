@@ -9,12 +9,12 @@ from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.references import MetricReference
 
-from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.query.group_by_item.group_by_item_resolver import GroupByItemResolver
 from metricflow.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
 from metricflow.query.group_by_item.resolution_dag.resolution_nodes.metric_resolution_node import (
     MetricGroupByItemResolutionNode,
 )
+from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.semantics.naming.naming_scheme import QueryItemNamingScheme
 from metricflow.semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration

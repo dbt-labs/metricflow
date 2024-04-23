@@ -11,7 +11,7 @@ from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanCon
 from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
 
 if TYPE_CHECKING:
-    from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
+    from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 
 
 class DataflowPlanNodeOutputDataSetResolver(DataflowToSqlQueryPlanConverter):

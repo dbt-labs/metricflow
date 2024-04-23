@@ -16,7 +16,7 @@ from dbt_semantic_interfaces.transformations.semantic_manifest_transformer impor
     PydanticSemanticManifestTransformer,
 )
 
-from metricflow.model.transformations.dedupe_metric_input_measures import DedupeMetricInputMeasuresRule
+from metricflow.semantics.model.transformations.dedupe_metric_input_measures import DedupeMetricInputMeasuresRule
 
 
 def parse_manifest_from_dbt_generated_manifest(manifest_json_string: str) -> PydanticSemanticManifest:

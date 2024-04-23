@@ -15,12 +15,12 @@ from dbt_semantic_interfaces.test_utils import semantic_model_with_guaranteed_me
 from dbt_semantic_interfaces.transformations.semantic_manifest_transformer import PydanticSemanticManifestTransformer
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 
-from metricflow.model.data_warehouse_model_validator import (
+from metricflow.protocols.sql_client import SqlClient
+from metricflow.semantics.model.data_warehouse_model_validator import (
     DataWarehouseModelValidator,
     DataWarehouseTaskBuilder,
     DataWarehouseValidationTask,
 )
-from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.snapshot_utils import (

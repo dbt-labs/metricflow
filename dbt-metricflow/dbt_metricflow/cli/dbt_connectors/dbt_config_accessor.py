@@ -16,7 +16,7 @@ from typing_extensions import Self
 
 from metricflow.errors.error_classes import ModelCreationException
 from metricflow.mf_logging.pretty_print import mf_pformat
-from metricflow.model.dbt_manifest_parser import parse_manifest_from_dbt_generated_manifest
+from metricflow.semantics.model.dbt_manifest_parser import parse_manifest_from_dbt_generated_manifest
 
 logger = logging.getLogger(__name__)
 

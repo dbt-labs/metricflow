@@ -49,7 +49,6 @@ from metricflow.instances import (
     TimeDimensionInstance,
 )
 from metricflow.mf_logging.formatting import indent
-from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.convert_to_sql_plan import ConvertToSqlPlanResult
 from metricflow.plan_conversion.instance_converters import (
     AddGroupByMetrics,
@@ -87,6 +86,7 @@ from metricflow.plan_conversion.sql_join_builder import (
 from metricflow.plan_conversion.time_spine import TIME_SPINE_DATA_SET_DESCRIPTION, TimeSpineSource
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
+from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.semantics.specs.column_assoc import (
     ColumnAssociation,
     ColumnAssociationResolver,

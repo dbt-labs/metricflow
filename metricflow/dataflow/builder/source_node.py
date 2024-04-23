@@ -12,7 +12,7 @@ from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionT
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
-from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
 
 

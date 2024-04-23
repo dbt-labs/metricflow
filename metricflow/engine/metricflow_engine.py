@@ -31,12 +31,6 @@ from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
 from metricflow.execution.executor import SequentialPlanExecutor
 from metricflow.mf_logging.formatting import indent
 from metricflow.mf_logging.pretty_print import mf_pformat
-from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.model.semantics.linkable_element import (
-    LinkableDimension,
-    LinkableElementProperty,
-)
-from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.convert_to_execution_plan import ConvertToExecutionPlanResult
 from metricflow.plan_conversion.dataflow_to_execution import (
@@ -49,6 +43,12 @@ from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.random_id import random_id
 from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
+from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow.semantics.model.semantics.linkable_element import (
+    LinkableDimension,
+    LinkableElementProperty,
+)
+from metricflow.semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow.semantics.specs.query_param_implementations import SavedQueryParameter

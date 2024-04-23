@@ -46,8 +46,8 @@ from metricflow.sql.sql_plan import SqlJoinType
 from metricflow.visitor import VisitorOutputT
 
 if TYPE_CHECKING:
-    from metricflow.model.semantics.metric_lookup import MetricLookup
-    from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
+    from metricflow.semantics.model.semantics.metric_lookup import MetricLookup
+    from metricflow.semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 
 
 def hash_items(items: Sequence[SqlColumnType]) -> str:

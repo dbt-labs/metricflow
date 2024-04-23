@@ -22,7 +22,7 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.errors.error_classes import UnknownMetricLinkingError
 from metricflow.mf_logging.pretty_print import mf_pformat
-from metricflow.model.semantics.linkable_element import (
+from metricflow.semantics.model.semantics.linkable_element import (
     ElementPathKey,
     LinkableDimension,
     LinkableElementProperty,
@@ -32,15 +32,15 @@ from metricflow.model.semantics.linkable_element import (
     SemanticModelJoinPath,
     SemanticModelJoinPathElement,
 )
-from metricflow.model.semantics.linkable_element_set import LinkableElementSet
-from metricflow.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
+from metricflow.semantics.model.semantics.linkable_element_set import LinkableElementSet
+from metricflow.semantics.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
 from metricflow.semantics.specs.spec_classes import (
     DEFAULT_TIME_GRANULARITY,
     EntityReference,
 )
 
 if TYPE_CHECKING:
-    from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
+    from metricflow.semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 
 
 logger = logging.getLogger(__name__)

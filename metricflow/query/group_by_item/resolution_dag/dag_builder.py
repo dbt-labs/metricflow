@@ -8,7 +8,6 @@ from dbt_semantic_interfaces.protocols import WhereFilterIntersection
 from dbt_semantic_interfaces.references import MeasureReference, MetricReference
 from dbt_semantic_interfaces.type_enums import MetricType
 
-from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
 from metricflow.query.group_by_item.resolution_dag.input_metric_location import InputMetricDefinitionLocation
 from metricflow.query.group_by_item.resolution_dag.resolution_nodes.measure_source_node import (
@@ -23,6 +22,7 @@ from metricflow.query.group_by_item.resolution_dag.resolution_nodes.no_metrics_q
 from metricflow.query.group_by_item.resolution_dag.resolution_nodes.query_resolution_node import (
     QueryGroupByItemResolutionNode,
 )
+from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 
 logger = logging.getLogger(__name__)
 
