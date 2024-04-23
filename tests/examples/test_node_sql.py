@@ -6,14 +6,14 @@ import pytest
 from dbt_semantic_interfaces.references import SemanticModelReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
-from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
-from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
-from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
-from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.mf_logging.pretty_print import mf_pformat
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.semantics.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
+from metricflow.semantics.dataflow.nodes.filter_elements import FilterElementsNode
+from metricflow.semantics.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
+from metricflow.semantics.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.semantics.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.semantics.specs.spec_classes import InstanceSpecSet, TimeDimensionReference, TimeDimensionSpec

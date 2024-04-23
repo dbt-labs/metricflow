@@ -13,13 +13,7 @@ from dbt_semantic_interfaces.implementations.filters.where_filter import Pydanti
 from dbt_semantic_interfaces.references import EntityReference, MeasureReference, MetricReference
 from dbt_semantic_interfaces.type_enums import DimensionType
 
-from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
-from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import DataflowPlan
-from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import (
-    SourceScanOptimizer,
-)
 from metricflow.engine.models import Dimension, Entity, Measure, Metric, SavedQuery
 from metricflow.engine.time_source import ServerTimeSource
 from metricflow.errors.error_classes import ExecutionException
@@ -39,6 +33,12 @@ from metricflow.query.query_exceptions import InvalidQueryException
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.random_id import random_id
 from metricflow.semantics.dag.sequential_id import SequentialIdGenerator
+from metricflow.semantics.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
+from metricflow.semantics.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
+from metricflow.semantics.dataflow.builder.source_node import SourceNodeBuilder
+from metricflow.semantics.dataflow.optimizer.source_scan.source_scan_optimizer import (
+    SourceScanOptimizer,
+)
 from metricflow.semantics.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.semantics.dataset.dataset_classes import DataSet
 from metricflow.semantics.dataset.semantic_model_adapter import SemanticModelDataSet

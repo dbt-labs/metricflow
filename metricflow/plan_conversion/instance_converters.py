@@ -16,7 +16,6 @@ from more_itertools import bucket
 
 from metricflow.aggregation_properties import AggregationState
 from metricflow.assert_one_arg import assert_exactly_one_arg_set
-from metricflow.dataflow.nodes.join_to_base import ValidityWindowJoinDescription
 from metricflow.instances import (
     DimensionInstance,
     EntityInstance,
@@ -30,6 +29,7 @@ from metricflow.instances import (
     TimeDimensionInstance,
 )
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
+from metricflow.semantics.dataflow.nodes.join_to_base import ValidityWindowJoinDescription
 from metricflow.semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow.semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver

@@ -8,8 +8,8 @@ from dbt_semantic_interfaces.references import TimeDimensionReference
 from metricflow.dataflow.dataflow_plan import (
     BaseOutput,
 )
-from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
-from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
+from metricflow.semantics.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
+from metricflow.semantics.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.semantics.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.semantics.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup

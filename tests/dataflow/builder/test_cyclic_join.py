@@ -7,7 +7,7 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.references import EntityReference
 
-from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
+from metricflow.semantics.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.semantics.specs.spec_classes import (
     DimensionSpec,
     MetricFlowQuerySpec,

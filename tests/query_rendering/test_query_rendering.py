@@ -16,10 +16,10 @@ from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
-from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.query.query_parser import MetricFlowQueryParser
+from metricflow.semantics.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.semantics.dataset.dataset_classes import DataSet
 from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 
-from metricflow.dataflow.builder.measure_additiveness import group_measure_specs_by_additiveness
+from metricflow.semantics.dataflow.builder.measure_additiveness import group_measure_specs_by_additiveness
 from metricflow.semantics.specs.spec_classes import MeasureSpec, NonAdditiveDimensionSpec
 
 

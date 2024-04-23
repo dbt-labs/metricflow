@@ -9,8 +9,6 @@ from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,
     SinkNodeVisitor,
 )
-from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataframeNode
-from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.execution.execution_plan import (
     ExecutionPlan,
     SelectSqlQueryToDataFrameTask,
@@ -20,6 +18,8 @@ from metricflow.plan_conversion.convert_to_execution_plan import ConvertToExecut
 from metricflow.plan_conversion.convert_to_sql_plan import ConvertToSqlPlanResult
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.semantics.dataflow.nodes.write_to_dataframe import WriteToResultDataframeNode
+from metricflow.semantics.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.sql.render.sql_plan_renderer import SqlPlanRenderResult, SqlQueryPlanRenderer
 
 logger = logging.getLogger(__name__)

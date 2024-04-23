@@ -9,14 +9,14 @@ from metricflow.dataflow.dataflow_plan import (
     BaseOutput,
     DataflowPlan,
 )
-from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
-from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataframeNode
-from metricflow.dataflow.optimizer.source_scan.cm_branch_combiner import (
+from metricflow.semantics.dag.id_prefix import StaticIdPrefix
+from metricflow.semantics.dag.mf_dag import DagId
+from metricflow.semantics.dataflow.nodes.filter_elements import FilterElementsNode
+from metricflow.semantics.dataflow.nodes.write_to_dataframe import WriteToResultDataframeNode
+from metricflow.semantics.dataflow.optimizer.source_scan.cm_branch_combiner import (
     ComputeMetricsBranchCombiner,
     ComputeMetricsBranchCombinerResult,
 )
-from metricflow.semantics.dag.id_prefix import StaticIdPrefix
-from metricflow.semantics.dag.mf_dag import DagId
 from metricflow.semantics.specs.spec_classes import InstanceSpecSet, MeasureSpec
 from tests.dataflow_plan_to_svg import display_graph_if_requested
 from tests.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
