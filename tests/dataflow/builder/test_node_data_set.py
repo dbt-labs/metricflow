@@ -52,7 +52,7 @@ def test_no_parent_node_data_set(
                             column_name="bookings", single_column_correlation_key=SingleColumnCorrelationKey()
                         ),
                     ),
-                    origin_semantic_model_reference=SemanticModelElementReference(
+                    semantic_model_element_reference=SemanticModelElementReference(
                         semantic_model_name="fct_bookings_semantic_model", element_name="bookings"
                     ),
                     spec=MeasureSpec(

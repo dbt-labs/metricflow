@@ -333,7 +333,7 @@ class CreateValidityWindowJoinDescription(InstanceSetTransform[Optional[Validity
         semantic_model_to_window: Dict[SemanticModelReference, ValidityWindowJoinDescription] = {}
         instances_by_semantic_model = bucket(
             instance_set.time_dimension_instances,
-            lambda x: x.checked_origin_semantic_model_reference.semantic_model_reference,
+            lambda x: x.checked_semantic_model_element_reference.semantic_model_reference,
         )
         for semantic_model_reference in instances_by_semantic_model:
             validity_dims = self._get_validity_window_dimensions_for_semantic_model(semantic_model_reference)
@@ -410,7 +410,7 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
             dimension_instances_with_additional_link.append(
                 DimensionInstance(
                     associated_columns=dimension_instance.associated_columns,
-                    origin_semantic_model_reference=dimension_instance.origin_semantic_model_reference,
+                    semantic_model_element_reference=dimension_instance.semantic_model_element_reference,
                     spec=transformed_dimension_spec_from_right,
                 )
             )
@@ -431,7 +431,7 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
             time_dimension_instances_with_additional_link.append(
                 TimeDimensionInstance(
                     associated_columns=time_dimension_instance.associated_columns,
-                    origin_semantic_model_reference=time_dimension_instance.origin_semantic_model_reference,
+                    semantic_model_element_reference=time_dimension_instance.semantic_model_element_reference,
                     spec=transformed_time_dimension_spec_from_right,
                 )
             )
@@ -451,7 +451,7 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
             entity_instances_with_additional_link.append(
                 EntityInstance(
                     associated_columns=entity_instance.associated_columns,
-                    origin_semantic_model_reference=entity_instance.origin_semantic_model_reference,
+                    semantic_model_element_reference=entity_instance.semantic_model_element_reference,
                     spec=transformed_entity_spec_from_right,
                 )
             )
@@ -613,7 +613,7 @@ class ChangeMeasureAggregationState(InstanceSetTransform[InstanceSet]):
         measure_instances = tuple(
             MeasureInstance(
                 associated_columns=x.associated_columns,
-                origin_semantic_model_reference=x.origin_semantic_model_reference,
+                semantic_model_element_reference=x.semantic_model_element_reference,
                 aggregation_state=self._aggregation_state_changes[x.aggregation_state],
                 spec=x.spec,
             )
@@ -654,7 +654,7 @@ class UpdateMeasureFillNullsWith(InstanceSetTransform[InstanceSet]):
                     associated_columns=instance.associated_columns,
                     spec=measure_spec,
                     aggregation_state=instance.aggregation_state,
-                    origin_semantic_model_reference=instance.origin_semantic_model_reference,
+                    semantic_model_element_reference=instance.semantic_model_element_reference,
                 )
             )
 
@@ -709,7 +709,7 @@ class AliasAggregatedMeasures(InstanceSetTransform[InstanceSet]):
                     associated_columns=instance.associated_columns,
                     spec=measure_spec,
                     aggregation_state=instance.aggregation_state,
-                    origin_semantic_model_reference=instance.origin_semantic_model_reference,
+                    semantic_model_element_reference=instance.semantic_model_element_reference,
                 )
             )
 
@@ -942,7 +942,7 @@ class ChangeAssociatedColumns(InstanceSetTransform[InstanceSet]):
                 MeasureInstance(
                     associated_columns=(self._column_association_resolver.resolve_spec(input_measure_instance.spec),),
                     spec=input_measure_instance.spec,
-                    origin_semantic_model_reference=input_measure_instance.origin_semantic_model_reference,
+                    semantic_model_element_reference=input_measure_instance.semantic_model_element_reference,
                     aggregation_state=input_measure_instance.aggregation_state,
                 )
             )
@@ -953,7 +953,7 @@ class ChangeAssociatedColumns(InstanceSetTransform[InstanceSet]):
                 DimensionInstance(
                     associated_columns=(self._column_association_resolver.resolve_spec(input_dimension_instance.spec),),
                     spec=input_dimension_instance.spec,
-                    origin_semantic_model_reference=input_dimension_instance.origin_semantic_model_reference,
+                    semantic_model_element_reference=input_dimension_instance.semantic_model_element_reference,
                 )
             )
 
@@ -965,7 +965,7 @@ class ChangeAssociatedColumns(InstanceSetTransform[InstanceSet]):
                         self._column_association_resolver.resolve_spec(input_time_dimension_instance.spec),
                     ),
                     spec=input_time_dimension_instance.spec,
-                    origin_semantic_model_reference=input_time_dimension_instance.origin_semantic_model_reference,
+                    semantic_model_element_reference=input_time_dimension_instance.semantic_model_element_reference,
                 )
             )
 
@@ -975,7 +975,7 @@ class ChangeAssociatedColumns(InstanceSetTransform[InstanceSet]):
                 EntityInstance(
                     associated_columns=(self._column_association_resolver.resolve_spec(input_entity_instance.spec),),
                     spec=input_entity_instance.spec,
-                    origin_semantic_model_reference=input_entity_instance.origin_semantic_model_reference,
+                    semantic_model_element_reference=input_entity_instance.semantic_model_element_reference,
                 )
             )
 

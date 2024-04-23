@@ -233,7 +233,7 @@ class NodeEvaluatorForLinkableInstances:
                 if entity_instance_in_right_node is None:
                     raise RuntimeError(f"Could not find entity instance with name ({entity_spec_in_right_node})")
 
-                element_reference = entity_instance_in_right_node.checked_origin_semantic_model_reference
+                element_reference = entity_instance_in_right_node.checked_semantic_model_element_reference
                 entity_in_right_node = self._semantic_model_lookup.get_entity_in_semantic_model(element_reference)
                 if entity_in_right_node is None:
                     raise RuntimeError(f"Invalid SemanticModelElementReference {element_reference}")
@@ -249,8 +249,8 @@ class NodeEvaluatorForLinkableInstances:
                     continue
 
                 if not self._join_evaluator.is_valid_semantic_model_join(
-                    left_semantic_model_reference=entity_instance_in_left_node.checked_origin_semantic_model_reference.semantic_model_reference,
-                    right_semantic_model_reference=entity_instance_in_right_node.checked_origin_semantic_model_reference.semantic_model_reference,
+                    left_semantic_model_reference=entity_instance_in_left_node.checked_semantic_model_element_reference.semantic_model_reference,
+                    right_semantic_model_reference=entity_instance_in_right_node.checked_semantic_model_element_reference.semantic_model_reference,
                     on_entity_reference=entity_spec_in_right_node.reference,
                 ):
                     # If joining to ComputeMetricsNode, the right node is pre-aggregated.

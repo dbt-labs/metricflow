@@ -235,7 +235,7 @@ class SemanticModelJoinEvaluator:
             f"Not exactly 1 matching entity instances found: {matching_entity_instances} for {entity_reference} in "
             f"{mf_pformat(instance_set)}"
         )
-        return matching_entity_instances[0].checked_origin_semantic_model_reference.semantic_model_reference
+        return matching_entity_instances[0].checked_semantic_model_element_reference.semantic_model_reference
 
     def is_valid_instance_set_join(
         self,

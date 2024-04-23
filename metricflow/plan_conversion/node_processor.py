@@ -133,7 +133,7 @@ class PreJoinNodeProcessor:
             if len(entity_spec_in_first_node.entity_links) > 0:
                 continue
 
-            element_reference = entity_instance_in_first_node.checked_origin_semantic_model_reference
+            element_reference = entity_instance_in_first_node.checked_semantic_model_element_reference
             entity = self._semantic_model_lookup.get_entity_in_semantic_model(element_reference)
             if entity is None:
                 raise RuntimeError(f"Invalid SemanticModelElementReference {element_reference}")

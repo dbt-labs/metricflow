@@ -56,19 +56,19 @@ class MdoInstance(ABC, Generic[SpecT]):
 
 @dataclass(frozen=True)
 class SemanticModelElementInstance(SerializableDataclass):  # noqa: D101
-    origin_semantic_model_reference: Optional[SemanticModelElementReference]
+    semantic_model_element_reference: Optional[SemanticModelElementReference]
 
     @property
-    def checked_origin_semantic_model_reference(self) -> SemanticModelElementReference:
-        """Get origin_semantic_model_reference, error if it doesn't exist.
+    def checked_semantic_model_element_reference(self) -> SemanticModelElementReference:
+        """Get semantic_model_element_reference, error if it doesn't exist.
 
         Mostly used for type-checking simplification.
         """
-        if self.origin_semantic_model_reference is None:
+        if self.semantic_model_element_reference is None:
             raise ValueError(
-                f"Expected origin_semantic_model_reference for SemanticModelElementInstance, but found none. Instance: {self}"
+                f"Expected semantic_model_element_reference for SemanticModelElementInstance, but found none. Instance: {self}"
             )
-        return self.origin_semantic_model_reference
+        return self.semantic_model_element_reference
 
 
 @dataclass(frozen=True)

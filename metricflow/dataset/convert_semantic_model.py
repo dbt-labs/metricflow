@@ -95,7 +95,7 @@ class SemanticModelToDataSetConverter:
         return DimensionInstance(
             associated_columns=(self._column_association_resolver.resolve_spec(dimension_spec),),
             spec=dimension_spec,
-            origin_semantic_model_reference=SemanticModelElementReference(
+            semantic_model_element_reference=SemanticModelElementReference(
                 semantic_model_name=semantic_model_name,
                 element_name=dimension.reference.element_name,
             ),
@@ -120,7 +120,7 @@ class SemanticModelToDataSetConverter:
         return TimeDimensionInstance(
             associated_columns=(self._column_association_resolver.resolve_spec(time_dimension_spec),),
             spec=time_dimension_spec,
-            origin_semantic_model_reference=(
+            semantic_model_element_reference=(
                 SemanticModelElementReference(semantic_model_name=semantic_model_name, element_name=element_name)
                 if semantic_model_name
                 else None
@@ -141,7 +141,7 @@ class SemanticModelToDataSetConverter:
         return EntityInstance(
             associated_columns=(self._column_association_resolver.resolve_spec(entity_spec),),
             spec=entity_spec,
-            origin_semantic_model_reference=SemanticModelElementReference(
+            semantic_model_element_reference=SemanticModelElementReference(
                 semantic_model_name=semantic_model_name, element_name=entity.reference.element_name
             ),
         )
@@ -188,7 +188,7 @@ class SemanticModelToDataSetConverter:
             measure_instance = MeasureInstance(
                 associated_columns=(self._column_association_resolver.resolve_spec(measure_spec),),
                 spec=measure_spec,
-                origin_semantic_model_reference=SemanticModelElementReference(
+                semantic_model_element_reference=SemanticModelElementReference(
                     semantic_model_name=semantic_model_name, element_name=measure.reference.element_name
                 ),
                 aggregation_state=AggregationState.NON_AGGREGATED,
