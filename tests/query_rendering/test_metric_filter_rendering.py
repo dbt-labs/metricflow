@@ -257,7 +257,7 @@ def test_metric_filtered_by_itself(
 
 
 @pytest.mark.sql_engine_snapshot
-def test_query_with_simple_metric_in_where_filter_multi_hop(
+def test_multi_hop_with_explicit_entity_link(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -265,11 +265,41 @@ def test_query_with_simple_metric_in_where_filter_multi_hop(
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     query_parser: MetricFlowQueryParser,
 ) -> None:
-    """Tests a query with a simple metric in the query-level where filter."""
+    """Tests a metric filter that requires multiple join hops and explicitly states the entity link."""
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("listings",),
         where_constraint=PydanticWhereFilter(
             where_sql_template="{{ Metric('instant_bookings', ['user__company']) }} > 2",
+        ),
+    )
+    dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
+
+    convert_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_multi_hop_without_explicit_entity_link(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    sql_client: SqlClient,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    query_parser: MetricFlowQueryParser,
+) -> None:
+    """Tests a metric filter that requires multiple join hops and does not state the entity link.
+
+    Should return the same SQL as if the entity link was stated (group by resolution determines the entity link).
+    """
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("listings",),
+        where_constraint=PydanticWhereFilter(
+            where_sql_template="{{ Metric('instant_bookings', ['company']) }} > 2",
         ),
     )
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
