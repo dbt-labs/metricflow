@@ -635,7 +635,6 @@ class ValidLinkableSpecResolver:
                 f"Got semantic model: {semantic_model.reference.semantic_model_name}; "
                 f"last join path element: {using_join_path.last_semantic_model_reference.semantic_model_name}",
             )
-            # TODO: confirm that this is what we internally consider multi-hop
             properties = properties.union(frozenset({LinkableElementProperty.MULTI_HOP}))
 
         path_key_to_linkable_metrics: Dict[ElementPathKey, Tuple[LinkableMetric, ...]] = {}

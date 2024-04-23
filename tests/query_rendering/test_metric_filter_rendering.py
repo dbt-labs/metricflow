@@ -229,4 +229,28 @@ def test_distinct_values_query_with_metric_filter(
     )
 
 
-# TODO: tests for filters with conversion metrics
+@pytest.mark.sql_engine_snapshot
+def test_metric_filtered_by_itself(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    sql_client: SqlClient,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    query_parser: MetricFlowQueryParser,
+) -> None:
+    """Tests a query for a metric that filters by the same metric."""
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookers",),
+        where_constraint=PydanticWhereFilter(
+            where_sql_template="{{ Metric('bookers', ['guest']) }} > 1.00",
+        ),
+    )
+    dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
+
+    convert_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
