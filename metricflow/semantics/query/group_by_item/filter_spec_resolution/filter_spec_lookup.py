@@ -14,9 +14,9 @@ from dbt_semantic_interfaces.protocols import WhereFilterIntersection
 from dbt_semantic_interfaces.references import MetricReference
 from typing_extensions import override
 
+from metricflow.semantics.collection_helpers.merger import Mergeable
 from metricflow.semantics.mf_logging.formatting import indent
 from metricflow.semantics.mf_logging.pretty_print import mf_pformat
-from metricflow.semantics.collection_helpers.merger import Mergeable
 from metricflow.semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow.semantics.query.group_by_item.path_prefixable import PathPrefixable
 from metricflow.semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath

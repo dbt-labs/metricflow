@@ -10,8 +10,8 @@ from dbt_semantic_interfaces.references import (
     SemanticModelReference,
 )
 
-from metricflow.semantics.mf_logging.pretty_print import mf_pformat
 from metricflow.semantics.instances import EntityInstance, InstanceSet
+from metricflow.semantics.mf_logging.pretty_print import mf_pformat
 
 if TYPE_CHECKING:
     from metricflow.semantics.model.semantics.semantic_model_lookup import SemanticModelLookup

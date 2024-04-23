@@ -21,8 +21,6 @@ from metricflow.execution.dataflow_to_execution import (
 )
 from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
 from metricflow.execution.executor import SequentialPlanExecutor
-from metricflow.semantics.mf_logging.formatting import indent
-from metricflow.semantics.mf_logging.pretty_print import mf_pformat
 from metricflow.semantics.dag.sequential_id import SequentialIdGenerator
 from metricflow.semantics.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.semantics.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
@@ -36,6 +34,8 @@ from metricflow.semantics.dataset.dataset_classes import DataSet
 from metricflow.semantics.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.semantics.errors.error_classes import ExecutionException
 from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
+from metricflow.semantics.mf_logging.formatting import indent
+from metricflow.semantics.mf_logging.pretty_print import mf_pformat
 from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.semantics.model.semantics.linkable_element import (
     LinkableDimension,
@@ -55,9 +55,9 @@ from metricflow.semantics.specs.query_param_implementations import SavedQueryPar
 from metricflow.semantics.specs.spec_classes import InstanceSpecSet, MetricFlowQuerySpec
 from metricflow.semantics.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.semantics.sql.sql_table import SqlTable
-from metricflow.semantics.time.time_source import TimeSource
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
+from metricflow.time.time_source import TimeSource
 
 logger = logging.getLogger(__name__)
 _telemetry_reporter = TelemetryReporter(report_levels_higher_or_equal_to=TelemetryLevel.USAGE)

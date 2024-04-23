@@ -22,9 +22,6 @@ from dbt_semantic_interfaces.references import (
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 
-from metricflow.semantics.mf_logging.formatting import indent
-from metricflow.semantics.mf_logging.pretty_print import mf_pformat
-from metricflow.semantics.mf_logging.runtime import log_runtime
 from metricflow.semantics.dag.id_prefix import StaticIdPrefix
 from metricflow.semantics.dag.mf_dag import DagId
 from metricflow.semantics.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
@@ -59,6 +56,9 @@ from metricflow.semantics.dataflow.optimizer.dataflow_plan_optimizer import Data
 from metricflow.semantics.dataset.dataset_classes import DataSet
 from metricflow.semantics.errors.error_classes import UnableToSatisfyQueryError
 from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
+from metricflow.semantics.mf_logging.formatting import indent
+from metricflow.semantics.mf_logging.pretty_print import mf_pformat
+from metricflow.semantics.mf_logging.runtime import log_runtime
 from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.semantics.plan_conversion.node_processor import PreJoinNodeProcessor
 from metricflow.semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation

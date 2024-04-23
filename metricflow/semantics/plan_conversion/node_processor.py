@@ -6,7 +6,6 @@ from typing import List, Optional, Sequence, Set
 
 from dbt_semantic_interfaces.references import EntityReference, TimeDimensionReference
 
-from metricflow.semantics.mf_logging.pretty_print import mf_pformat
 from metricflow.semantics.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.semantics.dataflow.builder.partitions import PartitionJoinResolver
 from metricflow.semantics.dataflow.dataflow_plan import (
@@ -17,6 +16,7 @@ from metricflow.semantics.dataflow.nodes.filter_elements import FilterElementsNo
 from metricflow.semantics.dataflow.nodes.join_to_base import JoinDescription, JoinToBaseOutputNode
 from metricflow.semantics.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
+from metricflow.semantics.mf_logging.pretty_print import mf_pformat
 from metricflow.semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS, SemanticModelJoinEvaluator
 from metricflow.semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.semantics.specs.spec_classes import InstanceSpecSet, LinkableInstanceSpec, LinklessEntitySpec

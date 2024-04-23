@@ -30,7 +30,7 @@ from metricflow.semantics.sql.sql_exprs import (
     SqlExtractExpression,
     SqlStringLiteralExpression,
 )
-from metricflow.semantics.time.time_granularity import TimeGranularity
+from metricflow.time.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
 

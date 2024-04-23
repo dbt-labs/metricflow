@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Dict, Optional, Sequence
 
-from metricflow.semantics.mf_logging.runtime import log_block_runtime
 from metricflow.semantics.dataflow.dataflow_plan import (
     DataflowPlanNode,
 )
 from metricflow.semantics.dataset.sql_dataset import SqlDataSet
+from metricflow.semantics.mf_logging.runtime import log_block_runtime
 from metricflow.semantics.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
 

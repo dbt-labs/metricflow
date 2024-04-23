@@ -12,7 +12,6 @@ from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.conversion_calculation_type import ConversionCalculationType
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 
-from metricflow.semantics.mf_logging.formatting import indent
 from metricflow.semantics.aggregation_properties import AggregationState
 from metricflow.semantics.dag.id_prefix import StaticIdPrefix
 from metricflow.semantics.dag.mf_dag import DagId
@@ -50,6 +49,7 @@ from metricflow.semantics.instances import (
     MetricInstance,
     TimeDimensionInstance,
 )
+from metricflow.semantics.mf_logging.formatting import indent
 from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.semantics.plan_conversion.convert_to_sql_plan import ConvertToSqlPlanResult
 from metricflow.semantics.plan_conversion.instance_converters import (
@@ -137,7 +137,7 @@ from metricflow.semantics.sql.sql_plan import (
     SqlSelectStatementNode,
     SqlTableFromClauseNode,
 )
-from metricflow.semantics.time.time_constants import ISO8601_PYTHON_FORMAT
+from metricflow.time.time_constants import ISO8601_PYTHON_FORMAT
 
 logger = logging.getLogger(__name__)
 
