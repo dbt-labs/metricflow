@@ -4,9 +4,9 @@ from typing import Mapping
 
 from metricflow_semantics.instances import InstanceSet
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
 from metricflow_semantics.specs.spec_classes import InstanceSpecSet, MeasureSpec, MetricInputMeasureSpec
 
-from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.instance_converters import (
     CreateSelectColumnsWithMeasuresAggregated,
     FilterElements,

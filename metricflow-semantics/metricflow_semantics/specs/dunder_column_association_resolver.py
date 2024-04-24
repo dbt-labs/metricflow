@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import logging
-
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.naming.linkable_spec_name import DUNDER, StructuredLinkableSpecName
 from metricflow_semantics.specs.column_assoc import (
@@ -21,7 +19,24 @@ from metricflow_semantics.specs.spec_classes import (
     TimeDimensionSpec,
 )
 
-logger = logging.getLogger(__name__)
+
+class DunderColumnAssociationResolver(ColumnAssociationResolver):
+    """Uses a double underscore to map specs to column names.
+
+    For example:
+
+    DimensionSpec(element_name='country', entity_links=['listing'])
+
+    ->
+
+    listing__country
+    """
+
+    def __init__(self, semantic_manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D107
+        self._visitor_helper = DunderColumnAssociationResolverVisitor(semantic_manifest_lookup)
+
+    def resolve_spec(self, spec: InstanceSpec) -> ColumnAssociation:  # noqa: D102
+        return spec.accept(self._visitor_helper)
 
 
 class DunderColumnAssociationResolverVisitor(InstanceSpecVisitor[ColumnAssociation]):
@@ -92,22 +107,3 @@ class DunderColumnAssociationResolverVisitor(InstanceSpecVisitor[ColumnAssociati
             column_name=metadata_spec.qualified_name,
             single_column_correlation_key=SingleColumnCorrelationKey(),
         )
-
-
-class DunderColumnAssociationResolver(ColumnAssociationResolver):
-    """Uses a double underscore to map specs to column names.
-
-    For example:
-
-    DimensionSpec(element_name='country', entity_links=['listing'])
-
-    ->
-
-    listing__country
-    """
-
-    def __init__(self, semantic_manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D107
-        self._visitor_helper = DunderColumnAssociationResolverVisitor(semantic_manifest_lookup)
-
-    def resolve_spec(self, spec: InstanceSpec) -> ColumnAssociation:  # noqa: D102
-        return spec.accept(self._visitor_helper)
