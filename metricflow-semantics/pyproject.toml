@@ -57,11 +57,12 @@ features = [
 
 [tool.hatch.build.targets.sdist]
 exclude = [
-  "/.github",
-  "/.changes",
+  ".github",
+  ".changes",
   ".changie.yaml",
   ".gitignore",
   ".pre-commit-config.yaml",
   "CONTRIBUTING.md",
   "MAKEFILE",
+  "/tests_metricflow_semantics"
 ]

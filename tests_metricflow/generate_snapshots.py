@@ -53,7 +53,7 @@ from tests_metricflow.fixtures.setup_fixtures import SQL_ENGINE_SNAPSHOT_MARKER_
 logger = logging.getLogger(__name__)
 
 
-TEST_DIRECTORY = "tests"
+TEST_DIRECTORY = "tests_metricflow"
 
 
 class MetricFlowTestCredentialSet(FrozenBaseModel):  # noqa: D101

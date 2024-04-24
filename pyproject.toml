@@ -87,8 +87,8 @@ trino-sql-client-packages = [
 
 [tool.hatch.build.targets.sdist]
 exclude = [
-  "/.github",
-  "/.changes",
+  ".github",
+  ".changes",
   ".changie.yaml",
   ".gitignore",
   ".pre-commit-config.yaml",
@@ -96,6 +96,7 @@ exclude = [
   "Makefile",
   "/dbt-metricflow",
   "/local-data-warehouses",
+  "/metricflow-semantics/tests_metricflow_semantics",
   "/scripts",
   "/tests",
 ]
@@ -112,7 +113,8 @@ exclude = [
 description = "Environment for development. Includes a DuckDB-backed client."
 
 pre-install-commands = [
-  "pip install -e ./dbt-metricflow[duckdb]"
+  "pip install -e ./metricflow-semantics",
+  "pip install -e ./dbt-metricflow[duckdb]",
 ]
 
 features = [
@@ -133,6 +135,7 @@ MF_TEST_ADAPTER_TYPE="postgres"
 description = "Dev environment for working with Postgres adapter"
 
 pre-install-commands = [
+  "pip install -e ./metricflow-semantics",
   "pip install -e ./dbt-metricflow[postgres]"
 ]
 
@@ -151,6 +154,7 @@ MF_TEST_ADAPTER_TYPE="bigquery"
 description = "Dev environment for working with the BigQuery adapter"
 
 pre-install-commands = [
+  "pip install -e ./metricflow-semantics",
   "pip install -e ./dbt-metricflow[bigquery]"
 ]
 
@@ -166,6 +170,7 @@ MF_TEST_ADAPTER_TYPE="databricks"
 description = "Dev environment for working with the Databricks adapter"
 
 pre-install-commands = [
+  "pip install -e ./metricflow-semantics",
   "pip install -e ./dbt-metricflow[databricks]"
 ]
 
@@ -181,6 +186,7 @@ MF_TEST_ADAPTER_TYPE="redshift"
 description = "Dev environment for working with the Redshift adapter"
 
 pre-install-commands = [
+  "pip install -e ./metricflow-semantics",
   "pip install -e ./dbt-metricflow[redshift]"
 ]
 
@@ -196,6 +202,7 @@ MF_TEST_ADAPTER_TYPE="snowflake"
 description = "Dev environment for working with Snowflake adapter"
 
 pre-install-commands = [
+  "pip install -e ./metricflow-semantics",
   "pip install -e ./dbt-metricflow[snowflake]"
 ]
 
@@ -213,6 +220,7 @@ DBT_ENV_SECRET_CATALOG="memory"
 description = "Dev environment for working with the Trino adapter"
 
 pre-install-commands = [
+  "pip install -e ./metricflow-semantics",
   "pip install -e ./dbt-metricflow[trino]"
 ]
 
