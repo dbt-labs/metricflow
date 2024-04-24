@@ -15,13 +15,13 @@ from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.spec_classes import EntityReference, MetricFlowQuerySpec, MetricSpec, TimeDimensionSpec
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_MONTH
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 from tests_metricflow.query_rendering.compare_rendered_query import convert_and_check
-from tests_metricflow.time.metric_time_dimension import MTD_SPEC_MONTH
 
 
 @pytest.mark.sql_engine_snapshot

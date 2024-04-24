@@ -17,18 +17,18 @@ from metricflow_semantics.specs.spec_classes import (
     MetricSpec,
 )
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
-
-from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
-from metricflow.protocols.sql_client import SqlClient
-from tests_metricflow.query_rendering.compare_rendered_query import convert_and_check
-from tests_metricflow.time.metric_time_dimension import (
+from metricflow_semantics.test_helpers.metric_time_dimension import (
     MTD_SPEC_DAY,
     MTD_SPEC_MONTH,
     MTD_SPEC_QUARTER,
     MTD_SPEC_WEEK,
     MTD_SPEC_YEAR,
 )
+
+from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
+from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
+from metricflow.protocols.sql_client import SqlClient
+from tests_metricflow.query_rendering.compare_rendered_query import convert_and_check
 
 
 @pytest.mark.sql_engine_snapshot

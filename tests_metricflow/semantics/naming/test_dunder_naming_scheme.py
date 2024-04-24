@@ -8,8 +8,7 @@ from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from metricflow_semantics.naming.dunder_scheme import DunderNamingScheme
 from metricflow_semantics.specs.spec_classes import DimensionSpec, EntitySpec, LinkableInstanceSpec, TimeDimensionSpec
-
-from tests_metricflow.time.metric_time_dimension import MTD_SPEC_MONTH, MTD_SPEC_WEEK, MTD_SPEC_YEAR
+from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_MONTH, MTD_SPEC_WEEK, MTD_SPEC_YEAR
 
 
 @pytest.fixture(scope="session")

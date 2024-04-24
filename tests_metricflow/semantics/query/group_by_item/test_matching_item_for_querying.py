@@ -17,10 +17,10 @@ from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.me
     MetricGroupByItemResolutionNode,
 )
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_MONTH, MTD_SPEC_YEAR
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_object_snapshot_equal
 
 from tests_metricflow.semantics.query.group_by_item.conftest import AmbiguousResolutionQueryId
-from tests_metricflow.time.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_MONTH, MTD_SPEC_YEAR
 
 logger = logging.getLogger(__name__)
 

@@ -7,6 +7,7 @@ from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.references import TimeDimensionReference
 from metricflow_semantics.specs.spec_classes import MetricFlowQuerySpec, MetricSpec
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_DAY
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
@@ -14,7 +15,6 @@ from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanCon
 from metricflow.protocols.sql_client import SqlClient
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 from tests_metricflow.plan_conversion.test_dataflow_to_sql_plan import convert_and_check
-from tests_metricflow.time.metric_time_dimension import MTD_SPEC_DAY
 
 
 @pytest.mark.sql_engine_snapshot
