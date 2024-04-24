@@ -11,8 +11,8 @@ import pandas as pd
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow.semantics.dag.mf_dag import DagId, DagNode, DisplayedProperty, MetricFlowDag, NodeId
+from metricflow.semantics.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.semantics.visitor import Visitable
-from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_table import SqlTable
 
 logger = logging.getLogger(__name__)

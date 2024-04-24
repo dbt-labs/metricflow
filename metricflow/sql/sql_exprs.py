@@ -17,8 +17,8 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow.semantics.dag.mf_dag import DagNode, DisplayedProperty, NodeId
+from metricflow.semantics.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.semantics.visitor import Visitable, VisitorOutputT
-from metricflow.sql.sql_bind_parameters import SqlBindParameters
 
 
 class SqlExpressionNode(DagNode, Visitable, ABC):

@@ -9,13 +9,13 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
 
 from metricflow.semantics.errors.error_classes import UnsupportedEngineFeatureError
+from metricflow.semantics.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,
     SqlExpressionRenderer,
     SqlExpressionRenderResult,
 )
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
-from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_exprs import (
     SqlCastToTimestampExpression,
     SqlDateTruncExpression,

@@ -8,13 +8,13 @@ from string import Template
 from typing import List, Optional, Sequence, Tuple
 
 from metricflow.semantics.mf_logging.formatting import indent
+from metricflow.semantics.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,
     SqlExpressionRenderer,
     SqlExpressionRenderResult,
 )
 from metricflow.sql.render.rendering_constants import SqlRenderingConstants
-from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
     SqlJoinDescription,

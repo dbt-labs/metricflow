@@ -42,8 +42,8 @@ from metricflow.semantics.naming.linkable_spec_name import StructuredLinkableSpe
 from metricflow.semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
     FilterSpecResolutionLookUp,
 )
+from metricflow.semantics.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.semantics.visitor import VisitorOutputT
-from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_column_type import SqlColumnType
 from metricflow.sql.sql_plan import SqlJoinType
 

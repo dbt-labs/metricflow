@@ -13,8 +13,8 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
 
 from metricflow.semantics.mf_logging.formatting import indent
+from metricflow.semantics.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.render.rendering_constants import SqlRenderingConstants
-from metricflow.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_exprs import (
     SqlAggregateFunctionExpression,
     SqlBetweenExpression,
