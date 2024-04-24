@@ -36,7 +36,8 @@ class MetricFlowPrettyFormatter:
 
     @staticmethod
     def _is_pydantic_base_model(obj: Any):  # type:ignore
-        return isinstance(obj, BaseModel)
+        # Checking the attribute as the BaseModel check fails for newer version of Pydantic.
+        return isinstance(obj, BaseModel) or hasattr(obj, "__config__")
 
     def _handle_sequence_obj(self, list_like_obj: Union[list, tuple], remaining_line_width: Optional[int]) -> str:
         """Pretty prints a sequence object i.e. list or tuple.
