@@ -5,6 +5,16 @@ from typing import Mapping, Sequence
 
 import pytest
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.specs.spec_classes import (
+    DimensionSpec,
+    EntityReference,
+    EntitySpec,
+    LinkableInstanceSpec,
+    LinklessEntitySpec,
+    TimeDimensionSpec,
+)
+from metricflow_semantics.sql.sql_join_type import SqlJoinType
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.node_evaluator import (
@@ -18,16 +28,6 @@ from metricflow.dataflow.nodes.join_to_base import ValidityWindowJoinDescription
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.node_processor import PreJoinNodeProcessor
-from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.semantics.specs.spec_classes import (
-    DimensionSpec,
-    EntityReference,
-    EntitySpec,
-    LinkableInstanceSpec,
-    LinklessEntitySpec,
-    TimeDimensionSpec,
-)
-from metricflow.semantics.sql.sql_join_type import SqlJoinType
 from tests.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 
 logger = logging.getLogger(__name__)

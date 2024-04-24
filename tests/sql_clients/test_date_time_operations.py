@@ -22,9 +22,9 @@ from typing import Any
 import pandas as pd
 import pytest
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
+from metricflow_semantics.time.time_granularity import TimeGranularity
 
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.semantics.time.time_granularity import TimeGranularity
 from metricflow.sql.sql_exprs import (
     SqlCastToTimestampExpression,
     SqlDateTruncExpression,

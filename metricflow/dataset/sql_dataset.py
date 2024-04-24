@@ -3,15 +3,15 @@ from __future__ import annotations
 from typing import Optional, Sequence
 
 from dbt_semantic_interfaces.references import SemanticModelReference
+from metricflow_semantics.assert_one_arg import assert_exactly_one_arg_set
+from metricflow_semantics.instances import (
+    InstanceSet,
+)
+from metricflow_semantics.specs.column_assoc import ColumnAssociation
+from metricflow_semantics.specs.spec_classes import DimensionSpec, EntitySpec, TimeDimensionSpec
 from typing_extensions import override
 
 from metricflow.dataset.dataset_classes import DataSet
-from metricflow.semantics.assert_one_arg import assert_exactly_one_arg_set
-from metricflow.semantics.instances import (
-    InstanceSet,
-)
-from metricflow.semantics.specs.column_assoc import ColumnAssociation
-from metricflow.semantics.specs.spec_classes import DimensionSpec, EntitySpec, TimeDimensionSpec
 from metricflow.sql.sql_plan import (
     SqlQueryPlanNode,
     SqlSelectStatementNode,

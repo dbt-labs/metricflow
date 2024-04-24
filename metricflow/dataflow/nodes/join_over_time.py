@@ -4,13 +4,13 @@ from typing import Optional, Sequence
 
 from dbt_semantic_interfaces.protocols import MetricTimeWindow
 from dbt_semantic_interfaces.type_enums import TimeGranularity
+from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
+from metricflow_semantics.dag.mf_dag import DisplayedProperty, NodeId
+from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
+from metricflow_semantics.specs.spec_classes import TimeDimensionSpec
+from metricflow_semantics.visitor import VisitorOutputT
 
 from metricflow.dataflow.dataflow_plan import BaseOutput, DataflowPlanNode, DataflowPlanNodeVisitor
-from metricflow.semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
-from metricflow.semantics.dag.mf_dag import DisplayedProperty, NodeId
-from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
-from metricflow.semantics.specs.spec_classes import TimeDimensionSpec
-from metricflow.semantics.visitor import VisitorOutputT
 
 
 class JoinOverTimeRangeNode(BaseOutput):

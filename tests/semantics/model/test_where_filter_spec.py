@@ -23,19 +23,18 @@ from dbt_semantic_interfaces.references import (
 )
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-
-from metricflow.semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
-from metricflow.semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
-from metricflow.semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
+from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
+from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
+from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
     CallParameterSet,
     FilterSpecResolution,
     FilterSpecResolutionLookUp,
     ResolvedSpecLookUpKey,
 )
-from metricflow.semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
-from metricflow.semantics.query.issues.issues_base import MetricFlowQueryResolutionIssueSet
-from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
-from metricflow.semantics.specs.spec_classes import (
+from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
+from metricflow_semantics.query.issues.issues_base import MetricFlowQueryResolutionIssueSet
+from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
+from metricflow_semantics.specs.spec_classes import (
     DimensionSpec,
     EntitySpec,
     GroupByMetricSpec,
@@ -44,7 +43,8 @@ from metricflow.semantics.specs.spec_classes import (
     TimeDimensionSpec,
     WhereFilterSpec,
 )
-from metricflow.semantics.specs.where_filter_transform import WhereSpecFactory
+from metricflow_semantics.specs.where_filter_transform import WhereSpecFactory
+
 from tests.semantics.specs.conftest import EXAMPLE_FILTER_LOCATION
 
 logger = logging.getLogger(__name__)

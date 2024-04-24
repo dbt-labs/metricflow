@@ -6,8 +6,7 @@ from typing import Generator
 from unittest.mock import patch
 
 import pytest
-
-from metricflow.semantics.dag.sequential_id import SequentialIdGenerator
+from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
 
 
 @dataclass(frozen=True)

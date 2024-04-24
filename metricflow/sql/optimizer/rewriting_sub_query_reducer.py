@@ -4,7 +4,8 @@ import logging
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple
 
-from metricflow.semantics.mf_logging.formatting import indent
+from metricflow_semantics.mf_logging.formatting import indent
+
 from metricflow.sql.optimizer.sql_query_plan_optimizer import SqlQueryPlanOptimizer
 from metricflow.sql.sql_exprs import (
     SqlColumnAliasReferenceExpression,

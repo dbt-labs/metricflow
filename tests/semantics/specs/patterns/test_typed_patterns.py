@@ -18,14 +18,13 @@ from dbt_semantic_interfaces.references import (
 )
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
-
-from metricflow.semantics.specs.patterns.typed_patterns import (
+from metricflow_semantics.specs.patterns.typed_patterns import (
     DimensionPattern,
     EntityPattern,
     GroupByMetricPattern,
     TimeDimensionPattern,
 )
-from metricflow.semantics.specs.spec_classes import (
+from metricflow_semantics.specs.spec_classes import (
     DimensionSpec,
     EntitySpec,
     GroupByMetricSpec,

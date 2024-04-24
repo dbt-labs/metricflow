@@ -8,13 +8,13 @@ import pandas as pd
 from dbt.adapters.base.impl import BaseAdapter
 from dbt.exceptions import DbtDatabaseError
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow_semantics.errors.error_classes import SqlBindParametersNotSupportedError
+from metricflow_semantics.mf_logging.formatting import indent
+from metricflow_semantics.mf_logging.pretty_print import mf_pformat
+from metricflow_semantics.random_id import random_id
+from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
 
 from metricflow.protocols.sql_client import SqlEngine
-from metricflow.semantics.errors.error_classes import SqlBindParametersNotSupportedError
-from metricflow.semantics.mf_logging.formatting import indent
-from metricflow.semantics.mf_logging.pretty_print import mf_pformat
-from metricflow.semantics.random_id import random_id
-from metricflow.semantics.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.render.big_query import BigQuerySqlQueryPlanRenderer
 from metricflow.sql.render.databricks import DatabricksSqlQueryPlanRenderer
 from metricflow.sql.render.duckdb_renderer import DuckDbSqlQueryPlanRenderer

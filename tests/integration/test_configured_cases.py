@@ -13,6 +13,12 @@ from dbt_semantic_interfaces.implementations.elements.measure import PydanticMea
 from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.protocols.query_parameter import DimensionOrEntityQueryParameter
+from metricflow_semantics.specs.query_param_implementations import DimensionOrEntityParameter, TimeDimensionParameter
+from metricflow_semantics.test_helpers import (
+    ConfigurableTimeSource,
+)
 
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowQueryRequest
 from metricflow.plan_conversion.column_resolver import (
@@ -20,12 +26,6 @@ from metricflow.plan_conversion.column_resolver import (
 )
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.semantics.protocols.query_parameter import DimensionOrEntityQueryParameter
-from metricflow.semantics.specs.query_param_implementations import DimensionOrEntityParameter, TimeDimensionParameter
-from metricflow.semantics.test_helpers import (
-    ConfigurableTimeSource,
-)
 from metricflow.sql.sql_exprs import (
     SqlCastToTimestampExpression,
     SqlColumnReference,

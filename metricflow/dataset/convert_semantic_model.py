@@ -15,30 +15,30 @@ from dbt_semantic_interfaces.references import (
 )
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-
-from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
-from metricflow.dataset.sql_dataset import SqlDataSet
-from metricflow.plan_conversion.time_spine import TIME_SPINE_DATA_SET_DESCRIPTION, TimeSpineSource
-from metricflow.semantics.aggregation_properties import AggregationState
-from metricflow.semantics.dag.id_prefix import DynamicIdPrefix, StaticIdPrefix
-from metricflow.semantics.dag.sequential_id import SequentialIdGenerator
-from metricflow.semantics.instances import (
+from metricflow_semantics.aggregation_properties import AggregationState
+from metricflow_semantics.dag.id_prefix import DynamicIdPrefix, StaticIdPrefix
+from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
+from metricflow_semantics.instances import (
     DimensionInstance,
     EntityInstance,
     InstanceSet,
     MeasureInstance,
     TimeDimensionInstance,
 )
-from metricflow.semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
-from metricflow.semantics.model.spec_converters import MeasureConverter
-from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
-from metricflow.semantics.specs.spec_classes import (
+from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
+from metricflow_semantics.model.spec_converters import MeasureConverter
+from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
+from metricflow_semantics.specs.spec_classes import (
     DEFAULT_TIME_GRANULARITY,
     DimensionSpec,
     EntityReference,
     EntitySpec,
     TimeDimensionSpec,
 )
+
+from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
+from metricflow.dataset.sql_dataset import SqlDataSet
+from metricflow.plan_conversion.time_spine import TIME_SPINE_DATA_SET_DESCRIPTION, TimeSpineSource
 from metricflow.sql.sql_exprs import (
     SqlColumnReference,
     SqlColumnReferenceExpression,

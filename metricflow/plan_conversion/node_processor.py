@@ -5,6 +5,13 @@ from dataclasses import dataclass
 from typing import List, Optional, Sequence, Set
 
 from dbt_semantic_interfaces.references import EntityReference, TimeDimensionReference
+from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
+from metricflow_semantics.mf_logging.pretty_print import mf_pformat
+from metricflow_semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS, SemanticModelJoinEvaluator
+from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
+from metricflow_semantics.specs.spec_classes import InstanceSpecSet, LinkableInstanceSpec, LinklessEntitySpec
+from metricflow_semantics.specs.spec_set_transforms import ToElementNameSet
+from metricflow_semantics.sql.sql_join_type import SqlJoinType
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.partitions import PartitionJoinResolver
@@ -15,13 +22,6 @@ from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinToBaseOutputNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
-from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
-from metricflow.semantics.mf_logging.pretty_print import mf_pformat
-from metricflow.semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS, SemanticModelJoinEvaluator
-from metricflow.semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
-from metricflow.semantics.specs.spec_classes import InstanceSpecSet, LinkableInstanceSpec, LinklessEntitySpec
-from metricflow.semantics.specs.spec_set_transforms import ToElementNameSet
-from metricflow.semantics.sql.sql_join_type import SqlJoinType
 
 logger = logging.getLogger(__name__)
 

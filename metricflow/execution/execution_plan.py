@@ -7,12 +7,12 @@ from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple
 
 import pandas as pd
+from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
+from metricflow_semantics.dag.mf_dag import DagId, DagNode, DisplayedProperty, MetricFlowDag, NodeId
+from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
+from metricflow_semantics.visitor import Visitable
 
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
-from metricflow.semantics.dag.mf_dag import DagId, DagNode, DisplayedProperty, MetricFlowDag, NodeId
-from metricflow.semantics.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.semantics.visitor import Visitable
 from metricflow.sql.sql_table import SqlTable
 
 logger = logging.getLogger(__name__)

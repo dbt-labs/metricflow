@@ -5,9 +5,9 @@ import textwrap
 
 from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimension
 from dbt_semantic_interfaces.type_enums import DimensionType
+from metricflow_semantics.mf_logging.formatting import indent
+from metricflow_semantics.mf_logging.pretty_print import mf_pformat, mf_pformat_many
 
-from metricflow.semantics.mf_logging.formatting import indent
-from metricflow.semantics.mf_logging.pretty_print import mf_pformat, mf_pformat_many
 from tests.time.metric_time_dimension import MTD_SPEC_DAY
 
 logger = logging.getLogger(__name__)

@@ -12,6 +12,26 @@ from dbt_semantic_interfaces.implementations.elements.dimension import PydanticD
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
 from dbt_semantic_interfaces.references import EntityReference, MeasureReference, MetricReference
 from dbt_semantic_interfaces.type_enums import DimensionType
+from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
+from metricflow_semantics.errors.error_classes import ExecutionException
+from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
+from metricflow_semantics.mf_logging.formatting import indent
+from metricflow_semantics.mf_logging.pretty_print import mf_pformat
+from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.model.semantics.linkable_element import (
+    LinkableDimension,
+    LinkableElementProperty,
+)
+from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
+from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
+from metricflow_semantics.protocols.query_parameter import GroupByParameter, MetricQueryParameter, OrderByQueryParameter
+from metricflow_semantics.query.query_exceptions import InvalidQueryException
+from metricflow_semantics.query.query_parser import MetricFlowQueryParser
+from metricflow_semantics.random_id import random_id
+from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
+from metricflow_semantics.specs.query_param_implementations import SavedQueryParameter
+from metricflow_semantics.specs.spec_classes import InstanceSpecSet, MetricFlowQuerySpec
+from metricflow_semantics.time.time_source import TimeSource
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
@@ -35,26 +55,6 @@ from metricflow.plan_conversion.column_resolver import DunderColumnAssociationRe
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.semantics.dag.sequential_id import SequentialIdGenerator
-from metricflow.semantics.errors.error_classes import ExecutionException
-from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
-from metricflow.semantics.mf_logging.formatting import indent
-from metricflow.semantics.mf_logging.pretty_print import mf_pformat
-from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.semantics.model.semantics.linkable_element import (
-    LinkableDimension,
-    LinkableElementProperty,
-)
-from metricflow.semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
-from metricflow.semantics.naming.linkable_spec_name import StructuredLinkableSpecName
-from metricflow.semantics.protocols.query_parameter import GroupByParameter, MetricQueryParameter, OrderByQueryParameter
-from metricflow.semantics.query.query_exceptions import InvalidQueryException
-from metricflow.semantics.query.query_parser import MetricFlowQueryParser
-from metricflow.semantics.random_id import random_id
-from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
-from metricflow.semantics.specs.query_param_implementations import SavedQueryParameter
-from metricflow.semantics.specs.spec_classes import InstanceSpecSet, MetricFlowQuerySpec
-from metricflow.semantics.time.time_source import TimeSource
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.sql.sql_table import SqlTable
 from metricflow.telemetry.models import TelemetryLevel

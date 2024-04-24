@@ -10,16 +10,16 @@ import _pytest.config
 import pytest
 import sqlalchemy.util
 from _pytest.fixtures import FixtureRequest
-from sqlalchemy.engine import make_url
-
-from metricflow.semantics.random_id import random_id
-from metricflow.semantics.test_helpers import (
+from metricflow_semantics.random_id import random_id
+from metricflow_semantics.test_helpers import (
     DISPLAY_SNAPSHOTS_CLI_FLAG,
     OVERWRITE_SNAPSHOTS_CLI_FLAG,
     MetricFlowTestConfiguration,
     add_display_snapshots_cli_flag,
     add_overwrite_snapshots_cli_flag,
 )
+from sqlalchemy.engine import make_url
+
 from tests.fixtures.sql_clients.common_client import SqlDialect
 from tests.table_snapshot.table_snapshots import SqlTableSnapshotHash, SqlTableSnapshotRepository
 

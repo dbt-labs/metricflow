@@ -15,20 +15,20 @@ from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-
-from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from metricflow.dataset.dataset_classes import DataSet
-from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
-from metricflow.protocols.sql_client import SqlClient
-from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
-from metricflow.semantics.query.query_parser import MetricFlowQueryParser
-from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
-from metricflow.semantics.specs.spec_classes import (
+from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
+from metricflow_semantics.query.query_parser import MetricFlowQueryParser
+from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
+from metricflow_semantics.specs.spec_classes import (
     DimensionSpec,
     MetricFlowQuerySpec,
     MetricSpec,
     TimeDimensionSpec,
 )
+
+from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
+from metricflow.dataset.dataset_classes import DataSet
+from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
+from metricflow.protocols.sql_client import SqlClient
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.query_rendering.compare_rendered_query import convert_and_check
 from tests.time.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_WEEK

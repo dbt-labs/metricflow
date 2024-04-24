@@ -10,6 +10,8 @@ import pytest
 from click.testing import CliRunner, Result
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.test_utils import as_datetime
+from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.test_helpers import ConfigurableTimeSource
 from typing_extensions import override
 
 from dbt_metricflow.cli.cli_context import CLIContext
@@ -17,8 +19,6 @@ from dbt_metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts, 
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.semantics.test_helpers import ConfigurableTimeSource
 from tests.fixtures.setup_fixtures import dbt_project_dir
 
 

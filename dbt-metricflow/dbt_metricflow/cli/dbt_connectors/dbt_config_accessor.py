@@ -12,11 +12,10 @@ from dbt.config.profile import Profile
 from dbt.config.project import Project
 from dbt.config.runtime import load_profile, load_project
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
+from metricflow_semantics.errors.error_classes import ModelCreationException
+from metricflow_semantics.mf_logging.pretty_print import mf_pformat
+from metricflow_semantics.model.dbt_manifest_parser import parse_manifest_from_dbt_generated_manifest
 from typing_extensions import Self
-
-from metricflow.semantics.errors.error_classes import ModelCreationException
-from metricflow.semantics.mf_logging.pretty_print import mf_pformat
-from metricflow.semantics.model.dbt_manifest_parser import parse_manifest_from_dbt_generated_manifest
 
 logger = logging.getLogger(__name__)
 

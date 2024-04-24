@@ -10,14 +10,14 @@ from dbt_semantic_interfaces.implementations.filters.where_filter import Pydanti
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
+from metricflow_semantics.query.query_parser import MetricFlowQueryParser
+from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
+from metricflow_semantics.specs.spec_classes import EntityReference, MetricFlowQuerySpec, MetricSpec, TimeDimensionSpec
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
-from metricflow.semantics.query.query_parser import MetricFlowQueryParser
-from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
-from metricflow.semantics.specs.spec_classes import EntityReference, MetricFlowQuerySpec, MetricSpec, TimeDimensionSpec
 from tests.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.query_rendering.compare_rendered_query import convert_and_check

@@ -2,14 +2,14 @@ from __future__ import annotations
 
 import logging
 
-from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.semantics.naming.linkable_spec_name import DUNDER, StructuredLinkableSpecName
-from metricflow.semantics.specs.column_assoc import (
+from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.naming.linkable_spec_name import DUNDER, StructuredLinkableSpecName
+from metricflow_semantics.specs.column_assoc import (
     ColumnAssociation,
     ColumnAssociationResolver,
     SingleColumnCorrelationKey,
 )
-from metricflow.semantics.specs.spec_classes import (
+from metricflow_semantics.specs.spec_classes import (
     DimensionSpec,
     EntitySpec,
     GroupByMetricSpec,

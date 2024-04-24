@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from typing import List, Sequence, Tuple
 
 from dbt_semantic_interfaces.references import TimeDimensionReference
+from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 
 from metricflow.dataflow.dataflow_plan import (
     BaseOutput,
@@ -13,8 +15,6 @@ from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.plan_conversion.time_spine import TimeSpineSource
-from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
 
 
 @dataclass(frozen=True)

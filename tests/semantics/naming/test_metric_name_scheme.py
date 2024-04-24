@@ -3,9 +3,8 @@ from __future__ import annotations
 from typing import Sequence
 
 import pytest
-
-from metricflow.semantics.naming.metric_scheme import MetricNamingScheme
-from metricflow.semantics.specs.spec_classes import DimensionSpec, InstanceSpec, MetricSpec
+from metricflow_semantics.naming.metric_scheme import MetricNamingScheme
+from metricflow_semantics.specs.spec_classes import DimensionSpec, InstanceSpec, MetricSpec
 
 
 @pytest.fixture(scope="session")

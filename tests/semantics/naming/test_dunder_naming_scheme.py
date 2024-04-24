@@ -6,9 +6,9 @@ import pytest
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
+from metricflow_semantics.naming.dunder_scheme import DunderNamingScheme
+from metricflow_semantics.specs.spec_classes import DimensionSpec, EntitySpec, LinkableInstanceSpec, TimeDimensionSpec
 
-from metricflow.semantics.naming.dunder_scheme import DunderNamingScheme
-from metricflow.semantics.specs.spec_classes import DimensionSpec, EntitySpec, LinkableInstanceSpec, TimeDimensionSpec
 from tests.time.metric_time_dimension import MTD_SPEC_MONTH, MTD_SPEC_WEEK, MTD_SPEC_YEAR
 
 

@@ -4,6 +4,9 @@ import logging
 from dataclasses import dataclass
 from typing import List, Optional, Sequence
 
+from metricflow_semantics.dag.id_prefix import StaticIdPrefix
+from metricflow_semantics.dag.mf_dag import DagId
+
 from metricflow.dataflow.dataflow_plan import (
     BaseOutput,
     DataflowPlan,
@@ -34,8 +37,6 @@ from metricflow.dataflow.optimizer.source_scan.cm_branch_combiner import (
     ComputeMetricsBranchCombiner,
     ComputeMetricsBranchCombinerResult,
 )
-from metricflow.semantics.dag.id_prefix import StaticIdPrefix
-from metricflow.semantics.dag.mf_dag import DagId
 
 logger = logging.getLogger(__name__)
 

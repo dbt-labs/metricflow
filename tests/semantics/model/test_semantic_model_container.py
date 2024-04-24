@@ -6,10 +6,10 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import EntityReference, MeasureReference, MetricReference
+from metricflow_semantics.model.semantics.linkable_element import LinkableElementProperty
+from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
+from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 
-from metricflow.semantics.model.semantics.linkable_element import LinkableElementProperty
-from metricflow.semantics.model.semantics.metric_lookup import MetricLookup
-from metricflow.semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.snapshot_utils import assert_linkable_element_set_snapshot_equal, assert_object_snapshot_equal
 

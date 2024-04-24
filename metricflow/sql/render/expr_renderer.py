@@ -10,10 +10,10 @@ from typing import Collection, List
 import jinja2
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from metricflow_semantics.mf_logging.formatting import indent
+from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
 from typing_extensions import override
 
-from metricflow.semantics.mf_logging.formatting import indent
-from metricflow.semantics.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.render.rendering_constants import SqlRenderingConstants
 from metricflow.sql.sql_exprs import (
     SqlAggregateFunctionExpression,

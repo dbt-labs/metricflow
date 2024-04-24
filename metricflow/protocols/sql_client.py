@@ -4,9 +4,9 @@ from abc import abstractmethod
 from enum import Enum
 from typing import Protocol
 
+from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
 from pandas import DataFrame
 
-from metricflow.semantics.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 
 

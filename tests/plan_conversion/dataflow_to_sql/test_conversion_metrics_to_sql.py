@@ -4,16 +4,16 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-
-from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
-from metricflow.protocols.sql_client import SqlClient
-from metricflow.semantics.specs.spec_classes import (
+from metricflow_semantics.specs.spec_classes import (
     DimensionSpec,
     MetricFlowQuerySpec,
     MetricSpec,
     TimeDimensionSpec,
 )
+
+from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
+from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
+from metricflow.protocols.sql_client import SqlClient
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.plan_conversion.test_dataflow_to_sql_plan import convert_and_check
 

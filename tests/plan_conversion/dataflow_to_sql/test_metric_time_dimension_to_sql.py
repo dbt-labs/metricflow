@@ -5,12 +5,12 @@ from typing import Mapping
 import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.references import TimeDimensionReference
+from metricflow_semantics.specs.spec_classes import MetricFlowQuerySpec, MetricSpec
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.semantics.specs.spec_classes import MetricFlowQuerySpec, MetricSpec
 from tests.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.plan_conversion.test_dataflow_to_sql_plan import convert_and_check

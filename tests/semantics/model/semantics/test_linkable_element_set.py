@@ -20,16 +20,15 @@ from dbt_semantic_interfaces.references import (
     TimeDimensionReference,
 )
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-from more_itertools import bucket
-
-from metricflow.semantics.model.semantics.linkable_element import (
+from metricflow_semantics.model.semantics.linkable_element import (
     LinkableDimension,
     LinkableElementProperty,
     LinkableEntity,
     LinkableMetric,
     SemanticModelJoinPathElement,
 )
-from metricflow.semantics.model.semantics.linkable_element_set import LinkableElementSet
+from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
+from more_itertools import bucket
 
 AMBIGUOUS_NAME = "ambiguous"
 # Common references

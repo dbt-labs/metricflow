@@ -13,24 +13,24 @@ from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
-
-from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
-from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.semantics.query.query_exceptions import InvalidQueryException
-from metricflow.semantics.query.query_parser import MetricFlowQueryParser
-from metricflow.semantics.specs.query_param_implementations import (
+from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
+from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.query.query_exceptions import InvalidQueryException
+from metricflow_semantics.query.query_parser import MetricFlowQueryParser
+from metricflow_semantics.specs.query_param_implementations import (
     DimensionOrEntityParameter,
     MetricParameter,
     OrderByParameter,
     TimeDimensionParameter,
 )
-from metricflow.semantics.specs.spec_classes import (
+from metricflow_semantics.specs.spec_classes import (
     DimensionSpec,
     EntitySpec,
     MetricSpec,
     OrderBySpec,
     TimeDimensionSpec,
 )
+
 from tests.semantics.model.example_project_configuration import EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE
 from tests.time.metric_time_dimension import MTD
 

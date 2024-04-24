@@ -3,10 +3,11 @@ from __future__ import annotations
 from abc import ABC
 from typing import Sequence, Tuple
 
+from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
+from metricflow_semantics.specs.spec_classes import MetricInputMeasureSpec
+from metricflow_semantics.visitor import VisitorOutputT
+
 from metricflow.dataflow.dataflow_plan import BaseOutput, DataflowPlanNode, DataflowPlanNodeVisitor
-from metricflow.semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
-from metricflow.semantics.specs.spec_classes import MetricInputMeasureSpec
-from metricflow.semantics.visitor import VisitorOutputT
 
 
 class AggregatedMeasuresOutput(BaseOutput, ABC):

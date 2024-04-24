@@ -5,9 +5,9 @@ from typing import List
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+from metricflow_semantics.sql.sql_join_type import SqlJoinType
 
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.semantics.sql.sql_join_type import SqlJoinType
 from metricflow.sql.sql_exprs import (
     SqlAggregateFunctionExpression,
     SqlColumnReference,

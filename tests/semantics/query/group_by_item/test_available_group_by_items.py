@@ -5,11 +5,11 @@ from typing import Dict
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.query.group_by_item.group_by_item_resolver import GroupByItemResolver
+from metricflow_semantics.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
+from metricflow_semantics.specs.spec_classes import LinkableSpecSet
 
-from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.semantics.query.group_by_item.group_by_item_resolver import GroupByItemResolver
-from metricflow.semantics.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
-from metricflow.semantics.specs.spec_classes import LinkableSpecSet
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.semantics.query.group_by_item.conftest import AmbiguousResolutionQueryId
 from tests.snapshot_utils import assert_linkable_spec_set_snapshot_equal

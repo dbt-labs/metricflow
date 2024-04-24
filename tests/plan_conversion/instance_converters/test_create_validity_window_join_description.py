@@ -4,12 +4,12 @@ from typing import Mapping
 
 import pytest
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from metricflow_semantics.instances import InstanceSet
+from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.specs.spec_classes import TimeDimensionSpec
 
 from metricflow.dataflow.nodes.join_to_base import ValidityWindowJoinDescription
 from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
-from metricflow.semantics.instances import InstanceSet
-from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.semantics.specs.spec_classes import TimeDimensionSpec
 from tests.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 
 

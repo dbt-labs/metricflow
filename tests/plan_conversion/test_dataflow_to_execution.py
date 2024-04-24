@@ -2,20 +2,20 @@ from __future__ import annotations
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-
-from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from metricflow.execution.dataflow_to_execution import DataflowToExecutionPlanConverter
-from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
-from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
-from metricflow.protocols.sql_client import SqlClient
-from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.semantics.specs.spec_classes import (
+from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.specs.spec_classes import (
     DimensionSpec,
     EntityReference,
     MetricFlowQuerySpec,
     MetricSpec,
     TimeDimensionSpec,
 )
+
+from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
+from metricflow.execution.dataflow_to_execution import DataflowToExecutionPlanConverter
+from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
+from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
+from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.snapshot_utils import assert_execution_plan_text_equal

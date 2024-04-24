@@ -5,8 +5,9 @@ from abc import ABC, abstractmethod
 from collections import OrderedDict
 from typing import Dict
 
+from metricflow_semantics.dag.mf_dag import NodeId
+
 from metricflow.execution.execution_plan import ExecutionPlan, ExecutionPlanTask, TaskExecutionResult
-from metricflow.semantics.dag.mf_dag import NodeId
 
 logger = logging.getLogger(__name__)
 

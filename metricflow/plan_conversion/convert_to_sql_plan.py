@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from metricflow.semantics.instances import InstanceSet
+from metricflow_semantics.instances import InstanceSet
+
 from metricflow.sql.sql_plan import SqlQueryPlan
 
 

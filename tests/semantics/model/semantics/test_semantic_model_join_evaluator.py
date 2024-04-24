@@ -5,14 +5,14 @@ from typing import Dict, Mapping, Sequence
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols.entity import EntityType
 from dbt_semantic_interfaces.references import EntityReference, SemanticModelReference
-
-from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.semantics.model.semantics.semantic_model_join_evaluator import (
+from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.model.semantics.semantic_model_join_evaluator import (
     SemanticModelEntityJoin,
     SemanticModelEntityJoinType,
     SemanticModelJoinEvaluator,
     SemanticModelLink,
 )
+
 from tests.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 
 

@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 import pytest
-
-from metricflow.semantics.errors.error_classes import InvalidQuerySyntax
-from metricflow.semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
+from metricflow_semantics.errors.error_classes import InvalidQuerySyntax
+from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
     FilterSpecResolutionLookUp,
 )
-from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
-from metricflow.semantics.specs.rendered_spec_tracker import RenderedSpecTracker
-from metricflow.semantics.specs.where_filter_entity import WhereFilterEntity
+from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
+from metricflow_semantics.specs.rendered_spec_tracker import RenderedSpecTracker
+from metricflow_semantics.specs.where_filter_entity import WhereFilterEntity
+
 from tests.semantics.specs.conftest import EXAMPLE_FILTER_LOCATION
 
 

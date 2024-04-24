@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+from metricflow_semantics.sql.sql_join_type import SqlJoinType
 
-from metricflow.semantics.sql.sql_join_type import SqlJoinType
 from metricflow.sql.optimizer.table_alias_simplifier import SqlTableAliasSimplifier
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer, SqlQueryPlanRenderer
 from metricflow.sql.sql_exprs import (

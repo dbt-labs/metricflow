@@ -8,8 +8,8 @@ from typing import Iterator, Mapping, Optional, Sequence, Set, Union
 
 import pandas as pd
 import sqlalchemy
+from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
 
-from metricflow.semantics.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_table import SqlTable
 from tests.fixtures.sql_clients.base_sql_client_implementation import BaseSqlClientImplementation
 

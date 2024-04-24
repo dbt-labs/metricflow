@@ -6,6 +6,14 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from metricflow_semantics.query.query_parser import MetricFlowQueryParser
+from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
+from metricflow_semantics.specs.spec_classes import (
+    DimensionSpec,
+    EntityReference,
+    MetricFlowQuerySpec,
+    MetricSpec,
+)
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan import (
@@ -33,14 +41,6 @@ from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataframeN
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import SourceScanOptimizer
 from metricflow.dataset.dataset_classes import DataSet
-from metricflow.semantics.query.query_parser import MetricFlowQueryParser
-from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
-from metricflow.semantics.specs.spec_classes import (
-    DimensionSpec,
-    EntityReference,
-    MetricFlowQuerySpec,
-    MetricSpec,
-)
 from tests.dataflow_plan_to_svg import display_graph_if_requested
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.snapshot_utils import assert_plan_snapshot_text_equal

@@ -4,8 +4,7 @@ from typing import Sequence
 
 import pytest
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-
-from metricflow.semantics.specs.spec_classes import (
+from metricflow_semantics.specs.spec_classes import (
     DimensionSpec,
     EntityReference,
     EntitySpec,

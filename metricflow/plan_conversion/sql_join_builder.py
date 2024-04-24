@@ -5,6 +5,8 @@ from typing import List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.protocols.metric import MetricTimeWindow
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from metricflow_semantics.assert_one_arg import assert_exactly_one_arg_set
+from metricflow_semantics.sql.sql_join_type import SqlJoinType
 
 from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
 from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
@@ -12,8 +14,6 @@ from metricflow.dataflow.nodes.join_to_base import JoinDescription
 from metricflow.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
 from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.sql_expression_builders import make_coalesced_expr
-from metricflow.semantics.assert_one_arg import assert_exactly_one_arg_set
-from metricflow.semantics.sql.sql_join_type import SqlJoinType
 from metricflow.sql.sql_exprs import (
     SqlColumnReference,
     SqlColumnReferenceExpression,

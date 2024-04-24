@@ -8,18 +8,18 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
+from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
+from metricflow_semantics.naming.dunder_scheme import DunderNamingScheme
+from metricflow_semantics.query.query_parser import MetricFlowQueryParser
+from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
+from metricflow_semantics.specs.spec_classes import (
+    MetricFlowQuerySpec,
+    MetricSpec,
+)
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
-from metricflow.semantics.naming.dunder_scheme import DunderNamingScheme
-from metricflow.semantics.query.query_parser import MetricFlowQueryParser
-from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
-from metricflow.semantics.specs.spec_classes import (
-    MetricFlowQuerySpec,
-    MetricSpec,
-)
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.query_rendering.compare_rendered_query import convert_and_check
 from tests.time.metric_time_dimension import (

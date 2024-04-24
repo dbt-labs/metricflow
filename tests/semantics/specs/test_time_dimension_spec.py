@@ -4,8 +4,7 @@ import logging
 
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums import TimeGranularity
-
-from metricflow.semantics.specs.spec_classes import TimeDimensionSpec, TimeDimensionSpecField
+from metricflow_semantics.specs.spec_classes import TimeDimensionSpec, TimeDimensionSpecField
 
 logger = logging.getLogger(__name__)
 

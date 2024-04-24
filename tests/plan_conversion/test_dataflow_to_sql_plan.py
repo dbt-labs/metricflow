@@ -9,6 +9,26 @@ from dbt_semantic_interfaces.references import EntityReference, TimeDimensionRef
 from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from metricflow_semantics.dag.mf_dag import DagId
+from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
+from metricflow_semantics.query.query_parser import MetricFlowQueryParser
+from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
+from metricflow_semantics.specs.spec_classes import (
+    DimensionSpec,
+    InstanceSpecSet,
+    LinkableSpecSet,
+    LinklessEntitySpec,
+    MeasureSpec,
+    MetricFlowQuerySpec,
+    MetricInputMeasureSpec,
+    MetricSpec,
+    NonAdditiveDimensionSpec,
+    OrderBySpec,
+    TimeDimensionSpec,
+    WhereFilterSpec,
+)
+from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
+from metricflow_semantics.sql.sql_join_type import SqlJoinType
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan import (
@@ -29,26 +49,6 @@ from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
 from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataframeNode
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.semantics.dag.mf_dag import DagId
-from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
-from metricflow.semantics.query.query_parser import MetricFlowQueryParser
-from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
-from metricflow.semantics.specs.spec_classes import (
-    DimensionSpec,
-    InstanceSpecSet,
-    LinkableSpecSet,
-    LinklessEntitySpec,
-    MeasureSpec,
-    MetricFlowQuerySpec,
-    MetricInputMeasureSpec,
-    MetricSpec,
-    NonAdditiveDimensionSpec,
-    OrderBySpec,
-    TimeDimensionSpec,
-    WhereFilterSpec,
-)
-from metricflow.semantics.sql.sql_bind_parameters import SqlBindParameters
-from metricflow.semantics.sql.sql_join_type import SqlJoinType
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from tests.dataflow_plan_to_svg import display_graph_if_requested
 from tests.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup

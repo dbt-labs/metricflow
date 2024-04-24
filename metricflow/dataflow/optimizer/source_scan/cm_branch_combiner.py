@@ -4,6 +4,8 @@ import logging
 from dataclasses import dataclass
 from typing import List, Optional, Sequence
 
+from metricflow_semantics.specs.spec_classes import MetricSpec
+
 from metricflow.dataflow.dataflow_plan import (
     BaseOutput,
     DataflowPlanNode,
@@ -28,7 +30,6 @@ from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
 from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataframeNode
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataflow.optimizer.source_scan.matching_linkable_specs import MatchingLinkableSpecsTransform
-from metricflow.semantics.specs.spec_classes import MetricSpec
 
 logger = logging.getLogger(__name__)
 

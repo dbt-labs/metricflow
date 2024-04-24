@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import pandas as pd
+from metricflow_semantics.dag.mf_dag import DagId
+from metricflow_semantics.random_id import random_id
+from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
 
 from metricflow.execution.execution_plan import (
     ExecutionPlan,
@@ -9,9 +12,6 @@ from metricflow.execution.execution_plan import (
 )
 from metricflow.execution.executor import SequentialPlanExecutor
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
-from metricflow.semantics.dag.mf_dag import DagId
-from metricflow.semantics.random_id import random_id
-from metricflow.semantics.sql.sql_bind_parameters import SqlBindParameters
 from metricflow.sql.sql_table import SqlTable
 from tests.compare_df import assert_dataframes_equal
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
