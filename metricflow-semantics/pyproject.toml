@@ -1,0 +1,53 @@
+[build-system]
+requires = ["hatchling~=1.14.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "metricflow-semantics"
+version = "0.1.0"
+description = "Modules for semantic understanding of a MetricFlow query."
+readme = "README.md"
+requires-python = ">=3.8,<3.12"
+license = "BUSL-1.1"
+authors = [
+  { name = "dbt Labs", email = "info@dbtlabs.com" },
+]
+
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = [
+  "Jinja2>=3.1.3",
+  "PyYAML>=6.0, <7.0.0",
+  "dbt-semantic-interfaces>=0.5.1, <0.6.0",
+  "graphviz>=0.18.2, <0.21",
+  "more-itertools>=8.10.0, <10.2.0",
+  "pandas>=1.5.0, <1.6.0",
+  "pydantic>=1.10.0, <1.11.0",
+  "python-dateutil>=2.8.2, <2.9.0",
+  "rapidfuzz>=3.0, <4.0",
+  "ruamel.yaml>=0.17.21, <0.18.0",
+  "tabulate>=0.8.9",
+  "typing_extensions>=4.4, <5.0",
+]
+
+[project.urls]
+"Source Code" = "https://github.com/dbt-labs/metricflow/tree/main/metricflow-semanitcs"
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+  "/.github",
+  "/.changes",
+  ".changie.yaml",
+  ".gitignore",
+  ".pre-commit-config.yaml",
+  "CONTRIBUTING.md",
+  "MAKEFILE",
+]
