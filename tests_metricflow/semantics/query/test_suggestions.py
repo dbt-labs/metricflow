@@ -17,7 +17,6 @@ from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_str_snapshot_equal
 
-from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from tests_metricflow.semantics.model.modify.modify_manifest import modify_manifest
 from tests_metricflow.semantics.model.modify.modify_metric_filter import ModifyMetricFilterTransform
 
@@ -130,7 +129,6 @@ def test_suggestions_for_defined_filters_in_multi_metric_query(
     )
 
     semantic_manifest_lookup = SemanticManifestLookup(modified_manifest)
-    DunderColumnAssociationResolver(modified_manifest)
 
     query_parser = MetricFlowQueryParser(
         semantic_manifest_lookup=semantic_manifest_lookup,
