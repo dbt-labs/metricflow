@@ -18,8 +18,8 @@ from dbt_semantic_interfaces.references import (
 from dbt_semantic_interfaces.type_enums import MetricType
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 
-from metricflow.dataset.dataset_classes import DataSet
 from metricflow.semantics.errors.error_classes import UnknownMetricLinkingError
 from metricflow.semantics.mf_logging.pretty_print import mf_pformat
 from metricflow.semantics.model.semantics.linkable_element import (
@@ -412,7 +412,7 @@ class ValidLinkableSpecResolver:
 
             for date_part in possible_date_parts:
                 path_key = ElementPathKey(
-                    element_name=DataSet.metric_time_dimension_name(),
+                    element_name=MetricFlowReservedKeywords.METRIC_TIME.value,
                     element_type=LinkableElementType.TIME_DIMENSION,
                     entity_links=(),
                     time_granularity=time_granularity,
@@ -421,7 +421,7 @@ class ValidLinkableSpecResolver:
                 path_key_to_linkable_dimensions[path_key].append(
                     LinkableDimension(
                         semantic_model_origin=measure_semantic_model.reference if measure_semantic_model else None,
-                        element_name=DataSet.metric_time_dimension_name(),
+                        element_name=MetricFlowReservedKeywords.METRIC_TIME.value,
                         dimension_type=DimensionType.TIME,
                         entity_links=(),
                         join_path=(),
