@@ -12,9 +12,8 @@ from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticM
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import (
     assert_linkable_element_set_snapshot_equal,
+    assert_object_snapshot_equal,
 )
-
-from tests_metricflow.snapshot_utils import assert_object_snapshot_equal
 
 logger = logging.getLogger(__name__)
 

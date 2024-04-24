@@ -15,11 +15,11 @@ from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifest
 from metricflow_semantics.query.query_exceptions import InvalidQueryException
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.test_helpers.snapshot_helpers import assert_str_snapshot_equal
 
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from tests_metricflow.semantics.model.modify.modify_manifest import modify_manifest
 from tests_metricflow.semantics.model.modify.modify_metric_filter import ModifyMetricFilterTransform
-from tests_metricflow.snapshot_utils import assert_str_snapshot_equal
 
 logger = logging.getLogger(__name__)
 

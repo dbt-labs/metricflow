@@ -6,7 +6,7 @@ import os
 import re
 import webbrowser
 from dataclasses import dataclass
-from typing import Callable, List, Optional, Tuple, TypeVar
+from typing import Any, Callable, List, Optional, Tuple, TypeVar
 
 import _pytest.fixtures
 import tabulate
@@ -18,7 +18,6 @@ from metricflow_semantics.model.semantics.linkable_element_set import LinkableEl
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow_semantics.specs.spec_classes import InstanceSpecSet, LinkableSpecSet
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
-from tests_metricflow.snapshot_utils import assert_object_snapshot_equal, assert_str_snapshot_equal
 
 logger = logging.getLogger(__name__)
 
@@ -338,4 +337,38 @@ def assert_linkable_spec_set_snapshot_equal(  # noqa: D103
         snapshot_text=mf_pformat(sorted(naming_scheme.input_str(spec) for spec in spec_set.as_tuple)),
         snapshot_file_extension=".txt",
         additional_sub_directories_for_snapshots=(),
+    )
+
+
+def assert_object_snapshot_equal(  # type: ignore[misc]
+    request: FixtureRequest,
+    mf_test_configuration: SnapshotConfiguration,
+    obj_id: str,
+    obj: Any,
+) -> None:
+    """For tests to compare large objects, this can be used to snapshot a text representation of the object."""
+    assert_snapshot_text_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        group_id=obj.__class__.__name__,
+        snapshot_id=obj_id,
+        snapshot_text=mf_pformat(obj),
+        snapshot_file_extension=".txt",
+    )
+
+
+def assert_str_snapshot_equal(  # type: ignore[misc]
+    request: FixtureRequest,
+    mf_test_configuration: SnapshotConfiguration,
+    snapshot_id: str,
+    snapshot_str: str,
+) -> None:
+    """Write / compare a string snapshot."""
+    assert_snapshot_text_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        group_id=snapshot_str.__class__.__name__,
+        snapshot_id=snapshot_id,
+        snapshot_text=snapshot_str,
+        snapshot_file_extension=".txt",
     )

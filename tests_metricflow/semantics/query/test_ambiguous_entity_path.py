@@ -11,8 +11,7 @@ from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_patt
 from metricflow_semantics.query.query_exceptions import InvalidQueryException
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
-
-from tests_metricflow.snapshot_utils import assert_object_snapshot_equal, assert_str_snapshot_equal
+from metricflow_semantics.test_helpers.snapshot_helpers import assert_object_snapshot_equal, assert_str_snapshot_equal
 
 logger = logging.getLogger(__name__)
 
