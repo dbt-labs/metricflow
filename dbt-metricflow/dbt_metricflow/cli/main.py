@@ -37,9 +37,9 @@ from dbt_metricflow.cli.utils import (
 )
 from metricflow.engine.metricflow_engine import MetricFlowExplainResult, MetricFlowQueryRequest, MetricFlowQueryResult
 from metricflow.semantics.dag.dag_visualization import display_dag_as_svg
-from metricflow.semantics.model.data_warehouse_model_validator import DataWarehouseModelValidator
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
+from metricflow.validation.data_warehouse_model_validator import DataWarehouseModelValidator
 
 logger = logging.getLogger(__name__)
 
