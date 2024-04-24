@@ -30,7 +30,7 @@ def test_function_call(telemetry_reporter: TelemetryReporter) -> None:  # noqa: 
     assert start_event.function_name == "test_function"
 
     end_event = telemetry_reporter.test_handler.payloads[1].function_end_events[0]
-    assert end_event.module_name == "tests.telemetry.test_telemetry"
+    assert end_event.module_name == "tests_metricflow.telemetry.test_telemetry"
     assert end_event.function_name == "test_function"
     assert not end_event.exception_trace
     assert end_event.runtime > 0
@@ -46,11 +46,11 @@ def test_function_exception(telemetry_reporter: TelemetryReporter) -> None:  # n
         test_function()
 
     start_event = telemetry_reporter.test_handler.payloads[0].function_start_events[0]
-    assert start_event.module_name == "tests.telemetry.test_telemetry"
+    assert start_event.module_name == "tests_metricflow.telemetry.test_telemetry"
     assert start_event.function_name == "test_function"
 
     end_event = telemetry_reporter.test_handler.payloads[1].function_end_events[0]
-    assert end_event.module_name == "tests.telemetry.test_telemetry"
+    assert end_event.module_name == f"tests_metricflow.telemetry.test_telemetry"
     assert end_event.function_name == "test_function"
     assert end_event.exception_trace
     assert end_event.exception_trace.find("Traceback (most recent call last):") != -1
