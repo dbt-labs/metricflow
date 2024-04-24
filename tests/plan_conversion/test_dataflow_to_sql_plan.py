@@ -48,8 +48,8 @@ from metricflow.semantics.specs.spec_classes import (
     WhereFilterSpec,
 )
 from metricflow.semantics.sql.sql_bind_parameters import SqlBindParameters
+from metricflow.semantics.sql.sql_join_type import SqlJoinType
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
-from metricflow.sql.sql_plan import SqlJoinType
 from tests.dataflow_plan_to_svg import display_graph_if_requested
 from tests.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration

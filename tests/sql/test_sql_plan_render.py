@@ -7,6 +7,7 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.semantics.sql.sql_join_type import SqlJoinType
 from metricflow.sql.sql_exprs import (
     SqlAggregateFunctionExpression,
     SqlColumnReference,
@@ -19,7 +20,6 @@ from metricflow.sql.sql_exprs import (
 from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
     SqlJoinDescription,
-    SqlJoinType,
     SqlOrderByDescription,
     SqlSelectColumn,
     SqlSelectStatementNode,

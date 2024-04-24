@@ -3,6 +3,7 @@ from __future__ import annotations
 import pytest
 from _pytest.fixtures import FixtureRequest
 
+from metricflow.semantics.sql.sql_join_type import SqlJoinType
 from metricflow.sql.optimizer.column_pruner import SqlColumnPrunerOptimizer
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer, SqlQueryPlanRenderer
 from metricflow.sql.sql_exprs import (
@@ -15,7 +16,6 @@ from metricflow.sql.sql_exprs import (
 )
 from metricflow.sql.sql_plan import (
     SqlJoinDescription,
-    SqlJoinType,
     SqlQueryPlanNode,
     SqlSelectColumn,
     SqlSelectStatementNode,

@@ -47,7 +47,7 @@ from metricflow.semantics.specs.spec_classes import (
     LinkableSpecSet,
     LinklessEntitySpec,
 )
-from metricflow.sql.sql_plan import SqlJoinType
+from metricflow.semantics.sql.sql_join_type import SqlJoinType
 
 logger = logging.getLogger(__name__)
 

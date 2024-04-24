@@ -43,9 +43,9 @@ from metricflow.semantics.query.group_by_item.filter_spec_resolution.filter_spec
     FilterSpecResolutionLookUp,
 )
 from metricflow.semantics.sql.sql_bind_parameters import SqlBindParameters
+from metricflow.semantics.sql.sql_join_type import SqlJoinType
 from metricflow.semantics.visitor import VisitorOutputT
 from metricflow.sql.sql_column_type import SqlColumnType
-from metricflow.sql.sql_plan import SqlJoinType
 
 if TYPE_CHECKING:
     from metricflow.semantics.model.semantics.metric_lookup import MetricLookup

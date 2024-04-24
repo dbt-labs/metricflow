@@ -11,8 +11,8 @@ from metricflow.dataflow.dataflow_plan import BaseOutput, DataflowPlanNode, Data
 from metricflow.semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow.semantics.dag.mf_dag import DisplayedProperty, NodeId
 from metricflow.semantics.specs.spec_classes import LinklessEntitySpec, TimeDimensionSpec
+from metricflow.semantics.sql.sql_join_type import SqlJoinType
 from metricflow.semantics.visitor import VisitorOutputT
-from metricflow.sql.sql_plan import SqlJoinType
 
 
 @dataclass(frozen=True)

@@ -86,7 +86,7 @@ from metricflow.semantics.specs.spec_classes import (
     WhereFilterSpec,
 )
 from metricflow.semantics.specs.where_filter_transform import WhereSpecFactory
-from metricflow.sql.sql_plan import SqlJoinType
+from metricflow.semantics.sql.sql_join_type import SqlJoinType
 from metricflow.sql.sql_table import SqlTable
 
 logger = logging.getLogger(__name__)

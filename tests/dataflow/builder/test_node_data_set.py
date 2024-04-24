@@ -23,9 +23,9 @@ from metricflow.semantics.specs.spec_classes import (
     LinklessEntitySpec,
     MeasureSpec,
 )
+from metricflow.semantics.sql.sql_join_type import SqlJoinType
 from metricflow.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpression
 from metricflow.sql.sql_plan import (
-    SqlJoinType,
     SqlSelectColumn,
     SqlSelectStatementNode,
     SqlTableFromClauseNode,

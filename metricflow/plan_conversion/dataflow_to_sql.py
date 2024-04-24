@@ -100,6 +100,7 @@ from metricflow.semantics.specs.spec_classes import (
     MetricSpec,
     TimeDimensionSpec,
 )
+from metricflow.semantics.sql.sql_join_type import SqlJoinType
 from metricflow.semantics.time.time_constants import ISO8601_PYTHON_FORMAT
 from metricflow.sql.optimizer.optimization_levels import (
     SqlQueryOptimizationLevel,
@@ -130,7 +131,6 @@ from metricflow.sql.sql_exprs import (
 from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
     SqlJoinDescription,
-    SqlJoinType,
     SqlOrderByDescription,
     SqlQueryPlan,
     SqlQueryPlanNode,
