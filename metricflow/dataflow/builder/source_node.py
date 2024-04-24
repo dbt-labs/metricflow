@@ -12,6 +12,7 @@ from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionT
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
+from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.semantics.specs.column_assoc import ColumnAssociationResolver
 
@@ -54,7 +55,7 @@ class SourceNodeBuilder:
     ) -> None:
         self._semantic_manifest_lookup = semantic_manifest_lookup
         data_set_converter = SemanticModelToDataSetConverter(column_association_resolver)
-        time_spine_source = self._semantic_manifest_lookup.time_spine_source
+        time_spine_source = TimeSpineSource.create_from_manifest(semantic_manifest_lookup.semantic_manifest)
         time_spine_data_set = data_set_converter.build_time_spine_source_data_set(time_spine_source)
         time_dim_reference = TimeDimensionReference(element_name=time_spine_source.time_column_name)
         self._time_spine_source_node = MetricTimeDimensionTransformNode(

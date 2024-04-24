@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
@@ -40,7 +41,7 @@ def check_time_spine_source(
     The time spine table is defined in a table snapshot YAML file and is restored to the source schema based on that
     definition. The definition in the YAML should align with the definition in the time_spine_source fixture.
     """
-    time_spine_source = simple_semantic_manifest_lookup.time_spine_source
+    time_spine_source = TimeSpineSource.create_from_manifest(simple_semantic_manifest_lookup.semantic_manifest)
     assert (
         time_spine_source.schema_name == mf_test_configuration.mf_source_schema
     ), "The time spine source table should be in the source schema"

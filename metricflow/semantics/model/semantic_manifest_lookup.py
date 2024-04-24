@@ -3,13 +3,9 @@ from __future__ import annotations
 import logging
 
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.type_enums import TimeGranularity
 
-from metricflow.plan_conversion.time_spine import TimeSpineSource
-from metricflow.semantics.mf_logging.pretty_print import mf_pformat
 from metricflow.semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow.semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
-from metricflow.sql.sql_table import SqlTable
 
 logger = logging.getLogger(__name__)
 
@@ -33,26 +29,3 @@ class SemanticManifestLookup:
     @property
     def metric_lookup(self) -> MetricLookup:  # noqa: D102
         return self._metric_lookup
-
-    @property
-    def time_spine_source(self) -> TimeSpineSource:  # noqa: D102
-        time_spine_table_configurations = self._semantic_manifest.project_configuration.time_spine_table_configurations
-
-        if not (
-            len(time_spine_table_configurations) == 1
-            and time_spine_table_configurations[0].grain == TimeGranularity.DAY
-        ):
-            raise NotImplementedError(
-                f"Only a single time spine table configuration with {TimeGranularity.DAY} is currently "
-                f"supported. Got:\n"
-                f"{mf_pformat(time_spine_table_configurations)}"
-            )
-
-        time_spine_table_configuration = time_spine_table_configurations[0]
-        time_spine_table = SqlTable.from_string(time_spine_table_configuration.location)
-        return TimeSpineSource(
-            schema_name=time_spine_table.schema_name,
-            table_name=time_spine_table.table_name,
-            time_column_name=time_spine_table_configuration.column_name,
-            time_column_granularity=time_spine_table_configuration.grain,
-        )

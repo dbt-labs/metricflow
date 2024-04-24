@@ -18,6 +18,7 @@ from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowQuer
 from metricflow.plan_conversion.column_resolver import (
     DunderColumnAssociationResolver,
 )
+from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.semantics.protocols.query_parameter import DimensionOrEntityQueryParameter
@@ -319,7 +320,9 @@ def test_case(
                     render_date_trunc=check_query_helpers.render_date_trunc,
                     render_extract=check_query_helpers.render_extract,
                     render_percentile_expr=check_query_helpers.render_percentile_expr,
-                    mf_time_spine_source=semantic_manifest_lookup.time_spine_source.spine_table.sql,
+                    mf_time_spine_source=TimeSpineSource.create_from_manifest(
+                        semantic_manifest_lookup.semantic_manifest
+                    ).spine_table.sql,
                     double_data_type_name=check_query_helpers.double_data_type_name,
                     render_dimension_template=check_query_helpers.render_dimension_template,
                     render_entity_template=check_query_helpers.render_entity_template,
@@ -352,7 +355,9 @@ def test_case(
             render_date_trunc=check_query_helpers.render_date_trunc,
             render_extract=check_query_helpers.render_extract,
             render_percentile_expr=check_query_helpers.render_percentile_expr,
-            mf_time_spine_source=semantic_manifest_lookup.time_spine_source.spine_table.sql,
+            mf_time_spine_source=TimeSpineSource.create_from_manifest(
+                semantic_manifest_lookup.semantic_manifest
+            ).spine_table.sql,
             double_data_type_name=check_query_helpers.double_data_type_name,
             generate_random_uuid=check_query_helpers.generate_random_uuid,
             cast_to_ts=check_query_helpers.cast_to_ts,

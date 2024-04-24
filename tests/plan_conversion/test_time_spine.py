@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pandas import DataFrame
 
+from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
@@ -13,7 +14,7 @@ def test_date_spine_date_range(  # noqa: D103
     simple_semantic_manifest_lookup: SemanticManifestLookup,
     create_source_tables: None,
 ) -> None:
-    time_spine_source = simple_semantic_manifest_lookup.time_spine_source
+    time_spine_source = TimeSpineSource.create_from_manifest(simple_semantic_manifest_lookup.semantic_manifest)
     range_df: DataFrame = sql_client.query(
         f"""\
         SELECT

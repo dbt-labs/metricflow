@@ -65,7 +65,7 @@ class QueryRenderingTools:
             column_association_resolver=DunderColumnAssociationResolver(self.semantic_manifest_lookup),
             semantic_manifest_lookup=self.semantic_manifest_lookup,
         )
-        self.time_spine_source = self.semantic_manifest_lookup.time_spine_source
+        self.time_spine_source = TimeSpineSource.create_from_manifest(manifest)
         self.converter = SemanticModelToDataSetConverter(
             column_association_resolver=DunderColumnAssociationResolver(
                 semantic_manifest_lookup=self.semantic_manifest_lookup

@@ -33,6 +33,7 @@ from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
 from metricflow.execution.executor import SequentialPlanExecutor
 from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
+from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.semantics.dag.sequential_id import SequentialIdGenerator
 from metricflow.semantics.errors.error_classes import ExecutionException
@@ -365,7 +366,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             DunderColumnAssociationResolver(semantic_manifest_lookup)
         )
         self._time_source = time_source
-        self._time_spine_source = semantic_manifest_lookup.time_spine_source
+        self._time_spine_source = TimeSpineSource.create_from_manifest(semantic_manifest_lookup.semantic_manifest)
         self._source_data_sets: List[SemanticModelDataSet] = []
         converter = SemanticModelToDataSetConverter(column_association_resolver=self._column_association_resolver)
         for semantic_model in sorted(
