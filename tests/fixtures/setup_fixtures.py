@@ -3,12 +3,10 @@ from __future__ import annotations
 import datetime
 import logging
 import os
-import warnings
 from pathlib import Path
 
 import _pytest.config
 import pytest
-import sqlalchemy.util
 from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.random_id import random_id
 from metricflow_semantics.test_helpers import (
@@ -165,44 +163,3 @@ def dbt_project_dir() -> str:
     This is necessary for configuring both the dbt adapter for integration tests and the project location for CLI tests.
     """
     return os.path.join(os.path.dirname(__file__), Path("dbt_projects", "metricflow_testing"))
-
-
-@pytest.fixture(scope="session", autouse=True)
-def warn_user_about_slow_tests_without_parallelism(  # noqa: D103
-    request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
-) -> None:
-    worker_count_env_var = os.environ.get("PYTEST_XDIST_WORKER_COUNT", "1")
-    try:
-        num_workers = int(worker_count_env_var)
-    except ValueError as e:
-        raise ValueError(
-            f"Could not convert environment variable PYTEST_XDIST_WORKER_COUNT to int! "
-            f"Value in environ was: {worker_count_env_var}"
-        ) from e
-
-    num_items = len(request.session.items)
-    dialect = dialect_from_url(mf_test_configuration.sql_engine_url)
-
-    # If already running in parallel or if there's not many test items, no need to print the warning. Picking 10/30 as
-    # the thresholds, but not much thought has been put into it.
-    if num_workers > 1 or num_items < 10:
-        return
-
-    # Since DuckDB / Postgres is fast, use 30 as the threshold.
-    if (dialect is SqlDialect.DUCKDB or dialect is SqlDialect.POSTGRESQL) and num_items < 30:
-        return
-
-    if num_items > 10:
-        warnings.warn(
-            f"This test session with {dialect.name} and {num_items} item(s) is running with {num_workers} worker(s). "
-            f'Consider using the pytest-xdist option "-n <number of workers>" to parallelize execution and speed '
-            f"up the session."
-        )
-
-
-@pytest.fixture(scope="session", autouse=True)
-def disable_sql_alchemy_deprecation_warning() -> None:
-    """Since MF is tied to using SQLAlchemy 1.x.x due to the Snowflake connector, silence 2.0 deprecation warnings."""
-    # Seeing 'error: Module has no attribute "SILENCE_UBER_WARNING"' in the type checker, but this seems to work.
-    sqlalchemy.util.deprecations.SILENCE_UBER_WARNING = True  # type:ignore
