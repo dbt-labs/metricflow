@@ -21,11 +21,11 @@ from metricflow_semantics.specs.spec_classes import (
     TimeDimensionSpec,
 )
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.test_helpers.snapshot_helpers import assert_plan_snapshot_text_equal
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataset.dataset_classes import DataSet
 from tests_metricflow.dataflow_plan_to_svg import display_graph_if_requested
-from tests_metricflow.snapshot_utils import assert_plan_snapshot_text_equal
 from tests_metricflow.time.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_MONTH, MTD_SPEC_QUARTER, MTD_SPEC_WEEK
 
 logger = logging.getLogger(__name__)

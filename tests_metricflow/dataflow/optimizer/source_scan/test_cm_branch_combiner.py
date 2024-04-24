@@ -8,6 +8,7 @@ from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagId
 from metricflow_semantics.specs.spec_classes import InstanceSpecSet, MeasureSpec
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.test_helpers.snapshot_helpers import assert_plan_snapshot_text_equal
 
 from metricflow.dataflow.dataflow_plan import (
     BaseOutput,
@@ -21,7 +22,6 @@ from metricflow.dataflow.optimizer.source_scan.cm_branch_combiner import (
 )
 from tests_metricflow.dataflow_plan_to_svg import display_graph_if_requested
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
-from tests_metricflow.snapshot_utils import assert_plan_snapshot_text_equal
 
 
 def make_dataflow_plan(node: BaseOutput) -> DataflowPlan:  # noqa: D103

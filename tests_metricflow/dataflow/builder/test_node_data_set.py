@@ -18,6 +18,7 @@ from metricflow_semantics.specs.spec_classes import (
 )
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.test_helpers.snapshot_helpers import assert_spec_set_snapshot_equal
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinToBaseOutputNode
@@ -33,7 +34,6 @@ from metricflow.sql.sql_plan import (
 )
 from metricflow.sql.sql_table import SqlTable
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
-from tests_metricflow.snapshot_utils import assert_spec_set_snapshot_equal
 
 logger = logging.getLogger(__name__)
 

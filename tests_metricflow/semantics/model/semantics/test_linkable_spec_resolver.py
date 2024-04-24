@@ -21,8 +21,10 @@ from metricflow_semantics.model.semantics.linkable_spec_resolver import (
 )
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
-
-from tests_metricflow.snapshot_utils import assert_linkable_element_set_snapshot_equal, assert_spec_set_snapshot_equal
+from metricflow_semantics.test_helpers.snapshot_helpers import (
+    assert_linkable_element_set_snapshot_equal,
+    assert_spec_set_snapshot_equal,
+)
 
 logger = logging.getLogger(__name__)
 
