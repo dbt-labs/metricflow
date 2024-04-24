@@ -17,7 +17,6 @@ from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow_semantics.specs.spec_classes import InstanceSpecSet, LinkableSpecSet
-from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 logger = logging.getLogger(__name__)
 
@@ -217,7 +216,7 @@ PlanT = TypeVar("PlanT", bound=MetricFlowDag)
 
 def assert_plan_snapshot_text_equal(
     request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
+    mf_test_configuration: SnapshotConfiguration,
     plan: PlanT,
     plan_snapshot_text: str,
     plan_snapshot_file_extension: str = ".xml",
@@ -251,7 +250,7 @@ def assert_plan_snapshot_text_equal(
 
 def assert_linkable_element_set_snapshot_equal(  # noqa: D103
     request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
+    mf_test_configuration: SnapshotConfiguration,
     set_id: str,
     linkable_element_set: LinkableElementSet,
 ) -> None:
@@ -314,7 +313,7 @@ def assert_linkable_element_set_snapshot_equal(  # noqa: D103
 
 
 def assert_spec_set_snapshot_equal(  # noqa: D103
-    request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, set_id: str, spec_set: InstanceSpecSet
+    request: FixtureRequest, mf_test_configuration: SnapshotConfiguration, set_id: str, spec_set: InstanceSpecSet
 ) -> None:
     assert_object_snapshot_equal(
         request=request,
@@ -325,7 +324,7 @@ def assert_spec_set_snapshot_equal(  # noqa: D103
 
 
 def assert_linkable_spec_set_snapshot_equal(  # noqa: D103
-    request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, set_id: str, spec_set: LinkableSpecSet
+    request: FixtureRequest, mf_test_configuration: SnapshotConfiguration, set_id: str, spec_set: LinkableSpecSet
 ) -> None:
     # TODO: This will be used in a later PR and this message will be removed.
     naming_scheme = ObjectBuilderNamingScheme()
