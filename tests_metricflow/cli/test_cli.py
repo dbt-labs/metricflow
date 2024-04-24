@@ -29,10 +29,10 @@ from dbt_metricflow.cli.main import (
 )
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from tests_metricflow.fixtures.cli_fixtures import MetricFlowCliRunner
-from tests_metricflow.semantics.model.example_project_configuration import (
+from tests_metricflow.snapshot_utils import assert_str_snapshot_equal
+from tests_metricflow_semantics.model.example_project_configuration import (
     EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE,
 )
-from tests_metricflow.snapshot_utils import assert_str_snapshot_equal
 
 logger = logging.getLogger(__name__)
 

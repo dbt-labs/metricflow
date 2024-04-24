@@ -32,7 +32,7 @@ from metricflow_semantics.specs.spec_classes import (
 )
 from metricflow_semantics.test_helpers.metric_time_dimension import MTD
 
-from tests_metricflow.semantics.model.example_project_configuration import (
+from tests_metricflow_semantics.model.example_project_configuration import (
     EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE,
 )
 

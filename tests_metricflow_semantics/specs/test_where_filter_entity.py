@@ -9,7 +9,7 @@ from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.rendered_spec_tracker import RenderedSpecTracker
 from metricflow_semantics.specs.where_filter_entity import WhereFilterEntity
 
-from tests_metricflow.semantics.specs.conftest import EXAMPLE_FILTER_LOCATION
+from tests_metricflow_semantics.specs.conftest import EXAMPLE_FILTER_LOCATION
 
 
 def test_descending_cannot_be_set(  # noqa

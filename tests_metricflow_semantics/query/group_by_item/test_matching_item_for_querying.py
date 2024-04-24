@@ -20,7 +20,7 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_MONTH, MTD_SPEC_YEAR
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_object_snapshot_equal
 
-from tests_metricflow.semantics.query.group_by_item.conftest import AmbiguousResolutionQueryId
+from tests_metricflow_semantics.query.group_by_item.conftest import AmbiguousResolutionQueryId
 
 logger = logging.getLogger(__name__)
 

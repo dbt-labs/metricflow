@@ -45,7 +45,7 @@ from metricflow_semantics.specs.spec_classes import (
 )
 from metricflow_semantics.specs.where_filter_transform import WhereSpecFactory
 
-from tests_metricflow.semantics.specs.conftest import EXAMPLE_FILTER_LOCATION
+from tests_metricflow_semantics.specs.conftest import EXAMPLE_FILTER_LOCATION
 
 logger = logging.getLogger(__name__)
 
