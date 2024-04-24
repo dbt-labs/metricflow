@@ -1,0 +1,6 @@
+kind: Features
+body: Create `metricflow-semantics` package.
+time: 2024-04-24T14:59:49.8435-07:00
+custom:
+  Author: plypaul
+  Issue: "1150"
