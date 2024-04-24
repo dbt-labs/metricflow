@@ -15,6 +15,7 @@ from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.test_helpers.id_helpers import IdNumberSpace, patch_id_generators_helper
 from metricflow_semantics.test_helpers.manifest_helpers import load_semantic_manifest
 from metricflow_semantics.test_helpers.time_helpers import ConfigurableTimeSource
 
@@ -27,7 +28,6 @@ from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
-from tests_metricflow.fixtures.id_fixtures import IdNumberSpace, patch_id_generators_helper
 
 logger = logging.getLogger(__name__)
 
