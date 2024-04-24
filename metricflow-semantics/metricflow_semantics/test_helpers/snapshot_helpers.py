@@ -10,8 +10,6 @@ from typing import Callable, List, Optional, Tuple
 
 import _pytest.fixtures
 
-from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
-
 logger = logging.getLogger(__name__)
 
 
@@ -27,7 +25,7 @@ class SnapshotConfiguration:
 
 def assert_snapshot_text_equal(
     request: _pytest.fixtures.FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
+    mf_test_configuration: SnapshotConfiguration,
     group_id: str,
     snapshot_id: str,
     snapshot_text: str,
