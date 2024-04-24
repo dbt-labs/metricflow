@@ -19,7 +19,6 @@ from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSe
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.references import MetricReference
 from dbt_semantic_interfaces.transformations.transform_rule import SemanticManifestTransformRule
-from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.naming.naming_scheme import QueryItemNamingScheme
@@ -31,6 +30,7 @@ from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec
 )
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec_resolver import WhereFilterSpecResolver
 from metricflow_semantics.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
+from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from tests_metricflow.semantics.model.modify.modify_input_metric_filter import ModifyInputMetricFilterTransform
 from tests_metricflow.semantics.model.modify.modify_manifest import modify_manifest

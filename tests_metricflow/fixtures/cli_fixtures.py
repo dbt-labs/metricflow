@@ -11,7 +11,7 @@ from click.testing import CliRunner, Result
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.test_utils import as_datetime
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow_semantics.time_helpers import ConfigurableTimeSource
+from metricflow_semantics.test_helpers.time_helpers import ConfigurableTimeSource
 from typing_extensions import override
 
 from dbt_metricflow.cli.cli_context import CLIContext

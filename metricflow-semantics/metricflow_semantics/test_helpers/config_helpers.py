@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from metricflow_semantics.snapshot_helpers import SnapshotConfiguration
+from metricflow_semantics.test_helpers.snapshot_helpers import SnapshotConfiguration
 
 
 @dataclass(frozen=True)

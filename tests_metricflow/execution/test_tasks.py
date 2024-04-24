@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import pandas as pd
-from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.dag.mf_dag import DagId
 from metricflow_semantics.random_id import random_id
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
+from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.execution.execution_plan import (
     ExecutionPlan,

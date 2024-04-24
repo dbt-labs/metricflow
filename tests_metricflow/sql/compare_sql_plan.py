@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from _pytest.fixtures import FixtureRequest
-from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.dag.mf_dag import DagId
+from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer

@@ -6,8 +6,8 @@ from pathlib import Path
 import pandas as pd
 import pytest
 from dbt_semantic_interfaces.test_utils import as_datetime
-from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.random_id import random_id
+from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.protocols.sql_client import SqlEngine
 from tests_metricflow.compare_df import assert_dataframes_equal

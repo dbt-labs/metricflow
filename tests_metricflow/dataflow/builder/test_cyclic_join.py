@@ -6,12 +6,12 @@ from typing import Mapping
 import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.references import EntityReference
-from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.specs.spec_classes import (
     DimensionSpec,
     MetricFlowQuerySpec,
     MetricSpec,
 )
+from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from tests_metricflow.dataflow_plan_to_svg import display_graph_if_requested

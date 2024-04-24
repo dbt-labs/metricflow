@@ -6,13 +6,13 @@ from typing import Any, Callable, Optional, Tuple, TypeVar
 
 import tabulate
 from _pytest.fixtures import FixtureRequest
-from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.dag.mf_dag import MetricFlowDag
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.semantics.linkable_spec_resolver import LinkableElementSet
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
-from metricflow_semantics.snapshot_helpers import assert_snapshot_text_equal
 from metricflow_semantics.specs.spec_classes import InstanceSpecSet, LinkableSpecSet
+from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.test_helpers.snapshot_helpers import assert_snapshot_text_equal
 
 from metricflow.dataflow.dataflow_plan import DataflowPlan
 from metricflow.execution.execution_plan import ExecutionPlan

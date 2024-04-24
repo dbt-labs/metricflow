@@ -4,10 +4,10 @@ from typing import Mapping
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagId
 from metricflow_semantics.specs.spec_classes import InstanceSpecSet, MeasureSpec
+from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.dataflow.dataflow_plan import (
     BaseOutput,

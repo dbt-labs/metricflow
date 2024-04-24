@@ -10,7 +10,6 @@ from dbt_semantic_interfaces.references import (
     MetricReference,
     SemanticModelReference,
 )
-from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.linkable_element import (
     LinkableElementProperty,
@@ -21,6 +20,7 @@ from metricflow_semantics.model.semantics.linkable_spec_resolver import (
     ValidLinkableSpecResolver,
 )
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
+from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from tests_metricflow.snapshot_utils import assert_linkable_element_set_snapshot_equal, assert_spec_set_snapshot_equal
 

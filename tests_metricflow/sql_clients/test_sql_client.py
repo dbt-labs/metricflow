@@ -5,9 +5,9 @@ from typing import Set, Union
 
 import pandas as pd
 import pytest
-from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.random_id import random_id
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
+from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.sql.sql_table import SqlTable

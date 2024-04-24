@@ -5,7 +5,7 @@ import datetime
 import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.test_utils import as_datetime
-from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest
 from metricflow.protocols.sql_client import SqlClient

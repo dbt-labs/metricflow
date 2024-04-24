@@ -10,7 +10,7 @@ from typing import Callable, List, Optional, Tuple
 
 import _pytest.fixtures
 
-from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 logger = logging.getLogger(__name__)
 

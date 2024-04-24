@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.spec_classes import (
     DimensionSpec,
@@ -11,6 +10,7 @@ from metricflow_semantics.specs.spec_classes import (
     MetricSpec,
     TimeDimensionSpec,
 )
+from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.execution.dataflow_to_execution import DataflowToExecutionPlanConverter

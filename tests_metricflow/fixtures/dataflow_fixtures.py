@@ -3,9 +3,9 @@ from __future__ import annotations
 from typing import Mapping
 
 import pytest
-from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
+from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.plan_conversion.time_spine import TimeSpineSource

@@ -8,9 +8,9 @@ from pathlib import Path
 import _pytest.config
 import pytest
 from _pytest.fixtures import FixtureRequest
-from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.random_id import random_id
-from metricflow_semantics.snapshot_helpers import (
+from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.test_helpers.snapshot_helpers import (
     DISPLAY_SNAPSHOTS_CLI_FLAG,
     OVERWRITE_SNAPSHOTS_CLI_FLAG,
     add_display_snapshots_cli_flag,
