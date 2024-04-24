@@ -23,6 +23,11 @@ from tests_metricflow_semantics.model.modify.modify_metric_filter import ModifyM
 logger = logging.getLogger(__name__)
 
 
+@pytest.fixture
+def query_parser(simple_semantic_manifest_lookup: SemanticManifestLookup) -> MetricFlowQueryParser:  # noqa: D103
+    return MetricFlowQueryParser(simple_semantic_manifest_lookup)
+
+
 def test_suggestions_for_group_by_item(  # noqa: D103
     request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, query_parser: MetricFlowQueryParser
 ) -> None:
