@@ -7,7 +7,7 @@ from typing import List, Optional, Sequence, Set
 from dbt_semantic_interfaces.references import EntityReference, TimeDimensionReference
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
-from metricflow_semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS, SemanticModelJoinEvaluator
+from metricflow_semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.specs.spec_classes import InstanceSpecSet, LinkableInstanceSpec, LinklessEntitySpec
 from metricflow_semantics.specs.spec_set_transforms import ToElementNameSet
@@ -22,6 +22,7 @@ from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinToBaseOutputNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
+from metricflow.validation.dataflow_join_validator import JoinDataflowOutputValidator
 
 logger = logging.getLogger(__name__)
 
@@ -84,7 +85,7 @@ class PreJoinNodeProcessor:
         self._node_data_set_resolver = node_data_set_resolver
         self._partition_resolver = PartitionJoinResolver(semantic_model_lookup)
         self._semantic_model_lookup = semantic_model_lookup
-        self._join_evaluator = SemanticModelJoinEvaluator(semantic_model_lookup)
+        self._join_evaluator = JoinDataflowOutputValidator(semantic_model_lookup)
 
     def add_time_range_constraint(
         self,
