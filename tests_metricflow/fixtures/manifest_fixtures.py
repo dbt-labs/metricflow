@@ -1,25 +1,20 @@
 from __future__ import annotations
 
 import logging
-import os
 from collections import OrderedDict
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, Mapping, Optional, Sequence
+from typing import Dict, Mapping, Sequence
 
 import pytest
 from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
-from dbt_semantic_interfaces.parsing.dir_to_model import (
-    SemanticManifestBuildResult,
-    parse_directory_of_yaml_files_to_semantic_manifest,
-)
 from dbt_semantic_interfaces.protocols import SemanticModel
 from dbt_semantic_interfaces.test_utils import as_datetime
-from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.test_helpers.manifest_helpers import load_semantic_manifest
 from metricflow_semantics.test_helpers.time_helpers import ConfigurableTimeSource
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
@@ -234,20 +229,6 @@ def mf_engine_test_fixture_mapping(
             )
 
     return fixture_mapping
-
-
-def load_semantic_manifest(
-    relative_manifest_path: str,
-    template_mapping: Optional[Dict[str, str]] = None,
-) -> SemanticManifestBuildResult:
-    """Reads the manifest YAMLs from the standard location, applies transformations, runs validations."""
-    yaml_file_directory = os.path.join(os.path.dirname(__file__), f"semantic_manifest_yamls/{relative_manifest_path}")
-    build_result = parse_directory_of_yaml_files_to_semantic_manifest(
-        yaml_file_directory, template_mapping=template_mapping
-    )
-    validator = SemanticManifestValidator[PydanticSemanticManifest]()
-    validator.checked_validations(build_result.semantic_manifest)
-    return build_result
 
 
 @pytest.fixture(scope="session")
