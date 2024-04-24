@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Mapping
 
 import pytest
+from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 
@@ -10,7 +11,6 @@ from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilde
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
-from tests_metricflow.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests_metricflow.fixtures.sql_client_fixtures import sql_client  # noqa: F401, F403
 
 """

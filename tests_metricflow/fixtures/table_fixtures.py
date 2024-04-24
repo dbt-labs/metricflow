@@ -5,10 +5,10 @@ import os
 from pathlib import Path
 
 import pytest
+from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 
 from metricflow.plan_conversion.time_spine import TimeSpineSource
-from tests_metricflow.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests_metricflow.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 from tests_metricflow.source_schema_tools import create_tables_listed_in_table_snapshot_repository
 from tests_metricflow.table_snapshot.table_snapshots import (

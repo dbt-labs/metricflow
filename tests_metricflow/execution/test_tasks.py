@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pandas as pd
+from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.dag.mf_dag import DagId
 from metricflow_semantics.random_id import random_id
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
@@ -14,7 +15,6 @@ from metricflow.execution.executor import SequentialPlanExecutor
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.sql.sql_table import SqlTable
 from tests_metricflow.compare_df import assert_dataframes_equal
-from tests_metricflow.fixtures.setup_fixtures import MetricFlowTestConfiguration
 
 
 def test_read_sql_task(sql_client: SqlClient) -> None:  # noqa: D103

@@ -5,13 +5,13 @@ from typing import Set, Union
 
 import pandas as pd
 import pytest
+from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.random_id import random_id
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
 
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.sql.sql_table import SqlTable
 from tests_metricflow.compare_df import assert_dataframes_equal
-from tests_metricflow.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests_metricflow.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 
 logger = logging.getLogger(__name__)

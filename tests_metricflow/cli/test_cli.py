@@ -14,6 +14,7 @@ from dbt_semantic_interfaces.parsing.dir_to_model import (
 )
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from dbt_semantic_interfaces.test_utils import base_semantic_manifest_file
+from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
 
 from dbt_metricflow.cli.cli_context import CLIContext
 from dbt_metricflow.cli.main import (
@@ -28,7 +29,6 @@ from dbt_metricflow.cli.main import (
 )
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from tests_metricflow.fixtures.cli_fixtures import MetricFlowCliRunner
-from tests_metricflow.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests_metricflow.semantics.model.example_project_configuration import (
     EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE,
 )

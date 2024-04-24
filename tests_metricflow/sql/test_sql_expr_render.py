@@ -8,6 +8,7 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.sql.render.expr_renderer import DefaultSqlExpressionRenderer
 from metricflow.sql.sql_exprs import (
@@ -33,7 +34,6 @@ from metricflow.sql.sql_exprs import (
     SqlWindowFunctionExpression,
     SqlWindowOrderByArgument,
 )
-from tests_metricflow.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests_metricflow.snapshot_utils import assert_str_snapshot_equal
 
 logger = logging.getLogger(__name__)

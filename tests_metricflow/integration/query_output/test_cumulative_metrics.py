@@ -5,10 +5,10 @@ import datetime
 import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.test_utils import as_datetime
+from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest
 from metricflow.protocols.sql_client import SqlClient
-from tests_metricflow.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests_metricflow.integration.conftest import IntegrationTestHelpers
 from tests_metricflow.snapshot_utils import assert_str_snapshot_equal
 

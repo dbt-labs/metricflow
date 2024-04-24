@@ -8,6 +8,7 @@ from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.references import MetricReference
+from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.naming.naming_scheme import QueryItemNamingScheme
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
@@ -17,7 +18,6 @@ from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.me
     MetricGroupByItemResolutionNode,
 )
 
-from tests_metricflow.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests_metricflow.semantics.query.group_by_item.conftest import AmbiguousResolutionQueryId
 from tests_metricflow.snapshot_utils import assert_object_snapshot_equal
 from tests_metricflow.time.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_MONTH, MTD_SPEC_YEAR

@@ -5,6 +5,7 @@ from typing import List
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 
 from metricflow.protocols.sql_client import SqlClient
@@ -26,7 +27,6 @@ from metricflow.sql.sql_plan import (
     SqlTableFromClauseNode,
 )
 from metricflow.sql.sql_table import SqlTable, SqlTableType
-from tests_metricflow.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests_metricflow.sql.compare_sql_plan import assert_rendered_sql_equal
 
 logger = logging.getLogger(__name__)

@@ -13,12 +13,11 @@ from dbt_semantic_interfaces.implementations.elements.measure import PydanticMea
 from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.protocols.query_parameter import DimensionOrEntityQueryParameter
 from metricflow_semantics.specs.query_param_implementations import DimensionOrEntityParameter, TimeDimensionParameter
-from metricflow_semantics.test_helpers import (
-    ConfigurableTimeSource,
-)
+from metricflow_semantics.time_helpers import ConfigurableTimeSource
 
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowQueryRequest
 from metricflow.plan_conversion.column_resolver import (
@@ -40,7 +39,6 @@ from metricflow.sql.sql_exprs import (
     SqlSubtractTimeIntervalExpression,
 )
 from tests_metricflow.compare_df import assert_dataframes_equal
-from tests_metricflow.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests_metricflow.integration.configured_test_case import (
     CONFIGURED_INTEGRATION_TESTS_REPOSITORY,
     IntegrationTestModel,

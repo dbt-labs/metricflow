@@ -6,11 +6,11 @@ from pathlib import Path
 import pandas as pd
 import pytest
 from dbt_semantic_interfaces.test_utils import as_datetime
+from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.random_id import random_id
 
 from metricflow.protocols.sql_client import SqlEngine
 from tests_metricflow.compare_df import assert_dataframes_equal
-from tests_metricflow.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests_metricflow.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 from tests_metricflow.table_snapshot.table_snapshots import (
     SqlTableColumnDefinition,

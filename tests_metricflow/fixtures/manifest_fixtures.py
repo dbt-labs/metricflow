@@ -16,10 +16,11 @@ from dbt_semantic_interfaces.parsing.dir_to_model import (
 from dbt_semantic_interfaces.protocols import SemanticModel
 from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
+from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
-from metricflow_semantics.test_helpers import ConfigurableTimeSource
+from metricflow_semantics.time_helpers import ConfigurableTimeSource
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
@@ -32,7 +33,6 @@ from metricflow.plan_conversion.column_resolver import DunderColumnAssociationRe
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from tests_metricflow.fixtures.id_fixtures import IdNumberSpace, patch_id_generators_helper
-from tests_metricflow.fixtures.setup_fixtures import MetricFlowTestConfiguration
 
 logger = logging.getLogger(__name__)
 

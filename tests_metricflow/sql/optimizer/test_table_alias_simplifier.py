@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 
 from metricflow.sql.optimizer.table_alias_simplifier import SqlTableAliasSimplifier
@@ -19,7 +20,6 @@ from metricflow.sql.sql_plan import (
     SqlTableFromClauseNode,
 )
 from metricflow.sql.sql_table import SqlTable
-from tests_metricflow.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests_metricflow.sql.compare_sql_plan import assert_default_rendered_sql_equal
 
 

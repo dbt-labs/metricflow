@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 from _pytest.fixtures import FixtureRequest
+from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.dag.mf_dag import DagId
 
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlQueryPlanRenderer
 from metricflow.sql.sql_plan import SqlQueryPlan, SqlQueryPlanNode
-from tests_metricflow.fixtures.setup_fixtures import MetricFlowTestConfiguration, check_sql_engine_snapshot_marker
+from tests_metricflow.fixtures.setup_fixtures import check_sql_engine_snapshot_marker
 from tests_metricflow.snapshot_utils import (
     assert_plan_snapshot_text_equal,
     make_schema_replacement_function,

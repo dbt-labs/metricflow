@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import datetime
 import difflib
 import logging
 import os
@@ -11,24 +10,9 @@ from typing import Callable, List, Optional, Tuple
 
 import _pytest.fixtures
 
-from metricflow_semantics.time.time_source import TimeSource
+from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
 
 logger = logging.getLogger(__name__)
-
-DISPLAY_SNAPSHOTS_CLI_FLAG = "--display-snapshots"
-OVERWRITE_SNAPSHOTS_CLI_FLAG = "--overwrite-snapshots"
-
-
-def add_display_snapshots_cli_flag(parser: _pytest.config.argparsing.Parser) -> None:  # noqa: D103
-    parser.addoption(DISPLAY_SNAPSHOTS_CLI_FLAG, action="store_true", help="Displays snapshots in a browser if set")
-
-
-def add_overwrite_snapshots_cli_flag(parser: _pytest.config.argparsing.Parser) -> None:  # noqa: D103
-    parser.addoption(
-        OVERWRITE_SNAPSHOTS_CLI_FLAG,
-        action="store_true",
-        help="Overwrites existing snapshots by ones generated during this testing session",
-    )
 
 
 @dataclass(frozen=True)
@@ -39,26 +23,6 @@ class SnapshotConfiguration:
     display_snapshots: bool
     # Whether to overwrite any text files that were generated.
     overwrite_snapshots: bool
-
-
-@dataclass(frozen=True)
-class MetricFlowTestConfiguration(SnapshotConfiguration):
-    """State that is shared between tests during a testing session."""
-
-    sql_engine_url: str
-    sql_engine_password: str
-    # Where MF system tables should be stored.
-    mf_system_schema: str
-    # Where tables for test data sets should be stored.
-    mf_source_schema: str
-
-    # Whether to display the graph associated with a test session in a browser window.
-    display_graphs: bool
-
-    # The source schema contains tables that are used for running tests. If this is set, a source schema in the SQL
-    # is created and persisted between runs. The source schema name includes a hash of the tables that should be in
-    # the schema, so
-    use_persistent_source_schema: bool
 
 
 def assert_snapshot_text_equal(
@@ -189,15 +153,17 @@ def _exclude_lines_matching_regex(file_contents: str, exclude_line_regex: str) -
     return "\n".join([line for line in file_contents.split("\n") if not compiled_regex.match(line)])
 
 
-class ConfigurableTimeSource(TimeSource):
-    """A time source that can be configured so that scheduled operations can be simulated in testing."""
+DISPLAY_SNAPSHOTS_CLI_FLAG = "--display-snapshots"
+OVERWRITE_SNAPSHOTS_CLI_FLAG = "--overwrite-snapshots"
 
-    def __init__(self, configured_time: datetime.datetime) -> None:  # noqa: D107
-        self._configured_time = configured_time
 
-    def get_time(self) -> datetime.datetime:  # noqa: D102
-        return self._configured_time
+def add_display_snapshots_cli_flag(parser: _pytest.config.argparsing.Parser) -> None:  # noqa: D103
+    parser.addoption(DISPLAY_SNAPSHOTS_CLI_FLAG, action="store_true", help="Displays snapshots in a browser if set")
 
-    def set_time(self, new_time: datetime.datetime) -> datetime.datetime:  # noqa: D102
-        self._configured_time = new_time
-        return new_time
+
+def add_overwrite_snapshots_cli_flag(parser: _pytest.config.argparsing.Parser) -> None:  # noqa: D103
+    parser.addoption(
+        OVERWRITE_SNAPSHOTS_CLI_FLAG,
+        action="store_true",
+        help="Overwrites existing snapshots by ones generated during this testing session",
+    )

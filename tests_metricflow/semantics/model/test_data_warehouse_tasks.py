@@ -14,6 +14,7 @@ from dbt_semantic_interfaces.protocols.entity import EntityType
 from dbt_semantic_interfaces.test_utils import semantic_model_with_guaranteed_meta
 from dbt_semantic_interfaces.transformations.semantic_manifest_transformer import PydanticSemanticManifestTransformer
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
+from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
 
 from metricflow.protocols.sql_client import SqlClient
@@ -22,7 +23,6 @@ from metricflow.validation.data_warehouse_model_validator import (
     DataWarehouseTaskBuilder,
     DataWarehouseValidationTask,
 )
-from tests_metricflow.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests_metricflow.snapshot_utils import (
     assert_sql_snapshot_equal,
 )

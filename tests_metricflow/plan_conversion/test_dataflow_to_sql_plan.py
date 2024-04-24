@@ -9,6 +9,7 @@ from dbt_semantic_interfaces.references import EntityReference, TimeDimensionRef
 from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.dag.mf_dag import DagId
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
@@ -52,7 +53,6 @@ from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from tests_metricflow.dataflow_plan_to_svg import display_graph_if_requested
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
-from tests_metricflow.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests_metricflow.snapshot_utils import assert_plan_snapshot_text_equal
 from tests_metricflow.sql.compare_sql_plan import assert_rendered_sql_from_plan_equal, assert_sql_plan_text_equal
 from tests_metricflow.time.metric_time_dimension import MTD_SPEC_DAY

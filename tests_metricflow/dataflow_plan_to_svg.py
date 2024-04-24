@@ -3,10 +3,9 @@ from __future__ import annotations
 import os
 
 from _pytest.fixtures import FixtureRequest
+from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.dag.dag_visualization import DagGraphT, render_via_graphviz
-from metricflow_semantics.test_helpers import snapshot_path_prefix
-
-from tests_metricflow.fixtures.setup_fixtures import MetricFlowTestConfiguration
+from metricflow_semantics.snapshot_helpers import snapshot_path_prefix
 
 
 def display_graph_if_requested(

@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from _pytest.fixtures import FixtureRequest
+from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
 
-from tests_metricflow.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests_metricflow.integration.conftest import IntegrationTestHelpers
 from tests_metricflow.snapshot_utils import assert_object_snapshot_equal
 

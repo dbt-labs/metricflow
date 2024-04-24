@@ -5,10 +5,10 @@ from typing import Dict
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
 
-from tests_metricflow.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests_metricflow.semantics.query.group_by_item.ambiguous_resolution_query_id import AmbiguousResolutionQueryId
 from tests_metricflow.snapshot_utils import assert_plan_snapshot_text_equal
 

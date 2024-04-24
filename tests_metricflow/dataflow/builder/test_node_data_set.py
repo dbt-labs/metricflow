@@ -6,6 +6,7 @@ from typing import Mapping
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.references import SemanticModelElementReference
 from metricflow_semantics.aggregation_properties import AggregationState
+from metricflow_semantics.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.instances import (
     InstanceSet,
     MeasureInstance,
@@ -32,7 +33,6 @@ from metricflow.sql.sql_plan import (
 )
 from metricflow.sql.sql_table import SqlTable
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
-from tests_metricflow.fixtures.setup_fixtures import MetricFlowTestConfiguration
 from tests_metricflow.snapshot_utils import assert_spec_set_snapshot_equal
 
 logger = logging.getLogger(__name__)
