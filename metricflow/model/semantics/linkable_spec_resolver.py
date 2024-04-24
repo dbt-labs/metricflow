@@ -356,6 +356,7 @@ class LinkableElementSet:
                 GroupByMetricSpec(
                     element_name=linkable_metric.element_name,
                     entity_links=linkable_metric.join_path.entity_links,
+                    metric_subquery_entity_links=linkable_metric.metric_subquery_entity_links,
                 )
                 for linkable_metrics in self.path_key_to_linkable_metrics.values()
                 for linkable_metric in linkable_metrics

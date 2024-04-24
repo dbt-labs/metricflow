@@ -518,7 +518,8 @@ class MetricFlowQueryParser:
         self, group_by_metric_spec: GroupByMetricSpec
     ) -> MetricFlowQuerySpec:
         """Query spec that can be used to build a source node for this spec in the DFP."""
+        group_by_metric_spec.metric_subquery_entity_links
         return self.parse_and_validate_query(
             metrics=(MetricParameter(group_by_metric_spec.reference.element_name),),
-            group_by=(DimensionOrEntityParameter(group_by_metric_spec.entity_spec.qualified_name),),
+            group_by=(DimensionOrEntityParameter(group_by_metric_spec.metric_subquery_entity_spec.qualified_name),),
         )
