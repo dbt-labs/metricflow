@@ -18,7 +18,7 @@ from metricflow.semantics.query.group_by_item.resolution_dag.resolution_nodes.me
     MetricGroupByItemResolutionNode,
 )
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
-from tests.query.group_by_item.conftest import AmbiguousResolutionQueryId
+from tests.semantics.query.group_by_item.conftest import AmbiguousResolutionQueryId
 from tests.snapshot_utils import assert_object_snapshot_equal
 from tests.time.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_MONTH, MTD_SPEC_YEAR
 

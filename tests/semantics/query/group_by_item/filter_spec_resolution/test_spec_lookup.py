@@ -32,10 +32,10 @@ from metricflow.semantics.query.group_by_item.filter_spec_resolution.filter_spec
 from metricflow.semantics.query.group_by_item.filter_spec_resolution.filter_spec_resolver import WhereFilterSpecResolver
 from metricflow.semantics.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
-from tests.model.modify.modify_input_metric_filter import ModifyInputMetricFilterTransform
-from tests.model.modify.modify_manifest import modify_manifest
-from tests.model.modify.modify_metric_filter import ModifyMetricFilterTransform
-from tests.query.group_by_item.conftest import AmbiguousResolutionQueryId, _build_resolution_dag
+from tests.semantics.model.modify.modify_input_metric_filter import ModifyInputMetricFilterTransform
+from tests.semantics.model.modify.modify_manifest import modify_manifest
+from tests.semantics.model.modify.modify_metric_filter import ModifyMetricFilterTransform
+from tests.semantics.query.group_by_item.conftest import AmbiguousResolutionQueryId, _build_resolution_dag
 from tests.snapshot_utils import assert_str_snapshot_equal
 
 logger = logging.getLogger(__name__)

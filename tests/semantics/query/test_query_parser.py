@@ -31,7 +31,7 @@ from metricflow.semantics.specs.spec_classes import (
     OrderBySpec,
     TimeDimensionSpec,
 )
-from tests.model.example_project_configuration import EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE
+from tests.semantics.model.example_project_configuration import EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE
 from tests.time.metric_time_dimension import MTD
 
 logger = logging.getLogger(__name__)

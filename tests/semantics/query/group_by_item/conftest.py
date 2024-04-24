@@ -17,7 +17,7 @@ from metricflow.semantics.naming.object_builder_scheme import ObjectBuilderNamin
 from metricflow.semantics.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
 from metricflow.semantics.query.group_by_item.resolution_dag.dag_builder import GroupByItemResolutionDagBuilder
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
-from tests.query.group_by_item.ambiguous_resolution_query_id import AmbiguousResolutionQueryId
+from tests.semantics.query.group_by_item.ambiguous_resolution_query_id import AmbiguousResolutionQueryId
 
 
 def _build_resolution_dag(

@@ -5,36 +5,48 @@ from typing import Dict
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 
 from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow.semantics.naming.naming_scheme import QueryItemNamingScheme
+from metricflow.semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow.semantics.query.group_by_item.group_by_item_resolver import GroupByItemResolver
 from metricflow.semantics.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
-from metricflow.semantics.specs.spec_classes import LinkableSpecSet
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
-from tests.query.group_by_item.conftest import AmbiguousResolutionQueryId
-from tests.snapshot_utils import assert_linkable_spec_set_snapshot_equal
+from tests.semantics.query.group_by_item.conftest import AmbiguousResolutionQueryId
+from tests.snapshot_utils import assert_object_snapshot_equal
 
 logger = logging.getLogger(__name__)
 
 
 @pytest.mark.parametrize("dag_case_id", [case_id.value for case_id in AmbiguousResolutionQueryId])
-def test_available_group_by_items(  # noqa: D103
+def test_ambiguous_metric_time_in_query_filter(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
+    naming_scheme: QueryItemNamingScheme,
     ambiguous_resolution_manifest_lookup: SemanticManifestLookup,
     resolution_dags: Dict[AmbiguousResolutionQueryId, GroupByItemResolutionDag],
     dag_case_id: str,
 ) -> None:
-    resolution_dag = resolution_dags[AmbiguousResolutionQueryId(dag_case_id)]
+    case_id = AmbiguousResolutionQueryId(dag_case_id)
+    resolution_dag = resolution_dags[case_id]
     group_by_item_resolver = GroupByItemResolver(
         manifest_lookup=ambiguous_resolution_manifest_lookup,
         resolution_dag=resolution_dag,
     )
 
-    result = group_by_item_resolver.resolve_available_items()
-    assert_linkable_spec_set_snapshot_equal(
+    input_str = f"TimeDimension('{METRIC_TIME_ELEMENT_NAME}')"
+    spec_pattern = ObjectBuilderNamingScheme().spec_pattern(input_str)
+
+    result = group_by_item_resolver.resolve_matching_item_for_filters(
+        input_str=input_str,
+        spec_pattern=spec_pattern,
+        resolution_node=resolution_dag.sink_node,
+    )
+
+    assert_object_snapshot_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,
-        set_id="set0",
-        spec_set=LinkableSpecSet.from_specs(result.specs),
+        obj_id="result",
+        obj=result,
     )

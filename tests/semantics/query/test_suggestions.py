@@ -17,8 +17,8 @@ from metricflow.semantics.model.semantic_manifest_lookup import SemanticManifest
 from metricflow.semantics.query.query_exceptions import InvalidQueryException
 from metricflow.semantics.query.query_parser import MetricFlowQueryParser
 from tests.fixtures.setup_fixtures import MetricFlowTestConfiguration
-from tests.model.modify.modify_manifest import modify_manifest
-from tests.model.modify.modify_metric_filter import ModifyMetricFilterTransform
+from tests.semantics.model.modify.modify_manifest import modify_manifest
+from tests.semantics.model.modify.modify_metric_filter import ModifyMetricFilterTransform
 from tests.snapshot_utils import assert_str_snapshot_equal
 
 logger = logging.getLogger(__name__)
