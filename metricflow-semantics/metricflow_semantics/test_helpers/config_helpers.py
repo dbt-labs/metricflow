@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pathlib
+import traceback
 from dataclasses import dataclass
 
 from metricflow_semantics.test_helpers.snapshot_helpers import SnapshotConfiguration
@@ -33,13 +34,13 @@ class DirectoryPathAnchor:
     during refactoring.
     """
 
-    def __init__(self, path_to_file_in_directory: str) -> None:
+    def __init__(self) -> None:
         """Initializer.
 
-        Args:
-            path_to_file_in_directory: To be used with `__file__`.
+        The directory associated this anchor is where it's initialized.
         """
-        self._directory = pathlib.Path(path_to_file_in_directory).parent
+        stack = traceback.extract_stack()
+        self._directory = pathlib.Path(stack[-2].filename).parent
 
     @property
     def directory(self) -> pathlib.Path:  # noqa: D102
