@@ -462,6 +462,7 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
             transformed_group_by_metric_spec_from_right = GroupByMetricSpec(
                 element_name=group_by_metric_instance.spec.element_name,
                 entity_links=self._join_on_entity.as_linkless_prefix + group_by_metric_instance.spec.entity_links,
+                metric_subquery_entity_links=group_by_metric_instance.spec.metric_subquery_entity_links,
             )
             group_by_metric_instances_with_additional_link.append(
                 GroupByMetricInstance(
