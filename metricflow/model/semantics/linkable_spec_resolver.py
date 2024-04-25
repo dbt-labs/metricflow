@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Dict, FrozenSet, List, Optional, Sequence, Set
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols.dimension import Dimension, DimensionType
+from dbt_semantic_interfaces.protocols.metric import Metric
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.protocols.semantic_model import SemanticModel
 from dbt_semantic_interfaces.references import (
@@ -565,12 +566,14 @@ class ValidLinkableSpecResolver:
                 self._entity_to_semantic_model[entity.reference.element_name].append(semantic_model)
 
         self._metric_to_linkable_element_sets: Dict[str, List[LinkableElementSet]] = {}
+        self._metric_references_to_metrics: Dict[MetricReference, Metric] = {}
         self._joinable_metrics_for_entities: Dict[EntityReference, Set[MetricSubqueryJoinPathElement]] = defaultdict(
             set
         )
 
         start_time = time.time()
         for metric in self._semantic_manifest.metrics:
+            self._metric_references_to_metrics[MetricReference(metric.name)] = metric
             linkable_sets_for_measure = []
             for measure in metric.measure_references:
                 # Cumulative metrics currently can't be queried by other time granularities.
@@ -608,8 +611,13 @@ class ValidLinkableSpecResolver:
 
             self._metric_to_linkable_element_sets[metric.name] = linkable_sets_for_measure
 
-        # This loop must happen after the one above so that _metric_to_linkable_element_sets is populated.
+        # Populate storage dicts with linkable metrics. This loop must happen after the one above so that
+        # _metric_to_linkable_element_sets is populated with entities and dimensions.
         for metric in self._semantic_manifest.metrics:
+            # Cumulative metrics and time offset metrics require grouping by metric_time, which is not yet available for
+            # linkable metrics. So skip those.
+            if self._metric_requires_metric_time(metric):
+                continue
             metric_reference = MetricReference(metric.name)
             linkable_element_set_for_metric = self.get_linkable_elements_for_metrics([metric_reference])
             for linkable_entities in linkable_element_set_for_metric.path_key_to_linkable_entities.values():
@@ -622,6 +630,7 @@ class ValidLinkableSpecResolver:
                     self._joinable_metrics_for_entities[linkable_entity.reference].add(
                         metric_subquery_join_path_element
                     )
+                    # TODO: update _metric_to_linkable_element_sets to have linkable metrics
 
         # If no metrics are specified, the query interface supports querying distinct values for dimensions, entities,
         # and group by metrics.
@@ -638,6 +647,27 @@ class ValidLinkableSpecResolver:
         )
 
         logger.info(f"Building valid group-by-item indexes took: {time.time() - start_time:.2f}s")
+
+    def _metric_requires_metric_time(self, metric: Metric) -> bool:
+        """Checks if the metric can only be queried with metric_time. Also checks input metrics.
+
+        True if the metric uses cumulative time component or a time offset.
+        """
+        metrics_to_check = [metric]
+        while metrics_to_check:
+            metric_to_check = metrics_to_check.pop()
+            if metric_to_check.type_params.window is not None or metric_to_check.type_params.grain_to_date is not None:
+                return True
+            for input_metric in metric_to_check.input_metrics:
+                if input_metric.offset_window is not None or input_metric.offset_to_grain is not None:
+                    return True
+                metric_for_input_metric = self._metric_references_to_metrics.get(MetricReference(input_metric.name))
+                assert (
+                    metric_for_input_metric
+                ), f"Did not find input metric {input_metric.name} in registered metrics. This indicates internal misconfiguration."
+                metrics_to_check.append(metric_for_input_metric)
+
+        return False
 
     def _get_semantic_model_for_measure(self, measure_reference: MeasureReference) -> SemanticModel:
         semantic_models_where_measure_was_found = []
