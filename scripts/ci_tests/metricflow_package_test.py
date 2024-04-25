@@ -1,0 +1,180 @@
+from __future__ import annotations
+
+import logging
+import textwrap
+from collections import OrderedDict
+from typing import Sequence
+
+from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
+from dbt_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_validation_ready_semantic_manifest
+from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
+from dbt_semantic_interfaces.protocols import SemanticManifest, SemanticModel
+from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
+from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
+from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
+from metricflow_semantics.specs.spec_classes import (
+    DimensionSpec,
+    EntityReference,
+    MetricFlowQuerySpec,
+    MetricSpec,
+)
+
+from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
+from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
+from metricflow.dataflow.builder.source_node import SourceNodeBuilder, SourceNodeSet
+from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
+from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
+from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
+from metricflow.engine.metricflow_engine import MetricFlowEngine
+
+logger = logging.getLogger(__name__)
+
+
+def _data_set_to_read_nodes(data_sets: OrderedDict[str, SemanticModelDataSet]) -> OrderedDict[str, ReadSqlSourceNode]:
+    """Return a mapping from the name of the semantic model to the dataflow plan node that reads from it."""
+    # Moved from model_fixtures.py.
+    return_dict: OrderedDict[str, ReadSqlSourceNode] = OrderedDict()
+    for semantic_model_name, data_set in data_sets.items():
+        return_dict[semantic_model_name] = ReadSqlSourceNode(data_set)
+
+    return return_dict
+
+
+def _data_set_to_source_node_set(
+    column_association_resolver: ColumnAssociationResolver,
+    semantic_manifest_lookup: SemanticManifestLookup,
+    data_sets: OrderedDict[str, SemanticModelDataSet],
+) -> SourceNodeSet:
+    # Moved from model_fixtures.py.
+    source_node_builder = SourceNodeBuilder(column_association_resolver, semantic_manifest_lookup)
+    return source_node_builder.create_from_data_sets(list(data_sets.values()))
+
+
+def _create_data_sets(
+    semantic_manifest_lookup: SemanticManifestLookup,
+) -> OrderedDict[str, SemanticModelDataSet]:
+    """Convert the SemanticModels in the model to SqlDataSets.
+
+    Key is the name of the semantic model, value is the associated data set.
+    """
+    # Moved from model_fixtures.py.
+
+    # Use ordered dict and sort by name to get consistency when running tests.
+    data_sets = OrderedDict()
+    semantic_models: Sequence[SemanticModel] = semantic_manifest_lookup.semantic_manifest.semantic_models
+    semantic_models = sorted(semantic_models, key=lambda x: x.name)
+
+    converter = SemanticModelToDataSetConverter(
+        column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup)
+    )
+
+    for semantic_model in semantic_models:
+        data_sets[semantic_model.name] = converter.create_sql_source_data_set(semantic_model)
+
+    return data_sets
+
+
+def _semantic_manifest() -> PydanticSemanticManifest:
+    bookings_yaml_file = YamlConfigFile(
+        filepath="dummy_path_0",
+        contents=textwrap.dedent(
+            """\
+            semantic_model:
+              name: bookings_source
+
+              node_relation:
+                schema_name: some_schema
+                alias: bookings_source_table
+
+              defaults:
+                agg_time_dimension: ds
+
+              measures:
+                - name: bookings
+                  expr: "1"
+                  agg: sum
+                  create_metric: true
+
+              dimensions:
+                - name: is_instant
+                  type: categorical
+                - name: ds
+                  type: time
+                  type_params:
+                    time_granularity: day
+
+              primary_entity: booking
+
+              entities:
+                - name: listing
+                  type: foreign
+                  expr: listing_id
+            """
+        ),
+    )
+
+    project_configuration_yaml_file = YamlConfigFile(
+        filepath="projection_configuration_yaml_file_path",
+        contents=textwrap.dedent(
+            """\
+            project_configuration:
+              time_spine_table_configurations:
+                - location: example_schema.example_table
+                  column_name: ds
+                  grain: day
+            """
+        ),
+    )
+
+    semantic_manifest = parse_yaml_files_to_validation_ready_semantic_manifest(
+        [bookings_yaml_file, project_configuration_yaml_file], apply_transformations=True
+    ).semantic_manifest
+
+    SemanticManifestValidator[SemanticManifest]().checked_validations(semantic_manifest)
+    return semantic_manifest
+
+
+def log_dataflow_plan() -> None:  # noqa: D103
+    semantic_manifest = _semantic_manifest()
+    semantic_manifest_lookup = SemanticManifestLookup(semantic_manifest)
+    data_set_mapping = _create_data_sets(semantic_manifest_lookup)
+    column_association_resolver = DunderColumnAssociationResolver(semantic_manifest_lookup)
+
+    source_node_builder = SourceNodeBuilder(column_association_resolver, semantic_manifest_lookup)
+    source_node_set = source_node_builder.create_from_data_sets(list(data_set_mapping.values()))
+    node_output_resolver = DataflowPlanNodeOutputDataSetResolver(
+        column_association_resolver=column_association_resolver,
+        semantic_manifest_lookup=semantic_manifest_lookup,
+    )
+    node_output_resolver.cache_output_data_sets(source_node_set.all_nodes)
+
+    dataflow_plan_builder = DataflowPlanBuilder(
+        source_node_set=source_node_set,
+        semantic_manifest_lookup=semantic_manifest_lookup,
+        node_output_resolver=node_output_resolver,
+        column_association_resolver=column_association_resolver,
+    )
+
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="bookings"),),
+            dimension_specs=(
+                DimensionSpec(
+                    element_name="is_instant",
+                    entity_links=(EntityReference("booking"),),
+                ),
+            ),
+        )
+    )
+
+    logger.info(f"Dataflow plan is:\n{dataflow_plan.structure_text()}")
+
+
+def check_engine_import(metricflow_engine: MetricFlowEngine) -> None:
+    """Doesn't need to run, but having this here means that the import is tested."""
+    logger.info(f"Engine is {metricflow_engine}")
+
+
+logging.basicConfig(format="%(asctime)s - %(levelname)s -  %(message)s", level=logging.INFO)
+log_dataflow_plan()
