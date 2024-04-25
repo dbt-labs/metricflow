@@ -17,10 +17,10 @@ from metricflow_semantics.errors.error_classes import ExecutionException
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.mf_logging.formatting import indent
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
+from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.linkable_element import (
     LinkableDimension,
-    LinkableElementProperty,
 )
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName

@@ -10,9 +10,9 @@ from dbt_semantic_interfaces.references import (
     MetricReference,
     SemanticModelReference,
 )
+from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.linkable_element import (
-    LinkableElementProperty,
     SemanticModelJoinPath,
     SemanticModelJoinPathElement,
 )
