@@ -13,7 +13,7 @@ from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec
 from metricflow_semantics.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
 from metricflow_semantics.query.issues.issues_base import MetricFlowQueryResolutionIssueSet
 from metricflow_semantics.query.resolver_inputs.base_resolver_inputs import MetricFlowQueryResolverInput
-from metricflow_semantics.specs.spec_classes import MetricFlowQuerySpec
+from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 
 
 @dataclass(frozen=True)

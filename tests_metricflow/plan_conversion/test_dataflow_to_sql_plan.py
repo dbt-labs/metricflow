@@ -13,13 +13,13 @@ from metricflow_semantics.dag.mf_dag import DagId
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
+from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.spec_classes import (
     DimensionSpec,
     InstanceSpecSet,
     LinkableSpecSet,
     LinklessEntitySpec,
     MeasureSpec,
-    MetricFlowQuerySpec,
     MetricInputMeasureSpec,
     MetricSpec,
     NonAdditiveDimensionSpec,

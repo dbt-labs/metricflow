@@ -12,8 +12,8 @@ from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.naming.dunder_scheme import DunderNamingScheme
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
+from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.spec_classes import (
-    MetricFlowQuerySpec,
     MetricSpec,
 )
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration

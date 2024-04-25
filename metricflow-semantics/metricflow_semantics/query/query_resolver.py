@@ -52,11 +52,11 @@ from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import (
 from metricflow_semantics.query.suggestion_generator import QueryItemSuggestionGenerator
 from metricflow_semantics.query.validation_rules.query_validator import PostResolutionQueryValidator
 from metricflow_semantics.specs.patterns.match_list_pattern import MatchListSpecPattern
+from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.spec_classes import (
     InstanceSpec,
     LinkableInstanceSpec,
     LinkableSpecSet,
-    MetricFlowQuerySpec,
     MetricSpec,
     OrderBySpec,
 )

@@ -5,7 +5,8 @@ from typing import Mapping
 import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.references import TimeDimensionReference
-from metricflow_semantics.specs.spec_classes import MetricFlowQuerySpec, MetricSpec
+from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
+from metricflow_semantics.specs.spec_classes import MetricSpec
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_DAY
 

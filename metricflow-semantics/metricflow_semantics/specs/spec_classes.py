@@ -22,7 +22,7 @@ from typing import TYPE_CHECKING, Any, Dict, Generic, List, Optional, Sequence, 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
 from dbt_semantic_interfaces.naming.keywords import DUNDER, METRIC_TIME_ELEMENT_NAME
-from dbt_semantic_interfaces.protocols import MetricTimeWindow, WhereFilterIntersection
+from dbt_semantic_interfaces.protocols import MetricTimeWindow
 from dbt_semantic_interfaces.references import (
     DimensionReference,
     EntityReference,
@@ -37,11 +37,7 @@ from typing_extensions import override
 
 from metricflow_semantics.aggregation_properties import AggregationState
 from metricflow_semantics.collection_helpers.merger import Mergeable
-from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
-from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
-    FilterSpecResolutionLookUp,
-)
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
 from metricflow_semantics.sql.sql_column_type import SqlColumnType
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
@@ -50,6 +46,7 @@ from metricflow_semantics.visitor import VisitorOutputT
 if TYPE_CHECKING:
     from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
     from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
+    from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 
 
 def hash_items(items: Sequence[SqlColumnType]) -> str:
@@ -240,56 +237,6 @@ class EntitySpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D101
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_entity_spec(self)
-
-
-@dataclass(frozen=True)
-class GroupByMetricSpec(LinkableInstanceSpec, SerializableDataclass):
-    """Metric used in group by or where filter."""
-
-    @property
-    def without_first_entity_link(self) -> GroupByMetricSpec:  # noqa: D102
-        assert len(self.entity_links) > 0, f"Spec does not have any entity links: {self}"
-        return GroupByMetricSpec(element_name=self.element_name, entity_links=self.entity_links[1:])
-
-    @property
-    def without_entity_links(self) -> GroupByMetricSpec:  # noqa: D102
-        return GroupByMetricSpec(element_name=self.element_name, entity_links=())
-
-    @staticmethod
-    def from_name(name: str) -> GroupByMetricSpec:  # noqa: D102
-        structured_name = StructuredLinkableSpecName.from_name(name)
-        return GroupByMetricSpec(
-            entity_links=tuple(EntityReference(idl) for idl in structured_name.entity_link_names),
-            element_name=structured_name.element_name,
-        )
-
-    def __eq__(self, other: Any) -> bool:  # type: ignore[misc] # noqa: D105
-        if not isinstance(other, GroupByMetricSpec):
-            return False
-        return self.element_name == other.element_name and self.entity_links == other.entity_links
-
-    def __hash__(self) -> int:  # noqa: D105
-        return hash((self.element_name, self.entity_links))
-
-    @property
-    def reference(self) -> MetricReference:  # noqa: D102
-        return MetricReference(element_name=self.element_name)
-
-    @property
-    @override
-    def as_spec_set(self) -> InstanceSpecSet:
-        return InstanceSpecSet(group_by_metric_specs=(self,))
-
-    def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
-        return visitor.visit_group_by_metric_spec(self)
-
-    @property
-    def query_spec_for_source_node(self) -> MetricFlowQuerySpec:
-        """Query spec that can be used to build a source node for this spec in the DFP."""
-        return MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name=self.element_name),),
-            entity_specs=tuple(EntitySpec.from_name(entity_link.element_name) for entity_link in self.entity_links),
-        )
 
 
 @dataclass(frozen=True)
@@ -835,47 +782,6 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
             time_dimension_specs=instance_spec_set.time_dimension_specs,
             entity_specs=instance_spec_set.entity_specs,
             group_by_metric_specs=instance_spec_set.group_by_metric_specs,
-        )
-
-
-@dataclass(frozen=True)
-class MetricFlowQuerySpec(SerializableDataclass):
-    """Specs needed for running a query."""
-
-    metric_specs: Tuple[MetricSpec, ...] = ()
-    dimension_specs: Tuple[DimensionSpec, ...] = ()
-    entity_specs: Tuple[EntitySpec, ...] = ()
-    time_dimension_specs: Tuple[TimeDimensionSpec, ...] = ()
-    group_by_metric_specs: Tuple[GroupByMetricSpec, ...] = ()
-    order_by_specs: Tuple[OrderBySpec, ...] = ()
-    time_range_constraint: Optional[TimeRangeConstraint] = None
-    limit: Optional[int] = None
-    filter_intersection: Optional[WhereFilterIntersection] = None
-    filter_spec_resolution_lookup: FilterSpecResolutionLookUp = FilterSpecResolutionLookUp.empty_instance()
-    min_max_only: bool = False
-
-    @property
-    def linkable_specs(self) -> LinkableSpecSet:  # noqa: D102
-        return LinkableSpecSet(
-            dimension_specs=self.dimension_specs,
-            time_dimension_specs=self.time_dimension_specs,
-            entity_specs=self.entity_specs,
-            group_by_metric_specs=self.group_by_metric_specs,
-        )
-
-    def with_time_range_constraint(self, time_range_constraint: Optional[TimeRangeConstraint]) -> MetricFlowQuerySpec:
-        """Return a query spec that's the same as self but with a different time_range_constraint."""
-        return MetricFlowQuerySpec(
-            metric_specs=self.metric_specs,
-            dimension_specs=self.dimension_specs,
-            entity_specs=self.entity_specs,
-            time_dimension_specs=self.time_dimension_specs,
-            group_by_metric_specs=self.group_by_metric_specs,
-            order_by_specs=self.order_by_specs,
-            time_range_constraint=time_range_constraint,
-            limit=self.limit,
-            filter_intersection=self.filter_intersection,
-            filter_spec_resolution_lookup=self.filter_spec_resolution_lookup,
         )
 
 

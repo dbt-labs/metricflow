@@ -12,10 +12,10 @@ from metricflow_semantics.model.semantics.linkable_element import (
     LinkableEntity,
     LinkableMetric,
 )
+from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 from metricflow_semantics.specs.spec_classes import (
     DimensionSpec,
     EntitySpec,
-    GroupByMetricSpec,
     LinkableSpecSet,
     TimeDimensionSpec,
 )

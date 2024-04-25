@@ -31,7 +31,8 @@ from metricflow_semantics.random_id import random_id
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
 from metricflow_semantics.specs.query_param_implementations import SavedQueryParameter
-from metricflow_semantics.specs.spec_classes import InstanceSpecSet, MetricFlowQuerySpec
+from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
+from metricflow_semantics.specs.spec_classes import InstanceSpecSet
 from metricflow_semantics.time.time_source import TimeSource
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder

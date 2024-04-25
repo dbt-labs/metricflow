@@ -4,9 +4,9 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.spec_classes import (
     DimensionSpec,
-    MetricFlowQuerySpec,
     MetricSpec,
     TimeDimensionSpec,
 )

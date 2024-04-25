@@ -30,8 +30,8 @@ from metricflow_semantics.specs.column_assoc import (
     ColumnAssociationResolver,
     SingleColumnCorrelationKey,
 )
+from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 from metricflow_semantics.specs.spec_classes import (
-    GroupByMetricSpec,
     InstanceSpecSet,
     MeasureSpec,
     MetadataSpec,

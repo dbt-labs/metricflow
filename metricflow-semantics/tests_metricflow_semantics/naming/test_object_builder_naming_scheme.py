@@ -7,10 +7,10 @@ from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
+from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 from metricflow_semantics.specs.spec_classes import (
     DimensionSpec,
     EntitySpec,
-    GroupByMetricSpec,
     LinkableInstanceSpec,
     TimeDimensionSpec,
 )

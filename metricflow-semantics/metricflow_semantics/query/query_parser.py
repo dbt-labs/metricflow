@@ -54,10 +54,10 @@ from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import (
 from metricflow_semantics.specs.patterns.base_time_grain import BaseTimeGrainPattern
 from metricflow_semantics.specs.patterns.metric_time_pattern import MetricTimePattern
 from metricflow_semantics.specs.patterns.none_date_part import NoneDatePartPattern
+from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.spec_classes import (
     InstanceSpec,
     InstanceSpecSet,
-    MetricFlowQuerySpec,
     TimeDimensionSpec,
 )
 from metricflow_semantics.time.time_granularity import (

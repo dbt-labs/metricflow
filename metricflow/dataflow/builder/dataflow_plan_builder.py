@@ -34,6 +34,7 @@ from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec
     FilterSpecResolutionLookUp,
 )
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
+from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.spec_classes import (
     ConstantPropertySpec,
     CumulativeMeasureDescription,
@@ -45,7 +46,6 @@ from metricflow_semantics.specs.spec_classes import (
     LinklessEntitySpec,
     MeasureSpec,
     MetadataSpec,
-    MetricFlowQuerySpec,
     MetricInputMeasureSpec,
     MetricSpec,
     NonAdditiveDimensionSpec,

@@ -8,10 +8,10 @@ from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
+from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.spec_classes import (
     DimensionSpec,
     EntityReference,
-    MetricFlowQuerySpec,
     MetricSpec,
 )
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration

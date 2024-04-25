@@ -13,10 +13,10 @@ from dbt_semantic_interfaces.validations.semantic_manifest_validator import Sema
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
+from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.spec_classes import (
     DimensionSpec,
     EntityReference,
-    MetricFlowQuerySpec,
     MetricSpec,
 )
 

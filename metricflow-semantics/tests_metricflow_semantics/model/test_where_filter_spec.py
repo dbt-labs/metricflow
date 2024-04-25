@@ -34,10 +34,10 @@ from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow_semantics.query.issues.issues_base import MetricFlowQueryResolutionIssueSet
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
+from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 from metricflow_semantics.specs.spec_classes import (
     DimensionSpec,
     EntitySpec,
-    GroupByMetricSpec,
     LinkableInstanceSpec,
     LinkableSpecSet,
     TimeDimensionSpec,
