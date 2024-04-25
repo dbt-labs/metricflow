@@ -1,6 +1,6 @@
-kind: Features
+kind: Under the Hood
 body: Create `metricflow-semantics` package.
-time: 2024-04-24T14:59:49.8435-07:00
+time: 2024-04-25T02:01:37.532124-07:00
 custom:
   Author: plypaul
   Issue: "1150"

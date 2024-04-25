@@ -10,7 +10,6 @@
 
 # Welcome to metricflow-semantics
 
-This repo encapsulates the modules needed for semantic resolution for MetricFlow queries.
-
+`metricflow-semantics` encapsulates the modules needed to resolve the semantics of MetricFlow queries.
 ## Repo use cases
 - Resolving the dbt model dependencies of a (saved) query in MetricFlow for DAG dependency management.
