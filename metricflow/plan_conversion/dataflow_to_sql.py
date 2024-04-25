@@ -68,7 +68,7 @@ from metricflow.dataset.dataset_classes import DataSet
 from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.convert_to_sql_plan import ConvertToSqlPlanResult
 from metricflow.plan_conversion.instance_converters import (
-    AddGroupByMetrics,
+    AddGroupByMetric,
     AddLinkToLinkableElements,
     AddMetadata,
     AddMetrics,
@@ -744,7 +744,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                     metric_subquery_entity_links=entity_instance.spec.entity_links + (entity_instance.spec.reference,),
                 ),
             )
-            transform_func = AddGroupByMetrics([group_by_metric_instance])
+            transform_func = AddGroupByMetric(group_by_metric_instance)
 
         output_instance_set = output_instance_set.transform(transform_func)
 
