@@ -1,15 +1,13 @@
 from __future__ import annotations
 
-from typing import Optional, Sequence
+from typing import List, Optional, Sequence
 
 from dbt_semantic_interfaces.references import SemanticModelReference
 from typing_extensions import override
 
 from metricflow.assert_one_arg import assert_exactly_one_arg_set
 from metricflow.dataset.dataset import DataSet
-from metricflow.instances import (
-    InstanceSet,
-)
+from metricflow.instances import EntityInstance, InstanceSet
 from metricflow.specs.column_assoc import ColumnAssociation
 from metricflow.specs.specs import DimensionSpec, EntitySpec, TimeDimensionSpec
 from metricflow.sql.sql_plan import (
@@ -60,25 +58,33 @@ class SqlDataSet(DataSet):
         entity_spec: EntitySpec,
     ) -> Sequence[ColumnAssociation]:
         """Given the name of the entity, return the set of columns associated with it in the data set."""
-        matching_instances = 0
-        column_associations_to_return = None
+        matching_instances_with_same_entity_links: List[EntityInstance] = []
+        matching_instances_with_different_entity_links: List[EntityInstance] = []
         for linkable_instance in self.instance_set.entity_instances:
-            if (
-                entity_spec.element_name == linkable_instance.spec.element_name
-                and entity_spec.entity_links == linkable_instance.spec.entity_links
-            ):
-                column_associations_to_return = linkable_instance.associated_columns
-                matching_instances += 1
+            if entity_spec.element_name == linkable_instance.spec.element_name:
+                if entity_spec.entity_links == linkable_instance.spec.entity_links:
+                    matching_instances_with_same_entity_links.append(linkable_instance)
+                else:
+                    matching_instances_with_different_entity_links.append(linkable_instance)
 
-        if matching_instances > 1:
+        # Prioritize instances with matching entity links, but use mismatched links if matching links not found.
+        # Semantic model source data sets might have multiple instances of the same entity, in which case we want the one without
+        # links. But group by metric source data sets might only have an instance of the entity with links, and we can join to that.
+        matching_instances = matching_instances_with_same_entity_links or matching_instances_with_different_entity_links
+
+        if len(matching_instances) != 1:
             raise RuntimeError(
-                f"More than one instance with spec {entity_spec} in " f"instance set: {self.instance_set}"
+                f"Expected exactly one matching instance for {entity_spec} in instance set, but found: {matching_instances}"
+            )
+        matching_instance = matching_instances[0]
+        if not matching_instance.associated_columns:
+            print("entity links to compare:", entity_spec.entity_links, linkable_instance.spec.entity_links)
+            raise RuntimeError(
+                f"No associated columns for entity instance {matching_instance} in data set."
+                "This indicates internal misconfiguration."
             )
 
-        if not column_associations_to_return:
-            raise RuntimeError(f"No instances with spec {entity_spec} in instance set: {self.instance_set}")
-
-        return column_associations_to_return
+        return matching_instance.associated_columns
 
     def column_association_for_dimension(
         self,

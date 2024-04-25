@@ -242,16 +242,40 @@ class EntitySpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D101
 
 @dataclass(frozen=True)
 class GroupByMetricSpec(LinkableInstanceSpec, SerializableDataclass):
-    """Metric used in group by or where filter."""
+    """Metric used in group by or where filter.
+
+    Args:
+        element_name: Name of the metric being joined.
+        entity_links: Sequence of entities joined to join the metric subquery to the outer query. Last entity is the one
+            joining the subquery to the outer query.
+        metric_subquery_entity_links: Sequence of entities used in the metric subquery to join the metric to the entity.
+            Does not include the top-level entity (to avoid duplicating the last element of `entity_links`).
+
+    """
+
+    metric_subquery_entity_links: Tuple[EntityReference, ...]
 
     @property
     def without_first_entity_link(self) -> GroupByMetricSpec:  # noqa: D102
         assert len(self.entity_links) > 0, f"Spec does not have any entity links: {self}"
-        return GroupByMetricSpec(element_name=self.element_name, entity_links=self.entity_links[1:])
+        return GroupByMetricSpec(
+            element_name=self.element_name,
+            entity_links=self.entity_links[1:],
+            metric_subquery_entity_links=self.metric_subquery_entity_links,
+        )
 
     @property
     def without_entity_links(self) -> GroupByMetricSpec:  # noqa: D102
-        return GroupByMetricSpec(element_name=self.element_name, entity_links=())
+        return GroupByMetricSpec(
+            element_name=self.element_name,
+            entity_links=(),
+            metric_subquery_entity_links=self.metric_subquery_entity_links,
+        )
+
+    @property
+    def last_entity_link(self) -> EntityReference:  # noqa: D102
+        assert len(self.entity_links) > 0, f"Spec does not have any entity links: {self}"
+        return self.entity_links[-1]
 
     @staticmethod
     def from_name(name: str) -> GroupByMetricSpec:  # noqa: D102
@@ -259,6 +283,15 @@ class GroupByMetricSpec(LinkableInstanceSpec, SerializableDataclass):
         return GroupByMetricSpec(
             entity_links=tuple(EntityReference(idl) for idl in structured_name.entity_link_names),
             element_name=structured_name.element_name,
+            metric_subquery_entity_links=(),
+        )
+
+    @property
+    def metric_subquery_entity_spec(self) -> EntitySpec:
+        """Spec for the entity that the metric will be grouped by it the metric subquery."""
+        return EntitySpec(
+            element_name=self.last_entity_link.element_name,
+            entity_links=self.metric_subquery_entity_links,
         )
 
     def __eq__(self, other: Any) -> bool:  # type: ignore[misc] # noqa: D105
@@ -280,14 +313,6 @@ class GroupByMetricSpec(LinkableInstanceSpec, SerializableDataclass):
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_group_by_metric_spec(self)
-
-    @property
-    def query_spec_for_source_node(self) -> MetricFlowQuerySpec:
-        """Query spec that can be used to build a source node for this spec in the DFP."""
-        return MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name=self.element_name),),
-            entity_specs=tuple(EntitySpec.from_name(entity_link.element_name) for entity_link in self.entity_links),
-        )
 
 
 @dataclass(frozen=True)

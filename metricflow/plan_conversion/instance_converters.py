@@ -462,6 +462,7 @@ class AddLinkToLinkableElements(InstanceSetTransform[InstanceSet]):
             transformed_group_by_metric_spec_from_right = GroupByMetricSpec(
                 element_name=group_by_metric_instance.spec.element_name,
                 entity_links=self._join_on_entity.as_linkless_prefix + group_by_metric_instance.spec.entity_links,
+                metric_subquery_entity_links=group_by_metric_instance.spec.metric_subquery_entity_links,
             )
             group_by_metric_instances_with_additional_link.append(
                 GroupByMetricInstance(
@@ -744,11 +745,11 @@ class AddMetrics(InstanceSetTransform[InstanceSet]):
         )
 
 
-class AddGroupByMetrics(InstanceSetTransform[InstanceSet]):
+class AddGroupByMetric(InstanceSetTransform[InstanceSet]):
     """Adds the given metric instances to the instance set."""
 
-    def __init__(self, group_by_metric_instances: List[GroupByMetricInstance]) -> None:  # noqa: D107
-        self._group_by_metric_instances = group_by_metric_instances
+    def __init__(self, group_by_metric_instance: GroupByMetricInstance) -> None:  # noqa: D107
+        self._group_by_metric_instance = group_by_metric_instance
 
     def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D102
         return InstanceSet(
@@ -756,7 +757,7 @@ class AddGroupByMetrics(InstanceSetTransform[InstanceSet]):
             dimension_instances=instance_set.dimension_instances,
             time_dimension_instances=instance_set.time_dimension_instances,
             entity_instances=instance_set.entity_instances,
-            group_by_metric_instances=instance_set.group_by_metric_instances + tuple(self._group_by_metric_instances),
+            group_by_metric_instances=instance_set.group_by_metric_instances + (self._group_by_metric_instance,),
             metric_instances=instance_set.metric_instances,
             metadata_instances=instance_set.metadata_instances,
         )

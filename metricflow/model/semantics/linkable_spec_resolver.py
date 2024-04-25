@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Dict, FrozenSet, List, Optional, Sequence, Set
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols.dimension import Dimension, DimensionType
+from dbt_semantic_interfaces.protocols.metric import Metric
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.protocols.semantic_model import SemanticModel
 from dbt_semantic_interfaces.references import (
@@ -105,7 +106,7 @@ class LinkableMetric:
     """Describes how a metric can be realized by joining based on entity links."""
 
     properties: FrozenSet[LinkableElementProperty]
-    join_path: MetricSubqueryJoinPath
+    join_path: SemanticModelToMetricSubqueryJoinPath
 
     def __post_init__(self) -> None:
         """Ensure expected LinkableElementProperties have been set.
@@ -129,6 +130,16 @@ class LinkableMetric:
     @property
     def join_by_semantic_model(self) -> Optional[SemanticModelReference]:  # noqa: D102
         return self.join_path.last_semantic_model_reference
+
+    @property
+    def metric_to_entity_join_path(self) -> Optional[SemanticModelJoinPath]:
+        """Join path used in metric subquery to join entity to metric, if needed."""
+        return self.join_path.metric_subquery_join_path_element.metric_to_entity_join_path
+
+    @property
+    def metric_subquery_entity_links(self) -> Tuple[EntityReference, ...]:
+        """Entity links used to join the metric to the entity it's grouped by in the metric subquery."""
+        return self.metric_to_entity_join_path.entity_links if self.metric_to_entity_join_path else ()
 
 
 @dataclass(frozen=True)
@@ -344,10 +355,12 @@ class LinkableElementSet:
             ),
             group_by_metric_specs=tuple(
                 GroupByMetricSpec(
-                    element_name=path_key.element_name,
-                    entity_links=path_key.entity_links,
+                    element_name=linkable_metric.element_name,
+                    entity_links=linkable_metric.join_path.entity_links,
+                    metric_subquery_entity_links=linkable_metric.metric_subquery_entity_links,
                 )
-                for path_key in self.path_key_to_linkable_metrics
+                for linkable_metrics in self.path_key_to_linkable_metrics.values()
+                for linkable_metric in linkable_metrics
             ),
         )
 
@@ -383,17 +396,26 @@ class SemanticModelJoinPathElement:
 
 @dataclass(frozen=True)
 class MetricSubqueryJoinPathElement:
-    """Describes joining a metric subquery by the given entity."""
+    """Describes joining from a semantic model to a metric subquery.
+
+    Args:
+        metric_reference: The metric that's aggregated in the subquery.
+        join_on_entity: The entity that the metric is grouped by in the subquery. This will be updated in V2 to allow a list
+            of entitites & dimensions.
+        metric_to_entity_join_path: Describes the join path used in the subquery to join the metric to the `join_on_entity`.
+            Can be none if all required elements are defined in the same semantic model.
+    """
 
     metric_reference: MetricReference
     join_on_entity: EntityReference
+    metric_to_entity_join_path: Optional[SemanticModelJoinPath] = None
 
 
 @dataclass(frozen=True)
-class MetricSubqueryJoinPath:
-    """Describes how to join to a metric subquery.
+class SemanticModelToMetricSubqueryJoinPath:
+    """Describes how to join from a semantic model to a metric subquery.
 
-    Starts with semantic model join path, if exists. Always ends with metric subquery join path.
+    Starts with semantic model join path, if needed. Always ends with metric subquery join path.
     """
 
     metric_subquery_join_path_element: MetricSubqueryJoinPathElement
@@ -544,10 +566,14 @@ class ValidLinkableSpecResolver:
                 self._entity_to_semantic_model[entity.reference.element_name].append(semantic_model)
 
         self._metric_to_linkable_element_sets: Dict[str, List[LinkableElementSet]] = {}
-        self._joinable_metrics_for_entities: Dict[EntityReference, Set[MetricReference]] = defaultdict(set)
+        self._metric_references_to_metrics: Dict[MetricReference, Metric] = {}
+        self._joinable_metrics_for_entities: Dict[EntityReference, Set[MetricSubqueryJoinPathElement]] = defaultdict(
+            set
+        )
 
         start_time = time.time()
         for metric in self._semantic_manifest.metrics:
+            self._metric_references_to_metrics[MetricReference(metric.name)] = metric
             linkable_sets_for_measure = []
             for measure in metric.measure_references:
                 # Cumulative metrics currently can't be queried by other time granularities.
@@ -585,13 +611,26 @@ class ValidLinkableSpecResolver:
 
             self._metric_to_linkable_element_sets[metric.name] = linkable_sets_for_measure
 
-        # This loop must happen after the one above so that _metric_to_linkable_element_sets is populated.
+        # Populate storage dicts with linkable metrics. This loop must happen after the one above so that
+        # _metric_to_linkable_element_sets is populated with entities and dimensions.
         for metric in self._semantic_manifest.metrics:
+            # Cumulative metrics and time offset metrics require grouping by metric_time, which is not yet available for
+            # linkable metrics. So skip those.
+            if self._metric_is_cumulative_or_offset(metric):
+                continue
             metric_reference = MetricReference(metric.name)
             linkable_element_set_for_metric = self.get_linkable_elements_for_metrics([metric_reference])
             for linkable_entities in linkable_element_set_for_metric.path_key_to_linkable_entities.values():
                 for linkable_entity in linkable_entities:
-                    self._joinable_metrics_for_entities[linkable_entity.reference].add(metric_reference)
+                    metric_subquery_join_path_element = MetricSubqueryJoinPathElement(
+                        metric_reference=metric_reference,
+                        join_on_entity=linkable_entity.reference,
+                        metric_to_entity_join_path=SemanticModelJoinPath(linkable_entity.join_path),
+                    )
+                    self._joinable_metrics_for_entities[linkable_entity.reference].add(
+                        metric_subquery_join_path_element
+                    )
+                    # TODO: update _metric_to_linkable_element_sets to have linkable metrics
 
         # If no metrics are specified, the query interface supports querying distinct values for dimensions, entities,
         # and group by metrics.
@@ -608,6 +647,24 @@ class ValidLinkableSpecResolver:
         )
 
         logger.info(f"Building valid group-by-item indexes took: {time.time() - start_time:.2f}s")
+
+    def _metric_is_cumulative_or_offset(self, metric: Metric) -> bool:
+        """Check if the metric is cumulative or uses a time offset. Also checks input metrics."""
+        metrics_to_check = [metric]
+        while metrics_to_check:
+            metric_to_check = metrics_to_check.pop()
+            if metric_to_check.type is MetricType.CUMULATIVE:
+                return True
+            for input_metric in metric_to_check.input_metrics:
+                if input_metric.offset_window is not None or input_metric.offset_to_grain is not None:
+                    return True
+                metric_for_input_metric = self._metric_references_to_metrics.get(MetricReference(input_metric.name))
+                assert (
+                    metric_for_input_metric
+                ), f"Did not find input metric {input_metric.name} in registered metrics. This indicates internal misconfiguration."
+                metrics_to_check.append(metric_for_input_metric)
+
+        return False
 
     def _get_semantic_model_for_measure(self, measure_reference: MeasureReference) -> SemanticModel:
         semantic_models_where_measure_was_found = []
@@ -641,13 +698,11 @@ class ValidLinkableSpecResolver:
         for entity_reference in [entity.reference for entity in semantic_model.entities]:
             if using_join_path and entity_reference in using_join_path.entity_links:
                 continue
-            for metric_reference in self._joinable_metrics_for_entities[entity_reference]:
+            for metric_subquery_join_path_element in self._joinable_metrics_for_entities[entity_reference]:
                 linkable_metric = LinkableMetric(
                     properties=properties,
-                    join_path=MetricSubqueryJoinPath(
-                        metric_subquery_join_path_element=MetricSubqueryJoinPathElement(
-                            metric_reference=metric_reference, join_on_entity=entity_reference
-                        ),
+                    join_path=SemanticModelToMetricSubqueryJoinPath(
+                        metric_subquery_join_path_element=metric_subquery_join_path_element,
                         semantic_model_join_path=using_join_path,
                     ),
                 )

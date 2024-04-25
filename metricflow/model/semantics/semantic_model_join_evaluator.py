@@ -243,15 +243,34 @@ class SemanticModelJoinEvaluator:
         left_instance_set: InstanceSet,
         right_instance_set: InstanceSet,
         on_entity_reference: EntityReference,
+        right_node_is_subquery: bool = False,
     ) -> bool:
         """Return true if the instance sets can be joined using the given entity."""
-        return self.is_valid_semantic_model_join(
-            left_semantic_model_reference=SemanticModelJoinEvaluator._semantic_model_of_entity_in_instance_set(
-                instance_set=left_instance_set, entity_reference=on_entity_reference
-            ),
-            right_semantic_model_reference=SemanticModelJoinEvaluator._semantic_model_of_entity_in_instance_set(
-                instance_set=right_instance_set,
-                entity_reference=on_entity_reference,
-            ),
-            on_entity_reference=on_entity_reference,
+        left_semantic_model_reference = SemanticModelJoinEvaluator._semantic_model_of_entity_in_instance_set(
+            instance_set=left_instance_set, entity_reference=on_entity_reference
         )
+        if right_node_is_subquery:
+            left_entity = self._semantic_model_lookup.get_entity_in_semantic_model(
+                SemanticModelElementReference.create_from_references(left_semantic_model_reference, on_entity_reference)
+            )
+            if not left_entity:
+                return False
+            possible_right_entities = [
+                entity_instance
+                for entity_instance in right_instance_set.entity_instances
+                if entity_instance.spec.reference == on_entity_reference
+            ]
+            if len(possible_right_entities) != 1:
+                return False
+
+            # No fan-out check needed since right subquery is aggregated to the entity level, ensuring uniqueness.
+            return True
+        else:
+            return self.is_valid_semantic_model_join(
+                left_semantic_model_reference=left_semantic_model_reference,
+                right_semantic_model_reference=SemanticModelJoinEvaluator._semantic_model_of_entity_in_instance_set(
+                    instance_set=right_instance_set,
+                    entity_reference=on_entity_reference,
+                ),
+                on_entity_reference=on_entity_reference,
+            )
