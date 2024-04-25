@@ -85,21 +85,13 @@ trino-sql-client-packages = [
   "trino>=0.327.0, <0.328.0",
 ]
 
+# There are files that hatch will always include as well (e.g. the LICENSE file).
+# See hatch build docs for more details.
 [tool.hatch.build.targets.sdist]
-exclude = [
-  ".github",
-  ".changes",
-  ".changie.yaml",
-  ".gitignore",
-  ".pre-commit-config.yaml",
-  "CONTRIBUTING.md",
-  "Makefile",
-  "/dbt-metricflow",
-  "/local-data-warehouses",
-  "/metricflow-semantics/tests_metricflow_semantics",
-  "/scripts",
-  "/tests",
-]
+packages = ["metricflow", "metricflow-semantics/metricflow_semantics"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["metricflow", "metricflow-semantics/metricflow_semantics"]
 
 
 # Environment setup

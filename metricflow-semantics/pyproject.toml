@@ -56,13 +56,7 @@ features = [
 "Source Code" = "https://github.com/dbt-labs/metricflow/tree/main/metricflow-semanitcs"
 
 [tool.hatch.build.targets.sdist]
-exclude = [
-  ".github",
-  ".changes",
-  ".changie.yaml",
-  ".gitignore",
-  ".pre-commit-config.yaml",
-  "CONTRIBUTING.md",
-  "MAKEFILE",
-  "/tests_metricflow_semantics"
-]
+packages = ["metricflow_semantics"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["metricflow_semantics"]
