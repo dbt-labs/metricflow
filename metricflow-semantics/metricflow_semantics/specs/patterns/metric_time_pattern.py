@@ -8,10 +8,9 @@ from typing_extensions import override
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow_semantics.specs.spec_classes import (
     InstanceSpec,
-    InstanceSpecSet,
-    LinkableSpecSet,
     TimeDimensionSpec,
 )
+from metricflow_semantics.specs.spec_set import group_specs_by_type
 
 
 class MetricTimePattern(SpecPattern):
@@ -23,7 +22,7 @@ class MetricTimePattern(SpecPattern):
 
     @override
     def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[TimeDimensionSpec]:
-        spec_set = LinkableSpecSet.from_specs(InstanceSpecSet.from_specs(candidate_specs).linkable_specs)
+        spec_set = group_specs_by_type(candidate_specs)
         return tuple(
             time_dimension_spec
             for time_dimension_spec in spec_set.time_dimension_specs

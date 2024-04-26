@@ -12,7 +12,8 @@ from more_itertools import is_sorted
 from typing_extensions import override
 
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
-from metricflow_semantics.specs.spec_classes import InstanceSpec, InstanceSpecSet, LinkableInstanceSpec
+from metricflow_semantics.specs.spec_classes import InstanceSpec, LinkableInstanceSpec
+from metricflow_semantics.specs.spec_set import group_specs_by_type
 
 logger = logging.getLogger(__name__)
 
@@ -109,7 +110,7 @@ class EntityLinkPattern(SpecPattern):
 
     @override
     def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[LinkableInstanceSpec]:
-        filtered_candidate_specs = InstanceSpecSet.from_specs(candidate_specs).linkable_specs
+        filtered_candidate_specs = group_specs_by_type(candidate_specs).linkable_specs
         # Checks that EntityLinkPatternParameterSetField is valid wrt to the parameter set.
 
         # Entity links could be a partial match, so it's handled separately.
