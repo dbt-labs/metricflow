@@ -1,4 +1,5 @@
 GroupByItemResolution(
+  linkable_element_set=LinkableElementSet(),
   issue_set=MetricFlowQueryResolutionIssueSet(
     issues=(
       NoMatchingItemsForMeasure(
