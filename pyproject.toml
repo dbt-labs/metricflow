@@ -90,8 +90,15 @@ trino-sql-client-packages = [
 [tool.hatch.build.targets.sdist]
 packages = ["metricflow", "metricflow-semantics/metricflow_semantics"]
 
+# include doesn't seem to work with packages, so using force include.
+[tool.hatch.build.targets.sdist.force-include]
+"ATTRIBUTION.md" = "ATTRIBUTION.md"
+
 [tool.hatch.build.targets.wheel]
 packages = ["metricflow", "metricflow-semantics/metricflow_semantics"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"ATTRIBUTION.md" = "ATTRIBUTION.md"
 
 
 # Environment setup
