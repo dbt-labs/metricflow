@@ -49,7 +49,6 @@ from metricflow_semantics.query.suggestion_generator import QueryItemSuggestionG
 from metricflow_semantics.specs.patterns.base_time_grain import BaseTimeGrainPattern
 from metricflow_semantics.specs.patterns.none_date_part import NoneDatePartPattern
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
-from metricflow_semantics.specs.spec_classes import InstanceSpecSet, LinkableInstanceSpec
 
 logger = logging.getLogger(__name__)
 
@@ -156,13 +155,11 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
         """Push the group-by-item specs that are available to the measure and match the source patterns to the child."""
         with self._path_from_start_node_tracker.track_node_visit(node) as current_traversal_path:
             logger.info(f"Handling {node.ui_description}")
-            specs_available_for_measure: Sequence[
-                LinkableInstanceSpec
-            ] = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_measure(
+            items_available_for_measure = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_measure(
                 measure_reference=node.measure_reference,
                 with_any_of=self._with_any_property,
                 without_any_of=self._without_any_property,
-            ).as_spec_set.as_tuple
+            )
 
             # The following is needed to handle limitation of cumulative metrics. Filtering could be done at the measure
             # node, but doing it here makes it a little easier to generate the error message.
@@ -192,32 +189,28 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
             else:
                 assert_values_exhausted(metric.type)
 
-            specs_available_for_measure_given_child_metric = specs_available_for_measure
-
-            for pattern_to_apply in patterns_to_apply:
-                specs_available_for_measure_given_child_metric = InstanceSpecSet.from_specs(
-                    pattern_to_apply.match(specs_available_for_measure_given_child_metric)
-                ).linkable_specs
-
-            matching_specs = specs_available_for_measure_given_child_metric
-
-            for source_spec_pattern in self._source_spec_patterns:
-                matching_specs = InstanceSpecSet.from_specs(source_spec_pattern.match(matching_specs)).linkable_specs
-
-            logger.debug(
-                f"For {node.ui_description}:\n"
-                + indent(
-                    "After applying patterns:\n"
-                    + indent(mf_pformat(patterns_to_apply))
-                    + "\n"
-                    + "to inputs, matches are:\n"
-                    + indent(mf_pformat(matching_specs))
-                )
+            matching_items = items_available_for_measure.filter_by_spec_patterns(
+                patterns_to_apply + self._source_spec_patterns
             )
+
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(
+                    f"For {node.ui_description}:\n"
+                    + indent(
+                        "After applying patterns:\n"
+                        + indent(mf_pformat(patterns_to_apply))
+                        + "\n"
+                        + "to inputs, matches are:\n"
+                        + indent(mf_pformat(matching_items.specs))
+                    )
+                )
 
             # The specified patterns don't match to any of the available group-by-items that can be queried for the
             # measure.
-            if len(matching_specs) == 0:
+            if matching_items.spec_count == 0:
+                items_available_for_measure_given_child_metric = items_available_for_measure.filter_by_spec_patterns(
+                    patterns_to_apply
+                )
                 return PushDownResult(
                     candidate_set=GroupByItemCandidateSet.empty_instance(),
                     issue_set=MetricFlowQueryResolutionIssueSet.from_issue(
@@ -227,7 +220,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
                             input_suggestions=(
                                 tuple(
                                     self._suggestion_generator.input_suggestions(
-                                        specs_available_for_measure_given_child_metric
+                                        items_available_for_measure_given_child_metric.specs
                                     )
                                 )
                                 if self._suggestion_generator is not None
@@ -240,7 +233,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
             return PushDownResult(
                 candidate_set=GroupByItemCandidateSet(
                     measure_paths=(current_traversal_path,),
-                    specs=tuple(matching_specs),
+                    linkable_element_set=matching_items,
                     path_from_leaf_node=current_traversal_path,
                 ),
                 issue_set=MetricFlowQueryResolutionIssueSet(),
@@ -314,9 +307,10 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
                 current_traversal_path=current_traversal_path,
             )
             logger.info(f"Handling {node.ui_description}")
-            logger.debug(
-                "candidates from parents:\n" + indent(mf_pformat(merged_result_from_parents.candidate_set.specs))
-            )
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(
+                    "Candidates from parents:\n" + indent(mf_pformat(merged_result_from_parents.candidate_set.specs))
+                )
             if merged_result_from_parents.candidate_set.is_empty:
                 return merged_result_from_parents
 
@@ -340,43 +334,47 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
             else:
                 assert_values_exhausted(metric.type)
 
-            candidate_specs: Sequence[LinkableInstanceSpec] = merged_result_from_parents.candidate_set.specs
+            candidate_items = merged_result_from_parents.candidate_set.linkable_element_set
             issue_sets_to_merge = [merged_result_from_parents.issue_set]
 
-            matched_specs = candidate_specs
-            for pattern_to_apply in patterns_to_apply:
-                matched_specs = InstanceSpecSet.from_specs(pattern_to_apply.match(matched_specs)).linkable_specs
+            matched_items = candidate_items.filter_by_spec_patterns(patterns_to_apply)
 
-            logger.debug(
-                f"For {node.ui_description}:\n"
-                + indent(
-                    "After applying patterns:\n"
-                    + indent(mf_pformat(patterns_to_apply))
-                    + "\n"
-                    + "to inputs, outputs are:\n"
-                    + indent(mf_pformat(matched_specs))
+            if logger.isEnabledFor(logging.DEBUG):
+                matched_specs = matched_items.specs
+                logger.debug(
+                    f"For {node.ui_description}:\n"
+                    + indent(
+                        "After applying patterns:\n"
+                        + indent(mf_pformat(patterns_to_apply))
+                        + "\n"
+                        + "to inputs, outputs are:\n"
+                        + indent(mf_pformat(matched_specs))
+                    )
                 )
-            )
 
             # There were candidates that were common from the ones passed from parents, but after applying the filters,
             # none of the candidates were valid.
-            if len(matched_specs) == 0:
+            if matched_items.spec_count == 0:
                 issue_sets_to_merge.append(
                     MetricFlowQueryResolutionIssueSet.from_issue(
                         MetricExcludesDatePartIssue.from_parameters(
                             query_resolution_path=current_traversal_path,
-                            candidate_specs=candidate_specs,
+                            candidate_specs=candidate_items.specs,
                             parent_issues=(),
                         )
                     )
                 )
 
+            if matched_items.spec_count == 0:
+                return PushDownResult(
+                    candidate_set=GroupByItemCandidateSet.empty_instance(),
+                    issue_set=MetricFlowQueryResolutionIssueSet.merge_iterable(issue_sets_to_merge),
+                )
+
             return PushDownResult(
                 candidate_set=GroupByItemCandidateSet(
-                    specs=tuple(matched_specs),
-                    measure_paths=(
-                        merged_result_from_parents.candidate_set.measure_paths if len(matched_specs) > 0 else ()
-                    ),
+                    linkable_element_set=matched_items,
+                    measure_paths=merged_result_from_parents.candidate_set.measure_paths,
                     path_from_leaf_node=current_traversal_path,
                 ),
                 issue_set=MetricFlowQueryResolutionIssueSet.merge_iterable(issue_sets_to_merge),
@@ -395,11 +393,10 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
                 },
                 current_traversal_path=current_traversal_path,
             )
-
-            logger.info(f"Handling {node.ui_description}")
-            logger.debug(
-                "candidates from parents:\n" + indent(mf_pformat(merged_result_from_parents.candidate_set.specs))
-            )
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(
+                    "Candidates from parents:\n" + indent(mf_pformat(merged_result_from_parents.candidate_set.specs))
+                )
 
             return merged_result_from_parents
 
@@ -410,14 +407,11 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
             logger.info(f"Handling {node.ui_description}")
             # This is a case for distinct dimension values from semantic models.
             candidate_elements = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_no_metrics_query()
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f"Candidate elements are:\n{mf_pformat(candidate_elements)}")
+            candidates_after_filtering = candidate_elements.filter_by_spec_patterns(self._source_spec_patterns)
 
-            matching_specs: Sequence[LinkableInstanceSpec] = tuple(
-                sorted(candidate_elements.as_spec_set.as_tuple, key=lambda x: x.qualified_name)
-            )
-            for pattern_to_apply in self._source_spec_patterns:
-                matching_specs = InstanceSpecSet.from_specs(pattern_to_apply.match(matching_specs)).linkable_specs
-
-            if len(matching_specs) == 0:
+            if candidates_after_filtering.spec_count == 0:
                 return PushDownResult(
                     candidate_set=GroupByItemCandidateSet.empty_instance(),
                     issue_set=MetricFlowQueryResolutionIssueSet.from_issue(
@@ -430,7 +424,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
 
             return PushDownResult(
                 candidate_set=GroupByItemCandidateSet(
-                    specs=tuple(matching_specs),
+                    linkable_element_set=candidates_after_filtering,
                     measure_paths=(current_traversal_path,),
                     path_from_leaf_node=current_traversal_path,
                 ),

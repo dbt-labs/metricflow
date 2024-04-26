@@ -24,6 +24,7 @@ from metricflow_semantics.query.issues.issues_base import MetricFlowQueryResolut
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 
 if TYPE_CHECKING:
+    from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
     from metricflow_semantics.specs.spec_classes import LinkableInstanceSpec
 
 logger = logging.getLogger(__name__)
@@ -170,12 +171,29 @@ class FilterSpecResolution:
 
     lookup_key: ResolvedSpecLookUpKey
     where_filter_intersection: WhereFilterIntersection
-    resolved_spec: Optional[LinkableInstanceSpec]
+    resolved_linkable_element_set: Optional[LinkableElementSet]
     spec_pattern: SpecPattern
     issue_set: MetricFlowQueryResolutionIssueSet
     # Used for error messages.
     filter_location_path: MetricFlowQueryResolutionPath
     object_builder_str: str
+
+    def __post_init__(self) -> None:  # noqa: D105
+        if self.resolved_linkable_element_set is not None:
+            assert len(self.resolved_linkable_element_set.specs) <= 1
+
+    @property
+    def resolved_spec(self) -> Optional[LinkableInstanceSpec]:  # noqa: D102
+        if self.resolved_linkable_element_set is None:
+            return None
+
+        specs = self.resolved_linkable_element_set.specs
+        if len(specs) == 0:
+            return None
+        elif len(specs) == 1:
+            return specs[0]
+        else:
+            raise RuntimeError(f"Found {len(specs)} in {self.resolved_linkable_element_set}")
 
 
 CallParameterSet = Union[

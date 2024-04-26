@@ -362,7 +362,7 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
                         call_parameter_set=group_by_item_in_where_filter.call_parameter_set,
                     ),
                     filter_location_path=resolution_path,
-                    resolved_spec=group_by_item_resolution.spec,
+                    resolved_linkable_element_set=group_by_item_resolution.linkable_element_set,
                     where_filter_intersection=where_filter_intersection,
                     spec_pattern=group_by_item_in_where_filter.spec_pattern,
                     issue_set=group_by_item_resolution.issue_set.with_path_prefix(path_prefix),

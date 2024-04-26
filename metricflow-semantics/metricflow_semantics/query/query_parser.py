@@ -58,9 +58,9 @@ from metricflow_semantics.specs.patterns.none_date_part import NoneDatePartPatte
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.spec_classes import (
     InstanceSpec,
-    InstanceSpecSet,
     TimeDimensionSpec,
 )
+from metricflow_semantics.specs.spec_set import group_specs_by_type
 from metricflow_semantics.time.time_granularity import (
     adjust_to_end_of_period,
     adjust_to_start_of_period,
@@ -160,7 +160,7 @@ class MetricFlowQueryParser:
         ):
             matching_specs = pattern_to_apply.match(matching_specs)
         # The conversion below is awkward and needs some more thought.
-        time_dimension_specs = InstanceSpecSet.from_specs(matching_specs).time_dimension_specs
+        time_dimension_specs = group_specs_by_type(matching_specs).time_dimension_specs
         if len(time_dimension_specs) == 0:
             return None
 
