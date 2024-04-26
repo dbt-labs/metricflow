@@ -470,7 +470,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 time_constraint_end=mf_query_request.time_constraint_end,
                 order_by_names=mf_query_request.order_by_names,
                 order_by_parameters=mf_query_request.order_by,
-            )
+            ).query_spec
         else:
             query_spec = self._query_parser.parse_and_validate_query(
                 metric_names=mf_query_request.metric_names,
