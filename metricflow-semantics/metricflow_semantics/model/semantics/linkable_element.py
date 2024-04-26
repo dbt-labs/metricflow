@@ -20,6 +20,13 @@ from typing_extensions import override
 
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
+from metricflow_semantics.specs.spec_classes import (
+    DimensionSpec,
+    EntitySpec,
+    GroupByMetricSpec,
+    LinkableInstanceSpec,
+    TimeDimensionSpec,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -72,6 +79,35 @@ class ElementPathKey:
             pass
         else:
             assert_values_exhausted(element_type)
+
+    @property
+    def spec(self) -> LinkableInstanceSpec:
+        """The corresponding spec object for this path key."""
+        if self.element_type is LinkableElementType.DIMENSION:
+            return DimensionSpec(
+                element_name=self.element_name,
+                entity_links=self.entity_links,
+            )
+        elif self.element_type is LinkableElementType.TIME_DIMENSION:
+            assert self.time_granularity is not None
+            return TimeDimensionSpec(
+                element_name=self.element_name,
+                entity_links=self.entity_links,
+                time_granularity=self.time_granularity,
+                date_part=self.date_part,
+            )
+        elif self.element_type is LinkableElementType.ENTITY:
+            return EntitySpec(
+                element_name=self.element_name,
+                entity_links=self.entity_links,
+            )
+        elif self.element_type is LinkableElementType.METRIC:
+            return GroupByMetricSpec(
+                element_name=self.element_name,
+                entity_links=self.entity_links,
+            )
+        else:
+            assert_values_exhausted(self.element_type)
 
 
 @dataclass(frozen=True)
