@@ -8,13 +8,10 @@ from dbt_semantic_interfaces.references import EntityReference, MetricReference
 from typing_extensions import override
 
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
-from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.spec_classes import (
-    EntitySpec,
     InstanceSpecSet,
     InstanceSpecVisitor,
     LinkableInstanceSpec,
-    MetricSpec,
 )
 from metricflow_semantics.visitor import VisitorOutputT
 
@@ -59,11 +56,3 @@ class GroupByMetricSpec(LinkableInstanceSpec, SerializableDataclass):
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_group_by_metric_spec(self)
-
-    @property
-    def query_spec_for_source_node(self) -> MetricFlowQuerySpec:
-        """Query spec that can be used to build a source node for this spec in the DFP."""
-        return MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name=self.element_name),),
-            entity_specs=tuple(EntitySpec.from_name(entity_link.element_name) for entity_link in self.entity_links),
-        )

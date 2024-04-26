@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import typing
 from dataclasses import dataclass
 from typing import Optional, Tuple
 
@@ -11,6 +10,7 @@ from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
     FilterSpecResolutionLookUp,
 )
+from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 from metricflow_semantics.specs.spec_classes import (
     DimensionSpec,
     EntitySpec,
@@ -19,9 +19,6 @@ from metricflow_semantics.specs.spec_classes import (
     OrderBySpec,
     TimeDimensionSpec,
 )
-
-if typing.TYPE_CHECKING:
-    from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 
 
 @dataclass(frozen=True)

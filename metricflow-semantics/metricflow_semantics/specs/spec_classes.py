@@ -38,6 +38,7 @@ from typing_extensions import override
 from metricflow_semantics.aggregation_properties import AggregationState
 from metricflow_semantics.collection_helpers.merger import Mergeable
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
+from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
 from metricflow_semantics.sql.sql_column_type import SqlColumnType
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
@@ -46,7 +47,6 @@ from metricflow_semantics.visitor import VisitorOutputT
 if TYPE_CHECKING:
     from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
     from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
-    from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 
 
 def hash_items(items: Sequence[SqlColumnType]) -> str:
