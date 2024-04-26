@@ -16,7 +16,8 @@ from metricflow_semantics.dag.mf_dag import MetricFlowDag
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
-from metricflow_semantics.specs.spec_classes import InstanceSpecSet, LinkableSpecSet
+from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
+from metricflow_semantics.specs.spec_set import InstanceSpecSet
 
 logger = logging.getLogger(__name__)
 

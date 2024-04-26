@@ -27,11 +27,10 @@ from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.specs.spec_classes import (
-    InstanceSpecSet,
     LinkableInstanceSpec,
-    LinkableSpecSet,
     LinklessEntitySpec,
 )
+from metricflow_semantics.specs.spec_set import group_specs_by_type
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
@@ -120,7 +119,7 @@ class JoinLinkableInstancesRecipe:
             ]
         )
         filtered_node_to_join = FilterElementsNode(
-            parent_node=self.node_to_join, include_specs=InstanceSpecSet.from_specs(include_specs)
+            parent_node=self.node_to_join, include_specs=group_specs_by_type(include_specs)
         )
 
         return JoinDescription(
@@ -201,7 +200,7 @@ class NodeEvaluatorForLinkableInstances:
         for right_node in self._nodes_available_for_joins:
             # If right node is time spine source node, use cross join.
             if right_node == self._time_spine_node:
-                needed_metric_time_specs = LinkableSpecSet.from_specs(needed_linkable_specs).metric_time_specs
+                needed_metric_time_specs = group_specs_by_type(needed_linkable_specs).metric_time_specs
                 candidates_for_join.append(
                     JoinLinkableInstancesRecipe(
                         node_to_join=right_node,

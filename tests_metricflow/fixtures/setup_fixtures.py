@@ -24,9 +24,6 @@ from tests_metricflow.table_snapshot.table_snapshots import SqlTableSnapshotHash
 logger = logging.getLogger(__name__)
 
 
-# from metricflow.test.time.configurable_time_source import ConfigurableTimeSource
-
-
 DISPLAY_GRAPHS_CLI_FLAG = "--display-graphs"
 USE_PERSISTENT_SOURCE_SCHEMA_CLI_FLAG = "--use-persistent-source-schema"
 

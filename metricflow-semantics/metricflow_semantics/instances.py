@@ -11,17 +11,17 @@ from dbt_semantic_interfaces.references import MetricModelReference, SemanticMod
 
 from metricflow_semantics.aggregation_properties import AggregationState
 from metricflow_semantics.specs.column_assoc import ColumnAssociation
-from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 from metricflow_semantics.specs.spec_classes import (
     DimensionSpec,
     EntitySpec,
+    GroupByMetricSpec,
     InstanceSpec,
-    InstanceSpecSet,
     MeasureSpec,
     MetadataSpec,
     MetricSpec,
     TimeDimensionSpec,
 )
+from metricflow_semantics.specs.spec_set import InstanceSpecSet
 
 # Type for the specification used in the instance.
 SpecT = TypeVar("SpecT", bound=InstanceSpec)

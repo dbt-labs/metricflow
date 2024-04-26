@@ -17,9 +17,8 @@ from metricflow_semantics.specs.patterns.entity_link_pattern import (
 )
 from metricflow_semantics.specs.spec_classes import (
     InstanceSpec,
-    InstanceSpecSet,
-    InstanceSpecSetTransform,
 )
+from metricflow_semantics.specs.spec_set import InstanceSpecSet, InstanceSpecSetTransform, group_spec_by_type
 
 
 class DunderNamingScheme(QueryItemNamingScheme):
@@ -37,7 +36,7 @@ class DunderNamingScheme(QueryItemNamingScheme):
 
     @override
     def input_str(self, instance_spec: InstanceSpec) -> Optional[str]:
-        spec_set = InstanceSpecSet.from_specs((instance_spec,))
+        spec_set = group_spec_by_type(instance_spec)
 
         for time_dimension_spec in spec_set.time_dimension_specs:
             # From existing comment in StructuredLinkableSpecName:

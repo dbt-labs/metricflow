@@ -30,7 +30,8 @@ from dbt_semantic_interfaces.validations.validator_helpers import (
 )
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
-from metricflow_semantics.specs.spec_classes import InstanceSpecSet, LinkableInstanceSpec, MeasureSpec
+from metricflow_semantics.specs.spec_classes import LinkableInstanceSpec, MeasureSpec
+from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver

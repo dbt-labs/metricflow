@@ -34,16 +34,15 @@ from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec
     FilterSpecResolutionLookUp,
 )
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
-from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
+from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.spec_classes import (
     ConstantPropertySpec,
     CumulativeMeasureDescription,
     EntitySpec,
-    InstanceSpecSet,
+    GroupByMetricSpec,
     JoinToTimeSpineDescription,
     LinkableInstanceSpec,
-    LinkableSpecSet,
     LinklessEntitySpec,
     MeasureSpec,
     MetadataSpec,
@@ -54,6 +53,7 @@ from metricflow_semantics.specs.spec_classes import (
     TimeDimensionSpec,
     WhereFilterSpec,
 )
+from metricflow_semantics.specs.spec_set import InstanceSpecSet, group_specs_by_type
 from metricflow_semantics.specs.where_filter_transform import WhereSpecFactory
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 
@@ -309,7 +309,7 @@ class DataflowPlanBuilder:
             )
         filtered_unaggregated_base_node = FilterElementsNode(
             parent_node=unaggregated_base_measure_node,
-            include_specs=InstanceSpecSet.from_specs(required_local_specs)
+            include_specs=group_specs_by_type(required_local_specs)
             .merge(base_required_linkable_specs.as_spec_set)
             .dedupe(),
         )
@@ -1217,9 +1217,11 @@ class DataflowPlanBuilder:
         """
         linkable_spec_sets_to_merge: List[LinkableSpecSet] = []
         for filter_spec in filter_specs:
-            linkable_spec_sets_to_merge.append(filter_spec.linkable_spec_set)
+            linkable_spec_sets_to_merge.append(LinkableSpecSet.create_from_specs(filter_spec.linkable_specs))
         if non_additive_dimension_spec:
-            linkable_spec_sets_to_merge.append(non_additive_dimension_spec.linkable_specs)
+            linkable_spec_sets_to_merge.append(
+                LinkableSpecSet.create_from_specs(non_additive_dimension_spec.linkable_specs)
+            )
 
         extraneous_linkable_specs = LinkableSpecSet.merge_iterable(linkable_spec_sets_to_merge).dedupe()
         required_linkable_specs = queried_linkable_specs.merge(extraneous_linkable_specs).dedupe()
@@ -1352,7 +1354,7 @@ class DataflowPlanBuilder:
         filtered_measure_source_node = FilterElementsNode(
             parent_node=join_to_time_spine_node or time_range_node or measure_recipe.source_node,
             include_specs=InstanceSpecSet(measure_specs=(measure_spec,)).merge(
-                InstanceSpecSet.from_specs(measure_recipe.required_local_linkable_specs),
+                group_specs_by_type(measure_recipe.required_local_linkable_specs),
             ),
         )
 

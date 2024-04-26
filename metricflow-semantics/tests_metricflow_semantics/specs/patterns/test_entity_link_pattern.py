@@ -9,7 +9,6 @@ from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
-from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 from metricflow_semantics.specs.patterns.entity_link_pattern import (
     EntityLinkPattern,
     EntityLinkPatternParameterSet,
@@ -18,6 +17,7 @@ from metricflow_semantics.specs.patterns.entity_link_pattern import (
 from metricflow_semantics.specs.spec_classes import (
     DimensionSpec,
     EntitySpec,
+    GroupByMetricSpec,
     LinkableInstanceSpec,
     TimeDimensionSpec,
 )

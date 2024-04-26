@@ -29,19 +29,19 @@ from metricflow_semantics.instances import (
 from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
-from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 from metricflow_semantics.specs.spec_classes import (
     DimensionSpec,
     EntityReference,
     EntitySpec,
+    GroupByMetricSpec,
     InstanceSpec,
-    InstanceSpecSet,
     LinkableInstanceSpec,
     LinklessEntitySpec,
     MeasureSpec,
     MetricInputMeasureSpec,
     TimeDimensionSpec,
 )
+from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from more_itertools import bucket
 
 from metricflow.dataflow.nodes.join_to_base import ValidityWindowJoinDescription

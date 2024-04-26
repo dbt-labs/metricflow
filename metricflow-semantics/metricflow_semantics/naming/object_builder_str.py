@@ -14,7 +14,8 @@ from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from typing_extensions import override
 
-from metricflow_semantics.specs.spec_classes import InstanceSpec, InstanceSpecSet, InstanceSpecSetTransform
+from metricflow_semantics.specs.spec_classes import InstanceSpec
+from metricflow_semantics.specs.spec_set import InstanceSpecSet, InstanceSpecSetTransform, group_spec_by_type
 
 
 class ObjectBuilderNameConverter:
@@ -139,9 +140,7 @@ class ObjectBuilderNameConverter:
 
     @staticmethod
     def input_str_from_spec(instance_spec: InstanceSpec) -> str:  # noqa: D102
-        names = ObjectBuilderNameConverter._ObjectBuilderNameTransform().transform(
-            InstanceSpecSet.from_specs((instance_spec,))
-        )
+        names = ObjectBuilderNameConverter._ObjectBuilderNameTransform().transform(group_spec_by_type(instance_spec))
 
         if len(names) != 1:
             raise RuntimeError(f"Did not get exactly 1 name from {instance_spec}. Got {names}")

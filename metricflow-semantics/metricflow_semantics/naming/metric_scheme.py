@@ -9,8 +9,8 @@ from metricflow_semantics.naming.naming_scheme import QueryItemNamingScheme
 from metricflow_semantics.specs.patterns.metric_pattern import MetricSpecPattern
 from metricflow_semantics.specs.spec_classes import (
     InstanceSpec,
-    InstanceSpecSet,
 )
+from metricflow_semantics.specs.spec_set import group_spec_by_type
 
 
 class MetricNamingScheme(QueryItemNamingScheme):
@@ -18,7 +18,7 @@ class MetricNamingScheme(QueryItemNamingScheme):
 
     @override
     def input_str(self, instance_spec: InstanceSpec) -> Optional[str]:
-        spec_set = InstanceSpecSet.from_specs((instance_spec,))
+        spec_set = group_spec_by_type(instance_spec)
         names = tuple(spec.element_name for spec in spec_set.metric_specs)
 
         if len(names) != 1:

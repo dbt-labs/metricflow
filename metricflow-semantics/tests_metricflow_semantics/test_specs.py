@@ -4,19 +4,19 @@ from typing import Sequence
 
 import pytest
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 from metricflow_semantics.specs.spec_classes import (
     DimensionSpec,
     EntityReference,
     EntitySpec,
+    GroupByMetricSpec,
     InstanceSpec,
-    InstanceSpecSet,
     LinkableInstanceSpec,
     LinklessEntitySpec,
     MeasureSpec,
     MetricSpec,
     TimeDimensionSpec,
 )
+from metricflow_semantics.specs.spec_set import InstanceSpecSet
 
 
 @pytest.fixture
