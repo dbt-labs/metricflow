@@ -249,11 +249,17 @@ class GroupByMetricSpec(LinkableInstanceSpec, SerializableDataclass):
         entity_links: Sequence of entities joined to join the metric subquery to the outer query. Last entity is the one
             joining the subquery to the outer query.
         metric_subquery_entity_links: Sequence of entities used in the metric subquery to join the metric to the entity.
-            Does not include the top-level entity (to avoid duplicating the last element of `entity_links`).
-
     """
 
     metric_subquery_entity_links: Tuple[EntityReference, ...]
+
+    def __post_init__(self) -> None:
+        """The inner query and outer query entity paths must end with the same entity (that's what they join on).
+
+        If no entity links, it's because we're already in the final joined node (no links left).
+        """
+        if self.entity_links:
+            assert self.metric_subquery_entity_links[-1] == self.entity_links[-1]
 
     @property
     def without_first_entity_link(self) -> GroupByMetricSpec:  # noqa: D102
@@ -277,21 +283,15 @@ class GroupByMetricSpec(LinkableInstanceSpec, SerializableDataclass):
         assert len(self.entity_links) > 0, f"Spec does not have any entity links: {self}"
         return self.entity_links[-1]
 
-    @staticmethod
-    def from_name(name: str) -> GroupByMetricSpec:  # noqa: D102
-        structured_name = StructuredLinkableSpecName.from_name(name)
-        return GroupByMetricSpec(
-            entity_links=tuple(EntityReference(idl) for idl in structured_name.entity_link_names),
-            element_name=structured_name.element_name,
-            metric_subquery_entity_links=(),
-        )
-
     @property
     def metric_subquery_entity_spec(self) -> EntitySpec:
         """Spec for the entity that the metric will be grouped by it the metric subquery."""
+        assert (
+            len(self.metric_subquery_entity_links) > 0
+        ), "GroupByMetricSpec must have at least one metric_subquery_entity_link."
         return EntitySpec(
-            element_name=self.last_entity_link.element_name,
-            entity_links=self.metric_subquery_entity_links,
+            element_name=self.metric_subquery_entity_links[-1].element_name,
+            entity_links=self.metric_subquery_entity_links[:-1],
         )
 
     def __eq__(self, other: Any) -> bool:  # type: ignore[misc] # noqa: D105

@@ -32,11 +32,12 @@
                             <!-- description = "Pass Only Elements: ['listings', 'listing__bookings']" -->
                             <!-- node_id = NodeId(id_str='pfe_3') -->
                             <!-- include_spec = MeasureSpec(element_name='listings') -->
-                            <!-- include_spec =                                               -->
-                            <!--   GroupByMetricSpec(                                         -->
-                            <!--     element_name='bookings',                                 -->
-                            <!--     entity_links=(EntityReference(element_name='listing'),), -->
-                            <!--   )                                                          -->
+                            <!-- include_spec =                                                               -->
+                            <!--   GroupByMetricSpec(                                                         -->
+                            <!--     element_name='bookings',                                                 -->
+                            <!--     entity_links=(EntityReference(element_name='listing'),),                 -->
+                            <!--     metric_subquery_entity_links=(EntityReference(element_name='listing'),), -->
+                            <!--   )                                                                          -->
                             <!-- distinct = False -->
                             <JoinToBaseOutputNode>
                                 <!-- description = 'Join Standard Outputs' -->
@@ -65,10 +66,14 @@
                                     </MetricTimeDimensionTransformNode>
                                 </FilterElementsNode>
                                 <FilterElementsNode>
-                                    <!-- description = "Pass Only Elements: ['listing', 'bookings']" -->
+                                    <!-- description = "Pass Only Elements: ['listing', 'listing__bookings']" -->
                                     <!-- node_id = NodeId(id_str='pfe_2') -->
                                     <!-- include_spec = LinklessEntitySpec(element_name='listing') -->
-                                    <!-- include_spec = GroupByMetricSpec(element_name='bookings') -->
+                                    <!-- include_spec =                                                               -->
+                                    <!--   GroupByMetricSpec(                                                         -->
+                                    <!--     element_name='bookings',                                                 -->
+                                    <!--     metric_subquery_entity_links=(EntityReference(element_name='listing'),), -->
+                                    <!--   )                                                                          -->
                                     <!-- distinct = False -->
                                     <ComputeMetricsNode>
                                         <!-- description = 'Compute Metrics via Expressions' -->

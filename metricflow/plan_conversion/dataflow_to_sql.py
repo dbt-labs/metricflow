@@ -736,8 +736,8 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 defined_from=metric_instance.defined_from,
                 spec=GroupByMetricSpec(
                     element_name=metric_spec.element_name,
-                    entity_links=(),  # check this
-                    metric_subquery_entity_links=entity_instance.spec.entity_links,
+                    entity_links=(),
+                    metric_subquery_entity_links=entity_instance.spec.entity_links + (entity_instance.spec.reference,),
                 ),
             )
             transform_func = AddGroupByMetric(group_by_metric_instance)
