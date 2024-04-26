@@ -11,11 +11,36 @@ from dbt_semantic_interfaces.references import EntityReference, MetricModelRefer
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.conversion_calculation_type import ConversionCalculationType
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
+from metricflow_semantics.aggregation_properties import AggregationState
+from metricflow_semantics.dag.id_prefix import StaticIdPrefix
+from metricflow_semantics.dag.mf_dag import DagId
+from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
+from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
+from metricflow_semantics.instances import (
+    GroupByMetricInstance,
+    InstanceSet,
+    MetadataInstance,
+    MetricInstance,
+    TimeDimensionInstance,
+)
+from metricflow_semantics.mf_logging.formatting import indent
+from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.specs.column_assoc import (
+    ColumnAssociation,
+    ColumnAssociationResolver,
+    SingleColumnCorrelationKey,
+)
+from metricflow_semantics.specs.spec_classes import (
+    GroupByMetricSpec,
+    InstanceSpecSet,
+    MeasureSpec,
+    MetadataSpec,
+    MetricSpec,
+    TimeDimensionSpec,
+)
+from metricflow_semantics.sql.sql_join_type import SqlJoinType
+from metricflow_semantics.time.time_constants import ISO8601_PYTHON_FORMAT
 
-from metricflow.aggregation_properties import AggregationState
-from metricflow.dag.id_prefix import StaticIdPrefix
-from metricflow.dag.mf_dag import DagId
-from metricflow.dag.sequential_id import SequentialIdGenerator
 from metricflow.dataflow.dataflow_plan import (
     BaseOutput,
     DataflowPlanNode,
@@ -39,18 +64,8 @@ from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
 from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
 from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataframeNode
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
-from metricflow.dataset.dataset import DataSet
+from metricflow.dataset.dataset_classes import DataSet
 from metricflow.dataset.sql_dataset import SqlDataSet
-from metricflow.filters.time_constraint import TimeRangeConstraint
-from metricflow.instances import (
-    GroupByMetricInstance,
-    InstanceSet,
-    MetadataInstance,
-    MetricInstance,
-    TimeDimensionInstance,
-)
-from metricflow.mf_logging.formatting import indent
-from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow.plan_conversion.convert_to_sql_plan import ConvertToSqlPlanResult
 from metricflow.plan_conversion.instance_converters import (
     AddGroupByMetrics,
@@ -87,15 +102,6 @@ from metricflow.plan_conversion.sql_join_builder import (
 )
 from metricflow.plan_conversion.time_spine import TIME_SPINE_DATA_SET_DESCRIPTION, TimeSpineSource
 from metricflow.protocols.sql_client import SqlEngine
-from metricflow.specs.column_assoc import ColumnAssociation, ColumnAssociationResolver, SingleColumnCorrelationKey
-from metricflow.specs.specs import (
-    GroupByMetricSpec,
-    InstanceSpecSet,
-    MeasureSpec,
-    MetadataSpec,
-    MetricSpec,
-    TimeDimensionSpec,
-)
 from metricflow.sql.optimizer.optimization_levels import (
     SqlQueryOptimizationLevel,
     SqlQueryOptimizerConfiguration,
@@ -125,7 +131,6 @@ from metricflow.sql.sql_exprs import (
 from metricflow.sql.sql_plan import (
     SqlCreateTableAsNode,
     SqlJoinDescription,
-    SqlJoinType,
     SqlOrderByDescription,
     SqlQueryPlan,
     SqlQueryPlanNode,
@@ -133,7 +138,6 @@ from metricflow.sql.sql_plan import (
     SqlSelectStatementNode,
     SqlTableFromClauseNode,
 )
-from metricflow.time.time_constants import ISO8601_PYTHON_FORMAT
 
 logger = logging.getLogger(__name__)
 
@@ -178,7 +182,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         self._semantic_manifest_lookup = semantic_manifest_lookup
         self._metric_lookup = semantic_manifest_lookup.metric_lookup
         self._semantic_model_lookup = semantic_manifest_lookup.semantic_model_lookup
-        self._time_spine_source = semantic_manifest_lookup.time_spine_source
+        self._time_spine_source = TimeSpineSource.create_from_manifest(semantic_manifest_lookup.semantic_manifest)
 
     @property
     def column_association_resolver(self) -> ColumnAssociationResolver:  # noqa: D102

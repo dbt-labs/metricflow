@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime as dt
 
-from metricflow.time.time_source import TimeSource
+from metricflow_semantics.time.time_source import TimeSource
 
 
 class ServerTimeSource(TimeSource):

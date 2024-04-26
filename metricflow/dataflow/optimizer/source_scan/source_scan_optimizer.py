@@ -4,8 +4,9 @@ import logging
 from dataclasses import dataclass
 from typing import List, Optional, Sequence
 
-from metricflow.dag.id_prefix import StaticIdPrefix
-from metricflow.dag.mf_dag import DagId
+from metricflow_semantics.dag.id_prefix import StaticIdPrefix
+from metricflow_semantics.dag.mf_dag import DagId
+
 from metricflow.dataflow.dataflow_plan import (
     BaseOutput,
     DataflowPlan,

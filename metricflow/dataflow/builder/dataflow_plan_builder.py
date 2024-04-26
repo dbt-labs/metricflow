@@ -21,9 +21,41 @@ from dbt_semantic_interfaces.references import (
 )
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
+from metricflow_semantics.dag.id_prefix import StaticIdPrefix
+from metricflow_semantics.dag.mf_dag import DagId
+from metricflow_semantics.errors.error_classes import UnableToSatisfyQueryError
+from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
+from metricflow_semantics.mf_logging.formatting import indent
+from metricflow_semantics.mf_logging.pretty_print import mf_pformat
+from metricflow_semantics.mf_logging.runtime import log_runtime
+from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
+from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
+    FilterSpecResolutionLookUp,
+)
+from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
+from metricflow_semantics.specs.spec_classes import (
+    ConstantPropertySpec,
+    CumulativeMeasureDescription,
+    EntitySpec,
+    InstanceSpecSet,
+    JoinToTimeSpineDescription,
+    LinkableInstanceSpec,
+    LinkableSpecSet,
+    LinklessEntitySpec,
+    MeasureSpec,
+    MetadataSpec,
+    MetricFlowQuerySpec,
+    MetricInputMeasureSpec,
+    MetricSpec,
+    NonAdditiveDimensionSpec,
+    OrderBySpec,
+    TimeDimensionSpec,
+    WhereFilterSpec,
+)
+from metricflow_semantics.specs.where_filter_transform import WhereSpecFactory
+from metricflow_semantics.sql.sql_join_type import SqlJoinType
 
-from metricflow.dag.id_prefix import StaticIdPrefix
-from metricflow.dag.mf_dag import DagId
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.node_evaluator import (
     JoinLinkableInstancesRecipe,
@@ -53,38 +85,8 @@ from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
 from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataframeNode
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOptimizer
-from metricflow.dataset.dataset import DataSet
-from metricflow.errors.errors import UnableToSatisfyQueryError
-from metricflow.filters.time_constraint import TimeRangeConstraint
-from metricflow.mf_logging.formatting import indent
-from metricflow.mf_logging.pretty_print import mf_pformat
-from metricflow.mf_logging.runtime import log_runtime
-from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow.dataset.dataset_classes import DataSet
 from metricflow.plan_conversion.node_processor import PreJoinNodeProcessor
-from metricflow.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
-from metricflow.query.group_by_item.filter_spec_resolution.filter_spec_lookup import FilterSpecResolutionLookUp
-from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.specs.specs import (
-    ConstantPropertySpec,
-    CumulativeMeasureDescription,
-    EntitySpec,
-    InstanceSpecSet,
-    JoinToTimeSpineDescription,
-    LinkableInstanceSpec,
-    LinkableSpecSet,
-    LinklessEntitySpec,
-    MeasureSpec,
-    MetadataSpec,
-    MetricFlowQuerySpec,
-    MetricInputMeasureSpec,
-    MetricSpec,
-    NonAdditiveDimensionSpec,
-    OrderBySpec,
-    TimeDimensionSpec,
-    WhereFilterSpec,
-)
-from metricflow.specs.where_filter_transform import WhereSpecFactory
-from metricflow.sql.sql_plan import SqlJoinType
 from metricflow.sql.sql_table import SqlTable
 
 logger = logging.getLogger(__name__)

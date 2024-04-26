@@ -4,9 +4,9 @@ from typing import Collection
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
+from metricflow_semantics.errors.error_classes import UnsupportedEngineFeatureError
 from typing_extensions import override
 
-from metricflow.errors.errors import UnsupportedEngineFeatureError
 from metricflow.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,
     SqlExpressionRenderer,

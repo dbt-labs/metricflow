@@ -3,16 +3,17 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple
 
-from metricflow.dag.id_prefix import IdPrefix, StaticIdPrefix
-from metricflow.dag.mf_dag import DisplayedProperty, NodeId
+from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
+from metricflow_semantics.dag.mf_dag import DisplayedProperty, NodeId
+from metricflow_semantics.specs.spec_classes import LinklessEntitySpec, TimeDimensionSpec
+from metricflow_semantics.sql.sql_join_type import SqlJoinType
+from metricflow_semantics.visitor import VisitorOutputT
+
 from metricflow.dataflow.builder.partitions import (
     PartitionDimensionJoinDescription,
     PartitionTimeDimensionJoinDescription,
 )
 from metricflow.dataflow.dataflow_plan import BaseOutput, DataflowPlanNode, DataflowPlanNodeVisitor
-from metricflow.specs.specs import LinklessEntitySpec, TimeDimensionSpec
-from metricflow.sql.sql_plan import SqlJoinType
-from metricflow.visitor import VisitorOutputT
 
 
 @dataclass(frozen=True)

@@ -2,16 +2,17 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Dict, Optional, Sequence
 
+from metricflow_semantics.mf_logging.runtime import log_block_runtime
+from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
+
 from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,
 )
 from metricflow.dataset.sql_dataset import SqlDataSet
-from metricflow.mf_logging.runtime import log_block_runtime
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
-from metricflow.specs.column_assoc import ColumnAssociationResolver
 
 if TYPE_CHECKING:
-    from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
+    from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 
 
 class DataflowPlanNodeOutputDataSetResolver(DataflowToSqlQueryPlanConverter):

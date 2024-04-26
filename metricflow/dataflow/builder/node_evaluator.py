@@ -22,6 +22,17 @@ from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
+from metricflow_semantics.instances import InstanceSet
+from metricflow_semantics.mf_logging.pretty_print import mf_pformat
+from metricflow_semantics.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
+from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
+from metricflow_semantics.specs.spec_classes import (
+    InstanceSpecSet,
+    LinkableInstanceSpec,
+    LinkableSpecSet,
+    LinklessEntitySpec,
+)
+from metricflow_semantics.sql.sql_join_type import SqlJoinType
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.partitions import (
@@ -34,15 +45,9 @@ from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataflow.nodes.join_to_base import JoinDescription, ValidityWindowJoinDescription
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
-from metricflow.dataset.dataset import DataSet
+from metricflow.dataset.dataset_classes import DataSet
 from metricflow.dataset.sql_dataset import SqlDataSet
-from metricflow.instances import InstanceSet
-from metricflow.mf_logging.pretty_print import mf_pformat
-from metricflow.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
-from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow.plan_conversion.instance_converters import CreateValidityWindowJoinDescription
-from metricflow.specs.specs import InstanceSpecSet, LinkableInstanceSpec, LinkableSpecSet, LinklessEntitySpec
-from metricflow.sql.sql_plan import SqlJoinType
 
 logger = logging.getLogger(__name__)
 

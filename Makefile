@@ -9,7 +9,9 @@ ADDITIONAL_PYTEST_OPTIONS =
 
 # Pytest that can populate the persistent source schema
 USE_PERSISTENT_SOURCE_SCHEMA = --use-persistent-source-schema
-POPULATE_PERSISTENT_SOURCE_SCHEMA = tests/source_schema_tools.py::populate_source_schema
+TESTS_METRICFLOW = tests_metricflow
+TESTS_METRICFLOW_SEMANTICS = tests_metricflow_semantics
+POPULATE_PERSISTENT_SOURCE_SCHEMA = $(TESTS_METRICFLOW)/source_schema_tools.py::populate_source_schema
 
 # Install Hatch package / project manager
 .PHONY: install-hatch
@@ -19,16 +21,17 @@ install-hatch:
 # Testing and linting
 .PHONY: test
 test:
-	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) tests/
+	cd metricflow-semantics && hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW_SEMANTICS)/
+	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW)/
 
 .PHONY: test-postgresql
 test-postgresql:
-	hatch -v run postgres-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) tests/
+	hatch -v run postgres-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW)/
 
 # Engine-specific test environments.
 .PHONY: test-bigquery
 test-bigquery:
-	hatch -v run bigquery-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) tests/
+	hatch -v run bigquery-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW)/
 
 .PHONY: populate-persistent-source-schema-bigquery
 populate-persistent-source-schema-bigquery:
@@ -36,7 +39,7 @@ populate-persistent-source-schema-bigquery:
 
 .PHONY: test-databricks
 test-databricks:
-	hatch -v run databricks-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) tests/
+	hatch -v run databricks-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW)/
 
 .PHONY: populate-persistent-source-schema-databricks
 populate-persistent-source-schema-databricks:
@@ -44,7 +47,7 @@ populate-persistent-source-schema-databricks:
 
 .PHONY: test-redshift
 test-redshift:
-	hatch -v run redshift-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) tests/
+	hatch -v run redshift-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW)/
 
 .PHONY: populate-persistent-source-schema-redshift
 populate-persistent-source-schema-redshift:
@@ -53,7 +56,7 @@ populate-persistent-source-schema-redshift:
 
 .PHONY: test-snowflake
 test-snowflake:
-	hatch -v run snowflake-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) tests/
+	hatch -v run snowflake-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW)/
 
 .PHONY: populate-persistent-source-schema-snowflake
 populate-persistent-source-schema-snowflake:
@@ -61,7 +64,7 @@ populate-persistent-source-schema-snowflake:
 
 .PHONY: test-trino
 test-trino:
-	hatch -v run trino-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) tests/
+	hatch -v run trino-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW)/
 
 .PHONY: lint
 lint:
@@ -79,12 +82,12 @@ trino:
 # Re-generate test snapshots using all supported SQL engines.
 .PHONY: regenerate-test-snapshots
 regenerate-test-snapshots:
-	hatch -v run dev-env:python tests/generate_snapshots.py
+	hatch -v run dev-env:python tests_metricflow/generate_snapshots.py
 
 # Populate persistent source schemas for all relevant SQL engines.
 .PHONY: populate-persistent-source-schemas
 populate-persistent-source-schemas:
-	hatch -v run dev-env:python tests/populate_persistent_source_schemas.py
+	hatch -v run dev-env:python $(TESTS_METRICFLOW)/populate_persistent_source_schemas.py
 
 # Re-generate snapshots for the default SQL engine.
 .PHONY: test-snap

@@ -12,8 +12,28 @@ from dbt_semantic_interfaces.implementations.elements.dimension import PydanticD
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
 from dbt_semantic_interfaces.references import EntityReference, MeasureReference, MetricReference
 from dbt_semantic_interfaces.type_enums import DimensionType
+from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
+from metricflow_semantics.errors.error_classes import ExecutionException
+from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
+from metricflow_semantics.mf_logging.formatting import indent
+from metricflow_semantics.mf_logging.pretty_print import mf_pformat
+from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.model.semantics.linkable_element import (
+    LinkableDimension,
+    LinkableElementProperty,
+)
+from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
+from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
+from metricflow_semantics.protocols.query_parameter import GroupByParameter, MetricQueryParameter, OrderByQueryParameter
+from metricflow_semantics.query.query_exceptions import InvalidQueryException
+from metricflow_semantics.query.query_parser import MetricFlowQueryParser
+from metricflow_semantics.random_id import random_id
+from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
+from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
+from metricflow_semantics.specs.query_param_implementations import SavedQueryParameter
+from metricflow_semantics.specs.spec_classes import InstanceSpecSet, MetricFlowQuerySpec
+from metricflow_semantics.time.time_source import TimeSource
 
-from metricflow.dag.sequential_id import SequentialIdGenerator
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
@@ -22,42 +42,23 @@ from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import (
     SourceScanOptimizer,
 )
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
-from metricflow.dataset.dataset import DataSet
+from metricflow.dataset.dataset_classes import DataSet
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.engine.models import Dimension, Entity, Measure, Metric, SavedQuery
 from metricflow.engine.time_source import ServerTimeSource
-from metricflow.errors.errors import ExecutionException
-from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
-from metricflow.execution.executor import SequentialPlanExecutor
-from metricflow.filters.time_constraint import TimeRangeConstraint
-from metricflow.mf_logging.formatting import indent
-from metricflow.mf_logging.pretty_print import mf_pformat
-from metricflow.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow.model.semantics.linkable_element import (
-    LinkableDimension,
-    LinkableElementProperty,
-)
-from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
-from metricflow.naming.linkable_spec_name import StructuredLinkableSpecName
-from metricflow.plan_conversion.column_resolver import DunderColumnAssociationResolver
-from metricflow.plan_conversion.convert_to_execution_plan import ConvertToExecutionPlanResult
-from metricflow.plan_conversion.dataflow_to_execution import (
+from metricflow.execution.convert_to_execution_plan import ConvertToExecutionPlanResult
+from metricflow.execution.dataflow_to_execution import (
     DataflowToExecutionPlanConverter,
 )
+from metricflow.execution.execution_plan import ExecutionPlan, SqlQuery
+from metricflow.execution.executor import SequentialPlanExecutor
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
-from metricflow.protocols.query_parameter import GroupByParameter, MetricQueryParameter, OrderByQueryParameter
+from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
-from metricflow.query.query_exceptions import InvalidQueryException
-from metricflow.query.query_parser import MetricFlowQueryParser
-from metricflow.random_id import random_id
-from metricflow.specs.column_assoc import ColumnAssociationResolver
-from metricflow.specs.query_param_implementations import SavedQueryParameter
-from metricflow.specs.specs import InstanceSpecSet, MetricFlowQuerySpec
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
 from metricflow.sql.sql_table import SqlTable
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
-from metricflow.time.time_source import TimeSource
 
 logger = logging.getLogger(__name__)
 _telemetry_reporter = TelemetryReporter(report_levels_higher_or_equal_to=TelemetryLevel.USAGE)
@@ -365,7 +366,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             DunderColumnAssociationResolver(semantic_manifest_lookup)
         )
         self._time_source = time_source
-        self._time_spine_source = semantic_manifest_lookup.time_spine_source
+        self._time_spine_source = TimeSpineSource.create_from_manifest(semantic_manifest_lookup.semantic_manifest)
         self._source_data_sets: List[SemanticModelDataSet] = []
         converter = SemanticModelToDataSetConverter(column_association_resolver=self._column_association_resolver)
         for semantic_model in sorted(

@@ -21,7 +21,7 @@ jobs:
         with:
           python-version: "${{ env.PYTHON_VERSION }}"
 
-      - name: Hatch Publish
+      - name: Hatch Publish `metricflow`
         run: hatch build && hatch publish
         env:
           HATCH_INDEX_USER: __token__

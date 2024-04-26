@@ -4,14 +4,15 @@ from collections import OrderedDict
 from dataclasses import dataclass
 from typing import List, Sequence, Tuple
 
-from metricflow.dataset.dataset import DataSet
-from metricflow.model.semantics.semantic_model_lookup import SemanticModelLookup
-from metricflow.specs.specs import (
+from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
+from metricflow_semantics.specs.spec_classes import (
     DimensionSpec,
     InstanceSpecSet,
     PartitionSpecSet,
     TimeDimensionSpec,
 )
+
+from metricflow.dataset.dataset_classes import DataSet
 
 
 @dataclass(frozen=True)

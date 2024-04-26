@@ -2,12 +2,13 @@ from __future__ import annotations
 
 from typing import Optional, Sequence, Tuple
 
-from metricflow.dag.id_prefix import IdPrefix, StaticIdPrefix
-from metricflow.dag.mf_dag import DisplayedProperty
+from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
+from metricflow_semantics.dag.mf_dag import DisplayedProperty
+from metricflow_semantics.mf_logging.pretty_print import mf_pformat
+from metricflow_semantics.specs.spec_classes import InstanceSpecSet
+from metricflow_semantics.visitor import VisitorOutputT
+
 from metricflow.dataflow.dataflow_plan import BaseOutput, DataflowPlanNode, DataflowPlanNodeVisitor
-from metricflow.mf_logging.pretty_print import mf_pformat
-from metricflow.specs.specs import InstanceSpecSet
-from metricflow.visitor import VisitorOutputT
 
 
 class FilterElementsNode(BaseOutput):

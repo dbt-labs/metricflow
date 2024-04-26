@@ -2,14 +2,15 @@ from __future__ import annotations
 
 from typing import Sequence, Union
 
-from metricflow.dag.id_prefix import IdPrefix, StaticIdPrefix
+from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
+from metricflow_semantics.visitor import VisitorOutputT
+
 from metricflow.dataflow.dataflow_plan import (
     BaseOutput,
     ComputedMetricsOutput,
     DataflowPlanNode,
     DataflowPlanNodeVisitor,
 )
-from metricflow.visitor import VisitorOutputT
 
 
 class CombineAggregatedOutputsNode(ComputedMetricsOutput):

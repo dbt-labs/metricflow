@@ -5,16 +5,16 @@ from __future__ import annotations
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from enum import Enum
 from typing import Generic, List, Optional, Sequence, Tuple
 
+from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
+from metricflow_semantics.dag.mf_dag import DagId, DagNode, DisplayedProperty, MetricFlowDag, NodeId
+from metricflow_semantics.sql.sql_join_type import SqlJoinType
+from metricflow_semantics.visitor import VisitorOutputT
 from typing_extensions import override
 
-from metricflow.dag.id_prefix import IdPrefix, StaticIdPrefix
-from metricflow.dag.mf_dag import DagId, DagNode, DisplayedProperty, MetricFlowDag, NodeId
 from metricflow.sql.sql_exprs import SqlExpressionNode
 from metricflow.sql.sql_table import SqlTable
-from metricflow.visitor import VisitorOutputT
 
 logger = logging.getLogger(__name__)
 
@@ -89,21 +89,6 @@ class SqlSelectColumn:
     expr: SqlExpressionNode
     # Always require a column alias for simplicity.
     column_alias: str
-
-
-class SqlJoinType(Enum):
-    """Enumerates the different kinds of SQL joins.
-
-    The value is the SQL string to be used when rendering the join.
-    """
-
-    LEFT_OUTER = "LEFT OUTER JOIN"
-    FULL_OUTER = "FULL OUTER JOIN"
-    INNER = "INNER JOIN"
-    CROSS_JOIN = "CROSS JOIN"
-
-    def __repr__(self) -> str:  # noqa: D105
-        return f"{self.__class__.__name__}.{self.name}"
 
 
 @dataclass(frozen=True)

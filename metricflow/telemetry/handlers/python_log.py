@@ -3,7 +3,8 @@ from __future__ import annotations
 import logging
 import textwrap
 
-from metricflow.mf_logging.pretty_print import mf_pformat
+from metricflow_semantics.mf_logging.pretty_print import mf_pformat
+
 from metricflow.telemetry.handlers.handlers import PayloadType, TelemetryHandler
 
 logger = logging.getLogger(__name__)

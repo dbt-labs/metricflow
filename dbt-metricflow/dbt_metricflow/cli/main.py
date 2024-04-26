@@ -18,6 +18,7 @@ from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 from dbt_semantic_interfaces.validations.validator_helpers import SemanticManifestValidationResults
 from halo import Halo
+from metricflow_semantics.dag.dag_visualization import display_dag_as_svg
 from update_checker import UpdateChecker
 
 import dbt_metricflow.cli.custom_click_types as click_custom
@@ -35,11 +36,10 @@ from dbt_metricflow.cli.utils import (
     query_options,
     start_end_time_options,
 )
-from metricflow.dag.dag_visualization import display_dag_as_svg
 from metricflow.engine.metricflow_engine import MetricFlowExplainResult, MetricFlowQueryRequest, MetricFlowQueryResult
-from metricflow.model.data_warehouse_model_validator import DataWarehouseModelValidator
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
+from metricflow.validation.data_warehouse_model_validator import DataWarehouseModelValidator
 
 logger = logging.getLogger(__name__)
 

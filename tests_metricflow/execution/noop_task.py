@@ -1,0 +1,53 @@
+from __future__ import annotations
+
+import logging
+import time
+from typing import Optional, Sequence
+
+from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
+
+from metricflow.execution.execution_plan import (
+    ExecutionPlanTask,
+    SqlQuery,
+    TaskExecutionError,
+    TaskExecutionResult,
+)
+
+logger = logging.getLogger(__name__)
+
+
+class NoOpExecutionPlanTask(ExecutionPlanTask):
+    """A no-op task for testing executors."""
+
+    # Error to return if should_error is set.
+    EXAMPLE_ERROR = TaskExecutionError("Expected Error")
+
+    def __init__(self, parent_tasks: Sequence[ExecutionPlanTask] = (), should_error: bool = False) -> None:
+        """Constructor.
+
+        Args:
+            parent_tasks: Self-explanatory.
+            should_error: if true, return an error in the results.
+        """
+        self._should_error = should_error
+        super().__init__(task_id=self.create_unique_id(), parent_nodes=list(parent_tasks))
+
+    @property
+    def description(self) -> str:  # noqa: D102
+        return "Dummy No-Op"
+
+    @classmethod
+    def id_prefix(cls) -> IdPrefix:  # noqa: D102
+        return StaticIdPrefix.EXEC_NODE_NOOP
+
+    def execute(self) -> TaskExecutionResult:  # noqa: D102
+        start_time = time.time()
+        time.sleep(0.01)
+        end_time = time.time()
+        return TaskExecutionResult(
+            start_time=start_time, end_time=end_time, errors=(self.EXAMPLE_ERROR,) if self._should_error else ()
+        )
+
+    @property
+    def sql_query(self) -> Optional[SqlQuery]:  # noqa: D102
+        return None
