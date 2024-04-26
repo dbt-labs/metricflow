@@ -1,17 +1,27 @@
 from __future__ import annotations
 
+import logging
+from abc import ABC
 from dataclasses import dataclass
 from enum import Enum
-from typing import FrozenSet, Optional, Tuple
+from typing import FrozenSet, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols.dimension import DimensionType
-from dbt_semantic_interfaces.references import DimensionReference, MetricReference, SemanticModelReference
+from dbt_semantic_interfaces.references import (
+    DimensionReference,
+    EntityReference,
+    MetricReference,
+    SemanticModelReference,
+)
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from typing_extensions import override
 
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
-from metricflow_semantics.specs.spec_classes import EntityReference
+from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
+
+logger = logging.getLogger(__name__)
 
 
 class LinkableElementType(Enum):
@@ -72,8 +82,14 @@ class SemanticModelJoinPathElement:
     join_on_entity: EntityReference
 
 
+class LinkableElement(SemanticModelDerivation, ABC):
+    """An entity / dimension that may have been joined by entities."""
+
+    pass
+
+
 @dataclass(frozen=True)
-class LinkableDimension:
+class LinkableDimension(LinkableElement):
     """Describes how a dimension can be realized by joining based on entity links."""
 
     # The semantic model where this dimension was defined.
@@ -105,9 +121,20 @@ class LinkableDimension:
     def reference(self) -> DimensionReference:  # noqa: D102
         return DimensionReference(element_name=self.element_name)
 
+    @property
+    @override
+    def derived_from_semantic_models(self) -> Sequence[SemanticModelReference]:
+        semantic_model_references = set()
+        if self.semantic_model_origin:
+            semantic_model_references.add(self.semantic_model_origin)
+        for join_path_item in self.join_path:
+            semantic_model_references.add(join_path_item.semantic_model_reference)
+
+        return sorted(semantic_model_references, key=lambda reference: reference.semantic_model_name)
+
 
 @dataclass(frozen=True)
-class LinkableEntity:
+class LinkableEntity(LinkableElement, SemanticModelDerivation):
     """Describes how an entity can be realized by joining based on entity links."""
 
     # The semantic model where this entity was defined.
@@ -127,9 +154,18 @@ class LinkableEntity:
     def reference(self) -> EntityReference:  # noqa: D102
         return EntityReference(element_name=self.element_name)
 
+    @property
+    @override
+    def derived_from_semantic_models(self) -> Sequence[SemanticModelReference]:
+        semantic_model_references = {self.semantic_model_origin}
+        for join_path_item in self.join_path:
+            semantic_model_references.add(join_path_item.semantic_model_reference)
+
+        return sorted(semantic_model_references, key=lambda reference: reference.semantic_model_name)
+
 
 @dataclass(frozen=True)
-class LinkableMetric:
+class LinkableMetric(LinkableElement, SemanticModelDerivation):
     """Describes how a metric can be realized by joining based on entity links."""
 
     element_name: str
@@ -148,6 +184,15 @@ class LinkableMetric:
     @property
     def reference(self) -> MetricReference:  # noqa: D102
         return MetricReference(element_name=self.element_name)
+
+    @property
+    @override
+    def derived_from_semantic_models(self) -> Sequence[SemanticModelReference]:
+        semantic_model_references = {self.join_by_semantic_model}
+        for join_path_item in self.join_path:
+            semantic_model_references.add(join_path_item.semantic_model_reference)
+
+        return sorted(semantic_model_references, key=lambda reference: reference.semantic_model_name)
 
 
 @dataclass(frozen=True)
