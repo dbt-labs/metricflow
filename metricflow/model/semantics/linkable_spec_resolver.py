@@ -139,7 +139,8 @@ class LinkableMetric:
     @property
     def metric_subquery_entity_links(self) -> Tuple[EntityReference, ...]:
         """Entity links used to join the metric to the entity it's grouped by in the metric subquery."""
-        return self.join_path.metric_subquery_join_path_element.entity_links
+        metric_subquery = self.join_path.metric_subquery_join_path_element
+        return metric_subquery.entity_links + (metric_subquery.join_on_entity,)
 
 
 @dataclass(frozen=True)
@@ -408,12 +409,8 @@ class MetricSubqueryJoinPathElement:
 
     metric_reference: MetricReference
     join_on_entity: EntityReference
+    entity_links: Tuple[EntityReference, ...]
     metric_to_entity_join_path: Optional[SemanticModelJoinPath] = None
-
-    @property
-    def entity_links(self) -> Tuple[EntityReference, ...]:  # noqa: D102
-        join_links = self.metric_to_entity_join_path.entity_links if self.metric_to_entity_join_path else ()
-        return join_links + (self.join_on_entity,)
 
 
 @dataclass(frozen=True)
@@ -630,7 +627,10 @@ class ValidLinkableSpecResolver:
                     metric_subquery_join_path_element = MetricSubqueryJoinPathElement(
                         metric_reference=metric_reference,
                         join_on_entity=linkable_entity.reference,
-                        metric_to_entity_join_path=SemanticModelJoinPath(linkable_entity.join_path),
+                        entity_links=linkable_entity.entity_links,
+                        metric_to_entity_join_path=(
+                            SemanticModelJoinPath(linkable_entity.join_path) if linkable_entity.join_path else None
+                        ),
                     )
                     self._joinable_metrics_for_entities[linkable_entity.reference].add(
                         metric_subquery_join_path_element
