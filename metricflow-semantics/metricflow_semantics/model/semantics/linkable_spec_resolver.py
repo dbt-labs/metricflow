@@ -189,7 +189,10 @@ class ValidLinkableSpecResolver:
                     metric_subquery_join_path_element = MetricSubqueryJoinPathElement(
                         metric_reference=metric_reference,
                         join_on_entity=linkable_entity.reference,
-                        metric_to_entity_join_path=SemanticModelJoinPath(linkable_entity.join_path),
+                        entity_links=linkable_entity.entity_links,
+                        metric_to_entity_join_path=(
+                            SemanticModelJoinPath(linkable_entity.join_path) if linkable_entity.join_path else None
+                        ),
                     )
                     self._joinable_metrics_for_entities[linkable_entity.reference].add(
                         metric_subquery_join_path_element

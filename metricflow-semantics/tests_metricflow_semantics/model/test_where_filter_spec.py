@@ -537,6 +537,7 @@ def test_metric_in_filter(  # noqa: D103
                                 metric_subquery_join_path_element=MetricSubqueryJoinPathElement(
                                     metric_reference=MetricReference("bookings"),
                                     join_on_entity=EntityReference("listing"),
+                                    entity_links=(EntityReference("listing"),),
                                 )
                             ),
                         ),
