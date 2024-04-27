@@ -20,6 +20,7 @@ from metricflow_semantics.filters.merge_where import merge_to_single_where_filte
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.mf_logging.formatting import indent
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
+from metricflow_semantics.mf_logging.runtime import log_runtime
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.naming.dunder_scheme import DunderNamingScheme
 from metricflow_semantics.naming.metric_scheme import MetricNamingScheme
@@ -340,7 +341,7 @@ class MetricFlowQueryParser:
             min_max_only=min_max_only,
         ).query_spec
 
-    # @log_runtime()
+    @log_runtime()
     def _parse_and_validate_query(
         self,
         metric_names: Optional[Sequence[str]],

@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import itertools
 
+import pytest
 from dbt_semantic_interfaces.protocols.dimension import DimensionType
 from dbt_semantic_interfaces.references import (
     DimensionReference,
@@ -22,12 +23,20 @@ from dbt_semantic_interfaces.references import (
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantics.linkable_element import (
+    ElementPathKey,
     LinkableDimension,
+    LinkableElementType,
     LinkableEntity,
     LinkableMetric,
     SemanticModelJoinPathElement,
 )
 from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
+from metricflow_semantics.specs.patterns.entity_link_pattern import (
+    EntityLinkPattern,
+    EntityLinkPatternParameterSet,
+    ParameterSetField,
+)
+from metricflow_semantics.specs.spec_classes import TimeDimensionSpec
 from more_itertools import bucket
 
 AMBIGUOUS_NAME = "ambiguous"
@@ -475,3 +484,137 @@ def test_only_unique_path_keys() -> None:
         _base_entity.path_key: (_base_entity,)
     }, "Got unexpected value for unique entity sets!"
     assert unique_path_keys.path_key_to_linkable_metrics == dict(), "Found unexpected unique values for metric sets!"
+
+
+@pytest.fixture(scope="session")
+def linkable_set() -> LinkableElementSet:  # noqa: D103
+    entity_0 = EntityReference("entity_0")
+    entity_0_source = SemanticModelReference("entity_0_source")
+    entity_1 = EntityReference("entity_1")
+    entity_1_source = SemanticModelReference("entity_1_source")
+    entity_2 = EntityReference("entity_2")
+    entity_2_source = SemanticModelReference("entity_2_source")
+    entity_3 = EntityReference("entity_3")
+    entity_3_source = SemanticModelReference("entity_3_source")
+
+    return LinkableElementSet(
+        path_key_to_linkable_dimensions={
+            ElementPathKey(
+                element_name="dimension_element",
+                entity_links=(entity_0,),
+                element_type=LinkableElementType.DIMENSION,
+            ): (
+                LinkableDimension(
+                    semantic_model_origin=SemanticModelReference("dimension_source"),
+                    element_name="dimension_element",
+                    dimension_type=DimensionType.CATEGORICAL,
+                    entity_links=(entity_0,),
+                    join_path=(
+                        SemanticModelJoinPathElement(
+                            semantic_model_reference=entity_0_source,
+                            join_on_entity=entity_0,
+                        ),
+                    ),
+                    properties=frozenset(),
+                    time_granularity=None,
+                    date_part=None,
+                ),
+            ),
+            ElementPathKey(
+                element_name="time_dimension_element",
+                entity_links=(entity_1,),
+                element_type=LinkableElementType.TIME_DIMENSION,
+                time_granularity=TimeGranularity.DAY,
+            ): (
+                LinkableDimension(
+                    semantic_model_origin=SemanticModelReference("time_dimension_source"),
+                    element_name="time_dimension_element",
+                    dimension_type=DimensionType.TIME,
+                    entity_links=(entity_1,),
+                    join_path=(
+                        SemanticModelJoinPathElement(
+                            semantic_model_reference=entity_1_source,
+                            join_on_entity=entity_1,
+                        ),
+                    ),
+                    properties=frozenset(),
+                    time_granularity=TimeGranularity.DAY,
+                    date_part=None,
+                ),
+            ),
+        },
+        path_key_to_linkable_entities={
+            ElementPathKey(
+                element_name="entity_element",
+                entity_links=(entity_2,),
+                element_type=LinkableElementType.ENTITY,
+            ): (
+                LinkableEntity(
+                    semantic_model_origin=SemanticModelReference("entity_source"),
+                    element_name="entity_element",
+                    entity_links=(entity_2,),
+                    join_path=(
+                        SemanticModelJoinPathElement(
+                            semantic_model_reference=entity_2_source,
+                            join_on_entity=entity_2,
+                        ),
+                    ),
+                    properties=frozenset(),
+                ),
+            )
+        },
+        path_key_to_linkable_metrics={
+            ElementPathKey(
+                element_name="metric_element",
+                entity_links=(entity_3,),
+                element_type=LinkableElementType.METRIC,
+            ): (
+                LinkableMetric(
+                    join_by_semantic_model=SemanticModelReference("metric_source"),
+                    element_name="metric_element",
+                    entity_links=(entity_3,),
+                    join_path=(
+                        SemanticModelJoinPathElement(
+                            semantic_model_reference=entity_3_source,
+                            join_on_entity=entity_3,
+                        ),
+                    ),
+                    properties=frozenset(),
+                ),
+            )
+        },
+    )
+
+
+def test_derived_semantic_models(linkable_set: LinkableElementSet) -> None:
+    """Tests that the semantic models in the element set are returned via `derived_from_semantic_models`."""
+    assert tuple(linkable_set.derived_from_semantic_models) == (
+        SemanticModelReference(semantic_model_name="dimension_source"),
+        SemanticModelReference(semantic_model_name="entity_0_source"),
+        SemanticModelReference(semantic_model_name="entity_1_source"),
+        SemanticModelReference(semantic_model_name="entity_2_source"),
+        SemanticModelReference(semantic_model_name="entity_3_source"),
+        SemanticModelReference(semantic_model_name="entity_source"),
+        SemanticModelReference(semantic_model_name="metric_source"),
+        SemanticModelReference(semantic_model_name="time_dimension_source"),
+    )
+
+
+def test_filter_by_pattern(linkable_set: LinkableElementSet) -> None:
+    """Tests that the specs produced by the set are properly filtered by spec patterns."""
+    spec_pattern = EntityLinkPattern(
+        EntityLinkPatternParameterSet(
+            fields_to_compare=(ParameterSetField.ENTITY_LINKS,),
+            element_name=None,
+            entity_links=(EntityReference("entity_1"),),
+        )
+    )
+
+    assert tuple(linkable_set.filter_by_spec_patterns((spec_pattern,)).specs) == (
+        TimeDimensionSpec(
+            element_name="time_dimension_element",
+            entity_links=(EntityReference("entity_1"),),
+            time_granularity=TimeGranularity.DAY,
+            date_part=None,
+        ),
+    )

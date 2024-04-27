@@ -89,7 +89,9 @@ class ElementPathKey:
                 entity_links=self.entity_links,
             )
         elif self.element_type is LinkableElementType.TIME_DIMENSION:
-            assert self.time_granularity is not None
+            assert (
+                self.time_granularity is not None
+            ), f"{self.time_granularity=} should not be None as per check in dataclass validation"
             return TimeDimensionSpec(
                 element_name=self.element_name,
                 entity_links=self.entity_links,
@@ -170,7 +172,7 @@ class LinkableDimension(LinkableElement):
 
 
 @dataclass(frozen=True)
-class LinkableEntity(LinkableElement, SemanticModelDerivation):
+class LinkableEntity(LinkableElement):
     """Describes how an entity can be realized by joining based on entity links."""
 
     # The semantic model where this entity was defined.
@@ -201,7 +203,7 @@ class LinkableEntity(LinkableElement, SemanticModelDerivation):
 
 
 @dataclass(frozen=True)
-class LinkableMetric(LinkableElement, SemanticModelDerivation):
+class LinkableMetric(LinkableElement):
     """Describes how a metric can be realized by joining based on entity links."""
 
     element_name: str
