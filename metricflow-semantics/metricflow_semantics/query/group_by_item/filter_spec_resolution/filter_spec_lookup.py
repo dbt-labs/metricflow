@@ -171,29 +171,40 @@ class FilterSpecResolution:
 
     lookup_key: ResolvedSpecLookUpKey
     where_filter_intersection: WhereFilterIntersection
-    resolved_linkable_element_set: Optional[LinkableElementSet]
+    resolved_linkable_element_set: LinkableElementSet
     spec_pattern: SpecPattern
     issue_set: MetricFlowQueryResolutionIssueSet
     # Used for error messages.
     filter_location_path: MetricFlowQueryResolutionPath
     object_builder_str: str
 
-    def __post_init__(self) -> None:  # noqa: D105
-        if self.resolved_linkable_element_set is not None:
-            assert len(self.resolved_linkable_element_set.specs) <= 1
+    def __post_init__(self) -> None:
+        """Validation to ensure there is exactly one resolved spec for a FilterSpecResolution.
+
+        Due to the way the FilterSpecResolution is structured, the final output should contain a single spec.
+        """
+        num_specs = len(self.resolved_linkable_element_set.specs)
+        assert num_specs <= 1, (
+            f"Found {num_specs} in {self.resolved_linkable_element_set}, but a valid FilterSpecResolution should "
+            "contain either 0 or 1 resolved specs."
+        )
 
     @property
-    def resolved_spec(self) -> Optional[LinkableInstanceSpec]:  # noqa: D102
-        if self.resolved_linkable_element_set is None:
-            return None
+    def resolved_spec(self) -> Optional[LinkableInstanceSpec]:
+        """Returns the lone resolved spec, if one was found.
 
+        The final ValueError should not be reachable due to the post-init validation, but is in place in case someone
+        updates or removes the latter without accounting for the possibility of runtime divergence.
+        """
         specs = self.resolved_linkable_element_set.specs
         if len(specs) == 0:
             return None
         elif len(specs) == 1:
             return specs[0]
         else:
-            raise RuntimeError(f"Found {len(specs)} in {self.resolved_linkable_element_set}")
+            raise ValueError(
+                f"Found {len(specs)} in {self.resolved_linkable_element_set}, this should not be possible!"
+            )
 
 
 CallParameterSet = Union[
