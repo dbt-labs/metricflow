@@ -2,17 +2,20 @@ from __future__ import annotations
 
 import datetime
 import logging
+import string
 
 import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
+from dbt_semantic_interfaces.references import MeasureReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataset.dataset import DataSet
 from metricflow.errors.errors import UnableToSatisfyQueryError
 from metricflow.filters.time_constraint import TimeRangeConstraint
+from metricflow.model.semantics.linkable_element_properties import LinkableElementProperty
 from metricflow.query.query_parser import MetricFlowQueryParser
 from metricflow.specs.column_assoc import ColumnAssociationResolver
 from metricflow.specs.specs import (
@@ -1319,3 +1322,25 @@ def test_metric_in_metric_where_filter(
         mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
+
+
+def test_all_available_single_join_metric_filters(
+    dataflow_plan_builder: DataflowPlanBuilder, query_parser: MetricFlowQueryParser
+) -> None:
+    """Checks that all allowed metric filters do not error when used in dataflow plan (single-hop for both inner and out query)."""
+    for group_by_metric in dataflow_plan_builder._metric_lookup.linkable_elements_for_measure(
+        MeasureReference("listings"), without_any_of={LinkableElementProperty.MULTI_HOP}
+    ).as_spec_set.group_by_metric_specs:
+        entity_spec = group_by_metric.metric_subquery_entity_spec
+        if entity_spec.entity_links:
+            # TODO: Will handle in a different test.
+            continue
+        query_spec = query_parser.parse_and_validate_query(
+            metric_names=("listings",),
+            where_constraint=PydanticWhereFilter(
+                where_sql_template=string.Template("{{ Metric('$metric_name', ['$entity_name']) }} > 2").substitute(
+                    metric_name=group_by_metric.element_name, entity_name=entity_spec.element_name
+                ),
+            ),
+        )
+        dataflow_plan_builder.build_plan(query_spec)
