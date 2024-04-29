@@ -38,6 +38,7 @@ from typing_extensions import override
 from metricflow_semantics.aggregation_properties import AggregationState
 from metricflow_semantics.collection_helpers.dedupe import ordered_dedupe
 from metricflow_semantics.collection_helpers.merger import Mergeable
+from metricflow_semantics.model.semantics.linkable_element import ElementPathKey, LinkableElementType
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
 from metricflow_semantics.sql.sql_column_type import SqlColumnType
@@ -153,11 +154,13 @@ class LinkableInstanceSpec(InstanceSpec, ABC):
     entity_links: Tuple[EntityReference, ...]
 
     @property
+    @abstractmethod
     def without_first_entity_link(self: SelfTypeT) -> SelfTypeT:
         """e.g. user_id__device_id__platform -> device_id__platform."""
         raise NotImplementedError()
 
     @property
+    @abstractmethod
     def without_entity_links(self: SelfTypeT) -> SelfTypeT:
         """e.g. user_id__device_id__platform -> platform."""
         raise NotImplementedError()
@@ -179,8 +182,15 @@ class LinkableInstanceSpec(InstanceSpec, ABC):
 
     @property
     @abstractmethod
-    def reference(self) -> LinkableElementReference:  # noqa: D102
-        pass
+    def reference(self) -> LinkableElementReference:
+        """Return the LinkableElementReference associated with the spec instance."""
+        raise NotImplementedError()
+
+    @property
+    @abstractmethod
+    def element_path_key(self) -> ElementPathKey:
+        """Return the ElementPathKey representation of the LinkableInstanceSpec subtype."""
+        raise NotImplementedError()
 
 
 @dataclass(frozen=True)
@@ -224,6 +234,13 @@ class EntitySpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D101
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_entity_spec(self)
+
+    @property
+    @override
+    def element_path_key(self) -> ElementPathKey:
+        return ElementPathKey(
+            element_name=self.element_name, element_type=LinkableElementType.ENTITY, entity_links=self.entity_links
+        )
 
 
 @dataclass(frozen=True)
@@ -284,6 +301,13 @@ class DimensionSpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D101
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_dimension_spec(self)
+
+    @property
+    @override
+    def element_path_key(self) -> ElementPathKey:
+        return ElementPathKey(
+            element_name=self.element_name, element_type=LinkableElementType.DIMENSION, entity_links=self.entity_links
+        )
 
 
 class TimeDimensionSpecField(Enum):
@@ -397,6 +421,17 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
             time_granularity=self.time_granularity,
             date_part=self.date_part,
         ).qualified_name
+
+    @property
+    @override
+    def element_path_key(self) -> ElementPathKey:
+        return ElementPathKey(
+            element_name=self.element_name,
+            element_type=LinkableElementType.TIME_DIMENSION,
+            entity_links=self.entity_links,
+            time_granularity=self.time_granularity,
+            date_part=self.date_part,
+        )
 
     @staticmethod
     def from_reference(reference: TimeDimensionReference) -> TimeDimensionSpec:
@@ -786,3 +821,10 @@ class GroupByMetricSpec(LinkableInstanceSpec, SerializableDataclass):
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_group_by_metric_spec(self)
+
+    @property
+    @override
+    def element_path_key(self) -> ElementPathKey:
+        return ElementPathKey(
+            element_name=self.element_name, element_type=LinkableElementType.METRIC, entity_links=self.entity_links
+        )

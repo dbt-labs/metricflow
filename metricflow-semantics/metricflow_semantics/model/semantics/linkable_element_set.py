@@ -13,6 +13,7 @@ from metricflow_semantics.model.semantic_model_derivation import SemanticModelDe
 from metricflow_semantics.model.semantics.linkable_element import (
     ElementPathKey,
     LinkableDimension,
+    LinkableElement,
     LinkableElementType,
     LinkableEntity,
     LinkableMetric,
@@ -199,6 +200,20 @@ class LinkableElementSet(SemanticModelDerivation):
                 for path_key, metrics in join_path_to_linkable_metrics.items()
             },
         )
+
+    def linkable_elements_for_path_key(self, path_key: ElementPathKey) -> Sequence[LinkableElement]:
+        """Returns the linkable elements associated with the given path key in this set.
+
+        If the path key does not exist in the set, this silently returns an empty Sequence.
+        """
+        if path_key in self.path_key_to_linkable_dimensions:
+            return self.path_key_to_linkable_dimensions[path_key]
+        elif path_key in self.path_key_to_linkable_entities:
+            return self.path_key_to_linkable_entities[path_key]
+        elif path_key in self.path_key_to_linkable_metrics:
+            return self.path_key_to_linkable_metrics[path_key]
+        else:
+            return tuple()
 
     def filter(
         self,
