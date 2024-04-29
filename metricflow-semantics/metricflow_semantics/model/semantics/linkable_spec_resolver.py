@@ -22,10 +22,10 @@ from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowRese
 
 from metricflow_semantics.errors.error_classes import UnknownMetricLinkingError
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
+from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantics.linkable_element import (
     ElementPathKey,
     LinkableDimension,
-    LinkableElementProperty,
     LinkableElementType,
     LinkableEntity,
     LinkableMetric,

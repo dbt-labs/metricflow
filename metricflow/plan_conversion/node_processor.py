@@ -9,7 +9,8 @@ from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
-from metricflow_semantics.specs.spec_classes import InstanceSpecSet, LinkableInstanceSpec, LinklessEntitySpec
+from metricflow_semantics.specs.spec_classes import LinkableInstanceSpec, LinklessEntitySpec
+from metricflow_semantics.specs.spec_set import group_specs_by_type
 from metricflow_semantics.specs.spec_set_transforms import ToElementNameSet
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 
@@ -223,7 +224,7 @@ class PreJoinNodeProcessor:
                 specs = data_set_of_second_node_that_can_be_joined.instance_set.spec_set
                 filtered_joinable_node = FilterElementsNode(
                     parent_node=second_node_that_could_be_joined,
-                    include_specs=InstanceSpecSet.from_specs(
+                    include_specs=group_specs_by_type(
                         specs.dimension_specs + specs.entity_specs + specs.time_dimension_specs
                     ),
                 )

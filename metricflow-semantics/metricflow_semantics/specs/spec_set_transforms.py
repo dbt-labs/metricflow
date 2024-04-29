@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Set
 
-from metricflow_semantics.specs.spec_classes import InstanceSpecSet, InstanceSpecSetTransform
+from metricflow_semantics.specs.spec_set import InstanceSpecSet, InstanceSpecSetTransform
 
 
 class ToElementNameSet(InstanceSpecSetTransform[Set[str]]):

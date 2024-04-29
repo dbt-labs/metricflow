@@ -1,19 +1,25 @@
 from __future__ import annotations
 
 import itertools
+import logging
 from dataclasses import dataclass
-from typing import Iterable, Tuple
+from typing import Sequence, Tuple
 
+from dbt_semantic_interfaces.references import SemanticModelReference
 from typing_extensions import override
 
+from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
+from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
 from metricflow_semantics.query.group_by_item.path_prefixable import PathPrefixable
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
-from metricflow_semantics.specs.spec_classes import InstanceSpecSet, LinkableInstanceSpec, LinkableSpecSet
+from metricflow_semantics.specs.spec_classes import LinkableInstanceSpec
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
-class GroupByItemCandidateSet(PathPrefixable):
+class GroupByItemCandidateSet(PathPrefixable, SemanticModelDerivation):
     """The set of candidate specs that could match a given spec pattern.
 
     This candidate set is refined as it is passed from the root node (representing a measure) to the leaf node
@@ -29,7 +35,7 @@ class GroupByItemCandidateSet(PathPrefixable):
     error messages, you start analyzing from the leaf node.
     """
 
-    specs: Tuple[LinkableInstanceSpec, ...]
+    linkable_element_set: LinkableElementSet
     measure_paths: Tuple[MetricFlowQueryResolutionPath, ...]
     path_from_leaf_node: MetricFlowQueryResolutionPath
 
@@ -39,18 +45,30 @@ class GroupByItemCandidateSet(PathPrefixable):
             len(self.specs) == 0 and len(self.measure_paths) == 0
         )
 
+    @property
+    def specs(self) -> Sequence[LinkableInstanceSpec]:  # noqa: D102
+        return self.linkable_element_set.specs
+
     @staticmethod
     def intersection(
-        path_from_leaf_node: MetricFlowQueryResolutionPath, candidate_sets: Iterable[GroupByItemCandidateSet]
+        path_from_leaf_node: MetricFlowQueryResolutionPath, candidate_sets: Sequence[GroupByItemCandidateSet]
     ) -> GroupByItemCandidateSet:
         """Create a new candidate set that is the intersection of the given candidate sets.
 
         The intersection is defined as the specs common to all candidate sets. path_from_leaf_node is used to indicate
         where the new candidate set was created.
         """
-        specs_as_sets = tuple(set(candidate_set.specs) for candidate_set in candidate_sets)
-        common_specs = set.intersection(*specs_as_sets) if specs_as_sets else set()
-        if len(common_specs) == 0:
+        if len(candidate_sets) == 0:
+            return GroupByItemCandidateSet.empty_instance()
+        elif len(candidate_sets) == 1:
+            return GroupByItemCandidateSet(
+                linkable_element_set=candidate_sets[0].linkable_element_set,
+                measure_paths=candidate_sets[0].measure_paths,
+                path_from_leaf_node=path_from_leaf_node,
+            )
+        linkable_element_set_candidates = tuple(candidate_set.linkable_element_set for candidate_set in candidate_sets)
+        intersection_result = LinkableElementSet.intersection_by_path_key(linkable_element_set_candidates)
+        if intersection_result.spec_count == 0:
             return GroupByItemCandidateSet.empty_instance()
 
         measure_paths = tuple(
@@ -58,7 +76,9 @@ class GroupByItemCandidateSet(PathPrefixable):
         )
 
         return GroupByItemCandidateSet(
-            specs=tuple(common_specs), measure_paths=measure_paths, path_from_leaf_node=path_from_leaf_node
+            linkable_element_set=intersection_result,
+            measure_paths=measure_paths,
+            path_from_leaf_node=path_from_leaf_node,
         )
 
     @property
@@ -72,31 +92,34 @@ class GroupByItemCandidateSet(PathPrefixable):
     @staticmethod
     def empty_instance() -> GroupByItemCandidateSet:  # noqa: D102
         return GroupByItemCandidateSet(
-            specs=(), measure_paths=(), path_from_leaf_node=MetricFlowQueryResolutionPath.empty_instance()
+            linkable_element_set=LinkableElementSet(),
+            measure_paths=(),
+            path_from_leaf_node=MetricFlowQueryResolutionPath.empty_instance(),
         )
-
-    @property
-    def spec_set(self) -> LinkableSpecSet:
-        """Return the candidates as a spec set."""
-        return LinkableSpecSet.from_specs(self.specs)
 
     def filter_candidates_by_pattern(
         self,
         spec_pattern: SpecPattern,
     ) -> GroupByItemCandidateSet:
         """Return a new candidate set that only contains specs that match the given pattern."""
-        matching_specs = tuple(InstanceSpecSet.from_specs(spec_pattern.match(self.specs)).linkable_specs)
-        if len(matching_specs) == 0:
+        filtered_element_set = self.linkable_element_set.filter_by_spec_patterns((spec_pattern,))
+        if filtered_element_set.spec_count == 0:
             return GroupByItemCandidateSet.empty_instance()
-
         return GroupByItemCandidateSet(
-            specs=matching_specs, measure_paths=self.measure_paths, path_from_leaf_node=self.path_from_leaf_node
+            linkable_element_set=filtered_element_set,
+            measure_paths=self.measure_paths,
+            path_from_leaf_node=self.path_from_leaf_node,
         )
 
     @override
     def with_path_prefix(self, path_prefix: MetricFlowQueryResolutionPath) -> GroupByItemCandidateSet:
         return GroupByItemCandidateSet(
-            specs=self.specs,
+            linkable_element_set=self.linkable_element_set,
             measure_paths=tuple(path.with_path_prefix(path_prefix) for path in self.measure_paths),
             path_from_leaf_node=self.path_from_leaf_node.with_path_prefix(path_prefix),
         )
+
+    @property
+    @override
+    def derived_from_semantic_models(self) -> Sequence[SemanticModelReference]:
+        return self.linkable_element_set.derived_from_semantic_models

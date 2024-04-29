@@ -10,13 +10,13 @@ from metricflow_semantics.specs.spec_classes import (
     EntitySpec,
     GroupByMetricSpec,
     InstanceSpec,
-    InstanceSpecSet,
     LinkableInstanceSpec,
     LinklessEntitySpec,
     MeasureSpec,
     MetricSpec,
     TimeDimensionSpec,
 )
+from metricflow_semantics.specs.spec_set import InstanceSpecSet
 
 
 @pytest.fixture

@@ -32,12 +32,12 @@ from metricflow_semantics.specs.column_assoc import (
 )
 from metricflow_semantics.specs.spec_classes import (
     GroupByMetricSpec,
-    InstanceSpecSet,
     MeasureSpec,
     MetadataSpec,
     MetricSpec,
     TimeDimensionSpec,
 )
+from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.time.time_constants import ISO8601_PYTHON_FORMAT
 
@@ -874,7 +874,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
         column_associations_in_where_sql: Sequence[ColumnAssociation] = CreateColumnAssociations(
             column_association_resolver=self._column_association_resolver
-        ).transform(spec_set=node.where.linkable_spec_set.as_spec_set)
+        ).transform(spec_set=InstanceSpecSet.create_from_specs(node.where.linkable_specs))
 
         return SqlDataSet(
             instance_set=output_instance_set,

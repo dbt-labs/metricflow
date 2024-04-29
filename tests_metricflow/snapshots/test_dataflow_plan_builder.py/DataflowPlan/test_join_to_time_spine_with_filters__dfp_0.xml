@@ -5,24 +5,19 @@
         <ComputeMetricsNode>
             <!-- description = 'Compute Metrics via Expressions' -->
             <!-- node_id = NodeId(id_str='cm_0') -->
-            <!-- metric_spec =                                        -->
-            <!--   MetricSpec(                                        -->
-            <!--     element_name='bookings_fill_nulls_with_0',       -->
-            <!--     filter_specs=(                                   -->
-            <!--       WhereFilterSpec(                               -->
-            <!--         where_sql="metric_time__day = '2020-01-01'", -->
-            <!--         bind_parameters=SqlBindParameters(),         -->
-            <!--         linkable_spec_set=LinkableSpecSet(           -->
-            <!--           time_dimension_specs=(                     -->
-            <!--             TimeDimensionSpec(                       -->
-            <!--               element_name='metric_time',            -->
-            <!--               time_granularity=DAY,                  -->
-            <!--             ),                                       -->
-            <!--           ),                                         -->
-            <!--         ),                                           -->
-            <!--       ),                                             -->
-            <!--     ),                                               -->
-            <!--   )                                                  -->
+            <!-- metric_spec =                                                                  -->
+            <!--   MetricSpec(                                                                  -->
+            <!--     element_name='bookings_fill_nulls_with_0',                                 -->
+            <!--     filter_specs=(                                                             -->
+            <!--       WhereFilterSpec(                                                         -->
+            <!--         where_sql="metric_time__day = '2020-01-01'",                           -->
+            <!--         bind_parameters=SqlBindParameters(),                                   -->
+            <!--         linkable_specs=(                                                       -->
+            <!--           TimeDimensionSpec(element_name='metric_time', time_granularity=DAY), -->
+            <!--         ),                                                                     -->
+            <!--       ),                                                                       -->
+            <!--     ),                                                                         -->
+            <!--   )                                                                            -->
             <ConstrainTimeRangeNode>
                 <!-- description = 'Constrain Time Range to [2020-01-03T00:00:00, 2020-01-05T00:00:00]' -->
                 <!-- node_id = NodeId(id_str='ctr_1') -->
@@ -31,19 +26,12 @@
                 <WhereConstraintNode>
                     <!-- description = 'Constrain Output with WHERE' -->
                     <!-- node_id = NodeId(id_str='wcc_1') -->
-                    <!-- where_condition =                                -->
-                    <!--   WhereFilterSpec(                               -->
-                    <!--     where_sql="metric_time__day = '2020-01-01'", -->
-                    <!--     bind_parameters=SqlBindParameters(),         -->
-                    <!--     linkable_spec_set=LinkableSpecSet(           -->
-                    <!--       time_dimension_specs=(                     -->
-                    <!--         TimeDimensionSpec(                       -->
-                    <!--           element_name='metric_time',            -->
-                    <!--           time_granularity=DAY,                  -->
-                    <!--         ),                                       -->
-                    <!--       ),                                         -->
-                    <!--     ),                                           -->
-                    <!--   )                                              -->
+                    <!-- where_condition =                                                                          -->
+                    <!--   WhereFilterSpec(                                                                         -->
+                    <!--     where_sql="metric_time__day = '2020-01-01'",                                           -->
+                    <!--     bind_parameters=SqlBindParameters(),                                                   -->
+                    <!--     linkable_specs=(TimeDimensionSpec(element_name='metric_time', time_granularity=DAY),), -->
+                    <!--   )                                                                                        -->
                     <JoinToTimeSpineNode>
                         <!-- description = 'Join to Time Spine Dataset' -->
                         <!-- node_id = NodeId(id_str='jts_0') -->
@@ -68,12 +56,10 @@
                                 <!--   WhereFilterSpec(                               -->
                                 <!--     where_sql="metric_time__day = '2020-01-01'", -->
                                 <!--     bind_parameters=SqlBindParameters(),         -->
-                                <!--     linkable_spec_set=LinkableSpecSet(           -->
-                                <!--       time_dimension_specs=(                     -->
-                                <!--         TimeDimensionSpec(                       -->
-                                <!--           element_name='metric_time',            -->
-                                <!--           time_granularity=DAY,                  -->
-                                <!--         ),                                       -->
+                                <!--     linkable_specs=(                             -->
+                                <!--       TimeDimensionSpec(                         -->
+                                <!--         element_name='metric_time',              -->
+                                <!--         time_granularity=DAY,                    -->
                                 <!--       ),                                         -->
                                 <!--     ),                                           -->
                                 <!--   )                                              -->

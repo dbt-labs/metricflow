@@ -17,7 +17,8 @@ from metricflow_semantics.specs.patterns.entity_link_pattern import (
     EntityLinkPatternParameterSet,
     ParameterSetField,
 )
-from metricflow_semantics.specs.spec_classes import InstanceSpec, InstanceSpecSet, LinkableInstanceSpec
+from metricflow_semantics.specs.spec_classes import InstanceSpec, LinkableInstanceSpec
+from metricflow_semantics.specs.spec_set import group_specs_by_type
 
 
 @dataclass(frozen=True)
@@ -29,7 +30,7 @@ class DimensionPattern(EntityLinkPattern):
 
     @override
     def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[LinkableInstanceSpec]:
-        spec_set = InstanceSpecSet.from_specs(candidate_specs)
+        spec_set = group_specs_by_type(candidate_specs)
         filtered_specs: Sequence[LinkableInstanceSpec] = spec_set.dimension_specs + spec_set.time_dimension_specs
         return super().match(filtered_specs)
 
@@ -58,7 +59,7 @@ class TimeDimensionPattern(EntityLinkPattern):
 
     @override
     def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[LinkableInstanceSpec]:
-        spec_set = InstanceSpecSet.from_specs(candidate_specs)
+        spec_set = group_specs_by_type(candidate_specs)
         return super().match(spec_set.time_dimension_specs)
 
     @staticmethod
@@ -99,7 +100,7 @@ class EntityPattern(EntityLinkPattern):
 
     @override
     def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[LinkableInstanceSpec]:
-        spec_set = InstanceSpecSet.from_specs(candidate_specs)
+        spec_set = group_specs_by_type(candidate_specs)
         return super().match(spec_set.entity_specs)
 
     @staticmethod
@@ -122,7 +123,7 @@ class GroupByMetricPattern(EntityLinkPattern):
 
     @override
     def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[LinkableInstanceSpec]:
-        spec_set = InstanceSpecSet.from_specs(candidate_specs)
+        spec_set = group_specs_by_type(candidate_specs)
         return super().match(spec_set.group_by_metric_specs)
 
     @staticmethod

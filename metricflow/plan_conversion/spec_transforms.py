@@ -3,10 +3,7 @@ from __future__ import annotations
 from typing import List, Sequence
 
 from metricflow_semantics.specs.column_assoc import ColumnAssociation, ColumnAssociationResolver
-from metricflow_semantics.specs.spec_classes import (
-    InstanceSpecSet,
-    InstanceSpecSetTransform,
-)
+from metricflow_semantics.specs.spec_set import InstanceSpecSet, InstanceSpecSetTransform
 
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
 from metricflow.plan_conversion.sql_expression_builders import make_coalesced_expr

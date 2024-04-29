@@ -10,9 +10,9 @@ from dbt_semantic_interfaces.references import (
     MetricReference,
     SemanticModelReference,
 )
+from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.linkable_element import (
-    LinkableElementProperty,
     SemanticModelJoinPath,
     SemanticModelJoinPathElement,
 )
@@ -20,6 +20,7 @@ from metricflow_semantics.model.semantics.linkable_spec_resolver import (
     ValidLinkableSpecResolver,
 )
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
+from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import (
     assert_linkable_element_set_snapshot_equal,
@@ -193,15 +194,16 @@ def test_linkable_element_set_as_spec_set(
     double up on the .as_spec_set calls here. Yes, this is lazy. No, I don't care to make another helper to
     do snapshot comparisons on LinkableSpecSets.
     """
-    linkable_spec_set = simple_model_spec_resolver.get_linkable_element_set_for_measure(
-        MeasureReference(element_name="listings"),
-        with_any_of=LinkableElementProperty.all_properties(),
-        without_any_of=frozenset({}),
-    ).as_spec_set
-
+    linkable_spec_set = InstanceSpecSet.create_from_specs(
+        simple_model_spec_resolver.get_linkable_element_set_for_measure(
+            MeasureReference(element_name="listings"),
+            with_any_of=LinkableElementProperty.all_properties(),
+            without_any_of=frozenset({}),
+        ).specs
+    )
     assert_spec_set_snapshot_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,
         set_id="set0",
-        spec_set=linkable_spec_set.as_spec_set,
+        spec_set=linkable_spec_set,
     )

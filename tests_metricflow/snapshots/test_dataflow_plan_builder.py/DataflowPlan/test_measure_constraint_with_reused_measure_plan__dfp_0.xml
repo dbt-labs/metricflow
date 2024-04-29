@@ -12,29 +12,23 @@
                 <ComputeMetricsNode>
                     <!-- description = 'Compute Metrics via Expressions' -->
                     <!-- node_id = NodeId(id_str='cm_0') -->
-                    <!-- metric_spec =                                         -->
-                    <!--   MetricSpec(                                         -->
-                    <!--     element_name='booking_value',                     -->
-                    <!--     filter_specs=(                                    -->
-                    <!--       WhereFilterSpec(                                -->
-                    <!--         where_sql='booking__is_instant',              -->
-                    <!--         bind_parameters=SqlBindParameters(),          -->
-                    <!--         linkable_spec_set=LinkableSpecSet(            -->
-                    <!--           dimension_specs=(                           -->
-                    <!--             DimensionSpec(                            -->
-                    <!--               element_name='is_instant',              -->
-                    <!--               entity_links=(                          -->
-                    <!--                 EntityReference(                      -->
-                    <!--                   element_name='booking',             -->
-                    <!--                 ),                                    -->
-                    <!--               ),                                      -->
-                    <!--             ),                                        -->
-                    <!--           ),                                          -->
-                    <!--         ),                                            -->
-                    <!--       ),                                              -->
-                    <!--     ),                                                -->
-                    <!--     alias='booking_value_with_is_instant_constraint', -->
-                    <!--   )                                                   -->
+                    <!-- metric_spec =                                                        -->
+                    <!--   MetricSpec(                                                        -->
+                    <!--     element_name='booking_value',                                    -->
+                    <!--     filter_specs=(                                                   -->
+                    <!--       WhereFilterSpec(                                               -->
+                    <!--         where_sql='booking__is_instant',                             -->
+                    <!--         bind_parameters=SqlBindParameters(),                         -->
+                    <!--         linkable_specs=(                                             -->
+                    <!--           DimensionSpec(                                             -->
+                    <!--             element_name='is_instant',                               -->
+                    <!--             entity_links=(EntityReference(element_name='booking'),), -->
+                    <!--           ),                                                         -->
+                    <!--         ),                                                           -->
+                    <!--       ),                                                             -->
+                    <!--     ),                                                               -->
+                    <!--     alias='booking_value_with_is_instant_constraint',                -->
+                    <!--   )                                                                  -->
                     <AggregateMeasuresNode>
                         <!-- description = 'Aggregate Measures' -->
                         <!-- node_id = NodeId(id_str='am_0') -->
@@ -47,23 +41,17 @@
                             <WhereConstraintNode>
                                 <!-- description = 'Constrain Output with WHERE' -->
                                 <!-- node_id = NodeId(id_str='wcc_0') -->
-                                <!-- where_condition =                        -->
-                                <!--   WhereFilterSpec(                       -->
-                                <!--     where_sql='booking__is_instant',     -->
-                                <!--     bind_parameters=SqlBindParameters(), -->
-                                <!--     linkable_spec_set=LinkableSpecSet(   -->
-                                <!--       dimension_specs=(                  -->
-                                <!--         DimensionSpec(                   -->
-                                <!--           element_name='is_instant',     -->
-                                <!--           entity_links=(                 -->
-                                <!--             EntityReference(             -->
-                                <!--               element_name='booking',    -->
-                                <!--             ),                           -->
-                                <!--           ),                             -->
-                                <!--         ),                               -->
-                                <!--       ),                                 -->
-                                <!--     ),                                   -->
-                                <!--   )                                      -->
+                                <!-- where_condition =                                                -->
+                                <!--   WhereFilterSpec(                                               -->
+                                <!--     where_sql='booking__is_instant',                             -->
+                                <!--     bind_parameters=SqlBindParameters(),                         -->
+                                <!--     linkable_specs=(                                             -->
+                                <!--       DimensionSpec(                                             -->
+                                <!--         element_name='is_instant',                               -->
+                                <!--         entity_links=(EntityReference(element_name='booking'),), -->
+                                <!--       ),                                                         -->
+                                <!--     ),                                                           -->
+                                <!--   )                                                              -->
                                 <FilterElementsNode>
                                     <!-- description =                                                      -->
                                     <!--   ("Pass Only Elements: ['booking_value', 'booking__is_instant', " -->

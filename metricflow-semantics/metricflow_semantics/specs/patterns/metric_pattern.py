@@ -9,9 +9,9 @@ from typing_extensions import override
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow_semantics.specs.spec_classes import (
     InstanceSpec,
-    InstanceSpecSet,
     MetricSpec,
 )
+from metricflow_semantics.specs.spec_set import group_specs_by_type
 
 
 @dataclass(frozen=True)
@@ -22,7 +22,7 @@ class MetricSpecPattern(SpecPattern):
 
     @override
     def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[MetricSpec]:
-        spec_set = InstanceSpecSet.from_specs(candidate_specs)
+        spec_set = group_specs_by_type(candidate_specs)
         return tuple(
             metric_name for metric_name in spec_set.metric_specs if metric_name.reference == self.metric_reference
         )

@@ -10,13 +10,12 @@ from metricflow_semantics.specs.patterns.metric_time_pattern import MetricTimePa
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow_semantics.specs.spec_classes import (
     InstanceSpec,
-    InstanceSpecSet,
     LinkableInstanceSpec,
-    LinkableSpecSet,
     TimeDimensionSpec,
     TimeDimensionSpecComparisonKey,
     TimeDimensionSpecField,
 )
+from metricflow_semantics.specs.spec_set import group_specs_by_type
 
 
 class BaseTimeGrainPattern(SpecPattern):
@@ -66,7 +65,7 @@ class BaseTimeGrainPattern(SpecPattern):
 
             return other_specs + tuple(BaseTimeGrainPattern(only_apply_for_metric_time=False).match(metric_time_specs))
 
-        spec_set = LinkableSpecSet.from_specs(InstanceSpecSet.from_specs(candidate_specs).linkable_specs)
+        spec_set = group_specs_by_type(candidate_specs)
 
         spec_key_to_grains: Dict[TimeDimensionSpecComparisonKey, Set[TimeGranularity]] = defaultdict(set)
         spec_key_to_specs: Dict[TimeDimensionSpecComparisonKey, List[TimeDimensionSpec]] = defaultdict(list)

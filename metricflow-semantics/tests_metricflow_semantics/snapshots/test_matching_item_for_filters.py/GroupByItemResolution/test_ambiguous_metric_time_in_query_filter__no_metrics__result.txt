@@ -1,1 +1,19 @@
-GroupByItemResolution(spec=TimeDimensionSpec(element_name='metric_time', time_granularity=DAY))
+GroupByItemResolution(
+  spec=TimeDimensionSpec(element_name='metric_time', time_granularity=DAY),
+  linkable_element_set=LinkableElementSet(
+    path_key_to_linkable_dimensions={
+      ElementPathKey(
+        element_name='metric_time',
+        element_type=TIME_DIMENSION,
+        time_granularity=DAY,
+      ): (
+        LinkableDimension(
+          element_name='metric_time',
+          dimension_type=TIME,
+          properties=frozenset({<LinkableElementProperty.METRIC_TIME: 'metric_time'>}),
+          time_granularity=DAY,
+        ),
+      ),
+    },
+  ),
+)

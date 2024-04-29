@@ -13,13 +13,11 @@ from metricflow_semantics.dag.mf_dag import DagId
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
+from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.spec_classes import (
     DimensionSpec,
-    InstanceSpecSet,
-    LinkableSpecSet,
     LinklessEntitySpec,
     MeasureSpec,
-    MetricFlowQuerySpec,
     MetricInputMeasureSpec,
     MetricSpec,
     NonAdditiveDimensionSpec,
@@ -27,6 +25,7 @@ from metricflow_semantics.specs.spec_classes import (
     TimeDimensionSpec,
     WhereFilterSpec,
 )
+from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
@@ -192,14 +191,12 @@ def test_filter_with_where_constraint_node(
         where_constraint=WhereFilterSpec(
             where_sql="booking__ds__day = '2020-01-01'",
             bind_parameters=SqlBindParameters(),
-            linkable_spec_set=LinkableSpecSet(
-                time_dimension_specs=(
-                    TimeDimensionSpec(
-                        element_name="ds",
-                        entity_links=(EntityReference(element_name="booking"),),
-                        time_granularity=TimeGranularity.DAY,
-                    ),
-                )
+            linkable_specs=(
+                TimeDimensionSpec(
+                    element_name="ds",
+                    entity_links=(EntityReference(element_name="booking"),),
+                    time_granularity=TimeGranularity.DAY,
+                ),
             ),
         ),
     )

@@ -1,4 +1,5 @@
 GroupByItemResolution(
+  linkable_element_set=LinkableElementSet(),
   issue_set=MetricFlowQueryResolutionIssueSet(
     issues=(
       NoCommonItemsInParents(
@@ -8,11 +9,24 @@ GroupByItemResolution(
         ),
         parent_candidate_sets=(
           GroupByItemCandidateSet(
-            specs=(
-              TimeDimensionSpec(
-                element_name='metric_time',
-                time_granularity=MONTH,
-              ),
+            linkable_element_set=LinkableElementSet(
+              path_key_to_linkable_dimensions={
+                ElementPathKey(
+                  element_name='metric_time',
+                  element_type=TIME_DIMENSION,
+                  time_granularity=MONTH,
+                ): (
+                  LinkableDimension(
+                    semantic_model_origin=SemanticModelReference(
+                      semantic_model_name='monthly_measures_source',
+                    ),
+                    element_name='metric_time',
+                    dimension_type=TIME,
+                    properties=frozenset({<LinkableElementProperty.METRIC_TIME: 'metric_time'>}),
+                    time_granularity=MONTH,
+                  ),
+                ),
+              },
             ),
             measure_paths=(
               MetricFlowQueryResolutionPath(
@@ -31,11 +45,24 @@ GroupByItemResolution(
             ),
           ),
           GroupByItemCandidateSet(
-            specs=(
-              TimeDimensionSpec(
-                element_name='metric_time',
-                time_granularity=YEAR,
-              ),
+            linkable_element_set=LinkableElementSet(
+              path_key_to_linkable_dimensions={
+                ElementPathKey(
+                  element_name='metric_time',
+                  element_type=TIME_DIMENSION,
+                  time_granularity=YEAR,
+                ): (
+                  LinkableDimension(
+                    semantic_model_origin=SemanticModelReference(
+                      semantic_model_name='yearly_measure_source',
+                    ),
+                    element_name='metric_time',
+                    dimension_type=TIME,
+                    properties=frozenset({<LinkableElementProperty.METRIC_TIME: 'metric_time'>}),
+                    time_granularity=YEAR,
+                  ),
+                ),
+              },
             ),
             measure_paths=(
               MetricFlowQueryResolutionPath(

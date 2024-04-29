@@ -8,7 +8,8 @@ from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.group_by_item.group_by_item_resolver import GroupByItemResolver
 from metricflow_semantics.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
-from metricflow_semantics.specs.spec_classes import LinkableSpecSet
+from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
+from metricflow_semantics.specs.spec_set import group_specs_by_type
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_linkable_spec_set_snapshot_equal
 
@@ -36,5 +37,5 @@ def test_available_group_by_items(  # noqa: D103
         request=request,
         mf_test_configuration=mf_test_configuration,
         set_id="set0",
-        spec_set=LinkableSpecSet.from_specs(result.specs),
+        spec_set=LinkableSpecSet.create_from_spec_set(group_specs_by_type(result.specs)),
     )

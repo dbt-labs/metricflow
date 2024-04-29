@@ -16,12 +16,12 @@ from metricflow_semantics.specs.spec_classes import (
     EntitySpec,
     GroupByMetricSpec,
     InstanceSpec,
-    InstanceSpecSet,
     MeasureSpec,
     MetadataSpec,
     MetricSpec,
     TimeDimensionSpec,
 )
+from metricflow_semantics.specs.spec_set import InstanceSpecSet
 
 # Type for the specification used in the instance.
 SpecT = TypeVar("SpecT", bound=InstanceSpec)

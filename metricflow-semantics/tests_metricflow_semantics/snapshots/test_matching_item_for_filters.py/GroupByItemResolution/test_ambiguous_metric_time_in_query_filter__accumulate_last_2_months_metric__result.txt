@@ -1,1 +1,22 @@
-GroupByItemResolution(spec=TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH))
+GroupByItemResolution(
+  spec=TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH),
+  linkable_element_set=LinkableElementSet(
+    path_key_to_linkable_dimensions={
+      ElementPathKey(
+        element_name='metric_time',
+        element_type=TIME_DIMENSION,
+        time_granularity=MONTH,
+      ): (
+        LinkableDimension(
+          semantic_model_origin=SemanticModelReference(
+            semantic_model_name='monthly_measures_source',
+          ),
+          element_name='metric_time',
+          dimension_type=TIME,
+          properties=frozenset({<LinkableElementProperty.METRIC_TIME: 'metric_time'>}),
+          time_granularity=MONTH,
+        ),
+      ),
+    },
+  ),
+)

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import logging
+from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple, Union
 
 import pandas as pd
@@ -11,6 +12,7 @@ from dbt_semantic_interfaces.implementations.filters.where_filter import (
 )
 from dbt_semantic_interfaces.protocols import SavedQuery
 from dbt_semantic_interfaces.protocols.where_filter import WhereFilter
+from dbt_semantic_interfaces.references import SemanticModelReference
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 
 from metricflow_semantics.assert_one_arg import assert_at_most_one_arg_set
@@ -54,12 +56,12 @@ from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import (
 from metricflow_semantics.specs.patterns.base_time_grain import BaseTimeGrainPattern
 from metricflow_semantics.specs.patterns.metric_time_pattern import MetricTimePattern
 from metricflow_semantics.specs.patterns.none_date_part import NoneDatePartPattern
+from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.spec_classes import (
     InstanceSpec,
-    InstanceSpecSet,
-    MetricFlowQuerySpec,
     TimeDimensionSpec,
 )
+from metricflow_semantics.specs.spec_set import group_specs_by_type
 from metricflow_semantics.time.time_granularity import (
     adjust_to_end_of_period,
     adjust_to_start_of_period,
@@ -101,7 +103,7 @@ class MetricFlowQueryParser:
         time_constraint_end: Optional[datetime.datetime],
         order_by_names: Optional[Sequence[str]],
         order_by_parameters: Optional[Sequence[OrderByQueryParameter]],
-    ) -> MetricFlowQuerySpec:
+    ) -> ParseQueryResult:
         """Parse and validate a query using parameters from a pre-defined / saved query.
 
         Additional parameters act in conjunction with the parameters in the saved query.
@@ -115,15 +117,19 @@ class MetricFlowQueryParser:
         if where_filter is not None:
             where_filters.append(where_filter)
 
-        return self.parse_and_validate_query(
+        return self._parse_and_validate_query(
             metric_names=saved_query.query_params.metrics,
+            metrics=None,
             group_by_names=saved_query.query_params.group_by,
+            group_by=None,
             where_constraint=merge_to_single_where_filter(PydanticWhereFilterIntersection(where_filters=where_filters)),
+            where_constraint_str=None,
             time_constraint_start=time_constraint_start,
             time_constraint_end=time_constraint_end,
             limit=limit,
             order_by_names=order_by_names,
             order_by=order_by_parameters,
+            min_max_only=False,
         )
 
     def _get_saved_query(self, saved_query_parameter: SavedQueryParameter) -> SavedQuery:
@@ -155,7 +161,7 @@ class MetricFlowQueryParser:
         ):
             matching_specs = pattern_to_apply.match(matching_specs)
         # The conversion below is awkward and needs some more thought.
-        time_dimension_specs = InstanceSpecSet.from_specs(matching_specs).time_dimension_specs
+        time_dimension_specs = group_specs_by_type(matching_specs).time_dimension_specs
         if len(time_dimension_specs) == 0:
             return None
 
@@ -333,7 +339,7 @@ class MetricFlowQueryParser:
             order_by_names=order_by_names,
             order_by=order_by,
             min_max_only=min_max_only,
-        )
+        ).query_spec
 
     @log_runtime()
     def _parse_and_validate_query(
@@ -350,7 +356,7 @@ class MetricFlowQueryParser:
         order_by_names: Optional[Sequence[str]],
         order_by: Optional[Sequence[OrderByQueryParameter]],
         min_max_only: bool,
-    ) -> MetricFlowQuerySpec:
+    ) -> ParseQueryResult:
         # TODO: validate min_max_only - can only be called for non-metric queries
         assert_at_most_one_arg_set(metric_names=metric_names, metrics=metrics)
         assert_at_most_one_arg_set(group_by_names=group_by_names, group_by=group_by)
@@ -508,6 +514,20 @@ class MetricFlowQueryParser:
             )
             logger.info(f"Time constraint after adjustment is: {time_constraint}")
 
-            return query_spec.with_time_range_constraint(time_constraint)
+            return ParseQueryResult(
+                query_spec=query_spec.with_time_range_constraint(time_constraint),
+                queried_semantic_models=query_resolution.queried_semantic_models,
+            )
 
-        return query_spec
+        return ParseQueryResult(
+            query_spec=query_spec,
+            queried_semantic_models=query_resolution.queried_semantic_models,
+        )
+
+
+@dataclass(frozen=True)
+class ParseQueryResult:
+    """Result of parsing a MetricFlow query."""
+
+    query_spec: MetricFlowQuerySpec
+    queried_semantic_models: Tuple[SemanticModelReference, ...]

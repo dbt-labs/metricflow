@@ -8,7 +8,8 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
-from metricflow_semantics.specs.spec_classes import InstanceSpecSet, TimeDimensionReference, TimeDimensionSpec
+from metricflow_semantics.specs.spec_classes import TimeDimensionReference, TimeDimensionSpec
+from metricflow_semantics.specs.spec_set import InstanceSpecSet
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode

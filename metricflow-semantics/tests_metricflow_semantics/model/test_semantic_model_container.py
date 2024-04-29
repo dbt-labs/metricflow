@@ -6,7 +6,7 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import EntityReference, MeasureReference, MetricReference
-from metricflow_semantics.model.semantics.linkable_element import LinkableElementProperty
+from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
@@ -79,7 +79,7 @@ def test_local_linked_elements_for_metric(  # noqa: D103
         with_any_property=frozenset({LinkableElementProperty.LOCAL_LINKED}),
         without_any_property=frozenset({LinkableElementProperty.DERIVED_TIME_GRANULARITY}),
     )
-    sorted_specs = sorted(linkable_elements.as_spec_set.as_tuple, key=lambda x: x.qualified_name)
+    sorted_specs = sorted(linkable_elements.specs, key=lambda x: x.qualified_name)
     assert_object_snapshot_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,
@@ -140,7 +140,7 @@ def test_linkable_elements_for_no_metrics_query(
             LinkableElementProperty.DERIVED_TIME_GRANULARITY,
         }
     )
-    sorted_specs = sorted(linkable_elements.as_spec_set.as_tuple, key=lambda x: x.qualified_name)
+    sorted_specs = sorted(linkable_elements.specs, key=lambda x: x.qualified_name)
     assert_object_snapshot_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,

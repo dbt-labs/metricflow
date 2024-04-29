@@ -17,10 +17,10 @@ from metricflow_semantics.errors.error_classes import ExecutionException
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.mf_logging.formatting import indent
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
+from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.linkable_element import (
     LinkableDimension,
-    LinkableElementProperty,
 )
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
@@ -31,7 +31,8 @@ from metricflow_semantics.random_id import random_id
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
 from metricflow_semantics.specs.query_param_implementations import SavedQueryParameter
-from metricflow_semantics.specs.spec_classes import InstanceSpecSet, MetricFlowQuerySpec
+from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
+from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.time.time_source import TimeSource
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
@@ -469,7 +470,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 time_constraint_end=mf_query_request.time_constraint_end,
                 order_by_names=mf_query_request.order_by_names,
                 order_by_parameters=mf_query_request.order_by,
-            )
+            ).query_spec
         else:
             query_spec = self._query_parser.parse_and_validate_query(
                 metric_names=mf_query_request.metric_names,

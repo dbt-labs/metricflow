@@ -35,13 +35,13 @@ from metricflow_semantics.specs.spec_classes import (
     EntitySpec,
     GroupByMetricSpec,
     InstanceSpec,
-    InstanceSpecSet,
     LinkableInstanceSpec,
     LinklessEntitySpec,
     MeasureSpec,
     MetricInputMeasureSpec,
     TimeDimensionSpec,
 )
+from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from more_itertools import bucket
 
 from metricflow.dataflow.nodes.join_to_base import ValidityWindowJoinDescription

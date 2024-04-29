@@ -2,16 +2,19 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Optional, Tuple
+from typing import Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.call_parameter_sets import TimeDimensionCallParameterSet
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
-from dbt_semantic_interfaces.references import TimeDimensionReference
+from dbt_semantic_interfaces.references import SemanticModelReference, TimeDimensionReference
 from dbt_semantic_interfaces.type_enums import TimeGranularity
+from typing_extensions import override
 
 from metricflow_semantics.mf_logging.formatting import indent
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
+from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow_semantics.query.group_by_item.candidate_push_down.push_down_visitor import (
     PushDownResult,
@@ -27,13 +30,14 @@ from metricflow_semantics.query.suggestion_generator import QueryItemSuggestionG
 from metricflow_semantics.specs.patterns.base_time_grain import BaseTimeGrainPattern
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow_semantics.specs.patterns.typed_patterns import TimeDimensionPattern
-from metricflow_semantics.specs.spec_classes import LinkableInstanceSpec, LinkableSpecSet
+from metricflow_semantics.specs.spec_classes import LinkableInstanceSpec
+from metricflow_semantics.specs.spec_set import InstanceSpecSet, group_specs_by_type
 
 logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
-class GroupByItemResolution:
+class GroupByItemResolution(SemanticModelDerivation):
     """Result object that contains matching spec for a potentially ambiguous input to a query.
 
     e.g. "TimeDimension('metric_time')" -> TimeDimensionSpec('metric_time', DAY)
@@ -43,7 +47,13 @@ class GroupByItemResolution:
 
     # If the spec is None, then the pattern couldn't be resolved
     spec: Optional[LinkableInstanceSpec]
+    linkable_element_set: LinkableElementSet
     issue_set: MetricFlowQueryResolutionIssueSet
+
+    @property
+    @override
+    def derived_from_semantic_models(self) -> Sequence[SemanticModelReference]:
+        return self.linkable_element_set.derived_from_semantic_models
 
 
 @dataclass(frozen=True)
@@ -86,6 +96,7 @@ class GroupByItemResolver:
         if push_down_result.candidate_set.num_candidates == 0:
             return GroupByItemResolution(
                 spec=None,
+                linkable_element_set=LinkableElementSet(),
                 issue_set=push_down_result.issue_set,
             )
 
@@ -101,6 +112,7 @@ class GroupByItemResolver:
         if push_down_result.candidate_set.num_candidates > 1:
             return GroupByItemResolution(
                 spec=None,
+                linkable_element_set=LinkableElementSet(),
                 issue_set=push_down_result.issue_set.add_issue(
                     AmbiguousGroupByItemIssue.from_parameters(
                         candidate_set=push_down_result.candidate_set,
@@ -111,7 +123,11 @@ class GroupByItemResolver:
                 ),
             )
 
-        return GroupByItemResolution(spec=push_down_result.candidate_set.specs[0], issue_set=push_down_result.issue_set)
+        return GroupByItemResolution(
+            spec=push_down_result.candidate_set.specs[0],
+            linkable_element_set=push_down_result.candidate_set.linkable_element_set,
+            issue_set=push_down_result.issue_set,
+        )
 
     def resolve_matching_item_for_filters(
         self,
@@ -147,12 +163,14 @@ class GroupByItemResolver:
         if push_down_result.candidate_set.num_candidates == 0:
             return GroupByItemResolution(
                 spec=None,
+                linkable_element_set=LinkableElementSet(),
                 issue_set=push_down_result.issue_set,
             )
 
         if push_down_result.candidate_set.num_candidates > 1:
             return GroupByItemResolution(
                 spec=None,
+                linkable_element_set=LinkableElementSet(),
                 issue_set=push_down_result.issue_set.add_issue(
                     AmbiguousGroupByItemIssue.from_parameters(
                         candidate_set=push_down_result.candidate_set,
@@ -163,7 +181,11 @@ class GroupByItemResolver:
                 ),
             )
 
-        return GroupByItemResolution(spec=push_down_result.candidate_set.specs[0], issue_set=push_down_result.issue_set)
+        return GroupByItemResolution(
+            spec=push_down_result.candidate_set.specs[0],
+            linkable_element_set=push_down_result.candidate_set.linkable_element_set,
+            issue_set=push_down_result.issue_set,
+        )
 
     def resolve_available_items(
         self,
@@ -186,7 +208,7 @@ class GroupByItemResolver:
         push_down_result: PushDownResult = resolution_node.accept(push_down_visitor)
 
         return AvailableGroupByItemsResolution(
-            specs=push_down_result.candidate_set.specs,
+            specs=tuple(push_down_result.candidate_set.specs),
             issue_set=push_down_result.issue_set,
         )
 
@@ -202,9 +224,9 @@ class GroupByItemResolver:
             suggestion_generator=None,
         )
         metric_time_spec_set = (
-            LinkableSpecSet.from_specs((metric_time_grain_resolution.spec,))
+            group_specs_by_type((metric_time_grain_resolution.spec,))
             if metric_time_grain_resolution.spec is not None
-            else LinkableSpecSet.empty_instance()
+            else InstanceSpecSet.empty_instance()
         )
         if len(metric_time_spec_set.time_dimension_specs) != 1:
             raise RuntimeError(

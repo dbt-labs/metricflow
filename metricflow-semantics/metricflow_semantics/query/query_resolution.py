@@ -1,19 +1,21 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional, Sized, Tuple
+from typing import Optional, Sequence, Sized, Tuple
 
+from dbt_semantic_interfaces.references import SemanticModelReference
 from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.merger import Mergeable
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
+from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
     FilterSpecResolutionLookUp,
 )
 from metricflow_semantics.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
 from metricflow_semantics.query.issues.issues_base import MetricFlowQueryResolutionIssueSet
 from metricflow_semantics.query.resolver_inputs.base_resolver_inputs import MetricFlowQueryResolverInput
-from metricflow_semantics.specs.spec_classes import MetricFlowQuerySpec
+from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 
 
 @dataclass(frozen=True)
@@ -67,12 +69,11 @@ class InputToIssueSetMapping(Mergeable, Sized):
 
 
 @dataclass(frozen=True)
-class MetricFlowQueryResolution:
+class MetricFlowQueryResolution(SemanticModelDerivation):
     """The result of resolving query inputs to specs."""
 
     # Can be None if there were errors.
     query_spec: Optional[MetricFlowQuerySpec]
-
     # The resolution DAG generated for the query.
     resolution_dag: Optional[GroupByItemResolutionDag]
     # The lookup that is used later in the DataflowPlanBuilder to figure out which specs are required by the filters
@@ -80,6 +81,13 @@ class MetricFlowQueryResolution:
     filter_spec_lookup: FilterSpecResolutionLookUp
     # Mapping of issues with the inputs.
     input_to_issue_set: InputToIssueSetMapping
+    # The semantic models that would be queried to resolve the query.
+    queried_semantic_models: Tuple[SemanticModelReference, ...]
+
+    @property
+    @override
+    def derived_from_semantic_models(self) -> Sequence[SemanticModelReference]:
+        return self.queried_semantic_models
 
     @property
     def checked_query_spec(self) -> MetricFlowQuerySpec:

@@ -9,6 +9,7 @@ from dbt_semantic_interfaces.references import MetricReference
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.mf_logging.runtime import log_runtime
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
 from metricflow_semantics.naming.metric_scheme import MetricNamingScheme
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_pattern_factory import (
     WhereFilterPatternFactory,
@@ -52,14 +53,14 @@ from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import (
 from metricflow_semantics.query.suggestion_generator import QueryItemSuggestionGenerator
 from metricflow_semantics.query.validation_rules.query_validator import PostResolutionQueryValidator
 from metricflow_semantics.specs.patterns.match_list_pattern import MatchListSpecPattern
+from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.spec_classes import (
     InstanceSpec,
     LinkableInstanceSpec,
-    LinkableSpecSet,
-    MetricFlowQuerySpec,
     MetricSpec,
     OrderBySpec,
 )
+from metricflow_semantics.specs.spec_set import group_specs_by_type
 
 logger = logging.getLogger(__name__)
 
@@ -103,6 +104,7 @@ class ResolveGroupByItemsResult:
     resolution_dag: GroupByItemResolutionDag
     group_by_item_specs: Tuple[LinkableInstanceSpec, ...]
     input_to_issue_set_mapping: InputToIssueSetMapping
+    linkable_element_set: LinkableElementSet
 
 
 @dataclass(frozen=True)
@@ -231,6 +233,7 @@ class MetricFlowQueryResolver:
 
         input_to_issue_set_mapping_items: List[InputToIssueSetMappingItem] = []
         group_by_item_specs: List[LinkableInstanceSpec] = []
+        linkable_element_sets: List[LinkableElementSet] = []
         for group_by_item_input in group_by_item_inputs:
             resolution = MetricFlowQueryResolver._resolve_group_by_item_input(
                 group_by_item_resolver=group_by_item_resolver,
@@ -243,11 +246,13 @@ class MetricFlowQueryResolver:
                 )
             if resolution.spec is not None:
                 group_by_item_specs.append(resolution.spec)
+                linkable_element_sets.append(resolution.linkable_element_set)
 
         return ResolveGroupByItemsResult(
             resolution_dag=resolution_dag,
             group_by_item_specs=tuple(group_by_item_specs),
             input_to_issue_set_mapping=InputToIssueSetMapping(tuple(input_to_issue_set_mapping_items)),
+            linkable_element_set=LinkableElementSet.merge_by_path_key(linkable_element_sets),
         )
 
     @staticmethod
@@ -419,6 +424,7 @@ class MetricFlowQueryResolver:
                 resolution_dag=None,
                 filter_spec_lookup=FilterSpecResolutionLookUp.empty_instance(),
                 input_to_issue_set=issue_set_mapping_so_far,
+                queried_semantic_models=(),
             )
 
         # Resolve group by items.
@@ -478,11 +484,12 @@ class MetricFlowQueryResolver:
                 resolution_dag=resolution_dag,
                 filter_spec_lookup=filter_spec_lookup,
                 input_to_issue_set=issue_set_mapping_so_far,
+                queried_semantic_models=(),
             )
 
         # No errors.
-        linkable_spec_set = LinkableSpecSet.from_specs(group_by_item_specs)
-        logger.info(f"Group-by-items were resolved to:\n{mf_pformat(linkable_spec_set.as_tuple)}")
+        linkable_spec_set = group_specs_by_type(group_by_item_specs)
+        logger.info(f"Group-by-items were resolved to:\n{mf_pformat(linkable_spec_set.linkable_specs)}")
 
         # Run post-resolution validation rules to generate issues that are generated at the query-level.
         query_level_issue_set = self._post_resolution_query_validator.validate_query(
@@ -510,6 +517,7 @@ class MetricFlowQueryResolver:
                 resolution_dag=resolution_dag,
                 filter_spec_lookup=filter_spec_lookup,
                 input_to_issue_set=issue_set_mapping,
+                queried_semantic_models=(),
             )
 
         return MetricFlowQueryResolution(
@@ -527,4 +535,7 @@ class MetricFlowQueryResolver:
             resolution_dag=resolution_dag,
             filter_spec_lookup=filter_spec_lookup,
             input_to_issue_set=issue_set_mapping,
+            queried_semantic_models=tuple(
+                resolve_group_by_item_result.linkable_element_set.derived_from_semantic_models
+            ),
         )
