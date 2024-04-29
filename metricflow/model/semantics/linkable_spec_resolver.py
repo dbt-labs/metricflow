@@ -120,8 +120,23 @@ class LinkableMetric:
         return self.reference.element_name
 
     @property
-    def path_key(self) -> ElementPathKey:  # noqa: D102
-        return ElementPathKey(element_name=self.element_name, entity_links=self.join_path.entity_links)
+    def path_key(self) -> ElementPathKey:
+        """Key that can uniquely identify an element and the joins used to realize the element.
+
+        Use qualified name to guarantee uniqueness.
+        """
+        return ElementPathKey(
+            element_name=self.as_group_by_metric_spec.qualified_name, entity_links=self.join_path.entity_links
+        )
+
+    @property
+    def as_group_by_metric_spec(self) -> GroupByMetricSpec:
+        """Convert LinkableMetric to GroupByMetricSpec."""
+        return GroupByMetricSpec(
+            element_name=self.element_name,
+            entity_links=self.join_path.entity_links,
+            metric_subquery_entity_links=self.metric_subquery_entity_links,
+        )
 
     @property
     def reference(self) -> MetricReference:  # noqa: D102
@@ -257,7 +272,9 @@ class LinkableElementSet:
                 for path_key, entities in join_path_to_linkable_entities.items()
             },
             path_key_to_linkable_metrics={
-                path_key: tuple(sorted(metrics, key=lambda linkable_metric: linkable_metric.element_name))
+                path_key: tuple(
+                    sorted(metrics, key=lambda linkable_metric: linkable_metric.as_group_by_metric_spec.qualified_name)
+                )
                 for path_key, metrics in join_path_to_linkable_metrics.items()
             },
         )
@@ -355,11 +372,7 @@ class LinkableElementSet:
                 for path_key in self.path_key_to_linkable_entities
             ),
             group_by_metric_specs=tuple(
-                GroupByMetricSpec(
-                    element_name=linkable_metric.element_name,
-                    entity_links=linkable_metric.join_path.entity_links,
-                    metric_subquery_entity_links=linkable_metric.metric_subquery_entity_links,
-                )
+                linkable_metric.as_group_by_metric_spec
                 for linkable_metrics in self.path_key_to_linkable_metrics.values()
                 for linkable_metric in linkable_metrics
             ),
