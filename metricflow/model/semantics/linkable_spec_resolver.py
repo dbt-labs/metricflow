@@ -727,7 +727,9 @@ class ValidLinkableSpecResolver:
                         semantic_model_join_path=using_join_path,
                     ),
                 )
-                path_key_to_linkable_metrics[linkable_metric.path_key] = (linkable_metric,)
+                path_key_to_linkable_metrics[linkable_metric.path_key] = path_key_to_linkable_metrics.get(
+                    linkable_metric.path_key, ()
+                ) + (linkable_metric,)
 
         return LinkableElementSet(path_key_to_linkable_metrics=path_key_to_linkable_metrics)
 
@@ -792,6 +794,7 @@ class ValidLinkableSpecResolver:
                 else:
                     assert_values_exhausted(dimension_type)
 
+        # TODO: are these loops erasing options?
         return LinkableElementSet(
             path_key_to_linkable_dimensions={
                 linkable_dimension.path_key: (linkable_dimension,) for linkable_dimension in linkable_dimensions
@@ -1138,6 +1141,7 @@ class ValidLinkableSpecResolver:
                     )
                 )
 
+        # TODO: are these loops erasing options?
         return LinkableElementSet(
             path_key_to_linkable_dimensions={
                 linkable_dimension.path_key: (linkable_dimension,) for linkable_dimension in linkable_dimensions
