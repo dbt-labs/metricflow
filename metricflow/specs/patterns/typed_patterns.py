@@ -137,19 +137,23 @@ class GroupByMetricPattern(EntityLinkPattern):
                 "Currently only one group by item is allowed for Metric filters. "
                 "This should have been caught by validations."
             )
-        group_by = metric_call_parameter_set.group_by[0]
-        structured_name = StructuredLinkableSpecName.from_name(group_by.element_name)
-        entity_links = tuple(
+        structured_name = StructuredLinkableSpecName.from_name(metric_call_parameter_set.group_by[0].element_name)
+        metric_subquery_entity_links = tuple(
             EntityReference(entity_name)
             for entity_name in (structured_name.entity_link_names + (structured_name.element_name,))
         )
+        # Temp: we don't have a parameter to specify the join path from the outer query to the metric subquery,
+        # so just use the last entity. Will need to add another param for that later.
+        entity_links = metric_subquery_entity_links[-1:]
         return GroupByMetricPattern(
             parameter_set=EntityLinkPatternParameterSet.from_parameters(
                 fields_to_compare=(
                     ParameterSetField.ELEMENT_NAME,
                     ParameterSetField.ENTITY_LINKS,
+                    ParameterSetField.METRIC_SUBQUERY_ENTITY_LINKS,
                 ),
                 element_name=metric_call_parameter_set.metric_reference.element_name,
                 entity_links=entity_links,
+                metric_subquery_entity_links=metric_subquery_entity_links,
             )
         )

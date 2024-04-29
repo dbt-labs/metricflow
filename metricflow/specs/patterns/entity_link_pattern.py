@@ -27,6 +27,7 @@ class ParameterSetField(Enum):
     ENTITY_LINKS = "entity_links"
     TIME_GRANULARITY = "time_granularity"
     DATE_PART = "date_part"
+    METRIC_SUBQUERY_ENTITY_LINKS = "metric_subquery_entity_links"
 
     def __lt__(self, other: Any) -> bool:  # type: ignore[misc]
         """Allow for ordering so that a sequence of these can be consistently represented for test snapshots."""
@@ -50,6 +51,7 @@ class EntityLinkPatternParameterSet:
     # Properties of time dimensions to match.
     time_granularity: Optional[TimeGranularity] = None
     date_part: Optional[DatePart] = None
+    metric_subquery_entity_links: Optional[Tuple[EntityReference, ...]] = None
 
     @staticmethod
     def from_parameters(  # noqa: D102
@@ -58,6 +60,7 @@ class EntityLinkPatternParameterSet:
         entity_links: Optional[Sequence[EntityReference]] = None,
         time_granularity: Optional[TimeGranularity] = None,
         date_part: Optional[DatePart] = None,
+        metric_subquery_entity_links: Optional[Tuple[EntityReference, ...]] = None,
     ) -> EntityLinkPatternParameterSet:
         return EntityLinkPatternParameterSet(
             fields_to_compare=tuple(sorted(fields_to_compare)),
@@ -65,6 +68,7 @@ class EntityLinkPatternParameterSet:
             entity_links=tuple(entity_links) if entity_links is not None else None,
             time_granularity=time_granularity,
             date_part=date_part,
+            metric_subquery_entity_links=metric_subquery_entity_links,
         )
 
     def __post_init__(self) -> None:
