@@ -29,10 +29,10 @@ from metricflow_semantics.model.semantics.linkable_element import (
     LinkableElementType,
     LinkableEntity,
     LinkableMetric,
-    MetricSubqueryJoinPath,
     MetricSubqueryJoinPathElement,
     SemanticModelJoinPath,
     SemanticModelJoinPathElement,
+    SemanticModelToMetricSubqueryJoinPath,
 )
 from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
@@ -238,7 +238,7 @@ class ValidLinkableSpecResolver:
             for metric_reference in self._joinable_metrics_for_entities[entity_reference]:
                 linkable_metric = LinkableMetric(
                     properties=properties,
-                    join_path=MetricSubqueryJoinPath(
+                    join_path=SemanticModelToMetricSubqueryJoinPath(
                         metric_subquery_join_path_element=MetricSubqueryJoinPathElement(
                             metric_reference=metric_reference, join_on_entity=entity_reference
                         ),

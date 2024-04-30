@@ -32,8 +32,8 @@ from metricflow_semantics.model.semantics.linkable_element import (
     LinkableElementType,
     LinkableEntity,
     LinkableMetric,
-    MetricSubqueryJoinPath,
     MetricSubqueryJoinPathElement,
+    SemanticModelToMetricSubqueryJoinPath,
 )
 from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
@@ -528,7 +528,7 @@ def test_metric_in_filter(  # noqa: D103
                     ): (
                         LinkableMetric(
                             properties=frozenset({LinkableElementProperty.METRIC, LinkableElementProperty.JOINED}),
-                            join_path=MetricSubqueryJoinPath(
+                            join_path=SemanticModelToMetricSubqueryJoinPath(
                                 metric_subquery_join_path_element=MetricSubqueryJoinPathElement(
                                     metric_reference=MetricReference("bookings"),
                                     join_on_entity=EntityReference("listing"),
