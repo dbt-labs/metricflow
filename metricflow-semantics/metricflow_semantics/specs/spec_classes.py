@@ -755,6 +755,23 @@ class GroupByMetricSpec(LinkableInstanceSpec, SerializableDataclass):
             entity_links=self.metric_subquery_entity_links[:-1],
         )
 
+    @property
+    def qualified_name(self) -> str:
+        """Element name prefixed with entity links.
+
+        If same entity links are used in inner & outer query, use standard qualified name (country__bookings).
+        Else, specify both sets of entity links (listing__country__user__country__bookings).
+        """
+        if self.entity_links == self.metric_subquery_entity_links:
+            entity_links = self.entity_links
+        else:
+            entity_links = self.entity_links + self.metric_subquery_entity_links
+
+        return StructuredLinkableSpecName(
+            entity_link_names=tuple(entity_link.element_name for entity_link in entity_links),
+            element_name=self.element_name,
+        ).qualified_name
+
     def __eq__(self, other: Any) -> bool:  # type: ignore[misc] # noqa: D105
         if not isinstance(other, GroupByMetricSpec):
             return False
