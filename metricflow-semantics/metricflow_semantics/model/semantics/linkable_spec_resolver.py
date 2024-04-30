@@ -242,7 +242,9 @@ class ValidLinkableSpecResolver:
                         semantic_model_join_path=using_join_path,
                     ),
                 )
-                path_key_to_linkable_metrics[linkable_metric.path_key] = (linkable_metric,)
+                path_key_to_linkable_metrics[linkable_metric.path_key] = path_key_to_linkable_metrics.get(
+                    linkable_metric.path_key, ()
+                ) + (linkable_metric,)
 
         return LinkableElementSet(path_key_to_linkable_metrics=path_key_to_linkable_metrics)
 
@@ -307,13 +309,19 @@ class ValidLinkableSpecResolver:
                 else:
                     assert_values_exhausted(dimension_type)
 
+        path_key_to_linkable_dimensions: Dict[ElementPathKey, Tuple[LinkableDimension, ...]] = {}
+        for linkable_dimension in linkable_dimensions:
+            path_key_to_linkable_dimensions[linkable_dimension.path_key] = path_key_to_linkable_dimensions.get(
+                linkable_dimension.path_key, ()
+            ) + (linkable_dimension,)
+        path_key_to_linkable_entities: Dict[ElementPathKey, Tuple[LinkableEntity, ...]] = {}
+        for linkable_entity in linkable_entities:
+            path_key_to_linkable_entities[linkable_entity.path_key] = path_key_to_linkable_entities.get(
+                linkable_entity.path_key, ()
+            ) + (linkable_entity,)
         return LinkableElementSet(
-            path_key_to_linkable_dimensions={
-                linkable_dimension.path_key: (linkable_dimension,) for linkable_dimension in linkable_dimensions
-            },
-            path_key_to_linkable_entities={
-                linkable_entity.path_key: (linkable_entity,) for linkable_entity in linkable_entities
-            },
+            path_key_to_linkable_dimensions=path_key_to_linkable_dimensions,
+            path_key_to_linkable_entities=path_key_to_linkable_entities,
         )
 
     def _get_semantic_models_with_joinable_entity(
@@ -658,13 +666,19 @@ class ValidLinkableSpecResolver:
                     )
                 )
 
+        path_key_to_linkable_dimensions: Dict[ElementPathKey, Tuple[LinkableDimension, ...]] = {}
+        for linkable_dimension in linkable_dimensions:
+            path_key_to_linkable_dimensions[linkable_dimension.path_key] = path_key_to_linkable_dimensions.get(
+                linkable_dimension.path_key, ()
+            ) + (linkable_dimension,)
+        path_key_to_linkable_entities: Dict[ElementPathKey, Tuple[LinkableEntity, ...]] = {}
+        for linkable_entity in linkable_entities:
+            path_key_to_linkable_entities[linkable_entity.path_key] = path_key_to_linkable_entities.get(
+                linkable_entity.path_key, ()
+            ) + (linkable_entity,)
         return LinkableElementSet(
-            path_key_to_linkable_dimensions={
-                linkable_dimension.path_key: (linkable_dimension,) for linkable_dimension in linkable_dimensions
-            },
-            path_key_to_linkable_entities={
-                linkable_entity.path_key: (linkable_entity,) for linkable_entity in linkable_entities
-            },
+            path_key_to_linkable_dimensions=path_key_to_linkable_dimensions,
+            path_key_to_linkable_entities=path_key_to_linkable_entities,
             path_key_to_linkable_metrics=self.get_joinable_metrics_for_semantic_model(
                 semantic_model=semantic_model, using_join_path=join_path
             ).path_key_to_linkable_metrics,
