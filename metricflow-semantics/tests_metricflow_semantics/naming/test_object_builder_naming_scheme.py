@@ -57,7 +57,7 @@ def test_input_str(object_builder_naming_scheme: ObjectBuilderNamingScheme) -> N
             GroupByMetricSpec(
                 element_name="bookings",
                 entity_links=(EntityReference(element_name="listing"),),
-                metric_subquery_entity_links=(),
+                metric_subquery_entity_links=(EntityReference(element_name="listing"),),
             )
         )
         == "Metric('bookings', group_by=['listing'])"
@@ -130,6 +130,6 @@ def test_spec_pattern(  # noqa: D103
         GroupByMetricSpec(
             element_name="bookings",
             entity_links=(EntityReference(element_name="listing"),),
-            metric_subquery_entity_links=(),
+            metric_subquery_entity_links=(EntityReference(element_name="listing"),),
         ),
     )

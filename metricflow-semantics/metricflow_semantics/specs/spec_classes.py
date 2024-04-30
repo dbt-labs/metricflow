@@ -688,10 +688,22 @@ class GroupByMetricSpec(LinkableInstanceSpec, SerializableDataclass):
         entity_links: Sequence of entities joined to join the metric subquery to the outer query. Last entity is the one
             joining the subquery to the outer query.
         metric_subquery_entity_links: Sequence of entities used in the metric subquery to join the metric to the entity.
-            Does not include the top-level entity (to avoid duplicating the last element of `entity_links`).
     """
 
     metric_subquery_entity_links: Tuple[EntityReference, ...]
+
+    def __post_init__(self) -> None:
+        """The inner query and outer query entity paths must end with the same entity (that's what they join on).
+
+        If no entity links, it's because we're already in the final joined node (no links left).
+        """
+        assert (
+            len(self.metric_subquery_entity_links) > 0
+        ), "GroupByMetricSpec must have at least one metric_subquery_entity_link."
+        if self.entity_links:
+            assert (
+                self.metric_subquery_entity_links[-1] == self.entity_links[-1]
+            ), "Inner and outer query must have the same last entity link in order to join on that link."
 
     @property
     def without_first_entity_link(self) -> GroupByMetricSpec:  # noqa: D102
@@ -718,9 +730,12 @@ class GroupByMetricSpec(LinkableInstanceSpec, SerializableDataclass):
     @property
     def metric_subquery_entity_spec(self) -> EntitySpec:
         """Spec for the entity that the metric will be grouped by in the metric subquery."""
+        assert (
+            len(self.metric_subquery_entity_links) > 0
+        ), "GroupByMetricSpec must have at least one metric_subquery_entity_link."
         return EntitySpec(
-            element_name=self.last_entity_link.element_name,
-            entity_links=self.metric_subquery_entity_links,
+            element_name=self.metric_subquery_entity_links[-1].element_name,
+            entity_links=self.metric_subquery_entity_links[:-1],
         )
 
     def __eq__(self, other: Any) -> bool:  # type: ignore[misc] # noqa: D105
