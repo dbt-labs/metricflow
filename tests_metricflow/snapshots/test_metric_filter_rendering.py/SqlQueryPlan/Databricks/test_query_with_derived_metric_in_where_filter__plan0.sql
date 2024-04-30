@@ -164,7 +164,7 @@ FROM (
             ) subq_12
           ) subq_13
           LEFT OUTER JOIN (
-            -- Pass Only Elements: ['listing', 'views_times_booking_value']
+            -- Pass Only Elements: ['listing', 'listing__views_times_booking_value']
             SELECT
               subq_25.listing
               , subq_25.views_times_booking_value

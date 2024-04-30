@@ -164,7 +164,7 @@ FROM (
             ) subq_5
           ) subq_6
           LEFT OUTER JOIN (
-            -- Pass Only Elements: ['user', 'revenue_all_time']
+            -- Pass Only Elements: ['user', 'user__revenue_all_time']
             SELECT
               subq_11.user
               , subq_11.revenue_all_time

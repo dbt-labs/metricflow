@@ -167,7 +167,7 @@ FROM (
             ) subq_9
           ) subq_10
           LEFT OUTER JOIN (
-            -- Pass Only Elements: ['listing', 'bookings']
+            -- Pass Only Elements: ['listing', 'listing__bookings']
             SELECT
               subq_15.listing
               , subq_15.bookings
@@ -390,7 +390,7 @@ FROM (
           ON
             subq_10.listing = subq_16.listing
           LEFT OUTER JOIN (
-            -- Pass Only Elements: ['listing', 'bookers']
+            -- Pass Only Elements: ['listing', 'listing__bookers']
             SELECT
               subq_21.listing
               , subq_21.bookers

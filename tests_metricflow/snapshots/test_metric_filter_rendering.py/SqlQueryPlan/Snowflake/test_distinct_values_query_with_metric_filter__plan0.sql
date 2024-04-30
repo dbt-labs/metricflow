@@ -24,7 +24,7 @@ FROM (
       FROM ***************************.dim_lux_listing_id_mapping lux_listing_mapping_src_28000
     ) subq_4
     FULL OUTER JOIN (
-      -- Pass Only Elements: ['listing', 'bookings']
+      -- Pass Only Elements: ['listing', 'listing__bookings']
       SELECT
         subq_9.listing
         , subq_9.bookings

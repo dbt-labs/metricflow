@@ -22,7 +22,7 @@ FROM (
   LEFT OUTER JOIN (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
-    -- Pass Only Elements: ['listing', 'bookings']
+    -- Pass Only Elements: ['listing', 'listing__bookings']
     SELECT
       listing
       , SUM(bookings) AS bookings

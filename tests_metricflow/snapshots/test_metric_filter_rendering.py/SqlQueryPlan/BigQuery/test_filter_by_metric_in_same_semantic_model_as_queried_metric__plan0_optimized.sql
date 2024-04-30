@@ -25,7 +25,7 @@ FROM (
     -- Pass Only Elements: ['booking_value', 'guest']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
-    -- Pass Only Elements: ['guest', 'booking_value']
+    -- Pass Only Elements: ['guest', 'guest__booking_value']
     SELECT
       guest_id AS guest
       , SUM(booking_value) AS booking_value
