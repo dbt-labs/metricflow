@@ -230,6 +230,7 @@ class ValidLinkableSpecResolver:
 
         path_key_to_linkable_metrics: Dict[ElementPathKey, Tuple[LinkableMetric, ...]] = {}
         for entity_reference in [entity.reference for entity in semantic_model.entities]:
+            # Avoid creating an entity link cycle.
             if using_join_path and entity_reference in using_join_path.entity_links:
                 continue
             for metric_reference in self._joinable_metrics_for_entities[entity_reference]:
