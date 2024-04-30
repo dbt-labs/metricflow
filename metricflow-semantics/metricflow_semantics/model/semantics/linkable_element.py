@@ -206,28 +206,43 @@ class LinkableEntity(LinkableElement):
 class LinkableMetric(LinkableElement):
     """Describes how a metric can be realized by joining based on entity links."""
 
-    element_name: str
-    join_by_semantic_model: SemanticModelReference
-    # TODO: Enable joining by dimension
-    entity_links: Tuple[EntityReference, ...]
     properties: FrozenSet[LinkableElementProperty]
-    join_path: Tuple[SemanticModelJoinPathElement, ...]
+    join_path: MetricSubqueryJoinPath
+
+    def __post_init__(self) -> None:
+        """Ensure expected LinkableElementProperties have been set.
+
+        LinkableMetrics always require a join to a metric subquery.
+        """
+        assert {LinkableElementProperty.METRIC, LinkableElementProperty.JOINED}.issubset(self.properties)
+
+    @property
+    def element_name(self) -> str:  # noqa: D102
+        return self.reference.element_name
 
     @property
     def path_key(self) -> ElementPathKey:  # noqa: D102
         return ElementPathKey(
-            element_name=self.element_name, element_type=LinkableElementType.METRIC, entity_links=self.entity_links
+            element_name=self.element_name,
+            element_type=LinkableElementType.METRIC,
+            entity_links=self.join_path.entity_links,
         )
 
     @property
     def reference(self) -> MetricReference:  # noqa: D102
-        return MetricReference(element_name=self.element_name)
+        return self.join_path.metric_subquery_join_path_element.metric_reference
+
+    @property
+    def join_by_semantic_model(self) -> Optional[SemanticModelReference]:  # noqa: D102
+        return self.join_path.last_semantic_model_reference
 
     @property
     @override
     def derived_from_semantic_models(self) -> Sequence[SemanticModelReference]:
-        semantic_model_references = {self.join_by_semantic_model}
-        for join_path_item in self.join_path:
+        semantic_model_references = set()
+        for join_path_item in (
+            self.join_path.semantic_model_join_path.path_elements if self.join_path.semantic_model_join_path else ()
+        ):
             semantic_model_references.add(join_path_item.semantic_model_reference)
 
         return sorted(semantic_model_references, key=lambda reference: reference.semantic_model_name)
@@ -277,3 +292,44 @@ class SemanticModelJoinPath:
                 ),
             )
         )
+
+
+@dataclass(frozen=True)
+class MetricSubqueryJoinPathElement:
+    """Describes joining a metric subquery by the given entity."""
+
+    metric_reference: MetricReference
+    join_on_entity: EntityReference
+
+
+@dataclass(frozen=True)
+class MetricSubqueryJoinPath:
+    """Describes how to join to a metric subquery.
+
+    Starts with semantic model join path, if exists. Always ends with metric subquery join path.
+    """
+
+    metric_subquery_join_path_element: MetricSubqueryJoinPathElement
+    semantic_model_join_path: Optional[SemanticModelJoinPath] = None
+
+    def __post_init__(self) -> None:  # noqa: D105
+        if self.semantic_model_join_path:
+            assert (
+                self.metric_subquery_join_path_element.join_on_entity == self.semantic_model_join_path.last_entity_link
+            ), (
+                "Last entity link for `semantic_model_join_path` must match `semantic_model_join_path.join_on_entity`."
+                "This is the entity used to join the metric subquery to the outer query.",
+            )
+
+    @property
+    def entity_links(self) -> Tuple[EntityReference, ...]:  # noqa: D102
+        return (
+            self.semantic_model_join_path.entity_links
+            if self.semantic_model_join_path
+            else (self.metric_subquery_join_path_element.join_on_entity,)
+        )
+
+    @property
+    def last_semantic_model_reference(self) -> Optional[SemanticModelReference]:
+        """The last semantic model that would be joined in this path (if exists) before joining to metric."""
+        return self.semantic_model_join_path.last_semantic_model_reference if self.semantic_model_join_path else None

@@ -28,6 +28,9 @@ from metricflow_semantics.model.semantics.linkable_element import (
     LinkableElementType,
     LinkableEntity,
     LinkableMetric,
+    MetricSubqueryJoinPath,
+    MetricSubqueryJoinPathElement,
+    SemanticModelJoinPath,
     SemanticModelJoinPathElement,
 )
 from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
@@ -129,27 +132,29 @@ _ambiguous_categorical_dimension_with_join_path = LinkableDimension(
 
 # Metrics
 _base_metric = LinkableMetric(
-    element_name=_base_metric_reference.element_name,
-    join_by_semantic_model=_base_semantic_model,
-    entity_links=(_base_entity_reference,),
-    properties=frozenset([LinkableElementProperty.METRIC]),
-    join_path=(),
+    properties=frozenset([LinkableElementProperty.METRIC, LinkableElementProperty.JOINED]),
+    join_path=MetricSubqueryJoinPath(
+        metric_subquery_join_path_element=MetricSubqueryJoinPathElement(
+            metric_reference=_base_metric_reference, join_on_entity=_base_entity_reference
+        ),
+    ),
 )
 _ambiguous_metric = LinkableMetric(
-    element_name=AMBIGUOUS_NAME,
-    join_by_semantic_model=_secondary_semantic_model,
-    entity_links=(_base_entity_reference,),
-    properties=frozenset([LinkableElementProperty.METRIC]),
-    join_path=(),
+    properties=frozenset([LinkableElementProperty.METRIC, LinkableElementProperty.JOINED]),
+    join_path=MetricSubqueryJoinPath(
+        metric_subquery_join_path_element=MetricSubqueryJoinPathElement(
+            metric_reference=MetricReference(AMBIGUOUS_NAME), join_on_entity=_base_entity_reference
+        ),
+    ),
 )
 # For testing deduplication on metrics
 _ambiguous_metric_with_join_path = LinkableMetric(
-    element_name=AMBIGUOUS_NAME,
-    join_by_semantic_model=_secondary_semantic_model,
-    entity_links=(_base_entity_reference,),
     properties=frozenset([LinkableElementProperty.METRIC, LinkableElementProperty.JOINED]),
-    join_path=(
-        SemanticModelJoinPathElement(
+    join_path=MetricSubqueryJoinPath(
+        metric_subquery_join_path_element=MetricSubqueryJoinPathElement(
+            metric_reference=MetricReference(AMBIGUOUS_NAME), join_on_entity=_base_entity_reference
+        ),
+        semantic_model_join_path=SemanticModelJoinPath.from_single_element(
             semantic_model_reference=_base_semantic_model, join_on_entity=_base_entity_reference
         ),
     ),
@@ -263,35 +268,35 @@ def test_filter_without_any_of() -> None:
 def test_filter_without_all_of() -> None:
     """Tests behavior of filter method with a `without_all_of` specified.
 
-    Note the filter overlap. The end result should include metrics, but not if they have JOINED.
+    Note the filter overlap. The end result should include entities, but not if they have JOINED.
     """
     with_any_of_properties = frozenset(
-        [LinkableElementProperty.JOINED, LinkableElementProperty.LOCAL_LINKED, LinkableElementProperty.METRIC]
+        [LinkableElementProperty.JOINED, LinkableElementProperty.LOCAL_LINKED, LinkableElementProperty.ENTITY]
     )
-    without_all_of_properties = frozenset([LinkableElementProperty.JOINED, LinkableElementProperty.METRIC])
+    without_all_of_properties = frozenset([LinkableElementProperty.JOINED, LinkableElementProperty.ENTITY])
     linkable_set = _linkable_set_with_uniques_and_duplicates()
 
     filtered_set = linkable_set.filter(with_any_of=with_any_of_properties, without_all_of=without_all_of_properties)
 
-    filtered_entities = [
-        entity for entity in itertools.chain.from_iterable(filtered_set.path_key_to_linkable_entities.values())
-    ]
-    assert any(LinkableElementProperty.JOINED in entity.properties for entity in filtered_entities), (
-        f"At least one entity with a JOINED property was expected in the filtered output. "
-        f"Filter with_any_of: {with_any_of_properties}, filter without_all_of: {without_all_of_properties}. "
-        f"Entities: {linkable_set.path_key_to_linkable_entities.values()}. Filtered Entities: {filtered_entities}"
-    )
     filtered_metrics = [
         metric for metric in itertools.chain.from_iterable(filtered_set.path_key_to_linkable_metrics.values())
     ]
-    assert len(filtered_metrics) > 0, (
-        f"At least one metric without a JOINED property was expected in the filtered output. "
+    filtered_entities = [
+        entity for entity in itertools.chain.from_iterable(filtered_set.path_key_to_linkable_entities.values())
+    ]
+    assert any(LinkableElementProperty.JOINED in metric.properties for metric in filtered_metrics), (
+        f"At least one metric with a JOINED property was expected in the filtered output. "
         f"Filter with_any_of: {with_any_of_properties}, filter without_all_of: {without_all_of_properties}. "
-        f"Metrics: {linkable_set.path_key_to_linkable_metrics.values()}. Filtered Metrics: {filtered_metrics}"
+        f"Metrics: {linkable_set.path_key_to_linkable_metrics.values()}. Filtered metrics: {filtered_metrics}"
     )
-    assert all([LinkableElementProperty.JOINED not in metric.properties for metric in filtered_metrics]), (
-        f"Found a filtered metric that did not match the applied filter properties! "
-        f"Filter properties: {without_all_of_properties}, metrics: {filtered_metrics}"
+    assert len(filtered_entities) > 0, (
+        f"At least one entity without a JOINED property was expected in the filtered output. "
+        f"Filter with_any_of: {with_any_of_properties}, filter without_all_of: {without_all_of_properties}. "
+        f"Entities: {linkable_set.path_key_to_linkable_entities.values()}. Filtered entities: {filtered_entities}"
+    )
+    assert all([LinkableElementProperty.JOINED not in entity.properties for entity in filtered_entities]), (
+        f"Found a filtered entity that did not match the applied filter properties! "
+        f"Filter properties: {without_all_of_properties}, entities: {filtered_entities}"
     )
 
 
@@ -570,16 +575,15 @@ def linkable_set() -> LinkableElementSet:  # noqa: D103
                 element_type=LinkableElementType.METRIC,
             ): (
                 LinkableMetric(
-                    join_by_semantic_model=SemanticModelReference("metric_source"),
-                    element_name="metric_element",
-                    entity_links=(entity_3,),
-                    join_path=(
-                        SemanticModelJoinPathElement(
-                            semantic_model_reference=entity_3_source,
-                            join_on_entity=entity_3,
+                    properties=frozenset([LinkableElementProperty.METRIC, LinkableElementProperty.JOINED]),
+                    join_path=MetricSubqueryJoinPath(
+                        metric_subquery_join_path_element=MetricSubqueryJoinPathElement(
+                            metric_reference=MetricReference("metric_element"), join_on_entity=entity_3
+                        ),
+                        semantic_model_join_path=SemanticModelJoinPath.from_single_element(
+                            semantic_model_reference=entity_3_source, join_on_entity=entity_3
                         ),
                     ),
-                    properties=frozenset(),
                 ),
             )
         },
@@ -588,6 +592,7 @@ def linkable_set() -> LinkableElementSet:  # noqa: D103
 
 def test_derived_semantic_models(linkable_set: LinkableElementSet) -> None:
     """Tests that the semantic models in the element set are returned via `derived_from_semantic_models`."""
+    # TODO: add metric source for linkable metrics
     assert tuple(linkable_set.derived_from_semantic_models) == (
         SemanticModelReference(semantic_model_name="dimension_source"),
         SemanticModelReference(semantic_model_name="entity_0_source"),
@@ -595,7 +600,6 @@ def test_derived_semantic_models(linkable_set: LinkableElementSet) -> None:
         SemanticModelReference(semantic_model_name="entity_2_source"),
         SemanticModelReference(semantic_model_name="entity_3_source"),
         SemanticModelReference(semantic_model_name="entity_source"),
-        SemanticModelReference(semantic_model_name="metric_source"),
         SemanticModelReference(semantic_model_name="time_dimension_source"),
     )
 
