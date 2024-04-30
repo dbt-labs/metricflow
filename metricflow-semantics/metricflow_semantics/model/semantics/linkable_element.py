@@ -207,7 +207,7 @@ class LinkableMetric(LinkableElement):
     """Describes how a metric can be realized by joining based on entity links."""
 
     properties: FrozenSet[LinkableElementProperty]
-    join_path: MetricSubqueryJoinPath
+    join_path: SemanticModelToMetricSubqueryJoinPath
 
     def __post_init__(self) -> None:
         """Ensure expected LinkableElementProperties have been set.
@@ -246,6 +246,16 @@ class LinkableMetric(LinkableElement):
             semantic_model_references.add(join_path_item.semantic_model_reference)
 
         return sorted(semantic_model_references, key=lambda reference: reference.semantic_model_name)
+
+    @property
+    def metric_to_entity_join_path(self) -> Optional[SemanticModelJoinPath]:
+        """Join path used in metric subquery to join entity to metric, if needed."""
+        return self.join_path.metric_subquery_join_path_element.metric_to_entity_join_path
+
+    @property
+    def metric_subquery_entity_links(self) -> Tuple[EntityReference, ...]:
+        """Entity links used to join the metric to the entity it's grouped by in the metric subquery."""
+        return self.metric_to_entity_join_path.entity_links if self.metric_to_entity_join_path else ()
 
 
 @dataclass(frozen=True)
@@ -296,17 +306,26 @@ class SemanticModelJoinPath:
 
 @dataclass(frozen=True)
 class MetricSubqueryJoinPathElement:
-    """Describes joining a metric subquery by the given entity."""
+    """Describes joining from a semantic model to a metric subquery.
+
+    Args:
+        metric_reference: The metric that's aggregated in the subquery.
+        join_on_entity: The entity that the metric is grouped by in the subquery. This will be updated in V2 to allow a list
+            of entitites & dimensions.
+        metric_to_entity_join_path: Describes the join path used in the subquery to join the metric to the `join_on_entity`.
+            Can be none if all required elements are defined in the same semantic model.
+    """
 
     metric_reference: MetricReference
     join_on_entity: EntityReference
+    metric_to_entity_join_path: Optional[SemanticModelJoinPath] = None
 
 
 @dataclass(frozen=True)
-class MetricSubqueryJoinPath:
-    """Describes how to join to a metric subquery.
+class SemanticModelToMetricSubqueryJoinPath:
+    """Describes how to join from a semantic model to a metric subquery.
 
-    Starts with semantic model join path, if exists. Always ends with metric subquery join path.
+    Starts with semantic model join path, if needed. Always ends with metric subquery join path.
     """
 
     metric_subquery_join_path_element: MetricSubqueryJoinPathElement
