@@ -573,6 +573,7 @@ def linkable_set() -> LinkableElementSet:  # noqa: D103
                 element_name="metric_element",
                 entity_links=(entity_3,),
                 element_type=LinkableElementType.METRIC,
+                metric_subquery_entity_links=(),
             ): (
                 LinkableMetric(
                     properties=frozenset([LinkableElementProperty.METRIC, LinkableElementProperty.JOINED]),
