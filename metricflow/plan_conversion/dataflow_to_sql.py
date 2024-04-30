@@ -19,7 +19,6 @@ from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.instances import (
     GroupByMetricInstance,
     InstanceSet,
-    InstanceSetTransform,
     MetadataInstance,
     MetricInstance,
     TimeDimensionInstance,
@@ -83,6 +82,7 @@ from metricflow.plan_conversion.instance_converters import (
     CreateSqlColumnReferencesForInstances,
     FilterElements,
     FilterLinkableInstancesWithLeadingLink,
+    InstanceSetTransform,
     RemoveMeasures,
     RemoveMetrics,
     UpdateMeasureFillNullsWith,
