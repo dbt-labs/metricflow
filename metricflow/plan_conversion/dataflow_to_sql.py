@@ -19,7 +19,6 @@ from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.instances import (
     GroupByMetricInstance,
     InstanceSet,
-    InstanceSetTransform,
     MetadataInstance,
     MetricInstance,
     TimeDimensionInstance,
@@ -83,6 +82,7 @@ from metricflow.plan_conversion.instance_converters import (
     CreateSqlColumnReferencesForInstances,
     FilterElements,
     FilterLinkableInstancesWithLeadingLink,
+    InstanceSetTransform,
     RemoveMeasures,
     RemoveMetrics,
     UpdateMeasureFillNullsWith,
@@ -613,7 +613,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
         # Add select columns that would compute the metrics to the select columns.
         metric_select_columns = []
-        metric_instances = []
+        metric_instances: List[MetricInstance] = []
         for metric_spec in node.metric_specs:
             metric = self._metric_lookup.get_metric(metric_spec.reference)
 
@@ -744,12 +744,8 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                     metric_subquery_entity_links=entity_instance.spec.entity_links + (entity_instance.spec.reference,),
                 ),
             )
+            transform_func = AddGroupByMetrics([group_by_metric_instance])
 
-        transform_func = (
-            AddGroupByMetrics([group_by_metric_instance])
-            if node.for_group_by_source_node
-            else AddMetrics(metric_instances)
-        )
         output_instance_set = output_instance_set.transform(transform_func)
 
         combined_select_column_set = non_metric_select_column_set.merge(
