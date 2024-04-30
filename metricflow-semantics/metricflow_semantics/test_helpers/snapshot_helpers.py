@@ -301,7 +301,14 @@ def assert_linkable_element_set_snapshot_equal(  # noqa: D103
                         if linkable_metric.join_by_semantic_model
                         else ""
                     ),
-                    tuple(entity_link.element_name for entity_link in linkable_metric.join_path.entity_links),
+                    (
+                        str(tuple(entity_link.element_name for entity_link in linkable_metric.join_path.entity_links)),
+                        str(
+                            tuple(
+                                entity_link.element_name for entity_link in linkable_metric.metric_subquery_entity_links
+                            )
+                        ),
+                    ),
                     linkable_metric.element_name,
                     "",
                     "",
