@@ -25,7 +25,7 @@ FROM (
     -- Pass Only Elements: ['bookers', 'guest']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
-    -- Pass Only Elements: ['guest', 'bookers']
+    -- Pass Only Elements: ['guest', 'guest__bookers']
     SELECT
       guest_id AS guest
       , COUNT(DISTINCT guest_id) AS bookers

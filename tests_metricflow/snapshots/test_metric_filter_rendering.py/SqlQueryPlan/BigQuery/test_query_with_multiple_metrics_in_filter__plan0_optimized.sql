@@ -23,7 +23,7 @@ FROM (
   LEFT OUTER JOIN (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
-    -- Pass Only Elements: ['listing', 'bookings']
+    -- Pass Only Elements: ['listing', 'listing__bookings']
     SELECT
       listing
       , SUM(bookings) AS bookings
@@ -47,7 +47,7 @@ FROM (
     -- Pass Only Elements: ['bookers', 'listing']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
-    -- Pass Only Elements: ['listing', 'bookers']
+    -- Pass Only Elements: ['listing', 'listing__bookers']
     SELECT
       listing_id AS listing
       , COUNT(DISTINCT guest_id) AS bookers

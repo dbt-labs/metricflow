@@ -227,7 +227,7 @@ FROM (
             ) subq_5
           ) subq_6
           LEFT OUTER JOIN (
-            -- Pass Only Elements: ['guest', 'bookers']
+            -- Pass Only Elements: ['guest', 'guest__bookers']
             SELECT
               subq_11.guest
               , subq_11.bookers

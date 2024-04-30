@@ -171,7 +171,7 @@ FROM (
             ) subq_5
           ) subq_6
           LEFT OUTER JOIN (
-            -- Pass Only Elements: ['listing', 'bookings']
+            -- Pass Only Elements: ['listing', 'listing__bookings']
             SELECT
               subq_11.listing
               , subq_11.bookings
