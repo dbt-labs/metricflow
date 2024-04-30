@@ -653,8 +653,8 @@ class ValidLinkableSpecResolver:
                 raise RuntimeError(f"Unhandled type: {dimension_type}")
 
         for entity in semantic_model.entities:
-            # Avoid creating "booking_id__booking_id"
-            if entity.reference != join_path.last_entity_link:
+            # Avoid creating an entity cycle
+            if entity.reference not in join_path.entity_links:
                 linkable_entities.append(
                     LinkableEntity(
                         semantic_model_origin=semantic_model.reference,
