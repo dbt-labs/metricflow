@@ -508,7 +508,9 @@ def test_metric_in_filter(  # noqa: D103
 ) -> None:
     where_filter = PydanticWhereFilter(where_sql_template="{{ Metric('bookings', group_by=['listing']) }} > 2")
 
-    group_by_metric_spec = GroupByMetricSpec(element_name="bookings", entity_links=(EntityReference("listing"),))
+    group_by_metric_spec = GroupByMetricSpec(
+        element_name="bookings", entity_links=(EntityReference("listing"),), metric_subquery_entity_links=()
+    )
     where_filter_spec = WhereSpecFactory(
         column_association_resolver=column_association_resolver,
         spec_resolution_lookup=create_spec_lookup(
@@ -525,6 +527,7 @@ def test_metric_in_filter(  # noqa: D103
                         entity_links=(EntityReference("listing"),),
                         time_granularity=None,
                         date_part=None,
+                        metric_subquery_entity_links=(),
                     ): (
                         LinkableMetric(
                             properties=frozenset({LinkableElementProperty.METRIC, LinkableElementProperty.JOINED}),
