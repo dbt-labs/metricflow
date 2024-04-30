@@ -462,13 +462,9 @@ class ValidLinkableSpecResolver:
                 if semantic_model.name == measure_semantic_model.name:
                     continue
                 join_paths.append(
-                    SemanticModelJoinPath(
-                        path_elements=(
-                            SemanticModelJoinPathElement(
-                                semantic_model_reference=semantic_model.reference,
-                                join_on_entity=entity.reference,
-                            ),
-                        )
+                    SemanticModelJoinPath.from_single_element(
+                        semantic_model_reference=semantic_model.reference,
+                        join_on_entity=entity.reference,
                     )
                 )
         single_hop_elements = LinkableElementSet.merge_by_path_key(
