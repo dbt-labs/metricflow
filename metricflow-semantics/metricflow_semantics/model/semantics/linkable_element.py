@@ -236,7 +236,6 @@ class LinkableMetric(LinkableElement):
     def join_by_semantic_model(self) -> Optional[SemanticModelReference]:  # noqa: D102
         return self.join_path.last_semantic_model_reference
 
-    # TODO: update
     @property
     @override
     def derived_from_semantic_models(self) -> Sequence[SemanticModelReference]:
