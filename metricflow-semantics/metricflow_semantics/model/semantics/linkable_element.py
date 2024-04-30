@@ -312,21 +312,10 @@ class MetricSubqueryJoinPath:
     metric_subquery_join_path_element: MetricSubqueryJoinPathElement
     semantic_model_join_path: Optional[SemanticModelJoinPath] = None
 
-    def __post_init__(self) -> None:  # noqa: D105
-        if self.semantic_model_join_path:
-            assert (
-                self.metric_subquery_join_path_element.join_on_entity == self.semantic_model_join_path.last_entity_link
-            ), (
-                "Last entity link for `semantic_model_join_path` must match `semantic_model_join_path.join_on_entity`."
-                "This is the entity used to join the metric subquery to the outer query.",
-            )
-
     @property
     def entity_links(self) -> Tuple[EntityReference, ...]:  # noqa: D102
-        return (
-            self.semantic_model_join_path.entity_links
-            if self.semantic_model_join_path
-            else (self.metric_subquery_join_path_element.join_on_entity,)
+        return (self.semantic_model_join_path.entity_links if self.semantic_model_join_path else ()) + (
+            self.metric_subquery_join_path_element.join_on_entity,
         )
 
     @property
