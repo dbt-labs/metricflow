@@ -47,6 +47,19 @@ def simple_multi_hop_join_manifest_lookup(  # noqa: D103
 
 
 @pytest.fixture(scope="session")
+def multi_hop_join_manifest(template_mapping: Dict[str, str]) -> PydanticSemanticManifest:
+    """Manifest used for many tests."""
+    return load_named_manifest(template_mapping, "multi_hop_join_manifest")
+
+
+@pytest.fixture(scope="session")
+def multi_hop_join_manifest_lookup(  # noqa: D103
+    multi_hop_join_manifest: PydanticSemanticManifest,
+) -> SemanticManifestLookup:
+    return SemanticManifestLookup(multi_hop_join_manifest)
+
+
+@pytest.fixture(scope="session")
 def partitioned_multi_hop_join_semantic_manifest(  # noqa: D103
     template_mapping: Dict[str, str]
 ) -> PydanticSemanticManifest:

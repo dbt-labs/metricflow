@@ -268,12 +268,12 @@ def test_filter_without_any_of() -> None:
 def test_filter_without_all_of() -> None:
     """Tests behavior of filter method with a `without_all_of` specified.
 
-    Note the filter overlap. The end result should include metrics, but not if they have JOINED.
+    Note the filter overlap. The end result should include entities, but not if they have JOINED.
     """
     with_any_of_properties = frozenset(
-        [LinkableElementProperty.JOINED, LinkableElementProperty.LOCAL_LINKED, LinkableElementProperty.METRIC]
+        [LinkableElementProperty.JOINED, LinkableElementProperty.LOCAL_LINKED, LinkableElementProperty.ENTITY]
     )
-    without_all_of_properties = frozenset([LinkableElementProperty.JOINED, LinkableElementProperty.METRIC])
+    without_all_of_properties = frozenset([LinkableElementProperty.JOINED, LinkableElementProperty.ENTITY])
     linkable_set = _linkable_set_with_uniques_and_duplicates()
 
     filtered_set = linkable_set.filter(with_any_of=with_any_of_properties, without_all_of=without_all_of_properties)
@@ -281,22 +281,22 @@ def test_filter_without_all_of() -> None:
     filtered_entities = [
         entity for entity in itertools.chain.from_iterable(filtered_set.path_key_to_linkable_entities.values())
     ]
-    assert any(LinkableElementProperty.JOINED in entity.properties for entity in filtered_entities), (
-        f"At least one entity with a JOINED property was expected in the filtered output. "
-        f"Filter with_any_of: {with_any_of_properties}, filter without_all_of: {without_all_of_properties}. "
-        f"Entities: {linkable_set.path_key_to_linkable_entities.values()}. Filtered Entities: {filtered_entities}"
-    )
     filtered_metrics = [
         metric for metric in itertools.chain.from_iterable(filtered_set.path_key_to_linkable_metrics.values())
     ]
-    assert len(filtered_metrics) > 0, (
-        f"At least one metric without a JOINED property was expected in the filtered output. "
+    assert any(LinkableElementProperty.JOINED in metric.properties for metric in filtered_metrics), (
+        f"At least one metric with a JOINED property was expected in the filtered output. "
         f"Filter with_any_of: {with_any_of_properties}, filter without_all_of: {without_all_of_properties}. "
-        f"Metrics: {linkable_set.path_key_to_linkable_metrics.values()}. Filtered Metrics: {filtered_metrics}"
+        f"Metrics: {linkable_set.path_key_to_linkable_metrics.values()}. Filtered metrics: {filtered_metrics}"
     )
-    assert all([LinkableElementProperty.JOINED not in metric.properties for metric in filtered_metrics]), (
-        f"Found a filtered metric that did not match the applied filter properties! "
-        f"Filter properties: {without_all_of_properties}, metrics: {filtered_metrics}"
+    assert len(filtered_entities) > 0, (
+        f"At least one entity without a JOINED property was expected in the filtered output. "
+        f"Filter with_any_of: {with_any_of_properties}, filter without_all_of: {without_all_of_properties}. "
+        f"Entities: {linkable_set.path_key_to_linkable_entities.values()}. Filtered entities: {filtered_entities}"
+    )
+    assert all([LinkableElementProperty.JOINED not in entity.properties for entity in filtered_entities]), (
+        f"Found a filtered entity that did not match the applied filter properties! "
+        f"Filter properties: {without_all_of_properties}, entities: {filtered_entities}"
     )
 
 
