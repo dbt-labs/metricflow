@@ -27,9 +27,9 @@ def semantic_model_lookup(simple_semantic_manifest: SemanticManifest) -> Semanti
 
 @pytest.fixture
 def multi_hop_semantic_model_lookup(  # noqa: D103
-    multi_hop_join_semantic_manifest: SemanticManifest,
+    multi_hop_join_manifest: SemanticManifest,
 ) -> SemanticModelLookup:
-    return SemanticModelLookup(model=multi_hop_join_semantic_manifest)
+    return SemanticModelLookup(model=multi_hop_join_manifest)
 
 
 @pytest.fixture
@@ -41,10 +41,10 @@ def metric_lookup(  # noqa: D103
 
 @pytest.fixture
 def multi_hop_metric_lookup(  # noqa: D103
-    multi_hop_join_semantic_manifest: SemanticManifest, multi_hop_semantic_model_lookup: SemanticModelLookup
+    multi_hop_join_manifest: SemanticManifest, multi_hop_semantic_model_lookup: SemanticModelLookup
 ) -> MetricLookup:
     return MetricLookup(
-        semantic_manifest=multi_hop_join_semantic_manifest,
+        semantic_manifest=multi_hop_join_manifest,
         semantic_model_lookup=multi_hop_semantic_model_lookup,
     )
 
