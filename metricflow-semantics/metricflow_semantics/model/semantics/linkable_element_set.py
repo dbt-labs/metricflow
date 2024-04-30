@@ -190,11 +190,7 @@ class LinkableElementSet(SemanticModelDerivation):
                 for path_key, entities in join_path_to_linkable_entities.items()
             },
             path_key_to_linkable_metrics={
-                path_key: tuple(
-                    sorted(
-                        metrics, key=lambda linkable_metric: linkable_metric.join_by_semantic_model.semantic_model_name
-                    )
-                )
+                path_key: tuple(sorted(metrics, key=lambda linkable_metric: linkable_metric.element_name))
                 for path_key, metrics in join_path_to_linkable_metrics.items()
             },
         )

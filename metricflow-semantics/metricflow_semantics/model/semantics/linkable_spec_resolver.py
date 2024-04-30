@@ -29,6 +29,8 @@ from metricflow_semantics.model.semantics.linkable_element import (
     LinkableElementType,
     LinkableEntity,
     LinkableMetric,
+    MetricSubqueryJoinPath,
+    MetricSubqueryJoinPathElement,
     SemanticModelJoinPath,
     SemanticModelJoinPathElement,
 )
@@ -202,16 +204,17 @@ class ValidLinkableSpecResolver:
                             entity_links=(entity.reference,),
                         ): (
                             LinkableMetric(
-                                element_name=metric.element_name,
-                                entity_links=(entity.reference,),
-                                join_path=(
-                                    SemanticModelJoinPathElement(
+                                properties=frozenset({LinkableElementProperty.METRIC, LinkableElementProperty.JOINED}),
+                                join_path=MetricSubqueryJoinPath(
+                                    metric_subquery_join_path_element=MetricSubqueryJoinPathElement(
+                                        metric_reference=MetricReference(metric.element_name),
+                                        join_on_entity=entity.reference,
+                                    ),
+                                    semantic_model_join_path=SemanticModelJoinPath.from_single_element(
                                         semantic_model_reference=semantic_model.reference,
                                         join_on_entity=entity.reference,
                                     ),
                                 ),
-                                join_by_semantic_model=semantic_model.reference,
-                                properties=frozenset({LinkableElementProperty.METRIC}),
                             ),
                         )
                         for metric in joinable_metrics
@@ -247,11 +250,12 @@ class ValidLinkableSpecResolver:
             for entity_link in [entity.reference for entity in semantic_model.entities]:
                 linkable_metrics.append(
                     LinkableMetric(
-                        element_name=metric_ref.element_name,
-                        join_by_semantic_model=semantic_model.reference,
-                        entity_links=(entity_link,),
-                        properties=frozenset({LinkableElementProperty.METRIC}),
-                        join_path=(),
+                        properties=frozenset({LinkableElementProperty.METRIC, LinkableElementProperty.JOINED}),
+                        join_path=MetricSubqueryJoinPath(
+                            metric_subquery_join_path_element=MetricSubqueryJoinPathElement(
+                                metric_reference=metric_ref, join_on_entity=entity_link
+                            )
+                        ),
                     )
                 )
         return LinkableElementSet(
@@ -684,11 +688,15 @@ class ValidLinkableSpecResolver:
 
         linkable_metrics = [
             LinkableMetric(
-                element_name=metric.element_name,
-                entity_links=entity_links,
-                join_path=join_path.path_elements,
-                join_by_semantic_model=semantic_model.reference,
-                properties=with_properties.union({LinkableElementProperty.METRIC}),
+                properties=with_properties.union(
+                    frozenset({LinkableElementProperty.METRIC, LinkableElementProperty.JOINED})
+                ),
+                join_path=MetricSubqueryJoinPath(
+                    metric_subquery_join_path_element=MetricSubqueryJoinPathElement(
+                        metric_reference=MetricReference(metric.element_name), join_on_entity=join_path.last_entity_link
+                    ),
+                    semantic_model_join_path=join_path,
+                ),
             )
             for metric in self._joinable_metrics_for_semantic_models.get(join_path.last_semantic_model_reference, set())
         ]
