@@ -297,7 +297,7 @@ def assert_linkable_element_set_snapshot_equal(  # noqa: D103
                 (
                     # Checking a limited set of fields as the result is large due to the paths in the object.
                     linkable_metric.join_by_semantic_model.semantic_model_name,
-                    tuple(entity_link.element_name for entity_link in linkable_entity.entity_links),
+                    tuple(entity_link.element_name for entity_link in linkable_metric.entity_links),
                     linkable_metric.element_name,
                     "",
                     "",
