@@ -58,6 +58,6 @@ def specs() -> Sequence[LinkableInstanceSpec]:  # noqa: D103
         GroupByMetricSpec(
             element_name="bookings",
             entity_links=(EntityReference(element_name="listing"),),
-            metric_subquery_entity_links=(),
+            metric_subquery_entity_links=(EntityReference(element_name="listing"),),
         ),
     )

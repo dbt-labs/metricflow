@@ -144,7 +144,7 @@ def spec_set() -> InstanceSpecSet:  # noqa: D103
             GroupByMetricSpec(
                 element_name="bookings",
                 entity_links=(EntityReference(element_name="listing_id"),),
-                metric_subquery_entity_links=(),
+                metric_subquery_entity_links=(EntityReference(element_name="listing_id"),),
             ),
         ),
     )
@@ -165,7 +165,7 @@ def test_spec_set_linkable_specs(spec_set: InstanceSpecSet) -> None:  # noqa: D1
         GroupByMetricSpec(
             element_name="bookings",
             entity_links=(EntityReference(element_name="listing_id"),),
-            metric_subquery_entity_links=(),
+            metric_subquery_entity_links=(EntityReference(element_name="listing_id"),),
         ),
     }
 
@@ -189,7 +189,7 @@ def test_spec_set_all_specs(spec_set: InstanceSpecSet) -> None:  # noqa: D103
         GroupByMetricSpec(
             element_name="bookings",
             entity_links=(EntityReference(element_name="listing_id"),),
-            metric_subquery_entity_links=(),
+            metric_subquery_entity_links=(EntityReference(element_name="listing_id"),),
         ),
     }
 

@@ -19,6 +19,7 @@ from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.instances import (
     GroupByMetricInstance,
     InstanceSet,
+    InstanceSetTransform,
     MetadataInstance,
     MetricInstance,
     TimeDimensionInstance,
@@ -613,7 +614,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         # Add select columns that would compute the metrics to the select columns.
         metric_select_columns = []
         metric_instances = []
-        group_by_metric_instances = []
         for metric_spec in node.metric_specs:
             metric = self._metric_lookup.get_metric(metric_spec.reference)
 
@@ -727,20 +727,26 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                     spec=metric_spec,
                 )
             )
-            group_by_metric_instances.append(
-                GroupByMetricInstance(
-                    associated_columns=(output_column_association,),
-                    defined_from=MetricModelReference(metric_name=metric_spec.element_name),
-                    spec=GroupByMetricSpec(
-                        element_name=metric_spec.element_name,
-                        entity_links=(),
-                        metric_subquery_entity_links=(),  # TODO
-                    ),
-                )
+
+        transform_func: InstanceSetTransform = AddMetrics(metric_instances)
+        if node.for_group_by_source_node:
+            assert (
+                len(metric_instances) == 1 and len(output_instance_set.entity_instances) == 1
+            ), "Group by metrics currently only support exactly one metric grouped by exactly one entity."
+            metric_instance = metric_instances[0]
+            entity_instance = output_instance_set.entity_instances[0]
+            group_by_metric_instance = GroupByMetricInstance(
+                associated_columns=metric_instance.associated_columns,
+                defined_from=metric_instance.defined_from,
+                spec=GroupByMetricSpec(
+                    element_name=metric_spec.element_name,
+                    entity_links=(),
+                    metric_subquery_entity_links=entity_instance.spec.entity_links + (entity_instance.spec.reference,),
+                ),
             )
 
         transform_func = (
-            AddGroupByMetrics(group_by_metric_instances)
+            AddGroupByMetrics([group_by_metric_instance])
             if node.for_group_by_source_node
             else AddMetrics(metric_instances)
         )
