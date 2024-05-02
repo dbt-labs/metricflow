@@ -98,8 +98,13 @@ class SourceNodeBuilder:
             source_nodes_for_metric_queries=tuple(source_nodes_for_metric_queries),
         )
 
-    def build_source_node_for_group_by_metric(self, group_by_metric_spec: GroupByMetricSpec) -> MetricFlowQuerySpec:
-        """Build source node used to satisfy requested group by metrics.
+    def build_source_node_inputs_for_group_by_metric(
+        self, group_by_metric_spec: GroupByMetricSpec
+    ) -> MetricFlowQuerySpec:
+        """Build source node inputs used to satisfy requested group by metrics.
+
+        Group by metrics are essentially metric subqueries that operate as source nodes in the DataflowPlanBuilder. We
+        provide the inputs here because they require an entire DataFlowPlan generation step.
 
         This is just a wrapper around the query parser method, stored here to limit the scope of the DataFlowPlanBuilder's
         dependency on the query parser to only source nodes.

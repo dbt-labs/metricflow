@@ -33,6 +33,7 @@ from metricflow_semantics.protocols.query_parameter import (
 )
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_pattern_factory import (
     DefaultWhereFilterPatternFactory,
+    WhereFilterPatternFactory,
 )
 from metricflow_semantics.query.group_by_item.group_by_item_resolver import GroupByItemResolver
 from metricflow_semantics.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
@@ -82,14 +83,18 @@ class MetricFlowQueryParser:
     TODO: Add fuzzy match results.
     """
 
-    def __init__(self, semantic_manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D107
+    def __init__(  # noqa: D107
+        self,
+        semantic_manifest_lookup: SemanticManifestLookup,
+        where_filter_pattern_factory: WhereFilterPatternFactory = DefaultWhereFilterPatternFactory(),
+    ) -> None:
         self._manifest_lookup = semantic_manifest_lookup
         self._metric_naming_schemes = (MetricNamingScheme(),)
         self._group_by_item_naming_schemes = (
             ObjectBuilderNamingScheme(),
             DunderNamingScheme(),
         )
-        self._where_filter_pattern_factory = DefaultWhereFilterPatternFactory()
+        self._where_filter_pattern_factory = where_filter_pattern_factory
 
     def parse_and_validate_saved_query(
         self,
@@ -524,7 +529,7 @@ class MetricFlowQueryParser:
     def build_query_spec_for_group_by_metric_source_node(
         self, group_by_metric_spec: GroupByMetricSpec
     ) -> MetricFlowQuerySpec:
-        """Query spec that can be used to build a source node for this spec in the DFP."""
+        """Query spec that can be used to build a source node for this spec in the DataflowPlanBuilder."""
         return self.parse_and_validate_query(
             metrics=(MetricParameter(group_by_metric_spec.reference.element_name),),
             group_by=(DimensionOrEntityParameter(group_by_metric_spec.entity_spec.qualified_name),),

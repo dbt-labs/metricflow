@@ -829,7 +829,7 @@ class DataflowPlanBuilder:
         # MetricGroupBy source nodes could be extremely large (and potentially slow).
         candidate_nodes_for_right_side_of_join += [
             self._build_query_output_node(
-                query_spec=self._source_node_builder.build_source_node_for_group_by_metric(group_by_metric_spec),
+                query_spec=self._source_node_builder.build_source_node_inputs_for_group_by_metric(group_by_metric_spec),
                 for_group_by_source_node=True,
             )
             for group_by_metric_spec in linkable_spec_set.group_by_metric_specs
