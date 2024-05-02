@@ -20,10 +20,7 @@ logger = logging.getLogger(__name__)
 def multi_hop_query_parser(  # noqa: D103
     simple_multi_hop_join_manifest_lookup: SemanticManifestLookup,
 ) -> MetricFlowQueryParser:
-    return MetricFlowQueryParser(
-        semantic_manifest_lookup=simple_multi_hop_join_manifest_lookup,
-        where_filter_pattern_factory=DefaultWhereFilterPatternFactory(),
-    )
+    return MetricFlowQueryParser(semantic_manifest_lookup=simple_multi_hop_join_manifest_lookup)
 
 
 def test_resolvable_ambiguous_entity_path(  # noqa: D103

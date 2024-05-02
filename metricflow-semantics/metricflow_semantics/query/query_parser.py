@@ -33,7 +33,6 @@ from metricflow_semantics.protocols.query_parameter import (
 )
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_pattern_factory import (
     DefaultWhereFilterPatternFactory,
-    WhereFilterPatternFactory,
 )
 from metricflow_semantics.query.group_by_item.group_by_item_resolver import GroupByItemResolver
 from metricflow_semantics.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
@@ -81,18 +80,14 @@ class MetricFlowQueryParser:
     TODO: Add fuzzy match results.
     """
 
-    def __init__(  # noqa: D107
-        self,
-        semantic_manifest_lookup: SemanticManifestLookup,
-        where_filter_pattern_factory: WhereFilterPatternFactory = DefaultWhereFilterPatternFactory(),
-    ) -> None:
+    def __init__(self, semantic_manifest_lookup: SemanticManifestLookup) -> None:  # noqa: D107
         self._manifest_lookup = semantic_manifest_lookup
         self._metric_naming_schemes = (MetricNamingScheme(),)
         self._group_by_item_naming_schemes = (
             ObjectBuilderNamingScheme(),
             DunderNamingScheme(),
         )
-        self._where_filter_pattern_factory = where_filter_pattern_factory
+        self._where_filter_pattern_factory = DefaultWhereFilterPatternFactory()
 
     def parse_and_validate_saved_query(
         self,
