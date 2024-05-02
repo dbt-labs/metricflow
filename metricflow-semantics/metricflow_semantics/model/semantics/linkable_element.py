@@ -67,6 +67,7 @@ class ElementPathKey:
     entity_links: Tuple[EntityReference, ...]
     time_granularity: Optional[TimeGranularity] = None
     date_part: Optional[DatePart] = None
+    metric_subquery_entity_links: Tuple[EntityReference, ...] = ()
 
     def __post_init__(self) -> None:
         """Asserts all requirements associated with the element_type are met."""
@@ -75,7 +76,11 @@ class ElementPathKey:
             assert (
                 self.time_granularity
             ), "Time granularity must be specified for all ElementPathKeys associated with time dimensions!"
-        elif element_type is LinkableElementType.DIMENSION or LinkableElementType.ENTITY or LinkableElementType.METRIC:
+        elif (
+            element_type is LinkableElementType.DIMENSION
+            or element_type is LinkableElementType.ENTITY
+            or element_type is LinkableElementType.METRIC
+        ):
             pass
         else:
             assert_values_exhausted(element_type)
@@ -104,9 +109,14 @@ class ElementPathKey:
                 entity_links=self.entity_links,
             )
         elif self.element_type is LinkableElementType.METRIC:
+            assert self.metric_subquery_entity_links is not None, (
+                "ElementPathKeys for metrics must have non-null metric_subquery_entity_links."
+                "This should have been checked in post_init."
+            )
             return GroupByMetricSpec(
                 element_name=self.element_name,
                 entity_links=self.entity_links,
+                metric_subquery_entity_links=self.metric_subquery_entity_links,
             )
         else:
             assert_values_exhausted(self.element_type)
@@ -226,6 +236,7 @@ class LinkableMetric(LinkableElement):
             element_name=self.element_name,
             element_type=LinkableElementType.METRIC,
             entity_links=self.join_path.entity_links,
+            metric_subquery_entity_links=self.metric_subquery_entity_links,
         )
 
     @property
