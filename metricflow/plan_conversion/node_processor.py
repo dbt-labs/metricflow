@@ -225,7 +225,10 @@ class PreJoinNodeProcessor:
                 filtered_joinable_node = FilterElementsNode(
                     parent_node=second_node_that_could_be_joined,
                     include_specs=group_specs_by_type(
-                        specs.dimension_specs + specs.entity_specs + specs.time_dimension_specs
+                        specs.dimension_specs
+                        + specs.entity_specs
+                        + specs.time_dimension_specs
+                        + specs.group_by_metric_specs
                     ),
                 )
 

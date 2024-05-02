@@ -29,10 +29,10 @@ from metricflow_semantics.model.semantics.linkable_element import (
     LinkableElementType,
     LinkableEntity,
     LinkableMetric,
-    MetricSubqueryJoinPath,
     MetricSubqueryJoinPathElement,
     SemanticModelJoinPath,
     SemanticModelJoinPathElement,
+    SemanticModelToMetricSubqueryJoinPath,
 )
 from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
@@ -137,7 +137,9 @@ class ValidLinkableSpecResolver:
                 self._entity_to_semantic_model[entity.reference.element_name].append(semantic_model)
 
         self._metric_to_linkable_element_sets: Dict[str, List[LinkableElementSet]] = {}
-        self._joinable_metrics_for_entities: Dict[EntityReference, Set[MetricReference]] = defaultdict(set)
+        self._joinable_metrics_for_entities: Dict[EntityReference, Set[MetricSubqueryJoinPathElement]] = defaultdict(
+            set
+        )
 
         start_time = time.time()
         for metric in self._semantic_manifest.metrics:
@@ -184,7 +186,14 @@ class ValidLinkableSpecResolver:
             linkable_element_set_for_metric = self.get_linkable_elements_for_metrics([metric_reference])
             for linkable_entities in linkable_element_set_for_metric.path_key_to_linkable_entities.values():
                 for linkable_entity in linkable_entities:
-                    self._joinable_metrics_for_entities[linkable_entity.reference].add(metric_reference)
+                    metric_subquery_join_path_element = MetricSubqueryJoinPathElement(
+                        metric_reference=metric_reference,
+                        join_on_entity=linkable_entity.reference,
+                        metric_to_entity_join_path=SemanticModelJoinPath(linkable_entity.join_path),
+                    )
+                    self._joinable_metrics_for_entities[linkable_entity.reference].add(
+                        metric_subquery_join_path_element
+                    )
 
         # If no metrics are specified, the query interface supports querying distinct values for dimensions, entities,
         # and group by metrics.
@@ -235,13 +244,11 @@ class ValidLinkableSpecResolver:
             # Avoid creating an entity link cycle.
             if using_join_path and entity_reference in using_join_path.entity_links:
                 continue
-            for metric_reference in self._joinable_metrics_for_entities[entity_reference]:
+            for metric_subquery_join_path_element in self._joinable_metrics_for_entities[entity_reference]:
                 linkable_metric = LinkableMetric(
                     properties=properties,
-                    join_path=MetricSubqueryJoinPath(
-                        metric_subquery_join_path_element=MetricSubqueryJoinPathElement(
-                            metric_reference=metric_reference, join_on_entity=entity_reference
-                        ),
+                    join_path=SemanticModelToMetricSubqueryJoinPath(
+                        metric_subquery_join_path_element=metric_subquery_join_path_element,
                         semantic_model_join_path=using_join_path,
                     ),
                 )
