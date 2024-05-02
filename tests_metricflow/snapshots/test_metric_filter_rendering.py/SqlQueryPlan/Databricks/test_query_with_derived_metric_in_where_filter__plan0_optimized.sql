@@ -21,7 +21,7 @@ FROM (
   ) subq_34
   LEFT OUTER JOIN (
     -- Compute Metrics via Expressions
-    -- Pass Only Elements: ['listing', 'listing__views_times_booking_value']
+    -- Pass Only Elements: ['listing', 'views_times_booking_value']
     SELECT
       listing
       , booking_value * views AS views_times_booking_value

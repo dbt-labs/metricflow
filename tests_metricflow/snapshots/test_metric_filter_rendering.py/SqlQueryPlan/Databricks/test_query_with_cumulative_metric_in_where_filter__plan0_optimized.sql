@@ -25,7 +25,7 @@ FROM (
     -- Pass Only Elements: ['txn_revenue', 'user']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
-    -- Pass Only Elements: ['user', 'user__revenue_all_time']
+    -- Pass Only Elements: ['user', 'revenue_all_time']
     SELECT
       user_id AS user
       , SUM(revenue) AS revenue_all_time

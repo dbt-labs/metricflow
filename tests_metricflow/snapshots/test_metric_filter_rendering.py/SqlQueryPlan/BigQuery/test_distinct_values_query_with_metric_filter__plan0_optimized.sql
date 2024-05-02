@@ -11,7 +11,7 @@ FROM (
   FULL OUTER JOIN (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
-    -- Pass Only Elements: ['listing', 'listing__bookings']
+    -- Pass Only Elements: ['listing', 'bookings']
     SELECT
       listing
       , SUM(bookings) AS bookings
