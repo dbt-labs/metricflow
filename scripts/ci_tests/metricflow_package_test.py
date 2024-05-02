@@ -154,6 +154,7 @@ def log_dataflow_plan() -> None:  # noqa: D103
         semantic_manifest_lookup=semantic_manifest_lookup,
         node_output_resolver=node_output_resolver,
         column_association_resolver=column_association_resolver,
+        source_node_builder=source_node_builder,
     )
 
     dataflow_plan = dataflow_plan_builder.build_plan(

@@ -5,11 +5,12 @@ from typing import List, Sequence, Tuple
 
 from dbt_semantic_interfaces.references import TimeDimensionReference
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
+from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
+from metricflow_semantics.specs.spec_classes import GroupByMetricSpec
 
-from metricflow.dataflow.dataflow_plan import (
-    BaseOutput,
-)
+from metricflow.dataflow.dataflow_plan import BaseOutput
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
@@ -62,6 +63,7 @@ class SourceNodeBuilder:
             parent_node=ReadSqlSourceNode(data_set=time_spine_data_set),
             aggregation_time_dimension_reference=time_dim_reference,
         )
+        self._query_parser = MetricFlowQueryParser(semantic_manifest_lookup)
 
     def create_from_data_sets(self, data_sets: Sequence[SemanticModelDataSet]) -> SourceNodeSet:
         """Creates a `SourceNodeSet` from SemanticModelDataSets."""
@@ -95,3 +97,16 @@ class SourceNodeBuilder:
             source_nodes_for_group_by_item_queries=tuple(group_by_item_source_nodes) + (self._time_spine_source_node,),
             source_nodes_for_metric_queries=tuple(source_nodes_for_metric_queries),
         )
+
+    def build_source_node_inputs_for_group_by_metric(
+        self, group_by_metric_spec: GroupByMetricSpec
+    ) -> MetricFlowQuerySpec:
+        """Build source node inputs used to satisfy requested group by metrics.
+
+        Group by metrics are essentially metric subqueries that operate as source nodes in the DataflowPlanBuilder. We
+        provide the inputs here because they require an entire DataFlowPlan generation step.
+
+        This is just a wrapper around the query parser method, stored here to limit the scope of the DataFlowPlanBuilder's
+        dependency on the query parser to only source nodes.
+        """
+        return self._query_parser.build_query_spec_for_group_by_metric_source_node(group_by_metric_spec)

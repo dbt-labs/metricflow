@@ -105,6 +105,7 @@ class MetricFlowEngineTestFixture:
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter
     query_parser: MetricFlowQueryParser
     metricflow_engine: MetricFlowEngine
+    source_node_builder: SourceNodeBuilder
 
     _node_output_resolver: DataflowPlanNodeOutputDataSetResolver
 
@@ -116,9 +117,8 @@ class MetricFlowEngineTestFixture:
         data_set_mapping = MetricFlowEngineTestFixture._create_data_sets(semantic_manifest_lookup)
         read_node_mapping = MetricFlowEngineTestFixture._data_set_to_read_nodes(data_set_mapping)
         column_association_resolver = DunderColumnAssociationResolver(semantic_manifest_lookup)
-        source_node_set = MetricFlowEngineTestFixture._data_set_to_source_node_set(
-            column_association_resolver, semantic_manifest_lookup, data_set_mapping
-        )
+        source_node_builder = SourceNodeBuilder(column_association_resolver, semantic_manifest_lookup)
+        source_node_set = source_node_builder.create_from_data_sets(list(data_set_mapping.values()))
         node_output_resolver = DataflowPlanNodeOutputDataSetResolver(
             column_association_resolver=column_association_resolver,
             semantic_manifest_lookup=semantic_manifest_lookup,
@@ -145,6 +145,7 @@ class MetricFlowEngineTestFixture:
                 query_parser=query_parser,
                 column_association_resolver=column_association_resolver,
             ),
+            source_node_builder=source_node_builder,
         )
 
     @property
@@ -158,6 +159,7 @@ class MetricFlowEngineTestFixture:
             semantic_manifest_lookup=self.semantic_manifest_lookup,
             node_output_resolver=self._node_output_resolver.copy(),
             column_association_resolver=self.column_association_resolver,
+            source_node_builder=self.source_node_builder,
         )
 
     @staticmethod
@@ -174,16 +176,6 @@ class MetricFlowEngineTestFixture:
             )
 
         return return_dict
-
-    @staticmethod
-    def _data_set_to_source_node_set(
-        column_association_resolver: ColumnAssociationResolver,
-        semantic_manifest_lookup: SemanticManifestLookup,
-        data_sets: OrderedDict[str, SemanticModelDataSet],
-    ) -> SourceNodeSet:
-        # Moved from model_fixtures.py.
-        source_node_builder = SourceNodeBuilder(column_association_resolver, semantic_manifest_lookup)
-        return source_node_builder.create_from_data_sets(list(data_sets.values()))
 
     @staticmethod
     def _create_data_sets(

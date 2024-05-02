@@ -5,9 +5,6 @@ import logging
 import pytest
 from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_pattern_factory import (
-    DefaultWhereFilterPatternFactory,
-)
 from metricflow_semantics.query.query_exceptions import InvalidQueryException
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
@@ -20,10 +17,7 @@ logger = logging.getLogger(__name__)
 def multi_hop_query_parser(  # noqa: D103
     simple_multi_hop_join_manifest_lookup: SemanticManifestLookup,
 ) -> MetricFlowQueryParser:
-    return MetricFlowQueryParser(
-        semantic_manifest_lookup=simple_multi_hop_join_manifest_lookup,
-        where_filter_pattern_factory=DefaultWhereFilterPatternFactory(),
-    )
+    return MetricFlowQueryParser(semantic_manifest_lookup=simple_multi_hop_join_manifest_lookup)
 
 
 def test_resolvable_ambiguous_entity_path(  # noqa: D103
