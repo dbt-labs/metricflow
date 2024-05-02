@@ -28,10 +28,10 @@ from metricflow_semantics.model.semantics.linkable_element import (
     LinkableElementType,
     LinkableEntity,
     LinkableMetric,
-    MetricSubqueryJoinPath,
     MetricSubqueryJoinPathElement,
     SemanticModelJoinPath,
     SemanticModelJoinPathElement,
+    SemanticModelToMetricSubqueryJoinPath,
 )
 from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
 from metricflow_semantics.specs.patterns.entity_link_pattern import (
@@ -133,7 +133,7 @@ _ambiguous_categorical_dimension_with_join_path = LinkableDimension(
 # Metrics
 _base_metric = LinkableMetric(
     properties=frozenset([LinkableElementProperty.METRIC, LinkableElementProperty.JOINED]),
-    join_path=MetricSubqueryJoinPath(
+    join_path=SemanticModelToMetricSubqueryJoinPath(
         metric_subquery_join_path_element=MetricSubqueryJoinPathElement(
             metric_reference=_base_metric_reference, join_on_entity=_base_entity_reference
         ),
@@ -141,7 +141,7 @@ _base_metric = LinkableMetric(
 )
 _ambiguous_metric = LinkableMetric(
     properties=frozenset([LinkableElementProperty.METRIC, LinkableElementProperty.JOINED]),
-    join_path=MetricSubqueryJoinPath(
+    join_path=SemanticModelToMetricSubqueryJoinPath(
         metric_subquery_join_path_element=MetricSubqueryJoinPathElement(
             metric_reference=MetricReference(AMBIGUOUS_NAME), join_on_entity=_base_entity_reference
         ),
@@ -150,7 +150,7 @@ _ambiguous_metric = LinkableMetric(
 # For testing deduplication on metrics
 _ambiguous_metric_with_join_path = LinkableMetric(
     properties=frozenset([LinkableElementProperty.METRIC, LinkableElementProperty.JOINED]),
-    join_path=MetricSubqueryJoinPath(
+    join_path=SemanticModelToMetricSubqueryJoinPath(
         metric_subquery_join_path_element=MetricSubqueryJoinPathElement(
             metric_reference=MetricReference(AMBIGUOUS_NAME), join_on_entity=_base_entity_reference
         ),
@@ -576,7 +576,7 @@ def linkable_set() -> LinkableElementSet:  # noqa: D103
             ): (
                 LinkableMetric(
                     properties=frozenset([LinkableElementProperty.METRIC, LinkableElementProperty.JOINED]),
-                    join_path=MetricSubqueryJoinPath(
+                    join_path=SemanticModelToMetricSubqueryJoinPath(
                         metric_subquery_join_path_element=MetricSubqueryJoinPathElement(
                             metric_reference=MetricReference("metric_element"), join_on_entity=entity_3
                         ),
