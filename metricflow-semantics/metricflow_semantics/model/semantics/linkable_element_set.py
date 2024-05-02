@@ -4,6 +4,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import Dict, FrozenSet, List, Sequence, Set, Tuple
 
+from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.references import SemanticModelReference
 from typing_extensions import override
 
@@ -18,8 +19,12 @@ from metricflow_semantics.model.semantics.linkable_element import (
 )
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow_semantics.specs.spec_classes import (
+    DimensionSpec,
+    EntitySpec,
+    GroupByMetricSpec,
     InstanceSpec,
     LinkableInstanceSpec,
+    TimeDimensionSpec,
 )
 
 
@@ -308,14 +313,50 @@ class LinkableElementSet(SemanticModelDerivation):
     @property
     def specs(self) -> Sequence[LinkableInstanceSpec]:
         """Converts the items in a `LinkableElementSet` to their corresponding spec objects."""
-        return tuple(
-            path_key.spec
-            for path_key in (
-                tuple(self.path_key_to_linkable_dimensions.keys())
-                + tuple(self.path_key_to_linkable_entities.keys())
-                + tuple(self.path_key_to_linkable_metrics.keys())
+        specs: List[LinkableInstanceSpec] = []
+
+        for path_key in (
+            tuple(self.path_key_to_linkable_dimensions.keys())
+            + tuple(self.path_key_to_linkable_entities.keys())
+            + tuple(self.path_key_to_linkable_metrics.keys())
+        ):
+            specs.append(LinkableElementSet._path_key_to_spec(path_key))
+
+        return specs
+
+    @staticmethod
+    def _path_key_to_spec(path_key: ElementPathKey) -> LinkableInstanceSpec:
+        """Helper method to convert ElementPathKey instances to LinkableInstanceSpecs.
+
+        This is currently used in the context of switching between ElementPathKeys and LinkableInstanceSpecs
+        within a LinkableElementSet, so we leave it here for now.
+        """
+        if path_key.element_type is LinkableElementType.DIMENSION:
+            return DimensionSpec(
+                element_name=path_key.element_name,
+                entity_links=path_key.entity_links,
             )
-        )
+        elif path_key.element_type is LinkableElementType.TIME_DIMENSION:
+            assert path_key.time_granularity is not None
+            return TimeDimensionSpec(
+                element_name=path_key.element_name,
+                entity_links=path_key.entity_links,
+                time_granularity=path_key.time_granularity,
+                date_part=path_key.date_part,
+            )
+        elif path_key.element_type is LinkableElementType.ENTITY:
+            return EntitySpec(
+                element_name=path_key.element_name,
+                entity_links=path_key.entity_links,
+            )
+        elif path_key.element_type is LinkableElementType.METRIC:
+            return GroupByMetricSpec(
+                element_name=path_key.element_name,
+                entity_links=path_key.entity_links,
+                metric_subquery_entity_links=path_key.metric_subquery_entity_links,
+            )
+        else:
+            assert_values_exhausted(path_key.element_type)
 
     def filter_by_spec_patterns(self, spec_patterns: Sequence[SpecPattern]) -> LinkableElementSet:
         """Filter the elements in the set by the given spec patters.
@@ -335,15 +376,15 @@ class LinkableElementSet(SemanticModelDerivation):
         path_key_to_linkable_metrics: Dict[ElementPathKey, Tuple[LinkableMetric, ...]] = {}
 
         for path_key, linkable_dimensions in self.path_key_to_linkable_dimensions.items():
-            if path_key.spec in specs_to_include:
+            if LinkableElementSet._path_key_to_spec(path_key) in specs_to_include:
                 path_key_to_linkable_dimensions[path_key] = linkable_dimensions
 
         for path_key, linkable_entities in self.path_key_to_linkable_entities.items():
-            if path_key.spec in specs_to_include:
+            if LinkableElementSet._path_key_to_spec(path_key) in specs_to_include:
                 path_key_to_linkable_entities[path_key] = linkable_entities
 
         for path_key, linkable_metrics in self.path_key_to_linkable_metrics.items():
-            if path_key.spec in specs_to_include:
+            if LinkableElementSet._path_key_to_spec(path_key) in specs_to_include:
                 path_key_to_linkable_metrics[path_key] = linkable_metrics
 
         return LinkableElementSet(
