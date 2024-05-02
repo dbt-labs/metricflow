@@ -25,6 +25,19 @@
                     <!--             entity_links=(EntityReference(element_name='booking'),), -->
                     <!--           ),                                                         -->
                     <!--         ),                                                           -->
+                    <!--         linkable_elements=(                                          -->
+                    <!--           LinkableDimension(                                         -->
+                    <!--             semantic_model_origin=SemanticModelReference(            -->
+                    <!--               semantic_model_name='bookings_source',                 -->
+                    <!--             ),                                                       -->
+                    <!--             element_name='is_instant',                               -->
+                    <!--             dimension_type=CATEGORICAL,                              -->
+                    <!--             entity_links=(                                           -->
+                    <!--               EntityReference(element_name='booking'),               -->
+                    <!--             ),                                                       -->
+                    <!--             properties=frozenset(LOCAL,),                            -->
+                    <!--           ),                                                         -->
+                    <!--         ),                                                           -->
                     <!--       ),                                                             -->
                     <!--     ),                                                               -->
                     <!--     alias='booking_value_with_is_instant_constraint',                -->
@@ -49,6 +62,17 @@
                                 <!--       DimensionSpec(                                             -->
                                 <!--         element_name='is_instant',                               -->
                                 <!--         entity_links=(EntityReference(element_name='booking'),), -->
+                                <!--       ),                                                         -->
+                                <!--     ),                                                           -->
+                                <!--     linkable_elements=(                                          -->
+                                <!--       LinkableDimension(                                         -->
+                                <!--         semantic_model_origin=SemanticModelReference(            -->
+                                <!--           semantic_model_name='bookings_source',                 -->
+                                <!--         ),                                                       -->
+                                <!--         element_name='is_instant',                               -->
+                                <!--         dimension_type=CATEGORICAL,                              -->
+                                <!--         entity_links=(EntityReference(element_name='booking'),), -->
+                                <!--         properties=frozenset(LOCAL,),                            -->
                                 <!--       ),                                                         -->
                                 <!--     ),                                                           -->
                                 <!--   )                                                              -->

@@ -15,6 +15,17 @@
             <!--         linkable_specs=(                                                       -->
             <!--           TimeDimensionSpec(element_name='metric_time', time_granularity=DAY), -->
             <!--         ),                                                                     -->
+            <!--         linkable_elements=(                                                    -->
+            <!--           LinkableDimension(                                                   -->
+            <!--             semantic_model_origin=SemanticModelReference(                      -->
+            <!--               semantic_model_name='bookings_source',                           -->
+            <!--             ),                                                                 -->
+            <!--             element_name='metric_time',                                        -->
+            <!--             dimension_type=TIME,                                               -->
+            <!--             properties=frozenset(METRIC_TIME,),                                -->
+            <!--             time_granularity=DAY,                                              -->
+            <!--           ),                                                                   -->
+            <!--         ),                                                                     -->
             <!--       ),                                                                       -->
             <!--     ),                                                                         -->
             <!--   )                                                                            -->
@@ -39,6 +50,17 @@
                         <!--     where_sql="metric_time__day >= '2020-01-01'",                                          -->
                         <!--     bind_parameters=SqlBindParameters(),                                                   -->
                         <!--     linkable_specs=(TimeDimensionSpec(element_name='metric_time', time_granularity=DAY),), -->
+                        <!--     linkable_elements=(                                                                    -->
+                        <!--       LinkableDimension(                                                                   -->
+                        <!--         semantic_model_origin=SemanticModelReference(                                      -->
+                        <!--           semantic_model_name='bookings_source',                                           -->
+                        <!--         ),                                                                                 -->
+                        <!--         element_name='metric_time',                                                        -->
+                        <!--         dimension_type=TIME,                                                               -->
+                        <!--         properties=frozenset(METRIC_TIME,),                                                -->
+                        <!--         time_granularity=DAY,                                                              -->
+                        <!--       ),                                                                                   -->
+                        <!--     ),                                                                                     -->
                         <!--   )                                                                                        -->
                         <FilterElementsNode>
                             <!-- description =                                                                   -->

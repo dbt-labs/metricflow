@@ -41,6 +41,17 @@
                     <!--         entity_links=(EntityReference(element_name='listing'),), -->
                     <!--       ),                                                         -->
                     <!--     ),                                                           -->
+                    <!--     linkable_elements=(                                          -->
+                    <!--       LinkableDimension(                                         -->
+                    <!--         semantic_model_origin=SemanticModelReference(            -->
+                    <!--           semantic_model_name='listings_latest',                 -->
+                    <!--         ),                                                       -->
+                    <!--         element_name='country_latest',                           -->
+                    <!--         dimension_type=CATEGORICAL,                              -->
+                    <!--         entity_links=(EntityReference(element_name='listing'),), -->
+                    <!--         properties=frozenset(LOCAL,),                            -->
+                    <!--       ),                                                         -->
+                    <!--     ),                                                           -->
                     <!--   )                                                              -->
                     <JoinToBaseOutputNode>
                         <!-- description = 'Join Standard Outputs' -->
