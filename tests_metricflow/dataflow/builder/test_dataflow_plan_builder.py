@@ -1333,7 +1333,7 @@ def test_metric_in_metric_where_filter(
 def test_all_available_single_join_metric_filters(
     dataflow_plan_builder: DataflowPlanBuilder, query_parser: MetricFlowQueryParser
 ) -> None:
-    """Checks that all allowed metric filters do not error when used in dataflow plan (single-hop for both inner and out query)."""
+    """Checks that all allowed metric filters do not error when used in dataflow plan (single-hop for both inner and outer query)."""
     for linkable_metric_tuple in dataflow_plan_builder._metric_lookup.linkable_elements_for_measure(
         MeasureReference("listings"), without_any_of={LinkableElementProperty.MULTI_HOP}
     ).path_key_to_linkable_metrics.values():
@@ -1352,3 +1352,62 @@ def test_all_available_single_join_metric_filters(
                 ),
             )
             dataflow_plan_builder.build_plan(query_spec)
+
+
+# TODO: combine into one test when passing
+def test_all_available_multi_join_metric_filters(
+    dataflow_plan_builder: DataflowPlanBuilder, query_parser: MetricFlowQueryParser
+) -> None:
+    """Checks that all allowed metric filters do not error when used in dataflow plan (multi-hop for inner or outer query)."""
+    for linkable_metric_tuple in dataflow_plan_builder._metric_lookup.linkable_elements_for_measure(
+        MeasureReference("bookings"),
+    ).path_key_to_linkable_metrics.values():
+        for linkable_metric in linkable_metric_tuple:
+            group_by_metric_spec = linkable_metric.path_key.spec
+            assert isinstance(group_by_metric_spec, GroupByMetricSpec)
+            entity_spec = group_by_metric_spec.metric_subquery_entity_spec
+            if not (entity_spec.entity_links):  # single-hop for inner query
+                continue
+            if len(group_by_metric_spec.entity_links) <= 1:  # temp: testing this
+                continue
+            try:
+                query_spec = query_parser.parse_and_validate_query(
+                    metric_names=("bookings",),
+                    where_constraint=PydanticWhereFilter(
+                        where_sql_template=string.Template(
+                            "{{ Metric('$metric_name', ['$entity_name']) }} > 2"
+                        ).substitute(metric_name=linkable_metric.element_name, entity_name=entity_spec.element_name),
+                    ),
+                )
+                dataflow_plan_builder.build_plan(query_spec)
+                print("succeeded:", group_by_metric_spec)
+            except Exception as e:
+                print(f"failed with {e}:", group_by_metric_spec)
+
+    assert 0
+
+
+# Need to derive join path from last entity link for OUTER entity links
+# Then somehow differentiate the ones that can't be derived & disallow them
+# TODO: are there linkable metrics that should be allowed with multiple outer entity links that are derived by query parser, but I'm skipping them?
+
+
+def test_testy_test(dataflow_plan_builder: DataflowPlanBuilder, query_parser: MetricFlowQueryParser) -> None:
+    # GroupByMetricSpec(
+    #     element_name="bookers",
+    #     entity_links=(EntityReference(element_name="user"), EntityReference(element_name="company")),
+    #     metric_subquery_entity_links=(
+    #         EntityReference(element_name="listing"),
+    #         EntityReference(element_name="user"),
+    #         EntityReference(element_name="company"),
+    #     ),
+    # )
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("listings",),
+        where_constraint=PydanticWhereFilter(
+            where_sql_template=string.Template("{{ Metric('$metric_name', ['$entity_name']) }} > 2").substitute(
+                metric_name="bookers", entity_name="listing__user__company"
+            ),
+        ),
+    )
+    dataflow_plan_builder.build_plan(query_spec)
