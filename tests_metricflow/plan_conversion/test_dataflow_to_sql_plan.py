@@ -5,12 +5,14 @@ from typing import List, Mapping
 import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
-from dbt_semantic_interfaces.references import EntityReference, TimeDimensionReference
+from dbt_semantic_interfaces.references import EntityReference, SemanticModelReference, TimeDimensionReference
 from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
+from dbt_semantic_interfaces.type_enums.dimension_type import DimensionType
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.dag.mf_dag import DagId
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
+from metricflow_semantics.model.semantics.linkable_element import LinkableDimension
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
@@ -196,6 +198,18 @@ def test_filter_with_where_constraint_node(
                     element_name="ds",
                     entity_links=(EntityReference(element_name="booking"),),
                     time_granularity=TimeGranularity.DAY,
+                ),
+            ),
+            linkable_elements=(
+                LinkableDimension(
+                    semantic_model_origin=SemanticModelReference("bookings_source"),
+                    element_name="ds",
+                    dimension_type=DimensionType.TIME,
+                    entity_links=(EntityReference(element_name="booking"),),
+                    properties=frozenset(),
+                    time_granularity=TimeGranularity.DAY,
+                    date_part=None,
+                    join_path=(),
                 ),
             ),
         ),

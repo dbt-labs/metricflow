@@ -106,13 +106,14 @@ class WhereFilterDimension(ProtocolHint[QueryInterfaceDimension]):
                 dimension_reference=DimensionReference(self._element_name),
             )
 
-        resolved_spec = self._resolved_spec_lookup.checked_resolved_spec(
-            ResolvedSpecLookUpKey(
-                filter_location=self._where_filter_location,
-                call_parameter_set=call_parameter_set,
-            )
+        resolved_spec_key = ResolvedSpecLookUpKey(
+            filter_location=self._where_filter_location,
+            call_parameter_set=call_parameter_set,
         )
-        self._rendered_spec_tracker.record_rendered_spec(resolved_spec)
+
+        resolved_spec = self._resolved_spec_lookup.checked_resolved_spec(resolved_spec_key)
+        resolved_elements = self._resolved_spec_lookup.checked_resolved_linkable_elements(resolved_spec_key)
+        self._rendered_spec_tracker.record_rendered_spec_to_elements_mapping((resolved_spec, resolved_elements))
         column_association = self._column_association_resolver.resolve_spec(resolved_spec)
 
         return column_association.column_name
