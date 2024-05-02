@@ -394,6 +394,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             semantic_manifest_lookup=self._semantic_manifest_lookup,
             column_association_resolver=self._column_association_resolver,
             node_output_resolver=node_output_resolver,
+            source_node_builder=source_node_builder,
         )
         self._to_sql_query_plan_converter = DataflowToSqlQueryPlanConverter(
             column_association_resolver=self._column_association_resolver,

@@ -5,9 +5,6 @@ import logging
 import pytest
 from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_pattern_factory import (
-    DefaultWhereFilterPatternFactory,
-)
 from metricflow_semantics.query.query_exceptions import InvalidQueryException
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
