@@ -67,7 +67,7 @@ class ElementPathKey:
     entity_links: Tuple[EntityReference, ...]
     time_granularity: Optional[TimeGranularity] = None
     date_part: Optional[DatePart] = None
-    metric_subquery_entity_links: Optional[Tuple[EntityReference, ...]] = None
+    metric_subquery_entity_links: Tuple[EntityReference, ...] = ()
 
     def __post_init__(self) -> None:
         """Asserts all requirements associated with the element_type are met."""
@@ -76,12 +76,11 @@ class ElementPathKey:
             assert (
                 self.time_granularity
             ), "Time granularity must be specified for all ElementPathKeys associated with time dimensions!"
-        elif element_type is LinkableElementType.METRIC:
-            assert self.metric_subquery_entity_links is not None, (
-                "Metric subquery entity links must be set for all ElementPathKeys associated with metrics."
-                "This can be an empty tuple, but not null."
-            )
-        elif element_type is LinkableElementType.DIMENSION or element_type is LinkableElementType.ENTITY:
+        elif (
+            element_type is LinkableElementType.DIMENSION
+            or element_type is LinkableElementType.ENTITY
+            or element_type is LinkableElementType.METRIC
+        ):
             pass
         else:
             assert_values_exhausted(element_type)

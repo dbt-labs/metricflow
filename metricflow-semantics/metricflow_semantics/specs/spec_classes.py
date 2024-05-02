@@ -717,7 +717,7 @@ class GroupByMetricSpec(LinkableInstanceSpec, SerializableDataclass):
 
     @property
     def metric_subquery_entity_spec(self) -> EntitySpec:
-        """Spec for the entity that the metric will be grouped by it the metric subquery."""
+        """Spec for the entity that the metric will be grouped by in the metric subquery."""
         return EntitySpec(
             element_name=self.last_entity_link.element_name,
             entity_links=self.metric_subquery_entity_links,
