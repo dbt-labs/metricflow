@@ -25,6 +25,7 @@ from dbt_semantic_interfaces.protocols import MetricTimeWindow
 from dbt_semantic_interfaces.references import (
     DimensionReference,
     EntityReference,
+    LinkableElementReference,
     MeasureReference,
     MetricReference,
     TimeDimensionReference,
@@ -175,6 +176,11 @@ class LinkableInstanceSpec(InstanceSpec, ABC):
         return StructuredLinkableSpecName(
             entity_link_names=tuple(x.element_name for x in self.entity_links), element_name=self.element_name
         ).qualified_name
+
+    @property
+    @abstractmethod
+    def reference(self) -> LinkableElementReference:  # noqa: D102
+        pass
 
 
 @dataclass(frozen=True)
@@ -679,6 +685,17 @@ class JoinToTimeSpineDescription:
     offset_to_grain: Optional[TimeGranularity]
 
 
+# TODO: add to DSI
+@dataclass(frozen=True)
+class GroupByMetricReference(LinkableElementReference):
+    """Represents a group by metric.
+
+    Different from MetricReference because it inherits linkable element attributes.
+    """
+
+    pass
+
+
 @dataclass(frozen=True)
 class GroupByMetricSpec(LinkableInstanceSpec, SerializableDataclass):
     """Metric used in group by or where filter.
@@ -747,8 +764,8 @@ class GroupByMetricSpec(LinkableInstanceSpec, SerializableDataclass):
         return hash((self.element_name, self.entity_links, self.metric_subquery_entity_links))
 
     @property
-    def reference(self) -> MetricReference:  # noqa: D102
-        return MetricReference(element_name=self.element_name)
+    def reference(self) -> GroupByMetricReference:  # noqa: D102
+        return GroupByMetricReference(element_name=self.element_name)
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_group_by_metric_spec(self)
