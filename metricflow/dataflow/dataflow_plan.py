@@ -5,13 +5,15 @@ from __future__ import annotations
 import logging
 import typing
 from abc import ABC, abstractmethod
-from typing import Generic, Optional, Sequence, Type, TypeVar
+from typing import Generic, Optional, Sequence, Set, Type, TypeVar
 
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagId, DagNode, MetricFlowDag, NodeId
 from metricflow_semantics.visitor import Visitable, VisitorOutputT
 
 if typing.TYPE_CHECKING:
+    from dbt_semantic_interfaces.references import LinkableElementReference
+
     from metricflow.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode
     from metricflow.dataflow.nodes.aggregate_measures import AggregateMeasuresNode
     from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
@@ -175,7 +177,10 @@ class BaseOutput(DataflowPlanNode, ABC):
     The base format is where the columns represent un-aggregated measures, dimensions, and entities.
     """
 
-    pass
+    @property
+    def is_aggregated_to_elements(self) -> Set[LinkableElementReference]:
+        """Indicates that the node has been aggregated to these specs, guaranteeing uniqueness in each combination of them."""
+        return set()
 
 
 class AggregatedMeasuresOutput(BaseOutput, ABC):
