@@ -15,10 +15,7 @@ from dbt_semantic_interfaces.protocols.metric import (
     MetricTimeWindow,
     MetricType,
 )
-from dbt_semantic_interfaces.references import (
-    MetricReference,
-    TimeDimensionReference,
-)
+from dbt_semantic_interfaces.references import LinkableElementReference, MetricReference, TimeDimensionReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
@@ -389,6 +386,7 @@ class DataflowPlanBuilder:
             metric_spec=metric_spec,
             aggregated_measures_node=aggregated_measures_node,
             for_group_by_source_node=for_group_by_source_node,
+            aggregated_to_elements=queried_linkable_specs.as_reference_set,
         )
 
     def _build_base_metric_output_node(
@@ -447,6 +445,7 @@ class DataflowPlanBuilder:
             metric_spec=metric_spec,
             aggregated_measures_node=aggregated_measures_node,
             for_group_by_source_node=for_group_by_source_node,
+            aggregated_to_elements=queried_linkable_specs.as_reference_set,
         )
 
     def _build_derived_metric_output_node(
@@ -511,7 +510,10 @@ class DataflowPlanBuilder:
             parent_nodes[0] if len(parent_nodes) == 1 else CombineAggregatedOutputsNode(parent_nodes=parent_nodes)
         )
         output_node: BaseOutput = ComputeMetricsNode(
-            parent_node=parent_node, metric_specs=[metric_spec], for_group_by_source_node=for_group_by_source_node
+            parent_node=parent_node,
+            metric_specs=[metric_spec],
+            for_group_by_source_node=for_group_by_source_node,
+            is_aggregated_to_elements={spec.reference for spec in queried_linkable_specs.as_tuple},
         )
 
         # For ratio / derived metrics with time offset, apply offset & where constraint after metric computation.
@@ -1006,6 +1008,7 @@ class DataflowPlanBuilder:
         self,
         metric_spec: MetricSpec,
         aggregated_measures_node: Union[AggregateMeasuresNode, BaseOutput],
+        aggregated_to_elements: Set[LinkableElementReference],
         for_group_by_source_node: bool = False,
     ) -> ComputeMetricsNode:
         """Builds a ComputeMetricsNode from aggregated measures."""
@@ -1013,6 +1016,7 @@ class DataflowPlanBuilder:
             parent_node=aggregated_measures_node,
             metric_specs=[metric_spec],
             for_group_by_source_node=for_group_by_source_node,
+            is_aggregated_to_elements=aggregated_to_elements,
         )
 
     def _build_input_measure_specs_for_conversion_metric(

@@ -3,10 +3,10 @@ from __future__ import annotations
 import itertools
 import typing
 from dataclasses import dataclass
-from typing import Dict, List, Sequence, Tuple
+from typing import Dict, List, Sequence, Set, Tuple
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
-from dbt_semantic_interfaces.references import MeasureReference, MetricReference
+from dbt_semantic_interfaces.references import LinkableElementReference, MeasureReference, MetricReference
 from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.merger import Mergeable
@@ -83,6 +83,10 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
                 self.dimension_specs, self.time_dimension_specs, self.entity_specs, self.group_by_metric_specs
             )
         )
+
+    @property
+    def as_reference_set(self) -> Set[LinkableElementReference]:  # noqa: D102
+        return {spec.reference for spec in self.as_tuple}
 
     @override
     def merge(self, other: LinkableSpecSet) -> LinkableSpecSet:

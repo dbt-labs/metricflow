@@ -442,7 +442,11 @@ def test_compute_metrics_node(
     )
 
     metric_spec = MetricSpec(element_name="bookings")
-    compute_metrics_node = ComputeMetricsNode(parent_node=aggregated_measure_node, metric_specs=[metric_spec])
+    compute_metrics_node = ComputeMetricsNode(
+        parent_node=aggregated_measure_node,
+        metric_specs=[metric_spec],
+        is_aggregated_to_elements={entity_spec.reference, dimension_spec.reference},
+    )
 
     convert_and_check(
         request=request,
@@ -507,7 +511,11 @@ def test_compute_metrics_node_simple_expr(
         parent_node=join_node, metric_input_measure_specs=metric_input_measure_specs
     )
     metric_spec = MetricSpec(element_name="booking_fees")
-    compute_metrics_node = ComputeMetricsNode(parent_node=aggregated_measures_node, metric_specs=[metric_spec])
+    compute_metrics_node = ComputeMetricsNode(
+        parent_node=aggregated_measures_node,
+        metric_specs=[metric_spec],
+        is_aggregated_to_elements={entity_spec.reference, dimension_spec.reference},
+    )
 
     sink_node = WriteToResultDataframeNode(compute_metrics_node)
     dataflow_plan = DataflowPlan(sink_output_nodes=[sink_node], plan_id=DagId.from_str("plan0"))
@@ -567,7 +575,11 @@ def test_join_to_time_spine_node_without_offset(
         parent_node=filtered_measure_node, metric_input_measure_specs=metric_input_measure_specs
     )
     metric_spec = MetricSpec(element_name="booking_fees")
-    compute_metrics_node = ComputeMetricsNode(parent_node=aggregated_measures_node, metric_specs=[metric_spec])
+    compute_metrics_node = ComputeMetricsNode(
+        parent_node=aggregated_measures_node,
+        metric_specs=[metric_spec],
+        is_aggregated_to_elements={entity_spec.reference},
+    )
     join_to_time_spine_node = JoinToTimeSpineNode(
         parent_node=compute_metrics_node,
         requested_agg_time_dimension_specs=[MTD_SPEC_DAY],
@@ -634,7 +646,11 @@ def test_join_to_time_spine_node_with_offset_window(
         parent_node=filtered_measure_node, metric_input_measure_specs=metric_input_measure_specs
     )
     metric_spec = MetricSpec(element_name="booking_fees")
-    compute_metrics_node = ComputeMetricsNode(parent_node=aggregated_measures_node, metric_specs=[metric_spec])
+    compute_metrics_node = ComputeMetricsNode(
+        parent_node=aggregated_measures_node,
+        metric_specs=[metric_spec],
+        is_aggregated_to_elements={entity_spec.reference, metric_time_spec.reference},
+    )
     join_to_time_spine_node = JoinToTimeSpineNode(
         parent_node=compute_metrics_node,
         requested_agg_time_dimension_specs=[MTD_SPEC_DAY],
@@ -703,7 +719,11 @@ def test_join_to_time_spine_node_with_offset_to_grain(
         parent_node=filtered_measure_node, metric_input_measure_specs=metric_input_measure_specs
     )
     metric_spec = MetricSpec(element_name="booking_fees")
-    compute_metrics_node = ComputeMetricsNode(parent_node=aggregated_measures_node, metric_specs=[metric_spec])
+    compute_metrics_node = ComputeMetricsNode(
+        parent_node=aggregated_measures_node,
+        metric_specs=[metric_spec],
+        is_aggregated_to_elements={entity_spec.reference, metric_time_spec.reference},
+    )
     join_to_time_spine_node = JoinToTimeSpineNode(
         parent_node=compute_metrics_node,
         requested_agg_time_dimension_specs=[MTD_SPEC_DAY],
@@ -801,7 +821,11 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
         parent_node=join_node, metric_input_measure_specs=metric_input_measure_specs
     )
     metric_spec = MetricSpec(element_name="bookings_per_booker")
-    compute_metrics_node = ComputeMetricsNode(parent_node=aggregated_measures_node, metric_specs=[metric_spec])
+    compute_metrics_node = ComputeMetricsNode(
+        parent_node=aggregated_measures_node,
+        metric_specs=[metric_spec],
+        is_aggregated_to_elements={entity_spec.reference, dimension_spec.reference},
+    )
 
     convert_and_check(
         request=request,
@@ -853,7 +877,11 @@ def test_order_by_node(
     )
 
     metric_spec = MetricSpec(element_name="bookings")
-    compute_metrics_node = ComputeMetricsNode(parent_node=aggregated_measure_node, metric_specs=[metric_spec])
+    compute_metrics_node = ComputeMetricsNode(
+        parent_node=aggregated_measure_node,
+        metric_specs=[metric_spec],
+        is_aggregated_to_elements={dimension_spec.reference, time_dimension_spec.reference},
+    )
 
     order_by_node = OrderByLimitNode(
         order_by_specs=[
