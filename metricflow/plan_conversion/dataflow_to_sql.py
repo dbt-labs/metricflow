@@ -19,6 +19,7 @@ from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.instances import (
     GroupByMetricInstance,
     InstanceSet,
+    InstanceSetTransform,
     MetadataInstance,
     MetricInstance,
     TimeDimensionInstance,
@@ -603,6 +604,11 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         output_instance_set = output_instance_set.transform(ChangeAssociatedColumns(self._column_association_resolver))
         output_instance_set = output_instance_set.transform(RemoveMetrics())
 
+        if node.for_group_by_source_node:
+            assert (
+                len(node.metric_specs) == 1 and len(output_instance_set.entity_instances) == 1
+            ), "Group by metrics currently only support exactly one metric grouped by exactly one entity."
+
         non_metric_select_column_set: SelectColumnSet = output_instance_set.transform(
             CreateSelectColumnsForInstances(
                 table_alias=from_data_set_alias,
@@ -613,7 +619,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         # Add select columns that would compute the metrics to the select columns.
         metric_select_columns = []
         metric_instances = []
-        group_by_metric_instances = []
+        group_by_metric_instance: Optional[GroupByMetricInstance] = None
         for metric_spec in node.metric_specs:
             metric = self._metric_lookup.get_metric(metric_spec.reference)
 
@@ -713,37 +719,38 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
             assert metric_expr
 
-            output_column_association = self._column_association_resolver.resolve_spec(metric_spec)
+            defined_from = MetricModelReference(metric_name=metric_spec.element_name)
+
+            if node.for_group_by_source_node:
+                entity_spec = output_instance_set.entity_instances[0].spec
+                group_by_metric_spec = GroupByMetricSpec(
+                    element_name=metric_spec.element_name,
+                    entity_links=(),
+                    metric_subquery_entity_links=entity_spec.entity_links + (entity_spec.reference,),
+                )
+                output_column_association = self._column_association_resolver.resolve_spec(group_by_metric_spec)
+                group_by_metric_instance = GroupByMetricInstance(
+                    associated_columns=(output_column_association,),
+                    defined_from=defined_from,
+                    spec=group_by_metric_spec,
+                )
+            else:
+                output_column_association = self._column_association_resolver.resolve_spec(metric_spec)
+                metric_instances.append(
+                    MetricInstance(
+                        associated_columns=(output_column_association,),
+                        defined_from=defined_from,
+                        spec=metric_spec,
+                    )
+                )
             metric_select_columns.append(
-                SqlSelectColumn(
-                    expr=metric_expr,
-                    column_alias=output_column_association.column_name,
-                )
-            )
-            metric_instances.append(
-                MetricInstance(
-                    associated_columns=(output_column_association,),
-                    defined_from=MetricModelReference(metric_name=metric_spec.element_name),
-                    spec=metric_spec,
-                )
-            )
-            group_by_metric_instances.append(
-                GroupByMetricInstance(
-                    associated_columns=(output_column_association,),
-                    defined_from=MetricModelReference(metric_name=metric_spec.element_name),
-                    spec=GroupByMetricSpec(
-                        element_name=metric_spec.element_name,
-                        entity_links=(),
-                        metric_subquery_entity_links=(),  # TODO
-                    ),
-                )
+                SqlSelectColumn(expr=metric_expr, column_alias=output_column_association.column_name)
             )
 
-        transform_func = (
-            AddGroupByMetrics(group_by_metric_instances)
-            if node.for_group_by_source_node
-            else AddMetrics(metric_instances)
-        )
+        transform_func: InstanceSetTransform = AddMetrics(metric_instances)
+        if group_by_metric_instance:
+            transform_func = AddGroupByMetrics([group_by_metric_instance])
+
         output_instance_set = output_instance_set.transform(transform_func)
 
         combined_select_column_set = non_metric_select_column_set.merge(
