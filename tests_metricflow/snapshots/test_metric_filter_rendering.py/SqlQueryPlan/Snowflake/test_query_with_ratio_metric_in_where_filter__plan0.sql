@@ -23,7 +23,7 @@ FROM (
           -- Join Standard Outputs
           SELECT
             subq_13.listing AS listing
-            , subq_26.bookings_per_booker AS listing__bookings_per_booker
+            , subq_26.listing__bookings_per_booker AS listing__bookings_per_booker
             , subq_13.listings AS listings
           FROM (
             -- Pass Only Elements: ['listings', 'listing']
@@ -167,12 +167,12 @@ FROM (
             -- Pass Only Elements: ['listing', 'listing__bookings_per_booker']
             SELECT
               subq_25.listing
-              , subq_25.bookings_per_booker
+              , subq_25.listing__bookings_per_booker
             FROM (
               -- Compute Metrics via Expressions
               SELECT
                 subq_24.listing
-                , CAST(subq_24.bookings AS DOUBLE) / CAST(NULLIF(subq_24.bookers, 0) AS DOUBLE) AS bookings_per_booker
+                , CAST(subq_24.bookings AS DOUBLE) / CAST(NULLIF(subq_24.bookers, 0) AS DOUBLE) AS listing__bookings_per_booker
               FROM (
                 -- Combine Aggregated Outputs
                 SELECT
