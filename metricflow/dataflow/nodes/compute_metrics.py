@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from typing import Sequence
+from typing import Sequence, Set
 
+from dbt_semantic_interfaces.references import LinkableElementReference
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.specs.spec_classes import MetricSpec
@@ -19,7 +20,11 @@ class ComputeMetricsNode(ComputedMetricsOutput):
     """A node that computes metrics from input measures. Dimensions / entities are passed through."""
 
     def __init__(
-        self, parent_node: BaseOutput, metric_specs: Sequence[MetricSpec], for_group_by_source_node: bool = False
+        self,
+        parent_node: BaseOutput,
+        metric_specs: Sequence[MetricSpec],
+        is_aggregated_to_elements: Set[LinkableElementReference],
+        for_group_by_source_node: bool = False,
     ) -> None:
         """Constructor.
 
@@ -31,6 +36,7 @@ class ComputeMetricsNode(ComputedMetricsOutput):
         self._parent_node = parent_node
         self._metric_specs = tuple(metric_specs)
         self._for_group_by_source_node = for_group_by_source_node
+        self._is_aggregated_to_elements = is_aggregated_to_elements
         super().__init__(node_id=self.create_unique_id(), parent_nodes=(self._parent_node,))
 
     @classmethod
@@ -86,4 +92,9 @@ class ComputeMetricsNode(ComputedMetricsOutput):
             parent_node=new_parent_nodes[0],
             metric_specs=self.metric_specs,
             for_group_by_source_node=self.for_group_by_source_node,
+            is_aggregated_to_elements=self._is_aggregated_to_elements,
         )
+
+    @property
+    def is_aggregated_to_elements(self) -> Set[LinkableElementReference]:  # noqa: D102
+        return self._is_aggregated_to_elements

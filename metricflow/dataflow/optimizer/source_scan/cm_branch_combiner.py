@@ -285,6 +285,14 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
             )
             return ComputeMetricsBranchCombinerResult()
 
+        if not self._current_left_node.is_aggregated_to_elements == current_right_node.is_aggregated_to_elements:
+            self._log_combine_failure(
+                left_node=self._current_left_node,
+                right_node=current_right_node,
+                combine_failure_reason="nodes are aggregated to different elements",
+            )
+            return ComputeMetricsBranchCombinerResult()
+
         assert len(combined_parent_nodes) == 1
         combined_parent_node = combined_parent_nodes[0]
         assert combined_parent_node is not None
@@ -299,6 +307,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         combined_node = ComputeMetricsNode(
             parent_node=combined_parent_node,
             metric_specs=unique_metric_specs,
+            is_aggregated_to_elements=current_right_node.is_aggregated_to_elements,
         )
         self._log_combine_success(
             left_node=self._current_left_node,

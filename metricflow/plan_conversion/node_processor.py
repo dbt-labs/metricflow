@@ -132,9 +132,6 @@ class PreJoinNodeProcessor:
             if entity_spec_in_first_node.reference != entity_reference:
                 continue
 
-            if len(entity_spec_in_first_node.entity_links) > 0:
-                continue
-
             assert (
                 len(entity_instance_in_first_node.defined_from) == 1
             ), "Multiple items in defined_from not yet supported"
@@ -217,6 +214,8 @@ class PreJoinNodeProcessor:
                     left_instance_set=data_set_of_first_node_that_could_be_joined.instance_set,
                     right_instance_set=data_set_of_second_node_that_can_be_joined.instance_set,
                     on_entity_reference=entity_reference_to_join_first_and_second_nodes,
+                    right_node_is_aggregated_to_entity=second_node_that_could_be_joined.is_aggregated_to_elements
+                    == {entity_reference_to_join_first_and_second_nodes},
                 ):
                     continue
 
