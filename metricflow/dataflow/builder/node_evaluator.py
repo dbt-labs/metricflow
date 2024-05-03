@@ -40,7 +40,6 @@ from metricflow.dataflow.builder.partitions import (
     PartitionTimeDimensionJoinDescription,
 )
 from metricflow.dataflow.dataflow_plan import BaseOutput
-from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataflow.nodes.join_to_base import JoinDescription, ValidityWindowJoinDescription
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
@@ -257,17 +256,19 @@ class NodeEvaluatorForLinkableInstances:
                 assert len(entity_instance_in_left_node.defined_from) == 1
                 assert len(entity_instance_in_right_node.defined_from) == 1
 
-                if not self._join_evaluator.is_valid_semantic_model_join(
-                    left_semantic_model_reference=entity_instance_in_left_node.defined_from[0].semantic_model_reference,
-                    right_semantic_model_reference=entity_instance_in_right_node.defined_from[
-                        0
-                    ].semantic_model_reference,
-                    on_entity_reference=entity_spec_in_right_node.reference,
+                if not (
+                    self._join_evaluator.is_valid_semantic_model_join(
+                        left_semantic_model_reference=entity_instance_in_left_node.defined_from[
+                            0
+                        ].semantic_model_reference,
+                        right_semantic_model_reference=entity_instance_in_right_node.defined_from[
+                            0
+                        ].semantic_model_reference,
+                        on_entity_reference=entity_spec_in_right_node.reference,
+                    )
+                    or right_node.is_aggregated_to_elements == {entity_spec_in_right_node.reference}
                 ):
-                    # If joining to ComputeMetricsNode, the right node is pre-aggregated.
-                    # Since we currently only allow one entity on GroupByMetric, this won't fan out.
-                    if not isinstance(right_node, ComputeMetricsNode):
-                        continue
+                    continue
 
                 linkless_entity_spec_in_node = LinklessEntitySpec.from_element_name(
                     entity_spec_in_right_node.element_name

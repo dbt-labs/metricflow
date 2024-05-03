@@ -19,7 +19,6 @@ from metricflow.dataflow.builder.partitions import PartitionJoinResolver
 from metricflow.dataflow.dataflow_plan import (
     BaseOutput,
 )
-from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
 from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinToBaseOutputNode
@@ -215,8 +214,8 @@ class PreJoinNodeProcessor:
                     left_instance_set=data_set_of_first_node_that_could_be_joined.instance_set,
                     right_instance_set=data_set_of_second_node_that_can_be_joined.instance_set,
                     on_entity_reference=entity_reference_to_join_first_and_second_nodes,
-                    # TODO: make this check more substantial in V2
-                    right_node_is_subquery=isinstance(second_node_that_could_be_joined, ComputeMetricsNode),
+                    right_node_is_aggregated_to_entity=second_node_that_could_be_joined.is_aggregated_to_elements
+                    == {entity_reference_to_join_first_and_second_nodes},
                 ):
                     continue
 

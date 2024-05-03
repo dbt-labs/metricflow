@@ -40,13 +40,13 @@ class JoinDataflowOutputValidator:
         left_instance_set: InstanceSet,
         right_instance_set: InstanceSet,
         on_entity_reference: EntityReference,
-        right_node_is_subquery: bool = False,
+        right_node_is_aggregated_to_entity: bool = False,
     ) -> bool:
         """Return true if the instance sets can be joined using the given entity."""
         left_semantic_model_reference = self._semantic_model_of_entity_in_instance_set(
             instance_set=left_instance_set, entity_reference=on_entity_reference
         )
-        if right_node_is_subquery:
+        if right_node_is_aggregated_to_entity:
             left_entity = self._join_evaluator._semantic_model_lookup.get_entity_in_semantic_model(
                 SemanticModelElementReference.create_from_references(left_semantic_model_reference, on_entity_reference)
             )
