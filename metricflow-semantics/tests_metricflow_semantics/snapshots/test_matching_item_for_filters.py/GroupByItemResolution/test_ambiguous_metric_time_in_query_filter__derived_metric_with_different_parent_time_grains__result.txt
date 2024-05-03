@@ -25,7 +25,9 @@ GroupByItemResolution(
                     ),
                     element_name='metric_time',
                     dimension_type=TIME,
-                    properties=frozenset({<LinkableElementProperty.METRIC_TIME: 'metric_time'>}),
+                    properties=frozenset(
+                      METRIC_TIME,
+                    ),
                     time_granularity=MONTH,
                   ),
                 ),
@@ -63,7 +65,9 @@ GroupByItemResolution(
                     ),
                     element_name='metric_time',
                     dimension_type=TIME,
-                    properties=frozenset({<LinkableElementProperty.METRIC_TIME: 'metric_time'>}),
+                    properties=frozenset(
+                      METRIC_TIME,
+                    ),
                     time_granularity=YEAR,
                   ),
                 ),
