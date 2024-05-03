@@ -8,7 +8,7 @@ FROM (
   -- Join Standard Outputs
   -- Pass Only Elements: ['bookers', 'guest__bookers']
   SELECT
-    subq_26.bookers AS guest__bookers
+    subq_26.guest__bookers AS guest__bookers
     , subq_20.bookers AS bookers
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
@@ -25,10 +25,10 @@ FROM (
     -- Pass Only Elements: ['bookers', 'guest']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
-    -- Pass Only Elements: ['guest', 'bookers']
+    -- Pass Only Elements: ['guest', 'guest__bookers']
     SELECT
       guest_id AS guest
-      , COUNT(DISTINCT guest_id) AS bookers
+      , COUNT(DISTINCT guest_id) AS guest__bookers
     FROM ***************************.fct_bookings bookings_source_src_28000
     GROUP BY
       guest_id

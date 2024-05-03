@@ -8,7 +8,7 @@ FROM (
   -- Join Standard Outputs
   -- Pass Only Elements: ['listings', 'listing__views_times_booking_value']
   SELECT
-    subq_47.views_times_booking_value AS listing__views_times_booking_value
+    subq_47.listing__views_times_booking_value AS listing__views_times_booking_value
     , subq_34.listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
@@ -21,10 +21,10 @@ FROM (
   ) subq_34
   LEFT OUTER JOIN (
     -- Compute Metrics via Expressions
-    -- Pass Only Elements: ['listing', 'views_times_booking_value']
+    -- Pass Only Elements: ['listing', 'listing__views_times_booking_value']
     SELECT
       listing
-      , booking_value * views AS views_times_booking_value
+      , booking_value * views AS listing__views_times_booking_value
     FROM (
       -- Combine Aggregated Outputs
       SELECT

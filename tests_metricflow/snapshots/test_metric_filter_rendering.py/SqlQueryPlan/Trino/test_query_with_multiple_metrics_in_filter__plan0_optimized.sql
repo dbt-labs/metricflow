@@ -8,8 +8,8 @@ FROM (
   -- Join Standard Outputs
   -- Pass Only Elements: ['listings', 'listing__bookings', 'listing__bookers']
   SELECT
-    subq_36.bookings AS listing__bookings
-    , subq_42.bookers AS listing__bookers
+    subq_36.listing__bookings AS listing__bookings
+    , subq_42.listing__bookers AS listing__bookers
     , subq_30.listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
@@ -23,10 +23,10 @@ FROM (
   LEFT OUTER JOIN (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
-    -- Pass Only Elements: ['listing', 'bookings']
+    -- Pass Only Elements: ['listing', 'listing__bookings']
     SELECT
       listing
-      , SUM(bookings) AS bookings
+      , SUM(bookings) AS listing__bookings
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
@@ -47,10 +47,10 @@ FROM (
     -- Pass Only Elements: ['bookers', 'listing']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
-    -- Pass Only Elements: ['listing', 'bookers']
+    -- Pass Only Elements: ['listing', 'listing__bookers']
     SELECT
       listing_id AS listing
-      , COUNT(DISTINCT guest_id) AS bookers
+      , COUNT(DISTINCT guest_id) AS listing__bookers
     FROM ***************************.fct_bookings bookings_source_src_28000
     GROUP BY
       listing_id

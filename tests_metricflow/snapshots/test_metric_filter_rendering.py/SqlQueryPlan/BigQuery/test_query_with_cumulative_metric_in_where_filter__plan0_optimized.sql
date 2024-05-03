@@ -8,7 +8,7 @@ FROM (
   -- Join Standard Outputs
   -- Pass Only Elements: ['listings', 'user__revenue_all_time']
   SELECT
-    subq_26.revenue_all_time AS user__revenue_all_time
+    subq_26.user__revenue_all_time AS user__revenue_all_time
     , subq_20.listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
@@ -25,10 +25,10 @@ FROM (
     -- Pass Only Elements: ['txn_revenue', 'user']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
-    -- Pass Only Elements: ['user', 'revenue_all_time']
+    -- Pass Only Elements: ['user', 'user__revenue_all_time']
     SELECT
       user_id AS user
-      , SUM(revenue) AS revenue_all_time
+      , SUM(revenue) AS user__revenue_all_time
     FROM ***************************.fct_revenue revenue_src_28000
     GROUP BY
       user

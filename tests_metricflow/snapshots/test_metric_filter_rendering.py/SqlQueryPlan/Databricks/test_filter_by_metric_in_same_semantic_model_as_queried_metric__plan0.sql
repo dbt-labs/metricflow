@@ -23,7 +23,7 @@ FROM (
           -- Join Standard Outputs
           SELECT
             subq_6.guest AS guest
-            , subq_12.booking_value AS guest__booking_value
+            , subq_12.guest__booking_value AS guest__booking_value
             , subq_6.bookers AS bookers
           FROM (
             -- Pass Only Elements: ['bookers', 'guest']
@@ -227,15 +227,15 @@ FROM (
             ) subq_5
           ) subq_6
           LEFT OUTER JOIN (
-            -- Pass Only Elements: ['guest', 'booking_value']
+            -- Pass Only Elements: ['guest', 'guest__booking_value']
             SELECT
               subq_11.guest
-              , subq_11.booking_value
+              , subq_11.guest__booking_value
             FROM (
               -- Compute Metrics via Expressions
               SELECT
                 subq_10.guest
-                , subq_10.booking_value
+                , subq_10.booking_value AS guest__booking_value
               FROM (
                 -- Aggregate Measures
                 SELECT

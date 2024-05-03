@@ -29,7 +29,7 @@ FROM (
           SELECT
             subq_6.metric_time__day AS metric_time__day
             , subq_6.listing AS listing
-            , subq_12.bookings AS listing__bookings
+            , subq_12.listing__bookings AS listing__bookings
             , subq_6.listings AS listings
           FROM (
             -- Pass Only Elements: ['listings', 'metric_time__day', 'listing']
@@ -171,15 +171,15 @@ FROM (
             ) subq_5
           ) subq_6
           LEFT OUTER JOIN (
-            -- Pass Only Elements: ['listing', 'bookings']
+            -- Pass Only Elements: ['listing', 'listing__bookings']
             SELECT
               subq_11.listing
-              , subq_11.bookings
+              , subq_11.listing__bookings
             FROM (
               -- Compute Metrics via Expressions
               SELECT
                 subq_10.listing
-                , subq_10.bookings
+                , subq_10.bookings AS listing__bookings
               FROM (
                 -- Aggregate Measures
                 SELECT

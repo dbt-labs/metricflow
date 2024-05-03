@@ -25,8 +25,8 @@ FROM (
           -- Join Standard Outputs
           SELECT
             subq_10.listing AS listing
-            , subq_16.bookings AS listing__bookings
-            , subq_22.bookers AS listing__bookers
+            , subq_16.listing__bookings AS listing__bookings
+            , subq_22.listing__bookers AS listing__bookers
             , subq_10.listings AS listings
           FROM (
             -- Pass Only Elements: ['listings', 'listing', 'listing']
@@ -167,15 +167,15 @@ FROM (
             ) subq_9
           ) subq_10
           LEFT OUTER JOIN (
-            -- Pass Only Elements: ['listing', 'bookings']
+            -- Pass Only Elements: ['listing', 'listing__bookings']
             SELECT
               subq_15.listing
-              , subq_15.bookings
+              , subq_15.listing__bookings
             FROM (
               -- Compute Metrics via Expressions
               SELECT
                 subq_14.listing
-                , subq_14.bookings
+                , subq_14.bookings AS listing__bookings
               FROM (
                 -- Aggregate Measures
                 SELECT
@@ -390,15 +390,15 @@ FROM (
           ON
             subq_10.listing = subq_16.listing
           LEFT OUTER JOIN (
-            -- Pass Only Elements: ['listing', 'bookers']
+            -- Pass Only Elements: ['listing', 'listing__bookers']
             SELECT
               subq_21.listing
-              , subq_21.bookers
+              , subq_21.listing__bookers
             FROM (
               -- Compute Metrics via Expressions
               SELECT
                 subq_20.listing
-                , subq_20.bookers
+                , subq_20.bookers AS listing__bookers
               FROM (
                 -- Aggregate Measures
                 SELECT

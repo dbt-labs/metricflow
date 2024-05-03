@@ -23,7 +23,7 @@ FROM (
           -- Join Standard Outputs
           SELECT
             subq_6.user AS user
-            , subq_12.revenue_all_time AS user__revenue_all_time
+            , subq_12.user__revenue_all_time AS user__revenue_all_time
             , subq_6.listings AS listings
           FROM (
             -- Pass Only Elements: ['listings', 'user']
@@ -164,15 +164,15 @@ FROM (
             ) subq_5
           ) subq_6
           LEFT OUTER JOIN (
-            -- Pass Only Elements: ['user', 'revenue_all_time']
+            -- Pass Only Elements: ['user', 'user__revenue_all_time']
             SELECT
               subq_11.user
-              , subq_11.revenue_all_time
+              , subq_11.user__revenue_all_time
             FROM (
               -- Compute Metrics via Expressions
               SELECT
                 subq_10.user
-                , subq_10.txn_revenue AS revenue_all_time
+                , subq_10.txn_revenue AS user__revenue_all_time
               FROM (
                 -- Aggregate Measures
                 SELECT

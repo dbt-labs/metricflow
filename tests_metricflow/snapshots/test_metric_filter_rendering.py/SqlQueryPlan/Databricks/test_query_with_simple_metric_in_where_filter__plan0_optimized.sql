@@ -8,7 +8,7 @@ FROM (
   -- Join Standard Outputs
   -- Pass Only Elements: ['listings', 'listing__bookings']
   SELECT
-    subq_26.bookings AS listing__bookings
+    subq_26.listing__bookings AS listing__bookings
     , subq_20.listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
@@ -22,10 +22,10 @@ FROM (
   LEFT OUTER JOIN (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
-    -- Pass Only Elements: ['listing', 'bookings']
+    -- Pass Only Elements: ['listing', 'listing__bookings']
     SELECT
       listing
-      , SUM(bookings) AS bookings
+      , SUM(bookings) AS listing__bookings
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'

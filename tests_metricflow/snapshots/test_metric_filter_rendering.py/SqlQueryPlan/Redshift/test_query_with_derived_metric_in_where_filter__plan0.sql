@@ -23,7 +23,7 @@ FROM (
           -- Join Standard Outputs
           SELECT
             subq_13.listing AS listing
-            , subq_26.views_times_booking_value AS listing__views_times_booking_value
+            , subq_26.listing__views_times_booking_value AS listing__views_times_booking_value
             , subq_13.listings AS listings
           FROM (
             -- Pass Only Elements: ['listings', 'listing']
@@ -164,15 +164,15 @@ FROM (
             ) subq_12
           ) subq_13
           LEFT OUTER JOIN (
-            -- Pass Only Elements: ['listing', 'views_times_booking_value']
+            -- Pass Only Elements: ['listing', 'listing__views_times_booking_value']
             SELECT
               subq_25.listing
-              , subq_25.views_times_booking_value
+              , subq_25.listing__views_times_booking_value
             FROM (
               -- Compute Metrics via Expressions
               SELECT
                 subq_24.listing
-                , booking_value * views AS views_times_booking_value
+                , booking_value * views AS listing__views_times_booking_value
               FROM (
                 -- Combine Aggregated Outputs
                 SELECT

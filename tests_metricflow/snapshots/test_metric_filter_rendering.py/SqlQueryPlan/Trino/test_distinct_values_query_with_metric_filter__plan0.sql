@@ -14,7 +14,7 @@ FROM (
       subq_4.listing AS listing
       , subq_4.lux_listing AS lux_listing
       , subq_4.listing__lux_listing AS listing__lux_listing
-      , subq_10.bookings AS listing__bookings
+      , subq_10.listing__bookings AS listing__bookings
     FROM (
       -- Read Elements From Semantic Model 'lux_listing_mapping'
       SELECT
@@ -24,15 +24,15 @@ FROM (
       FROM ***************************.dim_lux_listing_id_mapping lux_listing_mapping_src_28000
     ) subq_4
     FULL OUTER JOIN (
-      -- Pass Only Elements: ['listing', 'bookings']
+      -- Pass Only Elements: ['listing', 'listing__bookings']
       SELECT
         subq_9.listing
-        , subq_9.bookings
+        , subq_9.listing__bookings
       FROM (
         -- Compute Metrics via Expressions
         SELECT
           subq_8.listing
-          , subq_8.bookings
+          , subq_8.bookings AS listing__bookings
         FROM (
           -- Aggregate Measures
           SELECT

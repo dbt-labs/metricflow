@@ -89,7 +89,7 @@
                                     </MetricTimeDimensionTransformNode>
                                 </FilterElementsNode>
                                 <FilterElementsNode>
-                                    <!-- description = "Pass Only Elements: ['listing', 'bookings']" -->
+                                    <!-- description = "Pass Only Elements: ['listing', 'listing__bookings']" -->
                                     <!-- node_id = NodeId(id_str='pfe_2') -->
                                     <!-- include_spec = LinklessEntitySpec(element_name='listing') -->
                                     <!-- include_spec =                                                               -->
