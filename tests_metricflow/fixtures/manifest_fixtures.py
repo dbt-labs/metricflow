@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import pathlib
 from collections import OrderedDict
 from dataclasses import dataclass
 from enum import Enum
@@ -17,6 +18,29 @@ from metricflow_semantics.specs.dunder_column_association_resolver import Dunder
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.id_helpers import IdNumberSpace, patch_id_generators_helper
 from metricflow_semantics.test_helpers.manifest_helpers import load_semantic_manifest
+from metricflow_semantics.test_helpers.semantic_manifest_yamls.ambiguous_resolution_manifest import (
+    AMBIGUOUS_RESOLUTION_MANIFEST_ANCHOR,
+)
+from metricflow_semantics.test_helpers.semantic_manifest_yamls.cyclic_join_manifest import CYCLIC_JOIN_MANIFEST_ANCHOR
+from metricflow_semantics.test_helpers.semantic_manifest_yamls.data_warehouse_validation_manifest import (
+    DW_VALIDATION_MANIFEST_ANCHOR,
+)
+from metricflow_semantics.test_helpers.semantic_manifest_yamls.extended_date_manifest import (
+    EXTENDED_DATE_MANIFEST_ANCHOR,
+)
+from metricflow_semantics.test_helpers.semantic_manifest_yamls.join_types_manifest import JOIN_TYPES_MANIFEST_ANCHOR
+from metricflow_semantics.test_helpers.semantic_manifest_yamls.multi_hop_join_manifest import (
+    MULTI_HOP_JOIN_MANIFEST_ANCHOR,
+)
+from metricflow_semantics.test_helpers.semantic_manifest_yamls.non_sm_manifest import NON_SM_MANIFEST_ANCHOR
+from metricflow_semantics.test_helpers.semantic_manifest_yamls.partitioned_multi_hop_join_manifest import (
+    PARTITIONED_MULTI_HOP_JOIN_MANIFEST_ANCHOR,
+)
+from metricflow_semantics.test_helpers.semantic_manifest_yamls.scd_manifest import SCD_MANIFEST_ANCHOR
+from metricflow_semantics.test_helpers.semantic_manifest_yamls.simple_manifest import SIMPLE_MANIFEST_ANCHOR
+from metricflow_semantics.test_helpers.semantic_manifest_yamls.simple_multi_hop_join_manifest import (
+    SIMPLE_MULTI_HOP_JOIN_MANIFEST_ANCHOR,
+)
 from metricflow_semantics.test_helpers.time_helpers import ConfigurableTimeSource
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
@@ -42,6 +66,8 @@ class SemanticManifestSetupPropertySet:
     # is modified. i.e. without this, modifying the first semantic manifest might cause all IDs in snapshots associated
     # with semantic manifests following the first one to change.
     id_number_space: IdNumberSpace
+    # Where the YAML files are located.
+    yaml_file_dir: pathlib.Path
 
 
 class SemanticManifestSetup(Enum):
@@ -50,37 +76,58 @@ class SemanticManifestSetup(Enum):
     AMBIGUOUS_RESOLUTION_MANIFEST = SemanticManifestSetupPropertySet(
         semantic_manifest_name="ambiguous_resolution_manifest",
         id_number_space=IdNumberSpace.for_block(0),
+        yaml_file_dir=AMBIGUOUS_RESOLUTION_MANIFEST_ANCHOR.directory,
     )
     # Not including CONFIG_LINTER_MANIFEST as it has intentional errors for running validations.
     CYCLIC_JOIN_MANIFEST = SemanticManifestSetupPropertySet(
-        semantic_manifest_name="cyclic_join_manifest", id_number_space=IdNumberSpace.for_block(1)
+        semantic_manifest_name="cyclic_join_manifest",
+        id_number_space=IdNumberSpace.for_block(1),
+        yaml_file_dir=CYCLIC_JOIN_MANIFEST_ANCHOR.directory,
     )
     DATA_WAREHOUSE_VALIDATION_MANIFEST = SemanticManifestSetupPropertySet(
-        semantic_manifest_name="data_warehouse_validation_manifest", id_number_space=IdNumberSpace.for_block(2)
+        semantic_manifest_name="data_warehouse_validation_manifest",
+        id_number_space=IdNumberSpace.for_block(2),
+        yaml_file_dir=DW_VALIDATION_MANIFEST_ANCHOR.directory,
     )
     EXTENDED_DATE_MANIFEST = SemanticManifestSetupPropertySet(
-        semantic_manifest_name="extended_date_manifest", id_number_space=IdNumberSpace.for_block(3)
+        semantic_manifest_name="extended_date_manifest",
+        id_number_space=IdNumberSpace.for_block(3),
+        yaml_file_dir=EXTENDED_DATE_MANIFEST_ANCHOR.directory,
     )
     JOIN_TYPES_MANIFEST = SemanticManifestSetupPropertySet(
-        semantic_manifest_name="join_types_manifest", id_number_space=IdNumberSpace.for_block(4)
+        semantic_manifest_name="join_types_manifest",
+        id_number_space=IdNumberSpace.for_block(4),
+        yaml_file_dir=JOIN_TYPES_MANIFEST_ANCHOR.directory,
     )
     MULTI_HOP_JOIN_MANIFEST = SemanticManifestSetupPropertySet(
-        semantic_manifest_name="multi_hop_join_manifest", id_number_space=IdNumberSpace.for_block(5)
+        semantic_manifest_name="multi_hop_join_manifest",
+        id_number_space=IdNumberSpace.for_block(5),
+        yaml_file_dir=MULTI_HOP_JOIN_MANIFEST_ANCHOR.directory,
     )
     PARTITIONED_MULTI_HOP_JOIN_MANIFEST = SemanticManifestSetupPropertySet(
-        semantic_manifest_name="partitioned_multi_hop_join_manifest", id_number_space=IdNumberSpace.for_block(6)
+        semantic_manifest_name="partitioned_multi_hop_join_manifest",
+        id_number_space=IdNumberSpace.for_block(6),
+        yaml_file_dir=PARTITIONED_MULTI_HOP_JOIN_MANIFEST_ANCHOR.directory,
     )
     NON_SM_MANIFEST = SemanticManifestSetupPropertySet(
-        semantic_manifest_name="non_sm_manifest", id_number_space=IdNumberSpace.for_block(7)
+        semantic_manifest_name="non_sm_manifest",
+        id_number_space=IdNumberSpace.for_block(7),
+        yaml_file_dir=NON_SM_MANIFEST_ANCHOR.directory,
     )
     SCD_MANIFEST = SemanticManifestSetupPropertySet(
-        semantic_manifest_name="scd_manifest", id_number_space=IdNumberSpace.for_block(8)
+        semantic_manifest_name="scd_manifest",
+        id_number_space=IdNumberSpace.for_block(8),
+        yaml_file_dir=SCD_MANIFEST_ANCHOR.directory,
     )
     SIMPLE_MANIFEST = SemanticManifestSetupPropertySet(
-        semantic_manifest_name="simple_manifest", id_number_space=IdNumberSpace.for_block(9)
+        semantic_manifest_name="simple_manifest",
+        id_number_space=IdNumberSpace.for_block(9),
+        yaml_file_dir=SIMPLE_MANIFEST_ANCHOR.directory,
     )
     SIMPLE_MULTI_HOP_JOIN_MANIFEST = SemanticManifestSetupPropertySet(
-        semantic_manifest_name="simple_multi_hop_join_manifest", id_number_space=IdNumberSpace.for_block(10)
+        semantic_manifest_name="simple_multi_hop_join_manifest",
+        id_number_space=IdNumberSpace.for_block(10),
+        yaml_file_dir=SIMPLE_MULTI_HOP_JOIN_MANIFEST_ANCHOR.directory,
     )
 
     @property
@@ -90,6 +137,10 @@ class SemanticManifestSetup(Enum):
     @property
     def semantic_manifest_name(self) -> str:  # noqa: D102
         return self.value.semantic_manifest_name
+
+    @property
+    def yaml_file_dir(self) -> pathlib.Path:  # noqa: D102
+        return self.value.yaml_file_dir
 
 
 @dataclass(frozen=True)
@@ -211,13 +262,8 @@ def mf_engine_test_fixture_mapping(
     fixture_mapping: Dict[SemanticManifestSetup, MetricFlowEngineTestFixture] = {}
     for semantic_manifest_setup in SemanticManifestSetup:
         with patch_id_generators_helper(semantic_manifest_setup.id_number_space.start_value):
-            try:
-                build_result = load_semantic_manifest(semantic_manifest_setup.semantic_manifest_name, template_mapping)
-            except Exception as e:
-                raise RuntimeError(f"Error while loading semantic manifest: {semantic_manifest_setup}") from e
-
             fixture_mapping[semantic_manifest_setup] = MetricFlowEngineTestFixture.from_parameters(
-                sql_client, build_result.semantic_manifest
+                sql_client, load_semantic_manifest(semantic_manifest_setup.yaml_file_dir, template_mapping)
             )
 
     return fixture_mapping
