@@ -45,7 +45,7 @@ class MetricFlowPrettyFormatter:
         """Pretty prints a sequence object i.e. list or tuple.
 
         Args:
-            list_like_obj: A list or a tuple.
+            list_like_obj: A list, tuple, set, or frozenset.
             remaining_line_width: If specified, try to make the string representation <= this many columns wide.
 
         Returns:
@@ -60,7 +60,10 @@ class MetricFlowPrettyFormatter:
         elif isinstance(list_like_obj, set) or isinstance(list_like_obj, frozenset):
             left_enclose_str = f"{type(list_like_obj).__name__}("
             right_enclose_str = ")"
-            list_like_obj = sorted(list_like_obj)
+            list_like_obj = sorted(
+                list_like_obj,
+                key=(lambda x: x.name) if (list_like_obj and isinstance(list(list_like_obj)[0], Enum)) else None,
+            )
         else:
             raise RuntimeError(f"Unhandled type: {type(list_like_obj)}")
 
