@@ -39,7 +39,9 @@ class MetricFlowPrettyFormatter:
         # Checking the attribute as the BaseModel check fails for newer version of Pydantic.
         return isinstance(obj, BaseModel) or hasattr(obj, "__config__")
 
-    def _handle_sequence_obj(self, list_like_obj: Union[list, tuple], remaining_line_width: Optional[int]) -> str:
+    def _handle_sequence_obj(
+        self, list_like_obj: Union[list, tuple, set, frozenset], remaining_line_width: Optional[int]
+    ) -> str:
         """Pretty prints a sequence object i.e. list or tuple.
 
         Args:
@@ -55,6 +57,10 @@ class MetricFlowPrettyFormatter:
         elif isinstance(list_like_obj, tuple):
             left_enclose_str = "("
             right_enclose_str = ")"
+        elif isinstance(list_like_obj, set) or isinstance(list_like_obj, frozenset):
+            left_enclose_str = f"{type(list_like_obj).__name__}("
+            right_enclose_str = ")"
+            list_like_obj = sorted(list_like_obj)
         else:
             raise RuntimeError(f"Unhandled type: {type(list_like_obj)}")
 
@@ -317,7 +323,7 @@ class MetricFlowPrettyFormatter:
         if isinstance(obj, Enum):
             return obj.name
 
-        if isinstance(obj, (list, tuple)):
+        if isinstance(obj, (list, tuple, set, frozenset)):
             return self._handle_sequence_obj(obj, remaining_line_width=remaining_line_width)
 
         if isinstance(obj, dict):
