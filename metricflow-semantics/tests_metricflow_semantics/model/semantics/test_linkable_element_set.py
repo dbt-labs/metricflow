@@ -49,6 +49,7 @@ _secondary_semantic_model = SemanticModelReference(semantic_model_name="secondar
 _base_entity_reference = EntityReference(element_name="base_entity")
 _base_dimension_reference = DimensionReference(element_name="base_dimension")
 _time_dimension_reference = TimeDimensionReference(element_name="time_dimension")
+_metric_semantic_model = SemanticModelReference(semantic_model_name="metric_semantic_model")
 _base_metric_reference = MetricReference(element_name="base_metric")
 
 
@@ -136,6 +137,7 @@ _base_metric = LinkableMetric(
     join_path=SemanticModelToMetricSubqueryJoinPath(
         metric_subquery_join_path_element=MetricSubqueryJoinPathElement(
             metric_reference=_base_metric_reference,
+            metric_derived_from_semantic_models=(_metric_semantic_model,),
             join_on_entity=_base_entity_reference,
             entity_links=(_base_entity_reference,),
         ),
@@ -146,6 +148,7 @@ _ambiguous_metric = LinkableMetric(
     join_path=SemanticModelToMetricSubqueryJoinPath(
         metric_subquery_join_path_element=MetricSubqueryJoinPathElement(
             metric_reference=MetricReference(AMBIGUOUS_NAME),
+            metric_derived_from_semantic_models=(_metric_semantic_model,),
             join_on_entity=_base_entity_reference,
             entity_links=(_base_entity_reference,),
         ),
@@ -157,6 +160,7 @@ _ambiguous_metric_with_join_path = LinkableMetric(
     join_path=SemanticModelToMetricSubqueryJoinPath(
         metric_subquery_join_path_element=MetricSubqueryJoinPathElement(
             metric_reference=MetricReference(AMBIGUOUS_NAME),
+            metric_derived_from_semantic_models=(_metric_semantic_model,),
             join_on_entity=_base_entity_reference,
             entity_links=(_base_entity_reference,),
         ),
@@ -547,6 +551,8 @@ def linkable_set() -> LinkableElementSet:  # noqa: D103
     entity_2_source = SemanticModelReference("entity_2_source")
     entity_3 = EntityReference("entity_3")
     entity_3_source = SemanticModelReference("entity_3_source")
+    entity_4 = EntityReference("entity_4")
+    entity_4_source = SemanticModelReference("entity_4_source")
 
     return LinkableElementSet(
         path_key_to_linkable_dimensions={
@@ -626,8 +632,19 @@ def linkable_set() -> LinkableElementSet:  # noqa: D103
                     join_path=SemanticModelToMetricSubqueryJoinPath(
                         metric_subquery_join_path_element=MetricSubqueryJoinPathElement(
                             metric_reference=MetricReference("metric_element"),
+                            metric_derived_from_semantic_models=(_metric_semantic_model,),
                             join_on_entity=entity_3,
-                            entity_links=(entity_3,),
+                            entity_links=(entity_3, entity_4),
+                            metric_to_entity_join_path=SemanticModelJoinPath(
+                                path_elements=(
+                                    SemanticModelJoinPathElement(
+                                        semantic_model_reference=entity_4_source, join_on_entity=entity_4
+                                    ),
+                                    SemanticModelJoinPathElement(
+                                        semantic_model_reference=entity_3_source, join_on_entity=entity_3
+                                    ),
+                                )
+                            ),
                         ),
                         semantic_model_join_path=SemanticModelJoinPath.from_single_element(
                             semantic_model_reference=entity_3_source, join_on_entity=entity_3
@@ -641,14 +658,15 @@ def linkable_set() -> LinkableElementSet:  # noqa: D103
 
 def test_derived_semantic_models(linkable_set: LinkableElementSet) -> None:
     """Tests that the semantic models in the element set are returned via `derived_from_semantic_models`."""
-    # TODO: add metric source for linkable metrics
     assert tuple(linkable_set.derived_from_semantic_models) == (
         SemanticModelReference(semantic_model_name="dimension_source"),
         SemanticModelReference(semantic_model_name="entity_0_source"),
         SemanticModelReference(semantic_model_name="entity_1_source"),
         SemanticModelReference(semantic_model_name="entity_2_source"),
         SemanticModelReference(semantic_model_name="entity_3_source"),
+        SemanticModelReference(semantic_model_name="entity_4_source"),
         SemanticModelReference(semantic_model_name="entity_source"),
+        SemanticModelReference(semantic_model_name="metric_semantic_model"),
         SemanticModelReference(semantic_model_name="time_dimension_source"),
     )
 

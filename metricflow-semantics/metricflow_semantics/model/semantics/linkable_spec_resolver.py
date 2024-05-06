@@ -192,10 +192,15 @@ class ValidLinkableSpecResolver:
                 continue
             metric_reference = MetricReference(metric.name)
             linkable_element_set_for_metric = self.get_linkable_elements_for_metrics([metric_reference])
+            defined_from_semantic_models = tuple(
+                self._semantic_model_lookup.get_semantic_model_for_measure(input_measure.measure_reference).reference
+                for input_measure in metric.input_measures
+            )
             for linkable_entities in linkable_element_set_for_metric.path_key_to_linkable_entities.values():
                 for linkable_entity in linkable_entities:
                     metric_subquery_join_path_element = MetricSubqueryJoinPathElement(
                         metric_reference=metric_reference,
+                        metric_derived_from_semantic_models=defined_from_semantic_models,
                         join_on_entity=linkable_entity.reference,
                         entity_links=linkable_entity.entity_links,
                         metric_to_entity_join_path=(
