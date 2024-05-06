@@ -13,6 +13,7 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.errors.error_classes import UnableToSatisfyQueryError
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
+from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
@@ -1338,7 +1339,7 @@ def test_all_available_single_join_metric_filters(
         MeasureReference("listings"), without_any_of={LinkableElementProperty.MULTI_HOP}
     ).path_key_to_linkable_metrics.values():
         for linkable_metric in linkable_metric_tuple:
-            group_by_metric_spec = linkable_metric.path_key.spec
+            group_by_metric_spec = LinkableElementSet._path_key_to_spec(linkable_metric.path_key)
             assert isinstance(group_by_metric_spec, GroupByMetricSpec)
             entity_spec = group_by_metric_spec.metric_subquery_entity_spec
             if entity_spec.entity_links:  # multi-hop for inner query
