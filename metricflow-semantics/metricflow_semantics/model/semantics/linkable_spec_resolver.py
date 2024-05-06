@@ -281,7 +281,10 @@ class ValidLinkableSpecResolver:
                 continue
             for metric_subquery_join_path_element in self._joinable_metrics_for_entities[entity_reference]:
                 # Temp: diable multi-hop options for LinkableMetrics.
-                if metric_subquery_join_path_element.metric_to_entity_join_path:
+                if (
+                    metric_subquery_join_path_element.metric_to_entity_join_path
+                    or len(metric_subquery_join_path_element.entity_links) > 1
+                ):
                     continue
                 linkable_metric = LinkableMetric(
                     properties=properties,

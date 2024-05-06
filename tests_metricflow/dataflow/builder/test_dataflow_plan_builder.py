@@ -1375,7 +1375,24 @@ def test_all_available_metric_filters(
                     ),
                 )
                 dataflow_plan_builder.build_plan(query_spec)
-                print("succeeded for:", group_by_metric_spec)
+                # print("succeeded for:", linkable_metric)
             except:
-                print("failed for:", group_by_metric_spec)
+                pass
+                # print("failed for:", linkable_metric)
     assert 0
+
+
+# Failing for this configuration:
+# derived metrics? or those with multiple entity links? why do they have multiple?
+# Ex:
+# SemanticModelToMetricSubqueryJoinPath(metric_subquery_join_path_element=MetricSubqueryJoinPathElement(metric_reference=MetricReference(element_name='bookings_per_listing'), join_on_entity=EntityReference(element_name='user'), entity_links=(EntityReference(element_name='listing'),), metric_to_entity_join_path=None), semantic_model_join_path=None))
+# entity links but no join path! yep
+# somehow we have: entity links that don't include the join on entity
+
+# does this double entity syntax even work??
+
+
+def test_test(dataflow_plan_builder: DataflowPlanBuilder, query_parser: MetricFlowQueryParser) -> None:
+
+    query_spec = query_parser.parse_and_validate_query(metric_names=("bookings",), group_by_names=("guest__listing",))
+    dataflow_plan_builder.build_plan(query_spec)
