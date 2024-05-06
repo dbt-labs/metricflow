@@ -1352,3 +1352,30 @@ def test_all_available_single_join_metric_filters(
                 ),
             )
             dataflow_plan_builder.build_plan(query_spec)
+
+
+def test_all_available_metric_filters(
+    dataflow_plan_builder: DataflowPlanBuilder, query_parser: MetricFlowQueryParser
+) -> None:
+    """Checks that all allowed metric filters do not error when used in dataflow plan (single-hop for both inner and out query)."""
+    for linkable_metric_tuple in dataflow_plan_builder._metric_lookup.linkable_elements_for_measure(
+        MeasureReference("listings")
+    ).path_key_to_linkable_metrics.values():
+        for linkable_metric in linkable_metric_tuple:
+            group_by_metric_spec = linkable_metric.path_key.spec
+            assert isinstance(group_by_metric_spec, GroupByMetricSpec)
+            entity_spec = group_by_metric_spec.metric_subquery_entity_spec
+            try:
+                query_spec = query_parser.parse_and_validate_query(
+                    metric_names=("listings",),
+                    where_constraint=PydanticWhereFilter(
+                        where_sql_template=string.Template(
+                            "{{ Metric('$metric_name', ['$entity_name']) }} > 2"
+                        ).substitute(metric_name=linkable_metric.element_name, entity_name=entity_spec.element_name),
+                    ),
+                )
+                dataflow_plan_builder.build_plan(query_spec)
+                print("succeeded for:", group_by_metric_spec)
+            except:
+                print("failed for:", group_by_metric_spec)
+    assert 0

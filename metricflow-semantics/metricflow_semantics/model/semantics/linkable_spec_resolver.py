@@ -271,6 +271,8 @@ class ValidLinkableSpecResolver:
                 f"last join path element: {using_join_path.last_semantic_model_reference.semantic_model_name}",
             )
             properties = properties.union(frozenset({LinkableElementProperty.MULTI_HOP}))
+            # Temp: diable multi-hop options for LinkableMetrics.
+            return LinkableElementSet()
 
         path_key_to_linkable_metrics: Dict[ElementPathKey, Tuple[LinkableMetric, ...]] = {}
         for entity_reference in [entity.reference for entity in semantic_model.entities]:
@@ -278,6 +280,9 @@ class ValidLinkableSpecResolver:
             if using_join_path and entity_reference in using_join_path.entity_links:
                 continue
             for metric_subquery_join_path_element in self._joinable_metrics_for_entities[entity_reference]:
+                # Temp: diable multi-hop options for LinkableMetrics.
+                if metric_subquery_join_path_element.metric_to_entity_join_path:
+                    continue
                 linkable_metric = LinkableMetric(
                     properties=properties,
                     join_path=SemanticModelToMetricSubqueryJoinPath(
