@@ -167,7 +167,15 @@ class ResolvedSpecLookUpKey:
 
 @dataclass(frozen=True)
 class FilterSpecResolution:
-    """Associates a lookup key and the resolved spec."""
+    """Associates a lookup key with the resolved spec and its associated LinkableElements.
+
+    We store the LinkableElementSet as a convenience container for managing the relationship between the
+    singular resolved LinkableInstanceSpec and the collection of LinkableElements. This allows us to
+    do things like fetch the full set of semantic models where the inputs for the given spec are defined.
+    In most cases, there would be exactly one such semantic model, but in cases where, for example, an entity
+    is used as a join key there might be multiple semantic model inputs for the given element, and we would
+    need to be able to track that information.
+    """
 
     lookup_key: ResolvedSpecLookUpKey
     where_filter_intersection: WhereFilterIntersection
