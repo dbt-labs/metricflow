@@ -7,10 +7,9 @@ from typing import Optional, Union
 import pandas as pd
 from dbt_semantic_interfaces.enum_extension import ExtendedEnum, assert_values_exhausted
 from dbt_semantic_interfaces.type_enums import TimeGranularity
-from typing_extensions import override
-
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.time.time_period import TimePeriodAdjuster
+from typing_extensions import override
 
 
 class PandasTimePeriodAdjuster(TimePeriodAdjuster):
