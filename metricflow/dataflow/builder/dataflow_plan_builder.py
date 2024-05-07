@@ -826,17 +826,6 @@ class DataflowPlanBuilder:
         candidate_nodes_for_left_side_of_join: List[BaseOutput] = []
         candidate_nodes_for_right_side_of_join: List[BaseOutput] = []
 
-        # If there are MetricGroupBys in the requested linkable specs, build source nodes to satisfy them.
-        # We do this at query time instead of during usual source node generation because the number of potential
-        # MetricGroupBy source nodes could be extremely large (and potentially slow).
-        candidate_nodes_for_right_side_of_join += [
-            self._build_query_output_node(
-                query_spec=self._source_node_builder.build_source_node_inputs_for_group_by_metric(group_by_metric_spec),
-                for_group_by_source_node=True,
-            )
-            for group_by_metric_spec in linkable_spec_set.group_by_metric_specs
-        ]
-
         if measure_spec_properties:
             candidate_nodes_for_right_side_of_join += self._source_node_set.source_nodes_for_metric_queries
             candidate_nodes_for_left_side_of_join += self._select_source_nodes_with_measures(
@@ -897,6 +886,19 @@ class DataflowPlanBuilder:
                 f"nodes for the right side of the join:\n"
                 f"{mf_pformat(candidate_nodes_for_right_side_of_join)}"
             )
+
+        # If there are MetricGroupBys in the requested linkable specs, build source nodes to satisfy them.
+        # We do this at query time instead of during usual source node generation because the number of potential
+        # MetricGroupBy source nodes could be extremely large (and potentially slow).
+        logger.info(f"Building source nodes for group by metrics: {linkable_spec_set.group_by_metric_specs}")
+        candidate_nodes_for_right_side_of_join += [
+            self._build_query_output_node(
+                query_spec=self._source_node_builder.build_source_node_inputs_for_group_by_metric(group_by_metric_spec),
+                for_group_by_source_node=True,
+            )
+            for group_by_metric_spec in linkable_spec_set.group_by_metric_specs
+        ]
+
         logger.info(f"Processing nodes took: {time.time()-start_time:.2f}s")
 
         node_evaluator = NodeEvaluatorForLinkableInstances(
