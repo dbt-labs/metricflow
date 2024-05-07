@@ -12,6 +12,7 @@ from dbt_semantic_interfaces.protocols.dimension import DimensionType
 from dbt_semantic_interfaces.references import (
     DimensionReference,
     EntityReference,
+    LinkableElementReference,
     MetricReference,
     SemanticModelReference,
 )
@@ -21,7 +22,6 @@ from typing_extensions import override
 
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
-from metricflow_semantics.specs.spec_classes import GroupByMetricReference
 
 logger = logging.getLogger(__name__)
 
@@ -170,6 +170,17 @@ class LinkableEntity(LinkableElement, SerializableDataclass):
             semantic_model_references.add(join_path_item.semantic_model_reference)
 
         return sorted(semantic_model_references, key=lambda reference: reference.semantic_model_name)
+
+
+# TODO: add to DSI
+@dataclass(frozen=True)
+class GroupByMetricReference(LinkableElementReference):
+    """Represents a group by metric.
+
+    Different from MetricReference because it inherits linkable element attributes.
+    """
+
+    pass
 
 
 @dataclass(frozen=True)
