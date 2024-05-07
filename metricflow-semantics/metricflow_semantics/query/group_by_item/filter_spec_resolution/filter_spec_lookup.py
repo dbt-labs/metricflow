@@ -17,6 +17,7 @@ from typing_extensions import override
 from metricflow_semantics.collection_helpers.merger import Mergeable
 from metricflow_semantics.mf_logging.formatting import indent
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
+from metricflow_semantics.model.semantics.linkable_element import LinkableElement
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow_semantics.query.group_by_item.path_prefixable import PathPrefixable
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
@@ -63,11 +64,8 @@ class FilterSpecResolutionLookUp(Mergeable):
         """Returns true if a resolution exists for the given key."""
         return len(self.get_spec_resolutions(resolved_spec_lookup_key)) > 0
 
-    def checked_resolved_spec(self, resolved_spec_lookup_key: ResolvedSpecLookUpKey) -> LinkableInstanceSpec:
-        """Returns the resolved spec for the given key.
-
-        If a resolution does not exist, or there is no spec associated with the resolution, this raises a RuntimeError.
-        """
+    def _checked_resolution(self, resolved_spec_lookup_key: ResolvedSpecLookUpKey) -> FilterSpecResolution:
+        """Helper to get just the resolution so we can access different properties on it."""
         resolutions = self.get_spec_resolutions(resolved_spec_lookup_key)
         if len(resolutions) == 0:
             raise RuntimeError(
@@ -91,7 +89,30 @@ class FilterSpecResolutionLookUp(Mergeable):
                 f"{mf_pformat(self.spec_resolutions)}"
             )
 
-        return resolution.resolved_spec
+        return resolution
+
+    def checked_resolved_spec(self, resolved_spec_lookup_key: ResolvedSpecLookUpKey) -> LinkableInstanceSpec:
+        """Returns the resolved spec for the given key.
+
+        If a resolution does not exist, or there is no spec associated with the resolution, this raises a RuntimeError.
+        """
+        resolution = self._checked_resolution(resolved_spec_lookup_key=resolved_spec_lookup_key)
+        resolved_spec = resolution.resolved_spec
+        assert (
+            resolved_spec is not None
+        ), f"Typechecker hint. Expected a resolution with a resolved spec, but got:\n{mf_pformat(resolution)}"
+        return resolved_spec
+
+    def checked_resolved_linkable_elements(
+        self, resolved_spec_lookup_key: ResolvedSpecLookUpKey
+    ) -> Sequence[LinkableElement]:
+        """Returns the sequence of LinkableElements for the given spec lookup key.
+
+        These are the LinkableElements bound to the singular spec/path_key for a given resolved filter item. They are
+        useful for propagating metadata about the origin semantic model across the boundary between the filter resolver
+        and the DataflowPlanBuilder.
+        """
+        return self._checked_resolution(resolved_spec_lookup_key=resolved_spec_lookup_key).resolved_linkable_elements
 
     @override
     def merge(self, other: FilterSpecResolutionLookUp) -> FilterSpecResolutionLookUp:
@@ -213,6 +234,15 @@ class FilterSpecResolution:
             raise ValueError(
                 f"Found {len(specs)} in {self.resolved_linkable_element_set}, this should not be possible!"
             )
+
+    @property
+    def resolved_linkable_elements(self) -> Sequence[LinkableElement]:
+        """Returns the resolved linkable elements, if any, for this resolution result."""
+        resolved_spec = self.resolved_spec
+        if resolved_spec is None:
+            return tuple()
+
+        return self.resolved_linkable_element_set.linkable_elements_for_path_key(resolved_spec.element_path_key)
 
 
 CallParameterSet = Union[

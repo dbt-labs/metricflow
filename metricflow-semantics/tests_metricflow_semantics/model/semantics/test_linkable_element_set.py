@@ -181,7 +181,7 @@ def _linkable_set_with_uniques_and_duplicates() -> LinkableElementSet:
         {_ambiguous_entity.path_key: (_ambiguous_entity, _ambiguous_entity_with_join_path)}
 
     This also includes a cross-type ambiguity, where one dimension has the same name and entity link set as one of
-    the entities. These will NOT resolve to the same ElementPathKey, because ElementPathKey incorporates elment type.
+    the entities. These will NOT resolve to the same ElementPathKey, because ElementPathKey incorporates element type.
     """
     dimensions = bucket(
         (
@@ -200,6 +200,46 @@ def _linkable_set_with_uniques_and_duplicates() -> LinkableElementSet:
         path_key_to_linkable_entities={path_key: tuple(entities[path_key]) for path_key in list(entities)},
         path_key_to_linkable_metrics={path_key: tuple(metrics[path_key]) for path_key in list(metrics)},
     )
+
+
+def test_linkable_elements_for_path_key() -> None:
+    """Tests accessing the linkable element tuples for a given path key.
+
+    The keys all share the same name and links but should return different results. Note the metric keys have
+    additional entity link annotations due to the way we differentiate between link paths within the query and link
+    paths outside the query (from outer query to inner metric query).
+    """
+    linkable_set = _linkable_set_with_uniques_and_duplicates()
+    entity_key = ElementPathKey(
+        element_name=AMBIGUOUS_NAME, element_type=LinkableElementType.ENTITY, entity_links=(_base_entity_reference,)
+    )
+    dimension_key = ElementPathKey(
+        element_name=AMBIGUOUS_NAME, element_type=LinkableElementType.DIMENSION, entity_links=(_base_entity_reference,)
+    )
+    ambiguous_metric_key = ElementPathKey(
+        element_name=AMBIGUOUS_NAME,
+        element_type=LinkableElementType.METRIC,
+        entity_links=(_base_entity_reference,),
+        metric_subquery_entity_links=(_base_entity_reference, _base_entity_reference),
+    )
+    doubled_ambiguous_metric_key = ElementPathKey(
+        element_name=AMBIGUOUS_NAME,
+        element_type=LinkableElementType.METRIC,
+        entity_links=(_base_entity_reference, _base_entity_reference),
+        metric_subquery_entity_links=(_base_entity_reference, _base_entity_reference),
+    )
+
+    entity_elements = linkable_set.linkable_elements_for_path_key(path_key=entity_key)
+    dimension_elements = linkable_set.linkable_elements_for_path_key(path_key=dimension_key)
+    ambiguous_metric_elements = linkable_set.linkable_elements_for_path_key(path_key=ambiguous_metric_key)
+    doubled_ambiguous_metric_elements = linkable_set.linkable_elements_for_path_key(
+        path_key=doubled_ambiguous_metric_key
+    )
+
+    assert entity_elements == (_ambiguous_entity, _ambiguous_entity_with_join_path)
+    assert dimension_elements == (_ambiguous_categorical_dimension, _ambiguous_categorical_dimension_with_join_path)
+    assert ambiguous_metric_elements == (_ambiguous_metric,)
+    assert doubled_ambiguous_metric_elements == (_ambiguous_metric_with_join_path,)
 
 
 def test_filter_with_any_of() -> None:
