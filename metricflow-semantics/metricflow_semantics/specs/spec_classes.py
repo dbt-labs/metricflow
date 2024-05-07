@@ -38,7 +38,12 @@ from typing_extensions import override
 from metricflow_semantics.aggregation_properties import AggregationState
 from metricflow_semantics.collection_helpers.dedupe import ordered_dedupe
 from metricflow_semantics.collection_helpers.merger import Mergeable
-from metricflow_semantics.model.semantics.linkable_element import ElementPathKey, LinkableElement, LinkableElementType
+from metricflow_semantics.model.semantics.linkable_element import (
+    ElementPathKey,
+    GroupByMetricReference,
+    LinkableElement,
+    LinkableElementType,
+)
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
 from metricflow_semantics.sql.sql_column_type import SqlColumnType
@@ -726,17 +731,6 @@ class JoinToTimeSpineDescription:
     join_type: SqlJoinType
     offset_window: Optional[MetricTimeWindow]
     offset_to_grain: Optional[TimeGranularity]
-
-
-# TODO: add to DSI
-@dataclass(frozen=True)
-class GroupByMetricReference(LinkableElementReference):
-    """Represents a group by metric.
-
-    Different from MetricReference because it inherits linkable element attributes.
-    """
-
-    pass
 
 
 @dataclass(frozen=True)
