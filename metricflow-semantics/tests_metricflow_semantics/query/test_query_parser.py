@@ -14,6 +14,7 @@ from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
+
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.query_exceptions import InvalidQueryException
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
@@ -27,12 +28,11 @@ from metricflow_semantics.specs.spec_classes import (
     DimensionSpec,
 )
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
-from metricflow_semantics.test_helpers.metric_time_dimension import MTD
-from metricflow_semantics.test_helpers.snapshot_helpers import assert_object_snapshot_equal
-
-from tests_metricflow_semantics.model.example_project_configuration import (
+from metricflow_semantics.test_helpers.example_project_configuration import (
     EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE,
 )
+from metricflow_semantics.test_helpers.metric_time_dimension import MTD
+from metricflow_semantics.test_helpers.snapshot_helpers import assert_object_snapshot_equal
 
 logger = logging.getLogger(__name__)
 
