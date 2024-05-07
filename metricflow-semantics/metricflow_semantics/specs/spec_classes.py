@@ -38,7 +38,7 @@ from typing_extensions import override
 from metricflow_semantics.aggregation_properties import AggregationState
 from metricflow_semantics.collection_helpers.dedupe import ordered_dedupe
 from metricflow_semantics.collection_helpers.merger import Mergeable
-from metricflow_semantics.model.semantics.linkable_element import ElementPathKey, LinkableElementType
+from metricflow_semantics.model.semantics.linkable_element import ElementPathKey, LinkableElement, LinkableElementType
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
 from metricflow_semantics.sql.sql_column_type import SqlColumnType
@@ -654,15 +654,20 @@ class WhereFilterSpec(Mergeable, SerializableDataclass):
 
     ->
 
-    ResolvedWhereFilter(
+    WhereFilterSpec(
         where_sql="listing__country == 'US'",
         bind_parameters: SqlBindParameters(),
-        linkable_spec_set: LinkableSpecSet(
-            dimension_specs=(
-                DimensionSpec(
-                    element_name='country',
-                    entity_links=('listing',),
-            ),
+        linkable_specs: (
+            DimensionSpec(
+                element_name='country',
+                entity_links=('listing',),
+        ),
+        linkable_elements: (
+            LinkableDimension(
+                semantic_model_origin=SemanticModelReference(semantic_model_name='listings_latest')
+                element_name='country',
+                ...
+            )
         )
     )
     """
@@ -672,6 +677,7 @@ class WhereFilterSpec(Mergeable, SerializableDataclass):
     where_sql: str
     bind_parameters: SqlBindParameters
     linkable_specs: Tuple[LinkableInstanceSpec, ...]
+    linkable_elements: Tuple[LinkableElement, ...]
 
     def merge(self, other: WhereFilterSpec) -> WhereFilterSpec:  # noqa: D102
         if self == WhereFilterSpec.empty_instance():
@@ -687,6 +693,7 @@ class WhereFilterSpec(Mergeable, SerializableDataclass):
             where_sql=f"({self.where_sql}) AND ({other.where_sql})",
             bind_parameters=self.bind_parameters.combine(other.bind_parameters),
             linkable_specs=ordered_dedupe(self.linkable_specs, other.linkable_specs),
+            linkable_elements=ordered_dedupe(self.linkable_elements, other.linkable_elements),
         )
 
     @classmethod
@@ -700,6 +707,7 @@ class WhereFilterSpec(Mergeable, SerializableDataclass):
             where_sql="TRUE",
             bind_parameters=SqlBindParameters(),
             linkable_specs=(),
+            linkable_elements=(),
         )
 
 

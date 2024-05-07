@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import itertools
 import logging
 from typing import List, Optional, Sequence
 
@@ -99,11 +100,16 @@ class WhereSpecFactory:
                 raise RenderSqlTemplateException(
                     f"Error while rendering Jinja template:\n{where_filter.where_sql_template}"
                 ) from e
+            rendered_specs = tuple(result[0] for result in rendered_spec_tracker.rendered_specs_to_elements)
+            linkable_elements = tuple(
+                itertools.chain.from_iterable(result[1] for result in rendered_spec_tracker.rendered_specs_to_elements)
+            )
             filter_specs.append(
                 WhereFilterSpec(
                     where_sql=where_sql,
                     bind_parameters=SqlBindParameters(),
-                    linkable_specs=tuple(rendered_spec_tracker.rendered_specs),
+                    linkable_specs=rendered_specs,
+                    linkable_elements=linkable_elements,
                 )
             )
 

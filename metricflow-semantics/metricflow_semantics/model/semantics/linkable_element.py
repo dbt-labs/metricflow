@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import FrozenSet, Optional, Sequence, Tuple
 
+from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols.dimension import DimensionType
 from dbt_semantic_interfaces.references import (
@@ -87,14 +88,15 @@ class SemanticModelJoinPathElement:
     join_on_entity: EntityReference
 
 
-class LinkableElement(SemanticModelDerivation, ABC):
+@dataclass(frozen=True)
+class LinkableElement(SemanticModelDerivation, SerializableDataclass, ABC):
     """An entity / dimension that may have been joined by entities."""
 
     pass
 
 
 @dataclass(frozen=True)
-class LinkableDimension(LinkableElement):
+class LinkableDimension(LinkableElement, SerializableDataclass):
     """Describes how a dimension can be realized by joining based on entity links."""
 
     # The semantic model where this dimension was defined.
@@ -139,7 +141,7 @@ class LinkableDimension(LinkableElement):
 
 
 @dataclass(frozen=True)
-class LinkableEntity(LinkableElement):
+class LinkableEntity(LinkableElement, SerializableDataclass):
     """Describes how an entity can be realized by joining based on entity links."""
 
     # The semantic model where this entity was defined.
@@ -170,7 +172,7 @@ class LinkableEntity(LinkableElement):
 
 
 @dataclass(frozen=True)
-class LinkableMetric(LinkableElement):
+class LinkableMetric(LinkableElement, SerializableDataclass):
     """Describes how a metric can be realized by joining based on entity links."""
 
     properties: FrozenSet[LinkableElementProperty]
