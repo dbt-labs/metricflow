@@ -64,7 +64,7 @@ from metricflow_semantics.specs.spec_classes import (
     TimeDimensionSpec,
 )
 from metricflow_semantics.specs.spec_set import group_specs_by_type
-from metricflow_semantics.time.time_granularity import (
+from metricflow_semantics.time.pandas_adjuster import (
     adjust_to_end_of_period,
     adjust_to_start_of_period,
     is_period_end,
