@@ -181,7 +181,7 @@ def _linkable_set_with_uniques_and_duplicates() -> LinkableElementSet:
         {_ambiguous_entity.path_key: (_ambiguous_entity, _ambiguous_entity_with_join_path)}
 
     This also includes a cross-type ambiguity, where one dimension has the same name and entity link set as one of
-    the entities. These will NOT resolve to the same ElementPathKey, because ElementPathKey incorporates elment type.
+    the entities. These will NOT resolve to the same ElementPathKey, because ElementPathKey incorporates element type.
     """
     dimensions = bucket(
         (
@@ -232,14 +232,14 @@ def test_linkable_elements_for_path_key() -> None:
     entity_elements = linkable_set.linkable_elements_for_path_key(path_key=entity_key)
     dimension_elements = linkable_set.linkable_elements_for_path_key(path_key=dimension_key)
     ambiguous_metric_elements = linkable_set.linkable_elements_for_path_key(path_key=ambiguous_metric_key)
-    doubled_ambiguous_metric_elments = linkable_set.linkable_elements_for_path_key(
+    doubled_ambiguous_metric_elements = linkable_set.linkable_elements_for_path_key(
         path_key=doubled_ambiguous_metric_key
     )
 
     assert entity_elements == (_ambiguous_entity, _ambiguous_entity_with_join_path)
     assert dimension_elements == (_ambiguous_categorical_dimension, _ambiguous_categorical_dimension_with_join_path)
     assert ambiguous_metric_elements == (_ambiguous_metric,)
-    assert doubled_ambiguous_metric_elments == (_ambiguous_metric_with_join_path,)
+    assert doubled_ambiguous_metric_elements == (_ambiguous_metric_with_join_path,)
 
 
 def test_filter_with_any_of() -> None:

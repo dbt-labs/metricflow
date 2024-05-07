@@ -96,8 +96,11 @@ class FilterSpecResolutionLookUp(Mergeable):
 
         If a resolution does not exist, or there is no spec associated with the resolution, this raises a RuntimeError.
         """
-        resolved_spec = self._checked_resolution(resolved_spec_lookup_key=resolved_spec_lookup_key).resolved_spec
-        assert resolved_spec is not None, "Typechecker hint, this should have been verified in _checked_resolution"
+        resolution = self._checked_resolution(resolved_spec_lookup_key=resolved_spec_lookup_key)
+        resolved_spec = resolution.resolved_spec
+        assert (
+            resolved_spec is not None
+        ), f"Typechecker hint. Expected a resolution with a resolved spec, but got:\n{mf_pformat(resolution)}"
         return resolved_spec
 
     def checked_resolved_linkable_elements(
