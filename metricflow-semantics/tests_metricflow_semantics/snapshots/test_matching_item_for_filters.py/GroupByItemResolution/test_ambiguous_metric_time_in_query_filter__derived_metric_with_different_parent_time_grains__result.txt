@@ -26,7 +26,7 @@ GroupByItemResolution(
                     element_name='metric_time',
                     dimension_type=TIME,
                     properties=frozenset(
-                      METRIC_TIME,
+                      'METRIC_TIME',
                     ),
                     time_granularity=MONTH,
                   ),
@@ -66,7 +66,7 @@ GroupByItemResolution(
                     element_name='metric_time',
                     dimension_type=TIME,
                     properties=frozenset(
-                      METRIC_TIME,
+                      'METRIC_TIME',
                     ),
                     time_granularity=YEAR,
                   ),

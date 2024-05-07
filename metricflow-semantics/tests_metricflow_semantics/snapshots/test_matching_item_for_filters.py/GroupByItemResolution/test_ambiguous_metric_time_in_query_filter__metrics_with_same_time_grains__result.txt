@@ -13,7 +13,7 @@ GroupByItemResolution(
           ),
           element_name='metric_time',
           dimension_type=TIME,
-          properties=frozenset(METRIC_TIME,),
+          properties=frozenset('METRIC_TIME',),
           time_granularity=MONTH,
         ),
       ),

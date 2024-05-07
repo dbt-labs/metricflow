@@ -65,7 +65,7 @@
                             <!--         element_name='is_instant',                               -->
                             <!--         dimension_type=CATEGORICAL,                              -->
                             <!--         entity_links=(EntityReference(element_name='booking'),), -->
-                            <!--         properties=frozenset(LOCAL,),                            -->
+                            <!--         properties=frozenset('LOCAL',),                          -->
                             <!--       ),                                                         -->
                             <!--     ),                                                           -->
                             <!--   )                                                              -->

@@ -45,7 +45,7 @@
                     <!--                 ),                                                   -->
                     <!--               ),                                                     -->
                     <!--             ),                                                       -->
-                    <!--             properties=frozenset(JOINED,),                           -->
+                    <!--             properties=frozenset('JOINED',),                         -->
                     <!--           ),                                                         -->
                     <!--         ),                                                           -->
                     <!--       ),                                                             -->
@@ -91,7 +91,7 @@
                                 <!--             ),                                                   -->
                                 <!--           ),                                                     -->
                                 <!--         ),                                                       -->
-                                <!--         properties=frozenset(JOINED,),                           -->
+                                <!--         properties=frozenset('JOINED',),                         -->
                                 <!--       ),                                                         -->
                                 <!--     ),                                                           -->
                                 <!--   )                                                              -->
@@ -200,7 +200,7 @@
                     <!--                 ),                                                   -->
                     <!--               ),                                                     -->
                     <!--             ),                                                       -->
-                    <!--             properties=frozenset(JOINED,),                           -->
+                    <!--             properties=frozenset('JOINED',),                         -->
                     <!--           ),                                                         -->
                     <!--         ),                                                           -->
                     <!--       ),                                                             -->
@@ -246,7 +246,7 @@
                                 <!--             ),                                                   -->
                                 <!--           ),                                                     -->
                                 <!--         ),                                                       -->
-                                <!--         properties=frozenset(JOINED,),                           -->
+                                <!--         properties=frozenset('JOINED',),                         -->
                                 <!--       ),                                                         -->
                                 <!--     ),                                                           -->
                                 <!--   )                                                              -->

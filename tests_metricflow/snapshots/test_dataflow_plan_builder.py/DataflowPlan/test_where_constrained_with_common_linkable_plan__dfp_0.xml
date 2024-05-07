@@ -36,7 +36,7 @@
             <!--                 ),                                                   -->
             <!--               ),                                                     -->
             <!--             ),                                                       -->
-            <!--             properties=frozenset(JOINED,),                           -->
+            <!--             properties=frozenset('JOINED',),                         -->
             <!--           ),                                                         -->
             <!--         ),                                                           -->
             <!--       ),                                                             -->
@@ -74,7 +74,7 @@
                     <!--             join_on_entity=EntityReference(element_name='listing'), -->
                     <!--           ),                                                        -->
                     <!--         ),                                                          -->
-                    <!--         properties=frozenset(JOINED,),                              -->
+                    <!--         properties=frozenset('JOINED',),                            -->
                     <!--       ),                                                            -->
                     <!--     ),                                                              -->
                     <!--   )                                                                 -->
