@@ -60,8 +60,6 @@ FROM (
           , subq_0.ds__extract_doy AS metric_time__extract_doy
           , subq_0.user
           , subq_0.session
-          , subq_0.visit__user
-          , subq_0.visit__session
           , subq_0.referrer_id
           , subq_0.visit__referrer_id
           , subq_0.visits
@@ -97,8 +95,6 @@ FROM (
             , visits_source_src_28000.referrer_id AS visit__referrer_id
             , visits_source_src_28000.user_id AS user
             , visits_source_src_28000.session_id AS session
-            , visits_source_src_28000.user_id AS visit__user
-            , visits_source_src_28000.session_id AS visit__session
           FROM ***************************.fct_visits visits_source_src_28000
         ) subq_0
       ) subq_1
@@ -219,8 +215,6 @@ FROM (
                 , subq_4.ds__extract_doy AS metric_time__extract_doy
                 , subq_4.user
                 , subq_4.session
-                , subq_4.visit__user
-                , subq_4.visit__session
                 , subq_4.referrer_id
                 , subq_4.visit__referrer_id
                 , subq_4.visits
@@ -256,8 +250,6 @@ FROM (
                   , visits_source_src_28000.referrer_id AS visit__referrer_id
                   , visits_source_src_28000.user_id AS user
                   , visits_source_src_28000.session_id AS session
-                  , visits_source_src_28000.user_id AS visit__user
-                  , visits_source_src_28000.session_id AS visit__session
                 FROM ***************************.fct_visits visits_source_src_28000
               ) subq_4
             ) subq_5
@@ -300,8 +292,6 @@ FROM (
               , subq_8.metric_time__extract_doy
               , subq_8.user
               , subq_8.session_id
-              , subq_8.buy__user
-              , subq_8.buy__session_id
               , subq_8.buys
               , subq_8.buyers
               , GEN_RANDOM_UUID() AS mf_internal_uuid
@@ -343,8 +333,6 @@ FROM (
                 , subq_7.ds__extract_doy AS metric_time__extract_doy
                 , subq_7.user
                 , subq_7.session_id
-                , subq_7.buy__user
-                , subq_7.buy__session_id
                 , subq_7.buys
                 , subq_7.buyers
               FROM (
@@ -376,8 +364,6 @@ FROM (
                   , EXTRACT(doy FROM buys_source_src_28000.ds) AS buy__ds__extract_doy
                   , buys_source_src_28000.user_id AS user
                   , buys_source_src_28000.session_id
-                  , buys_source_src_28000.user_id AS buy__user
-                  , buys_source_src_28000.session_id AS buy__session_id
                 FROM ***************************.fct_buys buys_source_src_28000
               ) subq_7
             ) subq_8

@@ -114,10 +114,6 @@ FROM (
             , subq_3.guest
             , subq_3.host
             , subq_3.user
-            , subq_3.booking__listing
-            , subq_3.booking__guest
-            , subq_3.booking__host
-            , subq_3.booking__user
             , subq_3.is_instant
             , subq_3.booking__is_instant
             , subq_3.bookings
@@ -206,10 +202,6 @@ FROM (
               , bookings_source_src_26000.guest_id AS guest
               , bookings_source_src_26000.host_id AS host
               , bookings_source_src_26000.guest_id AS user
-              , bookings_source_src_26000.listing_id AS booking__listing
-              , bookings_source_src_26000.guest_id AS booking__guest
-              , bookings_source_src_26000.host_id AS booking__host
-              , bookings_source_src_26000.guest_id AS booking__user
             FROM ***************************.fct_bookings bookings_source_src_26000
           ) subq_3
         ) subq_4
@@ -248,14 +240,12 @@ FROM (
             , subq_8.window_end__extract_doy AS lux_listing__window_end__extract_doy
             , subq_6.listing AS listing
             , subq_6.lux_listing AS lux_listing
-            , subq_6.listing__lux_listing AS listing__lux_listing
             , subq_8.is_confirmed_lux AS lux_listing__is_confirmed_lux
           FROM (
             -- Read Elements From Semantic Model 'lux_listing_mapping'
             SELECT
               lux_listing_mapping_src_26000.listing_id AS listing
               , lux_listing_mapping_src_26000.lux_listing_id AS lux_listing
-              , lux_listing_mapping_src_26000.lux_listing_id AS listing__lux_listing
             FROM ***************************.dim_lux_listing_id_mapping lux_listing_mapping_src_26000
           ) subq_6
           LEFT OUTER JOIN (

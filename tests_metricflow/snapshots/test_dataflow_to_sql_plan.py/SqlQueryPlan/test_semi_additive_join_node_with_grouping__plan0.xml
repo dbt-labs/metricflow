@@ -40,17 +40,16 @@
         <!-- col21 =                                                                                                      -->
         <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_32), column_alias='account__ds__extract_doy') -->
         <!-- col22 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_33), column_alias='user') -->
-        <!-- col23 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_34), column_alias='account__user') -->
-        <!-- col24 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_9), column_alias='account_type') -->
-        <!-- col25 =                                                                                                   -->
+        <!-- col23 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_9), column_alias='account_type') -->
+        <!-- col24 =                                                                                                   -->
         <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_10), column_alias='account__account_type') -->
-        <!-- col26 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_6), column_alias='account_balance') -->
-        <!-- col27 =                                              -->
+        <!-- col25 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_6), column_alias='account_balance') -->
+        <!-- col26 =                                              -->
         <!--   SqlSelectColumn(                                   -->
         <!--     expr=SqlColumnReferenceExpression(node_id=cr_7), -->
         <!--     column_alias='total_account_balance_first_day',  -->
         <!--   )                                                  -->
-        <!-- col28 =                                              -->
+        <!-- col27 =                                              -->
         <!--   SqlSelectColumn(                                   -->
         <!--     expr=SqlColumnReferenceExpression(node_id=cr_8), -->
         <!--     column_alias='current_account_balance_by_user',  -->
@@ -123,8 +122,6 @@
             <!--     column_alias='account__account_type',                -->
             <!--   )                                                      -->
             <!-- col27 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28007), column_alias='user') -->
-            <!-- col28 =                                                                                              -->
-            <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28008), column_alias='account__user') -->
             <!-- from_source = SqlTableFromClauseNode(node_id=tfc_28000) -->
             <!-- where = None -->
             <!-- distinct = False -->
@@ -230,8 +227,6 @@
                 <!--     column_alias='account__account_type',                -->
                 <!--   )                                                      -->
                 <!-- col27 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28007), column_alias='user') -->
-                <!-- col28 =                                                                                              -->
-                <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28008), column_alias='account__user') -->
                 <!-- from_source = SqlTableFromClauseNode(node_id=tfc_28000) -->
                 <!-- where = None -->
                 <!-- distinct = False -->

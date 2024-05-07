@@ -198,9 +198,6 @@ FROM (
             , subq_8.ds_partitioned__extract_doy AS customer_id__ds_partitioned__extract_doy
             , subq_6.account_id AS account_id
             , subq_6.customer_id AS customer_id
-            , subq_6.account_id__customer_id AS account_id__customer_id
-            , subq_6.bridge_account__account_id AS bridge_account__account_id
-            , subq_6.bridge_account__customer_id AS bridge_account__customer_id
             , subq_6.extra_dim AS extra_dim
             , subq_6.account_id__extra_dim AS account_id__extra_dim
             , subq_6.bridge_account__extra_dim AS bridge_account__extra_dim
@@ -247,9 +244,6 @@ FROM (
               , EXTRACT(doy FROM bridge_table_src_22000.ds_partitioned) AS bridge_account__ds_partitioned__extract_doy
               , bridge_table_src_22000.account_id
               , bridge_table_src_22000.customer_id
-              , bridge_table_src_22000.customer_id AS account_id__customer_id
-              , bridge_table_src_22000.account_id AS bridge_account__account_id
-              , bridge_table_src_22000.customer_id AS bridge_account__customer_id
             FROM ***************************.bridge_table bridge_table_src_22000
           ) subq_6
           LEFT OUTER JOIN (

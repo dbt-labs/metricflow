@@ -49,7 +49,6 @@ FROM (
         , subq_1.metric_time__extract_dow AS metric_time__extract_dow
         , subq_1.metric_time__extract_doy AS metric_time__extract_doy
         , subq_1.user AS user
-        , subq_1.revenue_instance__user AS revenue_instance__user
         , subq_1.txn_revenue AS txn_revenue
       FROM (
         -- Time Spine
@@ -94,7 +93,6 @@ FROM (
           , subq_0.ds__extract_dow AS metric_time__extract_dow
           , subq_0.ds__extract_doy AS metric_time__extract_doy
           , subq_0.user
-          , subq_0.revenue_instance__user
           , subq_0.txn_revenue
         FROM (
           -- Read Elements From Semantic Model 'revenue'
@@ -123,7 +121,6 @@ FROM (
             , EXTRACT(isodow FROM revenue_src_28000.created_at) AS revenue_instance__ds__extract_dow
             , EXTRACT(doy FROM revenue_src_28000.created_at) AS revenue_instance__ds__extract_doy
             , revenue_src_28000.user_id AS user
-            , revenue_src_28000.user_id AS revenue_instance__user
           FROM ***************************.fct_revenue revenue_src_28000
         ) subq_0
       ) subq_1

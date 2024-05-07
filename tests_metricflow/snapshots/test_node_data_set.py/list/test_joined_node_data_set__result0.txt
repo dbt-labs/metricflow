@@ -21,7 +21,6 @@
   'revenue_instance__ds__quarter',
   'revenue_instance__ds__week',
   'revenue_instance__ds__year',
-  'revenue_instance__user',
   'txn_revenue',
   'user',
   'user__ds_latest__day',

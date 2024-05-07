@@ -3,7 +3,7 @@
         <!-- description = 'Compute Metrics via Expressions' -->
         <!-- node_id = NodeId(id_str='ss_12') -->
         <!-- col0 =                                                                                                  -->
-        <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_213), column_alias='visit__referrer_id') -->
+        <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_205), column_alias='visit__referrer_id') -->
         <!-- col1 =                                                                                                        -->
         <!--   SqlSelectColumn(expr=SqlRatioComputationExpression(node_id=rc_0), column_alias='visit_buy_conversion_rate') -->
         <!-- from_source = SqlSelectStatementNode(node_id=ss_11) -->
@@ -47,7 +47,7 @@
                 <!-- node_id = NodeId(id_str='ss_2') -->
                 <!-- col0 =                                                -->
                 <!--   SqlSelectColumn(                                    -->
-                <!--     expr=SqlColumnReferenceExpression(node_id=cr_44), -->
+                <!--     expr=SqlColumnReferenceExpression(node_id=cr_42), -->
                 <!--     column_alias='visit__referrer_id',                -->
                 <!--   )                                                   -->
                 <!-- col1 =                                                                    -->
@@ -58,7 +58,7 @@
                 <!-- from_source = SqlSelectStatementNode(node_id=ss_1) -->
                 <!-- group_by0 =                                           -->
                 <!--   SqlSelectColumn(                                    -->
-                <!--     expr=SqlColumnReferenceExpression(node_id=cr_44), -->
+                <!--     expr=SqlColumnReferenceExpression(node_id=cr_42), -->
                 <!--     column_alias='visit__referrer_id',                -->
                 <!--   )                                                   -->
                 <!-- where = None -->
@@ -68,10 +68,10 @@
                     <!-- node_id = NodeId(id_str='ss_1') -->
                     <!-- col0 =                                                -->
                     <!--   SqlSelectColumn(                                    -->
-                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_42), -->
+                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_40), -->
                     <!--     column_alias='visit__referrer_id',                -->
                     <!--   )                                                   -->
-                    <!-- col1 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_41), column_alias='visits') -->
+                    <!-- col1 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_39), column_alias='visits') -->
                     <!-- from_source = SqlSelectStatementNode(node_id=ss_0) -->
                     <!-- where = None -->
                     <!-- distinct = False -->
@@ -235,29 +235,19 @@
                         <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_37), column_alias='user') -->
                         <!-- col34 =                                                                                     -->
                         <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_38), column_alias='session') -->
-                        <!-- col35 =                                               -->
-                        <!--   SqlSelectColumn(                                    -->
-                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_39), -->
-                        <!--     column_alias='visit__user',                       -->
-                        <!--   )                                                   -->
-                        <!-- col36 =                                               -->
-                        <!--   SqlSelectColumn(                                    -->
-                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_40), -->
-                        <!--     column_alias='visit__session',                    -->
-                        <!--   )                                                   -->
-                        <!-- col37 =                                              -->
+                        <!-- col35 =                                              -->
                         <!--   SqlSelectColumn(                                   -->
                         <!--     expr=SqlColumnReferenceExpression(node_id=cr_2), -->
                         <!--     column_alias='referrer_id',                      -->
                         <!--   )                                                  -->
-                        <!-- col38 =                                              -->
+                        <!-- col36 =                                              -->
                         <!--   SqlSelectColumn(                                   -->
                         <!--     expr=SqlColumnReferenceExpression(node_id=cr_3), -->
                         <!--     column_alias='visit__referrer_id',               -->
                         <!--   )                                                  -->
-                        <!-- col39 =                                                                                   -->
+                        <!-- col37 =                                                                                   -->
                         <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_0), column_alias='visits') -->
-                        <!-- col40 =                                                                                     -->
+                        <!-- col38 =                                                                                     -->
                         <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_1), column_alias='visitors') -->
                         <!-- from_source = SqlSelectStatementNode(node_id=ss_28011) -->
                         <!-- where = None -->
@@ -272,7 +262,7 @@
                             <!--   )                                                         -->
                             <!-- col1 =                                                   -->
                             <!--   SqlSelectColumn(                                       -->
-                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28102), -->
+                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28088), -->
                             <!--     column_alias='visitors',                             -->
                             <!--   )                                                      -->
                             <!-- col2 =                                                                                   -->
@@ -323,7 +313,7 @@
                             <!--   )                                              -->
                             <!-- col13 =                                                  -->
                             <!--   SqlSelectColumn(                                       -->
-                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28104), -->
+                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28090), -->
                             <!--     column_alias='referrer_id',                          -->
                             <!--   )                                                      -->
                             <!-- col14 =                                            -->
@@ -383,28 +373,18 @@
                             <!--   )                                              -->
                             <!-- col25 =                                                  -->
                             <!--   SqlSelectColumn(                                       -->
-                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28106), -->
+                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28092), -->
                             <!--     column_alias='visit__referrer_id',                   -->
                             <!--   )                                                      -->
                             <!-- col26 =                                                  -->
                             <!--   SqlSelectColumn(                                       -->
-                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28107), -->
+                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28093), -->
                             <!--     column_alias='user',                                 -->
                             <!--   )                                                      -->
                             <!-- col27 =                                                  -->
                             <!--   SqlSelectColumn(                                       -->
-                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28108), -->
+                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28094), -->
                             <!--     column_alias='session',                              -->
-                            <!--   )                                                      -->
-                            <!-- col28 =                                                  -->
-                            <!--   SqlSelectColumn(                                       -->
-                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28109), -->
-                            <!--     column_alias='visit__user',                          -->
-                            <!--   )                                                      -->
-                            <!-- col29 =                                                  -->
-                            <!--   SqlSelectColumn(                                       -->
-                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28110), -->
-                            <!--     column_alias='visit__session',                       -->
                             <!--   )                                                      -->
                             <!-- from_source = SqlTableFromClauseNode(node_id=tfc_28011) -->
                             <!-- where = None -->
@@ -423,7 +403,7 @@
                 <!-- node_id = NodeId(id_str='ss_10') -->
                 <!-- col0 =                                                 -->
                 <!--   SqlSelectColumn(                                     -->
-                <!--     expr=SqlColumnReferenceExpression(node_id=cr_206), -->
+                <!--     expr=SqlColumnReferenceExpression(node_id=cr_198), -->
                 <!--     column_alias='visit__referrer_id',                 -->
                 <!--   )                                                    -->
                 <!-- col1 =                                                                    -->
@@ -434,7 +414,7 @@
                 <!-- from_source = SqlSelectStatementNode(node_id=ss_9) -->
                 <!-- group_by0 =                                            -->
                 <!--   SqlSelectColumn(                                     -->
-                <!--     expr=SqlColumnReferenceExpression(node_id=cr_206), -->
+                <!--     expr=SqlColumnReferenceExpression(node_id=cr_198), -->
                 <!--     column_alias='visit__referrer_id',                 -->
                 <!--   )                                                    -->
                 <!-- where = None -->
@@ -444,10 +424,10 @@
                     <!-- node_id = NodeId(id_str='ss_9') -->
                     <!-- col0 =                                                 -->
                     <!--   SqlSelectColumn(                                     -->
-                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_204), -->
+                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_196), -->
                     <!--     column_alias='visit__referrer_id',                 -->
                     <!--   )                                                    -->
-                    <!-- col1 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_203), column_alias='buys') -->
+                    <!-- col1 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_195), column_alias='buys') -->
                     <!-- from_source = SqlSelectStatementNode(node_id=ss_8) -->
                     <!-- where = None -->
                     <!-- distinct = False -->
@@ -455,18 +435,18 @@
                         <!-- description = 'Find conversions for user within the range of INF' -->
                         <!-- node_id = NodeId(id_str='ss_8') -->
                         <!-- col0 =                                                                                       -->
-                        <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_201), column_alias='ds__day') -->
+                        <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_193), column_alias='ds__day') -->
                         <!-- col1 =                                                                                    -->
-                        <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_202), column_alias='user') -->
+                        <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_194), column_alias='user') -->
                         <!-- col2 =                                                 -->
                         <!--   SqlSelectColumn(                                     -->
-                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_200), -->
+                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_192), -->
                         <!--     column_alias='visit__referrer_id',                 -->
                         <!--   )                                                    -->
                         <!-- col3 =                                                                                    -->
-                        <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_198), column_alias='buys') -->
+                        <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_190), column_alias='buys') -->
                         <!-- col4 =                                                                                      -->
-                        <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_199), column_alias='visits') -->
+                        <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_191), column_alias='visits') -->
                         <!-- from_source = SqlSelectStatementNode(node_id=ss_7) -->
                         <!-- where = None -->
                         <!-- distinct = False -->
@@ -495,11 +475,11 @@
                             <!--   )                                                                             -->
                             <!-- col4 =                                                 -->
                             <!--   SqlSelectColumn(                                     -->
-                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_196), -->
+                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_188), -->
                             <!--     column_alias='mf_internal_uuid',                   -->
                             <!--   )                                                    -->
                             <!-- col5 =                                                                                    -->
-                            <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_197), column_alias='buys') -->
+                            <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_189), column_alias='buys') -->
                             <!-- from_source = SqlSelectStatementNode(node_id=ss_4) -->
                             <!-- join_0 =                                               -->
                             <!--   SqlJoinDescription(                                  -->
@@ -516,22 +496,22 @@
                                 <!-- node_id = NodeId(id_str='ss_4') -->
                                 <!-- col0 =                                                -->
                                 <!--   SqlSelectColumn(                                    -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_88), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_84), -->
                                 <!--     column_alias='ds__day',                           -->
                                 <!--   )                                                   -->
                                 <!-- col1 =                                                -->
                                 <!--   SqlSelectColumn(                                    -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_89), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_85), -->
                                 <!--     column_alias='user',                              -->
                                 <!--   )                                                   -->
                                 <!-- col2 =                                                -->
                                 <!--   SqlSelectColumn(                                    -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_87), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_83), -->
                                 <!--     column_alias='visit__referrer_id',                -->
                                 <!--   )                                                   -->
                                 <!-- col3 =                                                -->
                                 <!--   SqlSelectColumn(                                    -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_86), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_82), -->
                                 <!--     column_alias='visits',                            -->
                                 <!--   )                                                   -->
                                 <!-- from_source = SqlSelectStatementNode(node_id=ss_3) -->
@@ -542,207 +522,197 @@
                                     <!-- node_id = NodeId(id_str='ss_3') -->
                                     <!-- col0 =                                                -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_49), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_47), -->
                                     <!--     column_alias='ds__day',                           -->
                                     <!--   )                                                   -->
                                     <!-- col1 =                                                -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_50), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_48), -->
                                     <!--     column_alias='ds__week',                          -->
                                     <!--   )                                                   -->
                                     <!-- col2 =                                                -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_51), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_49), -->
                                     <!--     column_alias='ds__month',                         -->
                                     <!--   )                                                   -->
                                     <!-- col3 =                                                -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_52), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_50), -->
                                     <!--     column_alias='ds__quarter',                       -->
                                     <!--   )                                                   -->
                                     <!-- col4 =                                                -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_53), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_51), -->
                                     <!--     column_alias='ds__year',                          -->
                                     <!--   )                                                   -->
                                     <!-- col5 =                                                -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_54), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_52), -->
                                     <!--     column_alias='ds__extract_year',                  -->
                                     <!--   )                                                   -->
                                     <!-- col6 =                                                -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_55), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_53), -->
                                     <!--     column_alias='ds__extract_quarter',               -->
                                     <!--   )                                                   -->
                                     <!-- col7 =                                                -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_56), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_54), -->
                                     <!--     column_alias='ds__extract_month',                 -->
                                     <!--   )                                                   -->
                                     <!-- col8 =                                                -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_57), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_55), -->
                                     <!--     column_alias='ds__extract_day',                   -->
                                     <!--   )                                                   -->
                                     <!-- col9 =                                                -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_58), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_56), -->
                                     <!--     column_alias='ds__extract_dow',                   -->
                                     <!--   )                                                   -->
                                     <!-- col10 =                                               -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_59), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_57), -->
                                     <!--     column_alias='ds__extract_doy',                   -->
                                     <!--   )                                                   -->
                                     <!-- col11 =                                               -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_60), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_58), -->
                                     <!--     column_alias='visit__ds__day',                    -->
                                     <!--   )                                                   -->
                                     <!-- col12 =                                               -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_61), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_59), -->
                                     <!--     column_alias='visit__ds__week',                   -->
                                     <!--   )                                                   -->
                                     <!-- col13 =                                               -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_62), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_60), -->
                                     <!--     column_alias='visit__ds__month',                  -->
                                     <!--   )                                                   -->
                                     <!-- col14 =                                               -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_63), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_61), -->
                                     <!--     column_alias='visit__ds__quarter',                -->
                                     <!--   )                                                   -->
                                     <!-- col15 =                                               -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_64), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_62), -->
                                     <!--     column_alias='visit__ds__year',                   -->
                                     <!--   )                                                   -->
                                     <!-- col16 =                                               -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_65), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_63), -->
                                     <!--     column_alias='visit__ds__extract_year',           -->
                                     <!--   )                                                   -->
                                     <!-- col17 =                                               -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_66), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_64), -->
                                     <!--     column_alias='visit__ds__extract_quarter',        -->
                                     <!--   )                                                   -->
                                     <!-- col18 =                                               -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_67), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_65), -->
                                     <!--     column_alias='visit__ds__extract_month',          -->
                                     <!--   )                                                   -->
                                     <!-- col19 =                                               -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_68), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_66), -->
                                     <!--     column_alias='visit__ds__extract_day',            -->
                                     <!--   )                                                   -->
                                     <!-- col20 =                                               -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_69), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_67), -->
                                     <!--     column_alias='visit__ds__extract_dow',            -->
                                     <!--   )                                                   -->
                                     <!-- col21 =                                               -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_70), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_68), -->
                                     <!--     column_alias='visit__ds__extract_doy',            -->
                                     <!--   )                                                   -->
                                     <!-- col22 =                                               -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_71), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_69), -->
                                     <!--     column_alias='metric_time__day',                  -->
                                     <!--   )                                                   -->
                                     <!-- col23 =                                               -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_72), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_70), -->
                                     <!--     column_alias='metric_time__week',                 -->
                                     <!--   )                                                   -->
                                     <!-- col24 =                                               -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_73), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_71), -->
                                     <!--     column_alias='metric_time__month',                -->
                                     <!--   )                                                   -->
                                     <!-- col25 =                                               -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_74), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_72), -->
                                     <!--     column_alias='metric_time__quarter',              -->
                                     <!--   )                                                   -->
                                     <!-- col26 =                                               -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_75), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_73), -->
                                     <!--     column_alias='metric_time__year',                 -->
                                     <!--   )                                                   -->
                                     <!-- col27 =                                               -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_76), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_74), -->
                                     <!--     column_alias='metric_time__extract_year',         -->
                                     <!--   )                                                   -->
                                     <!-- col28 =                                               -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_77), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_75), -->
                                     <!--     column_alias='metric_time__extract_quarter',      -->
                                     <!--   )                                                   -->
                                     <!-- col29 =                                               -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_78), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_76), -->
                                     <!--     column_alias='metric_time__extract_month',        -->
                                     <!--   )                                                   -->
                                     <!-- col30 =                                               -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_79), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_77), -->
                                     <!--     column_alias='metric_time__extract_day',          -->
                                     <!--   )                                                   -->
                                     <!-- col31 =                                               -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_80), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_78), -->
                                     <!--     column_alias='metric_time__extract_dow',          -->
                                     <!--   )                                                   -->
                                     <!-- col32 =                                               -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_81), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_79), -->
                                     <!--     column_alias='metric_time__extract_doy',          -->
                                     <!--   )                                                   -->
                                     <!-- col33 =                                               -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_82), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_80), -->
                                     <!--     column_alias='user',                              -->
                                     <!--   )                                                   -->
                                     <!-- col34 =                                               -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_83), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_81), -->
                                     <!--     column_alias='session',                           -->
                                     <!--   )                                                   -->
                                     <!-- col35 =                                               -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_84), -->
-                                    <!--     column_alias='visit__user',                       -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_45), -->
+                                    <!--     column_alias='referrer_id',                       -->
                                     <!--   )                                                   -->
                                     <!-- col36 =                                               -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_85), -->
-                                    <!--     column_alias='visit__session',                    -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_46), -->
+                                    <!--     column_alias='visit__referrer_id',                -->
                                     <!--   )                                                   -->
                                     <!-- col37 =                                               -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_47), -->
-                                    <!--     column_alias='referrer_id',                       -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_43), -->
+                                    <!--     column_alias='visits',                            -->
                                     <!--   )                                                   -->
                                     <!-- col38 =                                               -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_48), -->
-                                    <!--     column_alias='visit__referrer_id',                -->
-                                    <!--   )                                                   -->
-                                    <!-- col39 =                                               -->
-                                    <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_45), -->
-                                    <!--     column_alias='visits',                            -->
-                                    <!--   )                                                   -->
-                                    <!-- col40 =                                               -->
-                                    <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_46), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_44), -->
                                     <!--     column_alias='visitors',                          -->
                                     <!--   )                                                   -->
                                     <!-- from_source = SqlSelectStatementNode(node_id=ss_28011) -->
@@ -758,7 +728,7 @@
                                         <!--   )                                                         -->
                                         <!-- col1 =                                                   -->
                                         <!--   SqlSelectColumn(                                       -->
-                                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_28102), -->
+                                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_28088), -->
                                         <!--     column_alias='visitors',                             -->
                                         <!--   )                                                      -->
                                         <!-- col2 =                                             -->
@@ -818,7 +788,7 @@
                                         <!--   )                                              -->
                                         <!-- col13 =                                                  -->
                                         <!--   SqlSelectColumn(                                       -->
-                                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_28104), -->
+                                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_28090), -->
                                         <!--     column_alias='referrer_id',                          -->
                                         <!--   )                                                      -->
                                         <!-- col14 =                                            -->
@@ -878,28 +848,18 @@
                                         <!--   )                                              -->
                                         <!-- col25 =                                                  -->
                                         <!--   SqlSelectColumn(                                       -->
-                                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_28106), -->
+                                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_28092), -->
                                         <!--     column_alias='visit__referrer_id',                   -->
                                         <!--   )                                                      -->
                                         <!-- col26 =                                                  -->
                                         <!--   SqlSelectColumn(                                       -->
-                                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_28107), -->
+                                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_28093), -->
                                         <!--     column_alias='user',                                 -->
                                         <!--   )                                                      -->
                                         <!-- col27 =                                                  -->
                                         <!--   SqlSelectColumn(                                       -->
-                                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_28108), -->
+                                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_28094), -->
                                         <!--     column_alias='session',                              -->
-                                        <!--   )                                                      -->
-                                        <!-- col28 =                                                  -->
-                                        <!--   SqlSelectColumn(                                       -->
-                                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_28109), -->
-                                        <!--     column_alias='visit__user',                          -->
-                                        <!--   )                                                      -->
-                                        <!-- col29 =                                                  -->
-                                        <!--   SqlSelectColumn(                                       -->
-                                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_28110), -->
-                                        <!--     column_alias='visit__session',                       -->
                                         <!--   )                                                      -->
                                         <!-- from_source = SqlTableFromClauseNode(node_id=tfc_28011) -->
                                         <!-- where = None -->
@@ -917,200 +877,190 @@
                                 <!-- node_id = NodeId(id_str='ss_6') -->
                                 <!-- col0 =                                                 -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_131), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_125), -->
                                 <!--     column_alias='ds__day',                            -->
                                 <!--   )                                                    -->
                                 <!-- col1 =                                                 -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_132), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_126), -->
                                 <!--     column_alias='ds__week',                           -->
                                 <!--   )                                                    -->
                                 <!-- col2 =                                                 -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_133), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_127), -->
                                 <!--     column_alias='ds__month',                          -->
                                 <!--   )                                                    -->
                                 <!-- col3 =                                                 -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_134), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_128), -->
                                 <!--     column_alias='ds__quarter',                        -->
                                 <!--   )                                                    -->
                                 <!-- col4 =                                                 -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_135), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_129), -->
                                 <!--     column_alias='ds__year',                           -->
                                 <!--   )                                                    -->
                                 <!-- col5 =                                                 -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_136), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_130), -->
                                 <!--     column_alias='ds__extract_year',                   -->
                                 <!--   )                                                    -->
                                 <!-- col6 =                                                 -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_137), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_131), -->
                                 <!--     column_alias='ds__extract_quarter',                -->
                                 <!--   )                                                    -->
                                 <!-- col7 =                                                 -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_138), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_132), -->
                                 <!--     column_alias='ds__extract_month',                  -->
                                 <!--   )                                                    -->
                                 <!-- col8 =                                                 -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_139), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_133), -->
                                 <!--     column_alias='ds__extract_day',                    -->
                                 <!--   )                                                    -->
                                 <!-- col9 =                                                 -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_140), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_134), -->
                                 <!--     column_alias='ds__extract_dow',                    -->
                                 <!--   )                                                    -->
                                 <!-- col10 =                                                -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_141), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_135), -->
                                 <!--     column_alias='ds__extract_doy',                    -->
                                 <!--   )                                                    -->
                                 <!-- col11 =                                                -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_142), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_136), -->
                                 <!--     column_alias='buy__ds__day',                       -->
                                 <!--   )                                                    -->
                                 <!-- col12 =                                                -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_143), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_137), -->
                                 <!--     column_alias='buy__ds__week',                      -->
                                 <!--   )                                                    -->
                                 <!-- col13 =                                                -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_144), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_138), -->
                                 <!--     column_alias='buy__ds__month',                     -->
                                 <!--   )                                                    -->
                                 <!-- col14 =                                                -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_145), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_139), -->
                                 <!--     column_alias='buy__ds__quarter',                   -->
                                 <!--   )                                                    -->
                                 <!-- col15 =                                                -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_146), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_140), -->
                                 <!--     column_alias='buy__ds__year',                      -->
                                 <!--   )                                                    -->
                                 <!-- col16 =                                                -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_147), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_141), -->
                                 <!--     column_alias='buy__ds__extract_year',              -->
                                 <!--   )                                                    -->
                                 <!-- col17 =                                                -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_148), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_142), -->
                                 <!--     column_alias='buy__ds__extract_quarter',           -->
                                 <!--   )                                                    -->
                                 <!-- col18 =                                                -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_149), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_143), -->
                                 <!--     column_alias='buy__ds__extract_month',             -->
                                 <!--   )                                                    -->
                                 <!-- col19 =                                                -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_150), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_144), -->
                                 <!--     column_alias='buy__ds__extract_day',               -->
                                 <!--   )                                                    -->
                                 <!-- col20 =                                                -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_151), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_145), -->
                                 <!--     column_alias='buy__ds__extract_dow',               -->
                                 <!--   )                                                    -->
                                 <!-- col21 =                                                -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_152), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_146), -->
                                 <!--     column_alias='buy__ds__extract_doy',               -->
                                 <!--   )                                                    -->
                                 <!-- col22 =                                                -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_153), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_147), -->
                                 <!--     column_alias='metric_time__day',                   -->
                                 <!--   )                                                    -->
                                 <!-- col23 =                                                -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_154), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_148), -->
                                 <!--     column_alias='metric_time__week',                  -->
                                 <!--   )                                                    -->
                                 <!-- col24 =                                                -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_155), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_149), -->
                                 <!--     column_alias='metric_time__month',                 -->
                                 <!--   )                                                    -->
                                 <!-- col25 =                                                -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_156), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_150), -->
                                 <!--     column_alias='metric_time__quarter',               -->
                                 <!--   )                                                    -->
                                 <!-- col26 =                                                -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_157), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_151), -->
                                 <!--     column_alias='metric_time__year',                  -->
                                 <!--   )                                                    -->
                                 <!-- col27 =                                                -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_158), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_152), -->
                                 <!--     column_alias='metric_time__extract_year',          -->
                                 <!--   )                                                    -->
                                 <!-- col28 =                                                -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_159), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_153), -->
                                 <!--     column_alias='metric_time__extract_quarter',       -->
                                 <!--   )                                                    -->
                                 <!-- col29 =                                                -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_160), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_154), -->
                                 <!--     column_alias='metric_time__extract_month',         -->
                                 <!--   )                                                    -->
                                 <!-- col30 =                                                -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_161), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_155), -->
                                 <!--     column_alias='metric_time__extract_day',           -->
                                 <!--   )                                                    -->
                                 <!-- col31 =                                                -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_162), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_156), -->
                                 <!--     column_alias='metric_time__extract_dow',           -->
                                 <!--   )                                                    -->
                                 <!-- col32 =                                                -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_163), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_157), -->
                                 <!--     column_alias='metric_time__extract_doy',           -->
                                 <!--   )                                                    -->
                                 <!-- col33 =                                                -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_164), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_158), -->
                                 <!--     column_alias='user',                               -->
                                 <!--   )                                                    -->
                                 <!-- col34 =                                                -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_165), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_159), -->
                                 <!--     column_alias='session_id',                         -->
                                 <!--   )                                                    -->
                                 <!-- col35 =                                                -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_166), -->
-                                <!--     column_alias='buy__user',                          -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_123), -->
+                                <!--     column_alias='buys',                               -->
                                 <!--   )                                                    -->
                                 <!-- col36 =                                                -->
                                 <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_167), -->
-                                <!--     column_alias='buy__session_id',                    -->
-                                <!--   )                                                    -->
-                                <!-- col37 =                                                -->
-                                <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_129), -->
-                                <!--     column_alias='buys',                               -->
-                                <!--   )                                                    -->
-                                <!-- col38 =                                                -->
-                                <!--   SqlSelectColumn(                                     -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_130), -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_124), -->
                                 <!--     column_alias='buyers',                             -->
                                 <!--   )                                                    -->
-                                <!-- col39 =                                             -->
+                                <!-- col37 =                                             -->
                                 <!--   SqlSelectColumn(                                  -->
                                 <!--     expr=SqlGenerateUuidExpression(node_id=uuid_0), -->
                                 <!--     column_alias='mf_internal_uuid',                -->
@@ -1123,197 +1073,187 @@
                                     <!-- node_id = NodeId(id_str='ss_5') -->
                                     <!-- col0 =                                                -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_92), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_88), -->
                                     <!--     column_alias='ds__day',                           -->
                                     <!--   )                                                   -->
                                     <!-- col1 =                                                -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_93), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_89), -->
                                     <!--     column_alias='ds__week',                          -->
                                     <!--   )                                                   -->
                                     <!-- col2 =                                                -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_94), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_90), -->
                                     <!--     column_alias='ds__month',                         -->
                                     <!--   )                                                   -->
                                     <!-- col3 =                                                -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_95), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_91), -->
                                     <!--     column_alias='ds__quarter',                       -->
                                     <!--   )                                                   -->
                                     <!-- col4 =                                                -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_96), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_92), -->
                                     <!--     column_alias='ds__year',                          -->
                                     <!--   )                                                   -->
                                     <!-- col5 =                                                -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_97), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_93), -->
                                     <!--     column_alias='ds__extract_year',                  -->
                                     <!--   )                                                   -->
                                     <!-- col6 =                                                -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_98), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_94), -->
                                     <!--     column_alias='ds__extract_quarter',               -->
                                     <!--   )                                                   -->
                                     <!-- col7 =                                                -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_99), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_95), -->
                                     <!--     column_alias='ds__extract_month',                 -->
                                     <!--   )                                                   -->
-                                    <!-- col8 =                                                 -->
-                                    <!--   SqlSelectColumn(                                     -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_100), -->
-                                    <!--     column_alias='ds__extract_day',                    -->
-                                    <!--   )                                                    -->
-                                    <!-- col9 =                                                 -->
-                                    <!--   SqlSelectColumn(                                     -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_101), -->
-                                    <!--     column_alias='ds__extract_dow',                    -->
-                                    <!--   )                                                    -->
-                                    <!-- col10 =                                                -->
-                                    <!--   SqlSelectColumn(                                     -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_102), -->
-                                    <!--     column_alias='ds__extract_doy',                    -->
-                                    <!--   )                                                    -->
-                                    <!-- col11 =                                                -->
-                                    <!--   SqlSelectColumn(                                     -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_103), -->
-                                    <!--     column_alias='buy__ds__day',                       -->
-                                    <!--   )                                                    -->
+                                    <!-- col8 =                                                -->
+                                    <!--   SqlSelectColumn(                                    -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_96), -->
+                                    <!--     column_alias='ds__extract_day',                   -->
+                                    <!--   )                                                   -->
+                                    <!-- col9 =                                                -->
+                                    <!--   SqlSelectColumn(                                    -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_97), -->
+                                    <!--     column_alias='ds__extract_dow',                   -->
+                                    <!--   )                                                   -->
+                                    <!-- col10 =                                               -->
+                                    <!--   SqlSelectColumn(                                    -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_98), -->
+                                    <!--     column_alias='ds__extract_doy',                   -->
+                                    <!--   )                                                   -->
+                                    <!-- col11 =                                               -->
+                                    <!--   SqlSelectColumn(                                    -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_99), -->
+                                    <!--     column_alias='buy__ds__day',                      -->
+                                    <!--   )                                                   -->
                                     <!-- col12 =                                                -->
                                     <!--   SqlSelectColumn(                                     -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_104), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_100), -->
                                     <!--     column_alias='buy__ds__week',                      -->
                                     <!--   )                                                    -->
                                     <!-- col13 =                                                -->
                                     <!--   SqlSelectColumn(                                     -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_105), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_101), -->
                                     <!--     column_alias='buy__ds__month',                     -->
                                     <!--   )                                                    -->
                                     <!-- col14 =                                                -->
                                     <!--   SqlSelectColumn(                                     -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_106), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_102), -->
                                     <!--     column_alias='buy__ds__quarter',                   -->
                                     <!--   )                                                    -->
                                     <!-- col15 =                                                -->
                                     <!--   SqlSelectColumn(                                     -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_107), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_103), -->
                                     <!--     column_alias='buy__ds__year',                      -->
                                     <!--   )                                                    -->
                                     <!-- col16 =                                                -->
                                     <!--   SqlSelectColumn(                                     -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_108), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_104), -->
                                     <!--     column_alias='buy__ds__extract_year',              -->
                                     <!--   )                                                    -->
                                     <!-- col17 =                                                -->
                                     <!--   SqlSelectColumn(                                     -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_109), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_105), -->
                                     <!--     column_alias='buy__ds__extract_quarter',           -->
                                     <!--   )                                                    -->
                                     <!-- col18 =                                                -->
                                     <!--   SqlSelectColumn(                                     -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_110), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_106), -->
                                     <!--     column_alias='buy__ds__extract_month',             -->
                                     <!--   )                                                    -->
                                     <!-- col19 =                                                -->
                                     <!--   SqlSelectColumn(                                     -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_111), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_107), -->
                                     <!--     column_alias='buy__ds__extract_day',               -->
                                     <!--   )                                                    -->
                                     <!-- col20 =                                                -->
                                     <!--   SqlSelectColumn(                                     -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_112), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_108), -->
                                     <!--     column_alias='buy__ds__extract_dow',               -->
                                     <!--   )                                                    -->
                                     <!-- col21 =                                                -->
                                     <!--   SqlSelectColumn(                                     -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_113), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_109), -->
                                     <!--     column_alias='buy__ds__extract_doy',               -->
                                     <!--   )                                                    -->
                                     <!-- col22 =                                                -->
                                     <!--   SqlSelectColumn(                                     -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_114), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_110), -->
                                     <!--     column_alias='metric_time__day',                   -->
                                     <!--   )                                                    -->
                                     <!-- col23 =                                                -->
                                     <!--   SqlSelectColumn(                                     -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_115), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_111), -->
                                     <!--     column_alias='metric_time__week',                  -->
                                     <!--   )                                                    -->
                                     <!-- col24 =                                                -->
                                     <!--   SqlSelectColumn(                                     -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_116), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_112), -->
                                     <!--     column_alias='metric_time__month',                 -->
                                     <!--   )                                                    -->
                                     <!-- col25 =                                                -->
                                     <!--   SqlSelectColumn(                                     -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_117), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_113), -->
                                     <!--     column_alias='metric_time__quarter',               -->
                                     <!--   )                                                    -->
                                     <!-- col26 =                                                -->
                                     <!--   SqlSelectColumn(                                     -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_118), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_114), -->
                                     <!--     column_alias='metric_time__year',                  -->
                                     <!--   )                                                    -->
                                     <!-- col27 =                                                -->
                                     <!--   SqlSelectColumn(                                     -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_119), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_115), -->
                                     <!--     column_alias='metric_time__extract_year',          -->
                                     <!--   )                                                    -->
                                     <!-- col28 =                                                -->
                                     <!--   SqlSelectColumn(                                     -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_120), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_116), -->
                                     <!--     column_alias='metric_time__extract_quarter',       -->
                                     <!--   )                                                    -->
                                     <!-- col29 =                                                -->
                                     <!--   SqlSelectColumn(                                     -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_121), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_117), -->
                                     <!--     column_alias='metric_time__extract_month',         -->
                                     <!--   )                                                    -->
                                     <!-- col30 =                                                -->
                                     <!--   SqlSelectColumn(                                     -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_122), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_118), -->
                                     <!--     column_alias='metric_time__extract_day',           -->
                                     <!--   )                                                    -->
                                     <!-- col31 =                                                -->
                                     <!--   SqlSelectColumn(                                     -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_123), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_119), -->
                                     <!--     column_alias='metric_time__extract_dow',           -->
                                     <!--   )                                                    -->
                                     <!-- col32 =                                                -->
                                     <!--   SqlSelectColumn(                                     -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_124), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_120), -->
                                     <!--     column_alias='metric_time__extract_doy',           -->
                                     <!--   )                                                    -->
                                     <!-- col33 =                                                -->
                                     <!--   SqlSelectColumn(                                     -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_125), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_121), -->
                                     <!--     column_alias='user',                               -->
                                     <!--   )                                                    -->
                                     <!-- col34 =                                                -->
                                     <!--   SqlSelectColumn(                                     -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_126), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_122), -->
                                     <!--     column_alias='session_id',                         -->
                                     <!--   )                                                    -->
-                                    <!-- col35 =                                                -->
-                                    <!--   SqlSelectColumn(                                     -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_127), -->
-                                    <!--     column_alias='buy__user',                          -->
-                                    <!--   )                                                    -->
-                                    <!-- col36 =                                                -->
-                                    <!--   SqlSelectColumn(                                     -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_128), -->
-                                    <!--     column_alias='buy__session_id',                    -->
-                                    <!--   )                                                    -->
-                                    <!-- col37 =                                               -->
+                                    <!-- col35 =                                               -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_90), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_86), -->
                                     <!--     column_alias='buys',                              -->
                                     <!--   )                                                   -->
-                                    <!-- col38 =                                               -->
+                                    <!-- col36 =                                               -->
                                     <!--   SqlSelectColumn(                                    -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_91), -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_87), -->
                                     <!--     column_alias='buyers',                            -->
                                     <!--   )                                                   -->
                                     <!-- from_source = SqlSelectStatementNode(node_id=ss_28002) -->
@@ -1329,7 +1269,7 @@
                                         <!--   )                                                         -->
                                         <!-- col1 =                                                   -->
                                         <!--   SqlSelectColumn(                                       -->
-                                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_28034), -->
+                                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_28030), -->
                                         <!--     column_alias='buyers',                               -->
                                         <!--   )                                                      -->
                                         <!-- col2 =                                             -->
@@ -1444,23 +1384,13 @@
                                         <!--   )                                              -->
                                         <!-- col24 =                                                  -->
                                         <!--   SqlSelectColumn(                                       -->
-                                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_28037), -->
+                                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_28033), -->
                                         <!--     column_alias='user',                                 -->
                                         <!--   )                                                      -->
                                         <!-- col25 =                                                  -->
                                         <!--   SqlSelectColumn(                                       -->
-                                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_28038), -->
+                                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_28034), -->
                                         <!--     column_alias='session_id',                           -->
-                                        <!--   )                                                      -->
-                                        <!-- col26 =                                                  -->
-                                        <!--   SqlSelectColumn(                                       -->
-                                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_28039), -->
-                                        <!--     column_alias='buy__user',                            -->
-                                        <!--   )                                                      -->
-                                        <!-- col27 =                                                  -->
-                                        <!--   SqlSelectColumn(                                       -->
-                                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_28040), -->
-                                        <!--     column_alias='buy__session_id',                      -->
                                         <!--   )                                                      -->
                                         <!-- from_source = SqlTableFromClauseNode(node_id=tfc_28002) -->
                                         <!-- where = None -->

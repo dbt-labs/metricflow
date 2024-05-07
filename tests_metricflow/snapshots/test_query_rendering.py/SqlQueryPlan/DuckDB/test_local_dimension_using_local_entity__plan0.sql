@@ -72,7 +72,6 @@ FROM (
         , subq_0.ds__extract_doy AS metric_time__extract_doy
         , subq_0.listing
         , subq_0.user
-        , subq_0.listing__user
         , subq_0.country_latest
         , subq_0.is_lux_latest
         , subq_0.capacity_latest
@@ -140,7 +139,6 @@ FROM (
           , listings_latest_src_28000.capacity AS listing__capacity_latest
           , listings_latest_src_28000.listing_id AS listing
           , listings_latest_src_28000.user_id AS user
-          , listings_latest_src_28000.user_id AS listing__user
         FROM ***************************.dim_listings_latest listings_latest_src_28000
       ) subq_0
     ) subq_1

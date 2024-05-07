@@ -2,9 +2,9 @@
     <SqlSelectStatementNode>
         <!-- description = 'Join to Time Spine Dataset' -->
         <!-- node_id = NodeId(id_str='ss_5') -->
-        <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_112), column_alias='metric_time__day') -->
-        <!-- col1 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_111), column_alias='listing') -->
-        <!-- col2 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_110), column_alias='booking_fees') -->
+        <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_109), column_alias='metric_time__day') -->
+        <!-- col1 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_108), column_alias='listing') -->
+        <!-- col2 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_107), column_alias='booking_fees') -->
         <!-- from_source = SqlSelectStatementNode(node_id=ss_4) -->
         <!-- join_0 =                                                 -->
         <!--   SqlJoinDescription(                                    -->
@@ -19,7 +19,7 @@
             <!-- description = 'Time Spine' -->
             <!-- node_id = NodeId(id_str='ss_4') -->
             <!-- col0 =                                                                                                -->
-            <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_106), column_alias='metric_time__day') -->
+            <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_103), column_alias='metric_time__day') -->
             <!-- from_source = SqlTableFromClauseNode(node_id=tfc_0) -->
             <!-- where = SqlBetweenExpression(node_id=betw_0) -->
             <!-- distinct = False -->
@@ -33,8 +33,8 @@
             <!-- description = 'Compute Metrics via Expressions' -->
             <!-- node_id = NodeId(id_str='ss_3') -->
             <!-- col0 =                                                                                                -->
-            <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_104), column_alias='metric_time__day') -->
-            <!-- col1 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_105), column_alias='listing') -->
+            <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_101), column_alias='metric_time__day') -->
+            <!-- col1 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_102), column_alias='listing') -->
             <!-- col2 =                                                                     -->
             <!--   SqlSelectColumn(                                                         -->
             <!--     expr=SqlStringExpression(node_id=str_0 sql_expr=booking_value * 0.05), -->
@@ -46,19 +46,19 @@
             <SqlSelectStatementNode>
                 <!-- description = 'Aggregate Measures' -->
                 <!-- node_id = NodeId(id_str='ss_2') -->
-                <!-- col0 =                                                                                                -->
-                <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_102), column_alias='metric_time__day') -->
-                <!-- col1 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_103), column_alias='listing') -->
+                <!-- col0 =                                                                                               -->
+                <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_99), column_alias='metric_time__day') -->
+                <!-- col1 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_100), column_alias='listing') -->
                 <!-- col2 =                                                                    -->
                 <!--   SqlSelectColumn(                                                        -->
                 <!--     expr=SqlAggregateFunctionExpression(node_id=fnc_0, sql_function=SUM), -->
                 <!--     column_alias='booking_value',                                         -->
                 <!--   )                                                                       -->
                 <!-- from_source = SqlSelectStatementNode(node_id=ss_1) -->
-                <!-- group_by0 =                                                                                           -->
-                <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_102), column_alias='metric_time__day') -->
+                <!-- group_by0 =                                                                                          -->
+                <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_99), column_alias='metric_time__day') -->
                 <!-- group_by1 =                                                                                  -->
-                <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_103), column_alias='listing') -->
+                <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_100), column_alias='listing') -->
                 <!-- where = None -->
                 <!-- distinct = False -->
                 <SqlSelectStatementNode>
@@ -66,13 +66,13 @@
                     <!-- node_id = NodeId(id_str='ss_1') -->
                     <!-- col0 =                                                -->
                     <!--   SqlSelectColumn(                                    -->
-                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_99), -->
+                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_96), -->
                     <!--     column_alias='metric_time__day',                  -->
                     <!--   )                                                   -->
-                    <!-- col1 =                                                                                       -->
-                    <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_100), column_alias='listing') -->
+                    <!-- col1 =                                                                                      -->
+                    <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_97), column_alias='listing') -->
                     <!-- col2 =                                                                                            -->
-                    <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_98), column_alias='booking_value') -->
+                    <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_95), column_alias='booking_value') -->
                     <!-- from_source = SqlSelectStatementNode(node_id=ss_0) -->
                     <!-- where = None -->
                     <!-- distinct = False -->
@@ -460,84 +460,69 @@
                         <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_94), column_alias='host') -->
                         <!-- col80 =                                               -->
                         <!--   SqlSelectColumn(                                    -->
-                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_95), -->
-                        <!--     column_alias='booking__listing',                  -->
-                        <!--   )                                                   -->
-                        <!-- col81 =                                               -->
-                        <!--   SqlSelectColumn(                                    -->
-                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_96), -->
-                        <!--     column_alias='booking__guest',                    -->
-                        <!--   )                                                   -->
-                        <!-- col82 =                                               -->
-                        <!--   SqlSelectColumn(                                    -->
-                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_97), -->
-                        <!--     column_alias='booking__host',                     -->
-                        <!--   )                                                   -->
-                        <!-- col83 =                                               -->
-                        <!--   SqlSelectColumn(                                    -->
                         <!--     expr=SqlColumnReferenceExpression(node_id=cr_13), -->
                         <!--     column_alias='is_instant',                        -->
                         <!--   )                                                   -->
-                        <!-- col84 =                                               -->
+                        <!-- col81 =                                               -->
                         <!--   SqlSelectColumn(                                    -->
                         <!--     expr=SqlColumnReferenceExpression(node_id=cr_14), -->
                         <!--     column_alias='booking__is_instant',               -->
                         <!--   )                                                   -->
-                        <!-- col85 =                                                                                     -->
+                        <!-- col82 =                                                                                     -->
                         <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_0), column_alias='bookings') -->
-                        <!-- col86 =                                              -->
+                        <!-- col83 =                                              -->
                         <!--   SqlSelectColumn(                                   -->
                         <!--     expr=SqlColumnReferenceExpression(node_id=cr_1), -->
                         <!--     column_alias='instant_bookings',                 -->
                         <!--   )                                                  -->
-                        <!-- col87 =                                              -->
+                        <!-- col84 =                                              -->
                         <!--   SqlSelectColumn(                                   -->
                         <!--     expr=SqlColumnReferenceExpression(node_id=cr_2), -->
                         <!--     column_alias='booking_value',                    -->
                         <!--   )                                                  -->
-                        <!-- col88 =                                              -->
+                        <!-- col85 =                                              -->
                         <!--   SqlSelectColumn(                                   -->
                         <!--     expr=SqlColumnReferenceExpression(node_id=cr_3), -->
                         <!--     column_alias='max_booking_value',                -->
                         <!--   )                                                  -->
-                        <!-- col89 =                                              -->
+                        <!-- col86 =                                              -->
                         <!--   SqlSelectColumn(                                   -->
                         <!--     expr=SqlColumnReferenceExpression(node_id=cr_4), -->
                         <!--     column_alias='min_booking_value',                -->
                         <!--   )                                                  -->
-                        <!-- col90 =                                                                                    -->
+                        <!-- col87 =                                                                                    -->
                         <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_5), column_alias='bookers') -->
-                        <!-- col91 =                                              -->
+                        <!-- col88 =                                              -->
                         <!--   SqlSelectColumn(                                   -->
                         <!--     expr=SqlColumnReferenceExpression(node_id=cr_6), -->
                         <!--     column_alias='average_booking_value',            -->
                         <!--   )                                                  -->
-                        <!-- col92 =                                              -->
+                        <!-- col89 =                                              -->
                         <!--   SqlSelectColumn(                                   -->
                         <!--     expr=SqlColumnReferenceExpression(node_id=cr_7), -->
                         <!--     column_alias='referred_bookings',                -->
                         <!--   )                                                  -->
-                        <!-- col93 =                                              -->
+                        <!-- col90 =                                              -->
                         <!--   SqlSelectColumn(                                   -->
                         <!--     expr=SqlColumnReferenceExpression(node_id=cr_8), -->
                         <!--     column_alias='median_booking_value',             -->
                         <!--   )                                                  -->
-                        <!-- col94 =                                              -->
+                        <!-- col91 =                                              -->
                         <!--   SqlSelectColumn(                                   -->
                         <!--     expr=SqlColumnReferenceExpression(node_id=cr_9), -->
                         <!--     column_alias='booking_value_p99',                -->
                         <!--   )                                                  -->
-                        <!-- col95 =                                               -->
+                        <!-- col92 =                                               -->
                         <!--   SqlSelectColumn(                                    -->
                         <!--     expr=SqlColumnReferenceExpression(node_id=cr_10), -->
                         <!--     column_alias='discrete_booking_value_p99',        -->
                         <!--   )                                                   -->
-                        <!-- col96 =                                                      -->
+                        <!-- col93 =                                                      -->
                         <!--   SqlSelectColumn(                                           -->
                         <!--     expr=SqlColumnReferenceExpression(node_id=cr_11),        -->
                         <!--     column_alias='approximate_continuous_booking_value_p99', -->
                         <!--   )                                                          -->
-                        <!-- col97 =                                                    -->
+                        <!-- col94 =                                                    -->
                         <!--   SqlSelectColumn(                                         -->
                         <!--     expr=SqlColumnReferenceExpression(node_id=cr_12),      -->
                         <!--     column_alias='approximate_discrete_booking_value_p99', -->
@@ -560,32 +545,32 @@
                             <!--   )                                                                                              -->
                             <!-- col2 =                                                   -->
                             <!--   SqlSelectColumn(                                       -->
-                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28009), -->
+                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28008), -->
                             <!--     column_alias='booking_value',                        -->
                             <!--   )                                                      -->
                             <!-- col3 =                                                   -->
                             <!--   SqlSelectColumn(                                       -->
-                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28010), -->
+                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28009), -->
                             <!--     column_alias='max_booking_value',                    -->
                             <!--   )                                                      -->
                             <!-- col4 =                                                   -->
                             <!--   SqlSelectColumn(                                       -->
-                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28011), -->
+                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28010), -->
                             <!--     column_alias='min_booking_value',                    -->
                             <!--   )                                                      -->
                             <!-- col5 =                                                   -->
                             <!--   SqlSelectColumn(                                       -->
-                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28012), -->
+                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28011), -->
                             <!--     column_alias='bookers',                              -->
                             <!--   )                                                      -->
                             <!-- col6 =                                                   -->
                             <!--   SqlSelectColumn(                                       -->
-                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28013), -->
+                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28012), -->
                             <!--     column_alias='average_booking_value',                -->
                             <!--   )                                                      -->
                             <!-- col7 =                                                   -->
                             <!--   SqlSelectColumn(                                       -->
-                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28014), -->
+                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28013), -->
                             <!--     column_alias='booking_payments',                     -->
                             <!--   )                                                      -->
                             <!-- col8 =                                                                                                        -->
@@ -595,32 +580,32 @@
                             <!--   )                                                                                                           -->
                             <!-- col9 =                                                   -->
                             <!--   SqlSelectColumn(                                       -->
-                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28015), -->
+                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28014), -->
                             <!--     column_alias='median_booking_value',                 -->
                             <!--   )                                                      -->
                             <!-- col10 =                                                  -->
                             <!--   SqlSelectColumn(                                       -->
-                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28016), -->
+                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28015), -->
                             <!--     column_alias='booking_value_p99',                    -->
                             <!--   )                                                      -->
                             <!-- col11 =                                                  -->
                             <!--   SqlSelectColumn(                                       -->
-                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28017), -->
+                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28016), -->
                             <!--     column_alias='discrete_booking_value_p99',           -->
                             <!--   )                                                      -->
                             <!-- col12 =                                                      -->
                             <!--   SqlSelectColumn(                                           -->
-                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28018),     -->
+                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28017),     -->
                             <!--     column_alias='approximate_continuous_booking_value_p99', -->
                             <!--   )                                                          -->
                             <!-- col13 =                                                    -->
                             <!--   SqlSelectColumn(                                         -->
-                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28019),   -->
+                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28018),   -->
                             <!--     column_alias='approximate_discrete_booking_value_p99', -->
                             <!--   )                                                        -->
                             <!-- col14 =                                                  -->
                             <!--   SqlSelectColumn(                                       -->
-                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28020), -->
+                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28019), -->
                             <!--     column_alias='is_instant',                           -->
                             <!--   )                                                      -->
                             <!-- col15 =                                                                                  -->
@@ -781,7 +766,7 @@
                             <!--   )                                              -->
                             <!-- col48 =                                                  -->
                             <!--   SqlSelectColumn(                                       -->
-                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28024), -->
+                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28023), -->
                             <!--     column_alias='booking__is_instant',                  -->
                             <!--   )                                                      -->
                             <!-- col49 =                                            -->
@@ -951,33 +936,18 @@
                             <!--   )                                               -->
                             <!-- col82 =                                                  -->
                             <!--   SqlSelectColumn(                                       -->
-                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28028), -->
+                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28027), -->
                             <!--     column_alias='listing',                              -->
                             <!--   )                                                      -->
                             <!-- col83 =                                                  -->
                             <!--   SqlSelectColumn(                                       -->
-                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28029), -->
+                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28028), -->
                             <!--     column_alias='guest',                                -->
                             <!--   )                                                      -->
                             <!-- col84 =                                                  -->
                             <!--   SqlSelectColumn(                                       -->
-                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28030), -->
+                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28029), -->
                             <!--     column_alias='host',                                 -->
-                            <!--   )                                                      -->
-                            <!-- col85 =                                                  -->
-                            <!--   SqlSelectColumn(                                       -->
-                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28031), -->
-                            <!--     column_alias='booking__listing',                     -->
-                            <!--   )                                                      -->
-                            <!-- col86 =                                                  -->
-                            <!--   SqlSelectColumn(                                       -->
-                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28032), -->
-                            <!--     column_alias='booking__guest',                       -->
-                            <!--   )                                                      -->
-                            <!-- col87 =                                                  -->
-                            <!--   SqlSelectColumn(                                       -->
-                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_28033), -->
-                            <!--     column_alias='booking__host',                        -->
                             <!--   )                                                      -->
                             <!-- from_source = SqlTableFromClauseNode(node_id=tfc_28001) -->
                             <!-- where = None -->

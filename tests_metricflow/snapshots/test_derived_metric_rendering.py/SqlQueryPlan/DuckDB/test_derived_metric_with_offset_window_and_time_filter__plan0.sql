@@ -111,9 +111,6 @@ FROM (
               , subq_0.listing
               , subq_0.guest
               , subq_0.host
-              , subq_0.booking__listing
-              , subq_0.booking__guest
-              , subq_0.booking__host
               , subq_0.is_instant
               , subq_0.booking__is_instant
               , subq_0.bookings
@@ -217,9 +214,6 @@ FROM (
                 , bookings_source_src_28000.listing_id AS listing
                 , bookings_source_src_28000.guest_id AS guest
                 , bookings_source_src_28000.host_id AS host
-                , bookings_source_src_28000.listing_id AS booking__listing
-                , bookings_source_src_28000.guest_id AS booking__guest
-                , bookings_source_src_28000.host_id AS booking__host
               FROM ***************************.fct_bookings bookings_source_src_28000
             ) subq_0
           ) subq_1
@@ -333,9 +327,6 @@ FROM (
               , subq_7.listing AS listing
               , subq_7.guest AS guest
               , subq_7.host AS host
-              , subq_7.booking__listing AS booking__listing
-              , subq_7.booking__guest AS booking__guest
-              , subq_7.booking__host AS booking__host
               , subq_7.is_instant AS is_instant
               , subq_7.booking__is_instant AS booking__is_instant
               , subq_7.bookings AS bookings
@@ -440,9 +431,6 @@ FROM (
                 , subq_6.listing
                 , subq_6.guest
                 , subq_6.host
-                , subq_6.booking__listing
-                , subq_6.booking__guest
-                , subq_6.booking__host
                 , subq_6.is_instant
                 , subq_6.booking__is_instant
                 , subq_6.bookings
@@ -546,9 +534,6 @@ FROM (
                   , bookings_source_src_28000.listing_id AS listing
                   , bookings_source_src_28000.guest_id AS guest
                   , bookings_source_src_28000.host_id AS host
-                  , bookings_source_src_28000.listing_id AS booking__listing
-                  , bookings_source_src_28000.guest_id AS booking__guest
-                  , bookings_source_src_28000.host_id AS booking__host
                 FROM ***************************.fct_bookings bookings_source_src_28000
               ) subq_6
             ) subq_7

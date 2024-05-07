@@ -49,5 +49,4 @@ SELECT
   , id_verifications_src_28000.verification_type AS verification__verification_type
   , id_verifications_src_28000.verification_id AS verification
   , id_verifications_src_28000.user_id AS user
-  , id_verifications_src_28000.user_id AS verification__user
 FROM ***************************.fct_id_verifications id_verifications_src_28000

@@ -114,10 +114,6 @@ FROM (
             , subq_11.guest
             , subq_11.host
             , subq_11.user
-            , subq_11.booking__listing
-            , subq_11.booking__guest
-            , subq_11.booking__host
-            , subq_11.booking__user
             , subq_11.is_instant
             , subq_11.booking__is_instant
             , subq_11.bookings
@@ -206,10 +202,6 @@ FROM (
               , bookings_source_src_26000.guest_id AS guest
               , bookings_source_src_26000.host_id AS host
               , bookings_source_src_26000.guest_id AS user
-              , bookings_source_src_26000.listing_id AS booking__listing
-              , bookings_source_src_26000.guest_id AS booking__guest
-              , bookings_source_src_26000.host_id AS booking__host
-              , bookings_source_src_26000.guest_id AS booking__user
             FROM ***************************.fct_bookings bookings_source_src_26000
           ) subq_11
         ) subq_12
@@ -281,7 +273,6 @@ FROM (
             , subq_16.ds__extract_doy AS user__ds__extract_doy
             , subq_14.listing AS listing
             , subq_14.user AS user
-            , subq_14.listing__user AS listing__user
             , subq_14.country AS country
             , subq_14.is_lux AS is_lux
             , subq_14.capacity AS capacity
@@ -344,7 +335,6 @@ FROM (
               , listings_src_26000.capacity AS listing__capacity
               , listings_src_26000.listing_id AS listing
               , listings_src_26000.user_id AS user
-              , listings_src_26000.user_id AS listing__user
             FROM ***************************.dim_listings listings_src_26000
           ) subq_14
           LEFT OUTER JOIN (

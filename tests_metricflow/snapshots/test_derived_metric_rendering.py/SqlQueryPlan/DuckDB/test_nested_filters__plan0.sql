@@ -131,9 +131,6 @@ FROM (
                       , subq_0.listing
                       , subq_0.guest
                       , subq_0.host
-                      , subq_0.booking__listing
-                      , subq_0.booking__guest
-                      , subq_0.booking__host
                       , subq_0.is_instant
                       , subq_0.booking__is_instant
                       , subq_0.bookings
@@ -237,9 +234,6 @@ FROM (
                         , bookings_source_src_28000.listing_id AS listing
                         , bookings_source_src_28000.guest_id AS guest
                         , bookings_source_src_28000.host_id AS host
-                        , bookings_source_src_28000.listing_id AS booking__listing
-                        , bookings_source_src_28000.guest_id AS booking__guest
-                        , bookings_source_src_28000.host_id AS booking__host
                       FROM ***************************.fct_bookings bookings_source_src_28000
                     ) subq_0
                   ) subq_1
@@ -309,7 +303,6 @@ FROM (
                       , subq_3.ds__extract_doy AS metric_time__extract_doy
                       , subq_3.listing
                       , subq_3.user
-                      , subq_3.listing__user
                       , subq_3.country_latest
                       , subq_3.is_lux_latest
                       , subq_3.capacity_latest
@@ -377,7 +370,6 @@ FROM (
                         , listings_latest_src_28000.capacity AS listing__capacity_latest
                         , listings_latest_src_28000.listing_id AS listing
                         , listings_latest_src_28000.user_id AS user
-                        , listings_latest_src_28000.user_id AS listing__user
                       FROM ***************************.dim_listings_latest listings_latest_src_28000
                     ) subq_3
                   ) subq_4
@@ -511,9 +503,6 @@ FROM (
                       , subq_12.listing
                       , subq_12.guest
                       , subq_12.host
-                      , subq_12.booking__listing
-                      , subq_12.booking__guest
-                      , subq_12.booking__host
                       , subq_12.is_instant
                       , subq_12.booking__is_instant
                       , subq_12.bookings
@@ -617,9 +606,6 @@ FROM (
                         , bookings_source_src_28000.listing_id AS listing
                         , bookings_source_src_28000.guest_id AS guest
                         , bookings_source_src_28000.host_id AS host
-                        , bookings_source_src_28000.listing_id AS booking__listing
-                        , bookings_source_src_28000.guest_id AS booking__guest
-                        , bookings_source_src_28000.host_id AS booking__host
                       FROM ***************************.fct_bookings bookings_source_src_28000
                     ) subq_12
                   ) subq_13
@@ -689,7 +675,6 @@ FROM (
                       , subq_15.ds__extract_doy AS metric_time__extract_doy
                       , subq_15.listing
                       , subq_15.user
-                      , subq_15.listing__user
                       , subq_15.country_latest
                       , subq_15.is_lux_latest
                       , subq_15.capacity_latest
@@ -757,7 +742,6 @@ FROM (
                         , listings_latest_src_28000.capacity AS listing__capacity_latest
                         , listings_latest_src_28000.listing_id AS listing
                         , listings_latest_src_28000.user_id AS user
-                        , listings_latest_src_28000.user_id AS listing__user
                       FROM ***************************.dim_listings_latest listings_latest_src_28000
                     ) subq_15
                   ) subq_16
@@ -876,9 +860,6 @@ FROM (
                   , subq_24.listing
                   , subq_24.guest
                   , subq_24.host
-                  , subq_24.booking__listing
-                  , subq_24.booking__guest
-                  , subq_24.booking__host
                   , subq_24.is_instant
                   , subq_24.booking__is_instant
                   , subq_24.bookings
@@ -982,9 +963,6 @@ FROM (
                     , bookings_source_src_28000.listing_id AS listing
                     , bookings_source_src_28000.guest_id AS guest
                     , bookings_source_src_28000.host_id AS host
-                    , bookings_source_src_28000.listing_id AS booking__listing
-                    , bookings_source_src_28000.guest_id AS booking__guest
-                    , bookings_source_src_28000.host_id AS booking__host
                   FROM ***************************.fct_bookings bookings_source_src_28000
                 ) subq_24
               ) subq_25

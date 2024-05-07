@@ -81,9 +81,6 @@ SELECT
   , listing_id AS listing
   , guest_id AS guest
   , host_id AS host
-  , listing_id AS booking__listing
-  , guest_id AS booking__guest
-  , host_id AS booking__host
   , is_instant
   , is_instant AS booking__is_instant
   , booking_value AS booking_payments

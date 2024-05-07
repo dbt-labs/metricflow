@@ -122,9 +122,6 @@ FROM (
                 , subq_3.listing
                 , subq_3.guest
                 , subq_3.host
-                , subq_3.booking__listing
-                , subq_3.booking__guest
-                , subq_3.booking__host
                 , subq_3.is_instant
                 , subq_3.booking__is_instant
                 , subq_3.bookings
@@ -223,9 +220,6 @@ FROM (
                   , subq_2.listing
                   , subq_2.guest
                   , subq_2.host
-                  , subq_2.booking__listing
-                  , subq_2.booking__guest
-                  , subq_2.booking__host
                   , subq_2.is_instant
                   , subq_2.booking__is_instant
                   , subq_2.bookings
@@ -329,9 +323,6 @@ FROM (
                     , bookings_source_src_28000.listing_id AS listing
                     , bookings_source_src_28000.guest_id AS guest
                     , bookings_source_src_28000.host_id AS host
-                    , bookings_source_src_28000.listing_id AS booking__listing
-                    , bookings_source_src_28000.guest_id AS booking__guest
-                    , bookings_source_src_28000.host_id AS booking__host
                   FROM ***************************.fct_bookings bookings_source_src_28000
                 ) subq_2
               ) subq_3

@@ -46,7 +46,6 @@
   'verification__ds_partitioned__quarter',
   'verification__ds_partitioned__week',
   'verification__ds_partitioned__year',
-  'verification__user',
   'verification__verification_type',
   'verification_type',
 ]

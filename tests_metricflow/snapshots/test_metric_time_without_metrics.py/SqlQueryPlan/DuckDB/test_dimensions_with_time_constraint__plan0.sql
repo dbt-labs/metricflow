@@ -53,7 +53,6 @@ FROM (
     , subq_8.metric_time__day
     , subq_8.listing
     , subq_8.user
-    , subq_8.listing__user
     , subq_8.country_latest
     , subq_8.is_lux_latest
     , subq_8.capacity_latest
@@ -114,7 +113,6 @@ FROM (
       , subq_5.metric_time__day AS metric_time__day
       , subq_2.listing AS listing
       , subq_2.user AS user
-      , subq_2.listing__user AS listing__user
       , subq_2.country_latest AS country_latest
       , subq_2.is_lux_latest AS is_lux_latest
       , subq_2.capacity_latest AS capacity_latest
@@ -183,7 +181,6 @@ FROM (
         , listings_latest_src_28000.capacity AS listing__capacity_latest
         , listings_latest_src_28000.listing_id AS listing
         , listings_latest_src_28000.user_id AS user
-        , listings_latest_src_28000.user_id AS listing__user
       FROM ***************************.dim_listings_latest listings_latest_src_28000
     ) subq_2
     CROSS JOIN (

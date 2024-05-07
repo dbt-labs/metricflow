@@ -445,6 +445,7 @@ class SemanticModelToDataSetConverter:
 
         for entity_link in SemanticModelLookup.entity_links_for_local_elements(semantic_model):
             possible_entity_links.append((entity_link,))
+        print("possible_entity_links:", possible_entity_links)
 
         # Handle dimensions
         conversion_results = [
@@ -482,15 +483,14 @@ class SemanticModelToDataSetConverter:
         )
 
         # Handle entities
-        for entity_links in possible_entity_links:
-            entity_instances, select_columns = self._create_entity_instances(
-                semantic_model_name=semantic_model.name,
-                entities=semantic_model.entities,
-                entity_links=entity_links,
-                table_alias=from_source_alias,
-            )
-            all_entity_instances.extend(entity_instances)
-            all_select_columns.extend(select_columns)
+        entity_instances, select_columns = self._create_entity_instances(
+            semantic_model_name=semantic_model.name,
+            entities=semantic_model.entities,
+            entity_links=(),
+            table_alias=from_source_alias,
+        )
+        all_entity_instances.extend(entity_instances)
+        all_select_columns.extend(select_columns)
 
         # Generate the "from" clause depending on whether it's an SQL query or an SQL table.
         from_source = SqlTableFromClauseNode(sql_table=SqlTable.from_string(semantic_model.node_relation.relation_name))

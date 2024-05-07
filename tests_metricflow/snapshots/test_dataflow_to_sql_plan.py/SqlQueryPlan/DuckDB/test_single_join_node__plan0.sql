@@ -95,9 +95,6 @@ FROM (
       , bookings_source_src_28000.listing_id AS listing
       , bookings_source_src_28000.guest_id AS guest
       , bookings_source_src_28000.host_id AS host
-      , bookings_source_src_28000.listing_id AS booking__listing
-      , bookings_source_src_28000.guest_id AS booking__guest
-      , bookings_source_src_28000.host_id AS booking__host
     FROM ***************************.fct_bookings bookings_source_src_28000
   ) subq_0
 ) subq_1
@@ -164,7 +161,6 @@ LEFT OUTER JOIN (
       , listings_latest_src_28000.capacity AS listing__capacity_latest
       , listings_latest_src_28000.listing_id AS listing
       , listings_latest_src_28000.user_id AS user
-      , listings_latest_src_28000.user_id AS listing__user
     FROM ***************************.dim_listings_latest listings_latest_src_28000
   ) subq_2
 ) subq_3

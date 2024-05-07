@@ -124,9 +124,6 @@ FROM (
                 , subq_0.listing
                 , subq_0.guest
                 , subq_0.host
-                , subq_0.booking__listing
-                , subq_0.booking__guest
-                , subq_0.booking__host
                 , subq_0.is_instant
                 , subq_0.booking__is_instant
                 , subq_0.bookings
@@ -230,9 +227,6 @@ FROM (
                   , bookings_source_src_28000.listing_id AS listing
                   , bookings_source_src_28000.guest_id AS guest
                   , bookings_source_src_28000.host_id AS host
-                  , bookings_source_src_28000.listing_id AS booking__listing
-                  , bookings_source_src_28000.guest_id AS booking__guest
-                  , bookings_source_src_28000.host_id AS booking__host
                 FROM ***************************.fct_bookings bookings_source_src_28000
               ) subq_0
             ) subq_1
@@ -302,7 +296,6 @@ FROM (
                 , subq_3.ds__extract_doy AS metric_time__extract_doy
                 , subq_3.listing
                 , subq_3.user
-                , subq_3.listing__user
                 , subq_3.country_latest
                 , subq_3.is_lux_latest
                 , subq_3.capacity_latest
@@ -370,7 +363,6 @@ FROM (
                   , listings_latest_src_28000.capacity AS listing__capacity_latest
                   , listings_latest_src_28000.listing_id AS listing
                   , listings_latest_src_28000.user_id AS user
-                  , listings_latest_src_28000.user_id AS listing__user
                 FROM ***************************.dim_listings_latest listings_latest_src_28000
               ) subq_3
             ) subq_4
@@ -475,8 +467,6 @@ FROM (
                 , subq_10.ds__extract_doy AS metric_time__extract_doy
                 , subq_10.listing
                 , subq_10.user
-                , subq_10.view__listing
-                , subq_10.view__user
                 , subq_10.views
               FROM (
                 -- Read Elements From Semantic Model 'views_source'
@@ -528,8 +518,6 @@ FROM (
                   , EXTRACT(doy FROM views_source_src_28000.ds_partitioned) AS view__ds_partitioned__extract_doy
                   , views_source_src_28000.listing_id AS listing
                   , views_source_src_28000.user_id AS user
-                  , views_source_src_28000.listing_id AS view__listing
-                  , views_source_src_28000.user_id AS view__user
                 FROM ***************************.fct_views views_source_src_28000
               ) subq_10
             ) subq_11
@@ -599,7 +587,6 @@ FROM (
                 , subq_13.ds__extract_doy AS metric_time__extract_doy
                 , subq_13.listing
                 , subq_13.user
-                , subq_13.listing__user
                 , subq_13.country_latest
                 , subq_13.is_lux_latest
                 , subq_13.capacity_latest
@@ -667,7 +654,6 @@ FROM (
                   , listings_latest_src_28000.capacity AS listing__capacity_latest
                   , listings_latest_src_28000.listing_id AS listing
                   , listings_latest_src_28000.user_id AS user
-                  , listings_latest_src_28000.user_id AS listing__user
                 FROM ***************************.dim_listings_latest listings_latest_src_28000
               ) subq_13
             ) subq_14

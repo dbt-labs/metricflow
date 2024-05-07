@@ -23,7 +23,6 @@ SELECT
   , subq_3.account__ds__extract_dow AS account__ds__extract_dow
   , subq_3.account__ds__extract_doy AS account__ds__extract_doy
   , subq_3.user AS user
-  , subq_3.account__user AS account__user
   , subq_3.account_type AS account_type
   , subq_3.account__account_type AS account__account_type
   , subq_3.account_balance AS account_balance
@@ -60,7 +59,6 @@ FROM (
     , EXTRACT(doy FROM ds) AS account__ds__extract_doy
     , account_type AS account__account_type
     , user_id AS user
-    , user_id AS account__user
   FROM ***************************.fct_accounts accounts_source_src_28000
 ) subq_3
 INNER JOIN (

@@ -39,7 +39,6 @@ FROM (
           , subq_4.metric_time__extract_quarter AS metric_time__extract_quarter
           , subq_4.metric_time__extract_month AS metric_time__extract_month
           , subq_4.listing AS listing
-          , subq_4.booking__listing AS booking__listing
           , subq_4.bookings_monthly AS bookings_monthly
         FROM (
           -- Time Spine
@@ -72,7 +71,6 @@ FROM (
             , subq_3.metric_time__extract_quarter
             , subq_3.metric_time__extract_month
             , subq_3.listing
-            , subq_3.booking__listing
             , subq_3.bookings_monthly
           FROM (
             -- Metric Time Dimension 'monthly_ds'
@@ -96,7 +94,6 @@ FROM (
               , subq_2.monthly_ds__extract_quarter AS metric_time__extract_quarter
               , subq_2.monthly_ds__extract_month AS metric_time__extract_month
               , subq_2.listing
-              , subq_2.booking__listing
               , subq_2.bookings_monthly
             FROM (
               -- Read Elements From Semantic Model 'bookings_monthly_source'
@@ -115,7 +112,6 @@ FROM (
                 , EXTRACT(quarter FROM bookings_monthly_source_src_16000.ds) AS booking__monthly_ds__extract_quarter
                 , EXTRACT(month FROM bookings_monthly_source_src_16000.ds) AS booking__monthly_ds__extract_month
                 , bookings_monthly_source_src_16000.listing_id AS listing
-                , bookings_monthly_source_src_16000.listing_id AS booking__listing
               FROM ***************************.fct_bookings_extended_monthly bookings_monthly_source_src_16000
             ) subq_2
           ) subq_3

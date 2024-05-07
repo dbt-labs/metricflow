@@ -64,7 +64,6 @@ FROM (
       , listings_latest_src_28000.capacity AS listing__capacity_latest
       , listings_latest_src_28000.listing_id AS listing
       , listings_latest_src_28000.user_id AS user
-      , listings_latest_src_28000.user_id AS listing__user
     FROM ***************************.dim_listings_latest listings_latest_src_28000
   ) subq_0
   GROUP BY

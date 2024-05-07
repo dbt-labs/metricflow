@@ -97,9 +97,6 @@ FROM (
           , subq_5.listing
           , subq_5.guest
           , subq_5.host
-          , subq_5.booking__listing
-          , subq_5.booking__guest
-          , subq_5.booking__host
           , subq_5.is_instant
           , subq_5.booking__is_instant
           , subq_5.bookings
@@ -198,9 +195,6 @@ FROM (
             , subq_4.listing
             , subq_4.guest
             , subq_4.host
-            , subq_4.booking__listing
-            , subq_4.booking__guest
-            , subq_4.booking__host
             , subq_4.is_instant
             , subq_4.booking__is_instant
             , subq_4.bookings
@@ -304,9 +298,6 @@ FROM (
               , bookings_source_src_28000.listing_id AS listing
               , bookings_source_src_28000.guest_id AS guest
               , bookings_source_src_28000.host_id AS host
-              , bookings_source_src_28000.listing_id AS booking__listing
-              , bookings_source_src_28000.guest_id AS booking__guest
-              , bookings_source_src_28000.host_id AS booking__host
             FROM ***************************.fct_bookings bookings_source_src_28000
           ) subq_4
         ) subq_5
@@ -387,7 +378,6 @@ CROSS JOIN (
           , subq_11.metric_time__extract_doy
           , subq_11.listing
           , subq_11.user
-          , subq_11.listing__user
           , subq_11.country_latest
           , subq_11.is_lux_latest
           , subq_11.capacity_latest
@@ -457,7 +447,6 @@ CROSS JOIN (
             , subq_10.ds__extract_doy AS metric_time__extract_doy
             , subq_10.listing
             , subq_10.user
-            , subq_10.listing__user
             , subq_10.country_latest
             , subq_10.is_lux_latest
             , subq_10.capacity_latest
@@ -525,7 +514,6 @@ CROSS JOIN (
               , listings_latest_src_28000.capacity AS listing__capacity_latest
               , listings_latest_src_28000.listing_id AS listing
               , listings_latest_src_28000.user_id AS user
-              , listings_latest_src_28000.user_id AS listing__user
             FROM ***************************.dim_listings_latest listings_latest_src_28000
           ) subq_10
         ) subq_11

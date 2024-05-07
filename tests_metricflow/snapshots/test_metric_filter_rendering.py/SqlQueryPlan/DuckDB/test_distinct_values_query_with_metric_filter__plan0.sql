@@ -6,21 +6,18 @@ FROM (
   SELECT
     subq_11.listing
     , subq_11.lux_listing
-    , subq_11.listing__lux_listing
     , subq_11.listing__bookings
   FROM (
     -- Join Standard Outputs
     SELECT
       subq_4.listing AS listing
       , subq_4.lux_listing AS lux_listing
-      , subq_4.listing__lux_listing AS listing__lux_listing
       , subq_10.listing__bookings AS listing__bookings
     FROM (
       -- Read Elements From Semantic Model 'lux_listing_mapping'
       SELECT
         lux_listing_mapping_src_28000.listing_id AS listing
         , lux_listing_mapping_src_28000.lux_listing_id AS lux_listing
-        , lux_listing_mapping_src_28000.lux_listing_id AS listing__lux_listing
       FROM ***************************.dim_lux_listing_id_mapping lux_listing_mapping_src_28000
     ) subq_4
     FULL OUTER JOIN (
@@ -126,9 +123,6 @@ FROM (
                 , subq_5.listing
                 , subq_5.guest
                 , subq_5.host
-                , subq_5.booking__listing
-                , subq_5.booking__guest
-                , subq_5.booking__host
                 , subq_5.is_instant
                 , subq_5.booking__is_instant
                 , subq_5.bookings
@@ -232,9 +226,6 @@ FROM (
                   , bookings_source_src_28000.listing_id AS listing
                   , bookings_source_src_28000.guest_id AS guest
                   , bookings_source_src_28000.host_id AS host
-                  , bookings_source_src_28000.listing_id AS booking__listing
-                  , bookings_source_src_28000.guest_id AS booking__guest
-                  , bookings_source_src_28000.host_id AS booking__host
                 FROM ***************************.fct_bookings bookings_source_src_28000
               ) subq_5
             ) subq_6

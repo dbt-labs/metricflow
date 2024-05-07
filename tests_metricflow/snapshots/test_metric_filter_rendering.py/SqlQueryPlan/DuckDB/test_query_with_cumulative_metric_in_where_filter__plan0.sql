@@ -90,7 +90,6 @@ FROM (
                 , subq_4.ds__extract_doy AS metric_time__extract_doy
                 , subq_4.listing
                 , subq_4.user
-                , subq_4.listing__user
                 , subq_4.country_latest
                 , subq_4.is_lux_latest
                 , subq_4.capacity_latest
@@ -158,7 +157,6 @@ FROM (
                   , listings_latest_src_28000.capacity AS listing__capacity_latest
                   , listings_latest_src_28000.listing_id AS listing
                   , listings_latest_src_28000.user_id AS user
-                  , listings_latest_src_28000.user_id AS listing__user
                 FROM ***************************.dim_listings_latest listings_latest_src_28000
               ) subq_4
             ) subq_5
@@ -220,7 +218,6 @@ FROM (
                       , subq_7.ds__extract_dow AS metric_time__extract_dow
                       , subq_7.ds__extract_doy AS metric_time__extract_doy
                       , subq_7.user
-                      , subq_7.revenue_instance__user
                       , subq_7.txn_revenue
                     FROM (
                       -- Read Elements From Semantic Model 'revenue'
@@ -249,7 +246,6 @@ FROM (
                         , EXTRACT(isodow FROM revenue_src_28000.created_at) AS revenue_instance__ds__extract_dow
                         , EXTRACT(doy FROM revenue_src_28000.created_at) AS revenue_instance__ds__extract_doy
                         , revenue_src_28000.user_id AS user
-                        , revenue_src_28000.user_id AS revenue_instance__user
                       FROM ***************************.fct_revenue revenue_src_28000
                     ) subq_7
                   ) subq_8

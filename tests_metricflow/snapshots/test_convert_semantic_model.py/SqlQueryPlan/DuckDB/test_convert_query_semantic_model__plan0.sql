@@ -24,5 +24,4 @@ SELECT
   , EXTRACT(isodow FROM revenue_src_28000.created_at) AS revenue_instance__ds__extract_dow
   , EXTRACT(doy FROM revenue_src_28000.created_at) AS revenue_instance__ds__extract_doy
   , revenue_src_28000.user_id AS user
-  , revenue_src_28000.user_id AS revenue_instance__user
 FROM ***************************.fct_revenue revenue_src_28000

@@ -23,7 +23,6 @@ SELECT
   , subq_0.account__ds__extract_dow AS account__ds__extract_dow
   , subq_0.account__ds__extract_doy AS account__ds__extract_doy
   , subq_0.user AS user
-  , subq_0.account__user AS account__user
   , subq_0.account_type AS account_type
   , subq_0.account__account_type AS account__account_type
   , subq_0.account_balance AS account_balance
@@ -60,7 +59,6 @@ FROM (
     , EXTRACT(doy FROM accounts_source_src_28000.ds) AS account__ds__extract_doy
     , accounts_source_src_28000.account_type AS account__account_type
     , accounts_source_src_28000.user_id AS user
-    , accounts_source_src_28000.user_id AS account__user
   FROM ***************************.fct_accounts accounts_source_src_28000
 ) subq_0
 INNER JOIN (
@@ -98,7 +96,6 @@ INNER JOIN (
       , EXTRACT(doy FROM accounts_source_src_28000.ds) AS account__ds__extract_doy
       , accounts_source_src_28000.account_type AS account__account_type
       , accounts_source_src_28000.user_id AS user
-      , accounts_source_src_28000.user_id AS account__user
     FROM ***************************.fct_accounts accounts_source_src_28000
   ) subq_1
 ) subq_2

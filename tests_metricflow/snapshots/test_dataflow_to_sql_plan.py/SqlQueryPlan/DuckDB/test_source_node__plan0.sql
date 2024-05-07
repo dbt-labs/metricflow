@@ -85,7 +85,4 @@ SELECT
   , bookings_source_src_28000.listing_id AS listing
   , bookings_source_src_28000.guest_id AS guest
   , bookings_source_src_28000.host_id AS host
-  , bookings_source_src_28000.listing_id AS booking__listing
-  , bookings_source_src_28000.guest_id AS booking__guest
-  , bookings_source_src_28000.host_id AS booking__host
 FROM ***************************.fct_bookings bookings_source_src_28000

@@ -3,18 +3,18 @@
         <!-- description =                                                                                     -->
         <!--   "Pass Only Elements: ['user__home_state_latest', 'listing__is_lux_latest', 'metric_time__day']" -->
         <!-- node_id = NodeId(id_str='ss_4') -->
-        <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_87), column_alias='metric_time__day') -->
+        <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_86), column_alias='metric_time__day') -->
         <!-- col1 =                                                                                                     -->
-        <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_85), column_alias='listing__is_lux_latest') -->
+        <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_84), column_alias='listing__is_lux_latest') -->
         <!-- col2 =                                                                                                      -->
-        <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_86), column_alias='user__home_state_latest') -->
+        <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_85), column_alias='user__home_state_latest') -->
         <!-- from_source = SqlSelectStatementNode(node_id=ss_3) -->
         <!-- group_by0 =                                                                                          -->
-        <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_87), column_alias='metric_time__day') -->
+        <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_86), column_alias='metric_time__day') -->
         <!-- group_by1 =                                                                                                -->
-        <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_85), column_alias='listing__is_lux_latest') -->
+        <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_84), column_alias='listing__is_lux_latest') -->
         <!-- group_by2 =                                                                                                 -->
-        <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_86), column_alias='user__home_state_latest') -->
+        <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_85), column_alias='user__home_state_latest') -->
         <!-- where = None -->
         <!-- distinct = False -->
         <SqlSelectStatementNode>
@@ -173,39 +173,38 @@
             <!--     column_alias='listing__created_at__extract_doy',  -->
             <!--   )                                                   -->
             <!-- col44 =                                                                                              -->
-            <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_83), column_alias='metric_time__day') -->
+            <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_82), column_alias='metric_time__day') -->
             <!-- col45 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_80), column_alias='listing') -->
             <!-- col46 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_81), column_alias='user') -->
-            <!-- col47 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_82), column_alias='listing__user') -->
-            <!-- col48 =                                                                                            -->
+            <!-- col47 =                                                                                            -->
             <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_30), column_alias='country_latest') -->
-            <!-- col49 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_31), column_alias='is_lux_latest') -->
-            <!-- col50 =                                                                                             -->
+            <!-- col48 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_31), column_alias='is_lux_latest') -->
+            <!-- col49 =                                                                                             -->
             <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_32), column_alias='capacity_latest') -->
-            <!-- col51 =                                               -->
+            <!-- col50 =                                               -->
             <!--   SqlSelectColumn(                                    -->
             <!--     expr=SqlColumnReferenceExpression(node_id=cr_33), -->
             <!--     column_alias='listing__country_latest',           -->
             <!--   )                                                   -->
-            <!-- col52 =                                               -->
+            <!-- col51 =                                               -->
             <!--   SqlSelectColumn(                                    -->
             <!--     expr=SqlColumnReferenceExpression(node_id=cr_34), -->
             <!--     column_alias='listing__is_lux_latest',            -->
             <!--   )                                                   -->
-            <!-- col53 =                                               -->
+            <!-- col52 =                                               -->
             <!--   SqlSelectColumn(                                    -->
             <!--     expr=SqlColumnReferenceExpression(node_id=cr_35), -->
             <!--     column_alias='listing__capacity_latest',          -->
             <!--   )                                                   -->
-            <!-- col54 =                                               -->
+            <!-- col53 =                                               -->
             <!--   SqlSelectColumn(                                    -->
-            <!--     expr=SqlColumnReferenceExpression(node_id=cr_84), -->
+            <!--     expr=SqlColumnReferenceExpression(node_id=cr_83), -->
             <!--     column_alias='user__home_state_latest',           -->
             <!--   )                                                   -->
-            <!-- col55 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_27), column_alias='listings') -->
-            <!-- col56 =                                                                                             -->
+            <!-- col54 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_27), column_alias='listings') -->
+            <!-- col55 =                                                                                             -->
             <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28), column_alias='largest_listing') -->
-            <!-- col57 =                                                                                              -->
+            <!-- col56 =                                                                                              -->
             <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_29), column_alias='smallest_listing') -->
             <!-- from_source = SqlSelectStatementNode(node_id=ss_28005) -->
             <!-- join_0 =                                               -->
@@ -230,12 +229,12 @@
                 <!--   SqlSelectColumn(expr=SqlStringExpression(node_id=str_28005 sql_expr=1), column_alias='listings') -->
                 <!-- col1 =                                                   -->
                 <!--   SqlSelectColumn(                                       -->
-                <!--     expr=SqlColumnReferenceExpression(node_id=cr_28057), -->
+                <!--     expr=SqlColumnReferenceExpression(node_id=cr_28048), -->
                 <!--     column_alias='largest_listing',                      -->
                 <!--   )                                                      -->
                 <!-- col2 =                                                   -->
                 <!--   SqlSelectColumn(                                       -->
-                <!--     expr=SqlColumnReferenceExpression(node_id=cr_28058), -->
+                <!--     expr=SqlColumnReferenceExpression(node_id=cr_28049), -->
                 <!--     column_alias='smallest_listing',                     -->
                 <!--   )                                                      -->
                 <!-- col3 = SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28070), column_alias='ds__day') -->
@@ -296,12 +295,12 @@
                 <!--     column_alias='created_at__extract_doy',      -->
                 <!--   )                                              -->
                 <!-- col25 =                                                                                               -->
-                <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28061), column_alias='country_latest') -->
+                <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28052), column_alias='country_latest') -->
                 <!-- col26 =                                                                                              -->
-                <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28062), column_alias='is_lux_latest') -->
+                <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28053), column_alias='is_lux_latest') -->
                 <!-- col27 =                                                  -->
                 <!--   SqlSelectColumn(                                       -->
-                <!--     expr=SqlColumnReferenceExpression(node_id=cr_28063), -->
+                <!--     expr=SqlColumnReferenceExpression(node_id=cr_28054), -->
                 <!--     column_alias='capacity_latest',                      -->
                 <!--   )                                                      -->
                 <!-- col28 =                                                                                           -->
@@ -401,24 +400,22 @@
                 <!--   )                                                  -->
                 <!-- col50 =                                                  -->
                 <!--   SqlSelectColumn(                                       -->
-                <!--     expr=SqlColumnReferenceExpression(node_id=cr_28066), -->
+                <!--     expr=SqlColumnReferenceExpression(node_id=cr_28057), -->
                 <!--     column_alias='listing__country_latest',              -->
                 <!--   )                                                      -->
                 <!-- col51 =                                                  -->
                 <!--   SqlSelectColumn(                                       -->
-                <!--     expr=SqlColumnReferenceExpression(node_id=cr_28067), -->
+                <!--     expr=SqlColumnReferenceExpression(node_id=cr_28058), -->
                 <!--     column_alias='listing__is_lux_latest',               -->
                 <!--   )                                                      -->
                 <!-- col52 =                                                  -->
                 <!--   SqlSelectColumn(                                       -->
-                <!--     expr=SqlColumnReferenceExpression(node_id=cr_28068), -->
+                <!--     expr=SqlColumnReferenceExpression(node_id=cr_28059), -->
                 <!--     column_alias='listing__capacity_latest',             -->
                 <!--   )                                                      -->
                 <!-- col53 =                                                                                        -->
-                <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28069), column_alias='listing') -->
-                <!-- col54 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28070), column_alias='user') -->
-                <!-- col55 =                                                                                              -->
-                <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28071), column_alias='listing__user') -->
+                <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28060), column_alias='listing') -->
+                <!-- col54 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28061), column_alias='user') -->
                 <!-- from_source = SqlTableFromClauseNode(node_id=tfc_28005) -->
                 <!-- where = None -->
                 <!-- distinct = False -->
@@ -647,7 +644,7 @@
                     <!--   )                                              -->
                     <!-- col11 =                                                  -->
                     <!--   SqlSelectColumn(                                       -->
-                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_28090), -->
+                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_28078), -->
                     <!--     column_alias='home_state_latest',                    -->
                     <!--   )                                                      -->
                     <!-- col12 =                                            -->
@@ -707,11 +704,11 @@
                     <!--   )                                              -->
                     <!-- col23 =                                                  -->
                     <!--   SqlSelectColumn(                                       -->
-                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_28092), -->
+                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_28080), -->
                     <!--     column_alias='user__home_state_latest',              -->
                     <!--   )                                                      -->
                     <!-- col24 =                                                                                     -->
-                    <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28093), column_alias='user') -->
+                    <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28081), column_alias='user') -->
                     <!-- from_source = SqlTableFromClauseNode(node_id=tfc_28009) -->
                     <!-- where = None -->
                     <!-- distinct = False -->
