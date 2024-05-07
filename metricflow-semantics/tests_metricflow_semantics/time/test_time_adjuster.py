@@ -1,3 +1,8 @@
+"""Tests for time period adjustments.
+
+Tests here use a reference implementation in `pandas`. To simplify test dependencies and to speed up tests, these are
+marked as skipped by default and the `pandas` implementation is loaded as a part of the test.
+"""
 from __future__ import annotations
 
 import datetime
@@ -11,7 +16,6 @@ from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
-from metricflow_semantics.test_helpers.pandas_adjuster import PandasTimePeriodAdjuster
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_str_snapshot_equal
 from metricflow_semantics.time.dateutil_adjuster import DateutilTimePeriodAdjuster
 
@@ -45,11 +49,14 @@ def grain_to_count_in_year() -> Dict[TimeGranularity, int]:
     }
 
 
+@pytest.mark.skip(reason="Requires pandas")
 def test_start_and_end_periods(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     date_times_to_check: Sequence[datetime.datetime],
 ) -> None:
+    from tests_metricflow_semantics.time.pandas_adjuster import PandasTimePeriodAdjuster
+
     pandas_adjuster = PandasTimePeriodAdjuster()
     dateutil_adjuster = DateutilTimePeriodAdjuster()
 
@@ -87,9 +94,12 @@ def test_start_and_end_periods(  # noqa: D103
     )
 
 
+@pytest.mark.skip(reason="Requires pandas")
 def test_expand_time_constraint_to_fill_granularity(  # noqa: D103
     date_times_to_check: Sequence[datetime.datetime], grain_to_count_in_year: Dict[TimeGranularity, int]
 ) -> None:
+    from tests_metricflow_semantics.time.pandas_adjuster import PandasTimePeriodAdjuster
+
     pandas_adjuster = PandasTimePeriodAdjuster()
     dateutil_adjuster = DateutilTimePeriodAdjuster()
 
@@ -126,9 +136,12 @@ def test_expand_time_constraint_to_fill_granularity(  # noqa: D103
             logger.info(f"Progress {finished_count / test_case_count * 100:.0f}%")
 
 
+@pytest.mark.skip(reason="Requires pandas")
 def test_expand_time_constraint_for_cumulative_metric(  # noqa: D103
     grain_to_count_in_year: Dict[TimeGranularity, int]
 ) -> None:
+    from tests_metricflow_semantics.time.pandas_adjuster import PandasTimePeriodAdjuster
+
     pandas_adjuster = PandasTimePeriodAdjuster()
     dateutil_adjuster = DateutilTimePeriodAdjuster()
 
