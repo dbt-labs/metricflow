@@ -36,7 +36,7 @@ FilterSpecResolutionLookUp(
               element_name='metric_time',
               dimension_type=TIME,
               properties=frozenset(
-                METRIC_TIME,
+                'METRIC_TIME',
               ),
               time_granularity=MONTH,
             ),
@@ -94,7 +94,7 @@ FilterSpecResolutionLookUp(
               element_name='metric_time',
               dimension_type=TIME,
               properties=frozenset(
-                METRIC_TIME,
+                'METRIC_TIME',
               ),
               time_granularity=MONTH,
             ),

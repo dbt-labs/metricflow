@@ -49,7 +49,7 @@
                     <!--         element_name='country_latest',                           -->
                     <!--         dimension_type=CATEGORICAL,                              -->
                     <!--         entity_links=(EntityReference(element_name='listing'),), -->
-                    <!--         properties=frozenset(LOCAL,),                            -->
+                    <!--         properties=frozenset('LOCAL',),                          -->
                     <!--       ),                                                         -->
                     <!--     ),                                                           -->
                     <!--   )                                                              -->
