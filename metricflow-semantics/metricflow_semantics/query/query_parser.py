@@ -5,7 +5,6 @@ import logging
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple, Union
 
-import pandas as pd
 from dbt_semantic_interfaces.implementations.filters.where_filter import (
     PydanticWhereFilter,
     PydanticWhereFilterIntersection,
@@ -64,12 +63,7 @@ from metricflow_semantics.specs.spec_classes import (
     TimeDimensionSpec,
 )
 from metricflow_semantics.specs.spec_set import group_specs_by_type
-from metricflow_semantics.time.pandas_adjuster import (
-    adjust_to_end_of_period,
-    adjust_to_start_of_period,
-    is_period_end,
-    is_period_start,
-)
+from metricflow_semantics.time.dateutil_adjuster import DateutilTimePeriodAdjuster
 
 logger = logging.getLogger(__name__)
 
@@ -95,6 +89,7 @@ class MetricFlowQueryParser:
             DunderNamingScheme(),
         )
         self._where_filter_pattern_factory = where_filter_pattern_factory
+        self._time_period_adjuster = DateutilTimePeriodAdjuster()
 
     def parse_and_validate_saved_query(
         self,
@@ -191,23 +186,10 @@ class MetricFlowQueryParser:
 
         e.g. [2020-01-15, 2020-2-15] with MONTH granularity -> [2020-01-01, 2020-02-29]
         """
-        constraint_start = time_constraint.start_time
-        constraint_end = time_constraint.end_time
-
-        start_ts = pd.Timestamp(time_constraint.start_time)
-        if not is_period_start(metric_time_granularity, start_ts):
-            constraint_start = adjust_to_start_of_period(metric_time_granularity, start_ts).to_pydatetime()
-
-        end_ts = pd.Timestamp(time_constraint.end_time)
-        if not is_period_end(metric_time_granularity, end_ts):
-            constraint_end = adjust_to_end_of_period(metric_time_granularity, end_ts).to_pydatetime()
-
-        if constraint_start < TimeRangeConstraint.ALL_TIME_BEGIN():
-            constraint_start = TimeRangeConstraint.ALL_TIME_BEGIN()
-        if constraint_end > TimeRangeConstraint.ALL_TIME_END():
-            constraint_end = TimeRangeConstraint.ALL_TIME_END()
-
-        return TimeRangeConstraint(start_time=constraint_start, end_time=constraint_end)
+        return self._time_period_adjuster.expand_time_constraint_to_fill_granularity(
+            time_constraint=time_constraint,
+            granularity=metric_time_granularity,
+        )
 
     def _parse_order_by_names(
         self,

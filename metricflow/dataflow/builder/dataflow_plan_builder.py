@@ -52,6 +52,7 @@ from metricflow_semantics.specs.spec_classes import (
 from metricflow_semantics.specs.spec_set import InstanceSpecSet, group_specs_by_type
 from metricflow_semantics.specs.where_filter_transform import WhereSpecFactory
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
+from metricflow_semantics.time.dateutil_adjuster import DateutilTimePeriodAdjuster
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.node_evaluator import (
@@ -131,6 +132,7 @@ class DataflowPlanBuilder:
         self._column_association_resolver = column_association_resolver
         self._node_data_set_resolver = node_output_resolver
         self._source_node_builder = source_node_builder
+        self._time_period_adjuster = DateutilTimePeriodAdjuster()
 
     def build_plan(
         self,
@@ -1261,9 +1263,11 @@ class DataflowPlanBuilder:
                 granularity = cumulative_grain_to_date
 
             cumulative_metric_adjusted_time_constraint = (
-                time_range_constraint.adjust_time_constraint_for_cumulative_metric(granularity, count)
+                self._time_period_adjuster.expand_time_constraint_for_cumulative_metric(
+                    time_range_constraint, granularity, count
+                )
             )
-            logger.info(f"Adjusted time range constraint {cumulative_metric_adjusted_time_constraint}")
+            logger.info(f"Adjusted time range constraint to: {cumulative_metric_adjusted_time_constraint}")
 
         required_linkable_specs, extraneous_linkable_specs = self.__get_required_and_extraneous_linkable_specs(
             queried_linkable_specs=queried_linkable_specs,
