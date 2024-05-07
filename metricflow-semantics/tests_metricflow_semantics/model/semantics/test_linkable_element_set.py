@@ -137,7 +137,7 @@ _base_metric = LinkableMetric(
     join_path=SemanticModelToMetricSubqueryJoinPath(
         metric_subquery_join_path_element=MetricSubqueryJoinPathElement(
             metric_reference=_base_metric_reference,
-            metric_derived_from_semantic_models=(_metric_semantic_model,),
+            derived_from_semantic_models=(_metric_semantic_model,),
             join_on_entity=_base_entity_reference,
             entity_links=(_base_entity_reference,),
         ),
@@ -148,7 +148,7 @@ _ambiguous_metric = LinkableMetric(
     join_path=SemanticModelToMetricSubqueryJoinPath(
         metric_subquery_join_path_element=MetricSubqueryJoinPathElement(
             metric_reference=MetricReference(AMBIGUOUS_NAME),
-            metric_derived_from_semantic_models=(_metric_semantic_model,),
+            derived_from_semantic_models=(_metric_semantic_model,),
             join_on_entity=_base_entity_reference,
             entity_links=(_base_entity_reference,),
         ),
@@ -160,7 +160,7 @@ _ambiguous_metric_with_join_path = LinkableMetric(
     join_path=SemanticModelToMetricSubqueryJoinPath(
         metric_subquery_join_path_element=MetricSubqueryJoinPathElement(
             metric_reference=MetricReference(AMBIGUOUS_NAME),
-            metric_derived_from_semantic_models=(_metric_semantic_model,),
+            derived_from_semantic_models=(_metric_semantic_model,),
             join_on_entity=_base_entity_reference,
             entity_links=(_base_entity_reference,),
         ),
@@ -632,7 +632,7 @@ def linkable_set() -> LinkableElementSet:  # noqa: D103
                     join_path=SemanticModelToMetricSubqueryJoinPath(
                         metric_subquery_join_path_element=MetricSubqueryJoinPathElement(
                             metric_reference=MetricReference("metric_element"),
-                            metric_derived_from_semantic_models=(_metric_semantic_model,),
+                            derived_from_semantic_models=(_metric_semantic_model,),
                             join_on_entity=entity_3,
                             entity_links=(entity_3, entity_4),
                             metric_to_entity_join_path=SemanticModelJoinPath(

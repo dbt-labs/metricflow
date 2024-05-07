@@ -200,7 +200,7 @@ class ValidLinkableSpecResolver:
                 for linkable_entity in linkable_entities:
                     metric_subquery_join_path_element = MetricSubqueryJoinPathElement(
                         metric_reference=metric_reference,
-                        metric_derived_from_semantic_models=defined_from_semantic_models,
+                        derived_from_semantic_models=defined_from_semantic_models,
                         join_on_entity=linkable_entity.reference,
                         entity_links=linkable_entity.entity_links,
                         metric_to_entity_join_path=(

@@ -219,9 +219,7 @@ class LinkableMetric(LinkableElement, SerializableDataclass):
         Includes semantic models used in the join paths for both the inner and outer queries (if applicable),
         plus the semantic models the metric's measure(s) originated from.
         """
-        semantic_model_references = set(
-            self.join_path.metric_subquery_join_path_element.metric_derived_from_semantic_models
-        )
+        semantic_model_references = set(self.join_path.metric_subquery_join_path_element.derived_from_semantic_models)
         if self.join_path.semantic_model_join_path:
             semantic_model_references.update(self.join_path.semantic_model_join_path.derived_from_semantic_models)
         if self.metric_to_entity_join_path:
@@ -301,6 +299,7 @@ class MetricSubqueryJoinPathElement:
 
     Args:
         metric_reference: The metric that's aggregated in the subquery.
+        derived_from_semantic_models: The semantic models that the measure's input metrics are defined in.
         join_on_entity: The entity that the metric is grouped by in the subquery. This will be updated in V2 to allow a list
             of entitites & dimensions.
         entity_links: Sequence of entities joined to get from a metric source to the `join_on_entity`.
@@ -309,14 +308,14 @@ class MetricSubqueryJoinPathElement:
     """
 
     metric_reference: MetricReference
-    metric_derived_from_semantic_models: Tuple[SemanticModelReference, ...]
+    derived_from_semantic_models: Tuple[SemanticModelReference, ...]
     join_on_entity: EntityReference
     entity_links: Tuple[EntityReference, ...]
     metric_to_entity_join_path: Optional[SemanticModelJoinPath] = None
 
     def __post_init__(self) -> None:  # noqa: D105
         assert (
-            self.metric_derived_from_semantic_models
+            self.derived_from_semantic_models
         ), "There must be at least one semantic model from which the metric is derived."
 
 
