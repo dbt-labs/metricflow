@@ -60,10 +60,7 @@ class MetricFlowPrettyFormatter:
         elif isinstance(list_like_obj, set) or isinstance(list_like_obj, frozenset):
             left_enclose_str = f"{type(list_like_obj).__name__}("
             right_enclose_str = ")"
-            list_like_obj = sorted(
-                list_like_obj,
-                key=(lambda x: x.name) if (list_like_obj and isinstance(list(list_like_obj)[0], Enum)) else None,
-            )
+            list_like_obj = sorted(self._handle_any_obj(obj, None) for obj in list_like_obj)
         else:
             raise RuntimeError(f"Unhandled type: {type(list_like_obj)}")
 
