@@ -11,9 +11,9 @@ from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.test_helpers.pandas_adjuster import PandasTimePeriodAdjuster
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_str_snapshot_equal
 from metricflow_semantics.time.dateutil_adjuster import DateutilTimePeriodAdjuster
-from metricflow_semantics.time.pandas_adjuster import PandasTimePeriodAdjuster
 
 logger = logging.getLogger(__name__)
 
