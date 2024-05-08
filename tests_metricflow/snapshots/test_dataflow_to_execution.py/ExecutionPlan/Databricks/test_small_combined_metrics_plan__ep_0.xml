@@ -1,5 +1,5 @@
 <ExecutionPlan>
-    <SelectSqlQueryToDataFrameTask>
+    <SelectSqlQueryToDataTableTask>
         <!-- description = 'Run a query and write the results to a data frame' -->
         <!-- node_id = NodeId(id_str='rsq_0') -->
         <!-- sql_query =                                                                        -->
@@ -43,5 +43,5 @@
         <!--    '  subq_4.is_instant = subq_9.is_instant\n'                                     -->
         <!--    'GROUP BY\n'                                                                    -->
         <!--    '  COALESCE(subq_4.is_instant, subq_9.is_instant)')                             -->
-    </SelectSqlQueryToDataFrameTask>
+    </SelectSqlQueryToDataTableTask>
 </ExecutionPlan>

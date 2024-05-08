@@ -1,6 +1,6 @@
 <DataflowPlan>
-    <WriteToResultDataframeNode>
-        <!-- description = 'Write to Dataframe' -->
+    <WriteToResultDataTableNode>
+        <!-- description = 'Write to DataTable' -->
         <!-- node_id = NodeId(id_str='wrd_0') -->
         <OrderByLimitNode>
             <!-- description = "Order By ['listing__is_lux_latest'] Limit 100" -->
@@ -83,5 +83,5 @@
                 </WhereConstraintNode>
             </FilterElementsNode>
         </OrderByLimitNode>
-    </WriteToResultDataframeNode>
+    </WriteToResultDataTableNode>
 </DataflowPlan>
