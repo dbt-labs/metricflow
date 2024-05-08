@@ -2047,3 +2047,23 @@ integration_test:
       ) c ON a.listing_id = c.listing_id
     ) outer_subq
     WHERE listing__bookings > 2 AND listing__bookers > 1
+---
+integration_test:
+  name: test_metric_filter_with_local_entity_prefix
+  description: Query with a metric filter, using a group by that has a local entity prefix
+  model: SIMPLE_MODEL
+  metrics: ["listings"]
+  where_filter: "{{ render_metric_template('views', ['view__listing']) }} > 2"
+  check_query: |
+    SELECT
+      SUM(1) AS listings
+    FROM {{ source_schema }}.dim_listings_latest l
+    LEFT OUTER JOIN (
+      SELECT
+        listing_id
+        , SUM(1) AS view__listing__views
+      FROM {{ source_schema }}.fct_views v
+      GROUP BY listing_id
+    ) subq
+    ON l.listing_id = subq.listing_id
+    WHERE view__listing__views > 2
