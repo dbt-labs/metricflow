@@ -74,11 +74,11 @@ class SqlDataSet(DataSet):
 
         if len(matching_instances) != 1:
             raise RuntimeError(
-                f"Expected exactly one matching instance for {entity_spec} in instance set, but found: {matching_instances}"
+                f"Expected exactly one matching instance for {entity_spec} in instance set, but found: {matching_instances}. "
+                f"All entity instances: {self.instance_set.entity_instances}"
             )
         matching_instance = matching_instances[0]
         if not matching_instance.associated_columns:
-            print("entity links to compare:", entity_spec.entity_links, linkable_instance.spec.entity_links)
             raise RuntimeError(
                 f"No associated columns for entity instance {matching_instance} in data set."
                 "This indicates internal misconfiguration."
