@@ -61,7 +61,7 @@ from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
 from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
-from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataframeNode
+from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataTableNode
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.dataset.sql_dataset import SqlDataSet
@@ -829,8 +829,8 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             ),
         )
 
-    def visit_write_to_result_dataframe_node(self, node: WriteToResultDataframeNode) -> SqlDataSet:  # noqa: D102
-        # Returning the parent-node SQL as an approximation since you can't write to a dataframe via SQL.
+    def visit_write_to_result_data_table_node(self, node: WriteToResultDataTableNode) -> SqlDataSet:  # noqa: D102
+        # Returning the parent-node SQL as an approximation since you can't write to a data_table via SQL.
         return node.parent_node.accept(self)
 
     def visit_write_to_result_table_node(self, node: WriteToResultTableNode) -> SqlDataSet:  # noqa: D102

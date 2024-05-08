@@ -10,7 +10,7 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 
 from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.protocols.sql_client import SqlEngine
-from tests_metricflow.compare_df import assert_dataframes_equal
+from tests_metricflow.compare_df import assert_data_tables_equal
 from tests_metricflow.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 from tests_metricflow.table_snapshot.table_snapshots import (
     SqlTableColumnDefinition,
@@ -44,7 +44,7 @@ def table_snapshot() -> SqlTableSnapshot:  # noqa: D103
 
 def test_as_df(table_snapshot: SqlTableSnapshot) -> None:
     """Check that SqlTableSnapshot.as_df works as expected."""
-    assert_dataframes_equal(
+    assert_data_tables_equal(
         actual=table_snapshot.as_df,
         expected=MetricFlowDataTable.create_from_rows(
             column_names=[f"col{i}" for i in range(5)],
@@ -71,7 +71,7 @@ def test_load(
         snapshot_loader.load(table_snapshot)
 
         actual = ddl_sql_client.query(f"SELECT * FROM {schema_name}.{table_snapshot.table_name}")
-        assert_dataframes_equal(
+        assert_data_tables_equal(
             actual=actual,
             expected=table_snapshot.as_df,
             compare_names_using_lowercase=ddl_sql_client.sql_engine_type is SqlEngine.SNOWFLAKE,

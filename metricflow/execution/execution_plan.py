@@ -82,12 +82,12 @@ class TaskExecutionResult:
     # If the task was an SQL query, it's stored here
     sql: Optional[str] = None
     bind_params: Optional[SqlBindParameters] = None
-    # If the task produces a dataframe as a result, it's stored here.
+    # If the task produces a data_table as a result, it's stored here.
     df: Optional[MetricFlowDataTable] = None
 
 
 class SelectSqlQueryToDataFrameTask(ExecutionPlanTask):
-    """A task that runs a SELECT and puts that result into a dataframe."""
+    """A task that runs a SELECT and puts that result into a data_table."""
 
     def __init__(  # noqa: D107
         self,

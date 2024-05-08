@@ -209,7 +209,7 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, clean: bool) -
     "--csv",
     type=click.File("wb"),
     required=False,
-    help="Provide filepath for dataframe output to csv",
+    help="Provide filepath for data_table output to csv",
 )
 @click.option(
     "--explain",

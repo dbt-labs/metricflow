@@ -20,17 +20,17 @@ class SqlClientWithDDLMethods(SqlClient, Protocol):
     """
 
     @abstractmethod
-    def create_table_from_dataframe(
+    def create_table_from_data_table(
         self,
         sql_table: SqlTable,
         df: MetricFlowDataTable,
         chunk_size: Optional[int] = None,
     ) -> None:
-        """Creates a table and populates it with the contents of the dataframe.
+        """Creates a table and populates it with the contents of the data_table.
 
         Args:
             sql_table: The SqlTable metadata of the table to create
-            df: The Pandas DataFrame with the contents of the target table
+            df: The Pandas DataTable with the contents of the target table
             chunk_size: The number of rows to write per query
         """
         raise NotImplementedError

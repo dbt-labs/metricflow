@@ -14,7 +14,7 @@ from metricflow.execution.execution_plan import (
 from metricflow.execution.executor import SequentialPlanExecutor
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.sql.sql_table import SqlTable
-from tests_metricflow.compare_df import assert_dataframes_equal
+from tests_metricflow.compare_df import assert_data_tables_equal
 
 
 def test_read_sql_task(sql_client: SqlClient) -> None:  # noqa: D103
@@ -27,7 +27,7 @@ def test_read_sql_task(sql_client: SqlClient) -> None:  # noqa: D103
     assert not results.contains_task_errors
     assert task_result.df is not None
 
-    assert_dataframes_equal(
+    assert_data_tables_equal(
         actual=task_result.df,
         expected=MetricFlowDataTable.create_from_rows(
             column_names=["foo"],
@@ -53,7 +53,7 @@ def test_write_table_task(  # noqa: D103
 
     assert not results.contains_task_errors
 
-    assert_dataframes_equal(
+    assert_data_tables_equal(
         actual=sql_client.query(f"SELECT * FROM {output_table.sql}"),
         expected=MetricFlowDataTable.create_from_rows(
             column_names=["foo"],

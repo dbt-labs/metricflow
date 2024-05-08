@@ -10,7 +10,6 @@ from typing import FrozenSet, Generic, Optional, Sequence, Set, Type, TypeVar
 import more_itertools
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagId, DagNode, MetricFlowDag, NodeId
-from metricflow_semantics.specs.spec_classes import LinkableInstanceSpec
 from metricflow_semantics.visitor import Visitable, VisitorOutputT
 
 if typing.TYPE_CHECKING:
@@ -33,7 +32,7 @@ if typing.TYPE_CHECKING:
     from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
     from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
     from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
-    from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataframeNode
+    from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataTableNode
     from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 
 
@@ -147,7 +146,7 @@ class DataflowPlanNodeVisitor(Generic[VisitorOutputT], ABC):
         pass
 
     @abstractmethod
-    def visit_write_to_result_dataframe_node(self, node: WriteToResultDataframeNode) -> VisitorOutputT:  # noqa: D102
+    def visit_write_to_result_data_table_node(self, node: WriteToResultDataTableNode) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod

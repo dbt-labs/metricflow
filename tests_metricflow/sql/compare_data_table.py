@@ -92,7 +92,7 @@ def check_data_tables_are_equal(
 ) -> None:
     """Check if this is equal to another table. If not, raise an exception.
 
-    This was migrated from an existing implementation based on `pandas` dataframes.
+    This was migrated from an existing implementation based on `pandas` data_tables.
     """
     if ignore_order:
         expected_table = expected_table.sorted()

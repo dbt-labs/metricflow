@@ -53,7 +53,7 @@ class SqlClient(Protocol):
         stmt: str,
         sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
     ) -> MetricFlowDataTable:
-        """Base query method, upon execution will run a query that returns a pandas DataFrame."""
+        """Base query method, upon execution will run a query that returns a pandas DataTable."""
         raise NotImplementedError
 
     @abstractmethod
