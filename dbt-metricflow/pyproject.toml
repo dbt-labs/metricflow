@@ -33,7 +33,7 @@ dependencies = [
 
   # Internal dependencies
   "dbt-core>=1.7.4, <1.8.0",
-  "metricflow>=0.205.0, <0.206.0",
+  "metricflow>=0.205.0, <0.207.0",
 
   # dsi version should be fixed by MetricFlow/dbt-core, not set here
   "dbt-semantic-interfaces",
