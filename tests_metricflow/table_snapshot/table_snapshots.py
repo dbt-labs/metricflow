@@ -10,12 +10,12 @@ from pathlib import Path
 from typing import List, Optional, Sequence, Tuple, Union
 
 import dateutil.parser
-import pandas as pd
 import yaml
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.implementations.base import FrozenBaseModel
 from metricflow_semantics.specs.spec_classes import hash_items
 
+from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.sql.sql_table import SqlTable
 from tests_metricflow.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 
@@ -90,7 +90,7 @@ class SqlTableSnapshot(FrozenBaseModel):
             raise RuntimeError(f"Invalid string representation of a boolean: {bool_str}")
 
     @property
-    def as_df(self) -> pd.DataFrame:
+    def as_df(self) -> MetricFlowDataTable:
         """Return this snapshot as represented by an equivalent dataframe."""
         # In the YAML files, all values are strings, but they need to be converted to defined type so that it can be
         # properly represented in a dataframe
@@ -116,9 +116,9 @@ class SqlTableSnapshot(FrozenBaseModel):
                     assert_values_exhausted(column_type)
             type_converted_rows.append(type_converted_row)
 
-        return pd.DataFrame(
-            columns=[column_definition.name for column_definition in self.column_definitions],
-            data=type_converted_rows,
+        return MetricFlowDataTable.create_from_rows(
+            column_names=[column_definition.name for column_definition in self.column_definitions],
+            rows=type_converted_rows,
         )
 
 

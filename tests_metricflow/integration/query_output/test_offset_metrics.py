@@ -30,7 +30,7 @@ def test_offset_to_grain_with_single_granularity(  # noqa: D103
         request=request,
         mf_test_configuration=mf_test_configuration,
         snapshot_id="query_output",
-        snapshot_str=query_result.result_df.to_string(),
+        snapshot_str=query_result.result_df.text_format(),
         sql_engine=sql_client.sql_engine_type,
     )
 
@@ -55,6 +55,6 @@ def test_offset_to_grain_with_multiple_granularities(  # noqa: D103
         request=request,
         mf_test_configuration=mf_test_configuration,
         snapshot_id="query_output",
-        snapshot_str=query_result.result_df.to_string(),
+        snapshot_str=query_result.result_df.text_format(),
         sql_engine=sql_client.sql_engine_type,
     )

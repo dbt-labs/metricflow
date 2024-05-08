@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-import pandas as pd
 from metricflow_semantics.dag.mf_dag import DagId
 from metricflow_semantics.random_id import random_id
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
+from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.execution.execution_plan import (
     ExecutionPlan,
     SelectSqlQueryToDataFrameTask,
@@ -29,9 +29,9 @@ def test_read_sql_task(sql_client: SqlClient) -> None:  # noqa: D103
 
     assert_dataframes_equal(
         actual=task_result.df,
-        expected=pd.DataFrame(
-            columns=["foo"],
-            data=[(1,)],
+        expected=MetricFlowDataTable.create_from_rows(
+            column_names=["foo"],
+            rows=[(1,)],
         ),
         compare_names_using_lowercase=sql_client.sql_engine_type is SqlEngine.SNOWFLAKE,
     )
@@ -55,9 +55,9 @@ def test_write_table_task(  # noqa: D103
 
     assert_dataframes_equal(
         actual=sql_client.query(f"SELECT * FROM {output_table.sql}"),
-        expected=pd.DataFrame(
-            columns=["foo"],
-            data=[(1,)],
+        expected=MetricFlowDataTable.create_from_rows(
+            column_names=["foo"],
+            rows=[(1,)],
         ),
         compare_names_using_lowercase=sql_client.sql_engine_type is SqlEngine.SNOWFLAKE,
     )

@@ -34,7 +34,7 @@ def test_simple_fill_nulls_with_0_metric_time(  # noqa: D103
         request=request,
         mf_test_configuration=mf_test_configuration,
         snapshot_id="query_output",
-        snapshot_str=query_result.result_df.to_string(),
+        snapshot_str=query_result.result_df.text_format(),
         sql_engine=sql_client.sql_engine_type,
     )
 
@@ -61,7 +61,7 @@ def test_simple_fill_nulls_with_0_month(  # noqa: D103
         request=request,
         mf_test_configuration=mf_test_configuration,
         snapshot_id="query_output",
-        snapshot_str=query_result.result_df.to_string(),
+        snapshot_str=query_result.result_df.text_format(),
         sql_engine=sql_client.sql_engine_type,
     )
 
@@ -88,7 +88,7 @@ def test_simple_join_to_time_spine(  # noqa: D103
         request=request,
         mf_test_configuration=mf_test_configuration,
         snapshot_id="query_output",
-        snapshot_str=query_result.result_df.to_string(),
+        snapshot_str=query_result.result_df.text_format(),
         sql_engine=sql_client.sql_engine_type,
     )
 
@@ -115,7 +115,7 @@ def test_fill_nulls_with_0_multi_metric_query(  # noqa: D103
         request=request,
         mf_test_configuration=mf_test_configuration,
         snapshot_id="query_output",
-        snapshot_str=query_result.result_df.to_string(),
+        snapshot_str=query_result.result_df.text_format(),
         sql_engine=sql_client.sql_engine_type,
     )
 
@@ -140,6 +140,6 @@ def test_fill_nulls_with_0_multi_metric_query_with_categorical_dimension(  # noq
         request=request,
         mf_test_configuration=mf_test_configuration,
         snapshot_id="query_output",
-        snapshot_str=query_result.result_df.to_string(),
+        snapshot_str=query_result.result_df.text_format(),
         sql_engine=sql_client.sql_engine_type,
     )

@@ -16,14 +16,15 @@ week and start of year are involved.
 
 from __future__ import annotations
 
+import datetime
 import logging
 from typing import Any
 
-import pandas as pd
 import pytest
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 
+from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_exprs import (
     SqlCastToTimestampExpression,
@@ -35,16 +36,11 @@ from metricflow.sql.sql_exprs import (
 logger = logging.getLogger(__name__)
 
 
-def _extract_dataframe_value(df: pd.DataFrame) -> Any:  # type: ignore[misc]
+def _extract_dataframe_value(df: MetricFlowDataTable) -> Any:  # type: ignore[misc]
     """Helper to assert that a query result has a single value, and return the value from the dataframe."""
-    assert df.shape == (
-        1,
-        1,
-    ), f"Invalid dataframe, expected exactly one Timestamp value but got {df.to_markdown(index=False)}!"
-    for col in df.select_dtypes(["datetimetz"]):
-        # Remove time zone information if the engine includes it by default, because weird stuff happens there.
-        df[col] = df[col].dt.tz_localize(None)
-    return df.iloc[0, 0]
+    assert df.row_count == 1
+    assert df.column_count == 1
+    return df.get_cell_value(0, 0)
 
 
 def _build_date_trunc_expression(date_string: str, time_granularity: TimeGranularity) -> SqlDateTruncExpression:
@@ -61,27 +57,27 @@ def test_date_trunc_to_year(sql_client: SqlClient) -> None:
     """
     # The ISO year start for 2015 is 2014-12-29, but we should always get 2015-01-01
     ISO_DATE_STRING = "2015-06-15"
-    expected = pd.Timestamp(year=2015, month=1, day=1)
+    expected = datetime.datetime(year=2015, month=1, day=1)
     date_trunc_stmt = sql_client.sql_query_plan_renderer.expr_renderer.render_sql_expr(
         _build_date_trunc_expression(date_string=ISO_DATE_STRING, time_granularity=TimeGranularity.YEAR)
     ).sql
 
     df = sql_client.query(f"SELECT {date_trunc_stmt}")
 
-    actual = pd.Timestamp(_extract_dataframe_value(df=df))
+    actual = _extract_dataframe_value(df=df)
     assert expected == actual
 
 
 @pytest.mark.parametrize(
     ("input", "expected"),
     (
-        ("2015-02-22", pd.Timestamp(year=2015, month=1, day=1)),
-        ("2015-06-30", pd.Timestamp(year=2015, month=4, day=1)),
-        ("2015-07-01", pd.Timestamp(year=2015, month=7, day=1)),
-        ("2015-11-17", pd.Timestamp(year=2015, month=10, day=1)),
+        ("2015-02-22", datetime.datetime(year=2015, month=1, day=1)),
+        ("2015-06-30", datetime.datetime(year=2015, month=4, day=1)),
+        ("2015-07-01", datetime.datetime(year=2015, month=7, day=1)),
+        ("2015-11-17", datetime.datetime(year=2015, month=10, day=1)),
     ),
 )
-def test_date_trunc_to_quarter(sql_client: SqlClient, input: str, expected: pd.Timestamp) -> None:
+def test_date_trunc_to_quarter(sql_client: SqlClient, input: str, expected: datetime.datetime) -> None:
     """Tests default date trunc behavior to quarterly boundaries.
 
     This should generally pin to the first day of the "natural" yearly quarters, for example,
@@ -93,19 +89,19 @@ def test_date_trunc_to_quarter(sql_client: SqlClient, input: str, expected: pd.T
 
     df = sql_client.query(f"SELECT {date_trunc_stmt}")
 
-    actual = pd.Timestamp(_extract_dataframe_value(df=df))
+    actual = _extract_dataframe_value(df=df)
     assert expected == actual
 
 
 @pytest.mark.parametrize(
     ("input", "expected"),
     (
-        ("2023-10-08", pd.Timestamp(year=2023, month=10, day=2)),  # Sunday -> preceding Monday
-        ("2023-10-02", pd.Timestamp(year=2023, month=10, day=2)),  # Monday truncates to itself
-        ("2023-09-01", pd.Timestamp(year=2023, month=8, day=28)),  # Weekday -> preceding Monday
+        ("2023-10-08", datetime.datetime(year=2023, month=10, day=2)),  # Sunday -> preceding Monday
+        ("2023-10-02", datetime.datetime(year=2023, month=10, day=2)),  # Monday truncates to itself
+        ("2023-09-01", datetime.datetime(year=2023, month=8, day=28)),  # Weekday -> preceding Monday
     ),
 )
-def test_date_trunc_to_week(sql_client: SqlClient, input: str, expected: pd.Timestamp) -> None:
+def test_date_trunc_to_week(sql_client: SqlClient, input: str, expected: datetime.datetime) -> None:
     """Tests date trunc behavior to verify that a date_trunc to WEEK returns the date for MONDAY.
 
     This is needed because some engines default to Monday and some default to Sunday for their week start.
@@ -117,7 +113,7 @@ def test_date_trunc_to_week(sql_client: SqlClient, input: str, expected: pd.Time
 
     df = sql_client.query(f"SELECT {date_trunc_stmt}")
 
-    actual = pd.Timestamp(_extract_dataframe_value(df=df))
+    actual = _extract_dataframe_value(df=df)
     assert expected == actual
 
 
