@@ -513,7 +513,7 @@ class DataflowPlanBuilder:
             parent_node=parent_node,
             metric_specs=[metric_spec],
             for_group_by_source_node=for_group_by_source_node,
-            is_aggregated_to_elements={spec.reference for spec in queried_linkable_specs.as_tuple},
+            aggregated_to_elements={spec.reference for spec in queried_linkable_specs.as_tuple},
         )
 
         # For ratio / derived metrics with time offset, apply offset & where constraint after metric computation.
@@ -1018,7 +1018,7 @@ class DataflowPlanBuilder:
             parent_node=aggregated_measures_node,
             metric_specs=[metric_spec],
             for_group_by_source_node=for_group_by_source_node,
-            is_aggregated_to_elements=aggregated_to_elements,
+            aggregated_to_elements=aggregated_to_elements,
         )
 
     def _build_input_measure_specs_for_conversion_metric(

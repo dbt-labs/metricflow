@@ -178,7 +178,7 @@ class BaseOutput(DataflowPlanNode, ABC):
     """
 
     @property
-    def is_aggregated_to_elements(self) -> Set[LinkableElementReference]:
+    def aggregated_to_elements(self) -> Set[LinkableElementReference]:
         """Indicates that the node has been aggregated to these specs, guaranteeing uniqueness in each combination of them."""
         return set()
 

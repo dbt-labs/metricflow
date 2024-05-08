@@ -266,7 +266,7 @@ class NodeEvaluatorForLinkableInstances:
                         ].semantic_model_reference,
                         on_entity_reference=entity_spec_in_right_node.reference,
                     )
-                    or right_node.is_aggregated_to_elements == {entity_spec_in_right_node.reference}
+                    or right_node.aggregated_to_elements == {entity_spec_in_right_node.reference}
                 ):
                     continue
 

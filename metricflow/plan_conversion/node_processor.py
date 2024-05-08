@@ -214,7 +214,7 @@ class PreJoinNodeProcessor:
                     left_instance_set=data_set_of_first_node_that_could_be_joined.instance_set,
                     right_instance_set=data_set_of_second_node_that_can_be_joined.instance_set,
                     on_entity_reference=entity_reference_to_join_first_and_second_nodes,
-                    right_node_is_aggregated_to_entity=second_node_that_could_be_joined.is_aggregated_to_elements
+                    right_node_is_aggregated_to_entity=second_node_that_could_be_joined.aggregated_to_elements
                     == {entity_reference_to_join_first_and_second_nodes},
                 ):
                     continue
