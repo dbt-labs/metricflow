@@ -20,8 +20,13 @@ def display_graph_if_requested(
     if len(request.session.items) > 1:
         raise ValueError("Displaying graphs is only supported when there's a single item in a testing session.")
 
-    plan_svg_output_path_prefix = snapshot_path_prefix(
-        request=request, snapshot_group=dag_graph.__class__.__name__, snapshot_id=str(dag_graph.dag_id)
+    plan_svg_output_path_prefix = str(
+        snapshot_path_prefix(
+            request=request,
+            snapshot_configuration=mf_test_configuration,
+            snapshot_group=dag_graph.__class__.__name__,
+            snapshot_id=str(dag_graph.dag_id),
+        )
     )
 
     # Create parent directory since it might not exist

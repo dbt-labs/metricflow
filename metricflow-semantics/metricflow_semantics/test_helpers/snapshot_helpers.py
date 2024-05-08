@@ -3,10 +3,11 @@ from __future__ import annotations
 import difflib
 import logging
 import os
+import pathlib
 import re
 import webbrowser
 from dataclasses import dataclass
-from typing import Any, Callable, List, Optional, Tuple, TypeVar
+from typing import Any, Callable, Optional, Tuple, TypeVar
 
 import _pytest.fixtures
 import tabulate
@@ -30,6 +31,10 @@ class SnapshotConfiguration:
     display_snapshots: bool
     # Whether to overwrite any text files that were generated.
     overwrite_snapshots: bool
+    # Absolute directory where the snapshots should be stored.
+    snapshot_directory: pathlib.Path
+    # Absolute directory where the tests are stored.
+    tests_directory: pathlib.Path
 
 
 def assert_snapshot_text_equal(
@@ -45,11 +50,14 @@ def assert_snapshot_text_equal(
 ) -> None:
     """Similar to assert_plan_snapshot_text_equal(), but with more controls on how the snapshot paths are generated."""
     file_path = (
-        snapshot_path_prefix(
-            request=request,
-            snapshot_group=group_id,
-            snapshot_id=snapshot_id,
-            additional_sub_directories=additional_sub_directories_for_snapshots,
+        str(
+            snapshot_path_prefix(
+                request=request,
+                snapshot_configuration=mf_test_configuration,
+                snapshot_group=group_id,
+                snapshot_id=snapshot_id,
+                additional_sub_directories=additional_sub_directories_for_snapshots,
+            )
         )
         + snapshot_file_extension
     )
@@ -105,10 +113,11 @@ def assert_snapshot_text_equal(
 
 def snapshot_path_prefix(
     request: _pytest.fixtures.FixtureRequest,
+    snapshot_configuration: SnapshotConfiguration,
     snapshot_group: str,
     snapshot_id: str,
     additional_sub_directories: Tuple[str, ...] = (),
-) -> str:
+) -> pathlib.Path:
     """Returns a path prefix that can be used to build filenames for files associated with the snapshot.
 
     The snapshot prefix is generated from the name of the test file, the name of the test, name of the snapshot class,
@@ -132,26 +141,17 @@ def snapshot_path_prefix(
     snapshot_file_name_parts = [part for part in snapshot_file_name_parts if len(part) > 0]
     snapshot_file_name_parts.append(snapshot_id)
 
-    snapshot_file_name = "__".join(snapshot_file_name_parts)
+    snapshot_file_name_prefix = "__".join(snapshot_file_name_parts)
+    path_to_test_file = pathlib.Path(request.node.fspath)
+    directory_to_store_snapshot = snapshot_configuration.snapshot_directory.joinpath(
+        snapshot_configuration.snapshot_directory,
+        path_to_test_file.name,
+        snapshot_group,
+    )
+    if additional_sub_directories is not None:
+        directory_to_store_snapshot = directory_to_store_snapshot.joinpath(*additional_sub_directories)
 
-    path_items: List[str] = []
-
-    test_file_path_items = os.path.normpath(request.node.fspath).split(os.sep)
-    test_file_name = test_file_path_items[-1]
-    # Default to where this is defined, but use more appropriate directories if found.
-    test_directory_root_index = -1
-    for i, path_item in enumerate(test_file_path_items):
-        if path_item in ("tests_metricflow", "tests_metricflow_semantics", "metricflow"):
-            test_directory_root_index = i + 1
-
-    path_to_store_snapshots = os.sep.join(test_file_path_items[:test_directory_root_index])
-    path_items.extend([path_to_store_snapshots, "snapshots", test_file_name, snapshot_group])
-
-    if additional_sub_directories:
-        path_items.extend(additional_sub_directories)
-    path_items.append(snapshot_file_name)
-
-    return os.path.abspath(os.path.join(*path_items))
+    return directory_to_store_snapshot.joinpath(snapshot_file_name_prefix)
 
 
 def _exclude_lines_matching_regex(file_contents: str, exclude_line_regex: str) -> str:
