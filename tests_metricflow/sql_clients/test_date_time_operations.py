@@ -36,8 +36,8 @@ from metricflow.sql.sql_exprs import (
 logger = logging.getLogger(__name__)
 
 
-def _extract_dataframe_value(df: MetricFlowDataTable) -> Any:  # type: ignore[misc]
-    """Helper to assert that a query result has a single value, and return the value from the dataframe."""
+def _extract_data_table_value(df: MetricFlowDataTable) -> Any:  # type: ignore[misc]
+    """Helper to assert that a query result has a single value, and return the value from the data_table."""
     assert df.row_count == 1
     assert df.column_count == 1
     return df.get_cell_value(0, 0)
@@ -64,7 +64,7 @@ def test_date_trunc_to_year(sql_client: SqlClient) -> None:
 
     df = sql_client.query(f"SELECT {date_trunc_stmt}")
 
-    actual = _extract_dataframe_value(df=df)
+    actual = _extract_data_table_value(df=df)
     assert expected == actual
 
 
@@ -89,7 +89,7 @@ def test_date_trunc_to_quarter(sql_client: SqlClient, input: str, expected: date
 
     df = sql_client.query(f"SELECT {date_trunc_stmt}")
 
-    actual = _extract_dataframe_value(df=df)
+    actual = _extract_data_table_value(df=df)
     assert expected == actual
 
 
@@ -113,7 +113,7 @@ def test_date_trunc_to_week(sql_client: SqlClient, input: str, expected: datetim
 
     df = sql_client.query(f"SELECT {date_trunc_stmt}")
 
-    actual = _extract_dataframe_value(df=df)
+    actual = _extract_data_table_value(df=df)
     assert expected == actual
 
 
@@ -138,7 +138,7 @@ def test_date_part_year(sql_client: SqlClient) -> None:
 
     df = sql_client.query(f"SELECT {extract_stmt}")
 
-    actual = _extract_dataframe_value(df=df)
+    actual = _extract_data_table_value(df=df)
     assert expected == actual
 
 
@@ -163,7 +163,7 @@ def test_date_part_quarter(sql_client: SqlClient, input: str, expected: int) -> 
 
     df = sql_client.query(f"SELECT {extract_stmt}")
 
-    actual = _extract_dataframe_value(df=df)
+    actual = _extract_data_table_value(df=df)
     assert expected == actual
 
 
@@ -182,7 +182,7 @@ def test_date_part_day_of_year(sql_client: SqlClient) -> None:
 
     df = sql_client.query(f"SELECT {extract_stmt}")
 
-    actual = _extract_dataframe_value(df=df)
+    actual = _extract_data_table_value(df=df)
     assert expected == actual
 
 
@@ -206,5 +206,5 @@ def test_date_part_day_of_week(sql_client: SqlClient, input: str, expected: int)
 
     df = sql_client.query(f"SELECT {extract_stmt}")
 
-    actual = _extract_dataframe_value(df=df)
+    actual = _extract_data_table_value(df=df)
     assert expected == actual

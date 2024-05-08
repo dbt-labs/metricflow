@@ -56,7 +56,7 @@ def test_context_provider() -> None:
     This test case currently mocks the Snowflake response with a `MagicMock`. This is not ideal
     and should probably be replaced by integration tests in the future.
     """
-    # See for SHOW COLUMNS result dataframe spec:
+    # See for SHOW COLUMNS result data_table spec:
     # https://docs.snowflake.com/en/sql-reference/sql/show-columns.html
 
     show_columns_result_dict: Dict[str, List[Union[int, str]]] = {

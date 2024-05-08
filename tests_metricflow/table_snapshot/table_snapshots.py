@@ -91,9 +91,9 @@ class SqlTableSnapshot(FrozenBaseModel):
 
     @property
     def as_df(self) -> MetricFlowDataTable:
-        """Return this snapshot as represented by an equivalent dataframe."""
+        """Return this snapshot as represented by an equivalent data_table."""
         # In the YAML files, all values are strings, but they need to be converted to defined type so that it can be
-        # properly represented in a dataframe
+        # properly represented in a data_table
 
         type_converted_rows = []
         for row in self.rows:
@@ -132,7 +132,7 @@ class SqlTableSnapshotLoader:
     def load(self, table_snapshot: SqlTableSnapshot) -> None:  # noqa: D102
         sql_table = SqlTable(schema_name=self._schema_name, table_name=table_snapshot.table_name)
 
-        self._ddl_sql_client.create_table_from_dataframe(
+        self._ddl_sql_client.create_table_from_data_table(
             sql_table=sql_table,
             df=table_snapshot.as_df,
             # Without this set, the insert queries may be too long.

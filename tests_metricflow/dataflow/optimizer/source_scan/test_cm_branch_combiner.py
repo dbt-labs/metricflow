@@ -16,7 +16,7 @@ from metricflow.dataflow.dataflow_plan import (
     DataflowPlan,
 )
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
-from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataframeNode
+from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataTableNode
 from metricflow.dataflow.optimizer.source_scan.cm_branch_combiner import (
     ComputeMetricsBranchCombiner,
     ComputeMetricsBranchCombinerResult,
@@ -27,7 +27,7 @@ from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixt
 
 def make_dataflow_plan(node: BaseOutput) -> DataflowPlan:  # noqa: D103
     return DataflowPlan(
-        sink_output_nodes=[WriteToResultDataframeNode(node)],
+        sink_output_nodes=[WriteToResultDataTableNode(node)],
         plan_id=DagId.from_id_prefix(StaticIdPrefix.OPTIMIZED_DATAFLOW_PLAN_PREFIX),
     )
 

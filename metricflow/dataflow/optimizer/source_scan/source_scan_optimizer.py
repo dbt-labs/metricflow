@@ -30,7 +30,7 @@ from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
 from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
-from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataframeNode
+from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataTableNode
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOptimizer
 from metricflow.dataflow.optimizer.source_scan.cm_branch_combiner import (
@@ -186,8 +186,8 @@ class SourceScanOptimizer(
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)
 
-    def visit_write_to_result_dataframe_node(  # noqa: D102
-        self, node: WriteToResultDataframeNode
+    def visit_write_to_result_data_table_node(  # noqa: D102
+        self, node: WriteToResultDataTableNode
     ) -> OptimizeBranchResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._default_sink_node_handler(node)

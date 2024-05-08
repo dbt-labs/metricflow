@@ -128,7 +128,7 @@ class AdapterBackedSqlClient:
         stmt: str,
         sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
     ) -> MetricFlowDataTable:
-        """Query statement; result expected to be data which will be returned as a DataFrame.
+        """Query statement; result expected to be data which will be returned as a DataTable.
 
         Args:
             stmt: The SQL query statement to run. This should produce output via a SELECT

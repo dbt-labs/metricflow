@@ -30,7 +30,7 @@ if typing.TYPE_CHECKING:
     from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
     from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
     from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
-    from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataframeNode
+    from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataTableNode
     from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 
 
@@ -121,7 +121,7 @@ class DataflowPlanNodeVisitor(Generic[VisitorOutputT], ABC):
         pass
 
     @abstractmethod
-    def visit_write_to_result_dataframe_node(self, node: WriteToResultDataframeNode) -> VisitorOutputT:  # noqa: D102
+    def visit_write_to_result_data_table_node(self, node: WriteToResultDataTableNode) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
@@ -202,7 +202,7 @@ class SinkNodeVisitor(Generic[VisitorOutputT], ABC):
     """Similar to DataflowPlanNodeVisitor, but only for sink nodes."""
 
     @abstractmethod
-    def visit_write_to_result_dataframe_node(self, node: WriteToResultDataframeNode) -> VisitorOutputT:  # noqa: D102
+    def visit_write_to_result_data_table_node(self, node: WriteToResultDataTableNode) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod

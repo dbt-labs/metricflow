@@ -96,7 +96,7 @@ class MetricFlowQueryRequest:
     where_constraint: A SQL string using group by names that can be used like a where clause on the output data.
     order_by_names: metric and group by names to order by. A "-" can be used to specify reverse order e.g. "-ds".
     order_by: metric, dimension, or entity objects to order by.
-    output_table: If specified, output the result data to this table instead of a result dataframe.
+    output_table: If specified, output the result data to this table instead of a result data_table.
     sql_optimization_level: The level of optimization for the generated SQL.
     query_type: Type of MetricFlow query.
     """

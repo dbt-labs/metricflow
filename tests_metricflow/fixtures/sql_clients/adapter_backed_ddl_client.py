@@ -17,29 +17,29 @@ logger = logging.getLogger(__name__)
 class AdapterBackedDDLSqlClient(AdapterBackedSqlClient):
     """Extends the AdapterBackedSqlClient with the DDL methods necessary for test configuration and execution."""
 
-    def create_table_from_dataframe(
+    def create_table_from_data_table(
         self,
         sql_table: SqlTable,
         df: MetricFlowDataTable,
         chunk_size: Optional[int] = None,
     ) -> None:
-        """Create a table in the data warehouse containing the contents of the dataframe.
+        """Create a table in the data warehouse containing the contents of the data_table.
 
         Only used in tutorials and tests.
 
         Args:
             sql_table: The SqlTable object representing the table location to use
-            df: The Pandas DataFrame object containing the column schema and data to load
+            df: The Pandas DataTable object containing the column schema and data to load
             chunk_size: The number of rows to insert per transaction
         """
-        logger.info(f"Creating table '{sql_table.sql}' from a DataFrame with {df.row_count} row(s)")
+        logger.info(f"Creating table '{sql_table.sql}' from a DataTable with {df.row_count} row(s)")
         start_time = time.time()
 
         log_queries = False
         if sql_table.table_name == "fct_bookings":
             log_queries = True
 
-        with self._adapter.connection_named("MetricFlow_create_from_dataframe"):
+        with self._adapter.connection_named("MetricFlow_create_from_data_table"):
             # Create table
             columns_to_insert = []
             for column_description in df.column_descriptions:
@@ -119,7 +119,7 @@ class AdapterBackedDDLSqlClient(AdapterBackedSqlClient):
             raise ValueError(f"Encountered unexpected {column_type=}!")
 
     def _quote_escape_value(self, value: str) -> str:
-        """Escape single quotes in string-like values for create_table_from_dataframe.
+        """Escape single quotes in string-like values for create_table_from_data_table.
 
         This is necessary because Databricks uses backslash as its escape character.
         We don't bother with the exhaustive switch here because we expect most engines

@@ -50,7 +50,7 @@ from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionT
 from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
 from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
 from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
-from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataframeNode
+from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataTableNode
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
@@ -531,7 +531,7 @@ def test_compute_metrics_node_simple_expr(
         is_aggregated_to_elements={entity_spec.reference, dimension_spec.reference},
     )
 
-    sink_node = WriteToResultDataframeNode(compute_metrics_node)
+    sink_node = WriteToResultDataTableNode(compute_metrics_node)
     dataflow_plan = DataflowPlan(sink_output_nodes=[sink_node], plan_id=DagId.from_str("plan0"))
 
     assert_plan_snapshot_text_equal(
@@ -603,7 +603,7 @@ def test_join_to_time_spine_node_without_offset(
         ),
         join_type=SqlJoinType.INNER,
     )
-    sink_node = WriteToResultDataframeNode(join_to_time_spine_node)
+    sink_node = WriteToResultDataTableNode(join_to_time_spine_node)
     dataflow_plan = DataflowPlan(sink_output_nodes=[sink_node], plan_id=DagId.from_str("plan0"))
 
     assert_plan_snapshot_text_equal(
@@ -676,7 +676,7 @@ def test_join_to_time_spine_node_with_offset_window(
         join_type=SqlJoinType.INNER,
     )
 
-    sink_node = WriteToResultDataframeNode(join_to_time_spine_node)
+    sink_node = WriteToResultDataTableNode(join_to_time_spine_node)
     dataflow_plan = DataflowPlan(sink_output_nodes=[sink_node], plan_id=DagId.from_str("plan0"))
 
     assert_plan_snapshot_text_equal(
@@ -750,7 +750,7 @@ def test_join_to_time_spine_node_with_offset_to_grain(
         join_type=SqlJoinType.INNER,
     )
 
-    sink_node = WriteToResultDataframeNode(join_to_time_spine_node)
+    sink_node = WriteToResultDataTableNode(join_to_time_spine_node)
     dataflow_plan = DataflowPlan(sink_output_nodes=[sink_node], plan_id=DagId.from_str("plan0"))
 
     assert_plan_snapshot_text_equal(
