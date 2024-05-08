@@ -9,7 +9,7 @@ from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,
     SinkNodeVisitor,
 )
-from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataTableNode
+from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTableNode
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.execution.convert_to_execution_plan import ConvertToExecutionPlanResult
 from metricflow.execution.execution_plan import (

@@ -35,7 +35,7 @@ class WriteToResultTableNode(SinkOutput):
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D102
-        return StaticIdPrefix.DATAFLOW_NODE_WRITE_TO_RESULT_DATAFRAME_ID_PREFIX
+        return StaticIdPrefix.DATAFLOW_NODE_WRITE_TO_RESULT_DATA_TABLE_ID_PREFIX
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_write_to_result_table_node(self)

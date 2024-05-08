@@ -16,7 +16,7 @@ from metricflow.dataflow.dataflow_plan import (
     DataflowPlan,
 )
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
-from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataTableNode
+from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTableNode
 from metricflow.dataflow.optimizer.source_scan.cm_branch_combiner import (
     ComputeMetricsBranchCombiner,
     ComputeMetricsBranchCombinerResult,
