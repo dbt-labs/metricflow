@@ -80,6 +80,10 @@ class ElementPathKey:
         else:
             assert_values_exhausted(element_type)
 
+        assert len(set(self.entity_links)) == len(
+            self.entity_links
+        ), f"Duplicate found in `entity_links`: {self.entity_links}."
+
 
 @dataclass(frozen=True)
 class SemanticModelJoinPathElement:
@@ -245,9 +249,11 @@ class LinkableMetric(LinkableElement, SerializableDataclass):
 
     @property
     def metric_subquery_entity_links(self) -> Tuple[EntityReference, ...]:
-        """Entity links used to join the metric to the entity it's grouped by in the metric subquery."""
-        metric_subquery = self.join_path.metric_subquery_join_path_element
-        return metric_subquery.entity_links + (metric_subquery.join_on_entity,)
+        """Entity links used to join the metric to the entity it's grouped by in the metric subquery.
+
+        Includes the `join_on_entity`, which will always be the last entity link.
+        """
+        return self.join_path.metric_subquery_entity_links
 
 
 @dataclass(frozen=True)
@@ -313,7 +319,8 @@ class MetricSubqueryJoinPathElement:
         derived_from_semantic_models: The semantic models that the measure's input metrics are defined in.
         join_on_entity: The entity that the metric is grouped by in the subquery. This will be updated in V2 to allow a list
             of entitites & dimensions.
-        entity_links: Sequence of entities joined to get from a metric source to the `join_on_entity`.
+        entity_links: Sequence of entities joined to get from a metric source to the `join_on_entity`. Should not include
+            the `join_on_entity`.
         metric_to_entity_join_path: Describes the join path used in the subquery to join the metric to the `join_on_entity`.
             Can be none if all required elements are defined in the same semantic model.
     """
@@ -329,6 +336,10 @@ class MetricSubqueryJoinPathElement:
             self.derived_from_semantic_models
         ), "There must be at least one semantic model from which the metric is derived."
 
+        assert (
+            self.join_on_entity not in self.entity_links
+        ), "Entity links have been misconfigured. They should not include the join_on_entity."
+
 
 @dataclass(frozen=True)
 class SemanticModelToMetricSubqueryJoinPath:
@@ -343,6 +354,12 @@ class SemanticModelToMetricSubqueryJoinPath:
     @property
     def entity_links(self) -> Tuple[EntityReference, ...]:  # noqa: D102
         return (self.semantic_model_join_path.entity_links if self.semantic_model_join_path else ()) + (
+            self.metric_subquery_join_path_element.join_on_entity,
+        )
+
+    @property
+    def metric_subquery_entity_links(self) -> Tuple[EntityReference, ...]:  # noqa: D102
+        return self.metric_subquery_join_path_element.entity_links + (
             self.metric_subquery_join_path_element.join_on_entity,
         )
 
