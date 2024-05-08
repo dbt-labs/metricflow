@@ -1,6 +1,6 @@
 <DataflowPlan>
-    <WriteToResultDataframeNode>
-        <!-- description = 'Write to Dataframe' -->
+    <WriteToResultDataTableNode>
+        <!-- description = 'Write to DataTable' -->
         <!-- node_id = NodeId(id_str='wrd_0') -->
         <ComputeMetricsNode>
             <!-- description = 'Compute Metrics via Expressions' -->
@@ -142,5 +142,5 @@
                 </WhereConstraintNode>
             </ConstrainTimeRangeNode>
         </ComputeMetricsNode>
-    </WriteToResultDataframeNode>
+    </WriteToResultDataTableNode>
 </DataflowPlan>
