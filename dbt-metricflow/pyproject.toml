@@ -36,6 +36,9 @@ dependencies = [
 
   # dsi version should be fixed by MetricFlow/dbt-core, not set here
   "dbt-semantic-interfaces",
+
+  # For visualizing via the CLI.
+  "graphviz>=0.18.2, <0.21",
 ]
 
 [project.urls]
