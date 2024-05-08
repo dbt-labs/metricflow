@@ -18,7 +18,9 @@ from metricflow_semantics.test_helpers.snapshot_helpers import (
 )
 from sqlalchemy.engine import make_url
 
+from tests_metricflow import TESTS_METRICFLOW_DIRECTORY_ANCHOR
 from tests_metricflow.fixtures.sql_clients.common_client import SqlDialect
+from tests_metricflow.snapshots import METRICFLOW_SNAPSHOT_DIRECTORY_ANCHOR
 from tests_metricflow.table_snapshot.table_snapshots import SqlTableSnapshotHash, SqlTableSnapshotRepository
 
 logger = logging.getLogger(__name__)
@@ -143,6 +145,8 @@ def mf_test_configuration(  # noqa: D103
         use_persistent_source_schema=bool(
             request.config.getoption(USE_PERSISTENT_SOURCE_SCHEMA_CLI_FLAG, default=False)
         ),
+        snapshot_directory=METRICFLOW_SNAPSHOT_DIRECTORY_ANCHOR.directory,
+        tests_directory=TESTS_METRICFLOW_DIRECTORY_ANCHOR.directory,
     )
 
 

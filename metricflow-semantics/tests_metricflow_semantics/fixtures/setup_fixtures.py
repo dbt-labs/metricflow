@@ -13,6 +13,9 @@ from metricflow_semantics.test_helpers.snapshot_helpers import (
     add_overwrite_snapshots_cli_flag,
 )
 
+from tests_metricflow_semantics import TESTS_METRICFLOW_SEMANTICS_DIRECTORY_ANCHOR
+from tests_metricflow_semantics.snapshots import METRICFLOW_SEMANTICS_SNAPSHOT_DIRECTORY_ANCHOR
+
 logger = logging.getLogger(__name__)
 
 
@@ -35,4 +38,6 @@ def mf_test_configuration(  # noqa: D103
         display_graphs=False,
         overwrite_snapshots=bool(request.config.getoption(OVERWRITE_SNAPSHOTS_CLI_FLAG, default=False)),
         use_persistent_source_schema=False,
+        snapshot_directory=METRICFLOW_SEMANTICS_SNAPSHOT_DIRECTORY_ANCHOR.directory,
+        tests_directory=TESTS_METRICFLOW_SEMANTICS_DIRECTORY_ANCHOR.directory,
     )
