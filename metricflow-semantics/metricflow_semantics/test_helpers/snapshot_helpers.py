@@ -106,9 +106,13 @@ def assert_snapshot_text_equal(
         # pytest should show a detailed diff with "assert actual_modified == expected_modified", but it's not, so doing
         # this instead.
         if snapshot_text != expected_snapshot_text:
-            differ = difflib.Differ()
-            diff = differ.compare(expected_snapshot_text.splitlines(), snapshot_text.splitlines())
-            assert False, f"Snapshot from {file_path} does not match. Diff from expected to actual:\n" + "\n".join(diff)
+            diff = difflib.unified_diff(
+                a=expected_snapshot_text.splitlines(keepends=True),
+                b=snapshot_text.splitlines(keepends=True),
+                fromfile=f"Expected Result in {file_path}",
+                tofile="Actual Result",
+            )
+            assert False, "Result does not match the stored snapshot. Diff from expected to actual:\n\n" + "".join(diff)
 
 
 def snapshot_path_prefix(
