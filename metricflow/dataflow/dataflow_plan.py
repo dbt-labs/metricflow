@@ -32,7 +32,7 @@ if typing.TYPE_CHECKING:
     from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
     from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
     from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
-    from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataTableNode
+    from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTableNode
     from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 
 
