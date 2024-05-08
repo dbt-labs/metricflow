@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from typing import Sequence, Set
 
-from dbt_semantic_interfaces.references import LinkableElementReference
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
-from metricflow_semantics.specs.spec_classes import MetricSpec
+from metricflow_semantics.specs.spec_classes import LinkableInstanceSpec, MetricSpec
 from metricflow_semantics.visitor import VisitorOutputT
 
 from metricflow.dataflow.dataflow_plan import (
@@ -23,7 +22,7 @@ class ComputeMetricsNode(ComputedMetricsOutput):
         self,
         parent_node: BaseOutput,
         metric_specs: Sequence[MetricSpec],
-        aggregated_to_elements: Set[LinkableElementReference],
+        aggregated_to_elements: Set[LinkableInstanceSpec],
         for_group_by_source_node: bool = False,
     ) -> None:
         """Constructor.
@@ -96,5 +95,5 @@ class ComputeMetricsNode(ComputedMetricsOutput):
         )
 
     @property
-    def aggregated_to_elements(self) -> Set[LinkableElementReference]:  # noqa: D102
+    def aggregated_to_elements(self) -> Set[LinkableInstanceSpec]:  # noqa: D102
         return self._aggregated_to_elements

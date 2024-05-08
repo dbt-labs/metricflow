@@ -459,7 +459,7 @@ def test_compute_metrics_node(
     compute_metrics_node = ComputeMetricsNode(
         parent_node=aggregated_measure_node,
         metric_specs=[metric_spec],
-        aggregated_to_elements={entity_spec.reference, dimension_spec.reference},
+        aggregated_to_elements={entity_spec, dimension_spec},
     )
 
     convert_and_check(
@@ -528,7 +528,7 @@ def test_compute_metrics_node_simple_expr(
     compute_metrics_node = ComputeMetricsNode(
         parent_node=aggregated_measures_node,
         metric_specs=[metric_spec],
-        aggregated_to_elements={entity_spec.reference, dimension_spec.reference},
+        aggregated_to_elements={entity_spec, dimension_spec},
     )
 
     sink_node = WriteToResultDataframeNode(compute_metrics_node)
@@ -592,7 +592,7 @@ def test_join_to_time_spine_node_without_offset(
     compute_metrics_node = ComputeMetricsNode(
         parent_node=aggregated_measures_node,
         metric_specs=[metric_spec],
-        aggregated_to_elements={entity_spec.reference},
+        aggregated_to_elements={entity_spec},
     )
     join_to_time_spine_node = JoinToTimeSpineNode(
         parent_node=compute_metrics_node,
@@ -663,7 +663,7 @@ def test_join_to_time_spine_node_with_offset_window(
     compute_metrics_node = ComputeMetricsNode(
         parent_node=aggregated_measures_node,
         metric_specs=[metric_spec],
-        aggregated_to_elements={entity_spec.reference, metric_time_spec.reference},
+        aggregated_to_elements={entity_spec, metric_time_spec},
     )
     join_to_time_spine_node = JoinToTimeSpineNode(
         parent_node=compute_metrics_node,
@@ -736,7 +736,7 @@ def test_join_to_time_spine_node_with_offset_to_grain(
     compute_metrics_node = ComputeMetricsNode(
         parent_node=aggregated_measures_node,
         metric_specs=[metric_spec],
-        aggregated_to_elements={entity_spec.reference, metric_time_spec.reference},
+        aggregated_to_elements={entity_spec, metric_time_spec},
     )
     join_to_time_spine_node = JoinToTimeSpineNode(
         parent_node=compute_metrics_node,
@@ -838,7 +838,7 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
     compute_metrics_node = ComputeMetricsNode(
         parent_node=aggregated_measures_node,
         metric_specs=[metric_spec],
-        aggregated_to_elements={entity_spec.reference, dimension_spec.reference},
+        aggregated_to_elements={entity_spec, dimension_spec},
     )
 
     convert_and_check(
@@ -894,7 +894,7 @@ def test_order_by_node(
     compute_metrics_node = ComputeMetricsNode(
         parent_node=aggregated_measure_node,
         metric_specs=[metric_spec],
-        aggregated_to_elements={dimension_spec.reference, time_dimension_spec.reference},
+        aggregated_to_elements={dimension_spec, time_dimension_spec},
     )
 
     order_by_node = OrderByLimitNode(
