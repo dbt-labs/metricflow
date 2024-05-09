@@ -7,6 +7,7 @@ from typing import Sequence
 import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
+from dbt_semantic_interfaces.references import SemanticModelReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
@@ -56,6 +57,23 @@ class DataflowPlanLookup:
     def source_node_count(self) -> int:
         """Counts the number of `ReadSqlSourceNodes` in the dataflow plan."""
         return len(self._dataflow_plan_sink_node.accept(_ReadSqlSourceNodeCollector()))
+
+    def read_semantic_models(self) -> Sequence[SemanticModelReference]:
+        """Returns all semantic models that are read in the plan."""
+        read_nodes = self._dataflow_plan_sink_node.accept(_ReadSqlSourceNodeCollector())
+        read_semantic_models = set()
+
+        for read_node in read_nodes:
+            semantic_model_reference = read_node.data_set.semantic_model_reference
+            if semantic_model_reference is not None:
+                read_semantic_models.add(semantic_model_reference)
+
+        return tuple(
+            sorted(
+                read_semantic_models,
+                key=lambda model_reference: model_reference.semantic_model_name,
+            )
+        )
 
 
 def check_optimization(  # noqa: D103

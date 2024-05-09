@@ -93,7 +93,7 @@ class SourceScanOptimizer(
     """
 
     def __init__(self) -> None:  # noqa: D107
-        super().__init__(visit_log_level=logging.ERROR, default_action_recursion=True)
+        super().__init__(visit_log_level=logging.DEBUG, default_action_recursion=True)
 
     @override
     def default_visit_action(
