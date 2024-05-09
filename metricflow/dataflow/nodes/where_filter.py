@@ -7,16 +7,15 @@ from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.specs.spec_classes import WhereFilterSpec
 from metricflow_semantics.visitor import VisitorOutputT
 
-from metricflow.dataflow.dataflow_plan import BaseOutput, DataflowPlanNode, DataflowPlanNodeVisitor
-from metricflow.dataflow.nodes.aggregate_measures import AggregatedMeasuresOutput
+from metricflow.dataflow.dataflow_plan import DataflowPlanNode, DataflowPlanNodeVisitor
 
 
-class WhereConstraintNode(AggregatedMeasuresOutput):
+class WhereConstraintNode(DataflowPlanNode):
     """Remove rows using a WHERE clause."""
 
     def __init__(  # noqa: D107
         self,
-        parent_node: BaseOutput,
+        parent_node: DataflowPlanNode,
         where_constraint: WhereFilterSpec,
     ) -> None:
         self._where = where_constraint
@@ -48,7 +47,7 @@ class WhereConstraintNode(AggregatedMeasuresOutput):
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D102
         return isinstance(other_node, self.__class__) and other_node.where == self.where
 
-    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> WhereConstraintNode:  # noqa: D102
+    def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> WhereConstraintNode:  # noqa: D102
         assert len(new_parent_nodes) == 1
         return WhereConstraintNode(
             parent_node=new_parent_nodes[0],

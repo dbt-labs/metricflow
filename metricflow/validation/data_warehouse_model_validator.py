@@ -36,7 +36,7 @@ from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
-from metricflow.dataflow.dataflow_plan import BaseOutput
+from metricflow.dataflow.dataflow_plan import DataflowPlanNode
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.dataset.dataset_classes import DataSet
@@ -104,7 +104,9 @@ class DataWarehouseTaskBuilder:
         return tuple(spec for spec in specs if not spec.entity_links)
 
     @staticmethod
-    def _semantic_model_nodes(render_tools: QueryRenderingTools, semantic_model: SemanticModel) -> Sequence[BaseOutput]:
+    def _semantic_model_nodes(
+        render_tools: QueryRenderingTools, semantic_model: SemanticModel
+    ) -> Sequence[DataflowPlanNode]:
         """Builds and returns the SemanticModelDataSet node for the given semantic model."""
         fetched_semantic_model = render_tools.semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
             SemanticModelReference(semantic_model_name=semantic_model.name)
@@ -347,7 +349,7 @@ class DataWarehouseTaskBuilder:
             dataset = render_tools.converter.create_sql_source_data_set(semantic_model)
             semantic_model_specs = dataset.instance_set.spec_set.measure_specs
 
-            source_node_by_measure_spec: Dict[MeasureSpec, BaseOutput] = {}
+            source_node_by_measure_spec: Dict[MeasureSpec, DataflowPlanNode] = {}
             measure_specs_source_node_pair = []
             for source_node in source_nodes:
                 measure_specs = render_tools.node_resolver.get_output_data_set(
@@ -357,7 +359,7 @@ class DataWarehouseTaskBuilder:
                 measure_specs_source_node_pair.append((measure_specs, source_node))
 
             source_node_to_sub_task: DefaultDict[
-                BaseOutput, List[DataWarehouseValidationTask]
+                DataflowPlanNode, List[DataWarehouseValidationTask]
             ] = collections.defaultdict(list)
             for spec in semantic_model_specs:
                 obtained_source_node = source_node_by_measure_spec.get(spec)

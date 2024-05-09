@@ -8,11 +8,11 @@ from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.visitor import VisitorOutputT
 
-from metricflow.dataflow.dataflow_plan import BaseOutput, DataflowPlanNode, DataflowPlanNodeVisitor
+from metricflow.dataflow.dataflow_plan import DataflowPlanNode, DataflowPlanNodeVisitor
 from metricflow.dataset.sql_dataset import SqlDataSet
 
 
-class ReadSqlSourceNode(BaseOutput):
+class ReadSqlSourceNode(DataflowPlanNode):
     """A source node where data from an SQL table or SQL query is read and output."""
 
     def __init__(self, data_set: SqlDataSet) -> None:
@@ -56,6 +56,6 @@ class ReadSqlSourceNode(BaseOutput):
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D102
         return isinstance(other_node, self.__class__) and other_node.data_set == self.data_set
 
-    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> ReadSqlSourceNode:  # noqa: D102
+    def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> ReadSqlSourceNode:  # noqa: D102
         assert len(new_parent_nodes) == 0
         return ReadSqlSourceNode(data_set=self.data_set)

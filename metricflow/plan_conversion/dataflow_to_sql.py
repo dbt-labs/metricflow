@@ -42,7 +42,6 @@ from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.time.time_constants import ISO8601_PYTHON_FORMAT
 
 from metricflow.dataflow.dataflow_plan import (
-    BaseOutput,
     DataflowPlanNode,
     DataflowPlanNodeVisitor,
 )
@@ -442,7 +441,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         for join_description in node.join_targets:
             join_on_entity = join_description.join_on_entity
 
-            right_node_to_join: BaseOutput = join_description.join_node
+            right_node_to_join: DataflowPlanNode = join_description.join_node
             right_data_set: SqlDataSet = right_node_to_join.accept(self)
             right_data_set_alias = self._next_unique_table_alias()
 

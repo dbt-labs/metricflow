@@ -45,7 +45,7 @@ def test_simple_query_with_date_part(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_output_node,
     )
 
 
@@ -76,7 +76,7 @@ def test_simple_query_with_multiple_date_parts(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_output_node,
     )
 
 
@@ -102,5 +102,5 @@ def test_offset_window_with_date_part(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_output_node,
     )

@@ -13,7 +13,7 @@ from metricflow.dataflow.builder.partitions import (
     PartitionDimensionJoinDescription,
     PartitionTimeDimensionJoinDescription,
 )
-from metricflow.dataflow.dataflow_plan import BaseOutput, DataflowPlanNode, DataflowPlanNodeVisitor
+from metricflow.dataflow.dataflow_plan import DataflowPlanNode, DataflowPlanNodeVisitor
 
 
 @dataclass(frozen=True)
@@ -28,7 +28,7 @@ class ValidityWindowJoinDescription:
 class JoinDescription:
     """Describes how data from a node should be joined to data from another node."""
 
-    join_node: BaseOutput
+    join_node: DataflowPlanNode
     join_on_entity: Optional[LinklessEntitySpec]
     join_type: SqlJoinType
 
@@ -42,12 +42,12 @@ class JoinDescription:
             raise RuntimeError("`join_on_entity` is required unless using CROSS JOIN.")
 
 
-class JoinToBaseOutputNode(BaseOutput):
+class JoinToBaseOutputNode(DataflowPlanNode):
     """A node that joins data from other nodes to a standard output node, one by one via entity."""
 
     def __init__(
         self,
-        left_node: BaseOutput,
+        left_node: DataflowPlanNode,
         join_targets: Sequence[JoinDescription],
         node_id: Optional[NodeId] = None,
     ) -> None:
@@ -79,7 +79,7 @@ class JoinToBaseOutputNode(BaseOutput):
         return """Join Standard Outputs"""
 
     @property
-    def left_node(self) -> BaseOutput:  # noqa: D102
+    def left_node(self) -> DataflowPlanNode:  # noqa: D102
         return self._left_node
 
     @property
@@ -109,7 +109,7 @@ class JoinToBaseOutputNode(BaseOutput):
                 return False
         return True
 
-    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> JoinToBaseOutputNode:  # noqa: D102
+    def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> JoinToBaseOutputNode:  # noqa: D102
         assert len(new_parent_nodes) > 1
         new_left_node = new_parent_nodes[0]
         new_join_nodes = new_parent_nodes[1:]

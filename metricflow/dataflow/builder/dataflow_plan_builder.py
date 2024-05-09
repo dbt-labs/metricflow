@@ -61,9 +61,8 @@ from metricflow.dataflow.builder.node_evaluator import (
 )
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder, SourceNodeSet
 from metricflow.dataflow.dataflow_plan import (
-    BaseOutput,
     DataflowPlan,
-    SinkOutput,
+    DataflowPlanNode,
 )
 from metricflow.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode
 from metricflow.dataflow.nodes.aggregate_measures import AggregateMeasuresNode
@@ -93,7 +92,7 @@ logger = logging.getLogger(__name__)
 class DataflowRecipe:
     """Get a recipe for how to build a dataflow plan node that outputs measures and linkable instances as needed."""
 
-    source_node: BaseOutput
+    source_node: DataflowPlanNode
     required_local_linkable_specs: Tuple[LinkableInstanceSpec, ...]
     join_linkable_instances_recipes: Tuple[JoinLinkableInstancesRecipe, ...]
 
@@ -151,7 +150,7 @@ class DataflowPlanBuilder:
 
     def _build_query_output_node(
         self, query_spec: MetricFlowQuerySpec, for_group_by_source_node: bool = False
-    ) -> BaseOutput:
+    ) -> DataflowPlanNode:
         """Build SQL output node from query inputs. May be used to build query DFP or source node."""
         for metric_spec in query_spec.metric_specs:
             if (
@@ -234,7 +233,7 @@ class DataflowPlanBuilder:
         queried_linkable_specs: LinkableSpecSet,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         constant_properties: Optional[Sequence[ConstantPropertyInput]] = None,
-    ) -> BaseOutput:
+    ) -> DataflowPlanNode:
         """Builds a node that contains aggregated values of conversions and opportunities."""
         # Build measure recipes
         base_required_linkable_specs, _ = self.__get_required_and_extraneous_linkable_specs(
@@ -455,7 +454,7 @@ class DataflowPlanBuilder:
         filter_spec_factory: WhereSpecFactory,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         for_group_by_source_node: bool = False,
-    ) -> BaseOutput:
+    ) -> DataflowPlanNode:
         """Builds a node to compute a metric defined from other metrics."""
         metric = self._metric_lookup.get_metric(metric_spec.reference)
         metric_input_specs = self._build_input_metric_specs_for_derived_metric(
@@ -470,7 +469,7 @@ class DataflowPlanBuilder:
             queried_linkable_specs=queried_linkable_specs, filter_specs=metric_spec.filter_specs
         )
 
-        parent_nodes: List[BaseOutput] = []
+        parent_nodes: List[DataflowPlanNode] = []
 
         # This is the filter that's defined for the metric in the configs.
         metric_definition_filter_specs = filter_spec_factory.create_from_where_filter_intersection(
@@ -509,7 +508,7 @@ class DataflowPlanBuilder:
         parent_node = (
             parent_nodes[0] if len(parent_nodes) == 1 else CombineAggregatedOutputsNode(parent_nodes=parent_nodes)
         )
-        output_node: BaseOutput = ComputeMetricsNode(
+        output_node: DataflowPlanNode = ComputeMetricsNode(
             parent_node=parent_node,
             metric_specs=[metric_spec],
             for_group_by_source_node=for_group_by_source_node,
@@ -553,7 +552,7 @@ class DataflowPlanBuilder:
         filter_spec_factory: WhereSpecFactory,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         for_group_by_source_node: bool = False,
-    ) -> BaseOutput:
+    ) -> DataflowPlanNode:
         """Builds a node to compute a metric of any type."""
         metric = self._metric_lookup.get_metric(metric_spec.reference)
 
@@ -592,7 +591,7 @@ class DataflowPlanBuilder:
         filter_spec_factory: WhereSpecFactory,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         for_group_by_source_node: bool = False,
-    ) -> BaseOutput:
+    ) -> DataflowPlanNode:
         """Builds a node that computes all requested metrics.
 
         Args:
@@ -602,7 +601,7 @@ class DataflowPlanBuilder:
             filter_spec_factory: Constructs WhereFilterSpecs with the resolved ambiguous group-by-items in the filter.
             time_range_constraint: Time range constraint used to compute the metric.
         """
-        output_nodes: List[BaseOutput] = []
+        output_nodes: List[DataflowPlanNode] = []
 
         for metric_spec in metric_specs:
             logger.info(f"Generating compute metrics node for:\n{indent(mf_pformat(metric_spec))}")
@@ -687,14 +686,14 @@ class DataflowPlanBuilder:
 
     @staticmethod
     def build_sink_node(
-        parent_node: BaseOutput,
+        parent_node: DataflowPlanNode,
         order_by_specs: Sequence[OrderBySpec],
         output_sql_table: Optional[SqlTable] = None,
         limit: Optional[int] = None,
         output_selection_specs: Optional[InstanceSpecSet] = None,
-    ) -> SinkOutput:
+    ) -> DataflowPlanNode:
         """Adds order by / limit / write nodes."""
-        pre_result_node: Optional[BaseOutput] = None
+        pre_result_node: Optional[DataflowPlanNode] = None
 
         if order_by_specs or limit:
             pre_result_node = OrderByLimitNode(
@@ -706,7 +705,7 @@ class DataflowPlanBuilder:
                 parent_node=pre_result_node or parent_node, include_specs=output_selection_specs
             )
 
-        write_result_node: SinkOutput
+        write_result_node: DataflowPlanNode
         if not output_sql_table:
             write_result_node = WriteToResultDataframeNode(parent_node=pre_result_node or parent_node)
         else:
@@ -721,21 +720,21 @@ class DataflowPlanBuilder:
         """Returns true if any of the linkable specs requires a multi-hop join to realize."""
         return any(len(x.entity_links) > 1 for x in linkable_specs)
 
-    def _sort_by_suitability(self, nodes: Sequence[BaseOutput]) -> Sequence[BaseOutput]:
+    def _sort_by_suitability(self, nodes: Sequence[DataflowPlanNode]) -> Sequence[DataflowPlanNode]:
         """Sort nodes by the number of linkable specs.
 
         The lower the number of linkable specs means less aggregation required.
         """
 
-        def sort_function(node: BaseOutput) -> int:
+        def sort_function(node: DataflowPlanNode) -> int:
             data_set = self._node_data_set_resolver.get_output_data_set(node)
             return len(data_set.instance_set.spec_set.linkable_specs)
 
         return sorted(nodes, key=sort_function)
 
     def _select_source_nodes_with_measures(
-        self, measure_specs: Set[MeasureSpec], source_nodes: Sequence[BaseOutput]
-    ) -> Sequence[BaseOutput]:
+        self, measure_specs: Set[MeasureSpec], source_nodes: Sequence[DataflowPlanNode]
+    ) -> Sequence[DataflowPlanNode]:
         nodes = []
         measure_specs_set = set(measure_specs)
         for source_node in source_nodes:
@@ -747,11 +746,11 @@ class DataflowPlanBuilder:
         return nodes
 
     def _select_source_nodes_with_linkable_specs(
-        self, linkable_specs: LinkableSpecSet, source_nodes: Sequence[BaseOutput]
-    ) -> Sequence[BaseOutput]:
+        self, linkable_specs: LinkableSpecSet, source_nodes: Sequence[DataflowPlanNode]
+    ) -> Sequence[DataflowPlanNode]:
         """Find source nodes with requested linkable specs and no measures."""
         # Use a dictionary to dedupe for consistent ordering.
-        selected_nodes: Dict[BaseOutput, None] = {}
+        selected_nodes: Dict[DataflowPlanNode, None] = {}
         requested_linkable_specs_set = set(linkable_specs.as_tuple)
         for source_node in source_nodes:
             output_spec_set = self._node_data_set_resolver.get_output_data_set(source_node).instance_set.spec_set
@@ -823,8 +822,8 @@ class DataflowPlanBuilder:
         time_range_constraint: Optional[TimeRangeConstraint] = None,
     ) -> Optional[DataflowRecipe]:
         linkable_specs = linkable_spec_set.as_tuple
-        candidate_nodes_for_left_side_of_join: List[BaseOutput] = []
-        candidate_nodes_for_right_side_of_join: List[BaseOutput] = []
+        candidate_nodes_for_left_side_of_join: List[DataflowPlanNode] = []
+        candidate_nodes_for_right_side_of_join: List[DataflowPlanNode] = []
 
         if measure_spec_properties:
             candidate_nodes_for_right_side_of_join += self._source_node_set.source_nodes_for_metric_queries
@@ -909,7 +908,7 @@ class DataflowPlanBuilder:
         )
 
         # Dict from the node that contains the source node to the evaluation results.
-        node_to_evaluation: Dict[BaseOutput, LinkableInstanceSatisfiabilityEvaluation] = {}
+        node_to_evaluation: Dict[DataflowPlanNode, LinkableInstanceSatisfiabilityEvaluation] = {}
 
         for node in self._sort_by_suitability(candidate_nodes_for_left_side_of_join):
             data_set = self._node_data_set_resolver.get_output_data_set(node)
@@ -1009,7 +1008,7 @@ class DataflowPlanBuilder:
     def build_computed_metrics_node(
         self,
         metric_spec: MetricSpec,
-        aggregated_measures_node: Union[AggregateMeasuresNode, BaseOutput],
+        aggregated_measures_node: Union[AggregateMeasuresNode, DataflowPlanNode],
         aggregated_to_elements: Set[LinkableInstanceSpec],
         for_group_by_source_node: bool = False,
     ) -> ComputeMetricsNode:
@@ -1182,7 +1181,7 @@ class DataflowPlanBuilder:
         queried_linkable_specs: LinkableSpecSet,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         measure_recipe: Optional[DataflowRecipe] = None,
-    ) -> BaseOutput:
+    ) -> DataflowPlanNode:
         """Returns a node where the measures are aggregated by the linkable specs and constrained appropriately.
 
         This might be a node representing a single aggregation over one semantic model, or a node representing
@@ -1234,7 +1233,7 @@ class DataflowPlanBuilder:
         queried_linkable_specs: LinkableSpecSet,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
         measure_recipe: Optional[DataflowRecipe] = None,
-    ) -> BaseOutput:
+    ) -> DataflowPlanNode:
         measure_spec = metric_input_measure_spec.measure_spec
         cumulative = metric_input_measure_spec.cumulative_description is not None
         cumulative_window = (
@@ -1359,7 +1358,7 @@ class DataflowPlanBuilder:
         )
 
         join_targets = measure_recipe.join_targets
-        unaggregated_measure_node: BaseOutput
+        unaggregated_measure_node: DataflowPlanNode
         if len(join_targets) > 0:
             filtered_measures_with_joined_elements = JoinToBaseOutputNode(
                 left_node=filtered_measure_source_node,
@@ -1388,7 +1387,7 @@ class DataflowPlanBuilder:
                 unaggregated_measure_node, time_range_constraint
             )
 
-        pre_aggregate_node: BaseOutput = cumulative_metric_constrained_node or unaggregated_measure_node
+        pre_aggregate_node: DataflowPlanNode = cumulative_metric_constrained_node or unaggregated_measure_node
         merged_where_filter_spec = WhereFilterSpec.merge_iterable(metric_input_measure_spec.filter_specs)
         if len(metric_input_measure_spec.filter_specs) > 0:
             # Apply where constraint on the node
@@ -1444,7 +1443,7 @@ class DataflowPlanBuilder:
                 f"Expected {SqlJoinType.LEFT_OUTER} for joining to time spine after aggregation. Remove this if "
                 f"there's a new use case."
             )
-            output_node: BaseOutput = JoinToTimeSpineNode(
+            output_node: DataflowPlanNode = JoinToTimeSpineNode(
                 parent_node=aggregate_measures_node,
                 requested_agg_time_dimension_specs=queried_agg_time_dimension_specs,
                 use_custom_agg_time_dimension=not queried_linkable_specs.contains_metric_time,

@@ -6,13 +6,13 @@ from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.visitor import VisitorOutputT
 
-from metricflow.dataflow.dataflow_plan import BaseOutput, DataflowPlanNode, DataflowPlanNodeVisitor
+from metricflow.dataflow.dataflow_plan import DataflowPlanNode, DataflowPlanNodeVisitor
 
 
-class AddGeneratedUuidColumnNode(BaseOutput):
+class AddGeneratedUuidColumnNode(DataflowPlanNode):
     """Adds a UUID column."""
 
-    def __init__(self, parent_node: BaseOutput) -> None:  # noqa: D107
+    def __init__(self, parent_node: DataflowPlanNode) -> None:  # noqa: D107
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[parent_node])
 
     @classmethod
@@ -38,6 +38,8 @@ class AddGeneratedUuidColumnNode(BaseOutput):
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D102
         return isinstance(other_node, self.__class__)
 
-    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> AddGeneratedUuidColumnNode:  # noqa: D102
+    def with_new_parents(  # noqa: D102
+        self, new_parent_nodes: Sequence[DataflowPlanNode]
+    ) -> AddGeneratedUuidColumnNode:
         assert len(new_parent_nodes) == 1
         return AddGeneratedUuidColumnNode(parent_node=new_parent_nodes[0])

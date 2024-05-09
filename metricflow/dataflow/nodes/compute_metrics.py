@@ -8,19 +8,17 @@ from metricflow_semantics.specs.spec_classes import LinkableInstanceSpec, Metric
 from metricflow_semantics.visitor import VisitorOutputT
 
 from metricflow.dataflow.dataflow_plan import (
-    BaseOutput,
-    ComputedMetricsOutput,
     DataflowPlanNode,
     DataflowPlanNodeVisitor,
 )
 
 
-class ComputeMetricsNode(ComputedMetricsOutput):
+class ComputeMetricsNode(DataflowPlanNode):
     """A node that computes metrics from input measures. Dimensions / entities are passed through."""
 
     def __init__(
         self,
-        parent_node: BaseOutput,
+        parent_node: DataflowPlanNode,
         metric_specs: Sequence[MetricSpec],
         aggregated_to_elements: Set[LinkableInstanceSpec],
         for_group_by_source_node: bool = False,
@@ -69,7 +67,7 @@ class ComputeMetricsNode(ComputedMetricsOutput):
         return displayed_properties
 
     @property
-    def parent_node(self) -> BaseOutput:  # noqa: D102
+    def parent_node(self) -> DataflowPlanNode:  # noqa: D102
         return self._parent_node
 
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D102
@@ -100,7 +98,7 @@ class ComputeMetricsNode(ComputedMetricsOutput):
 
         return True, ""
 
-    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> ComputeMetricsNode:  # noqa: D102
+    def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> ComputeMetricsNode:  # noqa: D102
         assert len(new_parent_nodes) == 1
         return ComputeMetricsNode(
             parent_node=new_parent_nodes[0],

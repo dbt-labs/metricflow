@@ -8,15 +8,15 @@ from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.visitor import VisitorOutputT
 
-from metricflow.dataflow.dataflow_plan import BaseOutput, DataflowPlanNode, DataflowPlanNodeVisitor
+from metricflow.dataflow.dataflow_plan import DataflowPlanNode, DataflowPlanNodeVisitor
 
 
-class FilterElementsNode(BaseOutput):
+class FilterElementsNode(DataflowPlanNode):
     """Only passes the listed elements."""
 
     def __init__(  # noqa: D107
         self,
-        parent_node: BaseOutput,
+        parent_node: DataflowPlanNode,
         include_specs: InstanceSpecSet,
         replace_description: Optional[str] = None,
         distinct: bool = False,
@@ -63,7 +63,7 @@ class FilterElementsNode(BaseOutput):
         return tuple(super().displayed_properties) + additional_properties
 
     @property
-    def parent_node(self) -> BaseOutput:  # noqa: D102
+    def parent_node(self) -> DataflowPlanNode:  # noqa: D102
         return self._parent_node
 
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D102
@@ -73,7 +73,7 @@ class FilterElementsNode(BaseOutput):
             and other_node.distinct == self.distinct
         )
 
-    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> FilterElementsNode:  # noqa: D102
+    def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> FilterElementsNode:  # noqa: D102
         assert len(new_parent_nodes) == 1
         return FilterElementsNode(
             parent_node=new_parent_nodes[0],
