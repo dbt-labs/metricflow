@@ -80,7 +80,7 @@ def log_query_spec() -> None:  # noqa: D103
     query_parser = MetricFlowQueryParser(SemanticManifestLookup(semantic_manifest))
     query_spec = query_parser.parse_and_validate_query(
         metric_names=["bookings"], group_by_names=["booking__is_instant"]
-    )
+    ).query_spec
 
     logger.info(f"{query_spec.__class__.__name__}:\n{mf_pformat(query_spec)}")
 

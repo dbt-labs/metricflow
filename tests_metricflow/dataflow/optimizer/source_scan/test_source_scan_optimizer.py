@@ -242,7 +242,7 @@ def test_constrained_metric_not_combined(
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("booking_value", "instant_booking_value"),
         group_by_names=(METRIC_TIME_ELEMENT_NAME,),
-    )
+    ).query_spec
     check_optimization(
         request=request,
         mf_test_configuration=mf_test_configuration,
