@@ -59,6 +59,16 @@ class MultiHopJoinCandidate:
     lineage: MultiHopJoinCandidateLineage
 
 
+@dataclass(frozen=True)
+class PredicatePushdownParameters:
+    """Container class for managing filter predicate pushdown.
+
+    Stores time constraint information for applying pre-join time filters.
+    """
+
+    time_range_constraint: Optional[TimeRangeConstraint]
+
+
 class PreJoinNodeProcessor:
     """Processes source nodes before other nodes are joined.
 
