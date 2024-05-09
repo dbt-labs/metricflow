@@ -12,8 +12,8 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_plan_snapshot_text_equal
 
 from metricflow.dataflow.dataflow_plan import (
-    BaseOutput,
     DataflowPlan,
+    DataflowPlanNode,
 )
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataframeNode
@@ -25,7 +25,7 @@ from tests_metricflow.dataflow_plan_to_svg import display_graph_if_requested
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 
 
-def make_dataflow_plan(node: BaseOutput) -> DataflowPlan:  # noqa: D103
+def make_dataflow_plan(node: DataflowPlanNode) -> DataflowPlan:  # noqa: D103
     return DataflowPlan(
         sink_output_nodes=[WriteToResultDataframeNode(node)],
         plan_id=DagId.from_id_prefix(StaticIdPrefix.OPTIMIZED_DATAFLOW_PLAN_PREFIX),

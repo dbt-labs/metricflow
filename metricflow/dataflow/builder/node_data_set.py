@@ -41,13 +41,13 @@ class DataflowPlanNodeOutputDataSetResolver(DataflowToSqlQueryPlanConverter):
     generate a set of nodes that already include the multi-hop dimensions available, the join resolution logic becomes
     much simpler. For example, a node like:
 
-    <JoinToBaseOutputNode>
+    <JoinNode>
         <!-- Join dim_users and dim_devices by device_id -->
         <ReadSqlSourceNode>
           <!-- Read from dim_users to get user_id, device_id -->
         <ReadSqlSourceNodes>
           <!-- Read from dim_devices device_id, platform -->
-    </JoinToBaseOutputNode>
+    </JoinNode>
 
     would have the dimension user_id__device_id__platform available, so to NodeEvaluatorForLinkableInstances,
     it's the same problem as doing a single-hop join. This simplifies the join resolution logic, though now the input

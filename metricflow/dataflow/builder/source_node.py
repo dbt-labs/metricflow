@@ -10,7 +10,7 @@ from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.spec_classes import GroupByMetricSpec
 
-from metricflow.dataflow.dataflow_plan import BaseOutput
+from metricflow.dataflow.dataflow_plan import DataflowPlanNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
@@ -30,17 +30,17 @@ class SourceNodeSet:
     # mapped to components with a transformation node to add `metric_time` / to support multiple aggregation time
     # dimensions. Each semantic model containing measures with k different aggregation time dimensions is mapped to k
     # components.
-    source_nodes_for_metric_queries: Tuple[BaseOutput, ...]
+    source_nodes_for_metric_queries: Tuple[DataflowPlanNode, ...]
 
     # Semantic models are 1:1 mapped to a ReadSqlSourceNode. The tuple also contains the same `time_spine_node` as
     # below. See usage in `DataflowPlanBuilder`.
-    source_nodes_for_group_by_item_queries: Tuple[BaseOutput, ...]
+    source_nodes_for_group_by_item_queries: Tuple[DataflowPlanNode, ...]
 
     # Provides the time spine.
     time_spine_node: MetricTimeDimensionTransformNode
 
     @property
-    def all_nodes(self) -> Sequence[BaseOutput]:  # noqa: D102
+    def all_nodes(self) -> Sequence[DataflowPlanNode]:  # noqa: D102
         return (
             self.source_nodes_for_metric_queries + self.source_nodes_for_group_by_item_queries + (self.time_spine_node,)
         )
@@ -67,8 +67,8 @@ class SourceNodeBuilder:
 
     def create_from_data_sets(self, data_sets: Sequence[SemanticModelDataSet]) -> SourceNodeSet:
         """Creates a `SourceNodeSet` from SemanticModelDataSets."""
-        group_by_item_source_nodes: List[BaseOutput] = []
-        source_nodes_for_metric_queries: List[BaseOutput] = []
+        group_by_item_source_nodes: List[DataflowPlanNode] = []
+        source_nodes_for_metric_queries: List[DataflowPlanNode] = []
 
         for data_set in data_sets:
             read_node = ReadSqlSourceNode(data_set)

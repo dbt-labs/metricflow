@@ -8,10 +8,10 @@ from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.specs.spec_classes import LinklessEntitySpec, TimeDimensionSpec
 from metricflow_semantics.visitor import VisitorOutputT
 
-from metricflow.dataflow.dataflow_plan import BaseOutput, DataflowPlanNode, DataflowPlanNodeVisitor
+from metricflow.dataflow.dataflow_plan import DataflowPlanNode, DataflowPlanNodeVisitor
 
 
-class SemiAdditiveJoinNode(BaseOutput):
+class SemiAdditiveJoinNode(DataflowPlanNode):
     """A node that performs a row filter by aggregating a given non-additive dimension.
 
     This is designed to filter a dataset down to singular non-additive time dimension values by aggregating
@@ -62,7 +62,7 @@ class SemiAdditiveJoinNode(BaseOutput):
 
     def __init__(
         self,
-        parent_node: BaseOutput,
+        parent_node: DataflowPlanNode,
         entity_specs: Sequence[LinklessEntitySpec],
         time_dimension_spec: TimeDimensionSpec,
         agg_by_function: AggregationType,
@@ -99,7 +99,7 @@ class SemiAdditiveJoinNode(BaseOutput):
         return f"""Join on {self.agg_by_function.name}({self.time_dimension_spec.element_name}) and {[i.element_name for i in self.entity_specs]} grouping by {self.queried_time_dimension_spec.element_name if self.queried_time_dimension_spec else None}"""
 
     @property
-    def parent_node(self) -> BaseOutput:  # noqa: D102
+    def parent_node(self) -> DataflowPlanNode:  # noqa: D102
         return self._parent_node
 
     @property
@@ -134,7 +134,7 @@ class SemiAdditiveJoinNode(BaseOutput):
             and other_node.queried_time_dimension_spec == self.queried_time_dimension_spec
         )
 
-    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> SemiAdditiveJoinNode:  # noqa: D102
+    def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> SemiAdditiveJoinNode:  # noqa: D102
         assert len(new_parent_nodes) == 1
 
         return SemiAdditiveJoinNode(

@@ -8,11 +8,9 @@ from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagId
 
 from metricflow.dataflow.dataflow_plan import (
-    BaseOutput,
     DataflowPlan,
     DataflowPlanNode,
     DataflowPlanNodeVisitor,
-    SinkOutput,
 )
 from metricflow.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode
 from metricflow.dataflow.nodes.aggregate_measures import AggregateMeasuresNode
@@ -22,7 +20,7 @@ from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
 from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
-from metricflow.dataflow.nodes.join_to_base import JoinToBaseOutputNode
+from metricflow.dataflow.nodes.join_to_base import JoinOnEntitiesNode
 from metricflow.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.dataflow.nodes.min_max import MinMaxNode
@@ -43,17 +41,17 @@ logger = logging.getLogger(__name__)
 
 @dataclass(frozen=True)
 class OptimizeBranchResult:  # noqa: D101
-    base_output_node: Optional[BaseOutput] = None
-    sink_node: Optional[SinkOutput] = None
+    base_output_node: Optional[DataflowPlanNode] = None
+    sink_node: Optional[DataflowPlanNode] = None
 
     @property
-    def checked_base_output(self) -> BaseOutput:  # noqa: D102
-        assert self.base_output_node, f"Expected the result of traversal to produce a {BaseOutput}"
+    def checked_base_output(self) -> DataflowPlanNode:  # noqa: D102
+        assert self.base_output_node, f"Expected the result of traversal to produce a {DataflowPlanNode}"
         return self.base_output_node
 
     @property
-    def checked_sink_node(self) -> SinkOutput:  # noqa: D102
-        assert self.sink_node, f"Expected the result of traversal to produce a {SinkOutput}"
+    def checked_sink_node(self) -> DataflowPlanNode:  # noqa: D102
+        assert self.sink_node, f"Expected the result of traversal to produce a {DataflowPlanNode}"
         return self.sink_node
 
 
@@ -61,9 +59,9 @@ class OptimizeBranchResult:  # noqa: D101
 class BranchCombinationResult:
     """Holds the results of combining a branch (right_branch) with one of the branches in a list (left_branch)."""
 
-    left_branch: BaseOutput
-    right_branch: BaseOutput
-    combined_branch: Optional[BaseOutput] = None
+    left_branch: DataflowPlanNode
+    right_branch: DataflowPlanNode
+    combined_branch: Optional[DataflowPlanNode] = None
 
 
 class SourceScanOptimizer(
@@ -128,24 +126,24 @@ class SourceScanOptimizer(
 
     def _default_base_output_handler(
         self,
-        node: BaseOutput,
+        node: DataflowPlanNode,
     ) -> OptimizeBranchResult:
         optimized_parents: Sequence[OptimizeBranchResult] = tuple(
             parent_node.accept(self) for parent_node in node.parent_nodes
         )
-        # Parents should always be BaseOutput
+        # Parents should always be DataflowPlanNode
         return OptimizeBranchResult(
             base_output_node=node.with_new_parents(tuple(x.checked_base_output for x in optimized_parents))
         )
 
     def _default_sink_node_handler(
         self,
-        node: SinkOutput,
+        node: DataflowPlanNode,
     ) -> OptimizeBranchResult:
         optimized_parents: Sequence[OptimizeBranchResult] = tuple(
             parent_node.accept(self) for parent_node in node.parent_nodes
         )
-        # Parents should always be BaseOutput
+        # Parents should always be DataflowPlanNode
         return OptimizeBranchResult(
             sink_node=node.with_new_parents(tuple(x.checked_base_output for x in optimized_parents))
         )
@@ -154,7 +152,7 @@ class SourceScanOptimizer(
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)
 
-    def visit_join_to_base_output_node(self, node: JoinToBaseOutputNode) -> OptimizeBranchResult:  # noqa: D102
+    def visit_join_on_entities_node(self, node: JoinOnEntitiesNode) -> OptimizeBranchResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)
 
@@ -202,7 +200,7 @@ class SourceScanOptimizer(
 
     @staticmethod
     def _combine_branches(
-        left_branches: Sequence[BaseOutput], right_branch: BaseOutput
+        left_branches: Sequence[DataflowPlanNode], right_branch: DataflowPlanNode
     ) -> Sequence[BranchCombinationResult]:
         """Combine the right branch with one of the left branches.
 
@@ -253,18 +251,18 @@ class SourceScanOptimizer(
 
             assert result.sink_node is None, (
                 f"Traversing the parents of of {node.__class__.__name__} should not have produced any "
-                f"{SinkOutput.__class__.__name__} nodes"
+                f"{DataflowPlanNode.__class__.__name__} nodes"
             )
 
             assert (
                 result.base_output_node is not None
-            ), f"Traversing the parents of a CombineAggregatedOutputsNode should always produce a BaseOutput. Got: {result}"
+            ), f"Traversing the parents of a CombineAggregatedOutputsNode should always produce a DataflowPlanNode. Got: {result}"
             optimized_parent_branches.append(result.base_output_node)
 
         # Try to combine (using ComputeMetricsBranchCombiner) as many parent branches as possible in a
         # greedy N^2 approach. The optimality of this approach needs more thought to prove conclusively, but given
         # the seemingly transitive properties of the combination operation, this seems reasonable.
-        combined_parent_branches: List[BaseOutput] = []
+        combined_parent_branches: List[DataflowPlanNode] = []
         for optimized_parent_branch in optimized_parent_branches:
             combination_results = SourceScanOptimizer._combine_branches(
                 left_branches=combined_parent_branches, right_branch=optimized_parent_branch

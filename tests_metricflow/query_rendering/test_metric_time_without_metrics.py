@@ -38,7 +38,7 @@ def test_metric_time_only(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_output_node,
     )
 
 
@@ -65,7 +65,7 @@ def test_metric_time_quarter_alone(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_output_node,
     )
 
 
@@ -92,7 +92,7 @@ def test_metric_time_with_other_dimensions(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_output_node,
     )
 
 
@@ -122,5 +122,5 @@ def test_dimensions_with_time_constraint(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_output_node,
     )

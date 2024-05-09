@@ -6,7 +6,7 @@ from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.dag.mf_dag import DagId
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
-from metricflow.dataflow.dataflow_plan import BaseOutput
+from metricflow.dataflow.dataflow_plan import DataflowPlanNode
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
@@ -19,9 +19,9 @@ def convert_and_check(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
-    node: BaseOutput,
+    node: DataflowPlanNode,
 ) -> None:
-    """Renders an engine-specific query output from a BaseOutput DataFlowPlan node.
+    """Renders an engine-specific query output from a DataflowPlanNode DataFlowPlan node.
 
     TODO: refine interface once file move operations are complete.
     """

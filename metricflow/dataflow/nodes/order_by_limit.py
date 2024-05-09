@@ -8,20 +8,18 @@ from metricflow_semantics.specs.spec_classes import OrderBySpec
 from metricflow_semantics.visitor import VisitorOutputT
 
 from metricflow.dataflow.dataflow_plan import (
-    BaseOutput,
-    ComputedMetricsOutput,
     DataflowPlanNode,
     DataflowPlanNodeVisitor,
 )
 
 
-class OrderByLimitNode(ComputedMetricsOutput):
+class OrderByLimitNode(DataflowPlanNode):
     """A node that re-orders the input data with a limit."""
 
     def __init__(
         self,
         order_by_specs: Sequence[OrderBySpec],
-        parent_node: Union[BaseOutput, ComputedMetricsOutput],
+        parent_node: Union[DataflowPlanNode, DataflowPlanNode],
         limit: Optional[int] = None,
     ) -> None:
         """Constructor.
@@ -68,7 +66,7 @@ class OrderByLimitNode(ComputedMetricsOutput):
         )
 
     @property
-    def parent_node(self) -> Union[BaseOutput, ComputedMetricsOutput]:  # noqa: D102
+    def parent_node(self) -> Union[DataflowPlanNode, DataflowPlanNode]:  # noqa: D102
         return self._parent_node
 
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D102
@@ -78,7 +76,7 @@ class OrderByLimitNode(ComputedMetricsOutput):
             and other_node.limit == self.limit
         )
 
-    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> OrderByLimitNode:  # noqa: D102
+    def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> OrderByLimitNode:  # noqa: D102
         assert len(new_parent_nodes) == 1
 
         return OrderByLimitNode(

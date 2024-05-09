@@ -13,7 +13,7 @@ from metricflow.dataflow.builder.partitions import (
     PartitionDimensionJoinDescription,
     PartitionTimeDimensionJoinDescription,
 )
-from metricflow.dataflow.dataflow_plan import BaseOutput, DataflowPlanNode, DataflowPlanNodeVisitor
+from metricflow.dataflow.dataflow_plan import DataflowPlanNode, DataflowPlanNodeVisitor
 
 
 @dataclass(frozen=True)
@@ -28,7 +28,7 @@ class ValidityWindowJoinDescription:
 class JoinDescription:
     """Describes how data from a node should be joined to data from another node."""
 
-    join_node: BaseOutput
+    join_node: DataflowPlanNode
     join_on_entity: Optional[LinklessEntitySpec]
     join_type: SqlJoinType
 
@@ -42,12 +42,12 @@ class JoinDescription:
             raise RuntimeError("`join_on_entity` is required unless using CROSS JOIN.")
 
 
-class JoinToBaseOutputNode(BaseOutput):
-    """A node that joins data from other nodes to a standard output node, one by one via entity."""
+class JoinOnEntitiesNode(DataflowPlanNode):
+    """A node that joins data from other nodes via the entities in the inputs."""
 
     def __init__(
         self,
-        left_node: BaseOutput,
+        left_node: DataflowPlanNode,
         join_targets: Sequence[JoinDescription],
         node_id: Optional[NodeId] = None,
     ) -> None:
@@ -72,14 +72,14 @@ class JoinToBaseOutputNode(BaseOutput):
         return StaticIdPrefix.DATAFLOW_NODE_JOIN_TO_STANDARD_OUTPUT_ID_PREFIX
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
-        return visitor.visit_join_to_base_output_node(self)
+        return visitor.visit_join_on_entities_node(self)
 
     @property
     def description(self) -> str:  # noqa: D102
         return """Join Standard Outputs"""
 
     @property
-    def left_node(self) -> BaseOutput:  # noqa: D102
+    def left_node(self) -> DataflowPlanNode:  # noqa: D102
         return self._left_node
 
     @property
@@ -109,13 +109,13 @@ class JoinToBaseOutputNode(BaseOutput):
                 return False
         return True
 
-    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> JoinToBaseOutputNode:  # noqa: D102
+    def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> JoinOnEntitiesNode:  # noqa: D102
         assert len(new_parent_nodes) > 1
         new_left_node = new_parent_nodes[0]
         new_join_nodes = new_parent_nodes[1:]
         assert len(new_join_nodes) == len(self._join_targets)
 
-        return JoinToBaseOutputNode(
+        return JoinOnEntitiesNode(
             left_node=new_left_node,
             join_targets=[
                 JoinDescription(

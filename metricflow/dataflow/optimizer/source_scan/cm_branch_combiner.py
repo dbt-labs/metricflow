@@ -7,7 +7,6 @@ from typing import List, Optional, Sequence
 from metricflow_semantics.specs.spec_classes import MetricSpec
 
 from metricflow.dataflow.dataflow_plan import (
-    BaseOutput,
     DataflowPlanNode,
     DataflowPlanNodeVisitor,
 )
@@ -19,7 +18,7 @@ from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
 from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
-from metricflow.dataflow.nodes.join_to_base import JoinToBaseOutputNode
+from metricflow.dataflow.nodes.join_to_base import JoinOnEntitiesNode
 from metricflow.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.dataflow.nodes.min_max import MinMaxNode
@@ -38,7 +37,7 @@ logger = logging.getLogger(__name__)
 class ComputeMetricsBranchCombinerResult:  # noqa: D101
     # Perhaps adding more metadata about how nodes got combined would be useful.
     # If combined_branch is None, it means combination could not occur.
-    combined_branch: Optional[BaseOutput] = None
+    combined_branch: Optional[DataflowPlanNode] = None
 
     @property
     def combined(self) -> bool:
@@ -46,7 +45,7 @@ class ComputeMetricsBranchCombinerResult:  # noqa: D101
         return self.combined_branch is not None
 
     @property
-    def checked_combined_branch(self) -> BaseOutput:  # noqa: D102
+    def checked_combined_branch(self) -> DataflowPlanNode:  # noqa: D102
         assert self.combined_branch is not None
         return self.combined_branch
 
@@ -126,7 +125,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
     is propagated up to the result at the root node.
     """
 
-    def __init__(self, left_branch_node: BaseOutput) -> None:  # noqa: D107
+    def __init__(self, left_branch_node: DataflowPlanNode) -> None:  # noqa: D107
         self._current_left_node: DataflowPlanNode = left_branch_node
         self._log_level = logging.DEBUG
 
@@ -156,7 +155,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
             msg=f"Combined left_node={left_node} right_node={right_node} combined_node: {combined_node}",
         )
 
-    def _combine_parent_branches(self, current_right_node: BaseOutput) -> Optional[Sequence[BaseOutput]]:
+    def _combine_parent_branches(self, current_right_node: DataflowPlanNode) -> Optional[Sequence[DataflowPlanNode]]:
         if len(self._current_left_node.parent_nodes) != len(current_right_node.parent_nodes):
             self._log_combine_failure(
                 left_node=self._current_left_node,
@@ -173,7 +172,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
             results_of_visiting_parent_nodes.append(right_node_parent_node.accept(self))
             self._current_left_node = left_position_before_recursion
 
-        combined_parents: List[BaseOutput] = []
+        combined_parents: List[DataflowPlanNode] = []
         for result in results_of_visiting_parent_nodes:
             if result.combined_branch is None:
                 self._log_combine_failure(
@@ -186,7 +185,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
 
         return combined_parents
 
-    def _default_handler(self, current_right_node: BaseOutput) -> ComputeMetricsBranchCombinerResult:
+    def _default_handler(self, current_right_node: DataflowPlanNode) -> ComputeMetricsBranchCombinerResult:
         combined_parent_nodes = self._combine_parent_branches(current_right_node)
         if combined_parent_nodes is None:
             return ComputeMetricsBranchCombinerResult()
@@ -213,8 +212,8 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
-    def visit_join_to_base_output_node(  # noqa: D102
-        self, node: JoinToBaseOutputNode
+    def visit_join_on_entities_node(  # noqa: D102
+        self, node: JoinOnEntitiesNode
     ) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._default_handler(node)

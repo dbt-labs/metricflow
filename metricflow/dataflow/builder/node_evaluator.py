@@ -39,7 +39,7 @@ from metricflow.dataflow.builder.partitions import (
     PartitionJoinResolver,
     PartitionTimeDimensionJoinDescription,
 )
-from metricflow.dataflow.dataflow_plan import BaseOutput
+from metricflow.dataflow.dataflow_plan import DataflowPlanNode
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataflow.nodes.join_to_base import JoinDescription, ValidityWindowJoinDescription
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
@@ -59,7 +59,7 @@ class JoinLinkableInstancesRecipe:
     satisfiable_linkable_specs.
     """
 
-    node_to_join: BaseOutput
+    node_to_join: DataflowPlanNode
     # The entity to join "node_to_join" on. Only nullable if using CROSS JOIN.
     join_on_entity: Optional[LinklessEntitySpec]
     # The linkable instances from the query that can be satisfied if we join this node. Note that this is different from
@@ -168,7 +168,7 @@ class NodeEvaluatorForLinkableInstances:
     def __init__(
         self,
         semantic_model_lookup: SemanticModelLookup,
-        nodes_available_for_joins: Sequence[BaseOutput],
+        nodes_available_for_joins: Sequence[DataflowPlanNode],
         node_data_set_resolver: DataflowPlanNodeOutputDataSetResolver,
         time_spine_node: MetricTimeDimensionTransformNode,
     ) -> None:
@@ -387,7 +387,7 @@ class NodeEvaluatorForLinkableInstances:
 
     def evaluate_node(
         self,
-        left_node: BaseOutput,
+        left_node: DataflowPlanNode,
         required_linkable_specs: Sequence[LinkableInstanceSpec],
         default_join_type: SqlJoinType,
     ) -> LinkableInstanceSatisfiabilityEvaluation:

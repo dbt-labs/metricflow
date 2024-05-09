@@ -6,21 +6,18 @@ from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.visitor import VisitorOutputT
 
 from metricflow.dataflow.dataflow_plan import (
-    BaseOutput,
     DataflowPlanNode,
     DataflowPlanNodeVisitor,
-    SinkNodeVisitor,
-    SinkOutput,
 )
 from metricflow.sql.sql_table import SqlTable
 
 
-class WriteToResultTableNode(SinkOutput):
+class WriteToResultTableNode(DataflowPlanNode):
     """A node where incoming data gets written to a table."""
 
     def __init__(
         self,
-        parent_node: BaseOutput,
+        parent_node: DataflowPlanNode,
         output_sql_table: SqlTable,
     ) -> None:
         """Constructor.
@@ -45,12 +42,9 @@ class WriteToResultTableNode(SinkOutput):
         return """Write to Table"""
 
     @property
-    def parent_node(self) -> BaseOutput:  # noqa: D102
+    def parent_node(self) -> DataflowPlanNode:  # noqa: D102
         assert len(self.parent_nodes) == 1
         return self._parent_node
-
-    def accept_sink_node_visitor(self, visitor: SinkNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
-        return visitor.visit_write_to_result_table_node(self)
 
     @property
     def output_sql_table(self) -> SqlTable:  # noqa: D102
@@ -59,7 +53,7 @@ class WriteToResultTableNode(SinkOutput):
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D102
         return isinstance(other_node, self.__class__) and other_node.output_sql_table == self.output_sql_table
 
-    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> WriteToResultTableNode:  # noqa: D102
+    def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> WriteToResultTableNode:  # noqa: D102
         return WriteToResultTableNode(
             parent_node=new_parent_nodes[0],
             output_sql_table=self.output_sql_table,
