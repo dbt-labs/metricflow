@@ -114,8 +114,8 @@ class DataflowToExecutionPlanConverter(DataflowPlanNodeVisitor[ConvertToExecutio
 
     def convert_to_execution_plan(self, dataflow_plan: DataflowPlan) -> ConvertToExecutionPlanResult:
         """Convert the dataflow plan to an execution plan."""
-        assert len(dataflow_plan.sink_output_nodes) == 1, "Only 1 sink node in the plan is currently supported."
-        return dataflow_plan.sink_output_nodes[0].accept(self)
+        assert len(dataflow_plan.sink_nodes) == 1, "Only 1 sink node in the plan is currently supported."
+        return dataflow_plan.sink_nodes[0].accept(self)
 
     @override
     def visit_source_node(self, node: ReadSqlSourceNode) -> ConvertToExecutionPlanResult:

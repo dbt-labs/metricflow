@@ -63,7 +63,7 @@ def test_multihop_node(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=multihop_dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -91,7 +91,7 @@ def test_filter_with_where_constraint_on_join_dim(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -121,7 +121,7 @@ def test_partitioned_join(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -152,7 +152,7 @@ def test_limit_rows(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -182,7 +182,7 @@ def test_distinct_values(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -211,7 +211,7 @@ def test_local_dimension_using_local_entity(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -235,7 +235,7 @@ def test_measure_constraint(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -259,7 +259,7 @@ def test_measure_constraint_with_reused_measure(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -284,7 +284,7 @@ def test_measure_constraint_with_single_expr_and_alias(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -313,7 +313,7 @@ def test_join_to_scd_dimension(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=scd_dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -339,7 +339,7 @@ def test_multi_hop_through_scd_dimension(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=scd_dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -365,7 +365,7 @@ def test_multi_hop_to_scd_dimension(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=scd_dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -391,7 +391,7 @@ def test_multiple_metrics_no_dimensions(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -414,7 +414,7 @@ def test_metric_with_measures_from_multiple_sources_no_dimensions(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -438,7 +438,7 @@ def test_common_semantic_model(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -468,7 +468,7 @@ def test_min_max_only_categorical(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -499,7 +499,7 @@ def test_min_max_only_time(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -530,7 +530,7 @@ def test_min_max_only_time_quarter(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -555,7 +555,7 @@ def test_min_max_metric_time(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -580,5 +580,5 @@ def test_min_max_metric_time_week(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )

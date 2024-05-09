@@ -210,7 +210,7 @@ class DataflowPlanBuilder:
         )
 
         plan_id = DagId.from_id_prefix(StaticIdPrefix.DATAFLOW_PLAN_PREFIX)
-        plan = DataflowPlan(sink_output_nodes=[sink_node], plan_id=plan_id)
+        plan = DataflowPlan(sink_nodes=[sink_node], plan_id=plan_id)
         for optimizer in optimizers:
             logger.info(f"Applying {optimizer.__class__.__name__}")
             try:
@@ -682,7 +682,7 @@ class DataflowPlanBuilder:
             parent_node=output_node, order_by_specs=query_spec.order_by_specs, limit=query_spec.limit
         )
 
-        return DataflowPlan(sink_output_nodes=[sink_node])
+        return DataflowPlan(sink_nodes=[sink_node])
 
     @staticmethod
     def build_sink_node(

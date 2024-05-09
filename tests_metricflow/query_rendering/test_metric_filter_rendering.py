@@ -35,7 +35,7 @@ def test_query_with_simple_metric_in_where_filter(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -60,7 +60,7 @@ def test_metric_with_metric_in_where_filter(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -87,7 +87,7 @@ def test_query_with_derived_metric_in_where_filter(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -114,7 +114,7 @@ def test_query_with_ratio_metric_in_where_filter(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -144,7 +144,7 @@ def test_query_with_cumulative_metric_in_where_filter(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -171,7 +171,7 @@ def test_query_with_multiple_metrics_in_filter(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -198,7 +198,7 @@ def test_filter_by_metric_in_same_semantic_model_as_queried_metric(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -225,7 +225,7 @@ def test_distinct_values_query_with_metric_filter(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -252,7 +252,7 @@ def test_metric_filtered_by_itself(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -278,7 +278,7 @@ def test_group_by_has_local_entity_prefix(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -304,5 +304,5 @@ def test_filter_with_conversion_metric(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )

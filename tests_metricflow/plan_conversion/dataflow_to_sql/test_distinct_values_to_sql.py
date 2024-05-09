@@ -38,7 +38,7 @@ def test_dimensions_requiring_join(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -66,5 +66,5 @@ def test_dimension_values_with_a_join_and_a_filter(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
