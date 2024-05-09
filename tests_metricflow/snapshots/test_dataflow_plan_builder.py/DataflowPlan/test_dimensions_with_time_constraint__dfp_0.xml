@@ -14,7 +14,7 @@
                 <!-- node_id = NodeId(id_str='ctr_1') -->
                 <!-- time_range_start = '2020-01-01T00:00:00' -->
                 <!-- time_range_end = '2020-01-03T00:00:00' -->
-                <JoinToBaseOutputNode>
+                <JoinOnEntitiesNode>
                     <!-- description = 'Join Standard Outputs' -->
                     <!-- node_id = NodeId(id_str='jso_0') -->
                     <!-- join0_for_node_id_pfe_1 =                                                            -->
@@ -40,7 +40,7 @@
                             </ReadSqlSourceNode>
                         </MetricTimeDimensionTransformNode>
                     </FilterElementsNode>
-                </JoinToBaseOutputNode>
+                </JoinOnEntitiesNode>
             </ConstrainTimeRangeNode>
         </FilterElementsNode>
     </WriteToResultDataframeNode>

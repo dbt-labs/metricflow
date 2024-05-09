@@ -9,7 +9,7 @@
             <AggregateMeasuresNode>
                 <!-- description = 'Aggregate Measures' -->
                 <!-- node_id = NodeId(id_str='am_0') -->
-                <JoinToBaseOutputNode>
+                <JoinOnEntitiesNode>
                     <!-- description = 'Join Standard Outputs' -->
                     <!-- node_id = NodeId(id_str='jso_0') -->
                     <!-- join0_for_node_id_pfe_1 =                                      -->
@@ -42,7 +42,7 @@
                             <!-- data_set = SemanticModelDataSet('listings_latest') -->
                         </ReadSqlSourceNode>
                     </FilterElementsNode>
-                </JoinToBaseOutputNode>
+                </JoinOnEntitiesNode>
             </AggregateMeasuresNode>
         </ComputeMetricsNode>
     </WriteToResultDataframeNode>
