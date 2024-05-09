@@ -19,7 +19,7 @@
                     <!--     entity_links=(EntityReference(element_name='cyclic_entity'),), -->
                     <!--   )                                                                -->
                     <!-- distinct = False -->
-                    <JoinToBaseOutputNode>
+                    <JoinOnEntitiesNode>
                         <!-- description = 'Join Standard Outputs' -->
                         <!-- node_id = NodeId(id_str='jso_0') -->
                         <!-- join0_for_node_id_pfe_1 =                                            -->
@@ -57,7 +57,7 @@
                                 <!-- data_set = SemanticModelDataSet('listings_latest_cyclic') -->
                             </ReadSqlSourceNode>
                         </FilterElementsNode>
-                    </JoinToBaseOutputNode>
+                    </JoinOnEntitiesNode>
                 </FilterElementsNode>
             </AggregateMeasuresNode>
         </ComputeMetricsNode>
