@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from typing import Sequence
 
 import pytest
 from _pytest.fixtures import FixtureRequest
@@ -16,31 +17,15 @@ from metricflow_semantics.specs.spec_classes import (
 )
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_plan_snapshot_text_equal
+from typing_extensions import override
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan import (
     DataflowPlan,
     DataflowPlanNode,
-    DataflowPlanNodeVisitor,
 )
-from metricflow.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode
-from metricflow.dataflow.nodes.aggregate_measures import AggregateMeasuresNode
-from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
-from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
-from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
-from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
-from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
-from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
-from metricflow.dataflow.nodes.join_to_base import JoinOnEntitiesNode
-from metricflow.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
-from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
-from metricflow.dataflow.nodes.min_max import MinMaxNode
-from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
+from metricflow.dataflow.dfs_walker import DataflowDagWalker
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
-from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
-from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
-from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataframeNode
-from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import SourceScanOptimizer
 from metricflow.dataset.dataset_classes import DataSet
 from tests_metricflow.dataflow_plan_to_svg import display_graph_if_requested
@@ -48,65 +33,15 @@ from tests_metricflow.dataflow_plan_to_svg import display_graph_if_requested
 logger = logging.getLogger(__name__)
 
 
-class ReadSqlSourceNodeCounter(DataflowPlanNodeVisitor[int]):
+class ReadSqlSourceNodeCounter(DataflowDagWalker[int]):
     """Counts the number of ReadSqlSourceNodes in the dataflow plan."""
 
-    def _sum_parents(self, node: DataflowPlanNode) -> int:
-        return sum(parent_node.accept(self) for parent_node in node.parent_nodes)
+    @override
+    def default_visit_action(self, current_node: DataflowPlanNode, inputs: Sequence[int]) -> int:
+        return sum(inputs)
 
     def visit_source_node(self, node: ReadSqlSourceNode) -> int:  # noqa: D102
         return 1
-
-    def visit_join_on_entities_node(self, node: JoinOnEntitiesNode) -> int:  # noqa: D102
-        return self._sum_parents(node)
-
-    def visit_aggregate_measures_node(self, node: AggregateMeasuresNode) -> int:  # noqa: D102
-        return self._sum_parents(node)
-
-    def visit_compute_metrics_node(self, node: ComputeMetricsNode) -> int:  # noqa: D102
-        return self._sum_parents(node)
-
-    def visit_order_by_limit_node(self, node: OrderByLimitNode) -> int:  # noqa: D102
-        return self._sum_parents(node)
-
-    def visit_where_constraint_node(self, node: WhereConstraintNode) -> int:  # noqa: D102
-        return self._sum_parents(node)
-
-    def visit_write_to_result_dataframe_node(self, node: WriteToResultDataframeNode) -> int:  # noqa: D102
-        return self._sum_parents(node)
-
-    def visit_write_to_result_table_node(self, node: WriteToResultTableNode) -> int:  # noqa: D102
-        return self._sum_parents(node)
-
-    def visit_filter_elements_node(self, node: FilterElementsNode) -> int:  # noqa: D102
-        return self._sum_parents(node)
-
-    def visit_combine_aggregated_outputs_node(self, node: CombineAggregatedOutputsNode) -> int:  # noqa: D102
-        return self._sum_parents(node)
-
-    def visit_constrain_time_range_node(self, node: ConstrainTimeRangeNode) -> int:  # noqa: D102
-        return self._sum_parents(node)
-
-    def visit_join_over_time_range_node(self, node: JoinOverTimeRangeNode) -> int:  # noqa: D102
-        return self._sum_parents(node)
-
-    def visit_semi_additive_join_node(self, node: SemiAdditiveJoinNode) -> int:  # noqa: D102
-        return self._sum_parents(node)
-
-    def visit_metric_time_dimension_transform_node(self, node: MetricTimeDimensionTransformNode) -> int:  # noqa: D102
-        return self._sum_parents(node)
-
-    def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode) -> int:  # noqa: D102
-        return self._sum_parents(node)
-
-    def visit_min_max_node(self, node: MinMaxNode) -> int:  # noqa: D102
-        return self._sum_parents(node)
-
-    def visit_add_generated_uuid_column_node(self, node: AddGeneratedUuidColumnNode) -> int:  # noqa :D
-        return self._sum_parents(node)
-
-    def visit_join_conversion_events_node(self, node: JoinConversionEventsNode) -> int:  # noqa: D102
-        return self._sum_parents(node)
 
     def count_source_nodes(self, dataflow_plan: DataflowPlan) -> int:  # noqa: D102
         return dataflow_plan.checked_sink_node.accept(self)

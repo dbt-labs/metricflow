@@ -6,30 +6,15 @@ from typing import List, Optional, Sequence
 
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagId
+from typing_extensions import override
 
 from metricflow.dataflow.dataflow_plan import (
     DataflowPlan,
     DataflowPlanNode,
-    DataflowPlanNodeVisitor,
 )
-from metricflow.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode
-from metricflow.dataflow.nodes.aggregate_measures import AggregateMeasuresNode
+from metricflow.dataflow.dfs_walker import DataflowDagWalker
 from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
 from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
-from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
-from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
-from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
-from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
-from metricflow.dataflow.nodes.join_to_base import JoinOnEntitiesNode
-from metricflow.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
-from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
-from metricflow.dataflow.nodes.min_max import MinMaxNode
-from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
-from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
-from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
-from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
-from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataframeNode
-from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOptimizer
 from metricflow.dataflow.optimizer.source_scan.cm_branch_combiner import (
     ComputeMetricsBranchCombiner,
@@ -54,7 +39,7 @@ class BranchCombinationResult:
 
 
 class SourceScanOptimizer(
-    DataflowPlanNodeVisitor[OptimizeBranchResult],
+    DataflowDagWalker[OptimizeBranchResult],
     DataflowPlanOptimizer,
 ):
     """Reduces the number of scans (ReadSqlSourceNodes) in a dataflow plan.
@@ -108,37 +93,18 @@ class SourceScanOptimizer(
     """
 
     def __init__(self) -> None:  # noqa: D107
-        self._log_level = logging.DEBUG
+        super().__init__(visit_log_level=logging.ERROR, default_action_recursion=True)
 
-    def _log_visit_node_type(self, node: DataflowPlanNode) -> None:
-        logger.log(level=self._log_level, msg=f"Visiting {node}")
-
-    def _default_base_output_handler(
-        self,
-        node: DataflowPlanNode,
+    @override
+    def default_visit_action(
+        self, current_node: DataflowPlanNode, inputs: Sequence[OptimizeBranchResult]
     ) -> OptimizeBranchResult:
-        optimized_parents: Sequence[OptimizeBranchResult] = tuple(
-            parent_node.accept(self) for parent_node in node.parent_nodes
-        )
-        # Parents should always be DataflowPlanNode
+        optimized_parents = inputs
         return OptimizeBranchResult(
-            optimized_branch=node.with_new_parents(tuple(x.optimized_branch for x in optimized_parents))
+            optimized_branch=current_node.with_new_parents(tuple(x.optimized_branch for x in optimized_parents))
         )
 
-    def visit_source_node(self, node: ReadSqlSourceNode) -> OptimizeBranchResult:  # noqa: D102
-        self._log_visit_node_type(node)
-        return self._default_base_output_handler(node)
-
-    def visit_join_on_entities_node(self, node: JoinOnEntitiesNode) -> OptimizeBranchResult:  # noqa: D102
-        self._log_visit_node_type(node)
-        return self._default_base_output_handler(node)
-
-    def visit_aggregate_measures_node(self, node: AggregateMeasuresNode) -> OptimizeBranchResult:  # noqa: D102
-        self._log_visit_node_type(node)
-        return self._default_base_output_handler(node)
-
-    def visit_compute_metrics_node(self, node: ComputeMetricsNode) -> OptimizeBranchResult:  # noqa: D102
-        self._log_visit_node_type(node)
+    def _visit_compute_metrics_node(self, node: ComputeMetricsNode) -> OptimizeBranchResult:  # noqa: D102
         # Run the optimizer on the parent branch to handle derived metrics, which are defined recursively in the DAG.
         optimized_parent_result: OptimizeBranchResult = node.parent_node.accept(self)
         if optimized_parent_result.optimized_branch is not None:
@@ -153,27 +119,13 @@ class SourceScanOptimizer(
 
         return OptimizeBranchResult(optimized_branch=node)
 
-    def visit_order_by_limit_node(self, node: OrderByLimitNode) -> OptimizeBranchResult:  # noqa: D102
-        self._log_visit_node_type(node)
-        return self._default_base_output_handler(node)
-
-    def visit_where_constraint_node(self, node: WhereConstraintNode) -> OptimizeBranchResult:  # noqa: D102
-        self._log_visit_node_type(node)
-        return self._default_base_output_handler(node)
-
-    def visit_write_to_result_dataframe_node(  # noqa: D102
-        self, node: WriteToResultDataframeNode
-    ) -> OptimizeBranchResult:  # noqa: D102
-        self._log_visit_node_type(node)
-        return self._default_base_output_handler(node)
-
-    def visit_write_to_result_table_node(self, node: WriteToResultTableNode) -> OptimizeBranchResult:  # noqa: D102
-        self._log_visit_node_type(node)
-        return self._default_base_output_handler(node)
-
-    def visit_filter_elements_node(self, node: FilterElementsNode) -> OptimizeBranchResult:  # noqa: D102
-        self._log_visit_node_type(node)
-        return self._default_base_output_handler(node)
+    def visit_compute_metrics_node(self, node: ComputeMetricsNode) -> OptimizeBranchResult:  # noqa: D102
+        result = None
+        try:
+            result = self._visit_compute_metrics_node(node)
+            return result
+        finally:
+            self.log_visit_end(node, result)
 
     @staticmethod
     def _combine_branches(
@@ -214,18 +166,26 @@ class SourceScanOptimizer(
 
     def visit_combine_aggregated_outputs_node(  # noqa: D102
         self, node: CombineAggregatedOutputsNode
-    ) -> OptimizeBranchResult:  # noqa: D102
-        self._log_visit_node_type(node)
-        # The parent node of the CombineAggregatedOutputsNode can be either ComputeMetricsNodes or CombineAggregatedOutputsNodes
+    ) -> OptimizeBranchResult:
+        inputs = self.walk_parents(node)
+        self.log_visit_start(node, inputs)
+        result = None
+        try:
+            result = self._visit_combine_aggregated_outputs_node(node, inputs)
+            return result
+        finally:
+            self.log_visit_end(node, result)
+
+    def _visit_combine_aggregated_outputs_node(  # noqa: D102
+        self, node: CombineAggregatedOutputsNode, inputs: Sequence[OptimizeBranchResult]
+    ) -> OptimizeBranchResult:
+        # The parent node of the CombineAggregatedOutputsNode can be either ComputeMetricsNodes or
+        # CombineAggregatedOutputsNodes
 
         # Stores the result of running this optimizer on each parent branch separately.
-        optimized_parent_branches = []
-        logger.log(level=self._log_level, msg=f"{node} has {len(node.parent_nodes)} parent branches")
-
-        # Run the optimizer on the parent branch to handle derived metrics, which are defined recursively in the DAG.
-        for parent_branch in node.parent_nodes:
-            result: OptimizeBranchResult = parent_branch.accept(self)
-            optimized_parent_branches.append(result.optimized_branch)
+        optimized_parent_branches = tuple(input.optimized_branch for input in inputs)
+        if self.should_log:
+            self.log(f"{node} has {len(node.parent_nodes)} parent branches")
 
         # Try to combine (using ComputeMetricsBranchCombiner) as many parent branches as possible in a
         # greedy N^2 approach. The optimality of this approach needs more thought to prove conclusively, but given
@@ -250,7 +210,8 @@ class SourceScanOptimizer(
                     for branch_combination_result in combination_results
                 ]
 
-        logger.log(level=self._log_level, msg=f"Got {len(combined_parent_branches)} branches after combination")
+        if self.should_log:
+            self.log(f"Got {len(combined_parent_branches)} branches after combination")
         assert len(combined_parent_branches) > 0
 
         # If we were able to reduce the parent branches of the CombineAggregatedOutputsNode into a single one, there's no need
@@ -262,54 +223,18 @@ class SourceScanOptimizer(
             optimized_branch=CombineAggregatedOutputsNode(parent_nodes=combined_parent_branches)
         )
 
-    def visit_constrain_time_range_node(self, node: ConstrainTimeRangeNode) -> OptimizeBranchResult:  # noqa: D102
-        self._log_visit_node_type(node)
-        return self._default_base_output_handler(node)
-
-    def visit_join_over_time_range_node(self, node: JoinOverTimeRangeNode) -> OptimizeBranchResult:  # noqa: D102
-        self._log_visit_node_type(node)
-        return self._default_base_output_handler(node)
-
-    def visit_semi_additive_join_node(self, node: SemiAdditiveJoinNode) -> OptimizeBranchResult:  # noqa: D102
-        self._log_visit_node_type(node)
-        return self._default_base_output_handler(node)
-
-    def visit_metric_time_dimension_transform_node(  # noqa: D102
-        self, node: MetricTimeDimensionTransformNode
-    ) -> OptimizeBranchResult:
-        self._log_visit_node_type(node)
-        return self._default_base_output_handler(node)
-
     def optimize(self, dataflow_plan: DataflowPlan) -> DataflowPlan:  # noqa: D102
         optimized_result: OptimizeBranchResult = dataflow_plan.checked_sink_node.accept(self)
 
-        logger.log(
-            level=self._log_level,
-            msg=f"Optimized:\n\n"
-            f"{dataflow_plan.checked_sink_node.structure_text()}\n\n"
-            f"to:\n\n"
-            f"{optimized_result.optimized_branch.structure_text()}",
-        )
+        if self.should_log:
+            self.log(
+                f"Optimized:\n\n"
+                f"{dataflow_plan.checked_sink_node.structure_text()}\n\n"
+                f"to:\n\n"
+                f"{optimized_result.optimized_branch.structure_text()}",
+            )
 
         return DataflowPlan(
             plan_id=DagId.from_id_prefix(StaticIdPrefix.OPTIMIZED_DATAFLOW_PLAN_PREFIX),
             sink_nodes=[optimized_result.optimized_branch],
         )
-
-    def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode) -> OptimizeBranchResult:  # noqa: D102
-        self._log_visit_node_type(node)
-        return self._default_base_output_handler(node)
-
-    def visit_add_generated_uuid_column_node(  # noqa: D102
-        self, node: AddGeneratedUuidColumnNode
-    ) -> OptimizeBranchResult:  # noqa: D102
-        self._log_visit_node_type(node)
-        return self._default_base_output_handler(node)
-
-    def visit_join_conversion_events_node(self, node: JoinConversionEventsNode) -> OptimizeBranchResult:  # noqa: D102
-        self._log_visit_node_type(node)
-        return self._default_base_output_handler(node)
-
-    def visit_min_max_node(self, node: MinMaxNode) -> OptimizeBranchResult:  # noqa: D102
-        self._log_visit_node_type(node)
-        return self._default_base_output_handler(node)
