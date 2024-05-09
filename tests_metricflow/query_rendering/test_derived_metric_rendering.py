@@ -122,7 +122,7 @@ def test_derived_metric_with_offset_window_and_time_filter(  # noqa: D103
                 "or {{ TimeDimension('metric_time', 'day') }} = '2020-01-14'"
             )
         ),
-    )
+    ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
     convert_and_check(
@@ -396,7 +396,7 @@ def test_nested_offsets_with_where_constraint(  # noqa: D103
                 "or {{ TimeDimension('metric_time', 'day') }} = '2020-01-13'"
             )
         ),
-    )
+    ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
     convert_and_check(
@@ -474,7 +474,7 @@ def test_nested_filters(
     create_source_tables: bool,
 ) -> None:
     """Tests derived metric rendering for a nested derived metric with filters on the outer metric spec."""
-    query_spec = query_parser.parse_and_validate_query(metric_names=("instant_lux_booking_value_rate",))
+    query_spec = query_parser.parse_and_validate_query(metric_names=("instant_lux_booking_value_rate",)).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec=query_spec)
 
     convert_and_check(
@@ -532,7 +532,7 @@ def test_nested_derived_metric_offset_with_joined_where_constraint_not_selected(
         metric_names=("bookings_offset_twice",),
         group_by_names=(group_by_name,),
         where_constraint_str="{{ Dimension('booking__is_instant') }}",
-    )
+    ).query_spec
 
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
     convert_and_check(
@@ -558,7 +558,7 @@ def test_offset_window_with_agg_time_dim(  # noqa: D103
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("bookings_growth_2_weeks",),
         group_by_names=("booking__ds__day",),
-    )
+    ).query_spec
 
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
     convert_and_check(
@@ -584,7 +584,7 @@ def test_offset_to_grain_with_agg_time_dim(  # noqa: D103
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("bookings_growth_since_start_of_month",),
         group_by_names=("booking__ds__day",),
-    )
+    ).query_spec
 
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
     convert_and_check(
@@ -610,7 +610,7 @@ def test_derived_offset_metric_with_agg_time_dim(  # noqa: D103
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("booking_fees_last_week_per_booker_this_week",),
         group_by_names=("booking__ds__day",),
-    )
+    ).query_spec
 
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
     convert_and_check(
@@ -717,7 +717,7 @@ def test_offset_window_metric_multiple_granularities(
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("booking_fees_last_week_per_booker_this_week",),
         group_by_names=("metric_time__day", "metric_time__month", "metric_time__year"),
-    )
+    ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
     convert_and_check(
@@ -743,7 +743,7 @@ def test_offset_to_grain_metric_multiple_granularities(
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("bookings_at_start_of_month",),
         group_by_names=("metric_time__day", "metric_time__month", "metric_time__year"),
-    )
+    ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
     convert_and_check(
@@ -772,7 +772,7 @@ def test_offset_window_metric_filter_and_query_have_different_granularities(
         where_constraint=PydanticWhereFilter(
             where_sql_template=("{{ TimeDimension('metric_time', 'day') }} = '2020-01-01'")
         ),
-    )
+    ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
     convert_and_check(
@@ -801,7 +801,7 @@ def test_offset_to_grain_metric_filter_and_query_have_different_granularities(
         where_constraint=PydanticWhereFilter(
             where_sql_template=("{{ TimeDimension('metric_time', 'day') }} = '2020-01-01'")
         ),
-    )
+    ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
     convert_and_check(

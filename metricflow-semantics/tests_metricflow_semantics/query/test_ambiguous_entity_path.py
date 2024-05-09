@@ -28,7 +28,7 @@ def test_resolvable_ambiguous_entity_path(  # noqa: D103
     query_spec = multi_hop_query_parser.parse_and_validate_query(
         metric_names=["entity_1_metric"],
         group_by_names=["entity_0__country"],
-    )
+    ).query_spec
 
     assert_object_snapshot_equal(
         request=request,
@@ -47,7 +47,7 @@ def test_ambiguous_entity_path_resolves_to_shortest_entity_path_item(
     query_spec = multi_hop_query_parser.parse_and_validate_query(
         metric_names=["all_entity_metric"],
         group_by_names=["entity_1__country"],
-    )
+    ).query_spec
 
     assert_object_snapshot_equal(
         request=request,
@@ -70,7 +70,7 @@ def test_non_resolvable_ambiguous_entity_path_due_to_multiple_matches(
         multi_hop_query_parser.parse_and_validate_query(
             metric_names=["entity_1_and_entity_2_metric"],
             group_by_names=["entity_0__country"],
-        )
+        ).query_spec
 
     assert_str_snapshot_equal(
         request=request,
@@ -93,7 +93,7 @@ def test_non_resolvable_ambiguous_entity_path_due_to_mismatch(
         multi_hop_query_parser.parse_and_validate_query(
             metric_names=["entity_0_metric", "entity_1_metric"],
             group_by_names=["entity_0__country"],
-        )
+        ).query_spec
 
     assert_str_snapshot_equal(
         request=request,

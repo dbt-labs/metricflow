@@ -125,7 +125,7 @@ def test_cumulative_metric_with_non_adjustable_time_filter(
                 "or {{ TimeDimension('metric_time', 'day') }} = '2020-01-07'"
             )
         ),
-    )
+    ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
     convert_and_check(

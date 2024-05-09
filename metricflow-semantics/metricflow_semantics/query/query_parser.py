@@ -321,7 +321,7 @@ class MetricFlowQueryParser:
         order_by_names: Optional[Sequence[str]] = None,
         order_by: Optional[Sequence[OrderByQueryParameter]] = None,
         min_max_only: bool = False,
-    ) -> MetricFlowQuerySpec:
+    ) -> ParseQueryResult:
         """Parse the query into spec objects, validating them in the process.
 
         e.g. make sure that the given metric is a valid metric name.
@@ -341,7 +341,7 @@ class MetricFlowQueryParser:
             order_by_names=order_by_names,
             order_by=order_by,
             min_max_only=min_max_only,
-        ).query_spec
+        )
 
     @log_runtime()
     def _parse_and_validate_query(
@@ -533,7 +533,7 @@ class MetricFlowQueryParser:
         return self.parse_and_validate_query(
             metrics=(MetricParameter(group_by_metric_spec.reference.element_name),),
             group_by=(DimensionOrEntityParameter(group_by_metric_spec.metric_subquery_entity_spec.qualified_name),),
-        )
+        ).query_spec
 
 
 @dataclass(frozen=True)

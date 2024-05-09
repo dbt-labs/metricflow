@@ -58,7 +58,7 @@ def test_dimension_values_with_a_join_and_a_filter(
         where_constraint=PydanticWhereFilter(
             where_sql_template="{{ Dimension('user__home_state_latest') }} = 'us'",
         ),
-    )
+    ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(query_spec)
 
     convert_and_check(

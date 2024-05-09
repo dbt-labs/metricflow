@@ -214,7 +214,7 @@ def test_join_to_time_spine_with_filters(  # noqa: D103
         ),
         time_constraint_start=datetime.datetime(2020, 1, 3),
         time_constraint_end=datetime.datetime(2020, 1, 5),
-    )
+    ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
     convert_and_check(

@@ -200,7 +200,7 @@ def test_query_parser(bookings_query_parser: MetricFlowQueryParser) -> None:  # 
         metric_names=["bookings"],
         group_by_names=["booking__is_instant", "listing", MTD],
         order_by_names=[MTD, "-bookings"],
-    )
+    ).query_spec
 
     assert query_spec.metric_specs == (MetricSpec(element_name="bookings"),)
     assert query_spec.dimension_specs == (
@@ -228,7 +228,7 @@ def test_query_parser_case_insensitivity(bookings_query_parser: MetricFlowQueryP
         metric_names=["BOOKINGS"],
         group_by_names=["BOOKING__IS_INSTANT", "LISTING", MTD.upper()],
         order_by_names=[MTD.upper(), "-BOOKINGS"],
-    )
+    ).query_spec
 
     assert query_spec.metric_specs == (MetricSpec(element_name="bookings"),)
     assert query_spec.dimension_specs == (
@@ -260,7 +260,9 @@ def test_query_parser_case_insensitivity(bookings_query_parser: MetricFlowQueryP
         OrderByParameter(order_by=TimeDimensionParameter(MTD.upper())),
         OrderByParameter(order_by=MetricParameter("BOOKINGS"), descending=True),
     )
-    query_spec = bookings_query_parser.parse_and_validate_query(metrics=[metric], group_by=group_by, order_by=order_by)
+    query_spec = bookings_query_parser.parse_and_validate_query(
+        metrics=[metric], group_by=group_by, order_by=order_by
+    ).query_spec
     assert query_spec.metric_specs == (MetricSpec(element_name="bookings"),)
     assert query_spec.dimension_specs == (
         DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),
@@ -283,7 +285,7 @@ def test_query_parser_case_insensitivity(bookings_query_parser: MetricFlowQueryP
 
 def test_query_parser_invalid_group_by(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D103
     with pytest.raises(InvalidQueryException):
-        bookings_query_parser.parse_and_validate_query(group_by_names=["random_stuff"])
+        bookings_query_parser.parse_and_validate_query(group_by_names=["random_stuff"]).query_spec
 
 
 def test_query_parser_with_object_params(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D103
@@ -297,7 +299,9 @@ def test_query_parser_with_object_params(bookings_query_parser: MetricFlowQueryP
         OrderByParameter(order_by=TimeDimensionParameter(MTD)),
         OrderByParameter(order_by=MetricParameter("bookings"), descending=True),
     )
-    query_spec = bookings_query_parser.parse_and_validate_query(metrics=[metric], group_by=group_by, order_by=order_by)
+    query_spec = bookings_query_parser.parse_and_validate_query(
+        metrics=[metric], group_by=group_by, order_by=order_by
+    ).query_spec
     assert query_spec.metric_specs == (MetricSpec(element_name="bookings"),)
     assert query_spec.dimension_specs == (
         DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),
@@ -333,7 +337,7 @@ def test_order_by_granularity_conversion() -> None:
     )
     query_spec = query_parser.parse_and_validate_query(
         metric_names=["bookings", "revenue"], group_by_names=[MTD], order_by_names=[f"-{MTD}"]
-    )
+    ).query_spec
 
     # The lowest common granularity is MONTH, so we expect the PTD in the order by to have that granularity.
     assert (
@@ -347,7 +351,7 @@ def test_order_by_granularity_conversion() -> None:
 def test_order_by_granularity_no_conversion(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D103
     query_spec = bookings_query_parser.parse_and_validate_query(
         metric_names=["bookings"], group_by_names=[MTD], order_by_names=[MTD]
-    )
+    ).query_spec
 
     # The only granularity is DAY, so we expect the PTD in the order by to have that granularity.
     assert (
@@ -373,7 +377,7 @@ def test_time_range_constraint_conversion() -> None:
         group_by_names=[MTD],
         time_constraint_start=as_datetime("2020-01-15"),
         time_constraint_end=as_datetime("2020-02-15"),
-    )
+    ).query_spec
 
     assert (
         TimeRangeConstraint(start_time=as_datetime("2020-01-01"), end_time=as_datetime("2020-02-29"))
@@ -390,7 +394,7 @@ def test_parse_and_validate_where_constraint_dims(bookings_query_parser: MetricF
             time_constraint_start=as_datetime("2020-01-15"),
             time_constraint_end=as_datetime("2020-02-15"),
             where_constraint_str="{{ Dimension('booking__invalid_dim') }} = '1'",
-        )
+        ).query_spec
 
     with pytest.raises(InvalidQueryException, match="Error parsing where filter"):
         bookings_query_parser.parse_and_validate_query(
@@ -399,7 +403,7 @@ def test_parse_and_validate_where_constraint_dims(bookings_query_parser: MetricF
             time_constraint_start=as_datetime("2020-01-15"),
             time_constraint_end=as_datetime("2020-02-15"),
             where_constraint_str="{{ Dimension('invalid_format') }} = '1'",
-        )
+        ).query_spec
 
     query_spec = bookings_query_parser.parse_and_validate_query(
         metric_names=["bookings"],
@@ -407,7 +411,7 @@ def test_parse_and_validate_where_constraint_dims(bookings_query_parser: MetricF
         time_constraint_start=as_datetime("2020-01-15"),
         time_constraint_end=as_datetime("2020-02-15"),
         where_constraint_str="{{ Dimension('booking__is_instant') }} = '1'",
-    )
+    ).query_spec
     assert (
         DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),))
         not in query_spec.dimension_specs
@@ -424,7 +428,7 @@ def test_parse_and_validate_where_constraint_metric_time() -> None:
             metric_names=["revenue"],
             group_by_names=[MTD],
             where_constraint_str="{{ TimeDimension('metric_time', 'day') }} > '2020-01-15'",
-        )
+        ).query_spec
 
 
 def test_parse_and_validate_metric_constraint_dims() -> None:
@@ -442,7 +446,7 @@ def test_parse_and_validate_metric_constraint_dims() -> None:
             group_by_names=[MTD],
             time_constraint_start=as_datetime("2020-01-15"),
             time_constraint_end=as_datetime("2020-02-15"),
-        )
+        ).query_spec
 
 
 def test_cumulative_metric_no_time_dimension_validation() -> None:
@@ -461,7 +465,7 @@ def test_cumulative_metric_no_time_dimension_validation() -> None:
     with pytest.raises(InvalidQueryException, match="do not include 'metric_time'"):
         query_parser.parse_and_validate_query(
             metric_names=["revenue_cumulative"],
-        )
+        ).query_spec
 
 
 def test_cumulative_metric_wrong_time_dimension_validation() -> None:
@@ -486,7 +490,7 @@ def test_cumulative_metric_wrong_time_dimension_validation() -> None:
         query_parser.parse_and_validate_query(
             metric_names=["revenue_cumulative"],
             group_by_names=["revenue_instance__loaded_at"],
-        )
+        ).query_spec
 
 
 def test_cumulative_metric_agg_time_dimension_name_validation() -> None:
@@ -498,7 +502,9 @@ def test_cumulative_metric_agg_time_dimension_name_validation() -> None:
         [EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, bookings_yaml_file, revenue_yaml_file, metrics_yaml_file]
     )
 
-    query_parser.parse_and_validate_query(metric_names=["revenue_cumulative"], group_by_names=["revenue_instance__ds"])
+    query_parser.parse_and_validate_query(
+        metric_names=["revenue_cumulative"], group_by_names=["revenue_instance__ds"]
+    ).query_spec
 
 
 def test_derived_metric_query_parsing() -> None:
@@ -514,20 +520,20 @@ def test_derived_metric_query_parsing() -> None:
         query_parser.parse_and_validate_query(
             metric_names=["revenue_sub_10"],
             group_by_names=[],
-        )
+        ).query_spec
 
     # Attempt to query with non-time dimension
     with pytest.raises(InvalidQueryException, match="does not match any of the available"):
         query_parser.parse_and_validate_query(
             metric_names=["revenue_sub_10"],
             group_by_names=["country"],
-        )
+        ).query_spec
 
     # Query with time dimension
     query_parser.parse_and_validate_query(
         metric_names=["revenue_sub_10"],
         group_by_names=[MTD],
-    )
+    ).query_spec
 
 
 def test_derived_metric_with_offset_parsing() -> None:
@@ -542,20 +548,20 @@ def test_derived_metric_with_offset_parsing() -> None:
         query_parser.parse_and_validate_query(
             metric_names=["revenue_growth_2_weeks"],
             group_by_names=[],
-        )
+        ).query_spec
 
     # Attempt to query with non-time dimension
     with pytest.raises(InvalidQueryException, match="do not include 'metric_time'"):
         query_parser.parse_and_validate_query(
             metric_names=["revenue_growth_2_weeks"],
             group_by_names=["revenue_instance__country"],
-        )
+        ).query_spec
 
     # Query with time dimension
     query_parser.parse_and_validate_query(
         metric_names=["revenue_growth_2_weeks"],
         group_by_names=[MTD],
-    )
+    ).query_spec
 
 
 def test_date_part_parsing() -> None:
@@ -571,21 +577,21 @@ def test_date_part_parsing() -> None:
         query_parser.parse_and_validate_query(
             metric_names=["revenue"],
             group_by=(TimeDimensionParameter(name="metric_time", date_part=DatePart.DOW),),
-        )
+        ).query_spec
 
     # Can't query date part for cumulative metrics
     with pytest.raises(InvalidQueryException, match="does not match any of the available"):
         query_parser.parse_and_validate_query(
             metric_names=["revenue_cumulative"],
             group_by=(TimeDimensionParameter(name="metric_time", date_part=DatePart.YEAR),),
-        )
+        ).query_spec
 
     # Can't query date part for metrics with offset to grain
     with pytest.raises(InvalidQueryException, match="does not allow group-by-items with a date part in the query"):
         query_parser.parse_and_validate_query(
             metric_names=["revenue_since_start_of_year"],
             group_by=(TimeDimensionParameter(name="metric_time", date_part=DatePart.MONTH),),
-        )
+        ).query_spec
 
     # Requested granularity doesn't match resolved granularity
     with pytest.raises(InvalidQueryException, match="does not match any of the available"):
@@ -594,13 +600,13 @@ def test_date_part_parsing() -> None:
             group_by=(
                 TimeDimensionParameter(name="metric_time", grain=TimeGranularity.YEAR, date_part=DatePart.MONTH),
             ),
-        )
+        ).query_spec
 
     # Date part is compatible
     query_parser.parse_and_validate_query(
         metric_names=["revenue"],
         group_by=(TimeDimensionParameter(name="metric_time", date_part=DatePart.MONTH),),
-    )
+    ).query_spec
 
 
 def test_duplicate_metric_query(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D103
@@ -608,12 +614,12 @@ def test_duplicate_metric_query(bookings_query_parser: MetricFlowQueryParser) ->
         bookings_query_parser.parse_and_validate_query(
             metric_names=["bookings", "bookings"],
             group_by_names=[MTD],
-        )
+        ).query_spec
 
 
 def test_no_metrics_or_group_by(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D103
     with pytest.raises(InvalidQueryException, match="no metrics or group by items"):
-        bookings_query_parser.parse_and_validate_query()
+        bookings_query_parser.parse_and_validate_query().query_spec
 
 
 def test_offset_metric_with_diff_agg_time_dims_error() -> None:  # noqa: D103
@@ -626,7 +632,7 @@ def test_offset_metric_with_diff_agg_time_dims_error() -> None:  # noqa: D103
         query_parser.parse_and_validate_query(
             metric_names=["monthly_revenue_last_7_days"],
             group_by_names=["revenue___ds"],
-        )
+        ).query_spec
 
 
 def query_parser_from_yaml(yaml_contents: List[YamlConfigFile]) -> MetricFlowQueryParser:
