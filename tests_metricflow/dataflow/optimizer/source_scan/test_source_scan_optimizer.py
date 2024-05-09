@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import itertools
 import logging
 from typing import Sequence
 
@@ -33,15 +34,17 @@ from tests_metricflow.dataflow_plan_to_svg import display_graph_if_requested
 logger = logging.getLogger(__name__)
 
 
-class _ReadSqlSourceNodeCounter(DataflowDagWalker[int]):
-    """Counts the number of ReadSqlSourceNodes in the dataflow plan."""
+class _ReadSqlSourceNodeCollector(DataflowDagWalker[Sequence[ReadSqlSourceNode]]):
+    """Collects and returns ReadSqlSourceNodes in the dataflow plan."""
 
     @override
-    def default_visit_action(self, current_node: DataflowPlanNode, inputs: Sequence[int]) -> int:
-        return sum(inputs)
+    def default_visit_action(
+        self, current_node: DataflowPlanNode, inputs: Sequence[Sequence[ReadSqlSourceNode]]
+    ) -> Sequence[ReadSqlSourceNode]:
+        return tuple(itertools.chain.from_iterable(inputs))
 
-    def visit_source_node(self, node: ReadSqlSourceNode) -> int:  # noqa: D102
-        return 1
+    def visit_source_node(self, node: ReadSqlSourceNode) -> Sequence[ReadSqlSourceNode]:  # noqa: D102
+        return (node,)
 
 
 class DataflowPlanLookup:
@@ -52,7 +55,7 @@ class DataflowPlanLookup:
 
     def source_node_count(self) -> int:
         """Counts the number of `ReadSqlSourceNodes` in the dataflow plan."""
-        return self._dataflow_plan_sink_node.accept(_ReadSqlSourceNodeCounter())
+        return len(self._dataflow_plan_sink_node.accept(_ReadSqlSourceNodeCollector()))
 
 
 def check_optimization(  # noqa: D103
