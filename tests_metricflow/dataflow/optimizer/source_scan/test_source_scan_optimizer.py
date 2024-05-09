@@ -109,7 +109,7 @@ class ReadSqlSourceNodeCounter(DataflowPlanNodeVisitor[int]):
         return self._sum_parents(node)
 
     def count_source_nodes(self, dataflow_plan: DataflowPlan) -> int:  # noqa: D102
-        return dataflow_plan.sink_output_node.accept(self)
+        return dataflow_plan.checked_sink_node.accept(self)
 
 
 def check_optimization(  # noqa: D103

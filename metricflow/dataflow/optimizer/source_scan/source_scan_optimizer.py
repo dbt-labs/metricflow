@@ -313,12 +313,12 @@ class SourceScanOptimizer(
         return self._default_base_output_handler(node)
 
     def optimize(self, dataflow_plan: DataflowPlan) -> DataflowPlan:  # noqa: D102
-        optimized_result: OptimizeBranchResult = dataflow_plan.sink_output_node.accept(self)
+        optimized_result: OptimizeBranchResult = dataflow_plan.checked_sink_node.accept(self)
 
         logger.log(
             level=self._log_level,
             msg=f"Optimized:\n\n"
-            f"{dataflow_plan.sink_output_node.structure_text()}\n\n"
+            f"{dataflow_plan.checked_sink_node.structure_text()}\n\n"
             f"to:\n\n"
             f"{optimized_result.checked_sink_node.structure_text()}",
         )
@@ -326,11 +326,11 @@ class SourceScanOptimizer(
         if optimized_result.sink_node:
             return DataflowPlan(
                 plan_id=DagId.from_id_prefix(StaticIdPrefix.OPTIMIZED_DATAFLOW_PLAN_PREFIX),
-                sink_output_nodes=[optimized_result.sink_node],
+                sink_nodes=[optimized_result.sink_node],
             )
         logger.log(level=self._log_level, msg="Optimizer didn't produce a result, so returning the same plan")
         return DataflowPlan(
-            sink_output_nodes=[dataflow_plan.sink_output_node],
+            sink_nodes=[dataflow_plan.checked_sink_node],
         )
 
     def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode) -> OptimizeBranchResult:  # noqa: D102

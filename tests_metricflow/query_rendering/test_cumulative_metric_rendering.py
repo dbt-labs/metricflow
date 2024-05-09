@@ -54,7 +54,7 @@ def test_cumulative_metric(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -95,7 +95,7 @@ def test_cumulative_metric_with_time_constraint(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -133,7 +133,7 @@ def test_cumulative_metric_with_non_adjustable_time_filter(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -160,7 +160,7 @@ def test_cumulative_metric_no_ds(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -193,7 +193,7 @@ def test_cumulative_metric_no_window(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -223,7 +223,7 @@ def test_cumulative_metric_no_window_with_time_constraint(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -256,7 +256,7 @@ def test_cumulative_metric_grain_to_date(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -286,7 +286,7 @@ def test_cumulative_metric_month(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=extended_date_dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )
 
 
@@ -315,5 +315,5 @@ def test_cumulative_metric_with_agg_time_dimension(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_node,
+        node=dataflow_plan.checked_sink_node,
     )

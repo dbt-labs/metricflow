@@ -178,22 +178,15 @@ class DataflowPlanNodeVisitor(Generic[VisitorOutputT], ABC):
 class DataflowPlan(MetricFlowDag[DataflowPlanNode]):
     """Describes the flow of metric data as it goes from source nodes to sink nodes in the graph."""
 
-    def __init__(  # noqa: D107
-        self, sink_output_nodes: Sequence[DataflowPlanNode], plan_id: Optional[DagId] = None
-    ) -> None:
-        if len(sink_output_nodes) == 0:
-            raise RuntimeError("Can't create a dataflow plan without sink node(s).")
-        self._sink_output_nodes = tuple(sink_output_nodes)
+    def __init__(self, sink_nodes: Sequence[DataflowPlanNode], plan_id: Optional[DagId] = None) -> None:  # noqa: D107
+        assert len(sink_nodes) == 1, f"Exactly 1 sink node is supported. Got: {sink_nodes}"
         super().__init__(
             dag_id=plan_id or DagId.from_id_prefix(StaticIdPrefix.DATAFLOW_PLAN_PREFIX),
-            sink_nodes=tuple(sink_output_nodes),
+            sink_nodes=tuple(sink_nodes),
         )
 
     @property
-    def sink_output_nodes(self) -> Sequence[DataflowPlanNode]:  # noqa: D102
-        return self._sink_output_nodes
-
-    @property
-    def sink_output_node(self) -> DataflowPlanNode:  # noqa: D102
-        assert len(self._sink_output_nodes) == 1, f"Only 1 sink node supported. Got: {self._sink_output_nodes}"
-        return self._sink_output_nodes[0]
+    def checked_sink_node(self) -> DataflowPlanNode:
+        """If this has a single sink node, return it. Otherwise, raise an exception."""
+        assert len(self._sink_nodes) == 1, f"Exactly 1 sink node is supported. Got: {self._sink_nodes}"
+        return self._sink_nodes[0]

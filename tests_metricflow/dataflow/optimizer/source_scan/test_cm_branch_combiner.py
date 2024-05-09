@@ -27,7 +27,7 @@ from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixt
 
 def make_dataflow_plan(node: DataflowPlanNode) -> DataflowPlan:  # noqa: D103
     return DataflowPlan(
-        sink_output_nodes=[WriteToResultDataframeNode(node)],
+        sink_nodes=[WriteToResultDataframeNode(node)],
         plan_id=DagId.from_id_prefix(StaticIdPrefix.OPTIMIZED_DATAFLOW_PLAN_PREFIX),
     )
 
