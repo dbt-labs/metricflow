@@ -198,6 +198,10 @@ class ValidLinkableSpecResolver:
             )
             for linkable_entities in linkable_element_set_for_metric.path_key_to_linkable_entities.values():
                 for linkable_entity in linkable_entities:
+                    # TODO: some users encounter a situation in which the entity reference is in the entity links. Debug why.
+                    if linkable_entity.reference in linkable_entity.entity_links:
+                        logger.info(f"Found entity reference in entity links for linkable entity: {linkable_entity}")
+                        continue
                     metric_subquery_join_path_element = MetricSubqueryJoinPathElement(
                         metric_reference=metric_reference,
                         derived_from_semantic_models=defined_from_semantic_models,
