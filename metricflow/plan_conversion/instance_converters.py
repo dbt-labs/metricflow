@@ -558,19 +558,25 @@ class FilterElements(InstanceSetTransform[InstanceSet]):
         # Sanity check to make sure the specs are in the instance set
 
         if self._include_specs:
+            include_specs_not_found = []
             for include_spec in self._include_specs.all_specs:
                 if include_spec not in instance_set.spec_set.all_specs:
-                    raise RuntimeError(
-                        f"Include spec {include_spec} is not in the spec set {instance_set.spec_set} - "
-                        f"check if this node was constructed correctly."
-                    )
+                    include_specs_not_found.append(include_spec)
+            if include_specs_not_found:
+                raise RuntimeError(
+                    f"Include specs {include_specs_not_found} are not in the spec set {instance_set.spec_set} - "
+                    f"check if this node was constructed correctly."
+                )
         elif self._exclude_specs:
+            exclude_specs_not_found = []
             for exclude_spec in self._exclude_specs.all_specs:
                 if exclude_spec not in instance_set.spec_set.all_specs:
-                    raise RuntimeError(
-                        f"Exclude spec {exclude_spec} is not in the spec set {instance_set.spec_set} - "
-                        f"check if this node was constructed correctly."
-                    )
+                    exclude_specs_not_found.append(exclude_spec)
+            if exclude_specs_not_found:
+                raise RuntimeError(
+                    f"Exclude specs {exclude_specs_not_found} are not in the spec set {instance_set.spec_set} - "
+                    f"check if this node was constructed correctly."
+                )
         else:
             assert False, "Include specs or exclude specs should have been specified."
 

@@ -79,10 +79,16 @@ class JoinLinkableInstancesRecipe:
         if self.join_on_entity is None and self.join_type != SqlJoinType.CROSS_JOIN:
             raise RuntimeError("`join_on_entity` is required unless using CROSS JOIN.")
 
+    # TODO: JoinDescription is very similar to JoinLinkableInstancesRecipe. Can we consolidate by just adding a
+    # `filtered_node_to_join` property on JoinLinkableInstancesRecipe?
     @property
     def join_description(self) -> JoinDescription:
-        """The recipe as a join description to use in the dataflow plan node."""
-        # Figure out what elements to filter from the joined node.
+        """The recipe as a join description to use in the dataflow plan node.
+
+        Here, we figure out which instance specs to keep from this node in order to join to it and render its
+        satisfiable linkable specs, e.g. if the node is used to satisfy "user_id__country", the node must have the
+        entity "user_id" and the "country" dimension so that it can be joined to the source node.
+        """
         include_specs: List[LinkableInstanceSpec] = []
         assert all(
             [
@@ -92,13 +98,13 @@ class JoinLinkableInstancesRecipe:
             ]
         )
 
-        include_specs.extend(
-            [
-                LinklessEntitySpec.from_reference(spec.entity_links[0])
-                for spec in self.satisfiable_linkable_specs
-                if len(spec.entity_links) > 0
-            ]
-        )
+        # Get the specs needed to join onto this node.
+        if self.node_to_join.aggregated_to_elements:
+            include_specs.extend(self.node_to_join.aggregated_to_elements)
+        else:
+            for spec in self.satisfiable_linkable_specs:
+                if len(spec.entity_links) > 0:
+                    include_specs.append(LinklessEntitySpec.from_reference(spec.entity_links[0]))
 
         include_specs.extend([join.node_to_join_dimension_spec for join in self.join_on_partition_dimensions])
         include_specs.extend([join.node_to_join_time_dimension_spec for join in self.join_on_partition_time_dimensions])
@@ -109,14 +115,13 @@ class JoinLinkableInstancesRecipe:
 
         # `satisfiable_linkable_specs` describes what can be satisfied after the join, so remove the entity
         # link when filtering before the join.
-        # e.g. if the node is used to satisfy "user_id__country", then the node must have the entity
-        # "user_id" and the "country" dimension so that it can be joined to the source node.
         include_specs.extend(
             [
                 spec.without_first_entity_link if len(spec.entity_links) > 0 else spec
                 for spec in self.satisfiable_linkable_specs
             ]
         )
+
         filtered_node_to_join = FilterElementsNode(
             parent_node=self.node_to_join, include_specs=group_specs_by_type(include_specs)
         )
@@ -256,6 +261,9 @@ class NodeEvaluatorForLinkableInstances:
                 assert len(entity_instance_in_left_node.defined_from) == 1
                 assert len(entity_instance_in_right_node.defined_from) == 1
 
+                entity_spec_matches_aggregated_specs = {
+                    spec.reference for spec in right_node.aggregated_to_elements
+                } == {entity_spec_in_right_node.reference}
                 if not (
                     self._join_evaluator.is_valid_semantic_model_join(
                         left_semantic_model_reference=entity_instance_in_left_node.defined_from[
@@ -266,7 +274,7 @@ class NodeEvaluatorForLinkableInstances:
                         ].semantic_model_reference,
                         on_entity_reference=entity_spec_in_right_node.reference,
                     )
-                    or right_node.is_aggregated_to_elements == {entity_spec_in_right_node.reference}
+                    or entity_spec_matches_aggregated_specs
                 ):
                     continue
 

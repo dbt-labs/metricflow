@@ -172,7 +172,7 @@ class SourceScanOptimizer(
                     parent_node=optimized_parent_result.base_output_node,
                     metric_specs=node.metric_specs,
                     for_group_by_source_node=node.for_group_by_source_node,
-                    is_aggregated_to_elements=node.is_aggregated_to_elements,
+                    aggregated_to_elements=node.aggregated_to_elements,
                 )
             )
 

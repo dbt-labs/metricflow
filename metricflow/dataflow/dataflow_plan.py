@@ -12,7 +12,7 @@ from metricflow_semantics.dag.mf_dag import DagId, DagNode, MetricFlowDag, NodeI
 from metricflow_semantics.visitor import Visitable, VisitorOutputT
 
 if typing.TYPE_CHECKING:
-    from dbt_semantic_interfaces.references import LinkableElementReference
+    from metricflow_semantics.specs.spec_classes import LinkableInstanceSpec
 
     from metricflow.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode
     from metricflow.dataflow.nodes.aggregate_measures import AggregateMeasuresNode
@@ -178,7 +178,7 @@ class BaseOutput(DataflowPlanNode, ABC):
     """
 
     @property
-    def is_aggregated_to_elements(self) -> Set[LinkableElementReference]:
+    def aggregated_to_elements(self) -> Set[LinkableInstanceSpec]:
         """Indicates that the node has been aggregated to these specs, guaranteeing uniqueness in each combination of them."""
         return set()
 
