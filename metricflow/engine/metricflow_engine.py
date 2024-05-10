@@ -26,7 +26,7 @@ from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticM
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.protocols.query_parameter import GroupByParameter, MetricQueryParameter, OrderByQueryParameter
 from metricflow_semantics.query.query_exceptions import InvalidQueryException
-from metricflow_semantics.query.query_parser import MetricFlowQueryParser
+from metricflow_semantics.query.query_parser import MetricFlowQueryParser, ParseQueryResult
 from metricflow_semantics.random_id import random_id
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
@@ -157,18 +157,28 @@ class MetricFlowQueryRequest:
 class MetricFlowQueryResult:
     """The result of a query and context on how it was generated."""
 
-    query_spec: MetricFlowQuerySpec
-    dataflow_plan: DataflowPlan
+    explain_result: MetricFlowExplainResult
     sql: str
     result_df: Optional[pd.DataFrame] = None
-    result_table: Optional[SqlTable] = None
+
+    @property
+    def query_spec(self) -> MetricFlowQuerySpec:  # noqa: D102
+        return self.explain_result.parse_query_result.query_spec
+
+    @property
+    def dataflow_plan(self) -> DataflowPlan:  # noqa: D102
+        return self.explain_result.dataflow_plan
+
+    @property
+    def result_table(self) -> Optional[SqlTable]:  # noqa: D102
+        return self.explain_result.output_table
 
 
 @dataclass(frozen=True)
 class MetricFlowExplainResult:
     """Returns plans for resolving a query."""
 
-    query_spec: MetricFlowQuerySpec
+    parse_query_result: ParseQueryResult
     dataflow_plan: DataflowPlan
     convert_to_execution_plan_result: ConvertToExecutionPlanResult
     output_table: Optional[SqlTable] = None
@@ -207,6 +217,10 @@ class MetricFlowExplainResult:
     @property
     def execution_plan(self) -> ExecutionPlan:  # noqa: D102
         return self.convert_to_execution_plan_result.execution_plan
+
+    @property
+    def query_spec(self) -> MetricFlowQuerySpec:  # noqa: D102
+        return self.parse_query_result.query_spec
 
 
 class AbstractMetricFlowEngine(ABC):
@@ -435,11 +449,9 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
         logger.info(f"Finished query request: {mf_request.request_id}")
         return MetricFlowQueryResult(
-            query_spec=explain_result.query_spec,
-            dataflow_plan=explain_result.dataflow_plan,
+            explain_result=explain_result,
             sql=task_execution_result.sql,
             result_df=task_execution_result.df,
-            result_table=explain_result.output_table,
         )
 
     @property
@@ -459,7 +471,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 raise InvalidQueryException("Metrics can't be specified with a saved query.")
             if mf_query_request.group_by or mf_query_request.group_by_names:
                 raise InvalidQueryException("Group by items can't be specified with a saved query.")
-            query_spec = self._query_parser.parse_and_validate_saved_query(
+            parse_query_result = self._query_parser.parse_and_validate_saved_query(
                 saved_query_parameter=SavedQueryParameter(mf_query_request.saved_query_name),
                 where_filter=(
                     PydanticWhereFilter(where_sql_template=mf_query_request.where_constraint)
@@ -471,9 +483,9 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 time_constraint_end=mf_query_request.time_constraint_end,
                 order_by_names=mf_query_request.order_by_names,
                 order_by_parameters=mf_query_request.order_by,
-            ).query_spec
+            )
         else:
-            query_spec = self._query_parser.parse_and_validate_query(
+            parse_query_result = self._query_parser.parse_and_validate_query(
                 metric_names=mf_query_request.metric_names,
                 metrics=mf_query_request.metrics,
                 group_by_names=mf_query_request.group_by_names,
@@ -485,7 +497,8 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 order_by_names=mf_query_request.order_by_names,
                 order_by=mf_query_request.order_by,
                 min_max_only=mf_query_request.min_max_only,
-            ).query_spec
+            )
+        query_spec = parse_query_result.query_spec
         logger.info(f"Query spec is:\n{mf_pformat(query_spec)}")
 
         output_selection_specs: Optional[InstanceSpecSet] = None
@@ -516,7 +529,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         convert_to_execution_plan_result = self._to_execution_plan_converter.convert_to_execution_plan(dataflow_plan)
 
         return MetricFlowExplainResult(
-            query_spec=query_spec,
+            parse_query_result=parse_query_result,
             dataflow_plan=dataflow_plan,
             convert_to_execution_plan_result=convert_to_execution_plan_result,
         )
