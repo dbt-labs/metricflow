@@ -336,9 +336,10 @@ class MetricSubqueryJoinPathElement:
             self.derived_from_semantic_models
         ), "There must be at least one semantic model from which the metric is derived."
 
-        assert (
-            self.join_on_entity not in self.entity_links
-        ), "Entity links have been misconfigured. They should not include the join_on_entity."
+        assert self.join_on_entity not in self.entity_links, (
+            "Entity links have been misconfigured. They should not include the join_on_entity."
+            f"Entity links: {self.entity_links}; Join on entity: {self.join_on_entity}"
+        )
 
 
 @dataclass(frozen=True)
