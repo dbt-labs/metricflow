@@ -259,22 +259,16 @@ def assert_linkable_element_set_snapshot_equal(  # noqa: D103
     set_id: str,
     linkable_element_set: LinkableElementSet,
 ) -> None:
-    headers = ("Semantic Model", "Entity Links", "Name", "Time Granularity", "Date Part", "Properties")
+    headers = ("Model Join-Path", "Entity Links", "Name", "Time Granularity", "Date Part", "Properties")
     rows = []
     for linkable_dimension_iterable in linkable_element_set.path_key_to_linkable_dimensions.values():
         for linkable_dimension in linkable_dimension_iterable:
-            # Temporarily dedupe rows as the added field `left_semantic_model_reference` will cause duplicate rows to
-            # show up. This is because the linkable element set groups by the join path, and for derived metrics that
-            # use multiple measures that have the same join, the merge process would combine them. With the added
-            # field, it is now possible to differentiate them.
-            # We verify that there are no snapshot changes after `left_semantic_model_reference` is added, then
-            # we'll update the table to show the field.
             row_to_add = (
                 # Checking a limited set of fields as the result is large due to the paths in the object.
-                (
-                    linkable_dimension.semantic_model_origin.semantic_model_name
-                    if linkable_dimension.semantic_model_origin
-                    else None
+                (linkable_dimension.join_path.left_semantic_model_reference.semantic_model_name,)
+                + tuple(
+                    path_element.semantic_model_reference.semantic_model_name
+                    for path_element in linkable_dimension.join_path.path_elements
                 ),
                 tuple(entity_link.element_name for entity_link in linkable_dimension.entity_links),
                 linkable_dimension.element_name,
@@ -289,7 +283,11 @@ def assert_linkable_element_set_snapshot_equal(  # noqa: D103
         for linkable_entity in linkable_entity_iterable:
             row_to_add = (
                 # Checking a limited set of fields as the result is large due to the paths in the object.
-                linkable_entity.semantic_model_origin.semantic_model_name,
+                (linkable_entity.join_path.left_semantic_model_reference.semantic_model_name,)
+                + tuple(
+                    path_element.semantic_model_reference.semantic_model_name
+                    for path_element in linkable_entity.join_path.path_elements
+                ),
                 tuple(entity_link.element_name for entity_link in linkable_entity.entity_links),
                 linkable_entity.element_name,
                 "",
@@ -307,7 +305,7 @@ def assert_linkable_element_set_snapshot_equal(  # noqa: D103
                     (
                         linkable_metric.join_by_semantic_model.semantic_model_name
                         if linkable_metric.join_by_semantic_model
-                        else ""
+                        else "",
                     ),
                     (
                         str(tuple(entity_link.element_name for entity_link in linkable_metric.join_path.entity_links)),

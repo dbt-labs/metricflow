@@ -22,6 +22,7 @@ from typing_extensions import override
 
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
+from metricflow_semantics.workarounds.reference import sorted_semantic_model_references
 
 logger = logging.getLogger(__name__)
 
@@ -141,7 +142,7 @@ class LinkableDimension(LinkableElement, SerializableDataclass):
             semantic_model_references.add(self.semantic_model_origin)
         semantic_model_references.update(self.join_path.derived_from_semantic_models)
 
-        return sorted(semantic_model_references, key=lambda reference: reference.semantic_model_name)
+        return sorted_semantic_model_references(semantic_model_references)
 
 
 @dataclass(frozen=True)
@@ -170,8 +171,7 @@ class LinkableEntity(LinkableElement, SerializableDataclass):
     def derived_from_semantic_models(self) -> Sequence[SemanticModelReference]:
         semantic_model_references = {self.semantic_model_origin}
         semantic_model_references.update(self.join_path.derived_from_semantic_models)
-
-        return sorted(semantic_model_references, key=lambda reference: reference.semantic_model_name)
+        return sorted_semantic_model_references(semantic_model_references)
 
 
 # TODO: add to DSI
@@ -238,7 +238,7 @@ class LinkableMetric(LinkableElement, SerializableDataclass):
         if self.metric_to_entity_join_path:
             semantic_model_references.update(self.metric_to_entity_join_path.derived_from_semantic_models)
 
-        return sorted(semantic_model_references, key=lambda reference: reference.semantic_model_name)
+        return sorted_semantic_model_references(semantic_model_references)
 
     @property
     def metric_to_entity_join_path(self) -> Optional[SemanticModelJoinPath]:
@@ -311,7 +311,7 @@ class SemanticModelJoinPath(SemanticModelDerivation):
         for path_element in self.path_elements:
             semantic_model_references.add(path_element.semantic_model_reference)
 
-        return sorted(semantic_model_references, key=lambda reference: reference.semantic_model_name)
+        return sorted_semantic_model_references(semantic_model_references)
 
 
 @dataclass(frozen=True)
