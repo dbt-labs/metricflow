@@ -263,37 +263,41 @@ def assert_linkable_element_set_snapshot_equal(  # noqa: D103
     rows = []
     for linkable_dimension_iterable in linkable_element_set.path_key_to_linkable_dimensions.values():
         for linkable_dimension in linkable_dimension_iterable:
-            rows.append(
+            # Temporarily dedupe rows as the added field `left_semantic_model_reference` will cause duplicate rows to
+            # show up. This is because the linkable element set groups by the join path, and for derived metrics that
+            # use multiple measures that have the same join, the merge process would combine them. With the added
+            # field, it is now possible to differentiate them.
+            # We verify that there are no snapshot changes after `left_semantic_model_reference` is added, then
+            # we'll update the table to show the field.
+            row_to_add = (
+                # Checking a limited set of fields as the result is large due to the paths in the object.
                 (
-                    # Checking a limited set of fields as the result is large due to the paths in the object.
-                    (
-                        linkable_dimension.semantic_model_origin.semantic_model_name
-                        if linkable_dimension.semantic_model_origin
-                        else None
-                    ),
-                    tuple(entity_link.element_name for entity_link in linkable_dimension.entity_links),
-                    linkable_dimension.element_name,
-                    linkable_dimension.time_granularity.name if linkable_dimension.time_granularity is not None else "",
-                    linkable_dimension.date_part.name if linkable_dimension.date_part is not None else "",
-                    sorted(
-                        linkable_element_property.name for linkable_element_property in linkable_dimension.properties
-                    ),
-                )
+                    linkable_dimension.semantic_model_origin.semantic_model_name
+                    if linkable_dimension.semantic_model_origin
+                    else None
+                ),
+                tuple(entity_link.element_name for entity_link in linkable_dimension.entity_links),
+                linkable_dimension.element_name,
+                linkable_dimension.time_granularity.name if linkable_dimension.time_granularity is not None else "",
+                linkable_dimension.date_part.name if linkable_dimension.date_part is not None else "",
+                sorted(linkable_element_property.name for linkable_element_property in linkable_dimension.properties),
             )
+            if row_to_add not in rows:
+                rows.append(row_to_add)
 
     for linkable_entity_iterable in linkable_element_set.path_key_to_linkable_entities.values():
         for linkable_entity in linkable_entity_iterable:
-            rows.append(
-                (
-                    # Checking a limited set of fields as the result is large due to the paths in the object.
-                    linkable_entity.semantic_model_origin.semantic_model_name,
-                    tuple(entity_link.element_name for entity_link in linkable_entity.entity_links),
-                    linkable_entity.element_name,
-                    "",
-                    "",
-                    sorted(linkable_element_property.name for linkable_element_property in linkable_entity.properties),
-                )
+            row_to_add = (
+                # Checking a limited set of fields as the result is large due to the paths in the object.
+                linkable_entity.semantic_model_origin.semantic_model_name,
+                tuple(entity_link.element_name for entity_link in linkable_entity.entity_links),
+                linkable_entity.element_name,
+                "",
+                "",
+                sorted(linkable_element_property.name for linkable_element_property in linkable_entity.properties),
             )
+            if row_to_add not in rows:
+                rows.append(row_to_add)
 
     for linkable_metric_iterable in linkable_element_set.path_key_to_linkable_metrics.values():
         for linkable_metric in linkable_metric_iterable:
