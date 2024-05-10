@@ -12,7 +12,6 @@ from dbt_semantic_interfaces.references import MeasureReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.errors.error_classes import UnableToSatisfyQueryError
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
@@ -1331,24 +1330,22 @@ def test_metric_in_metric_where_filter(
     )
 
 
-def test_all_available_single_join_metric_filters(
+def test_all_available_metric_filters(
     dataflow_plan_builder: DataflowPlanBuilder, query_parser: MetricFlowQueryParser
 ) -> None:
-    """Checks that all allowed metric filters do not error when used in dataflow plan (single-hop for both inner and out query)."""
+    """Checks that all allowed metric filters do not error when used in dataflow plan."""
     for linkable_metric_tuple in dataflow_plan_builder._metric_lookup.linkable_elements_for_measure(
-        MeasureReference("listings"), without_any_of={LinkableElementProperty.MULTI_HOP}
+        MeasureReference("bookings")
     ).path_key_to_linkable_metrics.values():
         for linkable_metric in linkable_metric_tuple:
             group_by_metric_spec = LinkableElementSet._path_key_to_spec(linkable_metric.path_key)
             assert isinstance(group_by_metric_spec, GroupByMetricSpec)
             entity_spec = group_by_metric_spec.metric_subquery_entity_spec
-            if entity_spec.entity_links:  # multi-hop for inner query
-                continue
             query_spec = query_parser.parse_and_validate_query(
-                metric_names=("listings",),
+                metric_names=("bookings",),
                 where_constraint=PydanticWhereFilter(
                     where_sql_template=string.Template("{{ Metric('$metric_name', ['$entity_name']) }} > 2").substitute(
-                        metric_name=linkable_metric.element_name, entity_name=entity_spec.element_name
+                        metric_name=linkable_metric.element_name, entity_name=entity_spec.qualified_name
                     ),
                 ),
             )
