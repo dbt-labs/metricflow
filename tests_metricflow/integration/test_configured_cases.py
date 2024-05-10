@@ -16,7 +16,7 @@ from metricflow_semantics.protocols.query_parameter import DimensionOrEntityQuer
 from metricflow_semantics.specs.query_param_implementations import DimensionOrEntityParameter, TimeDimensionParameter
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
-from metricflow.engine.metricflow_engine import MetricFlowQueryRequest
+from metricflow.engine.metricflow_engine import MetricFlowQueryRequest, MetricFlowQueryResult
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_exprs import (
@@ -279,7 +279,7 @@ def test_case(
             group_by.append(TimeDimensionParameter(**kwargs))
         else:
             group_by.append(DimensionOrEntityParameter(**kwargs))
-    query_result = engine.query(
+    query_result: MetricFlowQueryResult = engine.query(
         MetricFlowQueryRequest.create_with_random_request_id(
             metric_names=case.metrics,
             group_by_names=case.group_bys if len(case.group_bys) > 0 else None,
@@ -343,3 +343,14 @@ def test_case(
     # If we sort, it's effectively not checking the order whatever order that the output was would be overwritten.
     assert actual is not None, "Did not get a result table from MetricFlow"
     assert_data_tables_equal(actual, expected, sort_columns=not case.check_order, allow_empty=case.allow_empty)
+
+    # Check that the parse result and the dataflow plan show the same semantic models read.
+    if name in {"itest_dimensions.yaml/distinct_values_query_with_metric_filter"}:
+        pytest.skip(
+            "Skipping the congruence check for semantic models queried by the parser vs. the dataflow as "
+            "metrics-in-filters is a WIP."
+        )
+    parse_query_result = query_result.explain_result.parse_query_result
+    dataflow_queried_semantic_models = query_result.explain_result.dataflow_plan.source_semantic_models
+
+    assert tuple(parse_query_result.queried_semantic_models) == tuple(dataflow_queried_semantic_models)
