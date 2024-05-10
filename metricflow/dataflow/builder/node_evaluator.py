@@ -261,6 +261,9 @@ class NodeEvaluatorForLinkableInstances:
                 assert len(entity_instance_in_left_node.defined_from) == 1
                 assert len(entity_instance_in_right_node.defined_from) == 1
 
+                entity_spec_matches_aggregated_specs = {
+                    spec.reference for spec in right_node.aggregated_to_elements
+                } == {entity_spec_in_right_node.reference}
                 if not (
                     self._join_evaluator.is_valid_semantic_model_join(
                         left_semantic_model_reference=entity_instance_in_left_node.defined_from[
@@ -271,8 +274,7 @@ class NodeEvaluatorForLinkableInstances:
                         ].semantic_model_reference,
                         on_entity_reference=entity_spec_in_right_node.reference,
                     )
-                    or {spec.reference for spec in right_node.aggregated_to_elements}
-                    == {entity_spec_in_right_node.reference}
+                    or entity_spec_matches_aggregated_specs
                 ):
                     continue
 
