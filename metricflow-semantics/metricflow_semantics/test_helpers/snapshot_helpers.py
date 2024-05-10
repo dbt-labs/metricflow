@@ -361,8 +361,8 @@ def assert_linkable_spec_set_snapshot_equal(  # noqa: D103
 def assert_object_snapshot_equal(  # type: ignore[misc]
     request: FixtureRequest,
     mf_test_configuration: SnapshotConfiguration,
-    obj_id: str,
     obj: Any,
+    obj_id: str = "result",
 ) -> None:
     """For tests to compare large objects, this can be used to snapshot a text representation of the object."""
     assert_snapshot_text_equal(
@@ -375,7 +375,7 @@ def assert_object_snapshot_equal(  # type: ignore[misc]
     )
 
 
-def assert_str_snapshot_equal(  # type: ignore[misc]
+def assert_str_snapshot_equal(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: SnapshotConfiguration,
     snapshot_id: str,
