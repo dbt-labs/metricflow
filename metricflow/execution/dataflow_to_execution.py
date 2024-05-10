@@ -58,7 +58,7 @@ class DataflowToExecutionPlanConverter(DataflowDagWalker[ConvertToExecutionPlanR
 
     def convert_to_execution_plan(self, dataflow_plan: DataflowPlan) -> ConvertToExecutionPlanResult:
         """Convert the dataflow plan to an execution plan."""
-        return dataflow_plan.checked_sink_node.accept(self)
+        return dataflow_plan.sink_node.accept(self)
 
     @override
     def default_visit_action(
