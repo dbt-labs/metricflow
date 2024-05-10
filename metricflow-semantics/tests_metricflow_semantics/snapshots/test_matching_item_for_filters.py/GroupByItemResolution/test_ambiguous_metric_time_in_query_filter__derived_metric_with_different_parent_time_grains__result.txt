@@ -25,7 +25,11 @@ GroupByItemResolution(
                     ),
                     element_name='metric_time',
                     dimension_type=TIME,
-                    join_path=SemanticModelJoinPath(),
+                    join_path=SemanticModelJoinPath(
+                      left_semantic_model_reference=SemanticModelReference(
+                        semantic_model_name='monthly_measures_source',
+                      ),
+                    ),
                     properties=frozenset(
                       'METRIC_TIME',
                     ),
@@ -66,7 +70,11 @@ GroupByItemResolution(
                     ),
                     element_name='metric_time',
                     dimension_type=TIME,
-                    join_path=SemanticModelJoinPath(),
+                    join_path=SemanticModelJoinPath(
+                      left_semantic_model_reference=SemanticModelReference(
+                        semantic_model_name='yearly_measure_source',
+                      ),
+                    ),
                     properties=frozenset(
                       'METRIC_TIME',
                     ),

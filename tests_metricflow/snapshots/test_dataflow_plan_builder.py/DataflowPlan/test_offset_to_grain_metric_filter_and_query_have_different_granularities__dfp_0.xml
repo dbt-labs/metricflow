@@ -22,7 +22,11 @@
             <!--             ),                                                                 -->
             <!--             element_name='metric_time',                                        -->
             <!--             dimension_type=TIME,                                               -->
-            <!--             join_path=SemanticModelJoinPath(),                                 -->
+            <!--             join_path=SemanticModelJoinPath(                                   -->
+            <!--               left_semantic_model_reference=SemanticModelReference(            -->
+            <!--                 semantic_model_name='bookings_source',                         -->
+            <!--               ),                                                               -->
+            <!--             ),                                                                 -->
             <!--             properties=frozenset('METRIC_TIME',),                              -->
             <!--             time_granularity=DAY,                                              -->
             <!--           ),                                                                   -->
@@ -33,36 +37,40 @@
             <ComputeMetricsNode>
                 <!-- description = 'Compute Metrics via Expressions' -->
                 <!-- node_id = NodeId(id_str='cm_0') -->
-                <!-- metric_spec =                                             -->
-                <!--   MetricSpec(                                             -->
-                <!--     element_name='bookings',                              -->
-                <!--     filter_specs=(                                        -->
-                <!--       WhereFilterSpec(                                    -->
-                <!--         where_sql="metric_time__day = '2020-01-01'",      -->
-                <!--         bind_parameters=SqlBindParameters(),              -->
-                <!--         linkable_specs=(                                  -->
-                <!--           TimeDimensionSpec(                              -->
-                <!--             element_name='metric_time',                   -->
-                <!--             time_granularity=DAY,                         -->
-                <!--           ),                                              -->
-                <!--         ),                                                -->
-                <!--         linkable_elements=(                               -->
-                <!--           LinkableDimension(                              -->
-                <!--             semantic_model_origin=SemanticModelReference( -->
-                <!--               semantic_model_name='bookings_source',      -->
-                <!--             ),                                            -->
-                <!--             element_name='metric_time',                   -->
-                <!--             dimension_type=TIME,                          -->
-                <!--             join_path=SemanticModelJoinPath(),            -->
-                <!--             properties=frozenset('METRIC_TIME',),         -->
-                <!--             time_granularity=DAY,                         -->
-                <!--           ),                                              -->
-                <!--         ),                                                -->
-                <!--       ),                                                  -->
-                <!--     ),                                                    -->
-                <!--     alias='bookings_start_of_month',                      -->
-                <!--     offset_to_grain=MONTH,                                -->
-                <!--   )                                                       -->
+                <!-- metric_spec =                                                       -->
+                <!--   MetricSpec(                                                       -->
+                <!--     element_name='bookings',                                        -->
+                <!--     filter_specs=(                                                  -->
+                <!--       WhereFilterSpec(                                              -->
+                <!--         where_sql="metric_time__day = '2020-01-01'",                -->
+                <!--         bind_parameters=SqlBindParameters(),                        -->
+                <!--         linkable_specs=(                                            -->
+                <!--           TimeDimensionSpec(                                        -->
+                <!--             element_name='metric_time',                             -->
+                <!--             time_granularity=DAY,                                   -->
+                <!--           ),                                                        -->
+                <!--         ),                                                          -->
+                <!--         linkable_elements=(                                         -->
+                <!--           LinkableDimension(                                        -->
+                <!--             semantic_model_origin=SemanticModelReference(           -->
+                <!--               semantic_model_name='bookings_source',                -->
+                <!--             ),                                                      -->
+                <!--             element_name='metric_time',                             -->
+                <!--             dimension_type=TIME,                                    -->
+                <!--             join_path=SemanticModelJoinPath(                        -->
+                <!--               left_semantic_model_reference=SemanticModelReference( -->
+                <!--                 semantic_model_name='bookings_source',              -->
+                <!--               ),                                                    -->
+                <!--             ),                                                      -->
+                <!--             properties=frozenset('METRIC_TIME',),                   -->
+                <!--             time_granularity=DAY,                                   -->
+                <!--           ),                                                        -->
+                <!--         ),                                                          -->
+                <!--       ),                                                            -->
+                <!--     ),                                                              -->
+                <!--     alias='bookings_start_of_month',                                -->
+                <!--     offset_to_grain=MONTH,                                          -->
+                <!--   )                                                                 -->
                 <AggregateMeasuresNode>
                     <!-- description = 'Aggregate Measures' -->
                     <!-- node_id = NodeId(id_str='am_0') -->
@@ -87,7 +95,11 @@
                             <!--         ),                                                                                 -->
                             <!--         element_name='metric_time',                                                        -->
                             <!--         dimension_type=TIME,                                                               -->
-                            <!--         join_path=SemanticModelJoinPath(),                                                 -->
+                            <!--         join_path=SemanticModelJoinPath(                                                   -->
+                            <!--           left_semantic_model_reference=SemanticModelReference(                            -->
+                            <!--             semantic_model_name='bookings_source',                                         -->
+                            <!--           ),                                                                               -->
+                            <!--         ),                                                                                 -->
                             <!--         properties=frozenset('METRIC_TIME',),                                              -->
                             <!--         time_granularity=DAY,                                                              -->
                             <!--       ),                                                                                   -->

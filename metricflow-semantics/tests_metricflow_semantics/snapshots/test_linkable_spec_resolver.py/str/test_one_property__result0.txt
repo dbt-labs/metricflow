@@ -1,4 +1,4 @@
-Semantic Model    Entity Links    Name     Time Granularity    Date Part    Properties
-----------------  --------------  -------  ------------------  -----------  -------------------
-bookings_source   ()              listing                                   ['ENTITY', 'LOCAL']
-views_source      ()              listing                                   ['ENTITY', 'LOCAL']
+Model Join-Path       Entity Links    Name     Time Granularity    Date Part    Properties
+--------------------  --------------  -------  ------------------  -----------  -------------------
+('bookings_source',)  ()              listing                                   ['ENTITY', 'LOCAL']
+('views_source',)     ()              listing                                   ['ENTITY', 'LOCAL']

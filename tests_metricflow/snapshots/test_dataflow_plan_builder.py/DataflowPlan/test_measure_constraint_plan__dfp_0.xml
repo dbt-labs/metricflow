@@ -36,6 +36,9 @@
                     <!--               EntityReference(element_name='listing'),               -->
                     <!--             ),                                                       -->
                     <!--             join_path=SemanticModelJoinPath(                         -->
+                    <!--               left_semantic_model_reference=SemanticModelReference(  -->
+                    <!--                 semantic_model_name='bookings_source',               -->
+                    <!--               ),                                                     -->
                     <!--               path_elements=(                                        -->
                     <!--                 SemanticModelJoinPathElement(                        -->
                     <!--                   semantic_model_reference=SemanticModelReference(   -->
@@ -84,6 +87,9 @@
                                 <!--         dimension_type=CATEGORICAL,                              -->
                                 <!--         entity_links=(EntityReference(element_name='listing'),), -->
                                 <!--         join_path=SemanticModelJoinPath(                         -->
+                                <!--           left_semantic_model_reference=SemanticModelReference(  -->
+                                <!--             semantic_model_name='bookings_source',               -->
+                                <!--           ),                                                     -->
                                 <!--           path_elements=(                                        -->
                                 <!--             SemanticModelJoinPathElement(                        -->
                                 <!--               semantic_model_reference=SemanticModelReference(   -->
@@ -195,6 +201,9 @@
                     <!--               EntityReference(element_name='listing'),               -->
                     <!--             ),                                                       -->
                     <!--             join_path=SemanticModelJoinPath(                         -->
+                    <!--               left_semantic_model_reference=SemanticModelReference(  -->
+                    <!--                 semantic_model_name='bookings_source',               -->
+                    <!--               ),                                                     -->
                     <!--               path_elements=(                                        -->
                     <!--                 SemanticModelJoinPathElement(                        -->
                     <!--                   semantic_model_reference=SemanticModelReference(   -->
@@ -243,6 +252,9 @@
                                 <!--         dimension_type=CATEGORICAL,                              -->
                                 <!--         entity_links=(EntityReference(element_name='listing'),), -->
                                 <!--         join_path=SemanticModelJoinPath(                         -->
+                                <!--           left_semantic_model_reference=SemanticModelReference(  -->
+                                <!--             semantic_model_name='bookings_source',               -->
+                                <!--           ),                                                     -->
                                 <!--           path_elements=(                                        -->
                                 <!--             SemanticModelJoinPathElement(                        -->
                                 <!--               semantic_model_reference=SemanticModelReference(   -->

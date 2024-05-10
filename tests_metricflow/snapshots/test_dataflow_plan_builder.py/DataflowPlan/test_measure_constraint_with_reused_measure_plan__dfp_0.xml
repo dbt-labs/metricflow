@@ -35,7 +35,11 @@
                     <!--             entity_links=(                                           -->
                     <!--               EntityReference(element_name='booking'),               -->
                     <!--             ),                                                       -->
-                    <!--             join_path=SemanticModelJoinPath(),                       -->
+                    <!--             join_path=SemanticModelJoinPath(                         -->
+                    <!--               left_semantic_model_reference=SemanticModelReference(  -->
+                    <!--                 semantic_model_name='bookings_source',               -->
+                    <!--               ),                                                     -->
+                    <!--             ),                                                       -->
                     <!--             properties=frozenset('LOCAL',),                          -->
                     <!--           ),                                                         -->
                     <!--         ),                                                           -->
@@ -73,7 +77,11 @@
                                 <!--         element_name='is_instant',                               -->
                                 <!--         dimension_type=CATEGORICAL,                              -->
                                 <!--         entity_links=(EntityReference(element_name='booking'),), -->
-                                <!--         join_path=SemanticModelJoinPath(),                       -->
+                                <!--         join_path=SemanticModelJoinPath(                         -->
+                                <!--           left_semantic_model_reference=SemanticModelReference(  -->
+                                <!--             semantic_model_name='bookings_source',               -->
+                                <!--           ),                                                     -->
+                                <!--         ),                                                       -->
                                 <!--         properties=frozenset('LOCAL',),                          -->
                                 <!--       ),                                                         -->
                                 <!--     ),                                                           -->

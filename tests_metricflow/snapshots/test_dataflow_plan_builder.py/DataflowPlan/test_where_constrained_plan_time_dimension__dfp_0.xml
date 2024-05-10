@@ -22,7 +22,11 @@
             <!--             ),                                                                 -->
             <!--             element_name='metric_time',                                        -->
             <!--             dimension_type=TIME,                                               -->
-            <!--             join_path=SemanticModelJoinPath(),                                 -->
+            <!--             join_path=SemanticModelJoinPath(                                   -->
+            <!--               left_semantic_model_reference=SemanticModelReference(            -->
+            <!--                 semantic_model_name='bookings_source',                         -->
+            <!--               ),                                                               -->
+            <!--             ),                                                                 -->
             <!--             properties=frozenset('METRIC_TIME',),                              -->
             <!--             time_granularity=DAY,                                              -->
             <!--           ),                                                                   -->
@@ -58,7 +62,11 @@
                         <!--         ),                                                                                 -->
                         <!--         element_name='metric_time',                                                        -->
                         <!--         dimension_type=TIME,                                                               -->
-                        <!--         join_path=SemanticModelJoinPath(),                                                 -->
+                        <!--         join_path=SemanticModelJoinPath(                                                   -->
+                        <!--           left_semantic_model_reference=SemanticModelReference(                            -->
+                        <!--             semantic_model_name='bookings_source',                                         -->
+                        <!--           ),                                                                               -->
+                        <!--         ),                                                                                 -->
                         <!--         properties=frozenset('METRIC_TIME',),                                              -->
                         <!--         time_granularity=DAY,                                                              -->
                         <!--       ),                                                                                   -->

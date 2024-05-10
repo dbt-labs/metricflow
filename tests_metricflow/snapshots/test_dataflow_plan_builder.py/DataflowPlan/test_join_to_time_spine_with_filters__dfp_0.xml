@@ -22,7 +22,11 @@
             <!--             ),                                                                 -->
             <!--             element_name='metric_time',                                        -->
             <!--             dimension_type=TIME,                                               -->
-            <!--             join_path=SemanticModelJoinPath(),                                 -->
+            <!--             join_path=SemanticModelJoinPath(                                   -->
+            <!--               left_semantic_model_reference=SemanticModelReference(            -->
+            <!--                 semantic_model_name='bookings_source',                         -->
+            <!--               ),                                                               -->
+            <!--             ),                                                                 -->
             <!--             properties=frozenset('METRIC_TIME',),                              -->
             <!--             time_granularity=DAY,                                              -->
             <!--           ),                                                                   -->
@@ -50,7 +54,11 @@
                     <!--         ),                                                                                 -->
                     <!--         element_name='metric_time',                                                        -->
                     <!--         dimension_type=TIME,                                                               -->
-                    <!--         join_path=SemanticModelJoinPath(),                                                 -->
+                    <!--         join_path=SemanticModelJoinPath(                                                   -->
+                    <!--           left_semantic_model_reference=SemanticModelReference(                            -->
+                    <!--             semantic_model_name='bookings_source',                                         -->
+                    <!--           ),                                                                               -->
+                    <!--         ),                                                                                 -->
                     <!--         properties=frozenset('METRIC_TIME',),                                              -->
                     <!--         time_granularity=DAY,                                                              -->
                     <!--       ),                                                                                   -->
@@ -76,29 +84,33 @@
                             <WhereConstraintNode>
                                 <!-- description = 'Constrain Output with WHERE' -->
                                 <!-- node_id = NodeId(id_str='wcc_0') -->
-                                <!-- where_condition =                                     -->
-                                <!--   WhereFilterSpec(                                    -->
-                                <!--     where_sql="metric_time__day = '2020-01-01'",      -->
-                                <!--     bind_parameters=SqlBindParameters(),              -->
-                                <!--     linkable_specs=(                                  -->
-                                <!--       TimeDimensionSpec(                              -->
-                                <!--         element_name='metric_time',                   -->
-                                <!--         time_granularity=DAY,                         -->
-                                <!--       ),                                              -->
-                                <!--     ),                                                -->
-                                <!--     linkable_elements=(                               -->
-                                <!--       LinkableDimension(                              -->
-                                <!--         semantic_model_origin=SemanticModelReference( -->
-                                <!--           semantic_model_name='bookings_source',      -->
-                                <!--         ),                                            -->
-                                <!--         element_name='metric_time',                   -->
-                                <!--         dimension_type=TIME,                          -->
-                                <!--         join_path=SemanticModelJoinPath(),            -->
-                                <!--         properties=frozenset('METRIC_TIME',),         -->
-                                <!--         time_granularity=DAY,                         -->
-                                <!--       ),                                              -->
-                                <!--     ),                                                -->
-                                <!--   )                                                   -->
+                                <!-- where_condition =                                               -->
+                                <!--   WhereFilterSpec(                                              -->
+                                <!--     where_sql="metric_time__day = '2020-01-01'",                -->
+                                <!--     bind_parameters=SqlBindParameters(),                        -->
+                                <!--     linkable_specs=(                                            -->
+                                <!--       TimeDimensionSpec(                                        -->
+                                <!--         element_name='metric_time',                             -->
+                                <!--         time_granularity=DAY,                                   -->
+                                <!--       ),                                                        -->
+                                <!--     ),                                                          -->
+                                <!--     linkable_elements=(                                         -->
+                                <!--       LinkableDimension(                                        -->
+                                <!--         semantic_model_origin=SemanticModelReference(           -->
+                                <!--           semantic_model_name='bookings_source',                -->
+                                <!--         ),                                                      -->
+                                <!--         element_name='metric_time',                             -->
+                                <!--         dimension_type=TIME,                                    -->
+                                <!--         join_path=SemanticModelJoinPath(                        -->
+                                <!--           left_semantic_model_reference=SemanticModelReference( -->
+                                <!--             semantic_model_name='bookings_source',              -->
+                                <!--           ),                                                    -->
+                                <!--         ),                                                      -->
+                                <!--         properties=frozenset('METRIC_TIME',),                   -->
+                                <!--         time_granularity=DAY,                                   -->
+                                <!--       ),                                                        -->
+                                <!--     ),                                                          -->
+                                <!--   )                                                             -->
                                 <FilterElementsNode>
                                     <!-- description = "Pass Only Elements: ['bookings', 'metric_time__day']" -->
                                     <!-- node_id = NodeId(id_str='pfe_0') -->
