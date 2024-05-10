@@ -53,7 +53,7 @@ def _generate_linkable_time_dimensions(
     semantic_model_origin: SemanticModelReference,
     dimension: Dimension,
     entity_links: Tuple[EntityReference, ...],
-    join_path: Sequence[SemanticModelJoinPathElement],
+    join_path: SemanticModelJoinPath,
     with_properties: FrozenSet[LinkableElementProperty],
 ) -> Sequence[LinkableDimension]:
     """Generates different versions of the given dimension, but at other valid time granularities."""
@@ -75,7 +75,7 @@ def _generate_linkable_time_dimensions(
                 element_name=dimension.reference.element_name,
                 dimension_type=DimensionType.TIME,
                 entity_links=entity_links,
-                join_path=tuple(join_path),
+                join_path=join_path,
                 time_granularity=time_granularity,
                 date_part=None,
                 properties=frozenset(properties),
@@ -91,7 +91,7 @@ def _generate_linkable_time_dimensions(
                         element_name=dimension.reference.element_name,
                         dimension_type=DimensionType.TIME,
                         entity_links=entity_links,
-                        join_path=tuple(join_path),
+                        join_path=join_path,
                         time_granularity=time_granularity,
                         date_part=date_part,
                         properties=frozenset(properties),
@@ -203,9 +203,7 @@ class ValidLinkableSpecResolver:
                         derived_from_semantic_models=defined_from_semantic_models,
                         join_on_entity=linkable_entity.reference,
                         entity_links=linkable_entity.entity_links,
-                        metric_to_entity_join_path=(
-                            SemanticModelJoinPath(linkable_entity.join_path) if linkable_entity.join_path else None
-                        ),
+                        metric_to_entity_join_path=(linkable_entity.join_path if linkable_entity.join_path else None),
                     )
                     self._joinable_metrics_for_entities[linkable_entity.reference].add(
                         metric_subquery_join_path_element
@@ -312,7 +310,7 @@ class ValidLinkableSpecResolver:
                     semantic_model_origin=semantic_model.reference,
                     element_name=entity.reference.element_name,
                     entity_links=(),
-                    join_path=(),
+                    join_path=SemanticModelJoinPath(),
                     properties=frozenset({LinkableElementProperty.LOCAL, LinkableElementProperty.ENTITY}),
                 )
             )
@@ -325,7 +323,7 @@ class ValidLinkableSpecResolver:
                         semantic_model_origin=semantic_model.reference,
                         element_name=entity.reference.element_name,
                         entity_links=(entity_link,),
-                        join_path=(),
+                        join_path=SemanticModelJoinPath(),
                         properties=frozenset({LinkableElementProperty.LOCAL, LinkableElementProperty.ENTITY}),
                     )
                 )
@@ -341,7 +339,7 @@ class ValidLinkableSpecResolver:
                             element_name=dimension.reference.element_name,
                             dimension_type=DimensionType.CATEGORICAL,
                             entity_links=(entity_link,),
-                            join_path=(),
+                            join_path=SemanticModelJoinPath(),
                             properties=dimension_properties,
                             time_granularity=None,
                             date_part=None,
@@ -353,7 +351,7 @@ class ValidLinkableSpecResolver:
                             semantic_model_origin=semantic_model.reference,
                             dimension=dimension,
                             entity_links=(entity_link,),
-                            join_path=(),
+                            join_path=SemanticModelJoinPath(),
                             with_properties=dimension_properties,
                         )
                     )
@@ -469,7 +467,7 @@ class ValidLinkableSpecResolver:
                         element_name=MetricFlowReservedKeywords.METRIC_TIME.value,
                         dimension_type=DimensionType.TIME,
                         entity_links=(),
-                        join_path=(),
+                        join_path=SemanticModelJoinPath(),
                         # Anything that's not at the base time granularity of the measure's aggregation time dimension
                         # should be considered derived.
                         properties=(
@@ -685,7 +683,7 @@ class ValidLinkableSpecResolver:
                         element_name=dimension.reference.element_name,
                         dimension_type=DimensionType.CATEGORICAL,
                         entity_links=join_path.entity_links,
-                        join_path=join_path.path_elements,
+                        join_path=join_path,
                         properties=properties,
                         time_granularity=None,
                         date_part=None,
@@ -697,7 +695,7 @@ class ValidLinkableSpecResolver:
                         semantic_model_origin=semantic_model.reference,
                         dimension=dimension,
                         entity_links=join_path.entity_links,
-                        join_path=join_path.path_elements,
+                        join_path=join_path,
                         with_properties=properties,
                     )
                 )
@@ -712,7 +710,7 @@ class ValidLinkableSpecResolver:
                         semantic_model_origin=semantic_model.reference,
                         element_name=entity.reference.element_name,
                         entity_links=join_path.entity_links,
-                        join_path=join_path.path_elements,
+                        join_path=join_path,
                         properties=properties.union({LinkableElementProperty.ENTITY}),
                     )
                 )

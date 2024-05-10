@@ -59,14 +59,14 @@ _base_entity = LinkableEntity(
     element_name=_base_entity_reference.element_name,
     semantic_model_origin=_base_semantic_model,
     entity_links=(),
-    join_path=(),
+    join_path=SemanticModelJoinPath(),
     properties=frozenset([LinkableElementProperty.ENTITY]),
 )
 _ambiguous_entity = LinkableEntity(
     element_name=AMBIGUOUS_NAME,
     semantic_model_origin=_base_semantic_model,
     entity_links=(_base_entity_reference,),
-    join_path=(),
+    join_path=SemanticModelJoinPath(),
     properties=frozenset([LinkableElementProperty.ENTITY, LinkableElementProperty.LOCAL_LINKED]),
 )
 # For testing deduplication on entities
@@ -74,10 +74,12 @@ _ambiguous_entity_with_join_path = LinkableEntity(
     element_name=AMBIGUOUS_NAME,
     semantic_model_origin=_base_semantic_model,
     entity_links=(_base_entity_reference,),
-    join_path=(
-        SemanticModelJoinPathElement(
-            semantic_model_reference=_secondary_semantic_model,
-            join_on_entity=EntityReference(element_name="external_entity"),
+    join_path=SemanticModelJoinPath(
+        path_elements=(
+            SemanticModelJoinPathElement(
+                semantic_model_reference=_secondary_semantic_model,
+                join_on_entity=EntityReference(element_name="external_entity"),
+            ),
         ),
     ),
     properties=frozenset([LinkableElementProperty.ENTITY, LinkableElementProperty.JOINED]),
@@ -89,7 +91,7 @@ _categorical_dimension = LinkableDimension(
     entity_links=(_base_entity_reference,),
     dimension_type=DimensionType.CATEGORICAL,
     semantic_model_origin=_base_semantic_model,
-    join_path=(),
+    join_path=SemanticModelJoinPath(),
     properties=frozenset([LinkableElementProperty.LOCAL_LINKED]),
     time_granularity=None,
     date_part=None,
@@ -99,7 +101,7 @@ _time_dimension = LinkableDimension(
     entity_links=(_base_entity_reference,),
     dimension_type=DimensionType.TIME,
     semantic_model_origin=_base_semantic_model,
-    join_path=(),
+    join_path=SemanticModelJoinPath(),
     properties=frozenset([LinkableElementProperty.LOCAL_LINKED]),
     time_granularity=TimeGranularity.DAY,
     date_part=None,
@@ -110,7 +112,7 @@ _ambiguous_categorical_dimension = LinkableDimension(
     entity_links=(_base_entity_reference,),
     dimension_type=DimensionType.CATEGORICAL,
     semantic_model_origin=_secondary_semantic_model,
-    join_path=(),
+    join_path=SemanticModelJoinPath(),
     properties=frozenset([LinkableElementProperty.LOCAL_LINKED]),
     time_granularity=None,
     date_part=None,
@@ -122,9 +124,11 @@ _ambiguous_categorical_dimension_with_join_path = LinkableDimension(
     entity_links=(_base_entity_reference,),
     dimension_type=DimensionType.CATEGORICAL,
     semantic_model_origin=_secondary_semantic_model,
-    join_path=(
-        SemanticModelJoinPathElement(
-            semantic_model_reference=_base_semantic_model, join_on_entity=_base_entity_reference
+    join_path=SemanticModelJoinPath(
+        path_elements=(
+            SemanticModelJoinPathElement(
+                semantic_model_reference=_base_semantic_model, join_on_entity=_base_entity_reference
+            ),
         ),
     ),
     properties=frozenset([LinkableElementProperty.JOINED]),
@@ -567,10 +571,12 @@ def linkable_set() -> LinkableElementSet:  # noqa: D103
                     element_name="dimension_element",
                     dimension_type=DimensionType.CATEGORICAL,
                     entity_links=(entity_0,),
-                    join_path=(
-                        SemanticModelJoinPathElement(
-                            semantic_model_reference=entity_0_source,
-                            join_on_entity=entity_0,
+                    join_path=SemanticModelJoinPath(
+                        path_elements=(
+                            SemanticModelJoinPathElement(
+                                semantic_model_reference=entity_0_source,
+                                join_on_entity=entity_0,
+                            ),
                         ),
                     ),
                     properties=frozenset(),
@@ -589,10 +595,12 @@ def linkable_set() -> LinkableElementSet:  # noqa: D103
                     element_name="time_dimension_element",
                     dimension_type=DimensionType.TIME,
                     entity_links=(entity_1,),
-                    join_path=(
-                        SemanticModelJoinPathElement(
-                            semantic_model_reference=entity_1_source,
-                            join_on_entity=entity_1,
+                    join_path=SemanticModelJoinPath(
+                        path_elements=(
+                            SemanticModelJoinPathElement(
+                                semantic_model_reference=entity_1_source,
+                                join_on_entity=entity_1,
+                            ),
                         ),
                     ),
                     properties=frozenset(),
@@ -611,10 +619,12 @@ def linkable_set() -> LinkableElementSet:  # noqa: D103
                     semantic_model_origin=SemanticModelReference("entity_source"),
                     element_name="entity_element",
                     entity_links=(entity_2,),
-                    join_path=(
-                        SemanticModelJoinPathElement(
-                            semantic_model_reference=entity_2_source,
-                            join_on_entity=entity_2,
+                    join_path=SemanticModelJoinPath(
+                        path_elements=(
+                            SemanticModelJoinPathElement(
+                                semantic_model_reference=entity_2_source,
+                                join_on_entity=entity_2,
+                            ),
                         ),
                     ),
                     properties=frozenset(),

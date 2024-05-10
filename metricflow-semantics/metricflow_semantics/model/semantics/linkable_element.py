@@ -109,7 +109,7 @@ class LinkableDimension(LinkableElement, SerializableDataclass):
     element_name: str
     dimension_type: DimensionType
     entity_links: Tuple[EntityReference, ...]
-    join_path: Tuple[SemanticModelJoinPathElement, ...]
+    join_path: SemanticModelJoinPath
     properties: FrozenSet[LinkableElementProperty]
     time_granularity: Optional[TimeGranularity]
     date_part: Optional[DatePart]
@@ -139,7 +139,7 @@ class LinkableDimension(LinkableElement, SerializableDataclass):
         semantic_model_references = set()
         if self.semantic_model_origin:
             semantic_model_references.add(self.semantic_model_origin)
-        for join_path_item in self.join_path:
+        for join_path_item in self.join_path.path_elements:
             semantic_model_references.add(join_path_item.semantic_model_reference)
 
         return sorted(semantic_model_references, key=lambda reference: reference.semantic_model_name)
@@ -154,7 +154,7 @@ class LinkableEntity(LinkableElement, SerializableDataclass):
     element_name: str
     properties: FrozenSet[LinkableElementProperty]
     entity_links: Tuple[EntityReference, ...]
-    join_path: Tuple[SemanticModelJoinPathElement, ...]
+    join_path: SemanticModelJoinPath
 
     @property
     def path_key(self) -> ElementPathKey:  # noqa: D102
@@ -170,8 +170,7 @@ class LinkableEntity(LinkableElement, SerializableDataclass):
     @override
     def derived_from_semantic_models(self) -> Sequence[SemanticModelReference]:
         semantic_model_references = {self.semantic_model_origin}
-        for join_path_item in self.join_path:
-            semantic_model_references.add(join_path_item.semantic_model_reference)
+        semantic_model_references.update(self.join_path.derived_from_semantic_models)
 
         return sorted(semantic_model_references, key=lambda reference: reference.semantic_model_name)
 
@@ -257,7 +256,7 @@ class LinkableMetric(LinkableElement, SerializableDataclass):
 
 
 @dataclass(frozen=True)
-class SemanticModelJoinPath:
+class SemanticModelJoinPath(SemanticModelDerivation):
     """Describes a series of joins between the measure semantic model, and other semantic models by entity.
 
     For example:
@@ -267,7 +266,7 @@ class SemanticModelJoinPath:
     would be represented by 2 path elements [(semantic_model0, A), (dimension_source1, B)]
     """
 
-    path_elements: Tuple[SemanticModelJoinPathElement, ...]
+    path_elements: Tuple[SemanticModelJoinPathElement, ...] = ()
 
     @property
     def last_path_element(self) -> SemanticModelJoinPathElement:  # noqa: D102

@@ -12,7 +12,7 @@ from dbt_semantic_interfaces.type_enums.dimension_type import DimensionType
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.dag.mf_dag import DagId
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
-from metricflow_semantics.model.semantics.linkable_element import LinkableDimension
+from metricflow_semantics.model.semantics.linkable_element import LinkableDimension, SemanticModelJoinPath
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
@@ -209,7 +209,7 @@ def test_filter_with_where_constraint_node(
                     properties=frozenset(),
                     time_granularity=TimeGranularity.DAY,
                     date_part=None,
-                    join_path=(),
+                    join_path=SemanticModelJoinPath(),
                 ),
             ),
         ),
