@@ -119,7 +119,9 @@ def test_dimension_in_filter(  # noqa: D103
                             dimension_type=DimensionType.CATEGORICAL,
                             element_name="country_latest",
                             entity_links=(EntityReference("listing"),),
-                            join_path=SemanticModelJoinPath(),
+                            join_path=SemanticModelJoinPath(
+                                left_semantic_model_reference=SemanticModelReference("bookings_source"),
+                            ),
                             properties=frozenset(),
                             time_granularity=None,
                             date_part=None,
@@ -175,7 +177,9 @@ def test_dimension_in_filter_with_grain(  # noqa: D103
                             dimension_type=DimensionType.TIME,
                             element_name="created_at",
                             entity_links=(EntityReference("listing"),),
-                            join_path=SemanticModelJoinPath(),
+                            join_path=SemanticModelJoinPath(
+                                left_semantic_model_reference=SemanticModelReference("bookings_source"),
+                            ),
                             properties=frozenset(),
                             time_granularity=TimeGranularity.WEEK,
                             date_part=None,
@@ -237,7 +241,9 @@ def test_time_dimension_in_filter(  # noqa: D103
                             dimension_type=DimensionType.CATEGORICAL,
                             element_name="created_at",
                             entity_links=(EntityReference("listing"),),
-                            join_path=SemanticModelJoinPath(),
+                            join_path=SemanticModelJoinPath(
+                                left_semantic_model_reference=SemanticModelReference("bookings_source"),
+                            ),
                             properties=frozenset(),
                             time_granularity=TimeGranularity.MONTH,
                             date_part=None,
@@ -300,7 +306,9 @@ def test_date_part_in_filter(  # noqa: D103
                             dimension_type=DimensionType.TIME,
                             element_name="metric_time",
                             entity_links=(),
-                            join_path=SemanticModelJoinPath(),
+                            join_path=SemanticModelJoinPath(
+                                left_semantic_model_reference=SemanticModelReference("bookings_source"),
+                            ),
                             properties=frozenset(),
                             time_granularity=TimeGranularity.DAY,
                             date_part=DatePart.YEAR,
@@ -366,7 +374,9 @@ def resolved_spec_lookup() -> FilterSpecResolutionLookUp:
                                 dimension_type=DimensionType.TIME,
                                 element_name="metric_time",
                                 entity_links=(),
-                                join_path=SemanticModelJoinPath(),
+                                join_path=SemanticModelJoinPath(
+                                    left_semantic_model_reference=SemanticModelReference("bookings_source"),
+                                ),
                                 properties=frozenset(),
                                 time_granularity=TimeGranularity.WEEK,
                                 date_part=DatePart.YEAR,
@@ -485,7 +495,9 @@ def test_entity_in_filter(  # noqa: D103
                             semantic_model_origin=SemanticModelReference("bookings"),
                             element_name="user",
                             entity_links=(EntityReference("listing"),),
-                            join_path=SemanticModelJoinPath(),
+                            join_path=SemanticModelJoinPath(
+                                left_semantic_model_reference=SemanticModelReference("bookings_source"),
+                            ),
                             properties=frozenset(),
                         ),
                     )
@@ -592,7 +604,9 @@ def test_dimension_time_dimension_parity(column_association_resolver: ColumnAsso
                                         dimension_type=DimensionType.TIME,
                                         element_name=METRIC_TIME_ELEMENT_NAME,
                                         entity_links=(),
-                                        join_path=SemanticModelJoinPath(),
+                                        join_path=SemanticModelJoinPath(
+                                            left_semantic_model_reference=SemanticModelReference("bookings_source"),
+                                        ),
                                         properties=frozenset(),
                                         time_granularity=TimeGranularity.WEEK,
                                         date_part=DatePart.YEAR,

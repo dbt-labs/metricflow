@@ -44,6 +44,7 @@ from more_itertools import bucket
 
 AMBIGUOUS_NAME = "ambiguous"
 # Common references
+_measure_semantic_model = SemanticModelReference(semantic_model_name="measure_model")
 _base_semantic_model = SemanticModelReference(semantic_model_name="base_semantic_model")
 _secondary_semantic_model = SemanticModelReference(semantic_model_name="secondary_semantic_model")
 _base_entity_reference = EntityReference(element_name="base_entity")
@@ -59,14 +60,14 @@ _base_entity = LinkableEntity(
     element_name=_base_entity_reference.element_name,
     semantic_model_origin=_base_semantic_model,
     entity_links=(),
-    join_path=SemanticModelJoinPath(),
+    join_path=SemanticModelJoinPath(left_semantic_model_reference=_measure_semantic_model),
     properties=frozenset([LinkableElementProperty.ENTITY]),
 )
 _ambiguous_entity = LinkableEntity(
     element_name=AMBIGUOUS_NAME,
     semantic_model_origin=_base_semantic_model,
     entity_links=(_base_entity_reference,),
-    join_path=SemanticModelJoinPath(),
+    join_path=SemanticModelJoinPath(left_semantic_model_reference=_measure_semantic_model),
     properties=frozenset([LinkableElementProperty.ENTITY, LinkableElementProperty.LOCAL_LINKED]),
 )
 # For testing deduplication on entities
@@ -75,6 +76,7 @@ _ambiguous_entity_with_join_path = LinkableEntity(
     semantic_model_origin=_base_semantic_model,
     entity_links=(_base_entity_reference,),
     join_path=SemanticModelJoinPath(
+        left_semantic_model_reference=_measure_semantic_model,
         path_elements=(
             SemanticModelJoinPathElement(
                 semantic_model_reference=_secondary_semantic_model,
@@ -91,7 +93,7 @@ _categorical_dimension = LinkableDimension(
     entity_links=(_base_entity_reference,),
     dimension_type=DimensionType.CATEGORICAL,
     semantic_model_origin=_base_semantic_model,
-    join_path=SemanticModelJoinPath(),
+    join_path=SemanticModelJoinPath(left_semantic_model_reference=_measure_semantic_model),
     properties=frozenset([LinkableElementProperty.LOCAL_LINKED]),
     time_granularity=None,
     date_part=None,
@@ -101,7 +103,7 @@ _time_dimension = LinkableDimension(
     entity_links=(_base_entity_reference,),
     dimension_type=DimensionType.TIME,
     semantic_model_origin=_base_semantic_model,
-    join_path=SemanticModelJoinPath(),
+    join_path=SemanticModelJoinPath(left_semantic_model_reference=_measure_semantic_model),
     properties=frozenset([LinkableElementProperty.LOCAL_LINKED]),
     time_granularity=TimeGranularity.DAY,
     date_part=None,
@@ -112,7 +114,7 @@ _ambiguous_categorical_dimension = LinkableDimension(
     entity_links=(_base_entity_reference,),
     dimension_type=DimensionType.CATEGORICAL,
     semantic_model_origin=_secondary_semantic_model,
-    join_path=SemanticModelJoinPath(),
+    join_path=SemanticModelJoinPath(left_semantic_model_reference=_measure_semantic_model),
     properties=frozenset([LinkableElementProperty.LOCAL_LINKED]),
     time_granularity=None,
     date_part=None,
@@ -125,6 +127,7 @@ _ambiguous_categorical_dimension_with_join_path = LinkableDimension(
     dimension_type=DimensionType.CATEGORICAL,
     semantic_model_origin=_secondary_semantic_model,
     join_path=SemanticModelJoinPath(
+        left_semantic_model_reference=_measure_semantic_model,
         path_elements=(
             SemanticModelJoinPathElement(
                 semantic_model_reference=_base_semantic_model, join_on_entity=_base_entity_reference
@@ -169,7 +172,9 @@ _ambiguous_metric_with_join_path = LinkableMetric(
             join_on_entity=_base_entity_reference,
             entity_links=(_secondary_entity_reference,),
             metric_to_entity_join_path=SemanticModelJoinPath.from_single_element(
-                semantic_model_reference=_secondary_semantic_model, join_on_entity=_secondary_entity_reference
+                left_semantic_model_reference=_measure_semantic_model,
+                right_semantic_model_reference=_secondary_semantic_model,
+                join_on_entity=_secondary_entity_reference,
             ),
         ),
     ),
@@ -548,6 +553,7 @@ def test_only_unique_path_keys() -> None:
 
 @pytest.fixture(scope="session")
 def linkable_set() -> LinkableElementSet:  # noqa: D103
+    measure_source = SemanticModelReference("measure_source")
     entity_0 = EntityReference("entity_0")
     entity_0_source = SemanticModelReference("entity_0_source")
     entity_1 = EntityReference("entity_1")
@@ -572,6 +578,7 @@ def linkable_set() -> LinkableElementSet:  # noqa: D103
                     dimension_type=DimensionType.CATEGORICAL,
                     entity_links=(entity_0,),
                     join_path=SemanticModelJoinPath(
+                        left_semantic_model_reference=measure_source,
                         path_elements=(
                             SemanticModelJoinPathElement(
                                 semantic_model_reference=entity_0_source,
@@ -596,6 +603,7 @@ def linkable_set() -> LinkableElementSet:  # noqa: D103
                     dimension_type=DimensionType.TIME,
                     entity_links=(entity_1,),
                     join_path=SemanticModelJoinPath(
+                        left_semantic_model_reference=measure_source,
                         path_elements=(
                             SemanticModelJoinPathElement(
                                 semantic_model_reference=entity_1_source,
@@ -620,6 +628,7 @@ def linkable_set() -> LinkableElementSet:  # noqa: D103
                     element_name="entity_element",
                     entity_links=(entity_2,),
                     join_path=SemanticModelJoinPath(
+                        left_semantic_model_reference=measure_source,
                         path_elements=(
                             SemanticModelJoinPathElement(
                                 semantic_model_reference=entity_2_source,
@@ -647,6 +656,7 @@ def linkable_set() -> LinkableElementSet:  # noqa: D103
                             join_on_entity=entity_2,
                             entity_links=(entity_4, entity_3),
                             metric_to_entity_join_path=SemanticModelJoinPath(
+                                left_semantic_model_reference=measure_source,
                                 path_elements=(
                                     SemanticModelJoinPathElement(
                                         semantic_model_reference=entity_4_source, join_on_entity=entity_4
@@ -654,11 +664,13 @@ def linkable_set() -> LinkableElementSet:  # noqa: D103
                                     SemanticModelJoinPathElement(
                                         semantic_model_reference=entity_3_source, join_on_entity=entity_3
                                     ),
-                                )
+                                ),
                             ),
                         ),
                         semantic_model_join_path=SemanticModelJoinPath.from_single_element(
-                            semantic_model_reference=entity_3_source, join_on_entity=entity_3
+                            left_semantic_model_reference=measure_source,
+                            right_semantic_model_reference=entity_3_source,
+                            join_on_entity=entity_3,
                         ),
                     ),
                 ),
@@ -677,6 +689,7 @@ def test_derived_semantic_models(linkable_set: LinkableElementSet) -> None:
         SemanticModelReference(semantic_model_name="entity_3_source"),
         SemanticModelReference(semantic_model_name="entity_4_source"),
         SemanticModelReference(semantic_model_name="entity_source"),
+        SemanticModelReference(semantic_model_name="measure_source"),
         SemanticModelReference(semantic_model_name="metric_semantic_model"),
         SemanticModelReference(semantic_model_name="time_dimension_source"),
     )

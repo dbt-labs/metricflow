@@ -24,6 +24,7 @@ from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowRese
 from metricflow_semantics.errors.error_classes import UnknownMetricLinkingError
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
+from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
 from metricflow_semantics.model.semantics.linkable_element import (
     ElementPathKey,
     LinkableDimension,
@@ -310,7 +311,9 @@ class ValidLinkableSpecResolver:
                     semantic_model_origin=semantic_model.reference,
                     element_name=entity.reference.element_name,
                     entity_links=(),
-                    join_path=SemanticModelJoinPath(),
+                    join_path=SemanticModelJoinPath(
+                        left_semantic_model_reference=semantic_model.reference,
+                    ),
                     properties=frozenset({LinkableElementProperty.LOCAL, LinkableElementProperty.ENTITY}),
                 )
             )
@@ -323,7 +326,9 @@ class ValidLinkableSpecResolver:
                         semantic_model_origin=semantic_model.reference,
                         element_name=entity.reference.element_name,
                         entity_links=(entity_link,),
-                        join_path=SemanticModelJoinPath(),
+                        join_path=SemanticModelJoinPath(
+                            left_semantic_model_reference=semantic_model.reference,
+                        ),
                         properties=frozenset({LinkableElementProperty.LOCAL, LinkableElementProperty.ENTITY}),
                     )
                 )
@@ -339,7 +344,9 @@ class ValidLinkableSpecResolver:
                             element_name=dimension.reference.element_name,
                             dimension_type=DimensionType.CATEGORICAL,
                             entity_links=(entity_link,),
-                            join_path=SemanticModelJoinPath(),
+                            join_path=SemanticModelJoinPath(
+                                left_semantic_model_reference=semantic_model.reference,
+                            ),
                             properties=dimension_properties,
                             time_granularity=None,
                             date_part=None,
@@ -351,7 +358,9 @@ class ValidLinkableSpecResolver:
                             semantic_model_origin=semantic_model.reference,
                             dimension=dimension,
                             entity_links=(entity_link,),
-                            join_path=SemanticModelJoinPath(),
+                            join_path=SemanticModelJoinPath(
+                                left_semantic_model_reference=semantic_model.reference,
+                            ),
                             with_properties=dimension_properties,
                         )
                     )
@@ -467,7 +476,11 @@ class ValidLinkableSpecResolver:
                         element_name=MetricFlowReservedKeywords.METRIC_TIME.value,
                         dimension_type=DimensionType.TIME,
                         entity_links=(),
-                        join_path=SemanticModelJoinPath(),
+                        join_path=SemanticModelJoinPath(
+                            left_semantic_model_reference=measure_semantic_model.reference
+                            if measure_semantic_model
+                            else SemanticModelDerivation.VIRTUAL_SEMANTIC_MODEL_REFERENCE,
+                        ),
                         # Anything that's not at the base time granularity of the measure's aggregation time dimension
                         # should be considered derived.
                         properties=(
@@ -506,7 +519,8 @@ class ValidLinkableSpecResolver:
                     continue
                 join_paths.append(
                     SemanticModelJoinPath.from_single_element(
-                        semantic_model_reference=semantic_model.reference,
+                        left_semantic_model_reference=measure_semantic_model.reference,
+                        right_semantic_model_reference=semantic_model.reference,
                         join_on_entity=entity.reference,
                     )
                 )
@@ -648,12 +662,13 @@ class ValidLinkableSpecResolver:
                     continue
 
                 new_join_path = SemanticModelJoinPath(
+                    left_semantic_model_reference=current_join_path.left_semantic_model_reference,
                     path_elements=current_join_path.path_elements
                     + (
                         SemanticModelJoinPathElement(
                             semantic_model_reference=semantic_model.reference, join_on_entity=entity_reference
                         ),
-                    )
+                    ),
                 )
                 new_join_paths.append(new_join_path)
 

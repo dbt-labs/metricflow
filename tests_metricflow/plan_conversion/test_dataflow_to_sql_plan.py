@@ -209,7 +209,9 @@ def test_filter_with_where_constraint_node(
                     properties=frozenset(),
                     time_granularity=TimeGranularity.DAY,
                     date_part=None,
-                    join_path=SemanticModelJoinPath(),
+                    join_path=SemanticModelJoinPath(
+                        left_semantic_model_reference=SemanticModelReference("bookings_source"),
+                    ),
                 ),
             ),
         ),

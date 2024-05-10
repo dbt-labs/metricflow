@@ -139,8 +139,7 @@ class LinkableDimension(LinkableElement, SerializableDataclass):
         semantic_model_references = set()
         if self.semantic_model_origin:
             semantic_model_references.add(self.semantic_model_origin)
-        for join_path_item in self.join_path.path_elements:
-            semantic_model_references.add(join_path_item.semantic_model_reference)
+        semantic_model_references.update(self.join_path.derived_from_semantic_models)
 
         return sorted(semantic_model_references, key=lambda reference: reference.semantic_model_name)
 
@@ -266,6 +265,7 @@ class SemanticModelJoinPath(SemanticModelDerivation):
     would be represented by 2 path elements [(semantic_model0, A), (dimension_source1, B)]
     """
 
+    left_semantic_model_reference: SemanticModelReference
     path_elements: Tuple[SemanticModelJoinPathElement, ...] = ()
 
     @property
@@ -288,25 +288,30 @@ class SemanticModelJoinPath(SemanticModelDerivation):
 
     @staticmethod
     def from_single_element(
-        semantic_model_reference: SemanticModelReference, join_on_entity: EntityReference
+        left_semantic_model_reference: SemanticModelReference,
+        right_semantic_model_reference: SemanticModelReference,
+        join_on_entity: EntityReference,
     ) -> SemanticModelJoinPath:
         """Build SemanticModelJoinPath with just one join path element."""
         return SemanticModelJoinPath(
+            left_semantic_model_reference=left_semantic_model_reference,
             path_elements=(
                 SemanticModelJoinPathElement(
-                    semantic_model_reference=semantic_model_reference,
+                    semantic_model_reference=right_semantic_model_reference,
                     join_on_entity=join_on_entity,
                 ),
-            )
+            ),
         )
 
     @property
     def derived_from_semantic_models(self) -> Sequence[SemanticModelReference]:
         """Unique semantic models used in this join path."""
-        return sorted(
-            [path_element.semantic_model_reference for path_element in self.path_elements],
-            key=lambda reference: reference.semantic_model_name,
-        )
+        semantic_model_references = set()
+        semantic_model_references.add(self.left_semantic_model_reference)
+        for path_element in self.path_elements:
+            semantic_model_references.add(path_element.semantic_model_reference)
+
+        return sorted(semantic_model_references, key=lambda reference: reference.semantic_model_name)
 
 
 @dataclass(frozen=True)
