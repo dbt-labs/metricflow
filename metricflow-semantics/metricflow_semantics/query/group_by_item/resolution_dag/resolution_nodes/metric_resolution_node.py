@@ -10,6 +10,7 @@ from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.query.group_by_item.resolution_dag.input_metric_location import InputMetricDefinitionLocation
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.base_node import (
     GroupByItemResolutionNode,
+    GroupByItemResolutionNodeSet,
     GroupByItemResolutionNodeVisitor,
 )
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.measure_source_node import (
@@ -86,3 +87,7 @@ class MetricGroupByItemResolutionNode(GroupByItemResolutionNode):
             f"Metric({repr(self._metric_reference.element_name)}, "
             f"input_metric_index={self._metric_input_location.input_metric_list_index})"
         )
+
+    @override
+    def _self_set(self) -> GroupByItemResolutionNodeSet:
+        return GroupByItemResolutionNodeSet(metric_nodes=(self,))

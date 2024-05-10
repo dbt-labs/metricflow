@@ -1,14 +1,16 @@
 from __future__ import annotations
 
+import itertools
 import logging
 from dataclasses import dataclass
-from typing import List, Optional, Sequence, Tuple
+from typing import List, Optional, Sequence, Set, Tuple
 
-from dbt_semantic_interfaces.references import MetricReference
+from dbt_semantic_interfaces.references import MeasureReference, MetricReference, SemanticModelReference
 
-from metricflow_semantics.mf_logging.pretty_print import mf_pformat
+from metricflow_semantics.mf_logging.pretty_print import mf_pformat, mf_pformat_many
 from metricflow_semantics.mf_logging.runtime import log_runtime
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
 from metricflow_semantics.model.semantics.linkable_element_set import LinkableElementSet
 from metricflow_semantics.naming.metric_scheme import MetricNamingScheme
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_pattern_factory import (
@@ -61,6 +63,7 @@ from metricflow_semantics.specs.spec_classes import (
     OrderBySpec,
 )
 from metricflow_semantics.specs.spec_set import group_specs_by_type
+from metricflow_semantics.workarounds.reference import sorted_semantic_model_references
 
 logger = logging.getLogger(__name__)
 
@@ -520,6 +523,46 @@ class MetricFlowQueryResolver:
                 queried_semantic_models=(),
             )
 
+        model_reference_set = set(resolve_group_by_item_result.linkable_element_set.derived_from_semantic_models)
+        for filter_spec_resolution in filter_spec_lookup.spec_resolutions:
+            model_reference_set.update(
+                set(filter_spec_resolution.resolved_linkable_element_set.derived_from_semantic_models)
+            )
+
+        # Collect all semantic models referenced by the query.
+        semantic_models_in_group_by_items = set(
+            resolve_group_by_item_result.linkable_element_set.derived_from_semantic_models
+        )
+        semantic_models_in_filters = set(
+            itertools.chain.from_iterable(
+                filter_spec_resolution.resolved_linkable_element_set.derived_from_semantic_models
+                for filter_spec_resolution in filter_spec_lookup.spec_resolutions
+            )
+        )
+        measure_semantic_models = self._get_models_for_measures(resolution_dag)
+
+        queried_semantic_models = set.union(
+            semantic_models_in_group_by_items, semantic_models_in_filters, measure_semantic_models
+        )
+        queried_semantic_models -= {SemanticModelDerivation.VIRTUAL_SEMANTIC_MODEL_REFERENCE}
+
+        # Sanity check to make sure that all queried semantic models are in the model.
+        models_not_in_manifest = queried_semantic_models - {
+            semantic_model.reference for semantic_model in self._manifest_lookup.semantic_manifest.semantic_models
+        }
+
+        # There are no known cases where this should happen, but adding this check just in case there's a bug where
+        # a measure alias is used incorrectly.
+        if len(models_not_in_manifest) > 0:
+            logger.error(
+                mf_pformat_many(
+                    "Semantic references that aren't in the manifest were found in the set used in "
+                    "a query. This is a bug, and to avoid potential issues, they will be filtered out.",
+                    {"models_not_in_manifest": models_not_in_manifest},
+                )
+            )
+        queried_semantic_models -= models_not_in_manifest
+
         return MetricFlowQueryResolution(
             query_spec=MetricFlowQuerySpec(
                 metric_specs=metric_specs,
@@ -535,7 +578,34 @@ class MetricFlowQueryResolver:
             resolution_dag=resolution_dag,
             filter_spec_lookup=filter_spec_lookup,
             input_to_issue_set=issue_set_mapping,
-            queried_semantic_models=tuple(
-                resolve_group_by_item_result.linkable_element_set.derived_from_semantic_models
-            ),
+            queried_semantic_models=sorted_semantic_model_references(queried_semantic_models),
         )
+
+    def _get_models_for_measures(self, resolution_dag: GroupByItemResolutionDag) -> Set[SemanticModelReference]:
+        """Return the semantic model references for the measures used in the query."""
+        resolution_dag_node_set = resolution_dag.sink_node.inclusive_ancestors()
+
+        measure_references: Set[MeasureReference] = set()
+
+        # Collect measures for metrics through the associated measure nodes.
+        for measure_node in resolution_dag_node_set.measure_nodes:
+            measure_references.add(measure_node.measure_reference)
+
+        # For conversion metrics, get the measures through the metric since those measures aren't in the DAG.
+        for metric_node in resolution_dag_node_set.metric_nodes:
+            metric = self._manifest_lookup.metric_lookup.get_metric(metric_node.metric_reference)
+            conversion_type_params = metric.type_params.conversion_type_params
+            if conversion_type_params is None:
+                continue
+
+            measure_references.add(conversion_type_params.base_measure.measure_reference)
+            measure_references.add(conversion_type_params.conversion_measure.measure_reference)
+
+        model_references: Set[SemanticModelReference] = set()
+        for measure_reference in measure_references:
+            measure_semantic_model = self._manifest_lookup.semantic_model_lookup.get_semantic_model_for_measure(
+                measure_reference
+            )
+            model_references.add(measure_semantic_model.reference)
+
+        return model_references
