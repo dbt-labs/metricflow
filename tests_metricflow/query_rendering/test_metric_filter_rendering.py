@@ -280,3 +280,29 @@ def test_group_by_has_local_entity_prefix(  # noqa: D103
         sql_client=sql_client,
         node=dataflow_plan.sink_output_nodes[0].parent_node,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_filter_with_conversion_metric(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    sql_client: SqlClient,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    query_parser: MetricFlowQueryParser,
+) -> None:
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("listings",),
+        where_constraint=PydanticWhereFilter(
+            where_sql_template="{{ Metric('visit_buy_conversion_rate', ['user']) }} > 2",
+        ),
+    )
+    dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
+
+    convert_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_output_nodes[0].parent_node,
+    )
