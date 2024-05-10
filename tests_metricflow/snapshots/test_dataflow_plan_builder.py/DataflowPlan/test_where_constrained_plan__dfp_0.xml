@@ -26,13 +26,15 @@
             <!--             element_name='country_latest',                           -->
             <!--             dimension_type=CATEGORICAL,                              -->
             <!--             entity_links=(EntityReference(element_name='listing'),), -->
-            <!--             join_path=(                                              -->
-            <!--               SemanticModelJoinPathElement(                          -->
-            <!--                 semantic_model_reference=SemanticModelReference(     -->
-            <!--                   semantic_model_name='listings_latest',             -->
-            <!--                 ),                                                   -->
-            <!--                 join_on_entity=EntityReference(                      -->
-            <!--                   element_name='listing',                            -->
+            <!--             join_path=SemanticModelJoinPath(                         -->
+            <!--               path_elements=(                                        -->
+            <!--                 SemanticModelJoinPathElement(                        -->
+            <!--                   semantic_model_reference=SemanticModelReference(   -->
+            <!--                     semantic_model_name='listings_latest',           -->
+            <!--                   ),                                                 -->
+            <!--                   join_on_entity=EntityReference(                    -->
+            <!--                     element_name='listing',                          -->
+            <!--                   ),                                                 -->
             <!--                 ),                                                   -->
             <!--               ),                                                     -->
             <!--             ),                                                       -->
@@ -76,13 +78,15 @@
                         <!--         element_name='country_latest',                           -->
                         <!--         dimension_type=CATEGORICAL,                              -->
                         <!--         entity_links=(EntityReference(element_name='listing'),), -->
-                        <!--         join_path=(                                              -->
-                        <!--           SemanticModelJoinPathElement(                          -->
-                        <!--             semantic_model_reference=SemanticModelReference(     -->
-                        <!--               semantic_model_name='listings_latest',             -->
-                        <!--             ),                                                   -->
-                        <!--             join_on_entity=EntityReference(                      -->
-                        <!--               element_name='listing',                            -->
+                        <!--         join_path=SemanticModelJoinPath(                         -->
+                        <!--           path_elements=(                                        -->
+                        <!--             SemanticModelJoinPathElement(                        -->
+                        <!--               semantic_model_reference=SemanticModelReference(   -->
+                        <!--                 semantic_model_name='listings_latest',           -->
+                        <!--               ),                                                 -->
+                        <!--               join_on_entity=EntityReference(                    -->
+                        <!--                 element_name='listing',                          -->
+                        <!--               ),                                                 -->
                         <!--             ),                                                   -->
                         <!--           ),                                                     -->
                         <!--         ),                                                       -->

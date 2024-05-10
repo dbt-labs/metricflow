@@ -22,6 +22,7 @@
             <!--             ),                                                                 -->
             <!--             element_name='metric_time',                                        -->
             <!--             dimension_type=TIME,                                               -->
+            <!--             join_path=SemanticModelJoinPath(),                                 -->
             <!--             properties=frozenset('METRIC_TIME',),                              -->
             <!--             time_granularity=DAY,                                              -->
             <!--           ),                                                                   -->
@@ -49,6 +50,7 @@
                     <!--         ),                                                                                 -->
                     <!--         element_name='metric_time',                                                        -->
                     <!--         dimension_type=TIME,                                                               -->
+                    <!--         join_path=SemanticModelJoinPath(),                                                 -->
                     <!--         properties=frozenset('METRIC_TIME',),                                              -->
                     <!--         time_granularity=DAY,                                                              -->
                     <!--       ),                                                                                   -->
@@ -91,6 +93,7 @@
                                 <!--         ),                                            -->
                                 <!--         element_name='metric_time',                   -->
                                 <!--         dimension_type=TIME,                          -->
+                                <!--         join_path=SemanticModelJoinPath(),            -->
                                 <!--         properties=frozenset('METRIC_TIME',),         -->
                                 <!--         time_granularity=DAY,                         -->
                                 <!--       ),                                              -->

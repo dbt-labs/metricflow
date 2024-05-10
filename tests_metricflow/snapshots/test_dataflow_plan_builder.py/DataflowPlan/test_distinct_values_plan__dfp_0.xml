@@ -44,6 +44,7 @@
                     <!--         element_name='country_latest',                           -->
                     <!--         dimension_type=CATEGORICAL,                              -->
                     <!--         entity_links=(EntityReference(element_name='listing'),), -->
+                    <!--         join_path=SemanticModelJoinPath(),                       -->
                     <!--         properties=frozenset('LOCAL',),                          -->
                     <!--       ),                                                         -->
                     <!--     ),                                                           -->

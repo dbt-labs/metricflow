@@ -65,6 +65,7 @@
                             <!--         element_name='is_instant',                               -->
                             <!--         dimension_type=CATEGORICAL,                              -->
                             <!--         entity_links=(EntityReference(element_name='booking'),), -->
+                            <!--         join_path=SemanticModelJoinPath(),                       -->
                             <!--         properties=frozenset('LOCAL',),                          -->
                             <!--       ),                                                         -->
                             <!--     ),                                                           -->
