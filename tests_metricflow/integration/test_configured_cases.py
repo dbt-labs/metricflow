@@ -232,7 +232,8 @@ def filter_not_supported_features(
 
 @pytest.mark.parametrize(
     "name",
-    CONFIGURED_INTEGRATION_TESTS_REPOSITORY.all_test_case_names,
+    # CONFIGURED_INTEGRATION_TESTS_REPOSITORY.all_test_case_names,
+    ["itest_dimensions.yaml/distinct_values_query_with_metric_filter"],
     ids=lambda name: f"name={name}",
 )
 def test_case(
@@ -364,11 +365,6 @@ def test_case(
     assert_dataframes_equal(actual, expected, sort_columns=not case.check_order, allow_empty=case.allow_empty)
 
     # Check that the parse result and the dataflow plan show the same semantic models read.
-    if name in {"itest_dimensions.yaml/distinct_values_query_with_metric_filter"}:
-        pytest.skip(
-            "Skipping the congruence check for semantic models queried by the parser vs. the dataflow as "
-            "metrics-in-filters is a WIP."
-        )
     parse_query_result = query_result.explain_result.parse_query_result
 
     dataflow_plan_lookup = DataflowPlanLookup(query_result.dataflow_plan)

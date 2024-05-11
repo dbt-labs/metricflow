@@ -533,6 +533,8 @@ class MetricFlowQueryResolver:
         semantic_models_in_group_by_items = set(
             resolve_group_by_item_result.linkable_element_set.derived_from_semantic_models
         )
+        print(resolve_group_by_item_result.linkable_element_set)
+        print(semantic_models_in_group_by_items)
         semantic_models_in_filters = set(
             itertools.chain.from_iterable(
                 filter_spec_resolution.resolved_linkable_element_set.derived_from_semantic_models
