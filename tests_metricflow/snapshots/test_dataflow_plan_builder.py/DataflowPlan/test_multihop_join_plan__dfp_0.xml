@@ -95,11 +95,16 @@
                                 <!--       ),                                                           -->
                                 <!--     ),                                                             -->
                                 <!--   )                                                                -->
-                                <ReadSqlSourceNode>
-                                    <!-- description = "Read From SemanticModelDataSet('bridge_table')" -->
-                                    <!-- node_id = NodeId(id_str='rss_22007') -->
-                                    <!-- data_set = SemanticModelDataSet('bridge_table') -->
-                                </ReadSqlSourceNode>
+                                <MetricTimeDimensionTransformNode>
+                                    <!-- description = "Metric Time Dimension 'ds_partitioned'" -->
+                                    <!-- node_id = NodeId(id_str='sma_22002') -->
+                                    <!-- aggregation_time_dimension = 'ds_partitioned' -->
+                                    <ReadSqlSourceNode>
+                                        <!-- description = "Read From SemanticModelDataSet('bridge_table')" -->
+                                        <!-- node_id = NodeId(id_str='rss_22007') -->
+                                        <!-- data_set = SemanticModelDataSet('bridge_table') -->
+                                    </ReadSqlSourceNode>
+                                </MetricTimeDimensionTransformNode>
                                 <FilterElementsNode>
                                     <!-- description =                                            -->
                                     <!--   ('Pass Only Elements: [\n'                             -->
@@ -129,6 +134,17 @@
                                     <!--    "  'customer_id__ds_partitioned__extract_day',\n"     -->
                                     <!--    "  'customer_id__ds_partitioned__extract_dow',\n"     -->
                                     <!--    "  'customer_id__ds_partitioned__extract_doy',\n"     -->
+                                    <!--    "  'metric_time__day',\n"                             -->
+                                    <!--    "  'metric_time__week',\n"                            -->
+                                    <!--    "  'metric_time__month',\n"                           -->
+                                    <!--    "  'metric_time__quarter',\n"                         -->
+                                    <!--    "  'metric_time__year',\n"                            -->
+                                    <!--    "  'metric_time__extract_year',\n"                    -->
+                                    <!--    "  'metric_time__extract_quarter',\n"                 -->
+                                    <!--    "  'metric_time__extract_month',\n"                   -->
+                                    <!--    "  'metric_time__extract_day',\n"                     -->
+                                    <!--    "  'metric_time__extract_dow',\n"                     -->
+                                    <!--    "  'metric_time__extract_doy',\n"                     -->
                                     <!--    "  'customer_id',\n"                                  -->
                                     <!--    ']')                                                  -->
                                     <!-- node_id = NodeId(id_str='pfe_0') -->
@@ -262,13 +278,64 @@
                                     <!--     time_granularity=DAY,                                        -->
                                     <!--     date_part=DOY,                                               -->
                                     <!--   )                                                              -->
+                                    <!-- include_spec =                                                        -->
+                                    <!--   TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
+                                    <!-- include_spec =                                                         -->
+                                    <!--   TimeDimensionSpec(element_name='metric_time', time_granularity=WEEK) -->
+                                    <!-- include_spec =                                                          -->
+                                    <!--   TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH) -->
+                                    <!-- include_spec =                                                            -->
+                                    <!--   TimeDimensionSpec(element_name='metric_time', time_granularity=QUARTER) -->
+                                    <!-- include_spec =                                                         -->
+                                    <!--   TimeDimensionSpec(element_name='metric_time', time_granularity=YEAR) -->
+                                    <!-- include_spec =                  -->
+                                    <!--   TimeDimensionSpec(            -->
+                                    <!--     element_name='metric_time', -->
+                                    <!--     time_granularity=DAY,       -->
+                                    <!--     date_part=YEAR,             -->
+                                    <!--   )                             -->
+                                    <!-- include_spec =                  -->
+                                    <!--   TimeDimensionSpec(            -->
+                                    <!--     element_name='metric_time', -->
+                                    <!--     time_granularity=DAY,       -->
+                                    <!--     date_part=QUARTER,          -->
+                                    <!--   )                             -->
+                                    <!-- include_spec =                  -->
+                                    <!--   TimeDimensionSpec(            -->
+                                    <!--     element_name='metric_time', -->
+                                    <!--     time_granularity=DAY,       -->
+                                    <!--     date_part=MONTH,            -->
+                                    <!--   )                             -->
+                                    <!-- include_spec =                  -->
+                                    <!--   TimeDimensionSpec(            -->
+                                    <!--     element_name='metric_time', -->
+                                    <!--     time_granularity=DAY,       -->
+                                    <!--     date_part=DAY,              -->
+                                    <!--   )                             -->
+                                    <!-- include_spec =                  -->
+                                    <!--   TimeDimensionSpec(            -->
+                                    <!--     element_name='metric_time', -->
+                                    <!--     time_granularity=DAY,       -->
+                                    <!--     date_part=DOW,              -->
+                                    <!--   )                             -->
+                                    <!-- include_spec =                  -->
+                                    <!--   TimeDimensionSpec(            -->
+                                    <!--     element_name='metric_time', -->
+                                    <!--     time_granularity=DAY,       -->
+                                    <!--     date_part=DOY,              -->
+                                    <!--   )                             -->
                                     <!-- include_spec = EntitySpec(element_name='customer_id') -->
                                     <!-- distinct = False -->
-                                    <ReadSqlSourceNode>
-                                        <!-- description = "Read From SemanticModelDataSet('customer_table')" -->
-                                        <!-- node_id = NodeId(id_str='rss_22009') -->
-                                        <!-- data_set = SemanticModelDataSet('customer_table') -->
-                                    </ReadSqlSourceNode>
+                                    <MetricTimeDimensionTransformNode>
+                                        <!-- description = "Metric Time Dimension 'ds_partitioned'" -->
+                                        <!-- node_id = NodeId(id_str='sma_22004') -->
+                                        <!-- aggregation_time_dimension = 'ds_partitioned' -->
+                                        <ReadSqlSourceNode>
+                                            <!-- description = "Read From SemanticModelDataSet('customer_table')" -->
+                                            <!-- node_id = NodeId(id_str='rss_22009') -->
+                                            <!-- data_set = SemanticModelDataSet('customer_table') -->
+                                        </ReadSqlSourceNode>
+                                    </MetricTimeDimensionTransformNode>
                                 </FilterElementsNode>
                             </JoinToBaseOutputNode>
                         </FilterElementsNode>
