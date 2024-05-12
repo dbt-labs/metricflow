@@ -373,3 +373,17 @@ integration_test:
     ) outer_subq
     WHERE listing__bookings > 2
     GROUP BY listing
+---
+integration_test:
+  name: just_listings
+  description: Query without metrics using a metric filter
+  model: SIMPLE_MODEL
+  group_bys: ["listing"]
+  # I don't see how you could specify you want listing from the listings_latest source
+  check_query: |
+    SELECT
+      listing_id AS listing
+    FROM {{ source_schema }}.dim_lux_listing_id_mapping l
+    GROUP BY
+      listing_id
+   
