@@ -349,9 +349,6 @@ integration_test:
   name: distinct_values_query_with_metric_filter
   description: Query without metrics using a metric filter
   model: SIMPLE_MODEL
-  # How do we specify that we want listing from the listings table?
-  # When querying entities, should we prioritize using tables where the entity is a primary key (if not specified)?
-  # Are we prioritizing the left node appropriately in the DFP for distinct values queries?
   group_bys: ["listing"]
   where_filter: "{{ render_metric_template('bookings', ['listing']) }} > 2"
   check_query: |
