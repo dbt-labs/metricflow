@@ -42,12 +42,12 @@ class QueryItemSuggestionGenerator:
             candidate_specs = candidate_filter.match(candidate_specs)
 
         # Use edit distance to figure out the closest matches, so convert the specs to strings.
-        candidate_strs = []
+        candidate_strs = set()
         for candidate_spec in candidate_specs:
             candidate_str = self._input_naming_scheme.input_str(candidate_spec)
 
             if candidate_str is not None:
-                candidate_strs.append(candidate_str)
+                candidate_strs.add(candidate_str)
 
         fuzzy_matches = top_fuzzy_matches(
             item=self._input_str,
