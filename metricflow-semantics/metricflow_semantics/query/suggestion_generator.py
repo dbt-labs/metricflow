@@ -6,6 +6,7 @@ from typing import Sequence, Tuple
 from metricflow_semantics.naming.naming_scheme import QueryItemNamingScheme
 from metricflow_semantics.query.similarity import top_fuzzy_matches
 from metricflow_semantics.specs.patterns.base_time_grain import BaseTimeGrainPattern
+from metricflow_semantics.specs.patterns.no_group_by_metric import NoGroupByMetricPattern
 from metricflow_semantics.specs.patterns.none_date_part import NoneDatePartPattern
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow_semantics.specs.spec_classes import InstanceSpec
@@ -23,7 +24,12 @@ class QueryItemSuggestionGenerator:
 
     # Adding these filters so that we don't get multiple suggestions that are similar, but with different
     # grains. Some additional thought is needed to tweak this as the base grain may not be the best suggestion.
-    GROUP_BY_ITEM_CANDIDATE_FILTERS: Tuple[SpecPattern, ...] = (BaseTimeGrainPattern(), NoneDatePartPattern())
+    FILTER_ITEM_CANDIDATE_FILTERS: Tuple[SpecPattern, ...] = (BaseTimeGrainPattern(), NoneDatePartPattern())
+    GROUP_BY_ITEM_CANDIDATE_FILTERS: Tuple[SpecPattern, ...] = (
+        BaseTimeGrainPattern(),
+        NoneDatePartPattern(),
+        NoGroupByMetricPattern(),
+    )
 
     def __init__(  # noqa: D107
         self, input_naming_scheme: QueryItemNamingScheme, input_str: str, candidate_filters: Sequence[SpecPattern]
