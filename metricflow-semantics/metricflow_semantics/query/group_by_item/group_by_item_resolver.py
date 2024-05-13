@@ -28,6 +28,7 @@ from metricflow_semantics.query.issues.issues_base import (
 )
 from metricflow_semantics.query.suggestion_generator import QueryItemSuggestionGenerator
 from metricflow_semantics.specs.patterns.base_time_grain import BaseTimeGrainPattern
+from metricflow_semantics.specs.patterns.no_group_by_metric import NoGroupByMetricPattern
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow_semantics.specs.patterns.typed_patterns import TimeDimensionPattern
 from metricflow_semantics.specs.spec_classes import LinkableInstanceSpec
@@ -87,7 +88,7 @@ class GroupByItemResolver:
         """
         push_down_visitor = _PushDownGroupByItemCandidatesVisitor(
             manifest_lookup=self._manifest_lookup,
-            source_spec_patterns=(spec_pattern,),
+            source_spec_patterns=(spec_pattern, NoGroupByMetricPattern()),
             suggestion_generator=suggestion_generator,
         )
 
@@ -146,15 +147,12 @@ class GroupByItemResolver:
         suggestion_generator = QueryItemSuggestionGenerator(
             input_naming_scheme=ObjectBuilderNamingScheme(),
             input_str=input_str,
-            candidate_filters=QueryItemSuggestionGenerator.GROUP_BY_ITEM_CANDIDATE_FILTERS,
+            candidate_filters=QueryItemSuggestionGenerator.FILTER_ITEM_CANDIDATE_FILTERS,
         )
 
         push_down_visitor = _PushDownGroupByItemCandidatesVisitor(
             manifest_lookup=self._manifest_lookup,
-            source_spec_patterns=(
-                spec_pattern,
-                BaseTimeGrainPattern(),
-            ),
+            source_spec_patterns=(spec_pattern, BaseTimeGrainPattern()),
             suggestion_generator=suggestion_generator,
         )
 

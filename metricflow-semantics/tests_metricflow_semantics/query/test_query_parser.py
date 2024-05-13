@@ -640,3 +640,11 @@ def query_parser_from_yaml(yaml_contents: List[YamlConfigFile]) -> MetricFlowQue
     return MetricFlowQueryParser(
         semantic_manifest_lookup=semantic_manifest_lookup,
     )
+
+
+def test_invalid_group_by_metric(bookings_query_parser: MetricFlowQueryParser) -> None:
+    """Tests that a query for an invalid group by metric gives an appropriate group by metric suggestion."""
+    with pytest.raises(InvalidQueryException, match="Metric\\('bookings', group_by=\\['listing'\\]\\)"):
+        bookings_query_parser.parse_and_validate_query(
+            metric_names=("bookings",), where_constraint_str="{{ Metric('listings', ['garbage']) }} > 1"
+        )

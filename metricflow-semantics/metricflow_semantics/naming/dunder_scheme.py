@@ -159,7 +159,9 @@ class _DunderNameTransform(InstanceSpecSetTransform[Sequence[str]]):
                 items.append(time_dimension_spec.time_granularity.value)
             names_to_return.append(DUNDER.join(items))
 
-        for other_group_by_item_specs in spec_set.entity_specs + spec_set.dimension_specs:
+        for other_group_by_item_specs in (
+            spec_set.entity_specs + spec_set.dimension_specs + spec_set.group_by_metric_specs
+        ):
             items = list(entity_link.element_name for entity_link in other_group_by_item_specs.entity_links) + [
                 other_group_by_item_specs.element_name
             ]

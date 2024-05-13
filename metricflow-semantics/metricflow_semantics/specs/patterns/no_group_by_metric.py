@@ -12,21 +12,18 @@ from metricflow_semantics.specs.spec_classes import (
 from metricflow_semantics.specs.spec_set import group_specs_by_type
 
 
-class NoneDatePartPattern(SpecPattern):
-    """Matches to linkable specs, but for time dimension specs, only matches to ones without date_part.
+class NoGroupByMetricPattern(SpecPattern):
+    """Matches to linkable specs, but only if they're not group by metrics.
 
-    This is used to help implement restrictions for cumulative metrics where those can not be queried by date_part.
+    Group by metrics are allowed in filters but not in the query input group by.
     """
 
     @override
     def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[LinkableInstanceSpec]:
         specs_to_return: List[LinkableInstanceSpec] = []
         spec_set = group_specs_by_type(candidate_specs)
-        for time_dimension_spec in spec_set.time_dimension_specs:
-            if time_dimension_spec.date_part is None:
-                specs_to_return.append(time_dimension_spec)
+        specs_to_return.extend(spec_set.time_dimension_specs)
         specs_to_return.extend(spec_set.dimension_specs)
         specs_to_return.extend(spec_set.entity_specs)
-        specs_to_return.extend(spec_set.group_by_metric_specs)
 
         return specs_to_return
