@@ -222,7 +222,10 @@ class LinkableMetric(LinkableElement, SerializableDataclass):
 
     @property
     def join_by_semantic_model(self) -> Optional[SemanticModelReference]:  # noqa: D102
-        return self.join_path.last_semantic_model_reference
+        if len(self.join_path.semantic_model_join_path.path_elements) == 0:
+            return None
+
+        return self.join_path.semantic_model_join_path.last_semantic_model_reference
 
     @property
     @override
@@ -349,7 +352,7 @@ class SemanticModelToMetricSubqueryJoinPath:
     """
 
     metric_subquery_join_path_element: MetricSubqueryJoinPathElement
-    semantic_model_join_path: Optional[SemanticModelJoinPath] = None
+    semantic_model_join_path: SemanticModelJoinPath
 
     @property
     def entity_links(self) -> Tuple[EntityReference, ...]:  # noqa: D102
@@ -362,8 +365,3 @@ class SemanticModelToMetricSubqueryJoinPath:
         return self.metric_subquery_join_path_element.entity_links + (
             self.metric_subquery_join_path_element.join_on_entity,
         )
-
-    @property
-    def last_semantic_model_reference(self) -> Optional[SemanticModelReference]:
-        """The last semantic model that would be joined in this path (if exists) before joining to metric."""
-        return self.semantic_model_join_path.last_semantic_model_reference if self.semantic_model_join_path else None

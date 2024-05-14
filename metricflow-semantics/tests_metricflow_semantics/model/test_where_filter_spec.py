@@ -552,7 +552,10 @@ def test_metric_in_filter(  # noqa: D103
                                     derived_from_semantic_models=(SemanticModelReference("bookings"),),
                                     join_on_entity=EntityReference("listing"),
                                     entity_links=(),
-                                )
+                                ),
+                                semantic_model_join_path=SemanticModelJoinPath(
+                                    left_semantic_model_reference=SemanticModelReference("listings_latest")
+                                ),
                             ),
                         ),
                     )

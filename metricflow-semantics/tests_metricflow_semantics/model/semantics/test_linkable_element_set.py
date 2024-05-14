@@ -119,7 +119,7 @@ _ambiguous_categorical_dimension = LinkableDimension(
     time_granularity=None,
     date_part=None,
 )
-# The opposite direction of the join tfor ambiguous_entity_with_join_path
+# The opposite direction of the join for ambiguous_entity_with_join_path
 # For testing deduplication on dimensions
 _ambiguous_categorical_dimension_with_join_path = LinkableDimension(
     element_name=AMBIGUOUS_NAME,
@@ -149,6 +149,7 @@ _base_metric = LinkableMetric(
             join_on_entity=_base_entity_reference,
             entity_links=(),
         ),
+        semantic_model_join_path=SemanticModelJoinPath(left_semantic_model_reference=_base_semantic_model),
     ),
 )
 _ambiguous_metric = LinkableMetric(
@@ -160,6 +161,7 @@ _ambiguous_metric = LinkableMetric(
             join_on_entity=_base_entity_reference,
             entity_links=(),
         ),
+        semantic_model_join_path=SemanticModelJoinPath(left_semantic_model_reference=_base_semantic_model),
     ),
 )
 # For testing deduplication on metrics
@@ -177,6 +179,7 @@ _ambiguous_metric_with_join_path = LinkableMetric(
                 join_on_entity=_secondary_entity_reference,
             ),
         ),
+        semantic_model_join_path=SemanticModelJoinPath(left_semantic_model_reference=_base_semantic_model),
     ),
 )
 

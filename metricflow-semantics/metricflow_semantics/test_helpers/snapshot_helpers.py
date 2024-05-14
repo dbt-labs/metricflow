@@ -299,13 +299,14 @@ def assert_linkable_element_set_snapshot_equal(  # noqa: D103
 
     for linkable_metric_iterable in linkable_element_set.path_key_to_linkable_metrics.values():
         for linkable_metric in linkable_metric_iterable:
+            semantic_model_join_path = linkable_metric.join_path.semantic_model_join_path
             rows.append(
                 (
                     # Checking a limited set of fields as the result is large due to the paths in the object.
-                    (
-                        linkable_metric.join_by_semantic_model.semantic_model_name
-                        if linkable_metric.join_by_semantic_model
-                        else "",
+                    (semantic_model_join_path.left_semantic_model_reference.semantic_model_name,)
+                    + tuple(
+                        path_element.semantic_model_reference.semantic_model_name
+                        for path_element in semantic_model_join_path.path_elements
                     ),
                     (
                         str(tuple(entity_link.element_name for entity_link in linkable_metric.join_path.entity_links)),
