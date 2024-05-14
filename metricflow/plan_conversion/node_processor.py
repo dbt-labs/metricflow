@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import dataclasses
 import logging
-from dataclasses import dataclass
+from enum import Enum
 from typing import List, Optional, Sequence, Set
 
+from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.references import EntityReference, TimeDimensionReference
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
@@ -28,7 +30,7 @@ from metricflow.validation.dataflow_join_validator import JoinDataflowOutputVali
 logger = logging.getLogger(__name__)
 
 
-@dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True)
 class MultiHopJoinCandidateLineage:
     """Describes how the multi-hop join candidate was formed.
 
@@ -48,7 +50,7 @@ class MultiHopJoinCandidateLineage:
     join_second_node_by_entity: LinklessEntitySpec
 
 
-@dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True)
 class MultiHopJoinCandidate:
     """A candidate node containing linkable specs that is join of other nodes. It's used to resolve multi-hop queries.
 
@@ -59,14 +61,111 @@ class MultiHopJoinCandidate:
     lineage: MultiHopJoinCandidateLineage
 
 
-@dataclass(frozen=True)
-class PredicatePushdownParameters:
-    """Container class for managing filter predicate pushdown.
+class PredicatePushdownState(Enum):
+    """Enumeration of constraint states describing when predicate pushdown may operate in a dataflow plan.
 
-    Stores time constraint information for applying pre-join time filters.
+    This is necessary for holistic checks against the set of potentially enabled pushdown operations, because the
+    scenario where we only allow time range updates requires careful overriding of other pushdown properties.
+
+    Note: the time_range_only state is a backwards compatibility shim for use with conversion metrics while
+    we determine how best to support predicate pushdown for conversion metrics. It may have longer term utility,
+    but ideally we'd collapse this into a single enabled/disabled boolean property.
     """
 
-    time_range_constraint: Optional[TimeRangeConstraint]
+    DISABLED = "disabled"
+    FULLY_ENABLED = "fully_enabled"
+    ENABLED_FOR_TIME_RANGE_ONLY = "time_range_only"
+
+
+@dataclasses.dataclass(frozen=True)
+class PredicatePushdownParameters:
+    """Container class for managing information about whether and how to do filter predicate pushdown.
+
+    The time_range_constraint property holds the time window for setting up a time range filter expression.
+    """
+
+    _PREDICATE_METADATA_KEY = "is_predicate_property"
+
+    time_range_constraint: Optional[TimeRangeConstraint] = dataclasses.field(metadata={_PREDICATE_METADATA_KEY: True})
+    pushdown_state: PredicatePushdownState = PredicatePushdownState.FULLY_ENABLED
+
+    def __post_init__(self) -> None:
+        """Validation to ensure pushdown properties are configured correctly.
+
+        In particular, this asserts that cases where pushdown is disabled cannot leak pushdown operations via
+        outside property access - if pushdown is disabled, no further pushdown operations of any kind are allowed
+        on that particular code branch.
+        """
+        if self.pushdown_state is PredicatePushdownState.FULLY_ENABLED:
+            return
+
+        invalid_predicate_property_names = {
+            field.name for field in dataclasses.fields(self) if field.metadata.get(self._PREDICATE_METADATA_KEY)
+        }
+
+        if self.pushdown_state is PredicatePushdownState.ENABLED_FOR_TIME_RANGE_ONLY:
+            # We don't do validation for time range constraint configuration - having None set in this state is the
+            # equivalent of disabling predicate pushdown, but that time constraint value might be updated later,
+            # and so we do not block overrides to (or from) None to avoid meaningless bookkeeping at callsites.
+            # Also, we keep the magic string name Python uses hidden in here instead of expanding access to it.
+            invalid_predicate_property_names.remove("time_range_constraint")
+
+        instance_configuration = dataclasses.asdict(self)
+        invalid_disabled_properties = {
+            property_name: value
+            for property_name, value in instance_configuration.items()
+            if property_name in invalid_predicate_property_names and value is not None
+        }
+
+        assert not invalid_disabled_properties, (
+            "Invalid pushdown parameter configuration! Disabled pushdown parameters cannot have properties "
+            "set that may lead to improper access and use in other contexts, as that can lead to unintended "
+            "filtering operations in cases where these properties are accessed without appropriate checks against "
+            "pushdown configuration. This indicates that pushdown is configured for limited scope operations, but "
+            f"other predicate properties are set to non-None values.\nFull configuration: {instance_configuration}\n"
+            f"Invalid predicate properties: {invalid_disabled_properties}"
+        )
+
+    @property
+    def is_pushdown_enabled(self) -> bool:
+        """Convenience accessor for checking that no pushdown constraints exist."""
+        pushdown_state = self.pushdown_state
+        if pushdown_state is PredicatePushdownState.DISABLED:
+            return False
+        elif pushdown_state is PredicatePushdownState.FULLY_ENABLED:
+            return True
+        elif pushdown_state is PredicatePushdownState.ENABLED_FOR_TIME_RANGE_ONLY:
+            return True
+        else:
+            return assert_values_exhausted(pushdown_state)
+
+    @staticmethod
+    def with_time_range_constraint(
+        original_pushdown_params: PredicatePushdownParameters, time_range_constraint: Optional[TimeRangeConstraint]
+    ) -> PredicatePushdownParameters:
+        """Factory method for overriding the time range constraint value in a given set of pushdown parameters.
+
+        This allows for crude updates to the core time range constraint, including selectively disabling time range
+        predicate pushdown in certain sub-branches of the dataflow plan, such as in complex cases involving time spine
+        joins and cumulative metrics.
+        """
+        if original_pushdown_params.is_pushdown_enabled:
+            return PredicatePushdownParameters(
+                time_range_constraint=time_range_constraint,
+            )
+        else:
+            return original_pushdown_params
+
+    @staticmethod
+    def with_pushdown_disabled() -> PredicatePushdownParameters:
+        """Factory method for disabling predicate pushdown for all parameter types.
+
+        This is useful in cases where there is a branched path where pushdown should be disabled in one branch while the
+        other may remain eligible. For example, a join linkage where one side of the join contains an unsupported
+        configuration might send a disabled copy of the pushdown parameters down that path while retaining the potential
+        for using another path.
+        """
+        return PredicatePushdownParameters(time_range_constraint=None, pushdown_state=PredicatePushdownState.DISABLED)
 
 
 class PreJoinNodeProcessor:
