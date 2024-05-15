@@ -143,7 +143,7 @@ class SemanticModelLookup:
     def get_semantic_model_for_measure(self, measure_reference: MeasureReference) -> SemanticModel:  # noqa: D102
         semantic_model = self._measure_index.get(measure_reference)
         assert semantic_model, (
-            f"Semantic model not found for meeasure: {measure_reference}. "
+            f"Semantic model not found for measure: {repr(measure_reference)}. "
             f"This indicates either internal misconfiguration or that the measure does not exist."
         )
         return semantic_model
