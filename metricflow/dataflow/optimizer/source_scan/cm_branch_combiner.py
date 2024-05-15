@@ -293,6 +293,14 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
             )
             return ComputeMetricsBranchCombinerResult()
 
+        if self._current_left_node.for_group_by_source_node != current_right_node.for_group_by_source_node:
+            self._log_combine_failure(
+                left_node=self._current_left_node,
+                right_node=current_right_node,
+                combine_failure_reason="one node is a group by metric source node",
+            )
+            return ComputeMetricsBranchCombinerResult()
+
         assert len(combined_parent_nodes) == 1
         combined_parent_node = combined_parent_nodes[0]
         assert combined_parent_node is not None
@@ -308,6 +316,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
             parent_node=combined_parent_node,
             metric_specs=unique_metric_specs,
             aggregated_to_elements=current_right_node.aggregated_to_elements,
+            for_group_by_source_node=current_right_node.for_group_by_source_node,
         )
         self._log_combine_success(
             left_node=self._current_left_node,
