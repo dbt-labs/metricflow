@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import textwrap
-from typing import Sequence
+from typing import FrozenSet, Sequence
 
 import jinja2
+from dbt_semantic_interfaces.references import SemanticModelReference
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.visitor import VisitorOutputT
+from typing_extensions import override
 
 from metricflow.dataflow.dataflow_plan import BaseOutput, DataflowPlanNode, DataflowPlanNodeVisitor
 from metricflow.dataset.sql_dataset import SqlDataSet
@@ -30,6 +32,15 @@ class ReadSqlSourceNode(BaseOutput):
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_source_node(self)
+
+    @override
+    @property
+    def source_semantic_models(self) -> FrozenSet[SemanticModelReference]:
+        return (
+            frozenset([self.data_set.semantic_model_reference])
+            if self.data_set.semantic_model_reference
+            else frozenset()
+        )
 
     @property
     def data_set(self) -> SqlDataSet:

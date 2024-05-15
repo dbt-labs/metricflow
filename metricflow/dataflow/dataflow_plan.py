@@ -2,16 +2,18 @@
 
 from __future__ import annotations
 
+import itertools
 import logging
 import typing
 from abc import ABC, abstractmethod
-from typing import Generic, Optional, Sequence, Set, Type, TypeVar
+from typing import FrozenSet, Generic, Optional, Sequence, Set, Type, TypeVar
 
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagId, DagNode, MetricFlowDag, NodeId
 from metricflow_semantics.visitor import Visitable, VisitorOutputT
 
 if typing.TYPE_CHECKING:
+    from dbt_semantic_interfaces.references import SemanticModelReference
     from metricflow_semantics.specs.spec_classes import LinkableInstanceSpec
 
     from metricflow.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode
@@ -60,6 +62,11 @@ class DataflowPlanNode(DagNode, Visitable, ABC):
     def parent_nodes(self) -> Sequence[DataflowPlanNode]:
         """Return the nodes where data for this node comes from."""
         return self._parent_nodes
+
+    @property
+    def source_semantic_models(self) -> FrozenSet[SemanticModelReference]:
+        """Return the complete set of source semantic models for this node, collected recursively across all parents."""
+        return frozenset(itertools.chain.from_iterable([parent.source_semantic_models for parent in self.parent_nodes]))
 
     @abstractmethod
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:
