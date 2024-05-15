@@ -286,6 +286,7 @@ class ValidLinkableSpecResolver:
                 f"last join path element: {using_join_path.last_semantic_model_reference.semantic_model_name}",
             )
             # Temp: disable LinkableMetrics with outer join path until there is an interface to specify it.
+            # The result's properties = properties.union(frozenset({LinkableElementProperty.MULTI_HOP}))
             return LinkableElementSet()
 
         path_key_to_linkable_metrics: Dict[ElementPathKey, Tuple[LinkableMetric, ...]] = {}

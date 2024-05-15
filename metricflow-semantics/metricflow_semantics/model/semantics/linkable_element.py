@@ -221,13 +221,6 @@ class LinkableMetric(LinkableElement, SerializableDataclass):
         return GroupByMetricReference(self.metric_reference.element_name)
 
     @property
-    def join_by_semantic_model(self) -> Optional[SemanticModelReference]:  # noqa: D102
-        if len(self.join_path.semantic_model_join_path.path_elements) == 0:
-            return None
-
-        return self.join_path.semantic_model_join_path.last_semantic_model_reference
-
-    @property
     @override
     def derived_from_semantic_models(self) -> Sequence[SemanticModelReference]:
         """Semantic models needed to build and join to this LinkableMetric.
