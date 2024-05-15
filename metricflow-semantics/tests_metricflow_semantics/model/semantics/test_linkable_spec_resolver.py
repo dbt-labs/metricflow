@@ -143,7 +143,8 @@ def test_create_linkable_element_set_from_join_path(  # noqa: D103
         set_id="result0",
         linkable_element_set=simple_model_spec_resolver.create_linkable_element_set_from_join_path(
             join_path=SemanticModelJoinPath.from_single_element(
-                semantic_model_reference=SemanticModelReference("listings_latest"),
+                left_semantic_model_reference=SemanticModelReference("bookings_source"),
+                right_semantic_model_reference=SemanticModelReference("listings_latest"),
                 join_on_entity=EntityReference("listing"),
             ),
         ),
@@ -161,7 +162,8 @@ def test_create_linkable_element_set_from_join_path_multi_hop(  # noqa: D103
         set_id="result0",
         linkable_element_set=simple_model_spec_resolver.create_linkable_element_set_from_join_path(
             SemanticModelJoinPath(
-                (
+                left_semantic_model_reference=SemanticModelReference("views_source"),
+                path_elements=(
                     SemanticModelJoinPathElement(
                         semantic_model_reference=SemanticModelReference("bookings"),
                         join_on_entity=EntityReference("guest"),
@@ -170,7 +172,7 @@ def test_create_linkable_element_set_from_join_path_multi_hop(  # noqa: D103
                         semantic_model_reference=SemanticModelReference("listings_latest"),
                         join_on_entity=EntityReference("listing"),
                     ),
-                )
+                ),
             ),
         ),
     )
