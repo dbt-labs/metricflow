@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Sequence, Set
+from typing import Sequence, Set, Tuple
 
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
@@ -82,8 +82,23 @@ class ComputeMetricsNode(ComputedMetricsOutput):
         return (
             isinstance(other_node, self.__class__)
             and other_node.metric_specs == self.metric_specs
+            and other_node.aggregated_to_elements == self.aggregated_to_elements
             and other_node.for_group_by_source_node == self.for_group_by_source_node
         )
+
+    def can_combine(self, other_node: ComputeMetricsNode) -> Tuple[bool, str]:
+        """Check certain node attributes against another node to determine if the two can be combined.
+
+        Return a bool and a string reason for the failure to combine (if applicable) to be used in logging for
+        ComputeMetricsBranchCombiner.
+        """
+        if not other_node.aggregated_to_elements == self.aggregated_to_elements:
+            return False, "nodes are aggregated to different elements"
+
+        if other_node.for_group_by_source_node != self.for_group_by_source_node:
+            return False, "one node is a group by metric source node"
+
+        return True, ""
 
     def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> ComputeMetricsNode:  # noqa: D102
         assert len(new_parent_nodes) == 1
