@@ -1,0 +1,16 @@
+ParseQueryResult(
+  query_spec=MetricFlowQuerySpec(
+    metric_specs=(MetricSpec(element_name='bookings'),),
+    time_dimension_specs=(TimeDimensionSpec(element_name='metric_time', time_granularity=DAY),),
+    order_by_specs=(
+      OrderBySpec(
+        instance_spec=TimeDimensionSpec(element_name='metric_time', time_granularity=DAY),
+        descending=False,
+      ),
+    ),
+    filter_intersection=PydanticWhereFilterIntersection(),
+    filter_spec_resolution_lookup=FilterSpecResolutionLookUp(),
+    min_max_only=False,
+  ),
+  queried_semantic_models=(SemanticModelReference(semantic_model_name='bookings_source'),),
+)
