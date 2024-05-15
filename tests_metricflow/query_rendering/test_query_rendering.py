@@ -83,7 +83,7 @@ def test_filter_with_where_constraint_on_join_dim(
         where_constraint=PydanticWhereFilter(
             where_sql_template="{{ Dimension('listing__country_latest') }} = 'us'",
         ),
-    )
+    ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
     convert_and_check(
@@ -174,7 +174,7 @@ def test_distinct_values(
             where_sql_template="{{ Dimension('listing__country_latest') }} = 'us'",
         ),
         limit=100,
-    )
+    ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(query_spec)
 
     convert_and_check(
@@ -227,7 +227,7 @@ def test_measure_constraint(  # noqa: D103
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("lux_booking_value_rate_expr",),
         group_by_names=(MTD_SPEC_DAY.qualified_name,),
-    )
+    ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
     convert_and_check(
@@ -251,7 +251,7 @@ def test_measure_constraint_with_reused_measure(  # noqa: D103
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("instant_booking_value_ratio",),
         group_by_names=(MTD_SPEC_DAY.qualified_name,),
-    )
+    ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
     convert_and_check(
@@ -275,7 +275,7 @@ def test_measure_constraint_with_single_expr_and_alias(  # noqa: D103
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("double_counted_delayed_bookings",),
         group_by_names=(MTD_SPEC_DAY.qualified_name,),
-    )
+    ).query_spec
 
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
@@ -305,7 +305,7 @@ def test_join_to_scd_dimension(
         where_constraint=PydanticWhereFilter(
             where_sql_template="{{ Dimension('listing__capacity') }} > 2",
         ),
-    )
+    ).query_spec
     dataflow_plan = scd_dataflow_plan_builder.build_plan(query_spec)
 
     convert_and_check(
