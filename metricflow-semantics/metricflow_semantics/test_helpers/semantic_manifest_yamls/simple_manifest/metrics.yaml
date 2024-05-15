@@ -761,3 +761,14 @@ metric:
   type_params:
     measure: listings
   filter: "{{ Metric('bookings', ['listing']) }} > 2"
+---
+metric:
+  name: popular_listing_bookings_per_booker
+  description: bookings per booker for listings with at least 10 views
+  type: ratio
+  type_params:
+    numerator:
+      name: listings
+    denominator:
+      name: listings
+  filter: "{{ Metric('views', ['listing']) }} > 10"
