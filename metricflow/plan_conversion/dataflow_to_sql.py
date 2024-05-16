@@ -419,7 +419,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             ),
         )
 
-    def visit_join_to_base_output_node(self, node: JoinOnEntitiesNode) -> SqlDataSet:
+    def visit_join_on_entities_node(self, node: JoinOnEntitiesNode) -> SqlDataSet:
         """Generates the query that realizes the behavior of the JoinToStandardOutputNode."""
         # Keep a mapping between the table aliases that would be used in the query and the MDO instances in that source.
         # e.g. when building "FROM from_table a JOIN right_table b", the value for key "a" would be the instances in

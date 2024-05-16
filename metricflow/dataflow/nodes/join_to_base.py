@@ -72,7 +72,7 @@ class JoinOnEntitiesNode(DataflowPlanNode):
         return StaticIdPrefix.DATAFLOW_NODE_JOIN_TO_STANDARD_OUTPUT_ID_PREFIX
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
-        return visitor.visit_join_to_base_output_node(self)
+        return visitor.visit_join_on_entities_node(self)
 
     @property
     def description(self) -> str:  # noqa: D102

@@ -212,7 +212,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
-    def visit_join_to_base_output_node(  # noqa: D102
+    def visit_join_on_entities_node(  # noqa: D102
         self, node: JoinOnEntitiesNode
     ) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
         self._log_visit_node_type(node)

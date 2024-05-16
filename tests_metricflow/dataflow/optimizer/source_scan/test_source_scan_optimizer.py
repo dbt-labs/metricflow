@@ -57,7 +57,7 @@ class ReadSqlSourceNodeCounter(DataflowPlanNodeVisitor[int]):
     def visit_source_node(self, node: ReadSqlSourceNode) -> int:  # noqa: D102
         return 1
 
-    def visit_join_to_base_output_node(self, node: JoinOnEntitiesNode) -> int:  # noqa: D102
+    def visit_join_on_entities_node(self, node: JoinOnEntitiesNode) -> int:  # noqa: D102
         return self._sum_parents(node)
 
     def visit_aggregate_measures_node(self, node: AggregateMeasuresNode) -> int:  # noqa: D102

@@ -152,7 +152,7 @@ class SourceScanOptimizer(
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)
 
-    def visit_join_to_base_output_node(self, node: JoinOnEntitiesNode) -> OptimizeBranchResult:  # noqa: D102
+    def visit_join_on_entities_node(self, node: JoinOnEntitiesNode) -> OptimizeBranchResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)
 

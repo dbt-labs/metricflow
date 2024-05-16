@@ -105,7 +105,7 @@ class DataflowPlanNodeVisitor(Generic[VisitorOutputT], ABC):
         pass
 
     @abstractmethod
-    def visit_join_to_base_output_node(self, node: JoinOnEntitiesNode) -> VisitorOutputT:  # noqa: D102
+    def visit_join_on_entities_node(self, node: JoinOnEntitiesNode) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
