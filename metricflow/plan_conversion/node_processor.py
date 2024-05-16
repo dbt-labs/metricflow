@@ -21,7 +21,7 @@ from metricflow.dataflow.dataflow_plan import (
 )
 from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
-from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinToBaseOutputNode
+from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinOnEntitiesNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.validation.dataflow_join_validator import JoinDataflowOutputValidator
 
@@ -242,7 +242,7 @@ class PreJoinNodeProcessor:
 
                 multi_hop_join_candidates.append(
                     MultiHopJoinCandidate(
-                        node_with_multi_hop_elements=JoinToBaseOutputNode(
+                        node_with_multi_hop_elements=JoinOnEntitiesNode(
                             left_node=first_node_that_could_be_joined,
                             join_targets=[
                                 JoinDescription(

@@ -44,7 +44,7 @@ from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregat
 from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
 from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
-from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinToBaseOutputNode
+from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinOnEntitiesNode
 from metricflow.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
@@ -313,7 +313,7 @@ def test_single_join_node(
         ),
     )
 
-    join_node = JoinToBaseOutputNode(
+    join_node = JoinOnEntitiesNode(
         left_node=filtered_measure_node,
         join_targets=[
             JoinDescription(
@@ -371,7 +371,7 @@ def test_multi_join_node(
         ),
     )
 
-    join_node = JoinToBaseOutputNode(
+    join_node = JoinOnEntitiesNode(
         left_node=filtered_measure_node,
         join_targets=[
             JoinDescription(
@@ -440,7 +440,7 @@ def test_compute_metrics_node(
         ),
     )
 
-    join_node = JoinToBaseOutputNode(
+    join_node = JoinOnEntitiesNode(
         left_node=filtered_measure_node,
         join_targets=[
             JoinDescription(
@@ -510,7 +510,7 @@ def test_compute_metrics_node_simple_expr(
         ),
     )
 
-    join_node = JoinToBaseOutputNode(
+    join_node = JoinOnEntitiesNode(
         left_node=filtered_measure_node,
         join_targets=[
             JoinDescription(
@@ -820,7 +820,7 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
         ),
     )
 
-    join_node = JoinToBaseOutputNode(
+    join_node = JoinOnEntitiesNode(
         left_node=filtered_measures_node,
         join_targets=[
             JoinDescription(

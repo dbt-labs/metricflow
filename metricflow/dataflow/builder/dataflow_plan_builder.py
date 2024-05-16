@@ -72,7 +72,7 @@ from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
 from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
-from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinToBaseOutputNode
+from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinOnEntitiesNode
 from metricflow.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
 from metricflow.dataflow.nodes.min_max import MinMaxNode
 from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
@@ -301,7 +301,7 @@ class DataflowPlanBuilder:
         # Build the unaggregated base measure node for computing conversions
         unaggregated_base_measure_node = base_measure_recipe.source_node
         if base_measure_recipe.join_targets:
-            unaggregated_base_measure_node = JoinToBaseOutputNode(
+            unaggregated_base_measure_node = JoinOnEntitiesNode(
                 left_node=unaggregated_base_measure_node, join_targets=base_measure_recipe.join_targets
             )
         filtered_unaggregated_base_node = FilterElementsNode(
@@ -660,7 +660,7 @@ class DataflowPlanBuilder:
 
         output_node = dataflow_recipe.source_node
         if dataflow_recipe.join_targets:
-            output_node = JoinToBaseOutputNode(left_node=output_node, join_targets=dataflow_recipe.join_targets)
+            output_node = JoinOnEntitiesNode(left_node=output_node, join_targets=dataflow_recipe.join_targets)
 
         if len(query_level_filter_specs) > 0:
             output_node = WhereConstraintNode(
@@ -1360,7 +1360,7 @@ class DataflowPlanBuilder:
         join_targets = measure_recipe.join_targets
         unaggregated_measure_node: DataflowPlanNode
         if len(join_targets) > 0:
-            filtered_measures_with_joined_elements = JoinToBaseOutputNode(
+            filtered_measures_with_joined_elements = JoinOnEntitiesNode(
                 left_node=filtered_measure_source_node,
                 join_targets=join_targets,
             )

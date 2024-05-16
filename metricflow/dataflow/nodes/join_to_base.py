@@ -42,8 +42,8 @@ class JoinDescription:
             raise RuntimeError("`join_on_entity` is required unless using CROSS JOIN.")
 
 
-class JoinToBaseOutputNode(DataflowPlanNode):
-    """A node that joins data from other nodes to a standard output node, one by one via entity."""
+class JoinOnEntitiesNode(DataflowPlanNode):
+    """A node that joins data from other nodes via the entities in the inputs."""
 
     def __init__(
         self,
@@ -109,13 +109,13 @@ class JoinToBaseOutputNode(DataflowPlanNode):
                 return False
         return True
 
-    def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> JoinToBaseOutputNode:  # noqa: D102
+    def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> JoinOnEntitiesNode:  # noqa: D102
         assert len(new_parent_nodes) > 1
         new_left_node = new_parent_nodes[0]
         new_join_nodes = new_parent_nodes[1:]
         assert len(new_join_nodes) == len(self._join_targets)
 
-        return JoinToBaseOutputNode(
+        return JoinOnEntitiesNode(
             left_node=new_left_node,
             join_targets=[
                 JoinDescription(
