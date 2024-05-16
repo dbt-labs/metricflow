@@ -281,12 +281,12 @@ class SourceScanOptimizer(
         return self._default_base_output_handler(node)
 
     def optimize(self, dataflow_plan: DataflowPlan) -> DataflowPlan:  # noqa: D102
-        optimized_result: OptimizeBranchResult = dataflow_plan.checked_sink_node.accept(self)
+        optimized_result: OptimizeBranchResult = dataflow_plan.sink_node.accept(self)
 
         logger.log(
             level=self._log_level,
             msg=f"Optimized:\n\n"
-            f"{dataflow_plan.checked_sink_node.structure_text()}\n\n"
+            f"{dataflow_plan.sink_node.structure_text()}\n\n"
             f"to:\n\n"
             f"{optimized_result.optimized_branch.structure_text()}",
         )

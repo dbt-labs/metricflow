@@ -186,7 +186,5 @@ class DataflowPlan(MetricFlowDag[DataflowPlanNode]):
         )
 
     @property
-    def checked_sink_node(self) -> DataflowPlanNode:
-        """If this has a single sink node, return it. Otherwise, raise an exception."""
-        assert len(self._sink_nodes) == 1, f"Exactly 1 sink node is supported. Got: {self._sink_nodes}"
+    def sink_node(self) -> DataflowPlanNode:  # noqa: D102
         return self._sink_nodes[0]
