@@ -12,15 +12,15 @@ from metricflow_semantics.specs.spec_classes import TimeDimensionSpec
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.visitor import VisitorOutputT
 
-from metricflow.dataflow.dataflow_plan import BaseOutput, DataflowPlanNode, DataflowPlanNodeVisitor
+from metricflow.dataflow.dataflow_plan import DataflowPlanNode, DataflowPlanNodeVisitor
 
 
-class JoinToTimeSpineNode(BaseOutput, ABC):
+class JoinToTimeSpineNode(DataflowPlanNode, ABC):
     """Join parent dataset to time spine dataset."""
 
     def __init__(
         self,
-        parent_node: BaseOutput,
+        parent_node: DataflowPlanNode,
         requested_agg_time_dimension_specs: Sequence[TimeDimensionSpec],
         use_custom_agg_time_dimension: bool,
         join_type: SqlJoinType,
@@ -110,7 +110,7 @@ class JoinToTimeSpineNode(BaseOutput, ABC):
         )
 
     @property
-    def parent_node(self) -> BaseOutput:  # noqa: D102
+    def parent_node(self) -> DataflowPlanNode:  # noqa: D102
         return self._parent_node
 
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D102
@@ -124,7 +124,7 @@ class JoinToTimeSpineNode(BaseOutput, ABC):
             and other_node.join_type == self.join_type
         )
 
-    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> JoinToTimeSpineNode:  # noqa: D102
+    def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> JoinToTimeSpineNode:  # noqa: D102
         assert len(new_parent_nodes) == 1
         return JoinToTimeSpineNode(
             parent_node=new_parent_nodes[0],

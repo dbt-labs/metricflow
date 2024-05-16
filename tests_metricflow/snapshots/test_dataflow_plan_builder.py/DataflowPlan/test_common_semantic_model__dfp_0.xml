@@ -24,7 +24,7 @@
                         <!--     entity_links=(EntityReference(element_name='listing'),), -->
                         <!--   )                                                          -->
                         <!-- distinct = False -->
-                        <JoinToBaseOutputNode>
+                        <JoinOnEntitiesNode>
                             <!-- description = 'Join Standard Outputs' -->
                             <!-- node_id = NodeId(id_str='jso_0') -->
                             <!-- join0_for_node_id_pfe_1 =                                      -->
@@ -68,7 +68,7 @@
                                     </ReadSqlSourceNode>
                                 </MetricTimeDimensionTransformNode>
                             </FilterElementsNode>
-                        </JoinToBaseOutputNode>
+                        </JoinOnEntitiesNode>
                     </FilterElementsNode>
                 </AggregateMeasuresNode>
             </ComputeMetricsNode>
@@ -91,7 +91,7 @@
                         <!--     entity_links=(EntityReference(element_name='listing'),), -->
                         <!--   )                                                          -->
                         <!-- distinct = False -->
-                        <JoinToBaseOutputNode>
+                        <JoinOnEntitiesNode>
                             <!-- description = 'Join Standard Outputs' -->
                             <!-- node_id = NodeId(id_str='jso_1') -->
                             <!-- join0_for_node_id_pfe_4 =                                      -->
@@ -136,7 +136,7 @@
                                     </ReadSqlSourceNode>
                                 </MetricTimeDimensionTransformNode>
                             </FilterElementsNode>
-                        </JoinToBaseOutputNode>
+                        </JoinOnEntitiesNode>
                     </FilterElementsNode>
                 </AggregateMeasuresNode>
             </ComputeMetricsNode>

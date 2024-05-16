@@ -10,15 +10,15 @@ from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.specs.spec_classes import TimeDimensionSpec
 from metricflow_semantics.visitor import VisitorOutputT
 
-from metricflow.dataflow.dataflow_plan import BaseOutput, DataflowPlanNode, DataflowPlanNodeVisitor
+from metricflow.dataflow.dataflow_plan import DataflowPlanNode, DataflowPlanNodeVisitor
 
 
-class JoinOverTimeRangeNode(BaseOutput):
+class JoinOverTimeRangeNode(DataflowPlanNode):
     """A node that allows for cumulative metric computation by doing a self join across a cumulative date range."""
 
     def __init__(
         self,
-        parent_node: BaseOutput,
+        parent_node: DataflowPlanNode,
         time_dimension_spec_for_join: TimeDimensionSpec,
         window: Optional[MetricTimeWindow],
         grain_to_date: Optional[TimeGranularity],
@@ -67,7 +67,7 @@ class JoinOverTimeRangeNode(BaseOutput):
         return """Join Self Over Time Range"""
 
     @property
-    def parent_node(self) -> BaseOutput:  # noqa: D102
+    def parent_node(self) -> DataflowPlanNode:  # noqa: D102
         return self._parent_node
 
     @property
@@ -86,7 +86,7 @@ class JoinOverTimeRangeNode(BaseOutput):
             and other_node.time_range_constraint == self.time_range_constraint
         )
 
-    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> JoinOverTimeRangeNode:  # noqa: D102
+    def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> JoinOverTimeRangeNode:  # noqa: D102
         assert len(new_parent_nodes) == 1
         return JoinOverTimeRangeNode(
             parent_node=new_parent_nodes[0],

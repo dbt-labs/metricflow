@@ -14,17 +14,17 @@ from metricflow_semantics.specs.spec_classes import (
 )
 from metricflow_semantics.visitor import VisitorOutputT
 
-from metricflow.dataflow.dataflow_plan import BaseOutput, DataflowPlanNode, DataflowPlanNodeVisitor
+from metricflow.dataflow.dataflow_plan import DataflowPlanNode, DataflowPlanNodeVisitor
 
 
-class JoinConversionEventsNode(BaseOutput):
+class JoinConversionEventsNode(DataflowPlanNode):
     """Builds a data set containing successful conversion events."""
 
     def __init__(
         self,
-        base_node: BaseOutput,
+        base_node: DataflowPlanNode,
         base_time_dimension_spec: TimeDimensionSpec,
-        conversion_node: BaseOutput,
+        conversion_node: DataflowPlanNode,
         conversion_measure_spec: MeasureSpec,
         conversion_time_dimension_spec: TimeDimensionSpec,
         unique_identifier_keys: Sequence[InstanceSpec],
@@ -133,7 +133,7 @@ class JoinConversionEventsNode(BaseOutput):
             and other_node.constant_properties == self.constant_properties
         )
 
-    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> JoinConversionEventsNode:  # noqa: D102
+    def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> JoinConversionEventsNode:  # noqa: D102
         assert len(new_parent_nodes) == 2
         return JoinConversionEventsNode(
             base_node=new_parent_nodes[0],

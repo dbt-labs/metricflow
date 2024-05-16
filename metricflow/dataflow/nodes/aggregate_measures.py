@@ -1,25 +1,15 @@
 from __future__ import annotations
 
-from abc import ABC
 from typing import Sequence, Tuple
 
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.specs.spec_classes import MetricInputMeasureSpec
 from metricflow_semantics.visitor import VisitorOutputT
 
-from metricflow.dataflow.dataflow_plan import BaseOutput, DataflowPlanNode, DataflowPlanNodeVisitor
+from metricflow.dataflow.dataflow_plan import DataflowPlanNode, DataflowPlanNodeVisitor
 
 
-class AggregatedMeasuresOutput(BaseOutput, ABC):
-    """A node that outputs data where the measures are aggregated.
-
-    The measures are aggregated with respect to the present entities and dimensions.
-    """
-
-    pass
-
-
-class AggregateMeasuresNode(AggregatedMeasuresOutput):
+class AggregateMeasuresNode(DataflowPlanNode):
     """A node that aggregates the measures by the associated group by elements.
 
     In the event that one or more of the aggregated input measures has an alias assigned to it, any output query
@@ -30,7 +20,7 @@ class AggregateMeasuresNode(AggregatedMeasuresOutput):
 
     def __init__(
         self,
-        parent_node: BaseOutput,
+        parent_node: DataflowPlanNode,
         metric_input_measure_specs: Sequence[MetricInputMeasureSpec],
     ) -> None:
         """Initializer for AggregateMeasuresNode.
@@ -56,7 +46,7 @@ class AggregateMeasuresNode(AggregatedMeasuresOutput):
         return """Aggregate Measures"""
 
     @property
-    def parent_node(self) -> BaseOutput:  # noqa: D102
+    def parent_node(self) -> DataflowPlanNode:  # noqa: D102
         return self._parent_node
 
     @property
@@ -73,7 +63,7 @@ class AggregateMeasuresNode(AggregatedMeasuresOutput):
             and other_node.metric_input_measure_specs == self.metric_input_measure_specs
         )
 
-    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> AggregateMeasuresNode:  # noqa: D102
+    def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> AggregateMeasuresNode:  # noqa: D102
         assert len(new_parent_nodes) == 1
         return AggregateMeasuresNode(
             parent_node=new_parent_nodes[0],

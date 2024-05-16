@@ -22,7 +22,7 @@
                     <!--     ),                                             -->
                     <!--   )                                                -->
                     <!-- distinct = False -->
-                    <JoinToBaseOutputNode>
+                    <JoinOnEntitiesNode>
                         <!-- description = 'Join Standard Outputs' -->
                         <!-- node_id = NodeId(id_str='jso_1') -->
                         <!-- join0_for_node_id_pfe_2 =                                         -->
@@ -74,7 +74,7 @@
                             <!-- include_spec = TimeDimensionSpec(element_name='ds_partitioned', time_granularity=DAY) -->
                             <!-- include_spec = LinklessEntitySpec(element_name='account_id') -->
                             <!-- distinct = False -->
-                            <JoinToBaseOutputNode>
+                            <JoinOnEntitiesNode>
                                 <!-- description = 'Join Standard Outputs' -->
                                 <!-- node_id = NodeId(id_str='jso_0') -->
                                 <!-- join0_for_node_id_pfe_0 =                                          -->
@@ -270,9 +270,9 @@
                                         <!-- data_set = SemanticModelDataSet('customer_table') -->
                                     </ReadSqlSourceNode>
                                 </FilterElementsNode>
-                            </JoinToBaseOutputNode>
+                            </JoinOnEntitiesNode>
                         </FilterElementsNode>
-                    </JoinToBaseOutputNode>
+                    </JoinOnEntitiesNode>
                 </FilterElementsNode>
             </AggregateMeasuresNode>
         </ComputeMetricsNode>

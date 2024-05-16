@@ -507,10 +507,10 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         else:
             dataflow_plan = self._dataflow_plan_builder.build_plan_for_distinct_values(query_spec=query_spec)
 
-        if len(dataflow_plan.sink_output_nodes) > 1:
+        if len(dataflow_plan.sink_nodes) > 1:
             raise NotImplementedError(
                 f"Multiple output nodes in the dataflow plan not yet supported. "
-                f"Got tasks: {dataflow_plan.sink_output_nodes}"
+                f"Got tasks: {dataflow_plan.sink_nodes}"
             )
 
         convert_to_execution_plan_result = self._to_execution_plan_converter.convert_to_execution_plan(dataflow_plan)
