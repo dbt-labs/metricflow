@@ -209,13 +209,13 @@ class DataflowPlan(MetricFlowDag[DataflowPlanNode]):
     def sink_node(self) -> DataflowPlanNode:  # noqa: D102
         return self._sink_nodes[0]
 
-    def __complete_subgraph(self, node: DataflowPlanNode) -> Sequence[DataflowPlanNode]:
+    def __all_nodes_in_subgraph(self, node: DataflowPlanNode) -> Sequence[DataflowPlanNode]:
         """Node accessor for retrieving a flattened sequence of all nodes in the subgraph upstream of the input node.
 
         Useful for gathering nodes for subtype-agnostic operations, such as common property access or simple counts.
         """
         flattened_parent_subgraphs = tuple(
-            more_itertools.collapse(self.__complete_subgraph(parent_node) for parent_node in node.parent_nodes)
+            more_itertools.collapse(self.__all_nodes_in_subgraph(parent_node) for parent_node in node.parent_nodes)
         )
         return (node,) + flattened_parent_subgraphs
 
@@ -225,7 +225,7 @@ class DataflowPlan(MetricFlowDag[DataflowPlanNode]):
         return frozenset(
             [
                 node._input_semantic_model
-                for node in self.__complete_subgraph(self.sink_node)
+                for node in self.__all_nodes_in_subgraph(self.sink_node)
                 if node._input_semantic_model is not None
             ]
         )
