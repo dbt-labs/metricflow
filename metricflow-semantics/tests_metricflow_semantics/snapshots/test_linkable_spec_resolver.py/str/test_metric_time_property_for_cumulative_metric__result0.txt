@@ -1,3 +1,3 @@
-Semantic Model    Entity Links    Name         Time Granularity    Date Part    Properties
-----------------  --------------  -----------  ------------------  -----------  ---------------
-revenue           ()              metric_time  DAY                              ['METRIC_TIME']
+Model Join-Path    Entity Links    Name         Time Granularity    Date Part    Properties
+-----------------  --------------  -----------  ------------------  -----------  ---------------
+('revenue',)       ()              metric_time  DAY                              ['METRIC_TIME']

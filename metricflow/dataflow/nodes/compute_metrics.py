@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Sequence, Set
+from typing import Sequence, Set, Tuple
 
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
@@ -8,19 +8,17 @@ from metricflow_semantics.specs.spec_classes import LinkableInstanceSpec, Metric
 from metricflow_semantics.visitor import VisitorOutputT
 
 from metricflow.dataflow.dataflow_plan import (
-    BaseOutput,
-    ComputedMetricsOutput,
     DataflowPlanNode,
     DataflowPlanNodeVisitor,
 )
 
 
-class ComputeMetricsNode(ComputedMetricsOutput):
+class ComputeMetricsNode(DataflowPlanNode):
     """A node that computes metrics from input measures. Dimensions / entities are passed through."""
 
     def __init__(
         self,
-        parent_node: BaseOutput,
+        parent_node: DataflowPlanNode,
         metric_specs: Sequence[MetricSpec],
         aggregated_to_elements: Set[LinkableInstanceSpec],
         for_group_by_source_node: bool = False,
@@ -69,7 +67,7 @@ class ComputeMetricsNode(ComputedMetricsOutput):
         return displayed_properties
 
     @property
-    def parent_node(self) -> BaseOutput:  # noqa: D102
+    def parent_node(self) -> DataflowPlanNode:  # noqa: D102
         return self._parent_node
 
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D102
@@ -82,10 +80,25 @@ class ComputeMetricsNode(ComputedMetricsOutput):
         return (
             isinstance(other_node, self.__class__)
             and other_node.metric_specs == self.metric_specs
+            and other_node.aggregated_to_elements == self.aggregated_to_elements
             and other_node.for_group_by_source_node == self.for_group_by_source_node
         )
 
-    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> ComputeMetricsNode:  # noqa: D102
+    def can_combine(self, other_node: ComputeMetricsNode) -> Tuple[bool, str]:
+        """Check certain node attributes against another node to determine if the two can be combined.
+
+        Return a bool and a string reason for the failure to combine (if applicable) to be used in logging for
+        ComputeMetricsBranchCombiner.
+        """
+        if not other_node.aggregated_to_elements == self.aggregated_to_elements:
+            return False, "nodes are aggregated to different elements"
+
+        if other_node.for_group_by_source_node != self.for_group_by_source_node:
+            return False, "one node is a group by metric source node"
+
+        return True, ""
+
+    def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> ComputeMetricsNode:  # noqa: D102
         assert len(new_parent_nodes) == 1
         return ComputeMetricsNode(
             parent_node=new_parent_nodes[0],

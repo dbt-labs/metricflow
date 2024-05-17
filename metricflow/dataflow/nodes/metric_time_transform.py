@@ -7,10 +7,10 @@ from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.visitor import VisitorOutputT
 
-from metricflow.dataflow.dataflow_plan import BaseOutput, DataflowPlanNode, DataflowPlanNodeVisitor
+from metricflow.dataflow.dataflow_plan import DataflowPlanNode, DataflowPlanNodeVisitor
 
 
-class MetricTimeDimensionTransformNode(BaseOutput):
+class MetricTimeDimensionTransformNode(DataflowPlanNode):
     """A node transforms the input data set so that it contains the metric time dimension and relevant measures.
 
     The metric time dimension is used later to aggregate all measures in the data set.
@@ -23,7 +23,7 @@ class MetricTimeDimensionTransformNode(BaseOutput):
 
     def __init__(  # noqa: D107
         self,
-        parent_node: BaseOutput,
+        parent_node: DataflowPlanNode,
         aggregation_time_dimension_reference: TimeDimensionReference,
     ) -> None:
         self._aggregation_time_dimension_reference = aggregation_time_dimension_reference
@@ -53,7 +53,7 @@ class MetricTimeDimensionTransformNode(BaseOutput):
         )
 
     @property
-    def parent_node(self) -> BaseOutput:  # noqa: D102
+    def parent_node(self) -> DataflowPlanNode:  # noqa: D102
         return self._parent_node
 
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D102
@@ -63,7 +63,7 @@ class MetricTimeDimensionTransformNode(BaseOutput):
         )
 
     def with_new_parents(  # noqa: D102
-        self, new_parent_nodes: Sequence[BaseOutput]
+        self, new_parent_nodes: Sequence[DataflowPlanNode]
     ) -> MetricTimeDimensionTransformNode:  # noqa: D102
         assert len(new_parent_nodes) == 1
         return MetricTimeDimensionTransformNode(

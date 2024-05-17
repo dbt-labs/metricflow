@@ -7,6 +7,7 @@ from typing_extensions import override
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.base_node import (
     GroupByItemResolutionNode,
+    GroupByItemResolutionNodeSet,
     GroupByItemResolutionNodeVisitor,
 )
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.metric_resolution_node import (
@@ -44,3 +45,7 @@ class NoMetricsGroupByItemSourceNode(GroupByItemResolutionNode):
     @override
     def ui_description(self) -> str:
         return f"{self.__class__.__name__}()"
+
+    @override
+    def _self_set(self) -> GroupByItemResolutionNodeSet:
+        return GroupByItemResolutionNodeSet(no_metrics_query_nodes=(self,))

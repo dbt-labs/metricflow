@@ -19,7 +19,7 @@ Error #1:
         'listing__lux_listing',
         'listing__is_lux_latest',
         'listing__country_latest',
-        'listing__created_at__day',
+        'listing__capacity_latest',
       ]
 
   Query Input:

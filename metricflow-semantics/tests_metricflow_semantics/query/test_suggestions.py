@@ -32,7 +32,9 @@ def test_suggestions_for_group_by_item(  # noqa: D103
     request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, query_parser: MetricFlowQueryParser
 ) -> None:
     with pytest.raises(InvalidQueryException) as e:
-        query_parser.parse_and_validate_query(metric_names=("bookings",), group_by_names=("booking__instant",))
+        query_parser.parse_and_validate_query(
+            metric_names=("bookings",), group_by_names=("booking__instant",)
+        ).query_spec
 
     assert_str_snapshot_equal(
         request=request,
@@ -46,7 +48,9 @@ def test_suggestions_for_metric(  # noqa: D103
     request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, query_parser: MetricFlowQueryParser
 ) -> None:
     with pytest.raises(InvalidQueryException) as e:
-        query_parser.parse_and_validate_query(metric_names=("booking",), group_by_names=(METRIC_TIME_ELEMENT_NAME,))
+        query_parser.parse_and_validate_query(
+            metric_names=("booking",), group_by_names=(METRIC_TIME_ELEMENT_NAME,)
+        ).query_spec
 
     assert_str_snapshot_equal(
         request=request,
@@ -60,7 +64,9 @@ def test_suggestions_for_multiple_metrics(  # noqa: D103
     request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, query_parser: MetricFlowQueryParser
 ) -> None:
     with pytest.raises(InvalidQueryException) as e:
-        query_parser.parse_and_validate_query(metric_names=("bookings", "listings"), group_by_names=("booking__ds",))
+        query_parser.parse_and_validate_query(
+            metric_names=("bookings", "listings"), group_by_names=("booking__ds",)
+        ).query_spec
 
     assert_str_snapshot_equal(
         request=request,
@@ -93,7 +99,9 @@ def test_suggestions_for_defined_where_filter(  # noqa: D103
         semantic_manifest_lookup=semantic_manifest_lookup,
     )
     with pytest.raises(InvalidQueryException) as e:
-        query_parser.parse_and_validate_query(metric_names=("listings",), group_by_names=(METRIC_TIME_ELEMENT_NAME,))
+        query_parser.parse_and_validate_query(
+            metric_names=("listings",), group_by_names=(METRIC_TIME_ELEMENT_NAME,)
+        ).query_spec
 
     assert_str_snapshot_equal(
         request=request,
@@ -145,7 +153,7 @@ def test_suggestions_for_defined_filters_in_multi_metric_query(
                 "listings",
             ),
             group_by_names=(METRIC_TIME_ELEMENT_NAME,),
-        )
+        ).query_spec
 
     assert_str_snapshot_equal(
         request=request,

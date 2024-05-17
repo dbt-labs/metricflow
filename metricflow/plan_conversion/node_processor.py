@@ -17,11 +17,11 @@ from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.partitions import PartitionJoinResolver
 from metricflow.dataflow.dataflow_plan import (
-    BaseOutput,
+    DataflowPlanNode,
 )
 from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
-from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinToBaseOutputNode
+from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinOnEntitiesNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.validation.dataflow_join_validator import JoinDataflowOutputValidator
 
@@ -43,8 +43,8 @@ class MultiHopJoinCandidateLineage:
     to get the country dimension.
     """
 
-    first_node_to_join: BaseOutput
-    second_node_to_join: BaseOutput
+    first_node_to_join: DataflowPlanNode
+    second_node_to_join: DataflowPlanNode
     join_second_node_by_entity: LinklessEntitySpec
 
 
@@ -55,7 +55,7 @@ class MultiHopJoinCandidate:
     Also see MultiHopJoinCandidateLineage.
     """
 
-    node_with_multi_hop_elements: BaseOutput
+    node_with_multi_hop_elements: DataflowPlanNode
     lineage: MultiHopJoinCandidateLineage
 
 
@@ -90,12 +90,12 @@ class PreJoinNodeProcessor:
 
     def add_time_range_constraint(
         self,
-        source_nodes: Sequence[BaseOutput],
+        source_nodes: Sequence[DataflowPlanNode],
         metric_time_dimension_reference: TimeDimensionReference,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
-    ) -> Sequence[BaseOutput]:
+    ) -> Sequence[DataflowPlanNode]:
         """Adds a time range constraint node to the input nodes."""
-        processed_nodes: List[BaseOutput] = []
+        processed_nodes: List[DataflowPlanNode] = []
         for source_node in source_nodes:
             # Constrain the time range if specified.
             if time_range_constraint:
@@ -120,7 +120,7 @@ class PreJoinNodeProcessor:
 
     def _node_contains_entity(
         self,
-        node: BaseOutput,
+        node: DataflowPlanNode,
         entity_reference: EntityReference,
     ) -> bool:
         """Returns true if the output of the node contains an entity of the given types."""
@@ -149,7 +149,7 @@ class PreJoinNodeProcessor:
         return False
 
     def _get_candidates_nodes_for_multi_hop(
-        self, desired_linkable_spec: LinkableInstanceSpec, nodes: Sequence[BaseOutput], join_type: SqlJoinType
+        self, desired_linkable_spec: LinkableInstanceSpec, nodes: Sequence[DataflowPlanNode], join_type: SqlJoinType
     ) -> Sequence[MultiHopJoinCandidate]:
         """Assemble nodes representing all possible one-hop joins."""
         if len(desired_linkable_spec.entity_links) > MAX_JOIN_HOPS:
@@ -242,7 +242,7 @@ class PreJoinNodeProcessor:
 
                 multi_hop_join_candidates.append(
                     MultiHopJoinCandidate(
-                        node_with_multi_hop_elements=JoinToBaseOutputNode(
+                        node_with_multi_hop_elements=JoinOnEntitiesNode(
                             left_node=first_node_that_could_be_joined,
                             join_targets=[
                                 JoinDescription(
@@ -282,9 +282,9 @@ class PreJoinNodeProcessor:
     def add_multi_hop_joins(
         self,
         desired_linkable_specs: Sequence[LinkableInstanceSpec],
-        nodes: Sequence[BaseOutput],
+        nodes: Sequence[DataflowPlanNode],
         join_type: SqlJoinType,
-    ) -> Sequence[BaseOutput]:
+    ) -> Sequence[DataflowPlanNode]:
         """Assemble nodes representing all possible one-hop joins."""
         all_multi_hop_join_candidates: List[MultiHopJoinCandidate] = []
         lineage_for_all_multi_hop_join_candidates: Set[MultiHopJoinCandidateLineage] = set()
@@ -303,10 +303,10 @@ class PreJoinNodeProcessor:
     def remove_unnecessary_nodes(
         self,
         desired_linkable_specs: Sequence[LinkableInstanceSpec],
-        nodes: Sequence[BaseOutput],
+        nodes: Sequence[DataflowPlanNode],
         metric_time_dimension_reference: TimeDimensionReference,
         time_spine_node: MetricTimeDimensionTransformNode,
-    ) -> List[BaseOutput]:
+    ) -> List[DataflowPlanNode]:
         """Filters out many of the nodes that can't possibly be useful for joins to obtain the desired linkable specs.
 
         A simple filter is to remove any nodes that don't share a common element with the query. Having a common element

@@ -16,8 +16,8 @@ Error #1:
       [
         "Dimension('listing__capacity_latest')",
         "TimeDimension('listing__created_at', 'day')",
-        "TimeDimension('listing__ds', 'day')",
         "Dimension('listing__is_lux_latest')",
+        "TimeDimension('listing__ds', 'day')",
         "Dimension('listing__country_latest')",
         "TimeDimension('user__created_at', 'day')",
       ]

@@ -22,6 +22,7 @@ from typing_extensions import override
 
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
+from metricflow_semantics.workarounds.reference import sorted_semantic_model_references
 
 logger = logging.getLogger(__name__)
 
@@ -109,7 +110,7 @@ class LinkableDimension(LinkableElement, SerializableDataclass):
     element_name: str
     dimension_type: DimensionType
     entity_links: Tuple[EntityReference, ...]
-    join_path: Tuple[SemanticModelJoinPathElement, ...]
+    join_path: SemanticModelJoinPath
     properties: FrozenSet[LinkableElementProperty]
     time_granularity: Optional[TimeGranularity]
     date_part: Optional[DatePart]
@@ -139,10 +140,9 @@ class LinkableDimension(LinkableElement, SerializableDataclass):
         semantic_model_references = set()
         if self.semantic_model_origin:
             semantic_model_references.add(self.semantic_model_origin)
-        for join_path_item in self.join_path:
-            semantic_model_references.add(join_path_item.semantic_model_reference)
+        semantic_model_references.update(self.join_path.derived_from_semantic_models)
 
-        return sorted(semantic_model_references, key=lambda reference: reference.semantic_model_name)
+        return sorted_semantic_model_references(semantic_model_references)
 
 
 @dataclass(frozen=True)
@@ -154,7 +154,7 @@ class LinkableEntity(LinkableElement, SerializableDataclass):
     element_name: str
     properties: FrozenSet[LinkableElementProperty]
     entity_links: Tuple[EntityReference, ...]
-    join_path: Tuple[SemanticModelJoinPathElement, ...]
+    join_path: SemanticModelJoinPath
 
     @property
     def path_key(self) -> ElementPathKey:  # noqa: D102
@@ -170,10 +170,8 @@ class LinkableEntity(LinkableElement, SerializableDataclass):
     @override
     def derived_from_semantic_models(self) -> Sequence[SemanticModelReference]:
         semantic_model_references = {self.semantic_model_origin}
-        for join_path_item in self.join_path:
-            semantic_model_references.add(join_path_item.semantic_model_reference)
-
-        return sorted(semantic_model_references, key=lambda reference: reference.semantic_model_name)
+        semantic_model_references.update(self.join_path.derived_from_semantic_models)
+        return sorted_semantic_model_references(semantic_model_references)
 
 
 # TODO: add to DSI
@@ -223,10 +221,6 @@ class LinkableMetric(LinkableElement, SerializableDataclass):
         return GroupByMetricReference(self.metric_reference.element_name)
 
     @property
-    def join_by_semantic_model(self) -> Optional[SemanticModelReference]:  # noqa: D102
-        return self.join_path.last_semantic_model_reference
-
-    @property
     @override
     def derived_from_semantic_models(self) -> Sequence[SemanticModelReference]:
         """Semantic models needed to build and join to this LinkableMetric.
@@ -240,7 +234,7 @@ class LinkableMetric(LinkableElement, SerializableDataclass):
         if self.metric_to_entity_join_path:
             semantic_model_references.update(self.metric_to_entity_join_path.derived_from_semantic_models)
 
-        return sorted(semantic_model_references, key=lambda reference: reference.semantic_model_name)
+        return sorted_semantic_model_references(semantic_model_references)
 
     @property
     def metric_to_entity_join_path(self) -> Optional[SemanticModelJoinPath]:
@@ -257,7 +251,7 @@ class LinkableMetric(LinkableElement, SerializableDataclass):
 
 
 @dataclass(frozen=True)
-class SemanticModelJoinPath:
+class SemanticModelJoinPath(SemanticModelDerivation):
     """Describes a series of joins between the measure semantic model, and other semantic models by entity.
 
     For example:
@@ -267,7 +261,8 @@ class SemanticModelJoinPath:
     would be represented by 2 path elements [(semantic_model0, A), (dimension_source1, B)]
     """
 
-    path_elements: Tuple[SemanticModelJoinPathElement, ...]
+    left_semantic_model_reference: SemanticModelReference
+    path_elements: Tuple[SemanticModelJoinPathElement, ...] = ()
 
     @property
     def last_path_element(self) -> SemanticModelJoinPathElement:  # noqa: D102
@@ -289,25 +284,30 @@ class SemanticModelJoinPath:
 
     @staticmethod
     def from_single_element(
-        semantic_model_reference: SemanticModelReference, join_on_entity: EntityReference
+        left_semantic_model_reference: SemanticModelReference,
+        right_semantic_model_reference: SemanticModelReference,
+        join_on_entity: EntityReference,
     ) -> SemanticModelJoinPath:
         """Build SemanticModelJoinPath with just one join path element."""
         return SemanticModelJoinPath(
+            left_semantic_model_reference=left_semantic_model_reference,
             path_elements=(
                 SemanticModelJoinPathElement(
-                    semantic_model_reference=semantic_model_reference,
+                    semantic_model_reference=right_semantic_model_reference,
                     join_on_entity=join_on_entity,
                 ),
-            )
+            ),
         )
 
     @property
     def derived_from_semantic_models(self) -> Sequence[SemanticModelReference]:
         """Unique semantic models used in this join path."""
-        return sorted(
-            [path_element.semantic_model_reference for path_element in self.path_elements],
-            key=lambda reference: reference.semantic_model_name,
-        )
+        semantic_model_references = set()
+        semantic_model_references.add(self.left_semantic_model_reference)
+        for path_element in self.path_elements:
+            semantic_model_references.add(path_element.semantic_model_reference)
+
+        return sorted_semantic_model_references(semantic_model_references)
 
 
 @dataclass(frozen=True)
@@ -345,7 +345,7 @@ class SemanticModelToMetricSubqueryJoinPath:
     """
 
     metric_subquery_join_path_element: MetricSubqueryJoinPathElement
-    semantic_model_join_path: Optional[SemanticModelJoinPath] = None
+    semantic_model_join_path: SemanticModelJoinPath
 
     @property
     def entity_links(self) -> Tuple[EntityReference, ...]:  # noqa: D102
@@ -358,8 +358,3 @@ class SemanticModelToMetricSubqueryJoinPath:
         return self.metric_subquery_join_path_element.entity_links + (
             self.metric_subquery_join_path_element.join_on_entity,
         )
-
-    @property
-    def last_semantic_model_reference(self) -> Optional[SemanticModelReference]:
-        """The last semantic model that would be joined in this path (if exists) before joining to metric."""
-        return self.semantic_model_join_path.last_semantic_model_reference if self.semantic_model_join_path else None

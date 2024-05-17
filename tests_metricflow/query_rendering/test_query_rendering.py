@@ -63,7 +63,7 @@ def test_multihop_node(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=multihop_dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )
 
 
@@ -83,7 +83,7 @@ def test_filter_with_where_constraint_on_join_dim(
         where_constraint=PydanticWhereFilter(
             where_sql_template="{{ Dimension('listing__country_latest') }} = 'us'",
         ),
-    )
+    ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
     convert_and_check(
@@ -91,7 +91,7 @@ def test_filter_with_where_constraint_on_join_dim(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )
 
 
@@ -121,7 +121,7 @@ def test_partitioned_join(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )
 
 
@@ -152,7 +152,7 @@ def test_limit_rows(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )
 
 
@@ -174,7 +174,7 @@ def test_distinct_values(
             where_sql_template="{{ Dimension('listing__country_latest') }} = 'us'",
         ),
         limit=100,
-    )
+    ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(query_spec)
 
     convert_and_check(
@@ -182,7 +182,7 @@ def test_distinct_values(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )
 
 
@@ -211,7 +211,7 @@ def test_local_dimension_using_local_entity(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )
 
 
@@ -227,7 +227,7 @@ def test_measure_constraint(  # noqa: D103
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("lux_booking_value_rate_expr",),
         group_by_names=(MTD_SPEC_DAY.qualified_name,),
-    )
+    ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
     convert_and_check(
@@ -235,7 +235,7 @@ def test_measure_constraint(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )
 
 
@@ -251,7 +251,7 @@ def test_measure_constraint_with_reused_measure(  # noqa: D103
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("instant_booking_value_ratio",),
         group_by_names=(MTD_SPEC_DAY.qualified_name,),
-    )
+    ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
     convert_and_check(
@@ -259,7 +259,7 @@ def test_measure_constraint_with_reused_measure(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )
 
 
@@ -275,7 +275,7 @@ def test_measure_constraint_with_single_expr_and_alias(  # noqa: D103
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("double_counted_delayed_bookings",),
         group_by_names=(MTD_SPEC_DAY.qualified_name,),
-    )
+    ).query_spec
 
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
@@ -284,7 +284,7 @@ def test_measure_constraint_with_single_expr_and_alias(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )
 
 
@@ -305,7 +305,7 @@ def test_join_to_scd_dimension(
         where_constraint=PydanticWhereFilter(
             where_sql_template="{{ Dimension('listing__capacity') }} > 2",
         ),
-    )
+    ).query_spec
     dataflow_plan = scd_dataflow_plan_builder.build_plan(query_spec)
 
     convert_and_check(
@@ -313,7 +313,7 @@ def test_join_to_scd_dimension(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=scd_dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )
 
 
@@ -339,7 +339,7 @@ def test_multi_hop_through_scd_dimension(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=scd_dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )
 
 
@@ -365,7 +365,7 @@ def test_multi_hop_to_scd_dimension(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=scd_dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )
 
 
@@ -391,7 +391,7 @@ def test_multiple_metrics_no_dimensions(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )
 
 
@@ -414,7 +414,7 @@ def test_metric_with_measures_from_multiple_sources_no_dimensions(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )
 
 
@@ -438,7 +438,7 @@ def test_common_semantic_model(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )
 
 
@@ -468,7 +468,7 @@ def test_min_max_only_categorical(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )
 
 
@@ -499,7 +499,7 @@ def test_min_max_only_time(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )
 
 
@@ -530,7 +530,7 @@ def test_min_max_only_time_quarter(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )
 
 
@@ -555,7 +555,7 @@ def test_min_max_metric_time(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )
 
 
@@ -580,5 +580,5 @@ def test_min_max_metric_time_week(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )

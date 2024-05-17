@@ -10,6 +10,7 @@ from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.base_node import (
     GroupByItemResolutionNode,
+    GroupByItemResolutionNodeSet,
     GroupByItemResolutionNodeVisitor,
 )
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.metric_resolution_node import (
@@ -92,3 +93,7 @@ class QueryGroupByItemResolutionNode(GroupByItemResolutionNode):
     @override
     def ui_description(self) -> str:
         return f"Query({repr([metric_reference.element_name for metric_reference in self._metrics_in_query])})"
+
+    @override
+    def _self_set(self) -> GroupByItemResolutionNodeSet:
+        return GroupByItemResolutionNodeSet(query_nodes=(self,))

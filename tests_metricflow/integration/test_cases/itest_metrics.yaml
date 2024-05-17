@@ -2069,6 +2069,25 @@ integration_test:
     WHERE view__listing__views > 2
 ---
 integration_test:
+  name: test_filter_defined_on_ratio_metric
+  description: Query a ratio metric with a metric-level filter
+  model: SIMPLE_MODEL
+  metrics: ["popular_listing_bookings_per_booker"]
+  check_query: |
+    SELECT
+      CAST(SUM(1) AS {{ double_data_type_name }}) / CAST(NULLIF(SUM(1), 0) AS {{ double_data_type_name }}) AS popular_listing_bookings_per_booker
+    FROM {{ source_schema }}.dim_listings_latest l
+    LEFT OUTER JOIN (
+      SELECT
+        listing_id
+        , SUM(1) AS views
+      FROM {{ source_schema }}.fct_views v
+      GROUP BY listing_id
+    ) metric_subquery
+    ON l.listing_id = metric_subquery.listing_id
+    WHERE views > 10
+---
+integration_test:
   name: test_metric_filter_with_inner_query_single_hop_join
   description: Query with a metric filter where the inner query uses a single-hop join
   model: PARTITIONED_MULTI_HOP_JOIN_MODEL

@@ -1,0 +1,24 @@
+ParseQueryResult(
+  query_spec=MetricFlowQuerySpec(
+    metric_specs=(MetricSpec(element_name='visit_buy_conversion_rate_by_session'),),
+    dimension_specs=(
+      DimensionSpec(
+        element_name='referrer_id',
+        entity_links=(EntityReference(element_name='visit'),),
+      ),
+      DimensionSpec(
+        element_name='home_state_latest',
+        entity_links=(EntityReference(element_name='user'),),
+      ),
+    ),
+    time_dimension_specs=(TimeDimensionSpec(element_name='metric_time', time_granularity=DAY),),
+    filter_intersection=PydanticWhereFilterIntersection(),
+    filter_spec_resolution_lookup=FilterSpecResolutionLookUp(),
+    min_max_only=False,
+  ),
+  queried_semantic_models=(
+    SemanticModelReference(semantic_model_name='buys_source'),
+    SemanticModelReference(semantic_model_name='users_latest'),
+    SemanticModelReference(semantic_model_name='visits_source'),
+  ),
+)

@@ -27,7 +27,7 @@ def test_query_with_simple_metric_in_where_filter(
         where_constraint=PydanticWhereFilter(
             where_sql_template="{{ Metric('bookings', ['listing']) }} > 2",
         ),
-    )
+    ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
     convert_and_check(
@@ -35,7 +35,7 @@ def test_query_with_simple_metric_in_where_filter(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )
 
 
@@ -52,7 +52,7 @@ def test_metric_with_metric_in_where_filter(
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("active_listings",),
         group_by_names=("metric_time__day",),
-    )
+    ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
     convert_and_check(
@@ -60,7 +60,7 @@ def test_metric_with_metric_in_where_filter(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )
 
 
@@ -79,7 +79,7 @@ def test_query_with_derived_metric_in_where_filter(
         where_constraint=PydanticWhereFilter(
             where_sql_template="{{ Metric('views_times_booking_value', ['listing']) }} > 1",
         ),
-    )
+    ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
     convert_and_check(
@@ -87,7 +87,7 @@ def test_query_with_derived_metric_in_where_filter(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )
 
 
@@ -106,7 +106,7 @@ def test_query_with_ratio_metric_in_where_filter(
         where_constraint=PydanticWhereFilter(
             where_sql_template="{{ Metric('bookings_per_booker', ['listing']) }} > 1",
         ),
-    )
+    ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
     convert_and_check(
@@ -114,7 +114,7 @@ def test_query_with_ratio_metric_in_where_filter(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )
 
 
@@ -136,7 +136,7 @@ def test_query_with_cumulative_metric_in_where_filter(
         where_constraint=PydanticWhereFilter(
             where_sql_template="{{ Metric('revenue_all_time', ['user']) }} > 1",
         ),
-    )
+    ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
     convert_and_check(
@@ -144,7 +144,7 @@ def test_query_with_cumulative_metric_in_where_filter(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )
 
 
@@ -163,7 +163,7 @@ def test_query_with_multiple_metrics_in_filter(
         where_constraint=PydanticWhereFilter(
             where_sql_template="{{ Metric('bookings', ['listing']) }} > 2 AND {{ Metric('bookers', ['listing']) }} > 1",
         ),
-    )
+    ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
     convert_and_check(
@@ -171,7 +171,7 @@ def test_query_with_multiple_metrics_in_filter(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )
 
 
@@ -190,7 +190,7 @@ def test_filter_by_metric_in_same_semantic_model_as_queried_metric(
         where_constraint=PydanticWhereFilter(
             where_sql_template="{{ Metric('booking_value', ['guest']) }} > 1.00",
         ),
-    )
+    ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
     convert_and_check(
@@ -198,7 +198,7 @@ def test_filter_by_metric_in_same_semantic_model_as_queried_metric(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )
 
 
@@ -217,7 +217,7 @@ def test_distinct_values_query_with_metric_filter(
         where_constraint=PydanticWhereFilter(
             where_sql_template="{{ Metric('bookings', ['listing']) }} > 2",
         ),
-    )
+    ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(query_spec)
 
     convert_and_check(
@@ -225,7 +225,7 @@ def test_distinct_values_query_with_metric_filter(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )
 
 
@@ -244,7 +244,7 @@ def test_metric_filtered_by_itself(
         where_constraint=PydanticWhereFilter(
             where_sql_template="{{ Metric('bookers', ['guest']) }} > 1.00",
         ),
-    )
+    ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
     convert_and_check(
@@ -252,7 +252,7 @@ def test_metric_filtered_by_itself(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )
 
 
@@ -270,7 +270,7 @@ def test_group_by_has_local_entity_prefix(  # noqa: D103
         where_constraint=PydanticWhereFilter(
             where_sql_template="{{ Metric('average_booking_value', ['listing__user']) }} > 1",
         ),
-    )
+    ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
     convert_and_check(
@@ -278,7 +278,7 @@ def test_group_by_has_local_entity_prefix(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )
 
 
@@ -296,7 +296,7 @@ def test_filter_with_conversion_metric(  # noqa: D103
         where_constraint=PydanticWhereFilter(
             where_sql_template="{{ Metric('visit_buy_conversion_rate', ['user']) }} > 2",
         ),
-    )
+    ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
     convert_and_check(
@@ -304,7 +304,7 @@ def test_filter_with_conversion_metric(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )
 
 
@@ -323,7 +323,7 @@ def test_inner_query_single_hop(
         where_constraint=PydanticWhereFilter(
             where_sql_template="{{ Metric('paraguayan_customers', ['customer_id__customer_third_hop_id']) }} > 0",
         ),
-    )
+    ).query_spec
     dataflow_plan = multihop_dataflow_plan_builder.build_plan(query_spec)
 
     convert_and_check(
@@ -331,7 +331,7 @@ def test_inner_query_single_hop(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=multihop_dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )
 
 
@@ -350,7 +350,7 @@ def test_inner_query_multi_hop(
         where_constraint=PydanticWhereFilter(
             where_sql_template="{{ Metric('txn_count', ['account_id__customer_id__customer_third_hop_id']) }} > 2",
         ),
-    )
+    ).query_spec
     dataflow_plan = multihop_dataflow_plan_builder.build_plan(query_spec)
 
     convert_and_check(
@@ -358,5 +358,5 @@ def test_inner_query_multi_hop(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=multihop_dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )

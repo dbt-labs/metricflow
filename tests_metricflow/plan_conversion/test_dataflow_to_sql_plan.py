@@ -12,7 +12,7 @@ from dbt_semantic_interfaces.type_enums.dimension_type import DimensionType
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.dag.mf_dag import DagId
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
-from metricflow_semantics.model.semantics.linkable_element import LinkableDimension
+from metricflow_semantics.model.semantics.linkable_element import LinkableDimension, SemanticModelJoinPath
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
@@ -36,15 +36,15 @@ from metricflow_semantics.test_helpers.snapshot_helpers import assert_plan_snaps
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan import (
-    BaseOutput,
     DataflowPlan,
+    DataflowPlanNode,
 )
 from metricflow.dataflow.nodes.aggregate_measures import AggregateMeasuresNode
 from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
 from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
 from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
-from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinToBaseOutputNode
+from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinOnEntitiesNode
 from metricflow.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
@@ -64,7 +64,7 @@ def convert_and_check(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
-    node: BaseOutput,
+    node: DataflowPlanNode,
 ) -> None:
     """Convert the dataflow plan to SQL and compare with snapshots."""
     # Generate plans w/o optimizers
@@ -209,7 +209,9 @@ def test_filter_with_where_constraint_node(
                     properties=frozenset(),
                     time_granularity=TimeGranularity.DAY,
                     date_part=None,
-                    join_path=(),
+                    join_path=SemanticModelJoinPath(
+                        left_semantic_model_reference=SemanticModelReference("bookings_source"),
+                    ),
                 ),
             ),
         ),
@@ -311,7 +313,7 @@ def test_single_join_node(
         ),
     )
 
-    join_node = JoinToBaseOutputNode(
+    join_node = JoinOnEntitiesNode(
         left_node=filtered_measure_node,
         join_targets=[
             JoinDescription(
@@ -369,7 +371,7 @@ def test_multi_join_node(
         ),
     )
 
-    join_node = JoinToBaseOutputNode(
+    join_node = JoinOnEntitiesNode(
         left_node=filtered_measure_node,
         join_targets=[
             JoinDescription(
@@ -438,7 +440,7 @@ def test_compute_metrics_node(
         ),
     )
 
-    join_node = JoinToBaseOutputNode(
+    join_node = JoinOnEntitiesNode(
         left_node=filtered_measure_node,
         join_targets=[
             JoinDescription(
@@ -508,7 +510,7 @@ def test_compute_metrics_node_simple_expr(
         ),
     )
 
-    join_node = JoinToBaseOutputNode(
+    join_node = JoinOnEntitiesNode(
         left_node=filtered_measure_node,
         join_targets=[
             JoinDescription(
@@ -532,7 +534,7 @@ def test_compute_metrics_node_simple_expr(
     )
 
     sink_node = WriteToResultDataframeNode(compute_metrics_node)
-    dataflow_plan = DataflowPlan(sink_output_nodes=[sink_node], plan_id=DagId.from_str("plan0"))
+    dataflow_plan = DataflowPlan(sink_nodes=[sink_node], plan_id=DagId.from_str("plan0"))
 
     assert_plan_snapshot_text_equal(
         request=request,
@@ -604,7 +606,7 @@ def test_join_to_time_spine_node_without_offset(
         join_type=SqlJoinType.INNER,
     )
     sink_node = WriteToResultDataframeNode(join_to_time_spine_node)
-    dataflow_plan = DataflowPlan(sink_output_nodes=[sink_node], plan_id=DagId.from_str("plan0"))
+    dataflow_plan = DataflowPlan(sink_nodes=[sink_node], plan_id=DagId.from_str("plan0"))
 
     assert_plan_snapshot_text_equal(
         request=request,
@@ -677,7 +679,7 @@ def test_join_to_time_spine_node_with_offset_window(
     )
 
     sink_node = WriteToResultDataframeNode(join_to_time_spine_node)
-    dataflow_plan = DataflowPlan(sink_output_nodes=[sink_node], plan_id=DagId.from_str("plan0"))
+    dataflow_plan = DataflowPlan(sink_nodes=[sink_node], plan_id=DagId.from_str("plan0"))
 
     assert_plan_snapshot_text_equal(
         request=request,
@@ -751,7 +753,7 @@ def test_join_to_time_spine_node_with_offset_to_grain(
     )
 
     sink_node = WriteToResultDataframeNode(join_to_time_spine_node)
-    dataflow_plan = DataflowPlan(sink_output_nodes=[sink_node], plan_id=DagId.from_str("plan0"))
+    dataflow_plan = DataflowPlan(sink_nodes=[sink_node], plan_id=DagId.from_str("plan0"))
 
     assert_plan_snapshot_text_equal(
         request=request,
@@ -818,7 +820,7 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
         ),
     )
 
-    join_node = JoinToBaseOutputNode(
+    join_node = JoinOnEntitiesNode(
         left_node=filtered_measures_node,
         join_targets=[
             JoinDescription(
@@ -1099,7 +1101,7 @@ def test_compute_metrics_node_ratio_from_multiple_semantic_models(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )
 
 
@@ -1185,7 +1187,7 @@ def test_dimensions_requiring_join(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )
 
 
@@ -1203,7 +1205,7 @@ def test_dimension_with_joined_where_constraint(
     query_spec = query_parser.parse_and_validate_query(
         group_by_names=("user__home_state_latest",),
         where_constraint_str="{{ Dimension('listing__country_latest') }} = 'us'",
-    )
+    ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(query_spec)
 
     convert_and_check(
@@ -1211,5 +1213,5 @@ def test_dimension_with_joined_where_constraint(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_output_nodes[0].parent_node,
+        node=dataflow_plan.sink_node,
     )

@@ -42,7 +42,6 @@ from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.time.time_constants import ISO8601_PYTHON_FORMAT
 
 from metricflow.dataflow.dataflow_plan import (
-    BaseOutput,
     DataflowPlanNode,
     DataflowPlanNodeVisitor,
 )
@@ -54,7 +53,7 @@ from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
 from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
-from metricflow.dataflow.nodes.join_to_base import JoinToBaseOutputNode
+from metricflow.dataflow.nodes.join_to_base import JoinOnEntitiesNode
 from metricflow.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.dataflow.nodes.min_max import MinMaxNode
@@ -420,7 +419,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             ),
         )
 
-    def visit_join_to_base_output_node(self, node: JoinToBaseOutputNode) -> SqlDataSet:
+    def visit_join_on_entities_node(self, node: JoinOnEntitiesNode) -> SqlDataSet:
         """Generates the query that realizes the behavior of the JoinToStandardOutputNode."""
         # Keep a mapping between the table aliases that would be used in the query and the MDO instances in that source.
         # e.g. when building "FROM from_table a JOIN right_table b", the value for key "a" would be the instances in
@@ -442,7 +441,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         for join_description in node.join_targets:
             join_on_entity = join_description.join_on_entity
 
-            right_node_to_join: BaseOutput = join_description.join_node
+            right_node_to_join: DataflowPlanNode = join_description.join_node
             right_data_set: SqlDataSet = right_node_to_join.accept(self)
             right_data_set_alias = self._next_unique_table_alias()
 

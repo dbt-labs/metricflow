@@ -26,13 +26,18 @@
             <!--             element_name='country_latest',                           -->
             <!--             dimension_type=CATEGORICAL,                              -->
             <!--             entity_links=(EntityReference(element_name='listing'),), -->
-            <!--             join_path=(                                              -->
-            <!--               SemanticModelJoinPathElement(                          -->
-            <!--                 semantic_model_reference=SemanticModelReference(     -->
-            <!--                   semantic_model_name='listings_latest',             -->
-            <!--                 ),                                                   -->
-            <!--                 join_on_entity=EntityReference(                      -->
-            <!--                   element_name='listing',                            -->
+            <!--             join_path=SemanticModelJoinPath(                         -->
+            <!--               left_semantic_model_reference=SemanticModelReference(  -->
+            <!--                 semantic_model_name='bookings_source',               -->
+            <!--               ),                                                     -->
+            <!--               path_elements=(                                        -->
+            <!--                 SemanticModelJoinPathElement(                        -->
+            <!--                   semantic_model_reference=SemanticModelReference(   -->
+            <!--                     semantic_model_name='listings_latest',           -->
+            <!--                   ),                                                 -->
+            <!--                   join_on_entity=EntityReference(                    -->
+            <!--                     element_name='listing',                          -->
+            <!--                   ),                                                 -->
             <!--                 ),                                                   -->
             <!--               ),                                                     -->
             <!--             ),                                                       -->
@@ -76,13 +81,18 @@
                         <!--         element_name='country_latest',                           -->
                         <!--         dimension_type=CATEGORICAL,                              -->
                         <!--         entity_links=(EntityReference(element_name='listing'),), -->
-                        <!--         join_path=(                                              -->
-                        <!--           SemanticModelJoinPathElement(                          -->
-                        <!--             semantic_model_reference=SemanticModelReference(     -->
-                        <!--               semantic_model_name='listings_latest',             -->
-                        <!--             ),                                                   -->
-                        <!--             join_on_entity=EntityReference(                      -->
-                        <!--               element_name='listing',                            -->
+                        <!--         join_path=SemanticModelJoinPath(                         -->
+                        <!--           left_semantic_model_reference=SemanticModelReference(  -->
+                        <!--             semantic_model_name='bookings_source',               -->
+                        <!--           ),                                                     -->
+                        <!--           path_elements=(                                        -->
+                        <!--             SemanticModelJoinPathElement(                        -->
+                        <!--               semantic_model_reference=SemanticModelReference(   -->
+                        <!--                 semantic_model_name='listings_latest',           -->
+                        <!--               ),                                                 -->
+                        <!--               join_on_entity=EntityReference(                    -->
+                        <!--                 element_name='listing',                          -->
+                        <!--               ),                                                 -->
                         <!--             ),                                                   -->
                         <!--           ),                                                     -->
                         <!--         ),                                                       -->
@@ -106,7 +116,7 @@
                             <!--     entity_links=(EntityReference(element_name='listing'),), -->
                             <!--   )                                                          -->
                             <!-- distinct = False -->
-                            <JoinToBaseOutputNode>
+                            <JoinOnEntitiesNode>
                                 <!-- description = 'Join Standard Outputs' -->
                                 <!-- node_id = NodeId(id_str='jso_0') -->
                                 <!-- join0_for_node_id_pfe_1 =                                      -->
@@ -155,7 +165,7 @@
                                         </ReadSqlSourceNode>
                                     </MetricTimeDimensionTransformNode>
                                 </FilterElementsNode>
-                            </JoinToBaseOutputNode>
+                            </JoinOnEntitiesNode>
                         </FilterElementsNode>
                     </WhereConstraintNode>
                 </FilterElementsNode>

@@ -23,6 +23,10 @@ def top_fuzzy_matches(
 
     Return scores from -1 -> 0 inclusive.
     """
+    # In the case of a tie in score, items will be returned in the order they were passed in.
+    # Sort candidate item inputs first for consistent results.
+    sorted_candidate_items = sorted(candidate_items)
+
     scored_items = []
 
     # Rank choices by edit distance score.
@@ -31,7 +35,7 @@ def top_fuzzy_matches(
         rapidfuzz.process.extract(
             # This scorer seems to return the best results.
             item,
-            list(candidate_items),
+            sorted_candidate_items,
             limit=max_matches,
             scorer=rapidfuzz.fuzz.token_set_ratio,
         ),

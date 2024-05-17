@@ -7,11 +7,11 @@ from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.visitor import VisitorOutputT
 
-from metricflow.dataflow.dataflow_plan import BaseOutput, DataflowPlanNode, DataflowPlanNodeVisitor
-from metricflow.dataflow.nodes.aggregate_measures import AggregatedMeasuresOutput
+from metricflow.dataflow.dataflow_plan import DataflowPlanNodeVisitor
+from metricflow.dataflow.nodes.aggregate_measures import DataflowPlanNode
 
 
-class ConstrainTimeRangeNode(AggregatedMeasuresOutput, BaseOutput):
+class ConstrainTimeRangeNode(DataflowPlanNode):
     """Constrains the time range of the input data set.
 
     For example, if the input data set had "sales by date", then this would restrict the data set so that it only
@@ -20,7 +20,7 @@ class ConstrainTimeRangeNode(AggregatedMeasuresOutput, BaseOutput):
 
     def __init__(  # noqa: D107
         self,
-        parent_node: BaseOutput,
+        parent_node: DataflowPlanNode,
         time_range_constraint: TimeRangeConstraint,
     ) -> None:
         self._time_range_constraint = time_range_constraint
@@ -59,7 +59,7 @@ class ConstrainTimeRangeNode(AggregatedMeasuresOutput, BaseOutput):
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D102
         return isinstance(other_node, self.__class__) and self.time_range_constraint == other_node.time_range_constraint
 
-    def with_new_parents(self, new_parent_nodes: Sequence[BaseOutput]) -> ConstrainTimeRangeNode:  # noqa: D102
+    def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> ConstrainTimeRangeNode:  # noqa: D102
         assert len(new_parent_nodes) == 1
         return ConstrainTimeRangeNode(
             parent_node=new_parent_nodes[0],

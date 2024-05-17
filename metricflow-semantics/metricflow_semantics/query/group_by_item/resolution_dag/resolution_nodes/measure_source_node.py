@@ -9,6 +9,7 @@ from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.base_node import (
     GroupByItemResolutionNode,
+    GroupByItemResolutionNodeSet,
     GroupByItemResolutionNodeVisitor,
 )
 from metricflow_semantics.visitor import VisitorOutputT
@@ -78,3 +79,7 @@ class MeasureGroupByItemSourceNode(GroupByItemResolutionNode):
     @override
     def ui_description(self) -> str:
         return f"Measure({repr(self.measure_reference.element_name)})"
+
+    @override
+    def _self_set(self) -> GroupByItemResolutionNodeSet:
+        return GroupByItemResolutionNodeSet(measure_nodes=(self,))

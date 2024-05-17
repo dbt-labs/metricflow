@@ -22,7 +22,7 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_spec_set_snapshot_equal
 
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
-from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinToBaseOutputNode
+from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinOnEntitiesNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.time_spine import TimeSpineSource
@@ -110,7 +110,7 @@ def test_joined_node_data_set(
     # Join "revenue" with "users_latest" to get "user__home_state_latest"
     revenue_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping["revenue"]
     users_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping["users_latest"]
-    join_node = JoinToBaseOutputNode(
+    join_node = JoinOnEntitiesNode(
         left_node=revenue_node,
         join_targets=[
             JoinDescription(

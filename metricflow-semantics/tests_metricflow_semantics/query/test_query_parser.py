@@ -5,6 +5,7 @@ import textwrap
 from typing import List
 
 import pytest
+from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_validation_ready_semantic_manifest
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from dbt_semantic_interfaces.protocols import SemanticManifest
@@ -13,7 +14,6 @@ from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
-from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.query_exceptions import InvalidQueryException
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
@@ -25,12 +25,10 @@ from metricflow_semantics.specs.query_param_implementations import (
 )
 from metricflow_semantics.specs.spec_classes import (
     DimensionSpec,
-    EntitySpec,
-    MetricSpec,
-    OrderBySpec,
-    TimeDimensionSpec,
 )
+from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.metric_time_dimension import MTD
+from metricflow_semantics.test_helpers.snapshot_helpers import assert_object_snapshot_equal
 
 from tests_metricflow_semantics.model.example_project_configuration import (
     EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE,
@@ -195,61 +193,37 @@ def revenue_query_parser() -> MetricFlowQueryParser:  # noqa
     return query_parser_from_yaml([EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, revenue_yaml_file])
 
 
-def test_query_parser(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D103
-    query_spec = bookings_query_parser.parse_and_validate_query(
+def test_query_parser(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    bookings_query_parser: MetricFlowQueryParser,
+) -> None:
+    result = bookings_query_parser.parse_and_validate_query(
         metric_names=["bookings"],
         group_by_names=["booking__is_instant", "listing", MTD],
         order_by_names=[MTD, "-bookings"],
     )
-
-    assert query_spec.metric_specs == (MetricSpec(element_name="bookings"),)
-    assert query_spec.dimension_specs == (
-        DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),
-    )
-    assert query_spec.time_dimension_specs == (
-        TimeDimensionSpec(element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY),
-    )
-    assert query_spec.entity_specs == (EntitySpec(element_name="listing", entity_links=()),)
-    assert query_spec.order_by_specs == (
-        OrderBySpec(
-            instance_spec=TimeDimensionSpec(element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY),
-            descending=False,
-        ),
-        OrderBySpec(
-            instance_spec=MetricSpec(element_name="bookings"),
-            descending=True,
-        ),
-    )
+    assert_object_snapshot_equal(request=request, mf_test_configuration=mf_test_configuration, obj=result)
 
 
-def test_query_parser_case_insensitivity(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D103
-    # String params
-    query_spec = bookings_query_parser.parse_and_validate_query(
+def test_query_parser_case_insensitivity_with_names(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    bookings_query_parser: MetricFlowQueryParser,
+) -> None:
+    result = bookings_query_parser.parse_and_validate_query(
         metric_names=["BOOKINGS"],
         group_by_names=["BOOKING__IS_INSTANT", "LISTING", MTD.upper()],
         order_by_names=[MTD.upper(), "-BOOKINGS"],
     )
+    assert_object_snapshot_equal(request=request, mf_test_configuration=mf_test_configuration, obj=result)
 
-    assert query_spec.metric_specs == (MetricSpec(element_name="bookings"),)
-    assert query_spec.dimension_specs == (
-        DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),
-    )
-    assert query_spec.time_dimension_specs == (
-        TimeDimensionSpec(element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY),
-    )
-    assert query_spec.entity_specs == (EntitySpec(element_name="listing", entity_links=()),)
-    assert query_spec.order_by_specs == (
-        OrderBySpec(
-            instance_spec=TimeDimensionSpec(element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY),
-            descending=False,
-        ),
-        OrderBySpec(
-            instance_spec=MetricSpec(element_name="bookings"),
-            descending=True,
-        ),
-    )
 
-    # Object params
+def test_query_parser_case_insensitivity_with_parameter_objects(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    bookings_query_parser: MetricFlowQueryParser,
+) -> None:
     metric = MetricParameter(name="BOOKINGS")
     group_by = (
         DimensionOrEntityParameter("BOOKING__IS_INSTANT"),
@@ -260,25 +234,8 @@ def test_query_parser_case_insensitivity(bookings_query_parser: MetricFlowQueryP
         OrderByParameter(order_by=TimeDimensionParameter(MTD.upper())),
         OrderByParameter(order_by=MetricParameter("BOOKINGS"), descending=True),
     )
-    query_spec = bookings_query_parser.parse_and_validate_query(metrics=[metric], group_by=group_by, order_by=order_by)
-    assert query_spec.metric_specs == (MetricSpec(element_name="bookings"),)
-    assert query_spec.dimension_specs == (
-        DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),
-    )
-    assert query_spec.time_dimension_specs == (
-        TimeDimensionSpec(element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY),
-    )
-    assert query_spec.entity_specs == (EntitySpec(element_name="listing", entity_links=()),)
-    assert query_spec.order_by_specs == (
-        OrderBySpec(
-            instance_spec=TimeDimensionSpec(element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY),
-            descending=False,
-        ),
-        OrderBySpec(
-            instance_spec=MetricSpec(element_name="bookings"),
-            descending=True,
-        ),
-    )
+    result = bookings_query_parser.parse_and_validate_query(metrics=[metric], group_by=group_by, order_by=order_by)
+    assert_object_snapshot_equal(request=request, mf_test_configuration=mf_test_configuration, obj=result)
 
 
 def test_query_parser_invalid_group_by(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D103
@@ -286,7 +243,11 @@ def test_query_parser_invalid_group_by(bookings_query_parser: MetricFlowQueryPar
         bookings_query_parser.parse_and_validate_query(group_by_names=["random_stuff"])
 
 
-def test_query_parser_with_object_params(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D103
+def test_query_parser_with_object_params(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    bookings_query_parser: MetricFlowQueryParser,
+) -> None:
     metric = MetricParameter(name="bookings")
     group_by = (
         DimensionOrEntityParameter("booking__is_instant"),
@@ -297,28 +258,14 @@ def test_query_parser_with_object_params(bookings_query_parser: MetricFlowQueryP
         OrderByParameter(order_by=TimeDimensionParameter(MTD)),
         OrderByParameter(order_by=MetricParameter("bookings"), descending=True),
     )
-    query_spec = bookings_query_parser.parse_and_validate_query(metrics=[metric], group_by=group_by, order_by=order_by)
-    assert query_spec.metric_specs == (MetricSpec(element_name="bookings"),)
-    assert query_spec.dimension_specs == (
-        DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),
-    )
-    assert query_spec.time_dimension_specs == (
-        TimeDimensionSpec(element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY),
-    )
-    assert query_spec.entity_specs == (EntitySpec(element_name="listing", entity_links=()),)
-    assert query_spec.order_by_specs == (
-        OrderBySpec(
-            instance_spec=TimeDimensionSpec(element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY),
-            descending=False,
-        ),
-        OrderBySpec(
-            instance_spec=MetricSpec(element_name="bookings"),
-            descending=True,
-        ),
-    )
+    result = bookings_query_parser.parse_and_validate_query(metrics=[metric], group_by=group_by, order_by=order_by)
+    assert_object_snapshot_equal(request=request, mf_test_configuration=mf_test_configuration, obj=result)
 
 
-def test_order_by_granularity_conversion() -> None:
+def test_order_by_granularity_conversion(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+) -> None:
     """Test that the granularity of the primary time dimension in the order by is returned appropriately.
 
     In the case where the primary time dimension is specified in the order by without a granularity suffix, the order
@@ -331,34 +278,27 @@ def test_order_by_granularity_conversion() -> None:
     query_parser = query_parser_from_yaml(
         [EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, bookings_yaml_file, revenue_yaml_file]
     )
-    query_spec = query_parser.parse_and_validate_query(
+    result = query_parser.parse_and_validate_query(
         metric_names=["bookings", "revenue"], group_by_names=[MTD], order_by_names=[f"-{MTD}"]
     )
-
-    # The lowest common granularity is MONTH, so we expect the PTD in the order by to have that granularity.
-    assert (
-        OrderBySpec(
-            instance_spec=TimeDimensionSpec(element_name=MTD, entity_links=(), time_granularity=TimeGranularity.MONTH),
-            descending=True,
-        ),
-    ) == query_spec.order_by_specs
+    assert_object_snapshot_equal(request=request, mf_test_configuration=mf_test_configuration, obj=result)
 
 
-def test_order_by_granularity_no_conversion(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D103
-    query_spec = bookings_query_parser.parse_and_validate_query(
+def test_order_by_granularity_no_conversion(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    bookings_query_parser: MetricFlowQueryParser,
+) -> None:
+    result = bookings_query_parser.parse_and_validate_query(
         metric_names=["bookings"], group_by_names=[MTD], order_by_names=[MTD]
     )
-
-    # The only granularity is DAY, so we expect the PTD in the order by to have that granularity.
-    assert (
-        OrderBySpec(
-            instance_spec=TimeDimensionSpec(element_name=MTD, entity_links=(), time_granularity=TimeGranularity.DAY),
-            descending=False,
-        ),
-    ) == query_spec.order_by_specs
+    assert_object_snapshot_equal(request=request, mf_test_configuration=mf_test_configuration, obj=result)
 
 
-def test_time_range_constraint_conversion() -> None:
+def test_time_range_constraint_conversion(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+) -> None:
     """Test that the returned time constraint in the query spec is adjusted to match the granularity of the query."""
     bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=BOOKINGS_YAML)
     revenue_yaml_file = YamlConfigFile(filepath="inline_for_test_2", contents=REVENUE_YAML)
@@ -368,19 +308,20 @@ def test_time_range_constraint_conversion() -> None:
     )
 
     # "bookings" has a granularity of DAY, "revenue" has a granularity of MONTH
-    query_spec = query_parser.parse_and_validate_query(
+    result = query_parser.parse_and_validate_query(
         metric_names=["bookings", "revenue"],
         group_by_names=[MTD],
         time_constraint_start=as_datetime("2020-01-15"),
         time_constraint_end=as_datetime("2020-02-15"),
     )
-
-    assert (
-        TimeRangeConstraint(start_time=as_datetime("2020-01-01"), end_time=as_datetime("2020-02-29"))
-    ) == query_spec.time_range_constraint
+    assert_object_snapshot_equal(request=request, mf_test_configuration=mf_test_configuration, obj=result)
 
 
-def test_parse_and_validate_where_constraint_dims(bookings_query_parser: MetricFlowQueryParser) -> None:
+def test_parse_and_validate_where_constraint_dims(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    bookings_query_parser: MetricFlowQueryParser,
+) -> None:
     """Test that the returned time constraint in the query spec is adjusted to match the granularity of the query."""
     # check constraint on invalid_dim raises InvalidQueryException
     with pytest.raises(InvalidQueryException, match="does not match any of the available"):
@@ -401,20 +342,24 @@ def test_parse_and_validate_where_constraint_dims(bookings_query_parser: MetricF
             where_constraint_str="{{ Dimension('invalid_format') }} = '1'",
         )
 
-    query_spec = bookings_query_parser.parse_and_validate_query(
+    result = bookings_query_parser.parse_and_validate_query(
         metric_names=["bookings"],
         group_by_names=[MTD],
         time_constraint_start=as_datetime("2020-01-15"),
         time_constraint_end=as_datetime("2020-02-15"),
         where_constraint_str="{{ Dimension('booking__is_instant') }} = '1'",
     )
+    assert_object_snapshot_equal(request=request, mf_test_configuration=mf_test_configuration, obj=result)
     assert (
         DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),))
-        not in query_spec.dimension_specs
+        not in result.query_spec.dimension_specs
     )
 
 
-def test_parse_and_validate_where_constraint_metric_time() -> None:
+def test_parse_and_validate_where_constraint_metric_time(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+) -> None:
     """Test that granularity of metric_time reference in where constraint is at least that of the ds dimension."""
     revenue_yaml_file = YamlConfigFile(filepath="inline_for_test_2", contents=REVENUE_YAML)
 
@@ -427,7 +372,10 @@ def test_parse_and_validate_where_constraint_metric_time() -> None:
         )
 
 
-def test_parse_and_validate_metric_constraint_dims() -> None:
+def test_parse_and_validate_metric_constraint_dims(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+) -> None:
     """Test that the returned time constraint in the query spec is adjusted to match the granularity of the query.
 
     TODO: This test doesn't do what it says it does.
@@ -445,7 +393,10 @@ def test_parse_and_validate_metric_constraint_dims() -> None:
         )
 
 
-def test_cumulative_metric_no_time_dimension_validation() -> None:
+def test_cumulative_metric_no_time_dimension_validation(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+) -> None:
     """Test that queries for cumulative metrics fail if no time dimensions are selected.
 
     This is a test of validation enforcement to ensure users don't get incorrect results due to current
@@ -464,7 +415,10 @@ def test_cumulative_metric_no_time_dimension_validation() -> None:
         )
 
 
-def test_cumulative_metric_wrong_time_dimension_validation() -> None:
+def test_cumulative_metric_wrong_time_dimension_validation(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+) -> None:
     """Test that queries for cumulative metrics fail if the agg_time_dimension is not selected.
 
     Our current behavior for cases where a different time dimension is selected by the agg_time_dimension is
@@ -489,7 +443,10 @@ def test_cumulative_metric_wrong_time_dimension_validation() -> None:
         )
 
 
-def test_cumulative_metric_agg_time_dimension_name_validation() -> None:
+def test_cumulative_metric_agg_time_dimension_name_validation(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+) -> None:
     """Test that queries for cumulative metrics succeed if the agg_time_dimension is selected by name."""
     bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=BOOKINGS_YAML)
     metrics_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=METRICS_YAML)
@@ -498,10 +455,16 @@ def test_cumulative_metric_agg_time_dimension_name_validation() -> None:
         [EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, bookings_yaml_file, revenue_yaml_file, metrics_yaml_file]
     )
 
-    query_parser.parse_and_validate_query(metric_names=["revenue_cumulative"], group_by_names=["revenue_instance__ds"])
+    result = query_parser.parse_and_validate_query(
+        metric_names=["revenue_cumulative"], group_by_names=["revenue_instance__ds"]
+    )
+    assert_object_snapshot_equal(request=request, mf_test_configuration=mf_test_configuration, obj=result)
 
 
-def test_derived_metric_query_parsing() -> None:
+def test_derived_metric_query_parsing(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+) -> None:
     """Test derived metric inputs are properly validated."""
     bookings_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=BOOKINGS_YAML)
     metrics_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=METRICS_YAML)
@@ -530,7 +493,10 @@ def test_derived_metric_query_parsing() -> None:
     )
 
 
-def test_derived_metric_with_offset_parsing() -> None:
+def test_derived_metric_with_offset_parsing(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+) -> None:
     """Test that querying derived metrics with a time offset requires a time dimension."""
     revenue_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=REVENUE_YAML)
     metrics_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=METRICS_YAML)
@@ -552,13 +518,17 @@ def test_derived_metric_with_offset_parsing() -> None:
         )
 
     # Query with time dimension
-    query_parser.parse_and_validate_query(
+    result = query_parser.parse_and_validate_query(
         metric_names=["revenue_growth_2_weeks"],
         group_by_names=[MTD],
     )
+    assert_object_snapshot_equal(request=request, mf_test_configuration=mf_test_configuration, obj=result)
 
 
-def test_date_part_parsing() -> None:
+def test_date_part_parsing(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+) -> None:
     """Test that querying with a date_part verifies compatibility with time_granularity."""
     revenue_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=REVENUE_YAML)
     metrics_yaml_file = YamlConfigFile(filepath="inline_for_test_1", contents=METRICS_YAML)
@@ -603,7 +573,11 @@ def test_date_part_parsing() -> None:
     )
 
 
-def test_duplicate_metric_query(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D103
+def test_duplicate_metric_query(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    bookings_query_parser: MetricFlowQueryParser,
+) -> None:
     with pytest.raises(InvalidQueryException, match="duplicate metrics"):
         bookings_query_parser.parse_and_validate_query(
             metric_names=["bookings", "bookings"],
@@ -611,7 +585,11 @@ def test_duplicate_metric_query(bookings_query_parser: MetricFlowQueryParser) ->
         )
 
 
-def test_no_metrics_or_group_by(bookings_query_parser: MetricFlowQueryParser) -> None:  # noqa: D103
+def test_no_metrics_or_group_by(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    bookings_query_parser: MetricFlowQueryParser,
+) -> None:
     with pytest.raises(InvalidQueryException, match="no metrics or group by items"):
         bookings_query_parser.parse_and_validate_query()
 
@@ -640,3 +618,11 @@ def query_parser_from_yaml(yaml_contents: List[YamlConfigFile]) -> MetricFlowQue
     return MetricFlowQueryParser(
         semantic_manifest_lookup=semantic_manifest_lookup,
     )
+
+
+def test_invalid_group_by_metric(bookings_query_parser: MetricFlowQueryParser) -> None:
+    """Tests that a query for an invalid group by metric gives an appropriate group by metric suggestion."""
+    with pytest.raises(InvalidQueryException, match="Metric\\('bookings', group_by=\\['listing'\\]\\)"):
+        bookings_query_parser.parse_and_validate_query(
+            metric_names=("bookings",), where_constraint_str="{{ Metric('listings', ['garbage']) }} > 1"
+        )

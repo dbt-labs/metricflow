@@ -27,5 +27,6 @@ class NoneDatePartPattern(SpecPattern):
                 specs_to_return.append(time_dimension_spec)
         specs_to_return.extend(spec_set.dimension_specs)
         specs_to_return.extend(spec_set.entity_specs)
+        specs_to_return.extend(spec_set.group_by_metric_specs)
 
         return specs_to_return
