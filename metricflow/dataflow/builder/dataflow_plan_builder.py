@@ -83,9 +83,9 @@ from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOptimizer
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.plan_conversion.node_processor import (
+    PredicateInputType,
     PredicatePushdownParameters,
     PreJoinNodeProcessor,
-    PushdownPredicateInputType,
 )
 from metricflow.sql.sql_table import SqlTable
 
@@ -248,7 +248,7 @@ class DataflowPlanBuilder:
         disabled_pushdown_parameters = PredicatePushdownParameters.with_pushdown_disabled()
         time_range_only_pushdown_parameters = PredicatePushdownParameters(
             time_range_constraint=predicate_pushdown_params.time_range_constraint,
-            pushdown_enabled_types=frozenset([PushdownPredicateInputType.TIME_RANGE_CONSTRAINT]),
+            pushdown_enabled_types=frozenset([PredicateInputType.TIME_RANGE_CONSTRAINT]),
         )
 
         # Build measure recipes

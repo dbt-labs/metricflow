@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 
-from metricflow.plan_conversion.node_processor import PredicatePushdownParameters, PushdownPredicateInputType
+from metricflow.plan_conversion.node_processor import PredicateInputType, PredicatePushdownParameters
 
 
 @pytest.fixture
@@ -19,7 +19,7 @@ def test_time_range_pushdown_enabled_states(all_pushdown_params: PredicatePushdo
     """Tests pushdown enabled check for time range pushdown operations."""
     time_range_only_params = PredicatePushdownParameters(
         time_range_constraint=TimeRangeConstraint.all_time(),
-        pushdown_enabled_types=frozenset([PushdownPredicateInputType.TIME_RANGE_CONSTRAINT]),
+        pushdown_enabled_types=frozenset([PredicateInputType.TIME_RANGE_CONSTRAINT]),
     )
 
     enabled_states = {
