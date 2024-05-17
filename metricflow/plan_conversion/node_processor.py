@@ -3,7 +3,7 @@ from __future__ import annotations
 import dataclasses
 import logging
 from enum import Enum
-from typing import List, Optional, Sequence, Set
+from typing import FrozenSet, List, Optional, Sequence, Set
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.references import EntityReference, TimeDimensionReference
@@ -61,7 +61,7 @@ class MultiHopJoinCandidate:
     lineage: MultiHopJoinCandidateLineage
 
 
-class PredicatePushdownState(Enum):
+class PushdownPredicateInputType(Enum):
     """Enumeration of constraint states describing when predicate pushdown may operate in a dataflow plan.
 
     This is necessary for holistic checks against the set of potentially enabled pushdown operations, because the
@@ -72,9 +72,10 @@ class PredicatePushdownState(Enum):
     but ideally we'd collapse this into a single enabled/disabled boolean property.
     """
 
-    DISABLED = "disabled"
-    FULLY_ENABLED = "fully_enabled"
-    ENABLED_FOR_TIME_RANGE_ONLY = "time_range_only"
+    CATEGORICAL_DIMENSION = "categorical_dimension"
+    ENTITY = "entity"
+    TIME_DIMENSION = "time_dimension"
+    TIME_RANGE_CONSTRAINT = "time_range_constraint"
 
 
 @dataclasses.dataclass(frozen=True)
@@ -84,60 +85,58 @@ class PredicatePushdownParameters:
     The time_range_constraint property holds the time window for setting up a time range filter expression.
     """
 
-    _PREDICATE_METADATA_KEY = "is_predicate_property"
-
-    time_range_constraint: Optional[TimeRangeConstraint] = dataclasses.field(metadata={_PREDICATE_METADATA_KEY: True})
-    pushdown_state: PredicatePushdownState = PredicatePushdownState.FULLY_ENABLED
+    time_range_constraint: Optional[TimeRangeConstraint]
+    pushdown_enabled_types: FrozenSet[PushdownPredicateInputType] = frozenset(
+        [PushdownPredicateInputType.TIME_RANGE_CONSTRAINT]
+    )
 
     def __post_init__(self) -> None:
         """Validation to ensure pushdown properties are configured correctly.
 
         In particular, this asserts that cases where pushdown is disabled cannot leak pushdown operations via
         outside property access - if pushdown is disabled, no further pushdown operations of any kind are allowed
-        on that particular code branch.
+        on that particular code branch. It also asserts that unsupported pushdown scenarios are not configured.
         """
-        if self.pushdown_state is PredicatePushdownState.FULLY_ENABLED:
-            return
+        invalid_types: Set[PushdownPredicateInputType] = set()
 
-        invalid_predicate_property_names = {
-            field.name for field in dataclasses.fields(self) if field.metadata.get(self._PREDICATE_METADATA_KEY)
-        }
+        for input_type in self.pushdown_enabled_types:
+            if (
+                input_type is PushdownPredicateInputType.CATEGORICAL_DIMENSION
+                or input_type is PushdownPredicateInputType.ENTITY
+                or input_type is PushdownPredicateInputType.TIME_DIMENSION
+            ):
+                invalid_types.add(input_type)
+            elif input_type is PushdownPredicateInputType.TIME_RANGE_CONSTRAINT:
+                continue
+            else:
+                assert_values_exhausted(input_type)
 
-        if self.pushdown_state is PredicatePushdownState.ENABLED_FOR_TIME_RANGE_ONLY:
-            # We don't do validation for time range constraint configuration - having None set in this state is the
-            # equivalent of disabling predicate pushdown, but that time constraint value might be updated later,
-            # and so we do not block overrides to (or from) None to avoid meaningless bookkeeping at callsites.
-            # Also, we keep the magic string name Python uses hidden in here instead of expanding access to it.
-            invalid_predicate_property_names.remove("time_range_constraint")
-
-        instance_configuration = dataclasses.asdict(self)
-        invalid_disabled_properties = {
-            property_name: value
-            for property_name, value in instance_configuration.items()
-            if property_name in invalid_predicate_property_names and value is not None
-        }
-
-        assert not invalid_disabled_properties, (
-            "Invalid pushdown parameter configuration! Disabled pushdown parameters cannot have properties "
-            "set that may lead to improper access and use in other contexts, as that can lead to unintended "
-            "filtering operations in cases where these properties are accessed without appropriate checks against "
-            "pushdown configuration. This indicates that pushdown is configured for limited scope operations, but "
-            f"other predicate properties are set to non-None values.\nFull configuration: {instance_configuration}\n"
-            f"Invalid predicate properties: {invalid_disabled_properties}"
+        assert len(invalid_types) == 0, (
+            "Unsupported predicate input type found in pushdown state configuration! We currently only support "
+            "predicate pushdown for a subset of possible predicate input types (i.e., types of semantic manifest "
+            "elements, such as entities and time dimensions, referenced in filter predicates), but this was enabled "
+            f"for {self.pushdown_enabled_types}, which includes the following invalid types: {invalid_types}."
         )
 
+        if self.is_pushdown_disabled:
+            # TODO: Include where filter specs when they are added to this class
+            assert self.time_range_constraint is None, (
+                "Invalid pushdown parameter configuration! Disabled pushdown parameters cannot have properties "
+                "set that may lead to improper access and use in other contexts, as that can lead to unintended "
+                "filtering operations in cases where these properties are accessed without appropriate checks against "
+                "pushdown configuration. The following properties should all have None values:\n"
+                f"time_range_constraint: {self.time_range_constraint}"
+            )
+
     @property
-    def is_pushdown_enabled(self) -> bool:
-        """Convenience accessor for checking that no pushdown constraints exist."""
-        pushdown_state = self.pushdown_state
-        if pushdown_state is PredicatePushdownState.DISABLED:
-            return False
-        elif pushdown_state is PredicatePushdownState.FULLY_ENABLED:
-            return True
-        elif pushdown_state is PredicatePushdownState.ENABLED_FOR_TIME_RANGE_ONLY:
-            return True
-        else:
-            return assert_values_exhausted(pushdown_state)
+    def is_pushdown_disabled(self) -> bool:
+        """Convenience accessor for checking if pushdown should always be skipped."""
+        return len(self.pushdown_enabled_types) == 0
+
+    @property
+    def is_pushdown_enabled_for_time_range_constraint(self) -> bool:
+        """Convenience accessor for checking if pushdown is enabled for time range constraints."""
+        return PushdownPredicateInputType.TIME_RANGE_CONSTRAINT in self.pushdown_enabled_types
 
     @staticmethod
     def with_time_range_constraint(
@@ -149,7 +148,7 @@ class PredicatePushdownParameters:
         predicate pushdown in certain sub-branches of the dataflow plan, such as in complex cases involving time spine
         joins and cumulative metrics.
         """
-        if original_pushdown_params.is_pushdown_enabled:
+        if original_pushdown_params.is_pushdown_enabled_for_time_range_constraint:
             return PredicatePushdownParameters(
                 time_range_constraint=time_range_constraint,
             )
@@ -165,7 +164,10 @@ class PredicatePushdownParameters:
         configuration might send a disabled copy of the pushdown parameters down that path while retaining the potential
         for using another path.
         """
-        return PredicatePushdownParameters(time_range_constraint=None, pushdown_state=PredicatePushdownState.DISABLED)
+        return PredicatePushdownParameters(
+            time_range_constraint=None,
+            pushdown_enabled_types=frozenset(),
+        )
 
 
 class PreJoinNodeProcessor:

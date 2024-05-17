@@ -84,8 +84,8 @@ from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOp
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.plan_conversion.node_processor import (
     PredicatePushdownParameters,
-    PredicatePushdownState,
     PreJoinNodeProcessor,
+    PushdownPredicateInputType,
 )
 from metricflow.sql.sql_table import SqlTable
 
@@ -248,7 +248,7 @@ class DataflowPlanBuilder:
         disabled_pushdown_parameters = PredicatePushdownParameters.with_pushdown_disabled()
         time_range_only_pushdown_parameters = PredicatePushdownParameters(
             time_range_constraint=predicate_pushdown_params.time_range_constraint,
-            pushdown_state=PredicatePushdownState.ENABLED_FOR_TIME_RANGE_ONLY,
+            pushdown_enabled_types=frozenset([PushdownPredicateInputType.TIME_RANGE_CONSTRAINT]),
         )
 
         # Build measure recipes
@@ -883,7 +883,10 @@ class DataflowPlanBuilder:
             node_data_set_resolver=self._node_data_set_resolver,
         )
         # TODO - Pushdown: Encapsulate this in the node processor
-        if predicate_pushdown_params.is_pushdown_enabled and predicate_pushdown_params.time_range_constraint:
+        if (
+            predicate_pushdown_params.is_pushdown_enabled_for_time_range_constraint
+            and predicate_pushdown_params.time_range_constraint
+        ):
             candidate_nodes_for_left_side_of_join = list(
                 node_processor.add_time_range_constraint(
                     source_nodes=candidate_nodes_for_left_side_of_join,
@@ -1445,12 +1448,12 @@ class DataflowPlanBuilder:
         if non_additive_dimension_spec is not None:
             # Apply semi additive join on the node
             agg_time_dimension = measure_properties.agg_time_dimension
-            queried_time_dimension_spec: Optional[
-                TimeDimensionSpec
-            ] = self._find_non_additive_dimension_in_linkable_specs(
-                agg_time_dimension=agg_time_dimension,
-                linkable_specs=queried_linkable_specs.as_tuple,
-                non_additive_dimension_spec=non_additive_dimension_spec,
+            queried_time_dimension_spec: Optional[TimeDimensionSpec] = (
+                self._find_non_additive_dimension_in_linkable_specs(
+                    agg_time_dimension=agg_time_dimension,
+                    linkable_specs=queried_linkable_specs.as_tuple,
+                    non_additive_dimension_spec=non_additive_dimension_spec,
+                )
             )
             time_dimension_spec = TimeDimensionSpec.from_name(non_additive_dimension_spec.name)
             window_groupings = tuple(
