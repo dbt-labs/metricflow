@@ -3,21 +3,21 @@ from __future__ import annotations
 import pytest
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 
-from metricflow.plan_conversion.node_processor import PredicateInputType, PredicatePushdownParameters
+from metricflow.plan_conversion.node_processor import PredicateInputType, PredicatePushdownState
 
 
 @pytest.fixture
-def all_pushdown_params() -> PredicatePushdownParameters:
+def all_pushdown_params() -> PredicatePushdownState:
     """Tests a valid configuration with all predicate properties set and pushdown fully enabled."""
-    params = PredicatePushdownParameters(
+    params = PredicatePushdownState(
         time_range_constraint=TimeRangeConstraint.all_time(),
     )
     return params
 
 
-def test_time_range_pushdown_enabled_states(all_pushdown_params: PredicatePushdownParameters) -> None:
+def test_time_range_pushdown_enabled_states(all_pushdown_params: PredicatePushdownState) -> None:
     """Tests pushdown enabled check for time range pushdown operations."""
-    time_range_only_params = PredicatePushdownParameters(
+    time_range_only_params = PredicatePushdownState(
         time_range_constraint=TimeRangeConstraint.all_time(),
         pushdown_enabled_types=frozenset([PredicateInputType.TIME_RANGE_CONSTRAINT]),
     )
@@ -37,6 +37,4 @@ def test_time_range_pushdown_enabled_states(all_pushdown_params: PredicatePushdo
 def test_invalid_disabled_pushdown_params() -> None:
     """Tests checks for invalid param configuration on disabled pushdown parameters."""
     with pytest.raises(AssertionError, match="Disabled pushdown parameters cannot have properties set"):
-        PredicatePushdownParameters(
-            time_range_constraint=TimeRangeConstraint.all_time(), pushdown_enabled_types=frozenset()
-        )
+        PredicatePushdownState(time_range_constraint=TimeRangeConstraint.all_time(), pushdown_enabled_types=frozenset())

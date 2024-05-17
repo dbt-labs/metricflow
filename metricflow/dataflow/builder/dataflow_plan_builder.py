@@ -84,7 +84,7 @@ from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOp
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.plan_conversion.node_processor import (
     PredicateInputType,
-    PredicatePushdownParameters,
+    PredicatePushdownState,
     PreJoinNodeProcessor,
 )
 from metricflow.sql.sql_table import SqlTable
@@ -181,7 +181,7 @@ class DataflowPlanBuilder:
             )
         )
 
-        predicate_pushdown_params = PredicatePushdownParameters(time_range_constraint=query_spec.time_range_constraint)
+        predicate_pushdown_params = PredicatePushdownState(time_range_constraint=query_spec.time_range_constraint)
 
         return self._build_metrics_output_node(
             metric_specs=tuple(
@@ -237,7 +237,7 @@ class DataflowPlanBuilder:
         entity_spec: EntitySpec,
         window: Optional[MetricTimeWindow],
         queried_linkable_specs: LinkableSpecSet,
-        predicate_pushdown_params: PredicatePushdownParameters,
+        predicate_pushdown_params: PredicatePushdownState,
         constant_properties: Optional[Sequence[ConstantPropertyInput]] = None,
     ) -> DataflowPlanNode:
         """Builds a node that contains aggregated values of conversions and opportunities."""
@@ -245,8 +245,8 @@ class DataflowPlanBuilder:
         # Due to other outstanding issues with conversion metric filters, we disable predicate
         # pushdown for any filter parameter set that is not part of the original time range constraint
         # implementation.
-        disabled_pushdown_parameters = PredicatePushdownParameters.with_pushdown_disabled()
-        time_range_only_pushdown_parameters = PredicatePushdownParameters(
+        disabled_pushdown_parameters = PredicatePushdownState.with_pushdown_disabled()
+        time_range_only_pushdown_parameters = PredicatePushdownState(
             time_range_constraint=predicate_pushdown_params.time_range_constraint,
             pushdown_enabled_types=frozenset([PredicateInputType.TIME_RANGE_CONSTRAINT]),
         )
@@ -369,7 +369,7 @@ class DataflowPlanBuilder:
         metric_spec: MetricSpec,
         queried_linkable_specs: LinkableSpecSet,
         filter_spec_factory: WhereSpecFactory,
-        predicate_pushdown_params: PredicatePushdownParameters,
+        predicate_pushdown_params: PredicatePushdownState,
         for_group_by_source_node: bool = False,
     ) -> ComputeMetricsNode:
         """Builds a compute metric node for a conversion metric."""
@@ -414,7 +414,7 @@ class DataflowPlanBuilder:
         metric_spec: MetricSpec,
         queried_linkable_specs: LinkableSpecSet,
         filter_spec_factory: WhereSpecFactory,
-        predicate_pushdown_params: PredicatePushdownParameters,
+        predicate_pushdown_params: PredicatePushdownState,
         for_group_by_source_node: bool = False,
     ) -> ComputeMetricsNode:
         """Builds a node to compute a metric that is not defined from other metrics."""
@@ -473,7 +473,7 @@ class DataflowPlanBuilder:
         metric_spec: MetricSpec,
         queried_linkable_specs: LinkableSpecSet,
         filter_spec_factory: WhereSpecFactory,
-        predicate_pushdown_params: PredicatePushdownParameters,
+        predicate_pushdown_params: PredicatePushdownState,
         for_group_by_source_node: bool = False,
     ) -> DataflowPlanNode:
         """Builds a node to compute a metric defined from other metrics."""
@@ -512,7 +512,7 @@ class DataflowPlanBuilder:
             metric_pushdown_params = (
                 predicate_pushdown_params
                 if not metric_spec.has_time_offset
-                else PredicatePushdownParameters.with_pushdown_disabled()
+                else PredicatePushdownState.with_pushdown_disabled()
             )
 
             parent_nodes.append(
@@ -577,7 +577,7 @@ class DataflowPlanBuilder:
         metric_spec: MetricSpec,
         queried_linkable_specs: LinkableSpecSet,
         filter_spec_factory: WhereSpecFactory,
-        predicate_pushdown_params: PredicatePushdownParameters,
+        predicate_pushdown_params: PredicatePushdownState,
         for_group_by_source_node: bool = False,
     ) -> DataflowPlanNode:
         """Builds a node to compute a metric of any type."""
@@ -616,7 +616,7 @@ class DataflowPlanBuilder:
         metric_specs: Sequence[MetricSpec],
         queried_linkable_specs: LinkableSpecSet,
         filter_spec_factory: WhereSpecFactory,
-        predicate_pushdown_params: PredicatePushdownParameters,
+        predicate_pushdown_params: PredicatePushdownState,
         for_group_by_source_node: bool = False,
     ) -> DataflowPlanNode:
         """Builds a node that computes all requested metrics.
@@ -680,7 +680,7 @@ class DataflowPlanBuilder:
         required_linkable_specs, _ = self.__get_required_and_extraneous_linkable_specs(
             queried_linkable_specs=query_spec.linkable_specs, filter_specs=query_level_filter_specs
         )
-        predicate_pushdown_params = PredicatePushdownParameters(time_range_constraint=query_spec.time_range_constraint)
+        predicate_pushdown_params = PredicatePushdownState(time_range_constraint=query_spec.time_range_constraint)
         dataflow_recipe = self._find_dataflow_recipe(
             linkable_spec_set=required_linkable_specs, predicate_pushdown_params=predicate_pushdown_params
         )
@@ -847,7 +847,7 @@ class DataflowPlanBuilder:
     def _find_dataflow_recipe(
         self,
         linkable_spec_set: LinkableSpecSet,
-        predicate_pushdown_params: PredicatePushdownParameters,
+        predicate_pushdown_params: PredicatePushdownState,
         measure_spec_properties: Optional[MeasureSpecProperties] = None,
     ) -> Optional[DataflowRecipe]:
         linkable_specs = linkable_spec_set.as_tuple
@@ -1212,7 +1212,7 @@ class DataflowPlanBuilder:
         self,
         metric_input_measure_spec: MetricInputMeasureSpec,
         queried_linkable_specs: LinkableSpecSet,
-        predicate_pushdown_params: PredicatePushdownParameters,
+        predicate_pushdown_params: PredicatePushdownState,
         measure_recipe: Optional[DataflowRecipe] = None,
     ) -> DataflowPlanNode:
         """Returns a node where the measures are aggregated by the linkable specs and constrained appropriately.
@@ -1264,7 +1264,7 @@ class DataflowPlanBuilder:
         self,
         metric_input_measure_spec: MetricInputMeasureSpec,
         queried_linkable_specs: LinkableSpecSet,
-        predicate_pushdown_params: PredicatePushdownParameters,
+        predicate_pushdown_params: PredicatePushdownState,
         measure_recipe: Optional[DataflowRecipe] = None,
     ) -> DataflowPlanNode:
         measure_spec = metric_input_measure_spec.measure_spec
@@ -1324,11 +1324,11 @@ class DataflowPlanBuilder:
                 else None
             )
             if measure_time_constraint is None:
-                measure_pushdown_params = PredicatePushdownParameters.without_time_range_constraint(
+                measure_pushdown_params = PredicatePushdownState.without_time_range_constraint(
                     predicate_pushdown_params
                 )
             else:
-                measure_pushdown_params = PredicatePushdownParameters.with_time_range_constraint(
+                measure_pushdown_params = PredicatePushdownState.with_time_range_constraint(
                     predicate_pushdown_params, time_range_constraint=measure_time_constraint
                 )
 

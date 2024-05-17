@@ -79,7 +79,7 @@ class PredicateInputType(Enum):
 
 
 @dataclasses.dataclass(frozen=True)
-class PredicatePushdownParameters:
+class PredicatePushdownState:
     """Container class for managing information about whether and how to do filter predicate pushdown.
 
     The time_range_constraint property holds the time window for setting up a time range filter expression.
@@ -89,7 +89,7 @@ class PredicatePushdownParameters:
     pushdown_enabled_types: FrozenSet[PredicateInputType] = frozenset([PredicateInputType.TIME_RANGE_CONSTRAINT])
 
     def __post_init__(self) -> None:
-        """Validation to ensure pushdown properties are configured correctly.
+        """Validation to ensure pushdown states are configured correctly.
 
         In particular, this asserts that cases where pushdown is disabled cannot leak pushdown operations via
         outside property access - if pushdown is disabled, no further pushdown operations of any kind are allowed
@@ -143,8 +143,8 @@ class PredicatePushdownParameters:
 
     @staticmethod
     def with_time_range_constraint(
-        original_pushdown_params: PredicatePushdownParameters, time_range_constraint: TimeRangeConstraint
-    ) -> PredicatePushdownParameters:
+        original_pushdown_params: PredicatePushdownState, time_range_constraint: TimeRangeConstraint
+    ) -> PredicatePushdownState:
         """Factory method for adding or updating a time range constraint input to a set of pushdown parameters.
 
         This allows for temporarily overriding a time range constraint with an adjusted one, or enabling a time
@@ -153,22 +153,22 @@ class PredicatePushdownParameters:
         pushdown_enabled_types = original_pushdown_params.pushdown_enabled_types.union(
             {PredicateInputType.TIME_RANGE_CONSTRAINT}
         )
-        return PredicatePushdownParameters(
+        return PredicatePushdownState(
             time_range_constraint=time_range_constraint, pushdown_enabled_types=pushdown_enabled_types
         )
 
     @staticmethod
     def without_time_range_constraint(
-        original_pushdown_params: PredicatePushdownParameters,
-    ) -> PredicatePushdownParameters:
+        original_pushdown_params: PredicatePushdownState,
+    ) -> PredicatePushdownState:
         """Factory method for removing the time range constraint, if any, from the given set of pushdown parameters."""
         pushdown_enabled_types = original_pushdown_params.pushdown_enabled_types.difference(
             {PredicateInputType.TIME_RANGE_CONSTRAINT}
         )
-        return PredicatePushdownParameters(time_range_constraint=None, pushdown_enabled_types=pushdown_enabled_types)
+        return PredicatePushdownState(time_range_constraint=None, pushdown_enabled_types=pushdown_enabled_types)
 
     @staticmethod
-    def with_pushdown_disabled() -> PredicatePushdownParameters:
+    def with_pushdown_disabled() -> PredicatePushdownState:
         """Factory method for disabling predicate pushdown for all parameter types.
 
         This is useful in cases where there is a branched path where pushdown should be disabled in one branch while the
@@ -176,7 +176,7 @@ class PredicatePushdownParameters:
         configuration might send a disabled copy of the pushdown parameters down that path while retaining the potential
         for using another path.
         """
-        return PredicatePushdownParameters(
+        return PredicatePushdownState(
             time_range_constraint=None,
             pushdown_enabled_types=frozenset(),
         )
