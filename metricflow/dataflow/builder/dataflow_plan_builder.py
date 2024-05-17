@@ -242,7 +242,7 @@ class DataflowPlanBuilder:
     ) -> DataflowPlanNode:
         """Builds a node that contains aggregated values of conversions and opportunities."""
         # Pushdown parameters vary with conversion metrics due to the way the time joins are applied.
-        # Due to other outstanding issues with conversion metric fitlers, we disable predicate
+        # Due to other outstanding issues with conversion metric filters, we disable predicate
         # pushdown for any filter parameter set that is not part of the original time range constraint
         # implementation.
         disabled_pushdown_parameters = PredicatePushdownParameters.with_pushdown_disabled()
