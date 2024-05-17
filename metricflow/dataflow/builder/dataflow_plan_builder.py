@@ -245,8 +245,8 @@ class DataflowPlanBuilder:
         # Due to other outstanding issues with conversion metric filters, we disable predicate
         # pushdown for any filter parameter set that is not part of the original time range constraint
         # implementation.
-        disabled_pushdown_parameters = PredicatePushdownState.with_pushdown_disabled()
-        time_range_only_pushdown_parameters = PredicatePushdownState(
+        disabled_pushdown_state = PredicatePushdownState.with_pushdown_disabled()
+        time_range_only_pushdown_state = PredicatePushdownState(
             time_range_constraint=predicate_pushdown_state.time_range_constraint,
             pushdown_enabled_types=frozenset([PredicateInputType.TIME_RANGE_CONSTRAINT]),
         )
@@ -258,13 +258,13 @@ class DataflowPlanBuilder:
         )
         base_measure_recipe = self._find_dataflow_recipe(
             measure_spec_properties=self._build_measure_spec_properties([base_measure_spec.measure_spec]),
-            predicate_pushdown_state=time_range_only_pushdown_parameters,
+            predicate_pushdown_state=time_range_only_pushdown_state,
             linkable_spec_set=base_required_linkable_specs,
         )
         logger.info(f"Recipe for base measure aggregation:\n{mf_pformat(base_measure_recipe)}")
         conversion_measure_recipe = self._find_dataflow_recipe(
             measure_spec_properties=self._build_measure_spec_properties([conversion_measure_spec.measure_spec]),
-            predicate_pushdown_state=disabled_pushdown_parameters,
+            predicate_pushdown_state=disabled_pushdown_state,
             linkable_spec_set=LinkableSpecSet(),
         )
         logger.info(f"Recipe for conversion measure aggregation:\n{mf_pformat(conversion_measure_recipe)}")
@@ -281,7 +281,7 @@ class DataflowPlanBuilder:
         aggregated_base_measure_node = self.build_aggregated_measure(
             metric_input_measure_spec=base_measure_spec,
             queried_linkable_specs=queried_linkable_specs,
-            predicate_pushdown_state=time_range_only_pushdown_parameters,
+            predicate_pushdown_state=time_range_only_pushdown_state,
         )
 
         # Build unaggregated conversions source node
@@ -357,7 +357,7 @@ class DataflowPlanBuilder:
         aggregated_conversions_node = self.build_aggregated_measure(
             metric_input_measure_spec=conversion_measure_spec,
             queried_linkable_specs=queried_linkable_specs,
-            predicate_pushdown_state=disabled_pushdown_parameters,
+            predicate_pushdown_state=disabled_pushdown_state,
             measure_recipe=recipe_with_join_conversion_source_node,
         )
 

@@ -69,7 +69,7 @@ class PredicateInputType(Enum):
     scenario where we only allow time range updates, we must do careful overriding of other pushdown properties.
 
     This also allows us to disable pushdown for things like time dimension filters in cases where we might
-    accidental censor input data.
+    accidentally censor input data.
     """
 
     CATEGORICAL_DIMENSION = "categorical_dimension"
@@ -80,7 +80,16 @@ class PredicateInputType(Enum):
 
 @dataclasses.dataclass(frozen=True)
 class PredicatePushdownState:
-    """Container class for managing information about whether and how to do filter predicate pushdown.
+    """Container class for maintaining state information relevant for predicate pushdown.
+
+    This broadly tracks two related items:
+    1. Filter predicates collected during the process of constructing a dataflow plan
+    2. Predicate types eligible for pushdown
+
+    The former may be updated as things like time constraints get altered or metric and measure filters are
+    added to the query filters.
+    The latter may be updated based on query configuration, like if a cumulative metric is added to the plan
+    there may be changes to what sort of predicate pushdown operations are supported.
 
     The time_range_constraint property holds the time window for setting up a time range filter expression.
     """
@@ -117,9 +126,9 @@ class PredicatePushdownState:
         )
 
         if self.is_pushdown_disabled:
-            # TODO: Include where filter specs when they are added to this class
+            # TODO: Include where filter specs when they are added to this class and check state -> predicate pairs
             assert self.time_range_constraint is None, (
-                "Invalid pushdown parameter configuration! Disabled pushdown parameters cannot have properties "
+                "Invalid pushdown state configuration! Disabled pushdown state objects cannot have properties "
                 "set that may lead to improper access and use in other contexts, as that can lead to unintended "
                 "filtering operations in cases where these properties are accessed without appropriate checks against "
                 "pushdown configuration. The following properties should all have None values:\n"
@@ -145,7 +154,7 @@ class PredicatePushdownState:
     def with_time_range_constraint(
         original_pushdown_state: PredicatePushdownState, time_range_constraint: TimeRangeConstraint
     ) -> PredicatePushdownState:
-        """Factory method for adding or updating a time range constraint input to a set of pushdown parameters.
+        """Factory method for updating a pushdown state with a time range constraint.
 
         This allows for temporarily overriding a time range constraint with an adjusted one, or enabling a time
         range constraint filter if one becomes available mid-stream during dataflow plan construction.
@@ -161,7 +170,7 @@ class PredicatePushdownState:
     def without_time_range_constraint(
         original_pushdown_state: PredicatePushdownState,
     ) -> PredicatePushdownState:
-        """Factory method for removing the time range constraint, if any, from the given set of pushdown parameters."""
+        """Factory method for updating pushdown state to bypass time range constraints."""
         pushdown_enabled_types = original_pushdown_state.pushdown_enabled_types.difference(
             {PredicateInputType.TIME_RANGE_CONSTRAINT}
         )
@@ -169,7 +178,7 @@ class PredicatePushdownState:
 
     @staticmethod
     def with_pushdown_disabled() -> PredicatePushdownState:
-        """Factory method for disabling predicate pushdown for all parameter types.
+        """Factory method for configuring a disabled predicate pushdown state.
 
         This is useful in cases where there is a branched path where pushdown should be disabled in one branch while the
         other may remain eligible. For example, a join linkage where one side of the join contains an unsupported
