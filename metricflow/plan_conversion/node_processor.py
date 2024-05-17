@@ -140,20 +140,29 @@ class PredicatePushdownParameters:
 
     @staticmethod
     def with_time_range_constraint(
-        original_pushdown_params: PredicatePushdownParameters, time_range_constraint: Optional[TimeRangeConstraint]
+        original_pushdown_params: PredicatePushdownParameters, time_range_constraint: TimeRangeConstraint
     ) -> PredicatePushdownParameters:
-        """Factory method for overriding the time range constraint value in a given set of pushdown parameters.
+        """Factory method for adding or updating a time range constraint input to a set of pushdown parameters.
 
-        This allows for crude updates to the core time range constraint, including selectively disabling time range
-        predicate pushdown in certain sub-branches of the dataflow plan, such as in complex cases involving time spine
-        joins and cumulative metrics.
+        This allows for temporarily overriding a time range constraint with an adjusted one, or enabling a time
+        range constraint filter if one becomes available mid-stream during dataflow plan construction.
         """
-        if original_pushdown_params.is_pushdown_enabled_for_time_range_constraint:
-            return PredicatePushdownParameters(
-                time_range_constraint=time_range_constraint,
-            )
-        else:
-            return original_pushdown_params
+        pushdown_enabled_types = original_pushdown_params.pushdown_enabled_types.union(
+            {PushdownPredicateInputType.TIME_RANGE_CONSTRAINT}
+        )
+        return PredicatePushdownParameters(
+            time_range_constraint=time_range_constraint, pushdown_enabled_types=pushdown_enabled_types
+        )
+
+    @staticmethod
+    def without_time_range_constraint(
+        original_pushdown_params: PredicatePushdownParameters,
+    ) -> PredicatePushdownParameters:
+        """Factory method for removing the time range constraint, if any, from the given set of pushdown parameters."""
+        pushdown_enabled_types = original_pushdown_params.pushdown_enabled_types.difference(
+            {PushdownPredicateInputType.TIME_RANGE_CONSTRAINT}
+        )
+        return PredicatePushdownParameters(time_range_constraint=None, pushdown_enabled_types=pushdown_enabled_types)
 
     @staticmethod
     def with_pushdown_disabled() -> PredicatePushdownParameters:

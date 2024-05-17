@@ -1323,9 +1323,14 @@ class DataflowPlanBuilder:
                 if not before_aggregation_time_spine_join_description
                 else None
             )
-            measure_pushdown_params = PredicatePushdownParameters.with_time_range_constraint(
-                predicate_pushdown_params, time_range_constraint=measure_time_constraint
-            )
+            if measure_time_constraint is None:
+                measure_pushdown_params = PredicatePushdownParameters.without_time_range_constraint(
+                    predicate_pushdown_params
+                )
+            else:
+                measure_pushdown_params = PredicatePushdownParameters.with_time_range_constraint(
+                    predicate_pushdown_params, time_range_constraint=measure_time_constraint
+                )
 
             find_recipe_start_time = time.time()
             measure_recipe = self._find_dataflow_recipe(
@@ -1448,12 +1453,12 @@ class DataflowPlanBuilder:
         if non_additive_dimension_spec is not None:
             # Apply semi additive join on the node
             agg_time_dimension = measure_properties.agg_time_dimension
-            queried_time_dimension_spec: Optional[TimeDimensionSpec] = (
-                self._find_non_additive_dimension_in_linkable_specs(
-                    agg_time_dimension=agg_time_dimension,
-                    linkable_specs=queried_linkable_specs.as_tuple,
-                    non_additive_dimension_spec=non_additive_dimension_spec,
-                )
+            queried_time_dimension_spec: Optional[
+                TimeDimensionSpec
+            ] = self._find_non_additive_dimension_in_linkable_specs(
+                agg_time_dimension=agg_time_dimension,
+                linkable_specs=queried_linkable_specs.as_tuple,
+                non_additive_dimension_spec=non_additive_dimension_spec,
             )
             time_dimension_spec = TimeDimensionSpec.from_name(non_additive_dimension_spec.name)
             window_groupings = tuple(
