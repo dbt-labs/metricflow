@@ -181,7 +181,7 @@ class DataflowPlanBuilder:
             )
         )
 
-        predicate_pushdown_params = PredicatePushdownState(time_range_constraint=query_spec.time_range_constraint)
+        predicate_pushdown_state = PredicatePushdownState(time_range_constraint=query_spec.time_range_constraint)
 
         return self._build_metrics_output_node(
             metric_specs=tuple(
@@ -193,7 +193,7 @@ class DataflowPlanBuilder:
             ),
             queried_linkable_specs=query_spec.linkable_specs,
             filter_spec_factory=filter_spec_factory,
-            predicate_pushdown_params=predicate_pushdown_params,
+            predicate_pushdown_state=predicate_pushdown_state,
             for_group_by_source_node=for_group_by_source_node,
         )
 
@@ -237,7 +237,7 @@ class DataflowPlanBuilder:
         entity_spec: EntitySpec,
         window: Optional[MetricTimeWindow],
         queried_linkable_specs: LinkableSpecSet,
-        predicate_pushdown_params: PredicatePushdownState,
+        predicate_pushdown_state: PredicatePushdownState,
         constant_properties: Optional[Sequence[ConstantPropertyInput]] = None,
     ) -> DataflowPlanNode:
         """Builds a node that contains aggregated values of conversions and opportunities."""
@@ -247,7 +247,7 @@ class DataflowPlanBuilder:
         # implementation.
         disabled_pushdown_parameters = PredicatePushdownState.with_pushdown_disabled()
         time_range_only_pushdown_parameters = PredicatePushdownState(
-            time_range_constraint=predicate_pushdown_params.time_range_constraint,
+            time_range_constraint=predicate_pushdown_state.time_range_constraint,
             pushdown_enabled_types=frozenset([PredicateInputType.TIME_RANGE_CONSTRAINT]),
         )
 
@@ -258,13 +258,13 @@ class DataflowPlanBuilder:
         )
         base_measure_recipe = self._find_dataflow_recipe(
             measure_spec_properties=self._build_measure_spec_properties([base_measure_spec.measure_spec]),
-            predicate_pushdown_params=time_range_only_pushdown_parameters,
+            predicate_pushdown_state=time_range_only_pushdown_parameters,
             linkable_spec_set=base_required_linkable_specs,
         )
         logger.info(f"Recipe for base measure aggregation:\n{mf_pformat(base_measure_recipe)}")
         conversion_measure_recipe = self._find_dataflow_recipe(
             measure_spec_properties=self._build_measure_spec_properties([conversion_measure_spec.measure_spec]),
-            predicate_pushdown_params=disabled_pushdown_parameters,
+            predicate_pushdown_state=disabled_pushdown_parameters,
             linkable_spec_set=LinkableSpecSet(),
         )
         logger.info(f"Recipe for conversion measure aggregation:\n{mf_pformat(conversion_measure_recipe)}")
@@ -281,7 +281,7 @@ class DataflowPlanBuilder:
         aggregated_base_measure_node = self.build_aggregated_measure(
             metric_input_measure_spec=base_measure_spec,
             queried_linkable_specs=queried_linkable_specs,
-            predicate_pushdown_params=time_range_only_pushdown_parameters,
+            predicate_pushdown_state=time_range_only_pushdown_parameters,
         )
 
         # Build unaggregated conversions source node
@@ -357,7 +357,7 @@ class DataflowPlanBuilder:
         aggregated_conversions_node = self.build_aggregated_measure(
             metric_input_measure_spec=conversion_measure_spec,
             queried_linkable_specs=queried_linkable_specs,
-            predicate_pushdown_params=disabled_pushdown_parameters,
+            predicate_pushdown_state=disabled_pushdown_parameters,
             measure_recipe=recipe_with_join_conversion_source_node,
         )
 
@@ -369,7 +369,7 @@ class DataflowPlanBuilder:
         metric_spec: MetricSpec,
         queried_linkable_specs: LinkableSpecSet,
         filter_spec_factory: WhereSpecFactory,
-        predicate_pushdown_params: PredicatePushdownState,
+        predicate_pushdown_state: PredicatePushdownState,
         for_group_by_source_node: bool = False,
     ) -> ComputeMetricsNode:
         """Builds a compute metric node for a conversion metric."""
@@ -396,7 +396,7 @@ class DataflowPlanBuilder:
             base_measure_spec=base_measure,
             conversion_measure_spec=conversion_measure,
             queried_linkable_specs=queried_linkable_specs,
-            predicate_pushdown_params=predicate_pushdown_params,
+            predicate_pushdown_state=predicate_pushdown_state,
             entity_spec=entity_spec,
             window=conversion_type_params.window,
             constant_properties=conversion_type_params.constant_properties,
@@ -414,7 +414,7 @@ class DataflowPlanBuilder:
         metric_spec: MetricSpec,
         queried_linkable_specs: LinkableSpecSet,
         filter_spec_factory: WhereSpecFactory,
-        predicate_pushdown_params: PredicatePushdownState,
+        predicate_pushdown_state: PredicatePushdownState,
         for_group_by_source_node: bool = False,
     ) -> ComputeMetricsNode:
         """Builds a node to compute a metric that is not defined from other metrics."""
@@ -459,7 +459,7 @@ class DataflowPlanBuilder:
         aggregated_measures_node = self.build_aggregated_measure(
             metric_input_measure_spec=metric_input_measure_spec,
             queried_linkable_specs=queried_linkable_specs,
-            predicate_pushdown_params=predicate_pushdown_params,
+            predicate_pushdown_state=predicate_pushdown_state,
         )
         return self.build_computed_metrics_node(
             metric_spec=metric_spec,
@@ -473,7 +473,7 @@ class DataflowPlanBuilder:
         metric_spec: MetricSpec,
         queried_linkable_specs: LinkableSpecSet,
         filter_spec_factory: WhereSpecFactory,
-        predicate_pushdown_params: PredicatePushdownState,
+        predicate_pushdown_state: PredicatePushdownState,
         for_group_by_source_node: bool = False,
     ) -> DataflowPlanNode:
         """Builds a node to compute a metric defined from other metrics."""
@@ -509,8 +509,8 @@ class DataflowPlanBuilder:
             if not metric_spec.has_time_offset:
                 filter_specs.extend(metric_spec.filter_specs)
 
-            metric_pushdown_params = (
-                predicate_pushdown_params
+            metric_pushdown_state = (
+                predicate_pushdown_state
                 if not metric_spec.has_time_offset
                 else PredicatePushdownState.with_pushdown_disabled()
             )
@@ -528,7 +528,7 @@ class DataflowPlanBuilder:
                         queried_linkable_specs if not metric_spec.has_time_offset else required_linkable_specs
                     ),
                     filter_spec_factory=filter_spec_factory,
-                    predicate_pushdown_params=metric_pushdown_params,
+                    predicate_pushdown_state=metric_pushdown_state,
                 )
             )
 
@@ -554,7 +554,7 @@ class DataflowPlanBuilder:
                 parent_node=output_node,
                 requested_agg_time_dimension_specs=queried_agg_time_dimension_specs,
                 use_custom_agg_time_dimension=not queried_linkable_specs.contains_metric_time,
-                time_range_constraint=predicate_pushdown_params.time_range_constraint,
+                time_range_constraint=predicate_pushdown_state.time_range_constraint,
                 offset_window=metric_spec.offset_window,
                 offset_to_grain=metric_spec.offset_to_grain,
                 join_type=SqlJoinType.INNER,
@@ -577,7 +577,7 @@ class DataflowPlanBuilder:
         metric_spec: MetricSpec,
         queried_linkable_specs: LinkableSpecSet,
         filter_spec_factory: WhereSpecFactory,
-        predicate_pushdown_params: PredicatePushdownState,
+        predicate_pushdown_state: PredicatePushdownState,
         for_group_by_source_node: bool = False,
     ) -> DataflowPlanNode:
         """Builds a node to compute a metric of any type."""
@@ -588,7 +588,7 @@ class DataflowPlanBuilder:
                 metric_spec=metric_spec,
                 queried_linkable_specs=queried_linkable_specs,
                 filter_spec_factory=filter_spec_factory,
-                predicate_pushdown_params=predicate_pushdown_params,
+                predicate_pushdown_state=predicate_pushdown_state,
                 for_group_by_source_node=for_group_by_source_node,
             )
 
@@ -597,7 +597,7 @@ class DataflowPlanBuilder:
                 metric_spec=metric_spec,
                 queried_linkable_specs=queried_linkable_specs,
                 filter_spec_factory=filter_spec_factory,
-                predicate_pushdown_params=predicate_pushdown_params,
+                predicate_pushdown_state=predicate_pushdown_state,
                 for_group_by_source_node=for_group_by_source_node,
             )
         elif metric.type is MetricType.CONVERSION:
@@ -605,7 +605,7 @@ class DataflowPlanBuilder:
                 metric_spec=metric_spec,
                 queried_linkable_specs=queried_linkable_specs,
                 filter_spec_factory=filter_spec_factory,
-                predicate_pushdown_params=predicate_pushdown_params,
+                predicate_pushdown_state=predicate_pushdown_state,
                 for_group_by_source_node=for_group_by_source_node,
             )
 
@@ -616,7 +616,7 @@ class DataflowPlanBuilder:
         metric_specs: Sequence[MetricSpec],
         queried_linkable_specs: LinkableSpecSet,
         filter_spec_factory: WhereSpecFactory,
-        predicate_pushdown_params: PredicatePushdownState,
+        predicate_pushdown_state: PredicatePushdownState,
         for_group_by_source_node: bool = False,
     ) -> DataflowPlanNode:
         """Builds a node that computes all requested metrics.
@@ -626,7 +626,7 @@ class DataflowPlanBuilder:
             include offsets and filters.
             queried_linkable_specs: Dimensions/entities that were queried.
             filter_spec_factory: Constructs WhereFilterSpecs with the resolved ambiguous group-by-items in the filter.
-            predicate_pushdown_params: Parameters for evaluating and applying filter predicate pushdown, e.g., for
+            predicate_pushdown_state: Parameters for evaluating and applying filter predicate pushdown, e.g., for
             applying time constraints prior to other dimension joins.
         """
         output_nodes: List[DataflowPlanNode] = []
@@ -640,7 +640,7 @@ class DataflowPlanBuilder:
                     metric_spec=metric_spec,
                     queried_linkable_specs=queried_linkable_specs,
                     filter_spec_factory=filter_spec_factory,
-                    predicate_pushdown_params=predicate_pushdown_params,
+                    predicate_pushdown_state=predicate_pushdown_state,
                     for_group_by_source_node=for_group_by_source_node,
                 )
             )
@@ -680,9 +680,9 @@ class DataflowPlanBuilder:
         required_linkable_specs, _ = self.__get_required_and_extraneous_linkable_specs(
             queried_linkable_specs=query_spec.linkable_specs, filter_specs=query_level_filter_specs
         )
-        predicate_pushdown_params = PredicatePushdownState(time_range_constraint=query_spec.time_range_constraint)
+        predicate_pushdown_state = PredicatePushdownState(time_range_constraint=query_spec.time_range_constraint)
         dataflow_recipe = self._find_dataflow_recipe(
-            linkable_spec_set=required_linkable_specs, predicate_pushdown_params=predicate_pushdown_params
+            linkable_spec_set=required_linkable_specs, predicate_pushdown_state=predicate_pushdown_state
         )
         if not dataflow_recipe:
             raise UnableToSatisfyQueryError(f"Unable to join all items in request: {required_linkable_specs}")
@@ -847,7 +847,7 @@ class DataflowPlanBuilder:
     def _find_dataflow_recipe(
         self,
         linkable_spec_set: LinkableSpecSet,
-        predicate_pushdown_params: PredicatePushdownState,
+        predicate_pushdown_state: PredicatePushdownState,
         measure_spec_properties: Optional[MeasureSpecProperties] = None,
     ) -> Optional[DataflowRecipe]:
         linkable_specs = linkable_spec_set.as_tuple
@@ -884,14 +884,14 @@ class DataflowPlanBuilder:
         )
         # TODO - Pushdown: Encapsulate this in the node processor
         if (
-            predicate_pushdown_params.is_pushdown_enabled_for_time_range_constraint
-            and predicate_pushdown_params.time_range_constraint
+            predicate_pushdown_state.is_pushdown_enabled_for_time_range_constraint
+            and predicate_pushdown_state.time_range_constraint
         ):
             candidate_nodes_for_left_side_of_join = list(
                 node_processor.add_time_range_constraint(
                     source_nodes=candidate_nodes_for_left_side_of_join,
                     metric_time_dimension_reference=self._metric_time_dimension_reference,
-                    time_range_constraint=predicate_pushdown_params.time_range_constraint,
+                    time_range_constraint=predicate_pushdown_state.time_range_constraint,
                 )
             )
 
@@ -1212,7 +1212,7 @@ class DataflowPlanBuilder:
         self,
         metric_input_measure_spec: MetricInputMeasureSpec,
         queried_linkable_specs: LinkableSpecSet,
-        predicate_pushdown_params: PredicatePushdownState,
+        predicate_pushdown_state: PredicatePushdownState,
         measure_recipe: Optional[DataflowRecipe] = None,
     ) -> DataflowPlanNode:
         """Returns a node where the measures are aggregated by the linkable specs and constrained appropriately.
@@ -1232,7 +1232,7 @@ class DataflowPlanBuilder:
         return self._build_aggregated_measure_from_measure_source_node(
             metric_input_measure_spec=metric_input_measure_spec,
             queried_linkable_specs=queried_linkable_specs,
-            predicate_pushdown_params=predicate_pushdown_params,
+            predicate_pushdown_state=predicate_pushdown_state,
             measure_recipe=measure_recipe,
         )
 
@@ -1264,7 +1264,7 @@ class DataflowPlanBuilder:
         self,
         metric_input_measure_spec: MetricInputMeasureSpec,
         queried_linkable_specs: LinkableSpecSet,
-        predicate_pushdown_params: PredicatePushdownState,
+        predicate_pushdown_state: PredicatePushdownState,
         measure_recipe: Optional[DataflowRecipe] = None,
     ) -> DataflowPlanNode:
         measure_spec = metric_input_measure_spec.measure_spec
@@ -1283,8 +1283,8 @@ class DataflowPlanBuilder:
         non_additive_dimension_spec = measure_properties.non_additive_dimension_spec
 
         cumulative_metric_adjusted_time_constraint: Optional[TimeRangeConstraint] = None
-        if cumulative and predicate_pushdown_params.time_range_constraint is not None:
-            logger.info(f"Time range constraint before adjustment is {predicate_pushdown_params.time_range_constraint}")
+        if cumulative and predicate_pushdown_state.time_range_constraint is not None:
+            logger.info(f"Time range constraint before adjustment is {predicate_pushdown_state.time_range_constraint}")
             granularity: Optional[TimeGranularity] = None
             count = 0
             if cumulative_window is not None:
@@ -1295,7 +1295,7 @@ class DataflowPlanBuilder:
                 granularity = cumulative_grain_to_date
 
             cumulative_metric_adjusted_time_constraint = (
-                predicate_pushdown_params.time_range_constraint.adjust_time_constraint_for_cumulative_metric(
+                predicate_pushdown_state.time_range_constraint.adjust_time_constraint_for_cumulative_metric(
                     granularity, count
                 )
             )
@@ -1318,24 +1318,22 @@ class DataflowPlanBuilder:
                 + indent(f"\nevaluation:\n{mf_pformat(required_linkable_specs)}")
             )
             measure_time_constraint = (
-                (cumulative_metric_adjusted_time_constraint or predicate_pushdown_params.time_range_constraint)
+                (cumulative_metric_adjusted_time_constraint or predicate_pushdown_state.time_range_constraint)
                 # If joining to time spine for time offset, constraints will be applied after that join.
                 if not before_aggregation_time_spine_join_description
                 else None
             )
             if measure_time_constraint is None:
-                measure_pushdown_params = PredicatePushdownState.without_time_range_constraint(
-                    predicate_pushdown_params
-                )
+                measure_pushdown_state = PredicatePushdownState.without_time_range_constraint(predicate_pushdown_state)
             else:
-                measure_pushdown_params = PredicatePushdownState.with_time_range_constraint(
-                    predicate_pushdown_params, time_range_constraint=measure_time_constraint
+                measure_pushdown_state = PredicatePushdownState.with_time_range_constraint(
+                    predicate_pushdown_state, time_range_constraint=measure_time_constraint
                 )
 
             find_recipe_start_time = time.time()
             measure_recipe = self._find_dataflow_recipe(
                 measure_spec_properties=measure_properties,
-                predicate_pushdown_params=measure_pushdown_params,
+                predicate_pushdown_state=measure_pushdown_state,
                 linkable_spec_set=required_linkable_specs,
             )
             logger.info(
@@ -1370,7 +1368,7 @@ class DataflowPlanBuilder:
                 # Note: we use the original constraint here because the JoinOverTimeRangeNode will eventually get
                 # rendered with an interval that expands the join window
                 time_range_constraint=(
-                    predicate_pushdown_params.time_range_constraint
+                    predicate_pushdown_state.time_range_constraint
                     if not before_aggregation_time_spine_join_description
                     else None
                 ),
@@ -1393,7 +1391,7 @@ class DataflowPlanBuilder:
                 parent_node=time_range_node or measure_recipe.source_node,
                 requested_agg_time_dimension_specs=queried_agg_time_dimension_specs,
                 use_custom_agg_time_dimension=not queried_linkable_specs.contains_metric_time,
-                time_range_constraint=predicate_pushdown_params.time_range_constraint,
+                time_range_constraint=predicate_pushdown_state.time_range_constraint,
                 offset_window=before_aggregation_time_spine_join_description.offset_window,
                 offset_to_grain=before_aggregation_time_spine_join_description.offset_to_grain,
                 join_type=before_aggregation_time_spine_join_description.join_type,
@@ -1432,13 +1430,13 @@ class DataflowPlanBuilder:
         # TODO - Pushdown: Encapsulate all of this window sliding bookkeeping in the pushdown params object
         if (
             cumulative_metric_adjusted_time_constraint is not None
-            and predicate_pushdown_params.time_range_constraint is not None
+            and predicate_pushdown_state.time_range_constraint is not None
         ):
             assert (
                 queried_linkable_specs.contains_metric_time
             ), "Using time constraints currently requires querying with metric_time."
             cumulative_metric_constrained_node = ConstrainTimeRangeNode(
-                unaggregated_measure_node, predicate_pushdown_params.time_range_constraint
+                unaggregated_measure_node, predicate_pushdown_state.time_range_constraint
             )
 
         pre_aggregate_node: DataflowPlanNode = cumulative_metric_constrained_node or unaggregated_measure_node
@@ -1502,7 +1500,7 @@ class DataflowPlanBuilder:
                 requested_agg_time_dimension_specs=queried_agg_time_dimension_specs,
                 use_custom_agg_time_dimension=not queried_linkable_specs.contains_metric_time,
                 join_type=after_aggregation_time_spine_join_description.join_type,
-                time_range_constraint=predicate_pushdown_params.time_range_constraint,
+                time_range_constraint=predicate_pushdown_state.time_range_constraint,
                 offset_window=after_aggregation_time_spine_join_description.offset_window,
                 offset_to_grain=after_aggregation_time_spine_join_description.offset_to_grain,
             )
@@ -1522,9 +1520,9 @@ class DataflowPlanBuilder:
 
             # TODO: this will break if you query by agg_time_dimension but apply a time constraint on metric_time.
             # To fix when enabling time range constraints for agg_time_dimension.
-            if queried_agg_time_dimension_specs and predicate_pushdown_params.time_range_constraint is not None:
+            if queried_agg_time_dimension_specs and predicate_pushdown_state.time_range_constraint is not None:
                 output_node = ConstrainTimeRangeNode(
-                    parent_node=output_node, time_range_constraint=predicate_pushdown_params.time_range_constraint
+                    parent_node=output_node, time_range_constraint=predicate_pushdown_state.time_range_constraint
                 )
             return output_node
 
