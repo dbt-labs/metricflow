@@ -2124,7 +2124,7 @@ integration_test:
         , SUM(a.txn_count) AS txn_count
       FROM {{ source_schema }}.account_month_txns a
       LEFT OUTER JOIN  {{ source_schema }}.bridge_table b
-        ON (a.account_id = b.account_id) AND (DATE_TRUNC('day', a.ds_partitioned) = DATE_TRUNC('day', b.ds_partitioned))
+        ON (a.account_id = b.account_id) AND ({{ render_date_trunc("a.ds_partitioned", TimeGranularity.DAY) }} = {{ render_date_trunc("b.ds_partitioned", TimeGranularity.DAY) }})
       LEFT OUTER JOIN {{ source_schema }}.customer_other_data c
         ON b.customer_id = c.customer_id
       GROUP BY c.customer_third_hop_id
