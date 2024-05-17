@@ -61,6 +61,13 @@ def multihop_dataflow_plan_builder(  # noqa: D103
 
 
 @pytest.fixture(scope="session")
+def multihop_query_parser(  # noqa: D103
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture]
+) -> MetricFlowQueryParser:
+    return mf_engine_test_fixture_mapping[SemanticManifestSetup.PARTITIONED_MULTI_HOP_JOIN_MANIFEST].query_parser
+
+
+@pytest.fixture(scope="session")
 def scd_column_association_resolver(  # noqa: D103
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture]
 ) -> ColumnAssociationResolver:

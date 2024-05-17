@@ -306,3 +306,57 @@ def test_filter_with_conversion_metric(  # noqa: D103
         sql_client=sql_client,
         node=dataflow_plan.sink_node,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_inner_query_single_hop(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    multihop_dataflow_plan_builder: DataflowPlanBuilder,
+    sql_client: SqlClient,
+    multihop_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    multihop_query_parser: MetricFlowQueryParser,
+) -> None:
+    """Tests rendering for a metric filter using a one-hop join in the inner query."""
+    query_spec = multihop_query_parser.parse_and_validate_query(
+        metric_names=("third_hop_count",),
+        where_constraint=PydanticWhereFilter(
+            where_sql_template="{{ Metric('paraguayan_customers', ['customer_id__customer_third_hop_id']) }} > 0",
+        ),
+    ).query_spec
+    dataflow_plan = multihop_dataflow_plan_builder.build_plan(query_spec)
+
+    convert_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=multihop_dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_inner_query_multi_hop(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    multihop_dataflow_plan_builder: DataflowPlanBuilder,
+    sql_client: SqlClient,
+    multihop_dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    multihop_query_parser: MetricFlowQueryParser,
+) -> None:
+    """Tests rendering for a metric filter using a two-hop join in the inner query."""
+    query_spec = multihop_query_parser.parse_and_validate_query(
+        metric_names=("third_hop_count",),
+        where_constraint=PydanticWhereFilter(
+            where_sql_template="{{ Metric('txn_count', ['account_id__customer_id__customer_third_hop_id']) }} > 2",
+        ),
+    ).query_spec
+    dataflow_plan = multihop_dataflow_plan_builder.build_plan(query_spec)
+
+    convert_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=multihop_dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_node,
+    )

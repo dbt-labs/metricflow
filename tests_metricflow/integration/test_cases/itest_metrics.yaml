@@ -2086,3 +2086,48 @@ integration_test:
     ) metric_subquery
     ON l.listing_id = metric_subquery.listing_id
     WHERE views > 10
+---
+integration_test:
+  name: test_metric_filter_with_inner_query_single_hop_join
+  description: Query with a metric filter where the inner query uses a single-hop join
+  model: PARTITIONED_MULTI_HOP_JOIN_MODEL
+  metrics: ["third_hop_count"]
+  where_filter: "{{ render_metric_template('paraguayan_customers', ['customer_third_hop_id']) }} > 0"
+  check_query: |
+    SELECT
+      COUNT(DISTINCT t.customer_third_hop_id) AS third_hop_count
+    FROM {{ source_schema }}.third_hop_table t
+    LEFT OUTER JOIN (
+      SELECT
+        customer_third_hop_id
+        , SUM(1) AS paraguayan_customers
+      FROM {{ source_schema }}.customer_other_data c
+      WHERE country = 'paraguay'
+      GROUP BY customer_third_hop_id
+    ) metric_subquery
+    ON t.customer_third_hop_id = metric_subquery.customer_third_hop_id
+    WHERE paraguayan_customers > 0
+---
+integration_test:
+  name: test_metric_filter_with_inner_query_multi_hop_join
+  description: Query with a metric filter where the inner query uses a two-hop join
+  model: PARTITIONED_MULTI_HOP_JOIN_MODEL
+  metrics: ["third_hop_count"]
+  where_filter: "{{ render_metric_template('txn_count', ['account_id__customer_id__customer_third_hop_id']) }} > 0"
+  check_query: |
+    SELECT
+      COUNT(DISTINCT t.customer_third_hop_id) AS third_hop_count
+    FROM {{ source_schema }}.third_hop_table t
+    LEFT OUTER JOIN (
+      SELECT
+        c.customer_third_hop_id
+        , SUM(a.txn_count) AS txn_count
+      FROM {{ source_schema }}.account_month_txns a
+      LEFT OUTER JOIN  {{ source_schema }}.bridge_table b
+        ON (a.account_id = b.account_id) AND ({{ render_date_trunc("a.ds_partitioned", TimeGranularity.DAY) }} = {{ render_date_trunc("b.ds_partitioned", TimeGranularity.DAY) }})
+      LEFT OUTER JOIN {{ source_schema }}.customer_other_data c
+        ON b.customer_id = c.customer_id
+      GROUP BY c.customer_third_hop_id
+    ) metric_subquery
+    ON t.customer_third_hop_id = metric_subquery.customer_third_hop_id
+    WHERE txn_count > 0

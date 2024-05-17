@@ -7,6 +7,16 @@ semantic_model:
     schema_name: $source_schema
     alias: customer_table
 
+
+  defaults:
+    agg_time_dimension: ds_partitioned
+
+  measures:
+    - name: customers
+      expr: 1
+      agg: sum
+      create_metric: true
+
   dimensions:
     - name: customer_name
       type: categorical

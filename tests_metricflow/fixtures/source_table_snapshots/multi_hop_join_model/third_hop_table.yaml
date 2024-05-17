@@ -5,8 +5,10 @@ table_snapshot:
       type: STRING
     - name: value
       type: STRING
+    - name: third_hop_ds
+      type: STRING
   rows:
-    - ["another_id0", "citadel"]
-    - ["another_id1", "virtu"]
-    - ["another_id2", "two sigma"]
-    - ["another_id3", "jump"]
+    - ["another_id0", "citadel", "2020-01-01"]
+    - ["another_id1", "virtu", "2020-01-02"]
+    - ["another_id2", "two sigma", "2020-01-03"]
+    - ["another_id3", "jump", "2020-01-04"]

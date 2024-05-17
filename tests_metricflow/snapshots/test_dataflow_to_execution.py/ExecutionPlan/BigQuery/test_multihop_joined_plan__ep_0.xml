@@ -8,7 +8,7 @@
         <!--    '-- Aggregate Measures\n'                                                                            -->
         <!--    '-- Compute Metrics via Expressions\n'                                                               -->
         <!--    'SELECT\n'                                                                                           -->
-        <!--    '  subq_10.customer_id__customer_name AS account_id__customer_id__customer_name\n'                   -->
+        <!--    '  subq_14.customer_id__customer_name AS account_id__customer_id__customer_name\n'                   -->
         <!--    '  , SUM(account_month_txns_src_22000.txn_count) AS txn_count\n'                                     -->
         <!--    'FROM ***************************.account_month_txns account_month_txns_src_22000\n'                 -->
         <!--    'LEFT OUTER JOIN (\n'                                                                                -->
@@ -28,12 +28,12 @@
         <!--    "      DATE_TRUNC('day', bridge_table_src_22000.ds_partitioned) = DATE_TRUNC('day', "                -->
         <!--    'customer_table_src_22000.ds_partitioned)\n'                                                         -->
         <!--    '    )\n'                                                                                            -->
-        <!--    ') subq_10\n'                                                                                        -->
+        <!--    ') subq_14\n'                                                                                        -->
         <!--    'ON\n'                                                                                               -->
         <!--    '  (\n'                                                                                              -->
-        <!--    '    account_month_txns_src_22000.account_id = subq_10.account_id\n'                                 -->
+        <!--    '    account_month_txns_src_22000.account_id = subq_14.account_id\n'                                 -->
         <!--    '  ) AND (\n'                                                                                        -->
-        <!--    "    DATE_TRUNC('day', account_month_txns_src_22000.ds_partitioned) = subq_10.ds_partitioned__day\n" -->
+        <!--    "    DATE_TRUNC('day', account_month_txns_src_22000.ds_partitioned) = subq_14.ds_partitioned__day\n" -->
         <!--    '  )\n'                                                                                              -->
         <!--    'GROUP BY\n'                                                                                         -->
         <!--    '  account_id__customer_id__customer_name')                                                          -->
