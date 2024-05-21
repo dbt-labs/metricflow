@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import time
 from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Dict, Iterator, List, Optional, Sequence, Set, Tuple
@@ -189,9 +190,11 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
             else:
                 assert_values_exhausted(metric.type)
 
+            start_time = time.time()
             matching_items = items_available_for_measure.filter_by_spec_patterns(
                 patterns_to_apply + self._source_spec_patterns
             )
+            logger.info(f"Filtering valid linkable elements took: {time.time() - start_time:.2f}s")
 
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(

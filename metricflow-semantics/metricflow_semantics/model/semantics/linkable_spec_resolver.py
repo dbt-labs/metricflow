@@ -186,6 +186,7 @@ class ValidLinkableSpecResolver:
 
         # Populate storage dicts with linkable metrics. This loop must happen after the one above so that
         # _metric_to_linkable_element_sets is populated with entities and dimensions.
+        linkable_metrics_start_time = time.time()
         for metric in self._semantic_manifest.metrics:
             # Cumulative metrics and time offset metrics require grouping by metric_time, which is not yet available for
             # linkable metrics. So skip those.
@@ -218,13 +219,17 @@ class ValidLinkableSpecResolver:
         # If no metrics are specified, the query interface supports querying distinct values for dimensions, entities,
         # and group by metrics.
         linkable_element_sets_for_no_metrics_queries: List[LinkableElementSet] = []
+        # Temp: separate loop to track latency for linkable metrics. TODO: combine with loop below.
         for semantic_model in semantic_manifest.semantic_models:
-            linkable_element_sets_for_no_metrics_queries.append(self._get_elements_in_semantic_model(semantic_model))
             linkable_element_sets_for_no_metrics_queries.append(
                 self.get_joinable_metrics_for_semantic_model(
                     semantic_model, SemanticModelJoinPath(left_semantic_model_reference=semantic_model.reference)
                 )
             )
+        logger.info(f"Building valid linkable metrics took: {time.time() - linkable_metrics_start_time:.2f}s")
+
+        for semantic_model in semantic_manifest.semantic_models:
+            linkable_element_sets_for_no_metrics_queries.append(self._get_elements_in_semantic_model(semantic_model))
 
         metric_time_elements_for_no_metrics = self._get_metric_time_elements(measure_reference=None)
         self._no_metric_linkable_element_set = LinkableElementSet.merge_by_path_key(
