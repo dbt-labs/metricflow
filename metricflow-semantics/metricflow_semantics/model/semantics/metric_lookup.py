@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import time
 from typing import Dict, FrozenSet, Optional, Sequence, Set
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
@@ -53,11 +54,17 @@ class MetricLookup:
         frozen_with_any_of = LinkableElementProperty.all_properties() if with_any_of is None else frozenset(with_any_of)
         frozen_without_any_of = frozenset() if without_any_of is None else frozenset(without_any_of)
 
-        return self._linkable_spec_resolver.get_linkable_element_set_for_measure(
+        start_time = time.time()
+        linkable_element_set = self._linkable_spec_resolver.get_linkable_element_set_for_measure(
             measure_reference=measure_reference,
             with_any_of=frozen_with_any_of,
             without_any_of=frozen_without_any_of,
         )
+        logger.info(
+            f"Getting valid linkable elements for measure '{measure_reference.element_name}' took: {time.time() - start_time:.2f}s"
+        )
+
+        return linkable_element_set
 
     def linkable_elements_for_no_metrics_query(
         self,
