@@ -78,7 +78,9 @@ class DataflowPlanNode(DagNode, Visitable, ABC):
         inside of each node, we make those properties of the DataflowPlan, and this node-level converter makes
         such properties easily accessible.
         """
-        return DataflowPlan(sink_nodes=(self,))
+        return DataflowPlan(
+            sink_nodes=(self,), plan_id=DagId.from_id_prefix(id_prefix=StaticIdPrefix.DATAFLOW_PLAN_SUBGRAPH_PREFIX)
+        )
 
     @abstractmethod
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:
