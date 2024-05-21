@@ -371,4 +371,5 @@ def test_case(
     dataflow_plan_lookup = DataflowPlanLookup(query_result.dataflow_plan)
     dataflow_queried_semantic_models = dataflow_plan_lookup.read_semantic_models()
 
+    # Dataflow plan has the correct semantic models, query parser does not
     assert tuple(parse_query_result.queried_semantic_models) == tuple(dataflow_queried_semantic_models)

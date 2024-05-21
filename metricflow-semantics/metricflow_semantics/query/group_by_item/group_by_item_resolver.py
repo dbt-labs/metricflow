@@ -93,7 +93,12 @@ class GroupByItemResolver:
         )
 
         push_down_result: PushDownResult = self._resolution_dag.sink_node.accept(push_down_visitor)
+        print(push_down_result.candidate_set.linkable_element_set.path_key_to_linkable_entities)
 
+        # This tells you the number of canditate specs, NOT the number of candidate LinkableElements.
+        # There can be many LinkableElements that map to one spec. In this case, there are 4 LinkableEntities that map to
+        # the same EntitySpec('listings', entity_links=())
+        # Nowhere in the query parser do we narrow down which semantic model we should use to resolve a given group by item spec.
         if push_down_result.candidate_set.num_candidates == 0:
             return GroupByItemResolution(
                 spec=None,

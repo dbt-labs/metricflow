@@ -521,6 +521,7 @@ class MetricFlowQueryParser:
                 queried_semantic_models=query_resolution.queried_semantic_models,
             )
 
+        # This does not actually tell you the queried semantic models. It tells you the semantic models that COULD be queried.
         return ParseQueryResult(
             query_spec=query_spec,
             queried_semantic_models=query_resolution.queried_semantic_models,
