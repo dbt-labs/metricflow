@@ -1,0 +1,7 @@
+kind: Fixes
+body: For metrics that join to time spine, apply post-join filters only for specs
+  that are in the group by.
+time: 2024-05-21T16:58:53.09277-07:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1119"
