@@ -184,7 +184,9 @@ class DataflowPlanBuilder:
             )
         )
 
-        predicate_pushdown_state = PredicatePushdownState(time_range_constraint=query_spec.time_range_constraint)
+        predicate_pushdown_state = PredicatePushdownState(
+            time_range_constraint=query_spec.time_range_constraint, where_filter_specs=query_level_filter_specs
+        )
 
         return self._build_metrics_output_node(
             metric_specs=tuple(
@@ -251,6 +253,7 @@ class DataflowPlanBuilder:
         disabled_pushdown_state = PredicatePushdownState.with_pushdown_disabled()
         time_range_only_pushdown_state = PredicatePushdownState(
             time_range_constraint=predicate_pushdown_state.time_range_constraint,
+            where_filter_specs=tuple(),
             pushdown_enabled_types=frozenset([PredicateInputType.TIME_RANGE_CONSTRAINT]),
         )
 
@@ -511,6 +514,11 @@ class DataflowPlanBuilder:
             ),
             descendent_filter_specs=metric_spec.filter_specs,
         )
+        if predicate_pushdown_state.where_filter_pushdown_enabled:
+            predicate_pushdown_state = PredicatePushdownState.with_additional_where_filter_specs(
+                original_pushdown_state=predicate_pushdown_state,
+                additional_where_filter_specs=metric_input_measure_spec.filter_specs,
+            )
 
         logger.info(
             f"For\n{indent(mf_pformat(metric_spec))}"
@@ -568,6 +576,9 @@ class DataflowPlanBuilder:
 
             # If metric is offset, we'll apply where constraint after offset to avoid removing values
             # unexpectedly. Time constraint will be applied by INNER JOINing to time spine.
+            # We may consider encapsulating this in pushdown state later, but as of this moment pushdown
+            # is about post-join to pre-join for dimension access, and relies on the builder to collect
+            # predicates from query and metric specs and make them available at measure level.
             if not metric_spec.has_time_offset:
                 filter_specs.extend(metric_spec.filter_specs)
 
@@ -751,7 +762,9 @@ class DataflowPlanBuilder:
         required_linkable_specs, _ = self.__get_required_and_extraneous_linkable_specs(
             queried_linkable_specs=query_spec.linkable_specs, filter_specs=query_level_filter_specs
         )
-        predicate_pushdown_state = PredicatePushdownState(time_range_constraint=query_spec.time_range_constraint)
+        predicate_pushdown_state = PredicatePushdownState(
+            time_range_constraint=query_spec.time_range_constraint, where_filter_specs=query_level_filter_specs
+        )
         dataflow_recipe = self._find_dataflow_recipe(
             linkable_spec_set=required_linkable_specs, predicate_pushdown_state=predicate_pushdown_state
         )
@@ -959,6 +972,15 @@ class DataflowPlanBuilder:
                 node_processor.apply_matching_filter_predicates(
                     source_nodes=candidate_nodes_for_left_side_of_join,
                     predicate_pushdown_state=predicate_pushdown_state,
+                    metric_time_dimension_reference=self._metric_time_dimension_reference,
+                )
+            )
+            candidate_nodes_for_right_side_of_join = list(
+                node_processor.apply_matching_filter_predicates(
+                    source_nodes=candidate_nodes_for_right_side_of_join,
+                    predicate_pushdown_state=PredicatePushdownState.without_time_range_constraint(
+                        original_pushdown_state=predicate_pushdown_state
+                    ),
                     metric_time_dimension_reference=self._metric_time_dimension_reference,
                 )
             )
