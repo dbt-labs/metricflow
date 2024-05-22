@@ -5,9 +5,9 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_19.metric_time__day, subq_24.metric_time__day) AS metric_time__day
-    , MAX(subq_19.booking_value_with_is_instant_constraint) AS booking_value_with_is_instant_constraint
-    , MAX(subq_24.booking_value) AS booking_value
+    COALESCE(subq_27.metric_time__day, subq_32.metric_time__day) AS metric_time__day
+    , MAX(subq_27.booking_value_with_is_instant_constraint) AS booking_value_with_is_instant_constraint
+    , MAX(subq_32.booking_value) AS booking_value
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['booking_value', 'metric_time__day']
@@ -17,19 +17,27 @@ FROM (
       metric_time__day
       , SUM(booking_value) AS booking_value_with_is_instant_constraint
     FROM (
-      -- Read Elements From Semantic Model 'bookings_source'
-      -- Metric Time Dimension 'ds'
+      -- Constrain Output with WHERE
       -- Pass Only Elements: ['booking_value', 'booking__is_instant', 'metric_time__day']
       SELECT
-        DATE_TRUNC('day', ds) AS metric_time__day
-        , is_instant AS booking__is_instant
+        metric_time__day
+        , booking__is_instant
         , booking_value
-      FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_15
+      FROM (
+        -- Read Elements From Semantic Model 'bookings_source'
+        -- Metric Time Dimension 'ds'
+        SELECT
+          DATE_TRUNC('day', ds) AS metric_time__day
+          , is_instant AS booking__is_instant
+          , booking_value
+        FROM ***************************.fct_bookings bookings_source_src_28000
+      ) subq_21
+      WHERE booking__is_instant
+    ) subq_23
     WHERE booking__is_instant
     GROUP BY
       metric_time__day
-  ) subq_19
+  ) subq_27
   FULL OUTER JOIN (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
@@ -42,9 +50,9 @@ FROM (
     FROM ***************************.fct_bookings bookings_source_src_28000
     GROUP BY
       DATE_TRUNC('day', ds)
-  ) subq_24
+  ) subq_32
   ON
-    subq_19.metric_time__day = subq_24.metric_time__day
+    subq_27.metric_time__day = subq_32.metric_time__day
   GROUP BY
-    COALESCE(subq_19.metric_time__day, subq_24.metric_time__day)
-) subq_25
+    COALESCE(subq_27.metric_time__day, subq_32.metric_time__day)
+) subq_33
