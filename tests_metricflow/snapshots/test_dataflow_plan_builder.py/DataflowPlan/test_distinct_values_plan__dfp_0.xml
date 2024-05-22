@@ -38,7 +38,7 @@
                     <!--     ),                                                           -->
                     <!--     linkable_elements=(                                          -->
                     <!--       LinkableDimension(                                         -->
-                    <!--         semantic_model_origin=SemanticModelReference(            -->
+                    <!--         defined_in_semantic_model=SemanticModelReference(        -->
                     <!--           semantic_model_name='listings_latest',                 -->
                     <!--         ),                                                       -->
                     <!--         element_name='country_latest',                           -->

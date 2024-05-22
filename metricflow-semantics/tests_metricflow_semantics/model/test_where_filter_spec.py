@@ -115,7 +115,7 @@ def test_dimension_in_filter(  # noqa: D103
                         date_part=None,
                     ): (
                         LinkableDimension(
-                            semantic_model_origin=SemanticModelReference("bookings"),
+                            defined_in_semantic_model=SemanticModelReference("bookings"),
                             dimension_type=DimensionType.CATEGORICAL,
                             element_name="country_latest",
                             entity_links=(EntityReference("listing"),),
@@ -173,7 +173,7 @@ def test_dimension_in_filter_with_grain(  # noqa: D103
                         date_part=None,
                     ): (
                         LinkableDimension(
-                            semantic_model_origin=SemanticModelReference("listings_source"),
+                            defined_in_semantic_model=SemanticModelReference("listings_source"),
                             dimension_type=DimensionType.TIME,
                             element_name="created_at",
                             entity_links=(EntityReference("listing"),),
@@ -237,7 +237,7 @@ def test_time_dimension_in_filter(  # noqa: D103
                         date_part=None,
                     ): (
                         LinkableDimension(
-                            semantic_model_origin=SemanticModelReference("listings_source"),
+                            defined_in_semantic_model=SemanticModelReference("listings_source"),
                             dimension_type=DimensionType.CATEGORICAL,
                             element_name="created_at",
                             entity_links=(EntityReference("listing"),),
@@ -302,7 +302,7 @@ def test_date_part_in_filter(  # noqa: D103
                         date_part=DatePart.YEAR,
                     ): (
                         LinkableDimension(
-                            semantic_model_origin=SemanticModelReference("bookings"),
+                            defined_in_semantic_model=SemanticModelReference("bookings"),
                             dimension_type=DimensionType.TIME,
                             element_name="metric_time",
                             entity_links=(),
@@ -370,7 +370,7 @@ def resolved_spec_lookup() -> FilterSpecResolutionLookUp:
                             date_part=DatePart.YEAR,
                         ): (
                             LinkableDimension(
-                                semantic_model_origin=SemanticModelReference("bookings"),
+                                defined_in_semantic_model=SemanticModelReference("bookings"),
                                 dimension_type=DimensionType.TIME,
                                 element_name="metric_time",
                                 entity_links=(),
@@ -492,7 +492,7 @@ def test_entity_in_filter(  # noqa: D103
                         date_part=DatePart.YEAR,
                     ): (
                         LinkableEntity(
-                            semantic_model_origin=SemanticModelReference("bookings"),
+                            defined_in_semantic_model=SemanticModelReference("bookings"),
                             element_name="user",
                             entity_links=(EntityReference("listing"),),
                             join_path=SemanticModelJoinPath(
@@ -603,7 +603,7 @@ def test_dimension_time_dimension_parity(column_association_resolver: ColumnAsso
                                     date_part=DatePart.YEAR,
                                 ): (
                                     LinkableDimension(
-                                        semantic_model_origin=SemanticModelReference("bookings"),
+                                        defined_in_semantic_model=SemanticModelReference("bookings"),
                                         dimension_type=DimensionType.TIME,
                                         element_name=METRIC_TIME_ELEMENT_NAME,
                                         entity_links=(),

@@ -184,7 +184,7 @@ class LinkableElementSet(SemanticModelDerivation):
                         dimensions,
                         key=lambda linkable_dimension: (
                             linkable_dimension.semantic_model_origin.semantic_model_name
-                            if linkable_dimension.semantic_model_origin
+                            if linkable_dimension.defined_in_semantic_model
                             else ""
                         ),
                     )
@@ -194,7 +194,8 @@ class LinkableElementSet(SemanticModelDerivation):
             path_key_to_linkable_entities={
                 path_key: tuple(
                     sorted(
-                        entities, key=lambda linkable_entity: linkable_entity.semantic_model_origin.semantic_model_name
+                        entities,
+                        key=lambda linkable_entity: linkable_entity.defined_in_semantic_model.semantic_model_name,
                     )
                 )
                 for path_key, entities in join_path_to_linkable_entities.items()

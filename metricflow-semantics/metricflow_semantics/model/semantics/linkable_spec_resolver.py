@@ -72,7 +72,7 @@ def _generate_linkable_time_dimensions(
 
         linkable_dimensions.append(
             LinkableDimension(
-                semantic_model_origin=semantic_model_origin,
+                defined_in_semantic_model=semantic_model_origin,
                 element_name=dimension.reference.element_name,
                 dimension_type=DimensionType.TIME,
                 entity_links=entity_links,
@@ -88,7 +88,7 @@ def _generate_linkable_time_dimensions(
             if time_granularity.to_int() <= date_part.to_int():
                 linkable_dimensions.append(
                     LinkableDimension(
-                        semantic_model_origin=semantic_model_origin,
+                        defined_in_semantic_model=semantic_model_origin,
                         element_name=dimension.reference.element_name,
                         dimension_type=DimensionType.TIME,
                         entity_links=entity_links,
@@ -331,7 +331,7 @@ class ValidLinkableSpecResolver:
         for entity in semantic_model.entities:
             linkable_entities.append(
                 LinkableEntity(
-                    semantic_model_origin=semantic_model.reference,
+                    defined_in_semantic_model=semantic_model.reference,
                     element_name=entity.reference.element_name,
                     entity_links=(),
                     join_path=SemanticModelJoinPath(
@@ -346,7 +346,7 @@ class ValidLinkableSpecResolver:
                     continue
                 linkable_entities.append(
                     LinkableEntity(
-                        semantic_model_origin=semantic_model.reference,
+                        defined_in_semantic_model=semantic_model.reference,
                         element_name=entity.reference.element_name,
                         entity_links=(entity_link,),
                         join_path=SemanticModelJoinPath(
@@ -363,7 +363,7 @@ class ValidLinkableSpecResolver:
                 if dimension_type is DimensionType.CATEGORICAL:
                     linkable_dimensions.append(
                         LinkableDimension(
-                            semantic_model_origin=semantic_model.reference,
+                            defined_in_semantic_model=semantic_model.reference,
                             element_name=dimension.reference.element_name,
                             dimension_type=DimensionType.CATEGORICAL,
                             entity_links=(entity_link,),
@@ -495,7 +495,7 @@ class ValidLinkableSpecResolver:
                 )
                 path_key_to_linkable_dimensions[path_key].append(
                     LinkableDimension(
-                        semantic_model_origin=measure_semantic_model.reference if measure_semantic_model else None,
+                        defined_in_semantic_model=measure_semantic_model.reference if measure_semantic_model else None,
                         element_name=MetricFlowReservedKeywords.METRIC_TIME.value,
                         dimension_type=DimensionType.TIME,
                         entity_links=(),
@@ -722,7 +722,7 @@ class ValidLinkableSpecResolver:
             if dimension_type == DimensionType.CATEGORICAL:
                 linkable_dimensions.append(
                     LinkableDimension(
-                        semantic_model_origin=semantic_model.reference,
+                        defined_in_semantic_model=semantic_model.reference,
                         element_name=dimension.reference.element_name,
                         dimension_type=DimensionType.CATEGORICAL,
                         entity_links=join_path.entity_links,
@@ -750,7 +750,7 @@ class ValidLinkableSpecResolver:
             if entity.reference != join_path.last_entity_link:
                 linkable_entities.append(
                     LinkableEntity(
-                        semantic_model_origin=semantic_model.reference,
+                        defined_in_semantic_model=semantic_model.reference,
                         element_name=entity.reference.element_name,
                         entity_links=join_path.entity_links,
                         join_path=join_path,
