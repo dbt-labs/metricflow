@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from abc import ABC
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
 from typing import FrozenSet, Optional, Sequence, Tuple
@@ -98,7 +98,11 @@ class SemanticModelJoinPathElement:
 class LinkableElement(SemanticModelDerivation, SerializableDataclass, ABC):
     """An entity / dimension that may have been joined by entities."""
 
-    pass
+    @property
+    @abstractmethod
+    def element_type(self) -> LinkableElementType:
+        """Blah."""
+        raise NotImplementedError
 
 
 @dataclass(frozen=True)
@@ -116,15 +120,19 @@ class LinkableDimension(LinkableElement, SerializableDataclass):
     date_part: Optional[DatePart]
 
     @property
-    def path_key(self) -> ElementPathKey:  # noqa: D102
-        if self.dimension_type is DimensionType.CATEGORICAL:
-            element_type = LinkableElementType.DIMENSION
-        else:
-            element_type = LinkableElementType.TIME_DIMENSION
+    @override
+    def element_type(self) -> LinkableElementType:
+        return (
+            LinkableElementType.DIMENSION
+            if self.dimension_type is DimensionType.CATEGORICAL
+            else LinkableElementType.TIME_DIMENSION
+        )
 
+    @property
+    def path_key(self) -> ElementPathKey:  # noqa: D102
         return ElementPathKey(
             element_name=self.element_name,
-            element_type=element_type,
+            element_type=self.element_type,
             entity_links=self.entity_links,
             time_granularity=self.time_granularity,
             date_part=self.date_part,
@@ -157,9 +165,14 @@ class LinkableEntity(LinkableElement, SerializableDataclass):
     join_path: SemanticModelJoinPath
 
     @property
+    @override
+    def element_type(self) -> LinkableElementType:
+        return LinkableElementType.ENTITY
+
+    @property
     def path_key(self) -> ElementPathKey:  # noqa: D102
         return ElementPathKey(
-            element_name=self.element_name, element_type=LinkableElementType.ENTITY, entity_links=self.entity_links
+            element_name=self.element_name, element_type=self.element_type, entity_links=self.entity_links
         )
 
     @property
@@ -200,6 +213,11 @@ class LinkableMetric(LinkableElement, SerializableDataclass):
         assert {LinkableElementProperty.METRIC, LinkableElementProperty.JOINED}.issubset(self.properties)
 
     @property
+    @override
+    def element_type(self) -> LinkableElementType:
+        return LinkableElementType.METRIC
+
+    @property
     def element_name(self) -> str:  # noqa: D102
         return self.reference.element_name
 
@@ -207,7 +225,7 @@ class LinkableMetric(LinkableElement, SerializableDataclass):
     def path_key(self) -> ElementPathKey:  # noqa: D102
         return ElementPathKey(
             element_name=self.element_name,
-            element_type=LinkableElementType.METRIC,
+            element_type=self.element_type,
             entity_links=self.join_path.entity_links,
             metric_subquery_entity_links=self.metric_subquery_entity_links,
         )
