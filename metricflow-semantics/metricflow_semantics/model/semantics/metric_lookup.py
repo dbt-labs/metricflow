@@ -45,7 +45,7 @@ class MetricLookup:
             max_entity_links=MAX_JOIN_HOPS,
         )
 
-    @functools.cache
+    @functools.lru_cache
     def linkable_elements_for_measure(
         self,
         measure_reference: MeasureReference,
@@ -68,7 +68,7 @@ class MetricLookup:
 
         return linkable_element_set
 
-    @functools.cache
+    @functools.lru_cache
     def linkable_elements_for_no_metrics_query(
         self,
         with_any_of: Optional[FrozenSet[LinkableElementProperty]] = None,
@@ -83,7 +83,7 @@ class MetricLookup:
             without_any_of=frozen_without_any_of,
         )
 
-    @functools.cache
+    @functools.lru_cache
     def linkable_elements_for_metrics(
         self,
         metric_references: Sequence[MetricReference],
