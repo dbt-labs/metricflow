@@ -562,7 +562,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     ) -> List[Dimension]:
         path_key_to_linkable_dimensions = (
             self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_metrics(
-                metric_references=[MetricReference(element_name=mname) for mname in metric_names],
+                metric_references=tuple(MetricReference(element_name=mname) for mname in metric_names),
                 without_any_property=frozenset(without_any_property),
             )
         ).path_key_to_linkable_dimensions
@@ -646,7 +646,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     def entities_for_metrics(self, metric_names: List[str]) -> List[Entity]:  # noqa: D102
         path_key_to_linkable_entities = (
             self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_metrics(
-                metric_references=[MetricReference(element_name=mname) for mname in metric_names],
+                metric_references=tuple(MetricReference(element_name=mname) for mname in metric_names),
                 with_any_property=frozenset(
                     {
                         LinkableElementProperty.ENTITY,

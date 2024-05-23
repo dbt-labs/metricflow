@@ -92,7 +92,7 @@ def test_local_linked_elements_for_metric(  # noqa: D103
     request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, metric_lookup: MetricLookup
 ) -> None:
     linkable_elements = metric_lookup.linkable_elements_for_metrics(
-        [MetricReference(element_name="listings")],
+        (MetricReference(element_name="listings"),),
         with_any_property=frozenset({LinkableElementProperty.LOCAL_LINKED}),
         without_any_property=frozenset({LinkableElementProperty.DERIVED_TIME_GRANULARITY}),
     )
@@ -169,9 +169,7 @@ def test_linkable_elements_for_no_metrics_query(
 ) -> None:
     """Tests extracting linkable elements for a dimension values query with no metrics."""
     linkable_elements = metric_lookup.linkable_elements_for_no_metrics_query(
-        without_any_of={
-            LinkableElementProperty.DERIVED_TIME_GRANULARITY,
-        }
+        without_any_of=frozenset({LinkableElementProperty.DERIVED_TIME_GRANULARITY})
     )
     sorted_specs = sorted(linkable_elements.specs, key=lambda x: x.qualified_name)
     assert_object_snapshot_equal(

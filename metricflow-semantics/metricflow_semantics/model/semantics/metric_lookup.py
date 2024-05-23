@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import functools
 import logging
 import time
 from typing import Dict, FrozenSet, Optional, Sequence, Set
@@ -44,11 +45,12 @@ class MetricLookup:
             max_entity_links=MAX_JOIN_HOPS,
         )
 
+    @functools.cache
     def linkable_elements_for_measure(
         self,
         measure_reference: MeasureReference,
-        with_any_of: Optional[Set[LinkableElementProperty]] = None,
-        without_any_of: Optional[Set[LinkableElementProperty]] = None,
+        with_any_of: Optional[FrozenSet[LinkableElementProperty]] = None,
+        without_any_of: Optional[FrozenSet[LinkableElementProperty]] = None,
     ) -> LinkableElementSet:
         """Return the set of linkable elements reachable from a given measure."""
         frozen_with_any_of = LinkableElementProperty.all_properties() if with_any_of is None else frozenset(with_any_of)
@@ -66,10 +68,11 @@ class MetricLookup:
 
         return linkable_element_set
 
+    @functools.cache
     def linkable_elements_for_no_metrics_query(
         self,
-        with_any_of: Optional[Set[LinkableElementProperty]] = None,
-        without_any_of: Optional[Set[LinkableElementProperty]] = None,
+        with_any_of: Optional[FrozenSet[LinkableElementProperty]] = None,
+        without_any_of: Optional[FrozenSet[LinkableElementProperty]] = None,
     ) -> LinkableElementSet:
         """Return the reachable linkable elements for a dimension values query with no metrics."""
         frozen_with_any_of = LinkableElementProperty.all_properties() if with_any_of is None else frozenset(with_any_of)
@@ -80,6 +83,7 @@ class MetricLookup:
             without_any_of=frozen_without_any_of,
         )
 
+    @functools.cache
     def linkable_elements_for_metrics(
         self,
         metric_references: Sequence[MetricReference],
