@@ -2191,7 +2191,7 @@ integration_test:
 ---
 integration_test:
   name: join_to_time_spine_with_queried_time_constraint
-  description: Test join to time spine with time constraint that isn't in group by. Should apply constraint twice.
+  description: Test join to time spine with time constraint that is in group by. Should apply constraint twice.
   model: SIMPLE_MODEL
   metrics: ["bookings_join_to_time_spine"]
   group_by_objs: [{"name": "metric_time"}]
