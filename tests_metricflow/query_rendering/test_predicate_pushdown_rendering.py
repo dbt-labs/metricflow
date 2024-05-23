@@ -51,8 +51,8 @@ def test_multiple_categorical_dimension_pushdown(
 ) -> None:
     """Tests rendering a query where we expect predicate pushdown for more than one categorical dimension."""
     parsed_query = query_parser.parse_and_validate_query(
-        metric_names=("bookings",),
-        group_by_names=("booking__is_instant",),
+        metric_names=("listings",),
+        group_by_names=("user__home_state_latest",),
         where_constraint=PydanticWhereFilter(
             where_sql_template="{{ Dimension('listing__is_lux_latest') }} OR {{ Dimension('listing__capacity_latest') }} > 4",
         ),
@@ -69,37 +69,7 @@ def test_multiple_categorical_dimension_pushdown(
 
 
 @pytest.mark.sql_engine_snapshot
-def test_multiple_different_filters_on_same_joined_categorical_dimension(
-    request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
-    dataflow_plan_builder: DataflowPlanBuilder,
-    query_parser: MetricFlowQueryParser,
-    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
-    sql_client: SqlClient,
-) -> None:
-    """Tests rendering a query where multiple filters against the same joined dimension need to be an effective OR.
-
-    This can be an issue where a derived metric takes in two filters that refer to the same joined-in categorical
-    dimension. If these filters are disjoint the predicate pushdown needs to ensure that all matching rows are
-    returned, so we cannot simply push one filter or the other down, nor can we push them down as an AND - they
-    must be an OR, since all relevant rows need to be returned to the requesting metrics.
-    """
-    parsed_query = query_parser.parse_and_validate_query(
-        metric_names=("regional_starting_balance_ratios",),
-    )
-    dataflow_plan = dataflow_plan_builder.build_plan(parsed_query.query_spec)
-
-    convert_and_check(
-        request=request,
-        mf_test_configuration=mf_test_configuration,
-        dataflow_to_sql_converter=dataflow_to_sql_converter,
-        sql_client=sql_client,
-        node=dataflow_plan.sink_node,
-    )
-
-
-@pytest.mark.sql_engine_snapshot
-def test_multiple_different_filters_on_same_measure_source_categorical_dimension(
+def test_different_filters_on_same_measure_source_categorical_dimension(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
@@ -113,6 +83,9 @@ def test_multiple_different_filters_on_same_measure_source_categorical_dimension
     measure source. If these filters are disjoint the predicate pushdown needs to ensure that all matching rows are
     returned, so we cannot simply push one filter or the other down, nor can we push them down as an AND - they
     must be an OR, since all relevant rows need to be returned to the requesting metrics.
+
+    The metric listed here has one input that filters on bookings__is_instant and another that does not, which means
+    the source input for the latter input must NOT have the filter applied to it.
     """
     parsed_query = query_parser.parse_and_validate_query(
         metric_names=("instant_booking_fraction_of_max_value",),

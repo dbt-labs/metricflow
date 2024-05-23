@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import dataclasses
-import itertools
 import logging
 from enum import Enum
 from typing import Dict, FrozenSet, List, Optional, Sequence, Set
@@ -355,11 +354,7 @@ class PreJoinNodeProcessor:
         """Processes where filter specs and evaluates their fitness for pushdown against the provided node set."""
         eligible_filter_specs_by_model: Dict[SemanticModelReference, Sequence[WhereFilterSpec]] = {}
         for spec in where_filter_specs:
-            semantic_models = set(
-                itertools.chain.from_iterable(
-                    [element.derived_from_semantic_models for element in spec.linkable_elements]
-                )
-            )
+            semantic_models = set(element.semantic_model_origin for element in spec.linkable_elements)
             invalid_element_types = [
                 element for element in spec.linkable_elements if element.element_type not in enabled_element_types
             ]

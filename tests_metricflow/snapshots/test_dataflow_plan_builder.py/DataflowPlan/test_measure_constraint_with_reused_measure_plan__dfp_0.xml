@@ -58,7 +58,7 @@
                             <!-- distinct = False -->
                             <WhereConstraintNode>
                                 <!-- description = 'Constrain Output with WHERE' -->
-                                <!-- node_id = NodeId(id_str='wcc_3') -->
+                                <!-- node_id = NodeId(id_str='wcc_1') -->
                                 <!-- where_condition =                                                -->
                                 <!--   WhereFilterSpec(                                               -->
                                 <!--     where_sql='booking__is_instant',                             -->

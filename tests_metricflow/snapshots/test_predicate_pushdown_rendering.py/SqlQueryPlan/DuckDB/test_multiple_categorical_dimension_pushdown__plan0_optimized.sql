@@ -1,33 +1,43 @@
 -- Constrain Output with WHERE
--- Pass Only Elements: ['bookings', 'booking__is_instant']
+-- Pass Only Elements: ['listings', 'user__home_state_latest']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  booking__is_instant
-  , SUM(bookings) AS bookings
+  user__home_state_latest
+  , SUM(listings) AS listings
 FROM (
   -- Join Standard Outputs
-  -- Pass Only Elements: ['bookings', 'booking__is_instant', 'listing__is_lux_latest', 'listing__capacity_latest']
+  -- Pass Only Elements: ['listings', 'user__home_state_latest', 'listing__is_lux_latest', 'listing__capacity_latest']
   SELECT
-    subq_13.booking__is_instant AS booking__is_instant
-    , listings_latest_src_28000.is_lux AS listing__is_lux_latest
-    , listings_latest_src_28000.capacity AS listing__capacity_latest
-    , subq_13.bookings AS bookings
+    subq_16.listing__is_lux_latest AS listing__is_lux_latest
+    , subq_16.listing__capacity_latest AS listing__capacity_latest
+    , users_latest_src_28000.home_state_latest AS user__home_state_latest
+    , subq_16.listings AS listings
   FROM (
-    -- Read Elements From Semantic Model 'bookings_source'
-    -- Metric Time Dimension 'ds'
-    -- Pass Only Elements: ['bookings', 'booking__is_instant', 'listing']
+    -- Constrain Output with WHERE
+    -- Pass Only Elements: ['listings', 'listing__is_lux_latest', 'listing__capacity_latest', 'user']
     SELECT
-      listing_id AS listing
-      , is_instant AS booking__is_instant
-      , 1 AS bookings
-    FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_13
+      subq_14.user
+      , listing__is_lux_latest
+      , listing__capacity_latest
+      , listings
+    FROM (
+      -- Read Elements From Semantic Model 'listings_latest'
+      -- Metric Time Dimension 'ds'
+      SELECT
+        user_id AS user
+        , is_lux AS listing__is_lux_latest
+        , capacity AS listing__capacity_latest
+        , 1 AS listings
+      FROM ***************************.dim_listings_latest listings_latest_src_28000
+    ) subq_14
+    WHERE listing__is_lux_latest OR listing__capacity_latest > 4
+  ) subq_16
   LEFT OUTER JOIN
-    ***************************.dim_listings_latest listings_latest_src_28000
+    ***************************.dim_users_latest users_latest_src_28000
   ON
-    subq_13.listing = listings_latest_src_28000.listing_id
-) subq_18
+    subq_16.user = users_latest_src_28000.user_id
+) subq_20
 WHERE listing__is_lux_latest OR listing__capacity_latest > 4
 GROUP BY
-  booking__is_instant
+  user__home_state_latest
