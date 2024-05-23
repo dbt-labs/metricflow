@@ -1452,10 +1452,23 @@ class DataflowPlanBuilder:
                 offset_window=after_aggregation_time_spine_join_description.offset_window,
                 offset_to_grain=after_aggregation_time_spine_join_description.offset_to_grain,
             )
-            # Since new rows might have been added due to time spine join, apply constraints again here.
-            if len(metric_input_measure_spec.filter_specs) > 0:
-                output_node = WhereConstraintNode(parent_node=output_node, where_constraint=merged_where_filter_spec)
-            if time_range_constraint is not None:
+
+            # Since new rows might have been added due to time spine join, re-apply constraints here. Only re-apply filters
+            # for specs that are also in the queried specs, since those are the only ones that might have changed after the
+            # time spine join.
+            queried_filter_specs = [
+                filter_spec
+                for filter_spec in metric_input_measure_spec.filter_specs
+                if set(filter_spec.linkable_specs).issubset(set(queried_linkable_specs.as_tuple))
+            ]
+            if len(queried_filter_specs) > 0:
+                output_node = WhereConstraintNode(
+                    parent_node=output_node, where_constraint=WhereFilterSpec.merge_iterable(queried_filter_specs)
+                )
+
+            # TODO: this will break if you query by agg_time_dimension but apply a time constraint on metric_time.
+            # To fix when enabling time range constraints for agg_time_dimension.
+            if queried_agg_time_dimension_specs and time_range_constraint is not None:
                 output_node = ConstrainTimeRangeNode(
                     parent_node=output_node, time_range_constraint=time_range_constraint
                 )
