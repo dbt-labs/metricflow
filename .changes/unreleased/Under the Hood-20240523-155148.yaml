@@ -1,0 +1,7 @@
+kind: Under the Hood
+body: Cache functions related to parsing group by options in order to improve query
+  performance.
+time: 2024-05-23T15:51:48.789152-07:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1229"
