@@ -101,7 +101,7 @@ class LinkableElement(SemanticModelDerivation, SerializableDataclass, ABC):
     @property
     @abstractmethod
     def element_type(self) -> LinkableElementType:
-        """Blah."""
+        """The LinkableElementType describing what this instance represents."""
         raise NotImplementedError
 
 
