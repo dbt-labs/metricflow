@@ -9,9 +9,9 @@ FROM (
   -- Join Standard Outputs
   -- Pass Only Elements: ['bookings', 'listing__country_latest', 'booking__is_instant']
   SELECT
-    subq_21.booking__is_instant AS booking__is_instant
+    subq_17.booking__is_instant AS booking__is_instant
     , listings_latest_src_28000.country AS listing__country_latest
-    , subq_21.bookings AS bookings
+    , subq_17.bookings AS bookings
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['bookings', 'booking__is_instant', 'listing']
@@ -27,14 +27,14 @@ FROM (
         , is_instant AS booking__is_instant
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_19
+    ) subq_15
     WHERE booking__is_instant
-  ) subq_21
+  ) subq_17
   LEFT OUTER JOIN
     ***************************.dim_listings_latest listings_latest_src_28000
   ON
-    subq_21.listing = listings_latest_src_28000.listing_id
-) subq_26
+    subq_17.listing = listings_latest_src_28000.listing_id
+) subq_22
 WHERE booking__is_instant
 GROUP BY
   listing__country_latest

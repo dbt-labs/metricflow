@@ -8,248 +8,248 @@ FROM (
   FROM (
     -- Combine Aggregated Outputs
     SELECT
-      MAX(subq_30.average_booking_value) AS average_booking_value
-      , MAX(subq_43.bookings) AS bookings
-      , MAX(subq_51.booking_value) AS booking_value
+      MAX(subq_18.average_booking_value) AS average_booking_value
+      , MAX(subq_31.bookings) AS bookings
+      , MAX(subq_39.booking_value) AS booking_value
     FROM (
       -- Compute Metrics via Expressions
       SELECT
-        subq_29.average_booking_value
+        subq_17.average_booking_value
       FROM (
         -- Aggregate Measures
         SELECT
-          AVG(subq_28.average_booking_value) AS average_booking_value
+          AVG(subq_16.average_booking_value) AS average_booking_value
         FROM (
           -- Pass Only Elements: ['average_booking_value',]
           SELECT
-            subq_27.average_booking_value
+            subq_15.average_booking_value
           FROM (
             -- Constrain Output with WHERE
             SELECT
-              subq_26.booking__is_instant
-              , subq_26.listing__is_lux_latest
-              , subq_26.average_booking_value
+              subq_14.booking__is_instant
+              , subq_14.listing__is_lux_latest
+              , subq_14.average_booking_value
             FROM (
               -- Pass Only Elements: ['average_booking_value', 'listing__is_lux_latest', 'booking__is_instant']
               SELECT
-                subq_25.booking__is_instant
-                , subq_25.listing__is_lux_latest
-                , subq_25.average_booking_value
+                subq_13.booking__is_instant
+                , subq_13.listing__is_lux_latest
+                , subq_13.average_booking_value
               FROM (
                 -- Join Standard Outputs
                 SELECT
-                  subq_21.listing AS listing
-                  , subq_21.booking__is_instant AS booking__is_instant
-                  , subq_24.is_lux_latest AS listing__is_lux_latest
-                  , subq_21.average_booking_value AS average_booking_value
+                  subq_9.listing AS listing
+                  , subq_9.booking__is_instant AS booking__is_instant
+                  , subq_12.is_lux_latest AS listing__is_lux_latest
+                  , subq_9.average_booking_value AS average_booking_value
                 FROM (
                   -- Pass Only Elements: ['average_booking_value', 'booking__is_instant', 'listing']
                   SELECT
-                    subq_20.listing
-                    , subq_20.booking__is_instant
-                    , subq_20.average_booking_value
+                    subq_8.listing
+                    , subq_8.booking__is_instant
+                    , subq_8.average_booking_value
                   FROM (
                     -- Constrain Output with WHERE
                     SELECT
-                      subq_19.ds__day
-                      , subq_19.ds__week
-                      , subq_19.ds__month
-                      , subq_19.ds__quarter
-                      , subq_19.ds__year
-                      , subq_19.ds__extract_year
-                      , subq_19.ds__extract_quarter
-                      , subq_19.ds__extract_month
-                      , subq_19.ds__extract_day
-                      , subq_19.ds__extract_dow
-                      , subq_19.ds__extract_doy
-                      , subq_19.ds_partitioned__day
-                      , subq_19.ds_partitioned__week
-                      , subq_19.ds_partitioned__month
-                      , subq_19.ds_partitioned__quarter
-                      , subq_19.ds_partitioned__year
-                      , subq_19.ds_partitioned__extract_year
-                      , subq_19.ds_partitioned__extract_quarter
-                      , subq_19.ds_partitioned__extract_month
-                      , subq_19.ds_partitioned__extract_day
-                      , subq_19.ds_partitioned__extract_dow
-                      , subq_19.ds_partitioned__extract_doy
-                      , subq_19.paid_at__day
-                      , subq_19.paid_at__week
-                      , subq_19.paid_at__month
-                      , subq_19.paid_at__quarter
-                      , subq_19.paid_at__year
-                      , subq_19.paid_at__extract_year
-                      , subq_19.paid_at__extract_quarter
-                      , subq_19.paid_at__extract_month
-                      , subq_19.paid_at__extract_day
-                      , subq_19.paid_at__extract_dow
-                      , subq_19.paid_at__extract_doy
-                      , subq_19.booking__ds__day
-                      , subq_19.booking__ds__week
-                      , subq_19.booking__ds__month
-                      , subq_19.booking__ds__quarter
-                      , subq_19.booking__ds__year
-                      , subq_19.booking__ds__extract_year
-                      , subq_19.booking__ds__extract_quarter
-                      , subq_19.booking__ds__extract_month
-                      , subq_19.booking__ds__extract_day
-                      , subq_19.booking__ds__extract_dow
-                      , subq_19.booking__ds__extract_doy
-                      , subq_19.booking__ds_partitioned__day
-                      , subq_19.booking__ds_partitioned__week
-                      , subq_19.booking__ds_partitioned__month
-                      , subq_19.booking__ds_partitioned__quarter
-                      , subq_19.booking__ds_partitioned__year
-                      , subq_19.booking__ds_partitioned__extract_year
-                      , subq_19.booking__ds_partitioned__extract_quarter
-                      , subq_19.booking__ds_partitioned__extract_month
-                      , subq_19.booking__ds_partitioned__extract_day
-                      , subq_19.booking__ds_partitioned__extract_dow
-                      , subq_19.booking__ds_partitioned__extract_doy
-                      , subq_19.booking__paid_at__day
-                      , subq_19.booking__paid_at__week
-                      , subq_19.booking__paid_at__month
-                      , subq_19.booking__paid_at__quarter
-                      , subq_19.booking__paid_at__year
-                      , subq_19.booking__paid_at__extract_year
-                      , subq_19.booking__paid_at__extract_quarter
-                      , subq_19.booking__paid_at__extract_month
-                      , subq_19.booking__paid_at__extract_day
-                      , subq_19.booking__paid_at__extract_dow
-                      , subq_19.booking__paid_at__extract_doy
-                      , subq_19.metric_time__day
-                      , subq_19.metric_time__week
-                      , subq_19.metric_time__month
-                      , subq_19.metric_time__quarter
-                      , subq_19.metric_time__year
-                      , subq_19.metric_time__extract_year
-                      , subq_19.metric_time__extract_quarter
-                      , subq_19.metric_time__extract_month
-                      , subq_19.metric_time__extract_day
-                      , subq_19.metric_time__extract_dow
-                      , subq_19.metric_time__extract_doy
-                      , subq_19.listing
-                      , subq_19.guest
-                      , subq_19.host
-                      , subq_19.booking__listing
-                      , subq_19.booking__guest
-                      , subq_19.booking__host
-                      , subq_19.is_instant
-                      , subq_19.booking__is_instant
-                      , subq_19.bookings
-                      , subq_19.instant_bookings
-                      , subq_19.booking_value
-                      , subq_19.max_booking_value
-                      , subq_19.min_booking_value
-                      , subq_19.bookers
-                      , subq_19.average_booking_value
-                      , subq_19.referred_bookings
-                      , subq_19.median_booking_value
-                      , subq_19.booking_value_p99
-                      , subq_19.discrete_booking_value_p99
-                      , subq_19.approximate_continuous_booking_value_p99
-                      , subq_19.approximate_discrete_booking_value_p99
+                      subq_7.ds__day
+                      , subq_7.ds__week
+                      , subq_7.ds__month
+                      , subq_7.ds__quarter
+                      , subq_7.ds__year
+                      , subq_7.ds__extract_year
+                      , subq_7.ds__extract_quarter
+                      , subq_7.ds__extract_month
+                      , subq_7.ds__extract_day
+                      , subq_7.ds__extract_dow
+                      , subq_7.ds__extract_doy
+                      , subq_7.ds_partitioned__day
+                      , subq_7.ds_partitioned__week
+                      , subq_7.ds_partitioned__month
+                      , subq_7.ds_partitioned__quarter
+                      , subq_7.ds_partitioned__year
+                      , subq_7.ds_partitioned__extract_year
+                      , subq_7.ds_partitioned__extract_quarter
+                      , subq_7.ds_partitioned__extract_month
+                      , subq_7.ds_partitioned__extract_day
+                      , subq_7.ds_partitioned__extract_dow
+                      , subq_7.ds_partitioned__extract_doy
+                      , subq_7.paid_at__day
+                      , subq_7.paid_at__week
+                      , subq_7.paid_at__month
+                      , subq_7.paid_at__quarter
+                      , subq_7.paid_at__year
+                      , subq_7.paid_at__extract_year
+                      , subq_7.paid_at__extract_quarter
+                      , subq_7.paid_at__extract_month
+                      , subq_7.paid_at__extract_day
+                      , subq_7.paid_at__extract_dow
+                      , subq_7.paid_at__extract_doy
+                      , subq_7.booking__ds__day
+                      , subq_7.booking__ds__week
+                      , subq_7.booking__ds__month
+                      , subq_7.booking__ds__quarter
+                      , subq_7.booking__ds__year
+                      , subq_7.booking__ds__extract_year
+                      , subq_7.booking__ds__extract_quarter
+                      , subq_7.booking__ds__extract_month
+                      , subq_7.booking__ds__extract_day
+                      , subq_7.booking__ds__extract_dow
+                      , subq_7.booking__ds__extract_doy
+                      , subq_7.booking__ds_partitioned__day
+                      , subq_7.booking__ds_partitioned__week
+                      , subq_7.booking__ds_partitioned__month
+                      , subq_7.booking__ds_partitioned__quarter
+                      , subq_7.booking__ds_partitioned__year
+                      , subq_7.booking__ds_partitioned__extract_year
+                      , subq_7.booking__ds_partitioned__extract_quarter
+                      , subq_7.booking__ds_partitioned__extract_month
+                      , subq_7.booking__ds_partitioned__extract_day
+                      , subq_7.booking__ds_partitioned__extract_dow
+                      , subq_7.booking__ds_partitioned__extract_doy
+                      , subq_7.booking__paid_at__day
+                      , subq_7.booking__paid_at__week
+                      , subq_7.booking__paid_at__month
+                      , subq_7.booking__paid_at__quarter
+                      , subq_7.booking__paid_at__year
+                      , subq_7.booking__paid_at__extract_year
+                      , subq_7.booking__paid_at__extract_quarter
+                      , subq_7.booking__paid_at__extract_month
+                      , subq_7.booking__paid_at__extract_day
+                      , subq_7.booking__paid_at__extract_dow
+                      , subq_7.booking__paid_at__extract_doy
+                      , subq_7.metric_time__day
+                      , subq_7.metric_time__week
+                      , subq_7.metric_time__month
+                      , subq_7.metric_time__quarter
+                      , subq_7.metric_time__year
+                      , subq_7.metric_time__extract_year
+                      , subq_7.metric_time__extract_quarter
+                      , subq_7.metric_time__extract_month
+                      , subq_7.metric_time__extract_day
+                      , subq_7.metric_time__extract_dow
+                      , subq_7.metric_time__extract_doy
+                      , subq_7.listing
+                      , subq_7.guest
+                      , subq_7.host
+                      , subq_7.booking__listing
+                      , subq_7.booking__guest
+                      , subq_7.booking__host
+                      , subq_7.is_instant
+                      , subq_7.booking__is_instant
+                      , subq_7.bookings
+                      , subq_7.instant_bookings
+                      , subq_7.booking_value
+                      , subq_7.max_booking_value
+                      , subq_7.min_booking_value
+                      , subq_7.bookers
+                      , subq_7.average_booking_value
+                      , subq_7.referred_bookings
+                      , subq_7.median_booking_value
+                      , subq_7.booking_value_p99
+                      , subq_7.discrete_booking_value_p99
+                      , subq_7.approximate_continuous_booking_value_p99
+                      , subq_7.approximate_discrete_booking_value_p99
                     FROM (
                       -- Metric Time Dimension 'ds'
                       SELECT
-                        subq_18.ds__day
-                        , subq_18.ds__week
-                        , subq_18.ds__month
-                        , subq_18.ds__quarter
-                        , subq_18.ds__year
-                        , subq_18.ds__extract_year
-                        , subq_18.ds__extract_quarter
-                        , subq_18.ds__extract_month
-                        , subq_18.ds__extract_day
-                        , subq_18.ds__extract_dow
-                        , subq_18.ds__extract_doy
-                        , subq_18.ds_partitioned__day
-                        , subq_18.ds_partitioned__week
-                        , subq_18.ds_partitioned__month
-                        , subq_18.ds_partitioned__quarter
-                        , subq_18.ds_partitioned__year
-                        , subq_18.ds_partitioned__extract_year
-                        , subq_18.ds_partitioned__extract_quarter
-                        , subq_18.ds_partitioned__extract_month
-                        , subq_18.ds_partitioned__extract_day
-                        , subq_18.ds_partitioned__extract_dow
-                        , subq_18.ds_partitioned__extract_doy
-                        , subq_18.paid_at__day
-                        , subq_18.paid_at__week
-                        , subq_18.paid_at__month
-                        , subq_18.paid_at__quarter
-                        , subq_18.paid_at__year
-                        , subq_18.paid_at__extract_year
-                        , subq_18.paid_at__extract_quarter
-                        , subq_18.paid_at__extract_month
-                        , subq_18.paid_at__extract_day
-                        , subq_18.paid_at__extract_dow
-                        , subq_18.paid_at__extract_doy
-                        , subq_18.booking__ds__day
-                        , subq_18.booking__ds__week
-                        , subq_18.booking__ds__month
-                        , subq_18.booking__ds__quarter
-                        , subq_18.booking__ds__year
-                        , subq_18.booking__ds__extract_year
-                        , subq_18.booking__ds__extract_quarter
-                        , subq_18.booking__ds__extract_month
-                        , subq_18.booking__ds__extract_day
-                        , subq_18.booking__ds__extract_dow
-                        , subq_18.booking__ds__extract_doy
-                        , subq_18.booking__ds_partitioned__day
-                        , subq_18.booking__ds_partitioned__week
-                        , subq_18.booking__ds_partitioned__month
-                        , subq_18.booking__ds_partitioned__quarter
-                        , subq_18.booking__ds_partitioned__year
-                        , subq_18.booking__ds_partitioned__extract_year
-                        , subq_18.booking__ds_partitioned__extract_quarter
-                        , subq_18.booking__ds_partitioned__extract_month
-                        , subq_18.booking__ds_partitioned__extract_day
-                        , subq_18.booking__ds_partitioned__extract_dow
-                        , subq_18.booking__ds_partitioned__extract_doy
-                        , subq_18.booking__paid_at__day
-                        , subq_18.booking__paid_at__week
-                        , subq_18.booking__paid_at__month
-                        , subq_18.booking__paid_at__quarter
-                        , subq_18.booking__paid_at__year
-                        , subq_18.booking__paid_at__extract_year
-                        , subq_18.booking__paid_at__extract_quarter
-                        , subq_18.booking__paid_at__extract_month
-                        , subq_18.booking__paid_at__extract_day
-                        , subq_18.booking__paid_at__extract_dow
-                        , subq_18.booking__paid_at__extract_doy
-                        , subq_18.ds__day AS metric_time__day
-                        , subq_18.ds__week AS metric_time__week
-                        , subq_18.ds__month AS metric_time__month
-                        , subq_18.ds__quarter AS metric_time__quarter
-                        , subq_18.ds__year AS metric_time__year
-                        , subq_18.ds__extract_year AS metric_time__extract_year
-                        , subq_18.ds__extract_quarter AS metric_time__extract_quarter
-                        , subq_18.ds__extract_month AS metric_time__extract_month
-                        , subq_18.ds__extract_day AS metric_time__extract_day
-                        , subq_18.ds__extract_dow AS metric_time__extract_dow
-                        , subq_18.ds__extract_doy AS metric_time__extract_doy
-                        , subq_18.listing
-                        , subq_18.guest
-                        , subq_18.host
-                        , subq_18.booking__listing
-                        , subq_18.booking__guest
-                        , subq_18.booking__host
-                        , subq_18.is_instant
-                        , subq_18.booking__is_instant
-                        , subq_18.bookings
-                        , subq_18.instant_bookings
-                        , subq_18.booking_value
-                        , subq_18.max_booking_value
-                        , subq_18.min_booking_value
-                        , subq_18.bookers
-                        , subq_18.average_booking_value
-                        , subq_18.referred_bookings
-                        , subq_18.median_booking_value
-                        , subq_18.booking_value_p99
-                        , subq_18.discrete_booking_value_p99
-                        , subq_18.approximate_continuous_booking_value_p99
-                        , subq_18.approximate_discrete_booking_value_p99
+                        subq_6.ds__day
+                        , subq_6.ds__week
+                        , subq_6.ds__month
+                        , subq_6.ds__quarter
+                        , subq_6.ds__year
+                        , subq_6.ds__extract_year
+                        , subq_6.ds__extract_quarter
+                        , subq_6.ds__extract_month
+                        , subq_6.ds__extract_day
+                        , subq_6.ds__extract_dow
+                        , subq_6.ds__extract_doy
+                        , subq_6.ds_partitioned__day
+                        , subq_6.ds_partitioned__week
+                        , subq_6.ds_partitioned__month
+                        , subq_6.ds_partitioned__quarter
+                        , subq_6.ds_partitioned__year
+                        , subq_6.ds_partitioned__extract_year
+                        , subq_6.ds_partitioned__extract_quarter
+                        , subq_6.ds_partitioned__extract_month
+                        , subq_6.ds_partitioned__extract_day
+                        , subq_6.ds_partitioned__extract_dow
+                        , subq_6.ds_partitioned__extract_doy
+                        , subq_6.paid_at__day
+                        , subq_6.paid_at__week
+                        , subq_6.paid_at__month
+                        , subq_6.paid_at__quarter
+                        , subq_6.paid_at__year
+                        , subq_6.paid_at__extract_year
+                        , subq_6.paid_at__extract_quarter
+                        , subq_6.paid_at__extract_month
+                        , subq_6.paid_at__extract_day
+                        , subq_6.paid_at__extract_dow
+                        , subq_6.paid_at__extract_doy
+                        , subq_6.booking__ds__day
+                        , subq_6.booking__ds__week
+                        , subq_6.booking__ds__month
+                        , subq_6.booking__ds__quarter
+                        , subq_6.booking__ds__year
+                        , subq_6.booking__ds__extract_year
+                        , subq_6.booking__ds__extract_quarter
+                        , subq_6.booking__ds__extract_month
+                        , subq_6.booking__ds__extract_day
+                        , subq_6.booking__ds__extract_dow
+                        , subq_6.booking__ds__extract_doy
+                        , subq_6.booking__ds_partitioned__day
+                        , subq_6.booking__ds_partitioned__week
+                        , subq_6.booking__ds_partitioned__month
+                        , subq_6.booking__ds_partitioned__quarter
+                        , subq_6.booking__ds_partitioned__year
+                        , subq_6.booking__ds_partitioned__extract_year
+                        , subq_6.booking__ds_partitioned__extract_quarter
+                        , subq_6.booking__ds_partitioned__extract_month
+                        , subq_6.booking__ds_partitioned__extract_day
+                        , subq_6.booking__ds_partitioned__extract_dow
+                        , subq_6.booking__ds_partitioned__extract_doy
+                        , subq_6.booking__paid_at__day
+                        , subq_6.booking__paid_at__week
+                        , subq_6.booking__paid_at__month
+                        , subq_6.booking__paid_at__quarter
+                        , subq_6.booking__paid_at__year
+                        , subq_6.booking__paid_at__extract_year
+                        , subq_6.booking__paid_at__extract_quarter
+                        , subq_6.booking__paid_at__extract_month
+                        , subq_6.booking__paid_at__extract_day
+                        , subq_6.booking__paid_at__extract_dow
+                        , subq_6.booking__paid_at__extract_doy
+                        , subq_6.ds__day AS metric_time__day
+                        , subq_6.ds__week AS metric_time__week
+                        , subq_6.ds__month AS metric_time__month
+                        , subq_6.ds__quarter AS metric_time__quarter
+                        , subq_6.ds__year AS metric_time__year
+                        , subq_6.ds__extract_year AS metric_time__extract_year
+                        , subq_6.ds__extract_quarter AS metric_time__extract_quarter
+                        , subq_6.ds__extract_month AS metric_time__extract_month
+                        , subq_6.ds__extract_day AS metric_time__extract_day
+                        , subq_6.ds__extract_dow AS metric_time__extract_dow
+                        , subq_6.ds__extract_doy AS metric_time__extract_doy
+                        , subq_6.listing
+                        , subq_6.guest
+                        , subq_6.host
+                        , subq_6.booking__listing
+                        , subq_6.booking__guest
+                        , subq_6.booking__host
+                        , subq_6.is_instant
+                        , subq_6.booking__is_instant
+                        , subq_6.bookings
+                        , subq_6.instant_bookings
+                        , subq_6.booking_value
+                        , subq_6.max_booking_value
+                        , subq_6.min_booking_value
+                        , subq_6.bookers
+                        , subq_6.average_booking_value
+                        , subq_6.referred_bookings
+                        , subq_6.median_booking_value
+                        , subq_6.booking_value_p99
+                        , subq_6.discrete_booking_value_p99
+                        , subq_6.approximate_continuous_booking_value_p99
+                        , subq_6.approximate_discrete_booking_value_p99
                       FROM (
                         -- Read Elements From Semantic Model 'bookings_source'
                         SELECT
@@ -342,86 +342,86 @@ FROM (
                           , bookings_source_src_28000.guest_id AS booking__guest
                           , bookings_source_src_28000.host_id AS booking__host
                         FROM ***************************.fct_bookings bookings_source_src_28000
-                      ) subq_18
-                    ) subq_19
+                      ) subq_6
+                    ) subq_7
                     WHERE booking__is_instant
-                  ) subq_20
-                ) subq_21
+                  ) subq_8
+                ) subq_9
                 LEFT OUTER JOIN (
                   -- Pass Only Elements: ['is_lux_latest', 'listing']
                   SELECT
-                    subq_23.listing
-                    , subq_23.is_lux_latest
+                    subq_11.listing
+                    , subq_11.is_lux_latest
                   FROM (
                     -- Metric Time Dimension 'ds'
                     SELECT
-                      subq_22.ds__day
-                      , subq_22.ds__week
-                      , subq_22.ds__month
-                      , subq_22.ds__quarter
-                      , subq_22.ds__year
-                      , subq_22.ds__extract_year
-                      , subq_22.ds__extract_quarter
-                      , subq_22.ds__extract_month
-                      , subq_22.ds__extract_day
-                      , subq_22.ds__extract_dow
-                      , subq_22.ds__extract_doy
-                      , subq_22.created_at__day
-                      , subq_22.created_at__week
-                      , subq_22.created_at__month
-                      , subq_22.created_at__quarter
-                      , subq_22.created_at__year
-                      , subq_22.created_at__extract_year
-                      , subq_22.created_at__extract_quarter
-                      , subq_22.created_at__extract_month
-                      , subq_22.created_at__extract_day
-                      , subq_22.created_at__extract_dow
-                      , subq_22.created_at__extract_doy
-                      , subq_22.listing__ds__day
-                      , subq_22.listing__ds__week
-                      , subq_22.listing__ds__month
-                      , subq_22.listing__ds__quarter
-                      , subq_22.listing__ds__year
-                      , subq_22.listing__ds__extract_year
-                      , subq_22.listing__ds__extract_quarter
-                      , subq_22.listing__ds__extract_month
-                      , subq_22.listing__ds__extract_day
-                      , subq_22.listing__ds__extract_dow
-                      , subq_22.listing__ds__extract_doy
-                      , subq_22.listing__created_at__day
-                      , subq_22.listing__created_at__week
-                      , subq_22.listing__created_at__month
-                      , subq_22.listing__created_at__quarter
-                      , subq_22.listing__created_at__year
-                      , subq_22.listing__created_at__extract_year
-                      , subq_22.listing__created_at__extract_quarter
-                      , subq_22.listing__created_at__extract_month
-                      , subq_22.listing__created_at__extract_day
-                      , subq_22.listing__created_at__extract_dow
-                      , subq_22.listing__created_at__extract_doy
-                      , subq_22.ds__day AS metric_time__day
-                      , subq_22.ds__week AS metric_time__week
-                      , subq_22.ds__month AS metric_time__month
-                      , subq_22.ds__quarter AS metric_time__quarter
-                      , subq_22.ds__year AS metric_time__year
-                      , subq_22.ds__extract_year AS metric_time__extract_year
-                      , subq_22.ds__extract_quarter AS metric_time__extract_quarter
-                      , subq_22.ds__extract_month AS metric_time__extract_month
-                      , subq_22.ds__extract_day AS metric_time__extract_day
-                      , subq_22.ds__extract_dow AS metric_time__extract_dow
-                      , subq_22.ds__extract_doy AS metric_time__extract_doy
-                      , subq_22.listing
-                      , subq_22.user
-                      , subq_22.listing__user
-                      , subq_22.country_latest
-                      , subq_22.is_lux_latest
-                      , subq_22.capacity_latest
-                      , subq_22.listing__country_latest
-                      , subq_22.listing__is_lux_latest
-                      , subq_22.listing__capacity_latest
-                      , subq_22.listings
-                      , subq_22.largest_listing
-                      , subq_22.smallest_listing
+                      subq_10.ds__day
+                      , subq_10.ds__week
+                      , subq_10.ds__month
+                      , subq_10.ds__quarter
+                      , subq_10.ds__year
+                      , subq_10.ds__extract_year
+                      , subq_10.ds__extract_quarter
+                      , subq_10.ds__extract_month
+                      , subq_10.ds__extract_day
+                      , subq_10.ds__extract_dow
+                      , subq_10.ds__extract_doy
+                      , subq_10.created_at__day
+                      , subq_10.created_at__week
+                      , subq_10.created_at__month
+                      , subq_10.created_at__quarter
+                      , subq_10.created_at__year
+                      , subq_10.created_at__extract_year
+                      , subq_10.created_at__extract_quarter
+                      , subq_10.created_at__extract_month
+                      , subq_10.created_at__extract_day
+                      , subq_10.created_at__extract_dow
+                      , subq_10.created_at__extract_doy
+                      , subq_10.listing__ds__day
+                      , subq_10.listing__ds__week
+                      , subq_10.listing__ds__month
+                      , subq_10.listing__ds__quarter
+                      , subq_10.listing__ds__year
+                      , subq_10.listing__ds__extract_year
+                      , subq_10.listing__ds__extract_quarter
+                      , subq_10.listing__ds__extract_month
+                      , subq_10.listing__ds__extract_day
+                      , subq_10.listing__ds__extract_dow
+                      , subq_10.listing__ds__extract_doy
+                      , subq_10.listing__created_at__day
+                      , subq_10.listing__created_at__week
+                      , subq_10.listing__created_at__month
+                      , subq_10.listing__created_at__quarter
+                      , subq_10.listing__created_at__year
+                      , subq_10.listing__created_at__extract_year
+                      , subq_10.listing__created_at__extract_quarter
+                      , subq_10.listing__created_at__extract_month
+                      , subq_10.listing__created_at__extract_day
+                      , subq_10.listing__created_at__extract_dow
+                      , subq_10.listing__created_at__extract_doy
+                      , subq_10.ds__day AS metric_time__day
+                      , subq_10.ds__week AS metric_time__week
+                      , subq_10.ds__month AS metric_time__month
+                      , subq_10.ds__quarter AS metric_time__quarter
+                      , subq_10.ds__year AS metric_time__year
+                      , subq_10.ds__extract_year AS metric_time__extract_year
+                      , subq_10.ds__extract_quarter AS metric_time__extract_quarter
+                      , subq_10.ds__extract_month AS metric_time__extract_month
+                      , subq_10.ds__extract_day AS metric_time__extract_day
+                      , subq_10.ds__extract_dow AS metric_time__extract_dow
+                      , subq_10.ds__extract_doy AS metric_time__extract_doy
+                      , subq_10.listing
+                      , subq_10.user
+                      , subq_10.listing__user
+                      , subq_10.country_latest
+                      , subq_10.is_lux_latest
+                      , subq_10.capacity_latest
+                      , subq_10.listing__country_latest
+                      , subq_10.listing__is_lux_latest
+                      , subq_10.listing__capacity_latest
+                      , subq_10.listings
+                      , subq_10.largest_listing
+                      , subq_10.smallest_listing
                     FROM (
                       -- Read Elements From Semantic Model 'listings_latest'
                       SELECT
@@ -482,257 +482,257 @@ FROM (
                         , listings_latest_src_28000.user_id AS user
                         , listings_latest_src_28000.user_id AS listing__user
                       FROM ***************************.dim_listings_latest listings_latest_src_28000
-                    ) subq_22
-                  ) subq_23
-                ) subq_24
+                    ) subq_10
+                  ) subq_11
+                ) subq_12
                 ON
-                  subq_21.listing = subq_24.listing
-              ) subq_25
-            ) subq_26
+                  subq_9.listing = subq_12.listing
+              ) subq_13
+            ) subq_14
             WHERE (listing__is_lux_latest) AND (booking__is_instant)
-          ) subq_27
-        ) subq_28
-      ) subq_29
-    ) subq_30
+          ) subq_15
+        ) subq_16
+      ) subq_17
+    ) subq_18
     CROSS JOIN (
       -- Compute Metrics via Expressions
       SELECT
-        subq_42.bookings
+        subq_30.bookings
       FROM (
         -- Aggregate Measures
         SELECT
-          SUM(subq_41.bookings) AS bookings
+          SUM(subq_29.bookings) AS bookings
         FROM (
           -- Pass Only Elements: ['bookings',]
           SELECT
-            subq_40.bookings
+            subq_28.bookings
           FROM (
             -- Constrain Output with WHERE
             SELECT
-              subq_39.booking__is_instant
-              , subq_39.listing__is_lux_latest
-              , subq_39.bookings
+              subq_27.booking__is_instant
+              , subq_27.listing__is_lux_latest
+              , subq_27.bookings
             FROM (
               -- Pass Only Elements: ['bookings', 'listing__is_lux_latest', 'booking__is_instant']
               SELECT
-                subq_38.booking__is_instant
-                , subq_38.listing__is_lux_latest
-                , subq_38.bookings
+                subq_26.booking__is_instant
+                , subq_26.listing__is_lux_latest
+                , subq_26.bookings
               FROM (
                 -- Join Standard Outputs
                 SELECT
-                  subq_34.listing AS listing
-                  , subq_34.booking__is_instant AS booking__is_instant
-                  , subq_37.is_lux_latest AS listing__is_lux_latest
-                  , subq_34.bookings AS bookings
+                  subq_22.listing AS listing
+                  , subq_22.booking__is_instant AS booking__is_instant
+                  , subq_25.is_lux_latest AS listing__is_lux_latest
+                  , subq_22.bookings AS bookings
                 FROM (
                   -- Pass Only Elements: ['bookings', 'booking__is_instant', 'listing']
                   SELECT
-                    subq_33.listing
-                    , subq_33.booking__is_instant
-                    , subq_33.bookings
+                    subq_21.listing
+                    , subq_21.booking__is_instant
+                    , subq_21.bookings
                   FROM (
                     -- Constrain Output with WHERE
                     SELECT
-                      subq_32.ds__day
-                      , subq_32.ds__week
-                      , subq_32.ds__month
-                      , subq_32.ds__quarter
-                      , subq_32.ds__year
-                      , subq_32.ds__extract_year
-                      , subq_32.ds__extract_quarter
-                      , subq_32.ds__extract_month
-                      , subq_32.ds__extract_day
-                      , subq_32.ds__extract_dow
-                      , subq_32.ds__extract_doy
-                      , subq_32.ds_partitioned__day
-                      , subq_32.ds_partitioned__week
-                      , subq_32.ds_partitioned__month
-                      , subq_32.ds_partitioned__quarter
-                      , subq_32.ds_partitioned__year
-                      , subq_32.ds_partitioned__extract_year
-                      , subq_32.ds_partitioned__extract_quarter
-                      , subq_32.ds_partitioned__extract_month
-                      , subq_32.ds_partitioned__extract_day
-                      , subq_32.ds_partitioned__extract_dow
-                      , subq_32.ds_partitioned__extract_doy
-                      , subq_32.paid_at__day
-                      , subq_32.paid_at__week
-                      , subq_32.paid_at__month
-                      , subq_32.paid_at__quarter
-                      , subq_32.paid_at__year
-                      , subq_32.paid_at__extract_year
-                      , subq_32.paid_at__extract_quarter
-                      , subq_32.paid_at__extract_month
-                      , subq_32.paid_at__extract_day
-                      , subq_32.paid_at__extract_dow
-                      , subq_32.paid_at__extract_doy
-                      , subq_32.booking__ds__day
-                      , subq_32.booking__ds__week
-                      , subq_32.booking__ds__month
-                      , subq_32.booking__ds__quarter
-                      , subq_32.booking__ds__year
-                      , subq_32.booking__ds__extract_year
-                      , subq_32.booking__ds__extract_quarter
-                      , subq_32.booking__ds__extract_month
-                      , subq_32.booking__ds__extract_day
-                      , subq_32.booking__ds__extract_dow
-                      , subq_32.booking__ds__extract_doy
-                      , subq_32.booking__ds_partitioned__day
-                      , subq_32.booking__ds_partitioned__week
-                      , subq_32.booking__ds_partitioned__month
-                      , subq_32.booking__ds_partitioned__quarter
-                      , subq_32.booking__ds_partitioned__year
-                      , subq_32.booking__ds_partitioned__extract_year
-                      , subq_32.booking__ds_partitioned__extract_quarter
-                      , subq_32.booking__ds_partitioned__extract_month
-                      , subq_32.booking__ds_partitioned__extract_day
-                      , subq_32.booking__ds_partitioned__extract_dow
-                      , subq_32.booking__ds_partitioned__extract_doy
-                      , subq_32.booking__paid_at__day
-                      , subq_32.booking__paid_at__week
-                      , subq_32.booking__paid_at__month
-                      , subq_32.booking__paid_at__quarter
-                      , subq_32.booking__paid_at__year
-                      , subq_32.booking__paid_at__extract_year
-                      , subq_32.booking__paid_at__extract_quarter
-                      , subq_32.booking__paid_at__extract_month
-                      , subq_32.booking__paid_at__extract_day
-                      , subq_32.booking__paid_at__extract_dow
-                      , subq_32.booking__paid_at__extract_doy
-                      , subq_32.metric_time__day
-                      , subq_32.metric_time__week
-                      , subq_32.metric_time__month
-                      , subq_32.metric_time__quarter
-                      , subq_32.metric_time__year
-                      , subq_32.metric_time__extract_year
-                      , subq_32.metric_time__extract_quarter
-                      , subq_32.metric_time__extract_month
-                      , subq_32.metric_time__extract_day
-                      , subq_32.metric_time__extract_dow
-                      , subq_32.metric_time__extract_doy
-                      , subq_32.listing
-                      , subq_32.guest
-                      , subq_32.host
-                      , subq_32.booking__listing
-                      , subq_32.booking__guest
-                      , subq_32.booking__host
-                      , subq_32.is_instant
-                      , subq_32.booking__is_instant
-                      , subq_32.bookings
-                      , subq_32.instant_bookings
-                      , subq_32.booking_value
-                      , subq_32.max_booking_value
-                      , subq_32.min_booking_value
-                      , subq_32.bookers
-                      , subq_32.average_booking_value
-                      , subq_32.referred_bookings
-                      , subq_32.median_booking_value
-                      , subq_32.booking_value_p99
-                      , subq_32.discrete_booking_value_p99
-                      , subq_32.approximate_continuous_booking_value_p99
-                      , subq_32.approximate_discrete_booking_value_p99
+                      subq_20.ds__day
+                      , subq_20.ds__week
+                      , subq_20.ds__month
+                      , subq_20.ds__quarter
+                      , subq_20.ds__year
+                      , subq_20.ds__extract_year
+                      , subq_20.ds__extract_quarter
+                      , subq_20.ds__extract_month
+                      , subq_20.ds__extract_day
+                      , subq_20.ds__extract_dow
+                      , subq_20.ds__extract_doy
+                      , subq_20.ds_partitioned__day
+                      , subq_20.ds_partitioned__week
+                      , subq_20.ds_partitioned__month
+                      , subq_20.ds_partitioned__quarter
+                      , subq_20.ds_partitioned__year
+                      , subq_20.ds_partitioned__extract_year
+                      , subq_20.ds_partitioned__extract_quarter
+                      , subq_20.ds_partitioned__extract_month
+                      , subq_20.ds_partitioned__extract_day
+                      , subq_20.ds_partitioned__extract_dow
+                      , subq_20.ds_partitioned__extract_doy
+                      , subq_20.paid_at__day
+                      , subq_20.paid_at__week
+                      , subq_20.paid_at__month
+                      , subq_20.paid_at__quarter
+                      , subq_20.paid_at__year
+                      , subq_20.paid_at__extract_year
+                      , subq_20.paid_at__extract_quarter
+                      , subq_20.paid_at__extract_month
+                      , subq_20.paid_at__extract_day
+                      , subq_20.paid_at__extract_dow
+                      , subq_20.paid_at__extract_doy
+                      , subq_20.booking__ds__day
+                      , subq_20.booking__ds__week
+                      , subq_20.booking__ds__month
+                      , subq_20.booking__ds__quarter
+                      , subq_20.booking__ds__year
+                      , subq_20.booking__ds__extract_year
+                      , subq_20.booking__ds__extract_quarter
+                      , subq_20.booking__ds__extract_month
+                      , subq_20.booking__ds__extract_day
+                      , subq_20.booking__ds__extract_dow
+                      , subq_20.booking__ds__extract_doy
+                      , subq_20.booking__ds_partitioned__day
+                      , subq_20.booking__ds_partitioned__week
+                      , subq_20.booking__ds_partitioned__month
+                      , subq_20.booking__ds_partitioned__quarter
+                      , subq_20.booking__ds_partitioned__year
+                      , subq_20.booking__ds_partitioned__extract_year
+                      , subq_20.booking__ds_partitioned__extract_quarter
+                      , subq_20.booking__ds_partitioned__extract_month
+                      , subq_20.booking__ds_partitioned__extract_day
+                      , subq_20.booking__ds_partitioned__extract_dow
+                      , subq_20.booking__ds_partitioned__extract_doy
+                      , subq_20.booking__paid_at__day
+                      , subq_20.booking__paid_at__week
+                      , subq_20.booking__paid_at__month
+                      , subq_20.booking__paid_at__quarter
+                      , subq_20.booking__paid_at__year
+                      , subq_20.booking__paid_at__extract_year
+                      , subq_20.booking__paid_at__extract_quarter
+                      , subq_20.booking__paid_at__extract_month
+                      , subq_20.booking__paid_at__extract_day
+                      , subq_20.booking__paid_at__extract_dow
+                      , subq_20.booking__paid_at__extract_doy
+                      , subq_20.metric_time__day
+                      , subq_20.metric_time__week
+                      , subq_20.metric_time__month
+                      , subq_20.metric_time__quarter
+                      , subq_20.metric_time__year
+                      , subq_20.metric_time__extract_year
+                      , subq_20.metric_time__extract_quarter
+                      , subq_20.metric_time__extract_month
+                      , subq_20.metric_time__extract_day
+                      , subq_20.metric_time__extract_dow
+                      , subq_20.metric_time__extract_doy
+                      , subq_20.listing
+                      , subq_20.guest
+                      , subq_20.host
+                      , subq_20.booking__listing
+                      , subq_20.booking__guest
+                      , subq_20.booking__host
+                      , subq_20.is_instant
+                      , subq_20.booking__is_instant
+                      , subq_20.bookings
+                      , subq_20.instant_bookings
+                      , subq_20.booking_value
+                      , subq_20.max_booking_value
+                      , subq_20.min_booking_value
+                      , subq_20.bookers
+                      , subq_20.average_booking_value
+                      , subq_20.referred_bookings
+                      , subq_20.median_booking_value
+                      , subq_20.booking_value_p99
+                      , subq_20.discrete_booking_value_p99
+                      , subq_20.approximate_continuous_booking_value_p99
+                      , subq_20.approximate_discrete_booking_value_p99
                     FROM (
                       -- Metric Time Dimension 'ds'
                       SELECT
-                        subq_31.ds__day
-                        , subq_31.ds__week
-                        , subq_31.ds__month
-                        , subq_31.ds__quarter
-                        , subq_31.ds__year
-                        , subq_31.ds__extract_year
-                        , subq_31.ds__extract_quarter
-                        , subq_31.ds__extract_month
-                        , subq_31.ds__extract_day
-                        , subq_31.ds__extract_dow
-                        , subq_31.ds__extract_doy
-                        , subq_31.ds_partitioned__day
-                        , subq_31.ds_partitioned__week
-                        , subq_31.ds_partitioned__month
-                        , subq_31.ds_partitioned__quarter
-                        , subq_31.ds_partitioned__year
-                        , subq_31.ds_partitioned__extract_year
-                        , subq_31.ds_partitioned__extract_quarter
-                        , subq_31.ds_partitioned__extract_month
-                        , subq_31.ds_partitioned__extract_day
-                        , subq_31.ds_partitioned__extract_dow
-                        , subq_31.ds_partitioned__extract_doy
-                        , subq_31.paid_at__day
-                        , subq_31.paid_at__week
-                        , subq_31.paid_at__month
-                        , subq_31.paid_at__quarter
-                        , subq_31.paid_at__year
-                        , subq_31.paid_at__extract_year
-                        , subq_31.paid_at__extract_quarter
-                        , subq_31.paid_at__extract_month
-                        , subq_31.paid_at__extract_day
-                        , subq_31.paid_at__extract_dow
-                        , subq_31.paid_at__extract_doy
-                        , subq_31.booking__ds__day
-                        , subq_31.booking__ds__week
-                        , subq_31.booking__ds__month
-                        , subq_31.booking__ds__quarter
-                        , subq_31.booking__ds__year
-                        , subq_31.booking__ds__extract_year
-                        , subq_31.booking__ds__extract_quarter
-                        , subq_31.booking__ds__extract_month
-                        , subq_31.booking__ds__extract_day
-                        , subq_31.booking__ds__extract_dow
-                        , subq_31.booking__ds__extract_doy
-                        , subq_31.booking__ds_partitioned__day
-                        , subq_31.booking__ds_partitioned__week
-                        , subq_31.booking__ds_partitioned__month
-                        , subq_31.booking__ds_partitioned__quarter
-                        , subq_31.booking__ds_partitioned__year
-                        , subq_31.booking__ds_partitioned__extract_year
-                        , subq_31.booking__ds_partitioned__extract_quarter
-                        , subq_31.booking__ds_partitioned__extract_month
-                        , subq_31.booking__ds_partitioned__extract_day
-                        , subq_31.booking__ds_partitioned__extract_dow
-                        , subq_31.booking__ds_partitioned__extract_doy
-                        , subq_31.booking__paid_at__day
-                        , subq_31.booking__paid_at__week
-                        , subq_31.booking__paid_at__month
-                        , subq_31.booking__paid_at__quarter
-                        , subq_31.booking__paid_at__year
-                        , subq_31.booking__paid_at__extract_year
-                        , subq_31.booking__paid_at__extract_quarter
-                        , subq_31.booking__paid_at__extract_month
-                        , subq_31.booking__paid_at__extract_day
-                        , subq_31.booking__paid_at__extract_dow
-                        , subq_31.booking__paid_at__extract_doy
-                        , subq_31.ds__day AS metric_time__day
-                        , subq_31.ds__week AS metric_time__week
-                        , subq_31.ds__month AS metric_time__month
-                        , subq_31.ds__quarter AS metric_time__quarter
-                        , subq_31.ds__year AS metric_time__year
-                        , subq_31.ds__extract_year AS metric_time__extract_year
-                        , subq_31.ds__extract_quarter AS metric_time__extract_quarter
-                        , subq_31.ds__extract_month AS metric_time__extract_month
-                        , subq_31.ds__extract_day AS metric_time__extract_day
-                        , subq_31.ds__extract_dow AS metric_time__extract_dow
-                        , subq_31.ds__extract_doy AS metric_time__extract_doy
-                        , subq_31.listing
-                        , subq_31.guest
-                        , subq_31.host
-                        , subq_31.booking__listing
-                        , subq_31.booking__guest
-                        , subq_31.booking__host
-                        , subq_31.is_instant
-                        , subq_31.booking__is_instant
-                        , subq_31.bookings
-                        , subq_31.instant_bookings
-                        , subq_31.booking_value
-                        , subq_31.max_booking_value
-                        , subq_31.min_booking_value
-                        , subq_31.bookers
-                        , subq_31.average_booking_value
-                        , subq_31.referred_bookings
-                        , subq_31.median_booking_value
-                        , subq_31.booking_value_p99
-                        , subq_31.discrete_booking_value_p99
-                        , subq_31.approximate_continuous_booking_value_p99
-                        , subq_31.approximate_discrete_booking_value_p99
+                        subq_19.ds__day
+                        , subq_19.ds__week
+                        , subq_19.ds__month
+                        , subq_19.ds__quarter
+                        , subq_19.ds__year
+                        , subq_19.ds__extract_year
+                        , subq_19.ds__extract_quarter
+                        , subq_19.ds__extract_month
+                        , subq_19.ds__extract_day
+                        , subq_19.ds__extract_dow
+                        , subq_19.ds__extract_doy
+                        , subq_19.ds_partitioned__day
+                        , subq_19.ds_partitioned__week
+                        , subq_19.ds_partitioned__month
+                        , subq_19.ds_partitioned__quarter
+                        , subq_19.ds_partitioned__year
+                        , subq_19.ds_partitioned__extract_year
+                        , subq_19.ds_partitioned__extract_quarter
+                        , subq_19.ds_partitioned__extract_month
+                        , subq_19.ds_partitioned__extract_day
+                        , subq_19.ds_partitioned__extract_dow
+                        , subq_19.ds_partitioned__extract_doy
+                        , subq_19.paid_at__day
+                        , subq_19.paid_at__week
+                        , subq_19.paid_at__month
+                        , subq_19.paid_at__quarter
+                        , subq_19.paid_at__year
+                        , subq_19.paid_at__extract_year
+                        , subq_19.paid_at__extract_quarter
+                        , subq_19.paid_at__extract_month
+                        , subq_19.paid_at__extract_day
+                        , subq_19.paid_at__extract_dow
+                        , subq_19.paid_at__extract_doy
+                        , subq_19.booking__ds__day
+                        , subq_19.booking__ds__week
+                        , subq_19.booking__ds__month
+                        , subq_19.booking__ds__quarter
+                        , subq_19.booking__ds__year
+                        , subq_19.booking__ds__extract_year
+                        , subq_19.booking__ds__extract_quarter
+                        , subq_19.booking__ds__extract_month
+                        , subq_19.booking__ds__extract_day
+                        , subq_19.booking__ds__extract_dow
+                        , subq_19.booking__ds__extract_doy
+                        , subq_19.booking__ds_partitioned__day
+                        , subq_19.booking__ds_partitioned__week
+                        , subq_19.booking__ds_partitioned__month
+                        , subq_19.booking__ds_partitioned__quarter
+                        , subq_19.booking__ds_partitioned__year
+                        , subq_19.booking__ds_partitioned__extract_year
+                        , subq_19.booking__ds_partitioned__extract_quarter
+                        , subq_19.booking__ds_partitioned__extract_month
+                        , subq_19.booking__ds_partitioned__extract_day
+                        , subq_19.booking__ds_partitioned__extract_dow
+                        , subq_19.booking__ds_partitioned__extract_doy
+                        , subq_19.booking__paid_at__day
+                        , subq_19.booking__paid_at__week
+                        , subq_19.booking__paid_at__month
+                        , subq_19.booking__paid_at__quarter
+                        , subq_19.booking__paid_at__year
+                        , subq_19.booking__paid_at__extract_year
+                        , subq_19.booking__paid_at__extract_quarter
+                        , subq_19.booking__paid_at__extract_month
+                        , subq_19.booking__paid_at__extract_day
+                        , subq_19.booking__paid_at__extract_dow
+                        , subq_19.booking__paid_at__extract_doy
+                        , subq_19.ds__day AS metric_time__day
+                        , subq_19.ds__week AS metric_time__week
+                        , subq_19.ds__month AS metric_time__month
+                        , subq_19.ds__quarter AS metric_time__quarter
+                        , subq_19.ds__year AS metric_time__year
+                        , subq_19.ds__extract_year AS metric_time__extract_year
+                        , subq_19.ds__extract_quarter AS metric_time__extract_quarter
+                        , subq_19.ds__extract_month AS metric_time__extract_month
+                        , subq_19.ds__extract_day AS metric_time__extract_day
+                        , subq_19.ds__extract_dow AS metric_time__extract_dow
+                        , subq_19.ds__extract_doy AS metric_time__extract_doy
+                        , subq_19.listing
+                        , subq_19.guest
+                        , subq_19.host
+                        , subq_19.booking__listing
+                        , subq_19.booking__guest
+                        , subq_19.booking__host
+                        , subq_19.is_instant
+                        , subq_19.booking__is_instant
+                        , subq_19.bookings
+                        , subq_19.instant_bookings
+                        , subq_19.booking_value
+                        , subq_19.max_booking_value
+                        , subq_19.min_booking_value
+                        , subq_19.bookers
+                        , subq_19.average_booking_value
+                        , subq_19.referred_bookings
+                        , subq_19.median_booking_value
+                        , subq_19.booking_value_p99
+                        , subq_19.discrete_booking_value_p99
+                        , subq_19.approximate_continuous_booking_value_p99
+                        , subq_19.approximate_discrete_booking_value_p99
                       FROM (
                         -- Read Elements From Semantic Model 'bookings_source'
                         SELECT
@@ -825,86 +825,86 @@ FROM (
                           , bookings_source_src_28000.guest_id AS booking__guest
                           , bookings_source_src_28000.host_id AS booking__host
                         FROM ***************************.fct_bookings bookings_source_src_28000
-                      ) subq_31
-                    ) subq_32
+                      ) subq_19
+                    ) subq_20
                     WHERE booking__is_instant
-                  ) subq_33
-                ) subq_34
+                  ) subq_21
+                ) subq_22
                 LEFT OUTER JOIN (
                   -- Pass Only Elements: ['is_lux_latest', 'listing']
                   SELECT
-                    subq_36.listing
-                    , subq_36.is_lux_latest
+                    subq_24.listing
+                    , subq_24.is_lux_latest
                   FROM (
                     -- Metric Time Dimension 'ds'
                     SELECT
-                      subq_35.ds__day
-                      , subq_35.ds__week
-                      , subq_35.ds__month
-                      , subq_35.ds__quarter
-                      , subq_35.ds__year
-                      , subq_35.ds__extract_year
-                      , subq_35.ds__extract_quarter
-                      , subq_35.ds__extract_month
-                      , subq_35.ds__extract_day
-                      , subq_35.ds__extract_dow
-                      , subq_35.ds__extract_doy
-                      , subq_35.created_at__day
-                      , subq_35.created_at__week
-                      , subq_35.created_at__month
-                      , subq_35.created_at__quarter
-                      , subq_35.created_at__year
-                      , subq_35.created_at__extract_year
-                      , subq_35.created_at__extract_quarter
-                      , subq_35.created_at__extract_month
-                      , subq_35.created_at__extract_day
-                      , subq_35.created_at__extract_dow
-                      , subq_35.created_at__extract_doy
-                      , subq_35.listing__ds__day
-                      , subq_35.listing__ds__week
-                      , subq_35.listing__ds__month
-                      , subq_35.listing__ds__quarter
-                      , subq_35.listing__ds__year
-                      , subq_35.listing__ds__extract_year
-                      , subq_35.listing__ds__extract_quarter
-                      , subq_35.listing__ds__extract_month
-                      , subq_35.listing__ds__extract_day
-                      , subq_35.listing__ds__extract_dow
-                      , subq_35.listing__ds__extract_doy
-                      , subq_35.listing__created_at__day
-                      , subq_35.listing__created_at__week
-                      , subq_35.listing__created_at__month
-                      , subq_35.listing__created_at__quarter
-                      , subq_35.listing__created_at__year
-                      , subq_35.listing__created_at__extract_year
-                      , subq_35.listing__created_at__extract_quarter
-                      , subq_35.listing__created_at__extract_month
-                      , subq_35.listing__created_at__extract_day
-                      , subq_35.listing__created_at__extract_dow
-                      , subq_35.listing__created_at__extract_doy
-                      , subq_35.ds__day AS metric_time__day
-                      , subq_35.ds__week AS metric_time__week
-                      , subq_35.ds__month AS metric_time__month
-                      , subq_35.ds__quarter AS metric_time__quarter
-                      , subq_35.ds__year AS metric_time__year
-                      , subq_35.ds__extract_year AS metric_time__extract_year
-                      , subq_35.ds__extract_quarter AS metric_time__extract_quarter
-                      , subq_35.ds__extract_month AS metric_time__extract_month
-                      , subq_35.ds__extract_day AS metric_time__extract_day
-                      , subq_35.ds__extract_dow AS metric_time__extract_dow
-                      , subq_35.ds__extract_doy AS metric_time__extract_doy
-                      , subq_35.listing
-                      , subq_35.user
-                      , subq_35.listing__user
-                      , subq_35.country_latest
-                      , subq_35.is_lux_latest
-                      , subq_35.capacity_latest
-                      , subq_35.listing__country_latest
-                      , subq_35.listing__is_lux_latest
-                      , subq_35.listing__capacity_latest
-                      , subq_35.listings
-                      , subq_35.largest_listing
-                      , subq_35.smallest_listing
+                      subq_23.ds__day
+                      , subq_23.ds__week
+                      , subq_23.ds__month
+                      , subq_23.ds__quarter
+                      , subq_23.ds__year
+                      , subq_23.ds__extract_year
+                      , subq_23.ds__extract_quarter
+                      , subq_23.ds__extract_month
+                      , subq_23.ds__extract_day
+                      , subq_23.ds__extract_dow
+                      , subq_23.ds__extract_doy
+                      , subq_23.created_at__day
+                      , subq_23.created_at__week
+                      , subq_23.created_at__month
+                      , subq_23.created_at__quarter
+                      , subq_23.created_at__year
+                      , subq_23.created_at__extract_year
+                      , subq_23.created_at__extract_quarter
+                      , subq_23.created_at__extract_month
+                      , subq_23.created_at__extract_day
+                      , subq_23.created_at__extract_dow
+                      , subq_23.created_at__extract_doy
+                      , subq_23.listing__ds__day
+                      , subq_23.listing__ds__week
+                      , subq_23.listing__ds__month
+                      , subq_23.listing__ds__quarter
+                      , subq_23.listing__ds__year
+                      , subq_23.listing__ds__extract_year
+                      , subq_23.listing__ds__extract_quarter
+                      , subq_23.listing__ds__extract_month
+                      , subq_23.listing__ds__extract_day
+                      , subq_23.listing__ds__extract_dow
+                      , subq_23.listing__ds__extract_doy
+                      , subq_23.listing__created_at__day
+                      , subq_23.listing__created_at__week
+                      , subq_23.listing__created_at__month
+                      , subq_23.listing__created_at__quarter
+                      , subq_23.listing__created_at__year
+                      , subq_23.listing__created_at__extract_year
+                      , subq_23.listing__created_at__extract_quarter
+                      , subq_23.listing__created_at__extract_month
+                      , subq_23.listing__created_at__extract_day
+                      , subq_23.listing__created_at__extract_dow
+                      , subq_23.listing__created_at__extract_doy
+                      , subq_23.ds__day AS metric_time__day
+                      , subq_23.ds__week AS metric_time__week
+                      , subq_23.ds__month AS metric_time__month
+                      , subq_23.ds__quarter AS metric_time__quarter
+                      , subq_23.ds__year AS metric_time__year
+                      , subq_23.ds__extract_year AS metric_time__extract_year
+                      , subq_23.ds__extract_quarter AS metric_time__extract_quarter
+                      , subq_23.ds__extract_month AS metric_time__extract_month
+                      , subq_23.ds__extract_day AS metric_time__extract_day
+                      , subq_23.ds__extract_dow AS metric_time__extract_dow
+                      , subq_23.ds__extract_doy AS metric_time__extract_doy
+                      , subq_23.listing
+                      , subq_23.user
+                      , subq_23.listing__user
+                      , subq_23.country_latest
+                      , subq_23.is_lux_latest
+                      , subq_23.capacity_latest
+                      , subq_23.listing__country_latest
+                      , subq_23.listing__is_lux_latest
+                      , subq_23.listing__capacity_latest
+                      , subq_23.listings
+                      , subq_23.largest_listing
+                      , subq_23.smallest_listing
                     FROM (
                       -- Read Elements From Semantic Model 'listings_latest'
                       SELECT
@@ -965,242 +965,242 @@ FROM (
                         , listings_latest_src_28000.user_id AS user
                         , listings_latest_src_28000.user_id AS listing__user
                       FROM ***************************.dim_listings_latest listings_latest_src_28000
-                    ) subq_35
-                  ) subq_36
-                ) subq_37
+                    ) subq_23
+                  ) subq_24
+                ) subq_25
                 ON
-                  subq_34.listing = subq_37.listing
-              ) subq_38
-            ) subq_39
+                  subq_22.listing = subq_25.listing
+              ) subq_26
+            ) subq_27
             WHERE (listing__is_lux_latest) AND (booking__is_instant)
-          ) subq_40
-        ) subq_41
-      ) subq_42
-    ) subq_43
+          ) subq_28
+        ) subq_29
+      ) subq_30
+    ) subq_31
     CROSS JOIN (
       -- Compute Metrics via Expressions
       SELECT
-        subq_50.booking_value
+        subq_38.booking_value
       FROM (
         -- Aggregate Measures
         SELECT
-          SUM(subq_49.booking_value) AS booking_value
+          SUM(subq_37.booking_value) AS booking_value
         FROM (
           -- Pass Only Elements: ['booking_value',]
           SELECT
-            subq_48.booking_value
+            subq_36.booking_value
           FROM (
             -- Constrain Output with WHERE
             SELECT
-              subq_47.booking__is_instant
-              , subq_47.booking_value
+              subq_35.booking__is_instant
+              , subq_35.booking_value
             FROM (
               -- Pass Only Elements: ['booking_value', 'booking__is_instant']
               SELECT
-                subq_46.booking__is_instant
-                , subq_46.booking_value
+                subq_34.booking__is_instant
+                , subq_34.booking_value
               FROM (
                 -- Constrain Output with WHERE
                 SELECT
-                  subq_45.ds__day
-                  , subq_45.ds__week
-                  , subq_45.ds__month
-                  , subq_45.ds__quarter
-                  , subq_45.ds__year
-                  , subq_45.ds__extract_year
-                  , subq_45.ds__extract_quarter
-                  , subq_45.ds__extract_month
-                  , subq_45.ds__extract_day
-                  , subq_45.ds__extract_dow
-                  , subq_45.ds__extract_doy
-                  , subq_45.ds_partitioned__day
-                  , subq_45.ds_partitioned__week
-                  , subq_45.ds_partitioned__month
-                  , subq_45.ds_partitioned__quarter
-                  , subq_45.ds_partitioned__year
-                  , subq_45.ds_partitioned__extract_year
-                  , subq_45.ds_partitioned__extract_quarter
-                  , subq_45.ds_partitioned__extract_month
-                  , subq_45.ds_partitioned__extract_day
-                  , subq_45.ds_partitioned__extract_dow
-                  , subq_45.ds_partitioned__extract_doy
-                  , subq_45.paid_at__day
-                  , subq_45.paid_at__week
-                  , subq_45.paid_at__month
-                  , subq_45.paid_at__quarter
-                  , subq_45.paid_at__year
-                  , subq_45.paid_at__extract_year
-                  , subq_45.paid_at__extract_quarter
-                  , subq_45.paid_at__extract_month
-                  , subq_45.paid_at__extract_day
-                  , subq_45.paid_at__extract_dow
-                  , subq_45.paid_at__extract_doy
-                  , subq_45.booking__ds__day
-                  , subq_45.booking__ds__week
-                  , subq_45.booking__ds__month
-                  , subq_45.booking__ds__quarter
-                  , subq_45.booking__ds__year
-                  , subq_45.booking__ds__extract_year
-                  , subq_45.booking__ds__extract_quarter
-                  , subq_45.booking__ds__extract_month
-                  , subq_45.booking__ds__extract_day
-                  , subq_45.booking__ds__extract_dow
-                  , subq_45.booking__ds__extract_doy
-                  , subq_45.booking__ds_partitioned__day
-                  , subq_45.booking__ds_partitioned__week
-                  , subq_45.booking__ds_partitioned__month
-                  , subq_45.booking__ds_partitioned__quarter
-                  , subq_45.booking__ds_partitioned__year
-                  , subq_45.booking__ds_partitioned__extract_year
-                  , subq_45.booking__ds_partitioned__extract_quarter
-                  , subq_45.booking__ds_partitioned__extract_month
-                  , subq_45.booking__ds_partitioned__extract_day
-                  , subq_45.booking__ds_partitioned__extract_dow
-                  , subq_45.booking__ds_partitioned__extract_doy
-                  , subq_45.booking__paid_at__day
-                  , subq_45.booking__paid_at__week
-                  , subq_45.booking__paid_at__month
-                  , subq_45.booking__paid_at__quarter
-                  , subq_45.booking__paid_at__year
-                  , subq_45.booking__paid_at__extract_year
-                  , subq_45.booking__paid_at__extract_quarter
-                  , subq_45.booking__paid_at__extract_month
-                  , subq_45.booking__paid_at__extract_day
-                  , subq_45.booking__paid_at__extract_dow
-                  , subq_45.booking__paid_at__extract_doy
-                  , subq_45.metric_time__day
-                  , subq_45.metric_time__week
-                  , subq_45.metric_time__month
-                  , subq_45.metric_time__quarter
-                  , subq_45.metric_time__year
-                  , subq_45.metric_time__extract_year
-                  , subq_45.metric_time__extract_quarter
-                  , subq_45.metric_time__extract_month
-                  , subq_45.metric_time__extract_day
-                  , subq_45.metric_time__extract_dow
-                  , subq_45.metric_time__extract_doy
-                  , subq_45.listing
-                  , subq_45.guest
-                  , subq_45.host
-                  , subq_45.booking__listing
-                  , subq_45.booking__guest
-                  , subq_45.booking__host
-                  , subq_45.is_instant
-                  , subq_45.booking__is_instant
-                  , subq_45.bookings
-                  , subq_45.instant_bookings
-                  , subq_45.booking_value
-                  , subq_45.max_booking_value
-                  , subq_45.min_booking_value
-                  , subq_45.bookers
-                  , subq_45.average_booking_value
-                  , subq_45.referred_bookings
-                  , subq_45.median_booking_value
-                  , subq_45.booking_value_p99
-                  , subq_45.discrete_booking_value_p99
-                  , subq_45.approximate_continuous_booking_value_p99
-                  , subq_45.approximate_discrete_booking_value_p99
+                  subq_33.ds__day
+                  , subq_33.ds__week
+                  , subq_33.ds__month
+                  , subq_33.ds__quarter
+                  , subq_33.ds__year
+                  , subq_33.ds__extract_year
+                  , subq_33.ds__extract_quarter
+                  , subq_33.ds__extract_month
+                  , subq_33.ds__extract_day
+                  , subq_33.ds__extract_dow
+                  , subq_33.ds__extract_doy
+                  , subq_33.ds_partitioned__day
+                  , subq_33.ds_partitioned__week
+                  , subq_33.ds_partitioned__month
+                  , subq_33.ds_partitioned__quarter
+                  , subq_33.ds_partitioned__year
+                  , subq_33.ds_partitioned__extract_year
+                  , subq_33.ds_partitioned__extract_quarter
+                  , subq_33.ds_partitioned__extract_month
+                  , subq_33.ds_partitioned__extract_day
+                  , subq_33.ds_partitioned__extract_dow
+                  , subq_33.ds_partitioned__extract_doy
+                  , subq_33.paid_at__day
+                  , subq_33.paid_at__week
+                  , subq_33.paid_at__month
+                  , subq_33.paid_at__quarter
+                  , subq_33.paid_at__year
+                  , subq_33.paid_at__extract_year
+                  , subq_33.paid_at__extract_quarter
+                  , subq_33.paid_at__extract_month
+                  , subq_33.paid_at__extract_day
+                  , subq_33.paid_at__extract_dow
+                  , subq_33.paid_at__extract_doy
+                  , subq_33.booking__ds__day
+                  , subq_33.booking__ds__week
+                  , subq_33.booking__ds__month
+                  , subq_33.booking__ds__quarter
+                  , subq_33.booking__ds__year
+                  , subq_33.booking__ds__extract_year
+                  , subq_33.booking__ds__extract_quarter
+                  , subq_33.booking__ds__extract_month
+                  , subq_33.booking__ds__extract_day
+                  , subq_33.booking__ds__extract_dow
+                  , subq_33.booking__ds__extract_doy
+                  , subq_33.booking__ds_partitioned__day
+                  , subq_33.booking__ds_partitioned__week
+                  , subq_33.booking__ds_partitioned__month
+                  , subq_33.booking__ds_partitioned__quarter
+                  , subq_33.booking__ds_partitioned__year
+                  , subq_33.booking__ds_partitioned__extract_year
+                  , subq_33.booking__ds_partitioned__extract_quarter
+                  , subq_33.booking__ds_partitioned__extract_month
+                  , subq_33.booking__ds_partitioned__extract_day
+                  , subq_33.booking__ds_partitioned__extract_dow
+                  , subq_33.booking__ds_partitioned__extract_doy
+                  , subq_33.booking__paid_at__day
+                  , subq_33.booking__paid_at__week
+                  , subq_33.booking__paid_at__month
+                  , subq_33.booking__paid_at__quarter
+                  , subq_33.booking__paid_at__year
+                  , subq_33.booking__paid_at__extract_year
+                  , subq_33.booking__paid_at__extract_quarter
+                  , subq_33.booking__paid_at__extract_month
+                  , subq_33.booking__paid_at__extract_day
+                  , subq_33.booking__paid_at__extract_dow
+                  , subq_33.booking__paid_at__extract_doy
+                  , subq_33.metric_time__day
+                  , subq_33.metric_time__week
+                  , subq_33.metric_time__month
+                  , subq_33.metric_time__quarter
+                  , subq_33.metric_time__year
+                  , subq_33.metric_time__extract_year
+                  , subq_33.metric_time__extract_quarter
+                  , subq_33.metric_time__extract_month
+                  , subq_33.metric_time__extract_day
+                  , subq_33.metric_time__extract_dow
+                  , subq_33.metric_time__extract_doy
+                  , subq_33.listing
+                  , subq_33.guest
+                  , subq_33.host
+                  , subq_33.booking__listing
+                  , subq_33.booking__guest
+                  , subq_33.booking__host
+                  , subq_33.is_instant
+                  , subq_33.booking__is_instant
+                  , subq_33.bookings
+                  , subq_33.instant_bookings
+                  , subq_33.booking_value
+                  , subq_33.max_booking_value
+                  , subq_33.min_booking_value
+                  , subq_33.bookers
+                  , subq_33.average_booking_value
+                  , subq_33.referred_bookings
+                  , subq_33.median_booking_value
+                  , subq_33.booking_value_p99
+                  , subq_33.discrete_booking_value_p99
+                  , subq_33.approximate_continuous_booking_value_p99
+                  , subq_33.approximate_discrete_booking_value_p99
                 FROM (
                   -- Metric Time Dimension 'ds'
                   SELECT
-                    subq_44.ds__day
-                    , subq_44.ds__week
-                    , subq_44.ds__month
-                    , subq_44.ds__quarter
-                    , subq_44.ds__year
-                    , subq_44.ds__extract_year
-                    , subq_44.ds__extract_quarter
-                    , subq_44.ds__extract_month
-                    , subq_44.ds__extract_day
-                    , subq_44.ds__extract_dow
-                    , subq_44.ds__extract_doy
-                    , subq_44.ds_partitioned__day
-                    , subq_44.ds_partitioned__week
-                    , subq_44.ds_partitioned__month
-                    , subq_44.ds_partitioned__quarter
-                    , subq_44.ds_partitioned__year
-                    , subq_44.ds_partitioned__extract_year
-                    , subq_44.ds_partitioned__extract_quarter
-                    , subq_44.ds_partitioned__extract_month
-                    , subq_44.ds_partitioned__extract_day
-                    , subq_44.ds_partitioned__extract_dow
-                    , subq_44.ds_partitioned__extract_doy
-                    , subq_44.paid_at__day
-                    , subq_44.paid_at__week
-                    , subq_44.paid_at__month
-                    , subq_44.paid_at__quarter
-                    , subq_44.paid_at__year
-                    , subq_44.paid_at__extract_year
-                    , subq_44.paid_at__extract_quarter
-                    , subq_44.paid_at__extract_month
-                    , subq_44.paid_at__extract_day
-                    , subq_44.paid_at__extract_dow
-                    , subq_44.paid_at__extract_doy
-                    , subq_44.booking__ds__day
-                    , subq_44.booking__ds__week
-                    , subq_44.booking__ds__month
-                    , subq_44.booking__ds__quarter
-                    , subq_44.booking__ds__year
-                    , subq_44.booking__ds__extract_year
-                    , subq_44.booking__ds__extract_quarter
-                    , subq_44.booking__ds__extract_month
-                    , subq_44.booking__ds__extract_day
-                    , subq_44.booking__ds__extract_dow
-                    , subq_44.booking__ds__extract_doy
-                    , subq_44.booking__ds_partitioned__day
-                    , subq_44.booking__ds_partitioned__week
-                    , subq_44.booking__ds_partitioned__month
-                    , subq_44.booking__ds_partitioned__quarter
-                    , subq_44.booking__ds_partitioned__year
-                    , subq_44.booking__ds_partitioned__extract_year
-                    , subq_44.booking__ds_partitioned__extract_quarter
-                    , subq_44.booking__ds_partitioned__extract_month
-                    , subq_44.booking__ds_partitioned__extract_day
-                    , subq_44.booking__ds_partitioned__extract_dow
-                    , subq_44.booking__ds_partitioned__extract_doy
-                    , subq_44.booking__paid_at__day
-                    , subq_44.booking__paid_at__week
-                    , subq_44.booking__paid_at__month
-                    , subq_44.booking__paid_at__quarter
-                    , subq_44.booking__paid_at__year
-                    , subq_44.booking__paid_at__extract_year
-                    , subq_44.booking__paid_at__extract_quarter
-                    , subq_44.booking__paid_at__extract_month
-                    , subq_44.booking__paid_at__extract_day
-                    , subq_44.booking__paid_at__extract_dow
-                    , subq_44.booking__paid_at__extract_doy
-                    , subq_44.ds__day AS metric_time__day
-                    , subq_44.ds__week AS metric_time__week
-                    , subq_44.ds__month AS metric_time__month
-                    , subq_44.ds__quarter AS metric_time__quarter
-                    , subq_44.ds__year AS metric_time__year
-                    , subq_44.ds__extract_year AS metric_time__extract_year
-                    , subq_44.ds__extract_quarter AS metric_time__extract_quarter
-                    , subq_44.ds__extract_month AS metric_time__extract_month
-                    , subq_44.ds__extract_day AS metric_time__extract_day
-                    , subq_44.ds__extract_dow AS metric_time__extract_dow
-                    , subq_44.ds__extract_doy AS metric_time__extract_doy
-                    , subq_44.listing
-                    , subq_44.guest
-                    , subq_44.host
-                    , subq_44.booking__listing
-                    , subq_44.booking__guest
-                    , subq_44.booking__host
-                    , subq_44.is_instant
-                    , subq_44.booking__is_instant
-                    , subq_44.bookings
-                    , subq_44.instant_bookings
-                    , subq_44.booking_value
-                    , subq_44.max_booking_value
-                    , subq_44.min_booking_value
-                    , subq_44.bookers
-                    , subq_44.average_booking_value
-                    , subq_44.referred_bookings
-                    , subq_44.median_booking_value
-                    , subq_44.booking_value_p99
-                    , subq_44.discrete_booking_value_p99
-                    , subq_44.approximate_continuous_booking_value_p99
-                    , subq_44.approximate_discrete_booking_value_p99
+                    subq_32.ds__day
+                    , subq_32.ds__week
+                    , subq_32.ds__month
+                    , subq_32.ds__quarter
+                    , subq_32.ds__year
+                    , subq_32.ds__extract_year
+                    , subq_32.ds__extract_quarter
+                    , subq_32.ds__extract_month
+                    , subq_32.ds__extract_day
+                    , subq_32.ds__extract_dow
+                    , subq_32.ds__extract_doy
+                    , subq_32.ds_partitioned__day
+                    , subq_32.ds_partitioned__week
+                    , subq_32.ds_partitioned__month
+                    , subq_32.ds_partitioned__quarter
+                    , subq_32.ds_partitioned__year
+                    , subq_32.ds_partitioned__extract_year
+                    , subq_32.ds_partitioned__extract_quarter
+                    , subq_32.ds_partitioned__extract_month
+                    , subq_32.ds_partitioned__extract_day
+                    , subq_32.ds_partitioned__extract_dow
+                    , subq_32.ds_partitioned__extract_doy
+                    , subq_32.paid_at__day
+                    , subq_32.paid_at__week
+                    , subq_32.paid_at__month
+                    , subq_32.paid_at__quarter
+                    , subq_32.paid_at__year
+                    , subq_32.paid_at__extract_year
+                    , subq_32.paid_at__extract_quarter
+                    , subq_32.paid_at__extract_month
+                    , subq_32.paid_at__extract_day
+                    , subq_32.paid_at__extract_dow
+                    , subq_32.paid_at__extract_doy
+                    , subq_32.booking__ds__day
+                    , subq_32.booking__ds__week
+                    , subq_32.booking__ds__month
+                    , subq_32.booking__ds__quarter
+                    , subq_32.booking__ds__year
+                    , subq_32.booking__ds__extract_year
+                    , subq_32.booking__ds__extract_quarter
+                    , subq_32.booking__ds__extract_month
+                    , subq_32.booking__ds__extract_day
+                    , subq_32.booking__ds__extract_dow
+                    , subq_32.booking__ds__extract_doy
+                    , subq_32.booking__ds_partitioned__day
+                    , subq_32.booking__ds_partitioned__week
+                    , subq_32.booking__ds_partitioned__month
+                    , subq_32.booking__ds_partitioned__quarter
+                    , subq_32.booking__ds_partitioned__year
+                    , subq_32.booking__ds_partitioned__extract_year
+                    , subq_32.booking__ds_partitioned__extract_quarter
+                    , subq_32.booking__ds_partitioned__extract_month
+                    , subq_32.booking__ds_partitioned__extract_day
+                    , subq_32.booking__ds_partitioned__extract_dow
+                    , subq_32.booking__ds_partitioned__extract_doy
+                    , subq_32.booking__paid_at__day
+                    , subq_32.booking__paid_at__week
+                    , subq_32.booking__paid_at__month
+                    , subq_32.booking__paid_at__quarter
+                    , subq_32.booking__paid_at__year
+                    , subq_32.booking__paid_at__extract_year
+                    , subq_32.booking__paid_at__extract_quarter
+                    , subq_32.booking__paid_at__extract_month
+                    , subq_32.booking__paid_at__extract_day
+                    , subq_32.booking__paid_at__extract_dow
+                    , subq_32.booking__paid_at__extract_doy
+                    , subq_32.ds__day AS metric_time__day
+                    , subq_32.ds__week AS metric_time__week
+                    , subq_32.ds__month AS metric_time__month
+                    , subq_32.ds__quarter AS metric_time__quarter
+                    , subq_32.ds__year AS metric_time__year
+                    , subq_32.ds__extract_year AS metric_time__extract_year
+                    , subq_32.ds__extract_quarter AS metric_time__extract_quarter
+                    , subq_32.ds__extract_month AS metric_time__extract_month
+                    , subq_32.ds__extract_day AS metric_time__extract_day
+                    , subq_32.ds__extract_dow AS metric_time__extract_dow
+                    , subq_32.ds__extract_doy AS metric_time__extract_doy
+                    , subq_32.listing
+                    , subq_32.guest
+                    , subq_32.host
+                    , subq_32.booking__listing
+                    , subq_32.booking__guest
+                    , subq_32.booking__host
+                    , subq_32.is_instant
+                    , subq_32.booking__is_instant
+                    , subq_32.bookings
+                    , subq_32.instant_bookings
+                    , subq_32.booking_value
+                    , subq_32.max_booking_value
+                    , subq_32.min_booking_value
+                    , subq_32.bookers
+                    , subq_32.average_booking_value
+                    , subq_32.referred_bookings
+                    , subq_32.median_booking_value
+                    , subq_32.booking_value_p99
+                    , subq_32.discrete_booking_value_p99
+                    , subq_32.approximate_continuous_booking_value_p99
+                    , subq_32.approximate_discrete_booking_value_p99
                   FROM (
                     -- Read Elements From Semantic Model 'bookings_source'
                     SELECT
@@ -1293,15 +1293,15 @@ FROM (
                       , bookings_source_src_28000.guest_id AS booking__guest
                       , bookings_source_src_28000.host_id AS booking__host
                     FROM ***************************.fct_bookings bookings_source_src_28000
-                  ) subq_44
-                ) subq_45
+                  ) subq_32
+                ) subq_33
                 WHERE booking__is_instant
-              ) subq_46
-            ) subq_47
+              ) subq_34
+            ) subq_35
             WHERE booking__is_instant
-          ) subq_48
-        ) subq_49
-      ) subq_50
-    ) subq_51
-  ) subq_52
-) subq_53
+          ) subq_36
+        ) subq_37
+      ) subq_38
+    ) subq_39
+  ) subq_40
+) subq_41

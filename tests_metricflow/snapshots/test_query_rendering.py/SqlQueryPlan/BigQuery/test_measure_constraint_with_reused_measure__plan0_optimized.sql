@@ -5,9 +5,9 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_27.metric_time__day, subq_32.metric_time__day) AS metric_time__day
-    , MAX(subq_27.booking_value_with_is_instant_constraint) AS booking_value_with_is_instant_constraint
-    , MAX(subq_32.booking_value) AS booking_value
+    COALESCE(subq_23.metric_time__day, subq_28.metric_time__day) AS metric_time__day
+    , MAX(subq_23.booking_value_with_is_instant_constraint) AS booking_value_with_is_instant_constraint
+    , MAX(subq_28.booking_value) AS booking_value
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['booking_value', 'metric_time__day']
@@ -31,13 +31,13 @@ FROM (
           , is_instant AS booking__is_instant
           , booking_value
         FROM ***************************.fct_bookings bookings_source_src_28000
-      ) subq_21
+      ) subq_17
       WHERE booking__is_instant
-    ) subq_23
+    ) subq_19
     WHERE booking__is_instant
     GROUP BY
       metric_time__day
-  ) subq_27
+  ) subq_23
   FULL OUTER JOIN (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
@@ -50,9 +50,9 @@ FROM (
     FROM ***************************.fct_bookings bookings_source_src_28000
     GROUP BY
       metric_time__day
-  ) subq_32
+  ) subq_28
   ON
-    subq_27.metric_time__day = subq_32.metric_time__day
+    subq_23.metric_time__day = subq_28.metric_time__day
   GROUP BY
     metric_time__day
-) subq_33
+) subq_29
