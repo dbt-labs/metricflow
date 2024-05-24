@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import functools
 import logging
 import time
 from typing import Dict, FrozenSet, Optional, Sequence, Set
@@ -44,15 +45,16 @@ class MetricLookup:
             max_entity_links=MAX_JOIN_HOPS,
         )
 
+    @functools.lru_cache
     def linkable_elements_for_measure(
         self,
         measure_reference: MeasureReference,
-        with_any_of: Optional[Set[LinkableElementProperty]] = None,
-        without_any_of: Optional[Set[LinkableElementProperty]] = None,
+        with_any_of: Optional[FrozenSet[LinkableElementProperty]] = None,
+        without_any_of: Optional[FrozenSet[LinkableElementProperty]] = None,
     ) -> LinkableElementSet:
         """Return the set of linkable elements reachable from a given measure."""
-        frozen_with_any_of = LinkableElementProperty.all_properties() if with_any_of is None else frozenset(with_any_of)
-        frozen_without_any_of = frozenset() if without_any_of is None else frozenset(without_any_of)
+        frozen_with_any_of = LinkableElementProperty.all_properties() if with_any_of is None else with_any_of
+        frozen_without_any_of = frozenset() if without_any_of is None else without_any_of
 
         start_time = time.time()
         linkable_element_set = self._linkable_spec_resolver.get_linkable_element_set_for_measure(
@@ -66,20 +68,22 @@ class MetricLookup:
 
         return linkable_element_set
 
+    @functools.lru_cache
     def linkable_elements_for_no_metrics_query(
         self,
-        with_any_of: Optional[Set[LinkableElementProperty]] = None,
-        without_any_of: Optional[Set[LinkableElementProperty]] = None,
+        with_any_of: Optional[FrozenSet[LinkableElementProperty]] = None,
+        without_any_of: Optional[FrozenSet[LinkableElementProperty]] = None,
     ) -> LinkableElementSet:
         """Return the reachable linkable elements for a dimension values query with no metrics."""
-        frozen_with_any_of = LinkableElementProperty.all_properties() if with_any_of is None else frozenset(with_any_of)
-        frozen_without_any_of = frozenset() if without_any_of is None else frozenset(without_any_of)
+        frozen_with_any_of = LinkableElementProperty.all_properties() if with_any_of is None else with_any_of
+        frozen_without_any_of = frozenset() if without_any_of is None else without_any_of
 
         return self._linkable_spec_resolver.get_linkable_elements_for_distinct_values_query(
             with_any_of=frozen_with_any_of,
             without_any_of=frozen_without_any_of,
         )
 
+    @functools.lru_cache
     def linkable_elements_for_metrics(
         self,
         metric_references: Sequence[MetricReference],

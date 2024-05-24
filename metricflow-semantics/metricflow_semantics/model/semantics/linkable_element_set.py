@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import logging
+import time
 from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import Dict, FrozenSet, List, Sequence, Set, Tuple
@@ -27,6 +29,8 @@ from metricflow_semantics.specs.spec_classes import (
     LinkableInstanceSpec,
     TimeDimensionSpec,
 )
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -379,6 +383,8 @@ class LinkableElementSet(SemanticModelDerivation):
         Returns a new set consisting of the elements in the `LinkableElementSet` that have a corresponding spec that
         match all the given spec patterns.
         """
+        start_time = time.time()
+
         # Spec patterns need all specs to match properly e.g. `BaseTimeGrainPattern`.
         matching_specs: Sequence[InstanceSpec] = self.specs
 
@@ -402,8 +408,10 @@ class LinkableElementSet(SemanticModelDerivation):
             if LinkableElementSet._path_key_to_spec(path_key) in specs_to_include:
                 path_key_to_linkable_metrics[path_key] = linkable_metrics
 
-        return LinkableElementSet(
+        filtered_elements = LinkableElementSet(
             path_key_to_linkable_dimensions=path_key_to_linkable_dimensions,
             path_key_to_linkable_entities=path_key_to_linkable_entities,
             path_key_to_linkable_metrics=path_key_to_linkable_metrics,
         )
+        logger.info(f"Filtering valid linkable elements took: {time.time() - start_time:.2f}s")
+        return filtered_elements
