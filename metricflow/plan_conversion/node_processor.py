@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import dataclasses
 import logging
-from dataclasses import dataclass
-from typing import List, Optional, Sequence, Set
+from enum import Enum
+from typing import FrozenSet, List, Optional, Sequence, Set
 
+from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.references import EntityReference, TimeDimensionReference
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
@@ -28,7 +30,7 @@ from metricflow.validation.dataflow_join_validator import JoinDataflowOutputVali
 logger = logging.getLogger(__name__)
 
 
-@dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True)
 class MultiHopJoinCandidateLineage:
     """Describes how the multi-hop join candidate was formed.
 
@@ -48,7 +50,7 @@ class MultiHopJoinCandidateLineage:
     join_second_node_by_entity: LinklessEntitySpec
 
 
-@dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True)
 class MultiHopJoinCandidate:
     """A candidate node containing linkable specs that is join of other nodes. It's used to resolve multi-hop queries.
 
@@ -59,14 +61,125 @@ class MultiHopJoinCandidate:
     lineage: MultiHopJoinCandidateLineage
 
 
-@dataclass(frozen=True)
-class PredicatePushdownParameters:
-    """Container class for managing filter predicate pushdown.
+class PredicateInputType(Enum):
+    """Enumeration of predicate input types we may encounter in where filters.
 
-    Stores time constraint information for applying pre-join time filters.
+    This is primarily used for describing when predicate pushdown may operate in a dataflow plan, and is necessary
+    for holistic checks against the set of potentially enabled pushdown operations. For example, in the scenario
+    scenario where we only allow time range updates, we must do careful overriding of other pushdown properties.
+
+    This also allows us to disable pushdown for things like time dimension filters in cases where we might
+    accidental censor input data.
+    """
+
+    CATEGORICAL_DIMENSION = "categorical_dimension"
+    ENTITY = "entity"
+    TIME_DIMENSION = "time_dimension"
+    TIME_RANGE_CONSTRAINT = "time_range_constraint"
+
+
+@dataclasses.dataclass(frozen=True)
+class PredicatePushdownParameters:
+    """Container class for managing information about whether and how to do filter predicate pushdown.
+
+    The time_range_constraint property holds the time window for setting up a time range filter expression.
     """
 
     time_range_constraint: Optional[TimeRangeConstraint]
+    pushdown_enabled_types: FrozenSet[PredicateInputType] = frozenset([PredicateInputType.TIME_RANGE_CONSTRAINT])
+
+    def __post_init__(self) -> None:
+        """Validation to ensure pushdown properties are configured correctly.
+
+        In particular, this asserts that cases where pushdown is disabled cannot leak pushdown operations via
+        outside property access - if pushdown is disabled, no further pushdown operations of any kind are allowed
+        on that particular code branch. It also asserts that unsupported pushdown scenarios are not configured.
+        """
+        invalid_types: Set[PredicateInputType] = set()
+
+        for input_type in self.pushdown_enabled_types:
+            if (
+                input_type is PredicateInputType.CATEGORICAL_DIMENSION
+                or input_type is PredicateInputType.ENTITY
+                or input_type is PredicateInputType.TIME_DIMENSION
+            ):
+                invalid_types.add(input_type)
+            elif input_type is PredicateInputType.TIME_RANGE_CONSTRAINT:
+                continue
+            else:
+                assert_values_exhausted(input_type)
+
+        assert len(invalid_types) == 0, (
+            "Unsupported predicate input type found in pushdown state configuration! We currently only support "
+            "predicate pushdown for a subset of possible predicate input types (i.e., types of semantic manifest "
+            "elements, such as entities and time dimensions, referenced in filter predicates), but this was enabled "
+            f"for {self.pushdown_enabled_types}, which includes the following invalid types: {invalid_types}."
+        )
+
+        if self.is_pushdown_disabled:
+            # TODO: Include where filter specs when they are added to this class
+            assert self.time_range_constraint is None, (
+                "Invalid pushdown parameter configuration! Disabled pushdown parameters cannot have properties "
+                "set that may lead to improper access and use in other contexts, as that can lead to unintended "
+                "filtering operations in cases where these properties are accessed without appropriate checks against "
+                "pushdown configuration. The following properties should all have None values:\n"
+                f"time_range_constraint: {self.time_range_constraint}"
+            )
+
+    @property
+    def is_pushdown_disabled(self) -> bool:
+        """Convenience accessor for checking if pushdown should always be skipped."""
+        return len(self.pushdown_enabled_types) == 0
+
+    @property
+    def is_pushdown_enabled_for_time_range_constraint(self) -> bool:
+        """Convenience accessor for checking if pushdown is enabled for time range constraints.
+
+        Note: this time range enabled state is a backwards compatibility shim for use with conversion metrics while
+        we determine how best to support predicate pushdown for conversion metrics. It may have longer term utility,
+        but ideally we'd collapse this with the more general time dimension filter input scenarios.
+        """
+        return PredicateInputType.TIME_RANGE_CONSTRAINT in self.pushdown_enabled_types
+
+    @staticmethod
+    def with_time_range_constraint(
+        original_pushdown_params: PredicatePushdownParameters, time_range_constraint: TimeRangeConstraint
+    ) -> PredicatePushdownParameters:
+        """Factory method for adding or updating a time range constraint input to a set of pushdown parameters.
+
+        This allows for temporarily overriding a time range constraint with an adjusted one, or enabling a time
+        range constraint filter if one becomes available mid-stream during dataflow plan construction.
+        """
+        pushdown_enabled_types = original_pushdown_params.pushdown_enabled_types.union(
+            {PredicateInputType.TIME_RANGE_CONSTRAINT}
+        )
+        return PredicatePushdownParameters(
+            time_range_constraint=time_range_constraint, pushdown_enabled_types=pushdown_enabled_types
+        )
+
+    @staticmethod
+    def without_time_range_constraint(
+        original_pushdown_params: PredicatePushdownParameters,
+    ) -> PredicatePushdownParameters:
+        """Factory method for removing the time range constraint, if any, from the given set of pushdown parameters."""
+        pushdown_enabled_types = original_pushdown_params.pushdown_enabled_types.difference(
+            {PredicateInputType.TIME_RANGE_CONSTRAINT}
+        )
+        return PredicatePushdownParameters(time_range_constraint=None, pushdown_enabled_types=pushdown_enabled_types)
+
+    @staticmethod
+    def with_pushdown_disabled() -> PredicatePushdownParameters:
+        """Factory method for disabling predicate pushdown for all parameter types.
+
+        This is useful in cases where there is a branched path where pushdown should be disabled in one branch while the
+        other may remain eligible. For example, a join linkage where one side of the join contains an unsupported
+        configuration might send a disabled copy of the pushdown parameters down that path while retaining the potential
+        for using another path.
+        """
+        return PredicatePushdownParameters(
+            time_range_constraint=None,
+            pushdown_enabled_types=frozenset(),
+        )
 
 
 class PreJoinNodeProcessor:

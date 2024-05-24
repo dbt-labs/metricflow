@@ -82,7 +82,11 @@ from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataframeN
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOptimizer
 from metricflow.dataset.dataset_classes import DataSet
-from metricflow.plan_conversion.node_processor import PredicatePushdownParameters, PreJoinNodeProcessor
+from metricflow.plan_conversion.node_processor import (
+    PredicateInputType,
+    PredicatePushdownParameters,
+    PreJoinNodeProcessor,
+)
 from metricflow.sql.sql_table import SqlTable
 
 logger = logging.getLogger(__name__)
@@ -237,6 +241,16 @@ class DataflowPlanBuilder:
         constant_properties: Optional[Sequence[ConstantPropertyInput]] = None,
     ) -> DataflowPlanNode:
         """Builds a node that contains aggregated values of conversions and opportunities."""
+        # Pushdown parameters vary with conversion metrics due to the way the time joins are applied.
+        # Due to other outstanding issues with conversion metric filters, we disable predicate
+        # pushdown for any filter parameter set that is not part of the original time range constraint
+        # implementation.
+        disabled_pushdown_parameters = PredicatePushdownParameters.with_pushdown_disabled()
+        time_range_only_pushdown_parameters = PredicatePushdownParameters(
+            time_range_constraint=predicate_pushdown_params.time_range_constraint,
+            pushdown_enabled_types=frozenset([PredicateInputType.TIME_RANGE_CONSTRAINT]),
+        )
+
         # Build measure recipes
         base_required_linkable_specs, _ = self.__get_required_and_extraneous_linkable_specs(
             queried_linkable_specs=queried_linkable_specs,
@@ -244,14 +258,13 @@ class DataflowPlanBuilder:
         )
         base_measure_recipe = self._find_dataflow_recipe(
             measure_spec_properties=self._build_measure_spec_properties([base_measure_spec.measure_spec]),
-            predicate_pushdown_params=predicate_pushdown_params,
+            predicate_pushdown_params=time_range_only_pushdown_parameters,
             linkable_spec_set=base_required_linkable_specs,
         )
         logger.info(f"Recipe for base measure aggregation:\n{mf_pformat(base_measure_recipe)}")
         conversion_measure_recipe = self._find_dataflow_recipe(
             measure_spec_properties=self._build_measure_spec_properties([conversion_measure_spec.measure_spec]),
-            # TODO - Pushdown: Evaluate the potential for applying time constraints and other predicates for conversion
-            predicate_pushdown_params=PredicatePushdownParameters(time_range_constraint=None),
+            predicate_pushdown_params=disabled_pushdown_parameters,
             linkable_spec_set=LinkableSpecSet(),
         )
         logger.info(f"Recipe for conversion measure aggregation:\n{mf_pformat(conversion_measure_recipe)}")
@@ -268,7 +281,7 @@ class DataflowPlanBuilder:
         aggregated_base_measure_node = self.build_aggregated_measure(
             metric_input_measure_spec=base_measure_spec,
             queried_linkable_specs=queried_linkable_specs,
-            predicate_pushdown_params=predicate_pushdown_params,
+            predicate_pushdown_params=time_range_only_pushdown_parameters,
         )
 
         # Build unaggregated conversions source node
@@ -337,10 +350,14 @@ class DataflowPlanBuilder:
             required_local_linkable_specs=base_measure_recipe.required_local_linkable_specs,
             join_linkable_instances_recipes=base_measure_recipe.join_linkable_instances_recipes,
         )
+        # TODO: Refine conversion metric configuration to fit into the standard dataflow plan building model
+        # In this case we override the measure recipe, which currently results in us bypassing predicate pushdown
+        # Rather than relying on happenstance in the way the code is laid out we also explicitly disable
+        # predicate pushdwon until we are ready to fully support it for conversion metrics
         aggregated_conversions_node = self.build_aggregated_measure(
             metric_input_measure_spec=conversion_measure_spec,
             queried_linkable_specs=queried_linkable_specs,
-            predicate_pushdown_params=predicate_pushdown_params,
+            predicate_pushdown_params=disabled_pushdown_parameters,
             measure_recipe=recipe_with_join_conversion_source_node,
         )
 
@@ -492,11 +509,10 @@ class DataflowPlanBuilder:
             if not metric_spec.has_time_offset:
                 filter_specs.extend(metric_spec.filter_specs)
 
-            # TODO - Pushdown: use parameters to disable pushdown operations instead of clobbering the constraints
             metric_pushdown_params = (
                 predicate_pushdown_params
                 if not metric_spec.has_time_offset
-                else PredicatePushdownParameters(time_range_constraint=None)
+                else PredicatePushdownParameters.with_pushdown_disabled()
             )
 
             parent_nodes.append(
@@ -867,7 +883,10 @@ class DataflowPlanBuilder:
             node_data_set_resolver=self._node_data_set_resolver,
         )
         # TODO - Pushdown: Encapsulate this in the node processor
-        if predicate_pushdown_params.time_range_constraint:
+        if (
+            predicate_pushdown_params.is_pushdown_enabled_for_time_range_constraint
+            and predicate_pushdown_params.time_range_constraint
+        ):
             candidate_nodes_for_left_side_of_join = list(
                 node_processor.add_time_range_constraint(
                     source_nodes=candidate_nodes_for_left_side_of_join,
@@ -1298,15 +1317,21 @@ class DataflowPlanBuilder:
                 + indent(f"\nmeasure_specs:\n{mf_pformat([measure_spec])}")
                 + indent(f"\nevaluation:\n{mf_pformat(required_linkable_specs)}")
             )
-
-            # TODO - Pushdown: Update this to be more robust to additional pushdown parameters
             measure_time_constraint = (
                 (cumulative_metric_adjusted_time_constraint or predicate_pushdown_params.time_range_constraint)
                 # If joining to time spine for time offset, constraints will be applied after that join.
                 if not before_aggregation_time_spine_join_description
                 else None
             )
-            measure_pushdown_params = PredicatePushdownParameters(time_range_constraint=measure_time_constraint)
+            if measure_time_constraint is None:
+                measure_pushdown_params = PredicatePushdownParameters.without_time_range_constraint(
+                    predicate_pushdown_params
+                )
+            else:
+                measure_pushdown_params = PredicatePushdownParameters.with_time_range_constraint(
+                    predicate_pushdown_params, time_range_constraint=measure_time_constraint
+                )
+
             find_recipe_start_time = time.time()
             measure_recipe = self._find_dataflow_recipe(
                 measure_spec_properties=measure_properties,
