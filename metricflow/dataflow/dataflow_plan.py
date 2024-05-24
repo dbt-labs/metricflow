@@ -5,14 +5,18 @@ from __future__ import annotations
 import logging
 import typing
 from abc import ABC, abstractmethod
-from typing import Generic, Optional, Sequence, Set, Type, TypeVar
+from typing import FrozenSet, Generic, Optional, Sequence, Set, Type, TypeVar
 
+import more_itertools
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagId, DagNode, MetricFlowDag, NodeId
 from metricflow_semantics.specs.spec_classes import LinkableInstanceSpec
 from metricflow_semantics.visitor import Visitable, VisitorOutputT
 
 if typing.TYPE_CHECKING:
+    from dbt_semantic_interfaces.references import SemanticModelReference
+    from metricflow_semantics.specs.spec_classes import LinkableInstanceSpec
+
     from metricflow.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode
     from metricflow.dataflow.nodes.aggregate_measures import AggregateMeasuresNode
     from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
@@ -59,6 +63,24 @@ class DataflowPlanNode(DagNode, Visitable, ABC):
     def parent_nodes(self) -> Sequence[DataflowPlanNode]:
         """Return the nodes where data for this node comes from."""
         return self._parent_nodes
+
+    @property
+    def _input_semantic_model(self) -> Optional[SemanticModelReference]:
+        """Return the semantic model serving as direct input for this node, if one exists."""
+        return None
+
+    def as_plan(self) -> DataflowPlan:
+        """Converter method for taking an arbitrary mode and producing an associated DataflowPlan.
+
+        This is useful for doing lookups for plan-level properties at points in the call stack where we only have
+        a subgraph of a complete plan. For example, the total number of nodes represented by this node and all of
+        its parents would be a property of a given subgraph of the DAG. Rather than doing recursive property walks
+        inside of each node, we make those properties of the DataflowPlan, and this node-level converter makes
+        such properties easily accessible.
+        """
+        return DataflowPlan(
+            sink_nodes=(self,), plan_id=DagId.from_id_prefix(id_prefix=StaticIdPrefix.DATAFLOW_PLAN_SUBGRAPH_PREFIX)
+        )
 
     @abstractmethod
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:
@@ -188,3 +210,27 @@ class DataflowPlan(MetricFlowDag[DataflowPlanNode]):
     @property
     def sink_node(self) -> DataflowPlanNode:  # noqa: D102
         return self._sink_nodes[0]
+
+    @staticmethod
+    def __all_nodes_in_subgraph(node: DataflowPlanNode) -> Sequence[DataflowPlanNode]:
+        """Node accessor for retrieving a flattened sequence of all nodes in the subgraph upstream of the input node.
+
+        Useful for gathering nodes for subtype-agnostic operations, such as common property access or simple counts.
+        """
+        flattened_parent_subgraphs = tuple(
+            more_itertools.collapse(
+                DataflowPlan.__all_nodes_in_subgraph(parent_node) for parent_node in node.parent_nodes
+            )
+        )
+        return (node,) + flattened_parent_subgraphs
+
+    @property
+    def source_semantic_models(self) -> FrozenSet[SemanticModelReference]:
+        """Return the complete set of source semantic models for this DataflowPlan."""
+        return frozenset(
+            [
+                node._input_semantic_model
+                for node in DataflowPlan.__all_nodes_in_subgraph(self.sink_node)
+                if node._input_semantic_model is not None
+            ]
+        )

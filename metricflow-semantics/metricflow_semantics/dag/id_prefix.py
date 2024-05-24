@@ -89,6 +89,7 @@ class StaticIdPrefix(IdPrefix, Enum, metaclass=EnumMetaClassHelper):
     VALUES_GROUP_BY_ITEM_RESOLUTION_NODE = "vr"
 
     DATAFLOW_PLAN_PREFIX = "dfp"
+    DATAFLOW_PLAN_SUBGRAPH_PREFIX = "dfpsub"
     OPTIMIZED_DATAFLOW_PLAN_PREFIX = "dfpo"
     SQL_QUERY_PLAN_PREFIX = "sqp"
     EXEC_PLAN_PREFIX = "ep"

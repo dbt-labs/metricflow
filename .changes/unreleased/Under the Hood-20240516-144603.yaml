@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Make source semantic models available from DataflowPlanNode instances
+time: 2024-05-16T14:46:03.707367-07:00
+custom:
+  Author: tlento
+  Issue: "1218"
