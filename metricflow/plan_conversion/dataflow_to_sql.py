@@ -677,7 +677,9 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                     column_name=expr, input_measure=input_measure, from_data_set_alias=from_data_set_alias
                 )
             elif metric.type is MetricType.DERIVED:
-                assert metric.type_params.expr
+                assert (
+                    metric.type_params.expr
+                ), "Derived metrics are required to have an `expr` in their YAML definition."
                 metric_expr = SqlStringExpression(sql_expr=metric.type_params.expr)
             elif metric.type == MetricType.CONVERSION:
                 conversion_type_params = metric.type_params.conversion_type_params
@@ -1133,9 +1135,9 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                     spec=metric_time_dimension_spec,
                 )
             )
-            output_column_to_input_column[
-                metric_time_dimension_column_association.column_name
-            ] = matching_time_dimension_instance.associated_column.column_name
+            output_column_to_input_column[metric_time_dimension_column_association.column_name] = (
+                matching_time_dimension_instance.associated_column.column_name
+            )
 
         output_instance_set = InstanceSet(
             measure_instances=tuple(output_measure_instances),
@@ -1378,11 +1380,11 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             and len(time_spine_dataset.checked_sql_select_node.select_columns) == 1
         ), "Time spine dataset not configured properly. Expected exactly one column."
         original_time_spine_dim_instance = time_spine_dataset.instance_set.time_dimension_instances[0]
-        time_spine_column_select_expr: Union[
-            SqlColumnReferenceExpression, SqlDateTruncExpression
-        ] = SqlColumnReferenceExpression(
-            SqlColumnReference(
-                table_alias=time_spine_alias, column_name=original_time_spine_dim_instance.spec.qualified_name
+        time_spine_column_select_expr: Union[SqlColumnReferenceExpression, SqlDateTruncExpression] = (
+            SqlColumnReferenceExpression(
+                SqlColumnReference(
+                    table_alias=time_spine_alias, column_name=original_time_spine_dim_instance.spec.qualified_name
+                )
             )
         )
 
