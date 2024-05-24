@@ -23,13 +23,13 @@ def test_time_range_pushdown_enabled_states(fully_enabled_pushdown_state: Predic
     )
 
     enabled_states = {
-        "fully enabled": fully_enabled_pushdown_state.is_pushdown_enabled_for_time_range_constraint,
-        "enabled for time range only": time_range_only_state.is_pushdown_enabled_for_time_range_constraint,
+        "fully enabled": fully_enabled_pushdown_state.has_time_range_constraint_to_push_down,
+        "enabled for time range only": time_range_only_state.has_time_range_constraint_to_push_down,
     }
 
     assert all(list(enabled_states.values())), (
         "Expected pushdown to be enabled for pushdown state with time range constraint and global pushdown enabled, "
-        "but some states returned False for is_pushdown_enabled_for_time_range_constraints.\n"
+        "but some states returned False for has_time_range_constraint_to_push_down.\n"
         f"Pushdown enabled states: {enabled_states}\n"
         f"Fully enabled state: {fully_enabled_pushdown_state}\n"
         f"Time range only state: {time_range_only_state}"

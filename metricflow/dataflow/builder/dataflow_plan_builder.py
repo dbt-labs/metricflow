@@ -882,16 +882,13 @@ class DataflowPlanBuilder:
             semantic_model_lookup=self._semantic_model_lookup,
             node_data_set_resolver=self._node_data_set_resolver,
         )
-        # TODO - Pushdown: Encapsulate this in the node processor
-        if (
-            predicate_pushdown_state.is_pushdown_enabled_for_time_range_constraint
-            and predicate_pushdown_state.time_range_constraint
-        ):
+
+        if predicate_pushdown_state.has_pushdown_potential:
             candidate_nodes_for_left_side_of_join = list(
-                node_processor.add_time_range_constraint(
+                node_processor.apply_matching_filter_predicates(
                     source_nodes=candidate_nodes_for_left_side_of_join,
+                    predicate_pushdown_state=predicate_pushdown_state,
                     metric_time_dimension_reference=self._metric_time_dimension_reference,
-                    time_range_constraint=predicate_pushdown_state.time_range_constraint,
                 )
             )
 

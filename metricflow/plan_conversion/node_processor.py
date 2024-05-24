@@ -125,30 +125,36 @@ class PredicatePushdownState:
             f"for {self.pushdown_enabled_types}, which includes the following invalid types: {invalid_types}."
         )
 
-        if self.is_pushdown_disabled:
-            # TODO: Include where filter specs when they are added to this class and check state -> predicate pairs
-            assert self.time_range_constraint is None, (
-                "Invalid pushdown state configuration! Disabled pushdown state objects cannot have properties "
-                "set that may lead to improper access and use in other contexts, as that can lead to unintended "
-                "filtering operations in cases where these properties are accessed without appropriate checks against "
-                "pushdown configuration. The following properties should all have None values:\n"
-                f"time_range_constraint: {self.time_range_constraint}"
-            )
+        # TODO: Include where filter specs when they are added to this class
+        time_range_constraint_is_valid = (
+            self.time_range_constraint is None
+            or PredicateInputType.TIME_RANGE_CONSTRAINT in self.pushdown_enabled_types
+        )
+        assert time_range_constraint_is_valid, (
+            "Invalid pushdown state configuration! Disabled pushdown state objects cannot have properties "
+            "set that may lead to improper access and use in other contexts, as that can lead to unintended "
+            "filtering operations in cases where these properties are accessed without appropriate checks against "
+            "pushdown configuration. The following properties should all have None values:\n"
+            f"time_range_constraint: {self.time_range_constraint}"
+        )
 
     @property
-    def is_pushdown_disabled(self) -> bool:
-        """Convenience accessor for checking if pushdown should always be skipped."""
-        return len(self.pushdown_enabled_types) == 0
+    def has_pushdown_potential(self) -> bool:
+        """Returns whether or not pushdown is enabled for a type with predicate candidates in place."""
+        return self.has_time_range_constraint_to_push_down
 
     @property
-    def is_pushdown_enabled_for_time_range_constraint(self) -> bool:
-        """Convenience accessor for checking if pushdown is enabled for time range constraints.
+    def has_time_range_constraint_to_push_down(self) -> bool:
+        """Convenience accessor for checking if there is a time range constraint that can be pushed down.
 
         Note: this time range enabled state is a backwards compatibility shim for use with conversion metrics while
         we determine how best to support predicate pushdown for conversion metrics. It may have longer term utility,
         but ideally we'd collapse this with the more general time dimension filter input scenarios.
         """
-        return PredicateInputType.TIME_RANGE_CONSTRAINT in self.pushdown_enabled_types
+        return (
+            PredicateInputType.TIME_RANGE_CONSTRAINT in self.pushdown_enabled_types
+            and self.time_range_constraint is not None
+        )
 
     @staticmethod
     def with_time_range_constraint(
@@ -220,7 +226,23 @@ class PreJoinNodeProcessor:
         self._semantic_model_lookup = semantic_model_lookup
         self._join_evaluator = JoinDataflowOutputValidator(semantic_model_lookup)
 
-    def add_time_range_constraint(
+    def apply_matching_filter_predicates(
+        self,
+        source_nodes: Sequence[DataflowPlanNode],
+        predicate_pushdown_state: PredicatePushdownState,
+        metric_time_dimension_reference: TimeDimensionReference,
+    ) -> Sequence[DataflowPlanNode]:
+        """Adds filter predicate nodes to the input nodes as appropriate."""
+        if predicate_pushdown_state.has_time_range_constraint_to_push_down:
+            source_nodes = self._add_time_range_constraint(
+                source_nodes=source_nodes,
+                metric_time_dimension_reference=metric_time_dimension_reference,
+                time_range_constraint=predicate_pushdown_state.time_range_constraint,
+            )
+
+        return source_nodes
+
+    def _add_time_range_constraint(
         self,
         source_nodes: Sequence[DataflowPlanNode],
         metric_time_dimension_reference: TimeDimensionReference,
