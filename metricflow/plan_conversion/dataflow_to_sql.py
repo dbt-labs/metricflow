@@ -677,7 +677,9 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                     column_name=expr, input_measure=input_measure, from_data_set_alias=from_data_set_alias
                 )
             elif metric.type is MetricType.DERIVED:
-                assert metric.type_params.expr
+                assert (
+                    metric.type_params.expr
+                ), "Derived metrics are required to have an `expr` in their YAML definition."
                 metric_expr = SqlStringExpression(sql_expr=metric.type_params.expr)
             elif metric.type == MetricType.CONVERSION:
                 conversion_type_params = metric.type_params.conversion_type_params
