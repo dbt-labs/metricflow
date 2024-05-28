@@ -5,8 +5,8 @@ from enum import Enum
 from typing import Protocol
 
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
-from pandas import DataFrame
 
+from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 
 
@@ -52,7 +52,7 @@ class SqlClient(Protocol):
         self,
         stmt: str,
         sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
-    ) -> DataFrame:
+    ) -> MetricFlowDataTable:
         """Base query method, upon execution will run a query that returns a pandas DataFrame."""
         raise NotImplementedError
 

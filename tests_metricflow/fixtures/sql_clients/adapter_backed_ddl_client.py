@@ -1,12 +1,13 @@
 from __future__ import annotations
 
+import datetime
 import logging
 import time
 from typing import Optional
 
-import pandas as pd
-
 from dbt_metricflow.cli.dbt_connectors.adapter_backed_client import AdapterBackedSqlClient
+from metricflow.data_table.mf_column import ColumnDescription
+from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.sql.sql_table import SqlTable
 
@@ -19,7 +20,7 @@ class AdapterBackedDDLSqlClient(AdapterBackedSqlClient):
     def create_table_from_dataframe(
         self,
         sql_table: SqlTable,
-        df: pd.DataFrame,
+        df: MetricFlowDataTable,
         chunk_size: Optional[int] = None,
     ) -> None:
         """Create a table in the data warehouse containing the contents of the dataframe.
@@ -31,21 +32,16 @@ class AdapterBackedDDLSqlClient(AdapterBackedSqlClient):
             df: The Pandas DataFrame object containing the column schema and data to load
             chunk_size: The number of rows to insert per transaction
         """
-        logger.info(f"Creating table '{sql_table.sql}' from a DataFrame with {df.shape[0]} row(s)")
+        logger.info(f"Creating table '{sql_table.sql}' from a DataFrame with {df.row_count} row(s)")
         start_time = time.time()
+
         with self._adapter.connection_named("MetricFlow_create_from_dataframe"):
             # Create table
-            # update dtypes to convert None to NA in boolean columns.
-            # This mirrors the SQLAlchemy schema detection logic in pandas.io.sql
-            df = df.convert_dtypes()
-            columns = df.columns
-
             columns_to_insert = []
-            for i in range(len(df.columns)):
+            for column_description in df.column_descriptions:
                 # Format as "column_name column_type"
-                columns_to_insert.append(
-                    f"{columns[i]} {self._get_type_from_pandas_dtype(str(df[columns[i]].dtype).lower())}"
-                )
+                columns_to_insert.append(f"{column_description.column_name} {self._get_sql_type(column_description)}")
+
             self._adapter.execute(
                 f"CREATE TABLE IF NOT EXISTS {sql_table.sql} ({', '.join(columns_to_insert)})",
                 auto_begin=True,
@@ -55,18 +51,18 @@ class AdapterBackedDDLSqlClient(AdapterBackedSqlClient):
 
             # Insert rows
             values = []
-            for row in df.itertuples(index=False, name=None):
+            for row in df.rows:
                 cells = []
                 for cell in row:
-                    if pd.isnull(cell):
+                    if cell is None:
                         # use null keyword instead of isNA/None/etc.
                         cells.append("null")
-                    elif type(cell) in [str, pd.Timestamp]:
+                    elif type(cell) in [str, datetime.datetime]:
                         # Wrap cell in quotes & escape existing single quotes
                         escaped_cell = self._quote_escape_value(str(cell))
                         # Trino requires timestamp literals to be wrapped in a timestamp() function.
                         # There is probably a better way to handle this.
-                        if self.sql_engine_type is SqlEngine.TRINO and type(cell) is pd.Timestamp:
+                        if self.sql_engine_type is SqlEngine.TRINO and type(cell) is datetime.datetime:
                             cells.append(f"timestamp '{escaped_cell}'")
                         else:
                             cells.append(f"'{escaped_cell}'")
@@ -88,30 +84,31 @@ class AdapterBackedDDLSqlClient(AdapterBackedSqlClient):
             # Commit all insert transaction at once
             self._adapter.commit_if_has_connection()
 
-        logger.info(f"Created table '{sql_table.sql}' from a DataFrame in {time.time() - start_time:.2f}s")
+        logger.info(f"Created SQL table '{sql_table.sql}' from an in-memory table in {time.time() - start_time:.2f}s")
 
-    def _get_type_from_pandas_dtype(self, dtype: str) -> str:
+    def _get_sql_type(self, column_description: ColumnDescription) -> str:
         """Helper method to get the engine-specific type value.
 
         The dtype dict here is non-exhaustive but should be adequate for our needs.
         """
         # TODO: add type handling for string/bool/bigint types for all engines
-        if dtype == "string" or dtype == "object":
+        column_type = column_description.column_type
+        if column_type is str:
             if self.sql_engine_type is SqlEngine.DATABRICKS or self.sql_engine_type is SqlEngine.BIGQUERY:
                 return "string"
             if self.sql_engine_type is SqlEngine.TRINO:
                 return "varchar"
             return "text"
-        elif dtype == "boolean" or dtype == "bool":
+        elif column_type is bool:
             return "boolean"
-        elif dtype == "int64":
+        elif column_type is int:
             return "bigint"
-        elif dtype == "float64":
+        elif column_type is float:
             return self._sql_query_plan_renderer.expr_renderer.double_data_type
-        elif dtype == "datetime64[ns]":
+        elif column_type is datetime.datetime:
             return self._sql_query_plan_renderer.expr_renderer.timestamp_data_type
         else:
-            raise ValueError(f"Encountered unexpected Pandas dtype ({dtype})!")
+            raise ValueError(f"Encountered unexpected {column_type=}!")
 
     def _quote_escape_value(self, value: str) -> str:
         """Escape single quotes in string-like values for create_table_from_dataframe.

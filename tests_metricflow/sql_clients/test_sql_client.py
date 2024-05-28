@@ -3,12 +3,13 @@ from __future__ import annotations
 import logging
 from typing import Set, Union
 
-import pandas as pd
 import pytest
+from dbt_semantic_interfaces.test_utils import as_datetime
 from metricflow_semantics.random_id import random_id
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
+from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.sql.sql_table import SqlTable
 from tests_metricflow.compare_df import assert_dataframes_equal
@@ -25,17 +26,14 @@ def _select_x_as_y(x: int = 1, y: str = "y") -> str:
     return f"SELECT {x} AS {y}"
 
 
-def _check_1col(df: pd.DataFrame, col: str = "y", vals: Set[Union[int, str]] = {1}) -> None:
+def _check_1col(df: MetricFlowDataTable, col: str = "y", vals: Set[Union[int, str]] = {1}) -> None:
     """Helper to check that 1 column has the same value and a case-insensitive matching name.
 
     We lower-case the names due to snowflake's tendency to capitalize things. This isn't ideal but it'll do for now.
     """
-    df.columns = df.columns.str.lower()
-    col = col.lower()
-    assert isinstance(df, pd.DataFrame)
-    assert df.shape == (len(vals), 1)
-    assert df.columns.tolist() == [col]
-    assert set(df[col]) == vals
+    assert df.column_count == 1
+    assert df.column_names == (col,)
+    assert set(df.column_values_iterator(0)) == vals
 
 
 def test_query(sql_client: SqlClient) -> None:  # noqa: D103
@@ -52,14 +50,14 @@ def test_select_one_query(sql_client: SqlClient) -> None:  # noqa: D103
 def test_create_table_from_dataframe(  # noqa: D103
     mf_test_configuration: MetricFlowTestConfiguration, ddl_sql_client: SqlClientWithDDLMethods
 ) -> None:
-    expected_df = pd.DataFrame(
-        columns=["int_col", "str_col", "float_col", "bool_col", "time_col"],
-        data=[
-            (1, "abc", 1.23, False, "2020-01-01"),
-            (2, "def", 4.56, True, "2020-01-02"),
+    expected_df = MetricFlowDataTable.create_from_rows(
+        column_names=["int_col", "str_col", "float_col", "bool_col", "time_col"],
+        rows=[
+            (1, "abc", 1.23, False, as_datetime("2020-01-01")),
+            (2, "def", 4.56, True, as_datetime("2020-01-02")),
             (3, "ghi", 1.1, False, None),  # Test NaT type
-            (None, "jkl", None, True, "2020-01-03"),  # Test NaN types
-            (3, None, 1.2, None, "2020-01-04"),  # Test None types for NA conversions
+            (None, "jkl", None, True, as_datetime("2020-01-03")),  # Test NaN types
+            (3, None, 1.2, None, as_datetime("2020-01-04")),  # Test None types for NA conversions
         ],
     )
     sql_table = SqlTable(schema_name=mf_test_configuration.mf_system_schema, table_name=_random_table())
@@ -82,11 +80,11 @@ def test_percent_signs_in_query(sql_client: SqlClient) -> None:
 
 
 @pytest.fixture()
-def example_df() -> pd.DataFrame:
+def example_df() -> MetricFlowDataTable:
     """Data frame containing data of different types for testing. DateTime would be good to add."""
-    return pd.DataFrame(
-        columns=["int_col", "str_col", "float_col", "bool_col"],
-        data=[
+    return MetricFlowDataTable.create_from_rows(
+        column_names=["int_col", "str_col", "float_col", "bool_col"],
+        rows=[
             (1, "abc", 1.23, False),
             (2, "def", 4.56, True),
         ],

@@ -3,8 +3,7 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import Optional, Protocol
 
-from pandas import DataFrame
-
+from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_table import SqlTable
 
@@ -24,7 +23,7 @@ class SqlClientWithDDLMethods(SqlClient, Protocol):
     def create_table_from_dataframe(
         self,
         sql_table: SqlTable,
-        df: DataFrame,
+        df: MetricFlowDataTable,
         chunk_size: Optional[int] = None,
     ) -> None:
         """Creates a table and populates it with the contents of the dataframe.

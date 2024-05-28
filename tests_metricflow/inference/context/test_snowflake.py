@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import itertools
 import json
+from typing import Dict, List, Union
 from unittest.mock import MagicMock
 
-import pandas as pd
-
+from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.inference.context.data_warehouse import (
     ColumnProperties,
     DataWarehouseInferenceContext,
@@ -57,33 +58,36 @@ def test_context_provider() -> None:
     """
     # See for SHOW COLUMNS result dataframe spec:
     # https://docs.snowflake.com/en/sql-reference/sql/show-columns.html
-    show_columns_result = pd.DataFrame(
-        {
-            "column_name": ["INTCOL", "STRCOL"],
-            "schema_name": ["SCHEMA", "SCHEMA"],
-            "table_name": ["TABLE", "TABLE"],
-            "database_name": ["DB", "DB"],
-            "data_type": [
-                json.dumps({"type": "FIXED", "nullable": False}),
-                json.dumps({"type": "TEXT", "nullable": True}),
-            ],
-        }
-    )
 
-    stats_result = pd.DataFrame(
-        {
-            "intcol_countdistinct": [10],
-            "intcol_min": [0],
-            "intcol_max": [10],
-            "intcol_countnull": [0],
-            "strcol_countdistinct": [40],
-            "strcol_min": ["aaaa"],
-            "strcol_max": ["zzzz"],
-            "strcol_countnull": [10],
-            "rowcount": [50],
-        }
+    show_columns_result_dict: Dict[str, List[Union[int, str]]] = {
+        "column_name": ["INTCOL", "STRCOL"],
+        "schema_name": ["SCHEMA", "SCHEMA"],
+        "table_name": ["TABLE", "TABLE"],
+        "database_name": ["DB", "DB"],
+        "data_type": [
+            json.dumps({"type": "FIXED", "nullable": False}),
+            json.dumps({"type": "TEXT", "nullable": True}),
+        ],
+    }
+    show_columns_result = MetricFlowDataTable.create_from_rows(
+        column_names=tuple(show_columns_result_dict.keys()),
+        rows=tuple(itertools.zip_longest(*show_columns_result_dict.values())),
     )
-
+    stats_result_dict: Dict[str, List[Union[int, str]]] = {
+        "intcol_countdistinct": [10],
+        "intcol_min": [0],
+        "intcol_max": [10],
+        "intcol_countnull": [0],
+        "strcol_countdistinct": [40],
+        "strcol_min": ["aaaa"],
+        "strcol_max": ["zzzz"],
+        "strcol_countnull": [10],
+        "rowcount": [50],
+    }
+    stats_result = MetricFlowDataTable.create_from_rows(
+        column_names=tuple(stats_result_dict.keys()),
+        rows=tuple(itertools.zip_longest(*stats_result_dict.values())),
+    )
     client = MagicMock()
     client.query = MagicMock()
     client.query.side_effect = [show_columns_result, stats_result]
@@ -108,8 +112,8 @@ def test_context_provider() -> None:
                         distinct_row_count=10,
                         is_nullable=False,
                         null_count=0,
-                        min_value=0,
-                        max_value=10,
+                        min_value="0",
+                        max_value="10",
                     ),
                     ColumnProperties(
                         column=SqlColumn.from_string("db.schema.table.strcol"),
