@@ -132,9 +132,8 @@ class AdapterBackedSqlClient:
 
         Args:
             stmt: The SQL query statement to run. This should produce output via a SELECT
-            sql_bind_parameters: The parameter replacement mapping for filling in
-                concrete values for SQL query parameters.
-            extra_tags: An object containing JSON serialized tags meant for annotating queries.
+            sql_bind_parameters: The parameter replacement mapping for filling in concrete values for SQL query
+            parameters.
         """
         start = time.time()
         request_id = SqlRequestId(f"mf_rid__{random_id()}")
