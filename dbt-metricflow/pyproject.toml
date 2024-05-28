@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling~=1.14.0"]
+requires = ["hatchling~=1.14.0", "hatch-requirements-txt >= 0.4.1, <0.5.0"]
 build-backend = "hatchling.build"
 
 [project]
@@ -24,19 +24,14 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
-dependencies = [
-  # cli dependencies
-  "Jinja2>=3.1.3",
-  "click>=7.1.2",
-  "halo>=0.0.31, <0.1.0",
-  "update-checker>=0.18.0, <0.19.0",
 
-  # Internal dependencies
-  "dbt-core>=1.7.4, <1.8.0",
-  "metricflow>=0.206.dev3, <0.207.0",
+# Dependencies are specified through the `hatch-requirements-txt` plug-in.
+dynamic = ["dependencies", "optional-dependencies"]
 
-  # dsi version should be fixed by MetricFlow/dbt-core, not set here
-  "dbt-semantic-interfaces",
+[tool.hatch.metadata.hooks.requirements_txt]
+files = [
+  "extra-hatch-configuration/requirements-cli.txt",
+  "extra-hatch-configuration/requirements-metricflow.txt",
 ]
 
 [project.urls]
@@ -45,27 +40,24 @@ dependencies = [
 [project.scripts]
 mf = 'dbt_metricflow.cli.main:cli'
 
-[project.optional-dependencies]
-bigquery = [
-  "dbt-bigquery>=1.7.0, <1.8.0"
+[tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
+dbt-duckdb = [
+  "extra-hatch-configuration/requirements-dbt-duckdb.txt"
 ]
-databricks = [
-  "dbt-databricks>=1.7.0, <1.8.0"
+dbt-postgres = [
+  "extra-hatch-configuration/requirements-dbt-postgres.txt"
 ]
-duckdb = [
-  "dbt-duckdb>=1.7.0, <1.8.0"
+dbt-redshift = [
+  "extra-hatch-configuration/requirements-dbt-redshift.txt"
 ]
-postgres = [
-  "dbt-postgres>=1.7.0, <1.8.0"
+dbt-snowflake = [
+  "extra-hatch-configuration/requirements-dbt-snowflake.txt"
 ]
-redshift = [
-  "dbt-redshift>=1.7.0, <1.8.0"
+dbt-bigquery = [
+  "extra-hatch-configuration/requirements-dbt-bigquery.txt"
 ]
-snowflake = [
-  "dbt-snowflake>=1.7.0, <1.8.0"
-]
-trino = [
-  "dbt-trino>=1.7.0, <1.8.0"
+dbt-databricks = [
+  "extra-hatch-configuration/requirements-dbt-databricks.txt"
 ]
 
 [tool.hatch.build.targets.sdist]

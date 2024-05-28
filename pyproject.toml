@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling~=1.14.0"]
+requires = ["hatchling~=1.14.0", "hatch-requirements-txt >= 0.4.1, <0.5.0"]
 build-backend = "hatchling.build"
 
 [project]
@@ -39,50 +39,44 @@ dependencies = [
   "typing_extensions>=4.4, <5.0",
 ]
 
+# Optional dependencies are specified through the `hatch-requirements-txt` plug-in.
+dynamic = ["optional-dependencies"]
+
 [project.urls]
 Documentation = "https://docs.getdbt.com/docs/build/about-metricflow"
 "Source Code" = "https://github.com/dbt-labs/metricflow"
 
-[project.optional-dependencies]
+[tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
 dev-packages = [
-  # Developer tools
-  "mypy>=1.7.0, <1.8.0",
-  "pre-commit>=3.2.2, <3.3.0",
-  "pytest-mock>=3.7.0, <3.8.0",
-  "pytest-xdist>=3.2.1, <3.3.0",
-  "pytest>=7.1.1, < 7.2.0",
-  "types-PyYAML",
-  "types-python-dateutil",
-  "types-tabulate",
-
-  # Test and CLI development dependencies.
-  # These should generally match what's in dbt-metricflow/pyproject.toml, but may
-  # diverge during upgrade phases or for other reasons
-  #
-  # Note we do not currently depend on dbt-core because updates across minor version
-  # boundaries cause problems with tests against future versions of dbt-semantic-interfaces.
-  # In future we will refine this packaging to depend on stable dbt-adapter interfaces in
-  # the development builds, but those packages do not yet support all of our needs so we
-  # hack around the problem with editable pre-installs in the various dev environments.
-  # Note this only works because we don't use the dbt packages for anything other than
-  # managing warehouse connections and dispatching queries, so this is not a pattern
-  # anyone else should be emulating even as a short-term hack.
-
-  "halo>=0.0.31, <0.1.0",
-  "update-checker>=0.18.0, <0.19.0",
-
-  # Bug with mypy: https://github.com/pallets/click/issues/2558#issuecomment-1656546003
-  "click>=8.1.6",
+  "extra-hatch-configuration/requirements-dev-packages.txt",
+  "dbt-metricflow/extra-hatch-configuration/requirements-cli.txt"
 ]
-
-# These are currently separate for ease of removal, but due to the way Python
-# handles import statements they are required in all test environments
 sql-client-packages = [
-  "SQLAlchemy>=1.4.42, <1.5.0",
-  "sqlalchemy2-stubs>=0.0.2a21, <0.0.3",
+  "extra-hatch-configuration/requirements-sql-client-packages.txt"
 ]
 trino-sql-client-packages = [
-  "trino>=0.327.0, <0.328.0",
+  "extra-hatch-configuration/requirements-trino-sql-client-packages.txt"
+]
+dbt-duckdb = [
+  "dbt-metricflow/extra-hatch-configuration/requirements-dbt-duckdb.txt"
+]
+dbt-postgres = [
+  "dbt-metricflow/extra-hatch-configuration/requirements-dbt-postgres.txt"
+]
+dbt-redshift = [
+  "dbt-metricflow/extra-hatch-configuration/requirements-dbt-redshift.txt"
+]
+dbt-snowflake = [
+  "dbt-metricflow/extra-hatch-configuration/requirements-dbt-snowflake.txt"
+]
+dbt-bigquery = [
+  "dbt-metricflow/extra-hatch-configuration/requirements-dbt-bigquery.txt"
+]
+dbt-databricks = [
+  "dbt-metricflow/extra-hatch-configuration/requirements-dbt-databricks.txt"
+]
+dbt-trino = [
+  "dbt-metricflow/extra-hatch-configuration/requirements-dbt-trino.txt"
 ]
 
 # There are files that hatch will always include as well (e.g. the LICENSE file).
@@ -110,22 +104,25 @@ packages = ["metricflow", "metricflow-semantics/metricflow_semantics"]
 
 [tool.hatch.envs.dev-env]
 description = "Environment for development. Includes a DuckDB-backed client."
-
-pre-install-commands = [
-  "pip install -e ./metricflow-semantics",
-  "pip install -e ./dbt-metricflow[duckdb]",
-]
+run = "run-coverage --no-cov"
+dependencies = ["metricflow-semantics @ {root:uri}/metricflow-semantics"]
 
 features = [
   "dev-packages",
   "sql-client-packages",
+  "dbt-duckdb",
 ]
 
 [tool.hatch.envs.dev-env.env-vars]
 MF_TEST_ADAPTER_TYPE="duckdb"
 MF_SQL_ENGINE_URL="duckdb://"
+# This allows us to use the classes in the `dbt-metricflow` package for tests without installing the package.
+# `dbt-metricflow` can't be installed as it has `metricflow` as a dependency.
+PYTHONPATH="./dbt-metricflow"
+
 
 [tool.hatch.envs.postgres-env.env-vars]
+PYTHONPATH="./dbt-metricflow"
 MF_SQL_ENGINE_URL="postgresql://metricflow@localhost:5432/metricflow"
 MF_SQL_ENGINE_PASSWORD="metricflowing"
 MF_TEST_ADAPTER_TYPE="postgres"
@@ -133,84 +130,75 @@ MF_TEST_ADAPTER_TYPE="postgres"
 [tool.hatch.envs.postgres-env]
 description = "Dev environment for working with Postgres adapter"
 
-pre-install-commands = [
-  "pip install -e ./metricflow-semantics",
-  "pip install -e ./dbt-metricflow[postgres]"
-]
-
 features = [
   "dev-packages",
   "sql-client-packages",
+  "dbt-postgres",
 ]
+
 
 # NOTE: All of the below should have their authentication credentials
 # configured independently of the hatch env construction
 
 [tool.hatch.envs.bigquery-env.env-vars]
+PYTHONPATH="./dbt-metricflow"
 MF_TEST_ADAPTER_TYPE="bigquery"
 
 [tool.hatch.envs.bigquery-env]
 description = "Dev environment for working with the BigQuery adapter"
 
-pre-install-commands = [
-  "pip install -e ./metricflow-semantics",
-  "pip install -e ./dbt-metricflow[bigquery]"
-]
-
 features = [
   "dev-packages",
   "sql-client-packages",
+  "dbt-bigquery",
 ]
 
+
 [tool.hatch.envs.databricks-env.env-vars]
+PYTHONPATH="./dbt-metricflow"
 MF_TEST_ADAPTER_TYPE="databricks"
+
 
 [tool.hatch.envs.databricks-env]
 description = "Dev environment for working with the Databricks adapter"
 
-pre-install-commands = [
-  "pip install -e ./metricflow-semantics",
-  "pip install -e ./dbt-metricflow[databricks]"
-]
-
 features = [
   "dev-packages",
   "sql-client-packages",
+  "dbt-databricks",
 ]
 
+
 [tool.hatch.envs.redshift-env.env-vars]
+PYTHONPATH="./dbt-metricflow"
 MF_TEST_ADAPTER_TYPE="redshift"
 
 [tool.hatch.envs.redshift-env]
 description = "Dev environment for working with the Redshift adapter"
 
-pre-install-commands = [
-  "pip install -e ./metricflow-semantics",
-  "pip install -e ./dbt-metricflow[redshift]"
-]
-
 features = [
   "dev-packages",
   "sql-client-packages",
+  "dbt-redshift"
 ]
 
+
 [tool.hatch.envs.snowflake-env.env-vars]
+PYTHONPATH="./dbt-metricflow"
 MF_TEST_ADAPTER_TYPE="snowflake"
 
 [tool.hatch.envs.snowflake-env]
 description = "Dev environment for working with Snowflake adapter"
 
-pre-install-commands = [
-  "pip install -e ./metricflow-semantics",
-  "pip install -e ./dbt-metricflow[snowflake]"
-]
-
 features = [
   "dev-packages",
   "sql-client-packages",
+  "dbt-snowflake",
 ]
 
+
 [tool.hatch.envs.trino-env.env-vars]
+PYTHONPATH="./dbt-metricflow"
 MF_TEST_ADAPTER_TYPE = "trino"
 MF_SQL_ENGINE_URL = "trino://trino@localhost:8080/"
 DBT_ENV_SECRET_CATALOG="memory"
@@ -218,24 +206,21 @@ DBT_ENV_SECRET_CATALOG="memory"
 [tool.hatch.envs.trino-env]
 description = "Dev environment for working with the Trino adapter"
 
-pre-install-commands = [
-  "pip install -e ./metricflow-semantics",
-  "pip install -e ./dbt-metricflow[trino]"
-]
-
 features = [
   "dev-packages",
   "sql-client-packages",
   "trino-sql-client-packages",
+  "dbt-trino"
 ]
+
 
 [tool.black]
 line-length = 120
 
+[tool.pytest.ini_options]
 # Many deprecation warnings come from 3rd-party libraries and make the
 # output of pytest noisy. Since no action is going to be taken, hide those
 # warnings.
-[tool.pytest.ini_options]
 filterwarnings = [
   "ignore:Deprecated call to.*",
   "ignore:pkg_resources is deprecated as an API"
