@@ -86,7 +86,7 @@ class TaskExecutionResult:
     df: Optional[MetricFlowDataTable] = None
 
 
-class SelectSqlQueryToDataFrameTask(ExecutionPlanTask):
+class SelectSqlQueryToDataTableTask(ExecutionPlanTask):
     """A task that runs a SELECT and puts that result into a data_table."""
 
     def __init__(  # noqa: D107

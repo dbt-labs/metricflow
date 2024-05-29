@@ -8,7 +8,7 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.execution.execution_plan import (
     ExecutionPlan,
-    SelectSqlQueryToDataFrameTask,
+    SelectSqlQueryToDataTableTask,
     SelectSqlQueryToTableTask,
 )
 from metricflow.execution.executor import SequentialPlanExecutor
@@ -18,7 +18,7 @@ from tests_metricflow.compare_df import assert_data_tables_equal
 
 
 def test_read_sql_task(sql_client: SqlClient) -> None:  # noqa: D103
-    task = SelectSqlQueryToDataFrameTask(sql_client, "SELECT 1 AS foo", SqlBindParameters())
+    task = SelectSqlQueryToDataTableTask(sql_client, "SELECT 1 AS foo", SqlBindParameters())
     execution_plan = ExecutionPlan(leaf_tasks=[task], dag_id=DagId.from_str("plan0"))
 
     results = SequentialPlanExecutor().execute_plan(execution_plan)
