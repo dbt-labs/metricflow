@@ -42,10 +42,10 @@ def table_snapshot() -> SqlTableSnapshot:  # noqa: D103
     )
 
 
-def test_as_df(table_snapshot: SqlTableSnapshot) -> None:
+def test_as_data_table(table_snapshot: SqlTableSnapshot) -> None:
     """Check that SqlTableSnapshot.as_df works as expected."""
     assert_data_tables_equal(
-        actual=table_snapshot.as_df,
+        actual=table_snapshot.as_data_table,
         expected=MetricFlowDataTable.create_from_rows(
             column_names=[f"col{i}" for i in range(5)],
             rows=(
@@ -73,7 +73,7 @@ def test_load(
         actual = ddl_sql_client.query(f"SELECT * FROM {schema_name}.{table_snapshot.table_name}")
         assert_data_tables_equal(
             actual=actual,
-            expected=table_snapshot.as_df,
+            expected=table_snapshot.as_data_table,
             compare_names_using_lowercase=ddl_sql_client.sql_engine_type is SqlEngine.SNOWFLAKE,
         )
 

@@ -56,7 +56,7 @@ def test_validate_data_in_source_schema(
     for table_snapshot in matching_table_snapshots:
         try:
             sql_table = SqlTable(schema_name=schema_name, table_name=table_snapshot.table_name)
-            expected_table_df = table_snapshot.as_df
+            expected_table_df = table_snapshot.as_data_table
             actual_table_df = sql_client.query(f"SELECT * FROM {sql_table.sql}")
             assert_data_tables_equal(
                 actual=actual_table_df,

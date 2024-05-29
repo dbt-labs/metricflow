@@ -90,7 +90,7 @@ class SqlTableSnapshot(FrozenBaseModel):
             raise RuntimeError(f"Invalid string representation of a boolean: {bool_str}")
 
     @property
-    def as_df(self) -> MetricFlowDataTable:
+    def as_data_table(self) -> MetricFlowDataTable:
         """Return this snapshot as represented by an equivalent data_table."""
         # In the YAML files, all values are strings, but they need to be converted to defined type so that it can be
         # properly represented in a data_table
@@ -134,7 +134,7 @@ class SqlTableSnapshotLoader:
 
         self._ddl_sql_client.create_table_from_data_table(
             sql_table=sql_table,
-            df=table_snapshot.as_df,
+            df=table_snapshot.as_data_table,
             # Without this set, the insert queries may be too long.
             chunk_size=500,
         )
