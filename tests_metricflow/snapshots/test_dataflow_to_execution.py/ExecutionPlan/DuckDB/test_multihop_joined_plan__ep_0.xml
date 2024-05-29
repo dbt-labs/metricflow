@@ -1,5 +1,5 @@
 <ExecutionPlan>
-    <SelectSqlQueryToDataFrameTask>
+    <SelectSqlQueryToDataTableTask>
         <!-- description = 'Run a query and write the results to a data frame' -->
         <!-- node_id = NodeId(id_str='rsq_0') -->
         <!-- sql_query =                                                                                             -->
@@ -37,5 +37,5 @@
         <!--    '  )\n'                                                                                              -->
         <!--    'GROUP BY\n'                                                                                         -->
         <!--    '  subq_14.customer_id__customer_name')                                                              -->
-    </SelectSqlQueryToDataFrameTask>
+    </SelectSqlQueryToDataTableTask>
 </ExecutionPlan>
