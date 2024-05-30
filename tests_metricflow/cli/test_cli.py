@@ -15,7 +15,7 @@ from dbt_semantic_interfaces.parsing.dir_to_model import (
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from dbt_semantic_interfaces.test_utils import base_semantic_manifest_file
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
-from tests_metricflow_semantics.model.example_project_configuration import (
+from metricflow_semantics.test_helpers.example_project_configuration import (
     EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE,
 )
 

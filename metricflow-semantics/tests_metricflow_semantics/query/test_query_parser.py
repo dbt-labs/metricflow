@@ -27,12 +27,11 @@ from metricflow_semantics.specs.spec_classes import (
     DimensionSpec,
 )
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
-from metricflow_semantics.test_helpers.metric_time_dimension import MTD
-from metricflow_semantics.test_helpers.snapshot_helpers import assert_object_snapshot_equal
-
-from tests_metricflow_semantics.model.example_project_configuration import (
+from metricflow_semantics.test_helpers.example_project_configuration import (
     EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE,
 )
+from metricflow_semantics.test_helpers.metric_time_dimension import MTD
+from metricflow_semantics.test_helpers.snapshot_helpers import assert_object_snapshot_equal
 
 logger = logging.getLogger(__name__)
 
