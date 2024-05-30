@@ -334,14 +334,14 @@ def query(
     df = query_result.result_df
     # Show the data if returned successfully
     if df is not None:
-        if df.empty:
+        if df.row_count == 0:
             click.echo("🕳 Successful MQL query returned an empty result set.")
         elif csv is not None:
             # csv is a LazyFile that is file-like that works in this case.
             df.to_csv(csv, index=False)  # type: ignore
             click.echo(f"🖨 Successfully written query output to {csv.name}")
         else:
-            click.echo(df.to_markdown(index=False, floatfmt=f".{decimals}f"))
+            click.echo(df.text_format(decimals))
 
         if display_plans:
             temp_path = tempfile.mkdtemp()
