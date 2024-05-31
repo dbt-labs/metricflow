@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import csv as csv_module
 import datetime as dt
 import logging
 import pathlib
@@ -207,7 +208,7 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, clean: bool) -
 @query_options
 @click.option(
     "--csv",
-    type=click.File("wb"),
+    type=click.File("w"),
     required=False,
     help="Provide filepath for data_table output to csv",
 )
@@ -338,11 +339,12 @@ def query(
             click.echo("🕳 Successful MQL query returned an empty result set.")
         elif csv is not None:
             # csv is a LazyFile that is file-like that works in this case.
-            df.to_csv(csv, index=False)  # type: ignore
+            csv_writer = csv_module.writer(csv)
+            for row in df.rows:
+                csv_writer.writerow(row)
             click.echo(f"🖨 Successfully written query output to {csv.name}")
         else:
             click.echo(df.text_format(decimals))
-
         if display_plans:
             temp_path = tempfile.mkdtemp()
             svg_path = display_dag_as_svg(query_result.dataflow_plan, temp_path)
