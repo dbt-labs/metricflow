@@ -36,12 +36,12 @@ from metricflow.sql.sql_exprs import (
     SqlStringExpression,
     SqlSubtractTimeIntervalExpression,
 )
-from tests_metricflow.compare_df import assert_data_tables_equal
 from tests_metricflow.integration.configured_test_case import (
     CONFIGURED_INTEGRATION_TESTS_REPOSITORY,
     IntegrationTestModel,
     RequiredDwEngineFeature,
 )
+from tests_metricflow.sql.compare_data_table import assert_data_tables_equal
 
 logger = logging.getLogger(__name__)
 
