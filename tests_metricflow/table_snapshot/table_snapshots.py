@@ -1,21 +1,21 @@
 from __future__ import annotations
 
-import datetime
 import logging
 import os
 from collections import OrderedDict
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import List, Optional, Sequence, Tuple, Union
+from typing import List, Optional, Sequence, Tuple
 
 import dateutil.parser
-import pandas as pd
 import yaml
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.implementations.base import FrozenBaseModel
 from metricflow_semantics.specs.spec_classes import hash_items
 
+from metricflow.data_table.column_types import CellValue
+from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.sql.sql_table import SqlTable
 from tests_metricflow.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 
@@ -90,14 +90,14 @@ class SqlTableSnapshot(FrozenBaseModel):
             raise RuntimeError(f"Invalid string representation of a boolean: {bool_str}")
 
     @property
-    def as_df(self) -> pd.DataFrame:
+    def as_df(self) -> MetricFlowDataTable:
         """Return this snapshot as represented by an equivalent dataframe."""
         # In the YAML files, all values are strings, but they need to be converted to defined type so that it can be
         # properly represented in a dataframe
 
         type_converted_rows = []
         for row in self.rows:
-            type_converted_row: List[Union[str, datetime.datetime, int, float, bool, None]] = []
+            type_converted_row: List[CellValue] = []
             for column_num, column_value in enumerate(row):
                 column_type = self.column_definitions[column_num].type
                 if column_value is None:
@@ -116,9 +116,9 @@ class SqlTableSnapshot(FrozenBaseModel):
                     assert_values_exhausted(column_type)
             type_converted_rows.append(type_converted_row)
 
-        return pd.DataFrame(
-            columns=[column_definition.name for column_definition in self.column_definitions],
-            data=type_converted_rows,
+        return MetricFlowDataTable.create_from_rows(
+            column_names=[column_definition.name for column_definition in self.column_definitions],
+            rows=type_converted_rows,
         )
 
 
