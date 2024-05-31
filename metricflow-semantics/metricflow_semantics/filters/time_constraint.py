@@ -3,13 +3,8 @@ from __future__ import annotations
 import datetime
 import logging
 from dataclasses import dataclass
-from typing import Optional
 
-import pandas as pd
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-
-from metricflow_semantics.time.time_granularity import offset_period
 
 logger = logging.getLogger(__name__)
 
@@ -56,36 +51,6 @@ class TimeRangeConstraint(SerializableDataclass):
         return TimeRangeConstraint(
             start_time=TimeRangeConstraint.ALL_TIME_BEGIN(),
             end_time=TimeRangeConstraint.ALL_TIME_BEGIN(),
-        )
-
-    def _adjust_time_constraint_start_by_window(
-        self,
-        time_granularity: TimeGranularity,
-        time_unit_count: int,
-    ) -> TimeRangeConstraint:
-        """Moves the start of the time constraint back by <time_unit_count> windows.
-
-        if the metric is weekly-active-users (ie window = 1 week) it moves time_constraint.start one week earlier
-        """
-        start_ts = pd.Timestamp(self.start_time)
-        offset = offset_period(time_granularity) * time_unit_count
-        adjusted_start = (start_ts - offset).to_pydatetime()
-        return TimeRangeConstraint(
-            start_time=adjusted_start,
-            end_time=self.end_time,
-        )
-
-    def adjust_time_constraint_for_cumulative_metric(
-        self, granularity: Optional[TimeGranularity], count: int
-    ) -> TimeRangeConstraint:
-        """Given a time constraint for the overall query, adjust it to cover the time range for this metric."""
-        if granularity is not None:
-            return self._adjust_time_constraint_start_by_window(granularity, count)
-
-        # if no window is specified we want to accumulate from the beginning of time
-        return TimeRangeConstraint(
-            start_time=TimeRangeConstraint.ALL_TIME_BEGIN(),
-            end_time=self.end_time,
         )
 
     def is_subset_of(self, other: TimeRangeConstraint) -> bool:  # noqa: D102
