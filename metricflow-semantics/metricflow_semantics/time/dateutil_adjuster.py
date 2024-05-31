@@ -22,7 +22,19 @@ class DateutilTimePeriodAdjuster(TimePeriodAdjuster):
 
     def _relative_delta_for_window(self, time_granularity: TimeGranularity, count: int) -> relativedelta:
         """Relative-delta to cover time windows specified at different grains."""
-        if time_granularity is TimeGranularity.DAY:
+        if time_granularity is TimeGranularity.NANOSECOND:
+            raise ValueError("`relativedelta` does not support nanoseconds.")
+        elif time_granularity is TimeGranularity.MICROSECOND:
+            return relativedelta(microseconds=count)
+        elif time_granularity is TimeGranularity.MILLISECOND:
+            return relativedelta(microseconds=count * 1000)
+        elif time_granularity is TimeGranularity.SECOND:
+            return relativedelta(seconds=count)
+        elif time_granularity is TimeGranularity.MINUTE:
+            return relativedelta(minutes=count)
+        elif time_granularity is TimeGranularity.HOUR:
+            return relativedelta(hours=count)
+        elif time_granularity is TimeGranularity.DAY:
             return relativedelta(days=count)
         elif time_granularity is TimeGranularity.WEEK:
             return relativedelta(weeks=count)
@@ -53,8 +65,18 @@ class DateutilTimePeriodAdjuster(TimePeriodAdjuster):
     def adjust_to_start_of_period(
         self, time_granularity: TimeGranularity, date_to_adjust: datetime.datetime
     ) -> datetime.datetime:
-        if time_granularity is TimeGranularity.DAY:
+        # TODO: update these options once time constraints support a full timestamp
+        if (
+            time_granularity is TimeGranularity.NANOSECOND
+            or time_granularity is TimeGranularity.MICROSECOND
+            or time_granularity is TimeGranularity.MILLISECOND
+            or time_granularity is TimeGranularity.SECOND
+            or time_granularity is TimeGranularity.MINUTE
+            or time_granularity is TimeGranularity.HOUR
+            or time_granularity is TimeGranularity.DAY
+        ):
             return date_to_adjust
+
         elif time_granularity is TimeGranularity.WEEK:
             return date_to_adjust + relativedelta(weekday=dateutil.relativedelta.MO(-1))
         elif time_granularity is TimeGranularity.MONTH:
@@ -77,8 +99,18 @@ class DateutilTimePeriodAdjuster(TimePeriodAdjuster):
     def adjust_to_end_of_period(
         self, time_granularity: TimeGranularity, date_to_adjust: datetime.datetime
     ) -> datetime.datetime:
-        if time_granularity is TimeGranularity.DAY:
+        # TODO: update these options once time constraints support a full timestamp
+        if (
+            time_granularity is TimeGranularity.NANOSECOND
+            or time_granularity is TimeGranularity.MICROSECOND
+            or time_granularity is TimeGranularity.MILLISECOND
+            or time_granularity is TimeGranularity.SECOND
+            or time_granularity is TimeGranularity.MINUTE
+            or time_granularity is TimeGranularity.HOUR
+            or time_granularity is TimeGranularity.DAY
+        ):
             return date_to_adjust
+
         elif time_granularity is TimeGranularity.WEEK:
             return date_to_adjust + relativedelta(weekday=dateutil.relativedelta.SU(1))
         elif time_granularity is TimeGranularity.MONTH:

@@ -26,7 +26,7 @@ classifiers = [
 ]
 
 dependencies = [
-  "dbt-semantic-interfaces>=0.5.1, <0.6.0",
+  "dbt-semantic-interfaces==0.6.0.dev0",
   "rapidfuzz>=3.0, <4.0",
 ]
 

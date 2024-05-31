@@ -170,7 +170,7 @@ METRICS_YAML = textwrap.dedent(
       description: Derived offset metric with 2 different agg_time_dimensions
       type: derived
       type_params:
-        expr: revenue - revenue_daily
+        expr: revenue - revenue_last_7_days
         metrics:
           - name: revenue
           - name: revenue_daily
@@ -178,6 +178,7 @@ METRICS_YAML = textwrap.dedent(
             alias: revenue_last_7_days
     """
 )
+# TODO: is this validation going to be a breaking change? Will users hit validation errors when querying?
 
 
 @pytest.fixture
