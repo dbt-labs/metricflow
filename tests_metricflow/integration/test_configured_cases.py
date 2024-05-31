@@ -360,4 +360,5 @@ def test_case(
         )
     )
     # If we sort, it's effectively not checking the order whatever order that the output was would be overwritten.
+    assert actual is not None, "Did not get a result table from MetricFlow"
     assert_dataframes_equal(actual, expected, sort_columns=not case.check_order, allow_empty=case.allow_empty)
