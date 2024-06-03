@@ -1,0 +1,6 @@
+kind: Features
+body: Add support for Python 3.12
+time: 2024-05-30T19:09:00.228097-07:00
+custom:
+  Author: plypaul
+  Issue: "1065"
