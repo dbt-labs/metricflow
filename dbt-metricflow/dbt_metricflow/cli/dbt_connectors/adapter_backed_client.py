@@ -5,7 +5,7 @@ import logging
 import time
 
 from dbt.adapters.base.impl import BaseAdapter
-from dbt.exceptions import DbtDatabaseError
+from dbt_common.exceptions.base import DbtDatabaseError
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from metricflow_semantics.errors.error_classes import SqlBindParametersNotSupportedError
 from metricflow_semantics.mf_logging.formatting import indent
