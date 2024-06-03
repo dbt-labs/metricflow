@@ -12,8 +12,8 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.sql.sql_table import SqlTable
-from tests_metricflow.compare_df import assert_data_tables_equal
 from tests_metricflow.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
+from tests_metricflow.sql.compare_data_table import assert_data_tables_equal
 
 logger = logging.getLogger(__name__)
 

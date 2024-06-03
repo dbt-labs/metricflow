@@ -8,9 +8,9 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.sql.sql_table import SqlTable
-from tests_metricflow.compare_df import assert_data_tables_equal
 from tests_metricflow.fixtures.table_fixtures import CONFIGURED_SOURCE_TABLE_SNAPSHOT_REPOSITORY
 from tests_metricflow.source_schema_tools import get_populate_source_schema_shell_command
+from tests_metricflow.sql.compare_data_table import assert_data_tables_equal
 from tests_metricflow.table_snapshot.table_snapshots import (
     SqlTableSnapshotRepository,
     TableSnapshotException,

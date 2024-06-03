@@ -21,8 +21,8 @@ import logging
 from typing import Any
 
 import pytest
+from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
-from metricflow_semantics.time.time_granularity import TimeGranularity
 
 from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.protocols.sql_client import SqlClient
