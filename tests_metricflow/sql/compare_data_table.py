@@ -94,13 +94,15 @@ def check_data_tables_are_equal(
 
     This was migrated from an existing implementation based on `pandas` data_tables.
     """
-    if ignore_order:
-        expected_table = expected_table.sorted()
-        actual_table = actual_table.sorted()
-
     if compare_column_names_using_lowercase:
         expected_table = expected_table.with_lower_case_column_names()
         actual_table = actual_table.with_lower_case_column_names()
+
+    # Sort after case changes since the order can change after a case change. e.g. underscore comes
+    # before lowercase.
+    if ignore_order:
+        expected_table = expected_table.sorted()
+        actual_table = actual_table.sorted()
 
     if expected_table.column_names != actual_table.column_names:
         raise ValueError(

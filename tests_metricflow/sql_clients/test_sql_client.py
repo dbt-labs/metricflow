@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Set, Union
+from typing import Optional, Set, Union
 
 import pytest
 from dbt_semantic_interfaces.test_utils import as_datetime
@@ -26,13 +26,16 @@ def _select_x_as_y(x: int = 1, y: str = "y") -> str:
     return f"SELECT {x} AS {y}"
 
 
-def _check_1col(df: MetricFlowDataTable, col: str = "y", vals: Set[Union[int, str]] = {1}) -> None:
+def _check_1col(df: MetricFlowDataTable, col: str = "y", vals: Optional[Set[Union[int, str]]] = None) -> None:
     """Helper to check that 1 column has the same value and a case-insensitive matching name.
 
     We lower-case the names due to snowflake's tendency to capitalize things. This isn't ideal but it'll do for now.
     """
+    if vals is None:
+        vals = {1}
+
     assert df.column_count == 1
-    assert df.column_names == (col,)
+    assert tuple(column_name.lower() for column_name in df.column_names) == (col.lower(),)
     assert set(df.column_values_iterator(0)) == vals
 
 
