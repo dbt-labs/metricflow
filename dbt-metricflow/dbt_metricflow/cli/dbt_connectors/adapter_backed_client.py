@@ -4,7 +4,6 @@ import enum
 import logging
 import time
 
-import pandas as pd
 from dbt.adapters.base.impl import BaseAdapter
 from dbt.exceptions import DbtDatabaseError
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
@@ -14,6 +13,7 @@ from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.random_id import random_id
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
 
+from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.sql.render.big_query import BigQuerySqlQueryPlanRenderer
 from metricflow.sql.render.databricks import DatabricksSqlQueryPlanRenderer
@@ -127,8 +127,8 @@ class AdapterBackedSqlClient:
         self,
         stmt: str,
         sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
-    ) -> pd.DataFrame:
-        """Query statement; result expected to be data which will be returned as a DataFrame.
+    ) -> MetricFlowDataTable:
+        """Query statement; result expected to be data which will be returned as a DataTable.
 
         Args:
             stmt: The SQL query statement to run. This should produce output via a SELECT
@@ -150,10 +150,14 @@ class AdapterBackedSqlClient:
             logger.info(f"Query returned from dbt Adapter with response {result[0]}")
 
         agate_data = result[1]
-        df = pd.DataFrame([row.values() for row in agate_data.rows], columns=agate_data.column_names)
+        rows = [row.values() for row in agate_data.rows]
+        data_table = MetricFlowDataTable.create_from_rows(
+            column_names=agate_data.column_names,
+            rows=rows,
+        )
         stop = time.time()
-        logger.info(f"Finished running the query in {stop - start:.2f}s with {df.shape[0]} row(s) returned")
-        return df
+        logger.info(f"Finished running the query in {stop - start:.2f}s with {data_table.row_count} row(s) returned")
+        return data_table
 
     def execute(
         self,

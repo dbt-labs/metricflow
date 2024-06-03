@@ -3,14 +3,14 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-import pandas as pd
 import pytest
 from dbt_semantic_interfaces.test_utils import as_datetime
 from metricflow_semantics.random_id import random_id
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
+from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.protocols.sql_client import SqlEngine
-from tests_metricflow.compare_df import assert_dataframes_equal
+from tests_metricflow.compare_df import assert_data_tables_equal
 from tests_metricflow.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 from tests_metricflow.table_snapshot.table_snapshots import (
     SqlTableColumnDefinition,
@@ -42,13 +42,13 @@ def table_snapshot() -> SqlTableSnapshot:  # noqa: D103
     )
 
 
-def test_as_df(table_snapshot: SqlTableSnapshot) -> None:
+def test_as_data_table(table_snapshot: SqlTableSnapshot) -> None:
     """Check that SqlTableSnapshot.as_df works as expected."""
-    assert_dataframes_equal(
-        actual=table_snapshot.as_df,
-        expected=pd.DataFrame(
-            columns=[f"col{i}" for i in range(5)],
-            data=(
+    assert_data_tables_equal(
+        actual=table_snapshot.as_data_table,
+        expected=MetricFlowDataTable.create_from_rows(
+            column_names=[f"col{i}" for i in range(5)],
+            rows=(
                 (True, 1, 1.0, as_datetime("2020-01-02"), "hi"),
                 (False, -1, -1.0, as_datetime("2020-03-04 05:06:07"), "bye"),
             ),
@@ -71,9 +71,9 @@ def test_load(
         snapshot_loader.load(table_snapshot)
 
         actual = ddl_sql_client.query(f"SELECT * FROM {schema_name}.{table_snapshot.table_name}")
-        assert_dataframes_equal(
+        assert_data_tables_equal(
             actual=actual,
-            expected=table_snapshot.as_df,
+            expected=table_snapshot.as_data_table,
             compare_names_using_lowercase=ddl_sql_client.sql_engine_type is SqlEngine.SNOWFLAKE,
         )
 

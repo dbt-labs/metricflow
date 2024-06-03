@@ -6,6 +6,9 @@ from typing import SupportsFloat
 
 import pandas as pd
 
+from metricflow.data_table.mf_table import MetricFlowDataTable
+from tests_metricflow.sql.compare_data_table import check_data_tables_are_equal
+
 logger = logging.getLogger(__name__)
 
 
@@ -42,43 +45,23 @@ def _dataframes_contain_same_data(
     return True
 
 
-def assert_dataframes_equal(
-    actual: pd.DataFrame,
-    expected: pd.DataFrame,
+def assert_data_tables_equal(
+    actual: MetricFlowDataTable,
+    expected: MetricFlowDataTable,
     sort_columns: bool = True,
     allow_empty: bool = False,
     compare_names_using_lowercase: bool = False,
 ) -> None:
-    """Check that contents of DataFrames are the same.
+    """Check that contents of DataTables are the same.
 
     If sort_columns is set to false, value and column order needs to be the same.
-    If compare_names_using_lowercase is set to True, we copy the dataframes and lower-case their names.
+    If compare_names_using_lowercase is set to True, we copy the data_tables and lower-case their names.
     This is useful for Snowflake query output comparisons.
     """
-    if compare_names_using_lowercase:
-        actual = actual.copy()
-        expected = expected.copy()
-        actual.columns = actual.columns.str.lower()
-        expected.columns = expected.columns.str.lower()
-
-    if set(actual.columns) != set(expected.columns):
-        raise ValueError(
-            f"DataFrames do not contain the same columns. actual: {set(actual.columns)}, "
-            f"expected: {set(expected.columns)}"
-        )
-
-    if not allow_empty and actual.shape[0] == 0 and expected.shape[0] == 0:
-        raise AssertionError("Both dataframes have no rows; likely there is a mistake with the test")
-
-    if sort_columns:
-        sort_by = list(sorted(actual.columns.tolist()))
-        expected = expected.loc[:, sort_by].sort_values(sort_by).reset_index(drop=True)
-        actual = actual.loc[:, sort_by].sort_values(sort_by).reset_index(drop=True)
-
-    if not _dataframes_contain_same_data(actual=actual, expected=expected):
-        raise ValueError(
-            f"Dataframes not equal.\n"
-            f"Expected:\n{expected.to_markdown(index=False)}"
-            "\n---\n"
-            f"Actual:\n{actual.to_markdown(index=False)}"
-        )
+    check_data_tables_are_equal(
+        expected_table=expected,
+        actual_table=actual,
+        ignore_order=sort_columns,
+        allow_empty=allow_empty,
+        compare_column_names_using_lowercase=compare_names_using_lowercase,
+    )

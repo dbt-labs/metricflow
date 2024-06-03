@@ -8,7 +8,7 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.sql.sql_table import SqlTable
-from tests_metricflow.compare_df import assert_dataframes_equal
+from tests_metricflow.compare_df import assert_data_tables_equal
 from tests_metricflow.fixtures.table_fixtures import CONFIGURED_SOURCE_TABLE_SNAPSHOT_REPOSITORY
 from tests_metricflow.source_schema_tools import get_populate_source_schema_shell_command
 from tests_metricflow.table_snapshot.table_snapshots import (
@@ -56,9 +56,9 @@ def test_validate_data_in_source_schema(
     for table_snapshot in matching_table_snapshots:
         try:
             sql_table = SqlTable(schema_name=schema_name, table_name=table_snapshot.table_name)
-            expected_table_df = table_snapshot.as_df
+            expected_table_df = table_snapshot.as_data_table
             actual_table_df = sql_client.query(f"SELECT * FROM {sql_table.sql}")
-            assert_dataframes_equal(
+            assert_data_tables_equal(
                 actual=actual_table_df,
                 expected=expected_table_df,
                 compare_names_using_lowercase=sql_client.sql_engine_type is SqlEngine.SNOWFLAKE,

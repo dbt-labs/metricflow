@@ -25,12 +25,12 @@ from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
 from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
-from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataframeNode
+from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTableNode
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.execution.convert_to_execution_plan import ConvertToExecutionPlanResult
 from metricflow.execution.execution_plan import (
     ExecutionPlan,
-    SelectSqlQueryToDataFrameTask,
+    SelectSqlQueryToDataTableTask,
     SelectSqlQueryToTableTask,
 )
 from metricflow.plan_conversion.convert_to_sql_plan import ConvertToSqlPlanResult
@@ -74,12 +74,12 @@ class DataflowToExecutionPlanConverter(DataflowPlanNodeVisitor[ConvertToExecutio
         return self._sql_plan_renderer.render_sql_query_plan(convert_to_sql_plan_result.sql_plan)
 
     @override
-    def visit_write_to_result_dataframe_node(self, node: WriteToResultDataframeNode) -> ConvertToExecutionPlanResult:
+    def visit_write_to_result_data_table_node(self, node: WriteToResultDataTableNode) -> ConvertToExecutionPlanResult:
         convert_to_sql_plan_result = self._convert_to_sql_plan(node)
         render_sql_result = self._render_sql(convert_to_sql_plan_result)
         execution_plan = ExecutionPlan(
             leaf_tasks=(
-                SelectSqlQueryToDataFrameTask(
+                SelectSqlQueryToDataTableTask(
                     sql_client=self._sql_client,
                     sql_query=render_sql_result.sql,
                     bind_parameters=render_sql_result.bind_parameters,

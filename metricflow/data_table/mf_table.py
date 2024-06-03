@@ -95,8 +95,6 @@ class MetricFlowDataTable:
         return (row[column_index] for row in self.rows)
 
     def _sorted_by_column_name(self) -> MetricFlowDataTable:  # noqa: D102
-        # row_dict_by_row_index: Dict[int, Dict[str, CellType]] = defaultdict(dict)
-
         new_rows: List[List[CellValue]] = [[] for _ in range(self.row_count)]
         sorted_column_names = sorted(self.column_names)
         for column_name in sorted_column_names:
@@ -142,10 +140,7 @@ class MetricFlowDataTable:
                     continue
 
                 if isinstance(cell_value, datetime.datetime):
-                    if cell_value.time() == datetime.time.min:
-                        str_row.append(cell_value.date().isoformat())
-                    else:
-                        str_row.append(cell_value.isoformat())
+                    str_row.append(cell_value.isoformat())
                     continue
 
                 str_row.append(str(cell_value))

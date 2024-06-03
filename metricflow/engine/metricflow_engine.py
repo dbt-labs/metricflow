@@ -7,7 +7,6 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import List, Optional, Sequence, Tuple
 
-import pandas as pd
 from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimensionTypeParams
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
 from dbt_semantic_interfaces.references import EntityReference, MeasureReference, MetricReference
@@ -35,6 +34,7 @@ from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.time.time_source import TimeSource
 
+from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
@@ -96,7 +96,7 @@ class MetricFlowQueryRequest:
     where_constraint: A SQL string using group by names that can be used like a where clause on the output data.
     order_by_names: metric and group by names to order by. A "-" can be used to specify reverse order e.g. "-ds".
     order_by: metric, dimension, or entity objects to order by.
-    output_table: If specified, output the result data to this table instead of a result dataframe.
+    output_table: If specified, output the result data to this table instead of a result data_table.
     sql_optimization_level: The level of optimization for the generated SQL.
     query_type: Type of MetricFlow query.
     """
@@ -160,7 +160,7 @@ class MetricFlowQueryResult:
     query_spec: MetricFlowQuerySpec
     dataflow_plan: DataflowPlan
     sql: str
-    result_df: Optional[pd.DataFrame] = None
+    result_df: Optional[MetricFlowDataTable] = None
     result_table: Optional[SqlTable] = None
 
 
@@ -703,7 +703,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         time_constraint_end: Optional[datetime.datetime] = None,
     ) -> List[str]:
         # Run query
-        query_result = self.query(
+        query_result: MetricFlowQueryResult = self.query(
             MetricFlowQueryRequest.create_with_random_request_id(
                 metric_names=metric_names,
                 group_by_names=[get_group_by_values],
@@ -712,22 +712,10 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 query_type=MetricFlowQueryType.DIMENSION_VALUES,
             )
         )
-        result_dataframe = query_result.result_df
-        if result_dataframe is None:
+        if query_result.result_df is None:
             return []
 
-        # Snowflake likes upper-casing things in result output, so we lower-case all names
-        # before operating on the dataframe.
-        metric_names = [metric_name.lower() for metric_name in metric_names]
-        result_dataframe.columns = result_dataframe.columns.str.lower()
-
-        # Get dimension values regardless of input name -> output dimension mapping. This is necessary befcause
-        # granularity adjustments on time dimensions produce different output names for dimension values.
-        # Note: this only works as long as we have exactly one column of group by values
-        # and no other extraneous output columns
-        dim_vals = result_dataframe[result_dataframe.columns[~result_dataframe.columns.isin(metric_names)]].iloc[:, 0]
-
-        return sorted([str(val) for val in dim_vals])
+        return sorted([str(val) for val in query_result.result_df.column_values_iterator(0)])
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def explain_get_dimension_values(  # noqa: D102

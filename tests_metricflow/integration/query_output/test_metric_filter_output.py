@@ -31,7 +31,7 @@ def test_query_with_simple_metric_in_where_filter(  # noqa: D103
         request=request,
         mf_test_configuration=mf_test_configuration,
         snapshot_id="query_output",
-        snapshot_str=query_result.result_df.to_string(),
+        snapshot_str=query_result.result_df.text_format(),
         sql_engine=sql_client.sql_engine_type,
     )
 
@@ -57,6 +57,6 @@ def test_metric_with_metric_in_where_filter(  # noqa: D103
         request=request,
         mf_test_configuration=mf_test_configuration,
         snapshot_id="query_output",
-        snapshot_str=query_result.result_df.to_string(),
+        snapshot_str=query_result.result_df.text_format(),
         sql_engine=sql_client.sql_engine_type,
     )

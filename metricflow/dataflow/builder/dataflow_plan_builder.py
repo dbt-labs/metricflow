@@ -79,7 +79,7 @@ from metricflow.dataflow.nodes.min_max import MinMaxNode
 from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
 from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
 from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
-from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataframeNode
+from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTableNode
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOptimizer
 from metricflow.dataset.dataset_classes import DataSet
@@ -144,7 +144,7 @@ class DataflowPlanBuilder:
         output_selection_specs: Optional[InstanceSpecSet] = None,
         optimizers: Sequence[DataflowPlanOptimizer] = (),
     ) -> DataflowPlan:
-        """Generate a plan for reading the results of a query with the given spec into a dataframe or table."""
+        """Generate a plan for reading the results of a query with the given spec into a data_table or table."""
         # Workaround for a Pycharm type inspection issue with decorators.
         # noinspection PyArgumentList
         return self._build_plan(
@@ -738,7 +738,7 @@ class DataflowPlanBuilder:
 
         write_result_node: DataflowPlanNode
         if not output_sql_table:
-            write_result_node = WriteToResultDataframeNode(parent_node=pre_result_node or parent_node)
+            write_result_node = WriteToResultDataTableNode(parent_node=pre_result_node or parent_node)
         else:
             write_result_node = WriteToResultTableNode(
                 parent_node=pre_result_node or parent_node, output_sql_table=output_sql_table

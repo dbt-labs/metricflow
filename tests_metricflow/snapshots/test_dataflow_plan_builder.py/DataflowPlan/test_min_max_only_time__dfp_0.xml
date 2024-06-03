@@ -1,6 +1,6 @@
 <DataflowPlan>
-    <WriteToResultDataframeNode>
-        <!-- description = 'Write to Dataframe' -->
+    <WriteToResultDataTableNode>
+        <!-- description = 'Write to DataTable' -->
         <!-- node_id = NodeId(id_str='wrd_0') -->
         <MinMaxNode>
             <!-- description = 'Calculate min and max' -->
@@ -22,5 +22,5 @@
                 </ReadSqlSourceNode>
             </FilterElementsNode>
         </MinMaxNode>
-    </WriteToResultDataframeNode>
+    </WriteToResultDataTableNode>
 </DataflowPlan>

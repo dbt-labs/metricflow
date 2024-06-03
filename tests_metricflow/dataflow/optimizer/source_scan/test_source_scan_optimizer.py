@@ -39,7 +39,7 @@ from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
 from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
-from metricflow.dataflow.nodes.write_to_dataframe import WriteToResultDataframeNode
+from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTableNode
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import SourceScanOptimizer
 from metricflow.dataset.dataset_classes import DataSet
@@ -72,7 +72,7 @@ class ReadSqlSourceNodeCounter(DataflowPlanNodeVisitor[int]):
     def visit_where_constraint_node(self, node: WhereConstraintNode) -> int:  # noqa: D102
         return self._sum_parents(node)
 
-    def visit_write_to_result_dataframe_node(self, node: WriteToResultDataframeNode) -> int:  # noqa: D102
+    def visit_write_to_result_data_table_node(self, node: WriteToResultDataTableNode) -> int:  # noqa: D102
         return self._sum_parents(node)
 
     def visit_write_to_result_table_node(self, node: WriteToResultTableNode) -> int:  # noqa: D102

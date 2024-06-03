@@ -1,24 +1,24 @@
 from __future__ import annotations
 
-import pandas as pd
 from metricflow_semantics.dag.mf_dag import DagId
 from metricflow_semantics.random_id import random_id
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
+from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.execution.execution_plan import (
     ExecutionPlan,
-    SelectSqlQueryToDataFrameTask,
+    SelectSqlQueryToDataTableTask,
     SelectSqlQueryToTableTask,
 )
 from metricflow.execution.executor import SequentialPlanExecutor
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.sql.sql_table import SqlTable
-from tests_metricflow.compare_df import assert_dataframes_equal
+from tests_metricflow.compare_df import assert_data_tables_equal
 
 
 def test_read_sql_task(sql_client: SqlClient) -> None:  # noqa: D103
-    task = SelectSqlQueryToDataFrameTask(sql_client, "SELECT 1 AS foo", SqlBindParameters())
+    task = SelectSqlQueryToDataTableTask(sql_client, "SELECT 1 AS foo", SqlBindParameters())
     execution_plan = ExecutionPlan(leaf_tasks=[task], dag_id=DagId.from_str("plan0"))
 
     results = SequentialPlanExecutor().execute_plan(execution_plan)
@@ -27,11 +27,11 @@ def test_read_sql_task(sql_client: SqlClient) -> None:  # noqa: D103
     assert not results.contains_task_errors
     assert task_result.df is not None
 
-    assert_dataframes_equal(
+    assert_data_tables_equal(
         actual=task_result.df,
-        expected=pd.DataFrame(
-            columns=["foo"],
-            data=[(1,)],
+        expected=MetricFlowDataTable.create_from_rows(
+            column_names=["foo"],
+            rows=[(1,)],
         ),
         compare_names_using_lowercase=sql_client.sql_engine_type is SqlEngine.SNOWFLAKE,
     )
@@ -53,11 +53,11 @@ def test_write_table_task(  # noqa: D103
 
     assert not results.contains_task_errors
 
-    assert_dataframes_equal(
+    assert_data_tables_equal(
         actual=sql_client.query(f"SELECT * FROM {output_table.sql}"),
-        expected=pd.DataFrame(
-            columns=["foo"],
-            data=[(1,)],
+        expected=MetricFlowDataTable.create_from_rows(
+            column_names=["foo"],
+            rows=[(1,)],
         ),
         compare_names_using_lowercase=sql_client.sql_engine_type is SqlEngine.SNOWFLAKE,
     )

@@ -36,7 +36,7 @@ from metricflow.sql.sql_exprs import (
     SqlStringExpression,
     SqlSubtractTimeIntervalExpression,
 )
-from tests_metricflow.compare_df import assert_dataframes_equal
+from tests_metricflow.compare_df import assert_data_tables_equal
 from tests_metricflow.integration.configured_test_case import (
     CONFIGURED_INTEGRATION_TESTS_REPOSITORY,
     IntegrationTestModel,
@@ -360,4 +360,5 @@ def test_case(
         )
     )
     # If we sort, it's effectively not checking the order whatever order that the output was would be overwritten.
-    assert_dataframes_equal(actual, expected, sort_columns=not case.check_order, allow_empty=case.allow_empty)
+    assert actual is not None, "Did not get a result table from MetricFlow"
+    assert_data_tables_equal(actual, expected, sort_columns=not case.check_order, allow_empty=case.allow_empty)
