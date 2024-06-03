@@ -7,7 +7,7 @@ name = "dbt-metricflow"
 version = "0.6.0"
 description = "Execute commands against the MetricFlow semantic layer with dbt."
 readme = "README.md"
-requires-python = ">=3.8,<3.12"
+requires-python = ">=3.8,<3.13"
 license = "BUSL-1.1"
 authors = [
   { name = "dbt Labs", email = "info@dbtlabs.com" },
@@ -20,6 +20,7 @@ classifiers = [
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
@@ -32,7 +33,7 @@ dependencies = [
 
   # Internal dependencies
   "dbt-core>=1.7.4, <1.8.0",
-  "metricflow>=0.205.0, <0.206.0",
+  "metricflow>=0.206.dev3, <0.207.0",
 
   # dsi version should be fixed by MetricFlow/dbt-core, not set here
   "dbt-semantic-interfaces",
