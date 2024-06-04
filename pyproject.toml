@@ -63,7 +63,7 @@ dbt-trino = [
   "dbt-metricflow/extra-hatch-configuration/requirements-dbt-trino.txt"
 ]
 dev-packages = [
-  "extra-hatch-configuration/requirements-dev-packages.txt",
+  "metricflow-semantics/extra-hatch-configuration/requirements-dev-packages.txt",
   "dbt-metricflow/extra-hatch-configuration/requirements-cli.txt"
 ]
 sql-client-packages = [
