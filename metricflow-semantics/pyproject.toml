@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling~=1.14.0"]
+requires = ["hatchling~=1.14.0", "hatch-requirements-txt >= 0.4.1, <0.5.0"]
 build-backend = "hatchling.build"
 
 [project]
@@ -25,10 +25,12 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 
-dependencies = [
-  "dbt-semantic-interfaces>=0.5.1, <0.6.0",
-  "python-dateutil>=2.8.2, <2.9.0",
-  "rapidfuzz>=3.0, <4.0",
+# Dependencies are specified through the `hatch-requirements-txt` plug-in.
+dynamic = ["dependencies"]
+
+[tool.hatch.metadata.hooks.requirements_txt]
+files = [
+  "extra-hatch-configuration/requirements.txt",
 ]
 
 [project.optional-dependencies]
