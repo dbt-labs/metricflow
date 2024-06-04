@@ -23,6 +23,7 @@ jobs:
         uses: ./.github/actions/run-mf-tests
         with:
           python-version: ${{ matrix.python-version }}
+          make-target: "test-include-slow"
 
   metricflow-unit-tests-postgres:
     name: MetricFlow Tests (PostgreSQL)

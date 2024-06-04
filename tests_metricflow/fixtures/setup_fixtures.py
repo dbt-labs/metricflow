@@ -65,6 +65,10 @@ def pytest_configure(config: _pytest.config.Config) -> None:
         name="markers",
         line=f"{SQL_ENGINE_SNAPSHOT_MARKER_NAME}: mark tests as generating a snapshot specific to a SQL engine",
     )
+    config.addinivalue_line(
+        name="markers",
+        line="slow: mark tests as taking a long time to run.",
+    )
 
 
 def check_sql_engine_snapshot_marker(request: FixtureRequest) -> None:
