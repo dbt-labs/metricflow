@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Add test coverage for more filter + join interactions
+time: 2024-06-03T17:05:30.297854-07:00
+custom:
+  Author: tlento
+  Issue: "1240"
