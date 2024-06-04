@@ -3,24 +3,20 @@ from __future__ import annotations
 import datetime
 import logging
 from copy import copy
-from typing import List, Optional, Sequence, Tuple
+from typing import List, Mapping, Optional, Sequence, Tuple
 
 import jinja2
 import pytest
 from dateutil import parser
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.implementations.elements.measure import PydanticMeasureAggregationParameters
-from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.protocols.query_parameter import DimensionOrEntityQueryParameter
-from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
 from metricflow_semantics.specs.query_param_implementations import DimensionOrEntityParameter, TimeDimensionParameter
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
-from metricflow_semantics.test_helpers.time_helpers import ConfigurableTimeSource
 
-from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowQueryRequest
+from metricflow.engine.metricflow_engine import MetricFlowQueryRequest
 from metricflow.plan_conversion.time_spine import TimeSpineSource
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.sql_exprs import (
@@ -36,6 +32,7 @@ from metricflow.sql.sql_exprs import (
     SqlStringExpression,
     SqlSubtractTimeIntervalExpression,
 )
+from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 from tests_metricflow.integration.configured_test_case import (
     CONFIGURED_INTEGRATION_TESTS_REPOSITORY,
     IntegrationTestModel,
@@ -237,12 +234,8 @@ def filter_not_supported_features(
 def test_case(
     name: str,
     mf_test_configuration: MetricFlowTestConfiguration,
-    simple_semantic_manifest_lookup: SemanticManifestLookup,
-    simple_semantic_manifest_lookup_non_ds: SemanticManifestLookup,
-    multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
-    partitioned_multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
-    extended_date_semantic_manifest_lookup: SemanticManifestLookup,
-    scd_semantic_manifest_lookup: SemanticManifestLookup,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
+    time_spine_source: TimeSpineSource,
     sql_client: SqlClient,
     create_source_tables: bool,
 ) -> None:
@@ -254,30 +247,22 @@ def test_case(
     if missing_required_features:
         pytest.skip(f"DW does not support {missing_required_features}")
 
-    semantic_manifest_lookup: Optional[SemanticManifestLookup] = None
     if case.model is IntegrationTestModel.SIMPLE_MODEL:
-        semantic_manifest_lookup = simple_semantic_manifest_lookup
+        engine = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].metricflow_engine
     elif case.model is IntegrationTestModel.SIMPLE_MODEL_NON_DS:
-        semantic_manifest_lookup = simple_semantic_manifest_lookup_non_ds
+        engine = mf_engine_test_fixture_mapping[SemanticManifestSetup.NON_SM_MANIFEST].metricflow_engine
     elif case.model is IntegrationTestModel.UNPARTITIONED_MULTI_HOP_JOIN_MODEL:
-        semantic_manifest_lookup = multi_hop_join_semantic_manifest_lookup
+        engine = mf_engine_test_fixture_mapping[SemanticManifestSetup.MULTI_HOP_JOIN_MANIFEST].metricflow_engine
     elif case.model is IntegrationTestModel.PARTITIONED_MULTI_HOP_JOIN_MODEL:
-        semantic_manifest_lookup = partitioned_multi_hop_join_semantic_manifest_lookup
+        engine = mf_engine_test_fixture_mapping[
+            SemanticManifestSetup.PARTITIONED_MULTI_HOP_JOIN_MANIFEST
+        ].metricflow_engine
     elif case.model is IntegrationTestModel.EXTENDED_DATE_MODEL:
-        semantic_manifest_lookup = extended_date_semantic_manifest_lookup
+        engine = mf_engine_test_fixture_mapping[SemanticManifestSetup.EXTENDED_DATE_MANIFEST].metricflow_engine
     elif case.model is IntegrationTestModel.SCD_MODEL:
-        semantic_manifest_lookup = scd_semantic_manifest_lookup
+        engine = mf_engine_test_fixture_mapping[SemanticManifestSetup.SCD_MANIFEST].metricflow_engine
     else:
         assert_values_exhausted(case.model)
-
-    assert semantic_manifest_lookup
-
-    engine = MetricFlowEngine(
-        semantic_manifest_lookup=semantic_manifest_lookup,
-        sql_client=sql_client,
-        column_association_resolver=DunderColumnAssociationResolver(semantic_manifest_lookup),
-        time_source=ConfigurableTimeSource(as_datetime("2021-01-04")),
-    )
 
     check_query_helpers = CheckQueryHelpers(sql_client)
 
@@ -316,9 +301,7 @@ def test_case(
                     render_date_trunc=check_query_helpers.render_date_trunc,
                     render_extract=check_query_helpers.render_extract,
                     render_percentile_expr=check_query_helpers.render_percentile_expr,
-                    mf_time_spine_source=TimeSpineSource.create_from_manifest(
-                        semantic_manifest_lookup.semantic_manifest
-                    ).spine_table.sql,
+                    mf_time_spine_source=time_spine_source.spine_table.sql,
                     double_data_type_name=check_query_helpers.double_data_type_name,
                     render_dimension_template=check_query_helpers.render_dimension_template,
                     render_entity_template=check_query_helpers.render_entity_template,
@@ -351,9 +334,7 @@ def test_case(
             render_date_trunc=check_query_helpers.render_date_trunc,
             render_extract=check_query_helpers.render_extract,
             render_percentile_expr=check_query_helpers.render_percentile_expr,
-            mf_time_spine_source=TimeSpineSource.create_from_manifest(
-                semantic_manifest_lookup.semantic_manifest
-            ).spine_table.sql,
+            mf_time_spine_source=time_spine_source.spine_table.sql,
             double_data_type_name=check_query_helpers.double_data_type_name,
             generate_random_uuid=check_query_helpers.generate_random_uuid,
             cast_to_ts=check_query_helpers.cast_to_ts,
