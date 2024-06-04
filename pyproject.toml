@@ -209,7 +209,10 @@ line-length = 120
 # output of pytest noisy. Since no action is going to be taken, hide those
 # warnings.
 filterwarnings = [
-  "ignore:Deprecated call to.*",
-  "ignore:pkg_resources is deprecated as an API"
+  "ignore::DeprecationWarning:dbt_common.*:",
+  "ignore::DeprecationWarning:halo.*:",
+  # `protobuff` issue: https://github.com/protocolbuffers/protobuf/issues/15077
+  # protobuff is specified by `dbt-core`
+  'ignore:.*Type google.*:DeprecationWarning',
 ]
 python_functions = "test_* populate_source_schema"
