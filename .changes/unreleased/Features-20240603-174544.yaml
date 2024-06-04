@@ -1,0 +1,6 @@
+kind: Features
+body: Update `dbt-metricflow` dependencies to use `dbt*` 1.8 packages
+time: 2024-06-03T17:45:44.215307-07:00
+custom:
+  Author: plypaul
+  Issue: "1243"
