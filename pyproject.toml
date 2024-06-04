@@ -34,7 +34,6 @@ dependencies = [
   "pydantic>=1.10.0, <1.11.0",
   "python-dateutil>=2.8.2, <2.9.0",
   "rapidfuzz>=3.0, <4.0",
-  "ruamel.yaml>=0.17.21, <0.18.0",
   "tabulate>=0.8.9",
   "typing_extensions>=4.4, <5.0",
 ]
