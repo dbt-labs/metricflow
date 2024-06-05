@@ -28,7 +28,6 @@ classifiers = [
 dependencies = [
   "Jinja2>=3.1.3",
   "PyYAML>=6.0, <7.0.0",
-  "dbt-semantic-interfaces>=0.5.1, <0.6.0",
   "graphviz>=0.18.2, <0.21",
   "more-itertools>=8.10.0, <10.2.0",
   "pydantic>=1.10.0, <1.11.0",
@@ -114,6 +113,7 @@ description = "Environment for development. Includes a DuckDB-backed client."
 pre-install-commands = [
   "pip install -e ./metricflow-semantics",
   "pip install -e ./dbt-metricflow[duckdb]",
+  "pip install -e ../dbt-semantic-interfaces",
 ]
 
 features = [
