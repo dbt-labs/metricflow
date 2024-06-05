@@ -47,15 +47,11 @@ Documentation = "https://docs.getdbt.com/docs/build/about-metricflow"
 "Source Code" = "https://github.com/dbt-labs/metricflow"
 
 [tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
-dev-packages = [
-  "extra-hatch-configuration/requirements-dev-packages.txt",
-  "dbt-metricflow/extra-hatch-configuration/requirements-cli.txt"
+dbt-bigquery = [
+  "dbt-metricflow/extra-hatch-configuration/requirements-dbt-bigquery.txt"
 ]
-sql-client-packages = [
-  "extra-hatch-configuration/requirements-sql-client-packages.txt"
-]
-trino-sql-client-packages = [
-  "extra-hatch-configuration/requirements-trino-sql-client-packages.txt"
+dbt-databricks = [
+  "dbt-metricflow/extra-hatch-configuration/requirements-dbt-databricks.txt"
 ]
 dbt-duckdb = [
   "dbt-metricflow/extra-hatch-configuration/requirements-dbt-duckdb.txt"
@@ -69,14 +65,18 @@ dbt-redshift = [
 dbt-snowflake = [
   "dbt-metricflow/extra-hatch-configuration/requirements-dbt-snowflake.txt"
 ]
-dbt-bigquery = [
-  "dbt-metricflow/extra-hatch-configuration/requirements-dbt-bigquery.txt"
-]
-dbt-databricks = [
-  "dbt-metricflow/extra-hatch-configuration/requirements-dbt-databricks.txt"
-]
 dbt-trino = [
   "dbt-metricflow/extra-hatch-configuration/requirements-dbt-trino.txt"
+]
+dev-packages = [
+  "extra-hatch-configuration/requirements-dev-packages.txt",
+  "dbt-metricflow/extra-hatch-configuration/requirements-cli.txt"
+]
+sql-client-packages = [
+  "extra-hatch-configuration/requirements-sql-client-packages.txt"
+]
+trino-sql-client-packages = [
+  "extra-hatch-configuration/requirements-trino-sql-client-packages.txt"
 ]
 
 # There are files that hatch will always include as well (e.g. the LICENSE file).
@@ -96,16 +96,9 @@ packages = ["metricflow", "metricflow-semantics/metricflow_semantics"]
 
 
 # Environment setup
-# Due to our current wonky package organization, we need to do an editable install
-# of dbt-metricflow in every test running environment in order for the tests to work.
-# In theory we can install the adapter extra for dbt-metricflow and rely on that, but
-# for ease of managing versioning through upgrade phases we retain the explicit
-# dependencies on the specific adapter versions defined here.
-
 [tool.hatch.envs.dev-env]
 description = "Environment for development. Includes a DuckDB-backed client."
 run = "run-coverage --no-cov"
-dependencies = ["metricflow-semantics @ {root:uri}/metricflow-semantics"]
 
 features = [
   "dev-packages",
@@ -118,11 +111,11 @@ MF_TEST_ADAPTER_TYPE="duckdb"
 MF_SQL_ENGINE_URL="duckdb://"
 # This allows us to use the classes in the `dbt-metricflow` package for tests without installing the package.
 # `dbt-metricflow` can't be installed as it has `metricflow` as a dependency.
-PYTHONPATH="./dbt-metricflow"
+PYTHONPATH="metricflow-semantics:dbt-metricflow"
 
 
 [tool.hatch.envs.postgres-env.env-vars]
-PYTHONPATH="./dbt-metricflow"
+PYTHONPATH="metricflow-semantics:dbt-metricflow"
 MF_SQL_ENGINE_URL="postgresql://metricflow@localhost:5432/metricflow"
 MF_SQL_ENGINE_PASSWORD="metricflowing"
 MF_TEST_ADAPTER_TYPE="postgres"
@@ -141,7 +134,7 @@ features = [
 # configured independently of the hatch env construction
 
 [tool.hatch.envs.bigquery-env.env-vars]
-PYTHONPATH="./dbt-metricflow"
+PYTHONPATH="metricflow-semantics:dbt-metricflow"
 MF_TEST_ADAPTER_TYPE="bigquery"
 
 [tool.hatch.envs.bigquery-env]
@@ -155,7 +148,7 @@ features = [
 
 
 [tool.hatch.envs.databricks-env.env-vars]
-PYTHONPATH="./dbt-metricflow"
+PYTHONPATH="metricflow-semantics:dbt-metricflow"
 MF_TEST_ADAPTER_TYPE="databricks"
 
 
@@ -170,7 +163,7 @@ features = [
 
 
 [tool.hatch.envs.redshift-env.env-vars]
-PYTHONPATH="./dbt-metricflow"
+PYTHONPATH="metricflow-semantics:dbt-metricflow"
 MF_TEST_ADAPTER_TYPE="redshift"
 
 [tool.hatch.envs.redshift-env]
@@ -184,7 +177,7 @@ features = [
 
 
 [tool.hatch.envs.snowflake-env.env-vars]
-PYTHONPATH="./dbt-metricflow"
+PYTHONPATH="metricflow-semantics:dbt-metricflow"
 MF_TEST_ADAPTER_TYPE="snowflake"
 
 [tool.hatch.envs.snowflake-env]
@@ -198,7 +191,7 @@ features = [
 
 
 [tool.hatch.envs.trino-env.env-vars]
-PYTHONPATH="./dbt-metricflow"
+PYTHONPATH="metricflow-semantics:dbt-metricflow"
 MF_TEST_ADAPTER_TYPE = "trino"
 MF_SQL_ENGINE_URL = "trino://trino@localhost:8080/"
 DBT_ENV_SECRET_CATALOG="memory"

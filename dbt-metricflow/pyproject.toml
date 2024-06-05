@@ -41,6 +41,12 @@ files = [
 mf = 'dbt_metricflow.cli.main:cli'
 
 [tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
+dbt-bigquery = [
+  "extra-hatch-configuration/requirements-dbt-bigquery.txt"
+]
+dbt-databricks = [
+  "extra-hatch-configuration/requirements-dbt-databricks.txt"
+]
 dbt-duckdb = [
   "extra-hatch-configuration/requirements-dbt-duckdb.txt"
 ]
@@ -53,11 +59,8 @@ dbt-redshift = [
 dbt-snowflake = [
   "extra-hatch-configuration/requirements-dbt-snowflake.txt"
 ]
-dbt-bigquery = [
-  "extra-hatch-configuration/requirements-dbt-bigquery.txt"
-]
-dbt-databricks = [
-  "extra-hatch-configuration/requirements-dbt-databricks.txt"
+dbt-trino = [
+  "extra-hatch-configuration/requirements-dbt-trino.txt"
 ]
 
 [tool.hatch.build.targets.sdist]
