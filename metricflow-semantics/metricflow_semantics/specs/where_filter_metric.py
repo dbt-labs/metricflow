@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Sequence
+from typing import Sequence, Union
 
 from dbt_semantic_interfaces.call_parameter_sets import (
     MetricCallParameterSet,
@@ -18,6 +18,8 @@ from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec
 )
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.rendered_spec_tracker import RenderedSpecTracker
+
+from metricflow_semantics.specs.where_filter_entity import WhereFilterEntity
 
 
 class WhereFilterMetric(ProtocolHint[QueryInterfaceMetric]):
@@ -94,7 +96,7 @@ class WhereFilterMetricFactory(ProtocolHint[QueryInterfaceMetricFactory]):
         self._where_filter_location = where_filter_location
         self._rendered_spec_tracker = rendered_spec_tracker
 
-    def create(self, metric_name: str, group_by: Sequence[str] = ()) -> WhereFilterMetric:
+    def create(self, metric_name: str, group_by: Sequence[Union[str, WhereFilterEntity]] = ()) -> WhereFilterMetric:
         """Create a WhereFilterMetric."""
         return WhereFilterMetric(
             column_association_resolver=self._column_association_resolver,
@@ -102,5 +104,13 @@ class WhereFilterMetricFactory(ProtocolHint[QueryInterfaceMetricFactory]):
             where_filter_location=self._where_filter_location,
             rendered_spec_tracker=self._rendered_spec_tracker,
             element_name=metric_name,
-            group_by=tuple(LinkableElementReference(group_by_name.lower()) for group_by_name in group_by),
+            group_by=tuple(
+                LinkableElementReference(
+                    # TODO: add entity links
+                    group_by_item.lower()
+                    if isinstance(group_by_item, str)
+                    else group_by_item._element_name
+                )
+                for group_by_item in group_by
+            ),
         )

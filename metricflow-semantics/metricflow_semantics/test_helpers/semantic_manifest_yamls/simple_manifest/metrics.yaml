@@ -772,3 +772,11 @@ metric:
     denominator:
       name: listings
   filter: "{{ Metric('views', ['listing']) }} > 10"
+---
+metric:
+  name: really_active_listings
+  description: Listings with at least 5 bookings
+  type: simple
+  type_params:
+    measure: listings
+  filter: "{{ Metric('bookings', [Entity('listing')]) }} > 5"
