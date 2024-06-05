@@ -18,7 +18,7 @@ semantic_models:
       - name: ds
         type: time
         type_params:
-          time_granularity: day
+          time_granularity: hour
       - name: customer_country
         type: categorical
         expr: country
