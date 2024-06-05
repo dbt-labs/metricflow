@@ -25,21 +25,16 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
-dependencies = [
-  "Jinja2>=3.1.3",
-  "PyYAML>=6.0, <7.0.0",
-  "dbt-semantic-interfaces>=0.5.1, <0.6.0",
-  "graphviz>=0.18.2, <0.21",
-  "more-itertools>=8.10.0, <10.2.0",
-  "pydantic>=1.10.0, <1.11.0",
-  "python-dateutil>=2.8.2, <2.9.0",
-  "rapidfuzz>=3.0, <4.0",
-  "tabulate>=0.8.9",
-  "typing_extensions>=4.4, <5.0",
+
+# Dependencies are specified through the `hatch-requirements-txt` plug-in.
+dynamic = ["dependencies", "optional-dependencies"]
+
+[tool.hatch.metadata.hooks.requirements_txt]
+files = [
+  "metricflow-semantics/extra-hatch-configuration/requirements.txt",
+  "extra-hatch-configuration/requirements.txt",
 ]
 
-# Optional dependencies are specified through the `hatch-requirements-txt` plug-in.
-dynamic = ["optional-dependencies"]
 
 [project.urls]
 Documentation = "https://docs.getdbt.com/docs/build/about-metricflow"
@@ -68,7 +63,7 @@ dbt-trino = [
   "dbt-metricflow/extra-hatch-configuration/requirements-dbt-trino.txt"
 ]
 dev-packages = [
-  "extra-hatch-configuration/requirements-dev-packages.txt",
+  "metricflow-semantics/extra-hatch-configuration/requirements-dev-packages.txt",
   "dbt-metricflow/extra-hatch-configuration/requirements-cli.txt"
 ]
 sql-client-packages = [
