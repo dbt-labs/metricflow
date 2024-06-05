@@ -12,23 +12,23 @@ FROM (
     FROM (
       -- Constrain Output with WHERE
       SELECT
-        subq_14.guest__bookers
+        subq_14.listing__bookers
         , subq_14.bookers
       FROM (
-        -- Pass Only Elements: ['bookers', 'guest__bookers']
+        -- Pass Only Elements: ['bookers', 'listing__bookers']
         SELECT
-          subq_13.guest__bookers
+          subq_13.listing__bookers
           , subq_13.bookers
         FROM (
           -- Join Standard Outputs
           SELECT
-            subq_6.guest AS guest
-            , subq_12.guest__bookers AS guest__bookers
+            subq_6.listing AS listing
+            , subq_12.listing__bookers AS listing__bookers
             , subq_6.bookers AS bookers
           FROM (
-            -- Pass Only Elements: ['bookers', 'guest']
+            -- Pass Only Elements: ['bookers', 'listing']
             SELECT
-              subq_5.guest
+              subq_5.listing
               , subq_5.bookers
             FROM (
               -- Metric Time Dimension 'ds'
@@ -227,24 +227,24 @@ FROM (
             ) subq_5
           ) subq_6
           LEFT OUTER JOIN (
-            -- Pass Only Elements: ['guest', 'guest__bookers']
+            -- Pass Only Elements: ['listing', 'listing__bookers']
             SELECT
-              subq_11.guest
-              , subq_11.guest__bookers
+              subq_11.listing
+              , subq_11.listing__bookers
             FROM (
               -- Compute Metrics via Expressions
               SELECT
-                subq_10.guest
-                , subq_10.bookers AS guest__bookers
+                subq_10.listing
+                , subq_10.bookers AS listing__bookers
               FROM (
                 -- Aggregate Measures
                 SELECT
-                  subq_9.guest
+                  subq_9.listing
                   , COUNT(DISTINCT subq_9.bookers) AS bookers
                 FROM (
-                  -- Pass Only Elements: ['bookers', 'guest']
+                  -- Pass Only Elements: ['bookers', 'listing']
                   SELECT
-                    subq_8.guest
+                    subq_8.listing
                     , subq_8.bookers
                   FROM (
                     -- Metric Time Dimension 'ds'
@@ -443,15 +443,15 @@ FROM (
                   ) subq_8
                 ) subq_9
                 GROUP BY
-                  subq_9.guest
+                  subq_9.listing
               ) subq_10
             ) subq_11
           ) subq_12
           ON
-            subq_6.guest = subq_12.guest
+            subq_6.listing = subq_12.listing
         ) subq_13
       ) subq_14
-      WHERE guest__bookers > 1.00
+      WHERE listing__bookers > 1.00
     ) subq_15
   ) subq_16
 ) subq_17
