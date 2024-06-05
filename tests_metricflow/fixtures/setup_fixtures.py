@@ -82,7 +82,6 @@ def check_sql_engine_snapshot_marker(request: FixtureRequest) -> None:
 @pytest.fixture(scope="session")
 def mf_test_configuration(  # noqa: D103
     request: FixtureRequest,
-    disable_sql_alchemy_deprecation_warning: None,
     source_table_snapshot_repository: SqlTableSnapshotRepository,
 ) -> MetricFlowTestConfiguration:
     engine_url = os.environ.get("MF_SQL_ENGINE_URL")

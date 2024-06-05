@@ -7,8 +7,6 @@ import warnings
 from typing import Generator
 
 import pytest
-import sqlalchemy
-import sqlalchemy.util
 from _pytest.fixtures import FixtureRequest
 from dbt.adapters.factory import get_adapter_by_type
 from dbt.cli.main import dbtRunner
@@ -257,10 +255,3 @@ def warn_user_about_slow_tests_without_parallelism(  # noqa: D103
             f'Consider using the pytest-xdist option "-n <number of workers>" to parallelize execution and speed '
             f"up the session."
         )
-
-
-@pytest.fixture(scope="session", autouse=True)
-def disable_sql_alchemy_deprecation_warning() -> None:
-    """Since MF is tied to using SQLAlchemy 1.x.x due to the Snowflake connector, silence 2.0 deprecation warnings."""
-    # Seeing 'error: Module has no attribute "SILENCE_UBER_WARNING"' in the type checker, but this seems to work.
-    sqlalchemy.util.deprecations.SILENCE_UBER_WARNING = True  # type:ignore
