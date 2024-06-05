@@ -1,3 +1,4 @@
 dbt-semantic-interfaces>=0.5.1, <0.6.0
+graphviz>=0.18.2, <0.21
 python-dateutil>=2.8.2, <2.9.0
 rapidfuzz>=3.0, <4.0
