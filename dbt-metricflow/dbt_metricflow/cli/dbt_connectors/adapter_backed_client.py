@@ -5,7 +5,7 @@ import logging
 import time
 
 from dbt.adapters.base.impl import BaseAdapter
-from dbt.exceptions import DbtDatabaseError
+from dbt_common.exceptions.base import DbtDatabaseError
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from metricflow_semantics.errors.error_classes import SqlBindParametersNotSupportedError
 from metricflow_semantics.mf_logging.formatting import indent
@@ -132,9 +132,8 @@ class AdapterBackedSqlClient:
 
         Args:
             stmt: The SQL query statement to run. This should produce output via a SELECT
-            sql_bind_parameters: The parameter replacement mapping for filling in
-                concrete values for SQL query parameters.
-            extra_tags: An object containing JSON serialized tags meant for annotating queries.
+            sql_bind_parameters: The parameter replacement mapping for filling in concrete values for SQL query
+            parameters.
         """
         start = time.time()
         request_id = SqlRequestId(f"mf_rid__{random_id()}")

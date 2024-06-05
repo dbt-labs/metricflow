@@ -1,0 +1,4 @@
+# These are currently separate for ease of removal, but due to the way Python
+# handles import statements they are required in all test environments
+SQLAlchemy>=1.4.42, <1.5.0
+sqlalchemy2-stubs>=0.0.2a21, <0.0.3
