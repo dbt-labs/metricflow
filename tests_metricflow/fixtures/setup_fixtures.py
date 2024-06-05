@@ -16,10 +16,8 @@ from metricflow_semantics.test_helpers.snapshot_helpers import (
     add_display_snapshots_cli_flag,
     add_overwrite_snapshots_cli_flag,
 )
-from sqlalchemy.engine import make_url
 
 from tests_metricflow import TESTS_METRICFLOW_DIRECTORY_ANCHOR
-from tests_metricflow.fixtures.sql_clients.common_client import SqlDialect
 from tests_metricflow.snapshots import METRICFLOW_SNAPSHOT_DIRECTORY_ANCHOR
 from tests_metricflow.table_snapshot.table_snapshots import SqlTableSnapshotHash, SqlTableSnapshotRepository
 
@@ -152,14 +150,6 @@ def mf_test_configuration(  # noqa: D103
         snapshot_directory=METRICFLOW_SNAPSHOT_DIRECTORY_ANCHOR.directory,
         tests_directory=TESTS_METRICFLOW_DIRECTORY_ANCHOR.directory,
     )
-
-
-def dialect_from_url(url: str) -> SqlDialect:
-    """Return the SQL dialect specified in the URL in the configuration."""
-    dialect_protocol = make_url(url.split(";")[0]).drivername.split("+")
-    if len(dialect_protocol) > 2:
-        raise ValueError(f"Invalid # of +'s in {url}")
-    return SqlDialect(dialect_protocol[0])
 
 
 def dbt_project_dir() -> str:

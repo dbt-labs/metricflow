@@ -15,7 +15,8 @@ from dbt.cli.main import dbtRunner
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.protocols.sql_client import SqlClient
-from tests_metricflow.fixtures.setup_fixtures import dbt_project_dir, dialect_from_url
+from tests_metricflow.fixtures.connection_url import SqlEngineConnectionParameterSet
+from tests_metricflow.fixtures.setup_fixtures import dbt_project_dir
 from tests_metricflow.fixtures.sql_clients.adapter_backed_ddl_client import AdapterBackedDDLSqlClient
 from tests_metricflow.fixtures.sql_clients.common_client import SqlDialect
 from tests_metricflow.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
@@ -50,7 +51,7 @@ DBT_ENV_SECRET_TOKEN_URI = "DBT_ENV_SECRET_TOKEN_URI"
 DBT_ENV_SECRET_CATALOG = "DBT_ENV_SECRET_CATALOG"
 
 
-def __configure_test_env_from_url(url: str, password: str, schema: str) -> sqlalchemy.engine.URL:
+def __configure_test_env_from_url(url: str, password: str, schema: str) -> SqlEngineConnectionParameterSet:
     """Populates default env var mapping from a sqlalchemy URL string.
 
     This is used to configure the test environment from the original MF_SQL_ENGINE_URL environment variable in
@@ -58,25 +59,26 @@ def __configure_test_env_from_url(url: str, password: str, schema: str) -> sqlal
     the parsed URL object so that individual engine configurations can override the environment variables
     as needed to match their dbt profile configuration.
     """
-    parsed_url = sqlalchemy.engine.make_url(url)
+    # parsed_url = sqlalchemy.engine.make_url(url)
 
-    if parsed_url.drivername != "duckdb":
-        assert parsed_url.host, "Engine host is not set in engine connection URL!"
-        os.environ[DBT_ENV_SECRET_HOST] = parsed_url.host
+    connection_parameters = SqlEngineConnectionParameterSet.create_from_url(url)
+    if connection_parameters.dialect != "duckdb":
+        assert connection_parameters.hostname, "Engine host is not set in engine connection URL!"
+        os.environ[DBT_ENV_SECRET_HOST] = connection_parameters.hostname
 
-    if parsed_url.username:
-        os.environ[DBT_ENV_SECRET_USER] = parsed_url.username
+    if connection_parameters.username:
+        os.environ[DBT_ENV_SECRET_USER] = connection_parameters.username
 
-    if parsed_url.database:
-        os.environ[DBT_ENV_SECRET_DATABASE] = parsed_url.database
+    if connection_parameters.database:
+        os.environ[DBT_ENV_SECRET_DATABASE] = connection_parameters.database
 
-    if parsed_url.port:
-        os.environ[DBT_PROFILE_PORT] = str(parsed_url.port)
+    if connection_parameters.port:
+        os.environ[DBT_PROFILE_PORT] = str(connection_parameters.port)
 
     os.environ[DBT_ENV_SECRET_PASSWORD] = password
     os.environ[DBT_ENV_SECRET_SCHEMA] = schema
 
-    return parsed_url
+    return connection_parameters
 
 
 def __configure_bigquery_env_from_credential_string(password: str, schema: str) -> None:
@@ -140,37 +142,38 @@ def __initialize_dbt() -> None:
 def make_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithDDLMethods:
     """Build SQL client based on env configs."""
     # TODO: Switch on an enum of adapter type when all engines are cut over
-    dialect = dialect_from_url(url=url)
+    dialect = SqlDialect(SqlEngineConnectionParameterSet.create_from_url(url).dialect)
 
-    if dialect == SqlDialect.REDSHIFT:
+    if dialect is SqlDialect.REDSHIFT:
         __configure_test_env_from_url(url, password=password, schema=schema)
         __initialize_dbt()
         return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("redshift"))
-    elif dialect == SqlDialect.SNOWFLAKE:
-        parsed_url = __configure_test_env_from_url(url, password=password, schema=schema)
-        assert "warehouse" in parsed_url.normalized_query, "Sql engine URL params did not include Snowflake warehouse!"
-        warehouses = parsed_url.normalized_query["warehouse"]
-        assert len(warehouses) == 1, f"Found more than 1 warehouse in Snowflake URL: `{warehouses}`"
-        os.environ[DBT_ENV_SECRET_WAREHOUSE] = warehouses[0]
+    elif dialect is SqlDialect.SNOWFLAKE:
+        connection_parameters = __configure_test_env_from_url(url, password=password, schema=schema)
+        warehouse_names = connection_parameters.get_query_field_values("warehouse")
+        assert (
+            len(warehouse_names) == 1
+        ), f"SQL engine URL did not specify exactly 1 Snowflake warehouse! Got {warehouse_names}"
+        os.environ[DBT_ENV_SECRET_WAREHOUSE] = warehouse_names[0]
         __initialize_dbt()
         return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("snowflake"))
-    elif dialect == SqlDialect.BIGQUERY:
+    elif dialect is SqlDialect.BIGQUERY:
         __configure_bigquery_env_from_credential_string(password=password, schema=schema)
         __initialize_dbt()
         return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("bigquery"))
-    elif dialect == SqlDialect.POSTGRESQL:
+    elif dialect is SqlDialect.POSTGRESQL:
         __configure_test_env_from_url(url, password=password, schema=schema)
         __initialize_dbt()
         return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("postgres"))
-    elif dialect == SqlDialect.DUCKDB:
+    elif dialect is SqlDialect.DUCKDB:
         __configure_test_env_from_url(url, password=password, schema=schema)
         __initialize_dbt()
         return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("duckdb"))
-    elif dialect == SqlDialect.DATABRICKS:
+    elif dialect is SqlDialect.DATABRICKS:
         __configure_databricks_env_from_url(url, password=password, schema=schema)
         __initialize_dbt()
         return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("databricks"))
-    elif dialect == SqlDialect.TRINO:
+    elif dialect is SqlDialect.TRINO:
         __configure_test_env_from_url(url, password=password, schema=schema)
         __initialize_dbt()
         return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("trino"))
@@ -237,7 +240,7 @@ def warn_user_about_slow_tests_without_parallelism(  # noqa: D103
         ) from e
 
     num_items = len(request.session.items)
-    dialect = dialect_from_url(mf_test_configuration.sql_engine_url)
+    dialect = SqlDialect(SqlEngineConnectionParameterSet.create_from_url(mf_test_configuration.sql_engine_url).dialect)
 
     # If already running in parallel or if there's not many test items, no need to print the warning. Picking 10/30 as
     # the thresholds, but not much thought has been put into it.
