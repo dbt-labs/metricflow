@@ -242,7 +242,7 @@ def test_metric_filtered_by_itself(
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("bookers",),
         where_constraint=PydanticWhereFilter(
-            where_sql_template="{{ Metric('bookers', ['guest']) }} > 1.00",
+            where_sql_template="{{ Metric('bookers', ['listing']) }} > 1.00",
         ),
     ).query_spec
     dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
