@@ -1330,6 +1330,7 @@ def test_metric_in_metric_where_filter(
     )
 
 
+@pytest.mark.slow
 def test_all_available_metric_filters(
     dataflow_plan_builder: DataflowPlanBuilder, query_parser: MetricFlowQueryParser
 ) -> None:
