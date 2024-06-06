@@ -23,6 +23,7 @@ class DateutilTimePeriodAdjuster(TimePeriodAdjuster):
     def _relative_delta_for_window(self, time_granularity: TimeGranularity, count: int) -> relativedelta:
         """Relative-delta to cover time windows specified at different grains."""
         if time_granularity is TimeGranularity.NANOSECOND:
+            # TODO: figure out a workaround when enabling time constraints
             raise ValueError("`relativedelta` does not support nanoseconds.")
         elif time_granularity is TimeGranularity.MICROSECOND:
             return relativedelta(microseconds=count)

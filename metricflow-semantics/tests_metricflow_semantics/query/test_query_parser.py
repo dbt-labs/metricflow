@@ -178,7 +178,6 @@ METRICS_YAML = textwrap.dedent(
             alias: revenue_last_7_days
     """
 )
-# TODO: is this validation going to be a breaking change? Will users hit validation errors when querying?
 
 
 @pytest.fixture
