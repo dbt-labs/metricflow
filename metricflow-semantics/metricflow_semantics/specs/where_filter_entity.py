@@ -23,12 +23,8 @@ from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.rendered_spec_tracker import RenderedSpecTracker
 
 
-class WhereFilterEntity(ProtocolHint[QueryInterfaceEntity]):
+class RenderedWhereFilterEntity:
     """An entity that is passed in through the where filter parameter."""
-
-    @override
-    def _implements_protocol(self) -> QueryInterfaceEntity:
-        return self
 
     def __init__(  # noqa
         self,
@@ -49,12 +45,6 @@ class WhereFilterEntity(ProtocolHint[QueryInterfaceEntity]):
         self._entity_links = tuple(entity_links)
         self._time_grain = time_grain
         self._date_part = date_part
-
-    def descending(self, _is_descending: bool) -> QueryInterfaceEntity:
-        """Set the sort order for order-by."""
-        raise InvalidQuerySyntax(
-            "Can't set descending in the where clause. Try setting descending in the order_by clause instead"
-        )
 
     def __str__(self) -> str:
         """Returns the column name.
@@ -79,15 +69,11 @@ class WhereFilterEntity(ProtocolHint[QueryInterfaceEntity]):
         return column_association.column_name
 
 
-class WhereFilterEntityFactory(ProtocolHint[QueryInterfaceEntityFactory]):
-    """Creates a WhereFilterEntity.
+class RenderedWhereFilterEntityFactory(ProtocolHint[QueryInterfaceEntityFactory]):
+    """Creates a RenderedWhereFilterEntity.
 
     Each call to `create` adds an EntitySpec to entity_specs.
     """
-
-    @override
-    def _implements_protocol(self) -> QueryInterfaceEntityFactory:
-        return self
 
     def __init__(  # noqa
         self,
@@ -105,7 +91,7 @@ class WhereFilterEntityFactory(ProtocolHint[QueryInterfaceEntityFactory]):
         """Create a WhereFilterEntity."""
         structured_name = DunderedNameFormatter.parse_name(entity_name.lower())
 
-        return WhereFilterEntity(
+        return RenderedWhereFilterEntity(
             column_association_resolver=self._column_association_resolver,
             resolved_spec_lookup=self._resolved_spec_lookup,
             where_filter_location=self._where_filter_location,

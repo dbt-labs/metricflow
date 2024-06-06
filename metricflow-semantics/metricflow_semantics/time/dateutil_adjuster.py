@@ -5,7 +5,6 @@ from typing import Optional
 
 import dateutil.relativedelta
 from dateutil.relativedelta import relativedelta
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from typing_extensions import override
 
@@ -32,8 +31,8 @@ class DateutilTimePeriodAdjuster(TimePeriodAdjuster):
             return relativedelta(months=count * 3)
         elif time_granularity is TimeGranularity.YEAR:
             return relativedelta(years=count)
-        else:
-            assert_values_exhausted(time_granularity)
+        # else:
+        #     assert_values_exhausted(time_granularity)
 
     @override
     def expand_time_constraint_to_fill_granularity(
@@ -70,8 +69,8 @@ class DateutilTimePeriodAdjuster(TimePeriodAdjuster):
                 return date_to_adjust + relativedelta(month=10, day=1)
         elif time_granularity is TimeGranularity.YEAR:
             return date_to_adjust + relativedelta(month=1, day=1)
-        else:
-            assert_values_exhausted(time_granularity)
+        # else:
+        #     assert_values_exhausted(time_granularity)
 
     @override
     def adjust_to_end_of_period(
@@ -94,8 +93,8 @@ class DateutilTimePeriodAdjuster(TimePeriodAdjuster):
                 return date_to_adjust + relativedelta(month=12, day=31)
         elif time_granularity is TimeGranularity.YEAR:
             return date_to_adjust + relativedelta(month=12, day=31)
-        else:
-            assert_values_exhausted(time_granularity)
+        # else:
+        #     assert_values_exhausted(time_granularity)
 
     @override
     def expand_time_constraint_for_cumulative_metric(

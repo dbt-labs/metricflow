@@ -18,7 +18,6 @@ from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec
 )
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.rendered_spec_tracker import RenderedSpecTracker
-
 from metricflow_semantics.specs.where_filter_entity import WhereFilterEntity
 
 
