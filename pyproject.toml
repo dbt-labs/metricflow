@@ -66,9 +66,6 @@ dev-packages = [
   "metricflow-semantics/extra-hatch-configuration/requirements-dev-packages.txt",
   "dbt-metricflow/extra-hatch-configuration/requirements-cli.txt"
 ]
-sql-client-packages = [
-  "extra-hatch-configuration/requirements-sql-client-packages.txt"
-]
 trino-sql-client-packages = [
   "extra-hatch-configuration/requirements-trino-sql-client-packages.txt"
 ]
@@ -96,7 +93,6 @@ run = "run-coverage --no-cov"
 
 features = [
   "dev-packages",
-  "sql-client-packages",
   "dbt-duckdb",
 ]
 
@@ -119,7 +115,6 @@ description = "Dev environment for working with Postgres adapter"
 
 features = [
   "dev-packages",
-  "sql-client-packages",
   "dbt-postgres",
 ]
 
@@ -136,7 +131,6 @@ description = "Dev environment for working with the BigQuery adapter"
 
 features = [
   "dev-packages",
-  "sql-client-packages",
   "dbt-bigquery",
 ]
 
@@ -151,7 +145,6 @@ description = "Dev environment for working with the Databricks adapter"
 
 features = [
   "dev-packages",
-  "sql-client-packages",
   "dbt-databricks",
 ]
 
@@ -165,7 +158,6 @@ description = "Dev environment for working with the Redshift adapter"
 
 features = [
   "dev-packages",
-  "sql-client-packages",
   "dbt-redshift"
 ]
 
@@ -179,7 +171,6 @@ description = "Dev environment for working with Snowflake adapter"
 
 features = [
   "dev-packages",
-  "sql-client-packages",
   "dbt-snowflake",
 ]
 
@@ -195,7 +186,6 @@ description = "Dev environment for working with the Trino adapter"
 
 features = [
   "dev-packages",
-  "sql-client-packages",
   "trino-sql-client-packages",
   "dbt-trino"
 ]
