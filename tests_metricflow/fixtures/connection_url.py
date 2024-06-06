@@ -36,12 +36,14 @@ class SqlEngineConnectionParameterSet:
 
         * This implementation is used to avoid having to specify SQLAlchemy as a dependency.
         * Databricks has a URL with a semicolon that separates an additional parameter. e.g.
-          `databricks://host:port/database;http_path=a/b/c`. Need additional context for why this is done.
+          `databricks://host:port/database;http_path=a/b/c`. From @tlento: "Our original Databricks client was built
+          before they added an officially supported SQLAlchemy client, so we used the JDBC connection URI.
+          https://docs.databricks.com/en/integrations/jdbc/authentication.html"
         """
-        url_seperator = ";"
-        url_split = url_str.split(url_seperator)
+        url_separator = ";"
+        url_split = url_str.split(url_separator)
         if len(url_split) > 2:
-            raise ValueError(f"Expected at most 1 {repr(url_seperator)} in {url_str}")
+            raise ValueError(f"Expected at most 1 {repr(url_separator)} in {url_str}")
 
         parsed_url = urllib.parse.urlparse(url_split[0])
         url_extra = url_split[1] if len(url_split) > 1 else None
@@ -62,9 +64,9 @@ class SqlEngineConnectionParameterSet:
 
         http_path = None
         if url_extra is not None:
-            field_name_value_seperator = "="
-            url_extra_split = url_extra.split(field_name_value_seperator)
-            if len(field_name_value_seperator) == 2:
+            field_name_value_separator = "="
+            url_extra_split = url_extra.split(field_name_value_separator)
+            if len(field_name_value_separator) == 2:
                 field_name = url_extra_split[0]
                 value = url_split[1]
                 if field_name.lower() == "http_path":

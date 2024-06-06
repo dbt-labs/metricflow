@@ -57,8 +57,6 @@ def __configure_test_env_from_url(url: str, password: str, schema: str) -> SqlEn
     the parsed URL object so that individual engine configurations can override the environment variables
     as needed to match their dbt profile configuration.
     """
-    # parsed_url = sqlalchemy.engine.make_url(url)
-
     connection_parameters = SqlEngineConnectionParameterSet.create_from_url(url)
     if connection_parameters.dialect != "duckdb":
         assert connection_parameters.hostname, "Engine host is not set in engine connection URL!"
