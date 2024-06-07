@@ -82,7 +82,7 @@ semantic_model:
     - name: paid_at
       type: time
       type_params:
-        time_granularity: day
+        time_granularity: second
 
   primary_entity: booking
 
