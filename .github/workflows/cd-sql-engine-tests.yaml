@@ -108,10 +108,10 @@ jobs:
       - name: Check-out the repo
         uses: actions/checkout@v3
 
-      - name: Test w/ Python 3.11
+      - name: Test w/ Python 3.12
         uses: ./.github/actions/run-mf-tests
         with:
-          python-version: "3.11"
+          python-version: "3.12"
           make-target: "test-trino"
 
   remove-label:
