@@ -7,6 +7,7 @@ from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from metricflow_semantics.errors.error_classes import UnsupportedEngineFeatureError
 from typing_extensions import override
 
+from metricflow.protocols.sql_client import SqlEngine
 from metricflow.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,
     SqlExpressionRenderer,
@@ -18,6 +19,8 @@ from metricflow.sql.sql_exprs import SqlPercentileExpression, SqlPercentileFunct
 
 class DatabricksSqlExpressionRenderer(DefaultSqlExpressionRenderer):
     """Expression renderer for the Databricks engine."""
+
+    sql_engine = SqlEngine.DATABRICKS
 
     @property
     @override

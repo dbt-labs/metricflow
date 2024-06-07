@@ -8,6 +8,7 @@ from metricflow_semantics.errors.error_classes import UnsupportedEngineFeatureEr
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
 from typing_extensions import override
 
+from metricflow.protocols.sql_client import SqlEngine
 from metricflow.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,
     SqlExpressionRenderer,
@@ -23,6 +24,8 @@ from metricflow.sql.sql_exprs import (
 
 class SnowflakeSqlExpressionRenderer(DefaultSqlExpressionRenderer):
     """Expression renderer for the Snowflake engine."""
+
+    sql_engine = SqlEngine.SNOWFLAKE
 
     @property
     @override
