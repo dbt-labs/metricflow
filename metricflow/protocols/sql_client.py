@@ -28,7 +28,13 @@ class SqlEngine(Enum):
 
     @property
     def unsupported_granularities(self) -> Set[TimeGranularity]:
-        """Granularities that can't be used with this SqlEngine."""
+        """Granularities that can't be used with this SqlEngine.
+
+        We allow the smallest granularity the SqlEngine supports for its base TIMESTAMP type and all our required
+        operations (e.g., DATE_TRUNC). For example, when we added support for these granularities
+        Trino supported more precise types for storage and access, but Trino's base TIMESTAMP type and
+        DATE_TRUNC function only supported millisecond precision.
+        """
         if self is SqlEngine.SNOWFLAKE:
             return set()
         elif self is SqlEngine.BIGQUERY:
