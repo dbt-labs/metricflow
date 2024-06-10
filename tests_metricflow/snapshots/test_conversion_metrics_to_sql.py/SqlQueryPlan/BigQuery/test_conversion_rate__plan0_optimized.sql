@@ -74,7 +74,7 @@ FROM (
         -- Metric Time Dimension 'ds'
         -- Pass Only Elements: ['visits', 'visit__referrer_id', 'ds__day', 'user']
         SELECT
-          DATE_TRUNC(ds, day) AS ds__day
+          DATETIME_TRUNC(ds, day) AS ds__day
           , user_id AS user
           , referrer_id AS visit__referrer_id
           , 1 AS visits
@@ -85,7 +85,7 @@ FROM (
         -- Metric Time Dimension 'ds'
         -- Add column with generated UUID
         SELECT
-          DATE_TRUNC(ds, day) AS ds__day
+          DATETIME_TRUNC(ds, day) AS ds__day
           , user_id AS user
           , 1 AS buys
           , GENERATE_UUID() AS mf_internal_uuid

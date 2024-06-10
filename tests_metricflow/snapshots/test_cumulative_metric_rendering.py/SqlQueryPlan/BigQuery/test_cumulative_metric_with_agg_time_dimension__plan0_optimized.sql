@@ -10,9 +10,9 @@ INNER JOIN
   ***************************.fct_revenue revenue_src_28000
 ON
   (
-    DATE_TRUNC(revenue_src_28000.created_at, day) <= subq_10.ds
+    DATETIME_TRUNC(revenue_src_28000.created_at, day) <= subq_10.ds
   ) AND (
-    DATE_TRUNC(revenue_src_28000.created_at, day) > DATE_SUB(CAST(subq_10.ds AS DATETIME), INTERVAL 2 month)
+    DATETIME_TRUNC(revenue_src_28000.created_at, day) > DATE_SUB(CAST(subq_10.ds AS DATETIME), INTERVAL 2 month)
   )
 GROUP BY
   revenue_instance__ds__day

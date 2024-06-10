@@ -6,7 +6,7 @@ FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Pass Only Elements: ['booking__paid_at__day',]
   SELECT
-    DATE_TRUNC(paid_at, day) AS booking__paid_at__day
+    DATETIME_TRUNC(paid_at, day) AS booking__paid_at__day
   FROM ***************************.fct_bookings bookings_source_src_28000
   GROUP BY
     booking__paid_at__day

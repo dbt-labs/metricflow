@@ -21,13 +21,13 @@ FROM (
       -- Pass Only Elements: ['booking_value', 'metric_time__month', 'metric_time__day']
       SELECT
         subq_21.ds AS metric_time__day
-        , DATE_TRUNC(subq_21.ds, month) AS metric_time__month
+        , DATETIME_TRUNC(subq_21.ds, month) AS metric_time__month
         , bookings_source_src_28000.booking_value AS booking_value
       FROM ***************************.mf_time_spine subq_21
       INNER JOIN
         ***************************.fct_bookings bookings_source_src_28000
       ON
-        DATE_SUB(CAST(subq_21.ds AS DATETIME), INTERVAL 1 week) = DATE_TRUNC(bookings_source_src_28000.ds, day)
+        DATE_SUB(CAST(subq_21.ds AS DATETIME), INTERVAL 1 week) = DATETIME_TRUNC(bookings_source_src_28000.ds, day)
     ) subq_23
     WHERE metric_time__day = '2020-01-01'
     GROUP BY
@@ -46,8 +46,8 @@ FROM (
       -- Metric Time Dimension 'ds'
       -- Pass Only Elements: ['bookers', 'metric_time__month', 'metric_time__day']
       SELECT
-        DATE_TRUNC(ds, day) AS metric_time__day
-        , DATE_TRUNC(ds, month) AS metric_time__month
+        DATETIME_TRUNC(ds, day) AS metric_time__day
+        , DATETIME_TRUNC(ds, month) AS metric_time__month
         , guest_id AS bookers
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_30

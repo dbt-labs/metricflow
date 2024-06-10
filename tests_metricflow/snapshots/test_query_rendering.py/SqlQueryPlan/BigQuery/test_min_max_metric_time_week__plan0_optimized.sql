@@ -7,7 +7,7 @@ FROM (
   -- Metric Time Dimension 'ds'
   -- Pass Only Elements: ['metric_time__week',]
   SELECT
-    DATE_TRUNC(ds, isoweek) AS metric_time__week
+    DATETIME_TRUNC(ds, isoweek) AS metric_time__week
   FROM ***************************.mf_time_spine time_spine_src_28000
   GROUP BY
     metric_time__week

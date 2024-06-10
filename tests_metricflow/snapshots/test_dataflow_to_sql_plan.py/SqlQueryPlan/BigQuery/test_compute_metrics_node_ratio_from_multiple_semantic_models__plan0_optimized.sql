@@ -24,7 +24,7 @@ FROM (
       -- Metric Time Dimension 'ds'
       -- Pass Only Elements: ['bookings', 'ds__day', 'listing']
       SELECT
-        DATE_TRUNC(ds, day) AS ds__day
+        DATETIME_TRUNC(ds, day) AS ds__day
         , listing_id AS listing
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
@@ -51,7 +51,7 @@ FROM (
       -- Metric Time Dimension 'ds'
       -- Pass Only Elements: ['views', 'ds__day', 'listing']
       SELECT
-        DATE_TRUNC(ds, day) AS ds__day
+        DATETIME_TRUNC(ds, day) AS ds__day
         , listing_id AS listing
         , 1 AS views
       FROM ***************************.fct_views views_source_src_28000

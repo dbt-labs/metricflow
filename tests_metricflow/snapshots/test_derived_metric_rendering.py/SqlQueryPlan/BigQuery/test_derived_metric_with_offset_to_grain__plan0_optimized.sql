@@ -19,7 +19,7 @@ FROM (
       -- Metric Time Dimension 'ds'
       -- Pass Only Elements: ['bookings', 'metric_time__day']
       SELECT
-        DATE_TRUNC(ds, day) AS metric_time__day
+        DATETIME_TRUNC(ds, day) AS metric_time__day
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_16
@@ -39,12 +39,12 @@ FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
       SELECT
-        DATE_TRUNC(ds, day) AS metric_time__day
+        DATETIME_TRUNC(ds, day) AS metric_time__day
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_20
     ON
-      DATE_TRUNC(subq_22.ds, month) = subq_20.metric_time__day
+      DATETIME_TRUNC(subq_22.ds, month) = subq_20.metric_time__day
     GROUP BY
       metric_time__day
   ) subq_26

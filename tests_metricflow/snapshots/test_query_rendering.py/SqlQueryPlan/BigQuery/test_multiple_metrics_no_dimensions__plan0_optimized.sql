@@ -12,7 +12,7 @@ FROM (
   SELECT
     SUM(1) AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-  WHERE DATE_TRUNC(ds, day) BETWEEN '2020-01-01' AND '2020-01-01'
+  WHERE DATETIME_TRUNC(ds, day) BETWEEN '2020-01-01' AND '2020-01-01'
 ) subq_21
 CROSS JOIN (
   -- Read Elements From Semantic Model 'listings_latest'
@@ -24,5 +24,5 @@ CROSS JOIN (
   SELECT
     SUM(1) AS listings
   FROM ***************************.dim_listings_latest listings_latest_src_28000
-  WHERE DATE_TRUNC(created_at, day) BETWEEN '2020-01-01' AND '2020-01-01'
+  WHERE DATETIME_TRUNC(created_at, day) BETWEEN '2020-01-01' AND '2020-01-01'
 ) subq_27

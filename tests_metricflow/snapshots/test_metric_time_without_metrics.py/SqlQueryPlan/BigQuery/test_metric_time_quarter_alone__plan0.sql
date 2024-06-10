@@ -29,11 +29,11 @@ FROM (
   FROM (
     -- Time Spine
     SELECT
-      DATE_TRUNC(time_spine_src_28000.ds, day) AS ds__day
-      , DATE_TRUNC(time_spine_src_28000.ds, isoweek) AS ds__week
-      , DATE_TRUNC(time_spine_src_28000.ds, month) AS ds__month
-      , DATE_TRUNC(time_spine_src_28000.ds, quarter) AS ds__quarter
-      , DATE_TRUNC(time_spine_src_28000.ds, year) AS ds__year
+      DATETIME_TRUNC(time_spine_src_28000.ds, day) AS ds__day
+      , DATETIME_TRUNC(time_spine_src_28000.ds, isoweek) AS ds__week
+      , DATETIME_TRUNC(time_spine_src_28000.ds, month) AS ds__month
+      , DATETIME_TRUNC(time_spine_src_28000.ds, quarter) AS ds__quarter
+      , DATETIME_TRUNC(time_spine_src_28000.ds, year) AS ds__year
       , EXTRACT(year FROM time_spine_src_28000.ds) AS ds__extract_year
       , EXTRACT(quarter FROM time_spine_src_28000.ds) AS ds__extract_quarter
       , EXTRACT(month FROM time_spine_src_28000.ds) AS ds__extract_month

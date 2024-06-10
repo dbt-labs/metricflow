@@ -20,7 +20,7 @@ FROM (
     INNER JOIN
       ***************************.fct_bookings bookings_source_src_28000
     ON
-      DATE_SUB(CAST(subq_17.ds AS DATETIME), INTERVAL 1 week) = DATE_TRUNC(bookings_source_src_28000.ds, day)
+      DATE_SUB(CAST(subq_17.ds AS DATETIME), INTERVAL 1 week) = DATETIME_TRUNC(bookings_source_src_28000.ds, day)
     GROUP BY
       booking__ds__day
   ) subq_21
@@ -31,7 +31,7 @@ FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      DATE_TRUNC(ds, day) AS booking__ds__day
+      DATETIME_TRUNC(ds, day) AS booking__ds__day
       , COUNT(DISTINCT guest_id) AS bookers
     FROM ***************************.fct_bookings bookings_source_src_28000
     GROUP BY

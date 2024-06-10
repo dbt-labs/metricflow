@@ -19,7 +19,7 @@ FROM (
       -- Metric Time Dimension 'ds'
       -- Pass Only Elements: ['referred_bookings', 'metric_time__day']
       SELECT
-        DATE_TRUNC(ds, day) AS metric_time__day
+        DATETIME_TRUNC(ds, day) AS metric_time__day
         , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS referred_bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_13
@@ -37,7 +37,7 @@ FROM (
       -- Metric Time Dimension 'ds'
       -- Pass Only Elements: ['bookings', 'metric_time__day']
       SELECT
-        DATE_TRUNC(ds, day) AS metric_time__day
+        DATETIME_TRUNC(ds, day) AS metric_time__day
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_18

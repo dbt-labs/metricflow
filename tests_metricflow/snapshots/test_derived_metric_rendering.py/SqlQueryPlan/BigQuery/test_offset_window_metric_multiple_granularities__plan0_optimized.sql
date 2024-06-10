@@ -19,14 +19,14 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       subq_17.ds AS metric_time__day
-      , DATE_TRUNC(subq_17.ds, month) AS metric_time__month
-      , DATE_TRUNC(subq_17.ds, year) AS metric_time__year
+      , DATETIME_TRUNC(subq_17.ds, month) AS metric_time__month
+      , DATETIME_TRUNC(subq_17.ds, year) AS metric_time__year
       , SUM(bookings_source_src_28000.booking_value) AS booking_value
     FROM ***************************.mf_time_spine subq_17
     INNER JOIN
       ***************************.fct_bookings bookings_source_src_28000
     ON
-      DATE_SUB(CAST(subq_17.ds AS DATETIME), INTERVAL 1 week) = DATE_TRUNC(bookings_source_src_28000.ds, day)
+      DATE_SUB(CAST(subq_17.ds AS DATETIME), INTERVAL 1 week) = DATETIME_TRUNC(bookings_source_src_28000.ds, day)
     GROUP BY
       metric_time__day
       , metric_time__month
@@ -39,9 +39,9 @@ FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      DATE_TRUNC(ds, day) AS metric_time__day
-      , DATE_TRUNC(ds, month) AS metric_time__month
-      , DATE_TRUNC(ds, year) AS metric_time__year
+      DATETIME_TRUNC(ds, day) AS metric_time__day
+      , DATETIME_TRUNC(ds, month) AS metric_time__month
+      , DATETIME_TRUNC(ds, year) AS metric_time__year
       , COUNT(DISTINCT guest_id) AS bookers
     FROM ***************************.fct_bookings bookings_source_src_28000
     GROUP BY

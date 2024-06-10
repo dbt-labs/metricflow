@@ -31,7 +31,7 @@ FROM (
           -- Metric Time Dimension 'ds'
           -- Pass Only Elements: ['referred_bookings', 'metric_time__day']
           SELECT
-            DATE_TRUNC(ds, day) AS metric_time__day
+            DATETIME_TRUNC(ds, day) AS metric_time__day
             , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS referred_bookings
           FROM ***************************.fct_bookings bookings_source_src_28000
         ) subq_25
@@ -49,7 +49,7 @@ FROM (
           -- Metric Time Dimension 'ds'
           -- Pass Only Elements: ['bookings', 'metric_time__day']
           SELECT
-            DATE_TRUNC(ds, day) AS metric_time__day
+            DATETIME_TRUNC(ds, day) AS metric_time__day
             , 1 AS bookings
           FROM ***************************.fct_bookings bookings_source_src_28000
         ) subq_30
@@ -73,7 +73,7 @@ FROM (
       -- Metric Time Dimension 'ds'
       -- Pass Only Elements: ['instant_bookings', 'metric_time__day']
       SELECT
-        DATE_TRUNC(ds, day) AS metric_time__day
+        DATETIME_TRUNC(ds, day) AS metric_time__day
         , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_37
@@ -93,7 +93,7 @@ FROM (
       -- Metric Time Dimension 'ds'
       -- Pass Only Elements: ['bookings', 'metric_time__day']
       SELECT
-        DATE_TRUNC(ds, day) AS metric_time__day
+        DATETIME_TRUNC(ds, day) AS metric_time__day
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_42

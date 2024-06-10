@@ -15,20 +15,20 @@ FROM (
     -- Pass Only Elements: ['bookings', 'metric_time__month', 'metric_time__day']
     SELECT
       subq_13.ds AS metric_time__day
-      , DATE_TRUNC(subq_13.ds, month) AS metric_time__month
+      , DATETIME_TRUNC(subq_13.ds, month) AS metric_time__month
       , subq_11.bookings AS bookings
     FROM ***************************.mf_time_spine subq_13
     INNER JOIN (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
       SELECT
-        DATE_TRUNC(ds, day) AS metric_time__day
+        DATETIME_TRUNC(ds, day) AS metric_time__day
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_11
     ON
-      DATE_TRUNC(subq_13.ds, month) = subq_11.metric_time__day
-    WHERE DATE_TRUNC(subq_13.ds, month) = subq_13.ds
+      DATETIME_TRUNC(subq_13.ds, month) = subq_11.metric_time__day
+    WHERE DATETIME_TRUNC(subq_13.ds, month) = subq_13.ds
   ) subq_15
   WHERE metric_time__day = '2020-01-01'
   GROUP BY

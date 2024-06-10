@@ -22,7 +22,7 @@ INNER JOIN (
     -- Pass Only Elements: ['booking_value', 'metric_time__day', 'listing']
     -- Aggregate Measures
     SELECT
-      DATE_TRUNC(ds, day) AS metric_time__day
+      DATETIME_TRUNC(ds, day) AS metric_time__day
       , listing_id AS listing
       , SUM(booking_value) AS booking_value
     FROM ***************************.fct_bookings bookings_source_src_28000
@@ -32,4 +32,4 @@ INNER JOIN (
   ) subq_10
 ) subq_11
 ON
-  DATE_TRUNC(subq_12.metric_time__day, month) = subq_11.metric_time__day
+  DATETIME_TRUNC(subq_12.metric_time__day, month) = subq_11.metric_time__day

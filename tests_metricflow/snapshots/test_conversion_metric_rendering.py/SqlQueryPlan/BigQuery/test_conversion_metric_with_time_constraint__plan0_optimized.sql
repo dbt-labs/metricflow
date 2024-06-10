@@ -23,7 +23,7 @@ FROM (
         referrer_id AS visit__referrer_id
         , 1 AS visits
       FROM ***************************.fct_visits visits_source_src_28000
-      WHERE DATE_TRUNC(ds, day) BETWEEN '2020-01-01' AND '2020-01-02'
+      WHERE DATETIME_TRUNC(ds, day) BETWEEN '2020-01-01' AND '2020-01-02'
     ) subq_25
     WHERE visit__referrer_id = 'ref_id_01'
     GROUP BY
@@ -79,19 +79,19 @@ FROM (
         -- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-02T00:00:00]
         -- Pass Only Elements: ['visits', 'visit__referrer_id', 'ds__day', 'user']
         SELECT
-          DATE_TRUNC(ds, day) AS ds__day
+          DATETIME_TRUNC(ds, day) AS ds__day
           , user_id AS user
           , referrer_id AS visit__referrer_id
           , 1 AS visits
         FROM ***************************.fct_visits visits_source_src_28000
-        WHERE DATE_TRUNC(ds, day) BETWEEN '2020-01-01' AND '2020-01-02'
+        WHERE DATETIME_TRUNC(ds, day) BETWEEN '2020-01-01' AND '2020-01-02'
       ) subq_31
       INNER JOIN (
         -- Read Elements From Semantic Model 'buys_source'
         -- Metric Time Dimension 'ds'
         -- Add column with generated UUID
         SELECT
-          DATE_TRUNC(ds, day) AS ds__day
+          DATETIME_TRUNC(ds, day) AS ds__day
           , user_id AS user
           , 1 AS buys
           , GENERATE_UUID() AS mf_internal_uuid

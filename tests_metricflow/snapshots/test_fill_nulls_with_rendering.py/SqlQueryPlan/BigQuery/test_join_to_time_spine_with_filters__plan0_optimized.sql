@@ -32,10 +32,10 @@ FROM (
         -- Constrain Time Range to [2020-01-03T00:00:00, 2020-01-05T00:00:00]
         -- Pass Only Elements: ['bookings', 'metric_time__day']
         SELECT
-          DATE_TRUNC(ds, day) AS metric_time__day
+          DATETIME_TRUNC(ds, day) AS metric_time__day
           , 1 AS bookings
         FROM ***************************.fct_bookings bookings_source_src_28000
-        WHERE DATE_TRUNC(ds, day) BETWEEN '2020-01-03' AND '2020-01-05'
+        WHERE DATETIME_TRUNC(ds, day) BETWEEN '2020-01-03' AND '2020-01-05'
       ) subq_16
       WHERE metric_time__day > '2020-01-01'
       GROUP BY

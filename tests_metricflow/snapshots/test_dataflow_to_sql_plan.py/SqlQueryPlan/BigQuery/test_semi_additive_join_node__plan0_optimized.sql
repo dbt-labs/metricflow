@@ -35,11 +35,11 @@ FROM (
     account_balance
     , account_balance AS total_account_balance_first_day
     , account_balance AS current_account_balance_by_user
-    , DATE_TRUNC(ds, day) AS ds__day
-    , DATE_TRUNC(ds, isoweek) AS ds__week
-    , DATE_TRUNC(ds, month) AS ds__month
-    , DATE_TRUNC(ds, quarter) AS ds__quarter
-    , DATE_TRUNC(ds, year) AS ds__year
+    , DATETIME_TRUNC(ds, day) AS ds__day
+    , DATETIME_TRUNC(ds, isoweek) AS ds__week
+    , DATETIME_TRUNC(ds, month) AS ds__month
+    , DATETIME_TRUNC(ds, quarter) AS ds__quarter
+    , DATETIME_TRUNC(ds, year) AS ds__year
     , EXTRACT(year FROM ds) AS ds__extract_year
     , EXTRACT(quarter FROM ds) AS ds__extract_quarter
     , EXTRACT(month FROM ds) AS ds__extract_month
@@ -47,11 +47,11 @@ FROM (
     , IF(EXTRACT(dayofweek FROM ds) = 1, 7, EXTRACT(dayofweek FROM ds) - 1) AS ds__extract_dow
     , EXTRACT(dayofyear FROM ds) AS ds__extract_doy
     , account_type
-    , DATE_TRUNC(ds, day) AS account__ds__day
-    , DATE_TRUNC(ds, isoweek) AS account__ds__week
-    , DATE_TRUNC(ds, month) AS account__ds__month
-    , DATE_TRUNC(ds, quarter) AS account__ds__quarter
-    , DATE_TRUNC(ds, year) AS account__ds__year
+    , DATETIME_TRUNC(ds, day) AS account__ds__day
+    , DATETIME_TRUNC(ds, isoweek) AS account__ds__week
+    , DATETIME_TRUNC(ds, month) AS account__ds__month
+    , DATETIME_TRUNC(ds, quarter) AS account__ds__quarter
+    , DATETIME_TRUNC(ds, year) AS account__ds__year
     , EXTRACT(year FROM ds) AS account__ds__extract_year
     , EXTRACT(quarter FROM ds) AS account__ds__extract_quarter
     , EXTRACT(month FROM ds) AS account__ds__extract_month
@@ -67,7 +67,7 @@ INNER JOIN (
   -- Read Elements From Semantic Model 'accounts_source'
   -- Filter row on MIN(ds__day)
   SELECT
-    MIN(DATE_TRUNC(ds, day)) AS ds__day__complete
+    MIN(DATETIME_TRUNC(ds, day)) AS ds__day__complete
   FROM ***************************.fct_accounts accounts_source_src_28000
 ) subq_5
 ON
