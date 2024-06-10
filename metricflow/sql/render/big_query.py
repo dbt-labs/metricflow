@@ -131,10 +131,8 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
         if node.time_granularity == TimeGranularity.WEEK:
             prefix = "iso"
 
-        trunc_expr = "DATE_TRUNC" if node.time_granularity.to_int() >= TimeGranularity.DAY.to_int() else "TIME_TRUNC"
-
         return SqlExpressionRenderResult(
-            sql=f"{trunc_expr}({arg_rendered.sql}, {prefix}{node.time_granularity.value})",
+            sql=f"DATETIME_TRUNC({arg_rendered.sql}, {prefix}{node.time_granularity.value})",
             bind_parameters=arg_rendered.bind_parameters,
         )
 
