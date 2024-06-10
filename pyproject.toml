@@ -146,9 +146,12 @@ MF_TEST_ADAPTER_TYPE="databricks"
 [tool.hatch.envs.databricks-env]
 description = "Dev environment for working with the Databricks adapter"
 
+pre-install-commands = [
+  "pip install dbt-databricks"
+]
+
 features = [
   "dev-packages",
-  "dbt-databricks",
 ]
 
 
