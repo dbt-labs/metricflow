@@ -402,6 +402,10 @@ class SqlColumnReferenceExpression(SqlExpressionNode):
         self._should_render_table_alias = should_render_table_alias
         super().__init__(node_id=self.create_unique_id(), parent_nodes=[])
 
+    @staticmethod
+    def from_table_and_column_names(table_alias: str, column_name: str) -> SqlColumnReferenceExpression:  # noqa: D102
+        return SqlColumnReferenceExpression(SqlColumnReference(table_alias=table_alias, column_name=column_name))
+
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D102
         return StaticIdPrefix.SQL_EXPR_COLUMN_REFERENCE_ID_PREFIX
@@ -945,7 +949,9 @@ class SqlWindowFunction(Enum):
     """
 
     FIRST_VALUE = "first_value"
+    LAST_VALUE = "last_value"
     ROW_NUMBER = "row_number"
+    AVERAGE = "avg"
 
 
 @dataclass(frozen=True)

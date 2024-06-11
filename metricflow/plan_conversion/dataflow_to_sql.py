@@ -61,6 +61,7 @@ from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
 from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
+from metricflow.dataflow.nodes.window_reaggregation_node import WindowReaggregationNode
 from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTableNode
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataset.dataset_classes import DataSet
@@ -786,6 +787,111 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 sql_function_args=[metric_expr, SqlStringExpression(str(input_measure.fill_nulls_with))],
             )
         return metric_expr
+
+    def visit_window_reaggregation_node(self, node: WindowReaggregationNode) -> SqlDataSet:  # noqa: D102
+        from_data_set = node.parent_node.accept(self)
+        parent_instance_set = from_data_set.instance_set  # remove order by col
+        from_data_set_alias = self._next_unique_table_alias()
+
+        metric_instances = parent_instance_set.metric_instances
+        agg_time_dimension_instances = parent_instance_set.agg_time_dimension_instances(
+            metric_references=[metric_instance.spec.reference for metric_instance in metric_instances],
+            metric_lookup=self._metric_lookup,
+        )
+        for metric_instance in metric_instances:
+            sql_function = SqlWindowFunction[
+                self._metric_lookup.get_metric(
+                    metric_instance.spec.reference
+                ).type_params.cumulative_type_params.period_agg.name
+            ]  # pending DSI upgrade
+            minimum_queryable_granularity = self._metric_lookup.get_min_queryable_time_granularity(
+                metric_instance.spec.reference
+            )
+
+        # TODO: confirm this is the behavior we want. If you query multiple cumulative metrics with non-default granularity,
+        # you can only use agg_time_dimension if they share the same agg_time_dimension. Else, must use metric_time.
+        # Also, you can only include one metric_time/agg_time_dimension in each query.
+        order_by_instance = None
+        partition_by_instance = None
+        for agg_time_dimension_instance in agg_time_dimension_instances:
+            if agg_time_dimension_instance.spec.time_granularity == minimum_queryable_granularity:
+                if order_by_instance:
+                    # Need to validate this in the query parser - only allow one agg_time_dimension in these queries
+                    # If there are multiple metrics and they have different agg time dims, you must use metric_time
+                    raise ValueError(  # is this true?
+                        "Found multiple agg_time_dimensions matching defined granularity. Something has been misconfigured."
+                    )
+                order_by_instance = agg_time_dimension_instance
+            else:
+                if partition_by_instance:
+                    raise ValueError(
+                        "Found multiple agg_time_dimensions not matching defined granularity. Something has been misconfigured."
+                    )
+                partition_by_instance = agg_time_dimension_instance
+        assert (
+            order_by_instance and partition_by_instance
+        ), f"Did not receive appropriate agg_time_dimensions to render SQL for WindowReaggregationNode. Got: {agg_time_dimension_instances}"
+
+        metric_select_columns = tuple(
+            SqlSelectColumn(
+                expr=SqlWindowFunctionExpression(
+                    sql_function=sql_function,
+                    sql_function_args=[
+                        SqlColumnReferenceExpression.from_table_and_column_names(
+                            table_alias=from_data_set_alias, column_name=metric_instance.associated_column.column_name
+                        )
+                    ],
+                    partition_by_args=[
+                        SqlColumnReferenceExpression.from_table_and_column_names(
+                            table_alias=from_data_set_alias,
+                            column_name=partition_by_instance.associated_column.column_name,
+                        )
+                    ],
+                    order_by_args=[
+                        SqlWindowOrderByArgument(
+                            expr=SqlColumnReferenceExpression.from_table_and_column_names(
+                                table_alias=from_data_set_alias,
+                                column_name=order_by_instance.associated_column.column_name,
+                            ),
+                        )
+                    ],
+                ),
+                column_alias=metric_instance.associated_column.column_name,
+            )
+            for metric_instance in metric_instances
+        )
+
+        # Drop order by column from dataset
+        output_instance_set = parent_instance_set.transform(
+            FilterElements(exclude_specs=InstanceSpecSet(time_dimension_specs=(order_by_instance.spec,)))
+        )
+
+        # Create select columns, replacing metric columns with window function columns built above
+        select_columns = (
+            output_instance_set.transform(
+                FilterElements(
+                    exclude_specs=InstanceSpecSet(
+                        metric_specs=tuple(metric_instance.spec for metric_instance in metric_instances)
+                    )
+                )
+            )
+            .transform(CreateSelectColumnsForInstances(from_data_set_alias, self._column_association_resolver))
+            .as_tuple()
+            + metric_select_columns
+        )
+
+        return SqlDataSet(
+            instance_set=output_instance_set,
+            sql_select_node=SqlSelectStatementNode(
+                description=node.description,
+                select_columns=select_columns,
+                from_source=from_data_set.checked_sql_select_node,
+                from_source_alias=from_data_set_alias,
+                group_bys=select_columns,
+                joins_descs=(),
+                order_bys=(),
+            ),
+        )
 
     def visit_order_by_limit_node(self, node: OrderByLimitNode) -> SqlDataSet:  # noqa: D102
         from_data_set: SqlDataSet = node.parent_node.accept(self)

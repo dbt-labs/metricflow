@@ -18,14 +18,14 @@ from dbt_semantic_interfaces.references import (
     SemanticModelReference,
     TimeDimensionReference,
 )
-from dbt_semantic_interfaces.type_enums import DimensionType, EntityType
-from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
+from dbt_semantic_interfaces.type_enums import AggregationType, DimensionType, EntityType, TimeGranularity
 
 from metricflow_semantics.errors.error_classes import InvalidSemanticModelError
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.semantics.element_group import ElementGrouper
 from metricflow_semantics.model.spec_converters import MeasureConverter
 from metricflow_semantics.specs.spec_classes import (
+    DEFAULT_TIME_GRANULARITY,
     DimensionSpec,
     EntitySpec,
     LinkableInstanceSpec,
@@ -85,10 +85,12 @@ class SemanticModelLookup:
 
     def get_dimension(self, dimension_reference: DimensionReference) -> Dimension:
         """Retrieves a full dimension object by name."""
+        # If the reference passed is a TimeDimensionReference, convert to DimensionReference.
+        dimension_reference = DimensionReference(dimension_reference.element_name)
         semantic_models = self._dimension_index.get(dimension_reference)
         if not semantic_models:
             raise ValueError(
-                f"Could not find dimension with name ({dimension_reference.element_name}) in configured semantic models"
+                f"Could not find dimension with name '{dimension_reference.element_name}' in configured semantic models"
             )
 
         dimension = SemanticModelLookup.get_dimension_from_semantic_model(
@@ -366,3 +368,13 @@ class SemanticModelLookup:
             time_dimension_reference=agg_time_dimension,
             entity_links=(entity_link,),
         )
+
+    def get_defined_time_granularity(self, time_dimension_reference: TimeDimensionReference) -> TimeGranularity:
+        """Time granularity from the time dimension's YAML definition. If not set, defaults to DAY."""
+        time_dimension = self.get_dimension(time_dimension_reference)
+
+        defined_time_granularity = DEFAULT_TIME_GRANULARITY
+        if time_dimension.type_params and time_dimension.type_params.time_granularity:
+            defined_time_granularity = time_dimension.type_params.time_granularity
+
+        return defined_time_granularity

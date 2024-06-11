@@ -4,12 +4,14 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Generic, List, Tuple, TypeVar
+from typing import Generic, List, Sequence, Tuple, TypeVar
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
-from dbt_semantic_interfaces.references import MetricModelReference, SemanticModelElementReference
+from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
+from dbt_semantic_interfaces.references import MetricModelReference, MetricReference, SemanticModelElementReference
 
 from metricflow_semantics.aggregation_properties import AggregationState
+from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociation
 from metricflow_semantics.specs.spec_classes import (
     DimensionSpec,
@@ -216,3 +218,19 @@ class InstanceSet(SerializableDataclass):
             metric_specs=tuple(x.spec for x in self.metric_instances),
             metadata_specs=tuple(x.spec for x in self.metadata_instances),
         )
+
+    def agg_time_dimension_instances(
+        self, metric_references: Sequence[MetricReference], metric_lookup: MetricLookup
+    ) -> List[TimeDimensionInstance]:
+        """Get the time dims included that are valid agg time dimensions for the specified metric."""
+        valid_agg_time_dimension_names = {
+            agg_time_dimension.element_name
+            for metric_reference in metric_references
+            for agg_time_dimension in metric_lookup.get_valid_agg_time_dimensions_for_metric(metric_reference)
+        }.union({METRIC_TIME_ELEMENT_NAME})
+
+        return [
+            time_dimension_instance
+            for time_dimension_instance in self.time_dimension_instances
+            if time_dimension_instance.spec.element_name in valid_agg_time_dimension_names
+        ]

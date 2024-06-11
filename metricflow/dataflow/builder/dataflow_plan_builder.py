@@ -79,6 +79,7 @@ from metricflow.dataflow.nodes.min_max import MinMaxNode
 from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
 from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
 from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
+from metricflow.dataflow.nodes.window_reaggregation_node import WindowReaggregationNode
 from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTableNode
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOptimizer
@@ -411,6 +412,35 @@ class DataflowPlanBuilder:
             aggregated_to_elements=set(queried_linkable_specs.as_tuple),
         )
 
+    def _build_cumulative_metric_output_node(
+        self,
+        metric_spec: MetricSpec,
+        queried_linkable_specs: LinkableSpecSet,
+        filter_spec_factory: WhereSpecFactory,
+        predicate_pushdown_state: PredicatePushdownState,
+        for_group_by_source_node: bool = False,
+    ) -> DataflowPlanNode:
+        compute_metrics_node = self._build_base_metric_output_node(
+            metric_spec=metric_spec,
+            queried_linkable_specs=queried_linkable_specs,
+            filter_spec_factory=filter_spec_factory,
+            predicate_pushdown_state=predicate_pushdown_state,
+            for_group_by_source_node=for_group_by_source_node,
+        )
+
+        default_granularity = self._metric_lookup.get_min_queryable_time_granularity(metric_spec.reference)
+        non_default_granularity_specs = [
+            time_dimension_spec
+            for time_dimension_spec in queried_linkable_specs.included_agg_time_dimension_specs_for_metric(
+                metric_reference=metric_spec.reference, metric_lookup=self._metric_lookup
+            )
+            if time_dimension_spec.time_granularity != default_granularity
+        ]
+        if not non_default_granularity_specs:
+            return compute_metrics_node
+
+        return WindowReaggregationNode(parent_node=compute_metrics_node)
+
     def _build_base_metric_output_node(
         self,
         metric_spec: MetricSpec,
@@ -585,8 +615,17 @@ class DataflowPlanBuilder:
         """Builds a node to compute a metric of any type."""
         metric = self._metric_lookup.get_metric(metric_spec.reference)
 
-        if metric.type is MetricType.SIMPLE or metric.type is MetricType.CUMULATIVE:
+        if metric.type is MetricType.SIMPLE:
             return self._build_base_metric_output_node(
+                metric_spec=metric_spec,
+                queried_linkable_specs=queried_linkable_specs,
+                filter_spec_factory=filter_spec_factory,
+                predicate_pushdown_state=predicate_pushdown_state,
+                for_group_by_source_node=for_group_by_source_node,
+            )
+
+        elif metric.type is MetricType.CUMULATIVE:
+            return self._build_cumulative_metric_output_node(
                 metric_spec=metric_spec,
                 queried_linkable_specs=queried_linkable_specs,
                 filter_spec_factory=filter_spec_factory,
@@ -1450,12 +1489,12 @@ class DataflowPlanBuilder:
         if non_additive_dimension_spec is not None:
             # Apply semi additive join on the node
             agg_time_dimension = measure_properties.agg_time_dimension
-            queried_time_dimension_spec: Optional[
-                TimeDimensionSpec
-            ] = self._find_non_additive_dimension_in_linkable_specs(
-                agg_time_dimension=agg_time_dimension,
-                linkable_specs=queried_linkable_specs.as_tuple,
-                non_additive_dimension_spec=non_additive_dimension_spec,
+            queried_time_dimension_spec: Optional[TimeDimensionSpec] = (
+                self._find_non_additive_dimension_in_linkable_specs(
+                    agg_time_dimension=agg_time_dimension,
+                    linkable_specs=queried_linkable_specs.as_tuple,
+                    non_additive_dimension_spec=non_additive_dimension_spec,
+                )
             )
             time_dimension_spec = TimeDimensionSpec.from_name(non_additive_dimension_spec.name)
             window_groupings = tuple(

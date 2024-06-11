@@ -9,6 +9,7 @@ from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols.metric import Metric, MetricInputMeasure, MetricType
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import MeasureReference, MetricReference
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow_semantics.errors.error_classes import DuplicateMetricError, MetricNotFoundError, NonExistentMeasureError
 from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
@@ -186,3 +187,29 @@ class MetricLookup:
             entity_links=agg_time_dimension_entity_links,
         )
         return valid_agg_time_dimension_specs
+
+    def get_min_queryable_time_granularity(self, metric_reference: MetricReference) -> TimeGranularity:
+        """The minimum grain that can be queried with this metric.
+
+        Maps to the largest granularity defined for any of the metric's agg_time_dimensions.
+        """
+        agg_time_dimension_specs = self._get_agg_time_dimension_specs_for_metric(metric_reference)
+        assert (
+            agg_time_dimension_specs
+        ), f"No agg_time_dimension found for metric {metric_reference}. Something has been misconfigured."
+
+        minimum_queryable_granularity = self._semantic_model_lookup.get_defined_time_granularity(
+            agg_time_dimension_specs[0].reference
+        )
+        if len(agg_time_dimension_specs) > 1:
+            for agg_time_dimension_spec in agg_time_dimension_specs[1:]:
+                defined_time_granularity = self._semantic_model_lookup.get_defined_time_granularity(
+                    agg_time_dimension_spec.reference
+                )
+                if defined_time_granularity.to_int() > minimum_queryable_granularity.to_int():
+                    minimum_queryable_granularity = defined_time_granularity
+
+        return minimum_queryable_granularity
+
+    # TODO: remove any logic about cumulative metrics that tells you they can only be queried with one grain -
+    # i.e., in MFS queryable granularities
