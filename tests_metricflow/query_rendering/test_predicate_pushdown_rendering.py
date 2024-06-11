@@ -7,6 +7,7 @@ from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
+from metricflow.dataflow.optimizer.predicate_pushdown_optimizer import PredicatePushdownOptimizer
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from tests_metricflow.query_rendering.compare_rendered_query import convert_and_check
@@ -29,7 +30,9 @@ def test_single_categorical_dimension_pushdown(
             where_sql_template="{{ Dimension('booking__is_instant') }}",
         ),
     )
-    dataflow_plan = dataflow_plan_builder.build_plan(parsed_query.query_spec)
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        parsed_query.query_spec, optimizers=(PredicatePushdownOptimizer(),)
+    )
 
     convert_and_check(
         request=request,
