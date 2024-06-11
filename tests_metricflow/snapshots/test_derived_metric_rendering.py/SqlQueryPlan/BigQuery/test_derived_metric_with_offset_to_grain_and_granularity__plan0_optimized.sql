@@ -19,7 +19,7 @@ FROM (
       -- Metric Time Dimension 'ds'
       -- Pass Only Elements: ['bookings', 'metric_time__week']
       SELECT
-        DATE_TRUNC(ds, isoweek) AS metric_time__week
+        DATETIME_TRUNC(ds, isoweek) AS metric_time__week
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_16
@@ -32,20 +32,20 @@ FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      DATE_TRUNC(subq_22.ds, isoweek) AS metric_time__week
+      DATETIME_TRUNC(subq_22.ds, isoweek) AS metric_time__week
       , SUM(subq_20.bookings) AS bookings_at_start_of_month
     FROM ***************************.mf_time_spine subq_22
     INNER JOIN (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
       SELECT
-        DATE_TRUNC(ds, day) AS metric_time__day
+        DATETIME_TRUNC(ds, day) AS metric_time__day
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_20
     ON
-      DATE_TRUNC(subq_22.ds, month) = subq_20.metric_time__day
-    WHERE DATE_TRUNC(subq_22.ds, isoweek) = subq_22.ds
+      DATETIME_TRUNC(subq_22.ds, month) = subq_20.metric_time__day
+    WHERE DATETIME_TRUNC(subq_22.ds, isoweek) = subq_22.ds
     GROUP BY
       metric_time__week
   ) subq_26

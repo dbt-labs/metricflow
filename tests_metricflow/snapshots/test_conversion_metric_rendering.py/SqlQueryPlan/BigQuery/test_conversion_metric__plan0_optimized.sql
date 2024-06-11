@@ -19,7 +19,7 @@ FROM (
       -- Metric Time Dimension 'ds'
       -- Pass Only Elements: ['visits', 'metric_time__day']
       SELECT
-        DATE_TRUNC(ds, day) AS metric_time__day
+        DATETIME_TRUNC(ds, day) AS metric_time__day
         , 1 AS visits
       FROM ***************************.fct_visits visits_source_src_28000
     ) subq_18
@@ -76,8 +76,8 @@ FROM (
         -- Metric Time Dimension 'ds'
         -- Pass Only Elements: ['visits', 'ds__day', 'metric_time__day', 'user']
         SELECT
-          DATE_TRUNC(ds, day) AS ds__day
-          , DATE_TRUNC(ds, day) AS metric_time__day
+          DATETIME_TRUNC(ds, day) AS ds__day
+          , DATETIME_TRUNC(ds, day) AS metric_time__day
           , user_id AS user
           , 1 AS visits
         FROM ***************************.fct_visits visits_source_src_28000
@@ -87,7 +87,7 @@ FROM (
         -- Metric Time Dimension 'ds'
         -- Add column with generated UUID
         SELECT
-          DATE_TRUNC(ds, day) AS ds__day
+          DATETIME_TRUNC(ds, day) AS ds__day
           , user_id AS user
           , 1 AS buys
           , GENERATE_UUID() AS mf_internal_uuid

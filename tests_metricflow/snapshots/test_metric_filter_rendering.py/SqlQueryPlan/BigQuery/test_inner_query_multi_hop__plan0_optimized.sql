@@ -25,7 +25,7 @@ FROM (
       -- Join Standard Outputs
       -- Pass Only Elements: ['ds_partitioned__day', 'account_id', 'customer_id__customer_third_hop_id']
       SELECT
-        DATE_TRUNC(bridge_table_src_22000.ds_partitioned, day) AS ds_partitioned__day
+        DATETIME_TRUNC(bridge_table_src_22000.ds_partitioned, day) AS ds_partitioned__day
         , bridge_table_src_22000.account_id AS account_id
         , customer_other_data_src_22000.customer_third_hop_id AS customer_id__customer_third_hop_id
       FROM ***************************.bridge_table bridge_table_src_22000
@@ -38,7 +38,7 @@ FROM (
       (
         account_month_txns_src_22000.account_id = subq_53.account_id
       ) AND (
-        DATE_TRUNC(account_month_txns_src_22000.ds_partitioned, day) = subq_53.ds_partitioned__day
+        DATETIME_TRUNC(account_month_txns_src_22000.ds_partitioned, day) = subq_53.ds_partitioned__day
       )
     GROUP BY
       account_id__customer_id__customer_third_hop_id

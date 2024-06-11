@@ -9,6 +9,7 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
 from typing_extensions import override
 
+from metricflow.protocols.sql_client import SqlEngine
 from metricflow.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,
     SqlExpressionRenderer,
@@ -26,6 +27,8 @@ from metricflow.sql.sql_exprs import (
 
 class TrinoSqlExpressionRenderer(DefaultSqlExpressionRenderer):
     """Expression renderer for the Trino engine."""
+
+    sql_engine = SqlEngine.TRINO
 
     @property
     @override

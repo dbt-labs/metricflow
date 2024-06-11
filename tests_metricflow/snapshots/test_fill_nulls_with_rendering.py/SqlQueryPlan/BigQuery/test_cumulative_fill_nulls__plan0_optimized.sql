@@ -20,9 +20,9 @@ FROM (
       ***************************.fct_bookings bookings_source_src_28000
     ON
       (
-        DATE_TRUNC(bookings_source_src_28000.ds, day) <= subq_13.ds
+        DATETIME_TRUNC(bookings_source_src_28000.ds, day) <= subq_13.ds
       ) AND (
-        DATE_TRUNC(bookings_source_src_28000.ds, day) > DATE_SUB(CAST(subq_13.ds AS DATETIME), INTERVAL 2 day)
+        DATETIME_TRUNC(bookings_source_src_28000.ds, day) > DATE_SUB(CAST(subq_13.ds AS DATETIME), INTERVAL 2 day)
       )
     GROUP BY
       metric_time__day

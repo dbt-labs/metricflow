@@ -5,7 +5,7 @@ import textwrap
 from abc import ABC, abstractmethod
 from collections import namedtuple
 from dataclasses import dataclass
-from typing import Collection, List
+from typing import TYPE_CHECKING, Collection, List, Optional
 
 import jinja2
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
@@ -40,6 +40,10 @@ from metricflow.sql.sql_exprs import (
     SqlWindowFunctionExpression,
 )
 from metricflow.sql.sql_plan import SqlSelectColumn
+
+if TYPE_CHECKING:
+    from metricflow.protocols.sql_client import SqlEngine
+
 
 logger = logging.getLogger(__name__)
 
@@ -92,6 +96,10 @@ class SqlExpressionRenderer(SqlExpressionNodeVisitor[SqlExpressionRenderResult],
 
 class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
     """Renders the SQL query plan assuming ANSI SQL."""
+
+    @property
+    def sql_engine(self) -> Optional[SqlEngine]:  # noqa: D102
+        return None
 
     @property
     @override
@@ -263,7 +271,13 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
             bind_parameters=arg_rendered.bind_parameters,
         )
 
+    def _validate_granularity_for_engine(self, time_granularity: TimeGranularity) -> None:
+        if self.sql_engine and time_granularity in self.sql_engine.unsupported_granularities:
+            raise RuntimeError(f"{self.sql_engine.name} does not support time granularity {time_granularity.name}.")
+
     def visit_date_trunc_expr(self, node: SqlDateTruncExpression) -> SqlExpressionRenderResult:  # noqa: D102
+        self._validate_granularity_for_engine(node.time_granularity)
+
         arg_rendered = self.render_sql_expr(node.arg)
 
         return SqlExpressionRenderResult(

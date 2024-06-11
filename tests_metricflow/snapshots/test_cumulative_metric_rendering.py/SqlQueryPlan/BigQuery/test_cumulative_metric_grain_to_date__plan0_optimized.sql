@@ -4,7 +4,7 @@
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  DATE_TRUNC(created_at, month) AS ds__month
+  DATETIME_TRUNC(created_at, month) AS ds__month
   , SUM(revenue) AS revenue_mtd
 FROM ***************************.fct_revenue revenue_src_28000
 GROUP BY

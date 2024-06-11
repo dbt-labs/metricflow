@@ -17,7 +17,7 @@ FROM (
     -- Metric Time Dimension 'ds'
     -- Pass Only Elements: ['listings', 'metric_time__day', 'listing']
     SELECT
-      DATE_TRUNC(created_at, day) AS metric_time__day
+      DATETIME_TRUNC(created_at, day) AS metric_time__day
       , listing_id AS listing
       , 1 AS listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000

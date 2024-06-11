@@ -9,7 +9,7 @@ SELECT
 FROM (
   -- Time Spine
   SELECT
-    DATE_TRUNC(ds, month) AS metric_time__month
+    DATETIME_TRUNC(ds, month) AS metric_time__month
   FROM ***************************.mf_time_spine subq_15
   WHERE ds BETWEEN '2020-03-05' AND '2021-01-04'
   GROUP BY
@@ -20,10 +20,10 @@ INNER JOIN (
   -- Metric Time Dimension 'monthly_ds'
   -- Constrain Time Range to [2019-12-05T00:00:00, 2021-01-04T00:00:00]
   SELECT
-    DATE_TRUNC(ds, month) AS metric_time__month
+    DATETIME_TRUNC(ds, month) AS metric_time__month
     , bookings_monthly
   FROM ***************************.fct_bookings_extended_monthly bookings_monthly_source_src_16000
-  WHERE DATE_TRUNC(ds, month) BETWEEN '2019-12-05' AND '2021-01-04'
+  WHERE DATETIME_TRUNC(ds, month) BETWEEN '2019-12-05' AND '2021-01-04'
 ) subq_13
 ON
   (

@@ -10,5 +10,5 @@ FROM (
   SELECT
     SUM(1) AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-  WHERE DATE_TRUNC(ds, day) BETWEEN '2020-01-03' AND '2020-01-05'
+  WHERE DATETIME_TRUNC(ds, day) BETWEEN '2020-01-03' AND '2020-01-05'
 ) subq_11

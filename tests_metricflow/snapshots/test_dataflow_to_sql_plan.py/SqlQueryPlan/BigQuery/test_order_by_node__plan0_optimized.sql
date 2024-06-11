@@ -9,7 +9,7 @@ FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Pass Only Elements: ['bookings', 'is_instant', 'ds__day']
   SELECT
-    DATE_TRUNC(ds, day) AS ds__day
+    DATETIME_TRUNC(ds, day) AS ds__day
     , is_instant
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000

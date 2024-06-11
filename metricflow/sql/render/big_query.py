@@ -10,6 +10,7 @@ from metricflow_semantics.errors.error_classes import UnsupportedEngineFeatureEr
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
 from typing_extensions import override
 
+from metricflow.protocols.sql_client import SqlEngine
 from metricflow.sql.render.expr_renderer import (
     DefaultSqlExpressionRenderer,
     SqlExpressionRenderer,
@@ -30,6 +31,8 @@ from metricflow.sql.sql_plan import SqlSelectColumn
 
 class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
     """Expression renderer for the BigQuery engine."""
+
+    sql_engine = SqlEngine.BIGQUERY
 
     @property
     @override
@@ -120,6 +123,8 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
     @override
     def visit_date_trunc_expr(self, node: SqlDateTruncExpression) -> SqlExpressionRenderResult:
         """Render DATE_TRUNC for BigQuery, which takes the opposite argument order from Snowflake and Redshift."""
+        self._validate_granularity_for_engine(node.time_granularity)
+
         arg_rendered = self.render_sql_expr(node.arg)
 
         prefix = ""
@@ -127,7 +132,7 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
             prefix = "iso"
 
         return SqlExpressionRenderResult(
-            sql=f"DATE_TRUNC({arg_rendered.sql}, {prefix}{node.time_granularity.value})",
+            sql=f"DATETIME_TRUNC({arg_rendered.sql}, {prefix}{node.time_granularity.value})",
             bind_parameters=arg_rendered.bind_parameters,
         )
 

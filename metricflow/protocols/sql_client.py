@@ -2,8 +2,10 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from enum import Enum
-from typing import Protocol
+from typing import Protocol, Set
 
+from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
+from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameters
 
 from metricflow.data_table.mf_table import MetricFlowDataTable
@@ -23,6 +25,32 @@ class SqlEngine(Enum):
     SNOWFLAKE = "Snowflake"
     DATABRICKS = "Databricks"
     TRINO = "Trino"
+
+    @property
+    def unsupported_granularities(self) -> Set[TimeGranularity]:
+        """Granularities that can't be used with this SqlEngine.
+
+        We allow the smallest granularity the SqlEngine supports for its base TIMESTAMP type and all our required
+        operations (e.g., DATE_TRUNC). For example, when we added support for these granularities
+        Trino supported more precise types for storage and access, but Trino's base TIMESTAMP type and
+        DATE_TRUNC function only supported millisecond precision.
+        """
+        if self is SqlEngine.SNOWFLAKE:
+            return set()
+        elif self is SqlEngine.BIGQUERY:
+            return {TimeGranularity.NANOSECOND}
+        elif self is SqlEngine.DATABRICKS:
+            return {TimeGranularity.NANOSECOND}
+        elif self is SqlEngine.DUCKDB:
+            return {TimeGranularity.NANOSECOND}
+        elif self is SqlEngine.POSTGRES:
+            return {TimeGranularity.NANOSECOND}
+        elif self is SqlEngine.REDSHIFT:
+            return {TimeGranularity.NANOSECOND}
+        elif self is SqlEngine.TRINO:
+            return {TimeGranularity.NANOSECOND, TimeGranularity.MICROSECOND}
+        else:
+            assert_values_exhausted(self)
 
 
 class SqlClient(Protocol):

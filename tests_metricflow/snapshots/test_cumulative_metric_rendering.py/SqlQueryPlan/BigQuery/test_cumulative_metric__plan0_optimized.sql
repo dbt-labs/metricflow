@@ -4,7 +4,7 @@
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  DATE_TRUNC(created_at, day) AS ds__day
+  DATETIME_TRUNC(created_at, day) AS ds__day
   , SUM(revenue) AS trailing_2_months_revenue
 FROM ***************************.fct_revenue revenue_src_28000
 GROUP BY

@@ -26,7 +26,7 @@ FROM (
         -- Aggregate Measures
         -- Compute Metrics via Expressions
         SELECT
-          DATE_TRUNC(ds, day) AS metric_time__day
+          DATETIME_TRUNC(ds, day) AS metric_time__day
           , SUM(booking_value) AS booking_value
         FROM ***************************.fct_bookings bookings_source_src_28000
         GROUP BY
@@ -34,7 +34,7 @@ FROM (
       ) subq_20
     ) subq_21
     ON
-      DATE_TRUNC(subq_23.ds, month) = subq_21.metric_time__day
+      DATETIME_TRUNC(subq_23.ds, month) = subq_21.metric_time__day
   ) subq_24
   FULL OUTER JOIN (
     -- Compute Metrics via Expressions
@@ -48,7 +48,7 @@ FROM (
       -- Aggregate Measures
       -- Compute Metrics via Expressions
       SELECT
-        DATE_TRUNC(ds, day) AS metric_time__day
+        DATETIME_TRUNC(ds, day) AS metric_time__day
         , SUM(booking_value) AS booking_value
       FROM ***************************.fct_bookings bookings_source_src_28000
       GROUP BY

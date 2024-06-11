@@ -14,20 +14,20 @@ FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      DATE_TRUNC(subq_20.ds, year) AS metric_time__year
+      DATETIME_TRUNC(subq_20.ds, year) AS metric_time__year
       , SUM(subq_18.bookings) AS month_start_bookings
     FROM ***************************.mf_time_spine subq_20
     INNER JOIN (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
       SELECT
-        DATE_TRUNC(ds, day) AS metric_time__day
+        DATETIME_TRUNC(ds, day) AS metric_time__day
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_18
     ON
-      DATE_TRUNC(subq_20.ds, month) = subq_18.metric_time__day
-    WHERE DATE_TRUNC(subq_20.ds, year) = subq_20.ds
+      DATETIME_TRUNC(subq_20.ds, month) = subq_18.metric_time__day
+    WHERE DATETIME_TRUNC(subq_20.ds, year) = subq_20.ds
     GROUP BY
       metric_time__year
   ) subq_24
@@ -37,14 +37,14 @@ FROM (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      DATE_TRUNC(subq_28.ds, year) AS metric_time__year
+      DATETIME_TRUNC(subq_28.ds, year) AS metric_time__year
       , SUM(subq_26.bookings) AS bookings_1_month_ago
     FROM ***************************.mf_time_spine subq_28
     INNER JOIN (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
       SELECT
-        DATE_TRUNC(ds, day) AS metric_time__day
+        DATETIME_TRUNC(ds, day) AS metric_time__day
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_26

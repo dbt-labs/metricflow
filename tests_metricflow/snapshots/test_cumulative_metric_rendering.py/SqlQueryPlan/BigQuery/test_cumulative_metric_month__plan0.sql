@@ -44,7 +44,7 @@ FROM (
         FROM (
           -- Time Spine
           SELECT
-            DATE_TRUNC(subq_6.ds, month) AS metric_time__month
+            DATETIME_TRUNC(subq_6.ds, month) AS metric_time__month
           FROM ***************************.mf_time_spine subq_6
           WHERE subq_6.ds BETWEEN '2020-03-05' AND '2021-01-04'
           GROUP BY
@@ -102,15 +102,15 @@ FROM (
               -- Read Elements From Semantic Model 'bookings_monthly_source'
               SELECT
                 bookings_monthly_source_src_16000.bookings_monthly
-                , DATE_TRUNC(bookings_monthly_source_src_16000.ds, month) AS monthly_ds__month
-                , DATE_TRUNC(bookings_monthly_source_src_16000.ds, quarter) AS monthly_ds__quarter
-                , DATE_TRUNC(bookings_monthly_source_src_16000.ds, year) AS monthly_ds__year
+                , DATETIME_TRUNC(bookings_monthly_source_src_16000.ds, month) AS monthly_ds__month
+                , DATETIME_TRUNC(bookings_monthly_source_src_16000.ds, quarter) AS monthly_ds__quarter
+                , DATETIME_TRUNC(bookings_monthly_source_src_16000.ds, year) AS monthly_ds__year
                 , EXTRACT(year FROM bookings_monthly_source_src_16000.ds) AS monthly_ds__extract_year
                 , EXTRACT(quarter FROM bookings_monthly_source_src_16000.ds) AS monthly_ds__extract_quarter
                 , EXTRACT(month FROM bookings_monthly_source_src_16000.ds) AS monthly_ds__extract_month
-                , DATE_TRUNC(bookings_monthly_source_src_16000.ds, month) AS booking__monthly_ds__month
-                , DATE_TRUNC(bookings_monthly_source_src_16000.ds, quarter) AS booking__monthly_ds__quarter
-                , DATE_TRUNC(bookings_monthly_source_src_16000.ds, year) AS booking__monthly_ds__year
+                , DATETIME_TRUNC(bookings_monthly_source_src_16000.ds, month) AS booking__monthly_ds__month
+                , DATETIME_TRUNC(bookings_monthly_source_src_16000.ds, quarter) AS booking__monthly_ds__quarter
+                , DATETIME_TRUNC(bookings_monthly_source_src_16000.ds, year) AS booking__monthly_ds__year
                 , EXTRACT(year FROM bookings_monthly_source_src_16000.ds) AS booking__monthly_ds__extract_year
                 , EXTRACT(quarter FROM bookings_monthly_source_src_16000.ds) AS booking__monthly_ds__extract_quarter
                 , EXTRACT(month FROM bookings_monthly_source_src_16000.ds) AS booking__monthly_ds__extract_month

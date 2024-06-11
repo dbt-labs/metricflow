@@ -21,8 +21,8 @@ FROM (
         -- Join to Time Spine Dataset
         SELECT
           subq_2.metric_time__month AS metric_time__month
-          , DATE_TRUNC(subq_2.metric_time__month, quarter) AS metric_time__quarter
-          , DATE_TRUNC(subq_2.metric_time__month, year) AS metric_time__year
+          , DATETIME_TRUNC(subq_2.metric_time__month, quarter) AS metric_time__quarter
+          , DATETIME_TRUNC(subq_2.metric_time__month, year) AS metric_time__year
           , EXTRACT(year FROM subq_2.metric_time__month) AS metric_time__extract_year
           , EXTRACT(quarter FROM subq_2.metric_time__month) AS metric_time__extract_quarter
           , EXTRACT(month FROM subq_2.metric_time__month) AS metric_time__extract_month
@@ -44,7 +44,7 @@ FROM (
         FROM (
           -- Time Spine
           SELECT
-            DATE_TRUNC(subq_3.ds, month) AS metric_time__month
+            DATETIME_TRUNC(subq_3.ds, month) AS metric_time__month
           FROM ***************************.mf_time_spine subq_3
           GROUP BY
             metric_time__month
@@ -77,15 +77,15 @@ FROM (
             -- Read Elements From Semantic Model 'bookings_monthly_source'
             SELECT
               bookings_monthly_source_src_16000.bookings_monthly
-              , DATE_TRUNC(bookings_monthly_source_src_16000.ds, month) AS monthly_ds__month
-              , DATE_TRUNC(bookings_monthly_source_src_16000.ds, quarter) AS monthly_ds__quarter
-              , DATE_TRUNC(bookings_monthly_source_src_16000.ds, year) AS monthly_ds__year
+              , DATETIME_TRUNC(bookings_monthly_source_src_16000.ds, month) AS monthly_ds__month
+              , DATETIME_TRUNC(bookings_monthly_source_src_16000.ds, quarter) AS monthly_ds__quarter
+              , DATETIME_TRUNC(bookings_monthly_source_src_16000.ds, year) AS monthly_ds__year
               , EXTRACT(year FROM bookings_monthly_source_src_16000.ds) AS monthly_ds__extract_year
               , EXTRACT(quarter FROM bookings_monthly_source_src_16000.ds) AS monthly_ds__extract_quarter
               , EXTRACT(month FROM bookings_monthly_source_src_16000.ds) AS monthly_ds__extract_month
-              , DATE_TRUNC(bookings_monthly_source_src_16000.ds, month) AS booking__monthly_ds__month
-              , DATE_TRUNC(bookings_monthly_source_src_16000.ds, quarter) AS booking__monthly_ds__quarter
-              , DATE_TRUNC(bookings_monthly_source_src_16000.ds, year) AS booking__monthly_ds__year
+              , DATETIME_TRUNC(bookings_monthly_source_src_16000.ds, month) AS booking__monthly_ds__month
+              , DATETIME_TRUNC(bookings_monthly_source_src_16000.ds, quarter) AS booking__monthly_ds__quarter
+              , DATETIME_TRUNC(bookings_monthly_source_src_16000.ds, year) AS booking__monthly_ds__year
               , EXTRACT(year FROM bookings_monthly_source_src_16000.ds) AS booking__monthly_ds__extract_year
               , EXTRACT(quarter FROM bookings_monthly_source_src_16000.ds) AS booking__monthly_ds__extract_quarter
               , EXTRACT(month FROM bookings_monthly_source_src_16000.ds) AS booking__monthly_ds__extract_month

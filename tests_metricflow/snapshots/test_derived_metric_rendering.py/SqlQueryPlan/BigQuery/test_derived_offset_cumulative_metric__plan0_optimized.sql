@@ -21,9 +21,9 @@ FROM (
       ***************************.fct_bookings bookings_source_src_28000
     ON
       (
-        DATE_TRUNC(bookings_source_src_28000.ds, day) <= subq_14.ds
+        DATETIME_TRUNC(bookings_source_src_28000.ds, day) <= subq_14.ds
       ) AND (
-        DATE_TRUNC(bookings_source_src_28000.ds, day) > DATE_SUB(CAST(subq_14.ds AS DATETIME), INTERVAL 2 day)
+        DATETIME_TRUNC(bookings_source_src_28000.ds, day) > DATE_SUB(CAST(subq_14.ds AS DATETIME), INTERVAL 2 day)
       )
   ) subq_15
   ON

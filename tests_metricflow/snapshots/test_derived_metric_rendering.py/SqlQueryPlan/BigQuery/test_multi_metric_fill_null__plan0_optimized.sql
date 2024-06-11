@@ -23,7 +23,7 @@ FROM (
         -- Metric Time Dimension 'ds'
         -- Pass Only Elements: ['bookings', 'metric_time__day']
         SELECT
-          DATE_TRUNC(ds, day) AS metric_time__day
+          DATETIME_TRUNC(ds, day) AS metric_time__day
           , 1 AS bookings
         FROM ***************************.fct_bookings bookings_source_src_28000
       ) subq_13
@@ -43,7 +43,7 @@ FULL OUTER JOIN (
     -- Metric Time Dimension 'ds'
     -- Pass Only Elements: ['listings', 'metric_time__day']
     SELECT
-      DATE_TRUNC(created_at, day) AS metric_time__day
+      DATETIME_TRUNC(created_at, day) AS metric_time__day
       , 1 AS listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
   ) subq_19
