@@ -497,9 +497,11 @@ class ValidLinkableSpecResolver:
                         dimension_type=DimensionType.TIME,
                         entity_links=(),
                         join_path=SemanticModelJoinPath(
-                            left_semantic_model_reference=measure_semantic_model.reference
-                            if measure_semantic_model
-                            else SemanticModelDerivation.VIRTUAL_SEMANTIC_MODEL_REFERENCE,
+                            left_semantic_model_reference=(
+                                measure_semantic_model.reference
+                                if measure_semantic_model
+                                else SemanticModelDerivation.VIRTUAL_SEMANTIC_MODEL_REFERENCE
+                            ),
                         ),
                         # Anything that's not at the base time granularity of the measure's aggregation time dimension
                         # should be considered derived.

@@ -171,21 +171,8 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
             elif metric.type is MetricType.RATIO or metric.type is MetricType.DERIVED:
                 assert False, f"A measure should have a simple or cumulative metric as a child, but got {metric.type}"
             elif metric.type is MetricType.CUMULATIVE:
-                # To handle the restriction that cumulative metrics can only be queried at the base grain, it's
-                # easiest to handle that by applying the pattern to remove non-base grain time dimension specs at the
-                # measure node and generate the issue here if there's nothing that matches. Generating the issue here
-                # allows for creation of a more specific issue (i.e. include the measure) vs. generating the issue
-                # at a higher level. This can be more cleanly handled once we add additional context to the
-                # LinkableInstanceSpec.
-                patterns_to_apply = (
-                    # From comment in ValidLinkableSpecResolver:
-                    #   It's possible to aggregate measures to coarser time granularities
-                    #   (except with cumulative metrics).
-                    BaseTimeGrainPattern(only_apply_for_metric_time=True),
-                    # From comment in previous query parser:
-                    #   Cannot extract date part for cumulative metrics.
-                    NoneDatePartPattern(),
-                )
+                # TODO: can we remove this restriction? Why isn't date part allowed for cumulative metrics? Same as grain?
+                patterns_to_apply = (NoneDatePartPattern(),)
             else:
                 assert_values_exhausted(metric.type)
 
@@ -198,7 +185,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
                     f"For {node.ui_description}:\n"
                     + indent(
                         "After applying patterns:\n"
-                        + indent(mf_pformat(patterns_to_apply))
+                        + indent(mf_pformat(self._source_spec_patterns))
                         + "\n"
                         + "to inputs, matches are:\n"
                         + indent(mf_pformat(matching_items.specs))
@@ -208,9 +195,6 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
             # The specified patterns don't match to any of the available group-by-items that can be queried for the
             # measure.
             if matching_items.spec_count == 0:
-                items_available_for_measure_given_child_metric = items_available_for_measure.filter_by_spec_patterns(
-                    patterns_to_apply
-                )
                 return PushDownResult(
                     candidate_set=GroupByItemCandidateSet.empty_instance(),
                     issue_set=MetricFlowQueryResolutionIssueSet.from_issue(
@@ -218,11 +202,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
                             parent_issues=(),
                             query_resolution_path=current_traversal_path,
                             input_suggestions=(
-                                tuple(
-                                    self._suggestion_generator.input_suggestions(
-                                        items_available_for_measure_given_child_metric.specs
-                                    )
-                                )
+                                tuple(self._suggestion_generator.input_suggestions(items_available_for_measure.specs))
                                 if self._suggestion_generator is not None
                                 else ()
                             ),
