@@ -283,7 +283,7 @@ class SemanticModelToDataSetConverter:
         time_dimension_instances: List[TimeDimensionInstance] = []
         select_columns: List[SqlSelectColumn] = []
 
-        defined_time_granularity = TimeGranularity.DAY
+        defined_time_granularity = DEFAULT_TIME_GRANULARITY
         if dimension.type_params and dimension.type_params.time_granularity:
             defined_time_granularity = dimension.type_params.time_granularity
 

@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
+from metricflow_semantics.specs.spec_classes import DEFAULT_TIME_GRANULARITY
 
 from metricflow.sql.sql_table import SqlTable
 
@@ -23,7 +24,7 @@ class TimeSpineSource:
     # Name of the column in the table that contains the dates.
     time_column_name: str = "ds"
     # The time granularity of the dates in the spine table.
-    time_column_granularity: TimeGranularity = TimeGranularity.DAY
+    time_column_granularity: TimeGranularity = DEFAULT_TIME_GRANULARITY
 
     @property
     def spine_table(self) -> SqlTable:
@@ -37,10 +38,10 @@ class TimeSpineSource:
 
         if not (
             len(time_spine_table_configurations) == 1
-            and time_spine_table_configurations[0].grain == TimeGranularity.DAY
+            and time_spine_table_configurations[0].grain == DEFAULT_TIME_GRANULARITY
         ):
             raise NotImplementedError(
-                f"Only a single time spine table configuration with {TimeGranularity.DAY} is currently "
+                f"Only a single time spine table configuration with {DEFAULT_TIME_GRANULARITY} is currently "
                 f"supported. Got:\n"
                 f"{mf_pformat(time_spine_table_configurations)}"
             )
