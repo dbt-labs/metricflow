@@ -14,4 +14,5 @@ class MatchingLinkableSpecsTransform(InstanceSpecSetTransform[bool]):
             set(self._left_spec_set.dimension_specs) == set(spec_set.dimension_specs)
             and set(self._left_spec_set.time_dimension_specs) == set(spec_set.time_dimension_specs)
             and set(self._left_spec_set.entity_specs) == set(spec_set.entity_specs)
+            # TODO: add group by metrics?
         )

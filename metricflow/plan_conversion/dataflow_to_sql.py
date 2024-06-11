@@ -207,6 +207,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             optimization_level, use_column_alias_in_group_by=use_column_alias_in_group_by
         ):
             logger.info(f"Applying optimizer: {optimizer.__class__.__name__}")
+            print("optimizer!!", optimizer)
             sql_node = optimizer.optimize(sql_node)
             logger.info(
                 f"After applying {optimizer.__class__.__name__}, the SQL query plan is:\n"
@@ -791,26 +792,20 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
     def visit_window_reaggregation_node(self, node: WindowReaggregationNode) -> SqlDataSet:  # noqa: D102
         from_data_set = node.parent_node.accept(self)
         parent_instance_set = from_data_set.instance_set  # remove order by col
-        from_data_set_alias = self._next_unique_table_alias()
+        parent_data_set_alias = self._next_unique_table_alias()
 
-        metric_instances = parent_instance_set.metric_instances
+        assert (
+            len(parent_instance_set.metric_instances) == 1
+        ), f"WindowReaggregationNode supports only one metric per node. Got: {parent_instance_set.metric_instances}"
+        metric_instance = parent_instance_set.metric_instances[0]
         agg_time_dimension_instances = parent_instance_set.agg_time_dimension_instances(
-            metric_references=[metric_instance.spec.reference for metric_instance in metric_instances],
-            metric_lookup=self._metric_lookup,
+            metric_reference=metric_instance.spec.reference, metric_lookup=self._metric_lookup
         )
-        for metric_instance in metric_instances:
-            sql_function = SqlWindowFunction[
-                self._metric_lookup.get_metric(
-                    metric_instance.spec.reference
-                ).type_params.cumulative_type_params.period_agg.name
-            ]  # pending DSI upgrade
-            minimum_queryable_granularity = self._metric_lookup.get_min_queryable_time_granularity(
-                metric_instance.spec.reference
-            )
 
-        # TODO: confirm this is the behavior we want. If you query multiple cumulative metrics with non-default granularity,
-        # you can only use agg_time_dimension if they share the same agg_time_dimension. Else, must use metric_time.
-        # Also, you can only include one metric_time/agg_time_dimension in each query.
+        # TODO: confirm this is the behavior we want - can only include one metric_time/agg_time_dimension in each query.
+        minimum_queryable_granularity = self._metric_lookup.get_min_queryable_time_granularity(
+            metric_instance.spec.reference
+        )
         order_by_instance = None
         partition_by_instance = None
         for agg_time_dimension_instance in agg_time_dimension_instances:
@@ -832,33 +827,40 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             order_by_instance and partition_by_instance
         ), f"Did not receive appropriate agg_time_dimensions to render SQL for WindowReaggregationNode. Got: {agg_time_dimension_instances}"
 
-        metric_select_columns = tuple(
-            SqlSelectColumn(
-                expr=SqlWindowFunctionExpression(
-                    sql_function=sql_function,
-                    sql_function_args=[
-                        SqlColumnReferenceExpression.from_table_and_column_names(
-                            table_alias=from_data_set_alias, column_name=metric_instance.associated_column.column_name
-                        )
-                    ],
-                    partition_by_args=[
-                        SqlColumnReferenceExpression.from_table_and_column_names(
-                            table_alias=from_data_set_alias,
-                            column_name=partition_by_instance.associated_column.column_name,
-                        )
-                    ],
-                    order_by_args=[
-                        SqlWindowOrderByArgument(
-                            expr=SqlColumnReferenceExpression.from_table_and_column_names(
-                                table_alias=from_data_set_alias,
-                                column_name=order_by_instance.associated_column.column_name,
-                            ),
-                        )
-                    ],
-                ),
-                column_alias=metric_instance.associated_column.column_name,
+        # Pending DSI upgrade:
+        # sql_window_function = SqlWindowFunction[
+        #     self._metric_lookup.get_metric(
+        #         metric_instance.spec.reference
+        #     ).type_params.cumulative_type_params.period_agg.name
+        # ]
+        sql_window_function = SqlWindowFunction.FIRST_VALUE
+        order_by_args = []
+        if sql_window_function.requires_ordering:
+            order_by_args.append(
+                SqlWindowOrderByArgument(
+                    expr=SqlColumnReferenceExpression.from_table_and_column_names(
+                        table_alias=parent_data_set_alias,
+                        column_name=order_by_instance.associated_column.column_name,
+                    ),
+                )
             )
-            for metric_instance in metric_instances
+        metric_select_column = SqlSelectColumn(
+            expr=SqlWindowFunctionExpression(
+                sql_function=sql_window_function,
+                sql_function_args=[
+                    SqlColumnReferenceExpression.from_table_and_column_names(
+                        table_alias=parent_data_set_alias, column_name=metric_instance.associated_column.column_name
+                    )
+                ],
+                partition_by_args=[
+                    SqlColumnReferenceExpression.from_table_and_column_names(
+                        table_alias=parent_data_set_alias,
+                        column_name=partition_by_instance.associated_column.column_name,
+                    )
+                ],
+                order_by_args=order_by_args,
+            ),
+            column_alias=metric_instance.associated_column.column_name,
         )
 
         # Drop order by column from dataset
@@ -866,28 +868,38 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             FilterElements(exclude_specs=InstanceSpecSet(time_dimension_specs=(order_by_instance.spec,)))
         )
 
-        # Create select columns, replacing metric columns with window function columns built above
-        select_columns = (
-            output_instance_set.transform(
-                FilterElements(
-                    exclude_specs=InstanceSpecSet(
-                        metric_specs=tuple(metric_instance.spec for metric_instance in metric_instances)
-                    )
-                )
-            )
-            .transform(CreateSelectColumnsForInstances(from_data_set_alias, self._column_association_resolver))
-            .as_tuple()
-            + metric_select_columns
+        # Can't include window function in a group by, so we have to nest the window function in a subquery.
+        subquery_select_columns = output_instance_set.transform(
+            FilterElements(exclude_specs=InstanceSpecSet(metric_specs=(metric_instance.spec,)))
+        ).transform(
+            CreateSelectColumnsForInstances(parent_data_set_alias, self._column_association_resolver)
+        ).as_tuple() + (
+            metric_select_column,
         )
+        print("subquery_select_columns:", subquery_select_columns)
+        subquery = SqlSelectStatementNode(
+            description="",  # TODO - 2 descriptions for one node?
+            select_columns=subquery_select_columns,
+            from_source=from_data_set.checked_sql_select_node,
+            from_source_alias=parent_data_set_alias,
+            joins_descs=(),
+            order_bys=(),
+            group_bys=(),
+        )
+        subquery_alias = self._next_unique_table_alias()
 
+        outer_query_select_columns = output_instance_set.transform(
+            CreateSelectColumnsForInstances(subquery_alias, self._column_association_resolver)
+        ).as_tuple()
+        print("outer_query_select_columns:", outer_query_select_columns)
         return SqlDataSet(
             instance_set=output_instance_set,
             sql_select_node=SqlSelectStatementNode(
                 description=node.description,
-                select_columns=select_columns,
-                from_source=from_data_set.checked_sql_select_node,
-                from_source_alias=from_data_set_alias,
-                group_bys=select_columns,
+                select_columns=outer_query_select_columns,
+                from_source=subquery,
+                from_source_alias=subquery_alias,
+                group_bys=outer_query_select_columns,
                 joins_descs=(),
                 order_bys=(),
             ),
@@ -1241,9 +1253,9 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                     spec=metric_time_dimension_spec,
                 )
             )
-            output_column_to_input_column[
-                metric_time_dimension_column_association.column_name
-            ] = matching_time_dimension_instance.associated_column.column_name
+            output_column_to_input_column[metric_time_dimension_column_association.column_name] = (
+                matching_time_dimension_instance.associated_column.column_name
+            )
 
         output_instance_set = InstanceSet(
             measure_instances=tuple(output_measure_instances),
@@ -1486,11 +1498,11 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             and len(time_spine_dataset.checked_sql_select_node.select_columns) == 1
         ), "Time spine dataset not configured properly. Expected exactly one column."
         original_time_spine_dim_instance = time_spine_dataset.instance_set.time_dimension_instances[0]
-        time_spine_column_select_expr: Union[
-            SqlColumnReferenceExpression, SqlDateTruncExpression
-        ] = SqlColumnReferenceExpression(
-            SqlColumnReference(
-                table_alias=time_spine_alias, column_name=original_time_spine_dim_instance.spec.qualified_name
+        time_spine_column_select_expr: Union[SqlColumnReferenceExpression, SqlDateTruncExpression] = (
+            SqlColumnReferenceExpression(
+                SqlColumnReference(
+                    table_alias=time_spine_alias, column_name=original_time_spine_dim_instance.spec.qualified_name
+                )
             )
         )
 

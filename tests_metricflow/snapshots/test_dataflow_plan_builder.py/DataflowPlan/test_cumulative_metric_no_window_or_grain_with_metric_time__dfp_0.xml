@@ -2,35 +2,41 @@
     <WriteToResultDataTableNode>
         <!-- description = 'Write to DataTable' -->
         <!-- node_id = NodeId(id_str='wrd_0') -->
-        <ComputeMetricsNode>
-            <!-- description = 'Compute Metrics via Expressions' -->
-            <!-- node_id = NodeId(id_str='cm_0') -->
-            <!-- metric_spec = MetricSpec(element_name='revenue_all_time') -->
-            <AggregateMeasuresNode>
-                <!-- description = 'Aggregate Measures' -->
-                <!-- node_id = NodeId(id_str='am_0') -->
-                <FilterElementsNode>
-                    <!-- description = "Pass Only Elements: ['txn_revenue', 'metric_time__quarter']" -->
-                    <!-- node_id = NodeId(id_str='pfe_0') -->
-                    <!-- include_spec = MeasureSpec(element_name='txn_revenue') -->
-                    <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=QUARTER) -->
-                    <!-- distinct = False -->
-                    <JoinOverTimeRangeNode>
-                        <!-- description = 'Join Self Over Time Range' -->
-                        <!-- node_id = NodeId(id_str='jotr_0') -->
-                        <MetricTimeDimensionTransformNode>
-                            <!-- description = "Metric Time Dimension 'ds'" -->
-                            <!-- node_id = NodeId(id_str='sma_28007') -->
-                            <!-- aggregation_time_dimension = 'ds' -->
-                            <ReadSqlSourceNode>
-                                <!-- description = "Read From SemanticModelDataSet('revenue')" -->
-                                <!-- node_id = NodeId(id_str='rss_28020') -->
-                                <!-- data_set = SemanticModelDataSet('revenue') -->
-                            </ReadSqlSourceNode>
-                        </MetricTimeDimensionTransformNode>
-                    </JoinOverTimeRangeNode>
-                </FilterElementsNode>
-            </AggregateMeasuresNode>
-        </ComputeMetricsNode>
+        <WindowReaggregationNode>
+            <!-- description = 'Re-aggregate Metrics via Window Functions' -->
+            <!-- node_id = NodeId(id_str='wr_0') -->
+            <ComputeMetricsNode>
+                <!-- description = 'Compute Metrics via Expressions' -->
+                <!-- node_id = NodeId(id_str='cm_0') -->
+                <!-- metric_spec = MetricSpec(element_name='revenue_all_time') -->
+                <AggregateMeasuresNode>
+                    <!-- description = 'Aggregate Measures' -->
+                    <!-- node_id = NodeId(id_str='am_0') -->
+                    <FilterElementsNode>
+                        <!-- description =                                                                       -->
+                        <!--   "Pass Only Elements: ['txn_revenue', 'metric_time__quarter', 'metric_time__day']" -->
+                        <!-- node_id = NodeId(id_str='pfe_0') -->
+                        <!-- include_spec = MeasureSpec(element_name='txn_revenue') -->
+                        <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=QUARTER) -->
+                        <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
+                        <!-- distinct = False -->
+                        <JoinOverTimeRangeNode>
+                            <!-- description = 'Join Self Over Time Range' -->
+                            <!-- node_id = NodeId(id_str='jotr_0') -->
+                            <MetricTimeDimensionTransformNode>
+                                <!-- description = "Metric Time Dimension 'ds'" -->
+                                <!-- node_id = NodeId(id_str='sma_28007') -->
+                                <!-- aggregation_time_dimension = 'ds' -->
+                                <ReadSqlSourceNode>
+                                    <!-- description = "Read From SemanticModelDataSet('revenue')" -->
+                                    <!-- node_id = NodeId(id_str='rss_28020') -->
+                                    <!-- data_set = SemanticModelDataSet('revenue') -->
+                                </ReadSqlSourceNode>
+                            </MetricTimeDimensionTransformNode>
+                        </JoinOverTimeRangeNode>
+                    </FilterElementsNode>
+                </AggregateMeasuresNode>
+            </ComputeMetricsNode>
+        </WindowReaggregationNode>
     </WriteToResultDataTableNode>
 </DataflowPlan>

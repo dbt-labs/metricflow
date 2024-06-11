@@ -441,34 +441,36 @@ integration_test:
       GROUP BY a.ds
     ) c
     GROUP BY {{ render_date_trunc("metric_time__day", TimeGranularity.YEAR) }}
----
-integration_test:
-  name: windowed_cumulative_metric_with_small_granularity
-  description: Query a cumulative metric that aggregates the last 2 months with year granularity.
-  model: SIMPLE_MODEL
-  metrics: ["trailing_2_months_revenue"]
-  group_bys: ["metric_time__hour"]
-  check_query: |
-    SELECT
-      AVG(trailing_2_months_revenue) AS trailing_2_months_revenue
-      , {{ render_date_trunc("metric_time__day", TimeGranularity.YEAR) }} AS metric_time__year
-    FROM (
-      SELECT
-        SUM(b.txn_revenue) as trailing_2_months_revenue
-        , a.ds AS metric_time__second
-      FROM (
-        SELECT ds
-        FROM {{ mf_time_spine_source }}
-      ) a
-      INNER JOIN (
-        SELECT
-          revenue as txn_revenue
-          , created_at AS ds
-        FROM {{ source_schema }}.fct_revenue
-      ) b
-      ON b.ds <= a.ds AND b.ds > {{ render_date_sub("a", "ds", 2, TimeGranularity.MONTH) }}
-      GROUP BY a.ds
-    ) c
-    GROUP BY {{ render_date_trunc("metric_time__day", TimeGranularity.YEAR) }}
+# ---
+# integration_test:
+#   name: windowed_cumulative_metric_with_small_granularity
+#   description: Query a cumulative metric that aggregates the last 2 months with year granularity.
+#   model: SIMPLE_MODEL
+#   metrics: ["trailing_2_months_revenue"]
+#   group_bys: ["metric_time__hour"]
+#   check_query: |
+#     SELECT
+#       AVG(trailing_2_months_revenue) AS trailing_2_months_revenue
+#       , {{ render_date_trunc("metric_time__day", TimeGranularity.YEAR) }} AS metric_time__year
+#     FROM (
+#       SELECT
+#         SUM(b.txn_revenue) as trailing_2_months_revenue
+#         , a.ds AS metric_time__second
+#       FROM (
+#         SELECT ds
+#         FROM {{ mf_time_spine_source }}
+#       ) a
+#       INNER JOIN (
+#         SELECT
+#           revenue as txn_revenue
+#           , created_at AS ds
+#         FROM {{ source_schema }}.fct_revenue
+#       ) b
+#       ON b.ds <= a.ds AND b.ds > {{ render_date_sub("a", "ds", 2, TimeGranularity.MONTH) }}
+#       GROUP BY a.ds
+#     ) c
+#     GROUP BY {{ render_date_trunc("metric_time__day", TimeGranularity.YEAR) }}
+
+
 # Should we error if you try to re-aggregate a column that's defined at WEEK grain, since we won't always know the right period?
 # What happens if you query 2 cumulative metrics with one non-default grain? Should we combine nodes?

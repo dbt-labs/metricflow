@@ -950,8 +950,17 @@ class SqlWindowFunction(Enum):
 
     FIRST_VALUE = "first_value"
     LAST_VALUE = "last_value"
-    ROW_NUMBER = "row_number"
     AVERAGE = "avg"
+
+    @property
+    def requires_ordering(self) -> bool:
+        """Asserts whether or not ordering the window function will have an impact on the resulting value."""
+        if self is SqlWindowFunction.FIRST_VALUE or self is SqlWindowFunction.LAST_VALUE:
+            return True
+        elif self is SqlWindowFunction.AVERAGE:
+            return False
+        else:
+            assert_values_exhausted(self)
 
 
 @dataclass(frozen=True)

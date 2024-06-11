@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Generic, List, Sequence, Tuple, TypeVar
+from typing import Generic, List, Tuple, TypeVar
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
@@ -220,12 +220,11 @@ class InstanceSet(SerializableDataclass):
         )
 
     def agg_time_dimension_instances(
-        self, metric_references: Sequence[MetricReference], metric_lookup: MetricLookup
+        self, metric_reference: MetricReference, metric_lookup: MetricLookup
     ) -> List[TimeDimensionInstance]:
         """Get the time dims included that are valid agg time dimensions for the specified metric."""
         valid_agg_time_dimension_names = {
             agg_time_dimension.element_name
-            for metric_reference in metric_references
             for agg_time_dimension in metric_lookup.get_valid_agg_time_dimensions_for_metric(metric_reference)
         }.union({METRIC_TIME_ELEMENT_NAME})
 

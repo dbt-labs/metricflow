@@ -87,6 +87,7 @@ class SemanticModelLookup:
         """Retrieves a full dimension object by name."""
         # If the reference passed is a TimeDimensionReference, convert to DimensionReference.
         dimension_reference = DimensionReference(dimension_reference.element_name)
+
         semantic_models = self._dimension_index.get(dimension_reference)
         if not semantic_models:
             raise ValueError(

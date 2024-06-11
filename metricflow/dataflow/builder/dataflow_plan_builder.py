@@ -414,19 +414,14 @@ class DataflowPlanBuilder:
 
     def _build_cumulative_metric_output_node(
         self,
+        # currently only one metric allowed here, think we need an optimizer to put multiple in one node
         metric_spec: MetricSpec,
         queried_linkable_specs: LinkableSpecSet,
         filter_spec_factory: WhereSpecFactory,
         predicate_pushdown_state: PredicatePushdownState,
         for_group_by_source_node: bool = False,
     ) -> DataflowPlanNode:
-        compute_metrics_node = self._build_base_metric_output_node(
-            metric_spec=metric_spec,
-            queried_linkable_specs=queried_linkable_specs,
-            filter_spec_factory=filter_spec_factory,
-            predicate_pushdown_state=predicate_pushdown_state,
-            for_group_by_source_node=for_group_by_source_node,
-        )
+        # Add to queried_linkable_specs: default granularity spec!
 
         default_granularity = self._metric_lookup.get_min_queryable_time_granularity(metric_spec.reference)
         non_default_granularity_specs = [
@@ -437,8 +432,30 @@ class DataflowPlanBuilder:
             if time_dimension_spec.time_granularity != default_granularity
         ]
         if not non_default_granularity_specs:
-            return compute_metrics_node
+            return self._build_base_metric_output_node(
+                metric_spec=metric_spec,
+                queried_linkable_specs=queried_linkable_specs,
+                filter_spec_factory=filter_spec_factory,
+                predicate_pushdown_state=predicate_pushdown_state,
+                for_group_by_source_node=for_group_by_source_node,
+            )
 
+        # Is this right?? so weird
+        # The behavior for cumulative metrics with multiple agg_time_dimensions was already broken - better fix that first!
+        assert (
+            len(non_default_granularity_specs) == 1
+        ), "Cumulative metrics can only be queried with one metric_time or agg_time_dimension at a time."
+        default_granularity_spec = non_default_granularity_specs[0].with_grain(default_granularity)
+        include_linkable_specs = queried_linkable_specs.merge(
+            LinkableSpecSet(time_dimension_specs=(default_granularity_spec,))
+        )
+        compute_metrics_node = self._build_base_metric_output_node(
+            metric_spec=metric_spec,
+            queried_linkable_specs=include_linkable_specs,
+            filter_spec_factory=filter_spec_factory,
+            predicate_pushdown_state=predicate_pushdown_state,
+            for_group_by_source_node=for_group_by_source_node,
+        )
         return WindowReaggregationNode(parent_node=compute_metrics_node)
 
     def _build_base_metric_output_node(
@@ -1489,12 +1506,12 @@ class DataflowPlanBuilder:
         if non_additive_dimension_spec is not None:
             # Apply semi additive join on the node
             agg_time_dimension = measure_properties.agg_time_dimension
-            queried_time_dimension_spec: Optional[TimeDimensionSpec] = (
-                self._find_non_additive_dimension_in_linkable_specs(
-                    agg_time_dimension=agg_time_dimension,
-                    linkable_specs=queried_linkable_specs.as_tuple,
-                    non_additive_dimension_spec=non_additive_dimension_spec,
-                )
+            queried_time_dimension_spec: Optional[
+                TimeDimensionSpec
+            ] = self._find_non_additive_dimension_in_linkable_specs(
+                agg_time_dimension=agg_time_dimension,
+                linkable_specs=queried_linkable_specs.as_tuple,
+                non_additive_dimension_spec=non_additive_dimension_spec,
             )
             time_dimension_spec = TimeDimensionSpec.from_name(non_additive_dimension_spec.name)
             window_groupings = tuple(

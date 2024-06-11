@@ -1,17 +1,17 @@
 from __future__ import annotations
 
-from typing import Sequence, Set, Tuple
+from typing import Sequence, Set
 
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
-from metricflow_semantics.specs.spec_classes import LinkableInstanceSpec, MetricSpec, TimeDimensionSpec
+from metricflow_semantics.specs.spec_classes import LinkableInstanceSpec
 from metricflow_semantics.visitor import VisitorOutputT
-from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
 
 from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,
     DataflowPlanNodeVisitor,
 )
+from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
 
 
 # TODO: Rename, lolll
@@ -21,10 +21,7 @@ class WindowReaggregationNode(DataflowPlanNode):
     Used for calculating cumulative metrics at various granularities. Other dimensions / entities are passed through.
     """
 
-    def __init__(
-        self,
-        parent_node: ComputeMetricsNode,
-    ) -> None:
+    def __init__(self, parent_node: ComputeMetricsNode) -> None:  # noqa: D107
         self._parent_node = parent_node
         super().__init__(node_id=self.create_unique_id(), parent_nodes=(self._parent_node,))
 
@@ -51,10 +48,14 @@ class WindowReaggregationNode(DataflowPlanNode):
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D102
         return isinstance(other_node, self.__class__) and other_node.parent_node == self.parent_node
 
-    def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> ComputeMetricsNode:  # noqa: D102
+    def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> WindowReaggregationNode:  # noqa: D102
         assert len(new_parent_nodes) == 1
-        return WindowReaggregationNode(parent_node=new_parent_nodes[0])
+        new_parent_node = new_parent_nodes[0]
+        assert isinstance(
+            new_parent_node, ComputeMetricsNode
+        ), "WindowReaggregationNode can only have ComputeMetricsNode as parent node."
+        return WindowReaggregationNode(parent_node=new_parent_node)
 
     @property
     def aggregated_to_elements(self) -> Set[LinkableInstanceSpec]:  # noqa: D102
-        return ()
+        return set()

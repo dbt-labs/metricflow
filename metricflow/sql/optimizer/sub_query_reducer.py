@@ -55,6 +55,7 @@ class SqlSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
         checks for obvious cases where reducing can't happen, but there are cases where reducing is possible, but this
         returns false for ease of reasoning.
         """
+        print("did this run tho?")
         # If this node has multiple parents (i.e. a join), then this can't be collapsed.
         is_join = len(node.join_descs) > 0
         has_multiple_parent_nodes = len(node.parent_nodes) > 1
@@ -82,7 +83,9 @@ class SqlSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
             return False
 
         # Group bys are hard to reduce.
-        if len(node.group_bys) > 0:
+        logger.info("made it here??")
+        if len(node.group_bys) > 0 or (parent_node.as_select_node and len(parent_node.as_select_node.group_bys) > 0):
+            logger.info("and here?")
             return False
 
         # Similar with order bys.
@@ -122,6 +125,7 @@ class SqlSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
         return None
 
     def visit_select_statement_node(self, node: SqlSelectStatementNode) -> SqlQueryPlanNode:  # noqa: D102
+        print("is this running?")
         node_with_reduced_parents = self._reduce_parents(node)
 
         if not self._reduce_is_possible(node_with_reduced_parents):
@@ -217,4 +221,5 @@ class SqlSubQueryReducer(SqlQueryPlanOptimizer):
     """
 
     def optimize(self, node: SqlQueryPlanNode) -> SqlQueryPlanNode:  # noqa: D102
+        logger.info("optimize???")
         return node.accept(SqlSubQueryReducerVisitor())
