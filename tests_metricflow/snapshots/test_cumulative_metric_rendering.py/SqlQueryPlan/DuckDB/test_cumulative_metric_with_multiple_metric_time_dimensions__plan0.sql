@@ -19,6 +19,7 @@ FROM (
       -- Join Self Over Time Range
       SELECT
         subq_2.metric_time__day AS metric_time__day
+        , subq_2.metric_time__month AS metric_time__month
         , subq_1.ds__day AS ds__day
         , subq_1.ds__week AS ds__week
         , subq_1.ds__month AS ds__month
@@ -42,7 +43,6 @@ FROM (
         , subq_1.revenue_instance__ds__extract_dow AS revenue_instance__ds__extract_dow
         , subq_1.revenue_instance__ds__extract_doy AS revenue_instance__ds__extract_doy
         , subq_1.metric_time__week AS metric_time__week
-        , subq_1.metric_time__month AS metric_time__month
         , subq_1.metric_time__quarter AS metric_time__quarter
         , subq_1.metric_time__year AS metric_time__year
         , subq_1.metric_time__extract_year AS metric_time__extract_year
@@ -58,7 +58,11 @@ FROM (
         -- Time Spine
         SELECT
           subq_3.ds AS metric_time__day
+          , DATE_TRUNC('month', subq_3.ds) AS metric_time__month
         FROM ***************************.mf_time_spine subq_3
+        GROUP BY
+          subq_3.ds
+          , DATE_TRUNC('month', subq_3.ds)
       ) subq_2
       INNER JOIN (
         -- Metric Time Dimension 'ds'
