@@ -1355,13 +1355,9 @@ class DataflowPlanBuilder:
         # Otherwise, the measure will be aggregated over all time.
         time_range_node: Optional[JoinOverTimeRangeNode] = None
         if cumulative and queried_agg_time_dimension_specs:
-            # Use the time dimension spec with the smallest granularity.
-            agg_time_dimension_spec_for_join = sorted(
-                queried_agg_time_dimension_specs, key=lambda spec: spec.time_granularity.to_int()
-            )[0]
             time_range_node = JoinOverTimeRangeNode(
                 parent_node=measure_recipe.source_node,
-                time_dimension_spec_for_join=agg_time_dimension_spec_for_join,
+                queried_agg_time_dimension_specs=tuple(queried_agg_time_dimension_specs),
                 window=cumulative_window,
                 grain_to_date=cumulative_grain_to_date,
                 # Note: we use the original constraint here because the JoinOverTimeRangeNode will eventually get

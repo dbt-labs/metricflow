@@ -18,6 +18,8 @@
                     <JoinOverTimeRangeNode>
                         <!-- description = 'Join Self Over Time Range' -->
                         <!-- node_id = NodeId(id_str='jotr_0') -->
+                        <!-- queried_agg_time_dimension_specs =                                       -->
+                        <!--   (TimeDimensionSpec(element_name='metric_time', time_granularity=DAY),) -->
                         <MetricTimeDimensionTransformNode>
                             <!-- description = "Metric Time Dimension 'ds'" -->
                             <!-- node_id = NodeId(id_str='sma_28007') -->
