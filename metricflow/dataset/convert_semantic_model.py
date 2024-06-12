@@ -500,10 +500,6 @@ class SemanticModelToDataSetConverter:
             select_columns=tuple(all_select_columns),
             from_source=from_source,
             from_source_alias=from_source_alias,
-            joins_descs=(),
-            where=None,
-            group_bys=(),
-            order_bys=(),
         )
 
         return SemanticModelDataSet(
@@ -558,8 +554,5 @@ class SemanticModelToDataSetConverter:
                 select_columns=tuple(select_columns),
                 from_source=SqlTableFromClauseNode(sql_table=time_spine_source.spine_table),
                 from_source_alias=from_source_alias,
-                joins_descs=(),
-                group_bys=(),
-                order_bys=(),
             ),
         )

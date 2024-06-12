@@ -143,9 +143,6 @@ def base_select_statement() -> SqlSelectStatementNode:
             ),
             from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="from_source_table")),
             from_source_alias="from_source_table",
-            joins_descs=(),
-            group_bys=(),
-            order_bys=(),
         ),
         from_source_alias="from_source",
         joins_descs=(
@@ -185,9 +182,6 @@ def base_select_statement() -> SqlSelectStatementNode:
                         sql_table=SqlTable(schema_name="demo", table_name="joined_source_table")
                     ),
                     from_source_alias="joined_source_table",
-                    joins_descs=(),
-                    group_bys=(),
-                    order_bys=(),
                 ),
                 right_source_alias="joined_source",
                 on_condition=SqlComparisonExpression(
@@ -202,9 +196,6 @@ def base_select_statement() -> SqlSelectStatementNode:
                 join_type=SqlJoinType.INNER,
             ),
         ),
-        where=None,
-        group_bys=(),
-        order_bys=(),
     )
 
 
@@ -536,9 +527,6 @@ def string_select_statement() -> SqlSelectStatementNode:
             ),
             from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="from_source_table")),
             from_source_alias="from_source_table",
-            joins_descs=(),
-            group_bys=(),
-            order_bys=(),
         ),
         from_source_alias="from_source",
         joins_descs=(
@@ -578,9 +566,6 @@ def string_select_statement() -> SqlSelectStatementNode:
                         sql_table=SqlTable(schema_name="demo", table_name="joined_source_table")
                     ),
                     from_source_alias="joined_source_table",
-                    joins_descs=(),
-                    group_bys=(),
-                    order_bys=(),
                 ),
                 right_source_alias="joined_source",
                 on_condition=SqlComparisonExpression(
@@ -595,9 +580,6 @@ def string_select_statement() -> SqlSelectStatementNode:
                 join_type=SqlJoinType.INNER,
             ),
         ),
-        where=None,
-        group_bys=(),
-        order_bys=(),
     )
 
 
@@ -712,20 +694,10 @@ def grandparent_pruning_select_statement() -> SqlSelectStatementNode:
                 ),
                 from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="src0")),
                 from_source_alias="src0",
-                joins_descs=(),
-                group_bys=(),
-                order_bys=(),
             ),
             from_source_alias="src1",
-            joins_descs=(),
-            group_bys=(),
-            order_bys=(),
         ),
         from_source_alias="src2",
-        joins_descs=(),
-        where=None,
-        group_bys=(),
-        order_bys=(),
     )
 
 
@@ -846,14 +818,8 @@ def join_grandparent_pruning_select_statement() -> SqlSelectStatementNode:
                         ),
                         from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="src0")),
                         from_source_alias="src0",
-                        joins_descs=(),
-                        group_bys=(),
-                        order_bys=(),
                     ),
                     from_source_alias="src1",
-                    joins_descs=(),
-                    group_bys=(),
-                    order_bys=(),
                 ),
                 right_source_alias="src4",
                 on_condition=SqlComparisonExpression(
@@ -868,9 +834,6 @@ def join_grandparent_pruning_select_statement() -> SqlSelectStatementNode:
                 join_type=SqlJoinType.INNER,
             ),
         ),
-        where=None,
-        group_bys=(),
-        order_bys=(),
     )
 
 
@@ -931,17 +894,9 @@ def test_prune_distinct_select(
             ),
             from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
             from_source_alias="a",
-            joins_descs=(),
-            where=None,
-            group_bys=(),
-            order_bys=(),
             distinct=True,
         ),
         from_source_alias="b",
-        joins_descs=(),
-        where=None,
-        group_bys=(),
-        order_bys=(),
     )
     assert_default_rendered_sql_equal(
         request=request,

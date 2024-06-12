@@ -78,10 +78,6 @@ def test_no_parent_node_data_set(
             ),
             from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
             from_source_alias="src",
-            joins_descs=(),
-            where=None,
-            group_bys=(),
-            order_bys=(),
         ),
     )
 

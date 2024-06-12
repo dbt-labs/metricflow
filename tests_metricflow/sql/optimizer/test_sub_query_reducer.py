@@ -100,22 +100,12 @@ def base_select_statement() -> SqlSelectStatementNode:
                     sql_table=SqlTable(schema_name="demo", table_name="from_source_table")
                 ),
                 from_source_alias="src0",
-                joins_descs=(),
-                group_bys=(),
-                order_bys=(),
                 limit=2,
             ),
             from_source_alias="src1",
-            joins_descs=(),
-            where=None,
-            group_bys=(),
-            order_bys=(),
             limit=1,
         ),
         from_source_alias="src2",
-        joins_descs=(),
-        group_bys=(),
-        where=None,
         order_bys=(
             SqlOrderByDescription(
                 expr=SqlColumnReferenceExpression(
@@ -127,7 +117,6 @@ def base_select_statement() -> SqlSelectStatementNode:
                 desc=False,
             ),
         ),
-        limit=None,
     )
 
 
@@ -221,15 +210,9 @@ def rewrite_order_by_statement() -> SqlSelectStatementNode:
                         join_type=SqlJoinType.INNER,
                     ),
                 ),
-                where=None,
-                group_bys=(),
-                order_bys=(),
             )
         ),
         from_source_alias="src2",
-        joins_descs=(),
-        group_bys=(),
-        where=None,
         order_bys=(
             SqlOrderByDescription(
                 expr=SqlColumnReferenceExpression(
@@ -241,7 +224,6 @@ def rewrite_order_by_statement() -> SqlSelectStatementNode:
                 desc=False,
             ),
         ),
-        limit=None,
     )
 
 
@@ -301,17 +283,9 @@ def test_distinct_select_node_is_not_reduced(
             ),
             from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
             from_source_alias="a",
-            joins_descs=(),
-            where=None,
-            group_bys=(),
-            order_bys=(),
             distinct=True,
         ),
         from_source_alias="b",
-        joins_descs=(),
-        where=None,
-        group_bys=(),
-        order_bys=(),
     )
     assert_default_rendered_sql_equal(
         request=request,
