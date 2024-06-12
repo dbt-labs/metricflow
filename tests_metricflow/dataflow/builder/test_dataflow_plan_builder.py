@@ -499,7 +499,7 @@ def test_cumulative_metric_no_window_or_grain_with_metric_time(  # noqa: D103
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="revenue_all_time"),),
             dimension_specs=(),
-            time_dimension_specs=(MTD_SPEC_QUARTER,),
+            time_dimension_specs=(MTD_SPEC_DAY,),
         )
     )
 
