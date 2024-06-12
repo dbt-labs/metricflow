@@ -16,7 +16,7 @@ from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.spec_classes import EntityReference, MetricSpec, TimeDimensionSpec
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
-from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_MONTH
+from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_MONTH
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
@@ -211,7 +211,7 @@ def test_cumulative_metric_no_window_with_time_constraint(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="revenue_all_time"),),
             dimension_specs=(),
-            time_dimension_specs=(MTD_SPEC_MONTH,),
+            time_dimension_specs=(MTD_SPEC_DAY,),
             time_range_constraint=TimeRangeConstraint(
                 start_time=as_datetime("2020-01-01"), end_time=as_datetime("2020-01-01")
             ),

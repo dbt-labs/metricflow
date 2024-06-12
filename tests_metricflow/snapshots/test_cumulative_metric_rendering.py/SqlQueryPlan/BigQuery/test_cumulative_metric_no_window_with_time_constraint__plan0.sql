@@ -1,26 +1,26 @@
 -- Compute Metrics via Expressions
 SELECT
-  subq_10.metric_time__month
+  subq_10.metric_time__day
   , subq_10.txn_revenue AS revenue_all_time
 FROM (
   -- Aggregate Measures
   SELECT
-    subq_9.metric_time__month
+    subq_9.metric_time__day
     , SUM(subq_9.txn_revenue) AS txn_revenue
   FROM (
     -- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-01T00:00:00]
     SELECT
-      subq_8.metric_time__month
+      subq_8.metric_time__day
       , subq_8.txn_revenue
     FROM (
-      -- Pass Only Elements: ['txn_revenue', 'metric_time__month']
+      -- Pass Only Elements: ['txn_revenue', 'metric_time__day']
       SELECT
-        subq_7.metric_time__month
+        subq_7.metric_time__day
         , subq_7.txn_revenue
       FROM (
         -- Join Self Over Time Range
         SELECT
-          subq_5.metric_time__month AS metric_time__month
+          subq_5.metric_time__day AS metric_time__day
           , subq_4.ds__day AS ds__day
           , subq_4.ds__week AS ds__week
           , subq_4.ds__month AS ds__month
@@ -43,8 +43,8 @@ FROM (
           , subq_4.revenue_instance__ds__extract_day AS revenue_instance__ds__extract_day
           , subq_4.revenue_instance__ds__extract_dow AS revenue_instance__ds__extract_dow
           , subq_4.revenue_instance__ds__extract_doy AS revenue_instance__ds__extract_doy
-          , subq_4.metric_time__day AS metric_time__day
           , subq_4.metric_time__week AS metric_time__week
+          , subq_4.metric_time__month AS metric_time__month
           , subq_4.metric_time__quarter AS metric_time__quarter
           , subq_4.metric_time__year AS metric_time__year
           , subq_4.metric_time__extract_year AS metric_time__extract_year
@@ -59,11 +59,9 @@ FROM (
         FROM (
           -- Time Spine
           SELECT
-            DATETIME_TRUNC(subq_6.ds, month) AS metric_time__month
+            subq_6.ds AS metric_time__day
           FROM ***************************.mf_time_spine subq_6
           WHERE subq_6.ds BETWEEN '2020-01-01' AND '2020-01-01'
-          GROUP BY
-            metric_time__month
         ) subq_5
         INNER JOIN (
           -- Constrain Time Range to [2000-01-01T00:00:00, 2020-01-01T00:00:00]
@@ -177,11 +175,11 @@ FROM (
           WHERE subq_3.metric_time__day BETWEEN '2000-01-01' AND '2020-01-01'
         ) subq_4
         ON
-          (subq_4.metric_time__month <= subq_5.metric_time__month)
+          (subq_4.metric_time__day <= subq_5.metric_time__day)
       ) subq_7
     ) subq_8
-    WHERE subq_8.metric_time__month BETWEEN '2020-01-01' AND '2020-01-01'
+    WHERE subq_8.metric_time__day BETWEEN '2020-01-01' AND '2020-01-01'
   ) subq_9
   GROUP BY
-    metric_time__month
+    metric_time__day
 ) subq_10
