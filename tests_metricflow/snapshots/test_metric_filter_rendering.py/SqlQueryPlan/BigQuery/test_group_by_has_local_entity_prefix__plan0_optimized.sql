@@ -8,8 +8,8 @@ FROM (
   -- Join Standard Outputs
   -- Pass Only Elements: ['listings', 'user__listing__user__average_booking_value']
   SELECT
-    subq_41.listing__user__average_booking_value AS user__listing__user__average_booking_value
-    , subq_30.listings AS listings
+    subq_50.listing__user__average_booking_value AS user__listing__user__average_booking_value
+    , subq_39.listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
@@ -18,7 +18,7 @@ FROM (
       user_id AS user
       , 1 AS listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-  ) subq_30
+  ) subq_39
   LEFT OUTER JOIN (
     -- Join Standard Outputs
     -- Pass Only Elements: ['average_booking_value', 'listing__user']
@@ -35,8 +35,8 @@ FROM (
       bookings_source_src_28000.listing_id = listings_latest_src_28000.listing_id
     GROUP BY
       listing__user
-  ) subq_41
+  ) subq_50
   ON
-    subq_30.user = subq_41.listing__user
-) subq_43
+    subq_39.user = subq_50.listing__user
+) subq_52
 WHERE user__listing__user__average_booking_value > 1

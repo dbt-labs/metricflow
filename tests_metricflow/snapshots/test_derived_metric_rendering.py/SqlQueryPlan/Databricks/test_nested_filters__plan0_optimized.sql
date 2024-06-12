@@ -8,9 +8,9 @@ FROM (
   FROM (
     -- Combine Aggregated Outputs
     SELECT
-      MAX(subq_54.average_booking_value) AS average_booking_value
-      , MAX(subq_67.bookings) AS bookings
-      , MAX(subq_75.booking_value) AS booking_value
+      MAX(subq_60.average_booking_value) AS average_booking_value
+      , MAX(subq_73.bookings) AS bookings
+      , MAX(subq_81.booking_value) AS booking_value
     FROM (
       -- Constrain Output with WHERE
       -- Pass Only Elements: ['average_booking_value',]
@@ -22,9 +22,9 @@ FROM (
         -- Join Standard Outputs
         -- Pass Only Elements: ['average_booking_value', 'listing__is_lux_latest', 'booking__is_instant']
         SELECT
-          subq_45.booking__is_instant AS booking__is_instant
+          subq_51.booking__is_instant AS booking__is_instant
           , listings_latest_src_28000.is_lux AS listing__is_lux_latest
-          , subq_45.average_booking_value AS average_booking_value
+          , subq_51.average_booking_value AS average_booking_value
         FROM (
           -- Constrain Output with WHERE
           -- Pass Only Elements: ['average_booking_value', 'booking__is_instant', 'listing']
@@ -40,16 +40,16 @@ FROM (
               , is_instant AS booking__is_instant
               , booking_value AS average_booking_value
             FROM ***************************.fct_bookings bookings_source_src_28000
-          ) subq_43
+          ) subq_49
           WHERE booking__is_instant
-        ) subq_45
+        ) subq_51
         LEFT OUTER JOIN
           ***************************.dim_listings_latest listings_latest_src_28000
         ON
-          subq_45.listing = listings_latest_src_28000.listing_id
-      ) subq_50
+          subq_51.listing = listings_latest_src_28000.listing_id
+      ) subq_56
       WHERE (listing__is_lux_latest) AND (booking__is_instant)
-    ) subq_54
+    ) subq_60
     CROSS JOIN (
       -- Constrain Output with WHERE
       -- Pass Only Elements: ['bookings',]
@@ -61,9 +61,9 @@ FROM (
         -- Join Standard Outputs
         -- Pass Only Elements: ['bookings', 'listing__is_lux_latest', 'booking__is_instant']
         SELECT
-          subq_58.booking__is_instant AS booking__is_instant
+          subq_64.booking__is_instant AS booking__is_instant
           , listings_latest_src_28000.is_lux AS listing__is_lux_latest
-          , subq_58.bookings AS bookings
+          , subq_64.bookings AS bookings
         FROM (
           -- Constrain Output with WHERE
           -- Pass Only Elements: ['bookings', 'booking__is_instant', 'listing']
@@ -79,16 +79,16 @@ FROM (
               , is_instant AS booking__is_instant
               , 1 AS bookings
             FROM ***************************.fct_bookings bookings_source_src_28000
-          ) subq_56
+          ) subq_62
           WHERE booking__is_instant
-        ) subq_58
+        ) subq_64
         LEFT OUTER JOIN
           ***************************.dim_listings_latest listings_latest_src_28000
         ON
-          subq_58.listing = listings_latest_src_28000.listing_id
-      ) subq_63
+          subq_64.listing = listings_latest_src_28000.listing_id
+      ) subq_69
       WHERE (listing__is_lux_latest) AND (booking__is_instant)
-    ) subq_67
+    ) subq_73
     CROSS JOIN (
       -- Constrain Output with WHERE
       -- Pass Only Elements: ['booking_value',]
@@ -109,10 +109,10 @@ FROM (
             is_instant AS booking__is_instant
             , booking_value
           FROM ***************************.fct_bookings bookings_source_src_28000
-        ) subq_69
+        ) subq_75
         WHERE booking__is_instant
-      ) subq_71
+      ) subq_77
       WHERE booking__is_instant
-    ) subq_75
-  ) subq_76
-) subq_77
+    ) subq_81
+  ) subq_82
+) subq_83

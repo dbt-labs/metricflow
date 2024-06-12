@@ -6,15 +6,15 @@ FROM (
   -- Join to Time Spine Dataset
   -- Constrain Time Range to [2020-01-03T00:00:00, 2020-01-05T00:00:00]
   SELECT
-    subq_16.metric_time__day AS metric_time__day
-    , subq_15.bookings AS bookings
+    subq_18.metric_time__day AS metric_time__day
+    , subq_17.bookings AS bookings
   FROM (
     -- Time Spine
     SELECT
       ds AS metric_time__day
-    FROM ***************************.mf_time_spine subq_17
+    FROM ***************************.mf_time_spine subq_19
     WHERE ds BETWEEN '2020-01-03' AND '2020-01-05'
-  ) subq_16
+  ) subq_18
   LEFT OUTER JOIN (
     -- Aggregate Measures
     SELECT
@@ -30,11 +30,11 @@ FROM (
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
       WHERE DATE_TRUNC('day', ds) BETWEEN '2020-01-03' AND '2020-01-05'
-    ) subq_14
+    ) subq_16
     GROUP BY
       metric_time__day
-  ) subq_15
+  ) subq_17
   ON
-    subq_16.metric_time__day = subq_15.metric_time__day
-  WHERE subq_16.metric_time__day BETWEEN '2020-01-03' AND '2020-01-05'
-) subq_19
+    subq_18.metric_time__day = subq_17.metric_time__day
+  WHERE subq_18.metric_time__day BETWEEN '2020-01-03' AND '2020-01-05'
+) subq_21

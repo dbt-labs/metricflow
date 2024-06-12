@@ -25,10 +25,10 @@ FROM (
         , is_instant AS booking__is_instant
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_11
+    ) subq_13
     WHERE NOT booking__is_instant
-  ) subq_13
+  ) subq_15
   WHERE NOT booking__is_instant
   GROUP BY
     metric_time__day
-) subq_17
+) subq_19
