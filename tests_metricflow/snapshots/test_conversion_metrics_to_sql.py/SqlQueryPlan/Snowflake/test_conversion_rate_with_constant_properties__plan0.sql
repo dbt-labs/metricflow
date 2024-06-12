@@ -132,7 +132,7 @@ FROM (
         FROM (
           -- Dedupe the fanout with mf_internal_uuid in the conversion data set
           SELECT DISTINCT
-            first_value(subq_6.visits) OVER (
+            FIRST_VALUE(subq_6.visits) OVER (
               PARTITION BY
                 subq_9.user
                 , subq_9.ds__day
@@ -141,7 +141,7 @@ FROM (
               ORDER BY subq_6.ds__day DESC
               ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
             ) AS visits
-            , first_value(subq_6.visit__referrer_id) OVER (
+            , FIRST_VALUE(subq_6.visit__referrer_id) OVER (
               PARTITION BY
                 subq_9.user
                 , subq_9.ds__day
@@ -150,7 +150,7 @@ FROM (
               ORDER BY subq_6.ds__day DESC
               ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
             ) AS visit__referrer_id
-            , first_value(subq_6.ds__day) OVER (
+            , FIRST_VALUE(subq_6.ds__day) OVER (
               PARTITION BY
                 subq_9.user
                 , subq_9.ds__day
@@ -159,7 +159,7 @@ FROM (
               ORDER BY subq_6.ds__day DESC
               ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
             ) AS ds__day
-            , first_value(subq_6.metric_time__day) OVER (
+            , FIRST_VALUE(subq_6.metric_time__day) OVER (
               PARTITION BY
                 subq_9.user
                 , subq_9.ds__day
@@ -168,7 +168,7 @@ FROM (
               ORDER BY subq_6.ds__day DESC
               ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
             ) AS metric_time__day
-            , first_value(subq_6.user) OVER (
+            , FIRST_VALUE(subq_6.user) OVER (
               PARTITION BY
                 subq_9.user
                 , subq_9.ds__day
@@ -177,7 +177,7 @@ FROM (
               ORDER BY subq_6.ds__day DESC
               ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
             ) AS user
-            , first_value(subq_6.session) OVER (
+            , FIRST_VALUE(subq_6.session) OVER (
               PARTITION BY
                 subq_9.user
                 , subq_9.ds__day

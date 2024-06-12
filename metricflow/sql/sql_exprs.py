@@ -944,8 +944,9 @@ class SqlWindowFunction(Enum):
     Values are the SQL string to be used in rendering.
     """
 
-    FIRST_VALUE = "first_value"
-    ROW_NUMBER = "row_number"
+    FIRST_VALUE = "FIRST_VALUE"
+    LAST_VALUE = "LAST_VALUE"
+    AVERAGE = "AVG"
 
 
 @dataclass(frozen=True)

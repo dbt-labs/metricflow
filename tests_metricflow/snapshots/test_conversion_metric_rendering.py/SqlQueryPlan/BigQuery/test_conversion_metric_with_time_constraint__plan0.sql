@@ -176,7 +176,7 @@ FROM (
         FROM (
           -- Dedupe the fanout with mf_internal_uuid in the conversion data set
           SELECT DISTINCT
-            first_value(subq_13.visits) OVER (
+            FIRST_VALUE(subq_13.visits) OVER (
               PARTITION BY
                 subq_16.user
                 , subq_16.ds__day
@@ -184,7 +184,7 @@ FROM (
               ORDER BY subq_13.ds__day DESC
               ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
             ) AS visits
-            , first_value(subq_13.visit__referrer_id) OVER (
+            , FIRST_VALUE(subq_13.visit__referrer_id) OVER (
               PARTITION BY
                 subq_16.user
                 , subq_16.ds__day
@@ -192,7 +192,7 @@ FROM (
               ORDER BY subq_13.ds__day DESC
               ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
             ) AS visit__referrer_id
-            , first_value(subq_13.ds__day) OVER (
+            , FIRST_VALUE(subq_13.ds__day) OVER (
               PARTITION BY
                 subq_16.user
                 , subq_16.ds__day
@@ -200,7 +200,7 @@ FROM (
               ORDER BY subq_13.ds__day DESC
               ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
             ) AS ds__day
-            , first_value(subq_13.user) OVER (
+            , FIRST_VALUE(subq_13.user) OVER (
               PARTITION BY
                 subq_16.user
                 , subq_16.ds__day
