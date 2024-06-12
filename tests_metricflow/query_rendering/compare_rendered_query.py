@@ -23,10 +23,14 @@ def render_and_check(
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
     query_spec: MetricFlowQuerySpec,
+    is_distinct_values_plan: bool = False,
 ) -> None:
     """Renders an engine-specific query output from a given query, in both basic and optimized forms."""
     # Build and convert dataflow plan without optimizers
-    base_plan = dataflow_plan_builder.build_plan(query_spec)
+    if is_distinct_values_plan:
+        base_plan = dataflow_plan_builder.build_plan_for_distinct_values(query_spec=query_spec)
+    else:
+        base_plan = dataflow_plan_builder.build_plan(query_spec)
     conversion_result = dataflow_to_sql_converter.convert_to_sql_query_plan(
         sql_engine_type=sql_client.sql_engine_type,
         dataflow_plan_node=base_plan.sink_node,
@@ -48,7 +52,11 @@ def render_and_check(
     )
 
     # Run dataflow -> sql conversion with all optimizers
-    optimized_plan = dataflow_plan_builder.build_plan(query_spec, optimizers=(PredicatePushdownOptimizer(),))
+    if is_distinct_values_plan:
+        # TODO: Make optimization available for distinct values plans
+        optimized_plan = base_plan
+    else:
+        optimized_plan = dataflow_plan_builder.build_plan(query_spec, optimizers=(PredicatePushdownOptimizer(),))
     conversion_result = dataflow_to_sql_converter.convert_to_sql_query_plan(
         sql_engine_type=sql_client.sql_engine_type,
         dataflow_plan_node=optimized_plan.sink_node,
