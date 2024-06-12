@@ -34,7 +34,6 @@ class SqlTableAliasSimplifierVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
                 ),
                 from_source=node.from_source.accept(self),
                 from_source_alias=node.from_source_alias,
-                joins_descs=(),
                 group_bys=tuple(
                     SqlSelectColumn(expr=x.expr.rewrite(should_render_table_alias=False), column_alias=x.column_alias)
                     for x in node.group_bys

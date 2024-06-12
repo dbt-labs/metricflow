@@ -111,13 +111,9 @@ def base_select_statement() -> SqlSelectStatementNode:
                 ),
                 from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
                 from_source_alias="src0",
-                joins_descs=(),
-                group_bys=(),
-                order_bys=(),
                 limit=2,
             ),
             from_source_alias="src1",
-            joins_descs=(),
             where=SqlComparisonExpression(
                 left_expr=SqlColumnReferenceExpression(
                     SqlColumnReference(
@@ -128,12 +124,9 @@ def base_select_statement() -> SqlSelectStatementNode:
                 comparison=SqlComparison.GREATER_THAN_OR_EQUALS,
                 right_expr=SqlStringLiteralExpression("2020-01-01"),
             ),
-            group_bys=(),
-            order_bys=(),
             limit=1,
         ),
         from_source_alias="src2",
-        joins_descs=(),
         group_bys=(
             SqlSelectColumn(
                 expr=SqlColumnReferenceExpression(
@@ -166,7 +159,6 @@ def base_select_statement() -> SqlSelectStatementNode:
                 desc=False,
             ),
         ),
-        limit=None,
     )
 
 
@@ -267,11 +259,6 @@ def join_select_statement() -> SqlSelectStatementNode:
             ),
             from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
             from_source_alias="fct_bookings_src",
-            joins_descs=(),
-            where=None,
-            group_bys=(),
-            order_bys=(),
-            limit=None,
         ),
         from_source_alias="bookings_src",
         joins_descs=(
@@ -296,11 +283,6 @@ def join_select_statement() -> SqlSelectStatementNode:
                         sql_table=SqlTable(schema_name="demo", table_name="dim_listings")
                     ),
                     from_source_alias="dim_listings_src",
-                    joins_descs=(),
-                    where=None,
-                    group_bys=(),
-                    order_bys=(),
-                    limit=None,
                 ),
                 right_source_alias="listings_src",
                 on_condition=SqlComparisonExpression(
@@ -336,8 +318,6 @@ def join_select_statement() -> SqlSelectStatementNode:
             comparison=SqlComparison.LESS_THAN_OR_EQUALS,
             right_expr=SqlStringLiteralExpression("2020-01-05"),
         ),
-        order_bys=(),
-        limit=None,
     )
 
 
@@ -440,11 +420,6 @@ def colliding_select_statement() -> SqlSelectStatementNode:
             ),
             from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
             from_source_alias="colliding_alias",
-            joins_descs=(),
-            where=None,
-            group_bys=(),
-            order_bys=(),
-            limit=None,
         ),
         from_source_alias="bookings_src",
         joins_descs=(
@@ -469,11 +444,6 @@ def colliding_select_statement() -> SqlSelectStatementNode:
                         sql_table=SqlTable(schema_name="demo", table_name="dim_listings")
                     ),
                     from_source_alias="colliding_alias",
-                    joins_descs=(),
-                    where=None,
-                    group_bys=(),
-                    order_bys=(),
-                    limit=None,
                 ),
                 right_source_alias="listings_src",
                 on_condition=SqlComparisonExpression(
@@ -509,8 +479,6 @@ def colliding_select_statement() -> SqlSelectStatementNode:
             comparison=SqlComparison.LESS_THAN_OR_EQUALS,
             right_expr=SqlStringLiteralExpression("2020-01-05"),
         ),
-        order_bys=(),
-        limit=None,
     )
 
 
@@ -627,11 +595,6 @@ def reduce_all_join_select_statement() -> SqlSelectStatementNode:
             ),
             from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
             from_source_alias="fct_bookings_src",
-            joins_descs=(),
-            where=None,
-            group_bys=(),
-            order_bys=(),
-            limit=None,
         ),
         from_source_alias="bookings_src",
         joins_descs=(
@@ -656,11 +619,6 @@ def reduce_all_join_select_statement() -> SqlSelectStatementNode:
                         sql_table=SqlTable(schema_name="demo", table_name="dim_listings")
                     ),
                     from_source_alias="dim_listings_src1",
-                    joins_descs=(),
-                    where=None,
-                    group_bys=(),
-                    order_bys=(),
-                    limit=None,
                 ),
                 right_source_alias="listings_src1",
                 on_condition=SqlComparisonExpression(
@@ -695,11 +653,6 @@ def reduce_all_join_select_statement() -> SqlSelectStatementNode:
                         sql_table=SqlTable(schema_name="demo", table_name="dim_listings")
                     ),
                     from_source_alias="dim_listings_src2",
-                    joins_descs=(),
-                    where=None,
-                    group_bys=(),
-                    order_bys=(),
-                    limit=None,
                 ),
                 right_source_alias="listings_src2",
                 on_condition=SqlComparisonExpression(
@@ -743,9 +696,6 @@ def reduce_all_join_select_statement() -> SqlSelectStatementNode:
                 column_alias="listing__capacity_latest",
             ),
         ),
-        where=None,
-        order_bys=(),
-        limit=None,
     )
 
 
@@ -839,18 +789,8 @@ def reducing_join_statement() -> SqlSelectStatementNode:
                 ),
                 from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
                 from_source_alias="src0",
-                joins_descs=(),
-                where=None,
-                group_bys=(),
-                order_bys=(),
-                limit=None,
             ),
             from_source_alias="src1",
-            joins_descs=(),
-            where=None,
-            group_bys=(),
-            order_bys=(),
-            limit=None,
         ),
         from_source_alias="src2",
         joins_descs=(
@@ -874,21 +814,12 @@ def reducing_join_statement() -> SqlSelectStatementNode:
                         sql_table=SqlTable(schema_name="demo", table_name="fct_listings")
                     ),
                     from_source_alias="src4",
-                    joins_descs=(),
-                    where=None,
-                    group_bys=(),
-                    order_bys=(),
-                    limit=None,
                 ),
                 right_source_alias="src3",
                 on_condition=None,
                 join_type=SqlJoinType.CROSS_JOIN,
             ),
         ),
-        group_bys=(),
-        where=None,
-        order_bys=(),
-        limit=None,
     )
 
 
@@ -974,11 +905,6 @@ def reducing_join_left_node_statement() -> SqlSelectStatementNode:
             ),
             from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="fct_listings")),
             from_source_alias="src4",
-            joins_descs=(),
-            where=None,
-            group_bys=(),
-            order_bys=(),
-            limit=None,
         ),
         from_source_alias="src2",
         joins_descs=(
@@ -1010,28 +936,14 @@ def reducing_join_left_node_statement() -> SqlSelectStatementNode:
                             sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")
                         ),
                         from_source_alias="src0",
-                        joins_descs=(),
-                        where=None,
-                        group_bys=(),
-                        order_bys=(),
-                        limit=None,
                     ),
                     from_source_alias="src1",
-                    joins_descs=(),
-                    where=None,
-                    group_bys=(),
-                    order_bys=(),
-                    limit=None,
                 ),
                 right_source_alias="src3",
                 on_condition=None,
                 join_type=SqlJoinType.CROSS_JOIN,
             ),
         ),
-        group_bys=(),
-        where=None,
-        order_bys=(),
-        limit=None,
     )
 
 
@@ -1091,17 +1003,9 @@ def test_rewriting_distinct_select_node_is_not_reduced(
             ),
             from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
             from_source_alias="a",
-            joins_descs=(),
-            where=None,
-            group_bys=(),
-            order_bys=(),
             distinct=True,
         ),
         from_source_alias="b",
-        joins_descs=(),
-        where=None,
-        group_bys=(),
-        order_bys=(),
     )
     assert_default_rendered_sql_equal(
         request=request,

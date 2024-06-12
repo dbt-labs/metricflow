@@ -260,8 +260,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                     ),
                     from_source=SqlTableFromClauseNode(sql_table=time_spine_source.spine_table),
                     from_source_alias=time_spine_table_alias,
-                    joins_descs=(),
-                    group_bys=(),
                     where=(
                         _make_time_range_comparison_expr(
                             table_alias=time_spine_table_alias,
@@ -271,7 +269,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                         if time_range_constraint
                         else None
                     ),
-                    order_bys=(),
                 ),
             )
         # If the granularity is different, apply a DATE_TRUNC() and aggregate.
@@ -297,7 +294,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                     select_columns=select_columns,
                     from_source=SqlTableFromClauseNode(sql_table=time_spine_source.spine_table),
                     from_source_alias=time_spine_table_alias,
-                    joins_descs=(),
                     group_bys=select_columns,
                     where=(
                         _make_time_range_comparison_expr(
@@ -308,7 +304,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                         if time_range_constraint
                         else None
                     ),
-                    order_bys=(),
                 ),
             )
 
@@ -407,9 +402,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 from_source=time_spine_data_set.checked_sql_select_node,
                 from_source_alias=time_spine_data_set_alias,
                 joins_descs=(join_desc,),
-                group_bys=(),
-                where=None,
-                order_bys=(),
             ),
         )
 
@@ -500,9 +492,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 from_source=from_data_set.checked_sql_select_node,
                 from_source_alias=from_data_set_alias,
                 joins_descs=tuple(sql_join_descs),
-                group_bys=(),
-                where=None,
-                order_bys=(),
             ),
         )
 
@@ -576,11 +565,8 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 select_columns=select_column_set.as_tuple(),
                 from_source=from_data_set.checked_sql_select_node,
                 from_source_alias=from_data_set_alias,
-                joins_descs=(),
                 # This will generate expressions to group by the columns that don't correspond to a measure instance.
                 group_bys=select_column_set.without_measure_columns().as_tuple(),
-                where=None,
-                order_bys=(),
             ),
         )
 
@@ -759,10 +745,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 select_columns=combined_select_column_set.as_tuple(),
                 from_source=from_data_set.checked_sql_select_node,
                 from_source_alias=from_data_set_alias,
-                joins_descs=(),
-                group_bys=(),
-                where=None,
-                order_bys=(),
             ),
         )
 
@@ -815,9 +797,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 ).as_tuple(),
                 from_source=from_data_set.checked_sql_select_node,
                 from_source_alias=from_data_set_alias,
-                joins_descs=(),
-                group_bys=(),
-                where=None,
                 order_bys=tuple(order_by_descriptions),
                 limit=node.limit,
             ),
@@ -861,10 +840,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 select_columns=select_columns,
                 from_source=from_data_set.checked_sql_select_node,
                 from_source_alias=from_data_set_alias,
-                joins_descs=(),
                 group_bys=group_bys,
-                where=None,
-                order_bys=(),
             ),
         )
 
@@ -892,8 +868,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 ).as_tuple(),
                 from_source=parent_data_set.checked_sql_select_node,
                 from_source_alias=from_data_set_alias,
-                joins_descs=(),
-                group_bys=(),
                 where=SqlStringExpression(
                     sql_expr=node.where.where_sql,
                     used_columns=tuple(
@@ -901,7 +875,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                     ),
                     bind_parameters=node.where.bind_parameters,
                 ),
-                order_bys=(),
             ),
         )
 
@@ -1015,8 +988,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 from_source_alias=from_data_set.alias,
                 joins_descs=tuple(joins_descriptions),
                 group_bys=linkable_select_column_set.as_tuple(),
-                where=None,
-                order_bys=(),
             ),
         )
 
@@ -1065,10 +1036,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 ).as_tuple(),
                 from_source=from_data_set.checked_sql_select_node,
                 from_source_alias=from_data_set_alias,
-                joins_descs=(),
-                group_bys=(),
                 where=constrain_metric_time_column_condition,
-                order_bys=(),
             ),
         )
 
@@ -1158,10 +1126,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 .as_tuple(),
                 from_source=input_data_set.checked_sql_select_node,
                 from_source_alias=from_data_set_alias,
-                joins_descs=(),
-                group_bys=(),
-                where=None,
-                order_bys=(),
             ),
         )
 
@@ -1256,10 +1220,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             select_columns=row_filter_group_bys + (time_dimension_select_column,),
             from_source=from_data_set.checked_sql_select_node,
             from_source_alias=inner_join_data_set_alias,
-            joins_descs=(),
             group_bys=row_filter_group_bys,
-            where=None,
-            order_bys=(),
         )
 
         join_data_set_alias = self._next_unique_table_alias()
@@ -1280,9 +1241,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 from_source=from_data_set.checked_sql_select_node,
                 from_source_alias=from_data_set_alias,
                 joins_descs=(sql_join_desc,),
-                group_bys=(),
-                where=None,
-                order_bys=(),
             ),
         )
 
@@ -1458,8 +1416,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 from_source=time_spine_dataset.checked_sql_select_node,
                 from_source_alias=time_spine_alias,
                 joins_descs=(join_description,),
-                group_bys=(),
-                order_bys=(),
                 where=where_filter,
             ),
         )
@@ -1499,9 +1455,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 select_columns=tuple(select_columns),
                 from_source=parent_data_set.checked_sql_select_node,
                 from_source_alias=parent_table_alias,
-                joins_descs=(),
-                group_bys=(),
-                order_bys=(),
             ),
         )
 
@@ -1540,10 +1493,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 + (gen_uuid_sql_select_column,),
                 from_source=input_data_set.checked_sql_select_node,
                 from_source_alias=input_data_set_alias,
-                joins_descs=(),
-                group_bys=(),
-                where=None,
-                order_bys=(),
             ),
         )
 
@@ -1688,9 +1637,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             from_source=base_data_set.checked_sql_select_node,
             from_source_alias=base_data_set_alias,
             joins_descs=(sql_join_description,),
-            group_bys=(),
-            where=None,
-            order_bys=(),
             distinct=True,
         )
 
@@ -1708,9 +1654,5 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 ).as_tuple(),
                 from_source=deduped_sql_select_node,
                 from_source_alias=output_data_set_alias,
-                joins_descs=(),
-                group_bys=(),
-                where=None,
-                order_bys=(),
             ),
         )
