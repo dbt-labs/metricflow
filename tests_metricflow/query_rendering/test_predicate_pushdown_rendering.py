@@ -7,10 +7,9 @@ from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from metricflow.dataflow.optimizer.predicate_pushdown_optimizer import PredicatePushdownOptimizer
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
-from tests_metricflow.query_rendering.compare_rendered_query import convert_and_check
+from tests_metricflow.query_rendering.compare_rendered_query import render_and_check
 
 
 @pytest.mark.sql_engine_snapshot
@@ -30,16 +29,14 @@ def test_single_categorical_dimension_pushdown(
             where_sql_template="{{ Dimension('booking__is_instant') }}",
         ),
     )
-    dataflow_plan = dataflow_plan_builder.build_plan(
-        parsed_query.query_spec, optimizers=(PredicatePushdownOptimizer(),)
-    )
 
-    convert_and_check(
+    render_and_check(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_node,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=parsed_query.query_spec,
     )
 
 
@@ -60,14 +57,14 @@ def test_multiple_categorical_dimension_pushdown(
             where_sql_template="{{ Dimension('listing__is_lux_latest') }} OR {{ Dimension('listing__capacity_latest') }} > 4",
         ),
     )
-    dataflow_plan = dataflow_plan_builder.build_plan(parsed_query.query_spec)
 
-    convert_and_check(
+    render_and_check(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_node,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=parsed_query.query_spec,
     )
 
 
@@ -94,14 +91,14 @@ def test_different_filters_on_same_measure_source_categorical_dimension(
         metric_names=("instant_booking_fraction_of_max_value",),
         group_by_names=("metric_time",),
     )
-    dataflow_plan = dataflow_plan_builder.build_plan(parsed_query.query_spec)
 
-    convert_and_check(
+    render_and_check(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_node,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=parsed_query.query_spec,
     )
 
 
@@ -128,12 +125,12 @@ def test_skipped_pushdown(
             where_sql_template="{{ Dimension('booking__is_instant') }} OR {{ Dimension('listing__is_lux_latest') }}",
         ),
     )
-    dataflow_plan = dataflow_plan_builder.build_plan(parsed_query.query_spec)
 
-    convert_and_check(
+    render_and_check(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_node,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=parsed_query.query_spec,
     )

@@ -4,9 +4,11 @@ from __future__ import annotations
 
 from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.dag.mf_dag import DagId
+from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
-from metricflow.dataflow.dataflow_plan import DataflowPlanNode
+from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
+from metricflow.dataflow.optimizer.predicate_pushdown_optimizer import PredicatePushdownOptimizer
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
@@ -14,21 +16,20 @@ from tests_metricflow.dataflow_plan_to_svg import display_graph_if_requested
 from tests_metricflow.sql.compare_sql_plan import assert_rendered_sql_from_plan_equal
 
 
-def convert_and_check(
+def render_and_check(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
-    node: DataflowPlanNode,
+    query_spec: MetricFlowQuerySpec,
 ) -> None:
-    """Renders an engine-specific query output from a DataflowPlanNode DataFlowPlan node.
-
-    TODO: refine interface once file move operations are complete.
-    """
-    # Run dataflow -> sql conversion without optimizers
+    """Renders an engine-specific query output from a given query, in both basic and optimized forms."""
+    # Build and convert dataflow plan without optimizers
+    base_plan = dataflow_plan_builder.build_plan(query_spec)
     conversion_result = dataflow_to_sql_converter.convert_to_sql_query_plan(
         sql_engine_type=sql_client.sql_engine_type,
-        dataflow_plan_node=node,
+        dataflow_plan_node=base_plan.sink_node,
         optimization_level=SqlQueryOptimizationLevel.O0,
         sql_query_plan_id=DagId.from_str("plan0"),
     )
@@ -46,10 +47,11 @@ def convert_and_check(
         sql_client=sql_client,
     )
 
-    # Run dataflow -> sql conversion with optimizers
+    # Run dataflow -> sql conversion with all optimizers
+    optimized_plan = dataflow_plan_builder.build_plan(query_spec, optimizers=(PredicatePushdownOptimizer(),))
     conversion_result = dataflow_to_sql_converter.convert_to_sql_query_plan(
         sql_engine_type=sql_client.sql_engine_type,
-        dataflow_plan_node=node,
+        dataflow_plan_node=optimized_plan.sink_node,
         optimization_level=SqlQueryOptimizationLevel.O4,
         sql_query_plan_id=DagId.from_str("plan0_optimized"),
     )
