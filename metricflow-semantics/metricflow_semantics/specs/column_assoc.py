@@ -37,7 +37,7 @@ class ColumnAssociation(SerializableDataclass):
     # When an instance is passed from one dataflow node to another, we need to know how the columns from the input
     # corresponds to the columns from the output. Equality of this key is used to determine that relationship.
     # This could be made to be in a dictionary instead, but having it here means that it doesn't need to be hashable.
-    single_column_correlation_key: SingleColumnCorrelationKey
+    single_column_correlation_key: SingleColumnCorrelationKey = SingleColumnCorrelationKey()
 
     @property
     def column_correlation_key(self) -> ColumnCorrelationKey:  # noqa: D102

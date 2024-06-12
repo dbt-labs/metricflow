@@ -28,7 +28,6 @@ from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifest
 from metricflow_semantics.specs.column_assoc import (
     ColumnAssociation,
     ColumnAssociationResolver,
-    SingleColumnCorrelationKey,
 )
 from metricflow_semantics.specs.spec_classes import (
     GroupByMetricSpec,
@@ -235,12 +234,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         """
         time_spine_instance = TimeDimensionInstance(
             defined_from=agg_time_dimension_instance.defined_from,
-            associated_columns=(
-                ColumnAssociation(
-                    column_name=agg_time_dimension_column_name,
-                    single_column_correlation_key=SingleColumnCorrelationKey(),
-                ),
-            ),
+            associated_columns=(ColumnAssociation(agg_time_dimension_column_name),),
             spec=agg_time_dimension_instance.spec,
         )
 
