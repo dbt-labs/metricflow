@@ -16,9 +16,9 @@ class WhereConstraintNode(DataflowPlanNode):
     def __init__(  # noqa: D107
         self,
         parent_node: DataflowPlanNode,
-        where_constraint: WhereFilterSpec,
+        where_specs: Sequence[WhereFilterSpec],
     ) -> None:
-        self._where = where_constraint
+        self._where_specs = where_specs
         self.parent_node = parent_node
         super().__init__(node_id=self.create_unique_id(), parent_nodes=(parent_node,))
 
@@ -29,7 +29,17 @@ class WhereConstraintNode(DataflowPlanNode):
     @property
     def where(self) -> WhereFilterSpec:
         """Returns the specs for the elements that it should pass."""
-        return self._where
+        return WhereFilterSpec.merge_iterable(self._where_specs)
+
+    @property
+    def input_where_specs(self) -> Sequence[WhereFilterSpec]:
+        """Returns the discrete set of input where filter specs for this node.
+
+        This is useful for things like predicate pushdown, where we need to differentiate between individual specs
+        for pushdown operations on the filter spec level. We merge them for things like rendering and node comparisons,
+        but in some cases we may be able to push down a subset of the input specs for efficiency reasons.
+        """
+        return self._where_specs
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_where_constraint_node(self)
@@ -51,5 +61,5 @@ class WhereConstraintNode(DataflowPlanNode):
         assert len(new_parent_nodes) == 1
         return WhereConstraintNode(
             parent_node=new_parent_nodes[0],
-            where_constraint=self.where,
+            where_specs=self.input_where_specs,
         )
