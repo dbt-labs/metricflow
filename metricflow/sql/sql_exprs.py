@@ -476,6 +476,10 @@ class SqlColumnReferenceExpression(SqlExpressionNode):
             return False
         return self.col_ref == other.col_ref
 
+    @staticmethod
+    def from_table_and_column_names(table_alias: str, column_name: str) -> SqlColumnReferenceExpression:  # noqa: D102
+        return SqlColumnReferenceExpression(SqlColumnReference(table_alias=table_alias, column_name=column_name))
+
 
 class SqlColumnAliasReferenceExpression(SqlExpressionNode):
     """An expression that evaluates to the alias of a column, but is not qualified with a table alias.
