@@ -28,7 +28,6 @@ from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifest
 from metricflow_semantics.specs.column_assoc import (
     ColumnAssociation,
     ColumnAssociationResolver,
-    SingleColumnCorrelationKey,
 )
 from metricflow_semantics.specs.spec_classes import (
     GroupByMetricSpec,
@@ -207,7 +206,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             optimization_level, use_column_alias_in_group_by=use_column_alias_in_group_by
         ):
             logger.info(f"Applying optimizer: {optimizer.__class__.__name__}")
-            print("optimizer!!", optimizer)
             sql_node = optimizer.optimize(sql_node)
             logger.info(
                 f"After applying {optimizer.__class__.__name__}, the SQL query plan is:\n"
@@ -225,100 +223,61 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
     def _make_time_spine_data_set(
         self,
-        agg_time_dimension_instance: TimeDimensionInstance,
-        agg_time_dimension_column_name: str,
+        agg_time_dimension_instances: Tuple[TimeDimensionInstance, ...],
         time_spine_source: TimeSpineSource,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
     ) -> SqlDataSet:
-        """Make a time spine data set, which contains all date values like '2020-01-01', '2020-01-02'...
+        """Make a time spine data set, which contains all date/time values like '2020-01-01', '2020-01-02'...
 
-        This is useful in computing cumulative metrics. This will need to be updated to support granularities finer than a
-        day.
+        Returns a dataset with a column selected for each agg_time_dimension requested.
+        Column alias will use 'metric_time' or the agg_time_dimension name depending on which the user requested.
         """
-        time_spine_instance = TimeDimensionInstance(
-            defined_from=agg_time_dimension_instance.defined_from,
-            associated_columns=(
-                ColumnAssociation(
-                    column_name=agg_time_dimension_column_name,
-                    single_column_correlation_key=SingleColumnCorrelationKey(),
-                ),
-            ),
-            spec=agg_time_dimension_instance.spec,
-        )
-
-        time_spine_instance_set = InstanceSet(time_dimension_instances=(time_spine_instance,))
+        time_spine_instance_set = InstanceSet(time_dimension_instances=agg_time_dimension_instances)
         time_spine_table_alias = self._next_unique_table_alias()
 
-        # If the requested granularity is the same as the granularity of the spine, do a direct select.
-        if agg_time_dimension_instance.spec.time_granularity == time_spine_source.time_column_granularity:
-            return SqlDataSet(
-                instance_set=time_spine_instance_set,
-                sql_select_node=SqlSelectStatementNode(
-                    description=TIME_SPINE_DATA_SET_DESCRIPTION,
-                    select_columns=(
-                        SqlSelectColumn(
-                            expr=SqlColumnReferenceExpression(
-                                SqlColumnReference(
-                                    table_alias=time_spine_table_alias,
-                                    column_name=time_spine_source.time_column_name,
-                                ),
-                            ),
-                            column_alias=agg_time_dimension_column_name,
+        column_expr = SqlColumnReferenceExpression.from_table_and_column_names(
+            table_alias=time_spine_table_alias, column_name=time_spine_source.time_column_name
+        )
+
+        select_columns: Tuple[SqlSelectColumn, ...] = ()
+        apply_group_by = False
+        for agg_time_dimension_instance in agg_time_dimension_instances:
+            column_alias = self.column_association_resolver.resolve_spec(agg_time_dimension_instance.spec).column_name
+            # If the requested granularity is the same as the granularity of the spine, do a direct select.
+            # TODO: also handle date part.
+            if agg_time_dimension_instance.spec.time_granularity == time_spine_source.time_column_granularity:
+                select_columns += (SqlSelectColumn(expr=column_expr, column_alias=column_alias),)
+            # If any columns have a different granularity, apply a DATE_TRUNC() and aggregate via group_by.
+            else:
+                select_columns += (
+                    SqlSelectColumn(
+                        expr=SqlDateTruncExpression(
+                            time_granularity=agg_time_dimension_instance.spec.time_granularity, arg=column_expr
                         ),
+                        column_alias=column_alias,
                     ),
-                    from_source=SqlTableFromClauseNode(sql_table=time_spine_source.spine_table),
-                    from_source_alias=time_spine_table_alias,
-                    joins_descs=(),
-                    group_bys=(),
-                    where=(
-                        _make_time_range_comparison_expr(
-                            table_alias=time_spine_table_alias,
-                            column_alias=time_spine_source.time_column_name,
-                            time_range_constraint=time_range_constraint,
-                        )
-                        if time_range_constraint
-                        else None
-                    ),
-                    order_bys=(),
+                )
+                apply_group_by = True
+
+        return SqlDataSet(
+            instance_set=time_spine_instance_set,
+            sql_select_node=SqlSelectStatementNode(
+                description=TIME_SPINE_DATA_SET_DESCRIPTION,
+                select_columns=select_columns,
+                from_source=SqlTableFromClauseNode(sql_table=time_spine_source.spine_table),
+                from_source_alias=time_spine_table_alias,
+                group_bys=select_columns if apply_group_by else (),
+                where=(
+                    _make_time_range_comparison_expr(
+                        table_alias=time_spine_table_alias,
+                        column_alias=time_spine_source.time_column_name,
+                        time_range_constraint=time_range_constraint,
+                    )
+                    if time_range_constraint
+                    else None
                 ),
-            )
-        # If the granularity is different, apply a DATE_TRUNC() and aggregate.
-        else:
-            select_columns = (
-                SqlSelectColumn(
-                    expr=SqlDateTruncExpression(
-                        time_granularity=agg_time_dimension_instance.spec.time_granularity,
-                        arg=SqlColumnReferenceExpression(
-                            SqlColumnReference(
-                                table_alias=time_spine_table_alias,
-                                column_name=time_spine_source.time_column_name,
-                            ),
-                        ),
-                    ),
-                    column_alias=agg_time_dimension_column_name,
-                ),
-            )
-            return SqlDataSet(
-                instance_set=time_spine_instance_set,
-                sql_select_node=SqlSelectStatementNode(
-                    description=TIME_SPINE_DATA_SET_DESCRIPTION,
-                    select_columns=select_columns,
-                    from_source=SqlTableFromClauseNode(sql_table=time_spine_source.spine_table),
-                    from_source_alias=time_spine_table_alias,
-                    joins_descs=(),
-                    group_bys=select_columns,
-                    where=(
-                        _make_time_range_comparison_expr(
-                            table_alias=time_spine_table_alias,
-                            column_alias=time_spine_source.time_column_name,
-                            time_range_constraint=time_range_constraint,
-                        )
-                        if time_range_constraint
-                        else None
-                    ),
-                    order_bys=(),
-                ),
-            )
+            ),
+        )
 
     def visit_source_node(self, node: ReadSqlSourceNode) -> SqlDataSet:
         """Generate the SQL to read from the source."""
@@ -330,73 +289,57 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
     def visit_join_over_time_range_node(self, node: JoinOverTimeRangeNode) -> SqlDataSet:
         """Generate time range join SQL."""
         table_alias_to_instance_set: OrderedDict[str, InstanceSet] = OrderedDict()
-
         input_data_set = node.parent_node.accept(self)
         input_data_set_alias = self._next_unique_table_alias()
 
-        agg_time_dimension_instance: Optional[TimeDimensionInstance] = None
+        # Find requested agg_time_dimensions in parent instance set.
+        # Will use instance with smallest granularity in time spine join.
+        agg_time_dimension_instance_for_join: Optional[TimeDimensionInstance] = None
+        requested_agg_time_dimension_instances: Tuple[TimeDimensionInstance, ...] = ()
         for instance in input_data_set.instance_set.time_dimension_instances:
-            if instance.spec == node.time_dimension_spec_for_join:
-                agg_time_dimension_instance = instance
-                break
+            if instance.spec in node.queried_agg_time_dimension_specs:
+                requested_agg_time_dimension_instances += (instance,)
+                if not agg_time_dimension_instance_for_join or (
+                    instance.spec.time_granularity.to_int()
+                    < agg_time_dimension_instance_for_join.spec.time_granularity.to_int()
+                ):
+                    agg_time_dimension_instance_for_join = instance
         assert (
-            agg_time_dimension_instance
+            agg_time_dimension_instance_for_join
         ), "Specified metric time spec not found in parent data set. This should have been caught by validations."
 
         time_spine_data_set_alias = self._next_unique_table_alias()
 
-        agg_time_dimension_column_name = self.column_association_resolver.resolve_spec(
-            agg_time_dimension_instance.spec
-        ).column_name
-
-        # Assemble time_spine dataset with metric_time_dimension to join.
-        # Granularity of time_spine column should match granularity of metric_time column from parent dataset.
+        # Assemble time_spine dataset with agg_time_dimension_instance_for_join selected.
         time_spine_data_set = self._make_time_spine_data_set(
-            agg_time_dimension_instance=agg_time_dimension_instance,
-            agg_time_dimension_column_name=agg_time_dimension_column_name,
+            agg_time_dimension_instances=requested_agg_time_dimension_instances,
             time_spine_source=self._time_spine_source,
             time_range_constraint=node.time_range_constraint,
         )
         table_alias_to_instance_set[time_spine_data_set_alias] = time_spine_data_set.instance_set
 
-        # Figure out which columns correspond to the time dimension that we want to join on.
-        input_data_set_metric_time_column_association = input_data_set.column_association_for_time_dimension(
-            agg_time_dimension_instance.spec
-        )
-        input_data_set_metric_time_col = input_data_set_metric_time_column_association.column_name
-
-        time_spine_data_set_column_associations = time_spine_data_set.column_association_for_time_dimension(
-            agg_time_dimension_instance.spec
-        )
-        time_spine_data_set_time_dimension_col = time_spine_data_set_column_associations.column_name
-
-        annotated_input_data_set = AnnotatedSqlDataSet(
-            data_set=input_data_set, alias=input_data_set_alias, _metric_time_column_name=input_data_set_metric_time_col
-        )
-        annotated_time_spine_data_set = AnnotatedSqlDataSet(
-            data_set=time_spine_data_set,
-            alias=time_spine_data_set_alias,
-            _metric_time_column_name=time_spine_data_set_time_dimension_col,
-        )
-
         join_desc = SqlQueryPlanJoinBuilder.make_cumulative_metric_time_range_join_description(
-            node=node, metric_data_set=annotated_input_data_set, time_spine_data_set=annotated_time_spine_data_set
+            node=node,
+            metric_data_set=AnnotatedSqlDataSet(
+                data_set=input_data_set,
+                alias=input_data_set_alias,
+                _metric_time_column_name=input_data_set.column_association_for_time_dimension(
+                    agg_time_dimension_instance_for_join.spec
+                ).column_name,
+            ),
+            time_spine_data_set=AnnotatedSqlDataSet(
+                data_set=time_spine_data_set,
+                alias=time_spine_data_set_alias,
+                _metric_time_column_name=time_spine_data_set.column_association_for_time_dimension(
+                    agg_time_dimension_instance_for_join.spec
+                ).column_name,
+            ),
         )
 
-        modified_input_instance_set = InstanceSet(
-            measure_instances=input_data_set.instance_set.measure_instances,
-            dimension_instances=input_data_set.instance_set.dimension_instances,
-            entity_instances=input_data_set.instance_set.entity_instances,
-            metric_instances=input_data_set.instance_set.metric_instances,
-            # we omit the metric time dimension from the right side of the self-join because we need to use
-            # the metric time dimension from the right side
-            time_dimension_instances=tuple(
-                [
-                    time_dimension_instance
-                    for time_dimension_instance in input_data_set.instance_set.time_dimension_instances
-                    if time_dimension_instance != agg_time_dimension_instance
-                ]
-            ),
+        # Remove instances of agg_time_dimension from input data set. They'll be replaced with time spine instances.
+        agg_time_dimension_specs = tuple(dim.spec for dim in requested_agg_time_dimension_instances)
+        modified_input_instance_set = input_data_set.instance_set.transform(
+            FilterElements(exclude_specs=InstanceSpecSet(time_dimension_specs=agg_time_dimension_specs))
         )
         table_alias_to_instance_set[input_data_set_alias] = modified_input_instance_set
 
@@ -404,7 +347,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         output_instance_set = ChangeAssociatedColumns(self._column_association_resolver).transform(
             input_data_set.instance_set
         )
-
         return SqlDataSet(
             instance_set=output_instance_set,
             sql_select_node=SqlSelectStatementNode(
@@ -415,9 +357,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 from_source=time_spine_data_set.checked_sql_select_node,
                 from_source_alias=time_spine_data_set_alias,
                 joins_descs=(join_desc,),
-                group_bys=(),
-                where=None,
-                order_bys=(),
             ),
         )
 
@@ -508,9 +447,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 from_source=from_data_set.checked_sql_select_node,
                 from_source_alias=from_data_set_alias,
                 joins_descs=tuple(sql_join_descs),
-                group_bys=(),
-                where=None,
-                order_bys=(),
             ),
         )
 
@@ -584,11 +520,8 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 select_columns=select_column_set.as_tuple(),
                 from_source=from_data_set.checked_sql_select_node,
                 from_source_alias=from_data_set_alias,
-                joins_descs=(),
                 # This will generate expressions to group by the columns that don't correspond to a measure instance.
                 group_bys=select_column_set.without_measure_columns().as_tuple(),
-                where=None,
-                order_bys=(),
             ),
         )
 
@@ -767,10 +700,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 select_columns=combined_select_column_set.as_tuple(),
                 from_source=from_data_set.checked_sql_select_node,
                 from_source_alias=from_data_set_alias,
-                joins_descs=(),
-                group_bys=(),
-                where=None,
-                order_bys=(),
             ),
         )
 
@@ -876,22 +805,17 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         ).as_tuple() + (
             metric_select_column,
         )
-        print("subquery_select_columns:", subquery_select_columns)
         subquery = SqlSelectStatementNode(
             description="",  # TODO - 2 descriptions for one node?
             select_columns=subquery_select_columns,
             from_source=from_data_set.checked_sql_select_node,
             from_source_alias=parent_data_set_alias,
-            joins_descs=(),
-            order_bys=(),
-            group_bys=(),
         )
         subquery_alias = self._next_unique_table_alias()
 
         outer_query_select_columns = output_instance_set.transform(
             CreateSelectColumnsForInstances(subquery_alias, self._column_association_resolver)
         ).as_tuple()
-        print("outer_query_select_columns:", outer_query_select_columns)
         return SqlDataSet(
             instance_set=output_instance_set,
             sql_select_node=SqlSelectStatementNode(
@@ -900,8 +824,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 from_source=subquery,
                 from_source_alias=subquery_alias,
                 group_bys=outer_query_select_columns,
-                joins_descs=(),
-                order_bys=(),
             ),
         )
 
@@ -939,9 +861,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 ).as_tuple(),
                 from_source=from_data_set.checked_sql_select_node,
                 from_source_alias=from_data_set_alias,
-                joins_descs=(),
-                group_bys=(),
-                where=None,
                 order_bys=tuple(order_by_descriptions),
                 limit=node.limit,
             ),
@@ -985,10 +904,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 select_columns=select_columns,
                 from_source=from_data_set.checked_sql_select_node,
                 from_source_alias=from_data_set_alias,
-                joins_descs=(),
                 group_bys=group_bys,
-                where=None,
-                order_bys=(),
             ),
         )
 
@@ -1016,8 +932,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 ).as_tuple(),
                 from_source=parent_data_set.checked_sql_select_node,
                 from_source_alias=from_data_set_alias,
-                joins_descs=(),
-                group_bys=(),
                 where=SqlStringExpression(
                     sql_expr=node.where.where_sql,
                     used_columns=tuple(
@@ -1025,7 +939,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                     ),
                     bind_parameters=node.where.bind_parameters,
                 ),
-                order_bys=(),
             ),
         )
 
@@ -1139,8 +1052,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 from_source_alias=from_data_set.alias,
                 joins_descs=tuple(joins_descriptions),
                 group_bys=linkable_select_column_set.as_tuple(),
-                where=None,
-                order_bys=(),
             ),
         )
 
@@ -1189,10 +1100,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 ).as_tuple(),
                 from_source=from_data_set.checked_sql_select_node,
                 from_source_alias=from_data_set_alias,
-                joins_descs=(),
-                group_bys=(),
                 where=constrain_metric_time_column_condition,
-                order_bys=(),
             ),
         )
 
@@ -1253,9 +1161,9 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                     spec=metric_time_dimension_spec,
                 )
             )
-            output_column_to_input_column[metric_time_dimension_column_association.column_name] = (
-                matching_time_dimension_instance.associated_column.column_name
-            )
+            output_column_to_input_column[
+                metric_time_dimension_column_association.column_name
+            ] = matching_time_dimension_instance.associated_column.column_name
 
         output_instance_set = InstanceSet(
             measure_instances=tuple(output_measure_instances),
@@ -1282,10 +1190,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 .as_tuple(),
                 from_source=input_data_set.checked_sql_select_node,
                 from_source_alias=from_data_set_alias,
-                joins_descs=(),
-                group_bys=(),
-                where=None,
-                order_bys=(),
             ),
         )
 
@@ -1380,10 +1284,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             select_columns=row_filter_group_bys + (time_dimension_select_column,),
             from_source=from_data_set.checked_sql_select_node,
             from_source_alias=inner_join_data_set_alias,
-            joins_descs=(),
             group_bys=row_filter_group_bys,
-            where=None,
-            order_bys=(),
         )
 
         join_data_set_alias = self._next_unique_table_alias()
@@ -1404,9 +1305,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 from_source=from_data_set.checked_sql_select_node,
                 from_source_alias=from_data_set_alias,
                 joins_descs=(sql_join_desc,),
-                group_bys=(),
-                where=None,
-                order_bys=(),
             ),
         )
 
@@ -1440,14 +1338,10 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         )
         agg_time_dimension_instance_for_join = agg_time_dimension_instances[0]
 
-        # Build time spine data set using the requested agg_time_dimension name.
-        agg_time_dimension_column_name = self.column_association_resolver.resolve_spec(
-            agg_time_dimension_instance_for_join.spec
-        ).column_name
+        # Build time spine data set using the requested agg_time_dimension.
         time_spine_alias = self._next_unique_table_alias()
         time_spine_dataset = self._make_time_spine_data_set(
-            agg_time_dimension_instance=agg_time_dimension_instance_for_join,
-            agg_time_dimension_column_name=agg_time_dimension_column_name,
+            agg_time_dimension_instances=(agg_time_dimension_instance_for_join,),
             time_spine_source=self._time_spine_source,
             time_range_constraint=node.time_range_constraint,
         )
@@ -1456,7 +1350,9 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         join_description = SqlQueryPlanJoinBuilder.make_join_to_time_spine_join_description(
             node=node,
             time_spine_alias=time_spine_alias,
-            agg_time_dimension_column_name=agg_time_dimension_column_name,
+            agg_time_dimension_column_name=self.column_association_resolver.resolve_spec(
+                agg_time_dimension_instance_for_join.spec
+            ).column_name,
             parent_sql_select_node=parent_data_set.checked_sql_select_node,
             parent_alias=parent_alias,
         )
@@ -1498,11 +1394,11 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             and len(time_spine_dataset.checked_sql_select_node.select_columns) == 1
         ), "Time spine dataset not configured properly. Expected exactly one column."
         original_time_spine_dim_instance = time_spine_dataset.instance_set.time_dimension_instances[0]
-        time_spine_column_select_expr: Union[SqlColumnReferenceExpression, SqlDateTruncExpression] = (
-            SqlColumnReferenceExpression(
-                SqlColumnReference(
-                    table_alias=time_spine_alias, column_name=original_time_spine_dim_instance.spec.qualified_name
-                )
+        time_spine_column_select_expr: Union[
+            SqlColumnReferenceExpression, SqlDateTruncExpression
+        ] = SqlColumnReferenceExpression(
+            SqlColumnReference(
+                table_alias=time_spine_alias, column_name=original_time_spine_dim_instance.spec.qualified_name
             )
         )
 
@@ -1582,8 +1478,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 from_source=time_spine_dataset.checked_sql_select_node,
                 from_source_alias=time_spine_alias,
                 joins_descs=(join_description,),
-                group_bys=(),
-                order_bys=(),
                 where=where_filter,
             ),
         )
@@ -1623,9 +1517,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 select_columns=tuple(select_columns),
                 from_source=parent_data_set.checked_sql_select_node,
                 from_source_alias=parent_table_alias,
-                joins_descs=(),
-                group_bys=(),
-                order_bys=(),
             ),
         )
 
@@ -1664,10 +1555,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 + (gen_uuid_sql_select_column,),
                 from_source=input_data_set.checked_sql_select_node,
                 from_source_alias=input_data_set_alias,
-                joins_descs=(),
-                group_bys=(),
-                where=None,
-                order_bys=(),
             ),
         )
 
@@ -1812,9 +1699,6 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             from_source=base_data_set.checked_sql_select_node,
             from_source_alias=base_data_set_alias,
             joins_descs=(sql_join_description,),
-            group_bys=(),
-            where=None,
-            order_bys=(),
             distinct=True,
         )
 
@@ -1832,9 +1716,5 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 ).as_tuple(),
                 from_source=deduped_sql_select_node,
                 from_source_alias=output_data_set_alias,
-                joins_descs=(),
-                group_bys=(),
-                where=None,
-                order_bys=(),
             ),
         )

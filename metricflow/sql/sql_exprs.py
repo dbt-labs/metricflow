@@ -70,6 +70,11 @@ class SqlExpressionNode(DagNode, Visitable, ABC):
         """If this is a string expression, return self."""
         return None
 
+    @property
+    def as_window_function_expression(self) -> Optional[SqlWindowFunctionExpression]:
+        """If this is a window function expression, return self."""
+        return None
+
     @abstractmethod
     def rewrite(
         self,
@@ -1100,6 +1105,10 @@ class SqlWindowFunctionExpression(SqlFunctionExpression):
             and self.order_by_args == other.order_by_args
             and self._parents_match(other)
         )
+
+    @property
+    def as_window_function_expression(self) -> Optional[SqlWindowFunctionExpression]:  # noqa: D102
+        return self
 
 
 class SqlNullExpression(SqlExpressionNode):

@@ -11,7 +11,7 @@ from metricflow_semantics.instances import (
     MeasureInstance,
 )
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow_semantics.specs.column_assoc import ColumnAssociation, SingleColumnCorrelationKey
+from metricflow_semantics.specs.column_assoc import ColumnAssociation
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
 from metricflow_semantics.specs.spec_classes import (
     LinklessEntitySpec,
@@ -52,11 +52,7 @@ def test_no_parent_node_data_set(
         instance_set=InstanceSet(
             measure_instances=(
                 MeasureInstance(
-                    associated_columns=(
-                        ColumnAssociation(
-                            column_name="bookings", single_column_correlation_key=SingleColumnCorrelationKey()
-                        ),
-                    ),
+                    associated_columns=(ColumnAssociation("bookings"),),
                     defined_from=(
                         SemanticModelElementReference(
                             semantic_model_name="fct_bookings_semantic_model", element_name="bookings"
@@ -82,10 +78,6 @@ def test_no_parent_node_data_set(
             ),
             from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
             from_source_alias="src",
-            joins_descs=(),
-            where=None,
-            group_bys=(),
-            order_bys=(),
         ),
     )
 

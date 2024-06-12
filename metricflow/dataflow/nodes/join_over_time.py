@@ -19,7 +19,7 @@ class JoinOverTimeRangeNode(DataflowPlanNode):
     def __init__(
         self,
         parent_node: DataflowPlanNode,
-        time_dimension_spec_for_join: TimeDimensionSpec,
+        queried_agg_time_dimension_specs: Sequence[TimeDimensionSpec],
         window: Optional[MetricTimeWindow],
         grain_to_date: Optional[TimeGranularity],
         node_id: Optional[NodeId] = None,
@@ -34,7 +34,7 @@ class JoinOverTimeRangeNode(DataflowPlanNode):
             (eg month to day)
             node_id: Override the node ID with this value
             time_range_constraint: time range to aggregate over
-            time_dimension_spec_for_join: time dimension spec to use when joining to time spine
+            queried_agg_time_dimension_specs: time dimension specs that will be selected from time spine table
         """
         if window and grain_to_date:
             raise RuntimeError(
@@ -45,7 +45,7 @@ class JoinOverTimeRangeNode(DataflowPlanNode):
         self._grain_to_date = grain_to_date
         self._window = window
         self.time_range_constraint = time_range_constraint
-        self.time_dimension_spec_for_join = time_dimension_spec_for_join
+        self.queried_agg_time_dimension_specs = queried_agg_time_dimension_specs
 
         # Doing a list comprehension throws a type error, so doing it this way.
         parent_nodes: Sequence[DataflowPlanNode] = (self._parent_node,)
@@ -77,6 +77,7 @@ class JoinOverTimeRangeNode(DataflowPlanNode):
     @property
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
         return super().displayed_properties
+        # Add more displayed properties?
 
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D102
         return (
@@ -84,6 +85,7 @@ class JoinOverTimeRangeNode(DataflowPlanNode):
             and other_node.grain_to_date == self.grain_to_date
             and other_node.window == self.window
             and other_node.time_range_constraint == self.time_range_constraint
+            and other_node.queried_agg_time_dimension_specs == self.queried_agg_time_dimension_specs
         )
 
     def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> JoinOverTimeRangeNode:  # noqa: D102
@@ -93,5 +95,5 @@ class JoinOverTimeRangeNode(DataflowPlanNode):
             window=self.window,
             grain_to_date=self.grain_to_date,
             time_range_constraint=self.time_range_constraint,
-            time_dimension_spec_for_join=self.time_dimension_spec_for_join,
+            queried_agg_time_dimension_specs=self.queried_agg_time_dimension_specs,
         )

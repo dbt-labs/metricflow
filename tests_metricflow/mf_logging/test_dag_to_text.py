@@ -43,9 +43,6 @@ def test_multithread_dag_to_text() -> None:
             ),
             from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="schema", table_name="table")),
             from_source_alias="src",
-            joins_descs=(),
-            group_bys=(),
-            order_bys=(),
         ),
     )
 

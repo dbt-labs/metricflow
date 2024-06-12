@@ -421,26 +421,37 @@ integration_test:
   group_bys: ["metric_time__year"]
   check_query: |
     SELECT
-      AVG(trailing_2_months_revenue) AS trailing_2_months_revenue
-      , {{ render_date_trunc("metric_time__day", TimeGranularity.YEAR) }} AS metric_time__year
+      metric_time__year
+      , trailing_2_months_revenue
     FROM (
       SELECT
-        SUM(b.txn_revenue) as trailing_2_months_revenue
-        , a.ds AS metric_time__day
+        metric_time__year
+        , FIRST_VALUE(trailing_2_months_revenue) OVER (
+          PARTITION BY metric_time__year
+          ORDER BY metric_time__day
+          ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+        ) AS trailing_2_months_revenue
       FROM (
-        SELECT ds
-        FROM {{ mf_time_spine_source }}
-      ) a
-      INNER JOIN (
         SELECT
-          revenue as txn_revenue
-          , created_at AS ds
-        FROM {{ source_schema }}.fct_revenue
-      ) b
-      ON b.ds <= a.ds AND b.ds > {{ render_date_sub("a", "ds", 2, TimeGranularity.MONTH) }}
-      GROUP BY a.ds
-    ) c
-    GROUP BY {{ render_date_trunc("metric_time__day", TimeGranularity.YEAR) }}
+          subq_3.ds AS metric_time__day
+          , {{ render_date_trunc("subq_3.ds", TimeGranularity.YEAR) }} AS metric_time__year
+          , SUM(r.revenue) AS trailing_2_months_revenue
+        FROM {{ source_schema }}.mf_time_spine subq_3
+        INNER JOIN {{ source_schema }}.fct_revenue r
+        ON
+          (
+            {{ render_date_trunc("r.created_at", TimeGranularity.DAY) }} <= subq_3.ds
+          ) AND (
+            {{ render_date_trunc("r.created_at", TimeGranularity.DAY) }} > subq_3.ds - INTERVAL 2 month
+          )
+        GROUP BY
+          subq_3.ds
+          , {{ render_date_trunc("r.created_at", TimeGranularity.YEAR) }}
+      ) subq_7
+    ) subq_8
+    GROUP BY
+      metric_time__year
+      , trailing_2_months_revenue
 # ---
 # integration_test:
 #   name: windowed_cumulative_metric_with_small_granularity

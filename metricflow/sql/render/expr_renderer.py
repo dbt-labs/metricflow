@@ -163,7 +163,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         args_string = ", ".join([x.sql for x in args_rendered])
 
         return SqlExpressionRenderResult(
-            sql=f"{node.sql_function.value}({distinct_prefix}{args_string})",
+            sql=f"{node.sql_function.value.upper()}({distinct_prefix}{args_string})",
             bind_parameters=combined_params,
         )
 
@@ -339,6 +339,7 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
         )
 
     def visit_window_function_expr(self, node: SqlWindowFunctionExpression) -> SqlExpressionRenderResult:  # noqa: D102
+        sql_function_rendered = node.sql_function.value.upper()
         sql_function_args_rendered = [self.render_sql_expr(x) for x in node.sql_function_args]
         partition_by_args_rendered = [self.render_sql_expr(x) for x in node.partition_by_args]
         order_by_args_rendered = {self.render_sql_expr(x.expr): x for x in node.order_by_args}
@@ -392,13 +393,13 @@ class DefaultSqlExpressionRenderer(SqlExpressionRenderer):
 
         if len(window_string_lines) <= 1:
             return SqlExpressionRenderResult(
-                sql=f"{node.sql_function.value}({sql_function_args_string}) OVER ({window_string})",
+                sql=f"{sql_function_rendered}({sql_function_args_string}) OVER ({window_string})",
                 bind_parameters=combined_params,
             )
         else:
             indented_window_string = indent(window_string, indent_prefix=SqlRenderingConstants.INDENT)
             return SqlExpressionRenderResult(
-                sql=f"{node.sql_function.value}({sql_function_args_string}) OVER (\n{indented_window_string}\n)",
+                sql=f"{sql_function_rendered}({sql_function_args_string}) OVER (\n{indented_window_string}\n)",
                 bind_parameters=combined_params,
             )
 

@@ -119,7 +119,6 @@ class SelectSqlQueryToDataTableTask(ExecutionPlanTask):
 
     def execute(self) -> TaskExecutionResult:  # noqa: D102
         start_time = time.time()
-
         df = self._sql_client.query(
             self._sql_query,
             sql_bind_parameters=self.bind_parameters,

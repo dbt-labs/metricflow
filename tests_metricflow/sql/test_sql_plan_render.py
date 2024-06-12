@@ -240,7 +240,6 @@ def test_render_where(  # noqa: D103
             ),
             from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
             from_source_alias="a",
-            joins_descs=(),
             where=SqlComparisonExpression(
                 left_expr=SqlColumnReferenceExpression(
                     col_ref=SqlColumnReference(table_alias="a", column_name="booking_value")
@@ -252,8 +251,6 @@ def test_render_where(  # noqa: D103
                     used_columns=(),
                 ),
             ),
-            group_bys=(),
-            order_bys=(),
         ),
         plan_id="plan0",
         sql_client=sql_client,
@@ -287,9 +284,6 @@ def test_render_order_by(  # noqa: D103
             ),
             from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
             from_source_alias="a",
-            joins_descs=(),
-            where=None,
-            group_bys=(),
             order_bys=(
                 SqlOrderByDescription(
                     expr=SqlColumnReferenceExpression(
@@ -331,10 +325,6 @@ def test_render_limit(  # noqa: D103
             ),
             from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
             from_source_alias="a",
-            joins_descs=(),
-            where=None,
-            group_bys=(),
-            order_bys=(),
             limit=1,
         ),
         plan_id="plan0",
@@ -358,10 +348,6 @@ def test_render_create_table_as(  # noqa: D103
         ),
         from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
         from_source_alias="a",
-        joins_descs=(),
-        where=None,
-        group_bys=(),
-        order_bys=(),
         limit=1,
     )
     assert_rendered_sql_equal(
