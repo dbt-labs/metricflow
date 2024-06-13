@@ -229,7 +229,7 @@ class DefaultSqlQueryPlanRenderer(SqlQueryPlanRenderer):
         combined_params = SqlBindParameters()
 
         # Render description section
-        description_section = "\n".join([f"-- {x}" for x in node.description.split("\n")])
+        description_section = "\n".join([f"-- {x}" for x in node.description.split("\n") if x])
 
         # Render "SELECT" column section
         select_section, select_params = self._render_select_columns_section(
