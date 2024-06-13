@@ -8,7 +8,6 @@ from math import floor
 from time import perf_counter
 from typing import Callable, DefaultDict, Dict, List, Optional, Sequence, Tuple, TypeVar
 
-from dbt_semantic_interfaces.protocols.metric import Metric
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.protocols.semantic_model import SemanticModel
 from dbt_semantic_interfaces.references import (
@@ -19,6 +18,8 @@ from dbt_semantic_interfaces.references import (
 from dbt_semantic_interfaces.validations.validator_helpers import (
     FileContext,
     MetricContext,
+    SavedQueryContext,
+    SavedQueryElementType,
     SemanticManifestValidationResults,
     SemanticModelContext,
     SemanticModelElementContext,
@@ -441,12 +442,14 @@ class DataWarehouseTaskBuilder:
         return tasks
 
     @staticmethod
-    def _gen_metric_task_query_and_params(metric: Metric, mf_engine: MetricFlowEngine) -> Tuple[str, SqlBindParameters]:
-        mf_query = MetricFlowQueryRequest.create_with_random_request_id(
-            metric_names=[metric.name], group_by_names=[DataSet.metric_time_dimension_name()]
+    def _gen_explain_query_task_query_and_params(
+        mf_engine: MetricFlowEngine, mf_request: MetricFlowQueryRequest
+    ) -> Tuple[str, SqlBindParameters]:
+        explain_result: MetricFlowExplainResult = mf_engine.explain(mf_request=mf_request)
+        return (
+            explain_result.rendered_sql_without_descriptions.sql_query,
+            explain_result.rendered_sql_without_descriptions.bind_parameters,
         )
-        explain_result: MetricFlowExplainResult = mf_engine.explain(mf_request=mf_query)
-        return (explain_result.rendered_sql.sql_query, explain_result.rendered_sql.bind_parameters)
 
     @classmethod
     def gen_metric_tasks(
@@ -467,15 +470,52 @@ class DataWarehouseTaskBuilder:
             tasks.append(
                 DataWarehouseValidationTask(
                     query_and_params_callable=partial(
-                        cls._gen_metric_task_query_and_params,
-                        metric=metric,
+                        cls._gen_explain_query_task_query_and_params,
                         mf_engine=mf_engine,
+                        mf_request=MetricFlowQueryRequest.create_with_random_request_id(
+                            metric_names=[metric.name], group_by_names=[DataSet.metric_time_dimension_name()]
+                        ),
                     ),
                     context=MetricContext(
                         file_context=FileContext.from_metadata(metadata=metric.metadata),
                         metric=MetricModelReference(metric_name=metric.name),
                     ),
                     error_message=f"Unable to query metric `{metric.name}`.",
+                )
+            )
+        return tasks
+
+    @classmethod
+    def gen_saved_query_tasks(
+        cls,
+        manifest: SemanticManifest,
+        sql_client: SqlClient,
+        filter_by_saved_queries: Optional[Sequence[str]] = None,
+    ) -> List[DataWarehouseValidationTask]:
+        """Generates a list of tasks for validating the saved queries of the manifest."""
+        mf_engine = MetricFlowEngine(
+            semantic_manifest_lookup=SemanticManifestLookup(semantic_manifest=manifest),
+            sql_client=sql_client,
+        )
+        tasks: List[DataWarehouseValidationTask] = []
+        for saved_query in manifest.saved_queries:
+            if filter_by_saved_queries is not None and saved_query.name not in filter_by_saved_queries:
+                continue
+            tasks.append(
+                DataWarehouseValidationTask(
+                    query_and_params_callable=partial(
+                        cls._gen_explain_query_task_query_and_params,
+                        mf_engine=mf_engine,
+                        mf_request=MetricFlowQueryRequest.create_with_random_request_id(
+                            saved_query_name=saved_query.name
+                        ),
+                    ),
+                    context=SavedQueryContext(
+                        file_context=FileContext.from_metadata(metadata=saved_query.metadata),
+                        element_type=SavedQueryElementType.METRIC,
+                        element_value=saved_query.name,
+                    ),
+                    error_message=f"Unable to query saved query `{saved_query.name}`.",
                 )
             )
         return tasks
