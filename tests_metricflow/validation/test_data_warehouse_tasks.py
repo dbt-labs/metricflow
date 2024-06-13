@@ -289,3 +289,31 @@ def test_validate_metrics(  # noqa: D103
     assert len(issues.all_issues) == 1
     assert len(issues.errors) == 1
     assert "Unable to query metric `count_cats`" in issues.errors[0].message
+
+
+@pytest.mark.sql_engine_snapshot
+def test_build_saved_query_tasks(  # noqa: D103
+    request: FixtureRequest,
+    simple_semantic_manifest: PydanticSemanticManifest,
+    sql_client: SqlClient,
+    mf_test_configuration: MetricFlowTestConfiguration,
+) -> None:
+    tasks = DataWarehouseTaskBuilder.gen_saved_query_tasks(
+        manifest=simple_semantic_manifest,
+        sql_client=sql_client,
+    )
+    assert len(tasks) == 2
+
+    tasks = DataWarehouseTaskBuilder.gen_saved_query_tasks(
+        manifest=simple_semantic_manifest, sql_client=sql_client, filter_by_saved_queries=["p0_booking"]
+    )
+    assert len(tasks) == 1
+    (query_string, _params) = tasks[0].query_and_params_callable()
+
+    assert_sql_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        snapshot_id="query0",
+        sql=query_string,
+        sql_engine=sql_client.sql_engine_type,
+    )
