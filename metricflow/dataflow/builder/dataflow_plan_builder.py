@@ -228,7 +228,7 @@ class DataflowPlanBuilder:
         return self._optimize_plan(plan, optimizations)
 
     def _optimize_plan(self, plan: DataflowPlan, optimizations: Sequence[DataflowPlanOptimization]) -> DataflowPlan:
-        optimizer_factory = DataflowPlanOptimizerFactory()
+        optimizer_factory = DataflowPlanOptimizerFactory(self._node_data_set_resolver)
         for optimizer in optimizer_factory.get_optimizers(optimizations):
             logger.info(f"Applying {optimizer.__class__.__name__}")
             try:
