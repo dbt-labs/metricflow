@@ -82,7 +82,7 @@ class SqlSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
             return False
 
         # Group bys are hard to reduce.
-        if len(node.group_bys) > 0 or (parent_node.as_select_node and len(parent_node.as_select_node.group_bys) > 0):
+        if len(node.group_bys) > 0:
             return False
 
         # Similar with order bys.
