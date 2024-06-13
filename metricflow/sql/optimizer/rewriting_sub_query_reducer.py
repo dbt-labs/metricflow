@@ -139,6 +139,10 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
         return True
 
     @staticmethod
+    def _select_columns_with_window_functions(select_columns: Tuple[SqlSelectColumn, ...]) -> List[SqlSelectColumn]:
+        return [select_column for select_column in select_columns if select_column.expr.as_window_function_expression]
+
+    @staticmethod
     def _select_column_for_alias(column_alias: str, select_columns: Sequence[SqlSelectColumn]) -> SqlSelectColumn:
         for select_column in select_columns:
             if select_column.column_alias == column_alias:
@@ -274,6 +278,32 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
         if len(
             parent_select_node.group_bys
         ) > 0 and not SqlRewritingSubQueryReducerVisitor._select_columns_are_column_references(node.select_columns):
+            return False
+
+        # If the group by is referencing a window function in the parent node, it can't be reduced.
+        # Window functions can't be included in group by.
+        parent_column_aliases_with_window_functions = {
+            select_column.column_alias
+            for select_column in SqlRewritingSubQueryReducerVisitor._select_columns_with_window_functions(
+                parent_select_node.select_columns
+            )
+        }
+        if len(node.group_bys) > 0 and [
+            group_by
+            for group_by in node.group_bys
+            if (
+                group_by.column_alias in parent_column_aliases_with_window_functions
+                or (
+                    group_by.expr.as_column_reference_expression
+                    and group_by.expr.as_column_reference_expression.col_ref.column_name
+                    in parent_column_aliases_with_window_functions
+                )
+                or (
+                    group_by.expr.as_string_expression
+                    and group_by.expr.as_string_expression.sql_expr in parent_column_aliases_with_window_functions
+                )
+            )
+        ]:
             return False
 
         # If the parent select node contains string columns, and this has a GROUP BY, don't reduce as string columns
