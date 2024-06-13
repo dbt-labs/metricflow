@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from collections import OrderedDict
-from typing import List, Optional, Sequence, Tuple, Union
+from typing import List, Optional, Sequence, Set, Tuple, Union
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
@@ -19,6 +19,7 @@ from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.instances import (
     GroupByMetricInstance,
     InstanceSet,
+    MdoInstance,
     MetadataInstance,
     MetricInstance,
     TimeDimensionInstance,
@@ -31,6 +32,7 @@ from metricflow_semantics.specs.column_assoc import (
 )
 from metricflow_semantics.specs.spec_classes import (
     GroupByMetricSpec,
+    InstanceSpec,
     MeasureSpec,
     MetadataSpec,
     MetricSpec,
@@ -60,6 +62,7 @@ from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
 from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
+from metricflow.dataflow.nodes.window_reaggregation_node import WindowReaggregationNode
 from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTableNode
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataset.dataset_classes import DataSet
@@ -1608,5 +1611,99 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 ).as_tuple(),
                 from_source=deduped_sql_select_node,
                 from_source_alias=output_data_set_alias,
+            ),
+        )
+
+    def visit_window_reaggregation_node(self, node: WindowReaggregationNode) -> SqlDataSet:  # noqa: D102
+        from_data_set = node.parent_node.accept(self)
+        parent_instance_set = from_data_set.instance_set  # remove order by col
+        parent_data_set_alias = self._next_unique_table_alias()
+
+        metric_instance = None
+        order_by_instance = None
+        partition_by_instances: Tuple[MdoInstance, ...] = ()
+        for instance in parent_instance_set.as_tuple:
+            if instance.spec == node.metric_spec:
+                metric_instance = instance
+                continue
+            if instance.spec == node.order_by_spec:
+                order_by_instance = instance
+            if instance.spec in node.partition_by_specs:
+                partition_by_instances += (instance,)
+        expected_specs: Set[InstanceSpec] = {node.metric_spec, node.order_by_spec}.union(node.partition_by_specs)
+        assert metric_instance and order_by_instance and partition_by_instances, (
+            "Did not receive appropriate instances to render SQL for WindowReaggregationNode. Expected instances matching "
+            f"specs: {expected_specs}. Got: {parent_instance_set.as_tuple}."
+        )
+
+        # Pending DSI upgrade:
+        # sql_window_function = SqlWindowFunction[
+        #     self._metric_lookup.get_metric(
+        #         metric_instance.spec.reference
+        #     ).type_params.cumulative_type_params.period_agg.name
+        # ]
+        sql_window_function = SqlWindowFunction.FIRST_VALUE  # placeholder for now
+        order_by_args = []
+        if sql_window_function.requires_ordering:
+            order_by_args.append(
+                SqlWindowOrderByArgument(
+                    expr=SqlColumnReferenceExpression.from_table_and_column_names(
+                        table_alias=parent_data_set_alias,
+                        column_name=order_by_instance.associated_column.column_name,
+                    ),
+                )
+            )
+        metric_select_column = SqlSelectColumn(
+            expr=SqlWindowFunctionExpression(
+                sql_function=sql_window_function,
+                sql_function_args=[
+                    SqlColumnReferenceExpression.from_table_and_column_names(
+                        table_alias=parent_data_set_alias, column_name=metric_instance.associated_column.column_name
+                    )
+                ],
+                partition_by_args=[
+                    SqlColumnReferenceExpression.from_table_and_column_names(
+                        table_alias=parent_data_set_alias,
+                        column_name=partition_by_instance.associated_column.column_name,
+                    )
+                    for partition_by_instance in partition_by_instances
+                ],
+                order_by_args=order_by_args,
+            ),
+            column_alias=metric_instance.associated_column.column_name,
+        )
+
+        # Order by instance should not be included in the output dataset because it was not requested in the query.
+        output_instance_set = parent_instance_set.transform(
+            FilterElements(exclude_specs=InstanceSpecSet(time_dimension_specs=(order_by_instance.spec,)))
+        )
+
+        # Can't include window function in a group by, so we use a subquery and apply group by in the outer query.
+        subquery_select_columns = output_instance_set.transform(
+            FilterElements(exclude_specs=InstanceSpecSet(metric_specs=(metric_instance.spec,)))
+        ).transform(
+            CreateSelectColumnsForInstances(parent_data_set_alias, self._column_association_resolver)
+        ).as_tuple() + (
+            metric_select_column,
+        )
+        subquery = SqlSelectStatementNode(
+            description="",  # description included in outer query
+            select_columns=subquery_select_columns,
+            from_source=from_data_set.checked_sql_select_node,
+            from_source_alias=parent_data_set_alias,
+        )
+        subquery_alias = self._next_unique_table_alias()
+
+        outer_query_select_columns = output_instance_set.transform(
+            CreateSelectColumnsForInstances(subquery_alias, self._column_association_resolver)
+        ).as_tuple()
+        return SqlDataSet(
+            instance_set=output_instance_set,
+            sql_select_node=SqlSelectStatementNode(
+                description=node.description,
+                select_columns=outer_query_select_columns,
+                from_source=subquery,
+                from_source_alias=subquery_alias,
+                group_bys=outer_query_select_columns,
             ),
         )

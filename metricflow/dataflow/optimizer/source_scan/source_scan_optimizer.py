@@ -28,6 +28,7 @@ from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
 from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
+from metricflow.dataflow.nodes.window_reaggregation_node import WindowReaggregationNode
 from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTableNode
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOptimizer
@@ -134,6 +135,10 @@ class SourceScanOptimizer(
         return self._default_base_output_handler(node)
 
     def visit_aggregate_measures_node(self, node: AggregateMeasuresNode) -> OptimizeBranchResult:  # noqa: D102
+        self._log_visit_node_type(node)
+        return self._default_base_output_handler(node)
+
+    def visit_window_reaggregation_node(self, node: WindowReaggregationNode) -> OptimizeBranchResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)
 

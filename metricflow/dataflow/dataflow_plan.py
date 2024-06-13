@@ -32,6 +32,7 @@ if typing.TYPE_CHECKING:
     from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
     from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
     from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
+    from metricflow.dataflow.nodes.window_reaggregation_node import WindowReaggregationNode
     from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTableNode
     from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 
@@ -135,6 +136,10 @@ class DataflowPlanNodeVisitor(Generic[VisitorOutputT], ABC):
 
     @abstractmethod
     def visit_compute_metrics_node(self, node: ComputeMetricsNode) -> VisitorOutputT:  # noqa: D102
+        pass
+
+    @abstractmethod
+    def visit_window_reaggregation_node(self, node: WindowReaggregationNode) -> VisitorOutputT:  # noqa: D102
         pass
 
     @abstractmethod
