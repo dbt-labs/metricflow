@@ -216,3 +216,15 @@ class InstanceSet(SerializableDataclass):
             metric_specs=tuple(x.spec for x in self.metric_instances),
             metadata_specs=tuple(x.spec for x in self.metadata_instances),
         )
+
+    @property
+    def as_tuple(self) -> Tuple[MdoInstance, ...]:  # noqa: D102
+        return (
+            self.measure_instances
+            + self.dimension_instances
+            + self.time_dimension_instances
+            + self.entity_instances
+            + self.group_by_metric_instances
+            + self.metric_instances
+            + self.metadata_instances
+        )

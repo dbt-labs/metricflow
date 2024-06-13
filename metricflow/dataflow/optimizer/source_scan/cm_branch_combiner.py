@@ -26,6 +26,7 @@ from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
 from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
+from metricflow.dataflow.nodes.window_reaggregation_node import WindowReaggregationNode
 from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTableNode
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataflow.optimizer.source_scan.matching_linkable_specs import MatchingLinkableSpecsTransform
@@ -327,13 +328,19 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         )
         return ComputeMetricsBranchCombinerResult()
 
+    def visit_window_reaggregation_node(  # noqa: D102
+        self, node: WindowReaggregationNode
+    ) -> ComputeMetricsBranchCombinerResult:
+        self._log_visit_node_type(node)
+        return self._handle_unsupported_node(node)
+
     def visit_order_by_limit_node(self, node: OrderByLimitNode) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._handle_unsupported_node(node)
 
     def visit_where_constraint_node(  # noqa: D102
         self, node: WhereConstraintNode
-    ) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
+    ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
@@ -345,13 +352,11 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
 
     def visit_write_to_result_table_node(  # noqa: D102
         self, node: WriteToResultTableNode
-    ) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
+    ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._handle_unsupported_node(node)
 
-    def visit_filter_elements_node(  # noqa: D102
-        self, node: FilterElementsNode
-    ) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
+    def visit_filter_elements_node(self, node: FilterElementsNode) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
         self._log_visit_node_type(node)
 
         current_right_node = node
@@ -403,19 +408,19 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
 
     def visit_constrain_time_range_node(  # noqa: D102
         self, node: ConstrainTimeRangeNode
-    ) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
+    ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
     def visit_join_over_time_range_node(  # noqa: D102
         self, node: JoinOverTimeRangeNode
-    ) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
+    ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
     def visit_semi_additive_join_node(  # noqa: D102
         self, node: SemiAdditiveJoinNode
-    ) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
+    ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
@@ -427,7 +432,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
 
     def visit_join_to_time_spine_node(  # noqa: D102
         self, node: JoinToTimeSpineNode
-    ) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
+    ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
@@ -439,7 +444,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
 
     def visit_join_conversion_events_node(  # noqa: D102
         self, node: JoinConversionEventsNode
-    ) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
+    ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
