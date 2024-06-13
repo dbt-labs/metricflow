@@ -135,10 +135,14 @@ class DataWarehouseTaskBuilder:
         return (rendered_plan.sql, rendered_plan.bind_parameters)
 
     @classmethod
-    def gen_semantic_model_tasks(cls, manifest: SemanticManifest) -> List[DataWarehouseValidationTask]:
+    def gen_semantic_model_tasks(
+        cls, manifest: SemanticManifest, filter_by_semantic_models: Optional[Sequence[str]] = None
+    ) -> List[DataWarehouseValidationTask]:
         """Generates a list of tasks for validating the semantic models of the manifest."""
         tasks: List[DataWarehouseValidationTask] = []
         for semantic_model in manifest.semantic_models:
+            if filter_by_semantic_models is not None and semantic_model.name not in filter_by_semantic_models:
+                continue
             tasks.append(
                 DataWarehouseValidationTask(
                     query_and_params_callable=partial(
@@ -159,7 +163,10 @@ class DataWarehouseTaskBuilder:
 
     @classmethod
     def gen_dimension_tasks(
-        cls, manifest: SemanticManifest, sql_client: SqlClient
+        cls,
+        manifest: SemanticManifest,
+        sql_client: SqlClient,
+        filter_by_semantic_models: Optional[Sequence[str]] = None,
     ) -> List[DataWarehouseValidationTask]:
         """Generates a list of tasks for validating the dimensions of the manifest.
 
@@ -174,6 +181,9 @@ class DataWarehouseTaskBuilder:
         tasks: List[DataWarehouseValidationTask] = []
         for semantic_model in manifest.semantic_models:
             if not semantic_model.dimensions:
+                continue
+
+            if filter_by_semantic_models is not None and semantic_model.name not in filter_by_semantic_models:
                 continue
 
             source_node = cls._semantic_model_nodes(render_tools=render_tools, semantic_model=semantic_model)[0]
@@ -257,7 +267,12 @@ class DataWarehouseTaskBuilder:
         return tasks
 
     @classmethod
-    def gen_entity_tasks(cls, manifest: SemanticManifest, sql_client: SqlClient) -> List[DataWarehouseValidationTask]:
+    def gen_entity_tasks(
+        cls,
+        manifest: SemanticManifest,
+        sql_client: SqlClient,
+        filter_by_semantic_models: Optional[Sequence[str]] = None,
+    ) -> List[DataWarehouseValidationTask]:
         """Generates a list of tasks for validating the entities of the manifest.
 
         The high level tasks returned are "short cut" queries which try to
@@ -272,6 +287,9 @@ class DataWarehouseTaskBuilder:
         for semantic_model in manifest.semantic_models:
             if not semantic_model.entities:
                 continue
+            if filter_by_semantic_models is not None and semantic_model.name not in filter_by_semantic_models:
+                continue
+
             source_node = cls._semantic_model_nodes(render_tools=render_tools, semantic_model=semantic_model)[0]
 
             semantic_model_sub_tasks: List[DataWarehouseValidationTask] = []
@@ -329,7 +347,12 @@ class DataWarehouseTaskBuilder:
         return tasks
 
     @classmethod
-    def gen_measure_tasks(cls, manifest: SemanticManifest, sql_client: SqlClient) -> List[DataWarehouseValidationTask]:
+    def gen_measure_tasks(
+        cls,
+        manifest: SemanticManifest,
+        sql_client: SqlClient,
+        filter_by_semantic_models: Optional[Sequence[str]] = None,
+    ) -> List[DataWarehouseValidationTask]:
         """Generates a list of tasks for validating the measures of the manifest.
 
         The high level tasks returned are "short cut" queries which try to
@@ -343,6 +366,9 @@ class DataWarehouseTaskBuilder:
         tasks: List[DataWarehouseValidationTask] = []
         for semantic_model in manifest.semantic_models:
             if not semantic_model.measures:
+                continue
+
+            if filter_by_semantic_models is not None and semantic_model.name not in filter_by_semantic_models:
                 continue
 
             source_nodes = cls._semantic_model_nodes(render_tools=render_tools, semantic_model=semantic_model)
@@ -423,7 +449,12 @@ class DataWarehouseTaskBuilder:
         return (explain_result.rendered_sql.sql_query, explain_result.rendered_sql.bind_parameters)
 
     @classmethod
-    def gen_metric_tasks(cls, manifest: SemanticManifest, sql_client: SqlClient) -> List[DataWarehouseValidationTask]:
+    def gen_metric_tasks(
+        cls,
+        manifest: SemanticManifest,
+        sql_client: SqlClient,
+        filter_by_metrics: Optional[Sequence[str]] = None,
+    ) -> List[DataWarehouseValidationTask]:
         """Generates a list of tasks for validating the metrics of the manifest."""
         mf_engine = MetricFlowEngine(
             semantic_manifest_lookup=SemanticManifestLookup(semantic_manifest=manifest),
@@ -431,6 +462,8 @@ class DataWarehouseTaskBuilder:
         )
         tasks: List[DataWarehouseValidationTask] = []
         for metric in manifest.metrics:
+            if filter_by_metrics is not None and metric.name not in filter_by_metrics:
+                continue
             tasks.append(
                 DataWarehouseValidationTask(
                     query_and_params_callable=partial(
