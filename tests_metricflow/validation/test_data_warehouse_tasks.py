@@ -50,6 +50,11 @@ def test_build_semantic_model_tasks(  # noqa: D103
     tasks = DataWarehouseTaskBuilder.gen_semantic_model_tasks(manifest=data_warehouse_validation_model)
     assert len(tasks) == len(data_warehouse_validation_model.semantic_models)
 
+    tasks = DataWarehouseTaskBuilder.gen_semantic_model_tasks(
+        manifest=data_warehouse_validation_model, filter_by_semantic_models=[]
+    )
+    assert len(tasks) == 0
+
 
 def test_task_runner(sql_client: SqlClient, mf_test_configuration: MetricFlowTestConfiguration) -> None:  # noqa: D103
     dw_validator = DataWarehouseModelValidator(sql_client=sql_client)
@@ -115,6 +120,13 @@ def test_build_dimension_tasks(  # noqa: D103
     # 1 categorical dimension task, 1 time dimension task, 4 granularity based time dimension tasks, 6 date_part tasks
     assert len(tasks[0].on_fail_subtasks) == 12
 
+    tasks = DataWarehouseTaskBuilder.gen_dimension_tasks(
+        manifest=data_warehouse_validation_model,
+        sql_client=sql_client,
+        filter_by_semantic_models=[],
+    )
+    assert len(tasks) == 0
+
 
 def test_validate_dimensions(  # noqa: D103
     dw_backed_warehouse_validation_model: PydanticSemanticManifest,
@@ -149,6 +161,11 @@ def test_build_entities_tasks(  # noqa: D103
     assert len(tasks) == 1  # on semantic model query with all entities
     assert len(tasks[0].on_fail_subtasks) == 1  # a sub task for each entity on the semantic model
 
+    tasks = DataWarehouseTaskBuilder.gen_entity_tasks(
+        manifest=data_warehouse_validation_model, sql_client=sql_client, filter_by_semantic_models=[]
+    )
+    assert len(tasks) == 0
+
 
 def test_validate_entities(  # noqa: D103
     dw_backed_warehouse_validation_model: PydanticSemanticManifest,
@@ -182,6 +199,11 @@ def test_build_measure_tasks(  # noqa: D103
     )
     assert len(tasks) == 1  # on semantic model query with all measures
     assert len(tasks[0].on_fail_subtasks) == 1  # a sub task for each measure on the semantic model
+
+    tasks = DataWarehouseTaskBuilder.gen_measure_tasks(
+        manifest=data_warehouse_validation_model, sql_client=sql_client, filter_by_semantic_models=[]
+    )
+    assert len(tasks) == 0
 
 
 def test_validate_measures(  # noqa: D103
@@ -227,6 +249,13 @@ def test_build_metric_tasks(  # noqa: D103
         sql=query_string,
         sql_engine=sql_client.sql_engine_type,
     )
+
+    tasks = DataWarehouseTaskBuilder.gen_metric_tasks(
+        manifest=data_warehouse_validation_model,
+        sql_client=sql_client,
+        filter_by_metrics=[],
+    )
+    assert len(tasks) == 0
 
 
 def test_validate_metrics(  # noqa: D103
