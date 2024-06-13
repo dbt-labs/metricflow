@@ -82,7 +82,10 @@ from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
 from metricflow.dataflow.nodes.window_reaggregation_node import WindowReaggregationNode
 from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTableNode
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
-from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOptimizer
+from metricflow.dataflow.optimizer.dataflow_optimizer_factory import (
+    DataflowPlanOptimization,
+    DataflowPlanOptimizerFactory,
+)
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.plan_conversion.node_processor import (
     PredicateInputType,
@@ -143,7 +146,7 @@ class DataflowPlanBuilder:
         query_spec: MetricFlowQuerySpec,
         output_sql_table: Optional[SqlTable] = None,
         output_selection_specs: Optional[InstanceSpecSet] = None,
-        optimizers: Sequence[DataflowPlanOptimizer] = (),
+        optimizations: Sequence[DataflowPlanOptimization] = (),
     ) -> DataflowPlan:
         """Generate a plan for reading the results of a query with the given spec into a data_table or table."""
         # Workaround for a Pycharm type inspection issue with decorators.
@@ -152,7 +155,7 @@ class DataflowPlanBuilder:
             query_spec=query_spec,
             output_sql_table=output_sql_table,
             output_selection_specs=output_selection_specs,
-            optimizers=optimizers,
+            optimizations=optimizations,
         )
 
     def _build_query_output_node(
@@ -208,7 +211,7 @@ class DataflowPlanBuilder:
         query_spec: MetricFlowQuerySpec,
         output_sql_table: Optional[SqlTable],
         output_selection_specs: Optional[InstanceSpecSet],
-        optimizers: Sequence[DataflowPlanOptimizer],
+        optimizations: Sequence[DataflowPlanOptimization],
     ) -> DataflowPlan:
         metrics_output_node = self._build_query_output_node(query_spec=query_spec)
 
@@ -222,7 +225,11 @@ class DataflowPlanBuilder:
 
         plan_id = DagId.from_id_prefix(StaticIdPrefix.DATAFLOW_PLAN_PREFIX)
         plan = DataflowPlan(sink_nodes=[sink_node], plan_id=plan_id)
-        for optimizer in optimizers:
+        return self._optimize_plan(plan, optimizations)
+
+    def _optimize_plan(self, plan: DataflowPlan, optimizations: Sequence[DataflowPlanOptimization]) -> DataflowPlan:
+        optimizer_factory = DataflowPlanOptimizerFactory()
+        for optimizer in optimizer_factory.get_optimizers(optimizations):
             logger.info(f"Applying {optimizer.__class__.__name__}")
             try:
                 plan = optimizer.optimize(plan)
@@ -733,17 +740,21 @@ class DataflowPlanBuilder:
 
         return CombineAggregatedOutputsNode(parent_nodes=output_nodes)
 
-    def build_plan_for_distinct_values(self, query_spec: MetricFlowQuerySpec) -> DataflowPlan:
+    def build_plan_for_distinct_values(
+        self, query_spec: MetricFlowQuerySpec, optimizations: Sequence[DataflowPlanOptimization] = ()
+    ) -> DataflowPlan:
         """Generate a plan that would get the distinct values of a linkable instance.
 
         e.g. distinct listing__country_latest for bookings by listing__country_latest
         """
         # Workaround for a Pycharm type inspection issue with decorators.
         # noinspection PyArgumentList
-        return self._build_plan_for_distinct_values(query_spec)
+        return self._build_plan_for_distinct_values(query_spec, optimizations=optimizations)
 
     @log_runtime()
-    def _build_plan_for_distinct_values(self, query_spec: MetricFlowQuerySpec) -> DataflowPlan:
+    def _build_plan_for_distinct_values(
+        self, query_spec: MetricFlowQuerySpec, optimizations: Sequence[DataflowPlanOptimization]
+    ) -> DataflowPlan:
         assert not query_spec.metric_specs, "Can't build distinct values plan with metrics."
         query_level_filter_specs: Sequence[WhereFilterSpec] = ()
         if query_spec.filter_intersection is not None and len(query_spec.filter_intersection.where_filters) > 0:
@@ -792,7 +803,8 @@ class DataflowPlanBuilder:
             parent_node=output_node, order_by_specs=query_spec.order_by_specs, limit=query_spec.limit
         )
 
-        return DataflowPlan(sink_nodes=[sink_node])
+        plan = DataflowPlan(sink_nodes=[sink_node])
+        return self._optimize_plan(plan, optimizations)
 
     @staticmethod
     def build_sink_node(

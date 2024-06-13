@@ -8,7 +8,7 @@ from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
-from metricflow.dataflow.optimizer.predicate_pushdown_optimizer import PredicatePushdownOptimizer
+from metricflow.dataflow.optimizer.dataflow_optimizer_factory import DataflowPlanOptimization
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlQueryOptimizationLevel
@@ -52,11 +52,11 @@ def render_and_check(
     )
 
     # Run dataflow -> sql conversion with all optimizers
+    optimizations = (DataflowPlanOptimization.PREDICATE_PUSHDOWN,)
     if is_distinct_values_plan:
-        # TODO: Make optimization available for distinct values plans
-        optimized_plan = base_plan
+        optimized_plan = dataflow_plan_builder.build_plan_for_distinct_values(query_spec, optimizations=optimizations)
     else:
-        optimized_plan = dataflow_plan_builder.build_plan(query_spec, optimizers=(PredicatePushdownOptimizer(),))
+        optimized_plan = dataflow_plan_builder.build_plan(query_spec, optimizations=optimizations)
     conversion_result = dataflow_to_sql_converter.convert_to_sql_query_plan(
         sql_engine_type=sql_client.sql_engine_type,
         dataflow_plan_node=optimized_plan.sink_node,
