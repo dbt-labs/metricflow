@@ -16,7 +16,13 @@ from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.spec_classes import EntityReference, MetricSpec, TimeDimensionSpec
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
-from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_MONTH
+from metricflow_semantics.test_helpers.metric_time_dimension import (
+    MTD_SPEC_DAY,
+    MTD_SPEC_MONTH,
+    MTD_SPEC_QUARTER,
+    MTD_SPEC_WEEK,
+    MTD_SPEC_YEAR,
+)
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
@@ -38,7 +44,6 @@ def test_cumulative_metric(
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="trailing_2_months_revenue"),),
-            dimension_specs=(),
             time_dimension_specs=(
                 TimeDimensionSpec(
                     element_name="ds",
@@ -76,7 +81,6 @@ def test_cumulative_metric_with_time_constraint(
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="trailing_2_months_revenue"),),
-            dimension_specs=(),
             time_dimension_specs=(
                 TimeDimensionSpec(
                     element_name="metric_time",
@@ -150,7 +154,6 @@ def test_cumulative_metric_no_ds(
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="trailing_2_months_revenue"),),
-            dimension_specs=(),
             time_dimension_specs=(),
         )
     )
@@ -177,7 +180,6 @@ def test_cumulative_metric_no_window(
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="revenue_all_time"),),
-            dimension_specs=(),
             time_dimension_specs=(
                 TimeDimensionSpec(
                     element_name="ds",
@@ -210,7 +212,6 @@ def test_cumulative_metric_no_window_with_time_constraint(
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="revenue_all_time"),),
-            dimension_specs=(),
             time_dimension_specs=(MTD_SPEC_DAY,),
             time_range_constraint=TimeRangeConstraint(
                 start_time=as_datetime("2020-01-01"), end_time=as_datetime("2020-01-01")
@@ -240,7 +241,6 @@ def test_cumulative_metric_grain_to_date(
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="revenue_mtd"),),
-            dimension_specs=(),
             time_dimension_specs=(
                 TimeDimensionSpec(
                     element_name="ds",
@@ -273,7 +273,6 @@ def test_cumulative_metric_month(
     dataflow_plan = extended_date_dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="trailing_3_months_bookings"),),
-            dimension_specs=(),
             time_dimension_specs=(MTD_SPEC_MONTH,),
             time_range_constraint=TimeRangeConstraint(
                 start_time=as_datetime("2020-03-05"), end_time=as_datetime("2021-01-04")
@@ -303,7 +302,6 @@ def test_cumulative_metric_with_agg_time_dimension(
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="trailing_2_months_revenue"),),
-            dimension_specs=(),
             time_dimension_specs=(
                 TimeDimensionSpec(element_name="ds", entity_links=(EntityReference("revenue_instance"),)),
             ),
@@ -332,7 +330,6 @@ def test_cumulative_metric_with_multiple_agg_time_dimensions(
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="trailing_2_months_revenue"),),
-            dimension_specs=(),
             time_dimension_specs=(
                 TimeDimensionSpec(
                     element_name="ds",
@@ -370,7 +367,6 @@ def test_cumulative_metric_with_multiple_metric_time_dimensions(
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="trailing_2_months_revenue"),),
-            dimension_specs=(),
             time_dimension_specs=(MTD_SPEC_DAY, MTD_SPEC_MONTH),
         )
     )
@@ -397,7 +393,6 @@ def test_cumulative_metric_with_agg_time_and_metric_time(
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="trailing_2_months_revenue"),),
-            dimension_specs=(),
             time_dimension_specs=(
                 MTD_SPEC_DAY,
                 TimeDimensionSpec(
@@ -416,3 +411,220 @@ def test_cumulative_metric_with_agg_time_and_metric_time(
         sql_client=sql_client,
         node=dataflow_plan.sink_node,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_cumulative_metric_with_non_default_grain(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
+    sql_client: SqlClient,
+) -> None:
+    """Tests rendering a query for a cumulative all-time metric queried with non-default grain."""
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="revenue_all_time"),),
+            time_dimension_specs=(MTD_SPEC_WEEK,),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_window_metric_with_non_default_grain(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
+    sql_client: SqlClient,
+) -> None:
+    """Tests rendering a query for a cumulative window metric queried with non-default grain."""
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="trailing_2_months_revenue"),),
+            time_dimension_specs=(MTD_SPEC_YEAR,),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_grain_to_date_metric_with_non_default_grain(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
+    sql_client: SqlClient,
+) -> None:
+    """Tests rendering a query for a cumulative grain to date metric queried with non-default grain."""
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="revenue_mtd"),),
+            time_dimension_specs=(MTD_SPEC_MONTH,),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_window_metric_with_non_default_grains(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
+    sql_client: SqlClient,
+) -> None:
+    """Tests rendering a query for a cumulative window metric queried with non-default grains.
+
+    Uses both metric_time and agg_time_dimension. Excludes default grain.
+    """
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="every_two_days_bookers_fill_nulls_with_0"),),
+            time_dimension_specs=(
+                MTD_SPEC_WEEK,
+                TimeDimensionSpec(
+                    element_name="ds",
+                    entity_links=(EntityReference("booking"),),
+                    time_granularity=TimeGranularity.MONTH,
+                ),
+            ),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_grain_to_date_metric_with_non_default_grains(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
+    sql_client: SqlClient,
+) -> None:
+    """Tests rendering a query for a cumulative grain to date metric queried with non-default grains.
+
+    Uses agg time dimension instead of metric_time. Excludes default grain.
+    """
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="revenue_mtd"),),
+            time_dimension_specs=(
+                TimeDimensionSpec(
+                    element_name="ds",
+                    entity_links=(EntityReference("revenue_instance"),),
+                    time_granularity=TimeGranularity.QUARTER,
+                ),
+                TimeDimensionSpec(
+                    element_name="ds",
+                    entity_links=(EntityReference("revenue_instance"),),
+                    time_granularity=TimeGranularity.YEAR,
+                ),
+            ),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_all_time_metric_with_non_default_grains(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
+    sql_client: SqlClient,
+) -> None:
+    """Tests rendering a query for a cumulative all-time metric queried with non-default grains.
+
+    Uses only metric_time. Excludes default grain.
+    """
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="revenue_all_time"),),
+            time_dimension_specs=(MTD_SPEC_WEEK, MTD_SPEC_QUARTER),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_derived_cumulative_metric_with_non_default_grains(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
+    sql_client: SqlClient,
+) -> None:
+    """Test querying a derived metric with a cumulative input metric using non-default grains."""
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="trailing_2_months_revenue_sub_10"),),
+            time_dimension_specs=(MTD_SPEC_WEEK,),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_node,
+    )
+
+
+# TODO: write the following tests when unblocked
+# - Render each of the allowed period_aggs (both set in YAML & default)
+# - Query cumulative metric with non-day default_grain (using default grain and non-default grain)
+# - Query 2 metrics with different default_grains using metric_time (no grain specified)
+# - If default grain is WEEK, query with a higher grain (check that we still get correct values)
+# - Query cumulative metric with sub-daily grain
