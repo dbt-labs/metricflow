@@ -46,7 +46,6 @@ from metricflow_semantics.query.issues.issues_base import (
     MetricFlowQueryResolutionIssueSet,
 )
 from metricflow_semantics.query.suggestion_generator import QueryItemSuggestionGenerator
-from metricflow_semantics.specs.patterns.base_time_grain import BaseTimeGrainPattern
 from metricflow_semantics.specs.patterns.none_date_part import NoneDatePartPattern
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 
@@ -171,19 +170,8 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
             elif metric.type is MetricType.RATIO or metric.type is MetricType.DERIVED:
                 assert False, f"A measure should have a simple or cumulative metric as a child, but got {metric.type}"
             elif metric.type is MetricType.CUMULATIVE:
-                # To handle the restriction that cumulative metrics can only be queried at the base grain, it's
-                # easiest to handle that by applying the pattern to remove non-base grain time dimension specs at the
-                # measure node and generate the issue here if there's nothing that matches. Generating the issue here
-                # allows for creation of a more specific issue (i.e. include the measure) vs. generating the issue
-                # at a higher level. This can be more cleanly handled once we add additional context to the
-                # LinkableInstanceSpec.
                 patterns_to_apply = (
-                    # From comment in ValidLinkableSpecResolver:
-                    #   It's possible to aggregate measures to coarser time granularities
-                    #   (except with cumulative metrics).
-                    BaseTimeGrainPattern(only_apply_for_metric_time=True),
-                    # From comment in previous query parser:
-                    #   Cannot extract date part for cumulative metrics.
+                    # Date part doesn't make clear sense with cumulative metrics, so we don't allow it.
                     NoneDatePartPattern(),
                 )
             else:
