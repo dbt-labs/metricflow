@@ -1351,3 +1351,57 @@ def test_all_available_metric_filters(
                 ),
             ).query_spec
             dataflow_plan_builder.build_plan(query_spec)
+
+
+def test_cumulative_metric_with_non_default_grain(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    query_parser: MetricFlowQueryParser,
+    create_source_tables: bool,
+) -> None:
+    """Test querying a cumulative metric using a granularity that is not the metric's default."""
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("trailing_2_months_revenue",), group_by_names=("metric_time__year",)
+    ).query_spec
+    dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan.structure_text(),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dag_graph=dataflow_plan,
+    )
+
+
+def test_derived_cumulative_metric_with_non_default_grain(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    query_parser: MetricFlowQueryParser,
+    create_source_tables: bool,
+) -> None:
+    """Test querying a derived metric with a cumulative input metric using non-default granularity."""
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("trailing_2_months_revenue_sub_10",), group_by_names=("metric_time__month",)
+    ).query_spec
+    dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
+
+    assert_plan_snapshot_text_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        plan=dataflow_plan,
+        plan_snapshot_text=dataflow_plan.structure_text(),
+    )
+
+    display_graph_if_requested(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dag_graph=dataflow_plan,
+    )
