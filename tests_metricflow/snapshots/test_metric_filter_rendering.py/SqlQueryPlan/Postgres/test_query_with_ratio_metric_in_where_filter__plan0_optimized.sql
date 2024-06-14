@@ -8,8 +8,8 @@ FROM (
   -- Join Standard Outputs
   -- Pass Only Elements: ['listings', 'listing__bookings_per_booker']
   SELECT
-    CAST(subq_56.bookings AS DOUBLE PRECISION) / CAST(NULLIF(subq_56.bookers, 0) AS DOUBLE PRECISION) AS listing__bookings_per_booker
-    , subq_45.listings AS listings
+    CAST(subq_34.bookings AS DOUBLE PRECISION) / CAST(NULLIF(subq_34.bookers, 0) AS DOUBLE PRECISION) AS listing__bookings_per_booker
+    , subq_23.listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
@@ -18,13 +18,13 @@ FROM (
       listing_id AS listing
       , 1 AS listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-  ) subq_45
+  ) subq_23
   LEFT OUTER JOIN (
     -- Combine Aggregated Outputs
     SELECT
-      COALESCE(subq_50.listing, subq_55.listing) AS listing
-      , MAX(subq_50.bookings) AS bookings
-      , MAX(subq_55.bookers) AS bookers
+      COALESCE(subq_28.listing, subq_33.listing) AS listing
+      , MAX(subq_28.bookings) AS bookings
+      , MAX(subq_33.bookers) AS bookers
     FROM (
       -- Aggregate Measures
       -- Compute Metrics via Expressions
@@ -39,10 +39,10 @@ FROM (
           listing_id AS listing
           , 1 AS bookings
         FROM ***************************.fct_bookings bookings_source_src_28000
-      ) subq_48
+      ) subq_26
       GROUP BY
         listing
-    ) subq_50
+    ) subq_28
     FULL OUTER JOIN (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
@@ -55,13 +55,13 @@ FROM (
       FROM ***************************.fct_bookings bookings_source_src_28000
       GROUP BY
         listing_id
-    ) subq_55
+    ) subq_33
     ON
-      subq_50.listing = subq_55.listing
+      subq_28.listing = subq_33.listing
     GROUP BY
-      COALESCE(subq_50.listing, subq_55.listing)
-  ) subq_56
+      COALESCE(subq_28.listing, subq_33.listing)
+  ) subq_34
   ON
-    subq_45.listing = subq_56.listing
-) subq_60
+    subq_23.listing = subq_34.listing
+) subq_38
 WHERE listing__bookings_per_booker > 1

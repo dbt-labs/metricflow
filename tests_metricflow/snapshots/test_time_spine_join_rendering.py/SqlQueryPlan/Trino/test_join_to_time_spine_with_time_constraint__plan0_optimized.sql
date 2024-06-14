@@ -11,4 +11,4 @@ FROM (
     SUM(1) AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
   WHERE DATE_TRUNC('day', ds) BETWEEN timestamp '2020-01-03' AND timestamp '2020-01-05'
-) subq_13
+) subq_9

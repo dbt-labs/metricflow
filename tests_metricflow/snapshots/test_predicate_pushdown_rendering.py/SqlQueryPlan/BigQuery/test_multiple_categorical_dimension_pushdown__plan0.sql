@@ -1,186 +1,186 @@
 -- Compute Metrics via Expressions
 SELECT
-  subq_12.user__home_state_latest
-  , subq_12.listings
+  subq_10.user__home_state_latest
+  , subq_10.listings
 FROM (
   -- Aggregate Measures
   SELECT
-    subq_11.user__home_state_latest
-    , SUM(subq_11.listings) AS listings
+    subq_9.user__home_state_latest
+    , SUM(subq_9.listings) AS listings
   FROM (
     -- Pass Only Elements: ['listings', 'user__home_state_latest']
     SELECT
-      subq_10.user__home_state_latest
-      , subq_10.listings
+      subq_8.user__home_state_latest
+      , subq_8.listings
     FROM (
       -- Constrain Output with WHERE
       SELECT
-        subq_9.listing__is_lux_latest
-        , subq_9.listing__capacity_latest
-        , subq_9.user__home_state_latest
-        , subq_9.listings
+        subq_7.listing__is_lux_latest
+        , subq_7.listing__capacity_latest
+        , subq_7.user__home_state_latest
+        , subq_7.listings
       FROM (
         -- Pass Only Elements: ['listings', 'user__home_state_latest', 'listing__is_lux_latest', 'listing__capacity_latest']
         SELECT
-          subq_8.listing__is_lux_latest
-          , subq_8.listing__capacity_latest
-          , subq_8.user__home_state_latest
-          , subq_8.listings
+          subq_6.listing__is_lux_latest
+          , subq_6.listing__capacity_latest
+          , subq_6.user__home_state_latest
+          , subq_6.listings
         FROM (
           -- Join Standard Outputs
           SELECT
-            subq_5.user AS user
-            , subq_5.listing__is_lux_latest AS listing__is_lux_latest
-            , subq_5.listing__capacity_latest AS listing__capacity_latest
-            , subq_7.home_state_latest AS user__home_state_latest
-            , subq_5.listings AS listings
+            subq_3.user AS user
+            , subq_3.listing__is_lux_latest AS listing__is_lux_latest
+            , subq_3.listing__capacity_latest AS listing__capacity_latest
+            , subq_5.home_state_latest AS user__home_state_latest
+            , subq_3.listings AS listings
           FROM (
             -- Pass Only Elements: ['listings', 'listing__is_lux_latest', 'listing__capacity_latest', 'user']
             SELECT
-              subq_4.user
-              , subq_4.listing__is_lux_latest
-              , subq_4.listing__capacity_latest
-              , subq_4.listings
+              subq_2.user
+              , subq_2.listing__is_lux_latest
+              , subq_2.listing__capacity_latest
+              , subq_2.listings
             FROM (
               -- Constrain Output with WHERE
               SELECT
-                subq_3.ds__day
-                , subq_3.ds__week
-                , subq_3.ds__month
-                , subq_3.ds__quarter
-                , subq_3.ds__year
-                , subq_3.ds__extract_year
-                , subq_3.ds__extract_quarter
-                , subq_3.ds__extract_month
-                , subq_3.ds__extract_day
-                , subq_3.ds__extract_dow
-                , subq_3.ds__extract_doy
-                , subq_3.created_at__day
-                , subq_3.created_at__week
-                , subq_3.created_at__month
-                , subq_3.created_at__quarter
-                , subq_3.created_at__year
-                , subq_3.created_at__extract_year
-                , subq_3.created_at__extract_quarter
-                , subq_3.created_at__extract_month
-                , subq_3.created_at__extract_day
-                , subq_3.created_at__extract_dow
-                , subq_3.created_at__extract_doy
-                , subq_3.listing__ds__day
-                , subq_3.listing__ds__week
-                , subq_3.listing__ds__month
-                , subq_3.listing__ds__quarter
-                , subq_3.listing__ds__year
-                , subq_3.listing__ds__extract_year
-                , subq_3.listing__ds__extract_quarter
-                , subq_3.listing__ds__extract_month
-                , subq_3.listing__ds__extract_day
-                , subq_3.listing__ds__extract_dow
-                , subq_3.listing__ds__extract_doy
-                , subq_3.listing__created_at__day
-                , subq_3.listing__created_at__week
-                , subq_3.listing__created_at__month
-                , subq_3.listing__created_at__quarter
-                , subq_3.listing__created_at__year
-                , subq_3.listing__created_at__extract_year
-                , subq_3.listing__created_at__extract_quarter
-                , subq_3.listing__created_at__extract_month
-                , subq_3.listing__created_at__extract_day
-                , subq_3.listing__created_at__extract_dow
-                , subq_3.listing__created_at__extract_doy
-                , subq_3.metric_time__day
-                , subq_3.metric_time__week
-                , subq_3.metric_time__month
-                , subq_3.metric_time__quarter
-                , subq_3.metric_time__year
-                , subq_3.metric_time__extract_year
-                , subq_3.metric_time__extract_quarter
-                , subq_3.metric_time__extract_month
-                , subq_3.metric_time__extract_day
-                , subq_3.metric_time__extract_dow
-                , subq_3.metric_time__extract_doy
-                , subq_3.listing
-                , subq_3.user
-                , subq_3.listing__user
-                , subq_3.country_latest
-                , subq_3.is_lux_latest
-                , subq_3.capacity_latest
-                , subq_3.listing__country_latest
-                , subq_3.listing__is_lux_latest
-                , subq_3.listing__capacity_latest
-                , subq_3.listings
-                , subq_3.largest_listing
-                , subq_3.smallest_listing
+                subq_1.ds__day
+                , subq_1.ds__week
+                , subq_1.ds__month
+                , subq_1.ds__quarter
+                , subq_1.ds__year
+                , subq_1.ds__extract_year
+                , subq_1.ds__extract_quarter
+                , subq_1.ds__extract_month
+                , subq_1.ds__extract_day
+                , subq_1.ds__extract_dow
+                , subq_1.ds__extract_doy
+                , subq_1.created_at__day
+                , subq_1.created_at__week
+                , subq_1.created_at__month
+                , subq_1.created_at__quarter
+                , subq_1.created_at__year
+                , subq_1.created_at__extract_year
+                , subq_1.created_at__extract_quarter
+                , subq_1.created_at__extract_month
+                , subq_1.created_at__extract_day
+                , subq_1.created_at__extract_dow
+                , subq_1.created_at__extract_doy
+                , subq_1.listing__ds__day
+                , subq_1.listing__ds__week
+                , subq_1.listing__ds__month
+                , subq_1.listing__ds__quarter
+                , subq_1.listing__ds__year
+                , subq_1.listing__ds__extract_year
+                , subq_1.listing__ds__extract_quarter
+                , subq_1.listing__ds__extract_month
+                , subq_1.listing__ds__extract_day
+                , subq_1.listing__ds__extract_dow
+                , subq_1.listing__ds__extract_doy
+                , subq_1.listing__created_at__day
+                , subq_1.listing__created_at__week
+                , subq_1.listing__created_at__month
+                , subq_1.listing__created_at__quarter
+                , subq_1.listing__created_at__year
+                , subq_1.listing__created_at__extract_year
+                , subq_1.listing__created_at__extract_quarter
+                , subq_1.listing__created_at__extract_month
+                , subq_1.listing__created_at__extract_day
+                , subq_1.listing__created_at__extract_dow
+                , subq_1.listing__created_at__extract_doy
+                , subq_1.metric_time__day
+                , subq_1.metric_time__week
+                , subq_1.metric_time__month
+                , subq_1.metric_time__quarter
+                , subq_1.metric_time__year
+                , subq_1.metric_time__extract_year
+                , subq_1.metric_time__extract_quarter
+                , subq_1.metric_time__extract_month
+                , subq_1.metric_time__extract_day
+                , subq_1.metric_time__extract_dow
+                , subq_1.metric_time__extract_doy
+                , subq_1.listing
+                , subq_1.user
+                , subq_1.listing__user
+                , subq_1.country_latest
+                , subq_1.is_lux_latest
+                , subq_1.capacity_latest
+                , subq_1.listing__country_latest
+                , subq_1.listing__is_lux_latest
+                , subq_1.listing__capacity_latest
+                , subq_1.listings
+                , subq_1.largest_listing
+                , subq_1.smallest_listing
               FROM (
                 -- Metric Time Dimension 'ds'
                 SELECT
-                  subq_2.ds__day
-                  , subq_2.ds__week
-                  , subq_2.ds__month
-                  , subq_2.ds__quarter
-                  , subq_2.ds__year
-                  , subq_2.ds__extract_year
-                  , subq_2.ds__extract_quarter
-                  , subq_2.ds__extract_month
-                  , subq_2.ds__extract_day
-                  , subq_2.ds__extract_dow
-                  , subq_2.ds__extract_doy
-                  , subq_2.created_at__day
-                  , subq_2.created_at__week
-                  , subq_2.created_at__month
-                  , subq_2.created_at__quarter
-                  , subq_2.created_at__year
-                  , subq_2.created_at__extract_year
-                  , subq_2.created_at__extract_quarter
-                  , subq_2.created_at__extract_month
-                  , subq_2.created_at__extract_day
-                  , subq_2.created_at__extract_dow
-                  , subq_2.created_at__extract_doy
-                  , subq_2.listing__ds__day
-                  , subq_2.listing__ds__week
-                  , subq_2.listing__ds__month
-                  , subq_2.listing__ds__quarter
-                  , subq_2.listing__ds__year
-                  , subq_2.listing__ds__extract_year
-                  , subq_2.listing__ds__extract_quarter
-                  , subq_2.listing__ds__extract_month
-                  , subq_2.listing__ds__extract_day
-                  , subq_2.listing__ds__extract_dow
-                  , subq_2.listing__ds__extract_doy
-                  , subq_2.listing__created_at__day
-                  , subq_2.listing__created_at__week
-                  , subq_2.listing__created_at__month
-                  , subq_2.listing__created_at__quarter
-                  , subq_2.listing__created_at__year
-                  , subq_2.listing__created_at__extract_year
-                  , subq_2.listing__created_at__extract_quarter
-                  , subq_2.listing__created_at__extract_month
-                  , subq_2.listing__created_at__extract_day
-                  , subq_2.listing__created_at__extract_dow
-                  , subq_2.listing__created_at__extract_doy
-                  , subq_2.ds__day AS metric_time__day
-                  , subq_2.ds__week AS metric_time__week
-                  , subq_2.ds__month AS metric_time__month
-                  , subq_2.ds__quarter AS metric_time__quarter
-                  , subq_2.ds__year AS metric_time__year
-                  , subq_2.ds__extract_year AS metric_time__extract_year
-                  , subq_2.ds__extract_quarter AS metric_time__extract_quarter
-                  , subq_2.ds__extract_month AS metric_time__extract_month
-                  , subq_2.ds__extract_day AS metric_time__extract_day
-                  , subq_2.ds__extract_dow AS metric_time__extract_dow
-                  , subq_2.ds__extract_doy AS metric_time__extract_doy
-                  , subq_2.listing
-                  , subq_2.user
-                  , subq_2.listing__user
-                  , subq_2.country_latest
-                  , subq_2.is_lux_latest
-                  , subq_2.capacity_latest
-                  , subq_2.listing__country_latest
-                  , subq_2.listing__is_lux_latest
-                  , subq_2.listing__capacity_latest
-                  , subq_2.listings
-                  , subq_2.largest_listing
-                  , subq_2.smallest_listing
+                  subq_0.ds__day
+                  , subq_0.ds__week
+                  , subq_0.ds__month
+                  , subq_0.ds__quarter
+                  , subq_0.ds__year
+                  , subq_0.ds__extract_year
+                  , subq_0.ds__extract_quarter
+                  , subq_0.ds__extract_month
+                  , subq_0.ds__extract_day
+                  , subq_0.ds__extract_dow
+                  , subq_0.ds__extract_doy
+                  , subq_0.created_at__day
+                  , subq_0.created_at__week
+                  , subq_0.created_at__month
+                  , subq_0.created_at__quarter
+                  , subq_0.created_at__year
+                  , subq_0.created_at__extract_year
+                  , subq_0.created_at__extract_quarter
+                  , subq_0.created_at__extract_month
+                  , subq_0.created_at__extract_day
+                  , subq_0.created_at__extract_dow
+                  , subq_0.created_at__extract_doy
+                  , subq_0.listing__ds__day
+                  , subq_0.listing__ds__week
+                  , subq_0.listing__ds__month
+                  , subq_0.listing__ds__quarter
+                  , subq_0.listing__ds__year
+                  , subq_0.listing__ds__extract_year
+                  , subq_0.listing__ds__extract_quarter
+                  , subq_0.listing__ds__extract_month
+                  , subq_0.listing__ds__extract_day
+                  , subq_0.listing__ds__extract_dow
+                  , subq_0.listing__ds__extract_doy
+                  , subq_0.listing__created_at__day
+                  , subq_0.listing__created_at__week
+                  , subq_0.listing__created_at__month
+                  , subq_0.listing__created_at__quarter
+                  , subq_0.listing__created_at__year
+                  , subq_0.listing__created_at__extract_year
+                  , subq_0.listing__created_at__extract_quarter
+                  , subq_0.listing__created_at__extract_month
+                  , subq_0.listing__created_at__extract_day
+                  , subq_0.listing__created_at__extract_dow
+                  , subq_0.listing__created_at__extract_doy
+                  , subq_0.ds__day AS metric_time__day
+                  , subq_0.ds__week AS metric_time__week
+                  , subq_0.ds__month AS metric_time__month
+                  , subq_0.ds__quarter AS metric_time__quarter
+                  , subq_0.ds__year AS metric_time__year
+                  , subq_0.ds__extract_year AS metric_time__extract_year
+                  , subq_0.ds__extract_quarter AS metric_time__extract_quarter
+                  , subq_0.ds__extract_month AS metric_time__extract_month
+                  , subq_0.ds__extract_day AS metric_time__extract_day
+                  , subq_0.ds__extract_dow AS metric_time__extract_dow
+                  , subq_0.ds__extract_doy AS metric_time__extract_doy
+                  , subq_0.listing
+                  , subq_0.user
+                  , subq_0.listing__user
+                  , subq_0.country_latest
+                  , subq_0.is_lux_latest
+                  , subq_0.capacity_latest
+                  , subq_0.listing__country_latest
+                  , subq_0.listing__is_lux_latest
+                  , subq_0.listing__capacity_latest
+                  , subq_0.listings
+                  , subq_0.largest_listing
+                  , subq_0.smallest_listing
                 FROM (
                   -- Read Elements From Semantic Model 'listings_latest'
                   SELECT
@@ -241,16 +241,16 @@ FROM (
                     , listings_latest_src_28000.user_id AS user
                     , listings_latest_src_28000.user_id AS listing__user
                   FROM ***************************.dim_listings_latest listings_latest_src_28000
-                ) subq_2
-              ) subq_3
+                ) subq_0
+              ) subq_1
               WHERE listing__is_lux_latest OR listing__capacity_latest > 4
-            ) subq_4
-          ) subq_5
+            ) subq_2
+          ) subq_3
           LEFT OUTER JOIN (
             -- Pass Only Elements: ['home_state_latest', 'user']
             SELECT
-              subq_6.user
-              , subq_6.home_state_latest
+              subq_4.user
+              , subq_4.home_state_latest
             FROM (
               -- Read Elements From Semantic Model 'users_latest'
               SELECT
@@ -280,15 +280,15 @@ FROM (
                 , users_latest_src_28000.home_state_latest AS user__home_state_latest
                 , users_latest_src_28000.user_id AS user
               FROM ***************************.dim_users_latest users_latest_src_28000
-            ) subq_6
-          ) subq_7
+            ) subq_4
+          ) subq_5
           ON
-            subq_5.user = subq_7.user
-        ) subq_8
-      ) subq_9
+            subq_3.user = subq_5.user
+        ) subq_6
+      ) subq_7
       WHERE listing__is_lux_latest OR listing__capacity_latest > 4
-    ) subq_10
-  ) subq_11
+    ) subq_8
+  ) subq_9
   GROUP BY
     user__home_state_latest
-) subq_12
+) subq_10

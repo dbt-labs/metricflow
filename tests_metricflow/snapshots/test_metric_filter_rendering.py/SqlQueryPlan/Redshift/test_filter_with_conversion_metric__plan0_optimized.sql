@@ -8,8 +8,8 @@ FROM (
   -- Join Standard Outputs
   -- Pass Only Elements: ['listings', 'user__visit_buy_conversion_rate']
   SELECT
-    CAST(subq_72.buys AS DOUBLE PRECISION) / CAST(NULLIF(subq_72.visits, 0) AS DOUBLE PRECISION) AS user__visit_buy_conversion_rate
-    , subq_57.listings AS listings
+    CAST(subq_42.buys AS DOUBLE PRECISION) / CAST(NULLIF(subq_42.visits, 0) AS DOUBLE PRECISION) AS user__visit_buy_conversion_rate
+    , subq_27.listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
@@ -18,17 +18,17 @@ FROM (
       user_id AS user
       , 1 AS listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-  ) subq_57
+  ) subq_27
   LEFT OUTER JOIN (
     -- Combine Aggregated Outputs
     SELECT
-      COALESCE(subq_61.user, subq_71.user) AS user
-      , MAX(subq_61.visits) AS visits
-      , MAX(subq_71.buys) AS buys
+      COALESCE(subq_31.user, subq_41.user) AS user
+      , MAX(subq_31.visits) AS visits
+      , MAX(subq_41.buys) AS buys
     FROM (
       -- Aggregate Measures
       SELECT
-        subq_60.user
+        subq_30.user
         , SUM(visits) AS visits
       FROM (
         -- Read Elements From Semantic Model 'visits_source'
@@ -38,46 +38,46 @@ FROM (
           user_id AS user
           , 1 AS visits
         FROM ***************************.fct_visits visits_source_src_28000
-      ) subq_60
+      ) subq_30
       GROUP BY
-        subq_60.user
-    ) subq_61
+        subq_30.user
+    ) subq_31
     FULL OUTER JOIN (
       -- Find conversions for user within the range of INF
       -- Pass Only Elements: ['buys', 'user']
       -- Aggregate Measures
       SELECT
-        subq_68.user
+        subq_38.user
         , SUM(buys) AS buys
       FROM (
         -- Dedupe the fanout with mf_internal_uuid in the conversion data set
         SELECT DISTINCT
-          FIRST_VALUE(subq_64.visits) OVER (
+          FIRST_VALUE(subq_34.visits) OVER (
             PARTITION BY
-              subq_67.user
-              , subq_67.ds__day
-              , subq_67.mf_internal_uuid
-            ORDER BY subq_64.ds__day DESC
+              subq_37.user
+              , subq_37.ds__day
+              , subq_37.mf_internal_uuid
+            ORDER BY subq_34.ds__day DESC
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
           ) AS visits
-          , FIRST_VALUE(subq_64.ds__day) OVER (
+          , FIRST_VALUE(subq_34.ds__day) OVER (
             PARTITION BY
-              subq_67.user
-              , subq_67.ds__day
-              , subq_67.mf_internal_uuid
-            ORDER BY subq_64.ds__day DESC
+              subq_37.user
+              , subq_37.ds__day
+              , subq_37.mf_internal_uuid
+            ORDER BY subq_34.ds__day DESC
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
           ) AS ds__day
-          , FIRST_VALUE(subq_64.user) OVER (
+          , FIRST_VALUE(subq_34.user) OVER (
             PARTITION BY
-              subq_67.user
-              , subq_67.ds__day
-              , subq_67.mf_internal_uuid
-            ORDER BY subq_64.ds__day DESC
+              subq_37.user
+              , subq_37.ds__day
+              , subq_37.mf_internal_uuid
+            ORDER BY subq_34.ds__day DESC
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
           ) AS user
-          , subq_67.mf_internal_uuid AS mf_internal_uuid
-          , subq_67.buys AS buys
+          , subq_37.mf_internal_uuid AS mf_internal_uuid
+          , subq_37.buys AS buys
         FROM (
           -- Read Elements From Semantic Model 'visits_source'
           -- Metric Time Dimension 'ds'
@@ -87,7 +87,7 @@ FROM (
             , user_id AS user
             , 1 AS visits
           FROM ***************************.fct_visits visits_source_src_28000
-        ) subq_64
+        ) subq_34
         INNER JOIN (
           -- Read Elements From Semantic Model 'buys_source'
           -- Metric Time Dimension 'ds'
@@ -98,23 +98,23 @@ FROM (
             , 1 AS buys
             , CONCAT(CAST(RANDOM()*100000000 AS INT)::VARCHAR,CAST(RANDOM()*100000000 AS INT)::VARCHAR) AS mf_internal_uuid
           FROM ***************************.fct_buys buys_source_src_28000
-        ) subq_67
+        ) subq_37
         ON
           (
-            subq_64.user = subq_67.user
+            subq_34.user = subq_37.user
           ) AND (
-            (subq_64.ds__day <= subq_67.ds__day)
+            (subq_34.ds__day <= subq_37.ds__day)
           )
-      ) subq_68
+      ) subq_38
       GROUP BY
-        subq_68.user
-    ) subq_71
+        subq_38.user
+    ) subq_41
     ON
-      subq_61.user = subq_71.user
+      subq_31.user = subq_41.user
     GROUP BY
-      COALESCE(subq_61.user, subq_71.user)
-  ) subq_72
+      COALESCE(subq_31.user, subq_41.user)
+  ) subq_42
   ON
-    subq_57.user = subq_72.user
-) subq_76
+    subq_27.user = subq_42.user
+) subq_46
 WHERE user__visit_buy_conversion_rate > 2

@@ -12,10 +12,10 @@ FROM (
   FROM (
     -- Join to Time Spine Dataset
     SELECT
-      subq_21.ds AS metric_time__day
-      , subq_19.booking__is_instant AS booking__is_instant
-      , subq_19.bookings AS bookings
-    FROM ***************************.mf_time_spine subq_21
+      subq_17.ds AS metric_time__day
+      , subq_15.booking__is_instant AS booking__is_instant
+      , subq_15.bookings AS bookings
+    FROM ***************************.mf_time_spine subq_17
     LEFT OUTER JOIN (
       -- Constrain Output with WHERE
       -- Aggregate Measures
@@ -38,16 +38,16 @@ FROM (
             , is_instant AS booking__is_instant
             , 1 AS bookings
           FROM ***************************.fct_bookings bookings_source_src_28000
-        ) subq_15
+        ) subq_11
         WHERE booking__is_instant
-      ) subq_17
+      ) subq_13
       WHERE booking__is_instant
       GROUP BY
         metric_time__day
         , booking__is_instant
-    ) subq_19
+    ) subq_15
     ON
-      subq_21.ds = subq_19.metric_time__day
-  ) subq_22
+      subq_17.ds = subq_15.metric_time__day
+  ) subq_18
   WHERE booking__is_instant
-) subq_23
+) subq_19

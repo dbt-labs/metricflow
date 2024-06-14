@@ -6,7 +6,7 @@ FROM (
   -- Join Standard Outputs
   SELECT
     lux_listing_mapping_src_28000.listing_id AS listing
-    , subq_23.listing__bookings AS listing__bookings
+    , subq_15.listing__bookings AS listing__bookings
   FROM ***************************.dim_lux_listing_id_mapping lux_listing_mapping_src_28000
   FULL OUTER JOIN (
     -- Aggregate Measures
@@ -23,13 +23,13 @@ FROM (
         listing_id AS listing
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_20
+    ) subq_12
     GROUP BY
       listing
-  ) subq_23
+  ) subq_15
   ON
-    lux_listing_mapping_src_28000.listing_id = subq_23.listing
-) subq_24
+    lux_listing_mapping_src_28000.listing_id = subq_15.listing
+) subq_16
 WHERE listing__bookings > 2
 GROUP BY
   listing
