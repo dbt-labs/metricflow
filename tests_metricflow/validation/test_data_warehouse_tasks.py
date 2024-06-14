@@ -51,7 +51,7 @@ def test_build_semantic_model_tasks(  # noqa: D103
     assert len(tasks) == len(data_warehouse_validation_model.semantic_models)
 
     tasks = DataWarehouseTaskBuilder.gen_semantic_model_tasks(
-        manifest=data_warehouse_validation_model, filter_by_semantic_models=[]
+        manifest=data_warehouse_validation_model, semantic_model_filters=[]
     )
     assert len(tasks) == 0
 
@@ -123,7 +123,7 @@ def test_build_dimension_tasks(  # noqa: D103
     tasks = DataWarehouseTaskBuilder.gen_dimension_tasks(
         manifest=data_warehouse_validation_model,
         sql_client=sql_client,
-        filter_by_semantic_models=[],
+        semantic_model_filters=[],
     )
     assert len(tasks) == 0
 
@@ -162,7 +162,7 @@ def test_build_entities_tasks(  # noqa: D103
     assert len(tasks[0].on_fail_subtasks) == 1  # a sub task for each entity on the semantic model
 
     tasks = DataWarehouseTaskBuilder.gen_entity_tasks(
-        manifest=data_warehouse_validation_model, sql_client=sql_client, filter_by_semantic_models=[]
+        manifest=data_warehouse_validation_model, sql_client=sql_client, semantic_model_filters=[]
     )
     assert len(tasks) == 0
 
@@ -201,7 +201,7 @@ def test_build_measure_tasks(  # noqa: D103
     assert len(tasks[0].on_fail_subtasks) == 1  # a sub task for each measure on the semantic model
 
     tasks = DataWarehouseTaskBuilder.gen_measure_tasks(
-        manifest=data_warehouse_validation_model, sql_client=sql_client, filter_by_semantic_models=[]
+        manifest=data_warehouse_validation_model, sql_client=sql_client, semantic_model_filters=[]
     )
     assert len(tasks) == 0
 
@@ -253,7 +253,7 @@ def test_build_metric_tasks(  # noqa: D103
     tasks = DataWarehouseTaskBuilder.gen_metric_tasks(
         manifest=data_warehouse_validation_model,
         sql_client=sql_client,
-        filter_by_metrics=[],
+        metric_filters=[],
     )
     assert len(tasks) == 0
 
@@ -305,7 +305,7 @@ def test_build_saved_query_tasks(  # noqa: D103
     assert len(tasks) == 2
 
     tasks = DataWarehouseTaskBuilder.gen_saved_query_tasks(
-        manifest=simple_semantic_manifest, sql_client=sql_client, filter_by_saved_queries=["p0_booking"]
+        manifest=simple_semantic_manifest, sql_client=sql_client, saved_query_filters=["p0_booking"]
     )
     assert len(tasks) == 1
     (query_string, _params) = tasks[0].query_and_params_callable()

@@ -137,12 +137,12 @@ class DataWarehouseTaskBuilder:
 
     @classmethod
     def gen_semantic_model_tasks(
-        cls, manifest: SemanticManifest, filter_by_semantic_models: Optional[Sequence[str]] = None
+        cls, manifest: SemanticManifest, semantic_model_filters: Optional[Sequence[str]] = None
     ) -> List[DataWarehouseValidationTask]:
         """Generates a list of tasks for validating the semantic models of the manifest."""
         tasks: List[DataWarehouseValidationTask] = []
         for semantic_model in manifest.semantic_models:
-            if filter_by_semantic_models is not None and semantic_model.name not in filter_by_semantic_models:
+            if semantic_model_filters is not None and semantic_model.name not in semantic_model_filters:
                 continue
             tasks.append(
                 DataWarehouseValidationTask(
@@ -167,7 +167,7 @@ class DataWarehouseTaskBuilder:
         cls,
         manifest: SemanticManifest,
         sql_client: SqlClient,
-        filter_by_semantic_models: Optional[Sequence[str]] = None,
+        semantic_model_filters: Optional[Sequence[str]] = None,
     ) -> List[DataWarehouseValidationTask]:
         """Generates a list of tasks for validating the dimensions of the manifest.
 
@@ -184,7 +184,7 @@ class DataWarehouseTaskBuilder:
             if not semantic_model.dimensions:
                 continue
 
-            if filter_by_semantic_models is not None and semantic_model.name not in filter_by_semantic_models:
+            if semantic_model_filters is not None and semantic_model.name not in semantic_model_filters:
                 continue
 
             source_node = cls._semantic_model_nodes(render_tools=render_tools, semantic_model=semantic_model)[0]
@@ -272,7 +272,7 @@ class DataWarehouseTaskBuilder:
         cls,
         manifest: SemanticManifest,
         sql_client: SqlClient,
-        filter_by_semantic_models: Optional[Sequence[str]] = None,
+        semantic_model_filters: Optional[Sequence[str]] = None,
     ) -> List[DataWarehouseValidationTask]:
         """Generates a list of tasks for validating the entities of the manifest.
 
@@ -288,7 +288,7 @@ class DataWarehouseTaskBuilder:
         for semantic_model in manifest.semantic_models:
             if not semantic_model.entities:
                 continue
-            if filter_by_semantic_models is not None and semantic_model.name not in filter_by_semantic_models:
+            if semantic_model_filters is not None and semantic_model.name not in semantic_model_filters:
                 continue
 
             source_node = cls._semantic_model_nodes(render_tools=render_tools, semantic_model=semantic_model)[0]
@@ -352,7 +352,7 @@ class DataWarehouseTaskBuilder:
         cls,
         manifest: SemanticManifest,
         sql_client: SqlClient,
-        filter_by_semantic_models: Optional[Sequence[str]] = None,
+        semantic_model_filters: Optional[Sequence[str]] = None,
     ) -> List[DataWarehouseValidationTask]:
         """Generates a list of tasks for validating the measures of the manifest.
 
@@ -369,7 +369,7 @@ class DataWarehouseTaskBuilder:
             if not semantic_model.measures:
                 continue
 
-            if filter_by_semantic_models is not None and semantic_model.name not in filter_by_semantic_models:
+            if semantic_model_filters is not None and semantic_model.name not in semantic_model_filters:
                 continue
 
             source_nodes = cls._semantic_model_nodes(render_tools=render_tools, semantic_model=semantic_model)
@@ -456,7 +456,7 @@ class DataWarehouseTaskBuilder:
         cls,
         manifest: SemanticManifest,
         sql_client: SqlClient,
-        filter_by_metrics: Optional[Sequence[str]] = None,
+        metric_filters: Optional[Sequence[str]] = None,
     ) -> List[DataWarehouseValidationTask]:
         """Generates a list of tasks for validating the metrics of the manifest."""
         mf_engine = MetricFlowEngine(
@@ -465,7 +465,7 @@ class DataWarehouseTaskBuilder:
         )
         tasks: List[DataWarehouseValidationTask] = []
         for metric in manifest.metrics:
-            if filter_by_metrics is not None and metric.name not in filter_by_metrics:
+            if metric_filters is not None and metric.name not in metric_filters:
                 continue
             tasks.append(
                 DataWarehouseValidationTask(
@@ -490,7 +490,7 @@ class DataWarehouseTaskBuilder:
         cls,
         manifest: SemanticManifest,
         sql_client: SqlClient,
-        filter_by_saved_queries: Optional[Sequence[str]] = None,
+        saved_query_filters: Optional[Sequence[str]] = None,
     ) -> List[DataWarehouseValidationTask]:
         """Generates a list of tasks for validating the saved queries of the manifest."""
         mf_engine = MetricFlowEngine(
@@ -499,7 +499,7 @@ class DataWarehouseTaskBuilder:
         )
         tasks: List[DataWarehouseValidationTask] = []
         for saved_query in manifest.saved_queries:
-            if filter_by_saved_queries is not None and saved_query.name not in filter_by_saved_queries:
+            if saved_query_filters is not None and saved_query.name not in saved_query_filters:
                 continue
             tasks.append(
                 DataWarehouseValidationTask(
