@@ -186,7 +186,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
                     f"For {node.ui_description}:\n"
                     + indent(
                         "After applying patterns:\n"
-                        + indent(mf_pformat(patterns_to_apply))
+                        + indent(mf_pformat(patterns_to_apply + self._source_spec_patterns))
                         + "\n"
                         + "to inputs, matches are:\n"
                         + indent(mf_pformat(matching_items.specs))
