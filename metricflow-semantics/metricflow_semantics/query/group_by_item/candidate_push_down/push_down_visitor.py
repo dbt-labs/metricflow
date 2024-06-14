@@ -177,9 +177,8 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
             else:
                 assert_values_exhausted(metric.type)
 
-            matching_items = items_available_for_measure.filter_by_spec_patterns(
-                patterns_to_apply + self._source_spec_patterns
-            )
+            patterns_to_apply += self._source_spec_patterns
+            matching_items = items_available_for_measure.filter_by_spec_patterns(patterns_to_apply)
 
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(
