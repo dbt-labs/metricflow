@@ -4,13 +4,10 @@ from typing import Sequence, Set
 
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
-from metricflow_semantics.specs.spec_classes import LinkableInstanceSpec, MetricSpec, TimeDimensionSpec
+from metricflow_semantics.specs.spec_classes import InstanceSpec, LinkableInstanceSpec, MetricSpec, TimeDimensionSpec
 from metricflow_semantics.visitor import VisitorOutputT
 
-from metricflow.dataflow.dataflow_plan import (
-    DataflowPlanNode,
-    DataflowPlanNodeVisitor,
-)
+from metricflow.dataflow.dataflow_plan import DataflowPlanNode, DataflowPlanNodeVisitor
 from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
 
 
@@ -25,7 +22,7 @@ class WindowReaggregationNode(DataflowPlanNode):
         parent_node: ComputeMetricsNode,
         metric_spec: MetricSpec,
         order_by_spec: TimeDimensionSpec,
-        partition_by_specs: Sequence[TimeDimensionSpec],
+        partition_by_specs: Sequence[InstanceSpec],
     ) -> None:
         if order_by_spec in partition_by_specs:
             raise ValueError(
