@@ -2,8 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Dict, Optional, Sequence
 
+from metricflow_semantics.dag.id_prefix import StaticIdPrefix
+from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
 from metricflow_semantics.mf_logging.runtime import log_block_runtime
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
+from typing_extensions import override
 
 from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,
@@ -93,3 +96,11 @@ class DataflowPlanNodeOutputDataSetResolver(DataflowToSqlQueryPlanConverter):
             semantic_manifest_lookup=self._semantic_manifest_lookup,
             _node_to_output_data_set=dict(self._node_to_output_data_set),
         )
+
+    @override
+    def _next_unique_table_alias(self) -> str:
+        """Return the next unique table alias to use in generating queries.
+
+        This uses a separate prefix in order to minimize subquery ID thrash.
+        """
+        return SequentialIdGenerator.create_next_id(StaticIdPrefix.NODE_RESOLVER_SUB_QUERY).str_value
