@@ -412,3 +412,183 @@ integration_test:
     WHERE {{ render_time_constraint("a.ds", "2020-03-05", "2021-01-04") }}
     GROUP BY a.ds
     ORDER BY a.ds
+---
+integration_test:
+  name: all_time_metric_with_non_default_grains
+  description: Query a cumulative all-time metric with non-default grains
+  model: SIMPLE_MODEL
+  metrics: ["revenue_all_time"]
+  group_bys: ["metric_time__week", "metric_time__quarter"]
+  check_query: |
+    SELECT
+      metric_time__week
+      , metric_time__quarter
+      , revenue_all_time
+    FROM (
+      SELECT
+        metric_time__week
+        , metric_time__quarter
+        , FIRST_VALUE(revenue_all_time) OVER (
+          PARTITION BY metric_time__week, metric_time__quarter
+          ORDER BY metric_time__day
+          ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+        ) AS revenue_all_time
+      FROM (
+        SELECT
+          t.ds AS metric_time__day
+          , {{ render_date_trunc("T.ds", TimeGranularity.WEEK) }} AS metric_time__week
+          , {{ render_date_trunc("t.ds", TimeGranularity.QUARTER) }} AS metric_time__quarter
+          , SUM(r.revenue) AS revenue_all_time
+        FROM {{ source_schema }}.mf_time_spine t
+        INNER JOIN {{ source_schema }}.fct_revenue r ON {{ render_date_trunc("r.created_at", TimeGranularity.DAY) }} <= t.ds
+        GROUP BY
+          t.ds
+          , {{ render_date_trunc("t.ds", TimeGranularity.WEEK) }}
+          , {{ render_date_trunc("t.ds", TimeGranularity.QUARTER) }}
+      ) subq_7
+    ) subq_8
+    GROUP BY
+      metric_time__week
+      , metric_time__quarter
+      , revenue_all_time
+---
+integration_test:
+  name: window_metric_with_non_default_grains
+  description: Query a cumulative window metric with non-default grains
+  model: SIMPLE_MODEL
+  metrics: ["trailing_2_months_revenue"]
+  group_bys: ["metric_time__week", "revenue_instance__ds__month"]
+  check_query: |
+    SELECT
+      revenue_instance__ds__month
+      , metric_time__week
+      , trailing_2_months_revenue
+    FROM (
+      SELECT
+        revenue_instance__ds__month
+        , metric_time__week
+        , FIRST_VALUE(trailing_2_months_revenue) OVER (
+          PARTITION BY revenue_instance__ds__month, metric_time__week
+          ORDER BY metric_time__day
+          ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+        ) AS trailing_2_months_revenue
+      FROM (
+        SELECT
+          {{ render_date_trunc("t.ds", TimeGranularity.MONTH) }} AS revenue_instance__ds__month
+          , t.ds AS metric_time__day
+          , {{ render_date_trunc("t.ds", TimeGranularity.WEEK) }} AS metric_time__week
+          , SUM(r.revenue) AS trailing_2_months_revenue
+        FROM {{ source_schema }}.mf_time_spine t
+        INNER JOIN {{ source_schema }}.fct_revenue r
+        ON
+          (
+            {{ render_date_trunc("r.created_at", TimeGranularity.DAY) }} <= t.ds
+          ) AND (
+            {{ render_date_trunc("r.created_at", TimeGranularity.DAY) }} > {{ render_date_sub("t", "ds", 2, TimeGranularity.MONTH) }}
+          )
+        GROUP BY
+          {{ render_date_trunc("t.ds", TimeGranularity.MONTH) }}
+          , t.ds
+          , {{ render_date_trunc("t.ds", TimeGranularity.WEEK) }}
+      ) subq_7
+    ) subq_8
+    GROUP BY
+      revenue_instance__ds__month
+      , metric_time__week
+      , trailing_2_months_revenue
+---
+integration_test:
+  name: grain_to_date_metric_with_non_default_grains
+  description: Query a cumulative grain to date metric with non-default grains
+  model: SIMPLE_MODEL
+  metrics: ["revenue_mtd"]
+  group_bys: ["revenue_instance__ds__quarter", "revenue_instance__ds__year"]
+  check_query: |
+    SELECT
+      revenue_instance__ds__quarter
+      , revenue_instance__ds__year
+      , revenue_mtd
+    FROM (
+      SELECT
+        revenue_instance__ds__quarter
+        , revenue_instance__ds__year
+        , FIRST_VALUE(revenue_mtd) OVER (
+          PARTITION BY revenue_instance__ds__quarter, revenue_instance__ds__year
+          ORDER BY metric_time__day
+          ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+        ) AS revenue_mtd
+      FROM (
+        SELECT
+          {{ render_date_trunc("t.ds", TimeGranularity.QUARTER) }} AS revenue_instance__ds__quarter
+          , {{ render_date_trunc("t.ds", TimeGranularity.YEAR) }} AS revenue_instance__ds__year
+          , t.ds AS metric_time__day
+          , SUM(r.revenue) AS revenue_mtd
+        FROM {{ source_schema }}.mf_time_spine t
+        INNER JOIN {{ source_schema }}.fct_revenue r
+        ON
+          (
+            {{ render_date_trunc("r.created_at", TimeGranularity.DAY) }} <= t.ds
+          ) AND (
+            {{ render_date_trunc("r.created_at", TimeGranularity.DAY) }} >= {{ render_date_trunc("t.ds", TimeGranularity.MONTH) }}
+          )
+        GROUP BY
+          {{ render_date_trunc("t.ds", TimeGranularity.QUARTER) }}
+          , {{ render_date_trunc("t.ds", TimeGranularity.YEAR) }}
+          , t.ds
+      ) subq_7
+    ) subq_8
+    GROUP BY
+      revenue_instance__ds__quarter
+      , revenue_instance__ds__year
+      , revenue_mtd
+---
+integration_test:
+  name: derived_cumulative_metric_with_non_default_grains
+  description: Query a derived cumulative metric with non-default grains
+  model: SIMPLE_MODEL
+  metrics: ["trailing_2_months_revenue_sub_10"]
+  group_bys: ["metric_time__month", "metric_time__year"]
+  check_query: |
+    SELECT
+      metric_time__month
+      , metric_time__year
+      , t2mr - 10 AS trailing_2_months_revenue_sub_10
+    FROM (
+      SELECT
+        metric_time__month
+        , metric_time__year
+        , t2mr
+      FROM (
+        SELECT
+          metric_time__month
+          , metric_time__year
+          , FIRST_VALUE(t2mr) OVER (
+            PARTITION BY metric_time__month, metric_time__year
+            ORDER BY metric_time__day
+            ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+          ) AS t2mr
+        FROM (
+          SELECT
+            t.ds AS metric_time__day
+            , {{ render_date_trunc("t.ds", TimeGranularity.MONTH) }} AS metric_time__month
+            , {{ render_date_trunc("t.ds", TimeGranularity.YEAR) }} AS metric_time__year
+            , SUM(r.revenue) AS t2mr
+          FROM {{ source_schema }}.mf_time_spine t
+          INNER JOIN {{ source_schema }}.fct_revenue r
+          ON
+            (
+              {{ render_date_trunc("r.created_at", TimeGranularity.DAY) }} <= t.ds
+            ) AND (
+              {{ render_date_trunc("r.created_at", TimeGranularity.DAY) }} > {{ render_date_sub("t", "ds", 2, TimeGranularity.MONTH) }}
+            )
+          GROUP BY
+            t.ds
+            , {{ render_date_trunc("t.ds", TimeGranularity.MONTH) }}
+            , {{ render_date_trunc("t.ds", TimeGranularity.YEAR) }}
+        ) subq_7
+      ) subq_8
+      GROUP BY
+        metric_time__month
+        , metric_time__year
+        , t2mr
+    ) subq_9
