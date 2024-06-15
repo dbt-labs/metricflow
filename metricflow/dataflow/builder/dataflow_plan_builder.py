@@ -188,7 +188,9 @@ class DataflowPlanBuilder:
         )
 
         predicate_pushdown_state = PredicatePushdownState(
-            time_range_constraint=query_spec.time_range_constraint, where_filter_specs=query_level_filter_specs
+            time_range_constraint=query_spec.time_range_constraint,
+            where_filter_specs=(),
+            pushdown_enabled_types=frozenset({PredicateInputType.TIME_RANGE_CONSTRAINT}),
         )
 
         return self._build_metrics_output_node(
@@ -521,12 +523,6 @@ class DataflowPlanBuilder:
             ),
             descendent_filter_specs=metric_spec.filter_specs,
         )
-        if predicate_pushdown_state.where_filter_pushdown_enabled:
-            predicate_pushdown_state = PredicatePushdownState.with_additional_where_filter_specs(
-                original_pushdown_state=predicate_pushdown_state,
-                additional_where_filter_specs=metric_input_measure_spec.filter_specs,
-            )
-
         logger.info(
             f"For\n{indent(mf_pformat(metric_spec))}"
             f"\nneeded measure is:"
