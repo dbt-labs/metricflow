@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional, Tuple
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
+from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
 from dbt_semantic_interfaces.protocols import WhereFilterIntersection
 
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
@@ -31,7 +32,9 @@ class MetricFlowQuerySpec(SerializableDataclass):
     order_by_specs: Tuple[OrderBySpec, ...] = ()
     time_range_constraint: Optional[TimeRangeConstraint] = None
     limit: Optional[int] = None
-    filter_intersection: Optional[WhereFilterIntersection] = None
+    filter_intersection: WhereFilterIntersection = field(
+        default_factory=lambda: PydanticWhereFilterIntersection(where_filters=[])
+    )
     filter_spec_resolution_lookup: FilterSpecResolutionLookUp = FilterSpecResolutionLookUp.empty_instance()
     min_max_only: bool = False
     apply_group_by: bool = True
