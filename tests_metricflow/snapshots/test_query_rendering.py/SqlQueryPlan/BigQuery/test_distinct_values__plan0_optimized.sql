@@ -4,11 +4,17 @@
 SELECT
   listing__country_latest
 FROM (
-  -- Read Elements From Semantic Model 'listings_latest'
+  -- Constrain Output with WHERE
   SELECT
-    country AS listing__country_latest
-  FROM ***************************.dim_listings_latest listings_latest_src_28000
-) subq_3
+    listing__country_latest
+  FROM (
+    -- Read Elements From Semantic Model 'listings_latest'
+    SELECT
+      country AS listing__country_latest
+    FROM ***************************.dim_listings_latest listings_latest_src_28000
+  ) subq_3
+  WHERE listing__country_latest = 'us'
+) subq_4
 WHERE listing__country_latest = 'us'
 GROUP BY
   listing__country_latest

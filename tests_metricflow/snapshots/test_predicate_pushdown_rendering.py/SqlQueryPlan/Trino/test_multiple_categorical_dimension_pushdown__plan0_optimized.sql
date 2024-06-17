@@ -9,15 +9,15 @@ FROM (
   -- Join Standard Outputs
   -- Pass Only Elements: ['listings', 'user__home_state_latest', 'listing__is_lux_latest', 'listing__capacity_latest']
   SELECT
-    subq_14.listing__is_lux_latest AS listing__is_lux_latest
-    , subq_14.listing__capacity_latest AS listing__capacity_latest
+    subq_13.listing__is_lux_latest AS listing__is_lux_latest
+    , subq_13.listing__capacity_latest AS listing__capacity_latest
     , users_latest_src_28000.home_state_latest AS user__home_state_latest
-    , subq_14.listings AS listings
+    , subq_13.listings AS listings
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['listings', 'listing__is_lux_latest', 'listing__capacity_latest', 'user']
     SELECT
-      subq_12.user
+      subq_11.user
       , listing__is_lux_latest
       , listing__capacity_latest
       , listings
@@ -30,14 +30,14 @@ FROM (
         , capacity AS listing__capacity_latest
         , 1 AS listings
       FROM ***************************.dim_listings_latest listings_latest_src_28000
-    ) subq_12
+    ) subq_11
     WHERE listing__is_lux_latest OR listing__capacity_latest > 4
-  ) subq_14
+  ) subq_13
   LEFT OUTER JOIN
     ***************************.dim_users_latest users_latest_src_28000
   ON
-    subq_14.user = users_latest_src_28000.user_id
-) subq_18
+    subq_13.user = users_latest_src_28000.user_id
+) subq_17
 WHERE listing__is_lux_latest OR listing__capacity_latest > 4
 GROUP BY
   user__home_state_latest
