@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Move categorical dimension predicate pushdown to DataflowPlanOptimizer
+time: 2024-06-17T11:07:49.619225-07:00
+custom:
+    Author: tlento
+    Issue: "1011"
