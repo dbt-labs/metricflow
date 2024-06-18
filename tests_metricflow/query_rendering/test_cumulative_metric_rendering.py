@@ -317,3 +317,102 @@ def test_cumulative_metric_with_agg_time_dimension(
         sql_client=sql_client,
         node=dataflow_plan.sink_node,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_cumulative_metric_with_multiple_agg_time_dimensions(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
+    sql_client: SqlClient,
+) -> None:
+    """Tests rendering a query for a cumulative metric queried with multiple agg time dimensions."""
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="trailing_2_months_revenue"),),
+            dimension_specs=(),
+            time_dimension_specs=(
+                TimeDimensionSpec(
+                    element_name="ds",
+                    entity_links=(EntityReference("revenue_instance"),),
+                    time_granularity=TimeGranularity.DAY,
+                ),
+                TimeDimensionSpec(
+                    element_name="ds",
+                    entity_links=(EntityReference("revenue_instance"),),
+                    time_granularity=TimeGranularity.MONTH,
+                ),
+            ),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_cumulative_metric_with_multiple_metric_time_dimensions(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
+    sql_client: SqlClient,
+) -> None:
+    """Tests rendering a query for a cumulative metric queried with multiple metric time dimensions."""
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="trailing_2_months_revenue"),),
+            dimension_specs=(),
+            time_dimension_specs=(MTD_SPEC_DAY, MTD_SPEC_MONTH),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_node,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_cumulative_metric_with_agg_time_and_metric_time(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
+    sql_client: SqlClient,
+) -> None:
+    """Tests rendering a query for a cumulative metric queried with one agg time dimension and one metric time dimension."""
+    dataflow_plan = dataflow_plan_builder.build_plan(
+        MetricFlowQuerySpec(
+            metric_specs=(MetricSpec(element_name="trailing_2_months_revenue"),),
+            dimension_specs=(),
+            time_dimension_specs=(
+                MTD_SPEC_DAY,
+                TimeDimensionSpec(
+                    element_name="ds",
+                    entity_links=(EntityReference("revenue_instance"),),
+                    time_granularity=TimeGranularity.MONTH,
+                ),
+            ),
+        )
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_node,
+    )

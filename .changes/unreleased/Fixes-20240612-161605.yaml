@@ -1,0 +1,7 @@
+kind: Fixes
+body: When querying multiple agg time or metric time dimensions with a cumulative
+  metric, select all of them from the time spine table.
+time: 2024-06-12T16:16:05.678697-07:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1271"
