@@ -4,7 +4,7 @@ from typing import Sequence, Set
 
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
-from metricflow_semantics.specs.spec_classes import LinkableInstanceSpec, MetricSpec, TimeDimensionSpec
+from metricflow_semantics.specs.spec_classes import LinkableInstanceSpec, MetricSpec, TimeDimensionSpec, InstanceSpec
 from metricflow_semantics.visitor import VisitorOutputT
 
 from metricflow.dataflow.dataflow_plan import (
@@ -25,7 +25,7 @@ class WindowReaggregationNode(DataflowPlanNode):
         parent_node: ComputeMetricsNode,
         metric_spec: MetricSpec,
         order_by_spec: TimeDimensionSpec,
-        partition_by_specs: Sequence[TimeDimensionSpec],
+        partition_by_specs: Sequence[InstanceSpec],
     ) -> None:
         if order_by_spec in partition_by_specs:
             raise ValueError(
@@ -70,7 +70,7 @@ class WindowReaggregationNode(DataflowPlanNode):
         )
 
     def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> WindowReaggregationNode:  # noqa: D102
-        assert len(new_parent_nodes) == 1
+        assert len(new_parent_nodes) == 1, "WindowReaggregationNode cannot accept multiple parents."
         new_parent_node = new_parent_nodes[0]
         assert isinstance(
             new_parent_node, ComputeMetricsNode
