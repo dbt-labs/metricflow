@@ -1687,7 +1687,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             metric_select_column,
         )
         subquery = SqlSelectStatementNode(
-            description="",  # description included in outer query
+            description="Window Function for Metric Re-aggregation",
             select_columns=subquery_select_columns,
             from_source=from_data_set.checked_sql_select_node,
             from_source_alias=parent_data_set_alias,
@@ -1700,7 +1700,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         return SqlDataSet(
             instance_set=output_instance_set,
             sql_select_node=SqlSelectStatementNode(
-                description=node.description,
+                description="Re-aggregate Metric via Group By",
                 select_columns=outer_query_select_columns,
                 from_source=subquery,
                 from_source_alias=subquery_alias,
