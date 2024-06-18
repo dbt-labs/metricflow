@@ -4,4 +4,5 @@ metric:
   type: cumulative
   type_params:
     measure: bookings
-    window: 7 days
+    cumulative_type_params:
+      window: 7 days
