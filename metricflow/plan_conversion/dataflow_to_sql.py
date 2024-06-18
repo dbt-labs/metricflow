@@ -1625,10 +1625,9 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         for instance in parent_instance_set.as_tuple:
             if instance.spec == node.metric_spec:
                 metric_instance = instance
-                continue
-            if instance.spec == node.order_by_spec:
+            elif instance.spec == node.order_by_spec:
                 order_by_instance = instance
-            if instance.spec in node.partition_by_specs:
+            elif instance.spec in node.partition_by_specs:
                 partition_by_instances += (instance,)
         expected_specs: Set[InstanceSpec] = {node.metric_spec, node.order_by_spec}.union(node.partition_by_specs)
         assert metric_instance and order_by_instance and partition_by_instances, (
