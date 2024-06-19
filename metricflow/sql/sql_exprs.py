@@ -70,6 +70,11 @@ class SqlExpressionNode(DagNode, Visitable, ABC):
         """If this is a string expression, return self."""
         return None
 
+    @property
+    def as_window_function_expression(self) -> Optional[SqlWindowFunctionExpression]:
+        """If this is a window function expression, return self."""
+        return None
+
     @abstractmethod
     def rewrite(
         self,
@@ -1091,6 +1096,10 @@ class SqlWindowFunctionExpression(SqlFunctionExpression):
         return SqlExpressionTreeLineage.combine(
             tuple(x.lineage for x in self.parent_nodes) + (SqlExpressionTreeLineage(function_exprs=(self,)),)
         )
+
+    @property
+    def as_window_function_expression(self) -> Optional[SqlWindowFunctionExpression]:  # noqa: D102
+        return self
 
     def matches(self, other: SqlExpressionNode) -> bool:  # noqa: D102
         if not isinstance(other, SqlWindowFunctionExpression):
