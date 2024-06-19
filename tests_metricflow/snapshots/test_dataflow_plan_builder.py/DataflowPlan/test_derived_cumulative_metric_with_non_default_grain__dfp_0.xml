@@ -1,0 +1,56 @@
+<DataflowPlan>
+    <WriteToResultDataTableNode>
+        <!-- description = 'Write to DataTable' -->
+        <!-- node_id = NodeId(id_str='wrd_0') -->
+        <ComputeMetricsNode>
+            <!-- description = 'Compute Metrics via Expressions' -->
+            <!-- node_id = NodeId(id_str='cm_1') -->
+            <!-- metric_spec = MetricSpec(element_name='trailing_2_months_revenue_sub_10') -->
+            <WindowReaggregationNode>
+                <!-- description = 'Re-aggregate Metrics via Window Functions' -->
+                <!-- node_id = NodeId(id_str='wr_0') -->
+                <!-- metric_spec = MetricSpec(element_name='trailing_2_months_revenue', alias='t2mr') -->
+                <!-- order_by_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
+                <!-- partition_by_specs = (TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH),) -->
+                <ComputeMetricsNode>
+                    <!-- description = 'Compute Metrics via Expressions' -->
+                    <!-- node_id = NodeId(id_str='cm_0') -->
+                    <!-- metric_spec = MetricSpec(element_name='trailing_2_months_revenue', alias='t2mr') -->
+                    <AggregateMeasuresNode>
+                        <!-- description = 'Aggregate Measures' -->
+                        <!-- node_id = NodeId(id_str='am_0') -->
+                        <FilterElementsNode>
+                            <!-- description =                                                                     -->
+                            <!--   "Pass Only Elements: ['txn_revenue', 'metric_time__month', 'metric_time__day']" -->
+                            <!-- node_id = NodeId(id_str='pfe_0') -->
+                            <!-- include_spec = MeasureSpec(element_name='txn_revenue') -->
+                            <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH) -->
+                            <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
+                            <!-- distinct = False -->
+                            <JoinOverTimeRangeNode>
+                                <!-- description = 'Join Self Over Time Range' -->
+                                <!-- node_id = NodeId(id_str='jotr_0') -->
+                                <!-- queried_agg_time_dimension_specs =                                         -->
+                                <!--   (                                                                        -->
+                                <!--     TimeDimensionSpec(element_name='metric_time', time_granularity=MONTH), -->
+                                <!--     TimeDimensionSpec(element_name='metric_time', time_granularity=DAY),   -->
+                                <!--   )                                                                        -->
+                                <!-- window = PydanticMetricTimeWindow(count=2, granularity=MONTH) -->
+                                <MetricTimeDimensionTransformNode>
+                                    <!-- description = "Metric Time Dimension 'ds'" -->
+                                    <!-- node_id = NodeId(id_str='sma_28007') -->
+                                    <!-- aggregation_time_dimension = 'ds' -->
+                                    <ReadSqlSourceNode>
+                                        <!-- description = "Read From SemanticModelDataSet('revenue')" -->
+                                        <!-- node_id = NodeId(id_str='rss_28020') -->
+                                        <!-- data_set = SemanticModelDataSet('revenue') -->
+                                    </ReadSqlSourceNode>
+                                </MetricTimeDimensionTransformNode>
+                            </JoinOverTimeRangeNode>
+                        </FilterElementsNode>
+                    </AggregateMeasuresNode>
+                </ComputeMetricsNode>
+            </WindowReaggregationNode>
+        </ComputeMetricsNode>
+    </WriteToResultDataTableNode>
+</DataflowPlan>
