@@ -1,9 +1,10 @@
--- Re-aggregate Metrics via Window Functions
+-- Re-aggregate Metric via Group By
 SELECT
   revenue_instance__ds__quarter
   , revenue_instance__ds__year
   , revenue_mtd
 FROM (
+  -- Window Function for Metric Re-aggregation
   SELECT
     revenue_instance__ds__quarter
     , revenue_instance__ds__year

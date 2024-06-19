@@ -1,9 +1,10 @@
--- Re-aggregate Metrics via Window Functions
+-- Re-aggregate Metric via Group By
 SELECT
   subq_8.revenue_instance__ds__quarter
   , subq_8.revenue_instance__ds__year
   , subq_8.revenue_mtd
 FROM (
+  -- Window Function for Metric Re-aggregation
   SELECT
     subq_7.revenue_instance__ds__quarter
     , subq_7.revenue_instance__ds__year

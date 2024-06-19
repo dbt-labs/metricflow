@@ -1,8 +1,9 @@
--- Re-aggregate Metrics via Window Functions
+-- Re-aggregate Metric via Group By
 SELECT
   metric_time__month
   , revenue_mtd
 FROM (
+  -- Window Function for Metric Re-aggregation
   SELECT
     metric_time__month
     , FIRST_VALUE(revenue_mtd) OVER (

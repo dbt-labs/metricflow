@@ -1,10 +1,11 @@
--- Re-aggregate Metrics via Window Functions
+-- Re-aggregate Metric via Group By
 SELECT
   metric_time__week
   , booking__ds__month
   , every_two_days_bookers_fill_nulls_with_0
 FROM (
   -- Compute Metrics via Expressions
+  -- Window Function for Metric Re-aggregation
   SELECT
     metric_time__week
     , booking__ds__month

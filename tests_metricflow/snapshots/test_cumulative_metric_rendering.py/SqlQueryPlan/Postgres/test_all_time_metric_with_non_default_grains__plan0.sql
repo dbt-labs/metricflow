@@ -1,9 +1,10 @@
--- Re-aggregate Metrics via Window Functions
+-- Re-aggregate Metric via Group By
 SELECT
   subq_8.metric_time__week
   , subq_8.metric_time__quarter
   , subq_8.revenue_all_time
 FROM (
+  -- Window Function for Metric Re-aggregation
   SELECT
     subq_7.metric_time__week
     , subq_7.metric_time__quarter

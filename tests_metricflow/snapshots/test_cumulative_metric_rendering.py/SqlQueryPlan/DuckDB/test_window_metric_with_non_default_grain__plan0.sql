@@ -1,8 +1,9 @@
--- Re-aggregate Metrics via Window Functions
+-- Re-aggregate Metric via Group By
 SELECT
   subq_8.metric_time__year
   , subq_8.trailing_2_months_revenue
 FROM (
+  -- Window Function for Metric Re-aggregation
   SELECT
     subq_7.metric_time__year
     , FIRST_VALUE(subq_7.trailing_2_months_revenue) OVER (

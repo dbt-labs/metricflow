@@ -3,11 +3,12 @@ SELECT
   subq_9.metric_time__week
   , t2mr - 10 AS trailing_2_months_revenue_sub_10
 FROM (
-  -- Re-aggregate Metrics via Window Functions
+  -- Re-aggregate Metric via Group By
   SELECT
     subq_8.metric_time__week
     , subq_8.t2mr
   FROM (
+    -- Window Function for Metric Re-aggregation
     SELECT
       subq_7.metric_time__week
       , FIRST_VALUE(subq_7.t2mr) OVER (
