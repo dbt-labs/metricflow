@@ -79,6 +79,7 @@ from metricflow.dataflow.nodes.min_max import MinMaxNode
 from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
 from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
 from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
+from metricflow.dataflow.nodes.window_reaggregation_node import WindowReaggregationNode
 from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTableNode
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOptimizer
@@ -411,6 +412,57 @@ class DataflowPlanBuilder:
             aggregated_to_elements=set(queried_linkable_specs.as_tuple),
         )
 
+    def _build_cumulative_metric_output_node(
+        self,
+        metric_spec: MetricSpec,
+        queried_linkable_specs: LinkableSpecSet,
+        filter_spec_factory: WhereSpecFactory,
+        predicate_pushdown_state: PredicatePushdownState,
+        for_group_by_source_node: bool = False,
+    ) -> DataflowPlanNode:
+        # TODO: replace with default_grain once added to YAML spec
+        default_granularity = self._metric_lookup.get_min_queryable_time_granularity(metric_spec.reference)
+
+        queried_agg_time_dimensions = queried_linkable_specs.included_agg_time_dimension_specs_for_metric(
+            metric_reference=metric_spec.reference, metric_lookup=self._metric_lookup
+        )
+        query_includes_agg_time_dimension_with_default_granularity = False
+        for time_dimension_spec in queried_agg_time_dimensions:
+            if time_dimension_spec.time_granularity == default_granularity:
+                query_includes_agg_time_dimension_with_default_granularity = True
+                break
+
+        if query_includes_agg_time_dimension_with_default_granularity or not queried_agg_time_dimensions:
+            return self._build_base_metric_output_node(
+                metric_spec=metric_spec,
+                queried_linkable_specs=queried_linkable_specs,
+                filter_spec_factory=filter_spec_factory,
+                predicate_pushdown_state=predicate_pushdown_state,
+                for_group_by_source_node=for_group_by_source_node,
+            )
+
+        # If a cumulative metric is queried without default granularity, it will need to be aggregated twice -
+        # once as a normal metric, and again using a window function to narrow down to one row per granularity period.
+        # In this case, add metric time at the default granularity to the linkable specs. It will be used in the order by
+        # clause of the window function and later excluded from the output selections.
+        default_metric_time = DataSet.metric_time_dimension_spec(default_granularity)
+        include_linkable_specs = queried_linkable_specs.merge(
+            LinkableSpecSet(time_dimension_specs=(default_metric_time,))
+        )
+        compute_metrics_node = self._build_base_metric_output_node(
+            metric_spec=metric_spec,
+            queried_linkable_specs=include_linkable_specs,
+            filter_spec_factory=filter_spec_factory,
+            predicate_pushdown_state=predicate_pushdown_state,
+            for_group_by_source_node=for_group_by_source_node,
+        )
+        return WindowReaggregationNode(
+            parent_node=compute_metrics_node,
+            metric_spec=metric_spec,
+            order_by_spec=default_metric_time,
+            partition_by_specs=queried_linkable_specs.as_tuple,
+        )
+
     def _build_base_metric_output_node(
         self,
         metric_spec: MetricSpec,
@@ -585,8 +637,17 @@ class DataflowPlanBuilder:
         """Builds a node to compute a metric of any type."""
         metric = self._metric_lookup.get_metric(metric_spec.reference)
 
-        if metric.type is MetricType.SIMPLE or metric.type is MetricType.CUMULATIVE:
+        if metric.type is MetricType.SIMPLE:
             return self._build_base_metric_output_node(
+                metric_spec=metric_spec,
+                queried_linkable_specs=queried_linkable_specs,
+                filter_spec_factory=filter_spec_factory,
+                predicate_pushdown_state=predicate_pushdown_state,
+                for_group_by_source_node=for_group_by_source_node,
+            )
+
+        elif metric.type is MetricType.CUMULATIVE:
+            return self._build_cumulative_metric_output_node(
                 metric_spec=metric_spec,
                 queried_linkable_specs=queried_linkable_specs,
                 filter_spec_factory=filter_spec_factory,
@@ -1351,7 +1412,7 @@ class DataflowPlanBuilder:
             measure_reference=measure_spec.reference, semantic_model_lookup=self._semantic_model_lookup
         )
 
-        # If a cumulative metric is queried with metric_time, join over time range.
+        # If a cumulative metric is queried with metric_time / agg_time_dimension, join over time range.
         # Otherwise, the measure will be aggregated over all time.
         time_range_node: Optional[JoinOverTimeRangeNode] = None
         if cumulative and queried_agg_time_dimension_specs:
