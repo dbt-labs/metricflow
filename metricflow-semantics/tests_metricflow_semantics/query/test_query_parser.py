@@ -130,7 +130,8 @@ METRICS_YAML = textwrap.dedent(
       type: cumulative
       type_params:
         measure: revenue
-        window: 7 days
+        cumulative_type_params:
+          window: 7 days
     ---
     metric:
       name: revenue_sub_10

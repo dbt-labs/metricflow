@@ -246,7 +246,10 @@ class ValidLinkableSpecResolver:
         metrics_to_check = [metric]
         while metrics_to_check:
             metric_to_check = metrics_to_check.pop()
-            if metric_to_check.type_params.window is not None or metric_to_check.type_params.grain_to_date is not None:
+            if metric_to_check.type_params.cumulative_type_params and (
+                metric_to_check.type_params.cumulative_type_params.window is not None
+                or metric_to_check.type_params.cumulative_type_params.grain_to_date is not None
+            ):
                 return True
             for input_metric in metric_to_check.input_metrics:
                 if input_metric.offset_window is not None or input_metric.offset_to_grain is not None:
@@ -497,9 +500,11 @@ class ValidLinkableSpecResolver:
                         dimension_type=DimensionType.TIME,
                         entity_links=(),
                         join_path=SemanticModelJoinPath(
-                            left_semantic_model_reference=measure_semantic_model.reference
-                            if measure_semantic_model
-                            else SemanticModelDerivation.VIRTUAL_SEMANTIC_MODEL_REFERENCE,
+                            left_semantic_model_reference=(
+                                measure_semantic_model.reference
+                                if measure_semantic_model
+                                else SemanticModelDerivation.VIRTUAL_SEMANTIC_MODEL_REFERENCE
+                            ),
                         ),
                         # Anything that's not at the base time granularity of the measure's aggregation time dimension
                         # should be considered derived.
