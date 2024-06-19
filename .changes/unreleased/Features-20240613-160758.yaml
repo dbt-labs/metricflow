@@ -1,0 +1,7 @@
+kind: Features
+body: Adds a new dataflow plan node to re-aggregate metrics using window functions.
+  Needed to calculate cumulative metrics at non-default granularities.
+time: 2024-06-13T16:07:58.767447-07:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1274"
