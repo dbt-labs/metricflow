@@ -6,7 +6,7 @@ FROM (
   -- Window Function for Metric Re-aggregation
   SELECT
     metric_time__week
-    , FIRST_VALUE(revenue_all_time) OVER (
+    , LAST_VALUE(revenue_all_time) OVER (
       PARTITION BY metric_time__week
       ORDER BY metric_time__day
       ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING

@@ -6,19 +6,14 @@ FROM (
   -- Window Function for Metric Re-aggregation
   SELECT
     metric_time__year
-    , FIRST_VALUE(trailing_2_months_revenue) OVER (
-      PARTITION BY metric_time__year
-      ORDER BY metric_time__day
-      ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-    ) AS trailing_2_months_revenue
+    , AVG(trailing_2_months_revenue) OVER (PARTITION BY metric_time__year) AS trailing_2_months_revenue
   FROM (
     -- Join Self Over Time Range
     -- Pass Only Elements: ['txn_revenue', 'metric_time__year', 'metric_time__day']
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
-      subq_11.metric_time__day AS metric_time__day
-      , subq_11.metric_time__year AS metric_time__year
+      subq_11.metric_time__year AS metric_time__year
       , SUM(revenue_src_28000.revenue) AS trailing_2_months_revenue
     FROM (
       -- Time Spine

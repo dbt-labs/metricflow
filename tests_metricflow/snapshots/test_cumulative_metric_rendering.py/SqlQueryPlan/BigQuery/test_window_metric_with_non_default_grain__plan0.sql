@@ -6,11 +6,7 @@ FROM (
   -- Window Function for Metric Re-aggregation
   SELECT
     subq_7.metric_time__year
-    , FIRST_VALUE(subq_7.trailing_2_months_revenue) OVER (
-      PARTITION BY subq_7.metric_time__year
-      ORDER BY subq_7.metric_time__day
-      ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-    ) AS trailing_2_months_revenue
+    , AVG(subq_7.trailing_2_months_revenue) OVER (PARTITION BY subq_7.metric_time__year) AS trailing_2_months_revenue
   FROM (
     -- Compute Metrics via Expressions
     SELECT

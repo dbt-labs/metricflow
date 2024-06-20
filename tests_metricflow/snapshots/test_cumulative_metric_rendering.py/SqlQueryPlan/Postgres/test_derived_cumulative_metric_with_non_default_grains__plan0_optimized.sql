@@ -11,19 +11,14 @@ FROM (
     -- Window Function for Metric Re-aggregation
     SELECT
       metric_time__week
-      , FIRST_VALUE(t2mr) OVER (
-        PARTITION BY metric_time__week
-        ORDER BY metric_time__day
-        ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-      ) AS t2mr
+      , AVG(t2mr) OVER (PARTITION BY metric_time__week) AS t2mr
     FROM (
       -- Join Self Over Time Range
       -- Pass Only Elements: ['txn_revenue', 'metric_time__week', 'metric_time__day']
       -- Aggregate Measures
       -- Compute Metrics via Expressions
       SELECT
-        subq_12.metric_time__day AS metric_time__day
-        , subq_12.metric_time__week AS metric_time__week
+        subq_12.metric_time__week AS metric_time__week
         , SUM(revenue_src_28000.revenue) AS t2mr
       FROM (
         -- Time Spine
