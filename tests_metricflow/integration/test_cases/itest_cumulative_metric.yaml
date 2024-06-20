@@ -428,7 +428,7 @@ integration_test:
       SELECT
         metric_time__week
         , metric_time__quarter
-        , FIRST_VALUE(revenue_all_time) OVER (
+        , LAST_VALUE(revenue_all_time) OVER (
           PARTITION BY metric_time__week, metric_time__quarter
           ORDER BY metric_time__day
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
@@ -467,7 +467,7 @@ integration_test:
       SELECT
         revenue_instance__ds__month
         , metric_time__week
-        , FIRST_VALUE(trailing_2_months_revenue) OVER (
+        , AVG(trailing_2_months_revenue) OVER (
           PARTITION BY revenue_instance__ds__month, metric_time__week
           ORDER BY metric_time__day
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
@@ -562,7 +562,7 @@ integration_test:
         SELECT
           metric_time__month
           , metric_time__year
-          , FIRST_VALUE(t2mr) OVER (
+          , AVG(t2mr) OVER (
             PARTITION BY metric_time__month, metric_time__year
             ORDER BY metric_time__day
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING

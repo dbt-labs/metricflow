@@ -240,7 +240,10 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
         if len(parent_select_node.group_bys) > 0 and len(node.group_bys) > 0:
             return False
 
-        # TODO: Check for the following case:
+        # If there is a column in the parent group by that is not used in the current select statement, don't reduce or it
+        # would leave an unselected column in the group by and change the meaning of the query. For example, in the SQL
+        # below, reducing would remove the `is_instant` from the select statement.
+        #
         # SELECT
         #   bookings
         #   , 2 * bookings AS twice_bookings
@@ -248,13 +251,27 @@ class SqlRewritingSubQueryReducerVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNod
         #   SELECT,
         #     SUM(bookings) AS bookings
         #     , fct_bookings_src.is_instant
-        #   FROM (
-        #     SELECT * FROM demo.fct_bookings
-        #   ) fct_bookings_src
+        #   FROM demo.fct_bookings fct_bookings_src
         #   GROUP BY fct_bookings_src.is_instant
         # ) src
         #
-        # If this is reduced, then the GROUP BY will refer to an unused column.
+        # Note: this is not as fine-tuned as it could be. This checks if all parent group bys are used in the current select
+        # columns as column reference expressions. If any are used in different types of expressions, we could reduce but
+        # won't. This is just limited by the complexity of different expressions that might be used.
+        current_select_column_refs = {
+            select_column.expr.as_column_reference_expression.col_ref.column_name
+            for select_column in node.select_columns
+            if select_column.expr.as_column_reference_expression
+        }
+        all_parent_group_bys_used_in_current_select = True
+        for group_by in parent_select_node.group_bys:
+            parent_group_by_select = SqlGroupByRewritingVisitor._find_matching_select(
+                expr=group_by.expr, select_columns=parent_select_node.select_columns
+            )
+            if parent_group_by_select and parent_group_by_select.column_alias not in current_select_column_refs:
+                all_parent_group_bys_used_in_current_select = False
+        if not all_parent_group_bys_used_in_current_select:
+            return False
 
         # Don't reduce if the ORDER BYs aren't column reference expressions for simplicity.
         for order_by in node.order_bys:

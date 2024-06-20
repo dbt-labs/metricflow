@@ -1,0 +1,7 @@
+kind: Under the Hood
+body: Consume cumulative-specific metric type params from new cumulative_type_params
+  field.
+time: 2024-06-18T16:12:41.132445-07:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1293"

@@ -8,7 +8,7 @@ FROM (
   SELECT
     subq_7.metric_time__week
     , subq_7.metric_time__quarter
-    , FIRST_VALUE(subq_7.revenue_all_time) OVER (
+    , LAST_VALUE(subq_7.revenue_all_time) OVER (
       PARTITION BY
         subq_7.metric_time__week
         , subq_7.metric_time__quarter

@@ -4,4 +4,5 @@ metric:
   type: cumulative
   type_params:
     measure: bookings_monthly
-    window: 3 month
+    cumulative_type_params:
+      window: 3 month

@@ -70,7 +70,8 @@ metric:
   type: cumulative
   type_params:
     measure: monthly_measure_0
-    window: 2 months
+    cumulative_type_params:
+      window: 2 months
 ---
 metric:
   name: derived_metric_with_common_filtered_metric_0

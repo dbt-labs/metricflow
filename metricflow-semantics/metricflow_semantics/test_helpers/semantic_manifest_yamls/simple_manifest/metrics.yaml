@@ -135,7 +135,9 @@ metric:
   type: cumulative
   type_params:
     measure: txn_revenue
-    window: 2 month
+    cumulative_type_params:
+      window: 2 month
+      period_agg: average
 ---
 metric:
   name: "revenue_all_time"
@@ -143,6 +145,8 @@ metric:
   type: cumulative
   type_params:
     measure: txn_revenue
+    cumulative_type_params:
+      period_agg: last
 ---
 metric:
   name: "every_two_days_bookers"
@@ -158,7 +162,8 @@ metric:
   type: cumulative
   type_params:
     measure: txn_revenue
-    grain_to_date: month
+    cumulative_type_params:
+      grain_to_date: month
 ---
 metric:
   name: booking_fees
@@ -629,7 +634,8 @@ metric:
       name: bookers
       join_to_timespine: true
       fill_nulls_with: 0
-    window: 2 days
+    cumulative_type_params:
+      window: 2 days
 ---
 metric:
   name: bookings_growth_2_weeks_fill_nulls_with_0

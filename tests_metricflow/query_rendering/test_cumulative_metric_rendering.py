@@ -623,7 +623,6 @@ def test_derived_cumulative_metric_with_non_default_grains(
 
 
 # TODO: write the following tests when unblocked
-# - Render each of the allowed period_aggs (both set in YAML & default)
 # - Query cumulative metric with non-day default_grain (using default grain and non-default grain)
 # - Query 2 metrics with different default_grains using metric_time (no grain specified)
 # - If default grain is WEEK, query with a higher grain (check that we still get correct values)

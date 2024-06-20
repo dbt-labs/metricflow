@@ -495,8 +495,16 @@ class DataflowPlanBuilder:
             child_metric_offset_to_grain=metric_spec.offset_to_grain,
             cumulative_description=(
                 CumulativeMeasureDescription(
-                    cumulative_window=metric.type_params.window,
-                    cumulative_grain_to_date=metric.type_params.grain_to_date,
+                    cumulative_window=(
+                        metric.type_params.cumulative_type_params.window
+                        if metric.type_params.cumulative_type_params
+                        else None
+                    ),
+                    cumulative_grain_to_date=(
+                        metric.type_params.cumulative_type_params.grain_to_date
+                        if metric.type_params.cumulative_type_params
+                        else None
+                    ),
                 )
                 if metric.type is MetricType.CUMULATIVE
                 else None

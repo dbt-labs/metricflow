@@ -11,11 +11,7 @@ FROM (
     -- Window Function for Metric Re-aggregation
     SELECT
       subq_7.metric_time__week
-      , FIRST_VALUE(subq_7.t2mr) OVER (
-        PARTITION BY subq_7.metric_time__week
-        ORDER BY subq_7.metric_time__day
-        ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-      ) AS t2mr
+      , AVG(subq_7.t2mr) OVER (PARTITION BY subq_7.metric_time__week) AS t2mr
     FROM (
       -- Compute Metrics via Expressions
       SELECT

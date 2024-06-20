@@ -13,6 +13,7 @@ from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols.measure import MeasureAggregationParameters
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
+from dbt_semantic_interfaces.type_enums.period_agg import PeriodAggregation
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagNode, DisplayedProperty, NodeId
@@ -966,6 +967,18 @@ class SqlWindowFunction(Enum):
             return False
         else:
             assert_values_exhausted(self)
+
+    @classmethod
+    def get_window_function_for_period_agg(cls, period_agg: PeriodAggregation) -> SqlWindowFunction:
+        """Get the window function to use for given period agg option."""
+        if period_agg is PeriodAggregation.FIRST:
+            return cls.FIRST_VALUE
+        elif period_agg is PeriodAggregation.LAST:
+            return cls.LAST_VALUE
+        elif period_agg is PeriodAggregation.AVERAGE:
+            return cls.AVERAGE
+        else:
+            assert_values_exhausted(period_agg)
 
 
 @dataclass(frozen=True)
