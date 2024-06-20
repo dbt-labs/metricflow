@@ -137,6 +137,7 @@ metric:
     measure: txn_revenue
     cumulative_type_params:
       window: 2 month
+      period_agg: average
 ---
 metric:
   name: "revenue_all_time"
@@ -144,6 +145,8 @@ metric:
   type: cumulative
   type_params:
     measure: txn_revenue
+    cumulative_type_params:
+      period_agg: last
 ---
 metric:
   name: "every_two_days_bookers"

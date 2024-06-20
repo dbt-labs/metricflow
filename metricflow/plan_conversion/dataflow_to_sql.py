@@ -10,6 +10,7 @@ from dbt_semantic_interfaces.protocols.metric import MetricInputMeasure, MetricT
 from dbt_semantic_interfaces.references import EntityReference, MetricModelReference
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.conversion_calculation_type import ConversionCalculationType
+from dbt_semantic_interfaces.type_enums.period_agg import PeriodAggregation
 from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 from metricflow_semantics.aggregation_properties import AggregationState
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
@@ -1635,13 +1636,14 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             f"specs: {expected_specs}. Got: {parent_instance_set.as_tuple}."
         )
 
-        # Pending DSI upgrade:
-        # sql_window_function = SqlWindowFunction[
-        #     self._metric_lookup.get_metric(
-        #         metric_instance.spec.reference
-        #     ).type_params.cumulative_type_params.period_agg.name
-        # ]
-        sql_window_function = SqlWindowFunction.FIRST_VALUE  # placeholder for now
+        cumulative_type_params = self._metric_lookup.get_metric(
+            metric_instance.spec.reference
+        ).type_params.cumulative_type_params
+        sql_window_function = SqlWindowFunction.get_window_function_for_period_agg(
+            cumulative_type_params.period_agg
+            if cumulative_type_params and cumulative_type_params.period_agg
+            else PeriodAggregation.FIRST
+        )
         order_by_args = []
         if sql_window_function.requires_ordering:
             order_by_args.append(
