@@ -8,18 +8,19 @@ FROM (
     metric_time__week
     , t2mr
   FROM (
+    -- Compute Metrics via Expressions
     -- Window Function for Metric Re-aggregation
     SELECT
       metric_time__week
-      , AVG(t2mr) OVER (PARTITION BY metric_time__week) AS t2mr
+      , AVG(txn_revenue) OVER (PARTITION BY metric_time__week) AS t2mr
     FROM (
       -- Join Self Over Time Range
       -- Pass Only Elements: ['txn_revenue', 'metric_time__week', 'metric_time__day']
       -- Aggregate Measures
-      -- Compute Metrics via Expressions
       SELECT
-        subq_12.metric_time__week AS metric_time__week
-        , SUM(revenue_src_28000.revenue) AS t2mr
+        subq_12.metric_time__day AS metric_time__day
+        , subq_12.metric_time__week AS metric_time__week
+        , SUM(revenue_src_28000.revenue) AS txn_revenue
       FROM (
         -- Time Spine
         SELECT
@@ -41,7 +42,7 @@ FROM (
       GROUP BY
         metric_time__day
         , metric_time__week
-    ) subq_17
+    ) subq_16
   ) subq_18
   GROUP BY
     metric_time__week
