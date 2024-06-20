@@ -26,6 +26,7 @@ def parse_manifest_from_dbt_generated_manifest(manifest_json_string: str) -> Pyd
     # The serialized object in the dbt project does not have all transformations applied to it at
     # this time, which causes failures with input measure resolution.
     # TODO: remove this transform call once the upstream changes are integrated into our dependency tree
+    # TODO: align rules between DSI, here, and MFS (if possible!)
     rules = (
         # Primary
         (LowerCaseNamesRule(),),
