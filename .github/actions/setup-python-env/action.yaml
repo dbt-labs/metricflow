@@ -37,6 +37,7 @@ runs:
       key: >-
         python_location: "${{ env.pythonLocation }}" AND
         pyproject_hash: "${{ hashFiles('pyproject.toml') }}" AND
+        extra_hatch_configuration_hash: "${{ hashFiles('**/extra-hatch-configuration/*') }}" AND
         precommit_config_hash: "${{ hashFiles('.pre-commit-config.yaml') }}" AND
         linux_release: "${{ env.LINUX_RELEASE }}"
 
