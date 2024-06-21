@@ -40,35 +40,6 @@ files = [
 Documentation = "https://docs.getdbt.com/docs/build/about-metricflow"
 "Source Code" = "https://github.com/dbt-labs/metricflow"
 
-[tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
-dbt-bigquery = [
-  "dbt-metricflow/extra-hatch-configuration/requirements-dbt-bigquery.txt"
-]
-dbt-databricks = [
-  "dbt-metricflow/extra-hatch-configuration/requirements-dbt-databricks.txt"
-]
-dbt-duckdb = [
-  "dbt-metricflow/extra-hatch-configuration/requirements-dbt-duckdb.txt"
-]
-dbt-postgres = [
-  "dbt-metricflow/extra-hatch-configuration/requirements-dbt-postgres.txt"
-]
-dbt-redshift = [
-  "dbt-metricflow/extra-hatch-configuration/requirements-dbt-redshift.txt"
-]
-dbt-snowflake = [
-  "dbt-metricflow/extra-hatch-configuration/requirements-dbt-snowflake.txt"
-]
-dbt-trino = [
-  "dbt-metricflow/extra-hatch-configuration/requirements-dbt-trino.txt"
-]
-dev-packages = [
-  "metricflow-semantics/extra-hatch-configuration/requirements-dev-packages.txt",
-  "dbt-metricflow/extra-hatch-configuration/requirements-cli.txt"
-]
-trino-sql-client-packages = [
-  "extra-hatch-configuration/requirements-trino-sql-client-packages.txt"
-]
 
 # There are files that hatch will always include as well (e.g. the LICENSE file).
 # See hatch build docs for more details.
@@ -91,10 +62,27 @@ packages = ["metricflow", "metricflow-semantics/metricflow_semantics"]
 description = "Environment for development. Includes a DuckDB-backed client."
 run = "run-coverage --no-cov"
 
-features = [
-  "dev-packages",
-  "dbt-duckdb",
+dependencies = [
+  # Developer tools
+  "mypy>=1.7.0, <1.8.0",
+  "pre-commit>=3.2.2, <3.3.0",
+  "pytest-mock>=3.14.0, <3.15.0",
+  "pytest-xdist>=3.6.0, <3.7.0",
+  "pytest>=8.0.0, < 9.0.0",
+  "PyYAML>=6.0, <7.0.0",
+  "tabulate>=0.8.9",
+  "types-PyYAML",
+  "types-python-dateutil",
+  "types-tabulate",
+  # CLI-related
+  "halo>=0.0.31, <0.1.0",
+  "update-checker>=0.18.0, <0.19.0",
+  # Bug with mypy: https://github.com/pallets/click/issues/2558#issuecomment-1656546003
+  "click>=8.1.6",
+  "dbt-core @ git+https://github.com/dbt-labs/dbt-core@e53420c1d073dc81609ae7aa84cef6ee09650576#subdirectory=core",
+  "dbt-duckdb>=1.8.0, <1.9.0",
 ]
+
 
 [tool.hatch.envs.dev-env.env-vars]
 MF_TEST_ADAPTER_TYPE="duckdb"
@@ -112,18 +100,12 @@ MF_TEST_ADAPTER_TYPE="postgres"
 
 [tool.hatch.envs.postgres-env]
 description = "Dev environment for working with Postgres adapter"
-
-features = [
-  "dev-packages",
-  "dbt-postgres",
-]
-[tool.hatch.metadata]
-allow-direct-references = true
+template = "dev-env"
+extra-dependencies = ["dbt-postgres>=1.8.0, <1.9.0"]
 
 
-
-# NOTE: All of the below should have their authentication credentials
-# configured independently of the hatch env construction
+## NOTE: All environments below should have their authentication credentials
+## configured independently of the hatch env construction
 
 [tool.hatch.envs.bigquery-env.env-vars]
 PYTHONPATH="metricflow-semantics:dbt-metricflow"
@@ -131,12 +113,8 @@ MF_TEST_ADAPTER_TYPE="bigquery"
 
 [tool.hatch.envs.bigquery-env]
 description = "Dev environment for working with the BigQuery adapter"
-
-features = [
-  "dev-packages",
-  "dbt-bigquery",
-]
-
+template = "dev-env"
+extra-dependencies = ["dbt-bigquery>=1.8.0, <1.9.0"]
 
 [tool.hatch.envs.databricks-env.env-vars]
 PYTHONPATH="metricflow-semantics:dbt-metricflow"
@@ -145,13 +123,11 @@ MF_TEST_ADAPTER_TYPE="databricks"
 
 [tool.hatch.envs.databricks-env]
 description = "Dev environment for working with the Databricks adapter"
+template = "dev-env"
 
+# Needed as dbt-databricks 1.8.1 depends on dbt-core~=1.8.0 while this uses dbt-core 1.9.0a1
 pre-install-commands = [
   "pip install dbt-databricks"
-]
-
-features = [
-  "dev-packages",
 ]
 
 
@@ -161,11 +137,8 @@ MF_TEST_ADAPTER_TYPE="redshift"
 
 [tool.hatch.envs.redshift-env]
 description = "Dev environment for working with the Redshift adapter"
-
-features = [
-  "dev-packages",
-  "dbt-redshift"
-]
+template = "dev-env"
+extra-dependencies = ["dbt-redshift>=1.8.0, <1.9.0"]
 
 
 [tool.hatch.envs.snowflake-env.env-vars]
@@ -174,11 +147,8 @@ MF_TEST_ADAPTER_TYPE="snowflake"
 
 [tool.hatch.envs.snowflake-env]
 description = "Dev environment for working with Snowflake adapter"
-
-features = [
-  "dev-packages",
-  "dbt-snowflake",
-]
+template = "dev-env"
+extra-dependencies = ["dbt-snowflake>=1.8.0, <1.9.0"]
 
 
 [tool.hatch.envs.trino-env.env-vars]
@@ -189,12 +159,8 @@ DBT_ENV_SECRET_CATALOG="memory"
 
 [tool.hatch.envs.trino-env]
 description = "Dev environment for working with the Trino adapter"
-
-features = [
-  "dev-packages",
-  "trino-sql-client-packages",
-  "dbt-trino"
-]
+template = "dev-env"
+extra-dependencies = ["trino>=0.328.0, <0.329.0", "dbt-trino>=1.8.0, <1.9.0"]
 
 
 [tool.black]

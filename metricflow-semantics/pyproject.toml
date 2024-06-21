@@ -26,7 +26,7 @@ classifiers = [
 ]
 
 # Dependencies are specified through the `hatch-requirements-txt` plug-in.
-dynamic = ["dependencies", "optional-dependencies"]
+dynamic = ["dependencies"]
 
 [tool.hatch.metadata.hooks.requirements_txt]
 files = [
