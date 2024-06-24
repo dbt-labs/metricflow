@@ -62,6 +62,9 @@ dbt-snowflake = [
 dbt-trino = [
   "dbt-metricflow/extra-hatch-configuration/requirements-dbt-trino.txt"
 ]
+dbt-clickhouse = [
+  "dbt-metricflow/extra-hatch-configuration/requirements-dbt-clickhouse.txt"
+]
 dev-packages = [
   "metricflow-semantics/extra-hatch-configuration/requirements-dev-packages.txt",
   "dbt-metricflow/extra-hatch-configuration/requirements-cli.txt"

@@ -23,6 +23,7 @@ class SqlEngine(Enum):
     SNOWFLAKE = "Snowflake"
     DATABRICKS = "Databricks"
     TRINO = "Trino"
+    CLICKHOUSE = "Clickhouse"
 
 
 class SqlClient(Protocol):

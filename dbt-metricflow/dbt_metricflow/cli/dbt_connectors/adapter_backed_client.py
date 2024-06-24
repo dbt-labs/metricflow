@@ -23,6 +23,7 @@ from metricflow.sql.render.redshift import RedshiftSqlQueryPlanRenderer
 from metricflow.sql.render.snowflake import SnowflakeSqlQueryPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlQueryPlanRenderer
 from metricflow.sql.render.trino import TrinoSqlQueryPlanRenderer
+from metricflow.sql.render.clickhouse import ClickhouseSqlQueryPlanRenderer
 from metricflow.sql_request.sql_request_attributes import SqlRequestId
 
 logger = logging.getLogger(__name__)
@@ -43,6 +44,7 @@ class SupportedAdapterTypes(enum.Enum):
     BIGQUERY = "bigquery"
     DUCKDB = "duckdb"
     TRINO = "trino"
+    CLICKHOUSE = "clickhouse"
 
     @property
     def sql_engine_type(self) -> SqlEngine:
@@ -61,6 +63,8 @@ class SupportedAdapterTypes(enum.Enum):
             return SqlEngine.DUCKDB
         elif self is SupportedAdapterTypes.TRINO:
             return SqlEngine.TRINO
+        elif self is SupportedAdapterTypes.CLICKHOUSE:
+            return SqlEngine.CLICKHOUSE
         else:
             assert_values_exhausted(self)
 
@@ -81,6 +85,8 @@ class SupportedAdapterTypes(enum.Enum):
             return DuckDbSqlQueryPlanRenderer()
         elif self is SupportedAdapterTypes.TRINO:
             return TrinoSqlQueryPlanRenderer()
+        elif self is SupportedAdapterTypes.CLICKHOUSE:
+            return ClickhouseSqlQueryPlanRenderer()
         else:
             assert_values_exhausted(self)
 
