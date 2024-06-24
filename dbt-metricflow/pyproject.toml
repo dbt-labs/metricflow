@@ -63,7 +63,7 @@ dbt-trino = [
   "extra-hatch-configuration/requirements-dbt-trino.txt"
 ]
 dbt-clickhouse = [
-  "dbt-metricflow/extra-hatch-configuration/requirements-dbt-clickhouse.txt"
+  "extra-hatch-configuration/requirements-dbt-clickhouse.txt"
 ]
 
 [tool.hatch.build.targets.sdist]
