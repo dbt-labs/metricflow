@@ -134,41 +134,6 @@ class AdapterBackedSqlClient:
         self,
         stmt: str,
         sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
-    ) -> MetricFlowDataTable:
-        """Query statement; result expected to be data which will be returned as a DataTable.
-
-        Args:
-            stmt: The SQL query statement to run. This should produce output via a SELECT
-            sql_bind_parameters: The parameter replacement mapping for filling in concrete values for SQL query
-            parameters.
-        """
-        start = time.time()
-        request_id = SqlRequestId(f"mf_rid__{random_id()}")
-        if sql_bind_parameters.param_dict:
-            raise SqlBindParametersNotSupportedError(
-                f"Invalid execute statement - we do not support queries with bind parameters through dbt adapters! "
-                f"Bind params: {sql_bind_parameters.param_dict}"
-            )
-        logger.info(AdapterBackedSqlClient._format_run_query_log_message(stmt, sql_bind_parameters))
-        with self._adapter.connection_named(f"MetricFlow_request_{request_id}"):
-            # returns a Tuple[AdapterResponse, agate.Table] but the decorator converts it to Any
-            result = self._adapter.execute(sql=stmt, auto_begin=True, fetch=True)
-            logger.info(f"Query returned from dbt Adapter with response {result[0]}")
-
-        agate_data = result[1]
-        rows = [row.values() for row in agate_data.rows]
-        data_table = MetricFlowDataTable.create_from_rows(
-            column_names=agate_data.column_names,
-            rows=rows,
-        )
-        stop = time.time()
-        logger.info(f"Finished running the query in {stop - start:.2f}s with {data_table.row_count} row(s) returned")
-        return data_table
-
-    def query_as_df(
-        self,
-        stmt: str,
-        sql_bind_parameters: SqlBindParameters = SqlBindParameters(),
     ) -> pd.DataFrame:
         """Query statement; result expected to be data which will be returned as a pandas DataFrame.
 
