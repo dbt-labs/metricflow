@@ -335,7 +335,7 @@ def query(
     df = query_result.result_df
     # Show the data if returned successfully
     if df is not None:
-        if df.row_count == 0:
+        if df.empty:
             click.echo("🕳 Successful MQL query returned an empty result set.")
         elif csv is not None:
             # csv is a LazyFile that is file-like that works in this case.
