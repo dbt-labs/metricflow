@@ -1602,7 +1602,9 @@ class DataflowPlanBuilder:
                 if set(filter_spec.linkable_specs).issubset(set(queried_linkable_specs.as_tuple))
             ]
             if len(queried_filter_specs) > 0:
-                output_node = WhereConstraintNode(parent_node=output_node, where_specs=queried_filter_specs)
+                output_node = WhereConstraintNode(
+                    parent_node=output_node, where_specs=queried_filter_specs, always_apply=True
+                )
 
             # TODO: this will break if you query by agg_time_dimension but apply a time constraint on metric_time.
             # To fix when enabling time range constraints for agg_time_dimension.

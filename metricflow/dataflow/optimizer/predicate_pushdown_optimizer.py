@@ -362,14 +362,10 @@ class PredicatePushdownOptimizer(
 
         with self._predicate_pushdown_tracker.track_pushdown_state(updated_pushdown_state):
             optimized_parent: OptimizeBranchResult = node.parent_node.accept(self)
-            # TODO: Update to only apply filters that have not been successfully pushed down
-            optimized_node = OptimizeBranchResult(
-                optimized_branch=node.with_new_parents((optimized_parent.optimized_branch,))
-            )
-
             pushdown_state_updated_by_parent = self._predicate_pushdown_tracker.last_pushdown_state
-            # Override the pushdown state for this node and allow all upstream propagation to be handled by the tracker
-            if len(pushdown_state_updated_by_parent.applied_where_filter_specs) > 0:
+            applied_filter_specs = pushdown_state_updated_by_parent.applied_where_filter_specs
+            filter_specs_to_apply = [spec for spec in node.input_where_specs if spec not in applied_filter_specs]
+            if len(applied_filter_specs) > 0:
                 updated_specs = frozenset.union(
                     frozenset(node.input_where_specs),
                     pushdown_state_updated_by_parent.applied_where_filter_specs,
@@ -387,6 +383,19 @@ class PredicatePushdownOptimizer(
                         + f"Updated pushdown state:\n\n{self._predicate_pushdown_tracker.last_pushdown_state}"
                     ),
                 )
+
+            if node.always_apply:
+                optimized_node = OptimizeBranchResult(
+                    optimized_branch=node.with_new_parents((optimized_parent.optimized_branch,))
+                )
+            elif len(filter_specs_to_apply) > 0:
+                optimized_node = OptimizeBranchResult(
+                    optimized_branch=WhereConstraintNode(
+                        parent_node=optimized_parent.optimized_branch, where_specs=filter_specs_to_apply
+                    )
+                )
+            else:
+                optimized_node = optimized_parent
 
         return optimized_node
 

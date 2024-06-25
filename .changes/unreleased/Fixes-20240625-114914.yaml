@@ -1,0 +1,6 @@
+kind: Fixes
+body: Remove extraneous where filter subqueries added by predicate pushdown
+time: 2024-06-25T11:49:14.837794-07:00
+custom:
+    Author: tlento
+    Issue: "1011"

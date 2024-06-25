@@ -194,7 +194,10 @@ def test_simple_join_categorical_pushdown(
     query_parser: MetricFlowQueryParser,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
-    """Tests pushdown optimization for a simple predicate through a single join."""
+    """Tests pushdown optimization for a simple predicate through a single join.
+
+    In this case the entire constraint should be moved inside of the join.
+    """
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("bookings",),
         group_by_names=("listing__country_latest",),
@@ -205,7 +208,7 @@ def test_simple_join_categorical_pushdown(
         mf_test_configuration=mf_test_configuration,
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
-        expected_additional_constraint_nodes_in_optimized=1,
+        expected_additional_constraint_nodes_in_optimized=0,
     )
 
 
@@ -256,7 +259,7 @@ def test_conversion_metric_predicate_pushdown(
         mf_test_configuration=mf_test_configuration,
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
-        expected_additional_constraint_nodes_in_optimized=1,  # TODO: Remove superfluous where constraint nodes
+        expected_additional_constraint_nodes_in_optimized=0,
     )
 
 
@@ -272,6 +275,8 @@ def test_cumulative_metric_predicate_pushdown(
     since supporting time filter pushdown for cumulative metrics requires filter expansion to ensure we capture the
     full set of inputs for the initial cumulative window.
 
+    For the query listed here the entire constraint will be moved past the dimension join.
+
     TODO: Add metric time filters
     """
     query_spec = query_parser.parse_and_validate_query(
@@ -284,7 +289,7 @@ def test_cumulative_metric_predicate_pushdown(
         mf_test_configuration=mf_test_configuration,
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
-        expected_additional_constraint_nodes_in_optimized=1,
+        expected_additional_constraint_nodes_in_optimized=0,
     )
 
 
@@ -323,6 +328,8 @@ def test_offset_metric_predicate_pushdown(
     As with cumulative metrics, at this time categorical dimension predicates may be pushed down, but metric_time
     predicates should not be, since we need to capture the union of the filter window and the offset span.
 
+    For the query listed here the entire constraint will be moved past the dimension join.
+
     TODO: Add metric time filters
     """
     query_spec = query_parser.parse_and_validate_query(
@@ -335,7 +342,7 @@ def test_offset_metric_predicate_pushdown(
         mf_test_configuration=mf_test_configuration,
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
-        expected_additional_constraint_nodes_in_optimized=1,
+        expected_additional_constraint_nodes_in_optimized=0,
     )
 
 
@@ -349,6 +356,8 @@ def test_fill_nulls_time_spine_metric_predicate_pushdown(
 
     Until time dimension pushdown is supported we will only see the categorical dimension entry pushed down here.
 
+    For the query listed here the entire constraint will be moved past the dimension join.
+
     TODO: Add metric time filters
     """
     query_spec = query_parser.parse_and_validate_query(
@@ -361,7 +370,7 @@ def test_fill_nulls_time_spine_metric_predicate_pushdown(
         mf_test_configuration=mf_test_configuration,
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
-        expected_additional_constraint_nodes_in_optimized=1,
+        expected_additional_constraint_nodes_in_optimized=0,
     )
 
 
@@ -377,7 +386,9 @@ def test_fill_nulls_time_spine_metric_with_post_agg_join_predicate_pushdown(
     against the time spine, which should preclude predicate pushdown for query-time filters at that state, but
     will allow for pushdown within the JoinToTimeSpine operation. This will still do predicate pushdown as before,
     but only exactly as before - the added constraint outside of the JoinToTimeSpine operation must still be
-    applied.
+    applied in its entirety, and so we expect 0 additional constraint nodes. If we failed to account for the
+    repeated constraint outside of the JoinToTimeSpine in our pushdown handling this would remove one of the
+    WhereConstraintNodes from the original query altogether.
 
     Until time dimension pushdown is supported we will only see the categorical dimension entry pushed down here.
 
@@ -393,5 +404,5 @@ def test_fill_nulls_time_spine_metric_with_post_agg_join_predicate_pushdown(
         mf_test_configuration=mf_test_configuration,
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
-        expected_additional_constraint_nodes_in_optimized=1,
+        expected_additional_constraint_nodes_in_optimized=0,
     )
