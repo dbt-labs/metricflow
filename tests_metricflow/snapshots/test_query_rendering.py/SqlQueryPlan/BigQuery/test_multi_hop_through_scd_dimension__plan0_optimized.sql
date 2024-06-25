@@ -3,9 +3,9 @@
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  subq_24.metric_time__day AS metric_time__day
-  , subq_29.user__home_state_latest AS listing__user__home_state_latest
-  , SUM(subq_24.bookings) AS bookings
+  subq_35.metric_time__day AS metric_time__day
+  , subq_40.user__home_state_latest AS listing__user__home_state_latest
+  , SUM(subq_35.bookings) AS bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
@@ -15,7 +15,7 @@ FROM (
     , listing_id AS listing
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_26000
-) subq_24
+) subq_35
 LEFT OUTER JOIN (
   -- Join Standard Outputs
   -- Pass Only Elements: ['user__home_state_latest', 'window_start__day', 'window_end__day', 'listing']
@@ -29,18 +29,18 @@ LEFT OUTER JOIN (
     ***************************.dim_users_latest users_latest_src_26000
   ON
     listings_src_26000.user_id = users_latest_src_26000.user_id
-) subq_29
+) subq_40
 ON
   (
-    subq_24.listing = subq_29.listing
+    subq_35.listing = subq_40.listing
   ) AND (
     (
-      subq_24.metric_time__day >= subq_29.window_start__day
+      subq_35.metric_time__day >= subq_40.window_start__day
     ) AND (
       (
-        subq_24.metric_time__day < subq_29.window_end__day
+        subq_35.metric_time__day < subq_40.window_end__day
       ) OR (
-        subq_29.window_end__day IS NULL
+        subq_40.window_end__day IS NULL
       )
     )
   )

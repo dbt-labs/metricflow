@@ -11,7 +11,7 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
-from tests_metricflow.query_rendering.compare_rendered_query import convert_and_check
+from tests_metricflow.query_rendering.compare_rendered_query import render_and_check
 
 
 @pytest.mark.sql_engine_snapshot
@@ -32,14 +32,14 @@ def test_conversion_metric(
             where_sql_template=("{{ TimeDimension('metric_time', 'day') }} = '2020-01-01'")
         ),
     )
-    dataflow_plan = dataflow_plan_builder.build_plan(parsed_query.query_spec)
 
-    convert_and_check(
+    render_and_check(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_node,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=parsed_query.query_spec,
     )
 
 
@@ -61,14 +61,14 @@ def test_conversion_metric_with_window(
             where_sql_template=("{{ TimeDimension('metric_time', 'day') }} = '2020-01-01'")
         ),
     )
-    dataflow_plan = dataflow_plan_builder.build_plan(parsed_query.query_spec)
 
-    convert_and_check(
+    render_and_check(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_node,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=parsed_query.query_spec,
     )
 
 
@@ -90,14 +90,14 @@ def test_conversion_metric_with_categorical_filter(
             where_sql_template=("{{ Dimension('visit__referrer_id') }} = 'ref_id_01'")
         ),
     )
-    dataflow_plan = dataflow_plan_builder.build_plan(parsed_query.query_spec)
 
-    convert_and_check(
+    render_and_check(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_node,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=parsed_query.query_spec,
     )
 
 
@@ -121,14 +121,14 @@ def test_conversion_metric_with_time_constraint(
         time_constraint_start=datetime.datetime(2020, 1, 1),
         time_constraint_end=datetime.datetime(2020, 1, 2),
     )
-    dataflow_plan = dataflow_plan_builder.build_plan(parsed_query.query_spec)
 
-    convert_and_check(
+    render_and_check(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_node,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=parsed_query.query_spec,
     )
 
 
@@ -155,12 +155,12 @@ def test_conversion_metric_with_window_and_time_constraint(
         time_constraint_start=datetime.datetime(2020, 1, 1),
         time_constraint_end=datetime.datetime(2020, 1, 2),
     )
-    dataflow_plan = dataflow_plan_builder.build_plan(parsed_query.query_spec)
 
-    convert_and_check(
+    render_and_check(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_node,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=parsed_query.query_spec,
     )

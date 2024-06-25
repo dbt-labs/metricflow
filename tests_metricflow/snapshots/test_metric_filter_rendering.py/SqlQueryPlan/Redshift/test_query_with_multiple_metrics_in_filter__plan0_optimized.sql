@@ -8,9 +8,9 @@ FROM (
   -- Join Standard Outputs
   -- Pass Only Elements: ['listings', 'listing__bookings', 'listing__bookers']
   SELECT
-    subq_36.listing__bookings AS listing__bookings
-    , subq_42.listing__bookers AS listing__bookers
-    , subq_30.listings AS listings
+    subq_44.listing__bookings AS listing__bookings
+    , subq_50.listing__bookers AS listing__bookers
+    , subq_38.listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
@@ -19,7 +19,7 @@ FROM (
       listing_id AS listing
       , 1 AS listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-  ) subq_30
+  ) subq_38
   LEFT OUTER JOIN (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
@@ -35,12 +35,12 @@ FROM (
         listing_id AS listing
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_33
+    ) subq_41
     GROUP BY
       listing
-  ) subq_36
+  ) subq_44
   ON
-    subq_30.listing = subq_36.listing
+    subq_38.listing = subq_44.listing
   LEFT OUTER JOIN (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
@@ -54,8 +54,8 @@ FROM (
     FROM ***************************.fct_bookings bookings_source_src_28000
     GROUP BY
       listing_id
-  ) subq_42
+  ) subq_50
   ON
-    subq_30.listing = subq_42.listing
-) subq_44
+    subq_38.listing = subq_50.listing
+) subq_52
 WHERE listing__bookings > 2 AND listing__bookers > 1

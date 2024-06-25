@@ -8,8 +8,8 @@ FROM (
   -- Join Standard Outputs
   -- Pass Only Elements: ['bookers', 'listing__bookers']
   SELECT
-    subq_26.listing__bookers AS listing__bookers
-    , subq_20.bookers AS bookers
+    subq_30.listing__bookers AS listing__bookers
+    , subq_24.bookers AS bookers
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
@@ -18,7 +18,7 @@ FROM (
       listing_id AS listing
       , guest_id AS bookers
     FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_20
+  ) subq_24
   LEFT OUTER JOIN (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
@@ -32,8 +32,8 @@ FROM (
     FROM ***************************.fct_bookings bookings_source_src_28000
     GROUP BY
       listing
-  ) subq_26
+  ) subq_30
   ON
-    subq_20.listing = subq_26.listing
-) subq_28
+    subq_24.listing = subq_30.listing
+) subq_32
 WHERE listing__bookers > 1.00

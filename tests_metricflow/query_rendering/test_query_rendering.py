@@ -31,7 +31,7 @@ from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilde
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.plan_conversion.dataflow_to_sql import DataflowToSqlQueryPlanConverter
 from metricflow.protocols.sql_client import SqlClient
-from tests_metricflow.query_rendering.compare_rendered_query import convert_and_check
+from tests_metricflow.query_rendering.compare_rendered_query import render_and_check
 
 
 @pytest.mark.sql_engine_snapshot
@@ -43,27 +43,26 @@ def test_multihop_node(
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan where there is a join between 1 measure and 2 dimensions."""
-    dataflow_plan = multihop_dataflow_plan_builder.build_plan(
-        MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="txn_count"),),
-            dimension_specs=(
-                DimensionSpec(
-                    element_name="customer_name",
-                    entity_links=(
-                        EntityReference(element_name="account_id"),
-                        EntityReference(element_name="customer_id"),
-                    ),
+    query_spec = MetricFlowQuerySpec(
+        metric_specs=(MetricSpec(element_name="txn_count"),),
+        dimension_specs=(
+            DimensionSpec(
+                element_name="customer_name",
+                entity_links=(
+                    EntityReference(element_name="account_id"),
+                    EntityReference(element_name="customer_id"),
                 ),
             ),
-        )
+        ),
     )
 
-    convert_and_check(
+    render_and_check(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=multihop_dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_node,
+        dataflow_plan_builder=multihop_dataflow_plan_builder,
+        query_spec=query_spec,
     )
 
 
@@ -84,14 +83,14 @@ def test_filter_with_where_constraint_on_join_dim(
             where_sql_template="{{ Dimension('listing__country_latest') }} = 'us'",
         ),
     ).query_spec
-    dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
-    convert_and_check(
+    render_and_check(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_node,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
     )
 
 
@@ -104,24 +103,23 @@ def test_partitioned_join(
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan where there's a join on a partitioned dimension."""
-    dataflow_plan = dataflow_plan_builder.build_plan(
-        MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="identity_verifications"),),
-            dimension_specs=(
-                DimensionSpec(
-                    element_name="home_state",
-                    entity_links=(EntityReference(element_name="user"),),
-                ),
+    query_spec = MetricFlowQuerySpec(
+        metric_specs=(MetricSpec(element_name="identity_verifications"),),
+        dimension_specs=(
+            DimensionSpec(
+                element_name="home_state",
+                entity_links=(EntityReference(element_name="user"),),
             ),
-        )
+        ),
     )
 
-    convert_and_check(
+    render_and_check(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_node,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
     )
 
 
@@ -134,25 +132,24 @@ def test_limit_rows(
     sql_client: SqlClient,
 ) -> None:
     """Tests a plan with a limit to the number of rows returned."""
-    dataflow_plan = dataflow_plan_builder.build_plan(
-        MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"),),
-            time_dimension_specs=(
-                TimeDimensionSpec(
-                    element_name="ds",
-                    entity_links=(),
-                ),
+    query_spec = MetricFlowQuerySpec(
+        metric_specs=(MetricSpec(element_name="bookings"),),
+        time_dimension_specs=(
+            TimeDimensionSpec(
+                element_name="ds",
+                entity_links=(),
             ),
-            limit=1,
-        )
+        ),
+        limit=1,
     )
 
-    convert_and_check(
+    render_and_check(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_node,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
     )
 
 
@@ -175,14 +172,15 @@ def test_distinct_values(
         ),
         limit=100,
     ).query_spec
-    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(query_spec)
 
-    convert_and_check(
+    render_and_check(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_node,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+        is_distinct_values_plan=True,
     )
 
 
@@ -194,24 +192,23 @@ def test_local_dimension_using_local_entity(  # noqa: D103
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
-    dataflow_plan = dataflow_plan_builder.build_plan(
-        MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="listings"),),
-            dimension_specs=(
-                DimensionSpec(
-                    element_name="country_latest",
-                    entity_links=(EntityReference(element_name="listing"),),
-                ),
+    query_spec = MetricFlowQuerySpec(
+        metric_specs=(MetricSpec(element_name="listings"),),
+        dimension_specs=(
+            DimensionSpec(
+                element_name="country_latest",
+                entity_links=(EntityReference(element_name="listing"),),
             ),
-        )
+        ),
     )
 
-    convert_and_check(
+    render_and_check(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_node,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
     )
 
 
@@ -228,14 +225,14 @@ def test_measure_constraint(  # noqa: D103
         metric_names=("lux_booking_value_rate_expr",),
         group_by_names=(MTD_SPEC_DAY.qualified_name,),
     ).query_spec
-    dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
-    convert_and_check(
+    render_and_check(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_node,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
     )
 
 
@@ -252,14 +249,14 @@ def test_measure_constraint_with_reused_measure(  # noqa: D103
         metric_names=("instant_booking_value_ratio",),
         group_by_names=(MTD_SPEC_DAY.qualified_name,),
     ).query_spec
-    dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
 
-    convert_and_check(
+    render_and_check(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_node,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
     )
 
 
@@ -277,14 +274,13 @@ def test_measure_constraint_with_single_expr_and_alias(  # noqa: D103
         group_by_names=(MTD_SPEC_DAY.qualified_name,),
     ).query_spec
 
-    dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
-
-    convert_and_check(
+    render_and_check(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_node,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
     )
 
 
@@ -306,14 +302,14 @@ def test_join_to_scd_dimension(
             where_sql_template="{{ Dimension('listing__capacity') }} > 2",
         ),
     ).query_spec
-    dataflow_plan = scd_dataflow_plan_builder.build_plan(query_spec)
 
-    convert_and_check(
+    render_and_check(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=scd_dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_node,
+        dataflow_plan_builder=scd_dataflow_plan_builder,
+        query_spec=query_spec,
     )
 
 
@@ -326,20 +322,19 @@ def test_multi_hop_through_scd_dimension(
     sql_client: SqlClient,
 ) -> None:
     """Tests conversion of a plan using a dimension that is reached through an SCD table."""
-    dataflow_plan = scd_dataflow_plan_builder.build_plan(
-        MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"),),
-            time_dimension_specs=(MTD_SPEC_DAY,),
-            dimension_specs=(DimensionSpec.from_name(name="listing__user__home_state_latest"),),
-        )
+    query_spec = MetricFlowQuerySpec(
+        metric_specs=(MetricSpec(element_name="bookings"),),
+        time_dimension_specs=(MTD_SPEC_DAY,),
+        dimension_specs=(DimensionSpec.from_name(name="listing__user__home_state_latest"),),
     )
 
-    convert_and_check(
+    render_and_check(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=scd_dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_node,
+        dataflow_plan_builder=scd_dataflow_plan_builder,
+        query_spec=query_spec,
     )
 
 
@@ -352,20 +347,19 @@ def test_multi_hop_to_scd_dimension(
     sql_client: SqlClient,
 ) -> None:
     """Tests conversion of a plan using an SCD dimension that is reached through another table."""
-    dataflow_plan = scd_dataflow_plan_builder.build_plan(
-        MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"),),
-            time_dimension_specs=(MTD_SPEC_DAY,),
-            dimension_specs=(DimensionSpec.from_name(name="listing__lux_listing__is_confirmed_lux"),),
-        )
+    query_spec = MetricFlowQuerySpec(
+        metric_specs=(MetricSpec(element_name="bookings"),),
+        time_dimension_specs=(MTD_SPEC_DAY,),
+        dimension_specs=(DimensionSpec.from_name(name="listing__lux_listing__is_confirmed_lux"),),
     )
 
-    convert_and_check(
+    render_and_check(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=scd_dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_node,
+        dataflow_plan_builder=scd_dataflow_plan_builder,
+        query_spec=query_spec,
     )
 
 
@@ -377,21 +371,20 @@ def test_multiple_metrics_no_dimensions(  # noqa: D103
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
-    dataflow_plan = dataflow_plan_builder.build_plan(
-        MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"), MetricSpec(element_name="listings")),
-            time_range_constraint=TimeRangeConstraint(
-                start_time=as_datetime("2020-01-01"), end_time=as_datetime("2020-01-01")
-            ),
-        )
+    query_spec = MetricFlowQuerySpec(
+        metric_specs=(MetricSpec(element_name="bookings"), MetricSpec(element_name="listings")),
+        time_range_constraint=TimeRangeConstraint(
+            start_time=as_datetime("2020-01-01"), end_time=as_datetime("2020-01-01")
+        ),
     )
 
-    convert_and_check(
+    render_and_check(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_node,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
     )
 
 
@@ -403,18 +396,17 @@ def test_metric_with_measures_from_multiple_sources_no_dimensions(  # noqa: D103
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
-    dataflow_plan = dataflow_plan_builder.build_plan(
-        MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings_per_listing"),),
-        )
+    query_spec = MetricFlowQuerySpec(
+        metric_specs=(MetricSpec(element_name="bookings_per_listing"),),
     )
 
-    convert_and_check(
+    render_and_check(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_node,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
     )
 
 
@@ -426,19 +418,18 @@ def test_common_semantic_model(  # noqa: D103
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
     sql_client: SqlClient,
 ) -> None:
-    dataflow_plan = dataflow_plan_builder.build_plan(
-        MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"), MetricSpec(element_name="booking_value")),
-            dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
-        ),
+    query_spec = MetricFlowQuerySpec(
+        metric_specs=(MetricSpec(element_name="bookings"), MetricSpec(element_name="booking_value")),
+        dimension_specs=(DataSet.metric_time_dimension_spec(TimeGranularity.DAY),),
     )
 
-    convert_and_check(
+    render_and_check(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_node,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
     )
 
 
@@ -451,24 +442,24 @@ def test_min_max_only_categorical(
     sql_client: SqlClient,
 ) -> None:
     """Tests a min max only query with a categorical dimension."""
-    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
-        query_spec=MetricFlowQuerySpec(
-            dimension_specs=(
-                DimensionSpec(
-                    element_name="country_latest",
-                    entity_links=(EntityReference(element_name="listing"),),
-                ),
+    query_spec = MetricFlowQuerySpec(
+        dimension_specs=(
+            DimensionSpec(
+                element_name="country_latest",
+                entity_links=(EntityReference(element_name="listing"),),
             ),
-            min_max_only=True,
         ),
+        min_max_only=True,
     )
 
-    convert_and_check(
+    render_and_check(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_node,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+        is_distinct_values_plan=True,
     )
 
 
@@ -481,25 +472,25 @@ def test_min_max_only_time(
     sql_client: SqlClient,
 ) -> None:
     """Tests a min max only query with a time dimension."""
-    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
-        query_spec=MetricFlowQuerySpec(
-            time_dimension_specs=(
-                TimeDimensionSpec(
-                    element_name="paid_at",
-                    entity_links=(EntityReference("booking"),),
-                    time_granularity=TimeGranularity.DAY,
-                ),
+    query_spec = MetricFlowQuerySpec(
+        time_dimension_specs=(
+            TimeDimensionSpec(
+                element_name="paid_at",
+                entity_links=(EntityReference("booking"),),
+                time_granularity=TimeGranularity.DAY,
             ),
-            min_max_only=True,
         ),
+        min_max_only=True,
     )
 
-    convert_and_check(
+    render_and_check(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_node,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+        is_distinct_values_plan=True,
     )
 
 
@@ -512,25 +503,25 @@ def test_min_max_only_time_quarter(
     sql_client: SqlClient,
 ) -> None:
     """Tests a min max only query with a time dimension and non-default granularity."""
-    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
-        query_spec=MetricFlowQuerySpec(
-            time_dimension_specs=(
-                TimeDimensionSpec(
-                    element_name="paid_at",
-                    entity_links=(EntityReference("booking"),),
-                    time_granularity=TimeGranularity.QUARTER,
-                ),
+    query_spec = MetricFlowQuerySpec(
+        time_dimension_specs=(
+            TimeDimensionSpec(
+                element_name="paid_at",
+                entity_links=(EntityReference("booking"),),
+                time_granularity=TimeGranularity.QUARTER,
             ),
-            min_max_only=True,
         ),
+        min_max_only=True,
     )
 
-    convert_and_check(
+    render_and_check(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_node,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+        is_distinct_values_plan=True,
     )
 
 
@@ -543,19 +534,19 @@ def test_min_max_metric_time(
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
 ) -> None:
     """Tests a plan to get the min & max distinct values of metric_time."""
-    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
-        query_spec=MetricFlowQuerySpec(
-            time_dimension_specs=(MTD_SPEC_DAY,),
-            min_max_only=True,
-        )
+    query_spec = MetricFlowQuerySpec(
+        time_dimension_specs=(MTD_SPEC_DAY,),
+        min_max_only=True,
     )
 
-    convert_and_check(
+    render_and_check(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_node,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+        is_distinct_values_plan=True,
     )
 
 
@@ -568,17 +559,17 @@ def test_min_max_metric_time_week(
     dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
 ) -> None:
     """Tests a plan to get the min & max distinct values of metric_time with non-default granularity."""
-    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(
-        query_spec=MetricFlowQuerySpec(
-            time_dimension_specs=(MTD_SPEC_WEEK,),
-            min_max_only=True,
-        )
+    query_spec = MetricFlowQuerySpec(
+        time_dimension_specs=(MTD_SPEC_WEEK,),
+        min_max_only=True,
     )
 
-    convert_and_check(
+    render_and_check(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=dataflow_plan.sink_node,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+        is_distinct_values_plan=True,
     )
