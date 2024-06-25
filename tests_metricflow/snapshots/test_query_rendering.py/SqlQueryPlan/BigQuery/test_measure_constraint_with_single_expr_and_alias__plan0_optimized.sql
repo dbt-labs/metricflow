@@ -4,6 +4,7 @@ SELECT
   , delayed_bookings * 2 AS double_counted_delayed_bookings
 FROM (
   -- Constrain Output with WHERE
+  -- Pass Only Elements: ['bookings', 'booking__is_instant', 'metric_time__day']
   -- Pass Only Elements: ['bookings', 'metric_time__day']
   -- Aggregate Measures
   -- Compute Metrics via Expressions
@@ -11,24 +12,15 @@ FROM (
     metric_time__day
     , SUM(bookings) AS delayed_bookings
   FROM (
-    -- Constrain Output with WHERE
-    -- Pass Only Elements: ['bookings', 'booking__is_instant', 'metric_time__day']
+    -- Read Elements From Semantic Model 'bookings_source'
+    -- Metric Time Dimension 'ds'
     SELECT
-      metric_time__day
-      , booking__is_instant
-      , bookings
-    FROM (
-      -- Read Elements From Semantic Model 'bookings_source'
-      -- Metric Time Dimension 'ds'
-      SELECT
-        DATETIME_TRUNC(ds, day) AS metric_time__day
-        , is_instant AS booking__is_instant
-        , 1 AS bookings
-      FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_8
-    WHERE NOT booking__is_instant
-  ) subq_10
+      DATETIME_TRUNC(ds, day) AS metric_time__day
+      , is_instant AS booking__is_instant
+      , 1 AS bookings
+    FROM ***************************.fct_bookings bookings_source_src_28000
+  ) subq_8
   WHERE NOT booking__is_instant
   GROUP BY
     metric_time__day
-) subq_14
+) subq_13
