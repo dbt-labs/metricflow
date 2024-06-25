@@ -215,6 +215,11 @@ class DataflowPlan(MetricFlowDag[DataflowPlanNode]):
     def sink_node(self) -> DataflowPlanNode:  # noqa: D102
         return self._sink_nodes[0]
 
+    @property
+    def node_count(self) -> int:
+        """Returns the number of nodes in the DataflowPlan."""
+        return len(DataflowPlan.__all_nodes_in_subgraph(self.sink_node))
+
     @staticmethod
     def __all_nodes_in_subgraph(node: DataflowPlanNode) -> Sequence[DataflowPlanNode]:
         """Node accessor for retrieving a flattened sequence of all nodes in the subgraph upstream of the input node.

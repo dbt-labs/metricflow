@@ -405,7 +405,6 @@ class PredicatePushdownOptimizer(
         handling this scenario at this time.
         """
         self._log_visit_node_type(node)
-        # TODO: move this "remove where filters" logic into PredicatePushdownState
         updated_pushdown_state = PredicatePushdownState.without_where_filter_specs(
             original_pushdown_state=self._predicate_pushdown_tracker.last_pushdown_state,
         )
