@@ -7,7 +7,7 @@ from dataclasses import fields, is_dataclass
 from enum import Enum
 from typing import Any, Dict, List, Optional, Sized, Union
 
-from pydantic import BaseModel
+from dsi_pydantic_shim import BaseModel
 
 from metricflow_semantics.mf_logging.formatting import indent
 
