@@ -59,7 +59,7 @@
                             <!--     ),                                                           -->
                             <!--     linkable_elements=(                                          -->
                             <!--       LinkableDimension(                                         -->
-                            <!--         semantic_model_origin=SemanticModelReference(            -->
+                            <!--         defined_in_semantic_model=SemanticModelReference(        -->
                             <!--           semantic_model_name='bookings_source',                 -->
                             <!--         ),                                                       -->
                             <!--         element_name='is_instant',                               -->

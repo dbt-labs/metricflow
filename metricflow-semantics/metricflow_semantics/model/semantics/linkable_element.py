@@ -104,13 +104,24 @@ class LinkableElement(SemanticModelDerivation, SerializableDataclass, ABC):
         """The LinkableElementType describing what this instance represents."""
         raise NotImplementedError
 
+    @property
+    @abstractmethod
+    def semantic_model_origin(self) -> SemanticModelReference:
+        """The semantic model where this element was defined, if one exists.
+
+        If no such model exists, the element will return the VIRTUAL_SEMANTIC_MODEL_REFERENCE, as it is
+        either a virtual construct (e.g., metric_time) or a composite of semantic model inputs that could be used as
+        a virtual semantic model at some point (e.g., metric queries requested as filter inputs).
+        """
+        raise NotImplementedError
+
 
 @dataclass(frozen=True)
 class LinkableDimension(LinkableElement, SerializableDataclass):
     """Describes how a dimension can be realized by joining based on entity links."""
 
     # The semantic model where this dimension was defined.
-    semantic_model_origin: Optional[SemanticModelReference]
+    defined_in_semantic_model: Optional[SemanticModelReference]
     element_name: str
     dimension_type: DimensionType
     entity_links: Tuple[EntityReference, ...]
@@ -146,11 +157,25 @@ class LinkableDimension(LinkableElement, SerializableDataclass):
     @override
     def derived_from_semantic_models(self) -> Sequence[SemanticModelReference]:
         semantic_model_references = set()
-        if self.semantic_model_origin:
-            semantic_model_references.add(self.semantic_model_origin)
+        if self.defined_in_semantic_model:
+            semantic_model_references.add(self.defined_in_semantic_model)
         semantic_model_references.update(self.join_path.derived_from_semantic_models)
 
         return sorted_semantic_model_references(semantic_model_references)
+
+    @property
+    @override
+    def semantic_model_origin(self) -> SemanticModelReference:
+        """Returns the semantic model reference pointing to the model where the dimension is defined.
+
+        For virtual dimensions, such as metric_time, where there is no semantic model definition we return the
+        virtual semantic model reference.
+        """
+        return (
+            self.defined_in_semantic_model
+            if self.defined_in_semantic_model
+            else SemanticModelDerivation.VIRTUAL_SEMANTIC_MODEL_REFERENCE
+        )
 
 
 @dataclass(frozen=True)
@@ -158,7 +183,7 @@ class LinkableEntity(LinkableElement, SerializableDataclass):
     """Describes how an entity can be realized by joining based on entity links."""
 
     # The semantic model where this entity was defined.
-    semantic_model_origin: SemanticModelReference
+    defined_in_semantic_model: SemanticModelReference
     element_name: str
     properties: FrozenSet[LinkableElementProperty]
     entity_links: Tuple[EntityReference, ...]
@@ -182,9 +207,14 @@ class LinkableEntity(LinkableElement, SerializableDataclass):
     @property
     @override
     def derived_from_semantic_models(self) -> Sequence[SemanticModelReference]:
-        semantic_model_references = {self.semantic_model_origin}
+        semantic_model_references = {self.defined_in_semantic_model}
         semantic_model_references.update(self.join_path.derived_from_semantic_models)
         return sorted_semantic_model_references(semantic_model_references)
+
+    @property
+    @override
+    def semantic_model_origin(self) -> SemanticModelReference:
+        return self.defined_in_semantic_model
 
 
 # TODO: add to DSI
@@ -253,6 +283,15 @@ class LinkableMetric(LinkableElement, SerializableDataclass):
             semantic_model_references.update(self.metric_to_entity_join_path.derived_from_semantic_models)
 
         return sorted_semantic_model_references(semantic_model_references)
+
+    @property
+    @override
+    def semantic_model_origin(self) -> SemanticModelReference:
+        """Returns the virtual semantic model reference, as metrics are not defined in semantic models.
+
+        Metrics may be used as virtual source nodes for metrics as dimensions use cases, and we represent that here.
+        """
+        return SemanticModelDerivation.VIRTUAL_SEMANTIC_MODEL_REFERENCE
 
     @property
     def metric_to_entity_join_path(self) -> Optional[SemanticModelJoinPath]:

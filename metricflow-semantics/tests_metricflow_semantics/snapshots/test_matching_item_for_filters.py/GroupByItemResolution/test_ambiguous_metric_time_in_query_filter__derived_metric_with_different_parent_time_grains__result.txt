@@ -20,7 +20,7 @@ GroupByItemResolution(
                   time_granularity=MONTH,
                 ): (
                   LinkableDimension(
-                    semantic_model_origin=SemanticModelReference(
+                    defined_in_semantic_model=SemanticModelReference(
                       semantic_model_name='monthly_measures_source',
                     ),
                     element_name='metric_time',
@@ -65,7 +65,7 @@ GroupByItemResolution(
                   time_granularity=YEAR,
                 ): (
                   LinkableDimension(
-                    semantic_model_origin=SemanticModelReference(
+                    defined_in_semantic_model=SemanticModelReference(
                       semantic_model_name='yearly_measure_source',
                     ),
                     element_name='metric_time',

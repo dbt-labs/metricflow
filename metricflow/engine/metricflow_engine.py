@@ -608,10 +608,10 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                     )
                 else:
                     assert (
-                        linkable_dimension.semantic_model_origin
+                        linkable_dimension.defined_in_semantic_model
                     ), "Only metric_time can have no semantic_model_origin."
                     semantic_model = self._semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
-                        linkable_dimension.semantic_model_origin
+                        linkable_dimension.defined_in_semantic_model
                     )
                     assert semantic_model
                     dimensions.append(
@@ -662,7 +662,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         ) in path_key_to_linkable_entities.items():
             for linkable_entity in linkable_entity_tuple:
                 semantic_model = self._semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
-                    linkable_entity.semantic_model_origin
+                    linkable_entity.defined_in_semantic_model
                 )
                 assert semantic_model
                 entities.append(
