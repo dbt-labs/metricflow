@@ -90,8 +90,12 @@ class PredicatePushdownBranchStateTracker:
         """Method for forcibly updating the last seen predicate pushdown state to a new value.
 
         This is necessary only for cases where we wish to back-propagate some updated state attribute
-        for handling in the exit condition of the preceding node in the DAG. Since it is something of an
-        extraordinary circumstance we designate it as a special method rather than making it a property setter.
+        for handling in the exit condition of the preceding node in the DAG. The scenario where we use
+        this here is for indicating that a where filter has been applied elsewhere on the branch, and so
+        outer nodes can skip application as appropriate.
+
+        Since this is not something we want people doing by accident we designate it as a special method
+        rather than making it a property setter.
         """
         self._current_branch_state[-1] = pushdown_state
 
