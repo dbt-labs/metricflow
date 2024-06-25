@@ -150,3 +150,82 @@ integration_test:
     FROM  {{ source_schema }}.fct_bookings
     WHERE ds = {{ cast_to_ts('2020-01-01') }}
     GROUP BY ds
+---
+integration_test:
+  name: test_measure_source_constraint_with_joined_group_by
+  description: |
+    Tests a filter on the measure source with a joined in group by item that includes post-filter null values
+  model: SIMPLE_MODEL
+  metrics: ["bookings"]
+  group_bys: ["listing__is_lux_latest"]
+  where_filter: "NOT {{ render_dimension_template('booking__is_instant') }}"
+  check_query: |
+    SELECT
+      SUM(1) AS bookings
+      , l.is_lux AS listing__is_lux_latest
+    FROM {{ source_schema }}.fct_bookings b
+    LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest l ON b.listing_id = l.listing_id
+    WHERE NOT b.is_instant
+    GROUP BY l.is_lux
+---
+integration_test:
+  name: test_constraint_with_joined_dimension_allowing_nulls
+  description: |
+    Tests a filter on a joined in dimension that allows post-filter null values
+  model: SIMPLE_MODEL
+  metrics: ["bookings"]
+  group_bys: ["listing__is_lux_latest"]
+  where_filter: |
+    NOT {{ render_dimension_template('listing__is_lux_latest') }}
+      OR {{ render_dimension_template('listing__is_lux_latest') }} IS NULL
+  check_query: |
+    SELECT
+      SUM(1) AS bookings
+      , l.is_lux AS listing__is_lux_latest
+    FROM {{ source_schema }}.fct_bookings b
+    LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest l ON b.listing_id = l.listing_id
+    WHERE NOT l.is_lux OR l.is_lux IS NULL
+    GROUP BY l.is_lux
+---
+integration_test:
+  name: test_constraints_on_both_sides_of_a_join
+  description: |
+    Tests a filter on a joined in dimension AND a measure source dimension
+  model: SIMPLE_MODEL
+  metrics: ["bookings"]
+  group_bys: ["listing__is_lux_latest"]
+  where_filter: |
+    NOT {{ render_dimension_template('booking__is_instant') }}
+      AND (
+        NOT {{ render_dimension_template('listing__is_lux_latest') }}
+          OR {{ render_dimension_template('listing__is_lux_latest') }} IS NULL
+        )
+  check_query: |
+    SELECT
+      SUM(1) AS bookings
+      , l.is_lux AS listing__is_lux_latest
+    FROM {{ source_schema }}.fct_bookings b
+    LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest l ON b.listing_id = l.listing_id
+    WHERE NOT b.is_instant AND (NOT l.is_lux OR l.is_lux IS NULL)
+    GROUP BY l.is_lux
+---
+integration_test:
+  name: test_constraints_on_joined_group_by_items
+  description: |
+    Tests a filter on a joined in dimension AND a measure source dimension
+  model: SIMPLE_MODEL
+  metrics: []
+  group_bys: ["listing__is_lux_latest", "booking__is_instant"]
+  where_filter: |
+    NOT {{ render_dimension_template('booking__is_instant') }}
+      AND (
+        NOT {{ render_dimension_template('listing__is_lux_latest') }}
+          OR {{ render_dimension_template('listing__is_lux_latest') }} IS NULL
+        )
+  check_query: |
+    SELECT DISTINCT
+      b.is_instant AS booking__is_instant
+      , l.is_lux AS listing__is_lux_latest
+    FROM {{ source_schema }}.fct_bookings b
+    LEFT OUTER JOIN {{ source_schema }}.dim_listings_latest l ON b.listing_id = l.listing_id
+    WHERE NOT b.is_instant AND (NOT l.is_lux OR l.is_lux IS NULL)
