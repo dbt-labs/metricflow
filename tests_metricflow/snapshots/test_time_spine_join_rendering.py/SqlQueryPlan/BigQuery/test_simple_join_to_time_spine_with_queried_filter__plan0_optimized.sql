@@ -12,10 +12,10 @@ FROM (
   FROM (
     -- Join to Time Spine Dataset
     SELECT
-      subq_15.ds AS metric_time__day
-      , subq_13.booking__is_instant AS booking__is_instant
-      , subq_13.bookings AS bookings
-    FROM ***************************.mf_time_spine subq_15
+      subq_19.ds AS metric_time__day
+      , subq_17.booking__is_instant AS booking__is_instant
+      , subq_17.bookings AS bookings
+    FROM ***************************.mf_time_spine subq_19
     LEFT OUTER JOIN (
       -- Constrain Output with WHERE
       -- Aggregate Measures
@@ -24,22 +24,30 @@ FROM (
         , booking__is_instant
         , SUM(bookings) AS bookings
       FROM (
-        -- Read Elements From Semantic Model 'bookings_source'
-        -- Metric Time Dimension 'ds'
+        -- Constrain Output with WHERE
         -- Pass Only Elements: ['bookings', 'booking__is_instant', 'metric_time__day']
         SELECT
-          DATETIME_TRUNC(ds, day) AS metric_time__day
-          , is_instant AS booking__is_instant
-          , 1 AS bookings
-        FROM ***************************.fct_bookings bookings_source_src_28000
-      ) subq_11
+          metric_time__day
+          , booking__is_instant
+          , bookings
+        FROM (
+          -- Read Elements From Semantic Model 'bookings_source'
+          -- Metric Time Dimension 'ds'
+          SELECT
+            DATETIME_TRUNC(ds, day) AS metric_time__day
+            , is_instant AS booking__is_instant
+            , 1 AS bookings
+          FROM ***************************.fct_bookings bookings_source_src_28000
+        ) subq_13
+        WHERE booking__is_instant
+      ) subq_15
       WHERE booking__is_instant
       GROUP BY
         metric_time__day
         , booking__is_instant
-    ) subq_13
+    ) subq_17
     ON
-      subq_15.ds = subq_13.metric_time__day
-  ) subq_16
+      subq_19.ds = subq_17.metric_time__day
+  ) subq_20
   WHERE booking__is_instant
-) subq_17
+) subq_21

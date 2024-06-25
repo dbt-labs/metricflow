@@ -263,7 +263,8 @@ metric:
   name: instant_booking_fraction_of_max_value
   description: |
     Average instant booking value as a ratio of overall max booking value.
-    Tests constrained ratio measure.
+    Tests constrained ratio measure and predicate pushdown with different filters
+    on the same measure input.
   type: ratio
   type_params:
     numerator:
@@ -331,7 +332,8 @@ metric:
   name: regional_starting_balance_ratios
   description: |
     First day account balance ratio of western vs eastern region starting balance ratios,
-    used to test interaction between semi-additive measures and measure constraints
+    used to test interaction between semi-additive measures and measure constraints, and
+    behavior of predicate pushdown when there are multiple filters on the same categorical dimension
   type: ratio
   type_params:
     numerator:

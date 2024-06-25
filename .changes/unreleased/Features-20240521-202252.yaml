@@ -1,0 +1,6 @@
+kind: Features
+body: Enable predicate pushdown for categorical dimensions
+time: 2024-05-21T20:22:52.841802-07:00
+custom:
+  Author: tlento
+  Issue: "1011"

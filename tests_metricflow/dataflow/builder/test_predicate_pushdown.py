@@ -9,9 +9,7 @@ from metricflow.plan_conversion.node_processor import PredicateInputType, Predic
 @pytest.fixture
 def fully_enabled_pushdown_state() -> PredicatePushdownState:
     """Tests a valid configuration with all predicate properties set and pushdown fully enabled."""
-    params = PredicatePushdownState(
-        time_range_constraint=TimeRangeConstraint.all_time(),
-    )
+    params = PredicatePushdownState(time_range_constraint=TimeRangeConstraint.all_time(), where_filter_specs=tuple())
     return params
 
 
@@ -20,6 +18,7 @@ def test_time_range_pushdown_enabled_states(fully_enabled_pushdown_state: Predic
     time_range_only_state = PredicatePushdownState(
         time_range_constraint=TimeRangeConstraint.all_time(),
         pushdown_enabled_types=frozenset([PredicateInputType.TIME_RANGE_CONSTRAINT]),
+        where_filter_specs=tuple(),
     )
 
     enabled_states = {
@@ -39,4 +38,8 @@ def test_time_range_pushdown_enabled_states(fully_enabled_pushdown_state: Predic
 def test_invalid_disabled_pushdown_state() -> None:
     """Tests checks for invalid param configuration on disabled pushdown parameters."""
     with pytest.raises(AssertionError, match="Disabled pushdown state objects cannot have properties set"):
-        PredicatePushdownState(time_range_constraint=TimeRangeConstraint.all_time(), pushdown_enabled_types=frozenset())
+        PredicatePushdownState(
+            time_range_constraint=TimeRangeConstraint.all_time(),
+            pushdown_enabled_types=frozenset(),
+            where_filter_specs=tuple(),
+        )
