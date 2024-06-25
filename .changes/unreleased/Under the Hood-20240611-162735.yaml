@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Add dataflow plan optimizer to replace build-time predicate pushdown
+time: 2024-06-11T16:27:35.410726-07:00
+custom:
+    Author: tlento
+    Issue: "1011"
