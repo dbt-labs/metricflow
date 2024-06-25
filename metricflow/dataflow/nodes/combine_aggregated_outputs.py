@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Sequence, Union
+from typing import Sequence
 
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.visitor import VisitorOutputT
@@ -16,8 +16,13 @@ class CombineAggregatedOutputsNode(DataflowPlanNode):
 
     def __init__(  # noqa: D107
         self,
-        parent_nodes: Sequence[Union[DataflowPlanNode, DataflowPlanNode]],
+        parent_nodes: Sequence[DataflowPlanNode],
     ) -> None:
+        num_parents = len(parent_nodes)
+        assert num_parents > 1, (
+            "The CombineAggregatedOutputsNode is intended to merge the output datasets from 2 or more nodes, but this "
+            f"node is being initialized with with only {num_parents} parent(s)."
+        )
         super().__init__(node_id=self.create_unique_id(), parent_nodes=parent_nodes)
 
     @classmethod
@@ -37,5 +42,4 @@ class CombineAggregatedOutputsNode(DataflowPlanNode):
     def with_new_parents(  # noqa: D102
         self, new_parent_nodes: Sequence[DataflowPlanNode]
     ) -> CombineAggregatedOutputsNode:
-        assert len(new_parent_nodes) == 1
         return CombineAggregatedOutputsNode(parent_nodes=new_parent_nodes)

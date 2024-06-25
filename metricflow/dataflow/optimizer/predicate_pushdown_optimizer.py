@@ -190,6 +190,8 @@ class PredicatePushdownOptimizer(
 
         As this is the base metric_time node, all time-based filter predicate pushdown needs to be managed
         here.
+
+        # TODO: Check relationships between subquery optimizers, time range constraints, and where constraint nodes
         """
         self._log_visit_node_type(node)
         # TODO: Update to handle time range constraints
@@ -241,13 +243,21 @@ class PredicatePushdownOptimizer(
                 filters_left_over.append(filter_spec)
 
         logger.log(level=self._log_level, msg=f"Filter specs to add:\n{filters_to_apply}")
-        # TODO: wrap node with a WhereConstraintNode and propagate filters applied back up the branch for removal
         updated_pushdown_state = PredicatePushdownState(
             time_range_constraint=current_pushdown_state.time_range_constraint,
             where_filter_specs=tuple(filters_left_over),
             pushdown_enabled_types=current_pushdown_state.pushdown_enabled_types,
         )
-        return self._default_handler(node=node, pushdown_state=updated_pushdown_state)
+        optimized_node = self._default_handler(node=node, pushdown_state=updated_pushdown_state)
+        # TODO: propagate filters applied back up the branch for removal
+        if len(filters_to_apply) > 0:
+            return OptimizeBranchResult(
+                optimized_branch=WhereConstraintNode(
+                    parent_node=optimized_node.optimized_branch, where_specs=filters_to_apply
+                )
+            )
+        else:
+            return optimized_node
 
     # Constraint nodes - predicate sources for pushdown.
 
@@ -275,7 +285,9 @@ class PredicatePushdownOptimizer(
         """
         self._log_visit_node_type(node)
         current_pushdown_state = self._predicate_pushdown_tracker.last_pushdown_state
-        # TODO: short-circuit cases where pushdown is disabled for where constraints
+        if not current_pushdown_state.where_filter_pushdown_enabled:
+            return self._default_handler(node)
+
         where_specs = node.input_where_specs
         pushdown_eligible_specs: List[WhereFilterSpec] = []
         for spec in where_specs:
@@ -285,7 +297,7 @@ class PredicatePushdownOptimizer(
                 for element in spec.linkable_elements
                 if element.element_type not in current_pushdown_state.pushdown_eligible_element_types
             ]
-            if len(semantic_models) != 1 and len(invalid_element_types) > 0:
+            if len(semantic_models) != 1 or len(invalid_element_types) > 0:
                 continue
             pushdown_eligible_specs.append(spec)
 
@@ -295,15 +307,19 @@ class PredicatePushdownOptimizer(
 
         return self._default_handler(node=node, pushdown_state=updated_pushdown_state)
 
-    # Join nodes - these potentially affect pushdown state
+    # Join nodes - these may affect pushdown state based on join type
 
     def visit_combine_aggregated_outputs_node(self, node: CombineAggregatedOutputsNode) -> OptimizeBranchResult:
         """Removes where filter specs from current pushdown state while allowing subsequent specs to be pushed down.
 
-        The combine aggregated outputs node does a FULL OUTER JOIN, which means any where constraint applied after it
-        cannot be safely pushed down if that constraint might include NULLs. However, where constraints applied
+        The combine aggregated outputs node typically does a FULL OUTER JOIN, which means any where constraint applied
+        after it cannot be safely pushed down if it might include NULLs. However, where constraints applied
         to parents of this node can still be pushed down along the branch, and time range constraints will never allow
         NULLs to pass so those should remain intact.
+
+        There is a CROSS JOIN case which would enable pushdown, but accessing that scenario requires rebuilding
+        the dataset for this node, and as this is rarely, if ever, wrapped by a WhereConstraintNode we don't bother
+        handling this scenario at this time.
         """
         self._log_visit_node_type(node)
         # TODO: move this "remove where filters" logic into PredicatePushdownState
@@ -407,7 +423,11 @@ class PredicatePushdownOptimizer(
         """Updates time range constraint window to account for join over time range behavior, as needed.
 
         For the time being we simply pass through in all cases, because time constraint adjustments are
-        handled in the DataflowPlanBuilder and the original time constraint is passed through.
+        handled in the DataflowPlanBuilder and the original time constraint is passed through. This handler
+        will need refinement once we move support for time range constraints and time filters to this class.
+
+        Note the join type is always INNER, which means we only need special handling for filters involving
+        time spans.
 
         TODO: move constraint window adjustment to the optimizer for application of the relevant TimeRangeConstraint.
         """
@@ -415,23 +435,51 @@ class PredicatePushdownOptimizer(
         return self._default_handler(node)
 
     def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode) -> OptimizeBranchResult:
-        """Updates time range constraint window to account for time spine join intervals, as needed.
+        """Updates pushdown state to account for time spine join types and constraint window requirements.
 
-        For the time being we simply pass through in all cases, because time constraint handling is done between the
-        DataflowPlanBuilder and DataflowToSqlQueryPlanConverter.
+        The JoinToTimeSpineNode is processed as the left node in a join against a single input parent, typically
+        a measure or metric input of some kind, but the join type depends on how the JoinToTimeSpineNode is configured.
+        Since we cannot safely push down filters that might allow for nulls, we must update the pushdown state
+        accordingly.
 
-        TODO: move constraint window management to the optimizer
+        TODO: move constraint window management to the optimizer and enable time-based filter propagation
+        as appropriate
         """
         self._log_visit_node_type(node)
-        return self._default_handler(node)
+        current_pushdown_state = self._predicate_pushdown_tracker.last_pushdown_state
+        if node.join_type is SqlJoinType.LEFT_OUTER or node.join_type is SqlJoinType.FULL_OUTER:
+            updated_pushdown_state = PredicatePushdownState(
+                time_range_constraint=None,
+                where_filter_specs=tuple(),
+                pushdown_enabled_types=current_pushdown_state.pushdown_enabled_types,
+            )
+        else:
+            updated_pushdown_state = PredicatePushdownState.without_time_range_constraint(current_pushdown_state)
+
+        return self._default_handler(node=node, pushdown_state=updated_pushdown_state)
+
+    # Nodes affecting pushdown state for other reasons
+
+    def visit_compute_metrics_node(self, node: ComputeMetricsNode) -> OptimizeBranchResult:
+        """Disables or refines pushdown state for metrics that require custom handling.
+
+        For example, time filters for derived offset or cumulative metrics might require special state
+        handling for filters on time dimension inputs or time range constraint expressions.
+        """
+        self._log_visit_node_type(node)
+        current_pushdown_state = self._predicate_pushdown_tracker.last_pushdown_state
+        if any(metric_spec.has_time_offset for metric_spec in node.metric_specs):
+            # TODO: Allow non-time filters for offset metrics. This is for parity with the original hook preventing
+            # invalid pushdown for offset metrics
+            updated_pushdown_state = PredicatePushdownState.with_pushdown_disabled()
+        else:
+            updated_pushdown_state = current_pushdown_state
+
+        return self._default_handler(node=node, pushdown_state=updated_pushdown_state)
 
     # Other nodes - these simply propagate state, as they do not affect predicate pushdown in our context
 
     def visit_aggregate_measures_node(self, node: AggregateMeasuresNode) -> OptimizeBranchResult:  # noqa: D102
-        self._log_visit_node_type(node)
-        return self._default_handler(node)
-
-    def visit_compute_metrics_node(self, node: ComputeMetricsNode) -> OptimizeBranchResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
@@ -443,7 +491,11 @@ class PredicatePushdownOptimizer(
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
-    def visit_semi_additive_join_node(self, node: SemiAdditiveJoinNode) -> OptimizeBranchResult:  # noqa: D102
+    def visit_semi_additive_join_node(self, node: SemiAdditiveJoinNode) -> OptimizeBranchResult:
+        """Propagates pushdown state to all input branches.
+
+        The semi-additive join node only does inner joins, so it does not affect pushdown state.
+        """
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
