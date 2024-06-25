@@ -134,3 +134,178 @@ def test_skipped_pushdown(
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=parsed_query.query_spec,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_metric_time_filter_with_two_targets(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    query_parser: MetricFlowQueryParser,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    """Tests pushdown optimization for a simple metric time predicate through a single join.
+
+    This is currently a no-op for the pushdown optimizer.
+    TODO: support metric time pushdown
+
+    """
+    parsed_query = query_parser.parse_and_validate_query(
+        metric_names=("bookings",),
+        group_by_names=("listing__country_latest",),
+        where_constraint=PydanticWhereFilter(where_sql_template="{{ TimeDimension('metric_time') }} = '2024-01-01'"),
+    )
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=parsed_query.query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_conversion_metric_query_filters(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    query_parser: MetricFlowQueryParser,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    """Tests pushdown optimizer behavior for a simple predicate on a conversion metric."""
+    parsed_query = query_parser.parse_and_validate_query(
+        metric_names=("visit_buy_conversion_rate_7days",),
+        group_by_names=("metric_time", "user__home_state_latest"),
+        where_constraint=PydanticWhereFilter(where_sql_template="{{ Dimension('visit__referrer_id') }} = '123456'"),
+    )
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=parsed_query.query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_cumulative_metric_with_query_time_filters(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    query_parser: MetricFlowQueryParser,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    """Tests pushdown optimizer behavior for a query against a cumulative metric.
+
+    TODO: support metric time filters
+    """
+    parsed_query = query_parser.parse_and_validate_query(
+        metric_names=("every_two_days_bookers",),
+        group_by_names=("listing__country_latest", "metric_time"),
+        where_constraint=PydanticWhereFilter(where_sql_template="{{ Dimension('booking__is_instant') }}"),
+    )
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=parsed_query.query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_offset_metric_with_query_time_filters(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    query_parser: MetricFlowQueryParser,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    """Tests pushdown optimizer behavior for a query against a derived offset metric.
+
+    TODO: support metric time filters
+    """
+    parsed_query = query_parser.parse_and_validate_query(
+        metric_names=("bookings_growth_2_weeks",),
+        group_by_names=("listing__country_latest", "metric_time"),
+        where_constraint=PydanticWhereFilter(where_sql_template="{{ Dimension('booking__is_instant') }}"),
+    )
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=parsed_query.query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_fill_nulls_time_spine_metric_predicate_pushdown(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    query_parser: MetricFlowQueryParser,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    """Tests pushdown optimizer behavior for a metric with a time spine and fill_nulls_with enabled.
+
+    TODO: support metric time filters
+    """
+    parsed_query = query_parser.parse_and_validate_query(
+        metric_names=("bookings_growth_2_weeks_fill_nulls_with_0",),
+        group_by_names=("listing__country_latest", "metric_time"),
+        where_constraint=PydanticWhereFilter(where_sql_template="{{ Dimension('booking__is_instant') }}"),
+    )
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=parsed_query.query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_simple_join_to_time_spine_pushdown_filter_application(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    query_parser: MetricFlowQueryParser,
+    dataflow_to_sql_converter: DataflowToSqlQueryPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    """Tests rendering a query where we join to a time spine and query the filter input.
+
+    This should produce a SQL query that applies the filter outside of the time spine join.
+    """
+    parsed_query = query_parser.parse_and_validate_query(
+        metric_names=("bookings_join_to_time_spine",),
+        group_by_names=("booking__is_instant", "metric_time"),
+        where_constraint=PydanticWhereFilter(
+            where_sql_template="{{ Dimension('booking__is_instant') }}",
+        ),
+    )
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=parsed_query.query_spec,
+    )
