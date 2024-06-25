@@ -39,9 +39,7 @@ from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilde
 from metricflow.dataflow.builder.node_data_set import DataflowPlanNodeOutputDataSetResolver
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import DataflowPlan
-from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import (
-    SourceScanOptimizer,
-)
+from metricflow.dataflow.optimizer.dataflow_optimizer_factory import DataflowPlanOptimization
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
@@ -502,7 +500,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             dataflow_plan = self._dataflow_plan_builder.build_plan(
                 query_spec=query_spec,
                 output_selection_specs=output_selection_specs,
-                optimizers=(SourceScanOptimizer(),),
+                optimizations=(DataflowPlanOptimization.SOURCE_SCAN,),
             )
         else:
             dataflow_plan = self._dataflow_plan_builder.build_plan_for_distinct_values(query_spec=query_spec)
