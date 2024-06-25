@@ -634,8 +634,7 @@ class DataflowPlanBuilder:
             )
 
             if len(metric_spec.filter_specs) > 0:
-                merged_where_filter = WhereFilterSpec.merge_iterable(metric_spec.filter_specs)
-                output_node = WhereConstraintNode(parent_node=output_node, where_constraint=merged_where_filter)
+                output_node = WhereConstraintNode(parent_node=output_node, where_specs=metric_spec.filter_specs)
             if not extraneous_linkable_specs.is_subset_of(queried_linkable_specs):
                 output_node = FilterElementsNode(
                     parent_node=output_node,
@@ -776,9 +775,7 @@ class DataflowPlanBuilder:
             output_node = JoinOnEntitiesNode(left_node=output_node, join_targets=dataflow_recipe.join_targets)
 
         if len(query_level_filter_specs) > 0:
-            output_node = WhereConstraintNode(
-                parent_node=output_node, where_constraint=WhereFilterSpec.merge_iterable(query_level_filter_specs)
-            )
+            output_node = WhereConstraintNode(parent_node=output_node, where_specs=query_level_filter_specs)
         if query_spec.time_range_constraint:
             output_node = ConstrainTimeRangeNode(
                 parent_node=output_node, time_range_constraint=query_spec.time_range_constraint
@@ -1524,12 +1521,11 @@ class DataflowPlanBuilder:
             )
 
         pre_aggregate_node: DataflowPlanNode = cumulative_metric_constrained_node or unaggregated_measure_node
-        merged_where_filter_spec = WhereFilterSpec.merge_iterable(metric_input_measure_spec.filter_specs)
         if len(metric_input_measure_spec.filter_specs) > 0:
             # Apply where constraint on the node
             pre_aggregate_node = WhereConstraintNode(
                 parent_node=pre_aggregate_node,
-                where_constraint=merged_where_filter_spec,
+                where_specs=metric_input_measure_spec.filter_specs,
             )
 
         if non_additive_dimension_spec is not None:
@@ -1598,9 +1594,7 @@ class DataflowPlanBuilder:
                 if set(filter_spec.linkable_specs).issubset(set(queried_linkable_specs.as_tuple))
             ]
             if len(queried_filter_specs) > 0:
-                output_node = WhereConstraintNode(
-                    parent_node=output_node, where_constraint=WhereFilterSpec.merge_iterable(queried_filter_specs)
-                )
+                output_node = WhereConstraintNode(parent_node=output_node, where_specs=queried_filter_specs)
 
             # TODO: this will break if you query by agg_time_dimension but apply a time constraint on metric_time.
             # To fix when enabling time range constraints for agg_time_dimension.

@@ -255,8 +255,8 @@ class PredicatePushdownOptimizer(
         """
         self._log_visit_node_type(node)
         current_pushdown_state = self._predicate_pushdown_tracker.last_pushdown_state
-        # TODO: update WhereConstraintNode to hold a list of specs instead of merging them all before initialization
-        where_specs = (node.where,)
+        # TODO: short-circuit cases where pushdown is disabled for where constraints
+        where_specs = node.input_where_specs
         pushdown_eligible_specs: List[WhereFilterSpec] = []
         for spec in where_specs:
             semantic_models = self._models_for_spec(spec)

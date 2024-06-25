@@ -190,27 +190,29 @@ def test_filter_with_where_constraint_node(
     )  # need to include ds_spec because where constraint operates on ds
     where_constraint_node = WhereConstraintNode(
         parent_node=filter_node,
-        where_constraint=WhereFilterSpec(
-            where_sql="booking__ds__day = '2020-01-01'",
-            bind_parameters=SqlBindParameters(),
-            linkable_specs=(
-                TimeDimensionSpec(
-                    element_name="ds",
-                    entity_links=(EntityReference(element_name="booking"),),
-                    time_granularity=TimeGranularity.DAY,
+        where_specs=(
+            WhereFilterSpec(
+                where_sql="booking__ds__day = '2020-01-01'",
+                bind_parameters=SqlBindParameters(),
+                linkable_specs=(
+                    TimeDimensionSpec(
+                        element_name="ds",
+                        entity_links=(EntityReference(element_name="booking"),),
+                        time_granularity=TimeGranularity.DAY,
+                    ),
                 ),
-            ),
-            linkable_elements=(
-                LinkableDimension(
-                    defined_in_semantic_model=SemanticModelReference("bookings_source"),
-                    element_name="ds",
-                    dimension_type=DimensionType.TIME,
-                    entity_links=(EntityReference(element_name="booking"),),
-                    properties=frozenset(),
-                    time_granularity=TimeGranularity.DAY,
-                    date_part=None,
-                    join_path=SemanticModelJoinPath(
-                        left_semantic_model_reference=SemanticModelReference("bookings_source"),
+                linkable_elements=(
+                    LinkableDimension(
+                        defined_in_semantic_model=SemanticModelReference("bookings_source"),
+                        element_name="ds",
+                        dimension_type=DimensionType.TIME,
+                        entity_links=(EntityReference(element_name="booking"),),
+                        properties=frozenset(),
+                        time_granularity=TimeGranularity.DAY,
+                        date_part=None,
+                        join_path=SemanticModelJoinPath(
+                            left_semantic_model_reference=SemanticModelReference("bookings_source"),
+                        ),
                     ),
                 ),
             ),

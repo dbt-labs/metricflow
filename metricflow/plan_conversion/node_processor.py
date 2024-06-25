@@ -378,9 +378,8 @@ class PreJoinNodeProcessor:
                 if len(matching_filter_specs) == 0:
                     filtered_nodes.append(source_node)
                 else:
-                    where_constraint = WhereFilterSpec.merge_iterable(matching_filter_specs)
                     filtered_nodes.append(
-                        WhereConstraintNode(parent_node=source_node, where_constraint=where_constraint)
+                        WhereConstraintNode(parent_node=source_node, where_specs=matching_filter_specs)
                     )
             else:
                 filtered_nodes.append(source_node)
