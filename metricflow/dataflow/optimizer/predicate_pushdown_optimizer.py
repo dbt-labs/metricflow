@@ -385,6 +385,13 @@ class PredicatePushdownOptimizer(
                 )
 
             if node.always_apply:
+                logger.log(
+                    level=self._log_level,
+                    msg=(
+                        "Applying original filter spec set based on node-level override directive. Additional specs "
+                        + f"appled:\n{[spec for spec in node.input_where_specs if spec not in filter_specs_to_apply]}"
+                    ),
+                )
                 optimized_node = OptimizeBranchResult(
                     optimized_branch=node.with_new_parents((optimized_parent.optimized_branch,))
                 )

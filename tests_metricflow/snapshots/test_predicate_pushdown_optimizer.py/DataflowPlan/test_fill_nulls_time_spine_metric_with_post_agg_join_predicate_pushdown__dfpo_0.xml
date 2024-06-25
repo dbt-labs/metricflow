@@ -107,6 +107,7 @@
                         <!--       ),                                                         -->
                         <!--     ),                                                           -->
                         <!--   )                                                              -->
+                        <!-- All filters always applied: = True -->
                         <JoinToTimeSpineNode>
                             <!-- description = 'Join to Time Spine Dataset' -->
                             <!-- node_id = NodeId(id_str='jts_3') -->
@@ -307,6 +308,7 @@
                         <!--       ),                                                         -->
                         <!--     ),                                                           -->
                         <!--   )                                                              -->
+                        <!-- All filters always applied: = True -->
                         <JoinToTimeSpineNode>
                             <!-- description = 'Join to Time Spine Dataset' -->
                             <!-- node_id = NodeId(id_str='jts_5') -->

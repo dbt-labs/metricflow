@@ -66,14 +66,20 @@ class WhereConstraintNode(DataflowPlanNode):
 
     @property
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
-        return tuple(super().displayed_properties) + (DisplayedProperty("where_condition", self.where),)
+        properties = tuple(super().displayed_properties) + (DisplayedProperty("where_condition", self.where),)
+        if self.always_apply:
+            properties = properties + (DisplayedProperty("All filters always applied:", self.always_apply),)
+        return properties
 
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D102
-        return isinstance(other_node, self.__class__) and other_node.where == self.where
+        return (
+            isinstance(other_node, self.__class__)
+            and other_node.where == self.where
+            and other_node.always_apply == self.always_apply
+        )
 
     def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> WhereConstraintNode:  # noqa: D102
         assert len(new_parent_nodes) == 1
         return WhereConstraintNode(
-            parent_node=new_parent_nodes[0],
-            where_specs=self.input_where_specs,
+            parent_node=new_parent_nodes[0], where_specs=self.input_where_specs, always_apply=self.always_apply
         )
