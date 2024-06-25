@@ -52,7 +52,10 @@ def render_and_check(
     )
 
     # Run dataflow -> sql conversion with all optimizers
-    optimizations = (DataflowPlanOptimization.PREDICATE_PUSHDOWN,)
+    optimizations = (
+        DataflowPlanOptimization.SOURCE_SCAN,
+        DataflowPlanOptimization.PREDICATE_PUSHDOWN,
+    )
     if is_distinct_values_plan:
         optimized_plan = dataflow_plan_builder.build_plan_for_distinct_values(query_spec, optimizations=optimizations)
     else:
