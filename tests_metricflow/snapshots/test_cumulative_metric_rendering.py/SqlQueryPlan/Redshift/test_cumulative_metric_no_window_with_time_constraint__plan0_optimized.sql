@@ -4,15 +4,15 @@
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  subq_16.metric_time__day AS metric_time__day
-  , SUM(subq_15.txn_revenue) AS revenue_all_time
+  subq_12.metric_time__day AS metric_time__day
+  , SUM(subq_11.txn_revenue) AS revenue_all_time
 FROM (
   -- Time Spine
   SELECT
     ds AS metric_time__day
-  FROM ***************************.mf_time_spine subq_17
+  FROM ***************************.mf_time_spine subq_13
   WHERE ds BETWEEN '2020-01-01' AND '2020-01-01'
-) subq_16
+) subq_12
 INNER JOIN (
   -- Read Elements From Semantic Model 'revenue'
   -- Metric Time Dimension 'ds'
@@ -22,9 +22,9 @@ INNER JOIN (
     , revenue AS txn_revenue
   FROM ***************************.fct_revenue revenue_src_28000
   WHERE DATE_TRUNC('day', created_at) BETWEEN '2000-01-01' AND '2020-01-01'
-) subq_15
+) subq_11
 ON
-  (subq_15.metric_time__day <= subq_16.metric_time__day)
-WHERE subq_16.metric_time__day BETWEEN '2020-01-01' AND '2020-01-01'
+  (subq_11.metric_time__day <= subq_12.metric_time__day)
+WHERE subq_12.metric_time__day BETWEEN '2020-01-01' AND '2020-01-01'
 GROUP BY
-  subq_16.metric_time__day
+  subq_12.metric_time__day

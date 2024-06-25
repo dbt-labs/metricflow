@@ -9,9 +9,9 @@ FROM (
   -- Join Standard Outputs
   -- Pass Only Elements: ['listings', 'metric_time__day', 'listing__bookings']
   SELECT
-    subq_24.metric_time__day AS metric_time__day
-    , subq_30.listing__bookings AS listing__bookings
-    , subq_24.listings AS listings
+    subq_16.metric_time__day AS metric_time__day
+    , subq_22.listing__bookings AS listing__bookings
+    , subq_16.listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
@@ -21,7 +21,7 @@ FROM (
       , listing_id AS listing
       , 1 AS listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-  ) subq_24
+  ) subq_16
   LEFT OUTER JOIN (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
@@ -37,13 +37,13 @@ FROM (
         listing_id AS listing
         , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_27
+    ) subq_19
     GROUP BY
       listing
-  ) subq_30
+  ) subq_22
   ON
-    subq_24.listing = subq_30.listing
-) subq_32
+    subq_16.listing = subq_22.listing
+) subq_24
 WHERE listing__bookings > 2
 GROUP BY
   metric_time__day

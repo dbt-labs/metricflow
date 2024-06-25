@@ -99,6 +99,7 @@ class StaticIdPrefix(IdPrefix, Enum, metaclass=EnumMetaClassHelper):
 
     TIME_SPINE_SOURCE = "time_spine_src"
     SUB_QUERY = "subq"
+    NODE_RESOLVER_SUB_QUERY = "nr_subq"
 
     @property
     @override

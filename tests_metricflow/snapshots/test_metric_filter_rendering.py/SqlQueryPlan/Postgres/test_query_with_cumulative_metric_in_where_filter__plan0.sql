@@ -1,105 +1,105 @@
 -- Compute Metrics via Expressions
 SELECT
-  subq_17.listings
+  subq_13.listings
 FROM (
   -- Aggregate Measures
   SELECT
-    SUM(subq_16.listings) AS listings
+    SUM(subq_12.listings) AS listings
   FROM (
     -- Pass Only Elements: ['listings',]
     SELECT
-      subq_15.listings
+      subq_11.listings
     FROM (
       -- Constrain Output with WHERE
       SELECT
-        subq_14.user__revenue_all_time
-        , subq_14.listings
+        subq_10.user__revenue_all_time
+        , subq_10.listings
       FROM (
         -- Pass Only Elements: ['listings', 'user__revenue_all_time']
         SELECT
-          subq_13.user__revenue_all_time
-          , subq_13.listings
+          subq_9.user__revenue_all_time
+          , subq_9.listings
         FROM (
           -- Join Standard Outputs
           SELECT
-            subq_6.user AS user
-            , subq_12.user__revenue_all_time AS user__revenue_all_time
-            , subq_6.listings AS listings
+            subq_2.user AS user
+            , subq_8.user__revenue_all_time AS user__revenue_all_time
+            , subq_2.listings AS listings
           FROM (
             -- Pass Only Elements: ['listings', 'user']
             SELECT
-              subq_5.user
-              , subq_5.listings
+              subq_1.user
+              , subq_1.listings
             FROM (
               -- Metric Time Dimension 'ds'
               SELECT
-                subq_4.ds__day
-                , subq_4.ds__week
-                , subq_4.ds__month
-                , subq_4.ds__quarter
-                , subq_4.ds__year
-                , subq_4.ds__extract_year
-                , subq_4.ds__extract_quarter
-                , subq_4.ds__extract_month
-                , subq_4.ds__extract_day
-                , subq_4.ds__extract_dow
-                , subq_4.ds__extract_doy
-                , subq_4.created_at__day
-                , subq_4.created_at__week
-                , subq_4.created_at__month
-                , subq_4.created_at__quarter
-                , subq_4.created_at__year
-                , subq_4.created_at__extract_year
-                , subq_4.created_at__extract_quarter
-                , subq_4.created_at__extract_month
-                , subq_4.created_at__extract_day
-                , subq_4.created_at__extract_dow
-                , subq_4.created_at__extract_doy
-                , subq_4.listing__ds__day
-                , subq_4.listing__ds__week
-                , subq_4.listing__ds__month
-                , subq_4.listing__ds__quarter
-                , subq_4.listing__ds__year
-                , subq_4.listing__ds__extract_year
-                , subq_4.listing__ds__extract_quarter
-                , subq_4.listing__ds__extract_month
-                , subq_4.listing__ds__extract_day
-                , subq_4.listing__ds__extract_dow
-                , subq_4.listing__ds__extract_doy
-                , subq_4.listing__created_at__day
-                , subq_4.listing__created_at__week
-                , subq_4.listing__created_at__month
-                , subq_4.listing__created_at__quarter
-                , subq_4.listing__created_at__year
-                , subq_4.listing__created_at__extract_year
-                , subq_4.listing__created_at__extract_quarter
-                , subq_4.listing__created_at__extract_month
-                , subq_4.listing__created_at__extract_day
-                , subq_4.listing__created_at__extract_dow
-                , subq_4.listing__created_at__extract_doy
-                , subq_4.ds__day AS metric_time__day
-                , subq_4.ds__week AS metric_time__week
-                , subq_4.ds__month AS metric_time__month
-                , subq_4.ds__quarter AS metric_time__quarter
-                , subq_4.ds__year AS metric_time__year
-                , subq_4.ds__extract_year AS metric_time__extract_year
-                , subq_4.ds__extract_quarter AS metric_time__extract_quarter
-                , subq_4.ds__extract_month AS metric_time__extract_month
-                , subq_4.ds__extract_day AS metric_time__extract_day
-                , subq_4.ds__extract_dow AS metric_time__extract_dow
-                , subq_4.ds__extract_doy AS metric_time__extract_doy
-                , subq_4.listing
-                , subq_4.user
-                , subq_4.listing__user
-                , subq_4.country_latest
-                , subq_4.is_lux_latest
-                , subq_4.capacity_latest
-                , subq_4.listing__country_latest
-                , subq_4.listing__is_lux_latest
-                , subq_4.listing__capacity_latest
-                , subq_4.listings
-                , subq_4.largest_listing
-                , subq_4.smallest_listing
+                subq_0.ds__day
+                , subq_0.ds__week
+                , subq_0.ds__month
+                , subq_0.ds__quarter
+                , subq_0.ds__year
+                , subq_0.ds__extract_year
+                , subq_0.ds__extract_quarter
+                , subq_0.ds__extract_month
+                , subq_0.ds__extract_day
+                , subq_0.ds__extract_dow
+                , subq_0.ds__extract_doy
+                , subq_0.created_at__day
+                , subq_0.created_at__week
+                , subq_0.created_at__month
+                , subq_0.created_at__quarter
+                , subq_0.created_at__year
+                , subq_0.created_at__extract_year
+                , subq_0.created_at__extract_quarter
+                , subq_0.created_at__extract_month
+                , subq_0.created_at__extract_day
+                , subq_0.created_at__extract_dow
+                , subq_0.created_at__extract_doy
+                , subq_0.listing__ds__day
+                , subq_0.listing__ds__week
+                , subq_0.listing__ds__month
+                , subq_0.listing__ds__quarter
+                , subq_0.listing__ds__year
+                , subq_0.listing__ds__extract_year
+                , subq_0.listing__ds__extract_quarter
+                , subq_0.listing__ds__extract_month
+                , subq_0.listing__ds__extract_day
+                , subq_0.listing__ds__extract_dow
+                , subq_0.listing__ds__extract_doy
+                , subq_0.listing__created_at__day
+                , subq_0.listing__created_at__week
+                , subq_0.listing__created_at__month
+                , subq_0.listing__created_at__quarter
+                , subq_0.listing__created_at__year
+                , subq_0.listing__created_at__extract_year
+                , subq_0.listing__created_at__extract_quarter
+                , subq_0.listing__created_at__extract_month
+                , subq_0.listing__created_at__extract_day
+                , subq_0.listing__created_at__extract_dow
+                , subq_0.listing__created_at__extract_doy
+                , subq_0.ds__day AS metric_time__day
+                , subq_0.ds__week AS metric_time__week
+                , subq_0.ds__month AS metric_time__month
+                , subq_0.ds__quarter AS metric_time__quarter
+                , subq_0.ds__year AS metric_time__year
+                , subq_0.ds__extract_year AS metric_time__extract_year
+                , subq_0.ds__extract_quarter AS metric_time__extract_quarter
+                , subq_0.ds__extract_month AS metric_time__extract_month
+                , subq_0.ds__extract_day AS metric_time__extract_day
+                , subq_0.ds__extract_dow AS metric_time__extract_dow
+                , subq_0.ds__extract_doy AS metric_time__extract_doy
+                , subq_0.listing
+                , subq_0.user
+                , subq_0.listing__user
+                , subq_0.country_latest
+                , subq_0.is_lux_latest
+                , subq_0.capacity_latest
+                , subq_0.listing__country_latest
+                , subq_0.listing__is_lux_latest
+                , subq_0.listing__capacity_latest
+                , subq_0.listings
+                , subq_0.largest_listing
+                , subq_0.smallest_listing
               FROM (
                 -- Read Elements From Semantic Model 'listings_latest'
                 SELECT
@@ -160,68 +160,68 @@ FROM (
                   , listings_latest_src_28000.user_id AS user
                   , listings_latest_src_28000.user_id AS listing__user
                 FROM ***************************.dim_listings_latest listings_latest_src_28000
-              ) subq_4
-            ) subq_5
-          ) subq_6
+              ) subq_0
+            ) subq_1
+          ) subq_2
           LEFT OUTER JOIN (
             -- Pass Only Elements: ['user', 'user__revenue_all_time']
             SELECT
-              subq_11.user
-              , subq_11.user__revenue_all_time
+              subq_7.user
+              , subq_7.user__revenue_all_time
             FROM (
               -- Compute Metrics via Expressions
               SELECT
-                subq_10.user
-                , subq_10.txn_revenue AS user__revenue_all_time
+                subq_6.user
+                , subq_6.txn_revenue AS user__revenue_all_time
               FROM (
                 -- Aggregate Measures
                 SELECT
-                  subq_9.user
-                  , SUM(subq_9.txn_revenue) AS txn_revenue
+                  subq_5.user
+                  , SUM(subq_5.txn_revenue) AS txn_revenue
                 FROM (
                   -- Pass Only Elements: ['txn_revenue', 'user']
                   SELECT
-                    subq_8.user
-                    , subq_8.txn_revenue
+                    subq_4.user
+                    , subq_4.txn_revenue
                   FROM (
                     -- Metric Time Dimension 'ds'
                     SELECT
-                      subq_7.ds__day
-                      , subq_7.ds__week
-                      , subq_7.ds__month
-                      , subq_7.ds__quarter
-                      , subq_7.ds__year
-                      , subq_7.ds__extract_year
-                      , subq_7.ds__extract_quarter
-                      , subq_7.ds__extract_month
-                      , subq_7.ds__extract_day
-                      , subq_7.ds__extract_dow
-                      , subq_7.ds__extract_doy
-                      , subq_7.revenue_instance__ds__day
-                      , subq_7.revenue_instance__ds__week
-                      , subq_7.revenue_instance__ds__month
-                      , subq_7.revenue_instance__ds__quarter
-                      , subq_7.revenue_instance__ds__year
-                      , subq_7.revenue_instance__ds__extract_year
-                      , subq_7.revenue_instance__ds__extract_quarter
-                      , subq_7.revenue_instance__ds__extract_month
-                      , subq_7.revenue_instance__ds__extract_day
-                      , subq_7.revenue_instance__ds__extract_dow
-                      , subq_7.revenue_instance__ds__extract_doy
-                      , subq_7.ds__day AS metric_time__day
-                      , subq_7.ds__week AS metric_time__week
-                      , subq_7.ds__month AS metric_time__month
-                      , subq_7.ds__quarter AS metric_time__quarter
-                      , subq_7.ds__year AS metric_time__year
-                      , subq_7.ds__extract_year AS metric_time__extract_year
-                      , subq_7.ds__extract_quarter AS metric_time__extract_quarter
-                      , subq_7.ds__extract_month AS metric_time__extract_month
-                      , subq_7.ds__extract_day AS metric_time__extract_day
-                      , subq_7.ds__extract_dow AS metric_time__extract_dow
-                      , subq_7.ds__extract_doy AS metric_time__extract_doy
-                      , subq_7.user
-                      , subq_7.revenue_instance__user
-                      , subq_7.txn_revenue
+                      subq_3.ds__day
+                      , subq_3.ds__week
+                      , subq_3.ds__month
+                      , subq_3.ds__quarter
+                      , subq_3.ds__year
+                      , subq_3.ds__extract_year
+                      , subq_3.ds__extract_quarter
+                      , subq_3.ds__extract_month
+                      , subq_3.ds__extract_day
+                      , subq_3.ds__extract_dow
+                      , subq_3.ds__extract_doy
+                      , subq_3.revenue_instance__ds__day
+                      , subq_3.revenue_instance__ds__week
+                      , subq_3.revenue_instance__ds__month
+                      , subq_3.revenue_instance__ds__quarter
+                      , subq_3.revenue_instance__ds__year
+                      , subq_3.revenue_instance__ds__extract_year
+                      , subq_3.revenue_instance__ds__extract_quarter
+                      , subq_3.revenue_instance__ds__extract_month
+                      , subq_3.revenue_instance__ds__extract_day
+                      , subq_3.revenue_instance__ds__extract_dow
+                      , subq_3.revenue_instance__ds__extract_doy
+                      , subq_3.ds__day AS metric_time__day
+                      , subq_3.ds__week AS metric_time__week
+                      , subq_3.ds__month AS metric_time__month
+                      , subq_3.ds__quarter AS metric_time__quarter
+                      , subq_3.ds__year AS metric_time__year
+                      , subq_3.ds__extract_year AS metric_time__extract_year
+                      , subq_3.ds__extract_quarter AS metric_time__extract_quarter
+                      , subq_3.ds__extract_month AS metric_time__extract_month
+                      , subq_3.ds__extract_day AS metric_time__extract_day
+                      , subq_3.ds__extract_dow AS metric_time__extract_dow
+                      , subq_3.ds__extract_doy AS metric_time__extract_doy
+                      , subq_3.user
+                      , subq_3.revenue_instance__user
+                      , subq_3.txn_revenue
                     FROM (
                       -- Read Elements From Semantic Model 'revenue'
                       SELECT
@@ -251,19 +251,19 @@ FROM (
                         , revenue_src_28000.user_id AS user
                         , revenue_src_28000.user_id AS revenue_instance__user
                       FROM ***************************.fct_revenue revenue_src_28000
-                    ) subq_7
-                  ) subq_8
-                ) subq_9
+                    ) subq_3
+                  ) subq_4
+                ) subq_5
                 GROUP BY
-                  subq_9.user
-              ) subq_10
-            ) subq_11
-          ) subq_12
+                  subq_5.user
+              ) subq_6
+            ) subq_7
+          ) subq_8
           ON
-            subq_6.user = subq_12.user
-        ) subq_13
-      ) subq_14
+            subq_2.user = subq_8.user
+        ) subq_9
+      ) subq_10
       WHERE user__revenue_all_time > 1
-    ) subq_15
-  ) subq_16
-) subq_17
+    ) subq_11
+  ) subq_12
+) subq_13

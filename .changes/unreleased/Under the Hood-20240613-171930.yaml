@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Refine subquery ID generation. This may result in changing subquery ids for rendered SQL.
+time: 2024-06-13T17:19:30.939376-07:00
+custom:
+    Author: tlento
+    Issue: "1280"
