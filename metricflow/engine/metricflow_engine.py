@@ -5,7 +5,7 @@ import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from typing import List, Optional, Sequence, Tuple
+from typing import FrozenSet, List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimensionTypeParams
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
@@ -113,6 +113,7 @@ class MetricFlowQueryRequest:
     order_by: Optional[Sequence[OrderByQueryParameter]] = None
     min_max_only: bool = False
     sql_optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O4
+    dataflow_plan_optimizations: FrozenSet[DataflowPlanOptimization] = DataflowPlanOptimization.all_optimizations()
     query_type: MetricFlowQueryType = MetricFlowQueryType.METRIC
 
     @staticmethod
@@ -129,6 +130,7 @@ class MetricFlowQueryRequest:
         order_by_names: Optional[Sequence[str]] = None,
         order_by: Optional[Sequence[OrderByQueryParameter]] = None,
         sql_optimization_level: SqlQueryOptimizationLevel = SqlQueryOptimizationLevel.O4,
+        dataflow_plan_optimizations: FrozenSet[DataflowPlanOptimization] = DataflowPlanOptimization.all_optimizations(),
         query_type: MetricFlowQueryType = MetricFlowQueryType.METRIC,
         min_max_only: bool = False,
     ) -> MetricFlowQueryRequest:
@@ -146,6 +148,7 @@ class MetricFlowQueryRequest:
             order_by_names=order_by_names,
             order_by=order_by,
             sql_optimization_level=sql_optimization_level,
+            dataflow_plan_optimizations=dataflow_plan_optimizations,
             query_type=query_type,
             min_max_only=min_max_only,
         )
@@ -500,10 +503,12 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             dataflow_plan = self._dataflow_plan_builder.build_plan(
                 query_spec=query_spec,
                 output_selection_specs=output_selection_specs,
-                optimizations=frozenset({DataflowPlanOptimization.SOURCE_SCAN}),
+                optimizations=mf_query_request.dataflow_plan_optimizations,
             )
         else:
-            dataflow_plan = self._dataflow_plan_builder.build_plan_for_distinct_values(query_spec=query_spec)
+            dataflow_plan = self._dataflow_plan_builder.build_plan_for_distinct_values(
+                query_spec=query_spec, optimizations=mf_query_request.dataflow_plan_optimizations
+            )
 
         if len(dataflow_plan.sink_nodes) > 1:
             raise NotImplementedError(
