@@ -1,0 +1,6 @@
+kind: Dependencies
+body: Allow pydantic 2.x installations
+time: 2024-06-24T18:23:25.370934-07:00
+custom:
+    Author: tlento
+    Issue: "1299"
