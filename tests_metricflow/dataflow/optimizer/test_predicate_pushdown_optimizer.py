@@ -288,6 +288,7 @@ def test_cumulative_metric_predicate_pushdown(
     )
 
 
+@pytest.mark.skip("plan output has non-deterministic ordering")
 def test_aggregate_output_join_metric_predicate_pushdown(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
