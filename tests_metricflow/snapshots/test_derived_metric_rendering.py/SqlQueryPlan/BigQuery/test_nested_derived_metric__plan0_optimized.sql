@@ -5,103 +5,58 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_34.metric_time__day, subq_39.metric_time__day, subq_44.metric_time__day) AS metric_time__day
-    , MAX(subq_34.non_referred) AS non_referred
-    , MAX(subq_39.instant) AS instant
-    , MAX(subq_44.bookings) AS bookings
+    COALESCE(subq_28.metric_time__day, subq_33.metric_time__day) AS metric_time__day
+    , MAX(subq_28.non_referred) AS non_referred
+    , MAX(subq_33.instant) AS instant
+    , MAX(subq_33.bookings) AS bookings
   FROM (
     -- Compute Metrics via Expressions
     SELECT
       metric_time__day
       , (bookings - ref_bookings) * 1.0 / bookings AS non_referred
     FROM (
-      -- Combine Aggregated Outputs
+      -- Aggregate Measures
+      -- Compute Metrics via Expressions
       SELECT
-        COALESCE(subq_27.metric_time__day, subq_32.metric_time__day) AS metric_time__day
-        , MAX(subq_27.ref_bookings) AS ref_bookings
-        , MAX(subq_32.bookings) AS bookings
+        metric_time__day
+        , SUM(referred_bookings) AS ref_bookings
+        , SUM(bookings) AS bookings
       FROM (
-        -- Aggregate Measures
-        -- Compute Metrics via Expressions
+        -- Read Elements From Semantic Model 'bookings_source'
+        -- Metric Time Dimension 'ds'
+        -- Pass Only Elements: ['referred_bookings', 'bookings', 'metric_time__day']
         SELECT
-          metric_time__day
-          , SUM(referred_bookings) AS ref_bookings
-        FROM (
-          -- Read Elements From Semantic Model 'bookings_source'
-          -- Metric Time Dimension 'ds'
-          -- Pass Only Elements: ['referred_bookings', 'metric_time__day']
-          SELECT
-            DATETIME_TRUNC(ds, day) AS metric_time__day
-            , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS referred_bookings
-          FROM ***************************.fct_bookings bookings_source_src_28000
-        ) subq_25
-        GROUP BY
-          metric_time__day
-      ) subq_27
-      FULL OUTER JOIN (
-        -- Aggregate Measures
-        -- Compute Metrics via Expressions
-        SELECT
-          metric_time__day
-          , SUM(bookings) AS bookings
-        FROM (
-          -- Read Elements From Semantic Model 'bookings_source'
-          -- Metric Time Dimension 'ds'
-          -- Pass Only Elements: ['bookings', 'metric_time__day']
-          SELECT
-            DATETIME_TRUNC(ds, day) AS metric_time__day
-            , 1 AS bookings
-          FROM ***************************.fct_bookings bookings_source_src_28000
-        ) subq_30
-        GROUP BY
-          metric_time__day
-      ) subq_32
-      ON
-        subq_27.metric_time__day = subq_32.metric_time__day
+          DATETIME_TRUNC(ds, day) AS metric_time__day
+          , 1 AS bookings
+          , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS referred_bookings
+        FROM ***************************.fct_bookings bookings_source_src_28000
+      ) subq_25
       GROUP BY
         metric_time__day
-    ) subq_33
-  ) subq_34
+    ) subq_27
+  ) subq_28
   FULL OUTER JOIN (
     -- Aggregate Measures
     -- Compute Metrics via Expressions
     SELECT
       metric_time__day
       , SUM(instant_bookings) AS instant
-    FROM (
-      -- Read Elements From Semantic Model 'bookings_source'
-      -- Metric Time Dimension 'ds'
-      -- Pass Only Elements: ['instant_bookings', 'metric_time__day']
-      SELECT
-        DATETIME_TRUNC(ds, day) AS metric_time__day
-        , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings
-      FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_37
-    GROUP BY
-      metric_time__day
-  ) subq_39
-  ON
-    subq_34.metric_time__day = subq_39.metric_time__day
-  FULL OUTER JOIN (
-    -- Aggregate Measures
-    -- Compute Metrics via Expressions
-    SELECT
-      metric_time__day
       , SUM(bookings) AS bookings
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
-      -- Pass Only Elements: ['bookings', 'metric_time__day']
+      -- Pass Only Elements: ['instant_bookings', 'bookings', 'metric_time__day']
       SELECT
         DATETIME_TRUNC(ds, day) AS metric_time__day
         , 1 AS bookings
+        , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_42
+    ) subq_31
     GROUP BY
       metric_time__day
-  ) subq_44
+  ) subq_33
   ON
-    COALESCE(subq_34.metric_time__day, subq_39.metric_time__day) = subq_44.metric_time__day
+    subq_28.metric_time__day = subq_33.metric_time__day
   GROUP BY
     metric_time__day
-) subq_45
+) subq_34
