@@ -24,6 +24,11 @@ class DataflowPlanOptimization(Enum):
     SOURCE_SCAN = 0
     PREDICATE_PUSHDOWN = 1
 
+    @staticmethod
+    def all_optimizations() -> FrozenSet[DataflowPlanOptimization]:
+        """Convenience method for getting a set of all available optimizations."""
+        return frozenset((DataflowPlanOptimization.SOURCE_SCAN, DataflowPlanOptimization.PREDICATE_PUSHDOWN))
+
 
 class DataflowPlanOptimizerFactory:
     """Factory class for initializing an enumerated set of optimizers.

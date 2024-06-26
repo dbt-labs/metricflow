@@ -1,0 +1,6 @@
+kind: Features
+body: Enable predicate pushdown optimization by default for all callers
+time: 2024-06-25T15:29:52.514224-07:00
+custom:
+    Author: tlento
+    Issue: "1011"
