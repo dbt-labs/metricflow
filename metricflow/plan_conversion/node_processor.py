@@ -221,7 +221,14 @@ class PredicatePushdownState:
     def without_time_range_constraint(
         original_pushdown_state: PredicatePushdownState,
     ) -> PredicatePushdownState:
-        """Factory method for updating pushdown state to bypass time range constraints."""
+        """Factory method for updating pushdown state to bypass time range constraints.
+
+        This eliminates time range constraint pushdown as an option, since the only reason to remove
+        time range constraint metadata is to turn it off, so we avoid potential issues where
+        a second ConstrainTimeRange node might update the pushdown state.
+
+        TODO: replace or rename this method.
+        """
         pushdown_enabled_types = original_pushdown_state.pushdown_enabled_types.difference(
             {PredicateInputType.TIME_RANGE_CONSTRAINT}
         )
@@ -232,18 +239,30 @@ class PredicatePushdownState:
         )
 
     @staticmethod
-    def with_additional_where_filter_specs(
-        original_pushdown_state: PredicatePushdownState, additional_where_filter_specs: Sequence[WhereFilterSpec]
+    def without_where_filter_specs(
+        original_pushdown_state: PredicatePushdownState,
     ) -> PredicatePushdownState:
-        """Factory method for adding additional WhereFilterSpecs for pushdown operations.
+        """Factory method for updating pushdown state to remove existing where filter specs.
 
-        This requires that the PushdownState allow for where filters - time range only or disabled states will
-        raise an exception, and must be checked externally.
+        This simply blanks out the where filter specs without altering which types of pushdown are available.
         """
-        updated_where_specs = tuple(original_pushdown_state.where_filter_specs) + tuple(additional_where_filter_specs)
+        return PredicatePushdownState.with_where_filter_specs(
+            original_pushdown_state=original_pushdown_state,
+            where_filter_specs=tuple(),
+        )
+
+    @staticmethod
+    def with_where_filter_specs(
+        original_pushdown_state: PredicatePushdownState, where_filter_specs: Sequence[WhereFilterSpec]
+    ) -> PredicatePushdownState:
+        """Factory method for replacing WhereFilterSpecs in pushdown operations.
+
+        This requires that the PushdownState allow for where filters - time range only or disabled states will raise
+        an exception, and must be checked externally.
+        """
         return PredicatePushdownState(
             time_range_constraint=original_pushdown_state.time_range_constraint,
-            where_filter_specs=updated_where_specs,
+            where_filter_specs=where_filter_specs,
             pushdown_enabled_types=original_pushdown_state.pushdown_enabled_types,
         )
 
