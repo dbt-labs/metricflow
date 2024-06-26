@@ -84,20 +84,24 @@ class PredicateInputType(Enum):
 class PredicatePushdownState:
     """Container class for maintaining state information relevant for predicate pushdown.
 
-    This broadly tracks two related items:
+    This broadly tracks three related items:
     1. Filter predicates collected during the process of constructing a dataflow plan
     2. Predicate types eligible for pushdown
+    3. Filters which have been applied already
 
-    The former may be updated as things like time constraints get altered or metric and measure filters are
+    The first may be updated as things like time constraints get altered or metric and measure filters are
     added to the query filters.
-    The latter may be updated based on query configuration, like if a cumulative metric is added to the plan
+    The second may be updated based on query configuration, like if a cumulative metric is added to the plan
     there may be changes to what sort of predicate pushdown operations are supported.
+    The last will be updated as filters are applied via pushdown or by the original WhereConstraintNode.
 
-    The time_range_constraint property holds the time window for setting up a time range filter expression.
+    Finally, the time_range_constraint property holds the time window for setting up a time range filter expression.
     """
 
     time_range_constraint: Optional[TimeRangeConstraint]
+    # TODO: Deduplicate where_filter_specs
     where_filter_specs: Sequence[WhereFilterSpec]
+    applied_where_filter_specs: FrozenSet[WhereFilterSpec] = frozenset()
     pushdown_enabled_types: FrozenSet[PredicateInputType] = frozenset(
         [PredicateInputType.TIME_RANGE_CONSTRAINT, PredicateInputType.CATEGORICAL_DIMENSION]
     )
@@ -215,6 +219,7 @@ class PredicatePushdownState:
             time_range_constraint=time_range_constraint,
             pushdown_enabled_types=pushdown_enabled_types,
             where_filter_specs=original_pushdown_state.where_filter_specs,
+            applied_where_filter_specs=original_pushdown_state.applied_where_filter_specs,
         )
 
     @staticmethod
@@ -236,6 +241,7 @@ class PredicatePushdownState:
             time_range_constraint=None,
             pushdown_enabled_types=pushdown_enabled_types,
             where_filter_specs=original_pushdown_state.where_filter_specs,
+            applied_where_filter_specs=original_pushdown_state.applied_where_filter_specs,
         )
 
     @staticmethod
@@ -264,6 +270,23 @@ class PredicatePushdownState:
             time_range_constraint=original_pushdown_state.time_range_constraint,
             where_filter_specs=where_filter_specs,
             pushdown_enabled_types=original_pushdown_state.pushdown_enabled_types,
+            applied_where_filter_specs=original_pushdown_state.applied_where_filter_specs,
+        )
+
+    @staticmethod
+    def with_pushdown_applied_where_filter_specs(
+        original_pushdown_state: PredicatePushdownState, pushdown_applied_where_filter_specs: FrozenSet[WhereFilterSpec]
+    ) -> PredicatePushdownState:
+        """Factory method for replacing pushdown applied where filter specs in pushdown operations.
+
+        This is useful for managing propagation - both forwards and backwards - of where filter specs that have been
+        applied via a pushdown operation.
+        """
+        return PredicatePushdownState(
+            time_range_constraint=original_pushdown_state.time_range_constraint,
+            pushdown_enabled_types=original_pushdown_state.pushdown_enabled_types,
+            where_filter_specs=original_pushdown_state.where_filter_specs,
+            applied_where_filter_specs=pushdown_applied_where_filter_specs,
         )
 
     @staticmethod
