@@ -1,43 +1,32 @@
--- Constrain Output with WHERE
+-- Join Standard Outputs
+-- Pass Only Elements: ['listings', 'user__home_state_latest', 'listing__is_lux_latest', 'listing__capacity_latest']
 -- Pass Only Elements: ['listings', 'user__home_state_latest']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 SELECT
-  user__home_state_latest
-  , SUM(listings) AS listings
+  users_latest_src_28000.home_state_latest AS user__home_state_latest
+  , SUM(subq_13.listings) AS listings
 FROM (
-  -- Join Standard Outputs
-  -- Pass Only Elements: ['listings', 'user__home_state_latest', 'listing__is_lux_latest', 'listing__capacity_latest']
+  -- Constrain Output with WHERE
+  -- Pass Only Elements: ['listings', 'listing__is_lux_latest', 'listing__capacity_latest', 'user']
   SELECT
-    subq_13.listing__is_lux_latest AS listing__is_lux_latest
-    , subq_13.listing__capacity_latest AS listing__capacity_latest
-    , users_latest_src_28000.home_state_latest AS user__home_state_latest
-    , subq_13.listings AS listings
+    subq_11.user
+    , listings
   FROM (
-    -- Constrain Output with WHERE
-    -- Pass Only Elements: ['listings', 'listing__is_lux_latest', 'listing__capacity_latest', 'user']
+    -- Read Elements From Semantic Model 'listings_latest'
+    -- Metric Time Dimension 'ds'
     SELECT
-      subq_11.user
-      , listing__is_lux_latest
-      , listing__capacity_latest
-      , listings
-    FROM (
-      -- Read Elements From Semantic Model 'listings_latest'
-      -- Metric Time Dimension 'ds'
-      SELECT
-        user_id AS user
-        , is_lux AS listing__is_lux_latest
-        , capacity AS listing__capacity_latest
-        , 1 AS listings
-      FROM ***************************.dim_listings_latest listings_latest_src_28000
-    ) subq_11
-    WHERE listing__is_lux_latest OR listing__capacity_latest > 4
-  ) subq_13
-  LEFT OUTER JOIN
-    ***************************.dim_users_latest users_latest_src_28000
-  ON
-    subq_13.user = users_latest_src_28000.user_id
-) subq_17
-WHERE listing__is_lux_latest OR listing__capacity_latest > 4
+      user_id AS user
+      , is_lux AS listing__is_lux_latest
+      , capacity AS listing__capacity_latest
+      , 1 AS listings
+    FROM ***************************.dim_listings_latest listings_latest_src_28000
+  ) subq_11
+  WHERE listing__is_lux_latest OR listing__capacity_latest > 4
+) subq_13
+LEFT OUTER JOIN
+  ***************************.dim_users_latest users_latest_src_28000
+ON
+  subq_13.user = users_latest_src_28000.user_id
 GROUP BY
-  user__home_state_latest
+  users_latest_src_28000.home_state_latest

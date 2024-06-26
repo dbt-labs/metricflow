@@ -55,143 +55,108 @@
                         <!--   )                                                       -->
                         <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
                         <!-- distinct = False -->
-                        <WhereConstraintNode>
-                            <!-- description = 'Constrain Output with WHERE' -->
-                            <!-- node_id = NodeId(id_str='wcc_2') -->
-                            <!-- where_condition =                                               -->
-                            <!--   WhereFilterSpec(                                              -->
-                            <!--     where_sql="visit__referrer_id = '123456'",                  -->
-                            <!--     bind_parameters=SqlBindParameters(),                        -->
-                            <!--     linkable_specs=(                                            -->
-                            <!--       DimensionSpec(                                            -->
-                            <!--         element_name='referrer_id',                             -->
-                            <!--         entity_links=(EntityReference(element_name='visit'),),  -->
-                            <!--       ),                                                        -->
-                            <!--     ),                                                          -->
-                            <!--     linkable_elements=(                                         -->
-                            <!--       LinkableDimension(                                        -->
-                            <!--         defined_in_semantic_model=SemanticModelReference(       -->
-                            <!--           semantic_model_name='visits_source',                  -->
-                            <!--         ),                                                      -->
-                            <!--         element_name='referrer_id',                             -->
-                            <!--         dimension_type=CATEGORICAL,                             -->
-                            <!--         entity_links=(EntityReference(element_name='visit'),),  -->
-                            <!--         join_path=SemanticModelJoinPath(                        -->
-                            <!--           left_semantic_model_reference=SemanticModelReference( -->
-                            <!--             semantic_model_name='visits_source',                -->
-                            <!--           ),                                                    -->
-                            <!--         ),                                                      -->
-                            <!--         properties=frozenset('LOCAL',),                         -->
-                            <!--       ),                                                        -->
-                            <!--     ),                                                          -->
-                            <!--   )                                                             -->
-                            <FilterElementsNode>
-                                <!-- description =                                                                         -->
-                                <!--   ("Pass Only Elements: ['visits', 'user__home_state_latest', 'visit__referrer_id', " -->
-                                <!--    "'metric_time__day']")                                                             -->
-                                <!-- node_id = NodeId(id_str='pfe_12') -->
-                                <!-- include_spec = MeasureSpec(element_name='visits') -->
-                                <!-- include_spec =                                            -->
-                                <!--   DimensionSpec(                                          -->
-                                <!--     element_name='home_state_latest',                     -->
-                                <!--     entity_links=(EntityReference(element_name='user'),), -->
-                                <!--   )                                                       -->
-                                <!-- include_spec =                                             -->
-                                <!--   DimensionSpec(                                           -->
-                                <!--     element_name='referrer_id',                            -->
-                                <!--     entity_links=(EntityReference(element_name='visit'),), -->
-                                <!--   )                                                        -->
-                                <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
-                                <!-- distinct = False -->
-                                <JoinOnEntitiesNode>
-                                    <!-- description = 'Join Standard Outputs' -->
-                                    <!-- node_id = NodeId(id_str='jso_3') -->
-                                    <!-- join0_for_node_id_pfe_11 =                                  -->
-                                    <!--   JoinDescription(                                          -->
-                                    <!--     join_node=FilterElementsNode(node_id=pfe_11),           -->
-                                    <!--     join_on_entity=LinklessEntitySpec(element_name='user'), -->
-                                    <!--     join_type=LEFT_OUTER,                                   -->
-                                    <!--   )                                                         -->
-                                    <FilterElementsNode>
-                                        <!-- description =                                              -->
-                                        <!--   ("Pass Only Elements: ['visits', 'visit__referrer_id', " -->
-                                        <!--    "'metric_time__day', 'user']")                          -->
-                                        <!-- node_id = NodeId(id_str='pfe_10') -->
-                                        <!-- include_spec = MeasureSpec(element_name='visits') -->
-                                        <!-- include_spec =                                             -->
-                                        <!--   DimensionSpec(                                           -->
-                                        <!--     element_name='referrer_id',                            -->
-                                        <!--     entity_links=(EntityReference(element_name='visit'),), -->
-                                        <!--   )                                                        -->
-                                        <!-- include_spec =                                                        -->
-                                        <!--   TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
-                                        <!-- include_spec = LinklessEntitySpec(element_name='user') -->
-                                        <!-- distinct = False -->
-                                        <WhereConstraintNode>
-                                            <!-- description = 'Constrain Output with WHERE' -->
-                                            <!-- node_id = NodeId(id_str='wcc_1') -->
-                                            <!-- where_condition =                                               -->
-                                            <!--   WhereFilterSpec(                                              -->
-                                            <!--     where_sql="visit__referrer_id = '123456'",                  -->
-                                            <!--     bind_parameters=SqlBindParameters(),                        -->
-                                            <!--     linkable_specs=(                                            -->
-                                            <!--       DimensionSpec(                                            -->
-                                            <!--         element_name='referrer_id',                             -->
-                                            <!--         entity_links=(                                          -->
-                                            <!--           EntityReference(                                      -->
-                                            <!--             element_name='visit',                               -->
-                                            <!--           ),                                                    -->
-                                            <!--         ),                                                      -->
-                                            <!--       ),                                                        -->
-                                            <!--     ),                                                          -->
-                                            <!--     linkable_elements=(                                         -->
-                                            <!--       LinkableDimension(                                        -->
-                                            <!--         defined_in_semantic_model=SemanticModelReference(       -->
-                                            <!--           semantic_model_name='visits_source',                  -->
-                                            <!--         ),                                                      -->
-                                            <!--         element_name='referrer_id',                             -->
-                                            <!--         dimension_type=CATEGORICAL,                             -->
-                                            <!--         entity_links=(                                          -->
-                                            <!--           EntityReference(                                      -->
-                                            <!--             element_name='visit',                               -->
-                                            <!--           ),                                                    -->
-                                            <!--         ),                                                      -->
-                                            <!--         join_path=SemanticModelJoinPath(                        -->
-                                            <!--           left_semantic_model_reference=SemanticModelReference( -->
-                                            <!--             semantic_model_name='visits_source',                -->
-                                            <!--           ),                                                    -->
-                                            <!--         ),                                                      -->
-                                            <!--         properties=frozenset('LOCAL',),                         -->
-                                            <!--       ),                                                        -->
-                                            <!--     ),                                                          -->
-                                            <!--   )                                                             -->
-                                            <MetricTimeDimensionTransformNode>
-                                                <!-- description = "Metric Time Dimension 'ds'" -->
-                                                <!-- node_id = NodeId(id_str='sma_0') -->
-                                                <!-- aggregation_time_dimension = 'ds' -->
-                                                <ReadSqlSourceNode>
-                                                    <!-- description = "Read From SemanticModelDataSet('visits_source')" -->
-                                                    <!-- node_id = NodeId(id_str='rss_0') -->
-                                                    <!-- data_set = SemanticModelDataSet('visits_source') -->
-                                                </ReadSqlSourceNode>
-                                            </MetricTimeDimensionTransformNode>
-                                        </WhereConstraintNode>
-                                    </FilterElementsNode>
-                                    <FilterElementsNode>
-                                        <!-- description = "Pass Only Elements: ['home_state_latest', 'user']" -->
-                                        <!-- node_id = NodeId(id_str='pfe_11') -->
-                                        <!-- include_spec = DimensionSpec(element_name='home_state_latest') -->
-                                        <!-- include_spec = LinklessEntitySpec(element_name='user') -->
-                                        <!-- distinct = False -->
-                                        <ReadSqlSourceNode>
-                                            <!-- description = "Read From SemanticModelDataSet('users_latest')" -->
-                                            <!-- node_id = NodeId(id_str='rss_1') -->
-                                            <!-- data_set = SemanticModelDataSet('users_latest') -->
-                                        </ReadSqlSourceNode>
-                                    </FilterElementsNode>
-                                </JoinOnEntitiesNode>
-                            </FilterElementsNode>
-                        </WhereConstraintNode>
+                        <FilterElementsNode>
+                            <!-- description =                                                                         -->
+                            <!--   ("Pass Only Elements: ['visits', 'user__home_state_latest', 'visit__referrer_id', " -->
+                            <!--    "'metric_time__day']")                                                             -->
+                            <!-- node_id = NodeId(id_str='pfe_12') -->
+                            <!-- include_spec = MeasureSpec(element_name='visits') -->
+                            <!-- include_spec =                                            -->
+                            <!--   DimensionSpec(                                          -->
+                            <!--     element_name='home_state_latest',                     -->
+                            <!--     entity_links=(EntityReference(element_name='user'),), -->
+                            <!--   )                                                       -->
+                            <!-- include_spec =                                             -->
+                            <!--   DimensionSpec(                                           -->
+                            <!--     element_name='referrer_id',                            -->
+                            <!--     entity_links=(EntityReference(element_name='visit'),), -->
+                            <!--   )                                                        -->
+                            <!-- include_spec = TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
+                            <!-- distinct = False -->
+                            <JoinOnEntitiesNode>
+                                <!-- description = 'Join Standard Outputs' -->
+                                <!-- node_id = NodeId(id_str='jso_3') -->
+                                <!-- join0_for_node_id_pfe_11 =                                  -->
+                                <!--   JoinDescription(                                          -->
+                                <!--     join_node=FilterElementsNode(node_id=pfe_11),           -->
+                                <!--     join_on_entity=LinklessEntitySpec(element_name='user'), -->
+                                <!--     join_type=LEFT_OUTER,                                   -->
+                                <!--   )                                                         -->
+                                <FilterElementsNode>
+                                    <!-- description =                                                                  -->
+                                    <!--   ("Pass Only Elements: ['visits', 'visit__referrer_id', 'metric_time__day', " -->
+                                    <!--    "'user']")                                                                  -->
+                                    <!-- node_id = NodeId(id_str='pfe_10') -->
+                                    <!-- include_spec = MeasureSpec(element_name='visits') -->
+                                    <!-- include_spec =                                             -->
+                                    <!--   DimensionSpec(                                           -->
+                                    <!--     element_name='referrer_id',                            -->
+                                    <!--     entity_links=(EntityReference(element_name='visit'),), -->
+                                    <!--   )                                                        -->
+                                    <!-- include_spec =                                                        -->
+                                    <!--   TimeDimensionSpec(element_name='metric_time', time_granularity=DAY) -->
+                                    <!-- include_spec = LinklessEntitySpec(element_name='user') -->
+                                    <!-- distinct = False -->
+                                    <WhereConstraintNode>
+                                        <!-- description = 'Constrain Output with WHERE' -->
+                                        <!-- node_id = NodeId(id_str='wcc_1') -->
+                                        <!-- where_condition =                                               -->
+                                        <!--   WhereFilterSpec(                                              -->
+                                        <!--     where_sql="visit__referrer_id = '123456'",                  -->
+                                        <!--     bind_parameters=SqlBindParameters(),                        -->
+                                        <!--     linkable_specs=(                                            -->
+                                        <!--       DimensionSpec(                                            -->
+                                        <!--         element_name='referrer_id',                             -->
+                                        <!--         entity_links=(EntityReference(element_name='visit'),),  -->
+                                        <!--       ),                                                        -->
+                                        <!--     ),                                                          -->
+                                        <!--     linkable_elements=(                                         -->
+                                        <!--       LinkableDimension(                                        -->
+                                        <!--         defined_in_semantic_model=SemanticModelReference(       -->
+                                        <!--           semantic_model_name='visits_source',                  -->
+                                        <!--         ),                                                      -->
+                                        <!--         element_name='referrer_id',                             -->
+                                        <!--         dimension_type=CATEGORICAL,                             -->
+                                        <!--         entity_links=(                                          -->
+                                        <!--           EntityReference(                                      -->
+                                        <!--             element_name='visit',                               -->
+                                        <!--           ),                                                    -->
+                                        <!--         ),                                                      -->
+                                        <!--         join_path=SemanticModelJoinPath(                        -->
+                                        <!--           left_semantic_model_reference=SemanticModelReference( -->
+                                        <!--             semantic_model_name='visits_source',                -->
+                                        <!--           ),                                                    -->
+                                        <!--         ),                                                      -->
+                                        <!--         properties=frozenset('LOCAL',),                         -->
+                                        <!--       ),                                                        -->
+                                        <!--     ),                                                          -->
+                                        <!--   )                                                             -->
+                                        <MetricTimeDimensionTransformNode>
+                                            <!-- description = "Metric Time Dimension 'ds'" -->
+                                            <!-- node_id = NodeId(id_str='sma_0') -->
+                                            <!-- aggregation_time_dimension = 'ds' -->
+                                            <ReadSqlSourceNode>
+                                                <!-- description = "Read From SemanticModelDataSet('visits_source')" -->
+                                                <!-- node_id = NodeId(id_str='rss_0') -->
+                                                <!-- data_set = SemanticModelDataSet('visits_source') -->
+                                            </ReadSqlSourceNode>
+                                        </MetricTimeDimensionTransformNode>
+                                    </WhereConstraintNode>
+                                </FilterElementsNode>
+                                <FilterElementsNode>
+                                    <!-- description = "Pass Only Elements: ['home_state_latest', 'user']" -->
+                                    <!-- node_id = NodeId(id_str='pfe_11') -->
+                                    <!-- include_spec = DimensionSpec(element_name='home_state_latest') -->
+                                    <!-- include_spec = LinklessEntitySpec(element_name='user') -->
+                                    <!-- distinct = False -->
+                                    <ReadSqlSourceNode>
+                                        <!-- description = "Read From SemanticModelDataSet('users_latest')" -->
+                                        <!-- node_id = NodeId(id_str='rss_1') -->
+                                        <!-- data_set = SemanticModelDataSet('users_latest') -->
+                                    </ReadSqlSourceNode>
+                                </FilterElementsNode>
+                            </JoinOnEntitiesNode>
+                        </FilterElementsNode>
                     </FilterElementsNode>
                 </AggregateMeasuresNode>
                 <AggregateMeasuresNode>
