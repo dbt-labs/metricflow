@@ -57,9 +57,11 @@ def render_and_check(
         DataflowPlanOptimization.PREDICATE_PUSHDOWN,
     )
     if is_distinct_values_plan:
-        optimized_plan = dataflow_plan_builder.build_plan_for_distinct_values(query_spec, optimizations=optimizations)
+        optimized_plan = dataflow_plan_builder.build_plan_for_distinct_values(
+            query_spec, optimizations=frozenset(optimizations)
+        )
     else:
-        optimized_plan = dataflow_plan_builder.build_plan(query_spec, optimizations=optimizations)
+        optimized_plan = dataflow_plan_builder.build_plan(query_spec, optimizations=frozenset(optimizations))
     conversion_result = dataflow_to_sql_converter.convert_to_sql_query_plan(
         sql_engine_type=sql_client.sql_engine_type,
         dataflow_plan_node=optimized_plan.sink_node,

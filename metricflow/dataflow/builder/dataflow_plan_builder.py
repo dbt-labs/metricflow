@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import time
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
+from typing import Dict, FrozenSet, List, Optional, Sequence, Set, Tuple, Union
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
@@ -146,7 +146,7 @@ class DataflowPlanBuilder:
         query_spec: MetricFlowQuerySpec,
         output_sql_table: Optional[SqlTable] = None,
         output_selection_specs: Optional[InstanceSpecSet] = None,
-        optimizations: Sequence[DataflowPlanOptimization] = (),
+        optimizations: FrozenSet[DataflowPlanOptimization] = frozenset(),
     ) -> DataflowPlan:
         """Generate a plan for reading the results of a query with the given spec into a data_table or table."""
         # Workaround for a Pycharm type inspection issue with decorators.
@@ -213,7 +213,7 @@ class DataflowPlanBuilder:
         query_spec: MetricFlowQuerySpec,
         output_sql_table: Optional[SqlTable],
         output_selection_specs: Optional[InstanceSpecSet],
-        optimizations: Sequence[DataflowPlanOptimization],
+        optimizations: FrozenSet[DataflowPlanOptimization],
     ) -> DataflowPlan:
         metrics_output_node = self._build_query_output_node(query_spec=query_spec)
 
@@ -229,7 +229,7 @@ class DataflowPlanBuilder:
         plan = DataflowPlan(sink_nodes=[sink_node], plan_id=plan_id)
         return self._optimize_plan(plan, optimizations)
 
-    def _optimize_plan(self, plan: DataflowPlan, optimizations: Sequence[DataflowPlanOptimization]) -> DataflowPlan:
+    def _optimize_plan(self, plan: DataflowPlan, optimizations: FrozenSet[DataflowPlanOptimization]) -> DataflowPlan:
         optimizer_factory = DataflowPlanOptimizerFactory(self._node_data_set_resolver)
         for optimizer in optimizer_factory.get_optimizers(optimizations):
             logger.info(f"Applying {optimizer.__class__.__name__}")
@@ -737,7 +737,7 @@ class DataflowPlanBuilder:
         return CombineAggregatedOutputsNode(parent_nodes=output_nodes)
 
     def build_plan_for_distinct_values(
-        self, query_spec: MetricFlowQuerySpec, optimizations: Sequence[DataflowPlanOptimization] = ()
+        self, query_spec: MetricFlowQuerySpec, optimizations: FrozenSet[DataflowPlanOptimization] = frozenset()
     ) -> DataflowPlan:
         """Generate a plan that would get the distinct values of a linkable instance.
 
@@ -749,7 +749,7 @@ class DataflowPlanBuilder:
 
     @log_runtime()
     def _build_plan_for_distinct_values(
-        self, query_spec: MetricFlowQuerySpec, optimizations: Sequence[DataflowPlanOptimization]
+        self, query_spec: MetricFlowQuerySpec, optimizations: FrozenSet[DataflowPlanOptimization]
     ) -> DataflowPlan:
         assert not query_spec.metric_specs, "Can't build distinct values plan with metrics."
         query_level_filter_specs: Sequence[WhereFilterSpec] = ()

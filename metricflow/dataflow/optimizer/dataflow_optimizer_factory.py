@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import List, Sequence
+from typing import FrozenSet, List, Sequence
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 
@@ -12,10 +12,17 @@ from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import Sour
 
 
 class DataflowPlanOptimization(Enum):
-    """Enumeration of optimization types available for execution."""
+    """Enumeration of optimization types available for execution.
 
-    PREDICATE_PUSHDOWN = "predicate_pushdown"
-    SOURCE_SCAN = "source_scan"
+    Values indicate order of application. We apply the source scan optimizer first because it reduces input branches,
+    making for maximally parsimonious queries prior to application of predicate pushdown. Note this is safe only
+    because the SourceScanOptimizer combines from the CombineAggregatedOutputNode, and will only combine branches
+    from there to source if they are functionally identical (i.e., they have all of the same WhereConstraintNode
+    configurations).
+    """
+
+    SOURCE_SCAN = 0
+    PREDICATE_PUSHDOWN = 1
 
 
 class DataflowPlanOptimizerFactory:
@@ -32,10 +39,10 @@ class DataflowPlanOptimizerFactory:
         """
         self._node_data_set_resolver = node_data_set_resolver
 
-    def get_optimizers(self, optimizations: Sequence[DataflowPlanOptimization]) -> Sequence[DataflowPlanOptimizer]:
+    def get_optimizers(self, optimizations: FrozenSet[DataflowPlanOptimization]) -> Sequence[DataflowPlanOptimizer]:
         """Initializes and returns a sequence of optimizers matching the input optimization requests."""
         optimizers: List[DataflowPlanOptimizer] = []
-        for optimization in optimizations:
+        for optimization in sorted(list(optimizations), key=lambda x: x.value):
             if optimization is DataflowPlanOptimization.SOURCE_SCAN:
                 optimizers.append(SourceScanOptimizer())
             elif optimization is DataflowPlanOptimization.PREDICATE_PUSHDOWN:
