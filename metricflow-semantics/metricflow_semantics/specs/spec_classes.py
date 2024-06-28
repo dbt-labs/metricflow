@@ -570,6 +570,7 @@ class MetricSpec(InstanceSpec):  # noqa: D101
     alias: Optional[str] = None
     offset_window: Optional[PydanticMetricTimeWindow] = None
     offset_to_grain: Optional[TimeGranularity] = None
+    default_granularity: Optional[TimeGranularity] = None
 
     @staticmethod
     def from_element_name(element_name: str) -> MetricSpec:  # noqa: D102
@@ -598,7 +599,12 @@ class MetricSpec(InstanceSpec):  # noqa: D101
 
     def without_offset(self) -> MetricSpec:
         """Represents the metric spec with any time offsets removed."""
-        return MetricSpec(element_name=self.element_name, filter_specs=self.filter_specs, alias=self.alias)
+        return MetricSpec(
+            element_name=self.element_name,
+            filter_specs=self.filter_specs,
+            alias=self.alias,
+            default_granularity=self.default_granularity,
+        )
 
 
 @dataclass(frozen=True)

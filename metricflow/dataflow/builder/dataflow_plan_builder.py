@@ -432,8 +432,11 @@ class DataflowPlanBuilder:
         predicate_pushdown_state: PredicatePushdownState,
         for_group_by_source_node: bool = False,
     ) -> DataflowPlanNode:
-        # TODO: replace with default_grain once added to YAML spec
-        default_granularity = self._metric_lookup.get_min_queryable_time_granularity(metric_spec.reference)
+        # What is the expected behavior if you query with default grain?
+        # What if you query with a grain smaller than default? And larger?
+        # TODO elsewhere: use default grain for metric_time resolution
+        default_granularity = metric_spec.default_granularity
+        assert default_granularity, f"No default_granularity set for {metric_spec}. Something has been misconfigured."
 
         queried_agg_time_dimensions = queried_linkable_specs.included_agg_time_dimension_specs_for_metric(
             metric_reference=metric_spec.reference, metric_lookup=self._metric_lookup
