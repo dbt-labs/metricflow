@@ -18,7 +18,7 @@ from metricflow_semantics.specs.spec_classes import (
 from metricflow_semantics.specs.spec_set import group_specs_by_type
 
 
-class BaseTimeGrainPattern(SpecPattern):
+class DefaultTimeGranularityPattern(SpecPattern):
     """A pattern that matches linkable specs, but for time dimension specs, only the one with the finest grain.
 
     e.g.
@@ -63,7 +63,7 @@ class BaseTimeGrainPattern(SpecPattern):
             metric_time_specs = MetricTimePattern().match(candidate_specs)
             other_specs = tuple(spec for spec in candidate_specs if spec not in metric_time_specs)
 
-            return other_specs + tuple(BaseTimeGrainPattern(only_apply_for_metric_time=False).match(metric_time_specs))
+            return other_specs + tuple(DefaultTimeGranularityPattern().match(metric_time_specs))
 
         spec_set = group_specs_by_type(candidate_specs)
 
