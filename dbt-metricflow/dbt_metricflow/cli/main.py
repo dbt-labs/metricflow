@@ -129,7 +129,8 @@ def tutorial(ctx: click.core.Context, cfg: CLIContext, msg: bool, clean: bool) -
                 `mf query --metrics transactions --group-by metric_time,customer__customer_country --order metric_time`
             11.  Add a coarser time granularity:
                 `mf query --metrics transactions --group-by metric_time__week --order metric_time__week`
-            12. Try a more complicated query: mf query --metrics transactions,transaction_usd_na --group-by metric_time,is_large --order metric_time --start-time 2022-03-20 --end-time 2022-04-01.
+            12. Try a more complicated query:
+                `mf query --metrics transactions,transaction_usd_na --group-by metric_time,transaction__is_large --order metric_time --start-time 2022-03-20 --end-time 2022-04-01`
             13. When you're done with the tutorial, run mf tutorial --clean to delete sample models and seeds.
         """
     )
