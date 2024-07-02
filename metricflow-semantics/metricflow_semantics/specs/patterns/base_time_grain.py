@@ -6,7 +6,6 @@ from typing import Dict, List, Sequence, Set
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from typing_extensions import override
 
-from metricflow_semantics.specs.patterns.metric_time_pattern import MetricTimePattern
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow_semantics.specs.spec_classes import (
     InstanceSpec,
@@ -19,7 +18,14 @@ from metricflow_semantics.specs.spec_set import group_specs_by_type
 
 
 class DefaultTimeGranularityPattern(SpecPattern):
-    """A pattern that matches linkable specs, but for time dimension specs, only the one with the finest grain.
+    """A pattern that matches linkable specs, but for time dimension specs, only the one with the default granularity.
+
+    When queried with metrics, default_granularity is specified in the YAML spec for the metrics. If this field is not
+    set for any of the queried metric(s), defaults to DAY for those metrics unless the minimum granularity is larger than
+    DAY. In that case, defaults to the smallest available granularity.
+
+    Same defaults apply if no metrics are queried: default to DAY if available for the time dimension queried, else the
+    smallest available granularity. Always defaults to DAY for metric_time if not metrics are queried.
 
     e.g.
 
@@ -39,32 +45,12 @@ class DefaultTimeGranularityPattern(SpecPattern):
     The finest grain represents the defined grain of the time dimension in the semantic model when evaluating specs
     of the source.
 
-    This pattern helps to implement matching of group-by-items for where filters - in those cases, an ambiguously
-    specified group-by-item can only match to time dimension spec with the base grain.
-
-    Also, this is currently used to help implement restrictions on cumulative metrics where they can only be queried
-    by the base grain of metric_time.
+    This pattern helps to implement matching of group-by-items. An ambiguously specified group-by-item can only match to
+    time dimension spec with the base grain.
     """
-
-    def __init__(self, only_apply_for_metric_time: bool = False) -> None:
-        """Initializer.
-
-        Args:
-            only_apply_for_metric_time: If set, only remove time dimension specs with a non-base grain if it's for
-            metric_time. This parameter is useful for implementing restrictions on cumulative metrics as they can only
-            be queried by the base grain of metric_time.
-            TODO: This is a little odd. This can be replaced once composite patterns are supported.
-        """
-        self._only_apply_for_metric_time = only_apply_for_metric_time
 
     @override
     def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[InstanceSpec]:
-        if self._only_apply_for_metric_time:
-            metric_time_specs = MetricTimePattern().match(candidate_specs)
-            other_specs = tuple(spec for spec in candidate_specs if spec not in metric_time_specs)
-
-            return other_specs + tuple(DefaultTimeGranularityPattern().match(metric_time_specs))
-
         spec_set = group_specs_by_type(candidate_specs)
 
         spec_key_to_grains: Dict[TimeDimensionSpecComparisonKey, Set[TimeGranularity]] = defaultdict(set)
@@ -76,6 +62,9 @@ class DefaultTimeGranularityPattern(SpecPattern):
 
         matched_time_dimension_specs: List[TimeDimensionSpec] = []
         for spec_key, time_grains in spec_key_to_grains.items():
+            # Replace this with new default logic! How does it know for metric time what grain is avail?
+            # Maybe that logic is done already when passed in here?
+            # But now we need separate logic if metrics are queried, so we'll need to pass in metrics here (optionally).
             matched_time_dimension_specs.append(spec_key_to_specs[spec_key][0].with_grain(min(time_grains)))
 
         matching_specs: Sequence[LinkableInstanceSpec] = (

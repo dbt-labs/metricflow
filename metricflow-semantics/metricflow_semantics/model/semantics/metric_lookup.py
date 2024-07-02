@@ -120,8 +120,6 @@ class MetricLookup:
 
     def _add_metric(self, metric: Metric) -> None:
         """Add metric, validating presence of required measures."""
-        print("attributes??", dir(metric), type(metric))
-        assert metric.default_granularity, "whyyy"
         metric_reference = MetricReference(element_name=metric.name)
         if metric_reference in self._metrics:
             raise DuplicateMetricError(f"Metric `{metric.name}` has already been registered")
