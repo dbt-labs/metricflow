@@ -28,7 +28,7 @@ from metricflow_semantics.query.issues.issues_base import (
     MetricFlowQueryResolutionIssueSet,
 )
 from metricflow_semantics.query.suggestion_generator import QueryItemSuggestionGenerator, QueryPartForSuggestions
-from metricflow_semantics.specs.patterns.base_time_grain import DefaultTimeGranularityPattern
+from metricflow_semantics.specs.patterns.default_time_granularity import DefaultTimeGranularityPattern
 from metricflow_semantics.specs.patterns.no_group_by_metric import NoGroupByMetricPattern
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow_semantics.specs.patterns.typed_patterns import TimeDimensionPattern
@@ -105,9 +105,7 @@ class GroupByItemResolver:
 
         push_down_result = push_down_result.filter_candidates_by_pattern(
             DefaultTimeGranularityPattern(
-                metric_lookup=self._manifest_lookup.metric_lookup,
-                only_apply_for_metric_time=False,
-                queried_metrics=queried_metrics,
+                metric_lookup=self._manifest_lookup.metric_lookup, queried_metrics=queried_metrics
             ),
         )
         logger.info(
@@ -164,9 +162,7 @@ class GroupByItemResolver:
             source_spec_patterns=(
                 spec_pattern,
                 DefaultTimeGranularityPattern(
-                    metric_lookup=self._manifest_lookup.metric_lookup,
-                    only_apply_for_metric_time=False,
-                    queried_metrics=filter_location.metric_references,
+                    metric_lookup=self._manifest_lookup.metric_lookup, queried_metrics=filter_location.metric_references
                 ),
             ),
             suggestion_generator=suggestion_generator,

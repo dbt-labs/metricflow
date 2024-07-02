@@ -10,7 +10,7 @@ from dbt_semantic_interfaces.references import MetricReference
 from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow_semantics.naming.naming_scheme import QueryItemNamingScheme
 from metricflow_semantics.query.similarity import top_fuzzy_matches
-from metricflow_semantics.specs.patterns.base_time_grain import DefaultTimeGranularityPattern
+from metricflow_semantics.specs.patterns.default_time_granularity import DefaultTimeGranularityPattern
 from metricflow_semantics.specs.patterns.match_list_pattern import MatchListSpecPattern
 from metricflow_semantics.specs.patterns.no_group_by_metric import NoGroupByMetricPattern
 from metricflow_semantics.specs.patterns.none_date_part import NoneDatePartPattern
@@ -64,11 +64,7 @@ class QueryItemSuggestionGenerator:
         These eensure we don't get multiple suggestions that are similar, but with different grains or date_parts.
         """
         default_filters = (
-            DefaultTimeGranularityPattern(
-                metric_lookup=self._metric_lookup,
-                only_apply_for_metric_time=False,
-                queried_metrics=self._queried_metrics,
-            ),
+            DefaultTimeGranularityPattern(metric_lookup=self._metric_lookup, queried_metrics=self._queried_metrics),
             NoneDatePartPattern(),
         )
         if self._query_part is QueryPartForSuggestions.WHERE_FILTER:

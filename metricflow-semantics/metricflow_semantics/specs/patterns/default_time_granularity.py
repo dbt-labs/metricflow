@@ -8,7 +8,6 @@ from dbt_semantic_interfaces.type_enums import TimeGranularity
 from typing_extensions import override
 
 from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
-from metricflow_semantics.specs.patterns.metric_time_pattern import MetricTimePattern
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow_semantics.specs.spec_classes import (
     InstanceSpec,
@@ -54,41 +53,16 @@ class DefaultTimeGranularityPattern(SpecPattern):
     time dimension spec with the base grain.
     """
 
-    def __init__(
-        self,
-        metric_lookup: MetricLookup,
-        only_apply_for_metric_time: bool = False,
-        queried_metrics: Sequence[MetricReference] = (),
-    ) -> None:
-        """Args:
-            only_apply_for_metric_time: If set, only remove time dimension specs with a non-base grain if it's for
-                metric_time. This is useful for resolving the default_granularity that metric_time should default to for
-                a given set of metrics. This is typically set to True when resolving query parameters, and False when
-                showing suggested group by items for a query (to avoid duplicates of the same time dimension in the list
-                of suggestions).
-            queried_metrics: The metrics in cluded in the query. This is used to resolve the default_granularity, which
-                is set in the metric YAML spec.
+    def __init__(self, metric_lookup: MetricLookup, queried_metrics: Sequence[MetricReference] = ()) -> None:
+        """Match only time dimensions with the default granularity for a given query.
 
-        TODO: This is a little odd. This can be replaced once composite patterns are supported.
+        Only affects time dimensions. All other items pass through.
         """
         self._metric_lookup = metric_lookup
-        self._only_apply_for_metric_time = only_apply_for_metric_time
         self._queried_metrics = queried_metrics
 
     @override
     def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[InstanceSpec]:
-        if self._only_apply_for_metric_time:
-            metric_time_specs = MetricTimePattern().match(candidate_specs)
-            other_specs = tuple(spec for spec in candidate_specs if spec not in metric_time_specs)
-
-            return other_specs + tuple(
-                DefaultTimeGranularityPattern(
-                    metric_lookup=self._metric_lookup,
-                    only_apply_for_metric_time=False,
-                    queried_metrics=self._queried_metrics,
-                ).match(metric_time_specs)
-            )
-
         spec_set = group_specs_by_type(candidate_specs)
 
         spec_key_to_grains: Dict[TimeDimensionSpecComparisonKey, Set[TimeGranularity]] = defaultdict(set)

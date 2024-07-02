@@ -52,7 +52,7 @@ from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import (
     ResolverInputForQuery,
     ResolverInputForQueryLevelWhereFilterIntersection,
 )
-from metricflow_semantics.specs.patterns.base_time_grain import DefaultTimeGranularityPattern
+from metricflow_semantics.specs.patterns.default_time_granularity import DefaultTimeGranularityPattern
 from metricflow_semantics.specs.patterns.metric_time_pattern import MetricTimePattern
 from metricflow_semantics.specs.patterns.none_date_part import NoneDatePartPattern
 from metricflow_semantics.specs.query_param_implementations import DimensionOrEntityParameter, MetricParameter
