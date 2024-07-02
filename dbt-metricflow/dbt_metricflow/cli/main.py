@@ -340,6 +340,7 @@ def query(
         elif csv is not None:
             # csv is a LazyFile that is file-like that works in this case.
             csv_writer = csv_module.writer(csv)
+            csv_writer.writerow(df.column_names)
             for row in df.rows:
                 csv_writer.writerow(row)
             click.echo(f"🖨 Successfully written query output to {csv.name}")
