@@ -53,6 +53,7 @@ class TimeDimensionParameter(ProtocolHint[TimeDimensionQueryParameter]):
             ParameterSetField.ENTITY_LINKS,
             ParameterSetField.DATE_PART,
         ]
+        # Is this left out because it needs to be resplved? If so document that.
         if self.grain is not None:
             fields_to_compare.append(ParameterSetField.TIME_GRANULARITY)
 

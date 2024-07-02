@@ -11,6 +11,7 @@ from dbt_semantic_interfaces.transformations.convert_median import (
     ConvertMedianToPercentileRule,
 )
 from dbt_semantic_interfaces.transformations.cumulative_type_params import SetCumulativeTypeParamsRule
+from dbt_semantic_interfaces.transformations.default_granularity import SetDefaultGranularityRule
 from dbt_semantic_interfaces.transformations.names import LowerCaseNamesRule
 from dbt_semantic_interfaces.transformations.proxy_measure import CreateProxyMeasureRule
 from dbt_semantic_interfaces.transformations.semantic_manifest_transformer import (
@@ -38,6 +39,7 @@ def parse_manifest_from_dbt_generated_manifest(manifest_json_string: str) -> Pyd
             ConvertMedianToPercentileRule(),
             DedupeMetricInputMeasuresRule(),  # Remove once fix is in core
             SetCumulativeTypeParamsRule(),
+            SetDefaultGranularityRule(),
         ),
     )
     model = PydanticSemanticManifestTransformer.transform(raw_model, rules)
