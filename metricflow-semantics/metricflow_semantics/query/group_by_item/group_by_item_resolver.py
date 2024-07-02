@@ -6,7 +6,7 @@ from typing import Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.call_parameter_sets import TimeDimensionCallParameterSet
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
-from dbt_semantic_interfaces.references import SemanticModelReference, TimeDimensionReference
+from dbt_semantic_interfaces.references import MetricReference, SemanticModelReference, TimeDimensionReference
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from typing_extensions import override
 
@@ -20,13 +20,14 @@ from metricflow_semantics.query.group_by_item.candidate_push_down.push_down_visi
     PushDownResult,
     _PushDownGroupByItemCandidatesVisitor,
 )
+from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow_semantics.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag, ResolutionDagSinkNode
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow_semantics.query.issues.group_by_item_resolver.ambiguous_group_by_item import AmbiguousGroupByItemIssue
 from metricflow_semantics.query.issues.issues_base import (
     MetricFlowQueryResolutionIssueSet,
 )
-from metricflow_semantics.query.suggestion_generator import QueryItemSuggestionGenerator
+from metricflow_semantics.query.suggestion_generator import QueryItemSuggestionGenerator, QueryPartForSuggestions
 from metricflow_semantics.specs.patterns.base_time_grain import DefaultTimeGranularityPattern
 from metricflow_semantics.specs.patterns.no_group_by_metric import NoGroupByMetricPattern
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
@@ -80,6 +81,7 @@ class GroupByItemResolver:
         self,
         spec_pattern: SpecPattern,
         suggestion_generator: Optional[QueryItemSuggestionGenerator],
+        queried_metrics: Sequence[MetricReference],
     ) -> GroupByItemResolution:
         """Returns the spec that corresponds the one described by spec_pattern and is valid for the query.
 
@@ -102,7 +104,11 @@ class GroupByItemResolver:
             )
 
         push_down_result = push_down_result.filter_candidates_by_pattern(
-            DefaultTimeGranularityPattern(),
+            DefaultTimeGranularityPattern(
+                metric_lookup=self._manifest_lookup.metric_lookup,
+                only_apply_for_metric_time=False,
+                queried_metrics=queried_metrics,
+            ),
         )
         logger.info(
             f"Spec pattern:\n"
@@ -135,6 +141,7 @@ class GroupByItemResolver:
         input_str: str,
         spec_pattern: SpecPattern,
         resolution_node: ResolutionDagSinkNode,
+        filter_location: WhereFilterLocation,
     ) -> GroupByItemResolution:
         """Returns the spec that matches the spec_pattern associated with the filter in the given node.
 
@@ -147,12 +154,21 @@ class GroupByItemResolver:
         suggestion_generator = QueryItemSuggestionGenerator(
             input_naming_scheme=ObjectBuilderNamingScheme(),
             input_str=input_str,
-            candidate_filters=QueryItemSuggestionGenerator.FILTER_ITEM_CANDIDATE_FILTERS,
+            query_part=QueryPartForSuggestions.WHERE_FILTER,
+            metric_lookup=self._manifest_lookup.metric_lookup,
+            queried_metrics=filter_location.metric_references,
         )
 
         push_down_visitor = _PushDownGroupByItemCandidatesVisitor(
             manifest_lookup=self._manifest_lookup,
-            source_spec_patterns=(spec_pattern, DefaultTimeGranularityPattern()),
+            source_spec_patterns=(
+                spec_pattern,
+                DefaultTimeGranularityPattern(
+                    metric_lookup=self._manifest_lookup.metric_lookup,
+                    only_apply_for_metric_time=False,
+                    queried_metrics=filter_location.metric_references,
+                ),
+            ),
             suggestion_generator=suggestion_generator,
         )
 
@@ -210,8 +226,8 @@ class GroupByItemResolver:
             issue_set=push_down_result.issue_set,
         )
 
-    def resolve_min_metric_time_grain(self) -> TimeGranularity:
-        """Returns the finest time grain of metric_time for querying."""
+    def resolve_default_metric_time_grain(self, metrics_in_query: Sequence[MetricReference]) -> TimeGranularity:
+        """Returns the default time grain of metric_time for querying."""
         metric_time_grain_resolution = self.resolve_matching_item_for_querying(
             spec_pattern=TimeDimensionPattern.from_call_parameter_set(
                 TimeDimensionCallParameterSet(
@@ -220,6 +236,7 @@ class GroupByItemResolver:
                 )
             ),
             suggestion_generator=None,
+            queried_metrics=metrics_in_query,
         )
         metric_time_spec_set = (
             group_specs_by_type((metric_time_grain_resolution.spec,))

@@ -11,7 +11,7 @@ from dbt_semantic_interfaces.implementations.filters.where_filter import (
 )
 from dbt_semantic_interfaces.protocols import SavedQuery
 from dbt_semantic_interfaces.protocols.where_filter import WhereFilter
-from dbt_semantic_interfaces.references import SemanticModelReference
+from dbt_semantic_interfaces.references import MetricReference, SemanticModelReference
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 
 from metricflow_semantics.assert_one_arg import assert_at_most_one_arg_set
@@ -147,13 +147,16 @@ class MetricFlowQueryParser:
 
         return matching_saved_queries[0]
 
-    @staticmethod
-    def _metric_time_granularity(time_dimension_specs: Sequence[TimeDimensionSpec]) -> Optional[TimeGranularity]:
+    def _metric_time_granularity(
+        self, time_dimension_specs: Sequence[TimeDimensionSpec], queried_metrics: Sequence[MetricReference]
+    ) -> Optional[TimeGranularity]:
         matching_specs: Sequence[InstanceSpec] = time_dimension_specs
 
         for pattern_to_apply in (
             MetricTimePattern(),
-            DefaultTimeGranularityPattern(),
+            DefaultTimeGranularityPattern(
+                metric_lookup=self._manifest_lookup.metric_lookup, queried_metrics=queried_metrics
+            ),
             NoneDatePartPattern(),
         ):
             matching_specs = pattern_to_apply.match(matching_specs)
@@ -173,14 +176,19 @@ class MetricFlowQueryParser:
         resolution_dag: GroupByItemResolutionDag,
         time_dimension_specs_in_query: Sequence[TimeDimensionSpec],
         time_constraint: TimeRangeConstraint,
+        metrics_in_query: Sequence[MetricReference],
     ) -> TimeRangeConstraint:
-        metric_time_granularity = MetricFlowQueryParser._metric_time_granularity(time_dimension_specs_in_query)
+        metric_time_granularity = self._metric_time_granularity(
+            time_dimension_specs=time_dimension_specs_in_query, queried_metrics=metrics_in_query
+        )
         if metric_time_granularity is None:
             group_by_item_resolver = GroupByItemResolver(
                 manifest_lookup=self._manifest_lookup,
                 resolution_dag=resolution_dag,
             )
-            metric_time_granularity = group_by_item_resolver.resolve_min_metric_time_grain()
+            metric_time_granularity = group_by_item_resolver.resolve_default_metric_time_grain(
+                metrics_in_query=metrics_in_query
+            )
 
         """Change the time range so that the ends are at the ends of the appropriate time granularity windows.
 
@@ -495,6 +503,10 @@ class MetricFlowQueryParser:
                 resolution_dag=query_resolution.resolution_dag,
                 time_dimension_specs_in_query=query_spec.time_dimension_specs,
                 time_constraint=time_constraint,
+                metrics_in_query=tuple(
+                    metric_resolver_input.spec_pattern.metric_reference
+                    for metric_resolver_input in resolver_inputs_for_metrics
+                ),
             )
             logger.info(f"Time constraint after adjustment is: {time_constraint}")
 

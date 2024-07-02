@@ -41,8 +41,7 @@ def test_ambiguous_metric_time_in_query(  # noqa: D103
     spec_pattern = ObjectBuilderNamingScheme().spec_pattern(f"TimeDimension('{METRIC_TIME_ELEMENT_NAME}')")
 
     result = group_by_item_resolver.resolve_matching_item_for_querying(
-        spec_pattern=spec_pattern,
-        suggestion_generator=None,
+        spec_pattern=spec_pattern, suggestion_generator=None, queried_metrics=resolution_dag.sink_node.metrics_in_query
     )
 
     if case_id is AmbiguousResolutionQueryId.NO_METRICS:
@@ -81,6 +80,7 @@ def test_unavailable_group_by_item_in_derived_metric_parent(
     result = group_by_item_resolver.resolve_matching_item_for_querying(
         spec_pattern=spec_pattern,
         suggestion_generator=None,
+        queried_metrics=(MetricReference("derived_metric_with_different_parent_time_grains"),),
     )
 
     assert_object_snapshot_equal(
@@ -108,6 +108,7 @@ def test_invalid_group_by_item(  # noqa: D103
     result = group_by_item_resolver.resolve_matching_item_for_querying(
         spec_pattern=naming_scheme.spec_pattern(input_str),
         suggestion_generator=None,
+        queried_metrics=(MetricReference("monthly_metric_0"), MetricReference("yearly_metric_0")),
     )
 
     assert_object_snapshot_equal(
