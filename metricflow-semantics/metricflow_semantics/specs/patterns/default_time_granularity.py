@@ -73,6 +73,7 @@ class DefaultTimeGranularityPattern(SpecPattern):
             spec_key_to_specs[spec_key].append(time_dimension_spec)
 
         default_granularity_for_metrics = self._metric_lookup.get_default_granularity_for_metrics(self._queried_metrics)
+        print("default::", self._queried_metrics, default_granularity_for_metrics)
         matched_time_dimension_specs: List[TimeDimensionSpec] = []
         for spec_key, time_grains in spec_key_to_grains.items():
             grain_to_use = (

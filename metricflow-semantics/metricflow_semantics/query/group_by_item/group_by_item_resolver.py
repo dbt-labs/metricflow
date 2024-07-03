@@ -127,6 +127,7 @@ class GroupByItemResolver:
                     )
                 ),
             )
+        # TODO: return issue if push_down_result.candidate_set.num_candidates < 1
 
         return GroupByItemResolution(
             spec=push_down_result.candidate_set.specs[0],

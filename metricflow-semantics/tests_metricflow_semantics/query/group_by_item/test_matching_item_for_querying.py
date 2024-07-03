@@ -39,7 +39,7 @@ def test_ambiguous_metric_time_in_query(  # noqa: D103
     )
 
     spec_pattern = ObjectBuilderNamingScheme().spec_pattern(f"TimeDimension('{METRIC_TIME_ELEMENT_NAME}')")
-
+    print("queried metrics:", resolution_dag.sink_node.metrics_in_query)
     result = group_by_item_resolver.resolve_matching_item_for_querying(
         spec_pattern=spec_pattern, suggestion_generator=None, queried_metrics=resolution_dag.sink_node.metrics_in_query
     )
