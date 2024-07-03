@@ -221,7 +221,7 @@ integration_test:
 ---
 integration_test:
   name: daily_metric_with_monthly_time_dimension
-  description: Query a metric with a month-granularity time dimensions.
+  description: Query a metric with a month-granularity time dimensions. Filter should expand to requested granularity.
   model: EXTENDED_DATE_MODEL
   metrics: ["bookings"]
   group_bys: ["metric_time__month"]
