@@ -1,7 +1,3 @@
-default:: (MetricReference(element_name='bookings'), MetricReference(element_name='instant_bookings')) TimeGranularity.DAY
-default:: (MetricReference(element_name='bookings'), MetricReference(element_name='instant_bookings')) TimeGranularity.DAY
-default:: (MetricReference(element_name='bookings'), MetricReference(element_name='instant_bookings')) TimeGranularity.DAY
-default:: (MetricReference(element_name='bookings'), MetricReference(element_name='instant_bookings')) TimeGranularity.DAY
 metric_time__day       listing__capacity_latest    bookings    instant_bookings
 -------------------  --------------------------  ----------  ------------------
 2019-12-01T00:00:00                           5           1                   0

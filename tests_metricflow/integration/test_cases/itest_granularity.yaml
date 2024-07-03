@@ -228,7 +228,7 @@ integration_test:
   time_constraint: ["2020-01-01", "2020-01-02"]
   check_query: |
     SELECT
-      SUM(booking) AS bookings
+      SUM(1) AS bookings
       , {{ render_date_trunc("ds", TimeGranularity.MONTH) }} AS metric_time__month
     FROM {{ source_schema }}.fct_bookings_extended
     WHERE {{ render_time_constraint("ds", "2020-01-01", "2020-01-31") }}

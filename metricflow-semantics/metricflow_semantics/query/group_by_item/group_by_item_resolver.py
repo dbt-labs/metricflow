@@ -28,6 +28,7 @@ from metricflow_semantics.query.issues.issues_base import (
     MetricFlowQueryResolutionIssueSet,
 )
 from metricflow_semantics.query.suggestion_generator import QueryItemSuggestionGenerator, QueryPartForSuggestions
+from metricflow_semantics.specs.patterns.base_time_grain import BaseTimeGrainPattern
 from metricflow_semantics.specs.patterns.default_time_granularity import DefaultTimeGranularityPattern
 from metricflow_semantics.specs.patterns.no_group_by_metric import NoGroupByMetricPattern
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
@@ -83,7 +84,7 @@ class GroupByItemResolver:
         suggestion_generator: Optional[QueryItemSuggestionGenerator],
         queried_metrics: Sequence[MetricReference],
     ) -> GroupByItemResolution:
-        """Returns the spec that corresponds the one described by spec_pattern and is valid for the query.
+        """Returns the spec that corresponds to the one described by spec_pattern and is valid for the query.
 
         For queries, if the pattern matches to a spec for the same element at different grains, the spec with the finest
         common grain is returned.
@@ -104,9 +105,7 @@ class GroupByItemResolver:
             )
 
         push_down_result = push_down_result.filter_candidates_by_pattern(
-            DefaultTimeGranularityPattern(
-                metric_lookup=self._manifest_lookup.metric_lookup, queried_metrics=queried_metrics
-            ),
+            BaseTimeGrainPattern(),
         )
         logger.info(
             f"Spec pattern:\n"
