@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import List, Sequence
 
 from typing_extensions import override
@@ -9,6 +10,7 @@ from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow_semantics.specs.spec_set import group_specs_by_type
 
 
+@dataclass(frozen=True)
 class NoneDatePartPattern(SpecPattern):
     """Matches to linkable specs, but for time dimension specs, only matches to ones without date_part.
 

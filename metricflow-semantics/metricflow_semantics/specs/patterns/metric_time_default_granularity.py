@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from dataclasses import dataclass
 from typing import Dict, Optional, Sequence, Set, Tuple
 
 from dbt_semantic_interfaces.type_enums import TimeGranularity
@@ -16,6 +17,7 @@ from metricflow_semantics.specs.time_dimension_spec import (
 )
 
 
+@dataclass(frozen=True)
 class MetricTimeDefaultGranularityPattern(SpecPattern):
     """A pattern that matches metric_time specs if they have the default granularity for the requested metrics.
 
@@ -40,15 +42,14 @@ class MetricTimeDefaultGranularityPattern(SpecPattern):
         ]
     """
 
-    def __init__(self, max_metric_default_time_granularity: Optional[TimeGranularity]) -> None:  # noqa: D107
-        self._max_metric_default_time_granularity = max_metric_default_time_granularity
+    max_metric_default_time_granularity: Optional[TimeGranularity]
 
     @override
     def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[InstanceSpec]:
         spec_set = group_specs_by_type(candidate_specs)
 
         # If there are no metrics or metric_time specs in the query, skip this filter.
-        if not (self._max_metric_default_time_granularity and spec_set.metric_time_specs):
+        if not (self.max_metric_default_time_granularity and spec_set.metric_time_specs):
             return candidate_specs
 
         spec_key_to_grains: Dict[TimeDimensionSpecComparisonKey, Set[TimeGranularity]] = defaultdict(set)
@@ -60,9 +61,9 @@ class MetricTimeDefaultGranularityPattern(SpecPattern):
 
         matched_metric_time_specs: Tuple[TimeDimensionSpec, ...] = ()
         for spec_key, time_grains in spec_key_to_grains.items():
-            if self._max_metric_default_time_granularity in time_grains:
+            if self.max_metric_default_time_granularity in time_grains:
                 matched_metric_time_specs += (
-                    spec_key_to_specs[spec_key][0].with_grain(self._max_metric_default_time_granularity),
+                    spec_key_to_specs[spec_key][0].with_grain(self.max_metric_default_time_granularity),
                 )
             else:
                 # If default_granularity is not in the available options, then time granularity was specified in the request

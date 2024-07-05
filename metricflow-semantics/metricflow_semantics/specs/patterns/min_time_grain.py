@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from dataclasses import dataclass
 from typing import Dict, List, Sequence, Set
 
 from dbt_semantic_interfaces.type_enums import TimeGranularity
@@ -16,6 +17,7 @@ from metricflow_semantics.specs.time_dimension_spec import (
 )
 
 
+@dataclass(frozen=True)
 class MinimumTimeGrainPattern(SpecPattern):
     """A pattern that matches linkable specs, but for time dimension specs, only the one with the finest grain.
 
