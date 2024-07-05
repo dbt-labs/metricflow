@@ -3,13 +3,12 @@
 from __future__ import annotations
 
 import logging
-import textwrap
 import threading
 import typing
 from contextlib import contextmanager
 from typing import Iterator, Optional
 
-import jinja2
+from metricflow_semantics.mf_logging.formatting import indent
 
 if typing.TYPE_CHECKING:
     from metricflow_semantics.dag.mf_dag import DagNode, DagNodeT, DisplayedProperty, MetricFlowDag
@@ -134,26 +133,17 @@ class MetricFlowDagTextFormatter:
                 )
                 node_fields.append(f"<!-- {self._value_indent_prefix}{value_str}{value_padding} -->")
 
-        return jinja2.Template(
-            textwrap.dedent(
-                """\
-                <{{ node_class }}{%- if not inner_contents and not node_fields %}/>{%- else %}>
-                    {%- if node_fields %}
-                    {{ node_fields | indent(4) }}
-                    {%- endif %}
-                    {%- if inner_contents %}
-                    {{ inner_contents | indent(4) }}
-                    {%- endif %}
-                </{{ node_class }}>
-                {%- endif %}
-                """
-            ),
-            undefined=jinja2.StrictUndefined,
-        ).render(
-            node_class=node.__class__.__name__,
-            node_fields="\n".join(node_fields),
-            inner_contents=inner_contents,
-        )
+        node_class = node.__class__.__name__
+        if not node_fields and not inner_contents:
+            return f"<{node_class}/>"
+
+        lines = [f"<{node_class}>"]
+        for line in node_fields:
+            lines.append(indent(line, indent_prefix=self._node_parent_indent_prefix))
+        if inner_contents:
+            lines.append(indent(inner_contents, indent_prefix=self._node_parent_indent_prefix))
+        lines.append(f"</{node_class}>")
+        return "\n".join(lines)
 
     def _recursively_format_to_text(self, node: DagNode) -> str:
         """Converts the node and its parents to a text representation.
@@ -183,22 +173,17 @@ class MetricFlowDagTextFormatter:
                     component_from_sink_nodes_as_text.append(self.dag_component_to_text(sink_node))
 
             # Under <DataflowPlan>, render all components.
-            return jinja2.Template(
-                textwrap.dedent(
-                    """\
-                    <{{ node_class }}{%- if not inner_contents %}/>{%- else %}>
-                        {%- if inner_contents %}
-                        {{ inner_contents | indent(4) }}
-                        {%- endif %}
-                    </{{ node_class }}>
-                    {%- endif %}
-                    """
-                ),
-                undefined=jinja2.StrictUndefined,
-            ).render(
-                node_class=dag.__class__.__name__,
-                inner_contents="\n".join(component_from_sink_nodes_as_text),
-            )
+            node_class = dag.__class__.__name__
+            if len(component_from_sink_nodes_as_text) == 0:
+                return f"<{node_class}/>"
+
+            lines = [f"<{node_class}>"]
+            for line in component_from_sink_nodes_as_text:
+                lines.append(indent(line, indent_prefix=self._node_parent_indent_prefix))
+            lines.append(f"</{node_class}>")
+
+            return "\n".join(lines)
+
         except Exception:
             logger.exception(
                 f"Got an exception while converting {dag} to text. This exception will be swallowed, and the built-in "
