@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
+from typing import Optional
 
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
@@ -25,11 +26,12 @@ class TimeSpineSource:
     time_column_name: str = "ds"
     # The time granularity of the dates in the spine table.
     time_column_granularity: TimeGranularity = DEFAULT_TIME_GRANULARITY
+    db_name: Optional[str] = None
 
     @property
     def spine_table(self) -> SqlTable:
         """Table containing all dates."""
-        return SqlTable(schema_name=self.schema_name, table_name=self.table_name)
+        return SqlTable(schema_name=self.schema_name, table_name=self.table_name, db_name=self.db_name)
 
     @staticmethod
     def create_from_manifest(semantic_manifest: SemanticManifest) -> TimeSpineSource:
@@ -51,6 +53,7 @@ class TimeSpineSource:
         return TimeSpineSource(
             schema_name=time_spine_table.schema_name,
             table_name=time_spine_table.table_name,
+            db_name=time_spine_table.db_name,
             time_column_name=time_spine_table_configuration.column_name,
             time_column_granularity=time_spine_table_configuration.grain,
         )
