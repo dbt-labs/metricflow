@@ -104,7 +104,7 @@ class SemanticModelLookup:
 
     def get_time_dimension(self, time_dimension_reference: TimeDimensionReference) -> Dimension:
         """Retrieves a full dimension object by name."""
-        return self.get_dimension(dimension_reference=time_dimension_reference.dimension_reference())
+        return self.get_dimension(dimension_reference=time_dimension_reference.dimension_reference)
 
     @property
     def measure_references(self) -> Sequence[MeasureReference]:
