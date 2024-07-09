@@ -275,6 +275,70 @@ def test_time_dimension_in_filter(  # noqa: D103
     )
 
 
+def test_time_dimension_with_grain_in_name(  # noqa: D103
+    column_association_resolver: ColumnAssociationResolver,
+) -> None:
+    where_filter_specs = WhereSpecFactory(
+        column_association_resolver=column_association_resolver,
+        spec_resolution_lookup=create_spec_lookup(
+            call_parameter_set=TimeDimensionCallParameterSet(
+                entity_path=(EntityReference("listing"),),
+                time_dimension_reference=TimeDimensionReference("created_at"),
+                time_granularity=TimeGranularity.MONTH,
+            ),
+            resolved_spec=TimeDimensionSpec(
+                element_name="created_at",
+                entity_links=(EntityReference("listing"),),
+                time_granularity=TimeGranularity.MONTH,
+            ),
+            resolved_linkable_element_set=LinkableElementSet(
+                path_key_to_linkable_dimensions={
+                    ElementPathKey(
+                        element_name="created_at",
+                        element_type=LinkableElementType.TIME_DIMENSION,
+                        entity_links=(EntityReference("listing"),),
+                        time_granularity=TimeGranularity.MONTH,
+                        date_part=None,
+                    ): (
+                        LinkableDimension(
+                            defined_in_semantic_model=SemanticModelReference("listings_source"),
+                            dimension_type=DimensionType.CATEGORICAL,
+                            element_name="created_at",
+                            entity_links=(EntityReference("listing"),),
+                            join_path=SemanticModelJoinPath(
+                                left_semantic_model_reference=SemanticModelReference("bookings_source"),
+                            ),
+                            properties=frozenset(),
+                            time_granularity=TimeGranularity.MONTH,
+                            date_part=None,
+                        ),
+                    )
+                }
+            ),
+        ),
+    ).create_from_where_filter_intersection(
+        filter_location=EXAMPLE_FILTER_LOCATION,
+        filter_intersection=create_where_filter_intersection(
+            "{{ TimeDimension('listing__created_at__month') }} = '2020-01-01'"
+        ),
+    )
+    assert len(where_filter_specs) == 1
+    where_filter_spec = where_filter_specs[0]
+    assert where_filter_spec.where_sql == "listing__created_at__month = '2020-01-01'"
+    assert LinkableSpecSet.create_from_specs(where_filter_spec.linkable_specs) == LinkableSpecSet(
+        dimension_specs=(),
+        time_dimension_specs=(
+            TimeDimensionSpec(
+                element_name="created_at",
+                entity_links=(EntityReference(element_name="listing"),),
+                time_granularity=TimeGranularity.MONTH,
+            ),
+        ),
+        entity_specs=(),
+        group_by_metric_specs=(),
+    )
+
+
 def test_date_part_in_filter(  # noqa: D103
     column_association_resolver: ColumnAssociationResolver,
 ) -> None:

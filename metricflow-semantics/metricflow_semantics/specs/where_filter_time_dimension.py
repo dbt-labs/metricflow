@@ -91,6 +91,15 @@ class WhereFilterTimeDimensionFactory(ProtocolHint[QueryInterfaceTimeDimensionFa
             )
         structured_name = DunderedNameFormatter.parse_name(time_dimension_name.lower())
 
+        grain_parsed_from_name = structured_name.time_granularity
+        grain_from_param = TimeGranularity(time_granularity_name) if time_granularity_name else None
+        if grain_parsed_from_name and grain_from_param and grain_parsed_from_name != grain_from_param:
+            raise InvalidQuerySyntax(
+                f"Received different granularities in `time_dimension_name` parameter ('{time_dimension_name}') "
+                f"and `time_granularity_name` parameter ('{time_granularity_name}')."
+            )
+
+        TimeGranularity(time_granularity_name.lower()) if time_granularity_name else None
         return WhereFilterTimeDimension(
             column_association_resolver=self._column_association_resolver,
             resolved_spec_lookup=self._resolved_spec_lookup,
@@ -99,6 +108,6 @@ class WhereFilterTimeDimensionFactory(ProtocolHint[QueryInterfaceTimeDimensionFa
             element_name=structured_name.element_name,
             entity_links=tuple(EntityReference(entity_link_name.lower()) for entity_link_name in entity_path)
             + structured_name.entity_links,
-            time_grain=TimeGranularity(time_granularity_name.lower()) if time_granularity_name else None,
+            time_grain=grain_from_param or grain_parsed_from_name,
             date_part=DatePart(date_part_name.lower()) if date_part_name else None,
         )
