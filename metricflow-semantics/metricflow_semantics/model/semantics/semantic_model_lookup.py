@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-from copy import deepcopy
 from typing import Dict, List, Optional, Sequence, Set
 
 from dbt_semantic_interfaces.protocols.dimension import Dimension
@@ -92,13 +91,11 @@ class SemanticModelLookup:
                 f"Could not find dimension with name '{dimension_reference.element_name}' in configured semantic models"
             )
 
-        dimension = SemanticModelLookup.get_dimension_from_semantic_model(
+        return SemanticModelLookup.get_dimension_from_semantic_model(
             # Dimension object should match across semantic models, so just use the first semantic model.
             semantic_model=semantic_models[0],
             dimension_reference=dimension_reference,
         )
-        # TODO: Unclear if the deepcopy is necessary.
-        return deepcopy(dimension)
 
     def get_time_dimension(self, time_dimension_reference: TimeDimensionReference) -> Dimension:
         """Retrieves a full dimension object by name."""
