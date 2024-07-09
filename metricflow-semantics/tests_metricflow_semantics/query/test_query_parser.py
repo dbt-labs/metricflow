@@ -30,7 +30,7 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 from metricflow_semantics.test_helpers.example_project_configuration import (
     EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE,
 )
-from metricflow_semantics.test_helpers.metric_time_dimension import MTD
+from metricflow_semantics.test_helpers.metric_time_dimension import MTD, MTD_SPEC_DAY, MTD_SPEC_MONTH, MTD_SPEC_YEAR
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_object_snapshot_equal
 
 logger = logging.getLogger(__name__)
@@ -53,6 +53,10 @@ BOOKINGS_YAML = textwrap.dedent(
           expr: "1"
           agg: sum
           create_metric: true
+        - name: monthly_bookings
+          expr: "1"
+          agg: sum
+          agg_time_dimension: ds_month
 
       dimensions:
         - name: is_instant
@@ -61,6 +65,10 @@ BOOKINGS_YAML = textwrap.dedent(
           type: time
           type_params:
             time_granularity: day
+        - name: ds_month
+          type: time
+          type_params:
+            time_granularity: month
 
       primary_entity: booking
 
@@ -68,6 +76,33 @@ BOOKINGS_YAML = textwrap.dedent(
         - name: listing
           type: foreign
           expr: listing_id
+    
+    ---
+    metric:
+      name: instant_bookings
+      description: instant bookings
+      type: simple
+      type_params:
+        measure: bookings
+      filter: "{{ Dimension('booking__is_instant') }}"
+      default_granularity: year
+    ---
+    metric:
+      name: month_bookings
+      description: monthly bookings
+      type: simple
+      type_params:
+        measure: monthly_bookings
+    ---
+    metric:
+      name: instant_plus_months_bookings
+      description: instant plus month bookings
+      type: derived
+      type_params:
+        expr: instant_bookings + month_bookings
+        metrics:
+          - name: instant_bookings
+          - name: month_bookings
     """
 )
 
@@ -626,3 +661,27 @@ def test_invalid_group_by_metric(bookings_query_parser: MetricFlowQueryParser) -
         bookings_query_parser.parse_and_validate_query(
             metric_names=("bookings",), where_constraint_str="{{ Metric('listings', ['garbage']) }} > 1"
         )
+
+
+def test_default_granularity(bookings_query_parser: MetricFlowQueryParser) -> None:
+    """Tests different scenarios using default granularity."""
+    # Metric with default_granularity set
+    query_spec = bookings_query_parser.parse_and_validate_query(
+        metric_names=("instant_bookings",), group_by_names=("metric_time",)
+    ).query_spec
+    assert len(query_spec.time_dimension_specs) == 1
+    assert query_spec.time_dimension_specs[0] == MTD_SPEC_YEAR
+
+    # Metric without default_granularity set
+    query_spec = bookings_query_parser.parse_and_validate_query(
+        metric_names=("month_bookings",), group_by_names=("metric_time",)
+    ).query_spec
+    assert len(query_spec.time_dimension_specs) == 1
+    assert query_spec.time_dimension_specs[0] == MTD_SPEC_MONTH
+
+    # Derived metric with different agg_time_dimensions and no default granularity set
+    query_spec = bookings_query_parser.parse_and_validate_query(
+        metric_names=("instant_plus_months_bookings",), group_by_names=("metric_time",)
+    ).query_spec
+    assert len(query_spec.time_dimension_specs) == 1
+    assert query_spec.time_dimension_specs[0] == MTD_SPEC_MONTH
