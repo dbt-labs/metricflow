@@ -104,8 +104,16 @@ class GroupByItemResolver:
                 issue_set=push_down_result.issue_set,
             )
 
+        # TODO: this isn't working, figure out why
+        filter_to_use = (
+            DefaultTimeGranularityPattern(
+                metric_lookup=self._manifest_lookup.metric_lookup, queried_metrics=queried_metrics
+            )
+            if queried_metrics
+            else 
+        )
         push_down_result = push_down_result.filter_candidates_by_pattern(
-            BaseTimeGrainPattern(),
+            filter_to_use,
         )
         logger.info(
             f"Spec pattern:\n"

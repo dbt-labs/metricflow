@@ -26,7 +26,7 @@ semantic_model:
       type: time
       expr: created_at
       type_params:
-        time_granularity: day
+        time_granularity: second
     - name: created_at
       type: time
       type_params:
