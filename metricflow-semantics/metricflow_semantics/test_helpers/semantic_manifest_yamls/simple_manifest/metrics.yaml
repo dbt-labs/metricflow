@@ -92,7 +92,6 @@ metric:
   type: simple
   type_params:
     measure: listings
-  default_granularity: day
 ---
 metric:
   name: "lux_listings"
@@ -101,7 +100,6 @@ metric:
   type_params:
     measure: listings
   filter: "{{ Dimension('listing__is_lux_latest') }}"
-  default_granularity: day
 ---
 metric:
   name: "smallest_listing"
@@ -109,7 +107,6 @@ metric:
   type: simple
   type_params:
     measure: smallest_listing
-  default_granularity: day
 ---
 metric:
   name: "largest_listing"
@@ -117,7 +114,7 @@ metric:
   type: simple
   type_params:
     measure: largest_listing
-  default_granularity: day
+  default_granularity: month
 ---
 metric:
   name: "identity_verifications"
@@ -773,7 +770,6 @@ metric:
   type_params:
     measure: listings
   filter: "{{ Metric('bookings', ['listing']) }} > 2"
-  default_granularity: day
 ---
 metric:
   name: popular_listing_bookings_per_booker
@@ -785,4 +781,4 @@ metric:
     denominator:
       name: listings
   filter: "{{ Metric('views', ['listing']) }} > 10"
-  default_granularity: day
+  default_granularity: week

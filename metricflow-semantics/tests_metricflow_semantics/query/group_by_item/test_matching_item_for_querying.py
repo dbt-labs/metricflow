@@ -16,6 +16,9 @@ from metricflow_semantics.query.group_by_item.resolution_dag.dag import GroupByI
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.metric_resolution_node import (
     MetricGroupByItemResolutionNode,
 )
+from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.query_resolution_node import (
+    QueryGroupByItemResolutionNode,
+)
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_MONTH, MTD_SPEC_YEAR
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_object_snapshot_equal
@@ -39,7 +42,7 @@ def test_ambiguous_metric_time_in_query(  # noqa: D103
     )
 
     spec_pattern = ObjectBuilderNamingScheme().spec_pattern(f"TimeDimension('{METRIC_TIME_ELEMENT_NAME}')")
-    print("queried metrics:", resolution_dag.sink_node.metrics_in_query)
+    assert isinstance(resolution_dag.sink_node, QueryGroupByItemResolutionNode)
     result = group_by_item_resolver.resolve_matching_item_for_querying(
         spec_pattern=spec_pattern, suggestion_generator=None, queried_metrics=resolution_dag.sink_node.metrics_in_query
     )
