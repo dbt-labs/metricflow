@@ -685,3 +685,10 @@ def test_default_granularity(bookings_query_parser: MetricFlowQueryParser) -> No
     ).query_spec
     assert len(query_spec.time_dimension_specs) == 1
     assert query_spec.time_dimension_specs[0] == MTD_SPEC_MONTH
+
+    # Using non-metric_time - should ignore default granularity
+    query_spec = bookings_query_parser.parse_and_validate_query(
+        metric_names=("instant_bookings",), group_by_names=("booking__ds",)
+    ).query_spec
+    assert len(query_spec.time_dimension_specs) == 1
+    assert query_spec.time_dimension_specs[0].time_granularity == TimeGranularity.DAY

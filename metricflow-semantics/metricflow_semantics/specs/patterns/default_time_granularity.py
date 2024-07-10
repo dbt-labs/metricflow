@@ -77,7 +77,14 @@ class DefaultTimeGranularityPattern(SpecPattern):
         for spec_key, time_grains in spec_key_to_grains.items():
             grain_to_use = (
                 default_granularity_for_metrics
-                if (default_granularity_for_metrics and spec_key.source_spec.is_metric_time)
+                if (
+                    default_granularity_for_metrics
+                    # Use default_granularity for metric_time, but minimum granularity for all other time dims.
+                    and spec_key.source_spec.is_metric_time
+                    # If default_granularity is not in the available options, then time granularity was probably
+                    # specified in the request and does not need a default here.
+                    and default_granularity_for_metrics in time_grains
+                )
                 else min(time_grains)
             )
             matched_time_dimension_specs.append(spec_key_to_specs[spec_key][0].with_grain(grain_to_use))

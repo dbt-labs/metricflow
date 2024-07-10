@@ -87,7 +87,7 @@ class GroupByItemResolver:
         """Returns the spec that corresponds to the one described by spec_pattern and is valid for the query.
 
         For queries, if the pattern matches to a spec for the same element at different grains, the spec with the finest
-        common grain is returned.
+        common grain is returned, unless the spec is metric_time, in which case the default grain is returned.
         """
         push_down_visitor = _PushDownGroupByItemCandidatesVisitor(
             manifest_lookup=self._manifest_lookup,
@@ -104,13 +104,12 @@ class GroupByItemResolver:
                 issue_set=push_down_result.issue_set,
             )
 
-        # TODO: this isn't working, figure out why
-        # filter_to_use = DefaultTimeGranularityPattern(
-        #     metric_lookup=self._manifest_lookup.metric_lookup, queried_metrics=queried_metrics
-        # )
         push_down_result = push_down_result.filter_candidates_by_pattern(
-            BaseTimeGrainPattern(),
+            DefaultTimeGranularityPattern(
+                metric_lookup=self._manifest_lookup.metric_lookup, queried_metrics=queried_metrics
+            )
         )
+
         logger.info(
             f"Spec pattern:\n"
             f"{indent(mf_pformat(spec_pattern))}\n"
@@ -130,7 +129,6 @@ class GroupByItemResolver:
                     )
                 ),
             )
-        # TODO: return issue if push_down_result.candidate_set.num_candidates < 1
 
         return GroupByItemResolution(
             spec=push_down_result.candidate_set.specs[0],
