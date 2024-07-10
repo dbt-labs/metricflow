@@ -10,6 +10,7 @@ from typing import Any, Dict, List, Optional, Sized, Union
 from dsi_pydantic_shim import BaseModel
 
 from metricflow_semantics.mf_logging.formatting import indent
+from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +28,7 @@ class MetricFlowPrettyFormatter:
     ) -> None:
         """See mf_pformat() for argument descriptions."""
         self._indent_prefix = indent_prefix
-        if max_line_length <= 0:
+        if not max_line_length > 0:
             raise ValueError(f"max_line_length must be > 0 as required by pprint.pformat(). Got {max_line_length}")
         self._max_line_width = max_line_length
         self._include_object_field_names = include_object_field_names
@@ -335,6 +336,10 @@ class MetricFlowPrettyFormatter:
                 is_dataclass_like_object=False,
                 remaining_line_width=remaining_line_width,
             )
+
+        if isinstance(obj, MetricFlowPrettyFormattable):
+            if obj.pretty_format is not None:
+                return obj.pretty_format
 
         if is_dataclass(obj):
             # dataclasses.asdict() seems to exclude None fields, so doing this instead.
