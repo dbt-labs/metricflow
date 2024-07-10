@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import List, Sequence, Union
+from dataclasses import dataclass
+from typing import List, Sequence, Tuple, Union
 
 from dbt_semantic_interfaces.protocols import WhereFilterIntersection
 from dbt_semantic_interfaces.references import MetricReference
@@ -22,19 +23,31 @@ from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.no
 from metricflow_semantics.visitor import VisitorOutputT
 
 
+@dataclass(frozen=True)
 class QueryGroupByItemResolutionNode(GroupByItemResolutionNode):
-    """Output the group-by-items relevant to the query and based on the inputs."""
+    """Output the group-by-items relevant to the query and based on the inputs.
 
-    def __init__(  # noqa: D107
-        self,
+    Attributes:
+        parent_nodes: The parent nodes of this query.
+        metrics_in_query: The metrics that are queried in this query.
+        where_filter_intersection: The intersection of where filters.
+    """
+
+    parent_nodes: Tuple[Union[MetricGroupByItemResolutionNode, NoMetricsGroupByItemSourceNode], ...]
+    metrics_in_query: Tuple[MetricReference, ...]
+    where_filter_intersection: WhereFilterIntersection
+
+    @staticmethod
+    def create(  # noqa: D102
         parent_nodes: Sequence[Union[MetricGroupByItemResolutionNode, NoMetricsGroupByItemSourceNode]],
         metrics_in_query: Sequence[MetricReference],
         where_filter_intersection: WhereFilterIntersection,
-    ) -> None:
-        self._parent_nodes = tuple(parent_nodes)
-        self._metrics_in_query = tuple(metrics_in_query)
-        self._where_filter_intersection = where_filter_intersection
-        super().__init__()
+    ) -> QueryGroupByItemResolutionNode:
+        return QueryGroupByItemResolutionNode(
+            parent_nodes=tuple(parent_nodes),
+            metrics_in_query=tuple(metrics_in_query),
+            where_filter_intersection=where_filter_intersection,
+        )
 
     @override
     def accept(self, visitor: GroupByItemResolutionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:
@@ -45,20 +58,10 @@ class QueryGroupByItemResolutionNode(GroupByItemResolutionNode):
     def description(self) -> str:
         return "Output the group-by items for query."
 
-    @property
-    @override
-    def parent_nodes(self) -> Sequence[Union[MetricGroupByItemResolutionNode, NoMetricsGroupByItemSourceNode]]:
-        return self._parent_nodes
-
     @classmethod
     @override
     def id_prefix(cls) -> IdPrefix:
         return StaticIdPrefix.QUERY_GROUP_BY_ITEM_RESOLUTION_NODE
-
-    @property
-    def metrics_in_query(self) -> Sequence[MetricReference]:
-        """Return the metrics that are queried in this query."""
-        return self._metrics_in_query
 
     @property
     @override
@@ -86,13 +89,9 @@ class QueryGroupByItemResolutionNode(GroupByItemResolutionNode):
         return properties
 
     @property
-    def where_filter_intersection(self) -> WhereFilterIntersection:  # noqa: D102
-        return self._where_filter_intersection
-
-    @property
     @override
     def ui_description(self) -> str:
-        return f"Query({repr([metric_reference.element_name for metric_reference in self._metrics_in_query])})"
+        return f"Query({repr([metric_reference.element_name for metric_reference in self.metrics_in_query])})"
 
     @override
     def _self_set(self) -> GroupByItemResolutionNodeSet:

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Sequence
 
 from dbt_semantic_interfaces.references import MeasureReference, MetricReference
@@ -15,23 +16,32 @@ from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.ba
 from metricflow_semantics.visitor import VisitorOutputT
 
 
+@dataclass(frozen=True)
 class MeasureGroupByItemSourceNode(GroupByItemResolutionNode):
-    """Outputs group-by-items for a measure."""
+    """Outputs group-by-items for a measure.
 
-    def __init__(
-        self,
+    Attributes:
+        measure_reference: Get the group-by items for this measure.
+        child_metric_reference: The metric that uses this measure.
+    """
+
+    measure_reference: MeasureReference
+    child_metric_reference: MetricReference
+
+    def __post_init__(self) -> None:  # noqa: D105
+        super().__post_init__()
+        assert len(self.parent_nodes) == 0
+
+    @staticmethod
+    def create(  # noqa: D102
         measure_reference: MeasureReference,
         child_metric_reference: MetricReference,
-    ) -> None:
-        """Initializer.
-
-        Args:
-            measure_reference: Get the group-by items for this measure.
-            child_metric_reference: The metric that uses this measure.
-        """
-        self._measure_reference = measure_reference
-        self._child_metric_reference = child_metric_reference
-        super().__init__()
+    ) -> MeasureGroupByItemSourceNode:
+        return MeasureGroupByItemSourceNode(
+            parent_nodes=(),
+            measure_reference=measure_reference,
+            child_metric_reference=child_metric_reference,
+        )
 
     @override
     def accept(self, visitor: GroupByItemResolutionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:
@@ -41,11 +51,6 @@ class MeasureGroupByItemSourceNode(GroupByItemResolutionNode):
     @override
     def description(self) -> str:
         return "Output group-by-items available for this measure."
-
-    @property
-    @override
-    def parent_nodes(self) -> Sequence[GroupByItemResolutionNode]:
-        return ()
 
     @classmethod
     @override
@@ -58,22 +63,13 @@ class MeasureGroupByItemSourceNode(GroupByItemResolutionNode):
         return tuple(super().displayed_properties) + (
             DisplayedProperty(
                 key="measure_reference",
-                value=str(self._measure_reference),
+                value=str(self.measure_reference),
             ),
             DisplayedProperty(
                 key="child_metric_reference",
-                value=str(self._child_metric_reference),
+                value=str(self.child_metric_reference),
             ),
         )
-
-    @property
-    def measure_reference(self) -> MeasureReference:  # noqa: D102
-        return self._measure_reference
-
-    @property
-    def child_metric_reference(self) -> MetricReference:
-        """Return the metric that uses this measure."""
-        return self._child_metric_reference
 
     @property
     @override
