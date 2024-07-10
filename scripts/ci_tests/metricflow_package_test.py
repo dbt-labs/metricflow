@@ -36,7 +36,7 @@ def _data_set_to_read_nodes(data_sets: OrderedDict[str, SemanticModelDataSet]) -
     # Moved from model_fixtures.py.
     return_dict: OrderedDict[str, ReadSqlSourceNode] = OrderedDict()
     for semantic_model_name, data_set in data_sets.items():
-        return_dict[semantic_model_name] = ReadSqlSourceNode(data_set)
+        return_dict[semantic_model_name] = ReadSqlSourceNode.create(data_set)
 
     return return_dict
 

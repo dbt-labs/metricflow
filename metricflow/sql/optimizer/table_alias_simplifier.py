@@ -26,7 +26,7 @@ class SqlTableAliasSimplifierVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
         should_simplify_table_aliases = len(node.parent_nodes) <= 1
 
         if should_simplify_table_aliases:
-            return SqlSelectStatementNode(
+            return SqlSelectStatementNode.create(
                 description=node.description,
                 select_columns=tuple(
                     SqlSelectColumn(expr=x.expr.rewrite(should_render_table_alias=False), column_alias=x.column_alias)
@@ -47,12 +47,12 @@ class SqlTableAliasSimplifierVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
                 distinct=node.distinct,
             )
 
-        return SqlSelectStatementNode(
+        return SqlSelectStatementNode.create(
             description=node.description,
             select_columns=node.select_columns,
             from_source=node.from_source.accept(self),
             from_source_alias=node.from_source_alias,
-            joins_descs=tuple(
+            join_descs=tuple(
                 SqlJoinDescription(
                     right_source=x.right_source.accept(self),
                     right_source_alias=x.right_source_alias,
@@ -75,7 +75,7 @@ class SqlTableAliasSimplifierVisitor(SqlQueryPlanNodeVisitor[SqlQueryPlanNode]):
         return node
 
     def visit_create_table_as_node(self, node: SqlCreateTableAsNode) -> SqlQueryPlanNode:  # noqa: D102
-        return SqlCreateTableAsNode(
+        return SqlCreateTableAsNode.create(
             sql_table=node.sql_table,
             parent_node=node.parent_node.accept(self),
         )

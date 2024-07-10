@@ -259,7 +259,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
                 )
                 return ComputeMetricsBranchCombinerResult()
 
-        combined_node = AggregateMeasuresNode(
+        combined_node = AggregateMeasuresNode.create(
             parent_node=combined_parent_node,
             metric_input_measure_specs=combined_metric_input_measure_specs,
         )
@@ -305,7 +305,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
             if metric_spec not in unique_metric_specs:
                 unique_metric_specs.append(metric_spec)
 
-        combined_node = ComputeMetricsNode(
+        combined_node = ComputeMetricsNode.create(
             parent_node=combined_parent_node,
             metric_specs=unique_metric_specs,
             aggregated_to_elements=current_right_node.aggregated_to_elements,
@@ -389,7 +389,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
 
         # De-dupe so that we don't see the same spec twice in include specs. For example, this can happen with dimension
         # specs since any branch that is merged together needs to output the same set of dimensions.
-        combined_node = FilterElementsNode(
+        combined_node = FilterElementsNode.create(
             parent_node=combined_parent_node,
             include_specs=self._current_left_node.include_specs.merge(current_right_node.include_specs).dedupe(),
         )

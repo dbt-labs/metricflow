@@ -201,7 +201,7 @@ class DataWarehouseTaskBuilder:
                 spec_filter_tuples.append(
                     (
                         spec,
-                        FilterElementsNode(
+                        FilterElementsNode.create(
                             parent_node=source_node, include_specs=InstanceSpecSet(dimension_specs=(spec,))
                         ),
                     )
@@ -214,7 +214,7 @@ class DataWarehouseTaskBuilder:
                 spec_filter_tuples.append(
                     (
                         spec,
-                        FilterElementsNode(
+                        FilterElementsNode.create(
                             parent_node=source_node, include_specs=InstanceSpecSet(time_dimension_specs=(spec,))
                         ),
                     )
@@ -241,7 +241,7 @@ class DataWarehouseTaskBuilder:
                     )
                 )
 
-            filter_elements_node = FilterElementsNode(
+            filter_elements_node = FilterElementsNode.create(
                 parent_node=source_node,
                 include_specs=InstanceSpecSet(
                     dimension_specs=dimension_specs,
@@ -299,7 +299,7 @@ class DataWarehouseTaskBuilder:
                 dataset.instance_set.spec_set.entity_specs
             )
             for spec in semantic_model_specs:
-                filter_elements_node = FilterElementsNode(
+                filter_elements_node = FilterElementsNode.create(
                     parent_node=source_node, include_specs=InstanceSpecSet(entity_specs=(spec,))
                 )
                 semantic_model_sub_tasks.append(
@@ -322,7 +322,7 @@ class DataWarehouseTaskBuilder:
                     )
                 )
 
-            filter_elements_node = FilterElementsNode(
+            filter_elements_node = FilterElementsNode.create(
                 parent_node=source_node,
                 include_specs=InstanceSpecSet(
                     entity_specs=tuple(semantic_model_specs),
@@ -392,7 +392,7 @@ class DataWarehouseTaskBuilder:
                 obtained_source_node = source_node_by_measure_spec.get(spec)
                 assert obtained_source_node, f"Unable to find generated source node for measure: {spec.element_name}"
 
-                filter_elements_node = FilterElementsNode(
+                filter_elements_node = FilterElementsNode.create(
                     parent_node=obtained_source_node,
                     include_specs=InstanceSpecSet(
                         measure_specs=(spec,),
@@ -419,7 +419,7 @@ class DataWarehouseTaskBuilder:
                 )
 
             for measure_specs, source_node in measure_specs_source_node_pair:
-                filter_elements_node = FilterElementsNode(
+                filter_elements_node = FilterElementsNode.create(
                     parent_node=source_node, include_specs=InstanceSpecSet(measure_specs=measure_specs)
                 )
                 tasks.append(

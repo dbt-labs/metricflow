@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import logging
 import time
-from typing import Optional, Sequence
+from dataclasses import dataclass
+from typing import ClassVar, Sequence
 
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 
 from metricflow.execution.execution_plan import (
     ExecutionPlanTask,
-    SqlQuery,
     TaskExecutionError,
     TaskExecutionResult,
 )
@@ -16,21 +16,28 @@ from metricflow.execution.execution_plan import (
 logger = logging.getLogger(__name__)
 
 
+@dataclass(frozen=True)
 class NoOpExecutionPlanTask(ExecutionPlanTask):
-    """A no-op task for testing executors."""
+    """A no-op task for testing executors.
 
-    # Error to return if should_error is set.
-    EXAMPLE_ERROR = TaskExecutionError("Expected Error")
+    Attributes:
+        should_error: If true, test the error flow by intentionally returning an error in the results.
+    """
 
-    def __init__(self, parent_tasks: Sequence[ExecutionPlanTask] = (), should_error: bool = False) -> None:
-        """Constructor.
+    EXAMPLE_ERROR: ClassVar[TaskExecutionError] = TaskExecutionError("Expected Error")
 
-        Args:
-            parent_tasks: Self-explanatory.
-            should_error: if true, return an error in the results.
-        """
-        self._should_error = should_error
-        super().__init__(task_id=self.create_unique_id(), parent_nodes=list(parent_tasks))
+    should_error: bool = False
+
+    @staticmethod
+    def create(  # noqa: D102
+        parent_tasks: Sequence[ExecutionPlanTask] = (),
+        should_error: bool = False,
+    ) -> NoOpExecutionPlanTask:
+        return NoOpExecutionPlanTask(
+            parent_nodes=tuple(parent_tasks),
+            sql_query=None,
+            should_error=should_error,
+        )
 
     @property
     def description(self) -> str:  # noqa: D102
@@ -45,9 +52,5 @@ class NoOpExecutionPlanTask(ExecutionPlanTask):
         time.sleep(0.01)
         end_time = time.time()
         return TaskExecutionResult(
-            start_time=start_time, end_time=end_time, errors=(self.EXAMPLE_ERROR,) if self._should_error else ()
+            start_time=start_time, end_time=end_time, errors=(self.EXAMPLE_ERROR,) if self.should_error else ()
         )
-
-    @property
-    def sql_query(self) -> Optional[SqlQuery]:  # noqa: D102
-        return None

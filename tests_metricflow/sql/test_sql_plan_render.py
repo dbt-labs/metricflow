@@ -42,14 +42,14 @@ def test_component_rendering(
     # Test single SELECT column
     select_columns = [
         SqlSelectColumn(
-            expr=SqlAggregateFunctionExpression(
-                sql_function=SqlFunction.SUM, sql_function_args=[SqlStringExpression("1")]
+            expr=SqlAggregateFunctionExpression.create(
+                sql_function=SqlFunction.SUM, sql_function_args=[SqlStringExpression.create("1")]
             ),
             column_alias="bookings",
         ),
     ]
 
-    from_source = SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings"))
+    from_source = SqlTableFromClauseNode.create(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings"))
 
     from_source = from_source
     from_source_alias = "a"
@@ -61,12 +61,12 @@ def test_component_rendering(
     assert_rendered_sql_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,
-        sql_plan_node=SqlSelectStatementNode(
+        sql_plan_node=SqlSelectStatementNode.create(
             description="test0",
             select_columns=tuple(select_columns),
             from_source=from_source,
             from_source_alias=from_source_alias,
-            joins_descs=tuple(joins_descs),
+            join_descs=tuple(joins_descs),
             where=where,
             group_bys=tuple(group_bys),
             order_bys=tuple(order_bys),
@@ -79,11 +79,11 @@ def test_component_rendering(
     select_columns.extend(
         [
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(SqlColumnReference("b", "country")),
+                expr=SqlColumnReferenceExpression.create(SqlColumnReference("b", "country")),
                 column_alias="user__country",
             ),
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(SqlColumnReference("c", "country")),
+                expr=SqlColumnReferenceExpression.create(SqlColumnReference("c", "country")),
                 column_alias="listing__country",
             ),
         ]
@@ -92,12 +92,12 @@ def test_component_rendering(
     assert_rendered_sql_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,
-        sql_plan_node=SqlSelectStatementNode(
+        sql_plan_node=SqlSelectStatementNode.create(
             description="test1",
             select_columns=tuple(select_columns),
             from_source=from_source,
             from_source_alias=from_source_alias,
-            joins_descs=tuple(joins_descs),
+            join_descs=tuple(joins_descs),
             where=where,
             group_bys=tuple(group_bys),
             order_bys=tuple(order_bys),
@@ -109,12 +109,12 @@ def test_component_rendering(
     # Test single join
     joins_descs.append(
         SqlJoinDescription(
-            right_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="dim_users")),
+            right_source=SqlTableFromClauseNode.create(sql_table=SqlTable(schema_name="demo", table_name="dim_users")),
             right_source_alias="b",
-            on_condition=SqlComparisonExpression(
-                left_expr=SqlColumnReferenceExpression(SqlColumnReference("a", "user_id")),
+            on_condition=SqlComparisonExpression.create(
+                left_expr=SqlColumnReferenceExpression.create(SqlColumnReference("a", "user_id")),
                 comparison=SqlComparison.EQUALS,
-                right_expr=SqlColumnReferenceExpression(SqlColumnReference("b", "user_id")),
+                right_expr=SqlColumnReferenceExpression.create(SqlColumnReference("b", "user_id")),
             ),
             join_type=SqlJoinType.LEFT_OUTER,
         )
@@ -123,12 +123,12 @@ def test_component_rendering(
     assert_rendered_sql_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,
-        sql_plan_node=SqlSelectStatementNode(
+        sql_plan_node=SqlSelectStatementNode.create(
             description="test2",
             select_columns=tuple(select_columns),
             from_source=from_source,
             from_source_alias=from_source_alias,
-            joins_descs=tuple(joins_descs),
+            join_descs=tuple(joins_descs),
             where=where,
             group_bys=tuple(group_bys),
             order_bys=tuple(order_bys),
@@ -140,12 +140,14 @@ def test_component_rendering(
     # Test multiple join
     joins_descs.append(
         SqlJoinDescription(
-            right_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="dim_listings")),
+            right_source=SqlTableFromClauseNode.create(
+                sql_table=SqlTable(schema_name="demo", table_name="dim_listings")
+            ),
             right_source_alias="c",
-            on_condition=SqlComparisonExpression(
-                left_expr=SqlColumnReferenceExpression(SqlColumnReference("a", "user_id")),
+            on_condition=SqlComparisonExpression.create(
+                left_expr=SqlColumnReferenceExpression.create(SqlColumnReference("a", "user_id")),
                 comparison=SqlComparison.EQUALS,
-                right_expr=SqlColumnReferenceExpression(SqlColumnReference("c", "user_id")),
+                right_expr=SqlColumnReferenceExpression.create(SqlColumnReference("c", "user_id")),
             ),
             join_type=SqlJoinType.LEFT_OUTER,
         )
@@ -154,12 +156,12 @@ def test_component_rendering(
     assert_rendered_sql_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,
-        sql_plan_node=SqlSelectStatementNode(
+        sql_plan_node=SqlSelectStatementNode.create(
             description="test3",
             select_columns=tuple(select_columns),
             from_source=from_source,
             from_source_alias=from_source_alias,
-            joins_descs=tuple(joins_descs),
+            join_descs=tuple(joins_descs),
             where=where,
             group_bys=tuple(group_bys),
             order_bys=tuple(order_bys),
@@ -171,7 +173,7 @@ def test_component_rendering(
     # Test single group by
     group_bys.append(
         SqlSelectColumn(
-            expr=SqlColumnReferenceExpression(SqlColumnReference("b", "country")),
+            expr=SqlColumnReferenceExpression.create(SqlColumnReference("b", "country")),
             column_alias="user__country",
         ),
     )
@@ -179,12 +181,12 @@ def test_component_rendering(
     assert_rendered_sql_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,
-        sql_plan_node=SqlSelectStatementNode(
+        sql_plan_node=SqlSelectStatementNode.create(
             description="test4",
             select_columns=tuple(select_columns),
             from_source=from_source,
             from_source_alias=from_source_alias,
-            joins_descs=tuple(joins_descs),
+            join_descs=tuple(joins_descs),
             where=where,
             group_bys=tuple(group_bys),
             order_bys=tuple(order_bys),
@@ -196,7 +198,7 @@ def test_component_rendering(
     # Test multiple group bys
     group_bys.append(
         SqlSelectColumn(
-            expr=SqlColumnReferenceExpression(SqlColumnReference("c", "country")),
+            expr=SqlColumnReferenceExpression.create(SqlColumnReference("c", "country")),
             column_alias="listing__country",
         ),
     )
@@ -204,12 +206,12 @@ def test_component_rendering(
     assert_rendered_sql_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,
-        sql_plan_node=SqlSelectStatementNode(
+        sql_plan_node=SqlSelectStatementNode.create(
             description="test5",
             select_columns=tuple(select_columns),
             from_source=from_source,
             from_source_alias=from_source_alias,
-            joins_descs=tuple(joins_descs),
+            join_descs=tuple(joins_descs),
             where=where,
             group_bys=tuple(group_bys),
             order_bys=tuple(order_bys),
@@ -228,24 +230,26 @@ def test_render_where(  # noqa: D103
     assert_rendered_sql_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,
-        sql_plan_node=SqlSelectStatementNode(
+        sql_plan_node=SqlSelectStatementNode.create(
             description="test0",
             select_columns=(
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(table_alias="a", column_name="booking_value")
                     ),
                     column_alias="booking_value",
                 ),
             ),
-            from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
+            from_source=SqlTableFromClauseNode.create(
+                sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")
+            ),
             from_source_alias="a",
-            where=SqlComparisonExpression(
-                left_expr=SqlColumnReferenceExpression(
+            where=SqlComparisonExpression.create(
+                left_expr=SqlColumnReferenceExpression.create(
                     col_ref=SqlColumnReference(table_alias="a", column_name="booking_value")
                 ),
                 comparison=SqlComparison.GREATER_THAN,
-                right_expr=SqlStringExpression(
+                right_expr=SqlStringExpression.create(
                     sql_expr="100",
                     requires_parenthesis=False,
                     used_columns=(),
@@ -266,33 +270,35 @@ def test_render_order_by(  # noqa: D103
     assert_rendered_sql_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,
-        sql_plan_node=SqlSelectStatementNode(
+        sql_plan_node=SqlSelectStatementNode.create(
             description="test0",
             select_columns=(
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(table_alias="a", column_name="booking_value")
                     ),
                     column_alias="booking_value",
                 ),
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(table_alias="a", column_name="bookings")
                     ),
                     column_alias="bookings",
                 ),
             ),
-            from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
+            from_source=SqlTableFromClauseNode.create(
+                sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")
+            ),
             from_source_alias="a",
             order_bys=(
                 SqlOrderByDescription(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(table_alias="a", column_name="booking_value")
                     ),
                     desc=False,
                 ),
                 SqlOrderByDescription(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(table_alias="a", column_name="bookings")
                     ),
                     desc=True,
@@ -313,17 +319,19 @@ def test_render_limit(  # noqa: D103
     assert_rendered_sql_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,
-        sql_plan_node=SqlSelectStatementNode(
+        sql_plan_node=SqlSelectStatementNode.create(
             description="test0",
             select_columns=(
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(table_alias="a", column_name="bookings")
                     ),
                     column_alias="bookings",
                 ),
             ),
-            from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
+            from_source=SqlTableFromClauseNode.create(
+                sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")
+            ),
             from_source_alias="a",
             limit=1,
         ),
@@ -338,22 +346,24 @@ def test_render_create_table_as(  # noqa: D103
     mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
 ) -> None:
-    select_node = SqlSelectStatementNode(
+    select_node = SqlSelectStatementNode.create(
         description="select_0",
         select_columns=(
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(col_ref=SqlColumnReference(table_alias="a", column_name="bookings")),
+                expr=SqlColumnReferenceExpression.create(
+                    col_ref=SqlColumnReference(table_alias="a", column_name="bookings")
+                ),
                 column_alias="bookings",
             ),
         ),
-        from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
+        from_source=SqlTableFromClauseNode.create(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
         from_source_alias="a",
         limit=1,
     )
     assert_rendered_sql_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,
-        sql_plan_node=SqlCreateTableAsNode(
+        sql_plan_node=SqlCreateTableAsNode.create(
             sql_table=SqlTable(
                 schema_name="schema_name",
                 table_name="table_name",
@@ -367,7 +377,7 @@ def test_render_create_table_as(  # noqa: D103
     assert_rendered_sql_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,
-        sql_plan_node=SqlCreateTableAsNode(
+        sql_plan_node=SqlCreateTableAsNode.create(
             sql_table=SqlTable(
                 schema_name="schema_name",
                 table_name="table_name",

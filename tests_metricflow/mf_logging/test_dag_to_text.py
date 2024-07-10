@@ -33,15 +33,15 @@ def test_multithread_dag_to_text() -> None:
     dag_to_text_formatter = MetricFlowDagTextFormatter(max_width=1)
     dag = SqlQueryPlan(
         plan_id=DagId("plan"),
-        render_node=SqlSelectStatementNode(
+        render_node=SqlSelectStatementNode.create(
             description="test",
             select_columns=(
                 SqlSelectColumn(
-                    expr=SqlStringExpression("'foo'"),
+                    expr=SqlStringExpression.create("'foo'"),
                     column_alias="bar",
                 ),
             ),
-            from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="schema", table_name="table")),
+            from_source=SqlTableFromClauseNode.create(sql_table=SqlTable(schema_name="schema", table_name="table")),
             from_source_alias="src",
         ),
     )

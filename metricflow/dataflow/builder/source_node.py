@@ -59,8 +59,8 @@ class SourceNodeBuilder:
         time_spine_source = TimeSpineSource.create_from_manifest(semantic_manifest_lookup.semantic_manifest)
         time_spine_data_set = data_set_converter.build_time_spine_source_data_set(time_spine_source)
         time_dim_reference = TimeDimensionReference(element_name=time_spine_source.time_column_name)
-        self._time_spine_source_node = MetricTimeDimensionTransformNode(
-            parent_node=ReadSqlSourceNode(data_set=time_spine_data_set),
+        self._time_spine_source_node = MetricTimeDimensionTransformNode.create(
+            parent_node=ReadSqlSourceNode.create(data_set=time_spine_data_set),
             aggregation_time_dimension_reference=time_dim_reference,
         )
         self._query_parser = MetricFlowQueryParser(semantic_manifest_lookup)
@@ -71,7 +71,7 @@ class SourceNodeBuilder:
         source_nodes_for_metric_queries: List[DataflowPlanNode] = []
 
         for data_set in data_sets:
-            read_node = ReadSqlSourceNode(data_set)
+            read_node = ReadSqlSourceNode.create(data_set)
             group_by_item_source_nodes.append(read_node)
             agg_time_dim_to_measures_grouper = (
                 self._semantic_manifest_lookup.semantic_model_lookup.get_aggregation_time_dimensions_with_measures(
@@ -86,7 +86,7 @@ class SourceNodeBuilder:
             else:
                 # Splits the measures by distinct aggregate time dimension.
                 for time_dimension_reference in time_dimension_references:
-                    metric_time_transform_node = MetricTimeDimensionTransformNode(
+                    metric_time_transform_node = MetricTimeDimensionTransformNode.create(
                         parent_node=read_node,
                         aggregation_time_dimension_reference=time_dimension_reference,
                     )

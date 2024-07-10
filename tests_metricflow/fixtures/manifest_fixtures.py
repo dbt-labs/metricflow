@@ -221,7 +221,7 @@ class MetricFlowEngineTestFixture:
         # Moved from model_fixtures.py.
         return_dict: OrderedDict[str, ReadSqlSourceNode] = OrderedDict()
         for semantic_model_name, data_set in data_sets.items():
-            return_dict[semantic_model_name] = ReadSqlSourceNode(data_set)
+            return_dict[semantic_model_name] = ReadSqlSourceNode.create(data_set)
             logger.debug(
                 f"For semantic model {semantic_model_name}, creating node_id {return_dict[semantic_model_name].node_id}"
             )

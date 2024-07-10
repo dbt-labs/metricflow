@@ -68,20 +68,24 @@ def test_no_parent_node_data_set(
             time_dimension_instances=(),
             entity_instances=(),
         ),
-        sql_select_node=SqlSelectStatementNode(
+        sql_select_node=SqlSelectStatementNode.create(
             description="test0",
             select_columns=(
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(SqlColumnReference(table_alias="src", column_name="bookings")),
+                    expr=SqlColumnReferenceExpression.create(
+                        SqlColumnReference(table_alias="src", column_name="bookings")
+                    ),
                     column_alias="bookings",
                 ),
             ),
-            from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
+            from_source=SqlTableFromClauseNode.create(
+                sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")
+            ),
             from_source_alias="src",
         ),
     )
 
-    node = ReadSqlSourceNode(data_set=data_set)
+    node = ReadSqlSourceNode.create(data_set=data_set)
 
     assert resolver.get_output_data_set(node).instance_set == data_set.instance_set
 
@@ -102,7 +106,7 @@ def test_joined_node_data_set(
     # Join "revenue" with "users_latest" to get "user__home_state_latest"
     revenue_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping["revenue"]
     users_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping["users_latest"]
-    join_node = JoinOnEntitiesNode(
+    join_node = JoinOnEntitiesNode.create(
         left_node=revenue_node,
         join_targets=[
             JoinDescription(

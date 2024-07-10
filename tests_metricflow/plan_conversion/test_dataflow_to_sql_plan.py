@@ -153,7 +153,7 @@ def test_filter_node(
     source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
-    filter_node = FilterElementsNode(
+    filter_node = FilterElementsNode.create(
         parent_node=source_node, include_specs=InstanceSpecSet(measure_specs=(measure_spec,))
     )
 
@@ -184,11 +184,11 @@ def test_filter_with_where_constraint_node(
     ]
 
     ds_spec = TimeDimensionSpec(element_name="ds", entity_links=(), time_granularity=TimeGranularity.DAY)
-    filter_node = FilterElementsNode(
+    filter_node = FilterElementsNode.create(
         parent_node=source_node,
         include_specs=InstanceSpecSet(measure_specs=(measure_spec,), time_dimension_specs=(ds_spec,)),
     )  # need to include ds_spec because where constraint operates on ds
-    where_constraint_node = WhereConstraintNode(
+    where_constraint_node = WhereConstraintNode.create(
         parent_node=filter_node,
         where_specs=(
             WhereFilterSpec(
@@ -258,12 +258,12 @@ def test_measure_aggregation_node(
     measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
-    filtered_measure_node = FilterElementsNode(
+    filtered_measure_node = FilterElementsNode.create(
         parent_node=measure_source_node,
         include_specs=InstanceSpecSet(measure_specs=tuple(measure_specs)),
     )
 
-    aggregated_measure_node = AggregateMeasuresNode(
+    aggregated_measure_node = AggregateMeasuresNode.create(
         parent_node=filtered_measure_node, metric_input_measure_specs=metric_input_measure_specs
     )
 
@@ -292,7 +292,7 @@ def test_single_join_node(
     measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
-    filtered_measure_node = FilterElementsNode(
+    filtered_measure_node = FilterElementsNode.create(
         parent_node=measure_source_node,
         include_specs=InstanceSpecSet(
             measure_specs=(measure_spec,),
@@ -307,7 +307,7 @@ def test_single_join_node(
     dimension_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "listings_latest"
     ]
-    filtered_dimension_node = FilterElementsNode(
+    filtered_dimension_node = FilterElementsNode.create(
         parent_node=dimension_source_node,
         include_specs=InstanceSpecSet(
             entity_specs=(entity_spec,),
@@ -315,7 +315,7 @@ def test_single_join_node(
         ),
     )
 
-    join_node = JoinOnEntitiesNode(
+    join_node = JoinOnEntitiesNode.create(
         left_node=filtered_measure_node,
         join_targets=[
             JoinDescription(
@@ -353,7 +353,7 @@ def test_multi_join_node(
     measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
-    filtered_measure_node = FilterElementsNode(
+    filtered_measure_node = FilterElementsNode.create(
         parent_node=measure_source_node,
         include_specs=InstanceSpecSet(measure_specs=(measure_spec,), entity_specs=(entity_spec,)),
     )
@@ -365,7 +365,7 @@ def test_multi_join_node(
     dimension_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "listings_latest"
     ]
-    filtered_dimension_node = FilterElementsNode(
+    filtered_dimension_node = FilterElementsNode.create(
         parent_node=dimension_source_node,
         include_specs=InstanceSpecSet(
             entity_specs=(entity_spec,),
@@ -373,7 +373,7 @@ def test_multi_join_node(
         ),
     )
 
-    join_node = JoinOnEntitiesNode(
+    join_node = JoinOnEntitiesNode.create(
         left_node=filtered_measure_node,
         join_targets=[
             JoinDescription(
@@ -419,7 +419,7 @@ def test_compute_metrics_node(
     measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
-    filtered_measure_node = FilterElementsNode(
+    filtered_measure_node = FilterElementsNode.create(
         parent_node=measure_source_node,
         include_specs=InstanceSpecSet(
             measure_specs=(measure_spec,),
@@ -434,7 +434,7 @@ def test_compute_metrics_node(
     dimension_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "listings_latest"
     ]
-    filtered_dimension_node = FilterElementsNode(
+    filtered_dimension_node = FilterElementsNode.create(
         parent_node=dimension_source_node,
         include_specs=InstanceSpecSet(
             entity_specs=(entity_spec,),
@@ -442,7 +442,7 @@ def test_compute_metrics_node(
         ),
     )
 
-    join_node = JoinOnEntitiesNode(
+    join_node = JoinOnEntitiesNode.create(
         left_node=filtered_measure_node,
         join_targets=[
             JoinDescription(
@@ -455,12 +455,12 @@ def test_compute_metrics_node(
         ],
     )
 
-    aggregated_measure_node = AggregateMeasuresNode(
+    aggregated_measure_node = AggregateMeasuresNode.create(
         parent_node=join_node, metric_input_measure_specs=metric_input_measure_specs
     )
 
     metric_spec = MetricSpec(element_name="bookings")
-    compute_metrics_node = ComputeMetricsNode(
+    compute_metrics_node = ComputeMetricsNode.create(
         parent_node=aggregated_measure_node,
         metric_specs=[metric_spec],
         aggregated_to_elements={entity_spec, dimension_spec},
@@ -492,7 +492,7 @@ def test_compute_metrics_node_simple_expr(
     measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
-    filtered_measure_node = FilterElementsNode(
+    filtered_measure_node = FilterElementsNode.create(
         parent_node=measure_source_node,
         include_specs=InstanceSpecSet(measure_specs=(measure_spec,), entity_specs=(entity_spec,)),
     )
@@ -504,7 +504,7 @@ def test_compute_metrics_node_simple_expr(
     dimension_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "listings_latest"
     ]
-    filtered_dimension_node = FilterElementsNode(
+    filtered_dimension_node = FilterElementsNode.create(
         parent_node=dimension_source_node,
         include_specs=InstanceSpecSet(
             entity_specs=(entity_spec,),
@@ -512,7 +512,7 @@ def test_compute_metrics_node_simple_expr(
         ),
     )
 
-    join_node = JoinOnEntitiesNode(
+    join_node = JoinOnEntitiesNode.create(
         left_node=filtered_measure_node,
         join_targets=[
             JoinDescription(
@@ -525,17 +525,17 @@ def test_compute_metrics_node_simple_expr(
         ],
     )
 
-    aggregated_measures_node = AggregateMeasuresNode(
+    aggregated_measures_node = AggregateMeasuresNode.create(
         parent_node=join_node, metric_input_measure_specs=metric_input_measure_specs
     )
     metric_spec = MetricSpec(element_name="booking_fees")
-    compute_metrics_node = ComputeMetricsNode(
+    compute_metrics_node = ComputeMetricsNode.create(
         parent_node=aggregated_measures_node,
         metric_specs=[metric_spec],
         aggregated_to_elements={entity_spec, dimension_spec},
     )
 
-    sink_node = WriteToResultDataTableNode(compute_metrics_node)
+    sink_node = WriteToResultDataTableNode.create(compute_metrics_node)
     dataflow_plan = DataflowPlan(sink_nodes=[sink_node], plan_id=DagId.from_str("plan0"))
 
     assert_plan_snapshot_text_equal(
@@ -578,27 +578,27 @@ def test_join_to_time_spine_node_without_offset(
     measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
-    metric_time_node = MetricTimeDimensionTransformNode(
+    metric_time_node = MetricTimeDimensionTransformNode.create(
         parent_node=measure_source_node,
         aggregation_time_dimension_reference=TimeDimensionReference(element_name="ds"),
     )
 
-    filtered_measure_node = FilterElementsNode(
+    filtered_measure_node = FilterElementsNode.create(
         parent_node=metric_time_node,
         include_specs=InstanceSpecSet(
             measure_specs=(measure_spec,), entity_specs=(entity_spec,), dimension_specs=(metric_time_spec,)
         ),
     )
-    aggregated_measures_node = AggregateMeasuresNode(
+    aggregated_measures_node = AggregateMeasuresNode.create(
         parent_node=filtered_measure_node, metric_input_measure_specs=metric_input_measure_specs
     )
     metric_spec = MetricSpec(element_name="booking_fees")
-    compute_metrics_node = ComputeMetricsNode(
+    compute_metrics_node = ComputeMetricsNode.create(
         parent_node=aggregated_measures_node,
         metric_specs=[metric_spec],
         aggregated_to_elements={entity_spec},
     )
-    join_to_time_spine_node = JoinToTimeSpineNode(
+    join_to_time_spine_node = JoinToTimeSpineNode.create(
         parent_node=compute_metrics_node,
         requested_agg_time_dimension_specs=[MTD_SPEC_DAY],
         use_custom_agg_time_dimension=False,
@@ -608,7 +608,7 @@ def test_join_to_time_spine_node_without_offset(
         join_type=SqlJoinType.INNER,
     )
 
-    sink_node = WriteToResultDataTableNode(join_to_time_spine_node)
+    sink_node = WriteToResultDataTableNode.create(join_to_time_spine_node)
     dataflow_plan = DataflowPlan(sink_nodes=[sink_node], plan_id=DagId.from_str("plan0"))
 
     assert_plan_snapshot_text_equal(
@@ -651,26 +651,26 @@ def test_join_to_time_spine_node_with_offset_window(
     measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
-    metric_time_node = MetricTimeDimensionTransformNode(
+    metric_time_node = MetricTimeDimensionTransformNode.create(
         parent_node=measure_source_node,
         aggregation_time_dimension_reference=TimeDimensionReference(element_name="ds"),
     )
-    filtered_measure_node = FilterElementsNode(
+    filtered_measure_node = FilterElementsNode.create(
         parent_node=metric_time_node,
         include_specs=InstanceSpecSet(
             measure_specs=(measure_spec,), entity_specs=(entity_spec,), dimension_specs=(metric_time_spec,)
         ),
     )
-    aggregated_measures_node = AggregateMeasuresNode(
+    aggregated_measures_node = AggregateMeasuresNode.create(
         parent_node=filtered_measure_node, metric_input_measure_specs=metric_input_measure_specs
     )
     metric_spec = MetricSpec(element_name="booking_fees")
-    compute_metrics_node = ComputeMetricsNode(
+    compute_metrics_node = ComputeMetricsNode.create(
         parent_node=aggregated_measures_node,
         metric_specs=[metric_spec],
         aggregated_to_elements={entity_spec, metric_time_spec},
     )
-    join_to_time_spine_node = JoinToTimeSpineNode(
+    join_to_time_spine_node = JoinToTimeSpineNode.create(
         parent_node=compute_metrics_node,
         requested_agg_time_dimension_specs=[MTD_SPEC_DAY],
         use_custom_agg_time_dimension=False,
@@ -681,7 +681,7 @@ def test_join_to_time_spine_node_with_offset_window(
         join_type=SqlJoinType.INNER,
     )
 
-    sink_node = WriteToResultDataTableNode(join_to_time_spine_node)
+    sink_node = WriteToResultDataTableNode.create(join_to_time_spine_node)
     dataflow_plan = DataflowPlan(sink_nodes=[sink_node], plan_id=DagId.from_str("plan0"))
 
     assert_plan_snapshot_text_equal(
@@ -724,26 +724,26 @@ def test_join_to_time_spine_node_with_offset_to_grain(
     measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
-    metric_time_node = MetricTimeDimensionTransformNode(
+    metric_time_node = MetricTimeDimensionTransformNode.create(
         parent_node=measure_source_node,
         aggregation_time_dimension_reference=TimeDimensionReference(element_name="ds"),
     )
-    filtered_measure_node = FilterElementsNode(
+    filtered_measure_node = FilterElementsNode.create(
         parent_node=metric_time_node,
         include_specs=InstanceSpecSet(
             measure_specs=(measure_spec,), entity_specs=(entity_spec,), dimension_specs=(metric_time_spec,)
         ),
     )
-    aggregated_measures_node = AggregateMeasuresNode(
+    aggregated_measures_node = AggregateMeasuresNode.create(
         parent_node=filtered_measure_node, metric_input_measure_specs=metric_input_measure_specs
     )
     metric_spec = MetricSpec(element_name="booking_fees")
-    compute_metrics_node = ComputeMetricsNode(
+    compute_metrics_node = ComputeMetricsNode.create(
         parent_node=aggregated_measures_node,
         metric_specs=[metric_spec],
         aggregated_to_elements={entity_spec, metric_time_spec},
     )
-    join_to_time_spine_node = JoinToTimeSpineNode(
+    join_to_time_spine_node = JoinToTimeSpineNode.create(
         parent_node=compute_metrics_node,
         requested_agg_time_dimension_specs=[MTD_SPEC_DAY],
         use_custom_agg_time_dimension=False,
@@ -755,7 +755,7 @@ def test_join_to_time_spine_node_with_offset_to_grain(
         join_type=SqlJoinType.INNER,
     )
 
-    sink_node = WriteToResultDataTableNode(join_to_time_spine_node)
+    sink_node = WriteToResultDataTableNode.create(join_to_time_spine_node)
     dataflow_plan = DataflowPlan(sink_nodes=[sink_node], plan_id=DagId.from_str("plan0"))
 
     assert_plan_snapshot_text_equal(
@@ -803,7 +803,7 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
     measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
-    filtered_measures_node = FilterElementsNode(
+    filtered_measures_node = FilterElementsNode.create(
         parent_node=measure_source_node,
         include_specs=InstanceSpecSet(measure_specs=(numerator_spec, denominator_spec), entity_specs=(entity_spec,)),
     )
@@ -815,7 +815,7 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
     dimension_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "listings_latest"
     ]
-    filtered_dimension_node = FilterElementsNode(
+    filtered_dimension_node = FilterElementsNode.create(
         parent_node=dimension_source_node,
         include_specs=InstanceSpecSet(
             entity_specs=(entity_spec,),
@@ -823,7 +823,7 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
         ),
     )
 
-    join_node = JoinOnEntitiesNode(
+    join_node = JoinOnEntitiesNode.create(
         left_node=filtered_measures_node,
         join_targets=[
             JoinDescription(
@@ -836,11 +836,11 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
         ],
     )
 
-    aggregated_measures_node = AggregateMeasuresNode(
+    aggregated_measures_node = AggregateMeasuresNode.create(
         parent_node=join_node, metric_input_measure_specs=metric_input_measure_specs
     )
     metric_spec = MetricSpec(element_name="bookings_per_booker")
-    compute_metrics_node = ComputeMetricsNode(
+    compute_metrics_node = ComputeMetricsNode.create(
         parent_node=aggregated_measures_node,
         metric_specs=[metric_spec],
         aggregated_to_elements={entity_spec, dimension_spec},
@@ -882,7 +882,7 @@ def test_order_by_node(
         "bookings_source"
     ]
 
-    filtered_measure_node = FilterElementsNode(
+    filtered_measure_node = FilterElementsNode.create(
         parent_node=measure_source_node,
         include_specs=InstanceSpecSet(
             measure_specs=(measure_spec,),
@@ -891,18 +891,18 @@ def test_order_by_node(
         ),
     )
 
-    aggregated_measure_node = AggregateMeasuresNode(
+    aggregated_measure_node = AggregateMeasuresNode.create(
         parent_node=filtered_measure_node, metric_input_measure_specs=metric_input_measure_specs
     )
 
     metric_spec = MetricSpec(element_name="bookings")
-    compute_metrics_node = ComputeMetricsNode(
+    compute_metrics_node = ComputeMetricsNode.create(
         parent_node=aggregated_measure_node,
         metric_specs=[metric_spec],
         aggregated_to_elements={dimension_spec, time_dimension_spec},
     )
 
-    order_by_node = OrderByLimitNode(
+    order_by_node = OrderByLimitNode.create(
         order_by_specs=[
             OrderBySpec(
                 instance_spec=time_dimension_spec,
@@ -940,7 +940,7 @@ def test_semi_additive_join_node(
     measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "accounts_source"
     ]
-    semi_additive_join_node = SemiAdditiveJoinNode(
+    semi_additive_join_node = SemiAdditiveJoinNode.create(
         parent_node=measure_source_node,
         entity_specs=tuple(),
         time_dimension_spec=time_dimension_spec,
@@ -974,7 +974,7 @@ def test_semi_additive_join_node_with_queried_group_by(
     measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "accounts_source"
     ]
-    semi_additive_join_node = SemiAdditiveJoinNode(
+    semi_additive_join_node = SemiAdditiveJoinNode.create(
         parent_node=measure_source_node,
         entity_specs=tuple(),
         time_dimension_spec=time_dimension_spec,
@@ -1010,7 +1010,7 @@ def test_semi_additive_join_node_with_grouping(
     measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "accounts_source"
     ]
-    semi_additive_join_node = SemiAdditiveJoinNode(
+    semi_additive_join_node = SemiAdditiveJoinNode.create(
         parent_node=measure_source_node,
         entity_specs=(entity_spec,),
         time_dimension_spec=time_dimension_spec,
@@ -1037,7 +1037,7 @@ def test_constrain_time_range_node(
     measure_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
-    filtered_measure_node = FilterElementsNode(
+    filtered_measure_node = FilterElementsNode.create(
         parent_node=measure_source_node,
         include_specs=InstanceSpecSet(
             measure_specs=(
@@ -1050,12 +1050,12 @@ def test_constrain_time_range_node(
             ),
         ),
     )
-    metric_time_node = MetricTimeDimensionTransformNode(
+    metric_time_node = MetricTimeDimensionTransformNode.create(
         parent_node=filtered_measure_node,
         aggregation_time_dimension_reference=TimeDimensionReference(element_name="ds"),
     )
 
-    constrain_time_node = ConstrainTimeRangeNode(
+    constrain_time_node = ConstrainTimeRangeNode.create(
         parent_node=metric_time_node,
         time_range_constraint=TimeRangeConstraint(
             start_time=as_datetime("2020-01-01"),
@@ -1136,29 +1136,29 @@ def test_combine_output_node(
 
     # Build compute measures node
     measure_specs: List[MeasureSpec] = [sum_spec]
-    filtered_measure_node = FilterElementsNode(
+    filtered_measure_node = FilterElementsNode.create(
         parent_node=measure_source_node,
         include_specs=InstanceSpecSet(measure_specs=tuple(measure_specs), dimension_specs=(dimension_spec,)),
     )
-    aggregated_measure_node = AggregateMeasuresNode(
+    aggregated_measure_node = AggregateMeasuresNode.create(
         parent_node=filtered_measure_node,
         metric_input_measure_specs=tuple(MetricInputMeasureSpec(measure_spec=x) for x in measure_specs),
     )
 
     # Build agg measures node
     measure_specs_2 = [sum_boolean_spec, count_distinct_spec]
-    filtered_measure_node_2 = FilterElementsNode(
+    filtered_measure_node_2 = FilterElementsNode.create(
         parent_node=measure_source_node,
         include_specs=InstanceSpecSet(measure_specs=tuple(measure_specs_2), dimension_specs=(dimension_spec,)),
     )
-    aggregated_measure_node_2 = AggregateMeasuresNode(
+    aggregated_measure_node_2 = AggregateMeasuresNode.create(
         parent_node=filtered_measure_node_2,
         metric_input_measure_specs=tuple(
             MetricInputMeasureSpec(measure_spec=x, fill_nulls_with=1) for x in measure_specs_2
         ),
     )
 
-    combine_output_node = CombineAggregatedOutputsNode([aggregated_measure_node, aggregated_measure_node_2])
+    combine_output_node = CombineAggregatedOutputsNode.create([aggregated_measure_node, aggregated_measure_node_2])
     convert_and_check(
         request=request,
         mf_test_configuration=mf_test_configuration,

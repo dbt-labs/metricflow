@@ -10,6 +10,7 @@ from metricflow.execution.execution_plan import (
     ExecutionPlan,
     SelectSqlQueryToDataTableTask,
     SelectSqlQueryToTableTask,
+    SqlQuery,
 )
 from metricflow.execution.executor import SequentialPlanExecutor
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
@@ -18,7 +19,7 @@ from tests_metricflow.sql.compare_data_table import assert_data_tables_equal
 
 
 def test_read_sql_task(sql_client: SqlClient) -> None:  # noqa: D103
-    task = SelectSqlQueryToDataTableTask(sql_client, "SELECT 1 AS foo", SqlBindParameters())
+    task = SelectSqlQueryToDataTableTask.create(sql_client, SqlQuery("SELECT 1 AS foo", SqlBindParameters()))
     execution_plan = ExecutionPlan(leaf_tasks=[task], dag_id=DagId.from_str("plan0"))
 
     results = SequentialPlanExecutor().execute_plan(execution_plan)
@@ -41,10 +42,12 @@ def test_write_table_task(  # noqa: D103
     mf_test_configuration: MetricFlowTestConfiguration, sql_client: SqlClient
 ) -> None:  # noqa: D103
     output_table = SqlTable(schema_name=mf_test_configuration.mf_system_schema, table_name=f"test_table_{random_id()}")
-    task = SelectSqlQueryToTableTask(
+    task = SelectSqlQueryToTableTask.create(
         sql_client=sql_client,
-        sql_query=f"CREATE TABLE {output_table.sql} AS SELECT 1 AS foo",
-        bind_parameters=SqlBindParameters(),
+        sql_query=SqlQuery(
+            sql_query=f"CREATE TABLE {output_table.sql} AS SELECT 1 AS foo",
+            bind_parameters=SqlBindParameters(),
+        ),
         output_table=output_table,
     )
     execution_plan = ExecutionPlan(leaf_tasks=[task], dag_id=DagId.from_str("plan0"))

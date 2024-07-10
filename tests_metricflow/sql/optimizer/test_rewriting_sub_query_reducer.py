@@ -54,14 +54,14 @@ def base_select_statement() -> SqlSelectStatementNode:
     GROUP BY src2.ds
     ORDER BY src2.ds
     """
-    return SqlSelectStatementNode(
+    return SqlSelectStatementNode.create(
         description="src3",
         select_columns=(
             SqlSelectColumn(
-                expr=SqlAggregateFunctionExpression(
+                expr=SqlAggregateFunctionExpression.create(
                     sql_function=SqlFunction.SUM,
                     sql_function_args=[
-                        SqlColumnReferenceExpression(
+                        SqlColumnReferenceExpression.create(
                             col_ref=SqlColumnReference(table_alias="src2", column_name="bookings")
                         )
                     ],
@@ -69,29 +69,33 @@ def base_select_statement() -> SqlSelectStatementNode:
                 column_alias="bookings",
             ),
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(col_ref=SqlColumnReference(table_alias="src2", column_name="ds")),
+                expr=SqlColumnReferenceExpression.create(
+                    col_ref=SqlColumnReference(table_alias="src2", column_name="ds")
+                ),
                 column_alias="ds",
             ),
         ),
-        from_source=SqlSelectStatementNode(
+        from_source=SqlSelectStatementNode.create(
             description="src2",
             select_columns=(
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(table_alias="src1", column_name="bookings")
                     ),
                     column_alias="bookings",
                 ),
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(col_ref=SqlColumnReference(table_alias="src1", column_name="ds")),
+                    expr=SqlColumnReferenceExpression.create(
+                        col_ref=SqlColumnReference(table_alias="src1", column_name="ds")
+                    ),
                     column_alias="ds",
                 ),
             ),
-            from_source=SqlSelectStatementNode(
+            from_source=SqlSelectStatementNode.create(
                 description="src1",
                 select_columns=(
                     SqlSelectColumn(
-                        expr=SqlColumnReferenceExpression(
+                        expr=SqlColumnReferenceExpression.create(
                             col_ref=SqlColumnReference(
                                 table_alias="src0",
                                 column_name="bookings",
@@ -100,7 +104,7 @@ def base_select_statement() -> SqlSelectStatementNode:
                         column_alias="bookings",
                     ),
                     SqlSelectColumn(
-                        expr=SqlColumnReferenceExpression(
+                        expr=SqlColumnReferenceExpression.create(
                             col_ref=SqlColumnReference(
                                 table_alias="src0",
                                 column_name="ds",
@@ -109,27 +113,29 @@ def base_select_statement() -> SqlSelectStatementNode:
                         column_alias="ds",
                     ),
                 ),
-                from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
+                from_source=SqlTableFromClauseNode.create(
+                    sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")
+                ),
                 from_source_alias="src0",
                 limit=2,
             ),
             from_source_alias="src1",
-            where=SqlComparisonExpression(
-                left_expr=SqlColumnReferenceExpression(
+            where=SqlComparisonExpression.create(
+                left_expr=SqlColumnReferenceExpression.create(
                     SqlColumnReference(
                         table_alias="src1",
                         column_name="ds",
                     )
                 ),
                 comparison=SqlComparison.GREATER_THAN_OR_EQUALS,
-                right_expr=SqlStringLiteralExpression("2020-01-01"),
+                right_expr=SqlStringLiteralExpression.create("2020-01-01"),
             ),
             limit=1,
         ),
         from_source_alias="src2",
         group_bys=(
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     SqlColumnReference(
                         table_alias="src2",
                         column_name="ds",
@@ -138,19 +144,19 @@ def base_select_statement() -> SqlSelectStatementNode:
                 column_alias="ds",
             ),
         ),
-        where=SqlComparisonExpression(
-            left_expr=SqlColumnReferenceExpression(
+        where=SqlComparisonExpression.create(
+            left_expr=SqlColumnReferenceExpression.create(
                 SqlColumnReference(
                     table_alias="src2",
                     column_name="ds",
                 )
             ),
             comparison=SqlComparison.LESS_THAN_OR_EQUALS,
-            right_expr=SqlStringLiteralExpression("2020-01-05"),
+            right_expr=SqlStringLiteralExpression.create("2020-01-05"),
         ),
         order_bys=(
             SqlOrderByDescription(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     SqlColumnReference(
                         table_alias="src2",
                         column_name="ds",
@@ -210,14 +216,14 @@ def join_select_statement() -> SqlSelectStatementNode:
     ON bookings_src.listing = listings_src.listing
     GROUP BY bookings_src.ds
     """
-    return SqlSelectStatementNode(
+    return SqlSelectStatementNode.create(
         description="query",
         select_columns=(
             SqlSelectColumn(
-                expr=SqlAggregateFunctionExpression(
+                expr=SqlAggregateFunctionExpression.create(
                     sql_function=SqlFunction.SUM,
                     sql_function_args=[
-                        SqlColumnReferenceExpression(
+                        SqlColumnReferenceExpression.create(
                             col_ref=SqlColumnReference(table_alias="bookings_src", column_name="bookings")
                         )
                     ],
@@ -225,72 +231,74 @@ def join_select_statement() -> SqlSelectStatementNode:
                 column_alias="bookings",
             ),
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     col_ref=SqlColumnReference(table_alias="listings_src", column_name="country_latest")
                 ),
                 column_alias="listing__country_latest",
             ),
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     col_ref=SqlColumnReference(table_alias="bookings_src", column_name="ds")
                 ),
                 column_alias="ds",
             ),
         ),
-        from_source=SqlSelectStatementNode(
+        from_source=SqlSelectStatementNode.create(
             description="bookings_src",
             select_columns=(
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(table_alias="fct_bookings_src", column_name="booking")
                     ),
                     column_alias="bookings",
                 ),
                 SqlSelectColumn(
-                    expr=SqlStringExpression(sql_expr="1", requires_parenthesis=False, used_columns=()),
+                    expr=SqlStringExpression.create(sql_expr="1", requires_parenthesis=False, used_columns=()),
                     column_alias="ds",
                 ),
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(table_alias="fct_bookings_src", column_name="listing_id")
                     ),
                     column_alias="listing",
                 ),
             ),
-            from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
+            from_source=SqlTableFromClauseNode.create(
+                sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")
+            ),
             from_source_alias="fct_bookings_src",
         ),
         from_source_alias="bookings_src",
-        joins_descs=(
+        join_descs=(
             SqlJoinDescription(
-                right_source=SqlSelectStatementNode(
+                right_source=SqlSelectStatementNode.create(
                     description="listings_src",
                     select_columns=(
                         SqlSelectColumn(
-                            expr=SqlColumnReferenceExpression(
+                            expr=SqlColumnReferenceExpression.create(
                                 col_ref=SqlColumnReference(table_alias="dim_listings_src", column_name="country")
                             ),
                             column_alias="country_latest",
                         ),
                         SqlSelectColumn(
-                            expr=SqlColumnReferenceExpression(
+                            expr=SqlColumnReferenceExpression.create(
                                 col_ref=SqlColumnReference(table_alias="dim_listings_src", column_name="listing_id")
                             ),
                             column_alias="listing",
                         ),
                     ),
-                    from_source=SqlTableFromClauseNode(
+                    from_source=SqlTableFromClauseNode.create(
                         sql_table=SqlTable(schema_name="demo", table_name="dim_listings")
                     ),
                     from_source_alias="dim_listings_src",
                 ),
                 right_source_alias="listings_src",
-                on_condition=SqlComparisonExpression(
-                    left_expr=SqlColumnReferenceExpression(
+                on_condition=SqlComparisonExpression.create(
+                    left_expr=SqlColumnReferenceExpression.create(
                         SqlColumnReference(table_alias="bookings_src", column_name="listing"),
                     ),
                     comparison=SqlComparison.EQUALS,
-                    right_expr=SqlColumnReferenceExpression(
+                    right_expr=SqlColumnReferenceExpression.create(
                         SqlColumnReference(table_alias="listings_src", column_name="listing"),
                     ),
                 ),
@@ -299,7 +307,7 @@ def join_select_statement() -> SqlSelectStatementNode:
         ),
         group_bys=(
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     SqlColumnReference(
                         table_alias="bookings_src",
                         column_name="ds",
@@ -308,15 +316,15 @@ def join_select_statement() -> SqlSelectStatementNode:
                 column_alias="ds",
             ),
         ),
-        where=SqlComparisonExpression(
-            left_expr=SqlColumnReferenceExpression(
+        where=SqlComparisonExpression.create(
+            left_expr=SqlColumnReferenceExpression.create(
                 SqlColumnReference(
                     table_alias="bookings_src",
                     column_name="ds",
                 )
             ),
             comparison=SqlComparison.LESS_THAN_OR_EQUALS,
-            right_expr=SqlStringLiteralExpression("2020-01-05"),
+            right_expr=SqlStringLiteralExpression.create("2020-01-05"),
         ),
     )
 
@@ -369,14 +377,14 @@ def colliding_select_statement() -> SqlSelectStatementNode:
     ON bookings_src.listing = listings_src.listing
     GROUP BY bookings_src.ds
     """
-    return SqlSelectStatementNode(
+    return SqlSelectStatementNode.create(
         description="query",
         select_columns=(
             SqlSelectColumn(
-                expr=SqlAggregateFunctionExpression(
+                expr=SqlAggregateFunctionExpression.create(
                     sql_function=SqlFunction.SUM,
                     sql_function_args=[
-                        SqlColumnReferenceExpression(
+                        SqlColumnReferenceExpression.create(
                             col_ref=SqlColumnReference(table_alias="bookings_src", column_name="bookings")
                         )
                     ],
@@ -384,74 +392,76 @@ def colliding_select_statement() -> SqlSelectStatementNode:
                 column_alias="bookings",
             ),
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     col_ref=SqlColumnReference(table_alias="listings_src", column_name="listing__country_latest")
                 ),
                 column_alias="listing__country_latest",
             ),
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     col_ref=SqlColumnReference(table_alias="bookings_src", column_name="ds")
                 ),
                 column_alias="ds",
             ),
         ),
-        from_source=SqlSelectStatementNode(
+        from_source=SqlSelectStatementNode.create(
             description="bookings_src",
             select_columns=(
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(table_alias="colliding_alias", column_name="booking")
                     ),
                     column_alias="bookings",
                 ),
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(table_alias="colliding_alias", column_name="ds")
                     ),
                     column_alias="ds",
                 ),
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(table_alias="colliding_alias", column_name="listing_id")
                     ),
                     column_alias="listing",
                 ),
             ),
-            from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
+            from_source=SqlTableFromClauseNode.create(
+                sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")
+            ),
             from_source_alias="colliding_alias",
         ),
         from_source_alias="bookings_src",
-        joins_descs=(
+        join_descs=(
             SqlJoinDescription(
-                right_source=SqlSelectStatementNode(
+                right_source=SqlSelectStatementNode.create(
                     description="listings_src",
                     select_columns=(
                         SqlSelectColumn(
-                            expr=SqlColumnReferenceExpression(
+                            expr=SqlColumnReferenceExpression.create(
                                 col_ref=SqlColumnReference(table_alias="colliding_alias", column_name="country")
                             ),
                             column_alias="country_latest",
                         ),
                         SqlSelectColumn(
-                            expr=SqlColumnReferenceExpression(
+                            expr=SqlColumnReferenceExpression.create(
                                 col_ref=SqlColumnReference(table_alias="colliding_alias", column_name="listing_id")
                             ),
                             column_alias="listing",
                         ),
                     ),
-                    from_source=SqlTableFromClauseNode(
+                    from_source=SqlTableFromClauseNode.create(
                         sql_table=SqlTable(schema_name="demo", table_name="dim_listings")
                     ),
                     from_source_alias="colliding_alias",
                 ),
                 right_source_alias="listings_src",
-                on_condition=SqlComparisonExpression(
-                    left_expr=SqlColumnReferenceExpression(
+                on_condition=SqlComparisonExpression.create(
+                    left_expr=SqlColumnReferenceExpression.create(
                         SqlColumnReference(table_alias="bookings_src", column_name="listing"),
                     ),
                     comparison=SqlComparison.EQUALS,
-                    right_expr=SqlColumnReferenceExpression(
+                    right_expr=SqlColumnReferenceExpression.create(
                         SqlColumnReference(table_alias="listings_src", column_name="listing"),
                     ),
                 ),
@@ -460,7 +470,7 @@ def colliding_select_statement() -> SqlSelectStatementNode:
         ),
         group_bys=(
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     SqlColumnReference(
                         table_alias="bookings_src",
                         column_name="ds",
@@ -469,15 +479,15 @@ def colliding_select_statement() -> SqlSelectStatementNode:
                 column_alias="ds",
             ),
         ),
-        where=SqlComparisonExpression(
-            left_expr=SqlColumnReferenceExpression(
+        where=SqlComparisonExpression.create(
+            left_expr=SqlColumnReferenceExpression.create(
                 SqlColumnReference(
                     table_alias="bookings_src",
                     column_name="ds",
                 )
             ),
             comparison=SqlComparison.LESS_THAN_OR_EQUALS,
-            right_expr=SqlStringLiteralExpression("2020-01-05"),
+            right_expr=SqlStringLiteralExpression.create("2020-01-05"),
         ),
     )
 
@@ -538,14 +548,14 @@ def reduce_all_join_select_statement() -> SqlSelectStatementNode:
     ON listing_src1.listing = listings_src2.listing
     GROUP BY bookings_src.ds, listings_src1.country_latest, listings_src2.capacity_latest
     """
-    return SqlSelectStatementNode(
+    return SqlSelectStatementNode.create(
         description="query",
         select_columns=(
             SqlSelectColumn(
-                expr=SqlAggregateFunctionExpression(
+                expr=SqlAggregateFunctionExpression.create(
                     sql_function=SqlFunction.SUM,
                     sql_function_args=[
-                        SqlColumnReferenceExpression(
+                        SqlColumnReferenceExpression.create(
                             col_ref=SqlColumnReference(table_alias="bookings_src", column_name="bookings")
                         )
                     ],
@@ -553,114 +563,116 @@ def reduce_all_join_select_statement() -> SqlSelectStatementNode:
                 column_alias="bookings",
             ),
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     col_ref=SqlColumnReference(table_alias="listings_src1", column_name="country_latest")
                 ),
                 column_alias="listing__country_latest",
             ),
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     col_ref=SqlColumnReference(table_alias="listings_src2", column_name="capacity_latest")
                 ),
                 column_alias="listing__capacity_latest",
             ),
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     col_ref=SqlColumnReference(table_alias="bookings_src", column_name="ds")
                 ),
                 column_alias="ds",
             ),
         ),
-        from_source=SqlSelectStatementNode(
+        from_source=SqlSelectStatementNode.create(
             description="bookings_src",
             select_columns=(
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(table_alias="fct_bookings_src", column_name="booking")
                     ),
                     column_alias="bookings",
                 ),
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(table_alias="fct_bookings_src", column_name="ds")
                     ),
                     column_alias="ds",
                 ),
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(table_alias="fct_bookings_src", column_name="listing_id")
                     ),
                     column_alias="listing",
                 ),
             ),
-            from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
+            from_source=SqlTableFromClauseNode.create(
+                sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")
+            ),
             from_source_alias="fct_bookings_src",
         ),
         from_source_alias="bookings_src",
-        joins_descs=(
+        join_descs=(
             SqlJoinDescription(
-                right_source=SqlSelectStatementNode(
+                right_source=SqlSelectStatementNode.create(
                     description="listings_src1",
                     select_columns=(
                         SqlSelectColumn(
-                            expr=SqlColumnReferenceExpression(
+                            expr=SqlColumnReferenceExpression.create(
                                 col_ref=SqlColumnReference(table_alias="dim_listings_src1", column_name="country")
                             ),
                             column_alias="country_latest",
                         ),
                         SqlSelectColumn(
-                            expr=SqlColumnReferenceExpression(
+                            expr=SqlColumnReferenceExpression.create(
                                 col_ref=SqlColumnReference(table_alias="dim_listings_src1", column_name="listing_id")
                             ),
                             column_alias="listing",
                         ),
                     ),
-                    from_source=SqlTableFromClauseNode(
+                    from_source=SqlTableFromClauseNode.create(
                         sql_table=SqlTable(schema_name="demo", table_name="dim_listings")
                     ),
                     from_source_alias="dim_listings_src1",
                 ),
                 right_source_alias="listings_src1",
-                on_condition=SqlComparisonExpression(
-                    left_expr=SqlColumnReferenceExpression(
+                on_condition=SqlComparisonExpression.create(
+                    left_expr=SqlColumnReferenceExpression.create(
                         SqlColumnReference(table_alias="bookings_src", column_name="listing"),
                     ),
                     comparison=SqlComparison.EQUALS,
-                    right_expr=SqlColumnReferenceExpression(
+                    right_expr=SqlColumnReferenceExpression.create(
                         SqlColumnReference(table_alias="listings_src1", column_name="listing"),
                     ),
                 ),
                 join_type=SqlJoinType.LEFT_OUTER,
             ),
             SqlJoinDescription(
-                right_source=SqlSelectStatementNode(
+                right_source=SqlSelectStatementNode.create(
                     description="listings_src2",
                     select_columns=(
                         SqlSelectColumn(
-                            expr=SqlColumnReferenceExpression(
+                            expr=SqlColumnReferenceExpression.create(
                                 col_ref=SqlColumnReference(table_alias="dim_listings_src2", column_name="capacity")
                             ),
                             column_alias="capacity_latest",
                         ),
                         SqlSelectColumn(
-                            expr=SqlColumnReferenceExpression(
+                            expr=SqlColumnReferenceExpression.create(
                                 col_ref=SqlColumnReference(table_alias="dim_listings_src2", column_name="listing_id")
                             ),
                             column_alias="listing",
                         ),
                     ),
-                    from_source=SqlTableFromClauseNode(
+                    from_source=SqlTableFromClauseNode.create(
                         sql_table=SqlTable(schema_name="demo", table_name="dim_listings")
                     ),
                     from_source_alias="dim_listings_src2",
                 ),
                 right_source_alias="listings_src2",
-                on_condition=SqlComparisonExpression(
-                    left_expr=SqlColumnReferenceExpression(
+                on_condition=SqlComparisonExpression.create(
+                    left_expr=SqlColumnReferenceExpression.create(
                         SqlColumnReference(table_alias="listings_src1", column_name="listing"),
                     ),
                     comparison=SqlComparison.EQUALS,
-                    right_expr=SqlColumnReferenceExpression(
+                    right_expr=SqlColumnReferenceExpression.create(
                         SqlColumnReference(table_alias="listings_src2", column_name="listing"),
                     ),
                 ),
@@ -669,7 +681,7 @@ def reduce_all_join_select_statement() -> SqlSelectStatementNode:
         ),
         group_bys=(
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     SqlColumnReference(
                         table_alias="bookings_src",
                         column_name="ds",
@@ -678,7 +690,7 @@ def reduce_all_join_select_statement() -> SqlSelectStatementNode:
                 column_alias="ds",
             ),
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     SqlColumnReference(
                         table_alias="listings_src1",
                         column_name="country_latest",
@@ -687,7 +699,7 @@ def reduce_all_join_select_statement() -> SqlSelectStatementNode:
                 column_alias="listing__country_latest",
             ),
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     SqlColumnReference(
                         table_alias="listings_src2",
                         column_name="capacity_latest",
@@ -748,30 +760,30 @@ def reducing_join_statement() -> SqlSelectStatementNode:
       FROM demo.fct_listings src4
     ) src3
     """
-    return SqlSelectStatementNode(
+    return SqlSelectStatementNode.create(
         description="query",
         select_columns=(
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     col_ref=SqlColumnReference(table_alias="src2", column_name="bookings")
                 ),
                 column_alias="bookings",
             ),
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     col_ref=SqlColumnReference(table_alias="src3", column_name="listings")
                 ),
                 column_alias="listings",
             ),
         ),
-        from_source=SqlSelectStatementNode(
+        from_source=SqlSelectStatementNode.create(
             description="src2",
             select_columns=(
                 SqlSelectColumn(
-                    expr=SqlAggregateFunctionExpression(
+                    expr=SqlAggregateFunctionExpression.create(
                         sql_function=SqlFunction.SUM,
                         sql_function_args=[
-                            SqlColumnReferenceExpression(
+                            SqlColumnReferenceExpression.create(
                                 col_ref=SqlColumnReference(table_alias="src1", column_name="bookings")
                             )
                         ],
@@ -779,30 +791,32 @@ def reducing_join_statement() -> SqlSelectStatementNode:
                     column_alias="bookings",
                 ),
             ),
-            from_source=SqlSelectStatementNode(
+            from_source=SqlSelectStatementNode.create(
                 description="src1",
                 select_columns=(
                     SqlSelectColumn(
-                        expr=SqlStringExpression(sql_expr="1", requires_parenthesis=False, used_columns=()),
+                        expr=SqlStringExpression.create(sql_expr="1", requires_parenthesis=False, used_columns=()),
                         column_alias="bookings",
                     ),
                 ),
-                from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
+                from_source=SqlTableFromClauseNode.create(
+                    sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")
+                ),
                 from_source_alias="src0",
             ),
             from_source_alias="src1",
         ),
         from_source_alias="src2",
-        joins_descs=(
+        join_descs=(
             SqlJoinDescription(
-                right_source=SqlSelectStatementNode(
+                right_source=SqlSelectStatementNode.create(
                     description="src4",
                     select_columns=(
                         SqlSelectColumn(
-                            expr=SqlAggregateFunctionExpression(
+                            expr=SqlAggregateFunctionExpression.create(
                                 sql_function=SqlFunction.SUM,
                                 sql_function_args=[
-                                    SqlColumnReferenceExpression(
+                                    SqlColumnReferenceExpression.create(
                                         col_ref=SqlColumnReference(table_alias="src4", column_name="listings")
                                     )
                                 ],
@@ -810,7 +824,7 @@ def reducing_join_statement() -> SqlSelectStatementNode:
                             column_alias="listings",
                         ),
                     ),
-                    from_source=SqlTableFromClauseNode(
+                    from_source=SqlTableFromClauseNode.create(
                         sql_table=SqlTable(schema_name="demo", table_name="fct_listings")
                     ),
                     from_source_alias="src4",
@@ -872,30 +886,30 @@ def reducing_join_left_node_statement() -> SqlSelectStatementNode:
       FROM demo.fct_listings src4
     ) src3
     """
-    return SqlSelectStatementNode(
+    return SqlSelectStatementNode.create(
         description="query",
         select_columns=(
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     col_ref=SqlColumnReference(table_alias="src2", column_name="bookings")
                 ),
                 column_alias="bookings",
             ),
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     col_ref=SqlColumnReference(table_alias="src3", column_name="listings")
                 ),
                 column_alias="listings",
             ),
         ),
-        from_source=SqlSelectStatementNode(
+        from_source=SqlSelectStatementNode.create(
             description="src4",
             select_columns=(
                 SqlSelectColumn(
-                    expr=SqlAggregateFunctionExpression(
+                    expr=SqlAggregateFunctionExpression.create(
                         sql_function=SqlFunction.SUM,
                         sql_function_args=[
-                            SqlColumnReferenceExpression(
+                            SqlColumnReferenceExpression.create(
                                 col_ref=SqlColumnReference(table_alias="src4", column_name="listings")
                             )
                         ],
@@ -903,20 +917,22 @@ def reducing_join_left_node_statement() -> SqlSelectStatementNode:
                     column_alias="listings",
                 ),
             ),
-            from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="fct_listings")),
+            from_source=SqlTableFromClauseNode.create(
+                sql_table=SqlTable(schema_name="demo", table_name="fct_listings")
+            ),
             from_source_alias="src4",
         ),
         from_source_alias="src2",
-        joins_descs=(
+        join_descs=(
             SqlJoinDescription(
-                right_source=SqlSelectStatementNode(
+                right_source=SqlSelectStatementNode.create(
                     description="src2",
                     select_columns=(
                         SqlSelectColumn(
-                            expr=SqlAggregateFunctionExpression(
+                            expr=SqlAggregateFunctionExpression.create(
                                 sql_function=SqlFunction.SUM,
                                 sql_function_args=[
-                                    SqlColumnReferenceExpression(
+                                    SqlColumnReferenceExpression.create(
                                         col_ref=SqlColumnReference(table_alias="src1", column_name="bookings")
                                     )
                                 ],
@@ -924,15 +940,17 @@ def reducing_join_left_node_statement() -> SqlSelectStatementNode:
                             column_alias="bookings",
                         ),
                     ),
-                    from_source=SqlSelectStatementNode(
+                    from_source=SqlSelectStatementNode.create(
                         description="src1",
                         select_columns=(
                             SqlSelectColumn(
-                                expr=SqlStringExpression(sql_expr="1", requires_parenthesis=False, used_columns=()),
+                                expr=SqlStringExpression.create(
+                                    sql_expr="1", requires_parenthesis=False, used_columns=()
+                                ),
                                 column_alias="bookings",
                             ),
                         ),
-                        from_source=SqlTableFromClauseNode(
+                        from_source=SqlTableFromClauseNode.create(
                             sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")
                         ),
                         from_source_alias="src0",
@@ -975,33 +993,35 @@ def test_rewriting_distinct_select_node_is_not_reduced(
     mf_test_configuration: MetricFlowTestConfiguration,
 ) -> None:
     """Tests to ensure distinct select node doesn't get overwritten."""
-    select_node = SqlSelectStatementNode(
+    select_node = SqlSelectStatementNode.create(
         description="test0",
         select_columns=(
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     col_ref=SqlColumnReference(table_alias="a", column_name="booking_value")
                 ),
                 column_alias="booking_value",
             ),
         ),
-        from_source=SqlSelectStatementNode(
+        from_source=SqlSelectStatementNode.create(
             description="test1",
             select_columns=(
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(table_alias="a", column_name="booking_value")
                     ),
                     column_alias="booking_value",
                 ),
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(table_alias="a", column_name="bookings")
                     ),
                     column_alias="bookings",
                 ),
             ),
-            from_source=SqlTableFromClauseNode(sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")),
+            from_source=SqlTableFromClauseNode.create(
+                sql_table=SqlTable(schema_name="demo", table_name="fct_bookings")
+            ),
             from_source_alias="a",
             distinct=True,
         ),

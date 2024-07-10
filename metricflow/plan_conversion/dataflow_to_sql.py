@@ -150,17 +150,17 @@ def _make_time_range_comparison_expr(
 ) -> SqlExpressionNode:
     """Build an expression like "ds BETWEEN CAST('2020-01-01' AS TIMESTAMP) AND CAST('2020-01-02' AS TIMESTAMP)."""
     # TODO: Update when adding < day granularity support.
-    return SqlBetweenExpression(
-        column_arg=SqlColumnReferenceExpression(
+    return SqlBetweenExpression.create(
+        column_arg=SqlColumnReferenceExpression.create(
             SqlColumnReference(
                 table_alias=table_alias,
                 column_name=column_alias,
             )
         ),
-        start_expr=SqlStringLiteralExpression(
+        start_expr=SqlStringLiteralExpression.create(
             literal_value=time_range_constraint.start_time.strftime(ISO8601_PYTHON_FORMAT),
         ),
-        end_expr=SqlStringLiteralExpression(
+        end_expr=SqlStringLiteralExpression.create(
             literal_value=time_range_constraint.end_time.strftime(ISO8601_PYTHON_FORMAT),
         ),
     )
@@ -254,7 +254,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             else:
                 select_columns += (
                     SqlSelectColumn(
-                        expr=SqlDateTruncExpression(
+                        expr=SqlDateTruncExpression.create(
                             time_granularity=agg_time_dimension_instance.spec.time_granularity, arg=column_expr
                         ),
                         column_alias=column_alias,
@@ -264,10 +264,10 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
         return SqlDataSet(
             instance_set=time_spine_instance_set,
-            sql_select_node=SqlSelectStatementNode(
+            sql_select_node=SqlSelectStatementNode.create(
                 description=TIME_SPINE_DATA_SET_DESCRIPTION,
                 select_columns=select_columns,
-                from_source=SqlTableFromClauseNode(sql_table=time_spine_source.spine_table),
+                from_source=SqlTableFromClauseNode.create(sql_table=time_spine_source.spine_table),
                 from_source_alias=time_spine_table_alias,
                 group_bys=select_columns if apply_group_by else (),
                 where=(
@@ -353,14 +353,14 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         )
         return SqlDataSet(
             instance_set=output_instance_set,
-            sql_select_node=SqlSelectStatementNode(
+            sql_select_node=SqlSelectStatementNode.create(
                 description=node.description,
                 select_columns=create_select_columns_for_instance_sets(
                     self._column_association_resolver, table_alias_to_instance_set
                 ),
                 from_source=time_spine_data_set.checked_sql_select_node,
                 from_source_alias=time_spine_data_set_alias,
-                joins_descs=(join_desc,),
+                join_descs=(join_desc,),
             ),
         )
 
@@ -443,14 +443,14 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         # clauses.
         return SqlDataSet(
             instance_set=InstanceSet.merge(list(table_alias_to_instance_set.values())),
-            sql_select_node=SqlSelectStatementNode(
+            sql_select_node=SqlSelectStatementNode.create(
                 description=node.description,
                 select_columns=create_select_columns_for_instance_sets(
                     self._column_association_resolver, table_alias_to_instance_set
                 ),
                 from_source=from_data_set.checked_sql_select_node,
                 from_source_alias=from_data_set_alias,
-                joins_descs=tuple(sql_join_descs),
+                join_descs=tuple(sql_join_descs),
             ),
         )
 
@@ -518,7 +518,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
         return SqlDataSet(
             instance_set=aggregated_instance_set,
-            sql_select_node=SqlSelectStatementNode(
+            sql_select_node=SqlSelectStatementNode.create(
                 description=node.description,
                 # This will generate expressions with the appropriate aggregation functions e.g. SUM()
                 select_columns=select_column_set.as_tuple(),
@@ -576,14 +576,14 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                     MetricSpec.from_reference(denominator.post_aggregation_reference)
                 ).column_name
 
-                metric_expr = SqlRatioComputationExpression(
-                    numerator=SqlColumnReferenceExpression(
+                metric_expr = SqlRatioComputationExpression.create(
+                    numerator=SqlColumnReferenceExpression.create(
                         SqlColumnReference(
                             table_alias=from_data_set_alias,
                             column_name=numerator_column_name,
                         )
                     ),
-                    denominator=SqlColumnReferenceExpression(
+                    denominator=SqlColumnReferenceExpression.create(
                         SqlColumnReference(
                             table_alias=from_data_set_alias,
                             column_name=denominator_column_name,
@@ -619,7 +619,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 assert (
                     metric.type_params.expr
                 ), "Derived metrics are required to have an `expr` in their YAML definition."
-                metric_expr = SqlStringExpression(sql_expr=metric.type_params.expr)
+                metric_expr = SqlStringExpression.create(sql_expr=metric.type_params.expr)
             elif metric.type == MetricType.CONVERSION:
                 conversion_type_params = metric.type_params.conversion_type_params
                 assert (
@@ -635,20 +635,20 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 ).column_name
 
                 calculation_type = conversion_type_params.calculation
-                conversion_column_reference = SqlColumnReferenceExpression(
+                conversion_column_reference = SqlColumnReferenceExpression.create(
                     SqlColumnReference(
                         table_alias=from_data_set_alias,
                         column_name=conversion_measure_column,
                     )
                 )
-                base_column_reference = SqlColumnReferenceExpression(
+                base_column_reference = SqlColumnReferenceExpression.create(
                     SqlColumnReference(
                         table_alias=from_data_set_alias,
                         column_name=base_measure_column,
                     )
                 )
                 if calculation_type == ConversionCalculationType.CONVERSION_RATE:
-                    metric_expr = SqlRatioComputationExpression(
+                    metric_expr = SqlRatioComputationExpression.create(
                         numerator=conversion_column_reference,
                         denominator=base_column_reference,
                     )
@@ -699,7 +699,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
         return SqlDataSet(
             instance_set=output_instance_set,
-            sql_select_node=SqlSelectStatementNode(
+            sql_select_node=SqlSelectStatementNode.create(
                 description=node.description,
                 select_columns=combined_select_column_set.as_tuple(),
                 from_source=from_data_set.checked_sql_select_node,
@@ -711,14 +711,14 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         self, column_name: str, input_measure: Optional[MetricInputMeasure], from_data_set_alias: str
     ) -> SqlExpressionNode:
         # Use a column reference to improve query optimization.
-        metric_expr: SqlExpressionNode = SqlColumnReferenceExpression(
+        metric_expr: SqlExpressionNode = SqlColumnReferenceExpression.create(
             SqlColumnReference(table_alias=from_data_set_alias, column_name=column_name)
         )
         # Coalesce nulls to requested integer value, if requested.
         if input_measure and input_measure.fill_nulls_with is not None:
-            metric_expr = SqlAggregateFunctionExpression(
+            metric_expr = SqlAggregateFunctionExpression.create(
                 sql_function=SqlFunction.COALESCE,
-                sql_function_args=[metric_expr, SqlStringExpression(str(input_measure.fill_nulls_with))],
+                sql_function_args=[metric_expr, SqlStringExpression.create(str(input_measure.fill_nulls_with))],
             )
         return metric_expr
 
@@ -734,7 +734,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         for order_by_spec in node.order_by_specs:
             order_by_descriptions.append(
                 SqlOrderByDescription(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         col_ref=SqlColumnReference(
                             table_alias=from_data_set_alias,
                             column_name=self._column_association_resolver.resolve_spec(
@@ -748,7 +748,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
         return SqlDataSet(
             instance_set=output_instance_set,
-            sql_select_node=SqlSelectStatementNode(
+            sql_select_node=SqlSelectStatementNode.create(
                 description=node.description,
                 # This creates select expressions for all columns referenced in the instance set.
                 select_columns=output_instance_set.transform(
@@ -770,7 +770,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         input_instance_set: InstanceSet = input_data_set.instance_set
         return SqlDataSet(
             instance_set=input_instance_set,
-            sql_node=SqlCreateTableAsNode(
+            sql_node=SqlCreateTableAsNode.create(
                 sql_table=node.output_sql_table,
                 parent_node=input_data_set.checked_sql_select_node,
             ),
@@ -794,7 +794,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         group_bys = select_columns if node.distinct else ()
         return SqlDataSet(
             instance_set=output_instance_set,
-            sql_select_node=SqlSelectStatementNode(
+            sql_select_node=SqlSelectStatementNode.create(
                 description=node.description,
                 select_columns=select_columns,
                 from_source=from_data_set.checked_sql_select_node,
@@ -819,7 +819,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
         return SqlDataSet(
             instance_set=output_instance_set,
-            sql_select_node=SqlSelectStatementNode(
+            sql_select_node=SqlSelectStatementNode.create(
                 description=node.description,
                 # This creates select expressions for all columns referenced in the instance set.
                 select_columns=output_instance_set.transform(
@@ -827,7 +827,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 ).as_tuple(),
                 from_source=parent_data_set.checked_sql_select_node,
                 from_source_alias=from_data_set_alias,
-                where=SqlStringExpression(
+                where=SqlStringExpression.create(
                     sql_expr=node.where.where_sql,
                     used_columns=tuple(
                         column_association.column_name for column_association in column_associations_in_where_sql
@@ -940,12 +940,12 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
         return SqlDataSet(
             instance_set=output_instance_set,
-            sql_select_node=SqlSelectStatementNode(
+            sql_select_node=SqlSelectStatementNode.create(
                 description=node.description,
                 select_columns=combined_select_column_set.as_tuple(),
                 from_source=from_data_set.data_set.checked_sql_select_node,
                 from_source_alias=from_data_set.alias,
-                joins_descs=tuple(joins_descriptions),
+                join_descs=tuple(joins_descriptions),
                 group_bys=linkable_select_column_set.as_tuple(),
             ),
         )
@@ -987,7 +987,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
         return SqlDataSet(
             instance_set=output_instance_set,
-            sql_select_node=SqlSelectStatementNode(
+            sql_select_node=SqlSelectStatementNode.create(
                 description=node.description,
                 # This creates select expressions for all columns referenced in the instance set.
                 select_columns=output_instance_set.transform(
@@ -1073,7 +1073,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
         return SqlDataSet(
             instance_set=output_instance_set,
-            sql_select_node=SqlSelectStatementNode(
+            sql_select_node=SqlSelectStatementNode.create(
                 description=node.description,
                 # This creates select expressions for all columns referenced in the instance set.
                 select_columns=CreateSelectColumnsForInstances(
@@ -1116,7 +1116,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         time_dimension_select_column = SqlSelectColumn(
             expr=SqlFunctionExpression.build_expression_from_aggregation_type(
                 aggregation_type=node.agg_by_function,
-                sql_column_expression=SqlColumnReferenceExpression(
+                sql_column_expression=SqlColumnReferenceExpression.create(
                     SqlColumnReference(
                         table_alias=inner_join_data_set_alias,
                         column_name=time_dimension_column_name,
@@ -1138,7 +1138,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             entity_column_name = self.column_association_resolver.resolve_spec(entity_spec).column_name
             entity_select_columns.append(
                 SqlSelectColumn(
-                    expr=SqlColumnReferenceExpression(
+                    expr=SqlColumnReferenceExpression.create(
                         SqlColumnReference(
                             table_alias=inner_join_data_set_alias,
                             column_name=entity_column_name,
@@ -1161,7 +1161,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 node.queried_time_dimension_spec
             ).column_name
             queried_time_dimension_select_column = SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     SqlColumnReference(
                         table_alias=inner_join_data_set_alias,
                         column_name=query_time_dimension_column_name,
@@ -1174,7 +1174,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         if queried_time_dimension_select_column:
             row_filter_group_bys += (queried_time_dimension_select_column,)
         # Construct SelectNode for Row filtering
-        row_filter_sql_select_node = SqlSelectStatementNode(
+        row_filter_sql_select_node = SqlSelectStatementNode.create(
             description=f"Filter row on {node.agg_by_function.name}({time_dimension_column_name})",
             select_columns=row_filter_group_bys + (time_dimension_select_column,),
             from_source=from_data_set.checked_sql_select_node,
@@ -1192,14 +1192,14 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         )
         return SqlDataSet(
             instance_set=output_instance_set,
-            sql_select_node=SqlSelectStatementNode(
+            sql_select_node=SqlSelectStatementNode.create(
                 description=node.description,
                 select_columns=output_instance_set.transform(
                     CreateSelectColumnsForInstances(from_data_set_alias, self._column_association_resolver)
                 ).as_tuple(),
                 from_source=from_data_set.checked_sql_select_node,
                 from_source_alias=from_data_set_alias,
-                joins_descs=(sql_join_desc,),
+                join_descs=(sql_join_desc,),
             ),
         )
 
@@ -1292,7 +1292,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         original_time_spine_dim_instance = time_spine_dataset.instance_set.time_dimension_instances[0]
         time_spine_column_select_expr: Union[
             SqlColumnReferenceExpression, SqlDateTruncExpression
-        ] = SqlColumnReferenceExpression(
+        ] = SqlColumnReferenceExpression.create(
             SqlColumnReference(
                 table_alias=time_spine_alias, column_name=original_time_spine_dim_instance.spec.qualified_name
             )
@@ -1329,25 +1329,25 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             select_expr: SqlExpressionNode = (
                 time_spine_column_select_expr
                 if time_dimension_spec.time_granularity == original_time_spine_dim_instance.spec.time_granularity
-                else SqlDateTruncExpression(
+                else SqlDateTruncExpression.create(
                     time_granularity=time_dimension_spec.time_granularity, arg=time_spine_column_select_expr
                 )
             )
             # Filter down to one row per granularity period requested in the group by. Any other granularities
             # included here will be filtered out in later nodes so should not be included in where filter.
             if need_where_filter and time_dimension_spec in node.requested_agg_time_dimension_specs:
-                new_where_filter = SqlComparisonExpression(
+                new_where_filter = SqlComparisonExpression.create(
                     left_expr=select_expr, comparison=SqlComparison.EQUALS, right_expr=time_spine_column_select_expr
                 )
                 where_filter = (
-                    SqlLogicalExpression(operator=SqlLogicalOperator.OR, args=(where_filter, new_where_filter))
+                    SqlLogicalExpression.create(operator=SqlLogicalOperator.OR, args=(where_filter, new_where_filter))
                     if where_filter
                     else new_where_filter
                 )
 
             # Apply date_part to time spine column select expression.
             if time_dimension_spec.date_part:
-                select_expr = SqlExtractExpression(date_part=time_dimension_spec.date_part, arg=select_expr)
+                select_expr = SqlExtractExpression.create(date_part=time_dimension_spec.date_part, arg=select_expr)
             time_dim_spec = TimeDimensionSpec(
                 element_name=original_time_spine_dim_instance.spec.element_name,
                 entity_links=original_time_spine_dim_instance.spec.entity_links,
@@ -1368,12 +1368,12 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
         return SqlDataSet(
             instance_set=InstanceSet.merge([time_spine_instance_set, parent_instance_set]),
-            sql_select_node=SqlSelectStatementNode(
+            sql_select_node=SqlSelectStatementNode.create(
                 description=node.description,
                 select_columns=tuple(time_spine_select_columns) + parent_select_columns,
                 from_source=time_spine_dataset.checked_sql_select_node,
                 from_source_alias=time_spine_alias,
-                joins_descs=(join_description,),
+                join_descs=(join_description,),
                 where=where_filter,
             ),
         )
@@ -1395,7 +1395,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 SqlSelectColumn(
                     expr=SqlFunctionExpression.build_expression_from_aggregation_type(
                         aggregation_type=agg_type,
-                        sql_column_expression=SqlColumnReferenceExpression(
+                        sql_column_expression=SqlColumnReferenceExpression.create(
                             SqlColumnReference(table_alias=parent_table_alias, column_name=parent_column_alias)
                         ),
                     ),
@@ -1408,7 +1408,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
 
         return SqlDataSet(
             instance_set=parent_data_set.instance_set.transform(ConvertToMetadata(metadata_instances)),
-            sql_select_node=SqlSelectStatementNode(
+            sql_select_node=SqlSelectStatementNode.create(
                 description=node.description,
                 select_columns=tuple(select_columns),
                 from_source=parent_data_set.checked_sql_select_node,
@@ -1438,12 +1438,12 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             )
         )
         gen_uuid_sql_select_column = SqlSelectColumn(
-            expr=SqlGenerateUuidExpression(), column_alias=output_column_association.column_name
+            expr=SqlGenerateUuidExpression.create(), column_alias=output_column_association.column_name
         )
 
         return SqlDataSet(
             instance_set=output_instance_set,
-            sql_select_node=SqlSelectStatementNode(
+            sql_select_node=SqlSelectStatementNode.create(
                 description="Add column with generated UUID",
                 select_columns=input_data_set.instance_set.transform(
                     CreateSelectColumnsForInstances(input_data_set_alias, self._column_association_resolver)
@@ -1531,10 +1531,10 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
             )
         base_sql_select_columns = tuple(
             SqlSelectColumn(
-                expr=SqlWindowFunctionExpression(
+                expr=SqlWindowFunctionExpression.create(
                     sql_function=SqlWindowFunction.FIRST_VALUE,
                     sql_function_args=[
-                        SqlColumnReferenceExpression(
+                        SqlColumnReferenceExpression.create(
                             SqlColumnReference(
                                 table_alias=base_data_set_alias,
                                 column_name=base_sql_column_reference.col_ref.column_name,
@@ -1542,7 +1542,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                         )
                     ],
                     partition_by_args=[
-                        SqlColumnReferenceExpression(
+                        SqlColumnReferenceExpression.create(
                             SqlColumnReference(
                                 table_alias=conversion_data_set_alias,
                                 column_name=column,
@@ -1552,7 +1552,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                     ],
                     order_by_args=[
                         SqlWindowOrderByArgument(
-                            expr=SqlColumnReferenceExpression(
+                            expr=SqlColumnReferenceExpression.create(
                                 SqlColumnReference(
                                     table_alias=base_data_set_alias,
                                     column_name=base_time_dimension_column_name,
@@ -1574,7 +1574,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         # Deduplicate the fanout results
         conversion_unique_key_select_columns = tuple(
             SqlSelectColumn(
-                expr=SqlColumnReferenceExpression(
+                expr=SqlColumnReferenceExpression.create(
                     SqlColumnReference(
                         table_alias=conversion_data_set_alias,
                         column_name=column_name,
@@ -1587,14 +1587,14 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         additional_conversion_select_columns = conversion_data_set_output_instance_set.transform(
             CreateSelectColumnsForInstances(conversion_data_set_alias, self._column_association_resolver)
         ).as_tuple()
-        deduped_sql_select_node = SqlSelectStatementNode(
+        deduped_sql_select_node = SqlSelectStatementNode.create(
             description=f"Dedupe the fanout with {','.join(spec.qualified_name for spec in node.unique_identifier_keys)} in the conversion data set",
             select_columns=base_sql_select_columns
             + conversion_unique_key_select_columns
             + additional_conversion_select_columns,
             from_source=base_data_set.checked_sql_select_node,
             from_source_alias=base_data_set_alias,
-            joins_descs=(sql_join_description,),
+            join_descs=(sql_join_description,),
             distinct=True,
         )
 
@@ -1605,7 +1605,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         )
         return SqlDataSet(
             instance_set=output_instance_set,
-            sql_select_node=SqlSelectStatementNode(
+            sql_select_node=SqlSelectStatementNode.create(
                 description=node.description,
                 select_columns=output_instance_set.transform(
                     CreateSelectColumnsForInstances(output_data_set_alias, self._column_association_resolver)
@@ -1655,7 +1655,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
                 )
             )
         metric_select_column = SqlSelectColumn(
-            expr=SqlWindowFunctionExpression(
+            expr=SqlWindowFunctionExpression.create(
                 sql_function=sql_window_function,
                 sql_function_args=[
                     SqlColumnReferenceExpression.from_table_and_column_names(
@@ -1687,7 +1687,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         ).as_tuple() + (
             metric_select_column,
         )
-        subquery = SqlSelectStatementNode(
+        subquery = SqlSelectStatementNode.create(
             description="Window Function for Metric Re-aggregation",
             select_columns=subquery_select_columns,
             from_source=from_data_set.checked_sql_select_node,
@@ -1700,7 +1700,7 @@ class DataflowToSqlQueryPlanConverter(DataflowPlanNodeVisitor[SqlDataSet]):
         ).as_tuple()
         return SqlDataSet(
             instance_set=output_instance_set,
-            sql_select_node=SqlSelectStatementNode(
+            sql_select_node=SqlSelectStatementNode.create(
                 description="Re-aggregate Metric via Group By",
                 select_columns=outer_query_select_columns,
                 from_source=subquery,

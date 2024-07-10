@@ -379,7 +379,9 @@ class PreJoinNodeProcessor:
                         break
                 if constrain_time:
                     processed_nodes.append(
-                        ConstrainTimeRangeNode(parent_node=source_node, time_range_constraint=time_range_constraint)
+                        ConstrainTimeRangeNode.create(
+                            parent_node=source_node, time_range_constraint=time_range_constraint
+                        )
                     )
                 else:
                     processed_nodes.append(source_node)
@@ -421,7 +423,7 @@ class PreJoinNodeProcessor:
                     filtered_nodes.append(source_node)
                 else:
                     filtered_nodes.append(
-                        WhereConstraintNode(parent_node=source_node, where_specs=matching_filter_specs)
+                        WhereConstraintNode.create(parent_node=source_node, where_specs=matching_filter_specs)
                     )
             else:
                 filtered_nodes.append(source_node)
@@ -531,7 +533,7 @@ class PreJoinNodeProcessor:
 
                 # filter measures out of joinable_node
                 specs = data_set_of_second_node_that_can_be_joined.instance_set.spec_set
-                filtered_joinable_node = FilterElementsNode(
+                filtered_joinable_node = FilterElementsNode.create(
                     parent_node=second_node_that_could_be_joined,
                     include_specs=group_specs_by_type(
                         specs.dimension_specs
@@ -552,7 +554,7 @@ class PreJoinNodeProcessor:
 
                 multi_hop_join_candidates.append(
                     MultiHopJoinCandidate(
-                        node_with_multi_hop_elements=JoinOnEntitiesNode(
+                        node_with_multi_hop_elements=JoinOnEntitiesNode.create(
                             left_node=first_node_that_could_be_joined,
                             join_targets=[
                                 JoinDescription(

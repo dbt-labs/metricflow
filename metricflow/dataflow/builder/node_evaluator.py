@@ -122,7 +122,7 @@ class JoinLinkableInstancesRecipe:
             ]
         )
 
-        filtered_node_to_join = FilterElementsNode(
+        filtered_node_to_join = FilterElementsNode.create(
             parent_node=self.node_to_join, include_specs=group_specs_by_type(include_specs)
         )
 

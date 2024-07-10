@@ -27,7 +27,7 @@ from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixt
 
 def make_dataflow_plan(node: DataflowPlanNode) -> DataflowPlan:  # noqa: D103
     return DataflowPlan(
-        sink_nodes=[WriteToResultDataTableNode(node)],
+        sink_nodes=[WriteToResultDataTableNode.create(node)],
         plan_id=DagId.from_id_prefix(StaticIdPrefix.OPTIMIZED_DATAFLOW_PLAN_PREFIX),
     )
 
@@ -69,11 +69,11 @@ def test_filter_combination(
 ) -> None:
     """Tests combining a single node."""
     source0 = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping["bookings_source"]
-    filter0 = FilterElementsNode(
+    filter0 = FilterElementsNode.create(
         parent_node=source0, include_specs=InstanceSpecSet(measure_specs=(MeasureSpec(element_name="bookings"),))
     )
     source1 = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping["bookings_source"]
-    filter1 = FilterElementsNode(
+    filter1 = FilterElementsNode.create(
         parent_node=source1,
         include_specs=InstanceSpecSet(
             measure_specs=(MeasureSpec(element_name="booking_value"),),
