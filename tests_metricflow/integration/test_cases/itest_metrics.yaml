@@ -1140,7 +1140,7 @@ integration_test:
   description: Test a simple query that joins to time spine and fills nulls
   model: SIMPLE_MODEL
   metrics: ["bookings_fill_nulls_with_0"]
-  group_by_objs: [{"name": "metric_time"}]
+  group_by_objs: [{"name": "metric_time", "grain": "day"}]
   check_query: |
     SELECT
       subq_5.ds AS metric_time__day
@@ -1340,7 +1340,7 @@ integration_test:
   description: Test a multi-metric query that fills nulls
   model: SIMPLE_MODEL
   metrics: ["bookings_fill_nulls_with_0", "views"]
-  group_by_objs: [{"name": "metric_time"}]
+  group_by_objs: [{"name": "metric_time", "grain": "day"}]
   check_query: |
     SELECT
       COALESCE(subq_7.metric_time__day, subq_12.metric_time__day) AS metric_time__day

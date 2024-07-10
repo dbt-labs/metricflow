@@ -201,7 +201,7 @@ def test_join_to_time_spine_with_filters(  # noqa: D103
         metric_names=("bookings_fill_nulls_with_0",),
         group_by_names=("metric_time__day",),
         where_constraint=PydanticWhereFilter(
-            where_sql_template="{{ TimeDimension('metric_time') }} > '2020-01-01'",
+            where_sql_template="{{ TimeDimension('metric_time', 'day') }} > '2020-01-01'",
         ),
         time_constraint_start=datetime.datetime(2020, 1, 3),
         time_constraint_end=datetime.datetime(2020, 1, 5),

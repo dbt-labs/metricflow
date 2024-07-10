@@ -22,8 +22,8 @@ def test_simple_fill_nulls_with_0_metric_time(  # noqa: D103
     query_result = it_helpers.mf_engine.query(
         MetricFlowQueryRequest.create_with_random_request_id(
             metric_names=["bookings_fill_nulls_with_0"],
-            group_by_names=["metric_time"],
-            order_by_names=["metric_time"],
+            group_by_names=["metric_time__day"],
+            order_by_names=["metric_time__day"],
             time_constraint_start=datetime.datetime(2019, 11, 27),
             time_constraint_end=datetime.datetime(2020, 1, 5),
         )
@@ -103,8 +103,8 @@ def test_fill_nulls_with_0_multi_metric_query(  # noqa: D103
     query_result = it_helpers.mf_engine.query(
         MetricFlowQueryRequest.create_with_random_request_id(
             metric_names=["bookings_fill_nulls_with_0", "views"],
-            group_by_names=["metric_time"],
-            order_by_names=["metric_time"],
+            group_by_names=["metric_time__day"],
+            order_by_names=["metric_time__day"],
             time_constraint_start=datetime.datetime(2019, 11, 27),
             time_constraint_end=datetime.datetime(2020, 1, 5),
         )
